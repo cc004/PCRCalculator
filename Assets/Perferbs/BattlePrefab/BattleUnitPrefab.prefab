@@ -1,0 +1,150 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7111783237254764026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 121544175500778420}
+  - component: {fileID: 7959323437094776911}
+  - component: {fileID: 1682080198927084066}
+  m_Layer: 0
+  m_Name: BattleUnitPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &121544175500778420
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7111783237254764026}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7959323437094776911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7111783237254764026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7627246d4e9f10747b896d9ca56f464e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AttackDetail:
+    Visible: 0
+    ExecTimeForPrefab: []
+    ExecTimeCombo: []
+    ActionId: 0
+    ActionEffectList: []
+  UseDefaultDelay: 1
+  Attack:
+    IsPrincessForm: 0
+    PrincessSkillMovieDataList: []
+    ActionParametersOnPrefab: []
+    SkillEffects: []
+    ShakeEffects: []
+    ForcePlayNoTarget: 0
+    ParameterTarget: 0
+    ChangeSortDatas: []
+    ScaleChangers: []
+    DisableOtherCharaOnStart: 0
+    BlackOutTime: 0
+    BlackoutEndWithMotion: 0
+    ForceComboDamage: 0
+    BlackoutColor: {r: 0, g: 0, b: 0, a: 0.9607843}
+    CutInMovieFadeStartTime: 1.9
+    CutInMovieFadeDurationTime: 0.1
+    CutInSkipTime: 0
+    SkillMotionType: 0
+    TrackDamageNum: 1
+    PauseStopState: 0
+    BranchIds: 
+  UnionBurstList: []
+  MainSkillList: []
+  SpecialSkillList: []
+  SpecialSkillEvolutionList: []
+  UnionBurstEvolutionList: []
+  MainSkillEvolutionList: []
+  Annihilation:
+    IsPrincessForm: 0
+    PrincessSkillMovieDataList: []
+    ActionParametersOnPrefab: []
+    SkillEffects: []
+    ShakeEffects: []
+    ForcePlayNoTarget: 0
+    ParameterTarget: 0
+    ChangeSortDatas: []
+    ScaleChangers: []
+    DisableOtherCharaOnStart: 0
+    BlackOutTime: 0
+    BlackoutEndWithMotion: 0
+    ForceComboDamage: 0
+    BlackoutColor: {r: 0, g: 0, b: 0, a: 0.9607843}
+    CutInMovieFadeStartTime: 1.9
+    CutInMovieFadeDurationTime: 0.1
+    CutInSkipTime: 0
+    SkillMotionType: 0
+    TrackDamageNum: 1
+    PauseStopState: 0
+    BranchIds: 
+--- !u!114 &1682080198927084066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7111783237254764026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6226ea371991d6409c6194281f8d34a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentRotateCoroutineId: 0
+  ShowTitleDelay: 0.5
+  UnitAppearDelay: 3
+  BossAppearDelay: 0.8
+  BattleCameraSize: 1
+  Scale: 1.35
+  BossDeltaX: 0
+  BossDeltaY: 0
+  AllUnitCenter: 0
+  BossBodyWidthOffset: 0
+  SummonTargetAttachmentName: 
+  SummonAppliedAttachmentName: 
+  IsGameStartDepthBack: 0
+  BossSortIsBack: 0
+  DisableFlash: 0
+  SortFrontDiappearAttachmentChangeDataList: []
+  IsForceLeftDir: 0
+  MainSkillIdList: 
+  SpecialSkillIdList: 
+  MainSkillEvolutionIdList: 
+  SpecialSkillEvolutionIdList: 
+  TreasureAnimeIdList: 
+  BossPartsList: []
+  UseTargetCursorOver: 0
+  damageNumCenterBone: 0
+  UseUbVoice3and4: 0
+  IsUbExecTrying: 0
+  unitData:
+    unitId: 0
+    level: 1
+    rarity: 1
+    love: 0
+    rank: 1
+    equipLevel: ffffffffffffffffffffffffffffffffffffffffffffffff
+    skillLevel: 01000000010000000100000001000000

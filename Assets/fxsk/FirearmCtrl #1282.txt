@@ -1,0 +1,48 @@
+MonoBehaviour Base
+	PPtr<GameObject> m_GameObject
+		int m_FileID = 0
+		SInt64 m_PathID = -2795064768355769996
+	UInt8 m_Enabled = 1
+	PPtr<MonoScript> m_Script
+		int m_FileID = 0
+		SInt64 m_PathID = 3595088996520014879
+	string m_Name = ""
+	PPtr<$ParticleSystem> particle
+		int m_FileID = 0
+		SInt64 m_PathID = -4394799102580880173
+	vector TweenerList
+		Array Array
+		int size = 0
+	vector TweenRotList
+		Array Array
+		int size = 0
+	vector AnimatorList
+		Array Array
+		int size = 0
+	PPtr<$CriAtomSource> skillSeSource
+		int m_FileID = 0
+		SInt64 m_PathID = 4118568686467229059
+	UInt8 isRepeat = 0
+	UInt8 isCommon = 1
+	int seType = 1
+	RarityUpTextureChangeDataSet textureChangeParticles
+		Array Array
+		int size = 0
+	DefenceModeTextureChange defenceModeTextureSetting
+		Array Array
+		int size = 0
+	float HitDelay = 0.05
+	float MoveRate = 2
+	float duration = 0.8
+	int MoveType = 0
+	float startRotate = 60
+	float endRotate = -60
+	AABB ColliderBox
+		Vector3f m_Center
+			float x = 0
+			float y = 0
+			float z = 0
+		Vector3f m_Extent
+			float x = 0.3
+			float y = 0.1
+			float z = 0

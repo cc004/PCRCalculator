@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0035: 检测到无法访问的代码
+dotnet_diagnostic.IDE0035.severity = none

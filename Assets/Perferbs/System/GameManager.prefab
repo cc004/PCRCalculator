@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4044618195180921842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4044618195180921843}
+  - component: {fileID: 4044618195180921840}
+  - component: {fileID: 8479292379845382890}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4044618195180921843
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4044618195180921842}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4044618195180921840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4044618195180921842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dacfa700ca3e224a96764225d85ca5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MassagePerferb: {fileID: 4097831020690548745, guid: 120cf3d7f48b94c4d8a359668c10e503,
+    type: 3}
+  SystemWindowMessagePerferb: {fileID: 6209569181771692923, guid: b6b9f43c41c086e4aac4ea8e046e7452,
+    type: 3}
+  asyncPrefab: {fileID: 8454601886927909527, guid: 47d40b81e14740a4dbe77b55a1122a42,
+    type: 3}
+  SystemInputPrefab: {fileID: 580239301326221121, guid: 354fd91307e9b7c40a931b50734480e1,
+    type: 3}
+  LoadingPagePrefab: {fileID: 6692115630542166358, guid: 80ef5813a95f1c3448cefe2bd5789c04,
+    type: 3}
+  LoadingPagePrefab_2: {fileID: 5997757917144725720, guid: 660aea92ec05f294a945d606e610d6c8,
+    type: 3}
+  stayPage: 0
+  UseNewBattleSystem: 1
+  showSummonIDs: 
+--- !u!114 &8479292379845382890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4044618195180921842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86d42fc616de8c8419ad151dee09c2cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spineMaterial: {fileID: 2100000, guid: fd7c5cadde0e1ee4e8be65455893e4b1, type: 2}
