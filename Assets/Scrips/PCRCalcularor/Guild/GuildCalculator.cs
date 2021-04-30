@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Elements.Battle;
 using Elements;
 using System.ComponentModel;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 
 namespace PCRCaculator.Guild
 {

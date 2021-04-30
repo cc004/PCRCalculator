@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 using PCRCaculator.Battle;
 /// <summary>
 /// 每个角色的所有数据类

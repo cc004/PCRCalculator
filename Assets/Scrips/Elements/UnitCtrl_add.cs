@@ -5,7 +5,7 @@ using PCRCaculator.Battle;
 using PCRCaculator;
 using System.IO;
 using System;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 
 namespace Elements
 {

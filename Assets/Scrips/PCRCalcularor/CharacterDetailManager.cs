@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Spine.Unity;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 using System.IO;
 
 namespace PCRCaculator

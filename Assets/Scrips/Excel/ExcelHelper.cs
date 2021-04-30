@@ -10,7 +10,7 @@ using ExcelDataReader;
 using System.Data;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 using PCRCaculator;
 using PCRCaculator.Guild;
 using System.Text.RegularExpressions;
