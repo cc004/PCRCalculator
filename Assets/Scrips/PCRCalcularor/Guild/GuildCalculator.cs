@@ -892,5 +892,15 @@ namespace PCRCaculator.Guild
                     return sourceName + "对" + targetName + "的其他判定";
             }
         }
+        public bool JudgeColored()
+        {
+            if (actionID >= 100000000)
+            {
+                int skill = (int)((actionID % 1000)/100);
+                if (skill == 1 && type == 0)
+                    return true;
+            }
+            return false;
+        }
     }
 }

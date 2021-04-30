@@ -903,6 +903,12 @@ namespace ExcelHelper
                     worksheet5.Cells[lineNum, 9].Value = data.criticalDamageRate;
                     worksheet5.Cells[lineNum, 10, lineNum, 15].Merge = true;
                     worksheet5.Cells[lineNum, 10].Value = data.GetDescribe();
+                    if (data.JudgeColored())
+                    {
+                        worksheet5.Cells[lineNum, 1,lineNum,20].Style.Fill.PatternType = ExcelFillStyle.DarkGray;
+                        worksheet5.Cells[lineNum, 1, lineNum, 20].Style.Fill.BackgroundColor.SetColor(stateColors[2]);
+
+                    }
                     lineNum++;
                 }
 
