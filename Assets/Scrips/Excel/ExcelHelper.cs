@@ -886,6 +886,8 @@ namespace ExcelHelper
                 worksheet5.Cells[lineNum, 9].Value = "参数2";
                 worksheet5.Cells[lineNum, 10, lineNum, 15].Merge = true;
                 worksheet5.Cells[lineNum, 10].Value = "状态";
+                worksheet5.Cells[lineNum, 16].Value = "seed";
+
                 lineNum++;
                 for (int i = 0; i < TimelineData.AllRandomList.Count; i++)
                 {
