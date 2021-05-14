@@ -1,278 +1,298 @@
-/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
 using System;
 
-namespace Spine {
-	internal class Triangulator {
+namespace Spine
+{
+	internal class Triangulator
+	{
 		private readonly ExposedList<ExposedList<float>> convexPolygons = new ExposedList<ExposedList<float>>();
+
 		private readonly ExposedList<ExposedList<int>> convexPolygonsIndices = new ExposedList<ExposedList<int>>();
 
 		private readonly ExposedList<int> indicesArray = new ExposedList<int>();
+
 		private readonly ExposedList<bool> isConcaveArray = new ExposedList<bool>();
+
 		private readonly ExposedList<int> triangles = new ExposedList<int>();
 
 		private readonly Pool<ExposedList<float>> polygonPool = new Pool<ExposedList<float>>();
+
 		private readonly Pool<ExposedList<int>> polygonIndicesPool = new Pool<ExposedList<int>>();
 
-		public ExposedList<int> Triangulate (ExposedList<float> verticesArray) {
-			var vertices = verticesArray.Items;
-			int vertexCount = verticesArray.Count >> 1;
-
-			var indicesArray = this.indicesArray;
-			indicesArray.Clear();
-			int[] indices = indicesArray.Resize(vertexCount).Items;
-			for (int i = 0; i < vertexCount; i++)
-				indices[i] = i;
-
-			var isConcaveArray = this.isConcaveArray;
-			bool[] isConcave = isConcaveArray.Resize(vertexCount).Items;
-			for (int i = 0, n = vertexCount; i < n; ++i)
-				isConcave[i] = IsConcave(i, vertexCount, vertices, indices);
-
-			var triangles = this.triangles;
-			triangles.Clear();
-			triangles.EnsureCapacity(Math.Max(0, vertexCount - 2) << 2);
-
-			while (vertexCount > 3) {
-				// Find ear tip.
-				int previous = vertexCount - 1, i = 0, next = 1;
-
-				// outer:
-				while (true) {
-					if (!isConcave[i]) {
-						int p1 = indices[previous] << 1, p2 = indices[i] << 1, p3 = indices[next] << 1;
-						float p1x = vertices[p1], p1y = vertices[p1 + 1];
-						float p2x = vertices[p2], p2y = vertices[p2 + 1];
-						float p3x = vertices[p3], p3y = vertices[p3 + 1];
-						for (int ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
-							if (!isConcave[ii]) continue;
-							int v = indices[ii] << 1;
-							float vx = vertices[v], vy = vertices[v + 1];
-							if (PositiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
-								if (PositiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
-									if (PositiveArea(p2x, p2y, p3x, p3y, vx, vy)) goto break_outer; // break outer;
-								}
+		public ExposedList<int> Triangulate(ExposedList<float> verticesArray)
+		{
+			float[] items = verticesArray.Items;
+			int num = verticesArray.Count >> 1;
+			ExposedList<int> exposedList = indicesArray;
+			exposedList.Clear();
+			int[] items2 = exposedList.Resize(num).Items;
+			for (int i = 0; i < num; i++)
+			{
+				items2[i] = i;
+			}
+			ExposedList<bool> exposedList2 = isConcaveArray;
+			bool[] items3 = exposedList2.Resize(num).Items;
+			int j = 0;
+			for (int num2 = num; j < num2; j++)
+			{
+				items3[j] = IsConcave(j, num, items, items2);
+			}
+			ExposedList<int> exposedList3 = triangles;
+			exposedList3.Clear();
+			exposedList3.EnsureCapacity(Math.Max(0, num - 2) << 2);
+			while (num > 3)
+			{
+				int num3 = num - 1;
+				int num4 = 0;
+				int num5 = 1;
+				while (true)
+				{
+					if (!items3[num4])
+					{
+						int num6 = items2[num3] << 1;
+						int num7 = items2[num4] << 1;
+						int num8 = items2[num5] << 1;
+						float num9 = items[num6];
+						float num10 = items[num6 + 1];
+						float num11 = items[num7];
+						float num12 = items[num7 + 1];
+						float num13 = items[num8];
+						float num14 = items[num8 + 1];
+						for (int num15 = (num5 + 1) % num; num15 != num3; num15 = (num15 + 1) % num)
+						{
+							if (!items3[num15])
+							{
+								continue;
+							}
+							int num16 = items2[num15] << 1;
+							float p3x = items[num16];
+							float p3y = items[num16 + 1];
+							if (!PositiveArea(num13, num14, num9, num10, p3x, p3y) || !PositiveArea(num9, num10, num11, num12, p3x, p3y) || !PositiveArea(num11, num12, num13, num14, p3x, p3y))
+							{
+								continue;
+							}
+							goto IL_0169;
+						}
+						break;
+					}
+					goto IL_0169;
+					IL_0169:
+					if (num5 == 0)
+					{
+						while (items3[num4])
+						{
+							num4--;
+							if (num4 <= 0)
+							{
+								break;
 							}
 						}
 						break;
 					}
-					break_outer:
-
-					if (next == 0) {
-						do {
-							if (!isConcave[i]) break;
-							i--;
-						} while (i > 0);
-						break;
-					}
-
-					previous = i;
-					i = next;
-					next = (next + 1) % vertexCount;
+					num3 = num4;
+					num4 = num5;
+					num5 = (num5 + 1) % num;
 				}
-
-				// Cut ear tip.
-				triangles.Add(indices[(vertexCount + i - 1) % vertexCount]);
-				triangles.Add(indices[i]);
-				triangles.Add(indices[(i + 1) % vertexCount]);
-				indicesArray.RemoveAt(i);
-				isConcaveArray.RemoveAt(i);
-				vertexCount--;
-
-				int previousIndex = (vertexCount + i - 1) % vertexCount;
-				int nextIndex = i == vertexCount ? 0 : i;
-				isConcave[previousIndex] = IsConcave(previousIndex, vertexCount, vertices, indices);
-				isConcave[nextIndex] = IsConcave(nextIndex, vertexCount, vertices, indices);
+				exposedList3.Add(items2[(num + num4 - 1) % num]);
+				exposedList3.Add(items2[num4]);
+				exposedList3.Add(items2[(num4 + 1) % num]);
+				exposedList.RemoveAt(num4);
+				exposedList2.RemoveAt(num4);
+				num--;
+				int num17 = (num + num4 - 1) % num;
+				int num18 = ((num4 != num) ? num4 : 0);
+				items3[num17] = IsConcave(num17, num, items, items2);
+				items3[num18] = IsConcave(num18, num, items, items2);
 			}
-
-			if (vertexCount == 3) {
-				triangles.Add(indices[2]);
-				triangles.Add(indices[0]);
-				triangles.Add(indices[1]);
+			if (num == 3)
+			{
+				exposedList3.Add(items2[2]);
+				exposedList3.Add(items2[0]);
+				exposedList3.Add(items2[1]);
 			}
-
-			return triangles;
+			return exposedList3;
 		}
 
-		public ExposedList<ExposedList<float>> Decompose (ExposedList<float> verticesArray, ExposedList<int> triangles) {
-			var vertices = verticesArray.Items;
-			var convexPolygons = this.convexPolygons;
-			for (int i = 0, n = convexPolygons.Count; i < n; i++) {
-				polygonPool.Free(convexPolygons.Items[i]);
-			}		
-			convexPolygons.Clear();
-
-			var convexPolygonsIndices = this.convexPolygonsIndices;
-			for (int i = 0, n = convexPolygonsIndices.Count; i < n; i++) {
-				polygonIndicesPool.Free(convexPolygonsIndices.Items[i]);
-			}			
-			convexPolygonsIndices.Clear();
-
-			var polygonIndices = polygonIndicesPool.Obtain();
-			polygonIndices.Clear();
-
-			var polygon = polygonPool.Obtain();
-			polygon.Clear();
-
-			// Merge subsequent triangles if they form a triangle fan.
-			int fanBaseIndex = -1, lastWinding = 0;
-			int[] trianglesItems = triangles.Items;
-			for (int i = 0, n = triangles.Count; i < n; i += 3) {
-				int t1 = trianglesItems[i] << 1, t2 = trianglesItems[i + 1] << 1, t3 = trianglesItems[i + 2] << 1;
-				float x1 = vertices[t1], y1 = vertices[t1 + 1];
-				float x2 = vertices[t2], y2 = vertices[t2 + 1];
-				float x3 = vertices[t3], y3 = vertices[t3 + 1];
-
-				// If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
-				var merged = false;
-				if (fanBaseIndex == t1) {
-					int o = polygon.Count - 4;
-					float[] p = polygon.Items;
-					int winding1 = Winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
-					int winding2 = Winding(x3, y3, p[0], p[1], p[2], p[3]);
-					if (winding1 == lastWinding && winding2 == lastWinding) {
-						polygon.Add(x3);
-						polygon.Add(y3);
-						polygonIndices.Add(t3);
-						merged = true;
+		public ExposedList<ExposedList<float>> Decompose(ExposedList<float> verticesArray, ExposedList<int> triangles)
+		{
+			float[] items = verticesArray.Items;
+			ExposedList<ExposedList<float>> exposedList = convexPolygons;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				polygonPool.Free(exposedList.Items[i]);
+			}
+			exposedList.Clear();
+			ExposedList<ExposedList<int>> exposedList2 = convexPolygonsIndices;
+			int j = 0;
+			for (int count2 = exposedList2.Count; j < count2; j++)
+			{
+				polygonIndicesPool.Free(exposedList2.Items[j]);
+			}
+			exposedList2.Clear();
+			ExposedList<int> exposedList3 = polygonIndicesPool.Obtain();
+			exposedList3.Clear();
+			ExposedList<float> exposedList4 = polygonPool.Obtain();
+			exposedList4.Clear();
+			int num = -1;
+			int num2 = 0;
+			int[] items2 = triangles.Items;
+			int k = 0;
+			for (int count3 = triangles.Count; k < count3; k += 3)
+			{
+				int num3 = items2[k] << 1;
+				int num4 = items2[k + 1] << 1;
+				int num5 = items2[k + 2] << 1;
+				float num6 = items[num3];
+				float num7 = items[num3 + 1];
+				float num8 = items[num4];
+				float num9 = items[num4 + 1];
+				float num10 = items[num5];
+				float num11 = items[num5 + 1];
+				bool flag = false;
+				if (num == num3)
+				{
+					int num12 = exposedList4.Count - 4;
+					float[] items3 = exposedList4.Items;
+					int num13 = Winding(items3[num12], items3[num12 + 1], items3[num12 + 2], items3[num12 + 3], num10, num11);
+					int num14 = Winding(num10, num11, items3[0], items3[1], items3[2], items3[3]);
+					if (num13 == num2 && num14 == num2)
+					{
+						exposedList4.Add(num10);
+						exposedList4.Add(num11);
+						exposedList3.Add(num5);
+						flag = true;
 					}
 				}
-
-				// Otherwise make this triangle the new base.
-				if (!merged) {
-					if (polygon.Count > 0) {
-						convexPolygons.Add(polygon);
-						convexPolygonsIndices.Add(polygonIndices);
-					} else {
-						polygonPool.Free(polygon);
-						polygonIndicesPool.Free(polygonIndices);
-					} 
-					polygon = polygonPool.Obtain();
-					polygon.Clear();
-					polygon.Add(x1);
-					polygon.Add(y1);
-					polygon.Add(x2);
-					polygon.Add(y2);
-					polygon.Add(x3);
-					polygon.Add(y3);
-					polygonIndices = polygonIndicesPool.Obtain();
-					polygonIndices.Clear();
-					polygonIndices.Add(t1);
-					polygonIndices.Add(t2);
-					polygonIndices.Add(t3);
-					lastWinding = Winding(x1, y1, x2, y2, x3, y3);
-					fanBaseIndex = t1;
+				if (!flag)
+				{
+					if (exposedList4.Count > 0)
+					{
+						exposedList.Add(exposedList4);
+						exposedList2.Add(exposedList3);
+					}
+					else
+					{
+						polygonPool.Free(exposedList4);
+						polygonIndicesPool.Free(exposedList3);
+					}
+					exposedList4 = polygonPool.Obtain();
+					exposedList4.Clear();
+					exposedList4.Add(num6);
+					exposedList4.Add(num7);
+					exposedList4.Add(num8);
+					exposedList4.Add(num9);
+					exposedList4.Add(num10);
+					exposedList4.Add(num11);
+					exposedList3 = polygonIndicesPool.Obtain();
+					exposedList3.Clear();
+					exposedList3.Add(num3);
+					exposedList3.Add(num4);
+					exposedList3.Add(num5);
+					num2 = Winding(num6, num7, num8, num9, num10, num11);
+					num = num3;
 				}
 			}
-
-			if (polygon.Count > 0) {
-				convexPolygons.Add(polygon);
-				convexPolygonsIndices.Add(polygonIndices);
+			if (exposedList4.Count > 0)
+			{
+				exposedList.Add(exposedList4);
+				exposedList2.Add(exposedList3);
 			}
-
-			// Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
-			for (int i = 0, n = convexPolygons.Count; i < n; i++) {
-				polygonIndices = convexPolygonsIndices.Items[i];
-				if (polygonIndices.Count == 0) continue;
-				int firstIndex = polygonIndices.Items[0];
-				int lastIndex = polygonIndices.Items[polygonIndices.Count - 1];
-
-				polygon = convexPolygons.Items[i];
-				int o = polygon.Count - 4;
-				float[] p = polygon.Items;
-				float prevPrevX = p[o], prevPrevY = p[o + 1];
-				float prevX = p[o + 2], prevY = p[o + 3];
-				float firstX = p[0], firstY = p[1];
-				float secondX = p[2], secondY = p[3];
-				int winding = Winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
-
-				for (int ii = 0; ii < n; ii++) {
-					if (ii == i) continue;
-					var otherIndices = convexPolygonsIndices.Items[ii];
-					if (otherIndices.Count != 3) continue;
-					int otherFirstIndex = otherIndices.Items[0];
-					int otherSecondIndex = otherIndices.Items[1];
-					int otherLastIndex = otherIndices.Items[2];
-
-					var otherPoly = convexPolygons.Items[ii];
-					float x3 = otherPoly.Items[otherPoly.Count - 2], y3 = otherPoly.Items[otherPoly.Count - 1];
-
-					if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;
-					int winding1 = Winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
-					int winding2 = Winding(x3, y3, firstX, firstY, secondX, secondY);
-					if (winding1 == winding && winding2 == winding) {
-						otherPoly.Clear();
-						otherIndices.Clear();
-						polygon.Add(x3);
-						polygon.Add(y3);
-						polygonIndices.Add(otherLastIndex);
-						prevPrevX = prevX;
-						prevPrevY = prevY;
-						prevX = x3;
-						prevY = y3;
-						ii = 0;
+			int l = 0;
+			for (int count4 = exposedList.Count; l < count4; l++)
+			{
+				exposedList3 = exposedList2.Items[l];
+				if (exposedList3.Count == 0)
+				{
+					continue;
+				}
+				int num15 = exposedList3.Items[0];
+				int num16 = exposedList3.Items[exposedList3.Count - 1];
+				exposedList4 = exposedList.Items[l];
+				int num17 = exposedList4.Count - 4;
+				float[] items4 = exposedList4.Items;
+				float p1x = items4[num17];
+				float p1y = items4[num17 + 1];
+				float num18 = items4[num17 + 2];
+				float num19 = items4[num17 + 3];
+				float num20 = items4[0];
+				float num21 = items4[1];
+				float p3x = items4[2];
+				float p3y = items4[3];
+				int num22 = Winding(p1x, p1y, num18, num19, num20, num21);
+				for (int m = 0; m < count4; m++)
+				{
+					if (m == l)
+					{
+						continue;
+					}
+					ExposedList<int> exposedList5 = exposedList2.Items[m];
+					if (exposedList5.Count != 3)
+					{
+						continue;
+					}
+					int num23 = exposedList5.Items[0];
+					int num24 = exposedList5.Items[1];
+					int item = exposedList5.Items[2];
+					ExposedList<float> exposedList6 = exposedList.Items[m];
+					float num25 = exposedList6.Items[exposedList6.Count - 2];
+					float num26 = exposedList6.Items[exposedList6.Count - 1];
+					if (num23 == num15 && num24 == num16)
+					{
+						int num27 = Winding(p1x, p1y, num18, num19, num25, num26);
+						int num28 = Winding(num25, num26, num20, num21, p3x, p3y);
+						if (num27 == num22 && num28 == num22)
+						{
+							exposedList6.Clear();
+							exposedList5.Clear();
+							exposedList4.Add(num25);
+							exposedList4.Add(num26);
+							exposedList3.Add(item);
+							p1x = num18;
+							p1y = num19;
+							num18 = num25;
+							num19 = num26;
+							m = 0;
+						}
 					}
 				}
 			}
-
-			// Remove empty polygons that resulted from the merge step above.
-			for (int i = convexPolygons.Count - 1; i >= 0; i--) {
-				polygon = convexPolygons.Items[i];
-				if (polygon.Count == 0) {
-					convexPolygons.RemoveAt(i);
-					polygonPool.Free(polygon);
-					polygonIndices = convexPolygonsIndices.Items[i];
-					convexPolygonsIndices.RemoveAt(i);
-					polygonIndicesPool.Free(polygonIndices);
+			for (int num29 = exposedList.Count - 1; num29 >= 0; num29--)
+			{
+				exposedList4 = exposedList.Items[num29];
+				if (exposedList4.Count == 0)
+				{
+					exposedList.RemoveAt(num29);
+					polygonPool.Free(exposedList4);
+					exposedList3 = exposedList2.Items[num29];
+					exposedList2.RemoveAt(num29);
+					polygonIndicesPool.Free(exposedList3);
 				}
 			}
-
-			return convexPolygons;
+			return exposedList;
 		}
 
-		static private bool IsConcave (int index, int vertexCount, float[] vertices, int[] indices) {
-			int previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
-			int current = indices[index] << 1;
-			int next = indices[(index + 1) % vertexCount] << 1;
-			return !PositiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next],
-				vertices[next + 1]);
+		private static bool IsConcave(int index, int vertexCount, float[] vertices, int[] indices)
+		{
+			int num = indices[(vertexCount + index - 1) % vertexCount] << 1;
+			int num2 = indices[index] << 1;
+			int num3 = indices[(index + 1) % vertexCount] << 1;
+			return !PositiveArea(vertices[num], vertices[num + 1], vertices[num2], vertices[num2 + 1], vertices[num3], vertices[num3 + 1]);
 		}
 
-		static private bool PositiveArea (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
-			return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
+		private static bool PositiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
+		{
+			return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0f;
 		}
 
-		static private int Winding (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
-			float px = p2x - p1x, py = p2y - p1y;
-			return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
+		private static int Winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
+		{
+			float num = p2x - p1x;
+			float num2 = p2y - p1y;
+			if (!(p3x * num2 - p3y * num + num * p1y - p1x * num2 >= 0f))
+			{
+				return -1;
+			}
+			return 1;
 		}
 	}
 }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Elements.Battle;
 using Elements;
 using System.ComponentModel;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 
 namespace PCRCaculator.Guild
 {
@@ -278,7 +278,7 @@ namespace PCRCaculator.Guild
         {
             data.id = AllRandomDataList.Count;
             data.frame = BattleHeaderController.CurrentFrameCount;
-            data.randomStata = UnityEngine.Random.state;
+            data.currentSeed = Random.seed;
             AllRandomDataList.Add(data);
         }
         public void OnToggleSwitched(int toggleId)
@@ -855,7 +855,7 @@ namespace PCRCaculator.Guild
         //1-对数盾暴击判定，小于等于则判定暴击（未触发对数盾则无效！）
         //0-暴击判定，小于等于则判定暴击
         public int type;
-        public Random.State randomStata;
+        public int currentSeed;
         public int randomResult;
         public float targetResult;
         public float criticalDamageRate;
@@ -891,6 +891,16 @@ namespace PCRCaculator.Guild
                 default:
                     return sourceName + "对" + targetName + "的其他判定";
             }
+        }
+        public bool JudgeColored()
+        {
+            if (actionID >= 100000000)
+            {
+                int skill = (int)((actionID % 1000)/100);
+                if (skill == 1 && type == 0)
+                    return true;
+            }
+            return false;
         }
     }
 }

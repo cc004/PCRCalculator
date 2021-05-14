@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 
 namespace PCRCaculator.Battle
 {

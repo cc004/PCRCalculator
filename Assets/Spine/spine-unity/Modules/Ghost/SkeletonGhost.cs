@@ -1,186 +1,179 @@
-/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
-// Contributed by: Mitch Thompson
-
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using UnityEngine;
 
-namespace Spine.Unity.Modules {
-	
+namespace Spine.Unity.Modules
+{
 	[RequireComponent(typeof(SkeletonRenderer))]
-	public class SkeletonGhost : MonoBehaviour {
-		// Internal Settings
-		const HideFlags GhostHideFlags = HideFlags.HideInHierarchy;
-		const string GhostingShaderName = "Spine/Special/SkeletonGhost";
+	public class SkeletonGhost : MonoBehaviour
+	{
+		private const HideFlags GhostHideFlags = HideFlags.HideInHierarchy;
+
+		private const string GhostingShaderName = "Spine/Special/SkeletonGhost";
 
 		public bool ghostingEnabled = true;
+
 		public float spawnRate = 0.05f;
-		public Color32 color = new Color32(0xFF, 0xFF, 0xFF, 0x00); // default for additive.
+
+		public Color32 color = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, 0);
+
 		[Tooltip("Remember to set color alpha to 0 if Additive is true")]
 		public bool additive = true;
+
 		public int maximumGhosts = 10;
-		public float fadeSpeed = 10;
+
+		public float fadeSpeed = 10f;
+
 		public Shader ghostShader;
+
 		[Tooltip("0 is Color and Alpha, 1 is Alpha only.")]
-		[Range(0, 1)]
-		public float textureFade = 1;
+		[Range(0f, 1f)]
+		public float textureFade = 1f;
 
 		[Header("Sorting")]
 		public bool sortWithDistanceOnly;
-		public float zOffset = 0f;
 
-		float nextSpawnTime;
-		SkeletonGhostRenderer[] pool;
-		int poolIndex = 0;
-		SkeletonRenderer skeletonRenderer;
-		MeshRenderer meshRenderer;
-		MeshFilter meshFilter;
+		public float zOffset;
 
-		readonly Dictionary<Material, Material> materialTable = new Dictionary<Material, Material>();
+		private float nextSpawnTime;
 
-		void Start () {
+		private SkeletonGhostRenderer[] pool;
+
+		private int poolIndex;
+
+		private SkeletonRenderer skeletonRenderer;
+
+		private MeshRenderer meshRenderer;
+
+		private MeshFilter meshFilter;
+
+		private readonly Dictionary<Material, Material> materialTable = new Dictionary<Material, Material>();
+
+		private void Start()
+		{
 			if (ghostShader == null)
-				ghostShader = Shader.Find(GhostingShaderName);
-
+			{
+				ghostShader = Shader.Find("Spine/Special/SkeletonGhost");
+			}
 			skeletonRenderer = GetComponent<SkeletonRenderer>();
 			meshFilter = GetComponent<MeshFilter>();
 			meshRenderer = GetComponent<MeshRenderer>();
 			nextSpawnTime = Time.time + spawnRate;
 			pool = new SkeletonGhostRenderer[maximumGhosts];
-			for (int i = 0; i < maximumGhosts; i++) {
-				GameObject go = new GameObject(gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
-				pool[i] = go.GetComponent<SkeletonGhostRenderer>();
-				go.SetActive(false);
-				go.hideFlags = GhostHideFlags;
+			for (int i = 0; i < maximumGhosts; i++)
+			{
+				GameObject gameObject = new GameObject(base.gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
+				pool[i] = gameObject.GetComponent<SkeletonGhostRenderer>();
+				gameObject.SetActive(value: false);
+				gameObject.hideFlags = HideFlags.HideInHierarchy;
 			}
-
-			var skeletonAnimation = skeletonRenderer as Spine.Unity.IAnimationStateComponent;
-			if (skeletonAnimation != null) skeletonAnimation.AnimationState.Event += OnEvent;
+			IAnimationStateComponent animationStateComponent = skeletonRenderer as IAnimationStateComponent;
+			if (animationStateComponent != null)
+			{
+				animationStateComponent.AnimationState.Event += OnEvent;
+			}
 		}
 
-		//SkeletonAnimation
-		/*
-		 *	Int Value:		0 sets ghostingEnabled to false, 1 sets ghostingEnabled to true
-		 *	Float Value:	Values greater than 0 set the spawnRate equal the float value
-		 *	String Value:	Pass RGBA hex color values in to set the color property.  IE:   "A0FF8BFF"
-		 */
-		void OnEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
-			if (e.Data.Name.Equals("Ghosting", System.StringComparison.Ordinal)) {
+		private void OnEvent(TrackEntry trackEntry, Event e)
+		{
+			if (e.Data.Name.Equals("Ghosting", StringComparison.Ordinal))
+			{
 				ghostingEnabled = e.Int > 0;
-				if (e.Float > 0)
+				if (e.Float > 0f)
+				{
 					spawnRate = e.Float;
-				
-				if (!string.IsNullOrEmpty(e.stringValue))
-					this.color = HexToColor(e.String);
-			}
-		}
-
-		//SkeletonAnimator
-		//SkeletonAnimator or Mecanim based animations only support toggling ghostingEnabled.  Be sure not to set anything other than the Int param in Spine or String will take priority.
-		void Ghosting (float val) {
-			ghostingEnabled = val > 0;
-		}
-
-		void Update () {
-			if (!ghostingEnabled)
-				return;
-
-			if (Time.time >= nextSpawnTime) {
-				GameObject go = pool[poolIndex].gameObject;
-
-				Material[] materials = meshRenderer.sharedMaterials;
-				for (int i = 0; i < materials.Length; i++) {
-					var originalMat = materials[i];
-					Material ghostMat;
-					if (!materialTable.ContainsKey(originalMat)) {
-						ghostMat = new Material(originalMat);
-						ghostMat.shader = ghostShader;
-						ghostMat.color = Color.white;
-						if (ghostMat.HasProperty("_TextureFade"))
-							ghostMat.SetFloat("_TextureFade", textureFade);
-						materialTable.Add(originalMat, ghostMat);
-					} else {
-						ghostMat = materialTable[originalMat];
-					}
-
-					materials[i] = ghostMat;
 				}
-
-				var goTransform = go.transform;
-				goTransform.parent = transform;
-
-				pool[poolIndex].Initialize(meshFilter.sharedMesh, materials, color, additive, fadeSpeed, meshRenderer.sortingLayerID, (sortWithDistanceOnly) ? meshRenderer.sortingOrder : meshRenderer.sortingOrder - 1);
-
-				goTransform.localPosition = new Vector3(0f, 0f, zOffset);
-				goTransform.localRotation = Quaternion.identity;
-				goTransform.localScale = Vector3.one;
-
-				goTransform.parent = null;
-
-				poolIndex++;
-
-				if (poolIndex == pool.Length)
-					poolIndex = 0;
-
-				nextSpawnTime = Time.time + spawnRate;
+				if (!string.IsNullOrEmpty(e.stringValue))
+				{
+					color = HexToColor(e.String);
+				}
 			}
 		}
 
-		void OnDestroy () {
-			if (pool != null) {
+		private void Ghosting(float val)
+		{
+			ghostingEnabled = val > 0f;
+		}
+
+		private void Update()
+		{
+			if (!ghostingEnabled || !(Time.time >= nextSpawnTime))
+			{
+				return;
+			}
+			GameObject gameObject = pool[poolIndex].gameObject;
+			Material[] sharedMaterials = meshRenderer.sharedMaterials;
+			for (int i = 0; i < sharedMaterials.Length; i++)
+			{
+				Material material = sharedMaterials[i];
+				Material material2;
+				if (!materialTable.ContainsKey(material))
+				{
+					material2 = new Material(material);
+					material2.shader = ghostShader;
+					material2.color = Color.white;
+					if (material2.HasProperty("_TextureFade"))
+					{
+						material2.SetFloat("_TextureFade", textureFade);
+					}
+					materialTable.Add(material, material2);
+				}
+				else
+				{
+					material2 = materialTable[material];
+				}
+				sharedMaterials[i] = material2;
+			}
+			Transform transform = gameObject.transform;
+			transform.parent = base.transform;
+			pool[poolIndex].Initialize(meshFilter.sharedMesh, sharedMaterials, color, additive, fadeSpeed, meshRenderer.sortingLayerID, sortWithDistanceOnly ? meshRenderer.sortingOrder : (meshRenderer.sortingOrder - 1));
+			transform.localPosition = new Vector3(0f, 0f, zOffset);
+			transform.localRotation = Quaternion.identity;
+			transform.localScale = Vector3.one;
+			transform.parent = null;
+			poolIndex++;
+			if (poolIndex == pool.Length)
+			{
+				poolIndex = 0;
+			}
+			nextSpawnTime = Time.time + spawnRate;
+		}
+
+		private void OnDestroy()
+		{
+			if (pool != null)
+			{
 				for (int i = 0; i < maximumGhosts; i++)
-					if (pool[i] != null) pool[i].Cleanup();
+				{
+					if (pool[i] != null)
+					{
+						pool[i].Cleanup();
+					}
+				}
 			}
-
-			foreach (var mat in materialTable.Values)
-				Destroy(mat);
+			foreach (Material value in materialTable.Values)
+			{
+				UnityEngine.Object.Destroy(value);
+			}
 		}
 
-		//based on UnifyWiki  http://wiki.unity3d.com/index.php?title=HexConverter
-		static Color32 HexToColor (string hex) {
-			const System.Globalization.NumberStyles HexStyle = System.Globalization.NumberStyles.HexNumber;
-
+		private static Color32 HexToColor(string hex)
+		{
 			if (hex.Length < 6)
+			{
 				return Color.magenta;
-
+			}
 			hex = hex.Replace("#", "");
-			byte r = byte.Parse(hex.Substring(0, 2), HexStyle);
-			byte g = byte.Parse(hex.Substring(2, 2), HexStyle);
-			byte b = byte.Parse(hex.Substring(4, 2), HexStyle);
-			byte a = 0xFF;
+			byte r = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+			byte g = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+			byte b = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+			byte a = byte.MaxValue;
 			if (hex.Length == 8)
-				a = byte.Parse(hex.Substring(6, 2), HexStyle);
-
+			{
+				a = byte.Parse(hex.Substring(6, 2), NumberStyles.HexNumber);
+			}
 			return new Color32(r, g, b, a);
 		}
 	}
-
 }

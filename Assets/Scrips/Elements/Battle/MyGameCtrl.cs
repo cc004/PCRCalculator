@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using Spine;
 using Spine.Unity;
-using Newtonsoft.Json;
+using Newtonsoft0.Json;
 
 namespace Elements
 {
