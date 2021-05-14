@@ -1,283 +1,438 @@
-/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
 using System;
+using UnityEngine;
 
-namespace Spine {
-	public class TransformConstraint : IConstraint {
+namespace Spine
+{
+	public class TransformConstraint : IConstraint, IUpdatable
+	{
 		internal TransformConstraintData data;
+
 		internal ExposedList<Bone> bones;
+
 		internal Bone target;
-		internal float rotateMix, translateMix, scaleMix, shearMix;
 
-		public TransformConstraintData Data { get { return data; } }
-		public int Order { get { return data.order; } }
-		public ExposedList<Bone> Bones { get { return bones; } }
-		public Bone Target { get { return target; } set { target = value; } }
-		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
-		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
-		public float ScaleMix { get { return scaleMix; } set { scaleMix = value; } }
-		public float ShearMix { get { return shearMix; } set { shearMix = value; } }
+		internal float rotateMix;
 
-		public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
-			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+		internal float translateMix;
+
+		internal float scaleMix;
+
+		internal float shearMix;
+
+		public TransformConstraintData Data => data;
+
+		public int Order => data.order;
+
+		public ExposedList<Bone> Bones => bones;
+
+		public Bone Target
+		{
+			get
+			{
+				return target;
+			}
+			set
+			{
+				target = value;
+			}
+		}
+
+		public float RotateMix
+		{
+			get
+			{
+				return rotateMix;
+			}
+			set
+			{
+				rotateMix = value;
+			}
+		}
+
+		public float TranslateMix
+		{
+			get
+			{
+				return translateMix;
+			}
+			set
+			{
+				translateMix = value;
+			}
+		}
+
+		public float ScaleMix
+		{
+			get
+			{
+				return scaleMix;
+			}
+			set
+			{
+				scaleMix = value;
+			}
+		}
+
+		public float ShearMix
+		{
+			get
+			{
+				return shearMix;
+			}
+			set
+			{
+				shearMix = value;
+			}
+		}
+
+		public TransformConstraint(TransformConstraintData data, Skeleton skeleton)
+		{
+			if (data == null)
+			{
+				throw new ArgumentNullException("data", "data cannot be null.");
+			}
+			if (skeleton == null)
+			{
+				throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+			}
 			this.data = data;
 			rotateMix = data.rotateMix;
 			translateMix = data.translateMix;
 			scaleMix = data.scaleMix;
 			shearMix = data.shearMix;
-
 			bones = new ExposedList<Bone>();
-			foreach (BoneData boneData in data.bones)
-				bones.Add (skeleton.FindBone (boneData.name));
-			
+			foreach (BoneData bone in data.bones)
+			{
+				bones.Add(skeleton.FindBone(bone.name));
+			}
 			target = skeleton.FindBone(data.target.name);
 		}
 
-		public void Apply () {
+		public void Apply()
+		{
 			Update();
 		}
 
-		public void Update () {
-			if (data.local) {
+		public void Update()
+		{
+			if (data.local)
+			{
 				if (data.relative)
+				{
 					ApplyRelativeLocal();
+				}
 				else
+				{
 					ApplyAbsoluteLocal();
-			} else {
-				if (data.relative)
-					ApplyRelativeWorld();
-				else
-					ApplyAbsoluteWorld();
+				}
+			}
+			else if (data.relative)
+			{
+				ApplyRelativeWorld();
+			}
+			else
+			{
+				ApplyAbsoluteWorld();
 			}
 		}
 
-		void ApplyAbsoluteWorld () {
-			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
-			Bone target = this.target;
-			float ta = target.a, tb = target.b, tc = target.c, td = target.d;
-			float degRadReflect = ta * td - tb * tc > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
-			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-			var bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
-				bool modified = false;
-
-				if (rotateMix != 0) {
-					float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					float r = MathUtils.Atan2(tc, ta) - MathUtils.Atan2(c, a) + offsetRotation;
-					if (r > MathUtils.PI)
-						r -= MathUtils.PI2;
-					else if (r < -MathUtils.PI) r += MathUtils.PI2;
-					r *= rotateMix;
-					float cos = MathUtils.Cos(r), sin = MathUtils.Sin(r);
-					bone.a = cos * a - sin * c;
-					bone.b = cos * b - sin * d;
-					bone.c = sin * a + cos * c;
-					bone.d = sin * b + cos * d;
-					modified = true;
+		private void ApplyAbsoluteWorld()
+		{
+			float num = rotateMix;
+			float num2 = translateMix;
+			float num3 = scaleMix;
+			float num4 = shearMix;
+			Bone bone = target;
+			float a = bone.a;
+			float b = bone.b;
+			float c = bone.c;
+			float d = bone.d;
+			float num5 = ((a * d - b * c > 0f) ? ((float)Math.PI / 180f) : (-(float)Math.PI / 180f));
+			float num6 = data.offsetRotation * num5;
+			float num7 = data.offsetShearY * num5;
+			ExposedList<Bone> exposedList = bones;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				Bone bone2 = exposedList.Items[i];
+				bool flag = false;
+				if (num != 0f)
+				{
+					float a2 = bone2.a;
+					float b2 = bone2.b;
+					float c2 = bone2.c;
+					float d2 = bone2.d;
+					float num8 = MathUtils.Atan2(c, a) - MathUtils.Atan2(c2, a2) + num6;
+					if (num8 > (float)Math.PI)
+					{
+						num8 -= (float)Math.PI * 2f;
+					}
+					else if (num8 < -(float)Math.PI)
+					{
+						num8 += (float)Math.PI * 2f;
+					}
+					num8 *= num;
+					float num9 = MathUtils.Cos(num8);
+					float num10 = MathUtils.Sin(num8);
+					bone2.a = num9 * a2 - num10 * c2;
+					bone2.b = num9 * b2 - num10 * d2;
+					bone2.c = num10 * a2 + num9 * c2;
+					bone2.d = num10 * b2 + num9 * d2;
+					flag = true;
 				}
-
-				if (translateMix != 0) {
-					float tx, ty; //Vector2 temp = this.temp;
-					target.LocalToWorld(data.offsetX, data.offsetY, out tx, out ty); //target.localToWorld(temp.set(data.offsetX, data.offsetY));
-					bone.worldX += (tx - bone.worldX) * translateMix;
-					bone.worldY += (ty - bone.worldY) * translateMix;
-					modified = true;
+				if (num2 != 0f)
+				{
+					bone.LocalToWorld(data.offsetX, data.offsetY, out var worldX, out var worldY);
+					bone2.worldX += (worldX - bone2.worldX) * num2;
+					bone2.worldY += (worldY - bone2.worldY) * num2;
+					flag = true;
 				}
-
-				if (scaleMix > 0) {
-					float s = (float)Math.Sqrt(bone.a * bone.a + bone.c * bone.c);
-					//float ts = (float)Math.sqrt(ta * ta + tc * tc);
-					if (s > 0.00001f) s = (s + ((float)Math.Sqrt(ta * ta + tc * tc) - s + data.offsetScaleX) * scaleMix) / s;
-					bone.a *= s;
-					bone.c *= s;
-					s = (float)Math.Sqrt(bone.b * bone.b + bone.d * bone.d);
-					//ts = (float)Math.Sqrt(tb * tb + td * td);
-					if (s > 0.00001f) s = (s + ((float)Math.Sqrt(tb * tb + td * td) - s + data.offsetScaleY) * scaleMix) / s;
-					bone.b *= s;
-					bone.d *= s;
-					modified = true;
+				if (num3 > 0f)
+				{
+					float num11 = Mathf.Sqrt(bone2.a * bone2.a + bone2.c * bone2.c);
+					if (num11 > 1E-05f)
+					{
+						num11 = (num11 + (Mathf.Sqrt(a * a + c * c) - num11 + data.offsetScaleX) * num3) / num11;
+					}
+					bone2.a *= num11;
+					bone2.c *= num11;
+					num11 = Mathf.Sqrt(bone2.b * bone2.b + bone2.d * bone2.d);
+					if (num11 > 1E-05f)
+					{
+						num11 = (num11 + (Mathf.Sqrt(b * b + d * d) - num11 + data.offsetScaleY) * num3) / num11;
+					}
+					bone2.b *= num11;
+					bone2.d *= num11;
+					flag = true;
 				}
-
-				if (shearMix > 0) {
-					float b = bone.b, d = bone.d;
-					float by = MathUtils.Atan2(d, b);
-					float r = MathUtils.Atan2(td, tb) - MathUtils.Atan2(tc, ta) - (by - MathUtils.Atan2(bone.c, bone.a));
-					if (r > MathUtils.PI)
-						r -= MathUtils.PI2;
-					else if (r < -MathUtils.PI) r += MathUtils.PI2;
-					r = by + (r + offsetShearY) * shearMix;
-					float s = (float)Math.Sqrt(b * b + d * d);
-					bone.b = MathUtils.Cos(r) * s;
-					bone.d = MathUtils.Sin(r) * s;
-					modified = true;
+				if (num4 > 0f)
+				{
+					float b3 = bone2.b;
+					float d3 = bone2.d;
+					float num12 = MathUtils.Atan2(d3, b3);
+					float num13 = MathUtils.Atan2(d, b) - MathUtils.Atan2(c, a) - (num12 - MathUtils.Atan2(bone2.c, bone2.a));
+					if (num13 > (float)Math.PI)
+					{
+						num13 -= (float)Math.PI * 2f;
+					}
+					else if (num13 < -(float)Math.PI)
+					{
+						num13 += (float)Math.PI * 2f;
+					}
+					num13 = num12 + (num13 + num7) * num4;
+					float num14 = Mathf.Sqrt(b3 * b3 + d3 * d3);
+					bone2.b = MathUtils.Cos(num13) * num14;
+					bone2.d = MathUtils.Sin(num13) * num14;
+					flag = true;
 				}
-
-				if (modified) bone.appliedValid = false;
+				if (flag)
+				{
+					bone2.appliedValid = false;
+				}
 			}
 		}
 
-		void ApplyRelativeWorld () {
-			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
-			Bone target = this.target;
-			float ta = target.a, tb = target.b, tc = target.c, td = target.d;
-			float degRadReflect = ta * td - tb * tc > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
-			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-			var bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
-				bool modified = false;
-
-				if (rotateMix != 0) {
-					float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-					float r = MathUtils.Atan2(tc, ta) + offsetRotation;
-					if (r > MathUtils.PI)
-						r -= MathUtils.PI2;
-					else if (r < -MathUtils.PI) r += MathUtils.PI2;
-					r *= rotateMix;
-					float cos = MathUtils.Cos(r), sin = MathUtils.Sin(r);
-					bone.a = cos * a - sin * c;
-					bone.b = cos * b - sin * d;
-					bone.c = sin * a + cos * c;
-					bone.d = sin * b + cos * d;
-					modified = true;
+		private void ApplyRelativeWorld()
+		{
+			float num = rotateMix;
+			float num2 = translateMix;
+			float num3 = scaleMix;
+			float num4 = shearMix;
+			Bone bone = target;
+			float a = bone.a;
+			float b = bone.b;
+			float c = bone.c;
+			float d = bone.d;
+			float num5 = ((a * d - b * c > 0f) ? ((float)Math.PI / 180f) : (-(float)Math.PI / 180f));
+			float num6 = data.offsetRotation * num5;
+			float num7 = data.offsetShearY * num5;
+			ExposedList<Bone> exposedList = bones;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				Bone bone2 = exposedList.Items[i];
+				bool flag = false;
+				if (num != 0f)
+				{
+					float a2 = bone2.a;
+					float b2 = bone2.b;
+					float c2 = bone2.c;
+					float d2 = bone2.d;
+					float num8 = MathUtils.Atan2(c, a) + num6;
+					if (num8 > (float)Math.PI)
+					{
+						num8 -= (float)Math.PI * 2f;
+					}
+					else if (num8 < -(float)Math.PI)
+					{
+						num8 += (float)Math.PI * 2f;
+					}
+					num8 *= num;
+					float num9 = MathUtils.Cos(num8);
+					float num10 = MathUtils.Sin(num8);
+					bone2.a = num9 * a2 - num10 * c2;
+					bone2.b = num9 * b2 - num10 * d2;
+					bone2.c = num10 * a2 + num9 * c2;
+					bone2.d = num10 * b2 + num9 * d2;
+					flag = true;
 				}
-
-				if (translateMix != 0) {
-					float tx, ty; //Vector2 temp = this.temp;
-					target.LocalToWorld(data.offsetX, data.offsetY, out tx, out ty); //target.localToWorld(temp.set(data.offsetX, data.offsetY));
-					bone.worldX += tx * translateMix;
-					bone.worldY += ty * translateMix;
-					modified = true;
+				if (num2 != 0f)
+				{
+					bone.LocalToWorld(data.offsetX, data.offsetY, out var worldX, out var worldY);
+					bone2.worldX += worldX * num2;
+					bone2.worldY += worldY * num2;
+					flag = true;
 				}
-
-				if (scaleMix > 0) {
-					float s = ((float)Math.Sqrt(ta * ta + tc * tc) - 1 + data.offsetScaleX) * scaleMix + 1;
-					bone.a *= s;
-					bone.c *= s;
-					s = ((float)Math.Sqrt(tb * tb + td * td) - 1 + data.offsetScaleY) * scaleMix + 1;
-					bone.b *= s;
-					bone.d *= s;
-					modified = true;
+				if (num3 > 0f)
+				{
+					float num11 = (Mathf.Sqrt(a * a + c * c) - 1f + data.offsetScaleX) * num3 + 1f;
+					bone2.a *= num11;
+					bone2.c *= num11;
+					num11 = (Mathf.Sqrt(b * b + d * d) - 1f + data.offsetScaleY) * num3 + 1f;
+					bone2.b *= num11;
+					bone2.d *= num11;
+					flag = true;
 				}
-
-				if (shearMix > 0) {
-					float r = MathUtils.Atan2(td, tb) - MathUtils.Atan2(tc, ta);
-					if (r > MathUtils.PI)
-						r -= MathUtils.PI2;
-					else if (r < -MathUtils.PI) r += MathUtils.PI2;
-					float b = bone.b, d = bone.d;
-					r = MathUtils.Atan2(d, b) + (r - MathUtils.PI / 2 + offsetShearY) * shearMix;
-					float s = (float)Math.Sqrt(b * b + d * d);
-					bone.b = MathUtils.Cos(r) * s;
-					bone.d = MathUtils.Sin(r) * s;
-					modified = true;
+				if (num4 > 0f)
+				{
+					float num12 = MathUtils.Atan2(d, b) - MathUtils.Atan2(c, a);
+					if (num12 > (float)Math.PI)
+					{
+						num12 -= (float)Math.PI * 2f;
+					}
+					else if (num12 < -(float)Math.PI)
+					{
+						num12 += (float)Math.PI * 2f;
+					}
+					float b3 = bone2.b;
+					float d3 = bone2.d;
+					num12 = MathUtils.Atan2(d3, b3) + (num12 - (float)Math.PI / 2f + num7) * num4;
+					float num13 = Mathf.Sqrt(b3 * b3 + d3 * d3);
+					bone2.b = MathUtils.Cos(num12) * num13;
+					bone2.d = MathUtils.Sin(num12) * num13;
+					flag = true;
 				}
-
-				if (modified) bone.appliedValid = false;
+				if (flag)
+				{
+					bone2.appliedValid = false;
+				}
 			}
 		}
 
-		void ApplyAbsoluteLocal () {
-			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
-			Bone target = this.target;
-			if (!target.appliedValid) target.UpdateAppliedTransform();
-			var bonesItems = this.bones.Items;
-			for (int i = 0, n = this.bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
-				if (!bone.appliedValid) bone.UpdateAppliedTransform();
-
-				float rotation = bone.arotation;
-				if (rotateMix != 0) {
-					float r = target.arotation - rotation + data.offsetRotation;
-					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-					rotation += r * rotateMix;
+		private void ApplyAbsoluteLocal()
+		{
+			float num = rotateMix;
+			float num2 = translateMix;
+			float num3 = scaleMix;
+			float num4 = shearMix;
+			Bone bone = target;
+			if (!bone.appliedValid)
+			{
+				bone.UpdateAppliedTransform();
+			}
+			Bone[] items = bones.Items;
+			int i = 0;
+			for (int count = bones.Count; i < count; i++)
+			{
+				Bone bone2 = items[i];
+				if (!bone2.appliedValid)
+				{
+					bone2.UpdateAppliedTransform();
 				}
-
-				float x = bone.ax, y = bone.ay;
-				if (translateMix != 0) {
-					x += (target.ax - x + data.offsetX) * translateMix;
-					y += (target.ay - y + data.offsetY) * translateMix;
+				float num5 = bone2.arotation;
+				if (num != 0f)
+				{
+					float num6 = bone.arotation - num5 + data.offsetRotation;
+					num6 -= (float)((16384 - (int)(16384.499999999996 - (double)(num6 / 360f))) * 360);
+					num5 += num6 * num;
 				}
-
-				float scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-				if (scaleMix > 0) {
-					if (scaleX > 0.00001f) scaleX = (scaleX + (target.ascaleX - scaleX + data.offsetScaleX) * scaleMix) / scaleX;
-					if (scaleY > 0.00001f) scaleY = (scaleY + (target.ascaleY - scaleY + data.offsetScaleY) * scaleMix) / scaleY;
+				float num7 = bone2.ax;
+				float num8 = bone2.ay;
+				if (num2 != 0f)
+				{
+					num7 += (bone.ax - num7 + data.offsetX) * num2;
+					num8 += (bone.ay - num8 + data.offsetY) * num2;
 				}
-
-				float shearY = bone.ashearY;
-				if (shearMix > 0) {
-					float r = target.ashearY - shearY + data.offsetShearY;
-					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-					bone.shearY += r * shearMix;
+				float num9 = bone2.ascaleX;
+				float num10 = bone2.ascaleY;
+				if (num3 > 0f)
+				{
+					if (num9 > 1E-05f)
+					{
+						num9 = (num9 + (bone.ascaleX - num9 + data.offsetScaleX) * num3) / num9;
+					}
+					if (num10 > 1E-05f)
+					{
+						num10 = (num10 + (bone.ascaleY - num10 + data.offsetScaleY) * num3) / num10;
+					}
 				}
-
-				bone.UpdateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
+				float ashearY = bone2.ashearY;
+				if (num4 > 0f)
+				{
+					float num11 = bone.ashearY - ashearY + data.offsetShearY;
+					num11 -= (float)((16384 - (int)(16384.499999999996 - (double)(num11 / 360f))) * 360);
+					bone2.shearY += num11 * num4;
+				}
+				bone2.UpdateWorldTransform(num7, num8, num5, num9, num10, bone2.ashearX, ashearY);
 			}
 		}
 
-		void ApplyRelativeLocal () {
-			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
-			Bone target = this.target;
-			if (!target.appliedValid) target.UpdateAppliedTransform();
-			var bonesItems = this.bones.Items;
-			for (int i = 0, n = this.bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
-				if (!bone.appliedValid) bone.UpdateAppliedTransform();
-
-				float rotation = bone.arotation;
-				if (rotateMix != 0) rotation += (target.arotation + data.offsetRotation) * rotateMix;
-
-				float x = bone.ax, y = bone.ay;
-				if (translateMix != 0) {
-					x += (target.ax + data.offsetX) * translateMix;
-					y += (target.ay + data.offsetY) * translateMix;
+		private void ApplyRelativeLocal()
+		{
+			float num = rotateMix;
+			float num2 = translateMix;
+			float num3 = scaleMix;
+			float num4 = shearMix;
+			Bone bone = target;
+			if (!bone.appliedValid)
+			{
+				bone.UpdateAppliedTransform();
+			}
+			Bone[] items = bones.Items;
+			int i = 0;
+			for (int count = bones.Count; i < count; i++)
+			{
+				Bone bone2 = items[i];
+				if (!bone2.appliedValid)
+				{
+					bone2.UpdateAppliedTransform();
 				}
-
-				float scaleX = bone.ascaleX, scaleY = bone.ascaleY;
-				if (scaleMix > 0) {
-					if (scaleX > 0.00001f) scaleX *= ((target.ascaleX - 1 + data.offsetScaleX) * scaleMix) + 1;
-					if (scaleY > 0.00001f) scaleY *= ((target.ascaleY - 1 + data.offsetScaleY) * scaleMix) + 1;
+				float num5 = bone2.arotation;
+				if (num != 0f)
+				{
+					num5 += (bone.arotation + data.offsetRotation) * num;
 				}
-
-				float shearY = bone.ashearY;
-				if (shearMix > 0) shearY += (target.ashearY + data.offsetShearY) * shearMix;
-
-				bone.UpdateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
+				float num6 = bone2.ax;
+				float num7 = bone2.ay;
+				if (num2 != 0f)
+				{
+					num6 += (bone.ax + data.offsetX) * num2;
+					num7 += (bone.ay + data.offsetY) * num2;
+				}
+				float num8 = bone2.ascaleX;
+				float num9 = bone2.ascaleY;
+				if (num3 > 0f)
+				{
+					if (num8 > 1E-05f)
+					{
+						num8 *= (bone.ascaleX - 1f + data.offsetScaleX) * num3 + 1f;
+					}
+					if (num9 > 1E-05f)
+					{
+						num9 *= (bone.ascaleY - 1f + data.offsetScaleY) * num3 + 1f;
+					}
+				}
+				float num10 = bone2.ashearY;
+				if (num4 > 0f)
+				{
+					num10 += (bone.ashearY + data.offsetShearY) * num4;
+				}
+				bone2.UpdateWorldTransform(num6, num7, num5, num8, num9, bone2.ashearX, num10);
 			}
 		}
 
-		override public string ToString () {
+		public override string ToString()
+		{
 			return data.name;
 		}
 	}

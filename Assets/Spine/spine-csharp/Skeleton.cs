@@ -1,415 +1,681 @@
-/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
 using System;
 using System.Collections.Generic;
 
-namespace Spine {
-	public class Skeleton {
+namespace Spine
+{
+	public class Skeleton
+	{
 		internal SkeletonData data;
+
 		internal ExposedList<Bone> bones;
+
 		internal ExposedList<Slot> slots;
+
 		internal ExposedList<Slot> drawOrder;
+
 		internal ExposedList<IkConstraint> ikConstraints;
+
 		internal ExposedList<TransformConstraint> transformConstraints;
+
 		internal ExposedList<PathConstraint> pathConstraints;
+
 		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
+
 		internal ExposedList<Bone> updateCacheReset = new ExposedList<Bone>();
+
 		internal Skin skin;
-		internal float r = 1, g = 1, b = 1, a = 1;
+
+		internal float r = 1f;
+
+		internal float g = 1f;
+
+		internal float b = 1f;
+
+		internal float a = 1f;
+
 		internal float time;
-		internal bool flipX, flipY;
-		internal float x, y;
 
-		public SkeletonData Data { get { return data; } }
-		public ExposedList<Bone> Bones { get { return bones; } }
-		public ExposedList<IUpdatable> UpdateCacheList { get { return updateCache; } }
-		public ExposedList<Slot> Slots { get { return slots; } }
-		public ExposedList<Slot> DrawOrder { get { return drawOrder; } }
-		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } }
-		public ExposedList<PathConstraint> PathConstraints { get { return pathConstraints; } }
-		public ExposedList<TransformConstraint> TransformConstraints { get { return transformConstraints; } }
-		public Skin Skin { get { return skin; } set { skin = value; } }
-		public float R { get { return r; } set { r = value; } }
-		public float G { get { return g; } set { g = value; } }
-		public float B { get { return b; } set { b = value; } }
-		public float A { get { return a; } set { a = value; } }
-		public float Time { get { return time; } set { time = value; } }
-		public float X { get { return x; } set { x = value; } }
-		public float Y { get { return y; } set { y = value; } }
-		public bool FlipX { get { return flipX; } set { flipX = value; } }
-		public bool FlipY { get { return flipY; } set { flipY = value; } }
+		internal bool flipX;
 
-		public Bone RootBone {
-			get { return bones.Count == 0 ? null : bones.Items[0]; }
+		internal bool flipY;
+
+		internal float x;
+
+		internal float y;
+
+		public SkeletonData Data => data;
+
+		public ExposedList<Bone> Bones => bones;
+
+		public ExposedList<IUpdatable> UpdateCacheList => updateCache;
+
+		public ExposedList<Slot> Slots => slots;
+
+		public ExposedList<Slot> DrawOrder => drawOrder;
+
+		public ExposedList<IkConstraint> IkConstraints => ikConstraints;
+
+		public ExposedList<PathConstraint> PathConstraints => pathConstraints;
+
+		public ExposedList<TransformConstraint> TransformConstraints => transformConstraints;
+
+		public Skin Skin
+		{
+			get
+			{
+				return skin;
+			}
+			set
+			{
+				skin = value;
+			}
 		}
 
-		public Skeleton (SkeletonData data) {
-			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
-			this.data = data;
-
-			bones = new ExposedList<Bone>(data.bones.Count);
-			foreach (BoneData boneData in data.bones) {
-				Bone bone;
-				if (boneData.parent == null) {
-					bone = new Bone(boneData, this, null);				
-				} else {
-					Bone parent = bones.Items[boneData.parent.index];
-					bone = new Bone(boneData, this, parent);
-					parent.children.Add(bone);
-				}
-				bones.Add(bone);
+		public float R
+		{
+			get
+			{
+				return r;
 			}
+			set
+			{
+				r = value;
+			}
+		}
 
+		public float G
+		{
+			get
+			{
+				return g;
+			}
+			set
+			{
+				g = value;
+			}
+		}
+
+		public float B
+		{
+			get
+			{
+				return b;
+			}
+			set
+			{
+				b = value;
+			}
+		}
+
+		public float A
+		{
+			get
+			{
+				return a;
+			}
+			set
+			{
+				a = value;
+			}
+		}
+
+		public float Time
+		{
+			get
+			{
+				return time;
+			}
+			set
+			{
+				time = value;
+			}
+		}
+
+		public float X
+		{
+			get
+			{
+				return x;
+			}
+			set
+			{
+				x = value;
+			}
+		}
+
+		public float Y
+		{
+			get
+			{
+				return y;
+			}
+			set
+			{
+				y = value;
+			}
+		}
+
+		public bool FlipX
+		{
+			get
+			{
+				return flipX;
+			}
+			set
+			{
+				flipX = value;
+			}
+		}
+
+		public bool FlipY
+		{
+			get
+			{
+				return flipY;
+			}
+			set
+			{
+				flipY = value;
+			}
+		}
+
+		public Bone RootBone
+		{
+			get
+			{
+				if (bones.Count != 0)
+				{
+					return bones.Items[0];
+				}
+				return null;
+			}
+		}
+
+		public Skeleton(SkeletonData data)
+		{
+			if (data == null)
+			{
+				throw new ArgumentNullException("data", "data cannot be null.");
+			}
+			this.data = data;
+			bones = new ExposedList<Bone>(data.bones.Count);
+			foreach (BoneData bone3 in data.bones)
+			{
+				Bone item;
+				if (bone3.parent == null)
+				{
+					item = new Bone(bone3, this, null);
+				}
+				else
+				{
+					Bone bone = bones.Items[bone3.parent.index];
+					item = new Bone(bone3, this, bone);
+					bone.children.Add(item);
+				}
+				bones.Add(item);
+			}
 			slots = new ExposedList<Slot>(data.slots.Count);
 			drawOrder = new ExposedList<Slot>(data.slots.Count);
-			foreach (SlotData slotData in data.slots) {
-				Bone bone = bones.Items[slotData.boneData.index];
-				Slot slot = new Slot(slotData, bone);
-				slots.Add(slot);
-				drawOrder.Add(slot);
+			foreach (SlotData slot in data.slots)
+			{
+				Bone bone2 = bones.Items[slot.boneData.index];
+				Slot item2 = new Slot(slot, bone2);
+				slots.Add(item2);
+				drawOrder.Add(item2);
 			}
-
 			ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
-			foreach (IkConstraintData ikConstraintData in data.ikConstraints)
-				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
-
+			foreach (IkConstraintData ikConstraint in data.ikConstraints)
+			{
+				ikConstraints.Add(new IkConstraint(ikConstraint, this));
+			}
 			transformConstraints = new ExposedList<TransformConstraint>(data.transformConstraints.Count);
-			foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
-				transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
-
-			pathConstraints = new ExposedList<PathConstraint> (data.pathConstraints.Count);
-			foreach (PathConstraintData pathConstraintData in data.pathConstraints)
-				pathConstraints.Add(new PathConstraint(pathConstraintData, this));
-
+			foreach (TransformConstraintData transformConstraint in data.transformConstraints)
+			{
+				transformConstraints.Add(new TransformConstraint(transformConstraint, this));
+			}
+			pathConstraints = new ExposedList<PathConstraint>(data.pathConstraints.Count);
+			foreach (PathConstraintData pathConstraint in data.pathConstraints)
+			{
+				pathConstraints.Add(new PathConstraint(pathConstraint, this));
+			}
 			UpdateCache();
 			UpdateWorldTransform();
 		}
 
-		/// <summary>Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
-		/// or removed.</summary>
-		public void UpdateCache () {
-			ExposedList<IUpdatable> updateCache = this.updateCache;
+		public void UpdateCache()
+		{
 			updateCache.Clear();
-			this.updateCacheReset.Clear();
-
-			ExposedList<Bone> bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				bones.Items[i].sorted = false;
-
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
-			var transformConstraints = this.transformConstraints;
-			var pathConstraints = this.pathConstraints;
-			int ikCount = IkConstraints.Count, transformCount = transformConstraints.Count, pathCount = pathConstraints.Count;
-			int constraintCount = ikCount + transformCount + pathCount;
-			//outer:
-			for (int i = 0; i < constraintCount; i++) {
-				for (int ii = 0; ii < ikCount; ii++) {
-					IkConstraint constraint = ikConstraints.Items[ii];
-					if (constraint.data.order == i) {
-						SortIkConstraint(constraint);
-						goto continue_outer; //continue outer;
-					}
-				}
-				for (int ii = 0; ii < transformCount; ii++) {
-					TransformConstraint constraint = transformConstraints.Items[ii];
-					if (constraint.data.order == i) {
-						SortTransformConstraint(constraint);
-						goto continue_outer; //continue outer;
-					}
-				}
-				for (int ii = 0; ii < pathCount; ii++) {
-					PathConstraint constraint = pathConstraints.Items[ii];
-					if (constraint.data.order == i) {
-						SortPathConstraint(constraint);
-						goto continue_outer; //continue outer;
-					}
-				}
-				continue_outer: {}
+			updateCacheReset.Clear();
+			ExposedList<Bone> exposedList = bones;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				exposedList.Items[i].sorted = false;
 			}
-
-			for (int i = 0, n = bones.Count; i < n; i++)
-				SortBone(bones.Items[i]);
+			ExposedList<IkConstraint> exposedList2 = ikConstraints;
+			ExposedList<TransformConstraint> exposedList3 = transformConstraints;
+			ExposedList<PathConstraint> exposedList4 = pathConstraints;
+			int count2 = IkConstraints.Count;
+			int count3 = exposedList3.Count;
+			int count4 = exposedList4.Count;
+			int num = count2 + count3 + count4;
+			for (int j = 0; j < num; j++)
+			{
+				int num2 = 0;
+				while (true)
+				{
+					if (num2 < count2)
+					{
+						IkConstraint ikConstraint = exposedList2.Items[num2];
+						if (ikConstraint.data.order == j)
+						{
+							SortIkConstraint(ikConstraint);
+							break;
+						}
+						num2++;
+						continue;
+					}
+					int num3 = 0;
+					while (true)
+					{
+						if (num3 < count3)
+						{
+							TransformConstraint transformConstraint = exposedList3.Items[num3];
+							if (transformConstraint.data.order == j)
+							{
+								SortTransformConstraint(transformConstraint);
+								break;
+							}
+							num3++;
+							continue;
+						}
+						for (int k = 0; k < count4; k++)
+						{
+							PathConstraint pathConstraint = exposedList4.Items[k];
+							if (pathConstraint.data.order == j)
+							{
+								SortPathConstraint(pathConstraint);
+								break;
+							}
+						}
+						break;
+					}
+					break;
+				}
+			}
+			int l = 0;
+			for (int count5 = exposedList.Count; l < count5; l++)
+			{
+				SortBone(exposedList.Items[l]);
+			}
 		}
 
-		private void SortIkConstraint (IkConstraint constraint) {
+		private void SortIkConstraint(IkConstraint constraint)
+		{
 			Bone target = constraint.target;
 			SortBone(target);
-
-			var constrained = constraint.bones;
-			Bone parent = constrained.Items[0];
-			SortBone(parent);
-
-			if (constrained.Count > 1) {
-				Bone child = constrained.Items[constrained.Count - 1];
-				if (!updateCache.Contains(child))
-					updateCacheReset.Add(child);
+			ExposedList<Bone> exposedList = constraint.bones;
+			Bone bone = exposedList.Items[0];
+			SortBone(bone);
+			if (exposedList.Count > 1)
+			{
+				Bone item = exposedList.Items[exposedList.Count - 1];
+				if (!updateCache.Contains(item))
+				{
+					updateCacheReset.Add(item);
+				}
 			}
-
 			updateCache.Add(constraint);
-
-			SortReset(parent.children);
-			constrained.Items[constrained.Count - 1].sorted = true;
+			SortReset(bone.children);
+			exposedList.Items[exposedList.Count - 1].sorted = true;
 		}
 
-		private void SortPathConstraint (PathConstraint constraint) {
-			Slot slot = constraint.target;
-			int slotIndex = slot.data.index;
-			Bone slotBone = slot.bone;
-			if (skin != null) SortPathConstraintAttachment(skin, slotIndex, slotBone);
+		private void SortPathConstraint(PathConstraint constraint)
+		{
+			Slot target = constraint.target;
+			int index = target.data.index;
+			Bone bone = target.bone;
+			if (skin != null)
+			{
+				SortPathConstraintAttachment(skin, index, bone);
+			}
 			if (data.defaultSkin != null && data.defaultSkin != skin)
-				SortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-			for (int ii = 0, nn = data.skins.Count; ii < nn; ii++)
-				SortPathConstraintAttachment(data.skins.Items[ii], slotIndex, slotBone);
-
-			Attachment attachment = slot.attachment;
-			if (attachment is PathAttachment) SortPathConstraintAttachment(attachment, slotBone);
-
-			var constrained = constraint.bones;
-			int boneCount = constrained.Count;
-			for (int i = 0; i < boneCount; i++)
-				SortBone(constrained.Items[i]);
-
+			{
+				SortPathConstraintAttachment(data.defaultSkin, index, bone);
+			}
+			int i = 0;
+			for (int count = data.skins.Count; i < count; i++)
+			{
+				SortPathConstraintAttachment(data.skins.Items[i], index, bone);
+			}
+			Attachment attachment = target.attachment;
+			if (attachment is PathAttachment)
+			{
+				SortPathConstraintAttachment(attachment, bone);
+			}
+			ExposedList<Bone> exposedList = constraint.bones;
+			int count2 = exposedList.Count;
+			for (int j = 0; j < count2; j++)
+			{
+				SortBone(exposedList.Items[j]);
+			}
 			updateCache.Add(constraint);
-
-			for (int i = 0; i < boneCount; i++)
-				SortReset(constrained.Items[i].children);
-			for (int i = 0; i < boneCount; i++)
-				constrained.Items[i].sorted = true;
+			for (int k = 0; k < count2; k++)
+			{
+				SortReset(exposedList.Items[k].children);
+			}
+			for (int l = 0; l < count2; l++)
+			{
+				exposedList.Items[l].sorted = true;
+			}
 		}
 
-		private void SortTransformConstraint (TransformConstraint constraint) {
+		private void SortTransformConstraint(TransformConstraint constraint)
+		{
 			SortBone(constraint.target);
-
-			var constrained = constraint.bones;
-			int boneCount = constrained.Count;
-			if (constraint.data.local) {
-				for (int i = 0; i < boneCount; i++) {
-					Bone child = constrained.Items[i];
-					SortBone(child.parent);
-					if (!updateCache.Contains(child)) updateCacheReset.Add(child);
+			ExposedList<Bone> exposedList = constraint.bones;
+			int count = exposedList.Count;
+			if (constraint.data.local)
+			{
+				for (int i = 0; i < count; i++)
+				{
+					Bone bone = exposedList.Items[i];
+					SortBone(bone.parent);
+					if (!updateCache.Contains(bone))
+					{
+						updateCacheReset.Add(bone);
+					}
 				}
-			} else {
-				for (int i = 0; i < boneCount; i++)
-					SortBone(constrained.Items[i]);
 			}
-
+			else
+			{
+				for (int j = 0; j < count; j++)
+				{
+					SortBone(exposedList.Items[j]);
+				}
+			}
 			updateCache.Add(constraint);
-
-			for (int i = 0; i < boneCount; i++)
-				SortReset(constrained.Items[i].children);
-			for (int i = 0; i < boneCount; i++)
-				constrained.Items[i].sorted = true;
+			for (int k = 0; k < count; k++)
+			{
+				SortReset(exposedList.Items[k].children);
+			}
+			for (int l = 0; l < count; l++)
+			{
+				exposedList.Items[l].sorted = true;
+			}
 		}
 
-		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
-			foreach (var entry in skin.Attachments)
-				if (entry.Key.slotIndex == slotIndex) SortPathConstraintAttachment(entry.Value, slotBone);
-		}
-
-		private void SortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
-			if (!(attachment is PathAttachment)) return;
-			int[] pathBones = ((PathAttachment)attachment).bones;
-			if (pathBones == null)
-				SortBone(slotBone);
-			else {
-				var bones = this.bones;
-				for (int i = 0, n = pathBones.Length; i < n;) {
-					int nn = pathBones[i++];
-					nn += i;
-					while (i < nn)
-						SortBone(bones.Items[pathBones[i++]]);
+		private void SortPathConstraintAttachment(Skin skin, int slotIndex, Bone slotBone)
+		{
+			foreach (KeyValuePair<Skin.AttachmentKeyTuple, Attachment> attachment in skin.Attachments)
+			{
+				if (attachment.Key.slotIndex == slotIndex)
+				{
+					SortPathConstraintAttachment(attachment.Value, slotBone);
 				}
 			}
 		}
 
-		private void SortBone (Bone bone) {
-			if (bone.sorted) return;
-			Bone parent = bone.parent;
-			if (parent != null) SortBone(parent);
-			bone.sorted = true;
-			updateCache.Add(bone);
+		private void SortPathConstraintAttachment(Attachment attachment, Bone slotBone)
+		{
+			if (!(attachment is PathAttachment))
+			{
+				return;
+			}
+			int[] array = ((PathAttachment)attachment).bones;
+			if (array == null)
+			{
+				SortBone(slotBone);
+				return;
+			}
+			ExposedList<Bone> exposedList = bones;
+			int num = 0;
+			int num2 = array.Length;
+			while (num < num2)
+			{
+				int num3 = array[num++];
+				num3 += num;
+				while (num < num3)
+				{
+					SortBone(exposedList.Items[array[num++]]);
+				}
+			}
 		}
 
-		private static void SortReset (ExposedList<Bone> bones) {
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
-				if (bone.sorted) SortReset(bone.children);
+		private void SortBone(Bone bone)
+		{
+			if (!bone.sorted)
+			{
+				Bone parent = bone.parent;
+				if (parent != null)
+				{
+					SortBone(parent);
+				}
+				bone.sorted = true;
+				updateCache.Add(bone);
+			}
+		}
+
+		private static void SortReset(ExposedList<Bone> bones)
+		{
+			Bone[] items = bones.Items;
+			int i = 0;
+			for (int count = bones.Count; i < count; i++)
+			{
+				Bone bone = items[i];
+				if (bone.sorted)
+				{
+					SortReset(bone.children);
+				}
 				bone.sorted = false;
 			}
 		}
 
-		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
-		public void UpdateWorldTransform () {
-			var updateCacheReset = this.updateCacheReset;
-			var updateCacheResetItems = updateCacheReset.Items;
-			for (int i = 0, n = updateCacheReset.Count; i < n; i++) {
-				Bone bone = updateCacheResetItems[i];
-				bone.ax = bone.x;
-				bone.ay = bone.y;
-				bone.arotation = bone.rotation;
-				bone.ascaleX = bone.scaleX;
-				bone.ascaleY = bone.scaleY;
-				bone.ashearX = bone.shearX;
-				bone.ashearY = bone.shearY;
-				bone.appliedValid = true;
+		public void UpdateWorldTransform()
+		{
+			ExposedList<Bone> exposedList = updateCacheReset;
+			Bone[] items = exposedList.Items;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				Bone obj = items[i];
+				obj.ax = obj.x;
+				obj.ay = obj.y;
+				obj.arotation = obj.rotation;
+				obj.ascaleX = obj.scaleX;
+				obj.ascaleY = obj.scaleY;
+				obj.ashearX = obj.shearX;
+				obj.ashearY = obj.shearY;
+				obj.appliedValid = true;
 			}
-			var updateItems = this.updateCache.Items;
-			for (int i = 0, n = updateCache.Count; i < n; i++)
-				updateItems[i].Update();
+			IUpdatable[] items2 = updateCache.Items;
+			int j = 0;
+			for (int count2 = updateCache.Count; j < count2; j++)
+			{
+				items2[j].Update();
+			}
 		}
 
-		/// <summary>Sets the bones, constraints, and slots to their setup pose values.</summary>
-		public void SetToSetupPose () {
+		public void SetToSetupPose()
+		{
 			SetBonesToSetupPose();
 			SetSlotsToSetupPose();
 		}
 
-		/// <summary>Sets the bones and constraints to their setup pose values.</summary>
-		public void SetBonesToSetupPose () {
-			var bonesItems = this.bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				bonesItems[i].SetToSetupPose();
-
-			var ikConstraintsItems = this.ikConstraints.Items;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint constraint = ikConstraintsItems[i];
-				constraint.bendDirection = constraint.data.bendDirection;
-				constraint.mix = constraint.data.mix;
+		public void SetBonesToSetupPose()
+		{
+			Bone[] items = bones.Items;
+			int i = 0;
+			for (int count = bones.Count; i < count; i++)
+			{
+				items[i].SetToSetupPose();
 			}
-
-			var transformConstraintsItems = this.transformConstraints.Items;
-			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraint constraint = transformConstraintsItems[i];
-				TransformConstraintData constraintData = constraint.data;
-				constraint.rotateMix = constraintData.rotateMix;
-				constraint.translateMix = constraintData.translateMix;
-				constraint.scaleMix = constraintData.scaleMix;
-				constraint.shearMix = constraintData.shearMix;
+			IkConstraint[] items2 = ikConstraints.Items;
+			int j = 0;
+			for (int count2 = ikConstraints.Count; j < count2; j++)
+			{
+				IkConstraint obj = items2[j];
+				obj.bendDirection = obj.data.bendDirection;
+				obj.mix = obj.data.mix;
 			}
-
-			var pathConstraintItems = this.pathConstraints.Items;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraintItems[i];
-				PathConstraintData constraintData = constraint.data;
-				constraint.position = constraintData.position;
-				constraint.spacing = constraintData.spacing;
-				constraint.rotateMix = constraintData.rotateMix;
-				constraint.translateMix = constraintData.translateMix;
+			TransformConstraint[] items3 = transformConstraints.Items;
+			int k = 0;
+			for (int count3 = transformConstraints.Count; k < count3; k++)
+			{
+				TransformConstraint obj2 = items3[k];
+				TransformConstraintData transformConstraintData = obj2.data;
+				obj2.rotateMix = transformConstraintData.rotateMix;
+				obj2.translateMix = transformConstraintData.translateMix;
+				obj2.scaleMix = transformConstraintData.scaleMix;
+				obj2.shearMix = transformConstraintData.shearMix;
+			}
+			PathConstraint[] items4 = pathConstraints.Items;
+			int l = 0;
+			for (int count4 = pathConstraints.Count; l < count4; l++)
+			{
+				PathConstraint obj3 = items4[l];
+				PathConstraintData pathConstraintData = obj3.data;
+				obj3.position = pathConstraintData.position;
+				obj3.spacing = pathConstraintData.spacing;
+				obj3.rotateMix = pathConstraintData.rotateMix;
+				obj3.translateMix = pathConstraintData.translateMix;
 			}
 		}
 
-		public void SetSlotsToSetupPose () {
-			var slots = this.slots;
-			var slotsItems = slots.Items;
+		public void SetSlotsToSetupPose()
+		{
+			ExposedList<Slot> exposedList = slots;
+			Slot[] items = exposedList.Items;
 			drawOrder.Clear();
-			for (int i = 0, n = slots.Count; i < n; i++)
-				drawOrder.Add(slotsItems[i]);
-
-			for (int i = 0, n = slots.Count; i < n; i++)
-				slotsItems[i].SetToSetupPose();
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				drawOrder.Add(items[i]);
+			}
+			int j = 0;
+			for (int count2 = exposedList.Count; j < count2; j++)
+			{
+				items[j].SetToSetupPose();
+			}
 		}
 
-		/// <returns>May be null.</returns>
-		public Bone FindBone (string boneName) {
-			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones;
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
-				if (bone.data.name == boneName) return bone;
+		public Bone FindBone(string boneName)
+		{
+			if (boneName == null)
+			{
+				throw new ArgumentNullException("boneName", "boneName cannot be null.");
+			}
+			ExposedList<Bone> exposedList = bones;
+			Bone[] items = exposedList.Items;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				Bone bone = items[i];
+				if (bone.data.name == boneName)
+				{
+					return bone;
+				}
 			}
 			return null;
 		}
 
-		/// <returns>-1 if the bone was not found.</returns>
-		public int FindBoneIndex (string boneName) {
-			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones;
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bonesItems[i].data.name == boneName) return i;
+		public int FindBoneIndex(string boneName)
+		{
+			if (boneName == null)
+			{
+				throw new ArgumentNullException("boneName", "boneName cannot be null.");
+			}
+			ExposedList<Bone> exposedList = bones;
+			Bone[] items = exposedList.Items;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				if (items[i].data.name == boneName)
+				{
+					return i;
+				}
+			}
 			return -1;
 		}
 
-		/// <returns>May be null.</returns>
-		public Slot FindSlot (string slotName) {
-			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			var slots = this.slots;
-			var slotsItems = slots.Items;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slotsItems[i];
-				if (slot.data.name == slotName) return slot;
+		public Slot FindSlot(string slotName)
+		{
+			if (slotName == null)
+			{
+				throw new ArgumentNullException("slotName", "slotName cannot be null.");
+			}
+			ExposedList<Slot> exposedList = slots;
+			Slot[] items = exposedList.Items;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				Slot slot = items[i];
+				if (slot.data.name == slotName)
+				{
+					return slot;
+				}
 			}
 			return null;
 		}
 
-		/// <returns>-1 if the bone was not found.</returns>
-		public int FindSlotIndex (string slotName) {
-			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			var slots = this.slots;
-			var slotsItems = slots.Items;
-			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slotsItems[i].data.name.Equals(slotName)) return i;
+		public int FindSlotIndex(string slotName)
+		{
+			if (slotName == null)
+			{
+				throw new ArgumentNullException("slotName", "slotName cannot be null.");
+			}
+			ExposedList<Slot> exposedList = slots;
+			Slot[] items = exposedList.Items;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				if (items[i].data.name.Equals(slotName))
+				{
+					return i;
+				}
+			}
 			return -1;
 		}
 
-		/// <summary>Sets a skin by name (see SetSkin).</summary>
-		public void SetSkin (string skinName) {
-			Skin foundSkin = data.FindSkin(skinName);
-			if (foundSkin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
-			SetSkin(foundSkin);
+		public void SetSkin(string skinName, bool _isNothingCheck = true)
+		{
+			Skin skin = data.FindSkin(skinName);
+			if (skin == null)
+			{
+				if (_isNothingCheck)
+				{
+					throw new ArgumentException("Skin not found: " + skinName, "skinName");
+				}
+			}
+			else
+			{
+				SetSkin(skin);
+			}
 		}
 
-		/// <summary>
-		/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. 
-		/// If there was no old skin, each slot's setup mode attachment is attached from the new skin.</para>
-		/// <para>After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling 
-		/// <see cref="Skeleton.SetSlotsToSetupPose()"/>. 
-		/// Also, often <see cref="AnimationState.Apply(Skeleton)"/> is called before the next time the 
-		/// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.</para>
-		/// </summary>
-		/// <param name="newSkin">May be null.</param>
-		public void SetSkin (Skin newSkin) {
-			if (newSkin != null) {
+		public void SetSkin(Skin newSkin)
+		{
+			if (newSkin != null)
+			{
 				if (skin != null)
+				{
 					newSkin.AttachAll(this, skin);
-				else {
-					ExposedList<Slot> slots = this.slots;
-					for (int i = 0, n = slots.Count; i < n; i++) {
-						Slot slot = slots.Items[i];
-						string name = slot.data.attachmentName;
-						if (name != null) {
-							Attachment attachment = newSkin.GetAttachment(i, name);
-							if (attachment != null) slot.Attachment = attachment;
+				}
+				else
+				{
+					ExposedList<Slot> exposedList = slots;
+					int i = 0;
+					for (int count = exposedList.Count; i < count; i++)
+					{
+						Slot slot = exposedList.Items[i];
+						string attachmentName = slot.data.attachmentName;
+						if (attachmentName != null)
+						{
+							Attachment attachment = newSkin.GetAttachment(i, attachmentName);
+							if (attachment != null)
+							{
+								slot.Attachment = attachment;
+							}
 						}
 					}
 				}
@@ -417,125 +683,183 @@ namespace Spine {
 			skin = newSkin;
 		}
 
-		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (string slotName, string attachmentName) {
+		public Attachment GetAttachment(string slotName, string attachmentName)
+		{
 			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
 		}
 
-		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, string attachmentName) {
-			if (attachmentName == null) throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
-			if (skin != null) {
-				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
-				if (attachment != null) return attachment;
+		public Attachment GetAttachment(int slotIndex, string attachmentName)
+		{
+			if (attachmentName == null)
+			{
+				throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
 			}
-			return data.defaultSkin != null ? data.defaultSkin.GetAttachment(slotIndex, attachmentName) : null;
+			if (skin != null)
+			{
+				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
+				if (attachment != null)
+				{
+					return attachment;
+				}
+			}
+			if (data.defaultSkin == null)
+			{
+				return null;
+			}
+			return data.defaultSkin.GetAttachment(slotIndex, attachmentName);
 		}
 
-		/// <param name="attachmentName">May be null.</param>
-		public void SetAttachment (string slotName, string attachmentName) {
-			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			ExposedList<Slot> slots = this.slots;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slots.Items[i];
-				if (slot.data.name == slotName) {
-					Attachment attachment = null;
-					if (attachmentName != null) {
-						attachment = GetAttachment(i, attachmentName);
-						if (attachment == null) throw new Exception("Attachment not found: " + attachmentName + ", for slot: " + slotName);
-					}
-					slot.Attachment = attachment;
-					return;
+		public void SetAttachment(string slotName, string attachmentName)
+		{
+			if (slotName == null)
+			{
+				throw new ArgumentNullException("slotName", "slotName cannot be null.");
+			}
+			ExposedList<Slot> exposedList = slots;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				Slot slot = exposedList.Items[i];
+				if (!(slot.data.name == slotName))
+				{
+					continue;
 				}
+				Attachment attachment = null;
+				if (attachmentName != null)
+				{
+					attachment = GetAttachment(i, attachmentName);
+					if (attachment == null)
+					{
+						throw new Exception("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+					}
+				}
+				slot.Attachment = attachment;
+				return;
 			}
 			throw new Exception("Slot not found: " + slotName);
 		}
-			
-		/// <returns>May be null.</returns>
-		public IkConstraint FindIkConstraint (string constraintName) {
-			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint ikConstraint = ikConstraints.Items[i];
-				if (ikConstraint.data.name == constraintName) return ikConstraint;
+
+		public IkConstraint FindIkConstraint(string constraintName)
+		{
+			if (constraintName == null)
+			{
+				throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
+			}
+			ExposedList<IkConstraint> exposedList = ikConstraints;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				IkConstraint ikConstraint = exposedList.Items[i];
+				if (ikConstraint.data.name == constraintName)
+				{
+					return ikConstraint;
+				}
 			}
 			return null;
 		}
 
-		/// <returns>May be null.</returns>
-		public TransformConstraint FindTransformConstraint (string constraintName) {
-			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
-			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraint transformConstraint = transformConstraints.Items[i];
-				if (transformConstraint.data.name == constraintName) return transformConstraint;
+		public TransformConstraint FindTransformConstraint(string constraintName)
+		{
+			if (constraintName == null)
+			{
+				throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
+			}
+			ExposedList<TransformConstraint> exposedList = transformConstraints;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				TransformConstraint transformConstraint = exposedList.Items[i];
+				if (transformConstraint.data.name == constraintName)
+				{
+					return transformConstraint;
+				}
 			}
 			return null;
 		}
 
-		/// <returns>May be null.</returns>
-		public PathConstraint FindPathConstraint (string constraintName) {
-			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<PathConstraint> pathConstraints = this.pathConstraints;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraints.Items[i];
-				if (constraint.data.name.Equals(constraintName)) return constraint;
+		public PathConstraint FindPathConstraint(string constraintName)
+		{
+			if (constraintName == null)
+			{
+				throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
+			}
+			ExposedList<PathConstraint> exposedList = pathConstraints;
+			int i = 0;
+			for (int count = exposedList.Count; i < count; i++)
+			{
+				PathConstraint pathConstraint = exposedList.Items[i];
+				if (pathConstraint.data.name.Equals(constraintName))
+				{
+					return pathConstraint;
+				}
 			}
 			return null;
 		}
 
-		public void Update (float delta) {
+		public void Update(float delta)
+		{
 			time += delta;
 		}
 
-		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.</summary>
-		/// <param name="x">The horizontal distance between the skeleton origin and the left side of the AABB.</param>
-		/// <param name="y">The vertical distance between the skeleton origin and the bottom side of the AABB.</param>
-		/// <param name="width">The width of the AABB</param>
-		/// <param name="height">The height of the AABB.</param>
-		/// <param name="vertexBuffer">Reference to hold a float[]. May be a null reference. This method will assign it a new float[] with the appropriate size as needed.</param>
-		public void GetBounds (out float x, out float y, out float width, out float height, ref float[] vertexBuffer) {
-			float[] temp = vertexBuffer;
-			temp = temp ?? new float[8];
-			var drawOrderItems = this.drawOrder.Items;
-			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			for (int i = 0, n = this.drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrderItems[i];
-				int verticesLength = 0;
-				float[] vertices = null;
+		public void GetBounds(out float x, out float y, out float width, out float height, ref float[] vertexBuffer)
+		{
+			float[] array = vertexBuffer;
+			array = array ?? new float[8];
+			Slot[] items = drawOrder.Items;
+			float num = 2.14748365E+09f;
+			float num2 = 2.14748365E+09f;
+			float num3 = -2.14748365E+09f;
+			float num4 = -2.14748365E+09f;
+			int i = 0;
+			for (int count = drawOrder.Count; i < count; i++)
+			{
+				Slot slot = items[i];
+				int num5 = 0;
+				float[] array2 = null;
 				Attachment attachment = slot.attachment;
-				var regionAttachment = attachment as RegionAttachment;
-				if (regionAttachment != null) {
-					verticesLength = 8;
-					vertices = temp;
-					if (vertices.Length < 8) vertices = temp = new float[8];
-					regionAttachment.ComputeWorldVertices(slot.bone, temp, 0);
-				} else {
-					var meshAttachment = attachment as MeshAttachment;
-					if (meshAttachment != null) {
-						MeshAttachment mesh = meshAttachment;
-						verticesLength = mesh.WorldVerticesLength;
-						vertices = temp;
-						if (vertices.Length < verticesLength) vertices = temp = new float[verticesLength];
-						mesh.ComputeWorldVertices(slot, 0, verticesLength, temp, 0);
+				RegionAttachment regionAttachment = attachment as RegionAttachment;
+				if (regionAttachment != null)
+				{
+					num5 = 8;
+					array2 = array;
+					if (array2.Length < 8)
+					{
+						array2 = (array = new float[8]);
+					}
+					regionAttachment.ComputeWorldVertices(slot.bone, array, 0);
+				}
+				else
+				{
+					MeshAttachment meshAttachment = attachment as MeshAttachment;
+					if (meshAttachment != null)
+					{
+						num5 = meshAttachment.WorldVerticesLength;
+						array2 = array;
+						if (array2.Length < num5)
+						{
+							array2 = (array = new float[num5]);
+						}
+						meshAttachment.ComputeWorldVertices(slot, 0, num5, array, 0);
 					}
 				}
-
-				if (vertices != null) {
-					for (int ii = 0; ii < verticesLength; ii += 2) {
-						float vx = vertices[ii], vy = vertices[ii + 1];
-						minX = Math.Min(minX, vx);
-						minY = Math.Min(minY, vy);
-						maxX = Math.Max(maxX, vx);
-						maxY = Math.Max(maxY, vy);
+				if (array2 != null)
+				{
+					for (int j = 0; j < num5; j += 2)
+					{
+						float val = array2[j];
+						float val2 = array2[j + 1];
+						num = Math.Min(num, val);
+						num2 = Math.Min(num2, val2);
+						num3 = Math.Max(num3, val);
+						num4 = Math.Max(num4, val2);
 					}
 				}
 			}
-			x = minX;
-			y = minY;
-			width = maxX - minX;
-			height = maxY - minY;
-			vertexBuffer = temp;
+			x = num;
+			y = num2;
+			width = num3 - num;
+			height = num4 - num2;
+			vertexBuffer = array;
 		}
 	}
 }

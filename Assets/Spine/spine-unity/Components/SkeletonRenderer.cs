@@ -1,331 +1,357 @@
-/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
-#define SPINE_OPTIONAL_RENDEROVERRIDE
-#define SPINE_OPTIONAL_MATERIALOVERRIDE
-
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace Spine.Unity {
-	/// <summary>Renders a skeleton.</summary>
-	[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
+namespace Spine.Unity
+{
+	[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+	[DisallowMultipleComponent]
+	[ExecuteInEditMode]
 	[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Rendering")]
-	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
+	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent
+	{
+		public delegate void SkeletonRendererDelegate(SkeletonRenderer skeletonRenderer);
 
-		public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
-		public event SkeletonRendererDelegate OnRebuild;
-
-		/// <summary> Occurs after the vertex data is populated every frame, before the vertices are pushed into the mesh.</summary>
-		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
+		public delegate void InstructionDelegate(SkeletonRendererInstruction instruction);
 
 		public SkeletonDataAsset skeletonDataAsset;
-		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
+
 		public string initialSkinName;
-		public bool initialFlipX, initialFlipY;
 
-		#region Advanced
-		// Submesh Separation
-		[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")] [SpineSlot] public string[] separatorSlotNames = new string[0];
-		[System.NonSerialized] public readonly List<Slot> separatorSlots = new List<Slot>();
+		public bool initialFlipX;
 
-		[Range(-0.1f, 0f)] public float zSpacing;
-		//public bool renderMeshes = true;
+		public bool initialFlipY;
+
+		[FormerlySerializedAs("submeshSeparators")]
+		[SpineSlot("", "", false, true)]
+		public string[] separatorSlotNames = new string[0];
+
+		[NonSerialized]
+		public readonly List<Slot> separatorSlots = new List<Slot>();
+
+		[Range(-0.1f, 0f)]
+		public float zSpacing;
+
 		public bool useClipping = true;
-		public bool immutableTriangles = false;
+
+		public bool immutableTriangles;
+
 		public bool pmaVertexColors = true;
-		/// <summary>Clears the state when this component or its GameObject is disabled. This prevents previous state from being retained when it is enabled again. When pooling your skeleton, setting this to true can be helpful.</summary>
-		public bool clearStateOnDisable = false;
-		public bool tintBlack = false;
-		public bool singleSubmesh = false;
 
-		[UnityEngine.Serialization.FormerlySerializedAs("calculateNormals")]
-		public bool addNormals = false;
-		public bool calculateTangents = false;
+		public bool clearStateOnDisable;
 
-		public bool logErrors = false;
+		public bool tintBlack;
 
-		#if SPINE_OPTIONAL_RENDEROVERRIDE
+		public bool singleSubmesh;
+
+		[FormerlySerializedAs("calculateNormals")]
+		public bool addNormals;
+
+		public bool calculateTangents;
+
+		public bool logErrors;
+
 		public bool disableRenderingOnOverride = true;
-		public delegate void InstructionDelegate (SkeletonRendererInstruction instruction);
-		event InstructionDelegate generateMeshOverride;
-		public event InstructionDelegate GenerateMeshOverride {
-			add {
+
+		[NonSerialized]
+		private readonly Dictionary<Material, Material> customMaterialOverride = new Dictionary<Material, Material>();
+
+		[NonSerialized]
+		private readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
+
+		private MeshRenderer meshRenderer;
+
+		private MeshFilter meshFilter;
+
+		private Material[] copyMaterials;
+
+		protected Shader curShader;
+
+		[NonSerialized]
+		public bool valid;
+
+		[NonSerialized]
+		public Skeleton skeleton;
+
+		[NonSerialized]
+		private readonly SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
+
+		private readonly MeshGenerator meshGenerator = new MeshGenerator();
+
+		[NonSerialized]
+		private readonly MeshRendererBuffers rendererBuffers = new MeshRendererBuffers();
+
+		public SkeletonDataAsset SkeletonDataAsset => skeletonDataAsset;
+
+		public Dictionary<Material, Material> CustomMaterialOverride => customMaterialOverride;
+
+		public Dictionary<Slot, Material> CustomSlotMaterials => customSlotMaterials;
+
+		public Skeleton Skeleton
+		{
+			get
+			{
+				Initialize(overwrite: false);
+				return skeleton;
+			}
+		}
+
+		public event SkeletonRendererDelegate OnRebuild;
+
+		public event MeshGeneratorDelegate OnPostProcessVertices;
+
+		private event InstructionDelegate generateMeshOverride;
+
+		public event InstructionDelegate GenerateMeshOverride
+		{
+			add
+			{
 				generateMeshOverride += value;
-				if (disableRenderingOnOverride && generateMeshOverride != null) {
-					Initialize(false);
+				if (disableRenderingOnOverride && this.generateMeshOverride != null)
+				{
+					Initialize(overwrite: false);
 					meshRenderer.enabled = false;
 				}
 			}
-			remove {
+			remove
+			{
 				generateMeshOverride -= value;
-				if (disableRenderingOnOverride && generateMeshOverride == null) {
-					Initialize(false);
+				if (disableRenderingOnOverride && this.generateMeshOverride == null)
+				{
+					Initialize(overwrite: false);
 					meshRenderer.enabled = true;
 				}
 			}
 		}
-		#endif
 
-		#if SPINE_OPTIONAL_MATERIALOVERRIDE
-		[System.NonSerialized] readonly Dictionary<Material, Material> customMaterialOverride = new Dictionary<Material, Material>();
-		public Dictionary<Material, Material> CustomMaterialOverride { get { return customMaterialOverride; } }
-		#endif
+		public static T NewSpineGameObject<T>(SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer
+		{
+			return AddSpineComponent<T>(new GameObject("New Spine GameObject"), skeletonDataAsset);
+		}
 
-		// Custom Slot Material
-		[System.NonSerialized] readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
-		public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
-		#endregion
-
-		MeshRenderer meshRenderer;
-		MeshFilter meshFilter;
-
-		[System.NonSerialized] public bool valid;
-		[System.NonSerialized] public Skeleton skeleton;
-		public Skeleton Skeleton {
-			get {
-				Initialize(false);
-				return skeleton;
+		public static T AddSpineComponent<T>(GameObject gameObject, SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer
+		{
+			T val = gameObject.AddComponent<T>();
+			if (skeletonDataAsset != null)
+			{
+				val.skeletonDataAsset = skeletonDataAsset;
+				val.Initialize(overwrite: false);
 			}
-		}
-			
-		[System.NonSerialized] readonly SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
-		readonly MeshGenerator meshGenerator = new MeshGenerator();
-		[System.NonSerialized] readonly MeshRendererBuffers rendererBuffers = new MeshRendererBuffers();
-
-		#region Runtime Instantiation
-		public static T NewSpineGameObject<T> (SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
-			return SkeletonRenderer.AddSpineComponent<T>(new GameObject("New Spine GameObject"), skeletonDataAsset);
+			return val;
 		}
 
-		/// <summary>Add and prepare a Spine component that derives from SkeletonRenderer to a GameObject at runtime.</summary>
-		/// <typeparam name="T">T should be SkeletonRenderer or any of its derived classes.</typeparam>
-		public static T AddSpineComponent<T> (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
-			var c = gameObject.AddComponent<T>();
-			if (skeletonDataAsset != null) {
-				c.skeletonDataAsset = skeletonDataAsset;
-				c.Initialize(false);
-			}
-			return c;
+		public void SetMeshSettings(MeshGenerator.Settings settings)
+		{
+			calculateTangents = settings.calculateTangents;
+			immutableTriangles = settings.immutableTriangles;
+			pmaVertexColors = settings.pmaVertexColors;
+			tintBlack = settings.tintBlack;
+			useClipping = settings.useClipping;
+			zSpacing = settings.zSpacing;
+			meshGenerator.settings = settings;
 		}
 
-		/// <summary>Applies MeshGenerator settings to the SkeletonRenderer and its internal MeshGenerator.</summary>
-		public void SetMeshSettings (MeshGenerator.Settings settings) {
-			this.calculateTangents = settings.calculateTangents;
-			this.immutableTriangles = settings.immutableTriangles;
-			this.pmaVertexColors = settings.pmaVertexColors;
-			this.tintBlack = settings.tintBlack;
-			this.useClipping = settings.useClipping;
-			this.zSpacing = settings.zSpacing;
-
-			this.meshGenerator.settings = settings;
-		}
-		#endregion
-
-		public virtual void Awake () {
-			Initialize(false);
+		public virtual void Awake()
+		{
+			Initialize(overwrite: false);
 		}
 
-		void OnDisable () {
+		private void OnDisable()
+		{
 			if (clearStateOnDisable && valid)
+			{
 				ClearState();
+			}
 		}
 
-		public virtual void OnDestroy () {
+		public virtual void OnDestroy()
+		{
 			rendererBuffers.Dispose();
 			valid = false;
+			if (copyMaterials != null)
+			{
+				for (int i = 0; i < copyMaterials.Length; i++)
+				{
+					UnityEngine.Object.Destroy(copyMaterials[i]);
+				}
+			}
 		}
 
-		/// <summary>
-		/// Clears the previously generated mesh and resets the skeleton's pose.</summary>
-		public virtual void ClearState () {
+		public virtual void ClearState()
+		{
 			meshFilter.sharedMesh = null;
 			currentInstructions.Clear();
-			if (skeleton != null) skeleton.SetToSetupPose();
-		}
-
-		public void EnsureMeshGeneratorCapacity (int minimumVertexCount) {
-			meshGenerator.EnsureVertexCapacity(minimumVertexCount);
-		}
-
-		/// <summary>
-		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and buffers.</summary>
-		/// <param name="overwrite">If set to <c>true</c>, it will overwrite internal objects if they were already generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
-		public virtual void Initialize (bool overwrite) {
-			if (valid && !overwrite)
-				return;
-
-			// Clear
+			if (skeleton != null)
 			{
-				if (meshFilter != null)
-					meshFilter.sharedMesh = null;
-
-				meshRenderer = GetComponent<MeshRenderer>();
-				if (meshRenderer != null) meshRenderer.sharedMaterial = null;
-
-				currentInstructions.Clear();
-				rendererBuffers.Clear();
-				meshGenerator.Begin();
-				skeleton = null;
-				valid = false;
+				skeleton.SetToSetupPose();
 			}
-
-			if (!skeletonDataAsset) {
-				if (logErrors) Debug.LogError("Missing SkeletonData asset.", this);
-				return;
-			}
-
-			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
-			if (skeletonData == null) return;
-			valid = true;
-
-			meshFilter = GetComponent<MeshFilter>();
-			meshRenderer = GetComponent<MeshRenderer>();
-			rendererBuffers.Initialize();
-
-			skeleton = new Skeleton(skeletonData) {
-				flipX = initialFlipX,
-				flipY = initialFlipY
-			};
-
-			if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", System.StringComparison.Ordinal))
-				skeleton.SetSkin(initialSkinName);
-
-			separatorSlots.Clear();
-			for (int i = 0; i < separatorSlotNames.Length; i++)
-				separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
-
-			LateUpdate(); // Generate mesh for the first frame it exists.
-
-			if (OnRebuild != null)
-				OnRebuild(this);
 		}
 
-		/// <summary>
-		/// Generates a new UnityEngine.Mesh from the internal Skeleton.</summary>
-		public virtual void LateUpdate () {
-			if (!valid) return;
-
-			#if SPINE_OPTIONAL_RENDEROVERRIDE
-			bool doMeshOverride = generateMeshOverride != null;
-			if ((!meshRenderer.enabled)	&& !doMeshOverride) return;
-			#else
-			const bool doMeshOverride = false;
-			if (!meshRenderer.enabled) return;
-			#endif
-			var currentInstructions = this.currentInstructions;
-			var workingSubmeshInstructions = currentInstructions.submeshInstructions;
-			var currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
-
-			bool updateTriangles;
-
-			if (this.singleSubmesh) {
-				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
-				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].materials[0]);
-
-				// STEP 1.9. Post-process workingInstructions. ==================================================================================
-				#if SPINE_OPTIONAL_MATERIALOVERRIDE
-				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
-					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
-				#endif
-
-				// STEP 2. Update vertex buffer based on verts from the attachments.  ===========================================================
-				meshGenerator.settings = new MeshGenerator.Settings {
-					pmaVertexColors = this.pmaVertexColors,
-					zSpacing = this.zSpacing,
-					useClipping = this.useClipping,
-					tintBlack = this.tintBlack,
-					calculateTangents = this.calculateTangents,
-					addNormals = this.addNormals
+		public virtual void Initialize(bool overwrite)
+		{
+			if (valid && !overwrite)
+			{
+				return;
+			}
+			if (meshFilter != null)
+			{
+				meshFilter.sharedMesh = null;
+			}
+			meshRenderer = GetComponent<MeshRenderer>();
+			if (meshRenderer != null)
+			{
+				meshRenderer.sharedMaterial = null;
+			}
+			currentInstructions.Clear();
+			rendererBuffers.Clear();
+			meshGenerator.Begin();
+			skeleton = null;
+			valid = false;
+			if (!skeletonDataAsset)
+			{
+				_ = logErrors;
+				return;
+			}
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(quiet: false);
+			if (skeletonData != null)
+			{
+				valid = true;
+				meshFilter = GetComponent<MeshFilter>();
+				meshRenderer = GetComponent<MeshRenderer>();
+				rendererBuffers.Initialize();
+				skeleton = new Skeleton(skeletonData)
+				{
+					flipX = initialFlipX,
+					flipY = initialFlipY
 				};
-				meshGenerator.Begin();
-				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
-				if (currentInstructions.hasActiveClipping) {
-					meshGenerator.AddSubmesh(workingSubmeshInstructions.Items[0], updateTriangles);
-				} else {
-					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
+				if (!string.IsNullOrEmpty(initialSkinName) && !string.Equals(initialSkinName, "default", StringComparison.Ordinal))
+				{
+					skeleton.SetSkin(initialSkinName);
 				}
-
-			} else {
-				// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes. =============================================
-				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, customSlotMaterials, separatorSlots, doMeshOverride, this.immutableTriangles);
-
-				// STEP 1.9. Post-process workingInstructions. ==================================================================================
-				#if SPINE_OPTIONAL_MATERIALOVERRIDE
-				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
-					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
-				#endif
-
-				#if SPINE_OPTIONAL_RENDEROVERRIDE
-				if (doMeshOverride) {
-					this.generateMeshOverride(currentInstructions);
-					if (disableRenderingOnOverride) return;
+				separatorSlots.Clear();
+				for (int i = 0; i < separatorSlotNames.Length; i++)
+				{
+					separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 				}
-				#endif
+				LateUpdate();
+				if (this.OnRebuild != null)
+				{
+					this.OnRebuild(this);
+				}
+			}
+		}
 
-				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
-
-				// STEP 2. Update vertex buffer based on verts from the attachments.  ===========================================================
-				meshGenerator.settings = new MeshGenerator.Settings {
-					pmaVertexColors = this.pmaVertexColors,
-					zSpacing = this.zSpacing,
-					useClipping = this.useClipping,
-					tintBlack = this.tintBlack,
-					calculateTangents = this.calculateTangents,
-					addNormals = this.addNormals
-				};
+		public virtual void LateUpdate()
+		{
+			if (!valid)
+			{
+				return;
+			}
+			bool flag = this.generateMeshOverride != null;
+			if (!meshRenderer.enabled && !flag)
+			{
+				return;
+			}
+			SkeletonRendererInstruction skeletonRendererInstruction = currentInstructions;
+			ExposedList<SubmeshInstruction> submeshInstructions = skeletonRendererInstruction.submeshInstructions;
+			MeshRendererBuffers.SmartMesh nextMesh = rendererBuffers.GetNextMesh();
+			MeshGenerator.Settings settings;
+			bool flag2;
+			if (singleSubmesh)
+			{
+				MeshGenerator.GenerateSingleSubmeshInstruction(skeletonRendererInstruction, skeleton, skeletonDataAsset.atlasAssets[0].materials[0]);
+				if (customMaterialOverride.Count > 0)
+				{
+					MeshGenerator.TryReplaceMaterials(submeshInstructions, customMaterialOverride);
+				}
+				settings = (meshGenerator.settings = new MeshGenerator.Settings
+				{
+					pmaVertexColors = pmaVertexColors,
+					zSpacing = zSpacing,
+					useClipping = useClipping,
+					tintBlack = tintBlack,
+					calculateTangents = calculateTangents,
+					addNormals = addNormals
+				});
 				meshGenerator.Begin();
-				if (currentInstructions.hasActiveClipping)
-					meshGenerator.BuildMesh(currentInstructions, updateTriangles);
+				flag2 = SkeletonRendererInstruction.GeometryNotEqual(skeletonRendererInstruction, nextMesh.instructionUsed);
+				if (skeletonRendererInstruction.hasActiveClipping)
+				{
+					meshGenerator.AddSubmesh(submeshInstructions.Items[0], flag2);
+				}
 				else
-					meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
+				{
+					meshGenerator.BuildMeshWithArrays(skeletonRendererInstruction, flag2);
+				}
 			}
-
-			if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
-
-			// STEP 3. Move the mesh data into a UnityEngine.Mesh ===========================================================================
-			var currentMesh = currentSmartMesh.mesh;
-			meshGenerator.FillVertexData(currentMesh);
-			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
-			if (updateTriangles) { // Check if the triangles should also be updated.
-				meshGenerator.FillTriangles(currentMesh);
-				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
-			} else if (rendererBuffers.MaterialsChangedInLastUpdate()) {
-				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
+			else
+			{
+				MeshGenerator.GenerateSkeletonRendererInstruction(skeletonRendererInstruction, skeleton, customSlotMaterials, separatorSlots, flag, immutableTriangles);
+				if (customMaterialOverride.Count > 0)
+				{
+					MeshGenerator.TryReplaceMaterials(submeshInstructions, customMaterialOverride);
+				}
+				if (flag)
+				{
+					this.generateMeshOverride(skeletonRendererInstruction);
+					if (disableRenderingOnOverride)
+					{
+						return;
+					}
+				}
+				flag2 = SkeletonRendererInstruction.GeometryNotEqual(skeletonRendererInstruction, nextMesh.instructionUsed);
+				settings = (meshGenerator.settings = new MeshGenerator.Settings
+				{
+					pmaVertexColors = pmaVertexColors,
+					zSpacing = zSpacing,
+					useClipping = useClipping,
+					tintBlack = tintBlack,
+					calculateTangents = calculateTangents,
+					addNormals = addNormals
+				});
+				meshGenerator.Begin();
+				if (skeletonRendererInstruction.hasActiveClipping)
+				{
+					meshGenerator.BuildMesh(skeletonRendererInstruction, flag2);
+				}
+				else
+				{
+					meshGenerator.BuildMeshWithArrays(skeletonRendererInstruction, flag2);
+				}
 			}
-
-			meshGenerator.FillLateVertexData(currentMesh);
-
-			// STEP 4. The UnityEngine.Mesh is ready. Set it as the MeshFilter's mesh. Store the instructions used for that mesh. ===========
-			meshFilter.sharedMesh = currentMesh;
-			currentSmartMesh.instructionUsed.Set(currentInstructions);
+			if (this.OnPostProcessVertices != null)
+			{
+				this.OnPostProcessVertices(meshGenerator.Buffers);
+			}
+			Mesh mesh = nextMesh.mesh;
+			meshGenerator.FillVertexData(mesh);
+			rendererBuffers.UpdateSharedMaterials(submeshInstructions);
+			if (flag2)
+			{
+				meshGenerator.FillTriangles(mesh);
+				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
+			}
+			else if (rendererBuffers.MaterialsChangedInLastUpdate())
+			{
+				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedShaderdMaterialsArray();
+			}
+			if (curShader != null)
+			{
+				if (copyMaterials == null)
+				{
+					Material[] materials = meshRenderer.materials;
+					copyMaterials = new Material[materials.Length];
+					Array.Copy(materials, copyMaterials, copyMaterials.Length);
+				}
+				for (int i = 0; i < copyMaterials.Length; i++)
+				{
+					copyMaterials[i].shader = curShader;
+				}
+				meshRenderer.materials = copyMaterials;
+			}
+			meshFilter.sharedMesh = mesh;
+			nextMesh.instructionUsed.Set(skeletonRendererInstruction);
 		}
 	}
 }

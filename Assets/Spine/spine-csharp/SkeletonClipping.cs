@@ -1,284 +1,308 @@
-﻿/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
-using System;
-
-namespace Spine {
-	public class SkeletonClipping {
+namespace Spine
+{
+	public class SkeletonClipping
+	{
 		internal readonly Triangulator triangulator = new Triangulator();
+
 		internal readonly ExposedList<float> clippingPolygon = new ExposedList<float>();
+
 		internal readonly ExposedList<float> clipOutput = new ExposedList<float>(128);
+
 		internal readonly ExposedList<float> clippedVertices = new ExposedList<float>(128);
+
 		internal readonly ExposedList<int> clippedTriangles = new ExposedList<int>(128);
+
 		internal readonly ExposedList<float> clippedUVs = new ExposedList<float>(128);
+
 		internal readonly ExposedList<float> scratch = new ExposedList<float>();
 
 		internal ClippingAttachment clipAttachment;
+
 		internal ExposedList<ExposedList<float>> clippingPolygons;
 
-		public ExposedList<float> ClippedVertices { get { return clippedVertices; } }
-		public ExposedList<int> ClippedTriangles { get { return clippedTriangles; } }
-		public ExposedList<float> ClippedUVs { get { return clippedUVs; } }
+		public ExposedList<float> ClippedVertices => clippedVertices;
 
-		public bool IsClipping { get { return clipAttachment != null; } }
+		public ExposedList<int> ClippedTriangles => clippedTriangles;
 
-		public int ClipStart (Slot slot, ClippingAttachment clip) {
-			if (clipAttachment != null) return 0;
+		public ExposedList<float> ClippedUVs => clippedUVs;
+
+		public bool IsClipping()
+		{
+			return clipAttachment != null;
+		}
+
+		public int ClipStart(Slot slot, ClippingAttachment clip)
+		{
+			if (clipAttachment != null)
+			{
+				return 0;
+			}
 			clipAttachment = clip;
-
-			int n = clip.worldVerticesLength;
-			float[] vertices = clippingPolygon.Resize(n).Items;
-			clip.ComputeWorldVertices(slot, 0, n, vertices, 0, 2);
+			int worldVerticesLength = clip.worldVerticesLength;
+			float[] items = clippingPolygon.Resize(worldVerticesLength).Items;
+			clip.ComputeWorldVertices(slot, 0, worldVerticesLength, items, 0);
 			MakeClockwise(clippingPolygon);
 			clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
-			foreach (var polygon in clippingPolygons) {
-				MakeClockwise(polygon);
-				polygon.Add(polygon.Items[0]);
-				polygon.Add(polygon.Items[1]);
+			foreach (ExposedList<float> clippingPolygon2 in clippingPolygons)
+			{
+				MakeClockwise(clippingPolygon2);
+				clippingPolygon2.Add(clippingPolygon2.Items[0]);
+				clippingPolygon2.Add(clippingPolygon2.Items[1]);
 			}
 			return clippingPolygons.Count;
 		}
 
-		public void ClipEnd (Slot slot) {
-			if (clipAttachment != null && clipAttachment.endSlot == slot.data) ClipEnd();
+		public void ClipEnd(Slot slot)
+		{
+			if (clipAttachment != null && clipAttachment.endSlot == slot.data)
+			{
+				ClipEnd();
+			}
 		}
 
-		public void ClipEnd () {
-			if (clipAttachment == null) return;
-			clipAttachment = null;
-			clippingPolygons = null;
-			clippedVertices.Clear();
-			clippedTriangles.Clear();
-			clippingPolygon.Clear();
+		public void ClipEnd()
+		{
+			if (clipAttachment != null)
+			{
+				clipAttachment = null;
+				clippingPolygons = null;
+				clippedVertices.Clear();
+				clippedTriangles.Clear();
+				clippingPolygon.Clear();
+			}
 		}
-			
-		public void ClipTriangles (float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs) {
-			ExposedList<float> clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
-			var clippedTriangles = this.clippedTriangles;
-			var polygons = clippingPolygons.Items;
-			int polygonsCount = clippingPolygons.Count;			
 
-			int index = 0;
-			clippedVertices.Clear();
+		public void ClipTriangles(float[] vertices, int verticesLength, int[] triangles, int trianglesLength, float[] uvs)
+		{
+			ExposedList<float> exposedList = clipOutput;
+			ExposedList<float> exposedList2 = clippedVertices;
+			ExposedList<int> exposedList3 = clippedTriangles;
+			ExposedList<float>[] items = clippingPolygons.Items;
+			int count = clippingPolygons.Count;
+			int num = 0;
+			exposedList2.Clear();
 			clippedUVs.Clear();
-			clippedTriangles.Clear();
-			//outer:
-			for (int i = 0; i < trianglesLength; i += 3) {
-				int vertexOffset = triangles[i] << 1;
-				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
-				float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
-
-				vertexOffset = triangles[i + 1] << 1;
-				float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
-				float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
-
-				vertexOffset = triangles[i + 2] << 1;
-				float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
-				float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
-
-				for (int p = 0; p < polygonsCount; p++) {
-					int s = clippedVertices.Count;
-					if (Clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
-						int clipOutputLength = clipOutput.Count;
-						if (clipOutputLength == 0) continue;
-						float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1;
-						float d = 1 / (d0 * d2 + d1 * (y1 - y3));
-
-						int clipOutputCount = clipOutputLength >> 1;
-						float[] clipOutputItems = clipOutput.Items;
-						float[] clippedVerticesItems = clippedVertices.Resize(s + clipOutputCount * 2).Items;
-						float[] clippedUVsItems = clippedUVs.Resize(s + clipOutputCount * 2).Items;
-						for (int ii = 0; ii < clipOutputLength; ii += 2) {
-							float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
-							clippedVerticesItems[s] = x;
-							clippedVerticesItems[s + 1] = y;							
-							float c0 = x - x3, c1 = y - y3;
-							float a = (d0 * c0 + d1 * c1) * d;
-							float b = (d4 * c0 + d2 * c1) * d;
-							float c = 1 - a - b;
-							clippedUVsItems[s] = u1 * a + u2 * b + u3 * c;
-							clippedUVsItems[s + 1] = v1 * a + v2 * b + v3 * c;
-							s += 2;
+			exposedList3.Clear();
+			for (int i = 0; i < trianglesLength; i += 3)
+			{
+				int num2 = triangles[i] << 1;
+				float num3 = vertices[num2];
+				float num4 = vertices[num2 + 1];
+				float num5 = uvs[num2];
+				float num6 = uvs[num2 + 1];
+				num2 = triangles[i + 1] << 1;
+				float num7 = vertices[num2];
+				float num8 = vertices[num2 + 1];
+				float num9 = uvs[num2];
+				float num10 = uvs[num2 + 1];
+				num2 = triangles[i + 2] << 1;
+				float num11 = vertices[num2];
+				float num12 = vertices[num2 + 1];
+				float num13 = uvs[num2];
+				float num14 = uvs[num2 + 1];
+				for (int j = 0; j < count; j++)
+				{
+					int num15 = exposedList2.Count;
+					if (Clip(num3, num4, num7, num8, num11, num12, items[j], exposedList))
+					{
+						int count2 = exposedList.Count;
+						if (count2 != 0)
+						{
+							float num16 = num8 - num12;
+							float num17 = num11 - num7;
+							float num18 = num3 - num11;
+							float num19 = num12 - num4;
+							float num20 = 1f / (num16 * num18 + num17 * (num4 - num12));
+							int num21 = count2 >> 1;
+							float[] items2 = exposedList.Items;
+							float[] items3 = exposedList2.Resize(num15 + num21 * 2).Items;
+							float[] items4 = clippedUVs.Resize(num15 + num21 * 2).Items;
+							for (int k = 0; k < count2; k += 2)
+							{
+								float num22 = items2[k];
+								float num23 = items2[k + 1];
+								items3[num15] = num22;
+								items3[num15 + 1] = num23;
+								float num24 = num22 - num11;
+								float num25 = num23 - num12;
+								float num26 = (num16 * num24 + num17 * num25) * num20;
+								float num27 = (num19 * num24 + num18 * num25) * num20;
+								float num28 = 1f - num26 - num27;
+								items4[num15] = num5 * num26 + num9 * num27 + num13 * num28;
+								items4[num15 + 1] = num6 * num26 + num10 * num27 + num14 * num28;
+								num15 += 2;
+							}
+							num15 = exposedList3.Count;
+							int[] items5 = exposedList3.Resize(num15 + 3 * (num21 - 2)).Items;
+							num21--;
+							for (int l = 1; l < num21; l++)
+							{
+								items5[num15] = num;
+								items5[num15 + 1] = num + l;
+								items5[num15 + 2] = num + l + 1;
+								num15 += 3;
+							}
+							num += num21 + 1;
 						}
-
-						s = clippedTriangles.Count;
-						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3 * (clipOutputCount - 2)).Items;
-						clipOutputCount--;
-						for (int ii = 1; ii < clipOutputCount; ii++) {
-							clippedTrianglesItems[s] = index;
-							clippedTrianglesItems[s + 1] = index + ii;
-							clippedTrianglesItems[s + 2] = index + ii + 1;
-							s += 3;
-						}
-						index += clipOutputCount + 1;
+						continue;
 					}
-					else {
-						float[] clippedVerticesItems = clippedVertices.Resize(s + 3 * 2).Items;
-						float[] clippedUVsItems = clippedUVs.Resize(s + 3 * 2).Items;
-						clippedVerticesItems[s] = x1;
-						clippedVerticesItems[s + 1] = y1;
-						clippedVerticesItems[s + 2] = x2;
-						clippedVerticesItems[s + 3] = y2;
-						clippedVerticesItems[s + 4] = x3;
-						clippedVerticesItems[s + 5] = y3;
-
-						clippedUVsItems[s] = u1;
-						clippedUVsItems[s + 1] = v1;
-						clippedUVsItems[s + 2] = u2;
-						clippedUVsItems[s + 3] = v2;
-						clippedUVsItems[s + 4] = u3;
-						clippedUVsItems[s + 5] = v3;
-
-						s = clippedTriangles.Count;
-						int[] clippedTrianglesItems = clippedTriangles.Resize(s + 3).Items;
-						clippedTrianglesItems[s] = index;
-						clippedTrianglesItems[s + 1] = index + 1;
-						clippedTrianglesItems[s + 2] = index + 2;
-						index += 3;
-						break; //continue outer;
-					}
+					float[] items6 = exposedList2.Resize(num15 + 6).Items;
+					float[] items7 = clippedUVs.Resize(num15 + 6).Items;
+					items6[num15] = num3;
+					items6[num15 + 1] = num4;
+					items6[num15 + 2] = num7;
+					items6[num15 + 3] = num8;
+					items6[num15 + 4] = num11;
+					items6[num15 + 5] = num12;
+					items7[num15] = num5;
+					items7[num15 + 1] = num6;
+					items7[num15 + 2] = num9;
+					items7[num15 + 3] = num10;
+					items7[num15 + 4] = num13;
+					items7[num15 + 5] = num14;
+					num15 = exposedList3.Count;
+					int[] items8 = exposedList3.Resize(num15 + 3).Items;
+					items8[num15] = num;
+					items8[num15 + 1] = num + 1;
+					items8[num15 + 2] = num + 2;
+					num += 3;
+					break;
 				}
 			}
-
 		}
 
-		/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
-		 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-		internal bool Clip (float x1, float y1, float x2, float y2, float x3, float y3, ExposedList<float> clippingArea, ExposedList<float> output) {
-			var originalOutput = output;
-			var clipped = false;
-
-			// Avoid copy at the end.
-			ExposedList<float> input = null;
-			if (clippingArea.Count % 4 >= 2) {
-				input = output;
+		internal bool Clip(float x1, float y1, float x2, float y2, float x3, float y3, ExposedList<float> clippingArea, ExposedList<float> output)
+		{
+			ExposedList<float> exposedList = output;
+			bool result = false;
+			ExposedList<float> exposedList2 = null;
+			if (clippingArea.Count % 4 >= 2)
+			{
+				exposedList2 = output;
 				output = scratch;
-			} else {
-				input = scratch;
 			}
-
-			input.Clear();
-			input.Add(x1);
-			input.Add(y1);
-			input.Add(x2);
-			input.Add(y2);
-			input.Add(x3);
-			input.Add(y3);
-			input.Add(x1);
-			input.Add(y1);
+			else
+			{
+				exposedList2 = scratch;
+			}
+			exposedList2.Clear();
+			exposedList2.Add(x1);
+			exposedList2.Add(y1);
+			exposedList2.Add(x2);
+			exposedList2.Add(y2);
+			exposedList2.Add(x3);
+			exposedList2.Add(y3);
+			exposedList2.Add(x1);
+			exposedList2.Add(y1);
 			output.Clear();
-
-			float[] clippingVertices = clippingArea.Items;
-			int clippingVerticesLast = clippingArea.Count - 4;
-			for (int i = 0; ; i += 2) {
-				float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
-				float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
-				float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
-
-				float[] inputVertices = input.Items;
-				int inputVerticesLength = input.Count - 2, outputStart = output.Count;
-				for (int ii = 0; ii < inputVerticesLength; ii += 2) {
-					float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
-					float inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
-					bool side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
-					if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-						if (side2) { // v1 inside, v2 inside
-							output.Add(inputX2);
-							output.Add(inputY2);
+			float[] items = clippingArea.Items;
+			int num = clippingArea.Count - 4;
+			int num2 = 0;
+			while (true)
+			{
+				float num3 = items[num2];
+				float num4 = items[num2 + 1];
+				float num5 = items[num2 + 2];
+				float num6 = items[num2 + 3];
+				float num7 = num3 - num5;
+				float num8 = num4 - num6;
+				float[] items2 = exposedList2.Items;
+				int num9 = exposedList2.Count - 2;
+				int count = output.Count;
+				for (int i = 0; i < num9; i += 2)
+				{
+					float num10 = items2[i];
+					float num11 = items2[i + 1];
+					float num12 = items2[i + 2];
+					float num13 = items2[i + 3];
+					bool flag = num7 * (num13 - num6) - num8 * (num12 - num5) > 0f;
+					if (num7 * (num11 - num6) - num8 * (num10 - num5) > 0f)
+					{
+						if (flag)
+						{
+							output.Add(num12);
+							output.Add(num13);
 							continue;
 						}
-						// v1 inside, v2 outside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.Add(edgeX + (edgeX2 - edgeX) * ua);
-						output.Add(edgeY + (edgeY2 - edgeY) * ua);
+						float num14 = num13 - num11;
+						float num15 = num12 - num10;
+						float num16 = (num15 * (num4 - num11) - num14 * (num3 - num10)) / (num14 * (num5 - num3) - num15 * (num6 - num4));
+						output.Add(num3 + (num5 - num3) * num16);
+						output.Add(num4 + (num6 - num4) * num16);
 					}
-					else if (side2) { // v1 outside, v2 inside
-						float c0 = inputY2 - inputY, c2 = inputX2 - inputX;
-						float ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / (c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY));
-						output.Add(edgeX + (edgeX2 - edgeX) * ua);
-						output.Add(edgeY + (edgeY2 - edgeY) * ua);
-						output.Add(inputX2);
-						output.Add(inputY2);
+					else if (flag)
+					{
+						float num17 = num13 - num11;
+						float num18 = num12 - num10;
+						float num19 = (num18 * (num4 - num11) - num17 * (num3 - num10)) / (num17 * (num5 - num3) - num18 * (num6 - num4));
+						output.Add(num3 + (num5 - num3) * num19);
+						output.Add(num4 + (num6 - num4) * num19);
+						output.Add(num12);
+						output.Add(num13);
 					}
-					clipped = true;
+					result = true;
 				}
-
-				if (outputStart == output.Count) { // All edges outside.
-					originalOutput.Clear();
+				if (count == output.Count)
+				{
+					exposedList.Clear();
 					return true;
 				}
-
 				output.Add(output.Items[0]);
 				output.Add(output.Items[1]);
-
-				if (i == clippingVerticesLast) break;
-				var temp = output;
-				output = input;
-				output.Clear();
-				input = temp;
-			}
-
-			if (originalOutput != output) {
-				originalOutput.Clear();
-				for (int i = 0, n = output.Count - 2; i < n; i++) {
-					originalOutput.Add(output.Items[i]);
+				if (num2 == num)
+				{
+					break;
 				}
-			} else {
-				originalOutput.Resize(originalOutput.Count - 2);
+				ExposedList<float> exposedList3 = output;
+				output = exposedList2;
+				output.Clear();
+				exposedList2 = exposedList3;
+				num2 += 2;
 			}
-
-			return clipped;
+			if (exposedList != output)
+			{
+				exposedList.Clear();
+				int j = 0;
+				for (int num20 = output.Count - 2; j < num20; j++)
+				{
+					exposedList.Add(output.Items[j]);
+				}
+			}
+			else
+			{
+				exposedList.Resize(exposedList.Count - 2);
+			}
+			return result;
 		}
 
-		static void MakeClockwise (ExposedList<float> polygon) {
-			float[] vertices = polygon.Items;
-			int verticeslength = polygon.Count;
-
-			float area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
-			for (int i = 0, n = verticeslength - 3; i < n; i += 2) {
-				p1x = vertices[i];
-				p1y = vertices[i + 1];
-				p2x = vertices[i + 2];
-				p2y = vertices[i + 3];
-				area += p1x * p2y - p2x * p1y;
+		private static void MakeClockwise(ExposedList<float> polygon)
+		{
+			float[] items = polygon.Items;
+			int count = polygon.Count;
+			float num = items[count - 2] * items[1] - items[0] * items[count - 1];
+			int i = 0;
+			for (int num2 = count - 3; i < num2; i += 2)
+			{
+				float num3 = items[i];
+				float num4 = items[i + 1];
+				float num5 = items[i + 2];
+				float num6 = items[i + 3];
+				num += num3 * num6 - num5 * num4;
 			}
-			if (area < 0) return;
-
-			for (int i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
-				float x = vertices[i], y = vertices[i + 1];
-				int other = lastX - i;
-				vertices[i] = vertices[other];
-				vertices[i + 1] = vertices[other + 1];
-				vertices[other] = x;
-				vertices[other + 1] = y;
+			if (!(num < 0f))
+			{
+				int j = 0;
+				int num7 = count - 2;
+				for (int num8 = count >> 1; j < num8; j += 2)
+				{
+					float num9 = items[j];
+					float num10 = items[j + 1];
+					int num11 = num7 - j;
+					items[j] = items[num11];
+					items[j + 1] = items[num11 + 1];
+					items[num11] = num9;
+					items[num11 + 1] = num10;
+				}
 			}
 		}
 	}

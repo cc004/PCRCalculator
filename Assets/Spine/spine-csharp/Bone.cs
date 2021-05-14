@@ -1,145 +1,326 @@
-/******************************************************************************
- * Spine Runtimes Software License v2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
 using System;
+using UnityEngine;
 
-namespace Spine {
-	/// <summary>
-	/// Stores a bone's current pose.
-	/// <para>
-	/// A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
-	/// local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
-	/// constraint or application code modifies the world transform after it was computed from the local transform.
-	/// </para>
-	/// </summary>
-	public class Bone : IUpdatable {
-		static public bool yDown;
+namespace Spine
+{
+	public class Bone : IUpdatable
+	{
+		public static bool yDown;
 
 		internal BoneData data;
+
 		internal Skeleton skeleton;
+
 		internal Bone parent;
+
 		internal ExposedList<Bone> children = new ExposedList<Bone>();
-		internal float x, y, rotation, scaleX, scaleY, shearX, shearY;
-		internal float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
+
+		internal float x;
+
+		internal float y;
+
+		internal float rotation;
+
+		internal float scaleX;
+
+		internal float scaleY;
+
+		internal float shearX;
+
+		internal float shearY;
+
+		internal float ax;
+
+		internal float ay;
+
+		internal float arotation;
+
+		internal float ascaleX;
+
+		internal float ascaleY;
+
+		internal float ashearX;
+
+		internal float ashearY;
+
 		internal bool appliedValid;
 
-		internal float a, b, worldX;
-		internal float c, d, worldY;
+		internal float a;
 
-//		internal float worldSignX, worldSignY;
-//		public float WorldSignX { get { return worldSignX; } }
-//		public float WorldSignY { get { return worldSignY; } }
+		internal float b;
+
+		internal float worldX;
+
+		internal float c;
+
+		internal float d;
+
+		internal float worldY;
 
 		internal bool sorted;
 
-		public BoneData Data { get { return data; } }
-		public Skeleton Skeleton { get { return skeleton; } }
-		public Bone Parent { get { return parent; } }
-		public ExposedList<Bone> Children { get { return children; } }
-		/// <summary>The local X translation.</summary>
-		public float X { get { return x; } set { x = value; } }
-		/// <summary>The local Y translation.</summary>
-		public float Y { get { return y; } set { y = value; } }
-		/// <summary>The local rotation.</summary>
-		public float Rotation { get { return rotation; } set { rotation = value; } }
+		public BoneData Data => data;
 
-		/// <summary>The local scaleX.</summary>
-		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+		public Skeleton Skeleton => skeleton;
 
-		/// <summary>The local scaleY.</summary>
-		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		public Bone Parent => parent;
 
-		/// <summary>The local shearX.</summary>
-		public float ShearX { get { return shearX; } set { shearX = value; } }
+		public ExposedList<Bone> Children => children;
 
-		/// <summary>The local shearY.</summary>
-		public float ShearY { get { return shearY; } set { shearY = value; } }
+		public float X
+		{
+			get
+			{
+				return x;
+			}
+			set
+			{
+				x = value;
+			}
+		}
 
-		/// <summary>The rotation, as calculated by any constraints.</summary>
-		public float AppliedRotation { get { return arotation; } set { arotation = value; } }
+		public float Y
+		{
+			get
+			{
+				return y;
+			}
+			set
+			{
+				y = value;
+			}
+		}
 
-		/// <summary>The applied local x translation.</summary>
-		public float AX { get { return ax; } set { ax = value; } }
+		public float Rotation
+		{
+			get
+			{
+				return rotation;
+			}
+			set
+			{
+				rotation = value;
+			}
+		}
 
-		/// <summary>The applied local y translation.</summary>
-		public float AY { get { return ay; } set { ay = value; } }
+		public float ScaleX
+		{
+			get
+			{
+				return scaleX;
+			}
+			set
+			{
+				scaleX = value;
+			}
+		}
 
-		/// <summary>The applied local scaleX.</summary>
-		public float AScaleX { get { return ascaleX; } set { ascaleX = value; } }
+		public float ScaleY
+		{
+			get
+			{
+				return scaleY;
+			}
+			set
+			{
+				scaleY = value;
+			}
+		}
 
-		/// <summary>The applied local scaleY.</summary>
-		public float AScaleY { get { return ascaleY; } set { ascaleY = value; } }
+		public float ShearX
+		{
+			get
+			{
+				return shearX;
+			}
+			set
+			{
+				shearX = value;
+			}
+		}
 
-		/// <summary>The applied local shearX.</summary>
-		public float AShearX { get { return ashearX; } set { ashearX = value; } }
+		public float ShearY
+		{
+			get
+			{
+				return shearY;
+			}
+			set
+			{
+				shearY = value;
+			}
+		}
 
-		/// <summary>The applied local shearY.</summary>
-		public float AShearY { get { return ashearY; } set { ashearY = value; } }
+		public float AppliedRotation
+		{
+			get
+			{
+				return arotation;
+			}
+			set
+			{
+				arotation = value;
+			}
+		}
 
-		public float A { get { return a; } }
-		public float B { get { return b; } }
-		public float C { get { return c; } }
-		public float D { get { return d; } }
+		public float AX
+		{
+			get
+			{
+				return ax;
+			}
+			set
+			{
+				ax = value;
+			}
+		}
 
-		public float WorldX { get { return worldX; } }
-		public float WorldY { get { return worldY; } }
-		public float WorldRotationX { get { return MathUtils.Atan2(c, a) * MathUtils.RadDeg; } }
-		public float WorldRotationY { get { return MathUtils.Atan2(d, b) * MathUtils.RadDeg; } }
+		public float AY
+		{
+			get
+			{
+				return ay;
+			}
+			set
+			{
+				ay = value;
+			}
+		}
 
-		/// <summary>Returns the magnitide (always positive) of the world scale X.</summary>
-		public float WorldScaleX { get { return (float)Math.Sqrt(a * a + c * c); } }
-		/// <summary>Returns the magnitide (always positive) of the world scale Y.</summary>
-		public float WorldScaleY { get { return (float)Math.Sqrt(b * b + d * d); } }
+		public float AScaleX
+		{
+			get
+			{
+				return ascaleX;
+			}
+			set
+			{
+				ascaleX = value;
+			}
+		}
 
-		/// <param name="parent">May be null.</param>
-		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
-			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+		public float AScaleY
+		{
+			get
+			{
+				return ascaleY;
+			}
+			set
+			{
+				ascaleY = value;
+			}
+		}
+
+		public float AShearX
+		{
+			get
+			{
+				return ashearX;
+			}
+			set
+			{
+				ashearX = value;
+			}
+		}
+
+		public float AShearY
+		{
+			get
+			{
+				return ashearY;
+			}
+			set
+			{
+				ashearY = value;
+			}
+		}
+
+		public float A => a;
+
+		public float B => b;
+
+		public float C => c;
+
+		public float D => d;
+
+		public float WorldX => worldX;
+
+		public float WorldY => worldY;
+
+		public float WorldRotationX => MathUtils.Atan2(c, a) * (180f / (float)Math.PI);
+
+		public float WorldRotationY => MathUtils.Atan2(d, b) * (180f / (float)Math.PI);
+
+		public float WorldScaleX => Mathf.Sqrt(a * a + c * c);
+
+		public float WorldScaleY => Mathf.Sqrt(b * b + d * d);
+
+		public float WorldToLocalRotationX
+		{
+			get
+			{
+				Bone bone = parent;
+				if (bone == null)
+				{
+					return arotation;
+				}
+				float num = bone.a;
+				float num2 = bone.b;
+				float num3 = bone.c;
+				float num4 = bone.d;
+				float num5 = a;
+				float num6 = c;
+				return MathUtils.Atan2(num * num6 - num3 * num5, num4 * num5 - num2 * num6) * (180f / (float)Math.PI);
+			}
+		}
+
+		public float WorldToLocalRotationY
+		{
+			get
+			{
+				Bone bone = parent;
+				if (bone == null)
+				{
+					return arotation;
+				}
+				float num = bone.a;
+				float num2 = bone.b;
+				float num3 = bone.c;
+				float num4 = bone.d;
+				float num5 = b;
+				float num6 = d;
+				return MathUtils.Atan2(num * num6 - num3 * num5, num4 * num5 - num2 * num6) * (180f / (float)Math.PI);
+			}
+		}
+
+		public Bone(BoneData data, Skeleton skeleton, Bone parent)
+		{
+			if (data == null)
+			{
+				throw new ArgumentNullException("data", "data cannot be null.");
+			}
+			if (skeleton == null)
+			{
+				throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+			}
 			this.data = data;
 			this.skeleton = skeleton;
 			this.parent = parent;
 			SetToSetupPose();
 		}
 
-		/// <summary>Same as <see cref="UpdateWorldTransform"/>. This method exists for Bone to implement <see cref="Spine.IUpdatable"/>.</summary>
-		public void Update () {
+		public void Update()
+		{
 			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 		}
 
-		/// <summary>Computes the world transform using the parent bone and this bone's local transform.</summary>
-		public void UpdateWorldTransform () {
+		public void UpdateWorldTransform()
+		{
 			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 		}
 
-		/// <summary>Computes the world transform using the parent bone and the specified local transform.</summary>
-		public void UpdateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+		public void UpdateWorldTransform(float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY)
+		{
 			ax = x;
 			ay = y;
 			arotation = rotation;
@@ -149,235 +330,251 @@ namespace Spine {
 			ashearY = shearY;
 			appliedValid = true;
 			Skeleton skeleton = this.skeleton;
-
-			Bone parent = this.parent;
-			if (parent == null) { // Root bone.
-				float rotationY = rotation + 90 + shearY;
-				float la = MathUtils.CosDeg(rotation + shearX) * scaleX;
-				float lb = MathUtils.CosDeg(rotationY) * scaleY;
-				float lc = MathUtils.SinDeg(rotation + shearX) * scaleX;
-				float ld = MathUtils.SinDeg(rotationY) * scaleY;
-				if (skeleton.flipX) {
-					x = -x;
-					la = -la;
-					lb = -lb;
+			Bone bone = parent;
+			if (bone == null)
+			{
+				float degrees = rotation + 90f + shearY;
+				float num = MathUtils.CosDeg(rotation + shearX) * scaleX;
+				float num2 = MathUtils.CosDeg(degrees) * scaleY;
+				float num3 = MathUtils.SinDeg(rotation + shearX) * scaleX;
+				float num4 = MathUtils.SinDeg(degrees) * scaleY;
+				if (skeleton.flipX)
+				{
+					x = 0f - x;
+					num = 0f - num;
+					num2 = 0f - num2;
 				}
-				if (skeleton.flipY != yDown) {
-					y = -y;
-					lc = -lc;
-					ld = -ld;
+				if (skeleton.flipY != yDown)
+				{
+					y = 0f - y;
+					num3 = 0f - num3;
+					num4 = 0f - num4;
 				}
-				a = la;
-				b = lb;
-				c = lc;
-				d = ld;
+				a = num;
+				b = num2;
+				c = num3;
+				d = num4;
 				worldX = x + skeleton.x;
 				worldY = y + skeleton.y;
 				return;
 			}
-
-			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
-			worldX = pa * x + pb * y + parent.worldX;
-			worldY = pc * x + pd * y + parent.worldY;
-
-			switch (data.transformMode) {
-			case TransformMode.Normal: {
-					float rotationY = rotation + 90 + shearY;
-					float la = MathUtils.CosDeg(rotation + shearX) * scaleX;
-					float lb = MathUtils.CosDeg(rotationY) * scaleY;
-					float lc = MathUtils.SinDeg(rotation + shearX) * scaleX;
-					float ld = MathUtils.SinDeg(rotationY) * scaleY;
-					a = pa * la + pb * lc;
-					b = pa * lb + pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
-					return;
-				}
-			case TransformMode.OnlyTranslation: {
-					float rotationY = rotation + 90 + shearY;
-					a = MathUtils.CosDeg(rotation + shearX) * scaleX;
-					b = MathUtils.CosDeg(rotationY) * scaleY;
-					c = MathUtils.SinDeg(rotation + shearX) * scaleX;
-					d = MathUtils.SinDeg(rotationY) * scaleY;
-					break;
-				}
-			case TransformMode.NoRotationOrReflection: {
-					float s = pa * pa + pc * pc, prx;
-					if (s > 0.0001f) {
-						s = Math.Abs(pa * pd - pb * pc) / s;
-						pb = pc * s;
-						pd = pa * s;
-						prx = MathUtils.Atan2(pc, pa) * MathUtils.RadDeg;
-					} else {
-						pa = 0;
-						pc = 0;
-						prx = 90 - MathUtils.Atan2(pd, pb) * MathUtils.RadDeg;
-					}
-					float rx = rotation + shearX - prx;
-					float ry = rotation + shearY - prx + 90;
-					float la = MathUtils.CosDeg(rx) * scaleX;
-					float lb = MathUtils.CosDeg(ry) * scaleY;
-					float lc = MathUtils.SinDeg(rx) * scaleX;
-					float ld = MathUtils.SinDeg(ry) * scaleY;
-					a = pa * la - pb * lc;
-					b = pa * lb - pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
-					break;
-				}
-			case TransformMode.NoScale:
-			case TransformMode.NoScaleOrReflection: {
-					float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
-					float za = pa * cos + pb * sin;
-					float zc = pc * cos + pd * sin;
-					float s = (float)Math.Sqrt(za * za + zc * zc);
-					if (s > 0.00001f) s = 1 / s;
-					za *= s;
-					zc *= s;
-					s = (float)Math.Sqrt(za * za + zc * zc);
-					float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
-					float zb = MathUtils.Cos(r) * s;
-					float zd = MathUtils.Sin(r) * s;
-					float la = MathUtils.CosDeg(shearX) * scaleX;
-					float lb = MathUtils.CosDeg(90 + shearY) * scaleY;
-					float lc = MathUtils.SinDeg(shearX) * scaleX;
-					float ld = MathUtils.SinDeg(90 + shearY) * scaleY;
-					if (data.transformMode != TransformMode.NoScaleOrReflection? pa * pd - pb* pc< 0 : skeleton.flipX != skeleton.flipY) {
-						zb = -zb;
-						zd = -zd;
-					}
-					a = za * la + zb * lc;
-					b = za * lb + zb * ld;
-					c = zc * la + zd * lc;
-					d = zc * lb + zd * ld;					
-					return;
-				}
-			}
-
-			if (skeleton.flipX) {
-				a = -a;
-				b = -b;
-			}
-			if (skeleton.flipY != Bone.yDown) {
-				c = -c;
-				d = -d;
-			}
-		}
-
-		public void SetToSetupPose () {
-			BoneData data = this.data;
-			x = data.x;
-			y = data.y;
-			rotation = data.rotation;
-			scaleX = data.scaleX;
-			scaleY = data.scaleY;
-			shearX = data.shearX;
-			shearY = data.shearY;
-		}
-
-		/// <summary>
-		/// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
-		/// the applied transform after the world transform has been modified directly (eg, by a constraint)..
-		/// 
-		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation.
-		/// </summary>
-		internal void UpdateAppliedTransform () {
-			appliedValid = true;
-			Bone parent = this.parent;
-			if (parent == null) {
-				ax = worldX;
-				ay = worldY;
-				arotation = MathUtils.Atan2(c, a) * MathUtils.RadDeg;
-				ascaleX = (float)Math.Sqrt(a * a + c * c);
-				ascaleY = (float)Math.Sqrt(b * b + d * d);
-				ashearX = 0;
-				ashearY = MathUtils.Atan2(a * b + c * d, a * d - b * c) * MathUtils.RadDeg;
+			float num5 = bone.a;
+			float num6 = bone.b;
+			float num7 = bone.c;
+			float num8 = bone.d;
+			worldX = num5 * x + num6 * y + bone.worldX;
+			worldY = num7 * x + num8 * y + bone.worldY;
+			switch (data.transformMode)
+			{
+			case TransformMode.Normal:
+			{
+				float degrees2 = rotation + 90f + shearY;
+				float num20 = MathUtils.CosDeg(rotation + shearX) * scaleX;
+				float num21 = MathUtils.CosDeg(degrees2) * scaleY;
+				float num22 = MathUtils.SinDeg(rotation + shearX) * scaleX;
+				float num23 = MathUtils.SinDeg(degrees2) * scaleY;
+				a = num5 * num20 + num6 * num22;
+				b = num5 * num21 + num6 * num23;
+				c = num7 * num20 + num8 * num22;
+				d = num7 * num21 + num8 * num23;
 				return;
 			}
-			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
-			float pid = 1 / (pa * pd - pb * pc);
-			float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
-			ax = (dx * pd * pid - dy * pb * pid);
-			ay = (dy * pa * pid - dx * pc * pid);
-			float ia = pid * pd;
-			float id = pid * pa;
-			float ib = pid * pb;
-			float ic = pid * pc;
-			float ra = ia * a - ib * c;
-			float rb = ia * b - ib * d;
-			float rc = id * c - ic * a;
-			float rd = id * d - ic * b;
-			ashearX = 0;
-			ascaleX = (float)Math.Sqrt(ra * ra + rc * rc);
-			if (ascaleX > 0.0001f) {
-				float det = ra * rd - rb * rc;
-				ascaleY = det / ascaleX;
-				ashearY = MathUtils.Atan2(ra * rb + rc * rd, det) * MathUtils.RadDeg;
-				arotation = MathUtils.Atan2(rc, ra) * MathUtils.RadDeg;
-			} else {
-				ascaleX = 0;
-				ascaleY = (float)Math.Sqrt(rb * rb + rd * rd);
-				ashearY = 0;
-				arotation = 90 - MathUtils.Atan2(rd, rb) * MathUtils.RadDeg;
+			case TransformMode.OnlyTranslation:
+			{
+				float degrees5 = rotation + 90f + shearY;
+				a = MathUtils.CosDeg(rotation + shearX) * scaleX;
+				b = MathUtils.CosDeg(degrees5) * scaleY;
+				c = MathUtils.SinDeg(rotation + shearX) * scaleX;
+				d = MathUtils.SinDeg(degrees5) * scaleY;
+				break;
+			}
+			case TransformMode.NoRotationOrReflection:
+			{
+				float num24 = num5 * num5 + num7 * num7;
+				float num25;
+				if (num24 > 0.0001f)
+				{
+					num24 = Math.Abs(num5 * num8 - num6 * num7) / num24;
+					num6 = num7 * num24;
+					num8 = num5 * num24;
+					num25 = MathUtils.Atan2(num7, num5) * (180f / (float)Math.PI);
+				}
+				else
+				{
+					num5 = 0f;
+					num7 = 0f;
+					num25 = 90f - MathUtils.Atan2(num8, num6) * (180f / (float)Math.PI);
+				}
+				float degrees3 = rotation + shearX - num25;
+				float degrees4 = rotation + shearY - num25 + 90f;
+				float num26 = MathUtils.CosDeg(degrees3) * scaleX;
+				float num27 = MathUtils.CosDeg(degrees4) * scaleY;
+				float num28 = MathUtils.SinDeg(degrees3) * scaleX;
+				float num29 = MathUtils.SinDeg(degrees4) * scaleY;
+				a = num5 * num26 - num6 * num28;
+				b = num5 * num27 - num6 * num29;
+				c = num7 * num26 + num8 * num28;
+				d = num7 * num27 + num8 * num29;
+				break;
+			}
+			case TransformMode.NoScale:
+			case TransformMode.NoScaleOrReflection:
+			{
+				float num9 = MathUtils.CosDeg(rotation);
+				float num10 = MathUtils.SinDeg(rotation);
+				float num11 = num5 * num9 + num6 * num10;
+				float num12 = num7 * num9 + num8 * num10;
+				float num13 = Mathf.Sqrt(num11 * num11 + num12 * num12);
+				if (num13 > 1E-05f)
+				{
+					num13 = 1f / num13;
+				}
+				num11 *= num13;
+				num12 *= num13;
+				num13 = Mathf.Sqrt(num11 * num11 + num12 * num12);
+				float radians = (float)Math.PI / 2f + MathUtils.Atan2(num12, num11);
+				float num14 = MathUtils.Cos(radians) * num13;
+				float num15 = MathUtils.Sin(radians) * num13;
+				float num16 = MathUtils.CosDeg(shearX) * scaleX;
+				float num17 = MathUtils.CosDeg(90f + shearY) * scaleY;
+				float num18 = MathUtils.SinDeg(shearX) * scaleX;
+				float num19 = MathUtils.SinDeg(90f + shearY) * scaleY;
+				if ((data.transformMode != TransformMode.NoScaleOrReflection) ? (num5 * num8 - num6 * num7 < 0f) : (skeleton.flipX != skeleton.flipY))
+				{
+					num14 = 0f - num14;
+					num15 = 0f - num15;
+				}
+				a = num11 * num16 + num14 * num18;
+				b = num11 * num17 + num14 * num19;
+				c = num12 * num16 + num15 * num18;
+				d = num12 * num17 + num15 * num19;
+				return;
+			}
+			}
+			if (skeleton.flipX)
+			{
+				a = 0f - a;
+				b = 0f - b;
+			}
+			if (skeleton.flipY != yDown)
+			{
+				c = 0f - c;
+				d = 0f - d;
 			}
 		}
 
-		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {			
-			float a = this.a, b = this.b, c = this.c, d = this.d;
-			float invDet = 1 / (a * d - b * c);
-			float x = worldX - this.worldX, y = worldY - this.worldY;
-			localX = (x * d * invDet - y * b * invDet);
-			localY = (y * a * invDet - x * c * invDet);
+		public void SetToSetupPose()
+		{
+			BoneData boneData = data;
+			x = boneData.x;
+			y = boneData.y;
+			rotation = boneData.rotation;
+			scaleX = boneData.scaleX;
+			scaleY = boneData.scaleY;
+			shearX = boneData.shearX;
+			shearY = boneData.shearY;
 		}
 
-		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {
+		internal void UpdateAppliedTransform()
+		{
+			appliedValid = true;
+			Bone bone = parent;
+			if (bone == null)
+			{
+				ax = worldX;
+				ay = worldY;
+				arotation = MathUtils.Atan2(c, a) * (180f / (float)Math.PI);
+				ascaleX = Mathf.Sqrt(a * a + c * c);
+				ascaleY = Mathf.Sqrt(b * b + d * d);
+				ashearX = 0f;
+				ashearY = MathUtils.Atan2(a * b + c * d, a * d - b * c) * (180f / (float)Math.PI);
+				return;
+			}
+			float num = bone.a;
+			float num2 = bone.b;
+			float num3 = bone.c;
+			float num4 = bone.d;
+			float num5 = 1f / (num * num4 - num2 * num3);
+			float num6 = worldX - bone.worldX;
+			float num7 = worldY - bone.worldY;
+			ax = num6 * num4 * num5 - num7 * num2 * num5;
+			ay = num7 * num * num5 - num6 * num3 * num5;
+			float num8 = num5 * num4;
+			float num9 = num5 * num;
+			float num10 = num5 * num2;
+			float num11 = num5 * num3;
+			float num12 = num8 * a - num10 * c;
+			float num13 = num8 * b - num10 * d;
+			float num14 = num9 * c - num11 * a;
+			float num15 = num9 * d - num11 * b;
+			ashearX = 0f;
+			ascaleX = Mathf.Sqrt(num12 * num12 + num14 * num14);
+			if (ascaleX > 0.0001f)
+			{
+				float num16 = num12 * num15 - num13 * num14;
+				ascaleY = num16 / ascaleX;
+				ashearY = MathUtils.Atan2(num12 * num13 + num14 * num15, num16) * (180f / (float)Math.PI);
+				arotation = MathUtils.Atan2(num14, num12) * (180f / (float)Math.PI);
+			}
+			else
+			{
+				ascaleX = 0f;
+				ascaleY = Mathf.Sqrt(num13 * num13 + num15 * num15);
+				ashearY = 0f;
+				arotation = 90f - MathUtils.Atan2(num15, num13) * (180f / (float)Math.PI);
+			}
+		}
+
+		public void WorldToLocal(float worldX, float worldY, out float localX, out float localY)
+		{
+			float num = a;
+			float num2 = b;
+			float num3 = c;
+			float num4 = d;
+			float num5 = 1f / (num * num4 - num2 * num3);
+			float num6 = worldX - this.worldX;
+			float num7 = worldY - this.worldY;
+			localX = num6 * num4 * num5 - num7 * num2 * num5;
+			localY = num7 * num * num5 - num6 * num3 * num5;
+		}
+
+		public void LocalToWorld(float localX, float localY, out float worldX, out float worldY)
+		{
 			worldX = localX * a + localY * b + this.worldX;
 			worldY = localX * c + localY * d + this.worldY;
 		}
 
-		public float WorldToLocalRotationX {
-			get {
-				Bone parent = this.parent;
-				if (parent == null) return arotation;
-				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
-				return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.RadDeg;
-			}
+		public float WorldToLocalRotation(float worldRotation)
+		{
+			float num = MathUtils.SinDeg(worldRotation);
+			float num2 = MathUtils.CosDeg(worldRotation);
+			return MathUtils.Atan2(a * num - c * num2, d * num2 - b * num) * (180f / (float)Math.PI);
 		}
 
-		public float WorldToLocalRotationY {
-			get {
-				Bone parent = this.parent;
-				if (parent == null) return arotation;
-				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
-				return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.RadDeg;
-			}
+		public float LocalToWorldRotation(float localRotation)
+		{
+			float num = MathUtils.SinDeg(localRotation);
+			float num2 = MathUtils.CosDeg(localRotation);
+			return MathUtils.Atan2(num2 * c + num * d, num2 * a + num * b) * (180f / (float)Math.PI);
 		}
 
-		public float WorldToLocalRotation (float worldRotation) {
-			float sin = MathUtils.SinDeg(worldRotation), cos = MathUtils.CosDeg(worldRotation);
-			return MathUtils.Atan2(a * sin - c * cos, d * cos - b * sin) * MathUtils.RadDeg;
-		}
-
-		public float LocalToWorldRotation (float localRotation) {
-			float sin = MathUtils.SinDeg(localRotation), cos = MathUtils.CosDeg(localRotation);
-			return MathUtils.Atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.RadDeg;
-		}
-
-		/// <summary>
-		/// Rotates the world transform the specified amount and sets isAppliedValid to false.
-		/// </summary>
-		/// <param name="degrees">Degrees.</param>
-		public void RotateWorld (float degrees) {
-			float a = this.a, b = this.b, c = this.c, d = this.d;
-			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
-			this.a = cos * a - sin * c;
-			this.b = cos * b - sin * d;
-			this.c = sin * a + cos * c;
-			this.d = sin * b + cos * d;
+		public void RotateWorld(float degrees)
+		{
+			float num = a;
+			float num2 = b;
+			float num3 = c;
+			float num4 = d;
+			float num5 = MathUtils.CosDeg(degrees);
+			float num6 = MathUtils.SinDeg(degrees);
+			a = num5 * num - num6 * num3;
+			b = num5 * num2 - num6 * num4;
+			c = num6 * num + num5 * num3;
+			d = num6 * num2 + num5 * num4;
 			appliedValid = false;
 		}
 
-		override public string ToString () {
+		public override string ToString()
+		{
 			return data.name;
 		}
 	}

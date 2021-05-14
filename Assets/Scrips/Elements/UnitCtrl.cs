@@ -1508,7 +1508,7 @@ this.updateCurColor();
             this.idleEffectsObjs = new List<SkillEffectCtrl>();
             //Scale = Scale *50;//1.35f;
             //if (_data.UniqueData.Id >= 400000)
-                Scale *= 50;
+            //    Scale *= 50;
             this.leftDirScale = (Vector2)new Vector3(-this.Scale, Mathf.Abs(this.Scale), 1f);
             this.rightDirScale = (Vector2)Vector3.Scale((Vector3)this.leftDirScale, new Vector3(-1f, 1f, 1f));
 
@@ -1848,7 +1848,7 @@ this.updateCurColor();
                 {
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, this.gameObject, false);
                     this.ColliderCenter = polygonCollider2D.bounds.center - this.transform.position;
-                    this.ColliderSize = polygonCollider2D.bounds.size *50;
+                    this.ColliderSize = polygonCollider2D.bounds.size;
                     if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.SettingData.usePhysics)
                     {
                         float coSize2 = this.ColliderSize.x / this.transform.lossyScale.x;
