@@ -15351,6 +15351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitParent: {fileID: 1199446829}
+  enemyParent: {fileID: 0}
   effectParent: {fileID: 0}
   prefab1: {fileID: 8876765918548570777, guid: d9794dcbb6e3ff14f89ee49375f3fc98, type: 3}
   prefab2: {fileID: 3850582718648040332, guid: 96283753467e5214d830448661aa1296, type: 3}
@@ -16190,6 +16191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitParent: {fileID: 2177380771696129155}
+  enemyParent: {fileID: 2081915953115004115}
   effectParent: {fileID: 1417075077}
   prefab1: {fileID: 8876765918548570777, guid: d9794dcbb6e3ff14f89ee49375f3fc98, type: 3}
   prefab2: {fileID: 3850582718648040332, guid: 96283753467e5214d830448661aa1296, type: 3}
