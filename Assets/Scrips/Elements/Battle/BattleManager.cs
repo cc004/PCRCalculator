@@ -58,7 +58,7 @@ namespace Elements.Battle
         [SerializeField]
         private BlurOptimized playCameraBlurOptimized;
         private ViewBattle viewBattle;*/
-        //private BattleEffectManager battleEffectManager;
+        private BattleEffectManager battleEffectManager;
         private float deltaTimeAccumulated;
         private float cutinSkipTimeAccumulated;
         private bool isToPauseOnFrameEnd;
