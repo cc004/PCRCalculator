@@ -1508,7 +1508,7 @@ this.updateCurColor();
             this.idleEffectsObjs = new List<SkillEffectCtrl>();
             //Scale = Scale *50;//1.35f;
             //if (_data.UniqueData.Id >= 400000)
-            //    Scale *= 50;
+            Scale *= 0.5f;
             this.leftDirScale = (Vector2)new Vector3(-this.Scale, Mathf.Abs(this.Scale), 1f);
             this.rightDirScale = (Vector2)Vector3.Scale((Vector3)this.leftDirScale, new Vector3(-1f, 1f, 1f));
 
