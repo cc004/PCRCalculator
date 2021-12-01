@@ -96,7 +96,7 @@ namespace Elements
                 _target.Owner.StrikeBackDictionary.Add((EnchantStrikeBackAction.eStrikeBackEffectType)this.ActionDetail2, strikeBackDataSet);
             }
             strikeBackDataSet.SkillEffect = skillEffectCtrl1;
-            int count = 0;// effectController.Children.Count;
+            int count = 5;// effectController.Children.Count;
             int number = Mathf.Min((int)_valueDictionary[eValueNumber.VALUE_3], count - strikeBackDataSet.DataList.Count);
             //effectController.AddEffect(number);
             for (int index = 0; index < number; ++index)
