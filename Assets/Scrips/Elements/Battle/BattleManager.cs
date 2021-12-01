@@ -4436,15 +4436,15 @@ namespace Elements.Battle
                 bool flag = (this._summonData.SummonSide == SummonAction.eSummonSide.OURS) ? this._summonData.Owner.IsOther : !this._summonData.Owner.IsOther;
 
 
-                BaseData additional = null;
+                PCRCaculator.BaseData additional = null;
 
                 if (_summonData.ConsiderEquipmentAndBonus)
                 {
-                    additional = MainManager.Instance.UnitRarityDic[_summonData.SummonId].GetBonusData(unitData);
+                    additional = PCRCaculator.MainManager.Instance.UnitRarityDic[_summonData.SummonId].GetBonusData(_summonData.Owner.unitData);
                 }
 
 
-                this.unitCtrl.Initialize(parameter,unitData_my, flag, true, false);
+                this.unitCtrl.Initialize(parameter,unitData_my, flag, true, false, additional);
                 if (this._summonData.ConsiderEquipmentAndBonus)
                 {
                     this.unitCtrl.ApplyPassiveSkillValue(true);
