@@ -69,7 +69,7 @@ namespace PCRCaculator.Guild
         {
             int i = 0;
             bool flag1 = false;
-            bool flag2 = changeData.endFrameCount == 5400;
+            bool flag2 = changeData.endFrameCount == 5500;
             if (flag2)
             {
                 var toendData = toEndAbnormalData.Find(a0 => a0.changeData.GetDescription() == changeData.GetDescription());
