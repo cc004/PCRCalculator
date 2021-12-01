@@ -1481,7 +1481,8 @@ this.updateCurColor();
           PCRCaculator.UnitData unitData_my,
           bool _isOther,
           bool _isFirstWave,
-          bool _isGaugeAlwaysVisible = false)
+          bool _isGaugeAlwaysVisible = false,
+          PCRCaculator.BaseData additional = null)
         {
             //this.soundManager = ManagerSingleton<SoundManager>.Instance;
             /*if (UnitCtrl.staticSingletonTree == null)
@@ -1730,6 +1731,9 @@ this.updateCurColor();
                 baseData = PCRCaculator.MainManager.Instance.UnitRarityDic[UnitId].GetBaseData(unitData_my);//,MyGameCtrl.Instance.tempData.isGuildBattle);
                 baseDataEX = PCRCaculator.MainManager.Instance.UnitRarityDic[UnitId].GetEXSkillValue(unitData_my);//,MyGameCtrl.Instance.tempData.isGuildBattle);
             }
+
+            if (additional != null) baseData += additional;
+
             if (UnitId >= 300000 && UnitId <= 399999)
             {
                 var data = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();

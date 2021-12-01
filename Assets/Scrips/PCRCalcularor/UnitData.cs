@@ -26,6 +26,45 @@ namespace PCRCaculator
         public readonly UnitDetailData detailData;
         public readonly UnitSkillData skillData;
 
+        public BaseData GetBonusData(UnitData a)
+        {
+            var result = new BaseData();
+            if (unitId < 200000)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    if (a.equipLevel[i] >= 0)
+                    {
+                        int key = ((a.rank <= rankData.rankEquipments.Count) ? rankData.rankEquipments[a.rank - 1][i] : 999999);
+                        if (MainManager.Instance.EquipmentDic.TryGetValue(key, out var value))
+                        {
+                            result += value.GetEquipmentData(a.equipLevel[i]);
+                        }
+                    }
+                }
+            }
+            if (a.love >= 0 && unitId <= 200000)
+            {
+                foreach (int item in MainManager.Instance.UnitStoryEffectDic[unitId])
+                {
+                    if (a.playLoveDic != null && a.playLoveDic.TryGetValue(item, out var value2))
+                    {
+                        result += MainManager.Instance.UnitStoryDic[item].GetLoveValues(value2);
+                    }
+                    else if (MainManager.Instance.JudgeWeatherShowThisUnit(item) && MainManager.Instance.unitDataDic.ContainsKey(item))
+                    {
+                        result += MainManager.Instance.UnitStoryDic[item].GetLoveValues(MainManager.Instance.unitDataDic[item].love);
+                    }
+                }
+            }
+            if (a.uniqueEqLv > 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out var value3))
+            {
+                result += value3.CalcUniqueValue(a.uniqueEqLv);
+            }
+
+            return result;
+        }
+
         public UnitRarityData() { }
         public UnitRarityData(int id, List<BaseData> d1, List<BaseData> d2, UnitRankData unitRankData, UnitDetailData detailData, UnitSkillData skillData)
         {

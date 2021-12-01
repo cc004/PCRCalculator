@@ -4434,6 +4434,16 @@ namespace Elements.Battle
                     parameter = TempData.CreateUnitParameter(unitData_my);
                 }
                 bool flag = (this._summonData.SummonSide == SummonAction.eSummonSide.OURS) ? this._summonData.Owner.IsOther : !this._summonData.Owner.IsOther;
+
+
+                BaseData additional = null;
+
+                if (_summonData.ConsiderEquipmentAndBonus)
+                {
+                    additional = MainManager.Instance.UnitRarityDic[_summonData.SummonId].GetBonusData(unitData);
+                }
+
+
                 this.unitCtrl.Initialize(parameter,unitData_my, flag, true, false);
                 if (this._summonData.ConsiderEquipmentAndBonus)
                 {
