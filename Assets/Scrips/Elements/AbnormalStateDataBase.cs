@@ -143,7 +143,10 @@ namespace Elements.Battle
                         OnRepeat();
                     }
                 }
-                time += BattleManager.DeltaTime_60fps;
+                if (BattleManager.GetBlackOutUnitLength() == 0)
+                {
+                    time += BattleManager.DeltaTime_60fps;
+                }
                 //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域加时"+);
                 eBattleGameState mmbmbjnnacg = BattleManager.GameState;
                 if (time <= StayTime && mmbmbjnnacg != eBattleGameState.NEXT_WAVE_PROCESS && (mmbmbjnnacg != eBattleGameState.WAIT_WAVE_END && !AHABEPKMKJJ))
