@@ -12,6 +12,7 @@ namespace Elements
     {
         public static MyGameCtrl Instance;
         public Transform unitParent;
+        public Transform enemyParent;
         public Transform effectParent;
         public GameObject prefab1;
         public GameObject prefab2;
@@ -297,8 +298,7 @@ namespace Elements
                     b.GetComponent<UnitCtrl>().SetUnitCtrl(ctrlData);
                 }
             }
-
-            b.transform.SetParent(unitParent);
+            b.transform.SetParent(isplayer?unitParent:enemyParent);
             b.name = "rotate_center";
 
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();

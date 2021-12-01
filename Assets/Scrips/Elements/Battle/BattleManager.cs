@@ -341,126 +341,108 @@ namespace Elements.Battle
             this.isToResumeOnFrameEnd = true;
         }
 
-        private void incrementWave(System.Action ACGNCFFDNON)
+        /*private void incrementWave(System.Action ACGNCFFDNON)
         {
             if (++this.CurrentWave >= 3)
                 this.CurrentWave = 2;
             this.LAMHAIODABF = 0;// this.battleProcessor.GetNextWaveStartStoryId();
             this.LKLFFOFDCHK = this.LAMHAIODABF == 0;
             this.StartCoroutine(this.incrementWaveCoroutin(ACGNCFFDNON));
-        }
+        }*/
 
-        private IEnumerator incrementWaveCoroutin(System.Action ACGNCFFDNON)
+        /*private IEnumerator incrementWaveCoroutin(Action ACGNCFFDNON)
         {
-            BattleManager battleManager = this;
-            // ISSUE: object of a compiler-generated type is created
-            // ISSUE: variable of a compiler-generated type
-            /*BattleManager.PGKHJPGFLFM pgkhjpgflfm = new BattleManager.PGKHJPGFLFM()
-            {
-              isCallbakCalled = false
-            };*/
-            // ISSUE: reference to a compiler-generated field
             bool isCallbakCalled = false;
-
-            // ISSUE: reference to a compiler-generated method
-            battleManager.InitializeEnemyForIncliment(() => { isCallbakCalled = true; });
-            // ISSUE: reference to a compiler-generated field
+            isCallbakCalled = false;
+            InitializeEnemyForIncliment(delegate
+            {
+                isCallbakCalled = true;
+            });
             while (!isCallbakCalled)
-                yield return (object)null;
-            battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            //if (IsBossBattle) { BossUnit = EnemyList[0]; }
-            // ISSUE: explicit non-virtual call
-            for (int index = 0; index < (battleManager.UnitList).Count; ++index)
             {
-                // ISSUE: explicit non-virtual call
-                (battleManager.UnitList)[index].WaveStartProcess(false);
+                yield return null;
             }
-            battleManager.sortAndSetPositionOneWave(battleManager.currentEnemyUnitCtrlDictionary);
-            battleManager.setupEnemyProcess();
-            int index1 = 0;
-            // ISSUE: explicit non-virtual call
-            for (int count = (battleManager.EnemyList).Count; index1 < count; ++index1)
+            checkBossBattle(currentEnemyUnitCtrlDictionary);
+            for (int i = 0; i < DJJKGCFKJNJ.Count; i++)
             {
-                // ISSUE: explicit non-virtual call
-                (battleManager.EnemyList)[index1].WaveStartProcess(false);
-                // ISSUE: explicit non-virtual call
-                (battleManager.EnemyList)[index1].ExecActionOnStartAndDetermineInstanceID();
-                // ISSUE: explicit non-virtual call
-                // ISSUE: explicit non-virtual call
-                // ISSUE: explicit non-virtual call
-                //(battleManager.EnemyList)[index1].UnitDamageInfo = battleManager.tempData.CreateDamageData((battleManager.EnemyList)[index1].UnitId, 0, (battleManager.EnemyList)[index1].UnitParameter.UniqueData.GetCurrentRarity(), true);
-                // ISSUE: explicit non-virtual call
-                if ((battleManager.EnemyList)[index1].StartStateIsWalk)
+                DJJKGCFKJNJ[i].WaveStartProcess(_first: false);
+            }
+            sortAndSetPositionOneWave(currentEnemyUnitCtrlDictionary);
+            setupEnemyProcess();
+            int j = 0;
+            for (int count = KKJHHMAAMEI.Count; j < count; j++)
+            {
+                KKJHHMAAMEI[j].WaveStartProcess(_first: false);
+                KKJHHMAAMEI[j].ExecActionOnStartAndDetermineInstanceID();
+                KKJHHMAAMEI[j].UnitDamageInfo = tempData.CreateDamageData(KKJHHMAAMEI[j].UnitId, 0, KKJHHMAAMEI[j].UnitParameter.UniqueData.GetCurrentRarity(), AOBBMGHCDMK: true);
+                if (KKJHHMAAMEI[j].StartStateIsWalk)
                 {
-                    // ISSUE: explicit non-virtual call
-                    (battleManager.EnemyList)[index1].SetState(UnitCtrl.ActionState.WALK);
+                    KKJHHMAAMEI[j].SetState(UnitCtrl.ActionState.WALK);
                 }
             }
-            // ISSUE: explicit non-virtual call
-            //BattleHeaderController..Instance.SetWaveNum((battleManager.POKEAEBGPIB) + battleManager.currentWaveOffset + 1);
-            battleManager.isPauseTimeLimit = false;
-            battleManager.BattleLeftTime = 90;//battleManager.tempData.PHDACAOAOMA.CAMIPEAOGNI;
-            int num1 = -1;
+            SingletonMonoBehaviour<BattleHeaderController>.Instance.SetWaveNum(POKEAEBGPIB + currentWaveOffset + 1);
+            isPauseTimeLimit = false;
+            MiliLimitTime01 = tempData.PHDACAOAOMA.CAMIPEAOGNI;
+            int num = -1;
             int num2 = -1;
-            // ISSUE: explicit non-virtual call
-            // ISSUE: explicit non-virtual call
-            /*if (0 < (battleManager.POKEAEBGPIB) && (battleManager.POKEAEBGPIB) < 3)
+            if (0 < POKEAEBGPIB && POKEAEBGPIB < 3)
             {
-                // ISSUE: explicit non-virtual call
-                num2 = battleManager.tempData.PHDACAOAOMA.CurrentBattleBackgrounds[(battleManager.POKEAEBGPIB) - 1];
-                // ISSUE: explicit non-virtual call
-                num1 = battleManager.tempData.PHDACAOAOMA.CurrentBattleBackgrounds[(battleManager.POKEAEBGPIB)];
-                // ISSUE: explicit non-virtual call
-                // ISSUE: explicit non-virtual call
-                if (battleManager.tempData.PHDACAOAOMA.CurrentBattleBGM[(battleManager.POKEAEBGPIB) - 1] != battleManager.tempData.PHDACAOAOMA.CurrentBattleBGM[(battleManager.POKEAEBGPIB)])
+                num2 = tempData.PHDACAOAOMA.CurrentBattleBackgrounds[POKEAEBGPIB - 1];
+                num = tempData.PHDACAOAOMA.CurrentBattleBackgrounds[POKEAEBGPIB];
+                if (tempData.PHDACAOAOMA.CurrentBattleBGM[POKEAEBGPIB - 1] != tempData.PHDACAOAOMA.CurrentBattleBGM[POKEAEBGPIB])
                 {
-                    // ISSUE: explicit non-virtual call
-                    // ISSUE: explicit non-virtual call
-                    battleManager.soundManager.PlayBGM(battleManager.tempData.PHDACAOAOMA.CurrentBattleBGMSheet[(battleManager.POKEAEBGPIB)], battleManager.tempData.PHDACAOAOMA.CurrentBattleBGM[(battleManager.POKEAEBGPIB)]);
+                    soundManager.PlayBGM(tempData.PHDACAOAOMA.CurrentBattleBGMSheet[POKEAEBGPIB], tempData.PHDACAOAOMA.CurrentBattleBGM[POKEAEBGPIB]);
                 }
-            }*/
-            /*if (num1 != -1 && num2 != num1)
+            }
+            if (num != -1 && num2 != num)
             {
-                battleManager.stageBgTex.mainTexture = (Texture)null;
-                battleManager.stageBgTex.material = (Material)null;
-                battleManager.stageForegroundTex.material = (Material)null;
-                battleManager.resourceManager.UnloadResourceId(eResourceId.BG_BATTLE, (long)num2);
-                battleManager.resourceManager.UnloadResourceId(eResourceId.BATTLE_BG_MASK, (long)num2);
-                battleManager.resourceManager.UnloadResourceId(eResourceId.BG_BATTLE_MATERIAL, (long)num2);
-                battleManager.resourceManager.UnloadResourceId(eResourceId.FG_BATTLE, (long)num2);
-                battleManager.resourceManager.KickUnloadUnusedAssets();
-                Texture texture1 = battleManager.resourceManager.LoadResourceImmediately(eResourceId.BG_BATTLE, (long)num1) as Texture;
-                if ((UnityEngine.Object)texture1 != (UnityEngine.Object)null)
-                    battleManager.stageBgTex.mainTexture = texture1;
-                if (QualityManager.GetGPUQualityLevel() == QualityManager.KMCGOHDIENP.Level_4 && ResourceManager.IsExistResource(eResourceId.BG_BATTLE_MATERIAL, (long)num1))
+                stageBgTex.mainTexture = null;
+                stageBgTex.material = null;
+                stageForegroundTex.material = null;
+                resourceManager.UnloadResourceId(eResourceId.BG_BATTLE, num2);
+                resourceManager.UnloadResourceId(eResourceId.BATTLE_BG_MASK, num2);
+                resourceManager.UnloadResourceId(eResourceId.BG_BATTLE_MATERIAL, num2);
+                resourceManager.UnloadResourceId(eResourceId.FG_BATTLE, num2);
+                resourceManager.KickUnloadUnusedAssets();
+                Texture texture = resourceManager.LoadResourceImmediately(eResourceId.BG_BATTLE, num) as Texture;
+                if (texture != null)
                 {
-                    Material material = battleManager.resourceManager.LoadResourceImmediately(eResourceId.BG_BATTLE_MATERIAL, (long)num1) as Material;
-                    if ((UnityEngine.Object)material != (UnityEngine.Object)null)
-                        battleManager.stageBgTex.material = material;
+                    stageBgTex.mainTexture = texture;
                 }
-                if (ResourceManager.IsExistResource(eResourceId.FG_BATTLE, (long)num1))
+                if (QualityManager.GetGPUQualityLevel() == QualityManager.KMCGOHDIENP.Level_4 && ResourceManager.IsExistResource(eResourceId.BG_BATTLE_MATERIAL, num))
                 {
-                    Texture texture2 = battleManager.resourceManager.LoadResourceImmediately(eResourceId.FG_BATTLE, (long)num1) as Texture;
-                    battleManager.stageForegroundTex.mainTexture = texture2;
+                    Material material = resourceManager.LoadResourceImmediately(eResourceId.BG_BATTLE_MATERIAL, num) as Material;
+                    if (material != null)
+                    {
+                        stageBgTex.material = material;
+                    }
                 }
-                UnityEngine.Object.Destroy((UnityEngine.Object)battleManager.PAMLMPDGEIJ);
-                if (ResourceManager.IsExistResource(eBundleId.BATTLE_FX_BG, (long)(num1 / 10)))
-                    battleManager.resourceManager.LoadAssetBundleImmediately(eBundleId.BATTLE_FX_BG, (long)(num1 / 10));
-                if (ResourceManager.IsExistResource(eResourceId.FX_BATTLE_BG, (long)num1))
-                    battleManager.PAMLMPDGEIJ = battleManager.resourceManager.LoadImmediately(eResourceId.FX_BATTLE_BG, ExceptNGUIRoot.Transform, (long)num1);
-            }*/
-            // ISSUE: explicit non-virtual call
-            //if ((battleManager.MCEEFEKJDGM))
-            //    battleManager.StartCoroutine(battleManager.viewBattle.CoroutineShowBossBattleTitle(battleManager.BossUnit.ShowTitleDelay));
-            battleManager.GameState = eBattleGameState.PLAY;
-            // ISSUE: explicit non-virtual call
-            if ((battleManager.CurrentWave) > 0)
+                if (ResourceManager.IsExistResource(eResourceId.FG_BATTLE, num))
+                {
+                    Texture mainTexture = resourceManager.LoadResourceImmediately(eResourceId.FG_BATTLE, num) as Texture;
+                    stageForegroundTex.mainTexture = mainTexture;
+                }
+                UnityEngine.Object.Destroy(PAMLMPDGEIJ);
+                if (ResourceManager.IsExistResource(eBundleId.BATTLE_FX_BG, num / 10))
+                {
+                    resourceManager.LoadAssetBundleImmediately(eBundleId.BATTLE_FX_BG, num / 10);
+                }
+                if (ResourceManager.IsExistResource(eResourceId.FX_BATTLE_BG, num))
+                {
+                    PAMLMPDGEIJ = resourceManager.LoadImmediately(eResourceId.FX_BATTLE_BG, ExceptNGUIRoot.Transform, num);
+                }
+            }
+            if (MCEEFEKJDGM)
             {
-                // ISSUE: explicit non-virtual call
-                battleManager.JJCJONPDGIM = (battleManager.CurrentWave) * 100000;
+                StartCoroutine(viewBattle.CoroutineShowBossBattleTitle(BossUnit.ShowTitleDelay));
+            }
+            MMBMBJNNACG = eBattleGameState.PLAY;
+            if (POKEAEBGPIB > 0)
+            {
+                JJCJONPDGIM = POKEAEBGPIB * 100000;
             }
             ACGNCFFDNON();
-        }
+        }*/
 
         private void Update()
         {
