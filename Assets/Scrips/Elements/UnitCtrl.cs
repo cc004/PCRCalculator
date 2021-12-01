@@ -1720,18 +1720,15 @@ this.updateCurColor();
             //UnitData uniqueData = _data.UniqueData;
             PCRCaculator.BaseData baseData = new PCRCaculator.BaseData();
             PCRCaculator.BaseData baseDataEX = new PCRCaculator.BaseData();
-            if (UnitId <= 200000 || UnitId >= 400000)
+            if (MyGameCtrl.Instance.tempData.guildEnemy?.unit_id == unitData_my.unitId)
+            {
+                //baseData = MyGameCtrl.Instance.tempData.guildEnemy.baseData;
+                baseData = _data.EnemyData.baseData;
+            }
+            else /* if (UnitId <= 200000 || UnitId >= 400000) */
             {
                 baseData = PCRCaculator.MainManager.Instance.UnitRarityDic[UnitId].GetBaseData(unitData_my);//,MyGameCtrl.Instance.tempData.isGuildBattle);
                 baseDataEX = PCRCaculator.MainManager.Instance.UnitRarityDic[UnitId].GetEXSkillValue(unitData_my);//,MyGameCtrl.Instance.tempData.isGuildBattle);
-            }
-            else
-            {
-                if(MyGameCtrl.Instance.tempData.guildEnemy!= null)
-                {
-                    //baseData = MyGameCtrl.Instance.tempData.guildEnemy.baseData;
-                    baseData = _data.EnemyData.baseData;
-                }
             }
             if (UnitId >= 300000 && UnitId <= 399999)
             {
