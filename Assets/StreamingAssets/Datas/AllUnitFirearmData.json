@@ -4630,7 +4630,7 @@
             "attack": [
                 {
                     "HitDelay": 0.1,
-                    "MoveRate": 3.6,
+                    "MoveRate": 3.3,
                     "duration": 0.8,
                     "MoveType": 0,
                     "startRotate": 60.0,
@@ -4654,7 +4654,7 @@
             "skill2": [
                 {
                     "HitDelay": 0.1,
-                    "MoveRate": 3.7,
+                    "MoveRate": 3.4,
                     "duration": 0.8,
                     "MoveType": 0,
                     "startRotate": 60.0,
@@ -4681,7 +4681,7 @@
             "attack": [
                 {
                     "HitDelay": 0.1,
-                    "MoveRate": 3.6,
+                    "MoveRate": 3.3,
                     "duration": 0.8,
                     "MoveType": 0,
                     "startRotate": 60.0,
@@ -4705,7 +4705,7 @@
             "skill2": [
                 {
                     "HitDelay": 0.1,
-                    "MoveRate": 3.7,
+                    "MoveRate": 3.4,
                     "duration": 0.8,
                     "MoveType": 0,
                     "startRotate": 60.0,
@@ -4731,7 +4731,7 @@
             "attack": [
                 {
                     "HitDelay": 0.1,
-                    "MoveRate": 3.6,
+                    "MoveRate": 3.3,
                     "duration": 0.8,
                     "MoveType": 0,
                     "startRotate": 60.0,
@@ -4755,7 +4755,7 @@
             "skill2": [
                 {
                     "HitDelay": 0.1,
-                    "MoveRate": 3.7,
+                    "MoveRate": 3.4,
                     "duration": 0.8,
                     "MoveType": 0,
                     "startRotate": 60.0,
