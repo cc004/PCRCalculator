@@ -1113,562 +1113,94 @@ namespace PCRCaculator.Battle
         public ResistData(int cent)
         {
             resist_ststus_id = cent;
-            ailments = new int[21];
-            switch (cent)
+            if(!resistDataDic.TryGetValue(cent,out ailments))
+            {
+                ailments = new int[32];
+            }
+            /*switch (cent)
             {
                 case 300000001:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 100;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                100,0,100,100,100,
+                100,100,100,100,100,
+                100,100,100,100,100,
+                100,100,0,100,100};
                     break;
                 case 300000002:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 30;
-                    ailments[3] = 30;
-                    ailments[4] = 30;
-                    ailments[5] = 30;
-                    ailments[6] = 30;
-                    ailments[7] = 30;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                100,0,30,30,30,
+                30,30,30,30,30,
+                100,100,100,100,100,
+                100,100,0,100,100};
                     break;
                 case 300000003:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                100,0,100,100,100,
+                100,100,100,30,30,
+                30,30,30,100,100,
+                100,100,0,100,30};
                     break;
                 case 300000004:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 30;
-                    ailments[3] = 30;
-                    ailments[4] = 30;
-                    ailments[5] = 30;
-                    ailments[6] = 30;
-                    ailments[7] = 30;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 30;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 30;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                100,0,30,30,30,
+                30,30,30,30,30,
+                30,30,30,30,100,
+                100,100,0,30,30};
                     break;
                 case 300000005:
-                    ailments[0] = 30;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 100;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 30;
-                    ailments[15] = 30;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 30;
+                    ailments = new int[20]{
+                30,0,100,100,100,
+                100,100,100,100,100,
+                100,100,100,100,30,
+                30,100,0,100,100};
                     break;
                 case 300000006:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 100;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 30;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 30;
+                    ailments = new int[20]{
+                100,0,100,100,100,
+                100,100,100,100,100,
+                100,100,100,100,30,
+                100,100,0,100,100};
                     break;
                 case 300000007:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 100;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 30;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 30;
+                    ailments = new int[20]{
+                100,0,100,100,100,
+                100,100,100,100,100,
+                100,100,100,100,30,
+                100,100,100,100,100};
                     break;
                 case 300000008:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                100,0,100,100,100,
+                100,100,100,30,30,
+                30,30,30,100,30,
+                100,100,100,100,30};
                     break;
                 case 300000009:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 100;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                100,0,100,100,100,
+                100,100,100,100,100,
+                100,100,100,100,100,
+                100,100,100,100,100};
                     break;
                 case 300000010:
-                    ailments[0] = 0;
-                    ailments[1] = 0;
-                    ailments[2] = 0;
-                    ailments[3] = 0;
-                    ailments[4] = 0;
-                    ailments[5] = 0;
-                    ailments[6] = 0;
-                    ailments[7] = 0;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 0;
-                    ailments[11] = 0;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
+                    ailments = new int[20]{
+                0,0,0,0,0,
+                0,0,0,30,30,
+                0,0,0,100,100,
+                100,100,0,100,0};
                     break;
-                case 300000011:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 0;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 100;
-                    ailments[10] = 100;
-                    ailments[11] = 100;
-                    ailments[12] = 100;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 100;
-                    ailments[20] = 100;
-                    break;
-                case 300000012:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 0;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
-                    break;
-                case 300000013:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
-                    break;
-                case 300000014:
-                    ailments[0] = 0;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
-                    break;
-                case 300000015:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 0;
-                    break;
-                case 300000016:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 0;
-                    ailments[10] = 0;
-                    ailments[11] = 0;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
-                    break;
-                case 300000017:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 0;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
-                    break;
-                case 300000018:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 0;
-                    ailments[10] = 0;
-                    ailments[11] = 0;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 0;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
-                    break;
-                case 300000019:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 0;
-                    ailments[7] = 100;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 0;
-                    ailments[18] = 100;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
-                    break;
-                case 300000020:
-                    ailments[0] = 0;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 0;
-                    ailments[10] = 0;
-                    ailments[11] = 0;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
-                    break;
-                case 300000021:
-                    ailments[0] = 0;
-                    ailments[1] = 0;
-                    ailments[2] = 0;
-                    ailments[3] = 0;
-                    ailments[4] = 0;
-                    ailments[5] = 0;
-                    ailments[6] = 0;
-                    ailments[7] = 0;
-                    ailments[8] = 30;
-                    ailments[9] = 30;
-                    ailments[10] = 0;
-                    ailments[11] = 0;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
-                    break;
-                case 300000022:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 0;
-                    ailments[9] = 0;
-                    ailments[10] = 0;
-                    ailments[11] = 0;
-                    ailments[12] = 0;
-                    ailments[13] = 100;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 100;
-                    ailments[19] = 0;
-                    ailments[20] = 100;
-                    break;
-                case 300000023:
-                    ailments[0] = 100;
-                    ailments[1] = 0;
-                    ailments[2] = 100;
-                    ailments[3] = 100;
-                    ailments[4] = 100;
-                    ailments[5] = 100;
-                    ailments[6] = 100;
-                    ailments[7] = 100;
-                    ailments[8] = 100;
-                    ailments[9] = 30;
-                    ailments[10] = 30;
-                    ailments[11] = 30;
-                    ailments[12] = 30;
-                    ailments[13] = 0;
-                    ailments[14] = 100;
-                    ailments[15] = 100;
-                    ailments[16] = 100;
-                    ailments[17] = 100;
-                    ailments[18] = 0;
-                    ailments[19] = 30;
-                    ailments[20] = 100;
-                    break;
+
+
+
                 default:
-                    ailments[0] = cent;
-                    ailments[1] = cent;
-                    ailments[2] = cent;
-                    ailments[3] = cent;
-                    ailments[4] = cent;
-                    ailments[5] = cent;
-                    ailments[6] = cent;
-                    ailments[7] = cent;
-                    ailments[8] = cent;
-                    ailments[9] = cent;
-                    ailments[10] = cent;
-                    ailments[11] = cent;
-                    ailments[12] = cent;
-                    ailments[13] = cent;
-                    ailments[14] = cent;
-                    ailments[15] = cent;
-                    ailments[16] = cent;
-                    ailments[17] = cent;
-                    ailments[18] = cent;
-                    ailments[19] = cent;
-                    ailments[20] = cent;
+                    ailments = new int[20]{
+                cent,cent,cent,cent,cent,
+                cent,cent,cent,cent,cent,
+                cent,cent,cent,cent,cent,
+                cent,cent,cent,cent,cent};
                     break;
-            }
+
+            }*/
         }
 
     }
