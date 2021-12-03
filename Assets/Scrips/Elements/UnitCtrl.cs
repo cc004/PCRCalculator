@@ -2616,29 +2616,18 @@ this.updateCurColor();
           float _moveSpeed)
         {
             UnitCtrl unitCtrl = this;
-            string currentMotionName = unitCtrl.GetCurrentSpineCtrl().AnimationName;
             while (true)
             {
-                if (!unitCtrl.battleManager.CoroutineManager.VisualPause && (double)unitCtrl.GetCurrentSpineCtrl().state.TimeScale == 0.0)
-                    unitCtrl.GetCurrentSpineCtrl().Resume();
-                if (!unitCtrl.IsUnableActionState())
+                if (!battleManager.CoroutineManager.VisualPause && GetCurrentSpineCtrl().state.TimeScale == 0f)
                 {
-                    if (!(unitCtrl.GetCurrentSpineCtrl().AnimationName != currentMotionName))
-                    {
-                        if (unitCtrl.GetCurrentSpineCtrl().IsPlayAnimeBattle)
-                            yield return (object)null;
-                        else
-                            goto label_8;
-                    }
-                    else
-                        break;
+                    GetCurrentSpineCtrl().Resume();
                 }
-                else
-                    goto label_8;
+                if (IsUnableActionState() || !GetCurrentSpineCtrl().IsPlayAnimeBattle)
+                {
+                    break;
+                }
+                yield return null;
             }
-            unitCtrl.BattleStartProcess(_respawnPos);
-            yield break;
-        label_8:
             Vector3 v;
             switch (_moveType)
             {
