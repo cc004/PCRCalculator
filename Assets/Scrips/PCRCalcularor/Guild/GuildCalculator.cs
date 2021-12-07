@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Elements.Battle;
 using Elements;
 using System.ComponentModel;
+using System.Linq;
 using Newtonsoft0.Json;
 
 namespace PCRCaculator.Guild
@@ -122,6 +123,8 @@ namespace PCRCaculator.Guild
             //AddSkillGroups(a, c, c,isPlayer?b.unitData.GetNicName():b.UnitName);
 
         }
+
+        private int id = 0;
         public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount,string describe)
         {
             try
@@ -132,6 +135,7 @@ namespace PCRCaculator.Guild
                     allUnitStateChangeDic[unitid].Add(
                         new UnitStateChangeData
                         {
+                            id = ++this.id,
                             changStateFrom = allUnitLastStateDic[unitid].changStateTo,
                             changStateTo = actionState,
                             currentFrameCount = frameCount
@@ -209,6 +213,7 @@ namespace PCRCaculator.Guild
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             var valueData = new ValueChangeData(frame * deltaXforChat, currentHP, hp, describe);
             valueData.damage = damage;
+            valueData.id = this.id;
             allUnitHPDic[unitid].Add(valueData);
             skillGroupPrefabDic[unitid].ReflashHPChat(allUnitHPDic[unitid]);
         }
@@ -433,6 +438,7 @@ namespace PCRCaculator.Guild
         }
         public List<List<float>> CreateUBExecTimeData()
         {
+            /*
             List<List<float>> UBTimes = new List<List<float>>();
             for(int i = 0; i < 5; i++)
             {
@@ -450,24 +456,42 @@ namespace PCRCaculator.Guild
                 }
                 UBTimes.Add(ubline);
             }
-            return UBTimes;
+            return UBTimes;*/
+            return PlayerIds.SelectMany((id, i) => allUnitStateChangeDic[id]
+                    .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                    .Select(s => (state: s, pos: i)))
+                .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.id)
+                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.1f)))
+                .GroupBy(s => s.t.pos).Select(g =>
+                    (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
+                .Aggregate(new List<List<float>>
+                {
+                    new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>()
+                }, (result, tuple) =>
+                {
+                    result[tuple.Key] = tuple.list;
+                    return result;
+                });
         }
         public List<UBDetail> CreateUBDetailList()
         {
             List<UBDetail> uBDetails = new List<UBDetail>();
-            List<List<float>> UBTimes = CreateUBExecTimeData();
+            //List<List<float>> UBTimes = CreateUBExecTimeData();
             for (int i = 0; i < 5; i++)
             {
                 if (i < PlayerIds.Count)
                 {
-                    foreach (int tm in UBTimes[i])
+                    foreach (var tm in allUnitStateChangeDic[PlayerIds[i]])
                     {
+                        if (tm.changStateTo != UnitCtrl.ActionState.SKILL_1) continue;
                         var unitData = players[i].unitData;
                         UBDetail detail = new UBDetail();
                         detail.unitData = unitData;
-                        detail.UBTime = (int)tm;
+                        detail.sorting = tm.id;
+                        detail.UBTime = tm.currentFrameCount;
                         ValueChangeData changeData = allUnitHPDic[bossId].Find(
-                            a => Mathf.RoundToInt(a.xValue * 5400) == tm);
+                            a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
+                                 a.id == tm.id);
                         if (changeData != null)
                         {
                             detail.Damage = changeData.damage;
@@ -485,11 +509,12 @@ namespace PCRCaculator.Guild
                 {
                     UBDetail detail = new UBDetail();
                     detail.isBossUB = true;
+                    detail.sorting = data.id;
                     detail.UBTime = data.currentFrameCount;
                     uBDetails.Add(detail);
                 }
             }
-            return uBDetails;
+            return uBDetails.OrderBy(d => d.sorting).ToList();
         }
         private string CreateExcelName()
         {
@@ -611,6 +636,7 @@ namespace PCRCaculator.Guild
     }
     public struct UnitStateChangeData
     {
+        public int id;
         public int currentFrameCount;
         public Elements.UnitCtrl.ActionState changStateFrom;
         public Elements.UnitCtrl.ActionState changStateTo;
@@ -622,6 +648,7 @@ namespace PCRCaculator.Guild
             this.changStateFrom = changStateFrom;
             this.changStateTo = changStateTo;
             this.describe = describe;
+            this.id = 0;
         }
         public string GetMainDescribe()
         {
@@ -680,6 +707,7 @@ namespace PCRCaculator.Guild
         public int hp;
         public int damage;        
         public string describe;
+        public int id;
         public ValueChangeData() { }
         public ValueChangeData(float x, float y)
         {
@@ -820,6 +848,7 @@ namespace PCRCaculator.Guild
     }
     public class UBDetail
     {
+        [JsonIgnore] public float sorting;
         public bool isBossUB;
         public UnitData unitData;
         public int UBTime;
