@@ -19,6 +19,7 @@ namespace Elements.Battle
 {
     public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController, BattleLogIntreface
     {
+        public AutoubManager ubmanager = new AutoubManager();
         public static BattleManager Instance;
         public const int POST_RESULT_TYPE_LOSE = 0;
         public const int POST_RESULT_TYPE_RESIGN = 1;

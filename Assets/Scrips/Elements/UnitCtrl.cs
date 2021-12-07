@@ -8939,6 +8939,7 @@ this.updateCurColor();
 
         public void StartCutIn()
         {
+            this.battleManager.ubmanager.UbExecCallback(this.battleManager.UnitList.IndexOf(this));
             ++this.UbCounter;
             //this.battleCameraEffect.DAHAALGOJNA = Vector3.zero;
             for (int index = 0; index < this.battleManager.UnitList.Count; ++index)
@@ -9094,6 +9095,8 @@ this.updateCurColor();
             if (this.IsUbExecTrying && (!MyGameCtrl.Instance.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())
                 this.battleManager.SetOnlyAutoClearFlag(false);
             if (this.IsUbExecTrying)
+                return true;
+            if (this.battleManager.ubmanager.IsUbExec(this.battleManager.UnitList.IndexOf(this)))
                 return true;
             //return this.battleManager.UnitUiCtrl.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;
             return MyGameCtrl.Instance.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;

@@ -78,8 +78,16 @@ namespace Elements
             }
             tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrier);
             Battle.BattleManager.Instance.Init(this);
-        }
-        private void LoadAllUnitCtrlData()
+            if (!IsAutoMode)
+            {
+                Battle.BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+            }
+            else
+            {
+                Battle.BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+            }
+    }
+    private void LoadAllUnitCtrlData()
         {
             TextAsset text_0 = Resources.Load<TextAsset>("unitCtrlData/UNIT_" + tempData.guildEnemy.unit_id);
             if (text_0 != null && text_0.text != "")
@@ -233,7 +241,7 @@ namespace Elements
             //callBack.Call<UnitCtrl>(unitCtrl);
             if (!IsAutoMode && isplayer)
             {
-                unitCtrl.SetUBExecTime(tempData.UBExecTimeList[idx], tempData.tryCount);
+                //unitCtrl.SetUBExecTime(tempData.UBExecTimeList[idx], tempData.tryCount);
             }
 
         }

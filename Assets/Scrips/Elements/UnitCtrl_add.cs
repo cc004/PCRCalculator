@@ -150,6 +150,7 @@ namespace Elements
             }
             return false;
         }
+        /*
         public void SetUBExecTime(List<float> times,int tryCount)
         {
             for(int i = 0; i < times.Count; i++)
@@ -189,7 +190,7 @@ namespace Elements
                 }
                 yield return null;
             }
-        }
+        }*/
         private void SetSkill(List<int> idList, List<SkillLevelInfo> skillLevelInfoList, eSpineCharacterAnimeId animeId, bool isSpecial, UnitParameter _data)
         {
             int index = 0;
