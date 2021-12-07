@@ -15,6 +15,8 @@ using PCRCaculator;
 using PCRCaculator.Guild;
 using System.Text.RegularExpressions;
 using System.Drawing;
+using System.Windows.Forms;
+using Application = UnityEngine.Application;
 
 namespace ExcelHelper
 {
@@ -104,48 +106,19 @@ namespace ExcelHelper
                 return false;
             }
 
-            OpenFileName ofn = new OpenFileName();
-
-            ofn.structSize = Marshal.SizeOf(ofn);
-
-            //ofn.filter = "All Files\0*.*\0\0";
-            //ofn.filter = "Image Files(*.jpg;*.png)\0*.jpg;*.png\0";
-            //ofn.filter = "Txt Files(*.txt)\0*.txt\0";
-
-            //ofn.filter = "Word Files(*.docx)\0*.docx\0";
-            //ofn.filter = "Word Files(*.doc)\0*.doc\0";
-            //ofn.filter = "Word Files(*.doc:*.docx)\0*.doc:*.docx\0";
-
-            //ofn.filter = "Excel Files(*.xls)\0*.xls\0";
-            ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";  //指定打开格式
-                                                           //ofn.filter = "Excel Files(*.xls:*.xlsx)\0*.xls:*.xlsx\0";
-                                                           //ofn.filter = "Excel Files(*.xlsx:*.xls)\0*.xlsx:*.xls\0";
-
-            ofn.file = new string(new char[256]);
-
-            ofn.maxFile = ofn.file.Length;
-
-            ofn.fileTitle = new string(new char[64]);
-
-            ofn.maxFileTitle = ofn.fileTitle.Length;
-
-            ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
-
-            ofn.title = "打开Excel";
-
-            ofn.defExt = "xlsx";
-
-            //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-
+            var diag = new OpenFileDialog();
+            diag.Filter = "Excel Files(*.xlsx)|*.xlsx";
+            diag.Title = "打开Excel";
+            diag.DefaultExt = "xlsx";
+            diag.InitialDirectory = Application.dataPath;
 
             //打开windows框
-            if (DllTest.GetOpenFileName(ofn))
+            if (diag.ShowDialog() == DialogResult.OK)
             {
                 //TODO
 
                 //把文件路径格式替换一下
-                ofn.file = ofn.file.Replace("\\", "/");
+                diag.FileName = diag.FileName.Replace("\\", "/");
 
                 //string url = ofn.file;
                 //WWW www = new WWW(url);
@@ -182,7 +155,7 @@ namespace ExcelHelper
                 FileStream stream = null;
                 try
                 {
-                     stream = File.Open(ofn.file,FileMode.Open, FileAccess.Read,FileShare.Read);
+                     stream = File.Open(diag.FileName, FileMode.Open, FileAccess.Read,FileShare.Read);
 
                 }
                 catch (IOException e)
@@ -264,44 +237,16 @@ namespace ExcelHelper
             string filePath = "";
             if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
             {
-                OpenFileName ofn = new OpenFileName();
+                var diag = new SaveFileDialog();
+                diag.Filter = "Excel Files(*.xlsx)|*.xlsx";
+                diag.FileName = defaultName;
+                diag.Title = "选择保存路径";
+                diag.DefaultExt = "xlsx";
+                diag.InitialDirectory = ".";
 
-                ofn.structSize = Marshal.SizeOf(ofn);
-
-                //ofn.filter = "All Files\0*.*\0\0";
-                //ofn.filter = "Image Files(*.jpg;*.png)\0*.jpg;*.png\0";
-                //ofn.filter = "Txt Files(*.txt)\0*.txt\0";
-
-                //ofn.filter = "Word Files(*.docx)\0*.docx\0";
-                //ofn.filter = "Word Files(*.doc)\0*.doc\0";
-                //ofn.filter = "Word Files(*.doc:*.docx)\0*.doc:*.docx\0";
-
-                //ofn.filter = "Excel Files(*.xls)\0*.xls\0";
-                ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";  //指定打开格式
-                                                               //ofn.filter = "Excel Files(*.xls:*.xlsx)\0*.xls:*.xlsx\0";
-                                                               //ofn.filter = "Excel Files(*.xlsx:*.xls)\0*.xlsx:*.xls\0";
-
-                ofn.file = new string(new char[256]);
-
-                ofn.maxFile = ofn.file.Length;
-
-                ofn.fileTitle = new string(new char[64]);
-
-                ofn.maxFileTitle = ofn.fileTitle.Length;
-
-                //ofn.fileTitle = "B1狼狗智克yls200w";
-
-                ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
-
-                ofn.title = "选择保存路径";
-
-                ofn.defExt = "xlsx";
-                ofn.file = defaultName;
-                //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-                ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-
-                isSuccess = DllTest.GetSaveFileName(ofn);
-                filePath = ofn.file.Replace("\\", "/");
+                isSuccess = diag.ShowDialog() == DialogResult.OK;
+                filePath = diag.FileName.Replace("\\", "/");
+                
 
             }
             else if(Application.platform == RuntimePlatform.Android)
@@ -1011,22 +956,16 @@ namespace ExcelHelper
         }
         public static void ReadExcelNicName()
         {
-            OpenFileName ofn = new OpenFileName();
-            ofn.structSize = Marshal.SizeOf(ofn);
-            ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";  //指定打开格式
-            ofn.file = new string(new char[256]);
-            ofn.maxFile = ofn.file.Length;
-            ofn.fileTitle = new string(new char[64]);
-            ofn.maxFileTitle = ofn.fileTitle.Length;
-            ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
-            ofn.title = "打开Excel";
-            ofn.defExt = "xlsx";
-            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-            //打开windows框
-            if (DllTest.GetOpenFileName(ofn))
+            var diag = new OpenFileDialog();
+            diag.Filter = "Excel Files(*.xlsx)|*.xlsx";
+            diag.Title = "打开Excel";
+            diag.DefaultExt = "xlsx";
+            diag.InitialDirectory = Application.dataPath;
+
+            if (diag.ShowDialog() == DialogResult.OK)
             {
-                ofn.file = ofn.file.Replace("\\", "/");
-                FileInfo info = new FileInfo(ofn.file);
+                diag.FileName = diag.FileName.Replace("\\", "/");
+                FileInfo info = new FileInfo(diag.FileName);
                 FileStream stream = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 ExcelDataReader.IExcelDataReader excelReader = ExcelDataReader.ExcelReaderFactory.CreateOpenXmlReader(stream);
                 DataSet result = excelReader.AsDataSet();
