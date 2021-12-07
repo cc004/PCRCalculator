@@ -5997,7 +5997,9 @@ this.updateCurColor();
             }*/
             float NormalizedHP = (float)(long)this.Hp / (float)(long)this.MaxHp;
             this.OnLifeAmmountChange.Call<float>(NormalizedHP);
-            string des = "受到来自" + _damageData.Source == null ? "???" : _damageData.Source.UnitName + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
+            string des;
+
+            des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
             MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)this.Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des);
             uIManager.LogMessage(des,PCRCaculator.Battle.eLogMessageType.GET_DAMAGE, this);
             this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
