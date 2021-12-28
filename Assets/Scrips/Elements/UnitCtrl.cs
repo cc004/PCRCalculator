@@ -1148,7 +1148,7 @@ namespace Elements
 
         public ObscuredInt Level { get; protected set; }
 
-        public ObscuredLong Hp { get; protected set; }
+        public ObscuredLong Hp { get; internal protected set; }
 
         public ObscuredLong MaxHp { get; set; }
 
@@ -5728,7 +5728,7 @@ this.updateCurColor();
             float num1 = 2f * _damageData.CriticalDamageRate;
             if (_critical)
                 a.value *= num1;
-            a.ex += (1 + num1 * Mathf.Clamp(_damageData.CriticalRate, 0f, 1f));
+            a.ex *= (1 + (num1 - 1) * Mathf.Clamp(_damageData.CriticalRate, 0f, 1f));
             if (this.debuffDamageUpDataList.Count > 0)
                 a *= this.GetDebuffDamageUpValue();
             bool flag1 = false;

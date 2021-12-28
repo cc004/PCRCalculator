@@ -12030,7 +12030,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1212528156}
-        m_MethodName: ExitButton
+        m_MethodName: ExitButton2
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -371,17 +371,24 @@ namespace PCRCaculator.Battle
             summon.SetUIForSuommon();
             b.SetBuffUI(rularSprites[0], summon,true);
         }
+
         public void ExitButton()
+        {
+            Elements.Battle.BattleManager.Instance.BossUnit.Hp = 0;
+        }
+
+        public void ExitButton2()
         {
             bool isGuildBossBattle = false;
             if (BattleManager.Instance != null)
             {
                 isGuildBossBattle = BattleManager.Instance.isGuildBossBattle;
             }
-            else if(Elements.MyGameCtrl.Instance != null)
+            else if (Elements.MyGameCtrl.Instance != null)
             {
                 isGuildBossBattle = Elements.MyGameCtrl.Instance.tempData.isGuildBattle;
             }
+
             Time.timeScale = 1;
             if (isGuildBossBattle)
             {
@@ -392,6 +399,7 @@ namespace PCRCaculator.Battle
                 SceneManager.LoadScene("BeginScene");
             }
         }
+
         public void PauseButton()
         {
             if (battleManager != null)
