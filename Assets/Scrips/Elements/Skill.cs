@@ -115,6 +115,8 @@ namespace Elements
         [JsonIgnore]
         public long TotalDamage { get; set; }
         [JsonIgnore]
+        public long ExDamage { get; set; }
+        [JsonIgnore]
         public float AweValue { get; set; }
         [JsonIgnore]
         public bool IsLifeStealEnabled { get; set; } = true;
@@ -130,6 +132,7 @@ namespace Elements
         public void ReadySkill()
         {
             this.TotalDamage = 0L;
+            this.ExDamage = 0L;
             this.DamagedPartsList.Clear();
             for (int index1 = 0; index1 < this.SkillEffects.Count; ++index1)
             {

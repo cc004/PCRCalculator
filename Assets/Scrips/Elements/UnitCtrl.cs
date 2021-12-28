@@ -1152,9 +1152,9 @@ namespace Elements
 
         public ObscuredLong MaxHp { get; set; }
 
-        public ObscuredInt Atk { get; set; }
+        public FloatWithEx Atk { get; set; }
 
-        public ObscuredInt MagicStr { get; set; }
+        public FloatWithEx MagicStr { get; set; }
         private int def;
         public ObscuredInt Def 
         {
@@ -1208,21 +1208,21 @@ namespace Elements
 
         public ObscuredInt MagicCriticalDamageRate { get; set; }
 
-        public ObscuredInt AtkZero => (ObscuredInt)(Mathf.Max(0, (int)this.Atk) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ATK));
+        public FloatWithEx AtkZero => (MathfPlus.Max(0f, this.Atk) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ATK));
 
-        public ObscuredInt MagicStrZero => (ObscuredInt)(Mathf.Max(0, (int)this.MagicStr) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_STR));
+        public FloatWithEx MagicStrZero => (MathfPlus.Max(0f, this.MagicStr) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_STR));
 
-        public ObscuredInt DefZero => (ObscuredInt)(Mathf.Max(0, (int)this.Def) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DEF));
+        public ObscuredInt DefZero => (int)(Mathf.Max(0, (int)this.Def) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DEF));
 
-        public ObscuredInt MagicDefZero => (ObscuredInt)(Mathf.Max(0, (int)this.MagicDef) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_DEF));
+        public ObscuredInt MagicDefZero => (int)(Mathf.Max(0, (int)this.MagicDef) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_DEF));
 
-        public ObscuredInt DodgeZero => (ObscuredInt)(Mathf.Max(0, (int)this.Dodge) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DODGE));
+        public ObscuredInt DodgeZero => (int)(Mathf.Max(0, (int)this.Dodge) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DODGE));
 
-        public ObscuredInt AccuracyZero => (ObscuredInt)(Mathf.Max(0, (int)this.Accuracy) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ACCURACY));
+        public ObscuredInt AccuracyZero => (int)(Mathf.Max(0, (int)this.Accuracy) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ACCURACY));
 
-        public ObscuredInt PhysicalCriticalZero => (ObscuredInt)(Mathf.Max(0, (int)this.PhysicalCritical) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL));
+        public ObscuredInt PhysicalCriticalZero => (int)(Mathf.Max(0, (int)this.PhysicalCritical) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL));
 
-        public ObscuredInt MagicCriticalZero => (ObscuredInt)(Mathf.Max(0, (int)this.MagicCritical) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_CRITICAL));
+        public ObscuredInt MagicCriticalZero => (int)(Mathf.Max(0, (int)this.MagicCritical) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_CRITICAL));
 
         public ObscuredInt WaveHpRecoveryZero => (ObscuredInt)Mathf.Max(0, (int)this.WaveHpRecovery);
 
@@ -1230,7 +1230,7 @@ namespace Elements
 
         public ObscuredInt EnergyRecoveryRateZero => (ObscuredInt)Mathf.Max(0, (int)this.EnergyRecoveryRate + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE));
 
-        public ObscuredInt LifeStealZero => (ObscuredInt)(Mathf.Max(0, (int)this.LifeSteal) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.LIFE_STEAL));
+        public ObscuredInt LifeStealZero => (int)(Mathf.Max(0, (int)this.LifeSteal) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.LIFE_STEAL));
 
         public ObscuredInt PhysicalPenetrateZero => (ObscuredInt)Mathf.Max(0, (int)this.PhysicalPenetrate);
 
@@ -1242,9 +1242,9 @@ namespace Elements
 
         public ObscuredFloat MoveSpeedZero => (ObscuredFloat)(Mathf.Max(0.0f, this.MoveSpeed) + (float)this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MOVE_SPEED));
 
-        public ObscuredInt PhysicalCriticalDamageRateOrMin => (ObscuredInt)(Mathf.Max(50, (int)this.PhysicalCriticalDamageRate) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE));
+        public ObscuredInt PhysicalCriticalDamageRateOrMin => (int)(Mathf.Max(50, (int)this.PhysicalCriticalDamageRate) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE));
 
-        public ObscuredInt MagicCriticalDamageRateOrMin => (ObscuredInt)(Mathf.Max(50, (int)this.MagicCriticalDamageRate) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE));
+        public ObscuredInt MagicCriticalDamageRateOrMin => (int)(Mathf.Max(50, (int)this.MagicCriticalDamageRate) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE));
 
         public float StartHpPercent { get; private set; }
 
@@ -1767,8 +1767,8 @@ this.updateCurColor();
             this.StartMagicStr = (ObscuredInt)Mathf.RoundToInt(baseData.Magic_str);
             this.StartMagicDef = (ObscuredInt)Mathf.RoundToInt(baseData.Magic_def);
             this.Def = (ObscuredInt)(StartDef + baseDataEX.Def);
-            this.Atk = (ObscuredInt)(StartAtk + baseDataEX.Atk);
-            this.MagicStr = (ObscuredInt)(StartMagicStr + baseDataEX.Magic_str);
+            this.Atk = (StartAtk + baseDataEX.Atk);
+            this.MagicStr = (StartMagicStr + baseDataEX.Magic_str);
             this.MagicDef = (ObscuredInt)(StartMagicDef + baseDataEX.Magic_def);
 
             if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
@@ -4247,17 +4247,17 @@ this.updateCurColor();
 
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
-        public Dictionary<UnitCtrl.BuffParamKind, int> AdditionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, int>();
+        public Dictionary<UnitCtrl.BuffParamKind, FloatWithEx> AdditionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, FloatWithEx>();
 
-        private int getAdditionalBuffDictionary(UnitCtrl.BuffParamKind _kind)
+        private FloatWithEx getAdditionalBuffDictionary(UnitCtrl.BuffParamKind _kind)
         {
-            int num;
-            return !this.AdditionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num;
+            FloatWithEx num;
+            return (int)(!this.AdditionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
         public void SetBuffParam(
           UnitCtrl.BuffParamKind _kind,
-          Dictionary<BasePartsData, int> _value,
+          Dictionary<BasePartsData, FloatWithEx> _value,
           float _time,
           int _skillId,
           UnitCtrl _source,
@@ -4291,7 +4291,7 @@ this.updateCurColor();
 
         private IEnumerator UpdateBuffParam(
           UnitCtrl.BuffParamKind _kind,
-          Dictionary<BasePartsData, int> _value,
+          Dictionary<BasePartsData, FloatWithEx> _value,
           float _maxTime,
           int _skillId,
           UnitCtrl _source,
@@ -4376,7 +4376,7 @@ this.updateCurColor();
 
         public void EnableBuffParam(
           UnitCtrl.BuffParamKind _kind,
-          Dictionary<BasePartsData, int> _value,
+          Dictionary<BasePartsData, FloatWithEx> _value,
           bool _enable,
           UnitCtrl _source,
           bool _isBuff,
@@ -4399,10 +4399,10 @@ this.updateCurColor();
             this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, IDAFJHFJKOL, _enable);
             string des = "";
             int MainValue = 0;
-            foreach(int value in _value.Values)
+            foreach(var value in _value.Values)
             {
                 des += value;
-                MainValue = value;
+                MainValue = (int)value;
             }
             ///added script
             PCRCaculator.Guild.UnitAbnormalStateChangeData stateChangeData = new PCRCaculator.Guild.UnitAbnormalStateChangeData();
@@ -4449,7 +4449,7 @@ this.updateCurColor();
                     --this.debuffCounter;
                 }
             }
-            Dictionary<BasePartsData, int>.Enumerator enumerator = _value.GetEnumerator();
+            Dictionary<BasePartsData, FloatWithEx>.Enumerator enumerator = _value.GetEnumerator();
             while (enumerator.MoveNext())
                 enumerator.Current.Key.SetBuffDebuff(_enable, enumerator.Current.Value, _kind, _source, this.battleLog, _additional);
         }
@@ -5388,13 +5388,13 @@ this.updateCurColor();
                         }
                         continue;
                     case eParamType.ATK:
-                        this.Atk = (ObscuredInt)(int)this.calculatePassiveSkillValue((float)(int)this.StartAtk, _passiveActionKV);
+                        this.Atk = this.calculatePassiveSkillValue((float)(int)this.StartAtk, _passiveActionKV);
                         continue;
                     case eParamType.DEF:
                         this.Def = (ObscuredInt)(int)this.calculatePassiveSkillValue((float)(int)this.StartDef, _passiveActionKV);
                         continue;
                     case eParamType.MAGIC_ATK:
-                        this.MagicStr = (ObscuredInt)(int)this.calculatePassiveSkillValue((float)(int)this.StartMagicStr, _passiveActionKV);
+                        this.MagicStr = this.calculatePassiveSkillValue((float)(int)this.StartMagicStr, _passiveActionKV);
                         continue;
                     case eParamType.MAGIC_DEF:
                         this.MagicDef = (ObscuredInt)(int)this.calculatePassiveSkillValue((float)(int)this.StartMagicDef, _passiveActionKV);
@@ -5470,8 +5470,8 @@ this.updateCurColor();
             return dictionary;
         }
 
-        private float calculatePassiveSkillValue(
-          float _value,
+        private FloatWithEx calculatePassiveSkillValue(
+            FloatWithEx _value,
           KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (float)((double)_value * ((double)_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
 
         public List<PartsData> BossPartsListForBattle { get; set; }
@@ -5578,7 +5578,7 @@ this.updateCurColor();
             }
             if (flag)
                 _critical = _damageData.IsLogBarrierCritical;
-            long num1 = this.SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate);
+            var (num1, expdmg) = this.SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate);
             if (_damageData.Target is PartsData)
             {
                 if (!_damageData.IsSlipDamage)
@@ -5684,11 +5684,14 @@ this.updateCurColor();
             if (num1 > 0L & _critical && _skill.CriticalPartsList != null)
                 _skill.CriticalPartsList.Add(_damageData.Target);
             if (_skill != null)
+            {
                 _skill.TotalDamage += num1;
+                _skill.ExDamage += expdmg;
+            }
             return num1;
         }
 
-        public long SetDamageImpl(
+        public (long, long) SetDamageImpl(
           DamageData _damageData,
           bool _byAttack,
           ActionParameter.OnDamageHitDelegate _onDamageHit,
@@ -5706,25 +5709,26 @@ this.updateCurColor();
             if (this.IdleOnly || this.IsDivisionSourceForDamage && !_damageData.IsDivisionDamage)
             {
                 callBack?.Invoke("伤害无效,目标不是可攻击状态");
-                return 0;
+                return (0, 0);
             }
             //if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.SHIELD && this.IsBoss)
             //    this.battleManager.SubstructEnemyPoint(1);
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
             {
                 callBack?.Invoke("伤害无效，目标处于无敌状态");
-                return 0;
+                return (0, 0);
             }
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.PHYSICS_DODGE) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 this.SetMissAtk(_damageData.Source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION, _parts: _damageData.Target);
                 callBack?.Invoke("伤害无效，目标处于物理闪避状态");
-                return 0;
+                return (0, 0);
             }
-            float a = (float)_damageData.Damage;
+            var a = _damageData.Damage;
             float num1 = 2f * _damageData.CriticalDamageRate;
             if (_critical)
-                a *= num1;
+                a.value *= num1;
+            a.ex += (1 + num1 * Mathf.Clamp(_damageData.CriticalRate, 0f, 1f));
             if (this.debuffDamageUpDataList.Count > 0)
                 a *= this.GetDebuffDamageUpValue();
             bool flag1 = false;
@@ -5738,7 +5742,7 @@ this.updateCurColor();
                     flag1 = true;
             }
             if (flag1)
-                a = (float)_damageData.LogBarrierExpectedDamage;
+                a = _damageData.LogBarrierExpectedDamage;
             if (_damageData.DamageType == DamageData.eDamageType.ATK && this.IsAbnormalState(UnitCtrl.eAbnormalState.CUT_ATK_DAMAGE))
             {
                 float num2 = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.CUT_ATK_DAMAGE) / 100f;
@@ -5762,7 +5766,7 @@ this.updateCurColor();
                     if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
                     {
                         float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ATK_BARRIR);
-                        float num2 = (Mathf.Log((float)(((double)_damageData.TotalDamageForLogBarrier - (double)abnormalStateSubValue) / (double)abnormalStateMainValue + 1.0)) * abnormalStateMainValue + abnormalStateSubValue) / (float)_damageData.TotalDamageForLogBarrier;
+                        var num2 = (MathfPlus.Log(((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)) * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
                         a *= num2;
                     }
                 }
@@ -5772,7 +5776,7 @@ this.updateCurColor();
                     if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
                     {
                         float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_MGC_BARRIR);
-                        float num2 = (Mathf.Log((float)(((double)_damageData.TotalDamageForLogBarrier - (double)abnormalStateSubValue) / (double)abnormalStateMainValue + 1.0)) * abnormalStateMainValue + abnormalStateSubValue) / (float)_damageData.TotalDamageForLogBarrier;
+                        var num2 = (MathfPlus.Log(((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)) * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
                         a *= num2;
                     }
                 }
@@ -5782,7 +5786,7 @@ this.updateCurColor();
                     if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
                     {
                         float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ALL_BARRIR);
-                        float num2 = (Mathf.Log((float)(((double)_damageData.TotalDamageForLogBarrier - (double)abnormalStateSubValue) / (double)abnormalStateMainValue + 1.0)) * abnormalStateMainValue + abnormalStateSubValue) / (float)_damageData.TotalDamageForLogBarrier;
+                        var num2 = (MathfPlus.Log(((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)) * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
                         a *= num2;
                     }
                 }
@@ -5809,15 +5813,16 @@ this.updateCurColor();
                         break;
                 }
             }
-            float num5 = Mathf.Min(a, 999999f);
+            var num5 = 0f-MathfPlus.Max(0f-a, 0f-999999f);
             if (this.CurrentState == UnitCtrl.ActionState.DIE)
             {
                 //this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.FloatToInt(num5));
                 callBack?.Invoke("伤害无效，目标已经死了");
-                return 0;
+                return (0, 0);
             }
+            /*
             if (_upperLimitFunc != null)
-                num5 = (float)_upperLimitFunc(BattleUtil.FloatToInt(num5), _critical ? num1 : 1f);
+                num5 = (float)_upperLimitFunc(BattleUtil.FloatToInt(num5), _critical ? num1 : 1f);*/
             if ((UnityEngine.Object)_damageData.Source != (UnityEngine.Object)null && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
             {
                 foreach (KeyValuePair<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet> strikeBack1 in this.StrikeBackDictionary)
@@ -5834,32 +5839,32 @@ this.updateCurColor();
                                 case StrikeBackData.eStrikeBackType.PHYSICAL_DRAIN:
                                     if (_damageData.DamageType == DamageData.eDamageType.ATK)
                                     {
-                                        strikeBack.Exec(_damageData.Source, this, BattleUtil.FloatToInt(num5), (System.Action)(() => list.Remove(strikeBack)));
+                                        strikeBack.Exec(_damageData.Source, this, (int)BattleUtil.FloatToInt(num5), (System.Action)(() => list.Remove(strikeBack)));
                                         this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, eStateIconType.STRIKE_BACK, false);
                                         this.MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false,90, "反击中");
                                         callBack?.Invoke("伤害无效，被目标格挡");
-                                        return 0;
+                                        return (0, 0);
                                     }
                                     continue;
                                 case StrikeBackData.eStrikeBackType.MAGIC_GUARD:
                                 case StrikeBackData.eStrikeBackType.MAGIC_DRAIN:
                                     if (_damageData.DamageType == DamageData.eDamageType.MGC)
                                     {
-                                        strikeBack.Exec(_damageData.Source, this, BattleUtil.FloatToInt(num5), (System.Action)(() => list.Remove(strikeBack)));
+                                        strikeBack.Exec(_damageData.Source, this, (int)BattleUtil.FloatToInt(num5), (System.Action)(() => list.Remove(strikeBack)));
                                         this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, eStateIconType.STRIKE_BACK, false);
                                         this.MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
 
                                         callBack?.Invoke("伤害无效，被目标格挡");
-                                        return 0;
+                                        return (0, 0);
                                     }
                                     continue;
                                 case StrikeBackData.eStrikeBackType.BOTH_GUARD:
                                 case StrikeBackData.eStrikeBackType.BOTH_DRAIN:
-                                    strikeBack.Exec(_damageData.Source, this, BattleUtil.FloatToInt(num5), (System.Action)(() => list.Remove(strikeBack)));
+                                    strikeBack.Exec(_damageData.Source, this, (int)BattleUtil.FloatToInt(num5), (System.Action)(() => list.Remove(strikeBack)));
                                     this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, eStateIconType.STRIKE_BACK, false);
                                     this.MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
                                     callBack?.Invoke("伤害无效，被目标格挡");
-                                    return 0;
+                                    return (0, 0);
                                 default:
                                     continue;
                             }
@@ -5873,11 +5878,11 @@ this.updateCurColor();
                 this.ChargeEnergy(eSetEnergyType.BY_SET_DAMAGE, num5 * (float)this.skillStackValDmg, _source: this, _hasNumberEffect: false, _multipleValue: _energyChargeMultiple);
             if ((double)num5 <= 0.0 && _damageData.ActionType == eActionType.FORCE_HP_CHANGE)
             {
-                this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.FloatToInt(num5));
+                this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.FloatToInt(num5));
                 callBack?.Invoke("伤害无效，因为伤害为负数");
-                return 0;
+                return (0, 0);
             }
-            float _fDamage = Mathf.Max(num5, 1f);
+            var _fDamage = MathfPlus.Max(num5, 1f);
             /*if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && this.battleManager.KIHOGJBONDH != 0 && this.IsBoss)
             {
                 int PBAANIPPIGL = BattleUtil.FloatToInt(_fDamage);
@@ -5918,7 +5923,7 @@ this.updateCurColor();
             int _overRecoverValue = 0;
             if (_damageData.ActionType != eActionType.INHIBIT_HEAL && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
-            long num6 = (long)BattleUtil.FloatToInt(_fDamage);
+            var num6 = BattleUtil.FloatToInt(_fDamage);
             bool flag2 = (long)this.Hp > 0L;
             int num7 = (double)(long)this.Hp > (double)(long)this.MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)this.Hp;
@@ -6006,7 +6011,7 @@ this.updateCurColor();
             if (this.OnDamage != null)
                 this.OnDamage(_byAttack, (float)num6, _critical);
             MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
-            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)(num6-num6/num1),criticalRate,num1);
+            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)(num6-num6/num1), num6.ex);
             this.OnDamageForLoopTrigger.Call<bool, float, bool>(_byAttack, (float)num6, _critical);
             this.OnDamageForLoopRepeat.Call<float>((float)num6);
             this.OnDamageForDivision.Call<bool, float, bool>(_byAttack, Mathf.Min((float)hp, (float)num6), _critical);
@@ -6034,14 +6039,14 @@ this.updateCurColor();
             }
             string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
             callBack?.Invoke(describe);
-            return num6;
+            return ((long)num6.value, (long)num6.ex);
         }
 
-        private void execBarrier(DamageData _damageData, ref float _fDamage, ref int _overRecoverValue)
+        private void execBarrier(DamageData _damageData, ref FloatWithEx _fDamage, ref int _overRecoverValue)
         {
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
-                float num = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
+                var num = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num > 0.0)
                 {
                     this.EnableAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK, false);
@@ -6055,7 +6060,7 @@ this.updateCurColor();
             }
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC) && _damageData.DamageType == DamageData.eDamageType.MGC)
             {
-                float num = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
+                var num = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
                 if ((double)num > 0.0)
                 {
                     this.EnableAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC, false);
@@ -6069,7 +6074,7 @@ this.updateCurColor();
             }
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
-                float num1 = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
+                var num1 = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num1 > 0.0)
                 {
                     _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery(BattleUtil.FloatToInt(this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
@@ -6078,15 +6083,15 @@ this.updateCurColor();
                 }
                 else
                 {
-                    int num2 = BattleUtil.FloatToInt(_fDamage);
-                    _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
+                    var num2 = BattleUtil.FloatToInt(_fDamage);
+                    _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery((int)num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
                     this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)num2;
                     _fDamage = 0.0f;
                 }
             }
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC) && _damageData.DamageType == DamageData.eDamageType.MGC)
             {
-                float num1 = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
+                var num1 = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
                 if ((double)num1 > 0.0)
                 {
                     _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery(BattleUtil.FloatToInt(this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
@@ -6095,7 +6100,7 @@ this.updateCurColor();
                 }
                 else
                 {
-                    int num2 = BattleUtil.FloatToInt(_fDamage);
+                    int num2 = (int)BattleUtil.FloatToInt(_fDamage);
                     _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
                     this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= (float)num2;
                     _fDamage = 0.0f;
@@ -6103,7 +6108,7 @@ this.updateCurColor();
             }
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH) && _damageData.ActionType != eActionType.DESTROY)
             {
-                float num = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
+                var num = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
                 if ((double)num > 0.0)
                 {
                     this.EnableAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH, false);
@@ -6117,7 +6122,7 @@ this.updateCurColor();
             }
             if (!this.IsAbnormalState(UnitCtrl.eAbnormalState.DRAIN_BOTH) || _damageData.ActionType == eActionType.DESTROY)
                 return;
-            float num3 = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
+            var num3 = _fDamage - this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
             if ((double)num3 > 0.0)
             {
                 _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery(BattleUtil.FloatToInt(this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
@@ -6126,7 +6131,7 @@ this.updateCurColor();
             }
             else
             {
-                int num1 = BattleUtil.FloatToInt(_fDamage);
+                int num1 = (int)BattleUtil.FloatToInt(_fDamage);
                 _overRecoverValue += (int)this.setRecoveryAndGetOverRecovery(num1, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
                 this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= (float)num1;
                 _fDamage = 0.0f;

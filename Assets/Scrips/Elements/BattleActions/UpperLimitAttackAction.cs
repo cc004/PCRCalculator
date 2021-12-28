@@ -22,7 +22,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       ++_target.UbAttackHitCount;
       AttackActionBase.eAttackType actionDetail1 = (AttackActionBase.eAttackType) this.ActionDetail1;

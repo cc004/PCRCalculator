@@ -18,7 +18,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary) => _source.BodyWidth = _valueDictionary[eValueNumber.VALUE_1];
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.BodyWidth = _valueDictionary[eValueNumber.VALUE_1];
 
     public override void SetLevel(float _level)
     {

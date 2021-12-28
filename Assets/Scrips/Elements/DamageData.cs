@@ -16,13 +16,13 @@ namespace Elements
 
     public BasePartsData Target { get; set; }
 
-    public long TotalDamageForLogBarrier { get; set; }
+    public FloatWithEx TotalDamageForLogBarrier { get; set; }
 
     public bool IsLogBarrierCritical { get; set; }
 
-    public long LogBarrierExpectedDamage { get; set; }
+    public FloatWithEx LogBarrierExpectedDamage { get; set; }
 
-    public long Damage { get; set; }
+    public FloatWithEx Damage { get; set; }
 
     public UnitCtrl Source { get; set; }
 

@@ -15,6 +15,7 @@ namespace Elements.Battle
             public UbStatus depending;
             public bool pressed;
             public int frame;
+            public float origin;
         }
 
         private Queue<UbStatus>[] queues;
@@ -33,14 +34,16 @@ namespace Elements.Battle
                 .GroupBy(g => (int) (g.time)).SelectMany(g => g.OrderBy(t => t.time).Aggregate(new List<(UbStatus sta, int pos)>(),
                     (result, tuple) =>
                     {
+                        var last = result.LastOrDefault(r => r.sta.origin < tuple.time);
                         result.Add((new UbStatus
                         {
-                            depending = result.LastOrDefault().sta,
-                            frame = g.Key
+                            depending = last.sta,
+                            frame = g.Key,
+                            origin = tuple.time
                         }, tuple.pos));
                         return result;
                     })).GroupBy(t => t.pos).OrderBy(g => g.Key)
-                .Select(g => (g.Key, new Queue<UbStatus>(g.Select(t => t.sta)))).Aggregate(new Queue<UbStatus>[]
+                .Select(g => (g.Key, new Queue<UbStatus>(g.Select(t => t.sta).OrderBy(t => t.frame)))).Aggregate(new Queue<UbStatus>[]
                 {
                     new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>()
                 }, (arr, tuple) =>
@@ -53,20 +56,26 @@ namespace Elements.Battle
         public bool IsUbExec(int pos)
         {
             if (!enabled) return false;
+            if (pos < 0 || pos > 4) return false;
             if (queues[pos].Count > 0)
             {
-                UbStatus next;
+                UbStatus next = null;
                 var cnt = BattleHeaderController.CurrentFrameCount;
-                while (true)
+                while (queues[pos].Count > 0)
                 {
                     next = queues[pos].Peek();
                     if (next.frame + count < cnt)
                     {
+                        next = null;
                         queues[pos].Dequeue();
                         continue;
                     }
+
                     break;
                 }
+
+                if (next == null) return false;
+
                 if (next.depending?.pressed ?? true)
                 {
                     if (next.frame <= cnt)
@@ -75,13 +84,14 @@ namespace Elements.Battle
                     }
                 }
             }
+
             return false;
         }
 
         public void UbExecCallback(int pos)
         {
             if (!enabled) return;
-            if (pos < 0) return;
+            if (pos < 0 || pos > 4) return;
             if (queues[pos].Count > 0)
                 queues[pos].Dequeue().pressed = true;
         }

@@ -25,7 +25,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary)
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             this.AppendIsAlreadyExeced(_target.Owner, _num);
@@ -147,7 +147,7 @@ namespace Elements
         {
             KnockAction knockAction = this;
             float start = _target.transform.localPosition.y;
-            float knockValue = _target.IsBoss ? 0.0f : knockAction.Value[eValueNumber.VALUE_1];
+            float knockValue = _target.IsBoss ? 0.0f : (float)knockAction.Value[eValueNumber.VALUE_1];
             float time = 0.0f;
             float duration = knockAction.Value[eValueNumber.VALUE_1] / knockAction.Value[eValueNumber.VALUE_3];
             ++_target.KnockBackEnableCount;

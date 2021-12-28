@@ -41,9 +41,9 @@ namespace Elements
 
         public int Level { get; protected set; }
 
-        public ObscuredInt Atk { get; protected set; }
+        public FloatWithEx Atk { get; protected set; }
 
-        public ObscuredInt MagicStr { get; protected set; }
+        public FloatWithEx MagicStr { get; protected set; }
 
         public ObscuredInt Def { get; protected set; }
 
@@ -84,12 +84,12 @@ namespace Elements
         public float RecoverTime = 1.12f;//添加
         public ObscuredInt MaxBreakPoint { get; private set; }
 
-        private Dictionary<UnitCtrl.BuffParamKind, int> additionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, int>();
+        private Dictionary<UnitCtrl.BuffParamKind, FloatWithEx> additionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, FloatWithEx>();
 
         private int getAdditionalBuff(UnitCtrl.BuffParamKind _kind)
         {
-            int num;
-            return !this.additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num;
+            FloatWithEx num;
+            return (int)(!this.additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
         public override bool GetTargetable() => !this.IsBreak || this.AttachmentNamePairList.Count <= 0;
@@ -156,9 +156,9 @@ namespace Elements
             }
             else
             {*/
-            this.Atk = this.StartAtk = (ObscuredInt)data.baseData.Atk;
+            this.Atk = (int)(this.StartAtk = (ObscuredInt)data.baseData.Atk);
             this.Def = this.StartDef = (ObscuredInt)data.baseData.Def;
-            this.MagicStr = this.StartMagicStr = (ObscuredInt)data.baseData.Magic_str;
+            this.MagicStr = (int)(this.StartMagicStr = (ObscuredInt)data.baseData.Magic_str);
             this.MagicDef = this.StartMagicDef = (ObscuredInt)data.baseData.Magic_def;
             this.PhysicalCritical = this.StartPhysicalCritical = (ObscuredInt)data.baseData.Physical_critical;
             this.MagicCritical = this.StartMagicCritical = (ObscuredInt)data.baseData.Magic_critical;
@@ -243,14 +243,14 @@ namespace Elements
 
         public override void SetBuffDebuff(
           bool _enable,
-          int _value,
+          FloatWithEx _value,
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
           bool _additional)
         {
             if (!_enable)
-                _value *= -1;
+                _value = _value * -1f;
             if (_additional)
             {
                 if (this.additionalBuffDictionary.ContainsKey(_kind))
@@ -271,31 +271,31 @@ namespace Elements
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
-                        this.Atk = (ObscuredInt)((int)this.Atk + _value);
+                        this.Atk = (this.Atk + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
-                        this.Def = (ObscuredInt)((int)this.Def + _value);
+                        this.Def = (int)((int)this.Def + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
-                        this.MagicStr = (ObscuredInt)((int)this.MagicStr + _value);
+                        this.MagicStr = (this.MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
-                        this.MagicDef = (ObscuredInt)((int)this.MagicDef + _value);
+                        this.MagicDef = (int)((int)this.MagicDef + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
-                        this.Dodge = (ObscuredInt)((int)this.Dodge + _value);
+                        this.Dodge = (int)((int)this.Dodge + _value);
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL:
-                        this.PhysicalCritical = (ObscuredInt)((int)this.PhysicalCritical + _value);
+                        this.PhysicalCritical = (int)((int)this.PhysicalCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL:
-                        this.MagicCritical = (ObscuredInt)((int)this.MagicCritical + _value);
+                        this.MagicCritical = (int)((int)this.MagicCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.LIFE_STEAL:
-                        this.LifeSteal = (ObscuredInt)((int)this.LifeSteal + _value);
+                        this.LifeSteal = (int)((int)this.LifeSteal + _value);
                         break;
                     case UnitCtrl.BuffParamKind.ACCURACY:
-                        this.Accuracy = (ObscuredInt)((int)this.Accuracy + _value);
+                        this.Accuracy = (int)((int)this.Accuracy + _value);
                         break;
                 }
             }

@@ -26,7 +26,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary)
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -39,7 +39,7 @@ namespace Elements
             if (randomNum <=judgeNum)
             {
                 this.AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, this.AbnormalStateFieldAction == null ? _valueDictionary[eValueNumber.VALUE_1] : 90f, (ActionParameter)this, _skill, (float)this.ActionDetail1);
+                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, (ActionParameter)this, _skill, (float)this.ActionDetail1);
             }
             else
             {

@@ -74,7 +74,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -92,7 +92,7 @@ namespace Elements
                 if (abnormalState == UnitCtrl.eAbnormalState.HASTE)
                 {
                     UnitCtrl owner = _target.Owner;
-                    Dictionary<BasePartsData, int> dictionary = new Dictionary<BasePartsData, int>();
+                    Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
                     dictionary.Add(_target, 0);
                     int skillId = _skill.SkillId;
                     UnitCtrl _source1 = _source;
@@ -107,7 +107,7 @@ namespace Elements
                         _valueDictionary[eValueNumber.VALUE_3] += myGameCtrl.tempData.SettingData.BossAbnormalAddValue;
                     }
                 }
-                _target.Owner.SetAbnormalState(_source, abnormalState, this.AbnormalStateFieldAction == null ? _valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (this.ActionDetail2 == 1));
+                _target.Owner.SetAbnormalState(_source, abnormalState, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (this.ActionDetail2 == 1));
                 string describe = ((ChangeSpeedAction.eChangeSpeedType)this.ActionDetail1).GetDescription() + ",值" + _valueDictionary[eValueNumber.VALUE_1] + ",持续时间：" + _valueDictionary[eValueNumber.VALUE_3] + "秒";
                 
                 if (this.ActionDetail2 != 1 || _target.Owner.OnDamageListForChangeSpeedDisableByAttack.ContainsKey(this.ActionId))

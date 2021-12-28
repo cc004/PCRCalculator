@@ -71,7 +71,7 @@ namespace PCRCaculator.Guild
                 guildPageUI.SetActive(true);
             else
                 guildPageUI.SetActive(false);
-            ReflashTotalDamage(false, 0, false,0,0,0);
+            ReflashTotalDamage(false, 0, false,0,0);
             CurrentBossText.text = MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes();
             currentSeedText.text = "" + MyGameCtrl.Instance.CurrentSeedForSave;
             int idx = 0;
@@ -308,12 +308,10 @@ namespace PCRCaculator.Guild
             guildSkill.Initialize(Name, skillGroupColors[colorIdx]);
             skillGroupPrefabDic.Add(unitid, guildSkill);
         }
-        public void ReflashTotalDamage(bool byAttack, float value, bool critical,float criticalEXdamage,float criticalValue,float criticalDamageMulti)
+        public void ReflashTotalDamage(bool byAttack, float value, bool critical, float criticalEXdamage, float exvalue)
         {
             totalDamage += (long)value;
-            criticalValue = Mathf.Min(1, Mathf.Max(0, criticalValue));
-            int baseDamage = critical?(int)(value - criticalEXdamage):(int)value;
-            totalDamageExcept += (long)(baseDamage + baseDamage * criticalValue * (criticalDamageMulti - 1));
+            totalDamageExcept += (long)exvalue;
             if (critical)
                 totalDamageCriEX += (long)criticalEXdamage;
             string damageStr = "" + totalDamage + 
@@ -364,7 +362,7 @@ namespace PCRCaculator.Guild
             if (currentFrame < 5400)
             {
                 backTime = Mathf.CeilToInt((5400 - currentFrame) / 60.0f) + 20;
-                ReflashTotalDamage(true, 0, false, 0, 0, 0);
+                ReflashTotalDamage(true, 0, false, 0,  0);
             }
         }
         private void ResizePrefabs(bool change)

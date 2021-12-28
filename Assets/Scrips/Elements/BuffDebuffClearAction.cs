@@ -26,7 +26,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       bool flag = (double) BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 18, BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))) >= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) && this.ActionDetail1 == 1;

@@ -79,7 +79,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary)
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             switch (this.ActionDetail1)
@@ -196,7 +196,7 @@ namespace Elements
             var group = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
             if (ActionId>=300000000&& group.isSpecialBoss &&( group.specialBossID == 666666 ||group.specialBossID==666667))
             {
-                Value[eValueNumber.VALUE_1] = 0;
+                Value[eValueNumber.VALUE_1] = 0f;
                 Value[eValueNumber.VALUE_3] = 82.5f;
             }
 

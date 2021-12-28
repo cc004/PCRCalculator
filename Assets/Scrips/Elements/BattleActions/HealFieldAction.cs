@@ -38,7 +38,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       float num = this.ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? (float) this.parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? (float) this.parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);

@@ -38,7 +38,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       if (this.ActionDetail2 != 0)
@@ -60,7 +60,7 @@ namespace Elements
         case 2:
           if (_num % 2 == 0)
           {
-            sourceTransform.localPosition += new Vector3(_source.IsLeftDir ? -_valueDictionary[eValueNumber.VALUE_1] : _valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
+            sourceTransform.localPosition += new Vector3(_source.IsLeftDir ? -_valueDictionary[eValueNumber.VALUE_1] : (float)_valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
             this.OnActionEnd = (ActionParameter.OnActionEndDelegate) (() =>
             {
               sourceTransform.localPosition = _skill.OwnerReturnPosition;
@@ -77,7 +77,7 @@ namespace Elements
           _sourceActionController.AppendCoroutine(this.resetPositionY(_skill, _source), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
           break;
         case 4:
-          _source.transform.localPosition += new Vector3(_source.IsLeftDir ? -_valueDictionary[eValueNumber.VALUE_1] : _valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
+          _source.transform.localPosition += new Vector3(_source.IsLeftDir ? -_valueDictionary[eValueNumber.VALUE_1] : (float)_valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
           break;
         case 5:
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, _isLoop: true);
@@ -91,7 +91,7 @@ namespace Elements
         case 7:
           if (_num % 2 == 0)
           {
-            sourceTransform.localPosition += new Vector3(_source.IsOther ? -_valueDictionary[eValueNumber.VALUE_1] : _valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
+            sourceTransform.localPosition += new Vector3(_source.IsOther ? -_valueDictionary[eValueNumber.VALUE_1] : (float)_valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
             _source.SetDirectionAuto();
             break;
           }
@@ -251,7 +251,7 @@ namespace Elements
       UnitCtrl _source,
       BasePartsData _target,
       UnitActionController _sourceActionController,
-      Dictionary<eValueNumber, float> _valueDictionary) => new Vector3((float) ((_source.IsLeftDir ? 1.0 : -1.0) * ((double) _valueDictionary[eValueNumber.VALUE_1] + (double) Math.Sign(_valueDictionary[eValueNumber.VALUE_1]) * ((double) _target.GetBodyWidth() / 2.0 + (double) _source.BodyWidth / 2.0))), 0.0f, 0.0f);
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => new Vector3((float) ((_source.IsLeftDir ? 1.0 : -1.0) * ((double) _valueDictionary[eValueNumber.VALUE_1] + (double) Math.Sign(_valueDictionary[eValueNumber.VALUE_1]) * ((double) _target.GetBodyWidth() / 2.0 + (double) _source.BodyWidth / 2.0))), 0.0f, 0.0f);
 
     private enum eMoveType
     {

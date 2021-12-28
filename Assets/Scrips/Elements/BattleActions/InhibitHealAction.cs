@@ -24,7 +24,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -33,7 +33,7 @@ namespace Elements
                 new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 13, (float)pp)) < (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
       {
         this.AppendIsAlreadyExeced(_target.Owner, _num);
-        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.INHIBIT_HEAL, this.AbnormalStateFieldAction == null ? _valueDictionary[eValueNumber.VALUE_2] : 9999f, (ActionParameter) this, _skill, _valueDictionary[eValueNumber.VALUE_1]);
+        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.INHIBIT_HEAL, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_2] : 9999f, (ActionParameter) this, _skill, _valueDictionary[eValueNumber.VALUE_1]);
       }
       else
       {

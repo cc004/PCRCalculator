@@ -53,7 +53,7 @@ namespace Elements
 
     public List<BasePartsData> TargetList { get; set; }
 
-    public Dictionary<eValueNumber, float> Value { get; set; }
+    public Dictionary<eValueNumber, FloatWithEx> Value { get; set; }
 
     public float[] ExecTime { get; set; }
 
@@ -101,13 +101,14 @@ namespace Elements
 
     public Dictionary<BasePartsData, List<CriticalData>> CriticalDataDictionary { get; set; } = new Dictionary<BasePartsData, List<CriticalData>>();
 
-    public Dictionary<BasePartsData, int> TotalDamageDictionary { get; set; } = new Dictionary<BasePartsData, int>();
+    public Dictionary<BasePartsData, FloatWithEx> TotalDamageDictionary { get; set; } = new Dictionary<BasePartsData, FloatWithEx>();
 
-    public Dictionary<eValueNumber, float> AdditionalValue { get; set; }
+    //FIXME: no expectation for multiple or divide value for the expression is not linear
+    public Dictionary<eValueNumber, FloatWithEx> AdditionalValue { get; set; }
 
-    public Dictionary<eValueNumber, float> MultipleValue { get; set; }
+    public Dictionary<eValueNumber, FloatWithEx> MultipleValue { get; set; }
 
-    public Dictionary<eValueNumber, float> DivideValue { get; set; }
+    public Dictionary<eValueNumber, FloatWithEx> DivideValue { get; set; }
 
     public MasterSkillAction.SkillAction MasterData { get; set; }
 
@@ -165,7 +166,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary,
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
       Action<string> callBack = null)
     {
             ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -182,7 +183,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
       
         {
         }

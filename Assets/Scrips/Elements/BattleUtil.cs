@@ -76,6 +76,14 @@ namespace Elements
       return (double) _num <= 0.0 ? Mathf.FloorToInt(_num) : Mathf.CeilToInt(_num);
     }
 
+    public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
+    {
+        return new FloatWithEx { ex = FloatToIntReverseTruncate(_num.ex), value = FloatToIntReverseTruncate(_num.value) };
+    }
+    public static FloatWithEx FloatToInt(FloatWithEx _num)
+    {
+        return new FloatWithEx{ ex = FloatToInt(_num.ex), value = FloatToInt(_num.value) };
+    }
     public static eUnitRespawnPos SearchRespawnPos(
       eUnitRespawnPos _basePos,
       List<UnitCtrl> _unitList)

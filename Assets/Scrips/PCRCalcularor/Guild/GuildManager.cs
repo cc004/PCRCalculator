@@ -292,6 +292,8 @@ namespace PCRCaculator.Guild
         {
             int enemyId = 0;
             GuildEnemyData guildEnemyData = guildEnemyDatas[month];
+            enemyId = int.Parse($"4010{turn}{13 + month}0{num + 1}");
+            /*
             switch (turn)
             {
                 case 1:
@@ -331,7 +333,7 @@ namespace PCRCaculator.Guild
                 default:
                     enemyId = guildEnemyDatas[0].enemyIds_1[0];
                     break;
-            }
+            }*/
             return enemyId;
         }
         public void OnCalSliderDraged()

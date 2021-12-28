@@ -190,22 +190,22 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       this.AppendIsAlreadyExeced(_target.Owner, _num);
       if (this.triggered)
         return;
       UnitCtrl.BuffParamKind changeParamKind = BuffDebuffAction.GetChangeParamKind(this.ActionDetail1);
-      Dictionary<BasePartsData, int> dictionary = new Dictionary<BasePartsData, int>();
+      Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
       bool _isDebuf = this.ActionDetail1 % 10 == 1;
       if (_target.Owner.IsPartsBoss)
       {
         for (int index = 0; index < _target.Owner.BossPartsListForBattle.Count; ++index)
-          dictionary.Add((BasePartsData) _target.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam((BasePartsData) _target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType) _valueDictionary[eValueNumber.VALUE_1], changeParamKind, _isDebuf));
+          dictionary.Add((BasePartsData) _target.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam((BasePartsData) _target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, _isDebuf));
       }
       else
-        dictionary.Add(_target.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType) _valueDictionary[eValueNumber.VALUE_1], changeParamKind, _isDebuf));
+        dictionary.Add(_target.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, _isDebuf));
       _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.0f, 0, (UnitCtrl) null, true, eEffectType.COMMON, !_isDebuf, false);
       _target.Owner.EnableBuffParam(changeParamKind, dictionary, true, _source, !_isDebuf, false,90);
       if (this.ActionDetail2 == 1)
@@ -237,7 +237,7 @@ namespace Elements
     {
       public UnitCtrl Target { get; set; }
 
-      public Dictionary<BasePartsData, int> Value { get; set; }
+      public Dictionary<BasePartsData, FloatWithEx> Value { get; set; }
 
       public UnitCtrl.BuffParamKind BuffParamKind { get; set; }
     }

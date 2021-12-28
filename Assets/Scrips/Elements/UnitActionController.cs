@@ -15,6 +15,69 @@ using UnityEngine;
 
 namespace Elements
 {
+    public static class MathfPlus
+    {
+        public static FloatWithEx Max(float f, FloatWithEx x) =>
+            new FloatWithEx { ex = Mathf.Max(x.ex, f), value = Mathf.Max(x.value, f)};
+
+        public static FloatWithEx Max(FloatWithEx x, float f) => Max(f, x);
+        public static FloatWithEx Log(FloatWithEx x) => new FloatWithEx { ex = Mathf.Log(x.ex), value = Mathf.Log(x.value)};
+    }
+    public struct FloatWithEx
+    {
+        public float value;
+        public float ex;
+
+        public override string ToString()
+        {
+            return (value == ex) ? value.ToString() : $"{(int)value}[{(int)ex}]";
+        }
+
+        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b)
+        {
+            return new FloatWithEx { value = a.value * b.value, ex = a.ex * b.ex };
+        }
+
+        public static FloatWithEx operator *(FloatWithEx a, float b)
+        {
+            return new FloatWithEx { value = a.value * b, ex = a.ex * b };
+        }
+
+        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b)
+        {
+            return new FloatWithEx { value = a.value + b.value, ex = a.ex + b.ex };
+        }
+
+        public static FloatWithEx operator +(FloatWithEx a, float b)
+        {
+            return new FloatWithEx { value = a.value + b, ex = a.ex + b };
+        }
+
+        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b)
+        {
+            return new FloatWithEx { value = a.value - b.value, ex = a.ex - b.ex };
+        }
+
+        public static FloatWithEx operator -(FloatWithEx a, float b)
+        {
+            return new FloatWithEx { value = a.value - b, ex = a.ex - b };
+        }
+
+        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b)
+        {
+            return new FloatWithEx { value = a.value / b.value, ex = a.ex / b.ex };
+        }
+
+        public static FloatWithEx operator /(FloatWithEx a, float b)
+        {
+            return new FloatWithEx { value = a.value / b, ex = a.ex / b };
+        }
+
+        public static implicit operator float(FloatWithEx self) => self.value;
+        public static implicit operator FloatWithEx(float x) => new FloatWithEx { value = x, ex = x};
+        
+    }
+
     public partial class UnitActionController : MonoBehaviour, ISingletonField
     {
         new public FixedTransformMonoBehavior.FixedTransform transform;
@@ -128,7 +191,7 @@ namespace Elements
             attackAction.TargetWidth = this.Owner.SearchAreaSize;
             attackAction.Direction = DirectionType.FRONT;
             attackAction.ActionType = eActionType.ATTACK;
-            attackAction.Value = new Dictionary<eValueNumber, float>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer())
+            attackAction.Value = new Dictionary<eValueNumber, FloatWithEx>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer())
       {
         {
           eValueNumber.VALUE_1,
@@ -476,7 +539,7 @@ namespace Elements
             actionParameter.ActionDetail1 = (int)actionParam.action_detail_1;
             actionParameter.ActionDetail2 = (int)actionParam.action_detail_2;
             actionParameter.ActionDetail3 = (int)actionParam.action_detail_3;
-            actionParameter.Value = new Dictionary<eValueNumber, float>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer());
+            actionParameter.Value = new Dictionary<eValueNumber, FloatWithEx>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer());
             actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)actionParam.action_value_1);
             actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)actionParam.action_value_2);
             actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)actionParam.action_value_3);
@@ -605,9 +668,9 @@ namespace Elements
                 ActionParameter actionParameter1 = skill.ActionParameters[index1];
                 actionParameter1.IdOffsetDictionary = new Dictionary<BasePartsData, long>();
                 actionParameter1.CancelByIfForAll = false;
-                actionParameter1.AdditionalValue = (Dictionary<eValueNumber, float>)null;
-                actionParameter1.MultipleValue = (Dictionary<eValueNumber, float>)null;
-                actionParameter1.DivideValue = (Dictionary<eValueNumber, float>)null;
+                actionParameter1.AdditionalValue = (Dictionary<eValueNumber, FloatWithEx>)null;
+                actionParameter1.MultipleValue = (Dictionary<eValueNumber, FloatWithEx>)null;
+                actionParameter1.DivideValue = (Dictionary<eValueNumber, FloatWithEx>)null;
                 if (!actionParameter1.ReferencedByReflection)
                 {
                     if (!actionParameter1.IsSearchAndSorted)
@@ -1214,26 +1277,26 @@ namespace Elements
           int num,
           float starttime)
         {
-            Dictionary<eValueNumber, float> additionalValue = action.AdditionalValue;
-            Dictionary<eValueNumber, float> multipleValue = action.MultipleValue;
-            Dictionary<eValueNumber, float> divideValue = action.DivideValue;
+            Dictionary<eValueNumber, FloatWithEx> additionalValue = action.AdditionalValue;
+            Dictionary<eValueNumber, FloatWithEx> multipleValue = action.MultipleValue;
+            Dictionary<eValueNumber, FloatWithEx> divideValue = action.DivideValue;
             Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
-            Func<ActionParameter, eValueNumber, float> func = (Func<ActionParameter, eValueNumber, float>)((_action, _type) =>
+            Func<ActionParameter, eValueNumber, FloatWithEx> func = (Func<ActionParameter, eValueNumber, FloatWithEx>)((_action, _type) =>
            {
-               float num1 = 0.0f;
+               FloatWithEx num1 = 0.0f;
                if (additionalValue != null && additionalValue.ContainsKey(_type))
                    num1 = additionalValue[_type];
-               float num2 = 1f;
+               FloatWithEx num2 = 1f;
                if (multipleValue != null && multipleValue.ContainsKey(_type))
                    num2 = multipleValue[_type];
-               float num3 = 1f;
+               FloatWithEx num3 = 1f;
                if (divideValue != null && divideValue.ContainsKey(_type) && (double)divideValue[_type] != 0.0)
                    num3 = divideValue[_type];
-               float num4 = 0.0f;
+               FloatWithEx num4 = 0.0f;
                _action.Value.TryGetValue(_type, out num4);
                return (num1 + num4) * num2 / num3;
            });
-            Dictionary<eValueNumber, float> _valueDictionary = new Dictionary<eValueNumber, float>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer())
+            Dictionary<eValueNumber, FloatWithEx> _valueDictionary = new Dictionary<eValueNumber, FloatWithEx>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer())
       {
         {
           eValueNumber.VALUE_1,

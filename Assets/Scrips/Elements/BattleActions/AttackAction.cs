@@ -22,7 +22,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
           System.Action<string> action = null)
         {
             _target.IncrementUbAttackHitCount();
@@ -45,7 +45,7 @@ namespace Elements
             DamageData damageData = this.createDamageData(_source, _target, _num, _valueDictionary, actionDetail1, _isCritical, _skill, eActionType.ATTACK);
             if (!this.TotalDamageDictionary.ContainsKey(_target))
             {
-                int num1 = 0;
+                FloatWithEx num1 = 0;
                 List<CriticalData> criticalDataList = new List<CriticalData>();
                 for (int index = 0; index < this.ActionExecTimeList.Count; ++index)
                 {
@@ -57,21 +57,21 @@ namespace Elements
                     if (num2 <= criticalRate && (double)damageData.CriticalDamageRate != 0.0)
                     {
                         criticalData.IsCritical = true;
-                        criticalData.ExpectedDamage = BattleUtil.FloatToInt((float)criticalData.ExpectedDamage * 2f * damageData.CriticalDamageRate);
+                        criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage * 2f * damageData.CriticalDamageRate);
                     }
                     if (!damageData.IgnoreDef)
                     {
                         switch (damageData.DamageType)
                         {
                             case DamageData.eDamageType.ATK:
-                                float defZero = (float)damageData.Target.GetDefZero();
-                                float num3 = Mathf.Max(0.0f, defZero - (float)damageData.DefPenetrate);
-                                criticalData.ExpectedDamage = (int)((double)criticalData.ExpectedDamage * (1.0 - (double)num3 / ((double)defZero + 100.0)));
+                                var defZero = (float)damageData.Target.GetDefZero();
+                                var num3 = Mathf.Max(0.0f, defZero - damageData.DefPenetrate);
+                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f)));
                                 break;
                             case DamageData.eDamageType.MGC:
                                 float magicDefZero = (float)damageData.Target.GetMagicDefZero();
-                                float num4 = Mathf.Max(0.0f, magicDefZero - (float)damageData.DefPenetrate);
-                                criticalData.ExpectedDamage = (int)((double)criticalData.ExpectedDamage * (1.0 - (double)num4 / ((double)magicDefZero + 100.0)));
+                                float num4 = Mathf.Max(0.0f, magicDefZero - damageData.DefPenetrate);
+                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f)));
                                 break;
                         }
                     }
@@ -92,7 +92,7 @@ namespace Elements
             //_target.ShowHitEffect(_source.ToadDatas.Count > 0 ? _skill.WeaponType : _source.WeaponSeType, _skill, _source.IsLeftDir);
         }
 
-    protected override float getCriticalDamageRate(Dictionary<eValueNumber, float> _valueDictionary) => (double) _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : _valueDictionary[eValueNumber.VALUE_6];
+    protected override float getCriticalDamageRate(Dictionary<eValueNumber, FloatWithEx> _valueDictionary) =>  _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : (float)_valueDictionary[eValueNumber.VALUE_6];
 
     public override void SetLevel(float _level)
     {

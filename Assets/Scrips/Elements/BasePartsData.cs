@@ -149,14 +149,14 @@ namespace Elements
 
         public virtual void SetBuffDebuff(
           bool _enable,
-          int _value,
+          FloatWithEx _value,
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
           bool _additional)
         {
             if (!_enable)
-                _value *= -1;
+                _value = _value * -1f;
             BattleLogIntreface mlegmhaocon = _battleLog;
             UnitCtrl unitCtrl = _source;
             UnitCtrl owner1 = this.Owner;
@@ -168,7 +168,7 @@ namespace Elements
             if (_additional)
             {
                 if (this.Owner.AdditionalBuffDictionary.ContainsKey(_kind))
-                    this.Owner.AdditionalBuffDictionary[_kind] += _value;
+                    this.Owner.AdditionalBuffDictionary[_kind] = this.Owner.AdditionalBuffDictionary[_kind] + _value;
                 else
                     this.Owner.AdditionalBuffDictionary.Add(_kind, _value);
             }
@@ -178,58 +178,58 @@ namespace Elements
                 {
                     case UnitCtrl.BuffParamKind.ATK:
                         UnitCtrl owner2 = this.Owner;
-                        owner2.Atk = (ObscuredInt)((int)owner2.Atk + _value);
+                        owner2.Atk = (owner2.Atk + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         UnitCtrl owner3 = this.Owner;
-                        owner3.Def = (ObscuredInt)((int)owner3.Def + _value);
+                        owner3.Def = (int)((int)owner3.Def + _value);
                         string des = (_source==null?"???":_source.UnitName) + "的技能" + (_enable?"开始":"结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
                         UnitCtrl owner4 = this.Owner;
-                        owner4.MagicStr = (ObscuredInt)((int)owner4.MagicStr + _value);
+                        owner4.MagicStr = (owner4.MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         UnitCtrl owner5 = this.Owner;
-                        owner5.MagicDef = (ObscuredInt)((int)owner5.MagicDef + _value);
+                        owner5.MagicDef = (int)((int)owner5.MagicDef + _value);
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
                         UnitCtrl owner6 = this.Owner;
-                        owner6.Dodge = (ObscuredInt)((int)owner6.Dodge + _value);
+                        owner6.Dodge = (int)((int)owner6.Dodge + _value);
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL:
                         UnitCtrl owner7 = this.Owner;
-                        owner7.PhysicalCritical = (ObscuredInt)((int)owner7.PhysicalCritical + _value);
+                        owner7.PhysicalCritical = (int)((int)owner7.PhysicalCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL:
                         UnitCtrl owner8 = this.Owner;
-                        owner8.MagicCritical = (ObscuredInt)((int)owner8.MagicCritical + _value);
+                        owner8.MagicCritical = (int)((int)owner8.MagicCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE:
                         UnitCtrl owner9 = this.Owner;
-                        owner9.EnergyRecoveryRate = (ObscuredInt)((int)owner9.EnergyRecoveryRate + _value);
+                        owner9.EnergyRecoveryRate = (int)((int)owner9.EnergyRecoveryRate + _value);
                         break;
                     case UnitCtrl.BuffParamKind.LIFE_STEAL:
                         UnitCtrl owner10 = this.Owner;
-                        owner10.LifeSteal = (ObscuredInt)((int)owner10.LifeSteal + _value);
+                        owner10.LifeSteal = (int)((int)owner10.LifeSteal + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MOVE_SPEED:
                         this.Owner.MoveSpeed += (float)_value;
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE:
                         UnitCtrl owner11 = this.Owner;
-                        owner11.PhysicalCriticalDamageRate = (ObscuredInt)((int)owner11.PhysicalCriticalDamageRate + _value);
+                        owner11.PhysicalCriticalDamageRate = (int)((int)owner11.PhysicalCriticalDamageRate + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE:
                         UnitCtrl owner12 = this.Owner;
-                        owner12.MagicCriticalDamageRate = (ObscuredInt)((int)owner12.MagicCriticalDamageRate + _value);
+                        owner12.MagicCriticalDamageRate = (int)((int)owner12.MagicCriticalDamageRate + _value);
                         break;
                     case UnitCtrl.BuffParamKind.ACCURACY:
                         UnitCtrl owner13 = this.Owner;
-                        owner13.Accuracy = (ObscuredInt)((int)owner13.Accuracy + _value);
+                        owner13.Accuracy = (int)(int)((int)owner13.Accuracy + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAX_HP:
                         if ((long)this.Owner.MaxHp + (long)_value > 0L)

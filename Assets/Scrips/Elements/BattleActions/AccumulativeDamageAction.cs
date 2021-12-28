@@ -23,18 +23,18 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary,
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
       System.Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       this.AppendIsAlreadyExeced(_target.Owner, _num);
-      eAccumulativeDamageType accumulativeDamageType = (eAccumulativeDamageType) _valueDictionary[eValueNumber.VALUE_1];
+      eAccumulativeDamageType accumulativeDamageType = (eAccumulativeDamageType)(float)_valueDictionary[eValueNumber.VALUE_1];
       _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.ACCUMULATIVE_DAMAGE, this.battleManager.BattleLeftTime, (ActionParameter) this, _skill);
       AccumulativeDamageData accumulativeDamageData = new AccumulativeDamageData()
       {
         AccumulativeDamageType = accumulativeDamageType,
-        FixedValue = accumulativeDamageType == eAccumulativeDamageType.FIXED ? _valueDictionary[eValueNumber.VALUE_2] : 0.0f,
-        PercentageValue = accumulativeDamageType == eAccumulativeDamageType.PERCENTAGE ? _valueDictionary[eValueNumber.VALUE_2] : 0.0f,
+        FixedValue = accumulativeDamageType == eAccumulativeDamageType.FIXED ? (float)_valueDictionary[eValueNumber.VALUE_2] : 0.0f,
+        PercentageValue = accumulativeDamageType == eAccumulativeDamageType.PERCENTAGE ? (float)_valueDictionary[eValueNumber.VALUE_2] : 0.0f,
         CountLimit = (int) _valueDictionary[eValueNumber.VALUE_4]
       };
       if (_target.Owner.AccumulativeDamageDataDictionary.ContainsKey(_source))

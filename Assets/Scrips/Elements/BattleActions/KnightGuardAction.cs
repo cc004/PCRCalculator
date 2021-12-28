@@ -31,11 +31,11 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       if ((long) _target.Owner.Hp <= 0L)
         return;
-      KnightGuardAction.eValueType eValueType = (KnightGuardAction.eValueType) _valueDictionary[eValueNumber.VALUE_1];
+      KnightGuardAction.eValueType eValueType = (KnightGuardAction.eValueType)(float)_valueDictionary[eValueNumber.VALUE_1];
       float num = _source.IsPartsBoss ? (eValueType == KnightGuardAction.eValueType.PHYSICS ? (float) this.parts.GetAtkZero() : (float) this.parts.GetMagicStrZero()) : (float) (int) (eValueType == KnightGuardAction.eValueType.PHYSICS ? _source.AtkZero : _source.MagicStrZero);
       KnightGuardData _knightGuardData = new KnightGuardData()
       {

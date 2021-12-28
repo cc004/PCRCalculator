@@ -71,7 +71,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       this.AppendIsAlreadyExeced(_target.Owner, _num);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());

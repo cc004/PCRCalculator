@@ -28,11 +28,11 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       this.AppendIsAlreadyExeced(_target.Owner, _num);
-      eStateIconType key = (eStateIconType) _valueDictionary[eValueNumber.VALUE_2];
+      eStateIconType key = (eStateIconType) (float)_valueDictionary[eValueNumber.VALUE_2];
       if (!_target.Owner.SealDictionary.ContainsKey(key))
       {
         SealData sealData = new SealData()

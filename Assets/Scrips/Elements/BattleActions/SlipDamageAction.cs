@@ -56,7 +56,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
           System.Action<string> callback  )
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -71,7 +71,7 @@ namespace Elements
             if ((double)num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
             {
                 this.AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, SlipDamageAction.abnormalStateDic[(SlipDamageAction.eSlipDamageType)this.ActionDetail1], this.AbnormalStateFieldAction == null ? _valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, (float)(int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
+                _target.Owner.SetAbnormalState(_source, SlipDamageAction.abnormalStateDic[(SlipDamageAction.eSlipDamageType)this.ActionDetail1], this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, (float)(int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
                 callback?.Invoke("DOT伤害，参数1：" + (int)_valueDictionary[eValueNumber.VALUE_1] + "，参数2：" + (int)_valueDictionary[eValueNumber.VALUE_5]);
             }
             else

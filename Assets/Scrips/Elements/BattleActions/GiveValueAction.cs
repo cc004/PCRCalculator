@@ -20,7 +20,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      switch ((GiveValueAction.eAdditiveValueType) this.Value[eValueNumber.VALUE_1])
+      switch ((GiveValueAction.eAdditiveValueType)(float)this.Value[eValueNumber.VALUE_1])
       {
         case GiveValueAction.eAdditiveValueType.DEFEAT_NUMBER:
           ActionParameter actionParameter1 = _skill.ActionParameters[0];
@@ -48,11 +48,11 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      Dictionary<eValueNumber, float> _addValue = new Dictionary<eValueNumber, float>();
-      eValueNumber eValueNumber = (eValueNumber) (this.ActionDetail2 - 1);
+      Dictionary<eValueNumber, FloatWithEx> _addValue = new Dictionary<eValueNumber, FloatWithEx>();
+      eValueNumber eValueNumber = (eValueNumber)(this.ActionDetail2 - 1);
       _addValue.Add(eValueNumber, 0.0f);
       this.createValue(_source, _skill, _valueDictionary, _addValue, eValueNumber, _target);
       BattleLogIntreface battleLog = this.battleLog;
@@ -68,8 +68,8 @@ namespace Elements
         /*protected virtual void createValue(
           UnitCtrl _source,
           Skill _skill,
-          Dictionary<eValueNumber, float> _valueDictionary,
-          Dictionary<eValueNumber, float> _addValue,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, FloatWithEx> _addValue,
           eValueNumber _evalue,
           BasePartsData _target)
         {
@@ -137,8 +137,8 @@ namespace Elements
         protected virtual void createValue(
       UnitCtrl _source,
       Skill _skill,
-      Dictionary<eValueNumber, float> _valueDictionary,
-      Dictionary<eValueNumber, float> _addValue,
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      Dictionary<eValueNumber, FloatWithEx> _addValue,
       eValueNumber _evalue,
       BasePartsData _target)
         {
@@ -162,7 +162,11 @@ namespace Elements
                     _addValue[_evalue] = (float)_skill.DamagedPartsList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 6:
-                    _addValue[_evalue] = (float)_skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = new FloatWithEx
+                    {
+                        ex = _skill.ExDamage,
+                        value = _skill.TotalDamage
+                    } * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 7:
                     _addValue[_evalue] = (float)(int)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];
@@ -199,23 +203,22 @@ namespace Elements
                     StrikeBackDataSet strikeBackDataSet = (StrikeBackDataSet)null;
                     if (!_target.Owner.StrikeBackDictionary.TryGetValue((EnchantStrikeBackAction.eStrikeBackEffectType)((int)_valueDictionary[eValueNumber.VALUE_1] - 100), out strikeBackDataSet))
                         break;
-                    _addValue[_evalue] = (float)strikeBackDataSet.DataList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
             }
         }
 
 
-        protected virtual void setValue(Dictionary<eValueNumber, float> _value, ActionParameter _action)
+        protected virtual void setValue(Dictionary<eValueNumber, FloatWithEx> _value, ActionParameter _action)
     {
     }
 
     protected virtual float calcHpValue(
       UnitCtrl _source,
-      Dictionary<eValueNumber, float> _valueDictionary) => 0.0f;
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => 0.0f;
 
     protected virtual float calcDamageValue(
       UnitCtrl _source,
-      Dictionary<eValueNumber, float> _valueDictionary) => 0.0f;
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => 0.0f;
 
     protected int countUnitNumCompareX(
       List<UnitCtrl> _targetList,

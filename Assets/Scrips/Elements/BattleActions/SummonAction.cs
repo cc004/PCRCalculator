@@ -37,7 +37,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       eUnitRespawnPos _basePos = (eUnitRespawnPos) Mathf.Min(9, Mathf.Max(0, (int) (_source.RespawnPos + (int) _valueDictionary[eValueNumber.VALUE_2])));
@@ -49,7 +49,7 @@ namespace Elements
         Skill = _skill,
         //Prefab = this.SummonPrefab,
         SummonSide = (SummonAction.eSummonSide) this.ActionDetail3,
-        SummonType = (SummonAction.eSummonType) _valueDictionary[eValueNumber.VALUE_5],
+        SummonType = (SummonAction.eSummonType) (float)_valueDictionary[eValueNumber.VALUE_5],
         MoveSpeed = _valueDictionary[eValueNumber.VALUE_1],
         FromPosition = _source.transform.localPosition + new Vector3((_source.IsLeftDir || _source.IsForceLeftDir ? -1f : 1f) * _valueDictionary[eValueNumber.VALUE_6], 0.0f, 0.0f),
         UseRespawnPos = (double) _valueDictionary[eValueNumber.VALUE_2] != 99.0,

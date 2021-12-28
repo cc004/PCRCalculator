@@ -50,7 +50,7 @@ namespace Elements
       Skill _skill,
       float _startTime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _startTime, _enabledChildAction, _valueDictionary);
       int defeatCount = 0;
@@ -107,7 +107,7 @@ namespace Elements
       }
       _source.DisappearForDivision(false, false);
       _source.AppendCoroutine(this.waitMotionEnd(_source, _sourceActionController, _skill), ePauseType.SYSTEM);
-      DivisionAction.eReleaseType eReleaseType = (DivisionAction.eReleaseType) _valueDictionary[eValueNumber.VALUE_1];
+      DivisionAction.eReleaseType eReleaseType = (DivisionAction.eReleaseType)(float)_valueDictionary[eValueNumber.VALUE_1];
       if (eReleaseType != DivisionAction.eReleaseType.TIME)
       {
         int num = (int) (eReleaseType - 2);

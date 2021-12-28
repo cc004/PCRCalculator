@@ -30,7 +30,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       ContinuousAttackNearByAction.eReleaseType actionDetail1 = (ContinuousAttackNearByAction.eReleaseType) this.ActionDetail1;
@@ -43,8 +43,8 @@ namespace Elements
         Size = _valueDictionary[eValueNumber.VALUE_1],
         BaseDamage = _valueDictionary[eValueNumber.VALUE_2],
         AttackEfficiency = _valueDictionary[eValueNumber.VALUE_4],
-        Timer = actionDetail1 == ContinuousAttackNearByAction.eReleaseType.TIMER ? _valueDictionary[eValueNumber.VALUE_6] : 0.0f,
-        ReduceEnergy = actionDetail1 == ContinuousAttackNearByAction.eReleaseType.ENERGY ? _valueDictionary[eValueNumber.VALUE_6] : 0.0f,
+        Timer = actionDetail1 == ContinuousAttackNearByAction.eReleaseType.TIMER ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
+        ReduceEnergy = actionDetail1 == ContinuousAttackNearByAction.eReleaseType.ENERGY ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
         AbsorberValue = this.battleManager.KIHOGJBONDH,
         Skill = _skill,
         ActionId = this.ActionId

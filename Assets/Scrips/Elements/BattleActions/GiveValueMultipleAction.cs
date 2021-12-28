@@ -11,7 +11,7 @@ namespace Elements
   public class GiveValueMultipleAction : GiveValueAction
   {
     protected override void setValue(
-      Dictionary<eValueNumber, float> _value,
+        Dictionary<eValueNumber, FloatWithEx> _value,
       ActionParameter _action)
     {
       base.setValue(_value, _action);
@@ -26,10 +26,10 @@ namespace Elements
 
     protected override float calcDamageValue(
       UnitCtrl _source,
-      Dictionary<eValueNumber, float> _valueDictionary) => (float) ((long) _source.MaxHp - (long) _source.Hp) / (float) (long) _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float) ((long) _source.MaxHp - (long) _source.Hp) / (float) (long) _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
     protected override float calcHpValue(
       UnitCtrl _source,
-      Dictionary<eValueNumber, float> _valueDictionary) => (float) (long) _source.Hp / (float) (long) _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float) (long) _source.Hp / (float) (long) _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
   }
 }

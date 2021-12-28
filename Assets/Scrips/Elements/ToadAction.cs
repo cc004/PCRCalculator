@@ -37,7 +37,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
             /*if (_target.Owner.IsDead)
               return;
@@ -109,7 +109,7 @@ namespace Elements
       ToadData _toadData,
       BasePartsData _target,
       Skill _skill,
-      Dictionary<eValueNumber, float> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       ToadAction toadAction = this;
       while ((double) _toadData.Timer <= (double) _valueDictionary[eValueNumber.VALUE_1] || _target.Owner.CurrentState != UnitCtrl.ActionState.IDLE)

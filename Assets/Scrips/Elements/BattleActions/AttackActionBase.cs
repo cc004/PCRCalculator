@@ -46,7 +46,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary)
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
         }
 
@@ -124,19 +124,19 @@ namespace Elements
           UnitCtrl _source,
           BasePartsData _target,
           int _num,
-          Dictionary<eValueNumber, float> _valueDictionary,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
           AttackActionBase.eAttackType _actionDetail1,
           bool _isCritical,
           Skill _skill,
           eActionType _actionType)
         {
             bool flag = this.judgeIsPhysical(_actionDetail1);
-            int num1;
+            FloatWithEx num1;
             int num2;
             int level;
             if (!_source.IsPartsBoss)
             {
-                num1 = (int)(flag ? _source.AtkZero : _source.MagicStrZero);
+                num1 = (flag ? _source.AtkZero : _source.MagicStrZero);
                 num2 = (int)(flag ? _source.PhysicalCriticalZero : _source.MagicCriticalZero);
                 level = (int)_source.Level;
             }
@@ -146,27 +146,29 @@ namespace Elements
                 num2 = flag ? this.parts.GetPhysicalCriticalZero() : this.parts.GetMagicCriticalZero();
                 level = this.parts.GetLevel();
             }
-            int num3 = BattleUtil.FloatToInt(_valueDictionary[eValueNumber.VALUE_1] + (float)num1 * _valueDictionary[eValueNumber.VALUE_3]);
-            int num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + (float)num1 * _valueDictionary[eValueNumber.VALUE_3]) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+            var num3 = BattleUtil.FloatToInt(_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]);
+            var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + (float)num1 * _valueDictionary[eValueNumber.VALUE_3]) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.ContainsKey(_source))
             {
                 AccumulativeDamageData accumulativeDamageData = _target.Owner.AccumulativeDamageDataDictionary[_source];
                 switch (accumulativeDamageData.AccumulativeDamageType)
                 {
                     case eAccumulativeDamageType.FIXED:
-                        num4 += (int)((double)accumulativeDamageData.DamagedCount * (double)accumulativeDamageData.FixedValue);
+                        num4 = num4 + (float)(int)((double)accumulativeDamageData.DamagedCount * (double)accumulativeDamageData.FixedValue);
                         break;
                     case eAccumulativeDamageType.PERCENTAGE:
-                        num4 += (int)((double)(num4 * accumulativeDamageData.DamagedCount) * (double)accumulativeDamageData.PercentageValue / 100.0);
+                        num4 = num4 + (float)(int)((double)(num4 * (float)accumulativeDamageData.DamagedCount) * (double)accumulativeDamageData.PercentageValue / 100.0);
                         break;
                 }
                 accumulativeDamageData.DamagedCount = Mathf.Min(accumulativeDamageData.DamagedCount + 1, accumulativeDamageData.CountLimit);
             }
             float num5 = this.getCriticalDamageRate(_valueDictionary) * (flag ? (float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f : (float)(int)_source.MagicCriticalDamageRateOrMin / 100f);
+            num4.value = (long) num4.value;
+            num3.value = (long) num3.value;
             return new DamageData()
             {
-                TotalDamageForLogBarrier = (long)num3,
-                Damage = (long)num4,
+                TotalDamageForLogBarrier = num3,
+                Damage = num4,
                 Target = _target,
                 Source = _source,
                 DamageType = flag ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC,
@@ -180,7 +182,7 @@ namespace Elements
             };
         }
 
-        protected virtual float getCriticalDamageRate(Dictionary<eValueNumber, float> _valueDictionary) => 1f;
+        protected virtual float getCriticalDamageRate(Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => 1f;
 
         public override void SetLevel(float _level)
         {

@@ -34,12 +34,12 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, float> _valueDictionary,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             UnitCtrl.BuffParamKind changeParamKind = BuffDebuffAction.GetChangeParamKind(this.ActionDetail1);
-            float intReverseTruncate = (float)BattleUtil.FloatToIntReverseTruncate(_valueDictionary[eValueNumber.VALUE_1]);
+            var intReverseTruncate = (float)BattleUtil.FloatToIntReverseTruncate(_valueDictionary[eValueNumber.VALUE_1]);
             GameObject gameObject1 = (GameObject)null;
             GameObject gameObject2 = (GameObject)null;
             if (this.ActionEffectList.Count > 0)

@@ -25,7 +25,7 @@ namespace Elements
         public Action<int, PCRCaculator.Guild.UnitSkillExecData> MyOnStartAction;
         public Action<int, int, PCRCaculator.Guild.UnitActionExecData> MyOnExecAction;
         public Action<int, int, float, int> MyOnDamage;
-        public Action<bool, float, bool, float,float,float> MyOnDamage2;
+        public Action<bool, float, bool, float,float> MyOnDamage2;
         public Action<int, int, float, int,string> MyOnBaseValueChanged;
         public Action<UnitCtrl, eStateIconType, bool,float,string> MyOnChangeAbnormalState;
         public Action<int, int, float, float> MyOnChangeSkillID;
