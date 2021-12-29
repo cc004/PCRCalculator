@@ -80,7 +80,9 @@ public class SQLiteHelper
             //Debug.Log("Database written");
         }
 
-        var dbPath = filepath;
+        var dbPath = Path.Combine(Application.streamingAssetsPath, "SQL", "temp.db");
+        File.Copy(filepath, dbPath, true);
+
 //#endif
         //_connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         //MainManager.Instance.debugtext.text += "\nFinal PATH: " + Application.dataPath + "/StreamingAssets/" + DatabaseName;
@@ -100,6 +102,12 @@ public class SQLiteHelper
             dbConnection = new SqliteConnection(connectingPath);
             //打开数据库
             dbConnection.Open();
+
+            var trac = dbConnection.BeginTransaction();
+            var cmd = dbConnection.CreateCommand();
+            cmd.CommandText = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "SQL", "dbdiff.sql"));
+            cmd.ExecuteNonQuery();
+            trac.Commit();
         }
         catch (Exception e)
         {

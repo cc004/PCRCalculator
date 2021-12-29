@@ -45,7 +45,7 @@ namespace PCRCaculator
 
         private SQLiteHelper sql;
         public int loadCharacterMax = 500000;//最多加载到的角色序号
-        private static bool editor = true;
+        private static bool editor = false;
         const string conn = "redive_jp.db";
         const string conn_cn = "redive_cn.db";
 
@@ -464,6 +464,7 @@ namespace PCRCaculator
                     reader.GetString(reader.GetOrdinal("description")),
                     reader.GetInt32(reader.GetOrdinal("icon_type"))
                     );
+                /*
                 if (!skillDataDic.ContainsKey(skillid))
                     skillDataDic.Add(skillid, skillData);
                 else
@@ -473,7 +474,9 @@ namespace PCRCaculator
                         if (skillid <= 2000000)
                             skillDataDic[skillid] = skillData;
                     }
-                }
+                }*/
+                // override jpdb by cndb
+                skillDataDic[skillid] = skillData;
             }
             reader = sql.ReadFullTable("skill_action");
 
@@ -511,6 +514,7 @@ namespace PCRCaculator
                     reader.GetString(reader.GetOrdinal("description")),
                     reader.GetString(reader.GetOrdinal("level_up_disp"))
                     );
+                /*
                 if (!skillActionDic.ContainsKey(actionid))
                     skillActionDic.Add(actionid, skillAction);
                 else
@@ -522,7 +526,10 @@ namespace PCRCaculator
                             skillActionDic[actionid] = skillAction;
                         }
                     }
-                }
+                }*/
+
+                // override jpdb by cndb
+                skillActionDic[actionid] = skillAction;
             }
         }
         private void LoadUnitRarityData(bool isJapen = false)
@@ -1121,8 +1128,22 @@ namespace PCRCaculator
                     }
                     enemyData.resist_status_id = reader.GetInt32(reader.GetOrdinal("resist_status_id"));
                     enemyData.unique_equipment_flag_1 = reader.GetInt32(reader.GetOrdinal("unique_equipment_flag_1"));
-                    enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
-                    enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
+                    try
+                    {
+                        enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
+                    }
+                    catch
+                    {
+
+                    }
+                    try
+                    {
+                        enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
+                    }
+                    catch
+                    {
+
+                    }
                     if (detailDic.ContainsKey(enemyData.unit_id))
                         enemyData.detailData = detailDic[enemyData.unit_id];
                     else

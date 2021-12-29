@@ -94,7 +94,7 @@ namespace Elements
             string key = "attack";
             try
             {
-                if (skillid == Owner.MainSkillIdList[0])
+                if (skillid == Owner.MainSkillIdList[0] || skillid - 10 == Owner.MainSkillIdList[0])
                 {
                     key = "skill1";
                     if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEqLv > 0)
@@ -104,7 +104,7 @@ namespace Elements
                 {
                     key = "skill2";
                 }
-                else if (skillid == Owner.UnionBurstSkillId)
+                else if (skillid == Owner.UnionBurstSkillId || skillid - 10 == Owner.UnionBurstSkillId)
                 {
                     key = "skill0";
                     if (Owner.UnitId <= 200000 && Owner.unitData.rarity == 6)
