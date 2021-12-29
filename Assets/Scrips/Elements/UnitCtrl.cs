@@ -1852,7 +1852,7 @@ this.updateCurColor();
                 {
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, this.gameObject, false);
                     this.ColliderCenter = polygonCollider2D.bounds.center - this.transform.position;
-                    this.ColliderSize = polygonCollider2D.bounds.size;
+                    this.ColliderSize = polygonCollider2D.bounds.size / 2;
                     if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.SettingData.usePhysics)
                     {
                         float coSize2 = this.ColliderSize.x / this.transform.lossyScale.x;
