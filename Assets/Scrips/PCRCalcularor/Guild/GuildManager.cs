@@ -938,6 +938,9 @@ namespace PCRCaculator.Guild
         }
         private IEnumerator AutoCalculate()
         {
+            var seed = RandomManager.RandomData.UseFixedRandomSeed;
+            RandomManager.RandomData.UseFixedRandomSeed = false;
+
             while (true)
             {
                 yield return new WaitForSecondsRealtime(2);
@@ -950,6 +953,7 @@ namespace PCRCaculator.Guild
                 break;
             }
 
+            RandomManager.RandomData.UseFixedRandomSeed = seed;
         }
 
         public static void SaveSettingData(GuildSettingData settingData)

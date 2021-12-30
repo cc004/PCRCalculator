@@ -374,7 +374,12 @@ namespace PCRCaculator.Battle
 
         public void ExitButton()
         {
-            Elements.Battle.BattleManager.Instance.BossUnit.Hp = 0;
+            if (Elements.Battle.BattleManager.Instance.BossUnit.Hp == 0)
+            {
+                ExitButton2();
+            }
+            else
+                Elements.Battle.BattleManager.Instance.BossUnit.Hp = 0;
         }
 
         public void ExitButton2()

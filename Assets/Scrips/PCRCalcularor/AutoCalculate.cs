@@ -28,7 +28,7 @@ namespace PCRCaculator
         }
         public void ButtonPress()
         {
-            if(calculatorData.isCalculating)
+            if(calculatorData.isCalculating && !calculatorData.isCanceled && !calculatorData.isFinish)
             {
                 calculatorData.isPaues = true;
                 MainManager.Instance.WindowConfigMessage("是否终止计算？", Cancel_0, Cancel_1);
