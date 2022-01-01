@@ -432,6 +432,7 @@ namespace PCRCaculator
                         equipLevel[i] = -1;
                     }
                 }
+                uniqueEqLv = playerSetting.maxUniqueEqLv;
                 playLoveDic = null;
             }
             else

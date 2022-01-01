@@ -361,7 +361,7 @@ namespace PCRCaculator.Guild
             OnToggleSwitched(0);
             if (currentFrame < 5400)
             {
-                backTime = Mathf.CeilToInt((5400 - currentFrame) / 60.0f) + 20;
+                backTime = Mathf.CeilToInt((Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
                 ReflashTotalDamage(true, 0, false, 0,  0);
             }
         }
@@ -660,7 +660,7 @@ namespace PCRCaculator.Guild
         public int startFrameCount;
         public int endFrameCount;
         public UnitCtrl.eAbnormalState CurrentAbnormalState;
-        public float MainValue;
+        public FloatWithEx MainValue;
         public float Time;
         public float Duration;
         public int ActionId;

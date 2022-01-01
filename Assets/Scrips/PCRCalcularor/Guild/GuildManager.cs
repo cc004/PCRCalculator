@@ -69,6 +69,7 @@ namespace PCRCaculator.Guild
         private static Dictionary<int, EnemyData> enemyDataDic;
         private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
         public GuildSettingData SettingData => StaticsettingData;
+
         private static GuildSettingData staticsettingData;
         public static GuildSettingData StaticsettingData
         {
@@ -284,7 +285,7 @@ namespace PCRCaculator.Guild
             group.isSpecialBoss = !isGuildBoss;
             group.specialBossID = specialEnemyid;
             group.specialInputValue = specialInputValue;
-            group.useLogBarrier = toggles_ChooseBoss[3].isOn;
+            group.useLogBarrierNew = (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
             SaveDataToJson();
             Reflash();
         }
@@ -408,6 +409,7 @@ namespace PCRCaculator.Guild
             dropdowns_ChooseBoss[2].value = data.currentGuildMonth;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
             dropdowns_ChooseBoss[1].value = data.currentTurn - 1;
+            dropdowns_ChooseBoss[4].value = (int)data.useLogBarrierNew;
             //toggles_ChooseBoss.isOn = SettingData.isViolent;
             if (data.isViolent)
                 toggles_ChooseBoss[0].isOn = true;
@@ -561,6 +563,7 @@ namespace PCRCaculator.Guild
             SettingToggles[7].isOn = SettingData.usePhysics;
             SettingToggles[8].isOn = SettingData.useSkillEffects;
             SettingInputs[4].text = SettingData.skillEffeckFix + "";
+            SettingInputs[5].text = SettingData.limitTime.ToString();
         }
         public void ReflashCalcUI()
         {
@@ -598,6 +601,7 @@ namespace PCRCaculator.Guild
             SettingData.usePhysics = SettingToggles[7].isOn;
             SettingData.useSkillEffects = SettingToggles[8].isOn;
             SettingData.skillEffeckFix = float.Parse(SettingInputs[4].text);
+            SettingData.limitTime = int.Parse(SettingInputs[5].text);
             SaveDataToJson();
         }
         private static void LoadAddedPlayerData()
@@ -1045,6 +1049,7 @@ namespace PCRCaculator.Guild
         public bool usePlayerSQL = true;
         public bool useSkillEffects = true;
         public float skillEffeckFix = 35;
+        public int limitTime = 90;
         //public bool[] unlockGuilds = new bool[12] { false, false, false, true, true, true, true, false, false, false, false, false };
 
         public GuildSettingData() { }
@@ -1179,7 +1184,14 @@ namespace PCRCaculator.Guild
         public bool isViolent;
         public bool usePlayerSettingHP;
         public int playerSetingHP;
-        public bool useLogBarrier;
+        public LogBarrierType useLogBarrierNew;
+
+        public enum LogBarrierType
+        {
+            NoBarrier = 0,
+            TpOnly = 1,
+            FullBarrier = 2
+        }
 
         public bool isSpecialBoss;
         public int specialBossID;

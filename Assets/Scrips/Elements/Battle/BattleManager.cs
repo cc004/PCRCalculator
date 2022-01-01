@@ -3438,7 +3438,7 @@ namespace Elements.Battle
                 scale = (battleManager.resourceManager.LoadResourceImmediately(eResourceId.SPINE_MIDDLEGROUND_SCALE, (long) battleBackground) as SpineGroundScale).Scale
               }.coroutineStartProcessb__16));
             }*/
-            battleManager.BattleLeftTime = 90;// battleManager.tempData.PHDACAOAOMA.CAMIPEAOGNI;
+            battleManager.BattleLeftTime = MyGameCtrl.Instance.tempData.SettingData.limitTime;// battleManager.tempData.PHDACAOAOMA.CAMIPEAOGNI;
             // ISSUE: explicit non-virtual call
             BattleHeaderController.Instance.SetRestTime(battleManager.BattleLeftTime);
             battleManager.initializePassiveSkill();
@@ -4425,7 +4425,7 @@ namespace Elements.Battle
                     //Debug.LogError("特殊召唤物鸽了！");
                     PCRCaculator.EnemyData enemyData = PCRCaculator.Guild.GuildManager.EnemyDataDic[this._summonData.SummonId];
                     unitData_my = enemyData.CreateUnitData();
-                    parameter = TempData.CreateUnitParameter(enemyData,true);
+                    parameter = TempData.CreateUnitParameter(enemyData, PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.FullBarrier);
                 }
                 else
                 {

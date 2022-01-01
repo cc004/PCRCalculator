@@ -487,7 +487,7 @@ namespace ExcelHelper
                     else
                     {
                         worksheet0.Cells[currentLineNum, 6, currentLineNum, 9].Merge = true;
-                        int second = (90 - a.UBTime / 60);
+                        int second = (Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime - a.UBTime / 60);
                         if (second >= 60)
                         {
                             second -= 60;
@@ -617,7 +617,7 @@ namespace ExcelHelper
                     {
                         if(UBexecTimeList[i]!=null && count0 < UBexecTimeList[i].Count)
                         {
-                            worksheet1.Cells[lineNum, 1 + i].Value = (90.0f- UBexecTimeList[i][count0]/60.0f);
+                            worksheet1.Cells[lineNum, 1 + i].Value = (Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime - UBexecTimeList[i][count0]/60.0f);
                             flag = true;
                         }
                     }

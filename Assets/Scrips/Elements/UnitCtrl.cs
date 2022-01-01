@@ -1752,7 +1752,7 @@ this.updateCurColor();
                 }
                 else
                     this.Hp = this.MaxHp = this.StartMaxHP = (ObscuredLong)baseData.Hp;
-                useLogBarrier = data.useLogBarrier;
+                useLogBarrier = data.useLogBarrierNew;
             }
             else
                 this.Hp = this.MaxHp = this.StartMaxHP = (ObscuredLong)baseData.Hp;
@@ -4277,7 +4277,7 @@ this.updateCurColor();
                 if (_effectType == eEffectType.COMMON)
                 { }  //this.CreateBuffDebuffEffect(_skillId, _isBuff, _source);
                 string valueStr = "";
-                foreach(int i in _value.Values)
+                foreach(var i in _value.Values)
                 {
                     valueStr += i + ",";
                 }
@@ -4398,12 +4398,18 @@ this.updateCurColor();
             eStateIconType IDAFJHFJKOL = _isBuff ? buffDebuff.BuffIcon : buffDebuff.DebuffIcon;
             this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, IDAFJHFJKOL, _enable);
             string des = "";
-            int MainValue = 0;
+            FloatWithEx MainValue = 0;
             foreach(var value in _value.Values)
             {
                 des += value;
-                MainValue = (int)value;
+                MainValue = value;
             }
+            if (MainValue.value > 3000)
+            {
+                Console.WriteLine();
+            }
+            MainValue.value = (int)MainValue.value;
+            MainValue.ex = (int)MainValue.ex;
             ///added script
             PCRCaculator.Guild.UnitAbnormalStateChangeData stateChangeData = new PCRCaculator.Guild.UnitAbnormalStateChangeData();
             //stateChangeData.AbsorberValue = data.AbsorberValue;

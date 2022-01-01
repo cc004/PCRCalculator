@@ -76,7 +76,7 @@ namespace Elements
                 tempData.enemyList = mainManager.EnemyDataForBattle;
                 tempData.SettingData = PCRCaculator.Guild.GuildManager.StaticsettingData;
             }
-            tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrier);
+            tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
             Battle.BattleManager.Instance.Init(this);
             if (!IsAutoMode)
             {
@@ -528,7 +528,7 @@ namespace Elements
         private IEnumerator BackToTitle()
         {
             yield return new WaitForSecondsRealtime(1.5f);
-            PCRCaculator.Battle.BattleUIManager.Instance.ExitButton();
+            PCRCaculator.Battle.BattleUIManager.Instance.ExitButton2();
         }
     }
     public class ExceptNGUIRoot
@@ -556,7 +556,7 @@ namespace Elements
         public Dictionary<int, PCRCaculator.BaseData> playerUnitBaseDataDic;
         public PCRCaculator.Guild.GuildRandomData randomData;
 
-        public void CreateAllUnitParameters(bool useLogBarrier = false)
+        public void CreateAllUnitParameters(PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType useLogBarrier = PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {
             AllUnitParameters = new List<List<UnitParameter>>();
             PlayerParameters = new List<UnitParameter>();
@@ -633,7 +633,7 @@ namespace Elements
 
                 ) ;
         }
-        public static UnitParameter CreateUnitParameter(PCRCaculator.EnemyData enemyData,bool useLogBarrier)
+        public static UnitParameter CreateUnitParameter(PCRCaculator.EnemyData enemyData, PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType useLogBarrier)
         {
             List<SkillLevelInfo> mainSkillLevelInfo = new List<SkillLevelInfo>();
             for(int i = 0; i < enemyData.main_skill_lvs.Count; i++)
@@ -663,9 +663,9 @@ namespace Elements
                 main_skill_10: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[9], useLogBarrier)
                 ),enemyData);
         }
-        private static int JudgeAndSetSkillByID(int skillid,bool enableLogBarrier = true)
+        private static int JudgeAndSetSkillByID(int skillid, PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType enableLogBarrier)
         {
-            if (skillid == 0 || enableLogBarrier)
+            if (skillid == 0 || enableLogBarrier != PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.NoBarrier)
                 return skillid;
             var skillData = PCRCaculator.MainManager.Instance.SkillDataDic[skillid];
             foreach(int actionid in skillData.skillactions)

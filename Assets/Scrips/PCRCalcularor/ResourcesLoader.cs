@@ -66,7 +66,7 @@ namespace PCRCaculator
         }
         public async void UpdateSQLData_async_cn()
         {
-            var a = MainManager.Instance.WindowAsyncMessage("正在导入数据，请耐心等待...");
+            var a = MainManager.Instance.WindowAsyncMessage("正在导入数据，请耐心等待...（不要点按钮！！！）");
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
                 await Task.Run(() => SQL2Json.CreateAllSQLDataInPlayerMode_cn());

@@ -36,7 +36,7 @@ namespace Elements
         public BattleUIManager UIManager { get => uIManager; }
         private const float BOSS_DELTA_FIX = -1f;
 
-        private bool useLogBarrier;
+        private PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType useLogBarrier;
         private static PCRCaculator.Guild.GuildPlayerGroupData group => MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
 
         public void SetUI(CharacterPageButton ui, CharacterBuffUIController buffui)

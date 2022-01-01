@@ -5,6 +5,7 @@ using UnityEditor;
 using Newtonsoft0.Json;
 using System.IO;
 using Mono.Data.Sqlite;
+using System.Linq;
 
 namespace PCRCaculator
 {
@@ -16,8 +17,8 @@ namespace PCRCaculator
         private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
         private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
         private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
-        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
-        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
+        public Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
+        public Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
         private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
         private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
         private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
@@ -53,12 +54,13 @@ namespace PCRCaculator
 #if UNITY_EDITOR
         [MenuItem("PCRTools/db2json")]
 #endif 
-        public static void Db2json()
+        public static (Dictionary<int, SkillAction>, Dictionary<int, SkillData>) Db2json()
         {
             SQL2Json a = new SQL2Json();
             a.Load();
             a.SaveDics2Json();
             //a.SaveUnitAttackPatternDic2Json();
+            return (a.skillActionDic, a.skillDataDic);
         }
 #if UNITY_EDITOR
         [MenuItem("PCRTools/createNewDB")]
@@ -142,10 +144,10 @@ namespace PCRCaculator
         [MenuItem("PCRTools/从DB导入工会战怪物json文件-cn")]
 #endif
 
-        public static void CreateEnemyJson2()
+        public static void CreateEnemyJson2((Dictionary<int, SkillAction>, Dictionary<int, SkillData>) skill)
         {
             SQL2Json a = new SQL2Json();
-            a.Load_3(true);
+            a.Load_3(true, skill);
             a.SaveDics2Json_3();
         }
 #if UNITY_EDITOR
@@ -218,9 +220,9 @@ namespace PCRCaculator
         }
         public static void CreateAllSQLDataInPlayerMode_cn()
         {
-            Db2json(); 
+            var skill = Db2json(); 
 
-            CreateEnemyJson2();
+            CreateEnemyJson2(skill);
             CreateAttackPatternJson2();
             CreateUniqueEquipmentJson();
             CreateClanBattleData();
@@ -273,7 +275,7 @@ namespace PCRCaculator
             sql.CloseConnection();
 
         }
-        private void Load_3(bool cn=false)
+        private void Load_3(bool cn=false, (Dictionary<int, SkillAction>, Dictionary<int, SkillData>) skill = default)
         {
 
             //string conn = "redive_cn.db";
@@ -281,13 +283,13 @@ namespace PCRCaculator
             if (cn)
             {
                 sql = new SQLiteHelper(conn_cn);
-                LoadEnemyData();
+                LoadEnemyData(skill);
                 sql.CloseConnection();
             }
             else
             {
                 sql = new SQLiteHelper(conn);
-                LoadEnemyData();
+                LoadEnemyData(skill);
                 sql.CloseConnection();
             }
 
@@ -432,53 +434,7 @@ namespace PCRCaculator
         }
         private void LoadSkillData(bool isJapanSQL = false)
         {
-            SqliteDataReader reader = sql.ReadFullTable("skill_data");
-
-            while (reader.Read())
-            {
-                int skillid = reader.GetInt32(reader.GetOrdinal("skill_id"));
-                int[] actions = new int[7]{
-                reader.GetInt32(reader.GetOrdinal("action_1")),
-                reader.GetInt32(reader.GetOrdinal("action_2")),
-                reader.GetInt32(reader.GetOrdinal("action_3")),
-                reader.GetInt32(reader.GetOrdinal("action_4")),
-                reader.GetInt32(reader.GetOrdinal("action_5")),
-                reader.GetInt32(reader.GetOrdinal("action_6")),
-                reader.GetInt32(reader.GetOrdinal("action_7"))
-            };
-                int[] deactions = new int[7]{
-                reader.GetInt32(reader.GetOrdinal("depend_action_1")),
-                reader.GetInt32(reader.GetOrdinal("depend_action_2")),
-                reader.GetInt32(reader.GetOrdinal("depend_action_3")),
-                reader.GetInt32(reader.GetOrdinal("depend_action_4")),
-                reader.GetInt32(reader.GetOrdinal("depend_action_5")),
-                reader.GetInt32(reader.GetOrdinal("depend_action_6")),
-                reader.GetInt32(reader.GetOrdinal("depend_action_7"))
-            };
-                SkillData skillData = new SkillData(skillid,
-                    reader.GetString(reader.GetOrdinal("name")),
-                    reader.GetInt32(reader.GetOrdinal("skill_type")),
-                    reader.GetInt32(reader.GetOrdinal("skill_area_width")),
-                    reader.GetFloat(reader.GetOrdinal("skill_cast_time")),
-                    actions, deactions,
-                    reader.GetString(reader.GetOrdinal("description")),
-                    reader.GetInt32(reader.GetOrdinal("icon_type"))
-                    );
-                /*
-                if (!skillDataDic.ContainsKey(skillid))
-                    skillDataDic.Add(skillid, skillData);
-                else
-                {
-                    if (isJapanSQL)
-                    {
-                        if (skillid <= 2000000)
-                            skillDataDic[skillid] = skillData;
-                    }
-                }*/
-                // override jpdb by cndb
-                skillDataDic[skillid] = skillData;
-            }
-            reader = sql.ReadFullTable("skill_action");
+            var reader = sql.ReadFullTable("skill_action");
 
             while (reader.Read())
             {
@@ -530,6 +486,61 @@ namespace PCRCaculator
 
                 // override jpdb by cndb
                 skillActionDic[actionid] = skillAction;
+            }
+
+            reader = sql.ReadFullTable("skill_data");
+
+            while (reader.Read())
+            {
+                int skillid = reader.GetInt32(reader.GetOrdinal("skill_id"));
+                int[] actions = new int[7]{
+                reader.GetInt32(reader.GetOrdinal("action_1")),
+                reader.GetInt32(reader.GetOrdinal("action_2")),
+                reader.GetInt32(reader.GetOrdinal("action_3")),
+                reader.GetInt32(reader.GetOrdinal("action_4")),
+                reader.GetInt32(reader.GetOrdinal("action_5")),
+                reader.GetInt32(reader.GetOrdinal("action_6")),
+                reader.GetInt32(reader.GetOrdinal("action_7"))
+            };
+                int[] deactions = new int[7]{
+                reader.GetInt32(reader.GetOrdinal("depend_action_1")),
+                reader.GetInt32(reader.GetOrdinal("depend_action_2")),
+                reader.GetInt32(reader.GetOrdinal("depend_action_3")),
+                reader.GetInt32(reader.GetOrdinal("depend_action_4")),
+                reader.GetInt32(reader.GetOrdinal("depend_action_5")),
+                reader.GetInt32(reader.GetOrdinal("depend_action_6")),
+                reader.GetInt32(reader.GetOrdinal("depend_action_7"))
+            };
+                SkillData skillData = new SkillData(skillid,
+                    reader.GetString(reader.GetOrdinal("name")),
+                    reader.GetInt32(reader.GetOrdinal("skill_type")),
+                    reader.GetInt32(reader.GetOrdinal("skill_area_width")),
+                    reader.GetFloat(reader.GetOrdinal("skill_cast_time")),
+                    actions, deactions,
+                    reader.GetString(reader.GetOrdinal("description")),
+                    reader.GetInt32(reader.GetOrdinal("icon_type"))
+                    );
+
+                if (skillActionDic.TryGetValue(skillData.skillactions[0], out var ac1) &&
+                        ac1.type == 17 && ac1.details[0] == 7 && ac1.values[2] == 90 &&
+                    skillActionDic.TryGetValue(skillData.skillactions[0] + 1, out var ac2) &&
+                        ac2.type == 73) //removed log barrier, recover it
+                {
+                    skillData.skillactions[1] = skillData.skillactions[0] + 1;
+                }
+                /*
+                if (!skillDataDic.ContainsKey(skillid))
+                    skillDataDic.Add(skillid, skillData);
+                else
+                {
+                    if (isJapanSQL)
+                    {
+                        if (skillid <= 2000000)
+                            skillDataDic[skillid] = skillData;
+                    }
+                }*/
+                // override jpdb by cndb
+                skillDataDic[skillid] = skillData;
             }
         }
         private void LoadUnitRarityData(bool isJapen = false)
@@ -1028,7 +1039,7 @@ namespace PCRCaculator
                 skill_cost[i] += skill_cost[i - 1];
             }
         }
-        private void LoadEnemyData()
+        private void LoadEnemyData((Dictionary<int, SkillAction> action, Dictionary<int, SkillData> skill) skill)
         {
             Dictionary<int, EnemyDetailData> detailDic = new Dictionary<int, EnemyDetailData>();
             SqliteDataReader reader = sql.ReadFullTable("unit_enemy_data");
@@ -1093,8 +1104,27 @@ namespace PCRCaculator
                     skillData.UB = reader.GetInt32(reader.GetOrdinal("union_burst"));
                     for (int i = 1; i < 11; i++)
                     {
-                        skillData.MainSkills.Add(reader.GetInt32(reader.GetOrdinal("main_skill_" + i)));
+                        var skill_id = reader.GetInt32(reader.GetOrdinal("main_skill_" + i));
+                        if (skill_id != 0)
+                        {
+                            var sk = skill.skill[skill_id];
+                            if (skill.action.TryGetValue(sk.skillactions[0], out var ac1) &&
+                                ac1.type == 17 && ac1.details[0] == 7 && ac1.values[2] == 90 &&
+                                skill.action.TryGetValue(sk.skillactions[1], out var ac2) && ac2.type == 73)
+                            {
+                                //remove current log barrier
+                                skill_id = 0;
+                            }
+                        }
+
+                        skillData.MainSkills.Add(skill_id);
                     }
+
+
+                    var id = skillData.MainSkills.FindIndex(sk => sk == 0);
+                    if (id >= 0)
+                        skillData.MainSkills[id] =
+                            skill.action.FirstOrDefault(pair => pair.Value.type == 73 && pair.Key / 1000 == unit_id).Key / 100;
                     if (patternDic.ContainsKey(unit_id))
                         skillData.enemyAttackPatterns = patternDic[unit_id];
                     else
