@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using PCRCaculator;
 using UnityEngine;
 
 namespace Elements
@@ -624,6 +625,10 @@ namespace Elements
                 actionParameter.ActionWeightSum += parameterOnPrefabDetail.ExecTime[index4].Weight;
                 actionParameter.ExecTime[index4] = parameterOnPrefabDetail.ExecTime[index4].Time;
             }
+
+            if (MainManager.Instance.execTimePatch.TryGetValue(actionParam.action_id, out var time))
+                actionParameter.ExecTime = time;
+
             actionParameter.DepenedActionId = actionParam.DependActionId;
             actionParameter.ActionId = (int)actionParam.action_id;
             actionParameter.TargetList = new List<BasePartsData>();

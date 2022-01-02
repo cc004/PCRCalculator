@@ -1014,7 +1014,7 @@ namespace Elements
 
         private ObscuredFloat m_fCastTimer { get; set; }
 
-        private long accumulateDamage { get; set; }
+        private FloatWithEx accumulateDamage { get; set; }
 
         private ObscuredFloat skillStackValDmg { get; set; }
 
@@ -5582,9 +5582,9 @@ this.updateCurColor();
                 else if (this.IsAbnormalState(UnitCtrl.eAbnormalState.LOG_ALL_BARRIR))
                     flag = true;
             }
-            if (flag)
-                _critical = _damageData.IsLogBarrierCritical;
-            var (num1, expdmg) = this.SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate);
+            
+            if (flag) _critical = _damageData.IsLogBarrierCritical;
+            var num1 = this.SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate);
             if (_damageData.Target is PartsData)
             {
                 if (!_damageData.IsSlipDamage)
@@ -5626,7 +5626,7 @@ this.updateCurColor();
             UnitCtrl source1 = _damageData.Source;
             UnitCtrl unitCtrl1 = this;
             int HLIKLPNIOKJ = (int)((_critical ? 1 : 2) * 10 + _damageData.DamageType);
-            long KGNFLOPBOMB = num1;
+            long KGNFLOPBOMB = (long)num1;
             long hp = (long)this.Hp;
             int OJHBHHCOAGK = _actionId;
             int PFLDDMLAICG = (int)_damageWeight * 100;
@@ -5692,12 +5692,11 @@ this.updateCurColor();
             if (_skill != null)
             {
                 _skill.TotalDamage += num1;
-                _skill.ExDamage += expdmg;
             }
-            return num1;
+            return (long)num1;
         }
 
-        public (long, long) SetDamageImpl(
+        public FloatWithEx SetDamageImpl(
           DamageData _damageData,
           bool _byAttack,
           ActionParameter.OnDamageHitDelegate _onDamageHit,
@@ -5715,20 +5714,20 @@ this.updateCurColor();
             if (this.IdleOnly || this.IsDivisionSourceForDamage && !_damageData.IsDivisionDamage)
             {
                 callBack?.Invoke("伤害无效,目标不是可攻击状态");
-                return (0, 0);
+                return 0f;
             }
             //if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.SHIELD && this.IsBoss)
             //    this.battleManager.SubstructEnemyPoint(1);
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
             {
                 callBack?.Invoke("伤害无效，目标处于无敌状态");
-                return (0, 0);
+                return 0f;
             }
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.PHYSICS_DODGE) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 this.SetMissAtk(_damageData.Source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION, _parts: _damageData.Target);
                 callBack?.Invoke("伤害无效，目标处于物理闪避状态");
-                return (0, 0);
+                return 0f;
             }
             var a = _damageData.Damage;
             float num1 = 2f * _damageData.CriticalDamageRate;
@@ -5824,7 +5823,7 @@ this.updateCurColor();
             {
                 //this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.FloatToInt(num5));
                 callBack?.Invoke("伤害无效，目标已经死了");
-                return (0, 0);
+                return 0f;
             }
             /*
             if (_upperLimitFunc != null)
@@ -5849,7 +5848,7 @@ this.updateCurColor();
                                         this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, eStateIconType.STRIKE_BACK, false);
                                         this.MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false,90, "反击中");
                                         callBack?.Invoke("伤害无效，被目标格挡");
-                                        return (0, 0);
+                                        return 0f;
                                     }
                                     continue;
                                 case StrikeBackData.eStrikeBackType.MAGIC_GUARD:
@@ -5861,7 +5860,7 @@ this.updateCurColor();
                                         this.MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
 
                                         callBack?.Invoke("伤害无效，被目标格挡");
-                                        return (0, 0);
+                                        return 0f;
                                     }
                                     continue;
                                 case StrikeBackData.eStrikeBackType.BOTH_GUARD:
@@ -5870,7 +5869,7 @@ this.updateCurColor();
                                     this.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this, eStateIconType.STRIKE_BACK, false);
                                     this.MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
                                     callBack?.Invoke("伤害无效，被目标格挡");
-                                    return (0, 0);
+                                    return 0f;
                                 default:
                                     continue;
                             }
@@ -5886,7 +5885,7 @@ this.updateCurColor();
             {
                 this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.FloatToInt(num5));
                 callBack?.Invoke("伤害无效，因为伤害为负数");
-                return (0, 0);
+                return 0f;
             }
             var _fDamage = MathfPlus.Max(num5, 1f);
             /*if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && this.battleManager.KIHOGJBONDH != 0 && this.IsBoss)
@@ -6045,7 +6044,7 @@ this.updateCurColor();
             }
             string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
             callBack?.Invoke(describe);
-            return ((long)num6.value, (long)num6.ex);
+            return num6.Floor();
         }
 
         private void execBarrier(DamageData _damageData, ref FloatWithEx _fDamage, ref int _overRecoverValue)

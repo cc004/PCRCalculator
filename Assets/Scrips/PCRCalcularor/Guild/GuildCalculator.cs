@@ -253,7 +253,7 @@ namespace PCRCaculator.Guild
         }
         public void AppendGetDamage(int unitid, int sourceUnitid, float damage, int currentFrame)
         {
-            if (sourceUnitid >= 400000) { return; }
+            if (!playerUnitDamageDic.ContainsKey(sourceUnitid)) return;
             if (unitid == bossId)
             {
                 playerUnitDamageDic[sourceUnitid].Add(new ValueChangeData(currentFrame / 5400.0f, damage));

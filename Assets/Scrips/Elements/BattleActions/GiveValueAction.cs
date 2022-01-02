@@ -162,11 +162,7 @@ namespace Elements
                     _addValue[_evalue] = (float)_skill.DamagedPartsList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 6:
-                    _addValue[_evalue] = new FloatWithEx
-                    {
-                        ex = _skill.ExDamage,
-                        value = _skill.TotalDamage
-                    } * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = _skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 7:
                     _addValue[_evalue] = (float)(int)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];

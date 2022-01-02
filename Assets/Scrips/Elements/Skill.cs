@@ -113,9 +113,7 @@ namespace Elements
         [JsonIgnore]
         public List<BasePartsData> CriticalPartsList { get; set; }
         [JsonIgnore]
-        public long TotalDamage { get; set; }
-        [JsonIgnore]
-        public long ExDamage { get; set; }
+        public FloatWithEx TotalDamage { get; set; }
         [JsonIgnore]
         public float AweValue { get; set; }
         [JsonIgnore]
@@ -131,8 +129,7 @@ namespace Elements
 
         public void ReadySkill()
         {
-            this.TotalDamage = 0L;
-            this.ExDamage = 0L;
+            this.TotalDamage = 0f;
             this.DamagedPartsList.Clear();
             for (int index1 = 0; index1 < this.SkillEffects.Count; ++index1)
             {

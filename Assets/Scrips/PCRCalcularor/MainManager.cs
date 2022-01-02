@@ -140,9 +140,12 @@ namespace PCRCaculator
             //CharacterManager = CharacterManager.Instance;
             //BattleManager = AdventureManager.Instance;
         }
+
+        public Dictionary<int, float[]> execTimePatch;
+
         private void Load()
         {
-
+            execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
             string jsonStr = LoadJsonDatas("Datas/AllData");
