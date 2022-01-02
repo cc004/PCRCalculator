@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEditor;
 using Newtonsoft0.Json;
 using System.IO;
 using Mono.Data.Sqlite;
 using System.Linq;
+using Debug = UnityEngine.Debug;
 
 namespace PCRCaculator
 {
@@ -1122,6 +1124,11 @@ namespace PCRCaculator
 
 
                     var id = skillData.MainSkills.FindIndex(sk => sk == 0);
+                    if (skill.action.FirstOrDefault(pair => pair.Value.type == 73 && pair.Key / 1000 == unit_id).Key !=
+                        0)
+                    {
+                        Debug.Log($"log barrier skill exists for {unit_id}");
+                    }
                     if (id >= 0)
                         skillData.MainSkills[id] =
                             skill.action.FirstOrDefault(pair => pair.Value.type == 73 && pair.Key / 1000 == unit_id).Key / 100;

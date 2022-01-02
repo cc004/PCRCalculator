@@ -4441,7 +4441,7 @@ namespace Elements.Battle
 
                 if (_summonData.ConsiderEquipmentAndBonus)
                 {
-                    additional = PCRCaculator.MainManager.Instance.UnitRarityDic[_summonData.SummonId].GetBonusData(_summonData.Owner.unitData);
+                    additional = PCRCaculator.MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData);
                 }
 
 

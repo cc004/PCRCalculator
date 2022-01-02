@@ -21,13 +21,20 @@ namespace Elements
             new FloatWithEx { ex = Mathf.Max(x.ex, f), value = Mathf.Max(x.value, f)};
 
         public static FloatWithEx Max(FloatWithEx x, float f) => Max(f, x);
-        public static FloatWithEx Log(FloatWithEx x) => new FloatWithEx { ex = Mathf.Log(x.ex), value = Mathf.Log(x.value)};
+        public static FloatWithEx Log(FloatWithEx x) => new FloatWithEx { ex = Mathf.Log(x.ex), value = Mathf.Log(x.value) };
     }
     public struct FloatWithEx
     {
         public float value;
         public float ex;
 
+        public FloatWithEx Floor()
+        {
+            return new FloatWithEx
+            {
+                ex = ex - 0.5f, value = (long) value
+            };
+        }
         public override string ToString()
         {
             return (value == ex) ? value.ToString() : $"{(int)value}[{(int)ex}]";
@@ -1219,6 +1226,9 @@ namespace Elements
           bool _boneCount = true,
           bool _ignoreCancel = false)
         {
+            // temporary fix for log barrier skill
+            if (_action is LogBarrierAction)
+                _action.ExecTime = new[] { 0f };
             for (int _num = 0; _num < _action.ExecTime.Length; ++_num)
             {
                 if (_boneCount)

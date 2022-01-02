@@ -52,12 +52,13 @@ namespace Elements
                     CriticalData criticalData = new CriticalData();
                     double num2 = (double)BattleManager.Random(0.0f, 1f,
                         new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 1, damageData.CriticalRate, damageData.CriticalDamageRate));
-                    criticalData.ExpectedDamage = BattleUtil.FloatToInt((float)damageData.TotalDamageForLogBarrier * this.ActionExecTimeList[index].Weight / this.ActionWeightSum);
+                    criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * this.ActionExecTimeList[index].Weight / this.ActionWeightSum);
                     double criticalRate = (double)damageData.CriticalRate;
+                    criticalData.ExpectedDamage.ex *= (1 + damageData.CriticalRate * (2f * damageData.CriticalDamageRate - 1));
                     if (num2 <= criticalRate && (double)damageData.CriticalDamageRate != 0.0)
                     {
                         criticalData.IsCritical = true;
-                        criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage * 2f * damageData.CriticalDamageRate);
+                        criticalData.ExpectedDamage.value = BattleUtil.FloatToInt(criticalData.ExpectedDamage * 2f * damageData.CriticalDamageRate).value;
                     }
                     if (!damageData.IgnoreDef)
                     {
@@ -83,8 +84,8 @@ namespace Elements
                 this.TotalDamageDictionary.Add(_target, num1);
             }
             damageData.IsLogBarrierCritical = this.CriticalDataDictionary[_target][_num].IsCritical;
-            damageData.LogBarrierExpectedDamage = (long)this.CriticalDataDictionary[_target][_num].ExpectedDamage;
-            damageData.TotalDamageForLogBarrier = (long)this.TotalDamageDictionary[_target];
+            damageData.LogBarrierExpectedDamage = this.CriticalDataDictionary[_target][_num].ExpectedDamage.Floor();
+            damageData.TotalDamageForLogBarrier = this.TotalDamageDictionary[_target].Floor();
             if (_target.Owner.SetDamage(damageData, true, this.ActionId, this.OnDamageHit, _skill: _skill, _onDefeat: this.OnDefeatEnemy, _damageWeight: this.ActionExecTimeList[_num].Weight, _damageWeightSum: this.ActionWeightSum, _energyChargeMultiple: this.EnergyChargeMultiple, callBack: action) != 0L)
                 this.HitOnceDic[_target] = true;
             if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK)

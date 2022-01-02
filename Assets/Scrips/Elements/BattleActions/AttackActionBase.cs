@@ -147,7 +147,7 @@ namespace Elements
                 level = this.parts.GetLevel();
             }
             var num3 = BattleUtil.FloatToInt(_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]);
-            var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + (float)num1 * _valueDictionary[eValueNumber.VALUE_3]) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+            var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.ContainsKey(_source))
             {
                 AccumulativeDamageData accumulativeDamageData = _target.Owner.AccumulativeDamageDataDictionary[_source];

@@ -379,7 +379,10 @@ namespace PCRCaculator.Battle
                 ExitButton2();
             }
             else
+            {
                 Elements.Battle.BattleManager.Instance.BossUnit.Hp = 0;
+                Elements.Battle.BattleManager.Instance.BossUnit.SetState(Elements.UnitCtrl.ActionState.DIE);
+            }
         }
 
         public void ExitButton2()
