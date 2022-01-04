@@ -1148,7 +1148,7 @@ namespace Elements
 
         public ObscuredInt Level { get; protected set; }
 
-        public ObscuredLong Hp { get; internal protected set; }
+        public FloatWithEx Hp { get; internal protected set; }
 
         public ObscuredLong MaxHp { get; set; }
 
@@ -1208,9 +1208,9 @@ namespace Elements
 
         public ObscuredInt MagicCriticalDamageRate { get; set; }
 
-        public FloatWithEx AtkZero => (MathfPlus.Max(0f, this.Atk) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ATK));
+        public FloatWithEx AtkZero => (this.Atk.Max(0f) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ATK));
 
-        public FloatWithEx MagicStrZero => (MathfPlus.Max(0f, this.MagicStr) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_STR));
+        public FloatWithEx MagicStrZero => (this.MagicStr.Max(0f) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_STR));
 
         public ObscuredInt DefZero => (int)(Mathf.Max(0, (int)this.Def) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DEF));
 
@@ -1254,19 +1254,20 @@ namespace Elements
 
         private BattleManager battleManager => UnitCtrl.staticBattleManager;
 
-        public float Energy
+        public FloatWithEx Energy
         {
-            get => (float)this.energy;
+            get => this.energy;
             private set
             {
-                this.energy = (ObscuredFloat)Mathf.Min((float)UnitDefine.MAX_ENERGY, Mathf.Max(0.0f, value));
+                this.energy = value.Min(UnitDefine.MAX_ENERGY).Max(0f);
+                //this.energy = (ObscuredFloat)Mathf.Min((float)UnitDefine.MAX_ENERGY, Mathf.Max(0.0f, value));
                 if (this.EnergyChange == null)
                     return;
                 this.EnergyChange(this);
             }
         }
 
-        private ObscuredFloat energy { get; set; }
+        private FloatWithEx energy { get; set; }
 
         public bool HasSkillTarget => this.skillTargetList.Count > 0;
 
@@ -1751,11 +1752,11 @@ this.updateCurColor();
                     this.Hp = data.playerSetingHP;
                 }
                 else
-                    this.Hp = this.MaxHp = this.StartMaxHP = (ObscuredLong)baseData.Hp;
+                    this.Hp = (long)(this.MaxHp = this.StartMaxHP = (ObscuredLong)baseData.Hp);
                 useLogBarrier = data.useLogBarrierNew;
             }
             else
-                this.Hp = this.MaxHp = this.StartMaxHP = (ObscuredLong)baseData.Hp;
+                this.Hp = (long)(this.MaxHp = this.StartMaxHP = (ObscuredLong)baseData.Hp);
 
 
             //this.Def = this.StartDef = (ObscuredInt)Mathf.RoundToInt(baseData.Def);
@@ -1773,7 +1774,7 @@ this.updateCurColor();
 
             if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
             {
-                this.Hp = this.MaxHp = this.StartMaxHP = (ObscuredLong)99999999;
+                this.Hp = (long)(this.MaxHp = this.StartMaxHP = (ObscuredLong)99999999);
                 Atk = 1;
                 StartDef = Def = StartMagicDef = MagicDef = group.specialInputValue;
                 Level = PCRCaculator.MainManager.Instance.PlayerSetting.playerLevel;
@@ -2738,7 +2739,7 @@ this.updateCurColor();
 
         public void SetCurrentHp(long _hp)
         {
-            this.Hp = (ObscuredLong)_hp;
+            this.Hp = _hp;
             if (_hp <= 0L)
             {
                 //this.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, 0.0f);
@@ -2752,7 +2753,7 @@ this.updateCurColor();
             this.StartHpPercent = (float)_hp / (float)(long)this.MaxHp;
         }
 
-        public void SetCurrentHpZero() => this.Hp = (ObscuredLong)0L;
+        public void SetCurrentHpZero() => this.Hp = 0L;
 
         public void SetMaxHp(long _maxHp) => this.MaxHp = (ObscuredLong)_maxHp;
 
@@ -2768,7 +2769,7 @@ this.updateCurColor();
             this.StartCoroutine(this.setColorOffsetDefaultWithDelay());
         }*/
 
-        public void SetEnergy(float energy, eSetEnergyType type, UnitCtrl source = null)
+        public void SetEnergy(FloatWithEx energy, eSetEnergyType type, UnitCtrl source = null)
         {
             BattleLogIntreface battleLog = this.battleLog;
             UnitCtrl unitCtrl1 = source;
@@ -4565,9 +4566,9 @@ this.updateCurColor();
 
         public int CompareLifeValueAscSameRight(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? this.CompareRight(_a, _b) : this.CompareLifeValueAsc(_a, _b);
 
-        public int CompareLifeValueAsc(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _a.Owner.Hp.GetDecrypted().CompareTo(_b.Owner.Hp.GetDecrypted()) : 1);
+        public int CompareLifeValueAsc(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _a.Owner.Hp.value.CompareTo(_b.Owner.Hp.value) : 1);
 
-        public static int CompareEnergyAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Owner.Energy.CompareTo(b.Owner.Energy) : 1);
+        public static int CompareEnergyAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Owner.Energy.value.CompareTo(b.Owner.Energy.value) : 1);
 
         public int CompareEnergyAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareEnergyAsc(_a, _b);
 
@@ -4579,9 +4580,9 @@ this.updateCurColor();
 
         public int CompareLifeValueDecSameRight(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? this.CompareRight(_a, _b) : this.CompareLifeValueDec(_a, _b);
 
-        public int CompareLifeValueDec(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _b.Owner.Hp.GetDecrypted().CompareTo(_a.Owner.Hp.GetDecrypted()) : -1);
+        public int CompareLifeValueDec(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _b.Owner.Hp.value.CompareTo(_a.Owner.Hp.value) : -1);
 
-        public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
+        public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.value.CompareTo(a.Owner.Energy.value) : -1);
 
         public int CompareEnergyDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareEnergyDec(_a, _b);
 
@@ -5388,8 +5389,8 @@ this.updateCurColor();
                     case eParamType.HP:
                         if (_first && !this.IsClanBattleOrSekaiEnemy)
                         {
-                            this.MaxHp = (ObscuredLong)(long)(int)this.calculatePassiveSkillValue((float)(long)this.MaxHp, _passiveActionKV);
-                            this.Hp = (ObscuredLong)(long)(int)((double)(long)this.Hp / (double)(long)this.StartMaxHP * (double)(long)this.MaxHp);
+                            this.MaxHp = (long)(int)this.calculatePassiveSkillValue((float)(long)this.MaxHp, _passiveActionKV);
+                            this.Hp = (long)(int)((double)(long)this.Hp / (double)(long)this.StartMaxHP * (double)(long)this.MaxHp);
                             continue;
                         }
                         continue;
@@ -5606,7 +5607,7 @@ this.updateCurColor();
                     lifeSteal += _skill.LifeSteal;
                 if (lifeSteal > 0)
                 {
-                    int num2 = (int)num1 * lifeSteal / (lifeSteal + (int)this.Level + 100);
+                    var num2 = num1.Floor() * (float)lifeSteal / (float)(lifeSteal + (int)this.Level + 100);
                     if (num2 != 0)
                     {   //_damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
                         _damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, UnitCtrl.GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
@@ -5771,7 +5772,7 @@ this.updateCurColor();
                     if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
                     {
                         float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ATK_BARRIR);
-                        var num2 = (MathfPlus.Log(((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)) * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
+                        var num2 = ((((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)).Log() * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
                         a *= num2;
                     }
                 }
@@ -5781,7 +5782,7 @@ this.updateCurColor();
                     if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
                     {
                         float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_MGC_BARRIR);
-                        var num2 = (MathfPlus.Log(((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)) * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
+                        var num2 = ((((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)).Log() * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
                         a *= num2;
                     }
                 }
@@ -5791,7 +5792,7 @@ this.updateCurColor();
                     if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
                     {
                         float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ALL_BARRIR);
-                        var num2 = (MathfPlus.Log(((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)) * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
+                        var num2 = ((((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)).Log() * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
                         a *= num2;
                     }
                 }
@@ -5818,7 +5819,7 @@ this.updateCurColor();
                         break;
                 }
             }
-            var num5 = 0f-MathfPlus.Max(0f-a, 0f-999999f);
+            var num5 = a.Min(999999f);
             if (this.CurrentState == UnitCtrl.ActionState.DIE)
             {
                 //this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.FloatToInt(num5));
@@ -5887,7 +5888,8 @@ this.updateCurColor();
                 callBack?.Invoke("伤害无效，因为伤害为负数");
                 return 0f;
             }
-            var _fDamage = MathfPlus.Max(num5, 1f);
+
+            var _fDamage = num5.Max(1f);
             /*if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && this.battleManager.KIHOGJBONDH != 0 && this.IsBoss)
             {
                 int PBAANIPPIGL = BattleUtil.FloatToInt(_fDamage);
@@ -5932,17 +5934,16 @@ this.updateCurColor();
             bool flag2 = (long)this.Hp > 0L;
             int num7 = (double)(long)this.Hp > (double)(long)this.MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)this.Hp;
-            this.Hp = (ObscuredLong)((long)this.Hp - (long)((int)num6 - (_overRecoverValue < 0 ? 0 : _overRecoverValue)));
+            this.Hp = (this.Hp - (num6.Floor() - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
             if (_onDamageHit != null & flag2)
                 _onDamageHit((float)num6);
             if ((long)this.Hp < 0L)
-                this.Hp = (ObscuredLong)0L;
+                this.Hp = 0L;
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (ObscuredLong)1L;
             if ((long)this.Hp == 0L && (this.IsTough || this.ExecKnightGuard()) && (long)this.Hp == 0L)
-                this.Hp = (ObscuredLong)1L;
-            if ((long)this.Hp > (long)this.MaxHp)
-                this.Hp = this.MaxHp;
+                this.Hp = 1L;
+            this.Hp = this.Hp.Min(MaxHp);
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
             //    this.playDamageVoice();
             /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
@@ -6296,10 +6297,10 @@ this.updateCurColor();
         }
 
         public void SetRecovery(
-          int _value,
+          FloatWithEx _value,
           UnitCtrl.eInhibitHealType _inhibitHealType,
           UnitCtrl _source,
-                float _healDownValue = 1f,
+          float _healDownValue = 1f,
           bool _isEffect = true,
           bool _isRevival = false,
           bool _isUnionBurstLifeSteal = false,
@@ -6311,7 +6312,7 @@ this.updateCurColor();
         {
             if (_target == null)
                 _target = this.GetFirstParts(true);
-            _value = BattleUtil.FloatToInt(_healDownValue * (float)_value);
+            _value = BattleUtil.FloatToInt(_healDownValue * _value);
             if ((this.IsDead || (double)(long)this.Hp <= 0.0) && !_isRevival || this.IsClanBattleOrSekaiEnemy)
                 this.battleLog.AppendBattleLog(eBattleLogType.MISS, 8, 0L, 0L, 0, 0, JELADBAMFKH: _source, LIMEKPEENOB: this);
             else if (this.IsAbnormalState(UnitCtrl.eAbnormalState.INHIBIT_HEAL) && _inhibitHealType != UnitCtrl.eInhibitHealType.NO_EFFECT)
@@ -6321,7 +6322,7 @@ this.updateCurColor();
                 DamageData _damageData = new DamageData()
                 {
                     Target = this.GetFirstParts((bool)(UnityEngine.Object)this),
-                    Damage = (long)BattleUtil.FloatToInt(this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.INHIBIT_HEAL) * (float)_value),
+                    Damage = BattleUtil.FloatToInt(this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.INHIBIT_HEAL) * _value),
                     DamageType = DamageData.eDamageType.NONE,
                     Source = this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.INHIBIT_HEAL].Source,
                     DamageNumMagic = _inhibitHealType == UnitCtrl.eInhibitHealType.MAGIC,
@@ -6337,7 +6338,7 @@ this.updateCurColor();
             {
                 if (_releaseToad && this.ToadDatas.Count > 0 && this.ToadDatas[0].ReleaseByHeal)
                     this.ToadDatas[0].Enable = false;
-                this.Hp = (ObscuredLong)((long)this.Hp + (long)_value);
+                this.Hp = (this.Hp + _value);
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
                 UnitCtrl unitCtrl2 = this;
@@ -6346,8 +6347,7 @@ this.updateCurColor();
                 UnitCtrl JELADBAMFKH = unitCtrl1;
                 UnitCtrl LIMEKPEENOB = unitCtrl2;
                 battleLog.AppendBattleLog(eBattleLogType.SET_RECOVERY, 0, KGNFLOPBOMB, hp, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
-                if ((long)this.Hp > (long)this.MaxHp)
-                    this.Hp = this.MaxHp;
+                this.Hp = this.Hp.Min(this.MaxHp);
                 /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
                 {
                     float NormalizedHP = (float)(long)this.Hp / (float)(long)this.MaxHp;
@@ -6404,7 +6404,7 @@ this.updateCurColor();
 
         public void ChargeEnergy(
           eSetEnergyType _setEnergyType,
-          float _energy,
+          FloatWithEx _energy,
           bool _hasEffect = false,
           UnitCtrl _source = null,
           bool _hasNumberEffect = true,
@@ -6416,7 +6416,7 @@ this.updateCurColor();
         {
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
-            float num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)(((double)(int)this.EnergyRecoveryRateZero + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
+            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)(((double)(int)this.EnergyRecoveryRateZero + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             action?.Invoke("目标能量增加<color=#4C5FFF>" + num + "</color>点");
             this.SetEnergy(this.Energy + num, _setEnergyType, _source);
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;

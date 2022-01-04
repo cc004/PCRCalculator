@@ -23,13 +23,6 @@ namespace Elements
       base.SetLevel(_level);
       this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
     }
-
-    protected override float calcDamageValue(
-      UnitCtrl _source,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float) ((long) _source.MaxHp - (long) _source.Hp) / (float) (long) _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
-
-    protected override float calcHpValue(
-      UnitCtrl _source,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float) (long) _source.Hp / (float) (long) _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+        
   }
 }

@@ -28,12 +28,10 @@ namespace Elements
   BasePartsData _target)
         {
             base.createValue(_source, _skill, _valueDictionary, _addValue, _evalue, _target);
-            var ex = _addValue[_evalue].ex;
             //XX: ignore influence by clamp of add value
             if ((double)this.MasterData.action_value_4 != 0.0 || (double)this.MasterData.action_value_5 != 0.0)
-                _addValue[_evalue] = Mathf.Min(_addValue[_evalue], this.Value[eValueNumber.VALUE_4]);
-            _addValue[_evalue] = Mathf.Max(_addValue[_evalue], 0.0f);
-            _addValue[_evalue] = new FloatWithEx {ex = ex, value = _addValue[_evalue].value};
+                _addValue[_evalue] = _addValue[_evalue].Min(this.Value[eValueNumber.VALUE_4]);
+            _addValue[_evalue] = _addValue[_evalue].Max(0.0f);
         }
 
         public override void SetLevel(float _level)
@@ -43,13 +41,5 @@ namespace Elements
             this.Value[eValueNumber.VALUE_4] = (float)((double)this.MasterData.action_value_4 + (double)this.MasterData.action_value_5 * (double)_level);
 
         }
-
-        protected override float calcDamageValue(
-      UnitCtrl _source,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float) ((long) _source.MaxHp - (long) _source.Hp) * _valueDictionary[eValueNumber.VALUE_2];
-
-    protected override float calcHpValue(
-      UnitCtrl _source,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float) (long) _source.Hp * _valueDictionary[eValueNumber.VALUE_2];
   }
 }

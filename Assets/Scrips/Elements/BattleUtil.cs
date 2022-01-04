@@ -78,11 +78,11 @@ namespace Elements
 
     public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
     {
-        return new FloatWithEx { ex = FloatToIntReverseTruncate(_num.ex), value = FloatToIntReverseTruncate(_num.value) };
+        return _num.Select(x => FloatToIntReverseTruncate(x));
     }
     public static FloatWithEx FloatToInt(FloatWithEx _num)
     {
-        return new FloatWithEx{ ex = FloatToInt(_num.ex), value = FloatToInt(_num.value) };
+        return _num.Select(x => FloatToInt(x));
     }
     public static eUnitRespawnPos SearchRespawnPos(
       eUnitRespawnPos _basePos,

@@ -249,7 +249,7 @@ namespace Elements
                 if (count >= 60)
                 {
                     count = 0;
-                    Energy += 80;
+                    Energy += 80f;
                 }
             }
         }

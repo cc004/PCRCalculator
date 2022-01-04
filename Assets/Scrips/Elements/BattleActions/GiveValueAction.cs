@@ -145,10 +145,10 @@ namespace Elements
             switch ((int)_valueDictionary[eValueNumber.VALUE_1])
             {
                 case 0:
-                    _addValue[_evalue] = this.calcHpValue(_source, _valueDictionary);
+                    _addValue[_evalue] = calcHpValue(_source, _valueDictionary);
                     break;
                 case 1:
-                    _addValue[_evalue] = this.calcDamageValue(_source, _valueDictionary);
+                    _addValue[_evalue] = calcDamageValue(_source, _valueDictionary);
                     break;
                 case 2:
                     _addValue[_evalue] = (float)_skill.DefeatEnemyCount * _valueDictionary[eValueNumber.VALUE_2];
@@ -208,15 +208,14 @@ namespace Elements
     {
     }
 
-    protected virtual float calcHpValue(
-      UnitCtrl _source,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => 0.0f;
+    private static FloatWithEx calcDamageValue(
+        UnitCtrl _source,
+        Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-    protected virtual float calcDamageValue(
-      UnitCtrl _source,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => 0.0f;
-
-    protected int countUnitNumCompareX(
+    private static FloatWithEx calcHpValue(
+        UnitCtrl _source,
+        Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp / _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+        protected int countUnitNumCompareX(
       List<UnitCtrl> _targetList,
       BasePartsData _source,
       bool _ahead)

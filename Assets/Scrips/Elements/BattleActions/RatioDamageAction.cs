@@ -14,7 +14,7 @@ namespace Elements
     {
         private const float PERCENT_DIGIT = 100f;
         private BasePartsData parts;
-        private Dictionary<BasePartsData, long> targetCurrentHps;
+        private Dictionary<BasePartsData, FloatWithEx> targetCurrentHps;
 
         public override void ReadyAction(
           UnitCtrl _source,
@@ -35,7 +35,7 @@ namespace Elements
             this.parts = (BasePartsData)_source.BossPartsListForBattle.Find((Predicate<PartsData>)(e => e.Index == _skill.ParameterTarget));
             if (this.targetCurrentHps != null)
                 return;
-            this.targetCurrentHps = new Dictionary<BasePartsData, long>();
+            this.targetCurrentHps = new Dictionary<BasePartsData, FloatWithEx>();
         }
 
         public override void ExecAction(
@@ -58,21 +58,21 @@ namespace Elements
                 this.HitOnceKeyList.Add(_target);
             }
             if (!this.HitOnceDic[_target])
-                this.targetCurrentHps[_target] = (long)_target.Owner.Hp;
-            int num = 0;
+                this.targetCurrentHps[_target] = _target.Owner.Hp;
+            FloatWithEx num = 0;
             switch ((RatioDamageAction.eTargetParameter)this.ActionDetail1)
             {
                 case RatioDamageAction.eTargetParameter.MAX_HP:
-                    num = BattleUtil.FloatToInt((float)((double)(long)_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_1] / 100.0) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+                    num = BattleUtil.FloatToInt(((float)_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100f) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
                     break;
                 case RatioDamageAction.eTargetParameter.CURRENT_HP:
-                    num = BattleUtil.FloatToInt((float)((double)this.targetCurrentHps[_target] * (double)_valueDictionary[eValueNumber.VALUE_1] / 100.0) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+                    num = BattleUtil.FloatToInt((this.targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100f) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
                     break;
             }
             DamageData damageData = new DamageData()
             {
                 Target = _target,
-                Damage = (long)num,
+                Damage = num,
                 DamageType = (DamageData.eDamageType)this.ActionDetail2,
                 Source = _source,
                 DamageSoundType = DamageData.eDamageSoundType.HIT,
