@@ -86,7 +86,8 @@ namespace Elements.Battle
             //if ((UnityEngine.Object) this.skillEffect != (UnityEngine.Object) null)
             //  this.BGAGEJBMAMH.AppendEffect(this.skillEffect, this.EGEPDDJBILL, false);
             //this.BattleManager.AppendCoroutine(this.Update(), ePauseType.SYSTEM, this.EGEPDDJBILL);
-            this.BattleManager.AppendCoroutine(this.Update(), ePauseType.SYSTEM, null);
+            // fix ub field bug
+            this.BattleManager.AppendCoroutine(this.Update(), ePauseType.SYSTEM, this.EGEPDDJBILL);
             this.fieldIndex = ++this.BattleManager.MCLFFJEFMIF;
         }
 
@@ -143,7 +144,10 @@ namespace Elements.Battle
                         OnRepeat();
                     }
                 }
-                time += BattleManager.DeltaTime_60fps;
+                if (this.BattleManager.GetBlackOutUnitLength() == 0)
+                {
+                    time += this.BattleManager.DeltaTime_60fps;
+                }
                 //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域加时"+);
                 eBattleGameState mmbmbjnnacg = BattleManager.GameState;
                 if (time <= StayTime && mmbmbjnnacg != eBattleGameState.NEXT_WAVE_PROCESS && (mmbmbjnnacg != eBattleGameState.WAIT_WAVE_END && !AHABEPKMKJJ))
