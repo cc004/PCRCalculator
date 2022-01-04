@@ -163,8 +163,6 @@ namespace Elements
                 accumulativeDamageData.DamagedCount = Mathf.Min(accumulativeDamageData.DamagedCount + 1, accumulativeDamageData.CountLimit);
             }
             float num5 = this.getCriticalDamageRate(_valueDictionary) * (flag ? (float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f : (float)(int)_source.MagicCriticalDamageRateOrMin / 100f);
-            num4.value = (long) num4.value;
-            num3.value = (long) num3.value;
             return new DamageData()
             {
                 TotalDamageForLogBarrier = num3,

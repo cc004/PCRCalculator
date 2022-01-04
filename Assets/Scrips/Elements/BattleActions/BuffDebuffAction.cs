@@ -141,10 +141,10 @@ namespace Elements
                     }
                     break;
             }
-            f.value = Mathf.CeilToInt(Mathf.Abs(f.value));
-            f.ex = Mathf.CeilToInt(Mathf.Abs(f.ex));
+
+            f = f.Select(x => Mathf.CeilToInt(Mathf.Abs(x)));
             if (_isDebuf)
-                f = f * -1f;
+                f *= -1f;
             return f;
         }
 

@@ -54,12 +54,17 @@ namespace Elements
                         new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 1, damageData.CriticalRate, damageData.CriticalDamageRate));
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * this.ActionExecTimeList[index].Weight / this.ActionWeightSum);
                     double criticalRate = (double)damageData.CriticalRate;
-                    criticalData.ExpectedDamage.ex *= (1 + damageData.CriticalRate * (2f * damageData.CriticalDamageRate - 1));
                     if (num2 <= criticalRate && (double)damageData.CriticalDamageRate != 0.0)
                     {
                         criticalData.IsCritical = true;
-                        criticalData.ExpectedDamage.value = BattleUtil.FloatToInt(criticalData.ExpectedDamage * 2f * damageData.CriticalDamageRate).value;
+                        criticalData.ExpectedDamage *= 1f + FloatWithEx.Binomial(damageData.CriticalRate, true) * (2f * damageData.CriticalDamageRate - 1);
                     }
+                    else
+                    {
+                        criticalData.ExpectedDamage *= 1f + FloatWithEx.Binomial(damageData.CriticalRate, false) * (2f * damageData.CriticalDamageRate - 1);
+                    }
+
+                    criticalData.ExpectedDamage = criticalData.ExpectedDamage.Floor();
                     if (!damageData.IgnoreDef)
                     {
                         switch (damageData.DamageType)

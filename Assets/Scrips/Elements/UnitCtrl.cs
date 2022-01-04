@@ -4405,12 +4405,8 @@ this.updateCurColor();
                 des += value;
                 MainValue = value;
             }
-            if (MainValue.value > 3000)
-            {
-                Console.WriteLine();
-            }
-            MainValue.value = (int)MainValue.value;
-            MainValue.ex = (int)MainValue.ex;
+
+            MainValue = MainValue.Floor();
             ///added script
             PCRCaculator.Guild.UnitAbnormalStateChangeData stateChangeData = new PCRCaculator.Guild.UnitAbnormalStateChangeData();
             //stateChangeData.AbsorberValue = data.AbsorberValue;
@@ -4566,9 +4562,9 @@ this.updateCurColor();
 
         public int CompareLifeValueAscSameRight(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? this.CompareRight(_a, _b) : this.CompareLifeValueAsc(_a, _b);
 
-        public int CompareLifeValueAsc(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _a.Owner.Hp.value.CompareTo(_b.Owner.Hp.value) : 1);
+        public int CompareLifeValueAsc(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _a.Owner.Hp.CompareTo(_b.Owner.Hp) : 1);
 
-        public static int CompareEnergyAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Owner.Energy.value.CompareTo(b.Owner.Energy.value) : 1);
+        public static int CompareEnergyAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Owner.Energy.CompareTo(b.Owner.Energy) : 1);
 
         public int CompareEnergyAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareEnergyAsc(_a, _b);
 
@@ -4580,9 +4576,9 @@ this.updateCurColor();
 
         public int CompareLifeValueDecSameRight(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? this.CompareRight(_a, _b) : this.CompareLifeValueDec(_a, _b);
 
-        public int CompareLifeValueDec(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _b.Owner.Hp.value.CompareTo(_a.Owner.Hp.value) : -1);
+        public int CompareLifeValueDec(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _b.Owner.Hp.CompareTo(_a.Owner.Hp) : -1);
 
-        public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.value.CompareTo(a.Owner.Energy.value) : -1);
+        public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
 
         public int CompareEnergyDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareEnergyDec(_a, _b);
 
@@ -5732,9 +5728,7 @@ this.updateCurColor();
             }
             var a = _damageData.Damage;
             float num1 = 2f * _damageData.CriticalDamageRate;
-            if (_critical)
-                a.value *= num1;
-            a.ex *= (1 + (num1 - 1) * Mathf.Clamp(_damageData.CriticalRate, 0f, 1f));
+            a *= (1 + num1 * FloatWithEx.Binomial(Mathf.Clamp(_damageData.CriticalRate, 0f, 1f), _critical));
             if (this.debuffDamageUpDataList.Count > 0)
                 a *= this.GetDebuffDamageUpValue();
             bool flag1 = false;
@@ -6017,7 +6011,7 @@ this.updateCurColor();
             if (this.OnDamage != null)
                 this.OnDamage(_byAttack, (float)num6, _critical);
             MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
-            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)(num6-num6/num1), num6.ex);
+            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)(num6-num6/num1), num6.Expected);
             this.OnDamageForLoopTrigger.Call<bool, float, bool>(_byAttack, (float)num6, _critical);
             this.OnDamageForLoopRepeat.Call<float>((float)num6);
             this.OnDamageForDivision.Call<bool, float, bool>(_byAttack, Mathf.Min((float)hp, (float)num6), _critical);
