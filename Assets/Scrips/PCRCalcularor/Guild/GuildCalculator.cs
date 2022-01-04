@@ -6,7 +6,9 @@ using Elements.Battle;
 using Elements;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms;
 using Newtonsoft0.Json;
+using Application = UnityEngine.Application;
 
 namespace PCRCaculator.Guild
 {
@@ -125,7 +127,7 @@ namespace PCRCaculator.Guild
         }
 
         private int id = 0;
-        public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount,string describe)
+        public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount,string describe, UnitCtrl ctrl)
         {
             try
             {
@@ -339,7 +341,7 @@ namespace PCRCaculator.Guild
                 foreach (UnitCtrl unitCtrl in a)
                 {
                     int unitid = unitCtrl.UnitId;
-                    AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽");
+                    AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
                     AppendChangeHP(unitid, (float)unitCtrl.Hp / unitCtrl.MaxHp,0, (int)unitCtrl.Hp, 5400, "时间耗尽");
                     AppendChangeTP(unitid, (float)unitCtrl.Energy / BattleDefine.SKILL_ENERGY_MAX, 5400, "时间耗尽");
                     foreach (var changeData in allUnitAbnormalStateDic[unitid])
@@ -737,6 +739,8 @@ namespace PCRCaculator.Guild
         public string skillName;
         public int startTime;
         public int endTime;
+        [JsonIgnore]
+        public FloatWithEx energy;
         public List<UnitActionExecData> actionExecDatas = new List<UnitActionExecData>();
 
         public string GetDescribeA()

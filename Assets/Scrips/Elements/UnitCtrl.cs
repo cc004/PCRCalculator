@@ -6011,7 +6011,7 @@ this.updateCurColor();
             if (this.OnDamage != null)
                 this.OnDamage(_byAttack, (float)num6, _critical);
             MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
-            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)(num6-num6/num1), num6.Expected);
+            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6.Expected);
             this.OnDamageForLoopTrigger.Call<bool, float, bool>(_byAttack, (float)num6, _critical);
             this.OnDamageForLoopRepeat.Call<float>((float)num6);
             this.OnDamageForDivision.Call<bool, float, bool>(_byAttack, Mathf.Min((float)hp, (float)num6), _critical);
@@ -6952,7 +6952,7 @@ this.updateCurColor();
         {
             string des = _state == ActionState.SKILL ? (unitActionController.skillDictionary.TryGetValue(_skillId,out var value)?value.SkillName:"UnknownSkill") : "";
 
-            MyOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount,des);
+            MyOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount,des, this);
             /*switch (UnitId)
             {
                 case 101701:
@@ -8910,6 +8910,8 @@ this.updateCurColor();
             this.CutInFrameSet.SupportSkillUsed = true;
         }
 
+        public FloatWithEx lastEnergyBeforeUB;
+
         public eConsumeResult ConsumeEnergy()
         {
             if ((double)this.Energy < 1000.0)
@@ -8917,6 +8919,7 @@ this.updateCurColor();
             float energy = (float)(0.0 + 1000.0 * (double)(int)this.EnergyReduceRateZero / 100.0);
             if (!this.unitActionController.Skill1IsChargeTime)
             {
+                lastEnergyBeforeUB = Energy.Copy();
                 this.SetEnergy(energy, eSetEnergyType.BY_USE_SKILL);
                 return eConsumeResult.SKILL_OK;
             }
@@ -8924,10 +8927,12 @@ this.updateCurColor();
                 return eConsumeResult.FAILED;
             if (this.unitActionController.Skill1Charging)
             {
+                lastEnergyBeforeUB = Energy.Copy();
                 this.SetEnergy(energy, eSetEnergyType.BY_USE_SKILL);
                 this.unitActionController.Skill1Charging = false;
                 return eConsumeResult.SKILL_RELEASE;
             }
+            lastEnergyBeforeUB = Energy.Copy();
             this.SetEnergy((float)(UnitDefine.MAX_ENERGY - 1), eSetEnergyType.BY_USE_SKILL);
             return eConsumeResult.SKILL_CHARGE;
         }

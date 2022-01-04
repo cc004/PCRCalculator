@@ -771,6 +771,18 @@ namespace Elements
             skillExecData.startTime = BattleHeaderController.CurrentFrameCount;
             skillExecData.unitid = Owner.UnitId;
             skillExecData.UnitName = Owner.UnitName;
+            if (skillId == Owner.UnionBurstSkillId)
+            {
+                if (Owner.UnitId > 199999)
+                {
+
+                }
+                skillExecData.energy = Owner.lastEnergyBeforeUB;
+            }
+            else
+            {
+                skillExecData.energy = Owner.Energy;
+            }
             Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
             //end added Scripts

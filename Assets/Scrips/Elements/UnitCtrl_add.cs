@@ -18,7 +18,7 @@ namespace Elements
         public UnitParameter unitParameter;
         public string UnitName = "";
         public int posIdx;//0-4
-        public Action<int,ActionState, int,string> MyOnChangeState;
+        public Action<int,ActionState, int,string, UnitCtrl> MyOnChangeState;
         public Action<int, PCRCaculator.Guild.UnitAbnormalStateChangeData, int> MyOnAbnormalStateChange;
         public Action<int,float,int, int,int,string> MyOnLifeChanged;
         public Action<int,float, int,string> MyOnTPChanged;
