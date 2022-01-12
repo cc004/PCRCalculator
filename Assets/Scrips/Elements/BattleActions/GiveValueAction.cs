@@ -165,10 +165,10 @@ namespace Elements
                     _addValue[_evalue] = _skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 7:
-                    _addValue[_evalue] = (float)(int)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (float)(int)(FloatWithEx)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 8:
-                    _addValue[_evalue] = (float)(int)_target.Owner.MagicStr * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (float)(int)(FloatWithEx)_target.Owner.MagicStr * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 9:
                     _addValue[_evalue] = (float)(int)_target.Owner.Def * _valueDictionary[eValueNumber.VALUE_2];
@@ -208,13 +208,13 @@ namespace Elements
     {
     }
 
-    private static FloatWithEx calcDamageValue(
+    protected virtual FloatWithEx calcDamageValue(
         UnitCtrl _source,
-        Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+        Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-    private static FloatWithEx calcHpValue(
+    protected virtual FloatWithEx calcHpValue(
         UnitCtrl _source,
-        Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp / _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+        Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
         protected int countUnitNumCompareX(
       List<UnitCtrl> _targetList,
       BasePartsData _source,

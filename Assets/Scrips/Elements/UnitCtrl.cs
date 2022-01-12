@@ -1148,13 +1148,23 @@ namespace Elements
 
         public ObscuredInt Level { get; protected set; }
 
-        public FloatWithEx Hp { get; internal protected set; }
+        private FloatWithEx _hp;
 
+        public FloatWithEx Hp
+        {
+            get => _hp;
+            internal protected set
+            {
+                _hp = value;
+                OnLifeAmmountChange?.Invoke((float)value / MaxHp);
+            }
+        }
+        
         public ObscuredLong MaxHp { get; set; }
 
-        public FloatWithEx Atk { get; set; }
+        public SumFloatWithEx Atk { get; set; }
 
-        public FloatWithEx MagicStr { get; set; }
+        public SumFloatWithEx MagicStr { get; set; }
         private int def;
         public ObscuredInt Def 
         {
@@ -1208,9 +1218,9 @@ namespace Elements
 
         public ObscuredInt MagicCriticalDamageRate { get; set; }
 
-        public FloatWithEx AtkZero => (this.Atk.Max(0f) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ATK));
+        public FloatWithEx AtkZero => (((FloatWithEx)this.Atk).Max(0f) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.ATK));
 
-        public FloatWithEx MagicStrZero => (this.MagicStr.Max(0f) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_STR));
+        public FloatWithEx MagicStrZero => (((FloatWithEx)this.MagicStr).Max(0f) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_STR));
 
         public ObscuredInt DefZero => (int)(Mathf.Max(0, (int)this.Def) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DEF));
 
@@ -1264,6 +1274,8 @@ namespace Elements
                 if (this.EnergyChange == null)
                     return;
                 this.EnergyChange(this);
+                if (unitUI != null)
+                    unitUI.SetTP((float)Energy / UnitDefine.MAX_ENERGY);
             }
         }
 
@@ -1768,14 +1780,14 @@ this.updateCurColor();
             this.StartMagicStr = (ObscuredInt)Mathf.RoundToInt(baseData.Magic_str);
             this.StartMagicDef = (ObscuredInt)Mathf.RoundToInt(baseData.Magic_def);
             this.Def = (ObscuredInt)(StartDef + baseDataEX.Def);
-            this.Atk = (StartAtk + baseDataEX.Atk);
-            this.MagicStr = (StartMagicStr + baseDataEX.Magic_str);
+            this.Atk = (FloatWithEx)(StartAtk + baseDataEX.Atk);
+            this.MagicStr = (FloatWithEx)(StartMagicStr + baseDataEX.Magic_str);
             this.MagicDef = (ObscuredInt)(StartMagicDef + baseDataEX.Magic_def);
 
             if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
             {
                 this.Hp = (long)(this.MaxHp = this.StartMaxHP = (ObscuredLong)99999999);
-                Atk = 1;
+                Atk = (FloatWithEx)1;
                 StartDef = Def = StartMagicDef = MagicDef = group.specialInputValue;
                 Level = PCRCaculator.MainManager.Instance.PlayerSetting.playerLevel;
             }
@@ -2780,8 +2792,6 @@ this.updateCurColor();
             UnitCtrl LIMEKPEENOB = unitCtrl2;
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             this.Energy = energy;
-            if(unitUI!= null)
-                unitUI.SetTP((float)Energy / UnitDefine.MAX_ENERGY);
             MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
             uIManager.LogMessage("TP变更为：" + energy, PCRCaculator.Battle.eLogMessageType.CHANGE_TP, this);
@@ -4454,7 +4464,8 @@ this.updateCurColor();
             }
             Dictionary<BasePartsData, FloatWithEx>.Enumerator enumerator = _value.GetEnumerator();
             while (enumerator.MoveNext())
-                enumerator.Current.Key.SetBuffDebuff(_enable, enumerator.Current.Value, _kind, _source, this.battleLog, _additional);
+                enumerator.Current.Key.SetBuffDebuff(_enable, enumerator.Current.Value, _kind, _source, this.battleLog, _additional,
+                    (_value, enumerator.Current.Key).GetHashCode());
         }
 
         private Color curColor { get; set; }
@@ -5728,7 +5739,7 @@ this.updateCurColor();
             }
             var a = _damageData.Damage;
             float num1 = 2f * _damageData.CriticalDamageRate;
-            a *= (1 + num1 * FloatWithEx.Binomial(Mathf.Clamp(_damageData.CriticalRate, 0f, 1f), _critical));
+            a *= (1 + (num1 - 1) * FloatWithEx.Binomial(Mathf.Clamp(_damageData.CriticalRate, 0f, 1f), _critical));
             if (this.debuffDamageUpDataList.Count > 0)
                 a *= this.GetDebuffDamageUpValue();
             bool flag1 = false;
@@ -5758,37 +5769,36 @@ this.updateCurColor();
                 float num2 = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.CUT_ALL_DAMAGE) / 100f;
                 a *= 1f - num2;
             }
+
+            float execBarrier(float total, float main, float sub)
+            {
+                if (total > sub)
+                    return (Mathf.Log(((total - sub) / main + 1.0f)) * main + sub) / total;
+                return 1f;
+            }
+
             if (_damageData.ActionType == eActionType.ATTACK)
             {
                 if (_damageData.DamageType == DamageData.eDamageType.ATK && this.IsAbnormalState(UnitCtrl.eAbnormalState.LOG_ATK_BARRIR))
                 {
                     float abnormalStateSubValue = this.GetAbnormalStateSubValue(UnitCtrl.eAbnormalStateCategory.LOG_ATK_BARRIR);
-                    if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
-                    {
-                        float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ATK_BARRIR);
-                        var num2 = ((((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)).Log() * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
-                        a *= num2;
-                    }
+                    float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ATK_BARRIR);
+                    a *= _damageData.TotalDamageForLogBarrier.Select(x =>
+                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue));
                 }
                 else if (_damageData.DamageType == DamageData.eDamageType.MGC && this.IsAbnormalState(UnitCtrl.eAbnormalState.LOG_MGC_BARRIR))
                 {
                     float abnormalStateSubValue = this.GetAbnormalStateSubValue(UnitCtrl.eAbnormalStateCategory.LOG_MGC_BARRIR);
-                    if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
-                    {
-                        float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_MGC_BARRIR);
-                        var num2 = ((((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)).Log() * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
-                        a *= num2;
-                    }
+                    float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_MGC_BARRIR);
+                    a *= _damageData.TotalDamageForLogBarrier.Select(x =>
+                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue));
                 }
                 if (this.IsAbnormalState(UnitCtrl.eAbnormalState.LOG_ALL_BARRIR))
                 {
                     float abnormalStateSubValue = this.GetAbnormalStateSubValue(UnitCtrl.eAbnormalStateCategory.LOG_ALL_BARRIR);
-                    if ((double)_damageData.TotalDamageForLogBarrier > (double)abnormalStateSubValue)
-                    {
-                        float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ALL_BARRIR);
-                        var num2 = ((((_damageData.TotalDamageForLogBarrier - abnormalStateSubValue) / abnormalStateMainValue + 1.0f)).Log() * abnormalStateMainValue + abnormalStateSubValue) / _damageData.TotalDamageForLogBarrier;
-                        a *= num2;
-                    }
+                    float abnormalStateMainValue = this.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.LOG_ALL_BARRIR);
+                    a *= _damageData.TotalDamageForLogBarrier.Select(x =>
+                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue));
                 }
             }
             if (_hasEffect)
@@ -5813,6 +5823,7 @@ this.updateCurColor();
                         break;
                 }
             }
+
             var num5 = a.Min(999999f);
             if (this.CurrentState == UnitCtrl.ActionState.DIE)
             {
@@ -5931,8 +5942,7 @@ this.updateCurColor();
             this.Hp = (this.Hp - (num6.Floor() - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
             if (_onDamageHit != null & flag2)
                 _onDamageHit((float)num6);
-            if ((long)this.Hp < 0L)
-                this.Hp = 0L;
+            this.Hp = this.Hp.Max(0f);
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (ObscuredLong)1L;
             if ((long)this.Hp == 0L && (this.IsTough || this.ExecKnightGuard()) && (long)this.Hp == 0L)
@@ -6001,17 +6011,19 @@ this.updateCurColor();
                 }
             }*/
             float NormalizedHP = (float)(long)this.Hp / (float)(long)this.MaxHp;
-            this.OnLifeAmmountChange.Call<float>(NormalizedHP);
+            /*
+            this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
             string des;
 
-            des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
+            des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
+                 + $"-{(int)(100 * Hp.Select(x => x <= 0f ? 1 : 0).Expected)}%";
             MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)this.Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des);
             uIManager.LogMessage(des,PCRCaculator.Battle.eLogMessageType.GET_DAMAGE, this);
             this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
             if (this.OnDamage != null)
                 this.OnDamage(_byAttack, (float)num6, _critical);
             MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
-            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6.Expected);
+            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
             this.OnDamageForLoopTrigger.Call<bool, float, bool>(_byAttack, (float)num6, _critical);
             this.OnDamageForLoopRepeat.Call<float>((float)num6);
             this.OnDamageForDivision.Call<bool, float, bool>(_byAttack, Mathf.Min((float)hp, (float)num6), _critical);
@@ -6037,7 +6049,8 @@ this.updateCurColor();
                         this.SetState(UnitCtrl.ActionState.DIE);
                 }
             }
-            string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
+            string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害") + 
+                              $"-{(int)(100 * Hp.Select(x => x <= 0f ? 1 : 0).Expected)}%";
             callBack?.Invoke(describe);
             return num6.Floor();
         }
@@ -6326,7 +6339,7 @@ this.updateCurColor();
                 int actionId = this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.INHIBIT_HEAL].ActionId;
                 Skill _skill = skill;
                 this.SetDamage(_damageData, false, actionId, _skill: _skill);
-                action?.Invoke("毒奶，对目标造成" + _damageData.Damage + "点伤害");
+                action?.Invoke("毒奶，对目标造成" + _damageData.Damage + $"点伤害-{(int)(100 * Hp.Select(x => x <= 0f ? 1 : 0).Expected)}%");
             }
             else
             {
@@ -6357,7 +6370,8 @@ this.updateCurColor();
                     this.OnLifeAmmountChange.Call<float>(NormalizedHP);
                 }*/
                 float NormalizedHP = (float)(long)this.Hp / (float)(long)this.MaxHp;
-                this.OnLifeAmmountChange.Call<float>(NormalizedHP);
+                /*
+                this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des = "目标HP回复<color=#54FF4F>" + _value + "</color>点";
                 action?.Invoke(des);
                 MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp,0, BattleHeaderController.CurrentFrameCount,des);
@@ -9082,7 +9096,17 @@ this.updateCurColor();
         {
             get
             {
-                if ((this.battleManager.BattleCategory == eBattleCategory.DUNGEON || this.battleManager.BattleCategory == eBattleCategory.TOWER || (this.battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL || this.battleManager.BattleCategory == eBattleCategory.TOWER_EX) || (this.battleManager.BattleCategory == eBattleCategory.TOWER_REPLAY || this.battleManager.BattleCategory == eBattleCategory.TOWER_EX_REPLAY || this.battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER) ? 1 : (this.battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY ? 1 : 0)) != 0 && !this.StandByDone || this.battleManager.IsSpecialBattle && (double)this.battleManager.ActionStartTimeCounter > 0.0 || 
+                if ((this.battleManager.BattleCategory == eBattleCategory.DUNGEON ||
+                     this.battleManager.BattleCategory == eBattleCategory.TOWER ||
+                     (this.battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL ||
+                      this.battleManager.BattleCategory == eBattleCategory.TOWER_EX) ||
+                     (this.battleManager.BattleCategory == eBattleCategory.TOWER_REPLAY ||
+                      this.battleManager.BattleCategory == eBattleCategory.TOWER_EX_REPLAY ||
+                      this.battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER)
+                        ? 1
+                        : (this.battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY ? 1 : 0)) != 0 &&
+                    !this.StandByDone || this.battleManager.IsSpecialBattle &&
+                    (double) this.battleManager.ActionStartTimeCounter > 0.0 || 
                     (this.battleManager.LOGNEDLPEIJ || this.skillTargetList.Count == 0 || (this.battleManager.GameState != eBattleGameState.PLAY || !this.battleManager.GetAdvPlayed())) || this.ModeChangeEnd)
                     return false;
                 /*switch (this.battleManager.GetPurpose())
@@ -9093,7 +9117,17 @@ this.updateCurColor();
                             return false;
                         break;
                 }*/
-                return this.ToadDatas.Count <= 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.UB_SILENCE) && !this.UbIsDisableByChangePattern && ((this.CurrentState != UnitCtrl.ActionState.SKILL_1 || this.unitActionController.Skill1IsChargeTime) && (!this.IsUnableActionState() && this.CurrentState != UnitCtrl.ActionState.DAMAGE)) && (this.UnionBurstSkillId != 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && (!this.IsDead && this.CurrentState != UnitCtrl.ActionState.DIE) && (!this.IsConfusionOrConvert() && (long)this.Hp > 0L && (!this.isAwakeMotion && !this.unitActionController.DisableUBByModeChange))) && ((double)this.Energy >= 1000.0 && this.SkillLevels[this.UnionBurstSkillId] != 0 && !this.GetIsReduceEnergy()) && this.battleManager.LAMHAIODABF == 0;
+                return this.ToadDatas.Count <= 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.UB_SILENCE) &&
+                       !this.UbIsDisableByChangePattern &&
+                       ((this.CurrentState != UnitCtrl.ActionState.SKILL_1 ||
+                         this.unitActionController.Skill1IsChargeTime) &&
+                        (!this.IsUnableActionState() && this.CurrentState != UnitCtrl.ActionState.DAMAGE)) &&
+                       (this.UnionBurstSkillId != 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) &&
+                        (!this.IsDead && this.CurrentState != UnitCtrl.ActionState.DIE) &&
+                        (!this.IsConfusionOrConvert() && (long) this.Hp > 0L &&
+                         (!this.isAwakeMotion && !this.unitActionController.DisableUBByModeChange))) &&
+                       ((double) this.Energy >= 1000.0 && this.SkillLevels[this.UnionBurstSkillId] != 0 &&
+                        !this.GetIsReduceEnergy()) && this.battleManager.LAMHAIODABF == 0;
                 //return this.ToadDatas.Count <= 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.UB_SILENCE) && (this.CurrentState != UnitCtrl.ActionState.SKILL_1 || this.unitActionController.Skill1IsChargeTime) && (!this.IsUnableActionState() && this.CurrentState != UnitCtrl.ActionState.DAMAGE && (this.UnionBurstSkillId != 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE))) && (!this.IsDead && this.CurrentState != UnitCtrl.ActionState.DIE && (!this.IsConfusionOrConvert() && (long)this.Hp > 0L) && (!this.isAwakeMotion && !this.unitActionController.DisableUBByModeChange && ((double)this.Energy >= 1000.0 && this.SkillLevels[this.UnionBurstSkillId] != 0))) && !this.GetIsReduceEnergy() && this.battleManager.LAMHAIODABF == 0;
             }
         }

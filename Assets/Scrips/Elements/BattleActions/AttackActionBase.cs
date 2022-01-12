@@ -8,6 +8,7 @@ using Cute;
 using Elements.Battle;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using UnityEngine;
 
 namespace Elements
@@ -130,6 +131,7 @@ namespace Elements
           Skill _skill,
           eActionType _actionType)
         {
+
             bool flag = this.judgeIsPhysical(_actionDetail1);
             FloatWithEx num1;
             int num2;

@@ -153,7 +153,7 @@ namespace Elements
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
-          bool _additional)
+          bool _additional, int hash)
         {
             if (!_enable)
                 _value = _value * -1f;
@@ -178,7 +178,7 @@ namespace Elements
                 {
                     case UnitCtrl.BuffParamKind.ATK:
                         UnitCtrl owner2 = this.Owner;
-                        owner2.Atk = (owner2.Atk + _value);
+                        owner2.Atk = owner2.Atk.Sum(hash, _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         UnitCtrl owner3 = this.Owner;
@@ -188,7 +188,7 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
                         UnitCtrl owner4 = this.Owner;
-                        owner4.MagicStr = (owner4.MagicStr + _value);
+                        owner4.MagicStr = owner4.MagicStr.Sum(hash,  _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         UnitCtrl owner5 = this.Owner;

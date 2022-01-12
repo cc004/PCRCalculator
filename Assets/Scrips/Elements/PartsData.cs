@@ -41,9 +41,9 @@ namespace Elements
 
         public int Level { get; protected set; }
 
-        public FloatWithEx Atk { get; protected set; }
+        public SumFloatWithEx Atk { get; protected set; }
 
-        public FloatWithEx MagicStr { get; protected set; }
+        public SumFloatWithEx MagicStr { get; protected set; }
 
         public ObscuredInt Def { get; protected set; }
 
@@ -156,9 +156,9 @@ namespace Elements
             }
             else
             {*/
-            this.Atk = (int)(this.StartAtk = (ObscuredInt)data.baseData.Atk);
+            this.Atk = (FloatWithEx)(int)(this.StartAtk = (ObscuredInt)data.baseData.Atk);
             this.Def = this.StartDef = (ObscuredInt)data.baseData.Def;
-            this.MagicStr = (int)(this.StartMagicStr = (ObscuredInt)data.baseData.Magic_str);
+            this.MagicStr = (FloatWithEx)(int)(this.StartMagicStr = (ObscuredInt)data.baseData.Magic_str);
             this.MagicDef = this.StartMagicDef = (ObscuredInt)data.baseData.Magic_def;
             this.PhysicalCritical = this.StartPhysicalCritical = (ObscuredInt)data.baseData.Physical_critical;
             this.MagicCritical = this.StartMagicCritical = (ObscuredInt)data.baseData.Magic_critical;
@@ -197,9 +197,9 @@ namespace Elements
 
         private int getDodgeZero() => Mathf.Max(0, (int)this.Dodge) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
 
-        public override int GetAtkZero() => Mathf.Max(0, (int)this.Atk) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
+        public override int GetAtkZero() => Mathf.Max(0, (int)(FloatWithEx)this.Atk) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
 
-        public override int GetMagicStrZero() => Mathf.Max(0, (int)this.MagicStr) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override int GetMagicStrZero() => Mathf.Max(0, (int)(FloatWithEx)this.MagicStr) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
 
         public override int GetAccuracyZero() => Mathf.Max(0, (int)this.Accuracy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
 
@@ -247,7 +247,7 @@ namespace Elements
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
-          bool _additional)
+          bool _additional, int hash)
         {
             if (!_enable)
                 _value = _value * -1f;
@@ -271,13 +271,13 @@ namespace Elements
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
-                        this.Atk = (this.Atk + _value);
+                        this.Atk = this.Atk.Sum(hash, _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         this.Def = (int)((int)this.Def + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
-                        this.MagicStr = (this.MagicStr + _value);
+                        this.MagicStr = this.MagicStr.Sum(hash, _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         this.MagicDef = (int)((int)this.MagicDef + _value);

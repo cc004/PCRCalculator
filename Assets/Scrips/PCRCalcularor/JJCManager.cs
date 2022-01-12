@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,8 +8,6 @@ using System.IO;
 
 namespace PCRCaculator
 {
-
-
     public class JJCManager : MonoBehaviour
     {
         public static JJCManager Instance;
@@ -91,6 +90,14 @@ namespace PCRCaculator
         }
         private void LoadAddedPlayerData()
         {
+            try
+            {
+                players = SaveManager.Load<List<AddedPlayerData>>();
+                return;
+            }
+            catch
+            {
+            }
             string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Battle/AddedPlayerList.json";
             if (File.Exists(filePath))
             {
@@ -135,15 +142,7 @@ namespace PCRCaculator
         }
         private void SaveDataToJson()
         {
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Battle/AddedPlayerList.json";
-            if (!Directory.Exists(PCRCaculator.MainManager.GetSaveDataPath() + "/Battle"))
-            {
-                Directory.CreateDirectory(PCRCaculator.MainManager.GetSaveDataPath() + "/Battle");
-            }
-            string saveJsonStr = JsonConvert.SerializeObject(players);
-            StreamWriter sw = new StreamWriter(filePath);
-            sw.Write(saveJsonStr);
-            sw.Close();
+            SaveManager.Save(players);
         }
     }
 

@@ -15,6 +15,7 @@ using PCRCaculator;
 using PCRCaculator.Guild;
 using System.Text.RegularExpressions;
 using System.Drawing;
+using OfficeOpenXml.Drawing;
 
 namespace ExcelHelper
 {
@@ -129,7 +130,7 @@ namespace ExcelHelper
 
             ofn.maxFileTitle = ofn.fileTitle.Length;
 
-            ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
+            //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
 
             ofn.title = "打开Excel";
 
@@ -291,7 +292,7 @@ namespace ExcelHelper
 
                 //ofn.fileTitle = "B1狼狗智克yls200w";
 
-                ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
+                //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
 
                 ofn.title = "选择保存路径";
 
@@ -1018,7 +1019,7 @@ namespace ExcelHelper
             ofn.maxFile = ofn.file.Length;
             ofn.fileTitle = new string(new char[64]);
             ofn.maxFileTitle = ofn.fileTitle.Length;
-            ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
+            //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
             ofn.title = "打开Excel";
             ofn.defExt = "xlsx";
             ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
@@ -1054,7 +1055,7 @@ namespace ExcelHelper
 
             }
         }
-        private static void MySetValue(this ExcelWorksheet worksheet,int posx,int posy,string value,
+        public static void MySetValue(this ExcelWorksheet worksheet,int posx,int posy,string value,
             int size=11,bool centre = true,bool blod = false,int[] fontColor=null,int[] backColor=null)
         {
             worksheet.Cells[posx,posy].Style.Font.Size = size; //字体大小
@@ -1097,7 +1098,7 @@ namespace ExcelHelper
             }
         }
 
-        public static void InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit,float widthCount,float hightCount)
+        public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit,float widthCount,float hightCount)
         {
             using (var image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
             {
@@ -1121,9 +1122,11 @@ namespace ExcelHelper
                 picture.SetPosition(rowNum - 1, rowOffsetPixels, columnNum - 1, columnOffsetPixels);*/
                 picture.SetSize(cellColumnWidthInPix, cellColumnWidthInPix);
                 picture.SetPosition(rowNum-1 , 0, columnNum-1 , 0);
-                
 
+
+                return picture;
             }
+
         }
         /// <summary>
         /// 获取自适应调整后的图片尺寸

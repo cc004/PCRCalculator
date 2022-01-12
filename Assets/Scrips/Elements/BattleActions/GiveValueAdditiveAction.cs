@@ -12,7 +12,16 @@ namespace Elements
 {
   public class GiveValueAdditiveAction : GiveValueAction
   {
-    protected override void setValue(
+
+      protected override FloatWithEx calcDamageValue(
+          UnitCtrl _source,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) * _valueDictionary[eValueNumber.VALUE_2];
+
+      protected override FloatWithEx calcHpValue(
+          UnitCtrl _source,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp * _valueDictionary[eValueNumber.VALUE_2];
+
+        protected override void setValue(
       Dictionary<eValueNumber, FloatWithEx> _value,
       ActionParameter _action)
     {

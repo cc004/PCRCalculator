@@ -564,6 +564,8 @@ namespace PCRCaculator.Guild
             SettingToggles[8].isOn = SettingData.useSkillEffects;
             SettingInputs[4].text = SettingData.skillEffeckFix + "";
             SettingInputs[5].text = SettingData.limitTime.ToString();
+            SettingInputs[6].text = SettingData.author;
+            SettingInputs[7].text = SettingData.format;
         }
         public void ReflashCalcUI()
         {
@@ -602,10 +604,21 @@ namespace PCRCaculator.Guild
             SettingData.useSkillEffects = SettingToggles[8].isOn;
             SettingData.skillEffeckFix = float.Parse(SettingInputs[4].text);
             SettingData.limitTime = int.Parse(SettingInputs[5].text);
+            SettingData.author = SettingInputs[6].text;
+            SettingData.format = SettingInputs[7].text;
             SaveDataToJson();
         }
         private static void LoadAddedPlayerData()
         {
+            try
+            {
+                staticsettingData = SaveManager.Load<GuildSettingData>();
+                return;
+            }
+            catch
+            {
+
+            }
             string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Guild/GuildSettingData.json";
             if (File.Exists(filePath))
             {
@@ -962,15 +975,7 @@ namespace PCRCaculator.Guild
 
         public static void SaveSettingData(GuildSettingData settingData)
         {
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Guild/GuildSettingData.json";
-            if (!Directory.Exists(PCRCaculator.MainManager.GetSaveDataPath() + "/Guild"))
-            {
-                Directory.CreateDirectory(PCRCaculator.MainManager.GetSaveDataPath() + "/Guild");
-            }
-            string saveJsonStr = JsonConvert.SerializeObject(settingData);
-            StreamWriter sw = new StreamWriter(filePath);
-            sw.Write(saveJsonStr);
-            sw.Close();
+            SaveManager.Save(settingData);
         }
 
 
@@ -1051,7 +1056,7 @@ namespace PCRCaculator.Guild
         public float skillEffeckFix = 35;
         public int limitTime = 90;
         //public bool[] unlockGuilds = new bool[12] { false, false, false, true, true, true, true, false, false, false, false, false };
-
+        public string author = "", format = "m:ss";
         public GuildSettingData() { }
         public GuildSettingData(bool createNew)
         {

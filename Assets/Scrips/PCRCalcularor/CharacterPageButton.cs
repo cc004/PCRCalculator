@@ -19,7 +19,7 @@ namespace PCRCaculator
         public ButtonType buttonType = ButtonType.typeA;
         public bool showPosition;//是否显示位置图标
         public Stars stars;
-        public Text levelText;
+        public Text levelText, hpPercent, tpPercent;
         public TextMeshProUGUI levelText_B;
         public Image characterImage;
         public List<Sprite> backgrounds;//0-4
@@ -213,6 +213,7 @@ namespace PCRCaculator
         public void SetHP(float normalizedHPRate)
         {
             HPSlider.value = normalizedHPRate;
+            hpPercent.text = $"{normalizedHPRate:P2}";
             if (normalizedHPRate <= 0)
             {
                 SetDie();
@@ -221,6 +222,7 @@ namespace PCRCaculator
         public void SetTP(float normalizedTPRate)
         {
             TPSlider.value = normalizedTPRate;
+            tpPercent.text = $"{normalizedTPRate:P2}";
             if (normalizedTPRate >= 1)
             {
                 TPFillImage.color = TPFullColor;
