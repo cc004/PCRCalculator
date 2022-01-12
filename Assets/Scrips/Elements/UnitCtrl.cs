@@ -2794,7 +2794,7 @@ this.updateCurColor();
             this.Energy = energy;
             MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
-            uIManager.LogMessage("TP变更为：" + energy, PCRCaculator.Battle.eLogMessageType.CHANGE_TP, this);
+            uIManager.LogMessage("TP变更为：" + energy + $"-{Energy.Probability(x => x >= 1000f):P0}", PCRCaculator.Battle.eLogMessageType.CHANGE_TP, this);
         }
 
         public void IndicateSkillName(string _skillName) 
@@ -5942,7 +5942,6 @@ this.updateCurColor();
             this.Hp = (this.Hp - (num6.Floor() - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
             if (_onDamageHit != null & flag2)
                 _onDamageHit((float)num6);
-            this.Hp = this.Hp.Max(0f);
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (ObscuredLong)1L;
             if ((long)this.Hp == 0L && (this.IsTough || this.ExecKnightGuard()) && (long)this.Hp == 0L)
@@ -6016,7 +6015,7 @@ this.updateCurColor();
             string des;
 
             des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
-                 + $"-{(int)(100 * Hp.Select(x => x <= 0f ? 1 : 0).Expected)}%";
+                + $"-{Hp.Probability(x => x <= 0f):P0}";
             MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)this.Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des);
             uIManager.LogMessage(des,PCRCaculator.Battle.eLogMessageType.GET_DAMAGE, this);
             this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
@@ -6049,8 +6048,8 @@ this.updateCurColor();
                         this.SetState(UnitCtrl.ActionState.DIE);
                 }
             }
-            string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害") + 
-                              $"-{(int)(100 * Hp.Select(x => x <= 0f ? 1 : 0).Expected)}%";
+            string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
+                                + $"-{Hp.Probability(x => x <= 0f):P0}";
             callBack?.Invoke(describe);
             return num6.Floor();
         }
@@ -6339,7 +6338,7 @@ this.updateCurColor();
                 int actionId = this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.INHIBIT_HEAL].ActionId;
                 Skill _skill = skill;
                 this.SetDamage(_damageData, false, actionId, _skill: _skill);
-                action?.Invoke("毒奶，对目标造成" + _damageData.Damage + $"点伤害-{(int)(100 * Hp.Select(x => x <= 0f ? 1 : 0).Expected)}%");
+                action?.Invoke("毒奶，对目标造成" + _damageData.Damage + $"点伤害-{Hp.Probability(x => x <= 0f):P0}");
             }
             else
             {
@@ -6425,7 +6424,7 @@ this.updateCurColor();
             if (this.IsAbnormalState(UnitCtrl.eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
             var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)(((double)(int)this.EnergyRecoveryRateZero + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
-            action?.Invoke("目标能量增加<color=#4C5FFF>" + num + "</color>点");
+            action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点-{Energy.Probability(x => x >= 1000f):P0}");
             this.SetEnergy(this.Energy + num, _setEnergyType, _source);
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_hasNumberEffect)
@@ -8933,7 +8932,7 @@ this.updateCurColor();
             float energy = (float)(0.0 + 1000.0 * (double)(int)this.EnergyReduceRateZero / 100.0);
             if (!this.unitActionController.Skill1IsChargeTime)
             {
-                lastEnergyBeforeUB = Energy.Copy();
+                lastEnergyBeforeUB = Energy;
                 this.SetEnergy(energy, eSetEnergyType.BY_USE_SKILL);
                 return eConsumeResult.SKILL_OK;
             }
@@ -8941,12 +8940,12 @@ this.updateCurColor();
                 return eConsumeResult.FAILED;
             if (this.unitActionController.Skill1Charging)
             {
-                lastEnergyBeforeUB = Energy.Copy();
+                lastEnergyBeforeUB = Energy;
                 this.SetEnergy(energy, eSetEnergyType.BY_USE_SKILL);
                 this.unitActionController.Skill1Charging = false;
                 return eConsumeResult.SKILL_RELEASE;
             }
-            lastEnergyBeforeUB = Energy.Copy();
+            lastEnergyBeforeUB = Energy;
             this.SetEnergy((float)(UnitDefine.MAX_ENERGY - 1), eSetEnergyType.BY_USE_SKILL);
             return eConsumeResult.SKILL_CHARGE;
         }

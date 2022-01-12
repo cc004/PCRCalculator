@@ -32,7 +32,7 @@ namespace Elements
             {
                 adds.Remove(hash);
 
-                if (x.notpure)
+                if (!x.pure)
                     return adds.Aggregate<KeyValuePair<int, FloatWithEx>, SumFloatWithEx>(@base, 
                         (current, val) => current.Sum(val.Key, val.Value));
             }
@@ -43,34 +43,14 @@ namespace Elements
         }
     }
 
-    public struct FloatWithEx : IComparable<FloatWithEx>, IEquatable<FloatWithEx>
+    public class FloatWithEx : IComparable<FloatWithEx>, IEquatable<FloatWithEx>
     {
-
-        internal bool notpure;
-        private float value;
-        private float ex;
-        private Func<float, float> selector;
-        private double[] distribution;
-        private float min, max;
-        private const int N = 100;
-        private HashSet<FloatWithEx> sums;
-
-        public FloatWithEx Copy()
-        {
-            var result = new FloatWithEx();
-            result.notpure = notpure;
-            result.value = value;
-            result.selector = selector;
-            result.ex = ex;
-            if (distribution != null)
-            {
-                result.max = max;
-                result.min = min;
-                result.distribution = new double[N];
-                Buffer.BlockCopy(distribution, 0, result.distribution, 0, N * sizeof(double));
-            }
-            return result;
-        }
+        internal bool pure => avg2 == avg * avg;
+        private float value, avg;
+        private double avg2;
+        private Func<float> root;
+        
+        private static System.Random rand = new System.Random();
 
         public static FloatWithEx Binomial(float p, bool val)
         {
@@ -80,114 +60,122 @@ namespace Elements
             var result = new FloatWithEx
             {
                 value = val ? 1 : 0,
-                ex = p,
-                min = 0,
-                max = 1,
-                notpure = true,
-                distribution = new double[N]
+                avg = p,
+                avg2 = p,
+                root = () => rand.NextDouble() < p ? 1 : 0
             };
-            result.distribution[0] = 1 - p;
-            result.distribution[N - 1] = p;
             return result;
         }
-        
+
+
         public FloatWithEx Select(Func<float, float> selector)
         {
-            if (!notpure)
-                return (float)selector(value);
-            var result = Copy();
-            var last = result.selector;
-            result.selector = result.selector == null ? selector : x => selector(last(x));
-            if (result.selector(max) == result.selector(min))
-                return (float) result;
-            return result;
+            if (pure) return selector(value);
+            double x = selector((float)Math.Sqrt(avg2));
+            return new FloatWithEx
+            {
+                value = selector(value),
+                avg = selector(avg),
+                avg2 = x * x,
+                root = () => selector(root())
+            };
         }
+
+        private static FloatWithEx Default = 0f;
 
         private static FloatWithEx Op(FloatWithEx a, FloatWithEx b,
-            Func<float, float, float> op)
+            Func<float, float, float> op,
+            Func<FloatWithEx, FloatWithEx, double> op2)
         {
-            if (!a.notpure) return b.Select(x => op(a.value, x));
-            if (!b.notpure) return a.Select(x => op(x, b.value));
-            var result = new FloatWithEx();
-            var sela = a.selector ?? (x => x);
-            var selb = b.selector ?? (x => x);
-            result.notpure = true;
-            var edge = new float[]
-            {
-                op(sela(a.min), selb(b.min)),
-                op(sela(a.min), selb(b.max)),
-                op(sela(a.max), selb(b.min)),
-                op(sela(a.max), selb(b.max))
-            };
-            result.min = Mathf.Min(edge);
-            result.max = Mathf.Max(edge);
-            result.value = op(sela(a.value), selb(b.value));
-            result.ex = op(sela(a.ex), selb(b.ex));
-            result.distribution = new double[N];
-            for (int i = 0; i < N; ++i)
-            for (int j = 0; j < N; ++j)
-            {
-                var vala = sela((a.max - a.min) * i / (N - 1) + a.min);
-                var valb = selb((b.max - b.min) * j / (N - 1) + b.min);
-                var index = Mathf.RoundToInt((op(vala, valb) - result.min) / (result.max - result.min) * (N - 1));
-                if (index > N - 1 || index < 0)
-                {
+            a = a ?? Default;
+            b = b ?? Default;
+            var vala = a.value;
+            var valb = b.value;
 
-                }
-                result.distribution[index] += a.distribution[i] * b.distribution[j];
+            if (a.pure)
+            {
+                if (b.pure)
+                    return op(a.value, b.value);
+                else
+                    return new FloatWithEx
+                    {
+                        value = op(vala, b.value),
+                        avg = op(vala, b.avg),
+                        avg2 = op2(a, b),
+                        root = () => op(vala, b.root())
+                    };
             }
-
-            var aa = result.distribution.Sum();
-            return result;
+            else if (b.pure)
+                return new FloatWithEx
+                {
+                    value = op(a.value, valb),
+                    avg = op(a.avg, valb),
+                    avg2 = op2(a, b),
+                    root = () => op(a.root(), valb)
+                };
+            else
+                return new FloatWithEx
+                {
+                    value = op(a.value, b.value),
+                    avg = op(a.avg, b.avg),
+                    avg2 = op2(a, b),
+                    root = () => (op(a.root(), b.root()))
+                };
         }
-        
-        public float Expect => (float)(selector?.Invoke(ex) ?? ex);
+
+        public float Expect => avg;
+        private float expectedCache = float.NaN;
         public float Expected
         {
             get
             {
-                var selector = this.selector ?? (x => x);
-                if (!notpure) return (float)selector(value);
-                var s = 0.0;
-                for (var i = 0; i < N; ++i)
-                {
-                    var val = selector((max - min) * i / (N - 1) + min);
-                    s += distribution[i] * val;
-                }
-                return (float)s;
+                return avg;
             }
         }
-
-        public float Stddev
+        private static double Rand(double u, double d)
         {
-            get
+            double u1, u2, z, x;
+            if (d <= 0)
             {
-                var selector = this.selector ?? (x => x);
-                if (!notpure) return 0f;
-                var s = 0.0;
-                for (var i = 0; i < N; ++i)
-                {
-                    var x = selector((max - min) * i / (N - 1) + min);
-                    s += distribution[i] * x * x;
-                }
 
-                var avg = Expected;
-                return Mathf.Sqrt((float)s - avg * avg);
+                return u;
             }
+            u1 = rand.NextDouble();
+            u2 = rand.NextDouble();
+
+            z = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
+
+            x = u + d * z;
+            return x;
+
         }
-        
-        public static implicit operator float(FloatWithEx self) => (float)(self.selector == null ? self.value : self.selector(self.value));
-        public static implicit operator FloatWithEx(float x) => new FloatWithEx { value = x, ex = x };
+        public float Probability(Func<float, bool> predict)
+        {
+            const int N = 1000;
+            int s = 0;
+            for (int i = 0; i < N; ++i)
+                if (predict((float)Rand(avg, Stddev))) ++s;
+            return (float)s / N;
+        }
+
+        public double Stddev => Math.Sqrt(Math.Max(0, avg2 - avg * avg));
+
+        public static implicit operator float(FloatWithEx self) => self.value;
+        public static implicit operator FloatWithEx(float x) => new FloatWithEx
+        { 
+            value = x, avg = x,
+            root = () => x, avg2 = x * x
+        };
         public FloatWithEx Log() => Select(Mathf.Log);
         public FloatWithEx Max(float f) => Select(x => Mathf.Max(x, f));
         public FloatWithEx Min(float f) => Select(x => Mathf.Min(x, f));
-        public override string ToString() => notpure ? $"{(int)(float)this}[{(int)Expected}]" : ((int)(float)this).ToString();
+        public override string ToString() => pure ? ((int)(float)this).ToString() : $"{(int)(float)this}[{(int)Expect}±{(int)Stddev}]";
         public FloatWithEx Floor() => Select(Mathf.Floor);
         public int CompareTo(FloatWithEx other) => ((float)this).CompareTo(other);
-        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y);
-        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y);
-        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x * y);
-        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x / y);
+        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y, (x, y) => x.avg2 + y.avg2 + 2 * x.avg * y.avg);
+        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y, (x, y) => x.avg2 + y.avg2 - 2 * x.avg * y.avg);
+        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x * y, (x, y) => x.avg2 * y.avg2);
+        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x / y, (x, y) => x.avg2 / y.avg2);
 
         public bool Equals(FloatWithEx other)
         {
