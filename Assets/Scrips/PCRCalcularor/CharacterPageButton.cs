@@ -37,8 +37,7 @@ namespace PCRCaculator
         public Vector3 buffUIAddPos;
         public SkillUI skillUI;
         public RectTransform ScreenShotTrans;
-
-        private UnitCtrl owner;
+        
         private Elements.UnitCtrl owner2;
         private BattleUIManager uIManager;
         //private List<eStateIconType> currentBuffs = new List<eStateIconType>();
@@ -153,31 +152,6 @@ namespace PCRCaculator
                     levelText_B.gameObject.SetActive(false);
 
             }
-        }
-        public void SetButton(UnitCtrl unitCtrl)
-        {
-            if(buttonType== ButtonType.typeC)
-            {
-                SetButton(unitCtrl.UnitData);
-
-                this.owner = unitCtrl;
-                uIManager = BattleUIManager.Instance;
-                //owner.OnChangeState += SetAbnormalIcons;
-                //SetAbnormalIcons(owner, eStateIconType.NONE, false);
-                SetHPAndTP(1, 0);
-
-            }
-            else if (buttonType == ButtonType.typeD)
-            {
-                SetButton(unitCtrl.UnitData);
-                backImage.gameObject.SetActive(unitCtrl.UnitData.unitId<=200000);
-            }
-            else
-            {
-                Debug.LogError("按钮样式错误！");
-                return;
-            }
-            
         }
         public void SetButton(Elements.UnitCtrl unitCtrl)
         {

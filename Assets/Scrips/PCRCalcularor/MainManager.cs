@@ -43,8 +43,6 @@ namespace PCRCaculator
         private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
         private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
         private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
-        private Dictionary<int, Dictionary<string, Elements.FirearmCtrlData>> allUnitFirearmDatas;//所有角色的技能特效数据
-        private Dictionary<int, Elements.UnitActionControllerData> allUnitActionControllerDatas;//所有角色的战斗初始化数据
         private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
         private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
         private Dictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic = new Dictionary<int, UniqueEquipmentData>();//角色专武字典
@@ -91,8 +89,6 @@ namespace PCRCaculator
         public TextMeshProUGUI PlayerLevelText { get => BaseBackManager.Instance.playerLevelText; }
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
-        public Dictionary<int, Dictionary<string, FirearmCtrlData>> AllUnitFirearmDatas { get => allUnitFirearmDatas; }
-        public Dictionary<int, UnitActionControllerData> AllUnitActionControllerDatas { get => allUnitActionControllerDatas;}
         public Dictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => allUnitSkillTimeDataDic;}
         public bool IsGuildBattle { get => isGuildBattle;}
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
@@ -467,41 +463,6 @@ namespace PCRCaculator
         {
             message = "";
             bool result = true;
-            return result;
-            foreach(UnitData a in PlayerDataForBattle)
-            {
-                UnitRarityData unitRarity = UnitRarityDic[a.unitId];
-                foreach (int skillid in unitRarity.skillData.GetSkillList(a))
-                {
-                    foreach(int actionid in SkillDataDic[skillid].skillactions)
-                    {
-                        SkillAction skillAction = SkillActionDic[actionid];                        
-                        Battle.ActionParameter ac = Battle.BattleDefine.GetActionParameterByActionType((Battle.eActionType)skillAction.type, out bool success);
-                        if (!success)
-                        {
-                            result = false;
-                            message += unitRarity.unitName + "的技能片段" + actionid + "的" + ((Battle.eActionType)skillAction.type).GetDescription() + "没有做好！\n";
-                        }
-                    }
-                }
-            }
-            foreach (UnitData a in EnemyDataForBattle)
-            {
-                UnitRarityData unitRarity = UnitRarityDic[a.unitId];
-                foreach (int skillid in unitRarity.skillData.GetSkillList(a))
-                {
-                    foreach (int actionid in SkillDataDic[skillid].skillactions)
-                    {
-                        SkillAction skillAction = SkillActionDic[actionid];
-                        Battle.ActionParameter ac = Battle.BattleDefine.GetActionParameterByActionType((Battle.eActionType)skillAction.type, out bool success);
-                        if (!success)
-                        {
-                            result = false;
-                            message += unitRarity.unitName + "的技能片段" + actionid + "的" + ((Battle.eActionType)skillAction.type).GetDescription() + "没有做好！\n";
-                        }
-                    }
-                }
-            }
             return result;
         }
         public bool JudgeWeatherShowThisUnit(int unitid)

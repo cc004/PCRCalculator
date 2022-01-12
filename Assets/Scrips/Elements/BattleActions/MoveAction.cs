@@ -263,5 +263,10 @@ namespace Elements
       ABSOLUTE_MOVE_BY_VELOCITY = 6,
       ABSOLUTE_MOVE_DONOT_USE_DIRECTION = 7,
     }
+
+    public static object GetActionDescription(int detail)
+    {
+        throw new NotImplementedException();
+    }
   }
 }

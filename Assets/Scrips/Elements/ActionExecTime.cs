@@ -9,15 +9,11 @@ using System;
 namespace Elements
 {
     [Serializable]
-    public class ActionExecTime : ICopyAble<ActionExecTime>
+    public class ActionExecTime
     {
         public float Time;
         public eDamageEffectType DamageNumType;
         public float Weight = 1f;
         public float DamageNumScale = 1f;
-        public ActionExecTime CopyThis()
-        {
-            return this;
-        }
     }
 }

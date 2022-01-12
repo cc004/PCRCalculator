@@ -19,22 +19,14 @@ namespace PCRCaculator.Battle
         private IEnumerator FollowUnit(Transform transform)
         {
             float castTime = 1;
-            bool k = BattleManager.Instance == null;
             while (castTime >= 0)
             {
                 //Vector3 pos = posFix + 18 * transform.position;
                 Vector3 pos = posFix + Camera.main.WorldToScreenPoint(transform.position);
                 pos.z = 0;
                 this.transform.position = pos;
-
-                if (k)
-                {
+                
                     castTime -= Elements.BattleHeaderController.Instance.IsPaused ? 0 : Time.deltaTime;
-                }
-                else
-                {
-                    castTime -= BattleManager.Instance.DeltaTimeForPause;
-                }
                 
                 yield return null;
             }

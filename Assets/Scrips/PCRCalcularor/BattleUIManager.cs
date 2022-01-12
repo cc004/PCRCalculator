@@ -81,7 +81,6 @@ namespace PCRCaculator.Battle
 
         private long fpsCount = 0;
         private float timeCount = 0;
-        private BattleManager battleManager=> BattleManager.Instance;
         private Elements.MyGameCtrl myGameCtrl=> Elements.MyGameCtrl.Instance;
         private float guildTotalDamage = 0;
         private Action _Update;
@@ -128,11 +127,7 @@ namespace PCRCaculator.Battle
         private void Start()
         {
             m_LastUpdateShowTime = Time.realtimeSinceStartup;
-            if(battleManager!= null)
-            {
-                _Update += _Update_0;
-            }
-            else if(myGameCtrl != null)
+            if(myGameCtrl != null)
             {
                 _Update += _Update_1;
             }
@@ -141,15 +136,6 @@ namespace PCRCaculator.Battle
         private void Update()
         {
             _Update?.Invoke();
-        }
-        private void _Update_0()
-        {
-            if (battleManager.GameState == eGameBattleState.FIGHTING && !battleManager.IsPause && !battleManager.IsPauseForUB)
-            {
-                fpsCount++;
-                TimeCount += battleManager.DeltaTimeForPause;
-                UpdateTimeCount();
-            }
         }
         private void _Update_1()
         {
@@ -280,43 +266,6 @@ namespace PCRCaculator.Battle
             a.GetComponent<SkillNameImage>().SetName(skillName, transform);
 
         }
-        public void SetUI()
-        {
-            guildTotalDamageNumber.gameObject.SetActive(false);
-            for (int i = 0; i < PlayerUI.Count; i++)
-            {
-                if (BattleManager.Instance.PlayersList.Count > i)
-                {
-                    GameObject a = Instantiate(buffUIPrefab);
-                    CharacterBuffUIController b = a.GetComponent<CharacterBuffUIController>();
-                    BattleManager.Instance.PlayersList[i].SetUI(PlayerUI[i], b);
-                    b.SetBuffUI(rularSprites[i], BattleManager.Instance.PlayersList[i]);
-                }
-                else
-                {
-                    PlayerUI[i].gameObject.SetActive(false);
-                }
-            }
-            for (int i = 0; i < EnemyUI.Count; i++)
-            {
-                if (BattleManager.Instance.EnemiesList.Count > i)
-                {
-                    GameObject a = Instantiate(buffUIPrefab);
-                    CharacterBuffUIController b = a.GetComponent<CharacterBuffUIController>();
-                    BattleManager.Instance.EnemiesList[i].SetUI(EnemyUI[i], b);
-                    b.SetBuffUI(rularSprites[i + 5], BattleManager.Instance.EnemiesList[i]);
-                    if (BattleManager.Instance.EnemiesList[i].isGuildEnemy)
-                    {
-                        guildTotalDamageNumber.gameObject.SetActive(true);
-                    }
-                }
-                else
-                {
-                    EnemyUI[i].gameObject.SetActive(false);
-                }
-            }
-            //StartCoroutine(AutoSaveImage());
-        }
         public void SetUI_2(Elements.MyGameCtrl gameCtrl)
         {
             guildTotalDamageNumber.gameObject.SetActive(false);            
@@ -388,11 +337,7 @@ namespace PCRCaculator.Battle
         public void ExitButton2()
         {
             bool isGuildBossBattle = false;
-            if (BattleManager.Instance != null)
-            {
-                isGuildBossBattle = BattleManager.Instance.isGuildBossBattle;
-            }
-            else if (Elements.MyGameCtrl.Instance != null)
+            if (Elements.MyGameCtrl.Instance != null)
             {
                 isGuildBossBattle = Elements.MyGameCtrl.Instance.tempData.isGuildBattle;
             }
@@ -410,11 +355,6 @@ namespace PCRCaculator.Battle
 
         public void PauseButton()
         {
-            if (battleManager != null)
-            {
-                battleManager.Pause();
-            }
-            else
             {
                 Elements.MyGameCtrl.Instance.PauseButton();
             }
@@ -500,19 +440,6 @@ namespace PCRCaculator.Battle
         }
         public void SetTimeScale(float scale)
         {
-            if (battleManager != null)
-            {
-                BattleManager.Instance.TimeScale = scale;
-                foreach (UnitCtrl a in BattleManager.Instance.PlayersList)
-                {
-                    a.SetTimeScale(scale);
-                }
-                foreach (UnitCtrl b in BattleManager.Instance.EnemiesList)
-                {
-                    b.SetTimeScale(scale);
-                }
-            }
-            else
             {
                 Elements.MyGameCtrl.Instance.SetBattleSpeed(scale);
             }
@@ -530,45 +457,6 @@ namespace PCRCaculator.Battle
                 LogMessage("未设置" + stateIconType.GetDescription() + "的技能图标！", eLogMessageType.ERROR, false);
             }
             return buffDebuffIcons[40];
-        }
-        public void SetDamageNumber(UnitCtrl source, UnitCtrl target, int value, eDamageType damageType, eDamageEffectType effectType, bool isCritical, bool isTotal)
-        {
-            string valuestr = value.ToString();
-            List<Sprite> numbers = new List<Sprite>();
-            List<Sprite> sprites = number_physical_large;
-            if (damageType == eDamageType.MGC)
-            {
-                sprites = number_magical_large;
-            }
-            for (int i = 0; i < valuestr.Length; i++)
-            {
-                //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
-                numbers.Add(sprites[num]);
-            }
-            Sprite head = null;
-            if (isCritical)
-            {
-                if (damageType == eDamageType.MGC)
-                {
-                    head = sprite_critical_magical;
-                }
-                else
-                {
-                    head = sprite_critical_physical;
-                }
-            }
-            if (isTotal)
-            {
-                head = damageType == eDamageType.MGC ? sprite_total_magical : sprite_total_physical;
-            }
-            float scale = 1;
-            if (effectType == eDamageEffectType.LARGE)
-            {
-                scale = 2;
-            }
-            Vector3 pos = target.transform.position + numberPosFix;
-            SetPrefabNumber(source, pos, numbers, head, scale);
         }
         public void SetDamageNumber(Vector3 pos,int value, eDamageType damageType, eDamageEffectType effectType, bool isCritical = false, bool isTotal = false)
         {
@@ -608,20 +496,6 @@ namespace PCRCaculator.Battle
             }
             SetPrefabNumber(pos + numberPosFix, numbers, head, scale);
         }
-        public void SetHealNumber(UnitCtrl source, UnitCtrl target, int value, float scale = 1)
-        {
-            string valuestr = value.ToString();
-            List<Sprite> numbers = new List<Sprite>();
-            List<Sprite> sprites = number_heal_large;
-            for (int i = 0; i < valuestr.Length; i++)
-            {
-                //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
-                numbers.Add(sprites[num]);
-            }
-            Vector3 pos = target.transform.position + numberPosFix;
-            SetPrefabNumber(source, pos, numbers, null, scale);
-        }
         public void SetHealNumber(Vector3 pos, int value, float scale = 1)
         {
             string valuestr = value.ToString();
@@ -634,32 +508,6 @@ namespace PCRCaculator.Battle
                 numbers.Add(sprites[num]);
             }
             SetPrefabNumber(pos + numberPosFix, numbers, null, scale);
-        }
-        public void SetEnergyNumber(UnitCtrl source, UnitCtrl target, int value, float scale = 1)
-        {
-            List<Sprite> numbers = new List<Sprite>();
-            List<Sprite> sprites = number_energy_large;
-            if (value < 0)
-            {
-                numbers.Add(sprites[10]);
-                value = Mathf.Abs(value);
-            }
-            string valuestr = value.ToString();
-            for (int i = 0; i < valuestr.Length; i++)
-            {
-                //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
-                if (num >= 0 && num <= 9)
-                {
-                    numbers.Add(sprites[num]);
-                }
-                else
-                {
-                    BattleUIManager.Instance.LogMessage(source.UnitName + "对" + target.UnitName + "的伤害数字错误！错误数字：" + num,eLogMessageType.ERROR, source.IsOther);
-                }
-            }
-            Vector3 pos = target.transform.position + numberPosFix;
-            SetPrefabNumber(source, pos, numbers, null, scale);
         }
         public void SetEnergyNumber(Vector3 pos, int value, float scale = 1)
         {
@@ -685,14 +533,6 @@ namespace PCRCaculator.Battle
         private float HeldRandom(float scale=0.1f)
         {
             return Elements.Battle.BattleManager.HeldRandom(-100, 100) / 100.0f*scale;
-        }
-        public void SetMissEffect(UnitCtrl source, UnitCtrl target, float scale = 1)
-        {
-            Vector3 randomPos = new Vector3(HeldRandom(), HeldRandom(), 0);
-            Vector3 pos = target.transform.position + numberPosFix + randomPos;
-            GameObject a = Instantiate(missPrefab);
-            a.transform.position = pos;
-            a.GetComponent<DamageNumbers>().SetMiss(source, scale*DamageScale);
         }
         public void SetMissEffect(Vector3 pos0, float scale = 1)
         {
@@ -721,15 +561,6 @@ namespace PCRCaculator.Battle
         public void ReflashGuildEnemyTotalDamage2(bool byAttack,float value,bool critical)
         {
             ReflashGuildEnemyTotalDamage(value);
-        }
-
-        private void SetPrefabNumber(UnitCtrl source, Vector3 pos, List<Sprite> numbers, Sprite head, float scale)
-        {
-            GameObject a = Instantiate(numberPrefab);
-            Vector3 randomPos = new Vector3(HeldRandom(0.65f), HeldRandom(0.35f), 0);
-            a.transform.position = pos + randomPos*DamageRandomScale;
-            a.GetComponent<DamageNumbers>().SetDamageNumber(source, numbers, head, scale);
-
         }
         private void SetPrefabNumber(Vector3 pos, List<Sprite> numbers, Sprite head = null, float scale = 1)
         {

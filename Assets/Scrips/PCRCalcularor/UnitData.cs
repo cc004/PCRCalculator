@@ -1,9 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+using Elements;
 using UnityEngine;
 using Newtonsoft0.Json;
 using PCRCaculator.Battle;
+using DirectionType = PCRCaculator.Battle.DirectionType;
+using eMoveTypes = PCRCaculator.Battle.eMoveTypes;
+using eTargetAssignment = PCRCaculator.Battle.eTargetAssignment;
+
 /// <summary>
 /// 每个角色的所有数据类
 /// </summary>
@@ -1476,7 +1481,7 @@ namespace PCRCaculator
             magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
             physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
             energy_recovery_rate, enerey_reduce_rate, accuracy;//14-16*/
-        public long[] dataint;//数据为*100后的整数，计算升级数据等时用整数计算避免浮点数误差累积。
+        public long[] dataint;//数据为*100后的整数，计算升级数据等时用整数计算避免浮点数误差累积。(用decimal不就好了）
         [JsonIgnore]
         public float Hp 
         { 
@@ -1829,16 +1834,8 @@ namespace PCRCaculator
         }
     }
     [System.Serializable]
-    public class AllUnitPrefabData
-    {
-        public Dictionary<int, Dictionary<string, Elements.FirearmCtrlData>> allUnitFirearmDatas = new Dictionary<int, Dictionary<string, Elements.FirearmCtrlData>>();
-        public Dictionary<int, Elements.UnitActionControllerData> allUnitActionControllerDatas = new Dictionary<int, Elements.UnitActionControllerData>();
-
-    }
-    [System.Serializable]
     public class UnitPrefabData
     {
-        public Elements.UnitActionControllerData UnitActionControllerData;
         public Dictionary<string, List<Elements.FirearmCtrlData>> unitFirearmDatas;
     }
     [System.Serializable]

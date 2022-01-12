@@ -248,7 +248,7 @@ namespace Elements
       return !_source.Owner.IsLeftDir ? (double) x1 < (double) x2 == _ahead : (double) x1 > (double) x2 == _ahead;
     }
 
-    protected enum eAdditiveValueType
+    public enum eAdditiveValueType
     {
       HP = 0,
       DAMAGE = 1,

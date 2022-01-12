@@ -14,8 +14,6 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
     int unitId = 101201;
 
     Dictionary<string, GameObject> allUnitSkillPrefabs = new Dictionary<string, GameObject>();
-    Dictionary<int, Dictionary<string, Elements.FirearmCtrlData>> allUnitFirearmDatas = new Dictionary<int, Dictionary<string, Elements.FirearmCtrlData>>();
-    Dictionary<int, Elements.UnitActionControllerData> allUnitActionControllerDatas = new Dictionary<int, UnitActionControllerData>();
 
     private AssetBundle AB;
 
@@ -62,18 +60,6 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
         //LoadUnitEffectDatas();
         LoadUnitActionControllers();
        // SaveToJson();
-    }
-    private void SaveToJson()
-    {
-        AllUnitPrefabData a = new AllUnitPrefabData();
-        a.allUnitFirearmDatas = allUnitFirearmDatas;
-        a.allUnitActionControllerDatas = allUnitActionControllerDatas;
-        string filePath = Application.dataPath + "/Txts/UnitPrefabDatas.txt";
-        string saveJsonStr = JsonConvert.SerializeObject(a);
-        StreamWriter sw = new StreamWriter(filePath);
-        sw.Write(saveJsonStr);
-        sw.Close();
-        Debug.Log("成功！" + filePath);
     }
     void LoadDependPrefabs(string path)
     {

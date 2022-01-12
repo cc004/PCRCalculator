@@ -1270,12 +1270,12 @@ namespace Elements
             private set
             {
                 this.energy = value.Min(UnitDefine.MAX_ENERGY).Max(0f);
+                if (unitUI != null)
+                    unitUI.SetTP((float)this.energy / UnitDefine.MAX_ENERGY);
                 //this.energy = (ObscuredFloat)Mathf.Min((float)UnitDefine.MAX_ENERGY, Mathf.Max(0.0f, value));
                 if (this.EnergyChange == null)
                     return;
                 this.EnergyChange(this);
-                if (unitUI != null)
-                    unitUI.SetTP((float)Energy / UnitDefine.MAX_ENERGY);
             }
         }
 

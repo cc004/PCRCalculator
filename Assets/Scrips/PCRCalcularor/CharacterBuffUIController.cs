@@ -15,26 +15,14 @@ namespace PCRCaculator.Battle
         public TextMesh hpHeadText;
         public GameObject partsDataPrefab;
         public float poszFix;
-
-        private UnitCtrl owner;
+        
         private Elements.UnitCtrl owner2;
         private BattleUIManager uIManager;
         private List<eStateIconType> currentBuffs = new List<eStateIconType>();
 
 
         private List<Elements.PartsData> bossPartsList = new List<Elements.PartsData>();
-
-
-        public void SetBuffUI(Sprite sprite,UnitCtrl owner)
-        {
-            rular.sprite = sprite;
-            this.owner = owner;
-            uIManager = BattleUIManager.Instance;
-            transform.SetParent(owner.transform, false);
-            SetAbnormalIcons(owner,eStateIconType.NONE,false);
-            owner.OnChangeState += SetAbnormalIcons;
-            StartCoroutine(ShowPosition());
-        }
+        
         public void SetBuffUI(Sprite sprite, Elements.UnitCtrl owner,bool isSummon = false)
         {
             rular.sprite = sprite;
@@ -54,7 +42,7 @@ namespace PCRCaculator.Battle
             }
             StartCoroutine(ShowPosition_2());
         }
-        public void SetAbnormalIcons(UnitCtrl unitCtrl,eStateIconType stateIconType,bool enable)
+        public void SetAbnormalIcons(object unitCtrl,eStateIconType stateIconType,bool enable)
         {
             if(stateIconType == eStateIconType.NONE)
             {
@@ -114,15 +102,7 @@ namespace PCRCaculator.Battle
         {
             transform.localScale = new Vector3(isReversed ? -1 : 1, 1, 1);
         }
-
-        private IEnumerator ShowPosition()
-        {
-            while (true)
-            {
-                posText.text = "" + Mathf.RoundToInt(owner.FixedPosition.x);
-                yield return null;
-            }
-        }
+        
         private IEnumerator ShowPosition_2()
         {
             while (true)

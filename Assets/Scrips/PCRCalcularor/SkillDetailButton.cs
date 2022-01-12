@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 namespace PCRCaculator
 {
-
-
     public class SkillDetailButton : MonoBehaviour
     {
         public Image smallIcon;

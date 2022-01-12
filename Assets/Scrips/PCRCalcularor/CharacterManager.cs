@@ -51,19 +51,6 @@ namespace PCRCaculator
                 detailBack.SetActive(true);
             }
         }
-        public void OnToggleSwitched(bool k)
-        {
-            if (k)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    if (toggles[i].isOn)
-                    {
-                        ReflashBasePage(i);
-                    }
-                }
-            }
-        }
         private void ReflashBasePage(int type)
         {
             PositionType positionType = PositionType.frount;

@@ -18,7 +18,7 @@ namespace PCRCaculator.Battle
         /// <param name="numberSprites">数字图片列表，最多6个</param>
         /// <param name="head">Total、Critical等，没有就写Null</param>
         /// <param name="scale"></param>
-        public void SetDamageNumber(UnitCtrl source,List<Sprite> numberSprites,Sprite head,float scale = 1)
+        public void SetDamageNumber(object source,List<Sprite> numberSprites,Sprite head,float scale = 1)
         {
             for(int i = 0; i < numbers.Count; i++)
             {
@@ -52,7 +52,7 @@ namespace PCRCaculator.Battle
             transform.localScale = Vector3.one * scale;
             StartCoroutine(_UpdateNumber());
         }
-        public void SetMiss(UnitCtrl source,float scale)
+        public void SetMiss(object source,float scale)
         {
             transform.localScale = Vector3.one * scale;
             StartCoroutine(_UpdateNumber(source));
@@ -62,17 +62,13 @@ namespace PCRCaculator.Battle
             transform.localScale = Vector3.one * scale;
             StartCoroutine(_UpdateNumber());
         }
-        private IEnumerator _UpdateNumber(UnitCtrl source)
+        private IEnumerator _UpdateNumber(object source)
         {
             if (alwaysExit) { yield break; }
             float time_0 = countTime;
             float deltaTime = 0.0167f;
             while (time_0 >= 0)
             {
-                if(source != null)
-                {
-                    deltaTime = source.DeltaTimeForPause;
-                }
                 transform.Translate(Vector3.up * speed * deltaTime);
                 time_0 -= deltaTime;
                 yield return null;

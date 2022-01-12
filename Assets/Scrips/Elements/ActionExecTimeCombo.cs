@@ -11,7 +11,7 @@ using Newtonsoft0.Json;
 namespace Elements
 {
     [Serializable]
-    public class ActionExecTimeCombo:ICopyAble<ActionExecTimeCombo>
+    public class ActionExecTimeCombo
     {
         public float StartTime;
         public float OffsetTime;
@@ -20,9 +20,5 @@ namespace Elements
         public eComboInterporationType InterporationType;
         [JsonIgnore]
         public AnimationCurve Curve = new AnimationCurve();
-        public ActionExecTimeCombo CopyThis()
-        {
-            return this;
-        }
     }
 }
