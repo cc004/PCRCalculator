@@ -16,6 +16,7 @@ using PCRCaculator.Guild;
 using System.Text.RegularExpressions;
 using System.Drawing;
 using OfficeOpenXml.Drawing;
+using System.Linq;
 
 namespace ExcelHelper
 {
@@ -512,14 +513,14 @@ namespace ExcelHelper
                 {
                     worksheet0.Cells[3, 7-count, 5, 7-count].Merge = true;
                     worksheet0.MySetValue(3, 7 - count, unitData.GetUnitName(), backColor: backColotInt_1);
-                    worksheet0.InsertImage(TimelineData.charImages[count], 3, 7 - count, false,1,3);
+                    worksheet0.InsertImage(TimelineData.charImages[count], 2, 6 - count, false,1,3);
                     worksheet0.MySetValue(6, 7 - count, unitData.GetLevelDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(7, 7 - count, unitData.GetRankDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(8, 7 - count, unitData.rarity , backColor: backColotInt_1);
                     count++;
                 }
                 worksheet0.Cells[3, 8, 8, 9].Merge = true;
-                worksheet0.InsertImage(TimelineData.charImages[5], 3, 8, false,1.8f,5);
+                worksheet0.InsertImage(TimelineData.charImages[5], 2, 7, false,2,6);
                 worksheet0.MySetValue(9, 1, "帧数");
                 worksheet0.MySetValue(9, 2, "秒数", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(9, 3, "角色", blod: true, backColor: backColotInt_2);
@@ -1055,7 +1056,7 @@ namespace ExcelHelper
 
             }
         }
-        public static void MySetValue(this ExcelWorksheet worksheet,int posx,int posy,string value,
+        public static void MySetValue(this ExcelWorksheet worksheet,int posx,int posy,object value,
             int size=11,bool centre = true,bool blod = false,int[] fontColor=null,int[] backColor=null)
         {
             worksheet.Cells[posx,posy].Style.Font.Size = size; //字体大小
@@ -1098,14 +1099,11 @@ namespace ExcelHelper
             }
         }
 
-        public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit,float widthCount,float hightCount)
+        public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit, int widthCount,int hightCount)
         {
             using (var image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
             {
                 var picture = worksheet.Drawings.AddPicture(rowNum+"0"+columnNum, image);
-                var cell = worksheet.Cells[rowNum, columnNum];
-                int cellColumnWidthInPix = Mathf.RoundToInt(GetWidthInPixels(cell)*widthCount);
-                int cellRowHeightInPix = GetHeightInPixels(cell);
                 /*int adjustImageWidthInPix = cellColumnWidthInPix;
                 int adjustImageHeightInPix = cellRowHeightInPix;
                 if (autofit)
@@ -1120,8 +1118,14 @@ namespace ExcelHelper
                 int rowOffsetPixels = (int)((cellRowHeightInPix - adjustImageHeightInPix) / 2.0);
                 picture.SetSize(adjustImageWidthInPix, adjustImageHeightInPix);
                 picture.SetPosition(rowNum - 1, rowOffsetPixels, columnNum - 1, columnOffsetPixels);*/
-                picture.SetSize(cellColumnWidthInPix, cellColumnWidthInPix);
-                picture.SetPosition(rowNum-1 , 0, columnNum-1 , 0);
+                picture.From.Column = columnNum;
+                picture.From.Row = rowNum;
+                picture.To.Column = columnNum + widthCount;
+                picture.To.Row = rowNum + hightCount;
+                picture.From.RowOff = 0;
+                picture.From.ColumnOff = 0;
+                picture.To.RowOff = 0;
+                picture.To.ColumnOff = -1;
 
 
                 return picture;
@@ -1178,6 +1182,7 @@ namespace ExcelHelper
         private static int GetHeightInPixels(ExcelRange cell)
         {
             double rowHeight = cell.Worksheet.Row(cell.Start.Row).Height;
+            return (int)rowHeight;
             using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
             {
                 float dpiY = graphics.DpiY;

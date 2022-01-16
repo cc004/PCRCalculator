@@ -2146,6 +2146,11 @@ this.updateCurColor();
                     break;
                 default:
                     this.m_fCastTimer = (ObscuredFloat)(this.battleManager.CurrentWave != 0 ? 0.3f : 2.5f);
+                    //XX: force make up for part boss additional 1 frame
+                    if (this.battleManager.BossUnit.IsPartsBoss)
+                    {
+                        this.m_fCastTimer += battleManager.DeltaTime_60fps;
+                    }
                     break;
             }
         }
@@ -3294,12 +3299,13 @@ this.updateCurColor();
                     }
                     if (!this.IsUnableActionState() && !_switch)
                     {
-                        this.specialSleepStatus = UnitCtrl.eSpecialSleepStatus.INVALID;
-                        BattleSpineController currentSpineCtrl = this.GetCurrentSpineCtrl();
-                        currentSpineCtrl.IsPlayAnimeBattle = false;
-                        currentSpineCtrl.IsStopState = false;
+                        //XX: temporary fix for damage spine resuming
+                        //this.specialSleepStatus = UnitCtrl.eSpecialSleepStatus.INVALID;
+                        //BattleSpineController currentSpineCtrl = this.GetCurrentSpineCtrl();
+                        //currentSpineCtrl.IsPlayAnimeBattle = false;
+                        //currentSpineCtrl.IsStopState = false;
                         this.setMotionResume();
-                        this.isContinueIdleForPauseAction = false;
+                        //this.isContinueIdleForPauseAction = false;
                         break;
                     }
                     break;
@@ -6045,7 +6051,7 @@ this.updateCurColor();
 
             des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
                 + $"-{prob:P0}";
-            MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)this.Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des);
+            MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)this.Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des, _damageData.Source);
             uIManager.LogMessage(des,PCRCaculator.Battle.eLogMessageType.GET_DAMAGE, this);
             this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
             if (this.OnDamage != null)
@@ -6402,7 +6408,7 @@ this.updateCurColor();
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des = "目标HP回复<color=#54FF4F>" + _value + "</color>点";
                 action?.Invoke(des);
-                MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp,0, BattleHeaderController.CurrentFrameCount,des);
+                MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp,0, BattleHeaderController.CurrentFrameCount,des, _source);
                 if (_isUnionBurstLifeSteal)
                 {
                     this.unionburstLifeStealNum += (long)_value;
@@ -8369,6 +8375,10 @@ this.updateCurColor();
                                 if (((double)unitCtrl.battleManager.ActionStartTimeCounter <= 0.0 || unitCtrl.IsOther ? (!unitCtrl.ToadRelease ? 1 : 0) : 0) != 0)
                                 {
                                     unitCtrl.m_fCastTimer = (ObscuredFloat)((float)unitCtrl.m_fCastTimer - unitCtrl.DeltaTimeForPause);
+                                    if (unitCtrl.m_fCastTimer < 0.1 && unitCtrl.UnitNameEx.Contains("凯"))
+                                    {
+
+                                    }
                                     MyOnSkillCD?.Invoke(m_fCastTimer);
                                 }
                                 if (unitCtrl.battleManager.LOGNEDLPEIJ)

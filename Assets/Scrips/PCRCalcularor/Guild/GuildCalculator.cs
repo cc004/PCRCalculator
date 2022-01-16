@@ -236,13 +236,14 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic[unitid].Remove(changeData);
             }
         }
-        public void AppendChangeHP(int unitid, float currentHP, int hp, int damage, int frame, string describe)
+        public void AppendChangeHP(int unitid, float currentHP, int hp, int damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             ValueChangeData valueData = new ValueChangeData(frame * deltaXforChat, currentHP, hp, describe)
             {
                 damage = damage,
-                id = id
+                id = id,
+                source = source.UnitId
             };
             allUnitHPDic[unitid].Add(valueData);
             skillGroupPrefabDic[unitid].ReflashHPChat(allUnitHPDic[unitid]);
@@ -375,7 +376,7 @@ namespace PCRCaculator.Guild
                 {
                     int unitid = unitCtrl.UnitId;
                     AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                    AppendChangeHP(unitid, unitCtrl.Hp / unitCtrl.MaxHp, 0, (int)unitCtrl.Hp, 5400, "时间耗尽");
+                    AppendChangeHP(unitid, unitCtrl.Hp / unitCtrl.MaxHp, 0, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
                     AppendChangeTP(unitid, (float)unitCtrl.Energy / BattleDefine.SKILL_ENERGY_MAX, 5400, "时间耗尽");
                     foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
                     {
@@ -545,7 +546,7 @@ namespace PCRCaculator.Guild
                         };
                         ValueChangeData changeData = allUnitHPDic[bossId].Find(
                             a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
-                                 a.id == tm.id);
+                                 a.id == tm.id && a.source == unitData.unitId);
                         if (changeData != null)
                         {
                             detail.Damage = changeData.damage;
@@ -920,13 +921,8 @@ namespace PCRCaculator.Guild
             
             if (templateSettings["BOSS头像"] != null)
             {
-                string[] arr = templateSettings["BOSS头像"].Split(',');
-                using (var image = System.Drawing.Image.FromStream(new MemoryStream(timelineData.charImages[5])))
-                {
-                    var pic = sheet.Drawings.AddPicture($"character{5}", image);
-                    pic.SetSize((int)(float.Parse(arr[3]) * hparam), (int)(float.Parse(arr[2]) * hparam2));
-                    pic.SetPosition((int)(float.Parse(arr[1]) * hparam2), (int)(float.Parse(arr[0]) * hparam));
-                }
+                var arr = templateSettings["BOSS头像"].Split(',').Select(int.Parse).ToArray();
+                sheet.InsertImage(timelineData.charImages[5], arr[0], arr[1], false, arr[2], arr[3]);
             }
             string text = "";
             for (int i = 0; i < 5; i++)
@@ -984,13 +980,8 @@ namespace PCRCaculator.Guild
 
                 if (templateSettings[$"角色{(i + 1)}头像"] != null)
                 {
-                    string[] arr = templateSettings[$"角色{(i + 1)}头像"].Split(',');
-                    using (var image = System.Drawing.Image.FromStream(new MemoryStream(timelineData.charImages[i])))
-                    {
-                        var pic = sheet.Drawings.AddPicture($"character{i}", image);
-                        pic.SetSize((int) (float.Parse(arr[3]) * hparam), (int) (float.Parse(arr[2]) * hparam2));
-                        pic.SetPosition((int)(float.Parse(arr[1]) * hparam2), (int)(float.Parse(arr[0]) * hparam));
-                    }
+                    var arr = templateSettings[$"角色{(i + 1)}头像"].Split(',').Select(int.Parse).ToArray();
+                    sheet.InsertImage(timelineData.charImages[i], arr[0], arr[1], false, arr[2], arr[3]);
                 }
             }
             
@@ -1003,34 +994,34 @@ namespace PCRCaculator.Guild
                     sheet.Cells[rowId, int.Parse(templateSettings["帧数列"])].Value = detail.UBTime;
                 }
 
-                if (last != detail.UBTime)
+                if (last != detail.UBTime / 60)
                 {
                     sheet.Cells[rowId, int.Parse(templateSettings["时间列"])].Value =
                         new DateTime(2000, 1, 1, 0, 0, 0)
-                            .Add(TimeSpan.FromSeconds((int)(GuildManager.Instance.SettingData.limitTime - detail.UBTime / 60f)))
-                            .ToString(GuildManager.Instance.SettingData.format);
-                    last = detail.UBTime;
+                            .Add(TimeSpan.FromSeconds(GuildManager.Instance.SettingData.limitTime - detail.UBTime / 60))
+                            .ToString(string.IsNullOrEmpty(GuildManager.Instance.SettingData.format) ? "m:ss" : GuildManager.Instance.SettingData.format);
+                    last = detail.UBTime / 60;
                 }
                 if (detail.isBossUB)
                 {
                     sheet.SelectedRange[$"A{rowId}:AAA{rowId}"].Clear();
-                    sheet.SelectedRange[$"A{templateSettings["BOOSUB行"]}:AAA{templateSettings["BOOSUB行"]}"]
-                        .Copy(sheet.SelectedRange[$"A{rowId}:AAA{rowId}"]);
+                    sheet.Cells[$"A{templateSettings["BOOSUB行"]}:AAA{templateSettings["BOOSUB行"]}"]
+                        .Copy(sheet.Cells[$"A{rowId}"]);
                 }
                 else
                 {
                     sheet.Cells[rowId, int.Parse(templateSettings["角色列"])].Value = detail.unitData.GetUnitName();
-                    sheet.MySetValue(rowId, int.Parse(templateSettings["伤害列"]), detail.Damage.ToString(),
+                    sheet.MySetValue(rowId, int.Parse(templateSettings["伤害列"]), detail.Damage,
                         fontColor: detail.Critical ? new int[] { 255, 0, 0 } : new int[] { 0, 0, 0 });
                 }
                 ++rowId;
             }
-            sheet.SelectedRange[$"A{(int.Parse(templateSettings["轴结尾行"]) - 2)}:AAA{templateSettings["轴结尾行"]}"]
-                .Copy(sheet.SelectedRange[$"A{rowId}"]);
+            sheet.Cells[$"A{(int.Parse(templateSettings["轴结尾行"]) - 2)}:AAA{templateSettings["轴结尾行"]}"]
+                .Copy(sheet.Cells[$"A{rowId}"]);
             //wsh2.Cells[rowId, int.Parse(setting["帧数列"])].Value = 5400;
             //wsh2.Cells[rowId, 3].Value = GetTimeText(5400);
             rowId += 3;
-            sheet.SelectedRange[$"A{rowId}:AAA999"].Clear();
+            sheet.Cells[$"A{rowId}:AAA999"].Clear();
 
             tgt.Save();
             MainManager.Instance.WindowMessage("保存完成");
@@ -1110,6 +1101,7 @@ namespace PCRCaculator.Guild
         public int damage;
         public string describe;
         public int id;
+        public int source;
         public ValueChangeData() { }
         public ValueChangeData(float x, float y)
         {
