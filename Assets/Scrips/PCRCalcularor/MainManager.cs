@@ -679,23 +679,15 @@ namespace PCRCaculator
         /// <returns>加密成功返回加密后的字符串，失败返回源串 </returns>
         public static string EncryptDES(string encryptString, string encryptKey = "PCRGuild")  
         {
-            try
-            {
-                byte[] rgbKey = Encoding.UTF8.GetBytes(encryptKey.Substring(0, 8));//转换为字节
-                byte[] rgbIV = Keys;
-                byte[] inputByteArray = Encoding.UTF8.GetBytes(encryptString);
-                DESCryptoServiceProvider dCSP = new DESCryptoServiceProvider();//实例化数据加密标准
-                MemoryStream mStream = new MemoryStream();//实例化内存流
-                //将数据流链接到加密转换的流
-                CryptoStream cStream = new CryptoStream(mStream, dCSP.CreateEncryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
-                cStream.Write(inputByteArray, 0, inputByteArray.Length);
-                cStream.FlushFinalBlock();
-                return System.Convert.ToBase64String(mStream.ToArray());
-            }
-            catch (System.Exception e)
-            {
-                return encryptString;
-            }
+            var ms = new MemoryStream();
+            var stream = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionLevel.Optimal);
+            var bytes = Encoding.UTF8.GetBytes(encryptString);
+            stream.Write(bytes, 0, bytes.Length);
+            stream.Dispose();
+            var res = System.Convert.ToBase64String(ms.ToArray());
+            ms.Dispose();
+            return res;
+
         }
         /// <summary>
         /// DES解密字符串
@@ -705,6 +697,23 @@ namespace PCRCaculator
         /// <returns>解密成功返回解密后的字符串，失败返源串</returns>
         public static string DecryptDES(string decryptString, string decryptKey = "PCRGuild")
         {
+            try
+            {
+                var stream = new System.IO.Compression.GZipStream(new MemoryStream(System.Convert.FromBase64String(decryptString)), System.IO.Compression.CompressionMode.Decompress);
+                var ms = new MemoryStream();
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = stream.Read(buf, 0, buf.Length)) > 0)
+                    ms.Write(buf, 0, len);
+                var res = Encoding.UTF8.GetString(ms.ToArray());
+                ms.Dispose();
+                stream.Dispose();
+                return res;
+            }
+            catch
+            {
+
+            }
             try
             {
                 byte[] rgbKey = Encoding.UTF8.GetBytes(decryptKey);
