@@ -113,7 +113,7 @@ namespace Elements
 
             this.Owner = _owner;
             this.transform = _owner.transform;
-            MyGameCtrl.ResetSkillEffects(this);
+            //MyGameCtrl.ResetSkillEffects(this);
             this.skillDictionary = new Dictionary<int, Skill>();
             this.Attack.AnimId = eSpineCharacterAnimeId.ATTACK;
             this.Attack.WeaponType = _initializeAttackOnly ? _seOwner.WeaponSeType : this.Owner.WeaponSeType;
@@ -778,6 +778,13 @@ namespace Elements
 
                 }
                 skillExecData.energy = Owner.lastEnergyBeforeUB;
+                var e = Owner.lastEnergyBeforeUB;
+                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                {
+                    unit = Owner.UnitNameEx,
+                    predict = hash => e.Emulate(hash) < 1000f,
+                    description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB没开出"
+                });
             }
             else
             {
@@ -1298,7 +1305,7 @@ namespace Elements
             bool exec = !isResisted && action.JudgeIsAlreadyExeced(target.Owner, num);
             PCRCaculator.Guild.UnitActionExecData actionExecData = new PCRCaculator.Guild.UnitActionExecData();
             actionExecData.execTime = BattleHeaderController.CurrentFrameCount;
-            actionExecData.describe = "";//"执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
+            actionExecData.describe = action.sortinfo;//"执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
             actionExecData.actionID = action.ActionId;
             actionExecData.unitid = Owner.UnitId;
             actionExecData.actionType = action.ActionType.GetDescription();
@@ -1308,6 +1315,7 @@ namespace Elements
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, PCRCaculator.Battle.eLogMessageType.EXEC_ACTION, this.Owner);
+                
                 action.ExecAction(this.Owner, target, num, this, skill, starttime, dictionary, 
                     _valueDictionary,(a)=> 
                 { 
@@ -1847,7 +1855,91 @@ namespace Elements
           float _value,
           bool _quiet)
         {
+            var skill = skillDictionary[Owner.CurrentSkillId];
+            Func<BasePartsData, string> selector;
+            switch (_actionParameter.TargetSort)
+            {
+                case PriorityPattern.HP_ASC:
+                case PriorityPattern.HP_DEC:
+                case PriorityPattern.HP_ASC_NEAR:
+                case PriorityPattern.HP_DEC_NEAR:
+                    selector = parts => $"{parts.Owner.UnitName}({parts.Owner.Hp / parts.Owner.MaxHp:P2})";
+                    break;
+                case PriorityPattern.ENERGY_ASC:
+                case PriorityPattern.ENERGY_DEC:
+                case PriorityPattern.ENERGY_REDUCING:
+                case PriorityPattern.ENERGY_ASC_NEAR:
+                case PriorityPattern.ENERGY_DEC_NEAR:
+                case PriorityPattern.ENERGY_DEC_NEAR_MAX:
+                    selector = parts => $"{parts.Owner.UnitName}({(float)parts.Owner.Energy / UnitDefine.MAX_ENERGY:P2})";
+                    break;
+                case PriorityPattern.ATK_ASC:
+                case PriorityPattern.ATK_DEC:
+                case PriorityPattern.ATK_ASC_NEAR:
+                case PriorityPattern.ATK_DEC_NEAR:
+                    selector = parts => $"{parts.Owner.UnitName}({parts.GetAtkZero()})";
+                    break;
+                case PriorityPattern.MAGIC_STR_ASC:
+                case PriorityPattern.MAGIC_STR_DEC:
+                case PriorityPattern.MAGIC_STR_ASC_NEAR:
+                case PriorityPattern.MAGIC_STR_DEC_NEAR:
+                    selector = parts => $"{parts.Owner.UnitName}({parts.GetMagicStrZero()})";
+                    break;
+                default:
+                    selector = parts => $"{parts.Owner.UnitName}";
+                    break;
+            }
+            void QuickSort(List<BasePartsData> _array, Func<BasePartsData, BasePartsData, int> _compare)
+            {
+                _actionParameter.sortinfo = "";
+                var str = $"对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})进行排序：\n" +
+                    $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
+                Owner.UIManager.LogMessage(str, PCRCaculator.Battle.eLogMessageType.EXEC_ACTION, Owner);
+                _actionParameter.sortinfo += str + "\n";
+                if (_array.Count == 0)
+                    return;
+                UnitCtrl.FunctionalComparer<BasePartsData> instance = UnitCtrl.FunctionalComparer<BasePartsData>.Instance;
+                instance.SetComparer(_compare);
+                UnitCtrl.quickSortImpl(_array, 0, _array.Count - 1, instance);
+                str = $"{Owner.UnitName}对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})排序结果\n" +
+                    $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
+                Owner.UIManager.LogMessage(str, PCRCaculator.Battle.eLogMessageType.EXEC_ACTION, Owner);
+                _actionParameter.sortinfo += str + "\n";
+            }
+
             List<BasePartsData> targetList = _actionParameter.TargetList;
+            var lst = targetList.Select(part => new BasePartsDataEx
+            {
+                Energy = part.Owner.Energy,
+                Hp = part.Owner.Hp,
+                MaxHp = part.Owner.MaxHp,
+                GetMagicStrZeroEx = part.GetMagicStrZeroEx(),
+                GetAtkZeroEx = part.GetAtkZeroEx(),
+                UnitName = part.Owner.UnitNameEx,
+                hash = part.GetHashCode()
+            }).ToList();
+
+            void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare)
+            {
+                if (_actionParameter.TargetNum != 1) return;
+                var nth = _actionParameter.TargetNth;
+                var tgt = targetList[Math.Min(lst.Count - 1, nth)];
+                var tgth = tgt.GetHashCode();
+                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                {
+                    unit = Owner.UnitNameEx,
+                    predict = hash =>
+                    {
+                        var lst2 = new List<BasePartsDataEx>(lst);
+                        var instance = UnitCtrl.FunctionalComparer<BasePartsDataEx>.Instance;
+                        instance.SetComparer((a, b) => _compare(a, b, hash));
+                        UnitCtrl.quickSortImpl(lst2, 0, lst2.Count - 1, instance);
+                        return lst2[Math.Min(lst2.Count - 1, nth)].hash != tgth;
+                    },
+                    description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的{(Owner.CurrentSkillId == 1 ? "普攻" : $"{skillDictionary[Owner.CurrentSkillId].SkillName}技能({Owner.CurrentSkillId})")}打歪(原定目标: {tgt.Owner.UnitNameEx})"
+                });
+            }
+
             switch (_actionParameter.TargetSort)
             {
                 case PriorityPattern.RANDOM:
@@ -1875,10 +1967,12 @@ namespace Elements
                     targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareDistanceDec));
                     break;
                 case PriorityPattern.HP_ASC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareLifeAsc));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareLifeAsc));
+                    AddProbEvent(UnitCtrl.CompareLifeAsc);
                     break;
                 case PriorityPattern.HP_DEC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareLifeDec));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareLifeDec));
+                    AddProbEvent(UnitCtrl.CompareLifeDec);
                     break;
                 case PriorityPattern.OWNER:
                     targetList.Clear();
@@ -1894,23 +1988,29 @@ namespace Elements
                     targetList.Add(this.Owner.GetFirstParts(true));
                     break;
                 case PriorityPattern.ENERGY_DEC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareEnergyDec));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareEnergyDec));
+                    AddProbEvent(UnitCtrl.CompareEnergyDec);
                     break;
                 case PriorityPattern.ENERGY_ASC:
                 case PriorityPattern.ENERGY_REDUCING:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareEnergyAsc));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareEnergyAsc));
+                    AddProbEvent(UnitCtrl.CompareEnergyAsc);
                     break;
                 case PriorityPattern.ATK_DEC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareAtkDec));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareAtkDec));
+                    AddProbEvent(UnitCtrl.CompareAtkDec);
                     break;
                 case PriorityPattern.ATK_ASC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareAtkAsc));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareAtkAsc));
+                    AddProbEvent(UnitCtrl.CompareAtkAsc);
                     break;
                 case PriorityPattern.MAGIC_STR_DEC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareMagicStrDec));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareMagicStrDec));
+                    AddProbEvent(UnitCtrl.CompareMagicStrDec);
                     break;
                 case PriorityPattern.MAGIC_STR_ASC:
-                    UnitCtrl.QuickSort<BasePartsData>(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareMagicStrAsc));
+                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareMagicStrAsc));
+                    AddProbEvent(UnitCtrl.CompareMagicStrAsc);
                     break;
                 case PriorityPattern.BOSS:
                     this.Owner.BaseX = _baseTransform.position.x;

@@ -5,50 +5,24 @@ using UnityEngine;
 
 namespace Elements
 {
-    public class SumFloatWithEx
-    {
-        private FloatWithEx @base;
-        private FloatWithEx value;
-        private Dictionary<int, FloatWithEx> adds;
-
-        public static implicit operator FloatWithEx(SumFloatWithEx self)
-        {
-            return self.value;
-        }
-
-        public static implicit operator SumFloatWithEx(FloatWithEx x)
-        {
-            return new SumFloatWithEx()
-            {
-                @base = x,
-                value = x,
-                adds = new Dictionary<int, FloatWithEx>()
-            };
-        }
-
-        public SumFloatWithEx Sum(int hash, FloatWithEx x)
-        {
-            if (adds.ContainsKey(hash))
-            {
-                adds.Remove(hash);
-
-                if (!x.pure)
-                    return adds.Aggregate<KeyValuePair<int, FloatWithEx>, SumFloatWithEx>(@base, 
-                        (current, val) => current.Sum(val.Key, val.Value));
-            }
-            else
-                adds.Add(hash, x);
-            value += x;
-            return this;
-        }
-    }
-
     public class FloatWithEx : IComparable<FloatWithEx>, IEquatable<FloatWithEx>
     {
-        internal bool pure => avg2 == avg * avg;
-        private float value, avg;
-        private double avg2;
-        private Func<float> root;
+        private bool pure => min == max;
+        private float value, avg, min, max;
+        private Func<int, float> root;
+        private int hash;
+        private float cache;
+
+        public float Emulate(int hash)
+        {
+            if (root == null) return value;
+            if (hash != this.hash)
+            {
+                cache = root(hash);
+                this.hash = hash;
+            }
+            return cache;
+        }
         
         private static System.Random rand = new System.Random();
 
@@ -61,8 +35,9 @@ namespace Elements
             {
                 value = val ? 1 : 0,
                 avg = p,
-                avg2 = p,
-                root = () => rand.NextDouble() < p ? 1 : 0
+                root = _ => rand.NextDouble() < p ? 1 : 0,
+                min = 0,
+                max = 1
             };
             return result;
         }
@@ -71,27 +46,32 @@ namespace Elements
         public FloatWithEx Select(Func<float, float> selector)
         {
             if (pure) return selector(value);
-            double x = selector((float)Math.Sqrt(avg2));
+            float a = selector(min), b = selector(max);
             return new FloatWithEx
             {
                 value = selector(value),
                 avg = selector(avg),
-                avg2 = x * x,
-                root = () => selector(root())
+                root = hash => selector(Emulate(hash)),
+                min = Mathf.Min(a, b), max = Mathf.Max(a, b)
             };
         }
 
         private static FloatWithEx Default = 0f;
 
         private static FloatWithEx Op(FloatWithEx a, FloatWithEx b,
-            Func<float, float, float> op,
-            Func<FloatWithEx, FloatWithEx, double> op2)
+            Func<float, float, float> op)
         {
             a = a ?? Default;
             b = b ?? Default;
             var vala = a.value;
             var valb = b.value;
-
+            var xs = new float[]
+            {
+                op(a.max, b.max),
+                op(a.min, b.min),
+                op(a.max, b.min),
+                op(a.min, b.max)
+            };
             if (a.pure)
             {
                 if (b.pure)
@@ -101,8 +81,8 @@ namespace Elements
                     {
                         value = op(vala, b.value),
                         avg = op(vala, b.avg),
-                        avg2 = op2(a, b),
-                        root = () => op(vala, b.root())
+                        root = hash => op(vala, b.Emulate(hash)),
+                        min = Mathf.Min(xs), max = Mathf.Max(xs)
                     };
             }
             else if (b.pure)
@@ -110,76 +90,78 @@ namespace Elements
                 {
                     value = op(a.value, valb),
                     avg = op(a.avg, valb),
-                    avg2 = op2(a, b),
-                    root = () => op(a.root(), valb)
+                    root = hash => op(a.Emulate(hash), valb),
+                    min = Mathf.Min(xs),
+                    max = Mathf.Max(xs)
                 };
             else
                 return new FloatWithEx
                 {
                     value = op(a.value, b.value),
                     avg = op(a.avg, b.avg),
-                    avg2 = op2(a, b),
-                    root = () => (op(a.root(), b.root()))
+                    root = hash => op(a.Emulate(hash), b.Emulate(hash)),
+                    min = Mathf.Min(xs),
+                    max = Mathf.Max(xs)
                 };
         }
 
         public float Expect => avg;
-        private float expectedCache = float.NaN;
         public float Expected
         {
             get
             {
-                return avg;
+                const int N = 1000;
+                double s = 0;
+                for (int i = 0; i < N; ++i)
+                    s += Emulate(rand.Next());
+                return (float)(s / N);
             }
         }
-        private static double Rand(double u, double d)
+        public float Stddev
         {
-            double u1, u2, z, x;
-            if (d <= 0)
+            get
             {
-
-                return u;
+                const int N = 1000;
+                double s = 0, s2 = 0;
+                for (int i = 0; i < N; ++i)
+                {
+                    var x = Emulate(rand.Next());
+                    s += x;
+                    s2 += x * x;
+                }
+                return (float)Math.Sqrt((s2 - s * s / N) / N);
             }
-            u1 = rand.NextDouble();
-            u2 = rand.NextDouble();
-
-            z = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
-
-            x = u + d * z;
-            return x;
-
         }
-        public float Probability(Func<float, bool> predict)
+        public float Probability(Func<float, bool> predict, int N = 100)
         {
-            const int N = 1000;
             int s = 0;
             for (int i = 0; i < N; ++i)
-                if (predict((float)Rand(avg, Stddev))) ++s;
+                if (predict((float)Emulate(rand.Next()))) ++s;
             return (float)s / N;
         }
-
-        public double Stddev => Math.Sqrt(Math.Max(0, avg2 - avg * avg));
 
         public static implicit operator float(FloatWithEx self) => self.value;
         public static implicit operator FloatWithEx(float x) => new FloatWithEx
         { 
-            value = x, avg = x,
-            root = () => x, avg2 = x * x
+            value = x, avg = x, min = x, max = x,
+            root = null
         };
         public FloatWithEx Log() => Select(Mathf.Log);
         public FloatWithEx Max(float f) => Select(x => Mathf.Max(x, f));
         public FloatWithEx Min(float f) => Select(x => Mathf.Min(x, f));
-        public override string ToString() => pure ? ((int)(float)this).ToString() : $"{(int)(float)this}[{(int)Expect}±{(int)Stddev}]";
+        public override string ToString() => pure ? ((int)(float)this).ToString() : $"{(int)(float)this}[{(int)Expect}]";
         public FloatWithEx Floor() => Select(Mathf.Floor);
         public int CompareTo(FloatWithEx other) => ((float)this).CompareTo(other);
-        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y, (x, y) => x.avg2 + y.avg2 + 2 * x.avg * y.avg);
-        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y, (x, y) => x.avg2 + y.avg2 - 2 * x.avg * y.avg);
-        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x * y, (x, y) => x.avg2 * y.avg2);
-        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x / y, (x, y) => x.avg2 / y.avg2);
+        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y);
+        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y);
+        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x * y);
+        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x / y);
 
+        public static bool operator ==(FloatWithEx a, FloatWithEx b) => a.Equals(b);
+        public static bool operator !=(FloatWithEx a, FloatWithEx b) => !a.Equals(b);
         public bool Equals(FloatWithEx other)
         {
-            return Mathf.Abs(value).Equals(Mathf.Abs(other.value));
+            return value.Equals(other.value);
         }
 
         public override bool Equals(object obj)
@@ -189,7 +171,7 @@ namespace Elements
 
         public override int GetHashCode()
         {
-            return Mathf.Abs(value).GetHashCode();
+            return value.GetHashCode();
         }
     }
 }

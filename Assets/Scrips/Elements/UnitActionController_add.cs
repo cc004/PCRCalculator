@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using Elements.Battle;
 using System;
+using PCRCaculator.Battle;
 using Spine;
 using Spine.Unity;
 
@@ -89,8 +90,17 @@ namespace Elements
             }
 
         }
+
+        private static Dictionary<int, FirearmCtrlData> cache = new Dictionary<int, FirearmCtrlData>();
+
+        private static void SetPrefabDataBySkillid(int skillid, FirearmCtrlData data)
+        {
+            cache[skillid] = data;
+        }
+
         private Elements.FirearmCtrlData GetPrefabDataBySkillid(int skillid)
         {
+            if (cache.TryGetValue(skillid, out var val)) return val;
             string key = "attack";
             try
             {
@@ -757,17 +767,17 @@ namespace Elements
                 return;
             GameObject prefab1 = (GameObject)null;
             //SkillEffectCtrl prefab2 = this.createPrefab(_skillEffect, _skill, _target, ref prefab1);
-            SkillEffectCtrl2 prefab2 = new FirearmCtrl2();            
+            SkillEffectCtrl2 prefab2 = new FirearmCtrl2();
             //prefab2.InitializeSort();//没用
             //prefab2.SetStartTime(_starttime);//设置特效激活时间
             //prefab2.PlaySe(this.Owner.SoundUnitId, this.Owner.IsLeftDir);
-            prefab2.SetPossitionAppearanceType(_skillEffect, _target, this.Owner, _skill);
             //prefab2.ExecAppendCoroutine((double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null, prefab2 is AwakeUbNoneStopEffect);
             //prefab2.SetTimeToDieByStartHp(this.Owner.StartHpPercent);
             //if (_modeChangeEndEffect)
             //    this.Owner.ModeChangeEndEffectList.Add(prefab2);
             //if (_skipCutIn)
             //    prefab2.OnAwakeWhenSkipCutIn();
+            prefab2.SetPossitionAppearanceType(_skillEffect, _target, this.Owner, _skill);
             switch (_skillEffect.EffectBehavior)
             {
                 case eEffectBehavior.FIREARM:
@@ -776,6 +786,7 @@ namespace Elements
                     try
                     {
                         firearmCtrl.data = _skillEffect.Prefab.GetComponent<FirearmCtrl>().GetPrefabData();
+                        SetPrefabDataBySkillid(_skill.SkillId, firearmCtrl.data);
                     }
                     catch (MissingReferenceException e)
                     {
@@ -944,7 +955,7 @@ namespace Elements
         private float resumeTime { get; set; }
 
 
-        public Vector3 position = Vector3.zero;
+        public virtual Vector3 position { get; set; } = Vector3.zero;
 
         public virtual void SetPossitionAppearanceType(
   NormalSkillEffect skillEffect,
@@ -1042,7 +1053,7 @@ namespace Elements
     public class FirearmCtrl2:SkillEffectCtrl2
     {
         public FirearmCtrlData data;
-
+        
         public bool IsAbsolute { get; set; }
 
         public bool InFlag { get; set; }
@@ -1127,29 +1138,45 @@ namespace Elements
             {
                 case eMoveTypes.LINEAR:
                     Vector3 toDirection = this.TargetPos - this.position;
+                    toDirection.z = 0;
                     toDirection.Normalize();
                     //this.speed = this.MoveRate * toDirection;
-                    this.speed = this.data.MoveRate * toDirection * SPEED_FIX;
+                    this.speed = this.data.MoveRate * toDirection;
                     //this.transform.rotation = Quaternion.FromToRotation((UnityEngine.Object)_owner == (UnityEngine.Object)null || !_owner.IsLeftDir ? Vector3.right : Vector3.left, toDirection);
                     break;
                 case eMoveTypes.NONE:
                 case eMoveTypes.HORIZONTAL:
-                    this.speed = new Vector3(this.data.MoveRate, 0.0f, 0.0f) * SPEED_FIX;
+                    this.speed = new Vector3(this.data.MoveRate, 0.0f, 0.0f);
                     break;
                 case eMoveTypes.PARABORIC:
                 case eMoveTypes.PARABORIC_ROTATE:
                     float durationTime = this.data.duration / 2f;
-                    //this.easingUpY = new CustomEasing(CustomEasing.eType.outCubic, this.transform.position.y, this.transform.position.y + _height, durationTime);
-                    //this.easingDownY = new CustomEasing(CustomEasing.eType.inQuad, this.transform.position.y + _height, this.TargetPos.y, durationTime);
-                    //this.easingX = new CustomEasing(CustomEasing.eType.linear, this.transform.position.x, this.TargetPos.x, this.duration);
+                    this.easingUpY = new CustomEasing(CustomEasing.eType.outCubic, this.position.y, this.position.y + _height, durationTime);
+                    this.easingDownY = new CustomEasing(CustomEasing.eType.inQuad, this.position.y + _height, this.TargetPos.y, durationTime);
+                    this.easingX = new CustomEasing(CustomEasing.eType.linear, this.position.x, this.TargetPos.x, this.data.duration);
                     break;
             }
             if ((eMoveTypes)this.data.MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return;
-            //this.easingUpRotate = new CustomEasing(CustomEasing.eType.inQuad, this.startRotate, 0.0f, this.duration / 2f);
-            //this.easingDownRotate = new CustomEasing(CustomEasing.eType.linear, 0.0f, this.endRotate, this.duration / 2f);
+            this.easingUpRotate = new CustomEasing(CustomEasing.eType.inQuad, this.data.startRotate, 0.0f, this.data.duration / 2f);
+            this.easingDownRotate = new CustomEasing(CustomEasing.eType.linear, 0.0f, this.data.endRotate, this.data.duration / 2f);
         }
 
+        private Vector3 GetParaboricPosition(float _currentTime, float _deltaTime)
+        {
+            Vector3 position = base.position;
+            if (this.easingX.IsMoving)
+            {
+                position = new Vector3(this.easingX.GetCurVal(_deltaTime, true), (_currentTime >= this.data.duration / 2f) ? this.easingDownY.GetCurVal(_deltaTime, true) : this.easingUpY.GetCurVal(_deltaTime, true), base.position.z);
+            }
+            return position;
+        }
+
+        private CustomEasing easingX;
+        private CustomEasing easingUpY;
+        private CustomEasing easingDownY;
+        private CustomEasing easingUpRotate;
+        private CustomEasing easingDownRotate;
         private IEnumerator updatePosition(float _lifeDistance)
         {
             float currentTime = 0.0f;
@@ -1192,25 +1219,25 @@ namespace Elements
                     {
                         case eMoveTypes.LINEAR:
                         case eMoveTypes.HORIZONTAL:
-                        case eMoveTypes.PARABORIC:
-                        case eMoveTypes.PARABORIC_ROTATE:
-
-                            b += new Vector3(speed.x * deltaTime,0,0);
-                            position = b;
-                            break;
                         //case eMoveTypes.PARABORIC:
                         //case eMoveTypes.PARABORIC_ROTATE:
-                            /*currentTime += deltaTime;
-                            b = data.GetParaboricPosition(currentTime, deltaTime);
+
+                            //b += new Vector3(speed.x * deltaTime,0,0);
+                        b += speed * deltaTime;
+                            break;
+                        case eMoveTypes.PARABORIC:
+                        case eMoveTypes.PARABORIC_ROTATE:
+                            currentTime += deltaTime;
+                            b = GetParaboricPosition(currentTime, deltaTime);
                             if ((double)currentTime > (double)data.duration)
                             {
                                 hitFlag = true;
                                 break;
-                            }*/
+                            }
                             break;
                     }
                     //if ((eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE)
-                     //   data.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, (double)currentTime >= (double)data.duration / 2.0 ? data.easingDownRotate.GetCurVal(deltaTime, true) : data.easingUpRotate.GetCurVal(deltaTime, true));
+                    //    data.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, (double)currentTime >= (double)data.duration / 2.0 ? data.easingDownRotate.GetCurVal(deltaTime, true) : data.easingUpRotate.GetCurVal(deltaTime, true));
                     position = b;
                     switch ((eMoveTypes)data.MoveType)
                     {
@@ -1264,6 +1291,7 @@ namespace Elements
             this.InFlag = true;
             return _hitFlag;
         }
+
 
     }
 }

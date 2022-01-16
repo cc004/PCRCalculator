@@ -341,14 +341,15 @@ namespace PCRCaculator.Guild
         {
             SettingData.calSpeed = Mathf.RoundToInt(calSlider.value);
             calSettingTexts[0].text = "x" + SettingData.calSpeed;
-            calSettingTexts[1].text = Mathf.RoundToInt(90.0f / SettingData.calSpeed) + "s";
         }
+        public int stoptime;
         public void StartCalButton()
         {
             /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
             {
                 return;
             }*/
+            stoptime = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             SaveDataToJson();
             EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
             GuildBattleData battleData = new GuildBattleData();

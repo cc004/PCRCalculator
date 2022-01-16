@@ -53,13 +53,13 @@ namespace Elements
         public virtual float GetBodyWidth() => this.Owner.BodyWidth;
 
         //public virtual Vector3 GetBottomTransformPosition() => (UnityEngine.Object)this.Owner == (UnityEngine.Object)null ? Vector3.zero : this.Owner.BottomTransform.position;
-        public virtual Vector3 GetBottomTransformPosition() => (UnityEngine.Object)this.Owner == (UnityEngine.Object)null ? Vector3.zero : this.Owner.BottomTransform.position*60f;
+        public virtual Vector3 GetBottomTransformPosition() => (UnityEngine.Object)this.Owner == (UnityEngine.Object)null ? Vector3.zero : this.Owner.BottomTransform.position;
 
         //public virtual Vector3 GetOwnerBottomTransformPosition() => this.Owner.BottomTransform.position;
         public virtual Vector3 GetOwnerBottomTransformPosition() => this.Owner.BottomTransform.position * 60f;
 
         //public Vector3 GetBottomTransformLocalPosition() => this.Owner.BottomTransform.localPosition;
-        public Vector3 GetBottomTransformLocalPosition() => this.Owner.BottomTransform.localPosition * 60f;
+        public Vector3 GetBottomTransformLocalPosition() => this.Owner.BottomTransform.localPosition;
 
         public Vector3 GetBottomLossyScale() => this.Owner.BottomTransform.lossyScale;
 
@@ -80,6 +80,10 @@ namespace Elements
         public virtual int GetAtkZero() => (int)this.Owner.AtkZero;
 
         public virtual int GetMagicStrZero() => (int)this.Owner.MagicStrZero;
+
+        public virtual FloatWithEx GetAtkZeroEx() => this.Owner.AtkZero;
+
+        public virtual FloatWithEx GetMagicStrZeroEx() => this.Owner.MagicStrZero;
 
         public virtual int GetAccuracyZero() => (int)this.Owner.AccuracyZero;
 
@@ -178,7 +182,7 @@ namespace Elements
                 {
                     case UnitCtrl.BuffParamKind.ATK:
                         UnitCtrl owner2 = this.Owner;
-                        owner2.Atk = owner2.Atk.Sum(hash, _value);
+                        owner2.Atk = owner2.Atk + _value;
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         UnitCtrl owner3 = this.Owner;
@@ -188,7 +192,7 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
                         UnitCtrl owner4 = this.Owner;
-                        owner4.MagicStr = owner4.MagicStr.Sum(hash,  _value);
+                        owner4.MagicStr = owner4.MagicStr +  _value;
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         UnitCtrl owner5 = this.Owner;

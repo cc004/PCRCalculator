@@ -15,6 +15,11 @@ namespace Elements
     [ExecuteAlways]
     public class FirearmCtrl : SkillEffectCtrl
     {
+        private CustomEasing easingX;
+        private CustomEasing easingUpY;
+        private CustomEasing easingDownY;
+        private CustomEasing easingUpRotate;
+        private CustomEasing easingDownRotate;
         [SerializeField]
         private float HitDelay = 0.1f;
         [SerializeField]
@@ -26,13 +31,9 @@ namespace Elements
         private float startRotate = 60f;
         [SerializeField]
         private float endRotate = -60f;
-        [NonSerialized]
+        //[NonSerialized]
+        [SerializeField]
         public Bounds ColliderBox;
-        private CustomEasing easingX;
-        private CustomEasing easingUpY;
-        private CustomEasing easingDownY;
-        private CustomEasing easingUpRotate;
-        private CustomEasing easingDownRotate;
         private bool activeSelf = true;
         private const float HIT_DELAY_DISTANCE = 0.2f;
         private float SPEED_FIX => MyGameCtrl.Instance.tempData.SettingData.skillEffeckFix;
@@ -84,6 +85,11 @@ namespace Elements
         }
 
         protected virtual Vector3 getHeadBonePos(BasePartsData _target) => _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
+
+        public void OnDisable()
+        {
+
+        }
 
         public virtual void Initialize(
           BasePartsData _target,

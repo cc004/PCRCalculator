@@ -499,7 +499,7 @@ namespace ExcelHelper
                 int[] backColotInt_2 = new int[3] { 250, 191, 143 };
                 int[] lineColor = new int[3] { 151, 71, 6 };
                 worksheet0.Cells[1, 2, 2, 9].Merge = true;
-                worksheet0.MySetValue(1, 2, TimelineData.timeLineName, 16, blod: true, backColor: backColotInt_1);
+                worksheet0.MySetValue(1, 2, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
                 worksheet0.MySetValue(3, 2,
                     MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes(),12, blod: true, fontColor:new int[3] { 226,107,10}, backColor: backColotInt_1);
                 worksheet0.MySetValue(4, 2, TimelineData.exceptDamage + "w", blod: true, fontColor: new int[3] { 26, 36, 242 }, backColor: backColotInt_1);

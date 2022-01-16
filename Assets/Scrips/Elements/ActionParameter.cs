@@ -13,6 +13,7 @@ namespace Elements
 {
   public class ActionParameter : ISingletonField
   {
+        public string sortinfo;
     //private static Yggdrasil<ActionParameter> staticSingletonTree;
     private static BattleManager staticBattleManager;
     private static BattleEffectPoolInterface staticBattleEffectPool;

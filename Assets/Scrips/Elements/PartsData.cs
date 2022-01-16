@@ -41,9 +41,9 @@ namespace Elements
 
         public int Level { get; protected set; }
 
-        public SumFloatWithEx Atk { get; protected set; }
+        public FloatWithEx Atk { get; protected set; }
 
-        public SumFloatWithEx MagicStr { get; protected set; }
+        public FloatWithEx MagicStr { get; protected set; }
 
         public ObscuredInt Def { get; protected set; }
 
@@ -90,6 +90,12 @@ namespace Elements
         {
             FloatWithEx num;
             return (int)(!this.additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
+        }
+
+        private FloatWithEx getAdditionalBuffEx(UnitCtrl.BuffParamKind _kind)
+        {
+            FloatWithEx num;
+            return (!this.additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
         public override bool GetTargetable() => !this.IsBreak || this.AttachmentNamePairList.Count <= 0;
@@ -201,6 +207,10 @@ namespace Elements
 
         public override int GetMagicStrZero() => Mathf.Max(0, (int)(FloatWithEx)this.MagicStr) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
 
+        public override FloatWithEx GetAtkZeroEx() => this.Atk.Max(0) + this.getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK);
+
+        public override FloatWithEx GetMagicStrZeroEx() => this.MagicStr.Max(0) + this.getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR);
+
         public override int GetAccuracyZero() => Mathf.Max(0, (int)this.Accuracy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
 
         public override int GetPhysicalCriticalZero() => Mathf.Max(0, (int)this.PhysicalCritical) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL);
@@ -271,13 +281,13 @@ namespace Elements
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
-                        this.Atk = this.Atk.Sum(hash, _value);
+                        this.Atk = (int)(this.Atk + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         this.Def = (int)((int)this.Def + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
-                        this.MagicStr = this.MagicStr.Sum(hash, _value);
+                        this.MagicStr = (int)(this.MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         this.MagicDef = (int)((int)this.MagicDef + _value);

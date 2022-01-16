@@ -33,8 +33,8 @@ namespace PCRCaculator.Battle
             owner.OnChangeState += SetAbnormalIcons;
             if (isSummon)
             {
-                owner.OnLifeAmmountChange += SetHPBar;
-                hpBar.SetActive(true);
+                //owner.OnLifeAmmountChange += SetHPBar;
+                //hpBar.SetActive(true);
             }
             if (owner.IsPartsBoss)
             {
@@ -107,7 +107,14 @@ namespace PCRCaculator.Battle
         {
             while (true)
             {
-                posText.text = "" + Mathf.RoundToInt(owner2.transform.localPosition.x);
+                try
+                {
+                    posText.text = $"{Mathf.RoundToInt(owner2.transform.localPosition.x)}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / Elements.UnitDefine.MAX_ENERGY:P2}";
+                }
+                catch
+                {
+
+                }
                 yield return null;
             }
         }

@@ -432,6 +432,7 @@ namespace PCRCaculator
                 {
                     if (path_0.Contains(fit))
                         result = asset.LoadAsset<T>(path_0);
+                    if (result != null) break;
                 }
             }
             return result;

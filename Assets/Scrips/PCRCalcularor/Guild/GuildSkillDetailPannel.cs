@@ -25,7 +25,7 @@ namespace PCRCaculator.Guild
             detailTexts[1].text = data.UnitName;
             detailTexts[2].text = data.skillState.GetDescription();
             detailTexts[3].text = data.startTime + "~" + data.endTime;
-            detailTexts[4].text = data.energy == 0f ? "无" : $"{data.energy}";
+            detailTexts[4].text = data.energy == 0f ? "无" : $"{data.energy}-{data.energy.Probability(x => x >= 1000f):P0}";
             for(int i = 0; i < data.actionExecDatas.Count; i++)
             {
                 AddActionDetails(data.actionExecDatas[i], i);
@@ -40,7 +40,7 @@ namespace PCRCaculator.Guild
         private void AddActionDetails(UnitActionExecData data,int idx)
         {
             GameObject a = Instantiate(actionPrefab);
-            a.transform.SetParent(prefabParent, false);
+            a.transform.SetParent(prefabParent, false); 
             a.transform.localPosition = prefabBasePos + idx*prefabAddPos;
             List<string> details = new List<string>();
             details.Add(data.actionID + "");

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using ExcelHelper;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,12 @@ using Random = UnityEngine.Random;
 
 namespace PCRCaculator.Guild
 {
+    public class ProbEvent
+    {
+        public string unit;
+        public string description;
+        public Func<int, bool> predict;
+    }
     public class GuildCalculator : MonoBehaviour
     {
         public static GuildCalculator Instance;
@@ -40,6 +47,7 @@ namespace PCRCaculator.Guild
         public ScrollRect skillScrollRect;
         public List<Toggle> ModeToggles;
         public GameObject skillGroupPrefab;
+        public InputField basedmg;
         public RectTransform skillGroupParent;
         public Vector3 skillGroupBasePos;
         public Vector3 skillGroupAddPos;
@@ -392,13 +400,17 @@ namespace PCRCaculator.Guild
                 ReflashTotalDamage(true, 0, false, 0, 0);
             }
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{(int)totalDamageExcept.Expected}±{(int)totalDamageExcept.Stddev}</color>]";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{(int)totalDamageExcept.Expect}({(int)totalDamageExcept.Expected})±{(int)totalDamageExcept.Stddev}</color>]";
             if (backTime > 0)
             {
-                damageStr += $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
+                detail = $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f, 1000):P0}";
+                damageStr += detail;
             }
+            else detail = string.Empty;
             totalDamageText.text = damageStr;
+            basedmg.text = totalDamageExcept.Expect.ToString();
         }
+        public string detail;
         private void ResizePrefabs(bool change)
         {
             int idx = 0;
@@ -451,12 +463,13 @@ namespace PCRCaculator.Guild
                     allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
                 {
                     UBExecTime = CreateUBExecTimeData(),
-                    exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expected / 10000),
+                    exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expect / 10000),
                     backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
                     charImages = PCRCaculator.Battle.BattleUIManager.Instance.GetCharactersImage(),
                     //string fileName = CreateExcelName();
                     timeLineName = CreateExcelName(),
-                    uBDetails = CreateUBDetailList()
+                    uBDetails = CreateUBDetailList(),
+                    detail = detail,
                 };
                 ExcelHelper.ExcelHelper.OutputGuildTimeLine(timelineData, fileName);
                 MainManager.Instance.WindowConfigMessage("成功！", null, null);
@@ -606,7 +619,7 @@ namespace PCRCaculator.Guild
             return new OnceResultData
             {
                 id = id,
-                exceptDamage = (long)totalDamageExcept.Expected,
+                exceptDamage = (long)totalDamageExcept.Expect,
                 criticalEX = totalDamageCriEX,
                 currentDamage = totalDamage,
                 randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,
@@ -682,6 +695,108 @@ namespace PCRCaculator.Guild
 
 
         private readonly Dictionary<string, string> templateSettings = new Dictionary<string, string>();
+        public readonly List<ProbEvent> dmglist = new List<ProbEvent>();
+        public readonly List<(int frame, FloatWithEx value)> bossValues = new List<(int frame, FloatWithEx value)>();
+
+        public void SaveDieProb()
+        {
+            try
+            {
+                var ofn = new OpenFileName();
+                ofn.structSize = Marshal.SizeOf(ofn);
+                ofn.filter = "Text Files(*.txt)\0*.txt\0";
+                ofn.file = new string(new char[256]);
+                ofn.maxFile = ofn.file.Length;
+                ofn.fileTitle = new string(new char[64]);
+                ofn.maxFileTitle = ofn.fileTitle.Length;
+                ofn.title = "选择保存路径";
+                ofn.defExt = "txt";
+                ofn.file = CreateExcelName();
+                //注意 一下项目不一定要全选 但是0x00000008项不要缺少
+                ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
+
+                if (!DllTest.GetSaveFileName(ofn))
+                {
+                    return;
+                }
+                var fileName = ofn.file.Replace("\\", "/");
+                const int N = 10000;
+                const string dmginfo = "标伤到达率";
+                const string dmginfo2 = "标伤到达率(未乱轴)";
+                const string totaldie = "总乱轴";
+                var dname = new Dictionary<string, int>();
+                var dskill = new Dictionary<string, Dictionary<string, int>>();
+                foreach (var name in dmglist.Select(n => n.unit).Distinct())
+                    dname.Add(name, 0);
+                dname.Add(dmginfo, 0);
+                dname.Add(dmginfo2, 0);
+                dname.Add(totaldie, 0);
+                foreach (var skill in dmglist.Select(n => (n.unit, n.description)).Distinct())
+                {
+                    if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());
+                    dskill[skill.unit].Add(skill.description, 0);
+                }
+                var sname = new HashSet<string>();
+                var sskill = new HashSet<(string, string)>();
+                var rnd = new System.Random();
+                var val = float.Parse(basedmg.text);
+
+                Func<int, bool> action;
+                if (val > 0) action = hash => totalDamageExcept.Emulate(hash) >= val;
+                else
+                {
+                    var lastHp = bossValues.Last(f => (PCRCaculator.Guild.GuildManager.Instance.SettingData.limitTime - (int)(f.frame / 60) >= -val)).value;
+                    action = hash => lastHp.Emulate(hash) <= 0;
+                }
+                for (int i = 0; i < N; ++i)
+                {
+                    var hash = rnd.Next();
+                    foreach (var evt in dmglist)
+                    {
+                        if (evt.predict(hash))
+                        {
+                            if (!sname.Contains(evt.unit))
+                            {
+                                sname.Add(evt.unit);
+                                sskill.Add((evt.unit, evt.description));
+                            }
+                        }
+                    }
+
+                    if (sname.Count > 0)
+                    {
+                        ++dname[totaldie];
+                        if (action(hash)) ++dname[dmginfo];
+                    }
+                    else if (action(hash))
+                    {
+                        ++dname[dmginfo];
+                        ++dname[dmginfo2];
+                    }
+
+                    foreach (var name in sname) ++dname[name];
+                    foreach ((string name, string source) in sskill) ++dskill[name][source];
+                    sname.Clear();
+                    sskill.Clear();
+                }
+                if (File.Exists(fileName)) File.Delete(fileName);
+                using (var sw = new StreamWriter(File.OpenWrite(fileName)))
+                {
+                    foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
+                    {
+                        sw.WriteLine($"{name}-{(float)dname[name] / N:P1}");
+                        if (!dskill.ContainsKey(name)) continue;
+                        foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
+                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / N:P1}");
+                    }
+                }
+                MainManager.Instance.WindowMessage("成功！");
+            }
+            catch (Exception e)
+            {
+                MainManager.Instance.WindowMessage(e.ToString());
+            }
+        }
 
         public void SaveFileToTemplate()
         {
@@ -745,12 +860,13 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
             {
                 UBExecTime = CreateUBExecTimeData(),
-                exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expected / 10000),
+                exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expect / 10000),
                 backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
                 charImages = PCRCaculator.Battle.BattleUIManager.Instance.GetCharactersImage(),
                 //string fileName = CreateExcelName();
                 timeLineName = CreateExcelName(),
-                uBDetails = CreateUBDetailList()
+                uBDetails = CreateUBDetailList(),
+                detail = detail,
             };
 
             string fileName = CreateExcelName();
@@ -1112,6 +1228,7 @@ namespace PCRCaculator.Guild
         [JsonIgnore]
         public List<byte[]> charImages;
         public string timeLineName;
+        public string detail;
         [JsonIgnore]
         public List<UBDetail> uBDetails;
         public GuildTimelineData()

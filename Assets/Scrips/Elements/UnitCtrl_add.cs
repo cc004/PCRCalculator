@@ -16,7 +16,7 @@ namespace Elements
         private BattleUIManager uIManager;
         public PCRCaculator.UnitData unitData;
         public UnitParameter unitParameter;
-        public string UnitName = "";
+        public string UnitName = "", UnitNameEx = "";
         public int posIdx;//0-4
         public Action<int,ActionState, int,string, UnitCtrl> MyOnChangeState;
         public Action<int, PCRCaculator.Guild.UnitAbnormalStateChangeData, int> MyOnAbnormalStateChange;

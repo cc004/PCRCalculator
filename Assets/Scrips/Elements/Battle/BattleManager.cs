@@ -534,6 +534,11 @@ namespace Elements.Battle
 
         private void updateFrame()
         {
+            if (PCRCaculator.Guild.GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
+            {
+                PCRCaculator.Guild.GuildManager.Instance.stoptime = -1;
+                MyGameCtrl.Instance.PauseButton();
+            }
             bool _canUpdateTime = !this.isPauseTimeLimit && this.BlackOutUnitList.Count == 0;
             //BattleHeaderController instance = BattleHeaderController..Instance;
 
@@ -3333,6 +3338,8 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
+            PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Clear();
+            PCRCaculator.Guild.GuildCalculator.Instance.bossValues.Clear();
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             // ISSUE: object of a compiler-generated type is created

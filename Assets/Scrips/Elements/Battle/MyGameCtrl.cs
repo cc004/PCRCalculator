@@ -340,6 +340,7 @@ namespace Elements
                 }*/
                 unitCtrl.UnitName = data.GetUnitName();
             }
+            unitCtrl.UnitNameEx = unitCtrl.UnitName;
             unitCtrl.UnitName = (isplayer ? "<color=#FF0000>" : "<color=#0024FF>") + unitCtrl.UnitName + "</color>";
             unitCtrl.posIdx = idx;
             var actionController = b.GetComponent<UnitActionController>();
@@ -370,6 +371,7 @@ namespace Elements
                 unitCtrl.SetUnitCtrl(ctrlData);
             }
             unitCtrl.UnitName = mainManager.GetUnitNickName(unitid);
+            unitCtrl.UnitNameEx = unitCtrl.UnitName;
             b.GetComponent<UnitActionController>().LoadActionControllerData(unitid);
             return unitCtrl;
         }
@@ -459,6 +461,7 @@ namespace Elements
             }
             return flag;
         }
+        /*
         public static void ResetSkillEffects(UnitActionController actionController)
         {
             int unitid = actionController.Owner.unitData.unitId;
@@ -511,7 +514,7 @@ namespace Elements
 
             }
 
-        }
+        }*/
         public void OnBattleFinished(int result)//1-lose,2-timeover
         {
             if (tempData.isGuildBattle)

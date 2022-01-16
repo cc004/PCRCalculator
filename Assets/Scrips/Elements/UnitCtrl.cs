@@ -19,6 +19,14 @@ using System.ComponentModel;
 
 namespace Elements
 {
+    public class BasePartsDataEx
+    {
+        public FloatWithEx Energy, Hp, GetAtkZeroEx, GetMagicStrZeroEx;
+        public long MaxHp;
+        public string UnitName;
+        public int hash;
+    }
+
     public partial class UnitCtrl : FixedTransformMonoBehavior, ISingletonField
     {
         private PrincessFormProcessor princessFormProcessor;
@@ -1162,9 +1170,9 @@ namespace Elements
         
         public ObscuredLong MaxHp { get; set; }
 
-        public SumFloatWithEx Atk { get; set; }
+        public FloatWithEx Atk { get; set; }
 
-        public SumFloatWithEx MagicStr { get; set; }
+        public FloatWithEx MagicStr { get; set; }
         private int def;
         public ObscuredInt Def 
         {
@@ -1512,8 +1520,9 @@ this.updateCurColor();
                 UnitCtrl.staticBattleManager = BattleManager.Instance;
                 UnitCtrl.staticBattleLog = battleManager;
                 UnitCtrl.staticBattleTimeScale = battleManager.battleTimeScale;
-                UnitCtrl.FunctionalComparer<BasePartsData>.CreateInstance();
-            
+            UnitCtrl.FunctionalComparer<BasePartsData>.CreateInstance();
+            UnitCtrl.FunctionalComparer<BasePartsDataEx>.CreateInstance();
+
             this.OwnerPassiveAction = new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>)new eParamType_DictComparer());
             UnitCtrl.InitializeExAndFreeSkill(_data.UniqueData, ePassiveInitType.OWNER, 0, this);
             this.RepeatEffectList = new List<SkillEffectCtrl>();
@@ -1864,7 +1873,7 @@ this.updateCurColor();
                 if (skin.GetAttachment(slotIndex, name) is BoundingBoxAttachment attachment)
                 {
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, this.gameObject, false);
-                    this.ColliderCenter = polygonCollider2D.bounds.center - this.transform.position;
+                    this.ColliderCenter = (polygonCollider2D.bounds.center - this.transform.position) / 2;
                     this.ColliderSize = polygonCollider2D.bounds.size / 2;
                     if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.SettingData.usePhysics)
                     {
@@ -4483,14 +4492,14 @@ this.updateCurColor();
             this.updateCurColor();
         }*/
 
-       /* private void updateCurColor()
-        {
-            Dictionary<ChangeColorEffect, Color>.Enumerator enumerator = this.curColorChannel.GetEnumerator();
-            Color curColor = this.curColor;
-            while (enumerator.MoveNext())
-                curColor *= enumerator.Current.Value;
-            this.GetCurrentSpineCtrl().CurColor = curColor;
-        }*/
+        /* private void updateCurColor()
+         {
+             Dictionary<ChangeColorEffect, Color>.Enumerator enumerator = this.curColorChannel.GetEnumerator();
+             Color curColor = this.curColor;
+             while (enumerator.MoveNext())
+                 curColor *= enumerator.Current.Value;
+             this.GetCurrentSpineCtrl().CurColor = curColor;
+         }*/
 
         /*public void SetCurColorOffset(ChangeColorEffect _key, Color _color)
         {
@@ -4505,14 +4514,6 @@ this.updateCurColor();
             this.GetCurrentSpineCtrl().CurColorOffset = color;
         }*/
 
-        public static void QuickSort<T>(List<T> _array, Func<T, T, int> _compare)
-        {
-            if (_array.Count == 0)
-                return;
-            UnitCtrl.FunctionalComparer<T> instance = UnitCtrl.FunctionalComparer<T>.Instance;
-            instance.SetComparer(_compare);
-            UnitCtrl.quickSortImpl<T>(_array, 0, _array.Count - 1, instance);
-        }
 
         private static void swap<T>(List<T> _list, int i, int j)
         {
@@ -4521,7 +4522,7 @@ this.updateCurColor();
             _list[j] = obj;
         }
 
-        private static void quickSortImpl<T>(
+        public static void quickSortImpl<T>(
           List<T> _array,
           int _left,
           int _right,
@@ -4559,13 +4560,11 @@ this.updateCurColor();
             }
         }
         private float baseX;
-        public float BaseX { get => baseX; set { baseX = value * 60; } }
+        public float BaseX { get => baseX; set { baseX = value; } }
 
         public int CompareLeft(BasePartsData _a, BasePartsData _b) => _a.GetPosition().x.CompareTo(_b.GetPosition().x);
 
         public int CompareRight(BasePartsData _a, BasePartsData _b) => _b.GetPosition().x.CompareTo(_a.GetPosition().x);
-
-        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((float)(long)a.Owner.Hp / (float)(long)a.Owner.MaxHp).CompareTo((float)(long)b.Owner.Hp / (float)(long)b.Owner.MaxHp) : 1);
 
         public int CompareLifeAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((float)(long)_a.Owner.Hp / (float)(long)_a.Owner.MaxHp, (float)(long)_b.Owner.Hp / (float)(long)_b.Owner.MaxHp) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareLifeAsc(_a, _b);
 
@@ -4575,11 +4574,7 @@ this.updateCurColor();
 
         public int CompareLifeValueAsc(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _a.Owner.Hp.CompareTo(_b.Owner.Hp) : 1);
 
-        public static int CompareEnergyAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Owner.Energy.CompareTo(b.Owner.Energy) : 1);
-
         public int CompareEnergyAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareEnergyAsc(_a, _b);
-
-        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((float)(long)b.Owner.Hp / (float)(long)b.Owner.MaxHp).CompareTo((float)(long)a.Owner.Hp / (float)(long)a.Owner.MaxHp) : -1);
 
         public int CompareLifeDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((float)(long)_a.Owner.Hp / (float)(long)_a.Owner.MaxHp, (float)(long)_b.Owner.Hp / (float)(long)_b.Owner.MaxHp) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareLifeDec(_a, _b);
 
@@ -4588,8 +4583,6 @@ this.updateCurColor();
         public int CompareLifeValueDecSameRight(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? this.CompareRight(_a, _b) : this.CompareLifeValueDec(_a, _b);
 
         public int CompareLifeValueDec(BasePartsData _a, BasePartsData _b) => _a == null ? (_b != null ? -1 : 0) : (_b != null ? _b.Owner.Hp.CompareTo(_a.Owner.Hp) : -1);
-
-        public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
 
         public int CompareEnergyDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareEnergyDec(_a, _b);
 
@@ -4625,6 +4618,14 @@ this.updateCurColor();
             return !BattleUtil.Approximately(_a, _b) ? Math.Abs(_b).CompareTo(Math.Abs(_a)) : a.Owner.UnitInstanceId.CompareTo(b.Owner.UnitInstanceId);
         }
 
+        public static int CompareEnergyAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Owner.Energy.CompareTo(b.Owner.Energy) : 1);
+
+        public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
+
+        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((float)(long)a.Owner.Hp / (float)(long)a.Owner.MaxHp).CompareTo((float)(long)b.Owner.Hp / (float)(long)b.Owner.MaxHp) : 1);
+
+        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((float)(long)b.Owner.Hp / (float)(long)b.Owner.MaxHp).CompareTo((float)(long)a.Owner.Hp / (float)(long)a.Owner.MaxHp) : -1);
+
         public static int CompareAtkAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZero().CompareTo(b.GetAtkZero()) : 1);
 
         public static int CompareAtkDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.GetAtkZero().CompareTo(a.GetAtkZero()) : -1);
@@ -4632,6 +4633,24 @@ this.updateCurColor();
         public static int CompareMagicStrAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetMagicStrZero().CompareTo(b.GetMagicStrZero()) : 1);
 
         public static int CompareMagicStrDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.GetMagicStrZero().CompareTo(a.GetMagicStrZero()) : -1);
+
+        public static int CompareEnergyAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? a.Energy.Emulate(hash).CompareTo(b.Energy.Emulate(hash)) : 1);
+
+        public static int CompareEnergyDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Energy.Emulate(hash).CompareTo(a.Energy.Emulate(hash)) : -1);
+
+        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / a.MaxHp).CompareTo(b.Hp.Emulate(hash) / b.MaxHp) : 1);
+
+        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / b.MaxHp).CompareTo(a.Hp.Emulate(hash) / a.MaxHp) : -1);
+
+        public static int CompareAtkAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZeroEx.Emulate(hash).CompareTo(b.GetAtkZeroEx.Emulate(hash)) : 1);
+
+        public static int CompareAtkDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.GetAtkZeroEx.Emulate(hash).CompareTo(a.GetAtkZeroEx.Emulate(hash)) : -1);
+
+        public static int CompareMagicStrAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetMagicStrZeroEx.Emulate(hash).CompareTo(b.GetMagicStrZeroEx.Emulate(hash)) : 1);
+
+        public static int CompareMagicStrDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.GetMagicStrZeroEx.Emulate(hash).CompareTo(a.GetMagicStrZeroEx.Emulate(hash)) : -1);
+
+
 
         public int CompareAtkAscNear(BasePartsData _a, BasePartsData _b) => _a.GetAtkZero() == _b.GetAtkZero() ? this.CompareDistanceAsc(_a, _b) : UnitCtrl.CompareAtkAsc(_a, _b);
 
@@ -5896,7 +5915,7 @@ this.updateCurColor();
 
             var _fDamage = num5.Max(1f);
             /*if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && this.battleManager.KIHOGJBONDH != 0 && this.IsBoss)
-            {
+            { 
                 int PBAANIPPIGL = BattleUtil.FloatToInt(_fDamage);
                 switch (_damageData.ActionType)
                 {
@@ -6013,9 +6032,19 @@ this.updateCurColor();
             /*
             this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
             string des;
+            var prob = Hp.Probability(x => x <= 0f);
+            if (!this.IsBoss)
+                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                {
+                    unit = UnitNameEx,
+                    predict = hash => Hp.Emulate(hash) <= 0f,
+                    description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
+                });
+            else
+                PCRCaculator.Guild.GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
 
             des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
-                + $"-{Hp.Probability(x => x <= 0f):P0}";
+                + $"-{prob:P0}";
             MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)this.Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des);
             uIManager.LogMessage(des,PCRCaculator.Battle.eLogMessageType.GET_DAMAGE, this);
             this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
@@ -6049,7 +6078,7 @@ this.updateCurColor();
                 }
             }
             string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
-                                + $"-{Hp.Probability(x => x <= 0f):P0}";
+                                + $"-{prob:P0}";
             callBack?.Invoke(describe);
             return num6.Floor();
         }
@@ -6338,7 +6367,7 @@ this.updateCurColor();
                 int actionId = this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.INHIBIT_HEAL].ActionId;
                 Skill _skill = skill;
                 this.SetDamage(_damageData, false, actionId, _skill: _skill);
-                action?.Invoke("毒奶，对目标造成" + _damageData.Damage + $"点伤害-{Hp.Probability(x => x <= 0f):P0}");
+                action?.Invoke("毒奶，对目标造成" + _damageData.Damage + $"点伤害");
             }
             else
             {
