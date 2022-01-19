@@ -536,26 +536,27 @@ namespace ExcelHelper
                 foreach(var a in UBList)
                 {
                     worksheet0.MySetValue(currentLineNum, 1, a.UBTime);
+                    int second = (Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime - a.UBTime / 60);
+                    if (second >= 60)
+                    {
+                        second -= 60;
+                        if (second >= 10)
+                            worksheet0.MySetValue(currentLineNum, 2, "1:" + second);
+                        else
+                            worksheet0.MySetValue(currentLineNum, 2, "1:0" + second);
+                    }
+                    else
+                        worksheet0.MySetValue(currentLineNum, 2, second);
                     if (a.isBossUB)
                     {
-                        worksheet0.Cells[currentLineNum, 2, currentLineNum, 9].Merge = true;
-                        worksheet0.MySetValue(currentLineNum, 2, "BOSS  UB",backColor:backColotInt_1);
+                        worksheet0.Cells[currentLineNum, 3, currentLineNum, 9].Merge = true;
+                        worksheet0.MySetValue(currentLineNum, 3, "BOSS  UB",backColor:backColotInt_1);
                     }
                     else
                     {
                         worksheet0.Cells[currentLineNum, 6, currentLineNum, 9].Merge = true;
-                        int second = (Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime - a.UBTime / 60);
-                        if (second >= 60)
-                        {
-                            second -= 60;
-                            if (second >= 10)
-                                worksheet0.MySetValue(currentLineNum, 2, "1:" + second);
-                            else
-                                worksheet0.MySetValue(currentLineNum, 2, "1:0" + second);
-                        }
-                        else
-                            worksheet0.MySetValue(currentLineNum, 2, second);
                         worksheet0.MySetValue(currentLineNum, 3, a.unitData.GetNicName());
+                        worksheet0.MySetValue(currentLineNum, 4, a.description);
                         worksheet0.MySetValue(currentLineNum, 5, a.Damage , fontColor: a.Critical ? new int[3] { 255, 0, 0 } : new int[3] { 0, 0, 0 });
                     }
                     currentLineNum++;

@@ -5,6 +5,7 @@ using PCRCaculator.Battle;
 using PCRCaculator;
 using System.IO;
 using System;
+using System.Linq;
 using Newtonsoft0.Json;
 
 namespace Elements
@@ -135,7 +136,7 @@ namespace Elements
                 return true;
             }
             if (MainSkillIdList != null && MainSkillIdList.Count > 0)
-                if (skillid == MainSkillIdList[0] && targetSkill == 1)
+                if (skillid == (MainSkill1Evolved ? MainSkillEvolutionIdList : MainSkillIdList)[0] && targetSkill == 1 )
                 {
                     return true;
                 }
@@ -252,6 +253,58 @@ namespace Elements
                     Energy += 80f;
                 }
             }
+        }
+
+        public enum eCritPointPriority
+        {
+            FullEnergy,
+            StartSkill,
+            ExecAction,
+        }
+
+        public class CritPoint
+        {
+            public eCritPointPriority priority;
+            public int frame;
+            public string description;
+            public string description2;
+
+            public string ToString(int frame)
+            {
+                if (priority == eCritPointPriority.FullEnergy && frame - this.frame <= 1)
+                    return description2;
+                if (frame <= this.frame + 2)
+                    return $"极限押{description2}({frame - this.frame})";
+                else if (frame <= this.frame + 5)
+                    return $"速押{description2}({frame - this.frame})";
+                else if (frame <= this.frame + 8)
+                    return $"慢押{description2}({frame - this.frame})";
+                return $"{description}后{frame - this.frame}帧";
+            }
+        }
+
+        private static CritPoint globalCritPoint;
+        public CritPoint critPoint;
+        public CritPoint lastCritPoint
+        {
+            get => critPoint;
+            set
+            {
+                if (critPoint == null || value.priority <= critPoint.priority || value.frame >= 10 + critPoint.frame)
+                    critPoint = value;
+                if (IsSummonOrPhantom) return;
+                globalCritPoint = value;
+                globalCritPoint.description = this.UnitNameEx + globalCritPoint.description;
+            }
+        }
+        public string GetCurrentOp()
+        {
+            var frame = BattleHeaderController.CurrentFrameCount;
+            var res = string.Empty;
+            res = new[] { critPoint, globalCritPoint }.Where(c => c?.frame >= frame - 8).Distinct()
+                .OrderByDescending(c => c.frame).FirstOrDefault()?.ToString(frame);
+            if (!string.IsNullOrEmpty(res)) return res;
+            return critPoint?.ToString(BattleHeaderController.CurrentFrameCount) + "    " + globalCritPoint?.ToString(BattleHeaderController.CurrentFrameCount);
         }
     }
 }

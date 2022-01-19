@@ -154,13 +154,24 @@ namespace PCRCaculator.Guild
                 if (unitid >= 500000 && allUnitStateChangeDic.ContainsKey(unitid)) { return; }
                 if (allUnitLastStateDic[unitid].changStateTo != actionState)
                 {
+                    if (actionState == UnitCtrl.ActionState.IDLE)
+                    {
+                        ctrl.critPoint = new UnitCtrl.CritPoint()
+                        {
+                            description = "IDLE",
+                            description2 = "AUTO",
+                            frame = frameCount,
+                            priority = UnitCtrl.eCritPointPriority.ExecAction
+                        };
+                    }
                     allUnitStateChangeDic[unitid].Add(
                         new UnitStateChangeData
                         {
                             id = ++id,
                             changStateFrom = allUnitLastStateDic[unitid].changStateTo,
                             changStateTo = actionState,
-                            currentFrameCount = frameCount
+                            currentFrameCount = frameCount,
+                            operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null
                         });
                     //skillGroupPrefabDic[unitid].AddButtons(allUnitLastStateDic[unitid].currentFrameCount, frameCount, (int)actionState);
                     System.Action action = null;
@@ -178,7 +189,8 @@ namespace PCRCaculator.Guild
                     skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action);
 
                     skillScrollRect.horizontalNormalizedPosition = frameCount * deltaXforChat;
-                    allUnitLastStateDic[unitid] = new UnitStateChangeData(frameCount, allUnitLastStateDic[unitid].changStateTo, actionState, describe);
+                    allUnitLastStateDic[unitid] = new UnitStateChangeData(frameCount,
+                        allUnitLastStateDic[unitid].changStateTo, actionState, describe);
                 }
             }
             catch (System.Exception e)
@@ -542,7 +554,8 @@ namespace PCRCaculator.Guild
                         {
                             unitData = unitData,
                             sorting = tm.id,
-                            UBTime = tm.currentFrameCount
+                            UBTime = tm.currentFrameCount,
+                            description = tm.operation ?? string.Empty
                         };
                         ValueChangeData changeData = allUnitHPDic[bossId].Find(
                             a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
@@ -1034,6 +1047,8 @@ namespace PCRCaculator.Guild
         public Elements.UnitCtrl.ActionState changStateFrom;
         public Elements.UnitCtrl.ActionState changStateTo;
         public string describe;
+        [JsonIgnore]
+        public string operation;
 
         public UnitStateChangeData(int currentFrameCount, UnitCtrl.ActionState changStateFrom, UnitCtrl.ActionState changStateTo, string describe = "")
         {
@@ -1041,6 +1056,7 @@ namespace PCRCaculator.Guild
             this.changStateFrom = changStateFrom;
             this.changStateTo = changStateTo;
             this.describe = describe;
+            this.operation = null;
             id = 0;
         }
         public string GetMainDescribe()
@@ -1251,6 +1267,7 @@ namespace PCRCaculator.Guild
         public int UBTime;
         public int Damage;
         public bool Critical;
+        public string description;
     }
     public class RandomData
     {

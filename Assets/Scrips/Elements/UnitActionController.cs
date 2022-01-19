@@ -793,6 +793,13 @@ namespace Elements
             Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
             //end added Scripts
+            Owner.lastCritPoint = new UnitCtrl.CritPoint()
+            {
+                description = $"{skill.SkillName}唱名",
+                description2 = $"{skill.SkillName}唱名",
+                frame = BattleHeaderController.CurrentFrameCount,
+                priority = UnitCtrl.eCritPointPriority.StartSkill,
+            };
             return true;
         }
         private void searchAndSortTarget(
@@ -1330,6 +1337,13 @@ namespace Elements
             }
             actionExecData.result = isResisted ? PCRCaculator.Guild.UnitActionExecData.ActionState.MISS : PCRCaculator.Guild.UnitActionExecData.ActionState.NORMAL;
             Owner.MyOnExecAction?.Invoke(Owner.UnitId, skill.SkillId, actionExecData);
+            Owner.lastCritPoint = new UnitCtrl.CritPoint()
+            {
+                description = $"{skill.SkillName}的{action.ActionType.GetDescription()}执行",
+                description2 = (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
+                frame = BattleHeaderController.CurrentFrameCount,
+                priority = UnitCtrl.eCritPointPriority.ExecAction
+            };
             //change end
             if (action.ActionType == eActionType.REFLEXIVE)
                 return;

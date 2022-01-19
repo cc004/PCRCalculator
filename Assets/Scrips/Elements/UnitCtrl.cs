@@ -2809,6 +2809,16 @@ this.updateCurColor();
             MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
             uIManager.LogMessage("TP变更为：" + energy + $"-{Energy.Probability(x => x >= 1000f):P0}", PCRCaculator.Battle.eLogMessageType.CHANGE_TP, this);
+            if (this.Energy >= UnitDefine.MAX_ENERGY)
+            {
+                critPoint = new CritPoint()
+                {
+                    description = "TP满",
+                    description2 = "连点",
+                    frame = BattleHeaderController.CurrentFrameCount,
+                    priority = eCritPointPriority.FullEnergy
+                };
+            }
         }
 
         public void IndicateSkillName(string _skillName) 
@@ -6039,11 +6049,12 @@ this.updateCurColor();
             this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
             string des;
             var prob = Hp.Probability(x => x <= 0f);
+            var hp2 = Hp;
             if (!this.IsBoss)
                 PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
                 {
                     unit = UnitNameEx,
-                    predict = hash => Hp.Emulate(hash) <= 0f,
+                    predict = hash => hp2.Emulate(hash) <= 0f,
                     description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
                 });
             else
@@ -7391,6 +7402,14 @@ this.updateCurColor();
                 this.AppendCoroutine(this.updateSkill1(), ePauseType.SYSTEM, this);
             else
                 this.SetState(UnitCtrl.ActionState.IDLE);
+
+            lastCritPoint = new CritPoint()
+            {
+                description = $"{UnitNameEx}释放ub",
+                description2 = $"{UnitNameEx}ub后",
+                frame = BattleHeaderController.CurrentFrameCount,
+                priority = eCritPointPriority.ExecAction
+            };
         }
 
         private void playUbVoiceWithDelay() { }// => this.playVoiceDataList(!this.battleTimeScale.SpeedUpFlag ? (!this.PlayCutInFlag ? this.NormalSkillVoiceDelay : this.NormalSkillVoiceDelayWithCutIn) : (!this.PlayCutInFlag ? this.SpeedUpSkillVoiceDelay : this.SpeedUpSkillVoiceDelayWithCutIn), 100);
