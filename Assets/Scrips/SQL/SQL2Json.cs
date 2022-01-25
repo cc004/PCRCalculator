@@ -11,8 +11,6 @@ using Debug = UnityEngine.Debug;
 
 namespace PCRCaculator
 {
-
-
     public class SQL2Json
     {
         private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
@@ -44,7 +42,7 @@ namespace PCRCaculator
         private Dictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic = new Dictionary<int, UniqueEquipmentData>();//角色专武字典
 
         private Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();
-        private List<Guild.GuildEnemyData> guildEnemyDataList = new List<Guild.GuildEnemyData>();
+        private Dictionary<int, Guild.GuildEnemyData> guildEnemyDataList = new Dictionary<int, Guild.GuildEnemyData>();
 
         private SQLiteHelper sql;
         public int loadCharacterMax = 500000;//最多加载到的角色序号
@@ -235,7 +233,7 @@ namespace PCRCaculator
             //string conn = "data source=redive_jp.db";
             //string conn = "redive_jp.db";
 
-            sql = new SQLiteHelper(conn);
+            sql = JpConnection;
             
             LoadUnitRarityData(true);
             LoadUnitStoryData();
@@ -244,7 +242,7 @@ namespace PCRCaculator
 
             sql.CloseConnection();
 
-            sql = new SQLiteHelper(conn_cn);
+            sql = CnConnection;
             //LoadEquipmentData();
             LoadSkillData();
             LoadChineseBaseData();
@@ -252,7 +250,7 @@ namespace PCRCaculator
             LoadUnitRarityData();
             sql.CloseConnection();
 
-            /*sql = new SQLiteHelper(conn);
+            /*sql = JpConnection;
             LoadEquipmentData();
             //LoadUnitStoryData();
             LoadSkillData(true);
@@ -262,12 +260,12 @@ namespace PCRCaculator
         }
         private void Load_2()
         {
-            sql = new SQLiteHelper(conn);
+            sql = JpConnection;
             LoadEquipmentData();
             /*sql.CloseConnection();
 
             string conn_cn = "redive_cn.db";
-            sql = new SQLiteHelper(conn_cn);*/
+            sql = CnConnection;*/
             LoadQuestData();
             LoadWaveGroupData();
             LoadEnemyRewardData();
@@ -284,13 +282,13 @@ namespace PCRCaculator
             //string conn = "redive_cn_old.db";
             if (cn)
             {
-                sql = new SQLiteHelper(conn_cn);
+                sql = CnConnection;
                 LoadEnemyData(skill);
                 sql.CloseConnection();
             }
             else
             {
-                sql = new SQLiteHelper(conn);
+                sql = JpConnection;
                 LoadEnemyData(skill);
                 sql.CloseConnection();
             }
@@ -300,22 +298,22 @@ namespace PCRCaculator
         {
             if (cn)
             {
-                sql = new SQLiteHelper(conn_cn);
+                sql = CnConnection;
                 //LoadUnitRarityData();
                 LoadUnitAttackPattern();
                 sql.CloseConnection();
-                sql = new SQLiteHelper(conn);
+                sql = JpConnection;
                 //LoadUnitRarityData();
                 LoadUnitAttackPattern();
                 sql.CloseConnection();
             }
             else
             {
-                sql = new SQLiteHelper(conn);
+                sql = JpConnection;
                 //LoadUnitRarityData();
                 LoadUnitAttackPattern();
                 sql.CloseConnection();
-                sql = new SQLiteHelper(conn_cn);
+                sql = CnConnection;
                 //LoadUnitRarityData();
                 LoadUnitAttackPattern();
                 sql.CloseConnection();
@@ -324,23 +322,26 @@ namespace PCRCaculator
         private void Load_5()
         {
 
-            sql = new SQLiteHelper(conn);
+            sql = JpConnection;
             LoadUniqueEquipmentData();
             sql.CloseConnection();
         }
         private void Load_6()
         {
-            sql = new SQLiteHelper(conn);
+            sql = JpConnection;
             LoadResistDada();
             sql.CloseConnection();
         }
         private void Load_7()
         {
-            sql = new SQLiteHelper(conn);
+            sql = CnConnection;
             LoadClanBattleData();
             sql.CloseConnection();
 
         }
+        private static SQLiteHelper _jpconn, _cnconn;
+        private static SQLiteHelper JpConnection => _jpconn = _jpconn ?? new SQLiteHelper(conn);
+        private static SQLiteHelper CnConnection => _cnconn = _cnconn ?? new SQLiteHelper(conn_cn, true);
         private void LoadEquipmentData()
         {
             Dictionary<int, BaseData> dic = new Dictionary<int, BaseData>();
@@ -1345,31 +1346,22 @@ namespace PCRCaculator
                 }
             }
             reader = sql.ReadFullTable("clan_battle_2_map_data");
+            var lst = new List<(int id, int group, int[])>();
             while (reader.Read())
             {
-                int id = reader.GetInt32(reader.GetOrdinal("id"));
-                if (id >= 31)
+                lst.Add((reader.GetInt32(reader.GetOrdinal("id")), reader.GetInt32(reader.GetOrdinal("clan_battle_id")), new[]
                 {
-                    int clanGroupid = reader.GetInt32(reader.GetOrdinal("clan_battle_id"));
-                    int order = clanGroupid - 1013;
-                    while (guildEnemyDataList.Count <= order)
-                    {
-                        guildEnemyDataList.Add(new Guild.GuildEnemyData());
-                    }
-                    int lap = (id - 31) % 4;
-                    if (lap > 0)
-                    {
-                        List<int> enemyids = new List<int>();
-                        for(int i = 1; i <= 5; i++)
-                        {
-                            int waveid = reader.GetInt32(reader.GetOrdinal("wave_group_id_"+i));
-                            enemyids.Add(waveGroupDic[waveid]);
-                        }
-                        guildEnemyDataList[order].SetLapData(lap, enemyids);
-                    }
-                    
-                }
+                    reader.GetInt32(reader.GetOrdinal("wave_group_id_1")),
+                    reader.GetInt32(reader.GetOrdinal("wave_group_id_2")),
+                    reader.GetInt32(reader.GetOrdinal("wave_group_id_3")),
+                    reader.GetInt32(reader.GetOrdinal("wave_group_id_4")),
+                    reader.GetInt32(reader.GetOrdinal("wave_group_id_5"))
+                }));
             }
+            guildEnemyDataList = lst.GroupBy(d => d.group).ToDictionary(g => g.Key, g => new Guild.GuildEnemyData
+            {
+                enemyIds = g.OrderBy(d => d.id).Select(d => d.Item3.Select(wave => waveGroupDic[wave]).ToArray()).ToArray()
+            });
         }
         private void SaveDics2Json_2()
         {

@@ -21457,29 +21457,55 @@ MonoBehaviour:
   m_Value: 5
   m_Options:
     m_Options:
-    - m_Text: "\u767D\u7F8A\u5EA7"
+    - m_Text: "\u53CC\u9C7C\u5EA7(1024)"
       m_Image: {fileID: 0}
-    - m_Text: "\u91D1\u725B\u5EA7"
+    - m_Text: "\u767D\u7F8A\u5EA7(1025)"
       m_Image: {fileID: 0}
-    - m_Text: "\u53CC\u5B50\u5EA7"
+    - m_Text: "\u91D1\u725B\u5EA7(1026)"
       m_Image: {fileID: 0}
-    - m_Text: "\u5DE8\u87F9\u5EA7"
+    - m_Text: "\u53CC\u5B50\u5EA7(1027)"
       m_Image: {fileID: 0}
-    - m_Text: "\u72EE\u5B50\u5EA7"
+    - m_Text: "\u5DE8\u87F9\u5EA7(1028)"
       m_Image: {fileID: 0}
-    - m_Text: "\u5904\u5973\u5EA7"
+    - m_Text: "\u72EE\u5B50\u5EA7(1029)"
       m_Image: {fileID: 0}
-    - m_Text: "\u5929\u79E4\u5EA7"
+    - m_Text: "\u5904\u5973\u5EA7(1030)"
       m_Image: {fileID: 0}
-    - m_Text: "\u5929\u874E\u5EA7"
+    - m_Text: "\u5929\u79E4\u5EA7(1031)"
       m_Image: {fileID: 0}
-    - m_Text: "\u5C04\u624B\u5EA7"
+    - m_Text: "\u5929\u874E\u5EA7(1032)"
       m_Image: {fileID: 0}
-    - m_Text: "\u6469\u7FAF\u5EA7"
+    - m_Text: "\u5C04\u624B\u5EA7(1033)"
       m_Image: {fileID: 0}
-    - m_Text: "\u6C34\u74F6\u5EA7"
+    - m_Text: "\u6469\u7FAF\u5EA7(1034)"
       m_Image: {fileID: 0}
-    - m_Text: "\u53CC\u9C7C\u5EA7"
+    - m_Text: "\u6C34\u74F6\u5EA7(1035)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u53CC\u9C7C\u5EA7(1036)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u767D\u7F8A\u5EA7(1037)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u91D1\u725B\u5EA7(1038)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u53CC\u5B50\u5EA7(1039)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u5DE8\u87F9\u5EA7(1040)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u72EE\u5B50\u5EA7(1041)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u5904\u5973\u5EA7(1042)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u5929\u79E4\u5EA7(1043)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u5929\u874E\u5EA7(1044)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u5C04\u624B\u5EA7(1045)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u6469\u7FAF\u5EA7(1046)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u6C34\u74F6\u5EA7(1047)"
+      m_Image: {fileID: 0}
+    - m_Text: "\u53CC\u9C7C\u5EA7(1048)"
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -37607,7 +37633,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5904\u5973\u5EA7"
+  m_Text: "\u72EE\u5B50\u5EA7(1029)"
 --- !u!222 &1405456530
 CanvasRenderer:
   m_ObjectHideFlags: 0

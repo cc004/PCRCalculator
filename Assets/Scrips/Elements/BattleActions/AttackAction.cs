@@ -52,6 +52,18 @@ namespace Elements
                     CriticalData criticalData = new CriticalData();
                     double num2 = (double)BattleManager.Random(0.0f, 1f,
                         new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 1, damageData.CriticalRate, damageData.CriticalDamageRate));
+
+
+                    if (MyGameCtrl.Instance.tempData.isGuildBattle && (MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_player && _target.Owner.IsOther || MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_enemy && !_target.Owner.IsOther))
+                        num2 = 1;
+                    if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.ForceCritical_player && _target.Owner.IsOther)
+                        num2 = 0;
+                    //start add
+                    if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(damageData.Source, _target.Owner, _skill, eActionType.ATTACK, BattleHeaderController.CurrentFrameCount, out float fix))
+                    {
+                        num2 = fix;
+                    }
+
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * this.ActionExecTimeList[index].Weight / this.ActionWeightSum);
                     double criticalRate = (double)damageData.CriticalRate;
                     if (num2 <= criticalRate && (double)damageData.CriticalDamageRate != 0.0)

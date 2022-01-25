@@ -26,7 +26,7 @@ public class SQLiteHelper
     /// 构造函数    
     /// </summary>
     /// <param name="connectionString">数据库连接字符串</param>
-    public SQLiteHelper(string connectionString)
+    public SQLiteHelper(string connectionString, bool patch = false)
     {
         string DatabaseName = connectionString;        
 //#if UNITY_EDITOR
@@ -80,9 +80,6 @@ public class SQLiteHelper
             //Debug.Log("Database written");
         }
 
-        var dbPath = Path.Combine(Application.streamingAssetsPath, "SQL", "temp.db");
-        File.Copy(filepath, dbPath, true);
-
 //#endif
         //_connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         //MainManager.Instance.debugtext.text += "\nFinal PATH: " + Application.dataPath + "/StreamingAssets/" + DatabaseName;
@@ -96,22 +93,36 @@ public class SQLiteHelper
             //    System.Text.Encoding.UTF8.GetBytes(dbbase.text));
             //string connectingPath = "Data Source=" + Application.persistentDataPath + "/" + DatabaseName;
 
-            string connectingPath = "Data Source=" + dbPath;
-            //MainManager.Instance.debugtext.text += connectingPath;
-            //构造数据库连接
-            dbConnection = new SqliteConnection(connectingPath);
-            //打开数据库
-            dbConnection.Open();
+            if (patch)
+            {
+                var dbPath = Path.Combine(Application.streamingAssetsPath, "SQL", $"temp.{connectionString}");
+                File.Copy(filepath, dbPath, true);
 
-            var trac = dbConnection.BeginTransaction();
-            var cmd = dbConnection.CreateCommand();
-            cmd.CommandText = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "SQL", "dbdiff.sql"));
-            cmd.ExecuteNonQuery();
-            trac.Commit();
+                string connectingPath = "Data Source=" + dbPath;
+                //MainManager.Instance.debugtext.text += connectingPath;
+                //构造数据库连接
+                dbConnection = new SqliteConnection(connectingPath);
+                //打开数据库
+                dbConnection.Open();
+
+                var cmd = dbConnection.CreateCommand();
+                cmd.CommandText = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "SQL", "dbdiff.sql"));
+                cmd.ExecuteNonQuery();
+            }
+            else
+            {
+                string connectingPath = "Data Source=" + filepath;
+                //MainManager.Instance.debugtext.text += connectingPath;
+                //构造数据库连接
+                dbConnection = new SqliteConnection(connectingPath);
+                //打开数据库
+                dbConnection.Open();
+
+            }
         }
         catch (Exception e)
         {
-            Debug.Log(e.Message);
+            Debug.Log(e.ToString());
         }
     }
 
@@ -133,6 +144,7 @@ public class SQLiteHelper
     /// </summary>
     public void CloseConnection()
     {
+        return;
         //销毁Command
         if (dbCommand != null)
         {

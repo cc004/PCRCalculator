@@ -56,7 +56,7 @@ namespace PCRCaculator.Guild
         //public List<Sprite> bossSprites;
         //public List<string> bossNames;
         //public List<int> enemy_ids;
-        public List<GuildEnemyData> guildEnemyDatas;
+        public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
         public List<int> specialEnemyDatas;
 
         //public GuildExecTimeSetting GuildExecTimeSetting;
@@ -137,7 +137,7 @@ namespace PCRCaculator.Guild
             string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
             if (!string.IsNullOrEmpty(guildenemyDatasStr))
             {
-                guildEnemyDatas = JsonConvert.DeserializeObject<List<GuildEnemyData>>(guildenemyDatasStr);
+                guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, Guild.GuildEnemyData>>(guildenemyDatasStr);
             }
             string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
             enemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>>(enemyMParts);
@@ -203,7 +203,7 @@ namespace PCRCaculator.Guild
             string Path;
             if (isGuildBoss)
             {
-                enemyid_0 = guildEnemyDatas[dropdowns_ChooseBoss[2].value].enemyIds_1[dropdowns_ChooseBoss[0].value];
+                enemyid_0 = guildEnemyDatas[dropdowns_ChooseBoss[2].value + 1024].enemyIds[0][dropdowns_ChooseBoss[0].value];
                 //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
                 //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
                 bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
@@ -266,8 +266,8 @@ namespace PCRCaculator.Guild
             if (isGuildBoss)
             {
                 int month = dropdowns_ChooseBoss[2].value;
-                SettingData.GetCurrentPlayerGroup().currentGuildMonth = month;
-                bossDetailTexts[3].text = guildMonthNames[month];
+                SettingData.GetCurrentPlayerGroup().currentGuildMonth = 1000 + month;
+                bossDetailTexts[3].text = guildMonthNames[(month + 11) % 12];
                 int num = dropdowns_ChooseBoss[0].value; ;
                 SettingData.GetCurrentPlayerGroup().currentGuildEnemyNum = num;
                 int turn = dropdowns_ChooseBoss[1].value + 1; 
@@ -292,8 +292,7 @@ namespace PCRCaculator.Guild
         public int GetGuildBossID(int month, int num, int turn)
         {
             int enemyId = 0;
-            GuildEnemyData guildEnemyData = guildEnemyDatas[month];
-            enemyId = int.Parse($"4010{turn + 1}{13 + month}0{num + 1}");
+            enemyId = guildEnemyDatas[month + 1024].enemyIds[turn][num];
             /*
             switch (turn)
             {
@@ -407,7 +406,7 @@ namespace PCRCaculator.Guild
             }
             ReflashCharacterGroupToggle();
             var data = SettingData.GetCurrentPlayerGroup();
-            dropdowns_ChooseBoss[2].value = data.currentGuildMonth;
+            dropdowns_ChooseBoss[2].value = data.currentGuildMonth > 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
             dropdowns_ChooseBoss[1].value = data.currentTurn - 1;
             dropdowns_ChooseBoss[4].value = (int)data.useLogBarrierNew;
@@ -984,34 +983,7 @@ namespace PCRCaculator.Guild
     [System.Serializable]
     public class GuildEnemyData
     {
-        public List<int> enemyIds_1;//一周目数据
-        public List<int> enemyIds_2;//二周目数据
-        public List<int> enemyIds_3;//三周目数据
-        public List<int> enemyIds_4;//三周目数据
-        public List<int> enemyIds_5;//三周目数据
-        public GuildEnemyData() { }
-        public void SetLapData(int lap,List<int> ids)
-        {
-            switch (lap)
-            {
-                case 1:
-                    enemyIds_1 = ids;
-                    break;
-                case 2:
-                    enemyIds_2 = ids;
-                    break;
-                case 3:
-                    enemyIds_3 = ids;
-                    break;
-                case 4:
-                    enemyIds_4 = ids;
-                    break;
-                case 5:
-                    enemyIds_5 = ids;
-                    break;
-
-            }
-        }
+        public int[][] enemyIds;
     }
     [System.Serializable]
     public class GuildSettingData

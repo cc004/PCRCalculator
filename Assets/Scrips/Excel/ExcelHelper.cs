@@ -380,10 +380,10 @@ namespace ExcelHelper
                 worksheet.Cells["X1"].Value = "触发时间11";
                 worksheet.Cells["Y1"].Value = "触发时间12";
                 worksheet.Cells["Z1"].Value = "触发时间13";
-                Dictionary<int, UnitRarityData> unitRarityDic = MainManager.Instance.UnitRarityDic;
-                Dictionary<int, string> unitName_cn = MainManager.Instance.UnitName_cn;
-                Dictionary<int, string[]> skillNameAndDescribe_cn = MainManager.Instance.SkillNameAndDescribe_cn;
-                Dictionary<int, SkillData> skillDataDic = MainManager.Instance.SkillDataDic;
+                var unitRarityDic = MainManager.Instance.UnitRarityDic;
+                var unitName_cn = MainManager.Instance.UnitName_cn;
+                var skillNameAndDescribe_cn = MainManager.Instance.SkillNameAndDescribe_cn;
+                var skillDataDic = MainManager.Instance.SkillDataDic;
                 string[] execStr = new string[] { "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
                 int i = 2;
                 foreach (PCRCaculator.UnitSkillTimeData timeData in DataDic.Values)
