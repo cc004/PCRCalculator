@@ -10,147 +10,9 @@ using TMPro;
 using Elements;
 using System.Security.Cryptography;
 using System.Text;
-using System;
-using System.Linq;
 
 namespace PCRCaculator
 {
-    public class HookedDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
-    {
-        private Func<SqliteDataReader, TValue> converter;
-        private SQLiteHelper[] sql;
-        private string query, querykey;
-        public HookedDictionary(SQLiteHelper[] sql, string table, string field, Func<SqliteDataReader, TValue> converter)
-        {
-            this.sql = sql;
-            this.converter = converter;
-            query = $"select * from {table} where {field} = {{0}}";
-            querykey = $"select {field} from {table}";
-        }
-
-        public TValue this[TKey key]
-        {
-            get
-            {
-                foreach (var s in sql)
-                {
-                    using (var query = s.ExecuteQuery(string.Format(this.query, key.ToString())))
-                    {
-                        if (query.Read()) return converter(query);
-                    }
-                }
-                throw new KeyNotFoundException();
-            }
-        }
-
-        public IEnumerable<TKey> Keys
-        {
-            get
-            {
-                return sql.SelectMany(s =>
-                {
-                    var result = new List<TKey>();
-                    using (var query = s.ExecuteQuery(querykey))
-                    {
-                        var ord = query.GetOrdinal(querykey);
-                        while (query.Read()) result.Add(query.GetFieldValue<TKey>(ord));
-                    }
-                    return result;
-                });
-            }
-        }
-
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return Keys.Select(key => new KeyValuePair<TKey, TValue>(key, this[key])).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-    public class MasterDataManager
-    {
-        public static MasterDataManager Instance;
-        public HookedDictionary<int, BaseData> equipmentEnhanceDic;//装备类与装备id的对应字典
-        public HookedDictionary<int, EquipmentData> equipmentDic;//装备类与装备id的对应字典
-        public HookedDictionary<int, UnitRarityData> unitRarityDic;//角色基础数据与角色id的对应字典 
-        public HookedDictionary<int, UnitStoryData> unitStoryDic;//角色羁绊奖励列表
-        public HookedDictionary<int, List<int>> unitStoryEffectDic;//角色的马甲列表
-        public HookedDictionary<int, SkillData> skillDataDic;//所有的技能列表
-        public HookedDictionary<int, SkillAction> skillActionDic;//所有小技能列表
-        public HookedDictionary<int, string[]> skillNameAndDescribe_cn;//技能中文名字和描述
-        public HookedDictionary<int, string> skillActionDescribe_cn;//技能片段中文
-        public HookedDictionary<int, string> unitName_cn;//角色中文名字描述
-        public HookedDictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
-        public HookedDictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
-        public HookedDictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic;//角色专武字典
-
-        private static string[] names = new string[17]
-        {
-            "hp","atk","magic_str","def","magic_def","physical_critical","magic_critical",
-            "wave_hp_recovery","wave_energy_recovery","dodge","physical_penetrate",
-            "magic_penetrate","life_steal","hp_recovery_rate","energy_recovery_rate",
-            "energy_reduce_rate","accuracy"
-        };
-
-        private static string[] names_growth = new string[17]
-        {
-            "hp_growth","atk_growth","magic_str_growth","def_growth","magic_def_growth","physical_critical_growth","magic_critical_growth",
-            "wave_hp_recovery_growth","wave_energy_recovery_growth","dodge_growth","physical_penetrate_growth",
-            "magic_penetrate_growth","life_steal_growth","hp_recovery_rate_growth","energy_recovery_rate_growth",
-            "energy_reduce_rate_growth","accuracy_growth"
-        };
-
-        private BaseData ReadBaseData(SqliteDataReader reader, string[] names)
-        {
-            BaseData baseData = new BaseData(
-                    (float)reader.GetDouble(reader.GetOrdinal(names[0])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[1])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[2])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[3])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[4])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[5])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[6])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[7])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[8])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[9])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[10])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[11])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[12])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[13])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[14])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[15])),
-                    (float)reader.GetDouble(reader.GetOrdinal(names[16]))
-
-                    );
-            return baseData;
-        }
-
-        private EquipmentData ReadEquipmentData(SqliteDataReader reader)
-        {
-            var id = reader.GetInt32(reader.GetOrdinal("equipment_id"));
-            return new EquipmentData(
-                id,
-                reader.GetString(reader.GetOrdinal("equipment_name")),
-                reader.GetInt32(reader.GetOrdinal("promotion_level")),
-                reader.GetString(reader.GetOrdinal("description")),
-                reader.GetInt32(reader.GetOrdinal("craft_flg")) == 1,
-                reader.GetInt32(reader.GetOrdinal("equipment_enhance_point")),
-                reader.GetInt32(reader.GetOrdinal("sale_price")),
-                reader.GetInt32(reader.GetOrdinal("craft_flg")),
-                ReadBaseData(reader, names),
-                equipmentEnhanceDic[id]);
-        }
-
-        public MasterDataManager(SQLiteHelper[] sql)
-        {
-            equipmentEnhanceDic = new HookedDictionary<int, BaseData>(sql, "equipment_enhance_rate", "equipment_id", reader => ReadBaseData(reader, names));
-            equipmentDic = new HookedDictionary<int, EquipmentData>(sql, "equipment_data", "equipment_id", ReadEquipmentData);
-        }
-    }
-
     public class MainManager : MonoBehaviour
     {
         public static MainManager Instance;
@@ -170,10 +32,20 @@ namespace PCRCaculator
         public bool UseNewBattleSystem = true;
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
-
-
+        private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
         public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(临时)
         public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(已保存)
+        private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
+        private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
+        private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
+        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
+        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
+        private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
+        private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
+        private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
+        private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
+        private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
+        private Dictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic = new Dictionary<int, UniqueEquipmentData>();//角色专武字典
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
 
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
@@ -194,18 +66,15 @@ namespace PCRCaculator
         private bool forceAutoMode;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
 
-        public HookedDictionary<int, EquipmentData> EquipmentDic { get => MasterDataManager.Instance.equipmentDic; }
-        public HookedDictionary<int, UnitRarityData> UnitRarityDic { get => MasterDataManager.Instance.unitRarityDic; }
-        public HookedDictionary<int, UnitStoryData> UnitStoryDic { get => MasterDataManager.Instance.unitStoryDic; }
-        public HookedDictionary<int, List<int>> UnitStoryEffectDic { get => MasterDataManager.Instance.unitStoryEffectDic; }
-        public HookedDictionary<int, SkillData> SkillDataDic { get => MasterDataManager.Instance.skillDataDic; }
-        public HookedDictionary<int, SkillAction> SkillActionDic { get => MasterDataManager.Instance.skillActionDic; }
-        public HookedDictionary<int, string> UnitName_cn { get => MasterDataManager.Instance.unitName_cn; }
-        public HookedDictionary<int, string[]> SkillNameAndDescribe_cn { get => MasterDataManager.Instance.skillNameAndDescribe_cn; }
-        public HookedDictionary<int, string> SkillActionDescribe_cn { get => MasterDataManager.Instance.skillActionDescribe_cn; }
-        public HookedDictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => MasterDataManager.Instance.allUnitAttackPatternDic; }
-        public HookedDictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => MasterDataManager.Instance.uniqueEquipmentDataDic; }
-        public HookedDictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => MasterDataManager.Instance.allUnitSkillTimeDataDic; }
+        public Dictionary<int, EquipmentData> EquipmentDic { get => equipmentDic; }
+        public Dictionary<int, UnitRarityData> UnitRarityDic { get => unitRarityDic; }
+        public Dictionary<int, UnitStoryData> UnitStoryDic { get => unitStoryDic; }
+        public Dictionary<int, List<int>> UnitStoryEffectDic { get => unitStoryEffectDic; }
+        public Dictionary<int, SkillData> SkillDataDic { get => skillDataDic; }
+        public Dictionary<int, SkillAction> SkillActionDic { get => skillActionDic; }
+        public Dictionary<int, string> UnitName_cn { get => unitName_cn; }
+        public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => skillNameAndDescribe_cn; }
+        public Dictionary<int, string> SkillActionDescribe_cn { get => skillActionDescribe_cn; }
         public PlayerSetting PlayerSetting { get => playerSetting; }
         public GameObject LatestUIback
         {
@@ -220,12 +89,15 @@ namespace PCRCaculator
         public TextMeshProUGUI PlayerLevelText { get => BaseBackManager.Instance.playerLevelText; }
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
+        public Dictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => allUnitSkillTimeDataDic;}
         public bool IsGuildBattle { get => isGuildBattle;}
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
         public List<UnitData> EnemyDataForBattle { get => enemyDataForBattle; }
+        public Dictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => allUnitAttackPatternDic; }
         public bool IsAutoMode { get => isAutoMode;}
         public bool ForceAutoMode { get => forceAutoMode; }
-        public GuildBattleData GuildBattleData { get => guildBattleData; }
+        public GuildBattleData GuildBattleData { get => guildBattleData;}
+        public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
         public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
         public AllUnitFirearmData FirearmData { get => firearmData;}
 
@@ -272,7 +144,6 @@ namespace PCRCaculator
             execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
-            /*
             string jsonStr = LoadJsonDatas("Datas/AllData");
             if (jsonStr != "")
             {
@@ -318,7 +189,7 @@ namespace PCRCaculator
                 Debugtext.text += "\n成功加载" + skillNameAndDescribe_cn.Count + "个技能数据(中文)！";
 
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
-            }*/
+            }
             LoadUnitData();
             LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
@@ -327,7 +198,7 @@ namespace PCRCaculator
             //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
-            /*
+
             string skillTimeStr = Resources.Load<TextAsset>("Datas/unitSkillTimeDic").text;
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
@@ -338,7 +209,6 @@ namespace PCRCaculator
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
             string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
-            */
             string nickNameDic = Resources.Load<TextAsset>("Datas/UnitNickNameDic").text;
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
@@ -806,7 +676,7 @@ namespace PCRCaculator
                 return Instance.spriteCacheDic[relativePath];
             }
 
-            UnityEngine.Object Preb = Resources.Load(relativePath, typeof(Sprite));
+            Object Preb = Resources.Load(relativePath, typeof(Sprite));
             Sprite tmpsprite = null;
             if (Preb != null)
             {

@@ -246,8 +246,8 @@ namespace PCRCaculator
             //LoadEquipmentData();
             LoadSkillData();
             LoadChineseBaseData();
-            LoadUnitStoryData();
             LoadUnitRarityData();
+            LoadUnitStoryData();
             sql.CloseConnection();
 
             /*sql = JpConnection;
