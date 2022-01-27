@@ -1340,7 +1340,8 @@ namespace Elements
             Owner.lastCritPoint = new UnitCtrl.CritPoint()
             {
                 description = $"{skill.SkillName}的{action.ActionType.GetDescription()}执行",
-                description2 = (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
+                description2 = skill.SkillId == Owner.UnionBurstSkillId ? "连点" : 
+                    (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
                 frame = BattleHeaderController.CurrentFrameCount,
                 priority = UnitCtrl.eCritPointPriority.ExecAction
             };
