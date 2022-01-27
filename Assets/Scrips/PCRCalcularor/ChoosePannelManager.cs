@@ -381,7 +381,6 @@ namespace PCRCaculator
                             unitRarityData.GetMaxLoveLevel(), 
                             0, 
                             null);
-
                     }
                     else
                     {
