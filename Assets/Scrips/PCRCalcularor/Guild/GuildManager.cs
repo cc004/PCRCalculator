@@ -617,21 +617,8 @@ namespace PCRCaculator.Guild
             }
             catch
             {
-
+                staticsettingData = new GuildSettingData(true);
             }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Guild/GuildSettingData.json";
-            if (File.Exists(filePath))
-            {
-                StreamReader sr = new StreamReader(filePath);
-                string jsonStr = sr.ReadToEnd();
-                sr.Close();
-                if (jsonStr != "")
-                {
-                    staticsettingData = JsonConvert.DeserializeObject<GuildSettingData>(jsonStr);
-                    return;
-                }
-            }
-            staticsettingData = new GuildSettingData(true);
         }
         private void FixGuildEnemyErrors()
         {

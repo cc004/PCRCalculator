@@ -225,34 +225,13 @@ namespace PCRCaculator
             {
                 unitDataDic = SaveManager.Load<Dictionary<int, UnitData>>();
                 unitDataDic_save = SaveManager.Load<Dictionary<int, UnitData>>();
-                foreach (int id in UnitRarityDic.Keys)
-                {
-                    if (!unitDataDic.ContainsKey(id))
-                    {
-                        unitDataDic.Add(id, new UnitData(id, UnitRarityDic[id].detailData.minrarity));
-                        unitDataDic_save.Add(id, new UnitData(id, UnitRarityDic[id].detailData.minrarity));
-                    }
-                }
-                return;
             }
             catch
             {
-
+                unitDataDic = new Dictionary<int, UnitData>();
+                unitDataDic_save = new Dictionary<int, UnitData>();
             }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/SaveData.json";
-            if (File.Exists(filePath))
-            {
-                StreamReader sr = new StreamReader(filePath);
-                string jsonStr = sr.ReadToEnd();
-                sr.Close();
-                if (jsonStr != "")
-                {
-                    unitDataDic_save = JsonConvert.DeserializeObject<Dictionary<int, UnitData>>(jsonStr);
-                    unitDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitData>>(jsonStr);
-                    //return;
-                }
 
-            }
             foreach (int id in UnitRarityDic.Keys)
             {
                 if (!unitDataDic.ContainsKey(id))
@@ -261,7 +240,6 @@ namespace PCRCaculator
                     unitDataDic_save.Add(id, new UnitData(id, UnitRarityDic[id].detailData.minrarity));
                 }
             }
-
         }
 
         private void LoadPlayerSettings()
@@ -277,31 +255,13 @@ namespace PCRCaculator
             }
             catch
             {
-
-            }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/PlayerData.json";
-            if (File.Exists(filePath))
-            {
-                StreamReader sr = new StreamReader(filePath);
-                string jsonStr = sr.ReadToEnd();
-                sr.Close();
-                if (jsonStr != "")
+                playerSetting = new PlayerSetting();
+                playerSetting.playerProcess = 12;
+                playerSetting.playerLevel = 100;
+                if (PlayerLevelText != null)
                 {
-                    playerSetting = JsonConvert.DeserializeObject<PlayerSetting>(jsonStr);
-                    if (PlayerLevelText != null)
-                    {
-                        PlayerLevelText.text = playerSetting.playerLevel + "";
-                    }
-                    return;
+                    PlayerLevelText.text = playerSetting.playerLevel + "";
                 }
-
-            }
-            playerSetting = new PlayerSetting();
-            playerSetting.playerProcess = 12;
-            playerSetting.playerLevel = 100;
-            if (PlayerLevelText != null)
-            {
-                PlayerLevelText.text = playerSetting.playerLevel + "";
             }
         }
 
@@ -327,20 +287,8 @@ namespace PCRCaculator
             {
 
             }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/SaveData.json";
-            if (File.Exists(filePath))
-            {
-                StreamReader sr = new StreamReader(filePath);
-                string jsonStr = sr.ReadToEnd();
-                sr.Close();
-                if (jsonStr != "")
-                {
-                    unitDataDic_save = JsonConvert.DeserializeObject<Dictionary<int, UnitData>>(jsonStr);
-                    unitDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitData>>(jsonStr);
-                }
-
-            }
         }
+
         public void ChangeBodyWidth(float value)
         {
             playerSetting.bodyWidth = value;
@@ -423,15 +371,11 @@ namespace PCRCaculator
         }
         public void CalculatorButton()
         {
-            TurnAllPageOff();
-            CalculatorManager.Instance.SwitchPage(1);
-            stayPage = StayPage.calculator;
         }
         private void TurnAllPageOff()
         {
             CharacterManager.SwitchPage(0);
             BattleManager.SwitchPage(0);
-            CalculatorManager.Instance.SwitchPage(0);
         }
         public void GetBattleData(out List<UnitData> playerdata, out List<UnitData> enemydata)
         {
@@ -762,21 +706,6 @@ namespace PCRCaculator
             else
                 return Application.streamingAssetsPath;
         }
-        [ContextMenu("生成战斗小人用txt文件")]
-        public void CreateUnitClassTxt()
-        {
-            Dictionary<int, UnitData_other> dic = new Dictionary<int, UnitData_other>();
-            foreach(var unit in UnitRarityDic)
-            {
-                dic.Add(unit.Key, new UnitData_other(unit.Value.unitName, unit.Value.detailData.motionType, false));
-            }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/classMap.txt";
-            string saveJsonStr = JsonConvert.SerializeObject(dic);
-            StreamWriter sw = new StreamWriter(filePath);
-            sw.Write(saveJsonStr);
-            sw.Close();
-            Debug.Log("成功！");
-        }
         [ContextMenu("生成排刀器用unitdetail文件")]
         public void CreateUnitDetailDic()
         {
@@ -785,7 +714,7 @@ namespace PCRCaculator
             {
                 dic.Add(unit.unitId, new UnitDetail_other(unit.unitId, unit.detailData.searchAreaWidth, GetUnitNickName(unit.unitId)));
             }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/UnitDetailDic.txt";
+            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Datas/UnitDetailDic.txt";
             string saveJsonStr = JsonConvert.SerializeObject(dic);
             StreamWriter sw = new StreamWriter(filePath);
             sw.Write(saveJsonStr);

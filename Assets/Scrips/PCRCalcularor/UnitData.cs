@@ -341,7 +341,16 @@ namespace PCRCaculator
     [System.Serializable]
     public class UnitData
     {
-        public int unitId = 0;
+        private int _unitId;
+        public int unitId
+        {
+            get => _unitId;
+            set
+            {
+                _unitId = value;
+                SetDefaultLoveDict();
+            }
+        }
         //public PositionType positionType = PositionType.frount;
         public int level = 1;
         public int rarity = 1;
@@ -352,7 +361,22 @@ namespace PCRCaculator
         public Dictionary<int, int> playLoveDic;
         public int uniqueEqLv = 0;//专武等级
         private string name = "";
-        public UnitData() { }
+
+        public void SetDefaultLoveDict()
+        {
+            if (playLoveDic != null) return;
+            playLoveDic = new Dictionary<int, int>();
+            if (!MainManager.Instance.UnitStoryEffectDic.ContainsKey(unitId)) return;
+            List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unitId];
+            foreach (var unit in effectUnitList)
+            {
+                playLoveDic.Add(unit, 0);
+            }
+        }
+
+        public UnitData()
+        {
+        }
         public UnitData(int id)
         {
             unitId = id;
@@ -385,7 +409,6 @@ namespace PCRCaculator
             rarity = ra;
             this.rank = rank;
             skillLevel = new int[4] { lv, lv, lv, lv };
-
         }
 
         public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null,int uniqueeqlv = 0)
@@ -438,7 +461,6 @@ namespace PCRCaculator
                     }
                 }
                 uniqueEqLv = playerSetting.maxUniqueEqLv;
-                playLoveDic = null;
             }
             else
             {
@@ -1681,8 +1703,8 @@ namespace PCRCaculator
         //public int maxLove = 8;
         public int maxUniqueEqLv = 110;
         public float bodyWidth = 100;
-        public bool allowRarity6 = false;
-        public bool showAllUnits = false;
+        public bool allowRarity6 = true;
+        public bool showAllUnits = true;
         public int pixFix = 0;
         public bool useDMMpath = false;
         public string dmmPath = "";

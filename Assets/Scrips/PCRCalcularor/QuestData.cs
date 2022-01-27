@@ -241,17 +241,4 @@ namespace PCRCaculator
         }
 
     }
-    [System.Serializable]
-    public class CalcDics
-    {
-        //public Dictionary<int, QuestData> questDataDic = new Dictionary<int, QuestData>();//普通地图数据
-        //public Dictionary<int, WaveGroupData> waveGroupDataDic = new Dictionary<int, WaveGroupData>();//怪物波次数据
-        //public Dictionary<int, EnemyRewardData> enemyRewardDataDic = new Dictionary<int, EnemyRewardData>();//怪物掉落数据
-        public Dictionary<int, EquipmentCraft> equipmentCraftDic = new Dictionary<int, EquipmentCraft>();//装备合成数据
-        public Dictionary<int, QuestRewardData> questRewardDic = new Dictionary<int, QuestRewardData>();//地图掉落数据
-        public Dictionary<int, EquipmentGet> equipmentGetDic = new Dictionary<int, EquipmentGet>();//装备获得数据
-        public List<int> exp_cost;
-        public List<int> skill_cost;
-
-    }
 }

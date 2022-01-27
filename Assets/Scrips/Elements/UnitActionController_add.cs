@@ -19,42 +19,20 @@ namespace Elements
         public void LoadActionControllerData(int unitid,bool isABunit=true)
         {
             unitFirearmDatas = PCRCaculator.MainManager.Instance.FirearmData.GetData(unitid);
+            if (!isABunit)
+                PCRCaculator.MainManager.Instance.WindowConfigMessage("错误！角色" + unitid + "的数据读取失败！", null, null);
+            /*
             if (isABunit)
                 return;
             string json_0 = "";
             int datatype = 0;
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Guild/UnitPrefabData/" + unitid + ".json";
-            if (File.Exists(filePath))
-            {
-                StreamReader sr = new StreamReader(filePath);
-                string jsonStr = sr.ReadToEnd();
-                sr.Close();
-                if (jsonStr != "")
-                {
-                    json_0 = jsonStr;
-                }
-            }
-            if (json_0 == "")
-            {
-                string filePath2 = PCRCaculator.MainManager.GetSaveDataPath() + "/Datas/Unit/" + unitid + "/unit_" + unitid + ".json";
-                if (File.Exists(filePath2))
-                {
-                    StreamReader sr = new StreamReader(filePath2);
-                    string jsonStr = sr.ReadToEnd();
-                    sr.Close();
-                    if (jsonStr != "")
-                    {
-                        json_0 = jsonStr;
-                    }
-                }
-            }
             if (json_0 == "")
             {
                 /*TextAsset text_0 = Resources.Load<TextAsset>("unitPrefabDatas/UNIT_" + unitid);
                 if (text_0 != null && text_0.text != "")
                 {
                     json_0 = text_0.text;
-                }*/
+                }*//*
                 string filePath3 = Application.streamingAssetsPath + "/Datas/unitPrefabDatas/UNIT_" + unitid + ".json";
                 if (File.Exists(filePath3))
                 {
@@ -86,9 +64,8 @@ namespace Elements
             }
             else
             {
-                PCRCaculator.MainManager.Instance.WindowConfigMessage("错误！角色" + unitid + "的数据读取失败！", null, null);
             }
-
+            */
         }
 
         private static Dictionary<int, FirearmCtrlData> cache = new Dictionary<int, FirearmCtrlData>();

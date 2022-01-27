@@ -831,23 +831,7 @@ namespace PCRCaculator.Guild
 
             OpenFileName ofn = new OpenFileName();
 
-            ofn.structSize = Marshal.SizeOf(ofn);
-            ofn.initialDir = $"{Application.streamingAssetsPath}/Templates";
-            ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";
-            ofn.file = new string(new char[256]);
-            ofn.maxFile = ofn.file.Length;
-            ofn.fileTitle = new string(new char[64]);
-            ofn.maxFileTitle = ofn.fileTitle.Length;
-            ofn.title = "打开模板文件";
-            ofn.defExt = "xlsx";
-            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 |
-                        0x00000008; //OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-            if (!DllTest.GetOpenFileName(ofn))
-            {
-                return;
-            }
-
-            ofn.file = ofn.file.Replace("\\", "/");
+            ofn.file = PCRCaculator.MainManager.GetSaveDataPath() + "/Templates/模板4 星美版2.xlsx";
             templateSettings.Clear();
             using (IExcelDataReader reader =
                    ExcelDataReader.ExcelReaderFactory.CreateReader(File.Open(ofn.file, FileMode.Open)))

@@ -97,19 +97,8 @@ namespace PCRCaculator
             }
             catch
             {
+                players = new List<AddedPlayerData>();
             }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Battle/AddedPlayerList.json";
-            if (File.Exists(filePath))
-            {
-                StreamReader sr = new StreamReader(filePath);
-                string jsonStr = sr.ReadToEnd();
-                sr.Close();
-                if (jsonStr != "")
-                {
-                    players = JsonConvert.DeserializeObject<List<AddedPlayerData>>(jsonStr);
-                }
-            }
-
         }
         /// <summary>
         /// 编辑完敌方阵容后调用
