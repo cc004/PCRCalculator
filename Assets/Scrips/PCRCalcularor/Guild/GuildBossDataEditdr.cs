@@ -262,16 +262,6 @@ namespace PCRCaculator.Guild
             {
                 bossAppearDelay = value;
             }
-            else
-            {
-                TextAsset text_0 = Resources.Load<TextAsset>("unitCtrlData/UNIT_" + enemyData.unit_id);
-                if (text_0 != null && text_0.text != "")
-                {
-                    Elements.UnitCtrlData data = Newtonsoft0.Json.JsonConvert.DeserializeObject<Elements.UnitCtrlData>(text_0.text);
-                    //allUnitCtrlDataDic.Add(enemyData.unit_id, data);
-                    bossAppearDelay = data.BossAppearDelay;
-                }
-            }
         }
         private void GetBossBodyWidth()
         {

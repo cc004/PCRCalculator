@@ -89,17 +89,6 @@ namespace Elements
     }
     private void LoadAllUnitCtrlData()
         {
-            TextAsset text_0 = Resources.Load<TextAsset>("unitCtrlData/UNIT_" + tempData.guildEnemy.unit_id);
-            if (text_0 != null && text_0.text != "")
-            {
-                UnitCtrlData data = JsonConvert.DeserializeObject<UnitCtrlData>(text_0.text);
-                if(tempData.SettingData.bossAppearDelayDic!=null&&tempData.SettingData.bossAppearDelayDic.TryGetValue(tempData.guildEnemy.unit_id,out float value))
-                {
-                    data.BossAppearDelay = value;
-                }
-                allUnitCtrlDataDic.Add(tempData.guildEnemy.unit_id, data);
-            }
-
         }
         public void Initialize()//由GameManager的init调用，生成己方战斗小人
         {
@@ -301,10 +290,6 @@ namespace Elements
             else
             {
                 b = Instantiate(battleUnitPrefab);
-                if (allUnitCtrlDataDic.TryGetValue(unitid, out UnitCtrlData ctrlData))
-                {
-                    b.GetComponent<UnitCtrl>().SetUnitCtrl(ctrlData);
-                }
             }
             b.transform.SetParent(isplayer?unitParent:enemyParent);
             b.name = "rotate_center";
@@ -366,10 +351,6 @@ namespace Elements
             b.transform.SetParent(unitParent);
             b.name = unitid + "(clone)";
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
-            if (allUnitCtrlDataDic.TryGetValue(unitid, out UnitCtrlData ctrlData))
-            {
-                unitCtrl.SetUnitCtrl(ctrlData);
-            }
             unitCtrl.UnitName = mainManager.GetUnitNickName(unitid);
             unitCtrl.UnitNameEx = unitCtrl.UnitName;
             b.GetComponent<UnitActionController>().LoadActionControllerData(unitid);
