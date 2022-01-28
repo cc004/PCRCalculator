@@ -16052,6 +16052,7 @@ MonoBehaviour:
   prefab2: {fileID: 3850582718648040332, guid: 96283753467e5214d830448661aa1296, type: 3}
   battleUnitPrefab: {fileID: 7111783237254764026, guid: 493198282fe1f7049b5f919e1cbefc98,
     type: 3}
+  firearmPrefab: {fileID: 0}
   IsUnitCreated: 0
   playerUnitCtrl: []
   enemyUnitCtrl: []
@@ -16891,6 +16892,8 @@ MonoBehaviour:
   prefab1: {fileID: 8876765918548570777, guid: d9794dcbb6e3ff14f89ee49375f3fc98, type: 3}
   prefab2: {fileID: 3850582718648040332, guid: 96283753467e5214d830448661aa1296, type: 3}
   battleUnitPrefab: {fileID: 7111783237254764026, guid: 493198282fe1f7049b5f919e1cbefc98,
+    type: 3}
+  firearmPrefab: {fileID: 4311752369244091493, guid: 44baad136108cbb46a9c55444fbae062,
     type: 3}
   IsUnitCreated: 0
   playerUnitCtrl: []

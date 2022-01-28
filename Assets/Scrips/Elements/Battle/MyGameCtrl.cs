@@ -17,6 +17,7 @@ namespace Elements
         public GameObject prefab1;
         public GameObject prefab2;
         public GameObject battleUnitPrefab;
+        public GameObject firearmPrefab;
         //public GameObject emptyObject;
 
 
@@ -522,6 +523,7 @@ namespace Elements
             yield return new WaitForSecondsRealtime(1.5f);
             PCRCaculator.Battle.BattleUIManager.Instance.ExitButton2();
         }
+
     }
     public class ExceptNGUIRoot
     {

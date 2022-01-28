@@ -25,7 +25,7 @@ namespace PCRCaculator.Battle
         
         public void SetBuffUI(Sprite sprite, Elements.UnitCtrl owner,bool isSummon = false)
         {
-            rular.sprite = sprite;
+            //rular.sprite = sprite;
             this.owner2 = owner;
             uIManager = BattleUIManager.Instance;
             transform.SetParent(owner2.gameObject.transform, false);
@@ -84,8 +84,11 @@ namespace PCRCaculator.Battle
         }
         private void Reflash()
         {
+            
             for(int i = 0; i < 4; i++)
             {
+                abnormalIcons[i].gameObject.SetActive(false);
+                /*
                 if (i < currentBuffs.Count)
                 {
                     abnormalIcons[i].sprite = uIManager.GetAbnormalIconSprite(currentBuffs[i]);
@@ -94,8 +97,7 @@ namespace PCRCaculator.Battle
                 else
                 {
                     abnormalIcons[i].sprite = null;
-                    abnormalIcons[i].gameObject.SetActive(false);
-                }
+                }*/
             }
         }
         public void SetLeftDir(bool isReversed = false)
@@ -109,7 +111,10 @@ namespace PCRCaculator.Battle
             {
                 try
                 {
-                    posText.text = $"{Mathf.RoundToInt(owner2.transform.localPosition.x)}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / Elements.UnitDefine.MAX_ENERGY:P2}";
+                    var mid = owner2.transform.position.x / owner2.transform.lossyScale.x;
+                    var r = mid + owner2.BodyWidth / 2;
+                    var l = mid - owner2.BodyWidth / 2;
+                    posText.text = $"{Mathf.RoundToInt(l)}/{Mathf.RoundToInt(r)}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / Elements.UnitDefine.MAX_ENERGY:P2}";
                 }
                 catch
                 {

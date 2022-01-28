@@ -13,7 +13,7 @@ namespace Elements.Battle
         private class UbStatus
         {
             public UbStatus depending;
-            public bool pressed;
+            public bool pressed, waitboss;
             public int frame;
             public float origin;
         }
@@ -39,7 +39,8 @@ namespace Elements.Battle
                         {
                             depending = last.sta,
                             frame = g.Key,
-                            origin = tuple.time
+                            origin = tuple.time,
+                            waitboss = (tuple.time - g.Key) > 0.5,
                         }, tuple.pos));
                         return result;
                     })).GroupBy(t => t.pos).OrderBy(g => g.Key)
@@ -78,7 +79,7 @@ namespace Elements.Battle
 
                 if (next.depending?.pressed ?? true)
                 {
-                    if (next.frame <= cnt)
+                    if (next.frame <= cnt && (!next.waitboss || lastbossub == next.frame))
                     {
                         return true;
                     }
@@ -88,9 +89,11 @@ namespace Elements.Battle
             return false;
         }
 
+        private int lastbossub = -1;
         public void UbExecCallback(int pos)
         {
             if (!enabled) return;
+            if (pos == -1) lastbossub = BattleHeaderController.CurrentFrameCount;
             if (pos < 0 || pos > 4) return;
             if (queues[pos].Count > 0)
                 queues[pos].Dequeue().pressed = true;

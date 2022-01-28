@@ -406,7 +406,7 @@ namespace PCRCaculator.Guild
             }
             ReflashCharacterGroupToggle();
             var data = SettingData.GetCurrentPlayerGroup();
-            dropdowns_ChooseBoss[2].value = data.currentGuildMonth > 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
+            dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
             dropdowns_ChooseBoss[1].value = data.currentTurn - 1;
             dropdowns_ChooseBoss[4].value = (int)data.useLogBarrierNew;
@@ -486,7 +486,7 @@ namespace PCRCaculator.Guild
             var group = SettingData.GetCurrentPlayerGroup();
 
             if (selectedBossEnemyid == 0)
-                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth, data.currentGuildEnemyNum, data.currentTurn);
+                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12, data.currentGuildEnemyNum, data.currentTurn);
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
             bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[selectedBossEnemyid].unit_id);
@@ -538,6 +538,7 @@ namespace PCRCaculator.Guild
                 group.playerSetingHP = 0;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
+            bossDetailTexts[3].text = guildMonthNames[(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 + 11 : data.currentGuildMonth) % 12];
             //group.useLogBarrier = toggles_ChooseBoss[3].isOn;
         }
         private void ReflashCalcSettings_start()

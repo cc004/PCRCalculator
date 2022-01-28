@@ -251,6 +251,7 @@ namespace Elements
                         _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
                         modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
                         _source.MotionPrefix = -1;
+                        _source.UnitSpineCtrl.gameObject.SetActive(true);
                         _source.UnitSpineCtrlModeChange.gameObject.SetActive(false);
                         _source.UnitSpineCtrl.CurColor = _source.UnitSpineCtrlModeChange.CurColor;
                         Color curColor = _source.UnitSpineCtrl.CurColor;

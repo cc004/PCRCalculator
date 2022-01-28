@@ -1030,7 +1030,15 @@ namespace Elements
     public class FirearmCtrl2:SkillEffectCtrl2
     {
         public FirearmCtrlData data;
-        
+        private GameObject obj;
+        private Vector2 _position = Vector2.zero;
+        public override Vector3 position { get => _position;
+            set
+            {
+                _position = value;
+                if (obj != null) obj.transform.position = _position;
+            }
+        }
         public bool IsAbsolute { get; set; }
 
         public bool InFlag { get; set; }
@@ -1074,6 +1082,7 @@ namespace Elements
   List<ShakeEffect> _shakes,
   eTargetBone _targetBone)
         {
+            this.obj = UnityEngine.Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
             this.ShakeEffects = _shakes;
             this.IsAbsolute = _isAbsolute;
             this.Skill = _skill;
@@ -1154,6 +1163,7 @@ namespace Elements
         private CustomEasing easingDownY;
         private CustomEasing easingUpRotate;
         private CustomEasing easingDownRotate;
+
         private IEnumerator updatePosition(float _lifeDistance)
         {
             float currentTime = 0.0f;
@@ -1171,6 +1181,8 @@ namespace Elements
                         hitTimer = 0.0f;
                         hitFlag = false;
                         stopFlag = true;
+                        UnityEngine.Object.Destroy(obj);
+                        obj = null;
                         if (OnHitAction != null)
                         {
                             //FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);

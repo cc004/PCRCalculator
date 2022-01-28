@@ -108,7 +108,7 @@ Transform:
   m_GameObject: {fileID: 888759348650006822}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 60, z: 1}
+  m_LocalScale: {x: 0.2, y: 60, z: 1}
   m_Children: []
   m_Father: {fileID: 5220777369402256499}
   m_RootOrder: 0
@@ -151,7 +151,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -100
+  m_SortingOrder: 999
   m_Sprite: {fileID: 3565401892052505685, guid: abf00b8945d7b354f8936fdab0a7a42b,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -301,7 +301,7 @@ MonoBehaviour:
   - {fileID: 1898265161329356200}
   - {fileID: 404117798869943008}
   - {fileID: 248580435398844024}
-  rular: {fileID: 3323032346651421404}
+  rular: {fileID: 0}
   posText: {fileID: 3219366496960427064}
   hpBar: {fileID: 6624215039741898226}
   hpHeadText: {fileID: 8748244013093816637}
@@ -646,7 +646,7 @@ TextMesh:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8652282360726526770}
   m_Text: 560
-  m_OffsetZ: 0
+  m_OffsetZ: -999
   m_CharacterSize: 0.03
   m_LineSpacing: 1
   m_Anchor: 4
@@ -658,4 +658,4 @@ TextMesh:
   m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
   m_Color:
     serializedVersion: 2
-    rgba: 4294901760
+    rgba: 4294967040

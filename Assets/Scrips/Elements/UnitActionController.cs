@@ -852,7 +852,7 @@ namespace Elements
                 if (basePartsData != null && !basePartsData.Owner.IsDead)
                 {
                     //if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 2.0 + (double)this.Owner.BodyWidth / 2.0)
-                    if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 4.0 + (double)this.Owner.BodyWidth / 4.0)
+                    if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 2.0 + (double)this.Owner.BodyWidth / 2.0)
                     {
                         _action.TargetList.Clear();
                         _action.TargetList.Add(basePartsData);
