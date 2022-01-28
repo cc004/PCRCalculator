@@ -112,7 +112,7 @@ namespace Spine.Unity
 					sd = ((!flag) ? ReadSkeletonData(skeletonJSON.text, attachmentLoader, num) : ReadSkeletonData(skeletonJSON.bytes, attachmentLoader, num));
 				}
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				return null;
 			}

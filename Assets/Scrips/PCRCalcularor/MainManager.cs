@@ -199,7 +199,7 @@ namespace PCRCaculator
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
 
-            string skillTimeStr = Resources.Load<TextAsset>("Datas/unitSkillTimeDic").text;
+            string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
             Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
@@ -209,7 +209,7 @@ namespace PCRCaculator
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
             string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
-            string nickNameDic = Resources.Load<TextAsset>("Datas/UnitNickNameDic").text;
+            string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData",true);
@@ -567,51 +567,10 @@ namespace PCRCaculator
             sw.Close();
         }
 
-        public string LoadJsonDatas(string path,bool forceStreaming = false)
+        public string LoadJsonDatas(string path,bool forceStreaming = true)
         {
-            string jsonStr = "";
-            System.Action action = new System.Action(() =>
-            {
-                var tex = Resources.Load<TextAsset>(path);
-                if (tex != null)
-                    jsonStr = tex.text;
-
-            });
-            switch (Application.platform)
-            {
-                case RuntimePlatform.WindowsEditor:
-                case RuntimePlatform.WindowsPlayer:
-                    bool flag = false;
-                    if (forceStreaming || Guild.GuildManager.Instance!=null&&Guild.GuildManager.Instance.SettingData.usePlayerSQL)
-                    {
-                        string filePath = PCRCaculator.MainManager.GetSaveDataPath() +"/"+ path + ".json";
-                        if (File.Exists(filePath))
-                        {
-                            StreamReader sr = new StreamReader(filePath);
-                            jsonStr = sr.ReadToEnd();
-                            sr.Close();
-                            if (!jsonStr.IsNullOrEmpty())
-                            {
-                                flag = true;
-                            }
-                        }
-                        if (!flag)
-                        {
-                            action();
-                            WindowConfigMessage("读取SQL数据失败！已恢复为默认数据。", null);
-                        }
-                    }
-                    else
-                    {
-                        action();
-                    }
-                    break;
-                default:
-                    action();
-                    break;
-            }
-            
-            return jsonStr;
+            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/" + path + ".json";
+            return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
         }
         public static Sprite LoadSourceSprite(string relativePath)
         {

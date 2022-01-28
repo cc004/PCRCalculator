@@ -21,7 +21,8 @@ namespace Elements
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
             if (this.ActionDetail1 != 3)
             {
-                /*BattleSpineController.LoadCreate(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, _source.SkinRarity, _source.transform.TargetTransform, (Action<BattleSpineController>)(_obj =>
+                /*
+                BattleSpineController.LoadCreate(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, _source.SkinRarity, _source.transform.TargetTransform, (Action<BattleSpineController>)(_obj =>
                {
                    _obj.gameObject.SetActive(false);
                    _obj.transform.localScale = new Vector3(_source.Scale, _source.Scale, 1f);

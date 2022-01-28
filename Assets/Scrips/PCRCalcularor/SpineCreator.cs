@@ -18,14 +18,14 @@ namespace PCRCaculator
             Instance = this;
         }
 
-        public SkeletonDataAsset Createskeletondata(int prefabID, float scale = 0.5f, bool useAB = false)
+        public SkeletonDataAsset Createskeletondata(int prefabID, float scale = 0.5f, bool useAB = false, string p0 = null)
         {
             int skinID = prefabID >= 200000 ? prefabID : prefabID + 30;
             if (prefabID == 407001)
                 skinID = 107031;
             Texture2D texture = new Texture2D(0, 0);
-            string p = "spine_sdnormal_" + skinID + ".unity3d";
-            string ab_atlas = "spine_sdnormal_" + skinID + ".unity3d";
+            var p = p0 ?? "spine_sdnormal_" + skinID + ".unity3d";
+            string ab_atlas = p;
 
             try
             {
@@ -61,7 +61,10 @@ namespace PCRCaculator
                 byte[] bytes_0;
                 if (useAB)
                 {
-                    bytes_0 = PCR_cysp2skel.MainTransClass.GetUnitSkelBytes(prefabID);
+                    if (p0 != null)
+                        bytes_0 = ABExTool.GetAssetBundleByName<TextAsset>(p0, ".skel").bytes;
+                    else
+                        bytes_0 = PCR_cysp2skel.MainTransClass.GetUnitSkelBytes(prefabID);
                 }
                 else
                     bytes_0 = File.ReadAllBytes(path_skel);

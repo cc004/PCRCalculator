@@ -390,7 +390,15 @@ namespace Elements
             //GameObject a = Instantiate(Instance.emptyObject);
             //a.transform.SetParent(_transform, false);
             SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+            int unitid = _unitId;
+            if (unitid >= 999999)
+                unitid = PCRCaculator.Guild.GuildManager.EnemyDataDic[unitid].unit_id;
+            int prefabID = PCRCaculator.ABExTool.GetPrefabId(unitid);
             dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + _unitId + "_1/" + (_unitId+30) + "_1_SkeletonData");
+            if (dataAsset == null)
+            {
+                dataAsset = PCRCaculator.SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{_unitId + 30}_1.unity3d");
+            }
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadNewSkeletonAnimationGameObject(dataAsset);
             battleSpineController.Initialize(false);
