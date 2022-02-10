@@ -103,8 +103,8 @@ namespace Elements
                 {
                     if (ActionDetail1 >= 3)
                     {
-                        _valueDictionary[eValueNumber.VALUE_3] *= myGameCtrl.tempData.SettingData.BossAbnormalMultValue;
-                        _valueDictionary[eValueNumber.VALUE_3] += myGameCtrl.tempData.SettingData.BossAbnormalAddValue;
+                        //_valueDictionary[eValueNumber.VALUE_3] *= myGameCtrl.tempData.SettingData.BossAbnormalMultValue;
+                        //_valueDictionary[eValueNumber.VALUE_3] += myGameCtrl.tempData.SettingData.BossAbnormalAddValue;
                     }
                 }
                 _target.Owner.SetAbnormalState(_source, abnormalState, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (this.ActionDetail2 == 1));

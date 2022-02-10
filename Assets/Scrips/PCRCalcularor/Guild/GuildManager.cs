@@ -557,13 +557,13 @@ namespace PCRCaculator.Guild
             SettingToggles[4].isOn = SettingData.ForceNoCritical_enemy;
             SettingToggles[5].isOn = SettingData.ForceIgnoreDodge_player;
             SettingToggles[6].isOn = SettingData.ForceIgnoreDodge_enemy;*/
-            SettingInputs[1].text = SettingData.BodyColliderWidth + "";
-            SettingInputs[2].text = SettingData.BossAbnormalMultValue + "";
-            SettingInputs[3].text = SettingData.BossAbnormalAddValue + "";
+            //SettingInputs[1].text = SettingData.BodyColliderWidth + "";
+            //SettingInputs[2].text = SettingData.BossAbnormalMultValue + "";
+            //SettingInputs[3].text = SettingData.BossAbnormalAddValue + "";
             RandomManager.Reflash();
-            SettingToggles[7].isOn = SettingData.usePhysics;
-            SettingToggles[8].isOn = SettingData.useSkillEffects;
-            SettingInputs[4].text = SettingData.skillEffeckFix + "";
+           // SettingToggles[7].isOn = SettingData.usePhysics;
+            //SettingToggles[8].isOn = SettingData.useSkillEffects;
+            //SettingInputs[4].text = SettingData.skillEffeckFix + "";
             SettingInputs[5].text = SettingData.limitTime.ToString();
             SettingInputs[6].text = SettingData.author;
             SettingInputs[7].text = SettingData.format;
@@ -574,7 +574,7 @@ namespace PCRCaculator.Guild
             SettingTexts[1].text = (int)SettingSliders[1].value * 10 + "";
             SettingTexts[2].text = (int)SettingSliders[2].value * 10 + "";
             SettingToggles[0].interactable = SettingData.calSpeed == 1;
-            SettingToggles[7].isOn = SettingData.usePhysics;
+            //SettingToggles[7].isOn = SettingData.usePhysics;
         }
         public void SaveCalcSettings()
         {
@@ -586,7 +586,7 @@ namespace PCRCaculator.Guild
             try
             {
                 //SettingData.RandomSeed = int.Parse(SettingInputs[0].text);
-                SettingData.BodyColliderWidth = float.Parse(SettingInputs[1].text);
+                //SettingData.BodyColliderWidth = float.Parse(SettingInputs[1].text);
             }
             catch
             {
@@ -598,12 +598,12 @@ namespace PCRCaculator.Guild
             SettingData.ForceNoCritical_enemy = SettingToggles[4].isOn;
             SettingData.ForceIgnoreDodge_player = SettingToggles[5].isOn;
             SettingData.ForceIgnoreDodge_enemy = SettingToggles[6].isOn;*/
-            SettingData.BossAbnormalMultValue = float.Parse(SettingInputs[2].text);
-            SettingData.BossAbnormalAddValue = float.Parse(SettingInputs[3].text);
-            MainManager.Instance.ChangeBodyWidth(SettingData.BodyColliderWidth);
-            SettingData.usePhysics = SettingToggles[7].isOn;
-            SettingData.useSkillEffects = SettingToggles[8].isOn;
-            SettingData.skillEffeckFix = float.Parse(SettingInputs[4].text);
+            //SettingData.BossAbnormalMultValue = float.Parse(SettingInputs[2].text);
+            //SettingData.BossAbnormalAddValue = float.Parse(SettingInputs[3].text);
+            //MainManager.Instance.ChangeBodyWidth(SettingData.BodyColliderWidth);
+            //SettingData.usePhysics = SettingToggles[7].isOn;
+            //SettingData.useSkillEffects = SettingToggles[8].isOn;
+            //SettingData.skillEffeckFix = float.Parse(SettingInputs[4].text);
             SettingData.limitTime = int.Parse(SettingInputs[5].text);
             SettingData.author = SettingInputs[6].text;
             SettingData.format = SettingInputs[7].text;
@@ -1003,18 +1003,18 @@ namespace PCRCaculator.Guild
         public bool ForceIgnoreDodge_player;
         public bool ForceIgnoreDodge_enemy;*/
         //public int currentRandomLine = 0;
-        public float BodyColliderWidth = 100;
+        //public float BodyColliderWidth = 100;
         //public bool usePlayerSettingHP;
         //public int playerSetingHP;
         public Dictionary<int, float> bossAppearDelayDic = new Dictionary<int, float>();
         public Dictionary<int, float> bossSkillCastTimeDic = new Dictionary<int, float>();
         public Dictionary<int, float> bossBodyWidthDic = new Dictionary<int, float>();
-        public float BossAbnormalAddValue = 0.867f;
-        public float BossAbnormalMultValue = 1;
-        public bool usePhysics = true;
+        //public float BossAbnormalAddValue = 0.867f;
+        //public float BossAbnormalMultValue = 1;
+        //public bool usePhysics = true;
         public bool usePlayerSQL = true;
-        public bool useSkillEffects = true;
-        public float skillEffeckFix = 35;
+        //public bool useSkillEffects = true;
+        //public float skillEffeckFix = 35;
         public int limitTime = 90;
         //public bool[] unlockGuilds = new bool[12] { false, false, false, true, true, true, true, false, false, false, false, false };
         public string author = "", format = "m:ss";

@@ -37,7 +37,7 @@ namespace Elements
         public bool ForceAutoMode;
 
         public int CurrentSeedForSave { get; set; }
-        public bool ignoreEffects => !tempData.SettingData.useSkillEffects;
+        public bool ignoreEffects => false;//!tempData.SettingData.useSkillEffects;
 
 
         private const float SPINE_SCALE = 0.01f;

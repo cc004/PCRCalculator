@@ -98,7 +98,7 @@ namespace PCRCaculator
         public bool ForceAutoMode { get => forceAutoMode; }
         public GuildBattleData GuildBattleData { get => guildBattleData;}
         public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
-        public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
+        //public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
         public AllUnitFirearmData FirearmData { get => firearmData;}
 
         public readonly List<int> showUnitIDs = new List<int>();
@@ -289,11 +289,6 @@ namespace PCRCaculator
             }
         }
 
-        public void ChangeBodyWidth(float value)
-        {
-            playerSetting.bodyWidth = value;
-            SavePlayerSetting();
-        }
         public void SavePlayerSetting()
         {
             SaveManager.Save(playerSetting);

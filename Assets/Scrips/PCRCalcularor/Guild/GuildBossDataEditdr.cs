@@ -272,7 +272,7 @@ namespace PCRCaculator.Guild
             }
             else
             {
-                bossBodyWidth = GuildManager.Instance.SettingData.BodyColliderWidth;
+                //bossBodyWidth = GuildManager.Instance.SettingData.BodyColliderWidth;
             }
         }
         private void GetBossSkillCastTime()

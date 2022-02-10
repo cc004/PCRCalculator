@@ -36,7 +36,7 @@ namespace Elements
         public Bounds ColliderBox;
         private bool activeSelf = true;
         private const float HIT_DELAY_DISTANCE = 0.2f;
-        private float SPEED_FIX => MyGameCtrl.Instance.tempData.SettingData.skillEffeckFix;
+        //private float SPEED_FIX => MyGameCtrl.Instance.tempData.SettingData.skillEffeckFix;
 
         public bool IsAbsolute { get; set; }
 
@@ -150,12 +150,12 @@ namespace Elements
                     Vector3 toDirection = this.TargetPos - this.transform.position;
                     toDirection.Normalize();
                     //this.speed = this.MoveRate * toDirection;
-                    this.speed = this.MoveRate * toDirection*SPEED_FIX;
+                    //this.speed = this.MoveRate * toDirection*SPEED_FIX;
                     //this.transform.rotation = Quaternion.FromToRotation((UnityEngine.Object)_owner == (UnityEngine.Object)null || !_owner.IsLeftDir ? Vector3.right : Vector3.left, toDirection);
                     break;
                 case eMoveTypes.NONE:
                 case eMoveTypes.HORIZONTAL:
-                    this.speed = new Vector3(this.MoveRate, 0.0f, 0.0f)*SPEED_FIX;
+                    //this.speed = new Vector3(this.MoveRate, 0.0f, 0.0f)*SPEED_FIX;
                     break;
                 case eMoveTypes.PARABORIC:
                 case eMoveTypes.PARABORIC_ROTATE:

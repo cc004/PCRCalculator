@@ -1066,7 +1066,7 @@ namespace Elements
         protected UnitCtrl owner { get; set; }
 
         protected Action onCowHit { get; set; }
-        private float SPEED_FIX => MyGameCtrl.Instance.tempData.SettingData.skillEffeckFix;
+        //private float SPEED_FIX => MyGameCtrl.Instance.tempData.SettingData.skillEffeckFix;
         protected BattleManager battleManager => BattleManager.Instance;
 
         public virtual void Initialize(

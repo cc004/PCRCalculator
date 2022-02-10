@@ -1875,19 +1875,13 @@ this.updateCurColor();
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, this.gameObject, false);
                     this.ColliderCenter = (polygonCollider2D.bounds.center - this.transform.position) / 2;
                     this.ColliderSize = polygonCollider2D.bounds.size / 2;
-                    if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.SettingData.usePhysics)
+                    if (MyGameCtrl.Instance.tempData.isGuildBattle)
                     {
                         float coSize2 = this.ColliderSize.x / this.transform.lossyScale.x;
                         this.BodyWidth = coSize2 + this.BossBodyWidthOffset;
                     }
                     else
                     {
-                        float coSize = MyGameCtrl.Instance.tempData.isGuildBattle ? Mathf.Max(10, MyGameCtrl.Instance.tempData.SettingData.BodyColliderWidth) : 112;
-                        if (IsBoss && MyGameCtrl.Instance.tempData.SettingData.bossBodyWidthDic.TryGetValue(UnitId, out float value))
-                        {
-                            coSize = value;
-                        }
-                        this.BodyWidth = coSize + this.BossBodyWidthOffset;
                     }
                     UnityEngine.Object.Destroy((UnityEngine.Object)polygonCollider2D);
                     UnityEngine.Object.Destroy((UnityEngine.Object)this.gameObject.GetComponent<Rigidbody2D>());

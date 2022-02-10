@@ -1702,7 +1702,7 @@ namespace PCRCaculator
         public int playerProcess;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 110;
-        public float bodyWidth = 100;
+        //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
         public int pixFix = 0;
