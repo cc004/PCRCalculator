@@ -1454,7 +1454,7 @@ namespace PCRCaculator
         }
         private void SaveDics2Json_2()
         {
-            CalcDics a = new CalcDics();
+            Calc.CalcDics a = new Calc.CalcDics();
             //a.enemyRewardDataDic = enemyRewardDataDic;
             a.equipmentCraftDic = equipmentCraftDic;
             //a.waveGroupDataDic = waveGroupDataDic;

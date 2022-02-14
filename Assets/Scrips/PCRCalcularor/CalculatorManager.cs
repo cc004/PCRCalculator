@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft0.Json;
-namespace PCRCaculator
+using System.Runtime.InteropServices;
+using System.IO;
+
+namespace PCRCaculator.Calc
 {
     public class CalculatorManager : MonoBehaviour
     {
@@ -48,7 +51,9 @@ namespace PCRCaculator
         private Dictionary<int, int> equipmentRequireDic_2;
         private Dictionary<QuestRewardData, int> equipmentQuestDic = new Dictionary<QuestRewardData, int>();
         private Dictionary<int, int> equipmentGetedDic_Quest = new Dictionary<int, int>();
+        private Dictionary<int, UserEquipData> userEquipDic_load = new Dictionary<int, UserEquipData>();
 
+        private Dictionary<int, int> equipmentRequireDic_3 = new Dictionary<int, int>();
 
         private Dictionary<int, EquipmentCraft> equipmentCraftDic;//装备制造数据
         private Dictionary<int, QuestRewardData> questRewardDic;//地图掉落数据
@@ -169,7 +174,7 @@ namespace PCRCaculator
                 Step2_A();
             }
         }
-        public void Step2_A()
+        private void Step2_A()
         {
             unitDataDicForCal_now = new Dictionary<int, UnitData>();
             foreach (UnitData unitData in MainManager.Instance.unitDataDic.Values)
@@ -178,7 +183,7 @@ namespace PCRCaculator
             }
             Step2_B();
         }
-        public void Step2_B()
+        private void Step2_B()
         {
             unitDataListForCal.Clear();
             foreach (UnitData a in unitDataDicForCal_now.Values)
@@ -190,7 +195,7 @@ namespace PCRCaculator
             }
             Step2_C();
         }
-        public void Step2_C()
+        private void Step2_C()
         {
             ClearUnitIcons(parent_A, unitPrefabs);
             int count = 1;
@@ -261,7 +266,12 @@ namespace PCRCaculator
                 b.transform.localScale = new Vector3(1, 1, 1);
                 b.transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8), -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
                 int num = equipentRequireDic[equipId];
-                b.GetComponent<EquipmentPageIcon>().SetEquipmentIcon(equipId, num);
+                int have = 0;
+                if (userEquipDic_load.TryGetValue(equipId, out var data))
+                {
+                    have = data.count;
+                }
+                b.GetComponent<EquipmentPageIcon>().SetEquipmentIcon(equipId, num,have);
                 equipPrefabs.Add(b);
                 count++;
                 requireNum += num;
@@ -274,6 +284,98 @@ namespace PCRCaculator
             equipmentCalPage_calEquipment_count.text = "" + requireNum;
 
         }
+        public void LoadFromJsonButton_OnClick()
+        {
+            string txtRead = ReadInputJson();
+            if (string.IsNullOrEmpty(txtRead))
+                return;
+            LoadDataBody loadDataBody = JsonConvert.DeserializeObject<LoadDataBody>(txtRead);
+            userEquipDic_load.Clear();
+            loadDataBody.user_equip.ForEach(a => userEquipDic_load.Add(a.id, a));
+            Step1_A();
+
+            foreach(var unitS in loadDataBody.unit_list)
+            {
+                if (unitDataDicForCal_perverous.ContainsKey(unitS.id))
+                {
+                    unitDataDicForCal_perverous[unitS.id] = new UnitData(unitS.id, unitS.unit_level, unitS.unit_rarity, 8, unitS.promotion_level, unitS.GetEqLv(), unitS.GetSkillLevelInfo(), null, 0);
+                }
+            }
+
+            equipmentCalPage_megText.text = stepmsg_3;
+            stepButton_1.interactable = false;
+            stepButton_2.interactable = false;
+            stepButton_3.interactable = true;
+            backButton.interactable = true;
+            equipmentCalPage_step = CurrentStep.step3;
+
+            Step2_A();
+
+
+
+        }
+        private string ReadInputJson()
+        {            
+
+            OpenFileName ofn = new OpenFileName();
+
+            ofn.structSize = Marshal.SizeOf(ofn);
+
+            //ofn.filter = "All Files\0*.*\0\0";
+            //ofn.filter = "Image Files(*.jpg;*.png)\0*.jpg;*.png\0";
+            //ofn.filter = "Txt Files(*.txt)\0*.txt\0";
+
+            //ofn.filter = "Word Files(*.docx)\0*.docx\0";
+            //ofn.filter = "Word Files(*.doc)\0*.doc\0";
+            //ofn.filter = "Word Files(*.doc:*.docx)\0*.doc:*.docx\0";
+
+            //ofn.filter = "Excel Files(*.xls)\0*.xls\0";
+            ofn.filter = "Txt Files(*.txt)\0*.txt\0"; //指定打开格式
+                                                      //ofn.filter = "Excel Files(*.xls:*.xlsx)\0*.xls:*.xlsx\0";
+                                                      //ofn.filter = "Excel Files(*.xlsx:*.xls)\0*.xlsx:*.xls\0";
+
+            ofn.file = new string(new char[256]);
+
+            ofn.maxFile = ofn.file.Length;
+
+            ofn.fileTitle = new string(new char[64]);
+
+            ofn.maxFileTitle = ofn.fileTitle.Length;
+
+            //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
+
+            ofn.title = "打开TXT";
+
+            //ofn.defExt = "txt";
+
+            //注意 一下项目不一定要全选 但是0x00000008项不要缺少
+            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
+
+
+            //打开windows框
+            if (DllTest.GetOpenFileName(ofn))
+            {
+                ofn.file = ofn.file.Replace("\\", "/");                
+                try
+                {
+                    string txtfile = File.ReadAllText(ofn.file);
+                    return txtfile;
+                }
+                catch (IOException e)
+                {
+                    MainManager.Instance.WindowConfigMessage("读取错误，请保证文件没有被其他程序占用！", null, null);
+                    return null;
+                }
+                //IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+            }
+            else
+            {
+                MainManager.Instance.WindowConfigMessage("文件读取失败！", null);
+            }
+            return null;
+
+        }
+
         public void BackButton_OnClick()
         {
             switch (equipmentCalPage_step)
@@ -302,6 +404,7 @@ namespace PCRCaculator
             cost_mana_craftEquipment = 0;
             equipmentCraftList.Clear();
             equipmentRequireDic_2 = new Dictionary<int, int>();
+            equipmentRequireDic_3 = new Dictionary<int, int>();
             foreach (int equipid in equipentRequireDic.Keys)
             {
                 int num_A = equipentRequireDic[equipid];
@@ -350,8 +453,17 @@ namespace PCRCaculator
                 b.transform.localScale = new Vector3(1, 1, 1);
                 b.transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8), -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
                 int num = equipmentRequireDic_2[equipId];
-                b.GetComponent<EquipmentPageIcon>().SetEquipmentIcon(equipId, num);
+                int have = 0;
+                if(userEquipDic_load.TryGetValue(equipId,out var data))
+                {
+                    have = data.stock;
+                }
+                b.GetComponent<EquipmentPageIcon>().SetEquipmentIcon(equipId, num,have);
                 equipPrefabs.Add(b);
+
+                if (have < num)
+                    equipmentRequireDic_3.Add(equipId, num - have);
+
                 count++;
                 requireNum += num;
                 //showUnitIDs.Add(id);
@@ -474,12 +586,12 @@ namespace PCRCaculator
         {
             equipmentGetedDic_Quest.Clear();
             equipmentQuestDic.Clear();
-            foreach (int equipment in equipmentRequireDic_2.Keys)
+            foreach (int equipment in equipmentRequireDic_3.Keys)
             {
                 EquipmentGet equipmentGet = equipmentGetDic[equipment];
                 if (equipmentGet.first_appear_quest_id > 11000 + ignorenum)
                 {
-                    AppendEquipmentToDic(equipmentGet, equipmentRequireDic_2[equipment], rate);
+                    AppendEquipmentToDic(equipmentGet, equipmentRequireDic_3[equipment], rate);
                 }
             }
             CalcAP_B();
