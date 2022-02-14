@@ -199,6 +199,7 @@ namespace PCRCaculator
 
         public static void CreateAllSQLDataInPlayerMode_jp()
         {
+            _jpconn = null; _cnconn = null;
             editor = false;
             Db2json();
             //CreateCraftjson();
@@ -208,6 +209,7 @@ namespace PCRCaculator
         }
         public static void CreateAllSQLDataInPlayerMode_cn()
         {
+            _jpconn = null; _cnconn = null;
             var skill = Db2json(); 
 
             CreateEnemyJson2(skill);

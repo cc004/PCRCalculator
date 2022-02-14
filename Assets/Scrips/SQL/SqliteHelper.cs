@@ -4,7 +4,8 @@ using Mono.Data.Sqlite;
 //using SQLite4Unity3d;
 using System;
 using System.IO;
- 
+using System.Runtime.InteropServices;
+
 public class SQLiteHelper
 {
     /// <summary>
@@ -95,7 +96,7 @@ public class SQLiteHelper
 
             if (patch)
             {
-                var dbPath = Path.Combine(Application.streamingAssetsPath, "SQL", $"temp.{connectionString}");
+                var dbPath = Path.GetTempFileName();
                 File.Copy(filepath, dbPath, true);
 
                 string connectingPath = "Data Source=" + dbPath;
@@ -104,10 +105,15 @@ public class SQLiteHelper
                 dbConnection = new SqliteConnection(connectingPath);
                 //打开数据库
                 dbConnection.Open();
-
-                var cmd = dbConnection.CreateCommand();
-                cmd.CommandText = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "SQL", "dbdiff.sql"));
-                cmd.ExecuteNonQuery();
+                var trans = dbConnection.BeginTransaction();
+                var num = UnsafeNativeMethods.sqlite3_exec((dbConnection._sql as SQLite3)._sql, SqliteConvert.ToUTF8(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "SQL", "dbdiff.sql"))), IntPtr.Zero, IntPtr.Zero, out var intPtr);
+                bool flag = num != 0;
+                if (flag)
+                {
+                    string onljihpignl = (intPtr == IntPtr.Zero) ? "" : Marshal.PtrToStringAnsi(intPtr);
+                    throw new Exception(onljihpignl);
+                }
+                trans.Commit();
             }
             else
             {
