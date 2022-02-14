@@ -366,6 +366,9 @@ namespace PCRCaculator
         }
         public void CalculatorButton()
         {
+            TurnAllPageOff();
+            CalculatorManager.Instance.SwitchPage(1);
+            stayPage = StayPage.calculator;
         }
         private void TurnAllPageOff()
         {

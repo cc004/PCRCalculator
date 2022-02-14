@@ -118,6 +118,19 @@ namespace PCRCaculator
         }
 #if UNITY_EDITOR
 
+        [MenuItem("PCRTools/从DB导入装备制造json文件")]
+#endif
+
+        public static void CreateCraftjson()
+        {
+            SQL2Json a = new SQL2Json();
+            a.Load_2();
+            a.CalcDics();
+            a.SaveDics2Json_2();
+        }
+
+#if UNITY_EDITOR
+
         [MenuItem("PCRTools/从DB导入工会战怪物json文件-jp")]
 #endif
 
@@ -1345,5 +1358,119 @@ namespace PCRCaculator
                 ;*/
 
         }
+        private void CalcDics()
+        {
+            foreach (EquipmentData equipmentData in equipmentDic.Values)
+            {
+                EquipmentGet equipmentGet = new EquipmentGet();
+                equipmentGet.equipment_id = equipmentData.equipment_id;
+                equipmentGet.isCraft = equipmentData.craftFlg;
+                equipmentGetDic.Add(equipmentGet.equipment_id, equipmentGet);
+            }
+            foreach (QuestData questData in questDataDic.Values)
+            {
+                if (questData.quest_id <= 18000000)//n,h图
+                {
+                    QuestRewardData questRewardData = new QuestRewardData();
+                    questRewardData.isHard = questData.quest_id > 12000000;
+                    questRewardData.quest_id = questData.quest_id;
+                    questRewardData.quest_name = questData.quest_name;
+                    questRewardData.area_id = questData.area_id;
+                    int[] waveGroupIds = new int[] { questData.wave_group_id_1, questData.wave_group_id_2, questData.wave_group_id_3 };
+                    foreach (int waveid in waveGroupIds)
+                    {
+                        try
+                        {
+                            List<WaveGroupData.EnemyDropData> dropDatas = waveGroupDataDic[waveid].enemyDropDatas;
+                            foreach (WaveGroupData.EnemyDropData dropData in dropDatas)
+                            {
+                                if (dropData.drop_reward_id > 0)
+                                {
+                                    List<EnemyRewardData.RewardData> rewardDatas = enemyRewardDataDic[dropData.drop_reward_id].rewardDatas;
+                                    foreach (EnemyRewardData.RewardData rewardData in rewardDatas)
+                                    {
+                                        if (rewardData.reward_type == 4 && rewardData.reward_id != 0)
+                                        {
+                                            if (rewardData.reward_num == 1)
+                                            {
+                                                if (!questRewardData.rewardEquips.Contains(rewardData.reward_id))
+                                                {
+                                                    questRewardData.rewardEquips.Add(rewardData.reward_id);
+                                                    questRewardData.odds.Add(rewardData.odds);
+                                                    /*EquipmentGet equipment = equipmentGetDic[rewardData.reward_id];
+                                                    if (!questRewardData.isHard)
+                                                    {
+                                                        equipment.getWays_n.Add(new EquipmentGet.GetWay(questData.quest_id,questData.area_id, rewardData.odds));
+                                                        if(equipment.first_appear_quest_id > questData.area_id || equipment.first_appear_quest_id == 0)
+                                                        {
+                                                            equipment.first_appear_quest_id = questData.area_id;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        equipment.getWays_h.Add(new EquipmentGet.GetWay(questData.quest_id, questData.area_id, rewardData.odds));
+                                                    }*/
+                                                }
+                                                else
+                                                {
+                                                    //Debug.Log("装备掉落重复！");
+                                                    int index = questRewardData.rewardEquips.FindIndex(a => a == rewardData.reward_id);
+                                                    questRewardData.odds[index] += rewardData.odds;
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch(KeyNotFoundException ex)
+                        {
+                            Debug.LogError($"waveid{waveid} is not exit!");
+                        }
+                    }
+                    for (int i = 0; i < questRewardData.rewardEquips.Count; i++)
+                    {
+                        int reward_id = questRewardData.rewardEquips[i];
+                        int odd = questRewardData.odds[i];
+                        EquipmentGet equipment = equipmentGetDic[reward_id];
+                        if (!questRewardData.isHard)
+                        {
+                            equipment.getWays_n.Add(new EquipmentGet.GetWay(questData.quest_id, questData.area_id, odd));
+                            if (equipment.first_appear_quest_id > questData.area_id || equipment.first_appear_quest_id == 0)
+                            {
+                                equipment.first_appear_quest_id = questData.area_id;
+                            }
+                        }
+                        else
+                        {
+                            equipment.getWays_h.Add(new EquipmentGet.GetWay(questData.quest_id, questData.area_id, odd));
+                        }
+                    }
+                    questRewardDic.Add(questRewardData.quest_id, questRewardData);
+                }
+            }
+
+        }
+        private void SaveDics2Json_2()
+        {
+            CalcDics a = new CalcDics();
+            //a.enemyRewardDataDic = enemyRewardDataDic;
+            a.equipmentCraftDic = equipmentCraftDic;
+            //a.waveGroupDataDic = waveGroupDataDic;
+            //a.questDataDic = questDataDic;
+            a.equipmentGetDic = equipmentGetDic;
+            a.questRewardDic = questRewardDic;
+            a.exp_cost = exp_cost;
+            a.skill_cost = skill_cost;
+            string filePath = GetSaveDataPath() + "/CalcDics.json";
+            string saveJsonStr = JsonConvert.SerializeObject(a);
+            StreamWriter sw = new StreamWriter(filePath);
+            sw.Write(saveJsonStr);
+            sw.Close();
+            Debug.Log("成功！" + filePath);
+
+        }
+
     }
 }
