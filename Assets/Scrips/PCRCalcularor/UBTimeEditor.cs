@@ -21,7 +21,7 @@ namespace PCRCaculator
         public void Save()
         {
             groupData.UBExecTimeData.Clear();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 groupData.UBExecTimeData.Add(UnitUBTimes[i].GetUBTimes());
                 UnitUBTimes[i].FinishEdit();
@@ -43,7 +43,7 @@ namespace PCRCaculator
         }
         public void Set(List<List<float>> list)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 if (i < list.Count)
                 {

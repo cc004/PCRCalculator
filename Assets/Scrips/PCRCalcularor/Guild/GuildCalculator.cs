@@ -518,16 +518,16 @@ namespace PCRCaculator.Guild
                 UBTimes.Add(ubline);
             }
             return UBTimes;*/
-            return PlayerIds.SelectMany((id, i) => allUnitStateChangeDic[id]
+            return PlayerIds.Append(bossId).SelectMany((id, i) => allUnitStateChangeDic[id]
                     .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
                     .Select(s => (state: s, pos: i)))
                 .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.id)
-                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.1f)))
+                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.01f)))
                 .GroupBy(s => s.t.pos).Select(g =>
                     (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
                 .Aggregate(new List<List<float>>
                 {
-                    new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>()
+                    new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>()
                 }, (result, tuple) =>
                 {
                     result[tuple.Key] = tuple.list;

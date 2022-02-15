@@ -478,6 +478,7 @@ namespace PCRCaculator.Guild
                     UnitUBTimes[i].SetUBTimes(new List<float>());
                 }
             }
+            UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             AutoModeToggle.isOn = data.useAutoMode;
 
             timeLineTexts[0].text = data.timeLineData.DataName;
@@ -661,7 +662,9 @@ namespace PCRCaculator.Guild
             }
             UBTimeEditButtonText.text = isEditongUBTime ? "保存" : "修改";
             int idx = 0;
-            foreach(UBTime uBTime in UnitUBTimes)
+            if (!isEditongUBTime && isButton)
+                SettingData.GetCurrentPlayerGroup().UBExecTimeData.Clear();
+            foreach (UBTime uBTime in UnitUBTimes)
             {
                 if (isEditongUBTime)
                 {
@@ -673,7 +676,7 @@ namespace PCRCaculator.Guild
                     uBTime.FinishEdit();
                     if (isButton)
                     {
-                        SettingData.GetCurrentPlayerGroup().UBExecTimeData[idx] = uBTime.GetUBTimes();
+                        SettingData.GetCurrentPlayerGroup().UBExecTimeData.Add(uBTime.GetUBTimes());
                     }
                 }
                 idx++;
@@ -725,6 +728,8 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("无效的存档！" , null, null);
                 return;
             }
+            if (guildTimelineData.playerGroupData.UBExecTimeData.Count == 5)
+                guildTimelineData.playerGroupData.UBExecTimeData.Add(new List<float>());
             int currentNum = SettingData.currentPlayerGroupNum;
             //int guild_currentNum = guildTimelineData.currentSettingData.currentPlayerGroupNum;
             //SettingData.addedPlayerDatas[currentNum] = guildTimelineData.currentSettingData.addedPlayerDatas[guild_currentNum];
@@ -1169,7 +1174,7 @@ namespace PCRCaculator.Guild
         {
             playerData = new AddedPlayerData();
             playerData.playerName = "新建队伍";
-            UBExecTimeData = new List<List<float>> { new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>() };
+            UBExecTimeData = new List<List<float>> { new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>() };
             timeLineData = new GuildRandomData();
         }
     }

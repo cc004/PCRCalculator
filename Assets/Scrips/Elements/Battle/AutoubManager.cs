@@ -13,7 +13,7 @@ namespace Elements.Battle
         private class UbStatus
         {
             public UbStatus depending;
-            public bool pressed, waitboss;
+            public bool pressed;
             public int frame;
             public float origin;
         }
@@ -40,13 +40,12 @@ namespace Elements.Battle
                             depending = last.sta,
                             frame = g.Key,
                             origin = tuple.time,
-                            waitboss = (tuple.time - g.Key) > 0.5,
                         }, tuple.pos));
                         return result;
                     })).GroupBy(t => t.pos).OrderBy(g => g.Key)
                 .Select(g => (g.Key, new Queue<UbStatus>(g.Select(t => t.sta).OrderBy(t => t.frame)))).Aggregate(new Queue<UbStatus>[]
                 {
-                    new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>()
+                    new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>()
                 }, (arr, tuple) =>
                 {
                     arr[tuple.Key] = tuple.Item2;
@@ -79,7 +78,7 @@ namespace Elements.Battle
 
                 if (next.depending?.pressed ?? true)
                 {
-                    if (next.frame <= cnt && (!next.waitboss || lastbossub == next.frame))
+                    if (next.frame <= cnt)
                     {
                         return true;
                     }
@@ -88,13 +87,12 @@ namespace Elements.Battle
 
             return false;
         }
-
-        private int lastbossub = -1;
+        
         public void UbExecCallback(int pos)
         {
             if (!enabled) return;
-            if (pos == -1) lastbossub = BattleHeaderController.CurrentFrameCount;
-            if (pos < 0 || pos > 4) return;
+            if (pos == -1) pos = 5;
+            if (pos < 0 || pos > 5) return;
             if (queues[pos].Count > 0)
                 queues[pos].Dequeue().pressed = true;
         }
