@@ -44,7 +44,7 @@ namespace PCRCaculator
         private Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();
         private Dictionary<int, Guild.GuildEnemyData> guildEnemyDataList = new Dictionary<int, Guild.GuildEnemyData>();
 
-        private SQLiteHelper sql;
+        private SQLiteHelper sql => CnConnection;
         public int loadCharacterMax = 500000;//最多加载到的角色序号
         private static bool editor = false;
         const string conn = "redive_jp.db";
@@ -211,17 +211,16 @@ namespace PCRCaculator
 
         public static void CreateAllSQLDataInPlayerMode_jp()
         {
-            _jpconn = null; _cnconn = null;
+            _cnconn = null;
             editor = false;
             Db2json();
-            //CreateCraftjson();
             CreateEnemyJson();
             CreateAttackPatternJson();
             CreateUniqueEquipmentJson();
         }
         public static void CreateAllSQLDataInPlayerMode_cn()
         {
-            _jpconn = null; _cnconn = null;
+            _cnconn = null;
             var skill = Db2json(); 
 
             CreateEnemyJson2(skill);
@@ -232,37 +231,17 @@ namespace PCRCaculator
 
         private void Load()
         {
-            //string conn = "data source=redive_jp.db";
-            //string conn = "redive_jp.db";
-
-            sql = JpConnection;
-            
             LoadUnitRarityData(true);
             LoadUnitStoryData();
             LoadEquipmentData();
             LoadSkillData(true);
-
-            sql.CloseConnection();
-
-            sql = CnConnection;
-            //LoadEquipmentData();
             LoadSkillData();
             LoadChineseBaseData();
             LoadUnitRarityData();
             LoadUnitStoryData();
-            sql.CloseConnection();
-
-            /*sql = JpConnection;
-            LoadEquipmentData();
-            //LoadUnitStoryData();
-            LoadSkillData(true);
-            sql.CloseConnection();*/
-
-
         }
         private void Load_2()
         {
-            sql = JpConnection;
             LoadEquipmentData();
             /*sql.CloseConnection();
 
@@ -274,75 +253,34 @@ namespace PCRCaculator
             LoadEquipmentCraft();
             LoadEXPCost();
             LoadSkillCost();
-            sql.CloseConnection();
 
         }
         private void Load_3(bool cn=false, (Dictionary<int, SkillAction>, Dictionary<int, SkillData>) skill = default)
         {
-
-            //string conn = "redive_cn.db";
-            //string conn = "redive_cn_old.db";
-            if (cn)
-            {
-                sql = CnConnection;
-                LoadEnemyData(skill);
-                sql.CloseConnection();
-            }
-            else
-            {
-                sql = JpConnection;
-                LoadEnemyData(skill);
-                sql.CloseConnection();
-            }
-
+            LoadEnemyData(skill);
         }
         private void Load_4(bool cn=false)
         {
-            if (cn)
-            {
-                sql = CnConnection;
-                //LoadUnitRarityData();
-                LoadUnitAttackPattern();
-                sql.CloseConnection();
-                sql = JpConnection;
-                //LoadUnitRarityData();
-                LoadUnitAttackPattern();
-                sql.CloseConnection();
-            }
-            else
-            {
-                sql = JpConnection;
-                //LoadUnitRarityData();
-                LoadUnitAttackPattern();
-                sql.CloseConnection();
-                sql = CnConnection;
-                //LoadUnitRarityData();
-                LoadUnitAttackPattern();
-                sql.CloseConnection();
-            }
+            LoadUnitAttackPattern();
         }
         private void Load_5()
         {
-
-            sql = JpConnection;
             LoadUniqueEquipmentData();
             sql.CloseConnection();
         }
         private void Load_6()
         {
-            sql = JpConnection;
             LoadResistDada();
             sql.CloseConnection();
         }
         private void Load_7()
         {
-            sql = CnConnection;
             LoadClanBattleData();
             sql.CloseConnection();
 
         }
-        private static SQLiteHelper _jpconn, _cnconn;
-        private static SQLiteHelper JpConnection => _jpconn = _jpconn ?? new SQLiteHelper(conn);
+        private static SQLiteHelper _cnconn;
+        //private static SQLiteHelper JpConnection => _jpconn = _jpconn ?? new SQLiteHelper(conn);
         private static SQLiteHelper CnConnection => _cnconn = _cnconn ?? new SQLiteHelper(conn_cn, true);
         private void LoadEquipmentData()
         {
@@ -723,11 +661,9 @@ namespace PCRCaculator
                 unitSkillData.SPskill_3 = reader.GetInt32(reader.GetOrdinal("sp_skill_3"));
                 unitSkillData.SPskill_4 = reader.GetInt32(reader.GetOrdinal("sp_skill_4"));
                 unitSkillData.SPskill_5 = reader.GetInt32(reader.GetOrdinal("sp_skill_5"));
-                if (isJapen)
-                {
-                    unitSkillData.SPskill_1_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_1"));
-                    unitSkillData.SPskill_2_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_2"));
-                }
+
+                unitSkillData.SPskill_1_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_1"));
+                unitSkillData.SPskill_2_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_2"));
 
 
                 unitSkilldic.Add(unitid, unitSkillData);
@@ -1168,22 +1104,8 @@ namespace PCRCaculator
                     }
                     enemyData.resist_status_id = reader.GetInt32(reader.GetOrdinal("resist_status_id"));
                     enemyData.unique_equipment_flag_1 = reader.GetInt32(reader.GetOrdinal("unique_equipment_flag_1"));
-                    try
-                    {
-                        enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
-                    }
-                    catch
-                    {
-
-                    }
-                    try
-                    {
-                        enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
-                    }
-                    catch
-                    {
-
-                    }
+                    enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
+                    enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
                     if (detailDic.ContainsKey(enemyData.unit_id))
                         enemyData.detailData = detailDic[enemyData.unit_id];
                     else

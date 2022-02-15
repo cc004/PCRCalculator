@@ -985,7 +985,8 @@ namespace Elements
             this.masterHatsuneQuestArea = masterHatsuneDatabase.masterHatsuneQuestArea;
             this.masterHatsuneBoss = masterHatsuneDatabase.masterHatsuneBoss;
             this.masterHatsuneBossCondition = masterHatsuneDatabase.masterHatsuneBossCondition;
-            this.masterHatsuneUnlockStoryCondition = masterHatsuneDatabase.masterHatsuneUnlockStoryCondition;
+            this.masterHatsune
+    StoryCondition = masterHatsuneDatabase.masterHatsuneUnlockStoryCondition;
             this.masterHatsuneDailyMissionData = masterHatsuneDatabase.masterHatsuneDailyMissionData;
             this.masterHatsuneStationaryMissionData = masterHatsuneDatabase.masterHatsuneStationaryMissionData;
             this.masterHatsuneSpecialMissionData = masterHatsuneDatabase.masterHatsuneSpecialMissionData;
