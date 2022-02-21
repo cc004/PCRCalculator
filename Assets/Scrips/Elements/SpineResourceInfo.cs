@@ -31,13 +31,13 @@ namespace Elements
       float _animationScale = 1f,
       bool _isSkinId = false)
     {
-      this.spineType = _spineType;
-      this.bundleId = _bundleId;
-      this.skelton = _skelton;
-      this.controller = _controller;
-      this.animation = _animation;
-      this.animationScale = _animationScale;
-      this.IsSkinId = _isSkinId;
+      spineType = _spineType;
+      bundleId = _bundleId;
+      skelton = _skelton;
+      controller = _controller;
+      animation = _animation;
+      animationScale = _animationScale;
+      IsSkinId = _isSkinId;
     }
   }
 }

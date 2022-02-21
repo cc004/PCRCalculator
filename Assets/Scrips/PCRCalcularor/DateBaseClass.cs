@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class equipment_data
+﻿public class equipment_data
 {
     public int equipment_id;
     public string equipment_name;

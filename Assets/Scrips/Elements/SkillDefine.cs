@@ -17,295 +17,295 @@ namespace Elements
     public const int UPGRADE_SKILL_NUM = 10;
     private const float NO_DISPLAY = 0.0f;
     private const float NO_VALUE_DISPLAY = -1f;
-    public static readonly Dictionary<eActionType, Func<List<float>, List<float>, bool, float>> SkillActionDictionary = new Dictionary<eActionType, Func<List<float>, List<float>, bool, float>>()
+    public static readonly Dictionary<eActionType, Func<List<float>, List<float>, bool, float>> SkillActionDictionary = new Dictionary<eActionType, Func<List<float>, List<float>, bool, float>>
     {
       {
         eActionType.ATTACK,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcAttackBaseParam)
+        calcAttackBaseParam
       },
       {
         eActionType.MOVE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.KNOCK,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.HEAL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcHealBaseParam)
+        calcHealBaseParam
       },
       {
         eActionType.CURE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.BARRIER,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.REFLEXIVE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.CHANGE_SPEED,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcSkillLevelParam)
+        calcSkillLevelParam
       },
       {
         eActionType.SLIP_DAMAGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcChargeParam)
+        calcChargeParam
       },
       {
         eActionType.BUFF_DEBUFF,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueSecondParam2)
+        calcValueSecondParam2
       },
       {
         eActionType.CHARM,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcSkillLevelParam)
+        calcSkillLevelParam
       },
       {
         eActionType.BLIND,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcSkillLevelParam)
+        calcSkillLevelParam
       },
       {
         eActionType.SILENCE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcSkillLevelParam)
+        calcSkillLevelParam
       },
       {
         eActionType.MODE_CHANGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.SUMMON,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueSecondParam)
+        calcValueSecondParam
       },
       {
         eActionType.CHARGE_ENERGY,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.TRIGER,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.DAMAGE_CHARGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.CHARGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.DECOY,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.NO_DAMAGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParamNoCeil)
+        calcValueFirstBaseParamNoCeil
       },
       {
         eActionType.CHANGE_PATTERN,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.IF_FOR_CHILDREN,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.REVIVAL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.CONTINUOUS_ATTACK,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcAttackBaseParam)
+        calcAttackBaseParam
       },
       {
         eActionType.GIVE_VALUE_AS_ADDITIVE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.GIVE_VALUE_AS_MULTIPLE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.IF_FOR_ALL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.SEARCH_AREA_CHANGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.DESTROY,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.CONTINUOUS_ATTACK_NEARBY,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.ENCHANT_LIFE_STEAL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.ENCHANT_STRIKE_BACK,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.ACCUMULATIVE_DAMAGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam)
+        calcValueFirstBaseParam
       },
       {
         eActionType.SEAL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.ATTACK_FIELD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcAttackBaseParam)
+        calcAttackBaseParam
       },
       {
         eActionType.HEAL_FIELD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcHealFieldBaseParam)
+        calcHealFieldBaseParam
       },
       {
         eActionType.CHANGE_PARAMETER_FIELD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParam2)
+        calcValueFirstBaseParam2
       },
       {
         eActionType.ABNORMAL_STATE_FIELD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.KETSUBAN,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.UB_CHANGE_TIME,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.LOOP_TRIGGER,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.IF_HAS_TARGET,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.WAVE_START_IDLE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.SKILL_EXEC_COUNT,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.RATIO_DAMAGE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.UPPER_LIMIT_ATTACK,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.REGENERATION,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcRegeneParam)
+        calcRegeneParam
       },
       {
         eActionType.BUFF_DEBUFF_CLEAR,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.LOOP_MOTION_BUFF_DEBUFF,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueSecondParam2)
+        calcValueSecondParam2
       },
       {
         eActionType.DIVISION,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.CHANGE_BODY_WIDTH,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.IF_EXISTS_FIELD_FOR_ALL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.STEALTH,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.COUNT_BLIND,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcSkillLevelParam)
+        calcSkillLevelParam
       },
       {
         eActionType.MOVE_PARTS,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.COUNT_DOWN,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.STOP_FIELD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.INHIBIT_HEAL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.ATTACK_SEAL,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.FEAR,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcSkillLevelParam)
+        calcSkillLevelParam
       },
       {
         eActionType.AWE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.TOAD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.LOOP_MOTION_REPEAT,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.KNGHT_GUARD,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcKnightGuardParam)
+        calcKnightGuardParam
       },
       {
         eActionType.DAMAGE_CUT,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParamRound)
+        calcValueFirstBaseParamRound
       },
       {
         eActionType.LOG_BARRIER,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueFirstBaseParamRound)
+        calcValueFirstBaseParamRound
       },
       {
         eActionType.GIVE_VALUE_AS_DIVIDE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.ACTION_BY_HIT_COUNT,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.IGNORE_DECOY,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.getNoDisplay)
+        getNoDisplay
       },
       {
         eActionType.PASSIVE,
-        new Func<List<float>, List<float>, bool, float>(SkillDefine.calcValueSecondParam)
+        calcValueSecondParam
       }
     };
-        public static readonly Dictionary<eActionType, System.Type> SkillActionTypeDictionary = new Dictionary<eActionType, System.Type>()
-    {
+        public static readonly Dictionary<eActionType, Type> SkillActionTypeDictionary = new Dictionary<eActionType, Type>
+        {
       {
         eActionType.ATTACK,
         typeof (AttackAction)
@@ -763,15 +763,15 @@ namespace Elements
       bool _isLevelUp)
     {
       float parameter1 = _parameters[0];
-      double parameter2 = (double) _parameters[1];
+      double parameter2 = _parameters[1];
       float parameter3 = _parameters[2];
       float parameter4 = _parameters[3];
       float parameter5 = _parameters[4];
       float subParameter1 = _subParameters[0];
       float subParameter2 = _subParameters[1];
       float subParameter3 = _subParameters[2];
-      double num = (double) parameter3 * (double) parameter1;
-      return Mathf.Floor((float) (parameter2 + num + ((double) subParameter1 == 1.0 || (double) subParameter1 == 3.0 ? (double) subParameter2 : (double) subParameter3) * ((double) parameter4 + (double) parameter5 * (double) parameter1)));
+      double num = parameter3 * (double) parameter1;
+      return Mathf.Floor((float) (parameter2 + num + (subParameter1 == 1.0 || subParameter1 == 3.0 ? subParameter2 : (double) subParameter3) * (parameter4 + parameter5 * (double) parameter1)));
     }
 
     private static float calcHealBaseParam(
@@ -780,16 +780,16 @@ namespace Elements
       bool _isLevelUp)
     {
       float parameter1 = _parameters[0];
-      double parameter2 = (double) _parameters[1];
-      double parameter3 = (double) _parameters[2];
+      double parameter2 = _parameters[1];
+      double parameter3 = _parameters[2];
       float parameter4 = _parameters[3];
       float parameter5 = _parameters[4];
       float parameter6 = _parameters[5];
       float subParameter1 = _subParameters[0];
       float subParameter2 = _subParameters[1];
       float subParameter3 = _subParameters[2];
-      double num = (double) parameter4 * (double) parameter1;
-      return Mathf.Floor((float) (parameter3 + num + ((double) subParameter1 == 1.0 ? (double) subParameter2 : (double) subParameter3) * ((double) parameter5 + (double) parameter6 * (double) parameter1)));
+      double num = parameter4 * (double) parameter1;
+      return Mathf.Floor((float) (parameter3 + num + (subParameter1 == 1.0 ? subParameter2 : (double) subParameter3) * (parameter5 + parameter6 * (double) parameter1)));
     }
 
     private static float calcKnightGuardParam(
@@ -798,16 +798,16 @@ namespace Elements
       bool _isLevelUp)
     {
       float parameter1 = _parameters[0];
-      double parameter2 = (double) _parameters[1];
+      double parameter2 = _parameters[1];
       float parameter3 = _parameters[2];
       float parameter4 = _parameters[3];
       float parameter5 = _parameters[4];
       float parameter6 = _parameters[5];
-      double subParameter1 = (double) _subParameters[0];
+      double subParameter1 = _subParameters[0];
       float subParameter2 = _subParameters[1];
       float subParameter3 = _subParameters[2];
       float num = (int) parameter2 == 1 ? subParameter2 : subParameter3;
-      return (float) (int) ((double) parameter3 + (double) parameter4 * (double) parameter1 + ((double) parameter5 + (double) parameter6 * (double) parameter1) * (double) num);
+      return (int) (parameter3 + parameter4 * (double) parameter1 + (parameter5 + parameter6 * (double) parameter1) * num);
     }
 
     private static float calcHealFieldBaseParam(
@@ -816,17 +816,17 @@ namespace Elements
       bool _levelUp)
     {
       float parameter1 = _parameters[0];
-      double parameter2 = (double) _parameters[1];
+      double parameter2 = _parameters[1];
       float parameter3 = _parameters[2];
       float parameter4 = _parameters[3];
       float parameter5 = _parameters[4];
-      double parameter6 = (double) _parameters[5];
+      double parameter6 = _parameters[5];
       float subParameter1 = _subParameters[0];
       float subParameter2 = _subParameters[1];
       float subParameter3 = _subParameters[2];
-      bool flag = (double) subParameter1 == 2.0 || (double) subParameter1 == 4.0;
-      double num = (double) parameter3 * (double) parameter1;
-      return Mathf.Floor((float) (parameter2 + num + (flag ? (double) subParameter3 : (double) subParameter2) * ((double) parameter4 + (double) parameter5 * (double) parameter1)));
+      bool flag = subParameter1 == 2.0 || subParameter1 == 4.0;
+      double num = parameter3 * (double) parameter1;
+      return Mathf.Floor((float) (parameter2 + num + (flag ? subParameter3 : (double) subParameter2) * (parameter4 + parameter5 * (double) parameter1)));
     }
 
     private static float calcValueFirstBaseParam(
@@ -844,7 +844,7 @@ namespace Elements
       bool _levelUp)
     {
       float parameter = _parameters[0];
-      return (float) BattleUtil.FloatToIntReverseTruncate(_parameters[1] + _parameters[2] * parameter);
+      return BattleUtil.FloatToIntReverseTruncate(_parameters[1] + _parameters[2] * parameter);
     }
 
     private static float calcValueFirstBaseParamNoCeil(
@@ -862,7 +862,7 @@ namespace Elements
       bool _levelUp)
     {
       float parameter = _parameters[0];
-      return (float) Mathf.RoundToInt(_parameters[1] + _parameters[2] * parameter);
+      return Mathf.RoundToInt(_parameters[1] + _parameters[2] * parameter);
     }
 
     private static float calcValueSecondParam(
@@ -880,7 +880,7 @@ namespace Elements
       bool _isSkillLevelUp)
     {
       float parameter = _parameters[0];
-      return (float) BattleUtil.FloatToIntReverseTruncate(_parameters[2] + _parameters[3] * parameter);
+      return BattleUtil.FloatToIntReverseTruncate(_parameters[2] + _parameters[3] * parameter);
     }
 
     private static float calcChargeParam(
@@ -905,7 +905,7 @@ namespace Elements
       float subParameter1 = _subParameters[0];
       float subParameter2 = _subParameters[1];
       float subParameter3 = _subParameters[2];
-      return (double) _subParameters[3] != 1.0 ? 0.0f : Mathf.Floor((float) ((double) parameter2 + (double) parameter3 * (double) parameter1 + ((double) parameter4 + (double) parameter5 * (double) parameter1) * ((double) subParameter1 == 1.0 ? (double) subParameter2 : (double) subParameter3)));
+      return _subParameters[3] != 1.0 ? 0.0f : Mathf.Floor((float) (parameter2 + parameter3 * (double) parameter1 + (parameter4 + parameter5 * (double) parameter1) * (subParameter1 == 1.0 ? subParameter2 : (double) subParameter3)));
     }
 
     public static bool IsEvolutionSkill(int _skillId) => _skillId / 10 % 10 == 1;

@@ -4,11 +4,12 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cute;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -22,228 +23,228 @@ namespace Elements
           UnitCtrl _source,
           UnitActionController _sourceActionController)
         {
-            PartsData parts = _source.BossPartsListForBattle.Find((Predicate<PartsData>)(e => e.Index == _skill.ParameterTarget));
+            PartsData parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
             UnitCtrl target = _source;
-            if (this.ActionDetail2 != 0)
+            if (ActionDetail2 != 0)
             {
-                target = (!_source.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList).Find((Predicate<UnitCtrl>)(e => e.UnitId == this.ActionDetail2));
-                if ((UnityEngine.Object)target == (UnityEngine.Object)null)
+                target = (!_source.IsOther ? battleManager.UnitList : battleManager.EnemyList).Find(e => e.UnitId == ActionDetail2);
+                if (target == null)
                     return;
             }
             bool actionDone = false;
             int actionCount = 0;
-            switch (this.ActionDetail1)
+            switch (ActionDetail1)
             {
                 case 1:
-                    target.OnDodge += (Action)(() =>
-                   {
-                       float num = BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
-                       if (_source.TargetEnemyList.Count == 0 || this.judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || (double)num > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
-                           _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                       else
-                           _sourceActionController.StartAction(_skill.SkillId);
-                   });
+                    target.OnDodge += () =>
+                    {
+                        float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
+                        if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || num > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
+                            _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                        else
+                            _sourceActionController.StartAction(_skill.SkillId);
+                    };
                     break;
                 case 2:
-                    target.OnDamage += (UnitCtrl.OnDamageDelegate)((byAtack, damage, critical) =>
-                   {
-                       if (!byAtack)
-                           return;
-                       float num = BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source,null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
-                       if (_source.TargetEnemyList.Count == 0 || this.judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || (double)num > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
-                           _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                       else
-                           _sourceActionController.StartAction(_skill.SkillId);
-                   });
+                    target.OnDamage += (byAtack, damage, critical) =>
+                    {
+                        if (!byAtack)
+                            return;
+                        float num = BattleManager.Random(0.0f, 1f, new RandomData(_source,null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
+                        if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || num > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
+                            _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                        else
+                            _sourceActionController.StartAction(_skill.SkillId);
+                    };
                     break;
                 case 3:
-                    if ((double)this.Value[eValueNumber.VALUE_4] == 99.0)
+                    if ((double)Value[eValueNumber.VALUE_4] == 99.0)
                         target.IsTough = true;
-                    if ((double)this.Value[eValueNumber.VALUE_3] == 0.0)
+                    if ((double)Value[eValueNumber.VALUE_3] == 0.0)
                         target.HasUnDeadTime = true;
-                    target.OnHpChange = (UnitCtrl.OnDamageDelegate)((byAttack, damage, critical) =>
-                   {
-                       float num = BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
-                       if (_source.HasUnDeadTime)
-                       {
-                           if (_source.UnDeadTimeHitCount > 1)
-                           {
-                               --_source.UnDeadTimeHitCount;
-                               if (_source.UnDeadTimeHitCount == 1)
-                                   _source.SetState(UnitCtrl.ActionState.DIE);
-                           }
-                           else
-                               actionDone = false;
-                       }
-                       if (this.judgeSilenceOrToad(_source) || _source.IsUnableActionState() || (_source.IsDead || (double)num > (double)this.Value[eValueNumber.VALUE_1] / 100.0) || (actionDone || (double)(long)_source.Hp > (double)this.Value[eValueNumber.VALUE_3] / 100.0 * (double)(long)_source.MaxHp))
-                           return;
-                       actionDone = true;
-                       Action<bool> action = (Action<bool>)(_waitUbTurn =>
-             {
-                         if (this.judgeSilenceOrToad(_source) || _source.IsUnableActionState())
-                         {
-                             actionDone = false;
-                         }
-                         else
-                         {
-                             if ((double)_skill.BlackOutTime > 0.0 & _waitUbTurn)
-                                 this.battleManager.OCAMDIOPEFP = true;
-                             _source.SkillUseCount[_skill.SkillId]++;
-                             _source.CancelByAwake = true;
-                             _source.CurrentTriggerSkillId = _skill.SkillId;
-                             if ((double)_skill.BlackOutTime > 0.0)
-                             {
-                                 this.battleManager.GamePause(true, false);
-                                 this.battleManager.SetSkillExeScreen(_source, _skill.BlackOutTime, _skill.BlackoutColor, _skill.BlackoutEndWithMotion);
-                                 _source.SetSortOrderFront();
-                             }
-                             _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                         }
-                     });
-                       if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
-                           _source.AppendCoroutine(this.waitStateIdle(action, _source), ePauseType.SYSTEM, _source);
-                       else if (this.battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE)
-                           action.Call<bool>(false);
-                       else
-                           _source.AppendCoroutine(this.waitChargeSkillTurnNone(action, _source), ePauseType.SYSTEM, _source);
-                   });
+                    target.OnHpChange = (byAttack, damage, critical) =>
+                    {
+                        float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
+                        if (_source.HasUnDeadTime)
+                        {
+                            if (_source.UnDeadTimeHitCount > 1)
+                            {
+                                --_source.UnDeadTimeHitCount;
+                                if (_source.UnDeadTimeHitCount == 1)
+                                    _source.SetState(UnitCtrl.ActionState.DIE);
+                            }
+                            else
+                                actionDone = false;
+                        }
+                        if (judgeSilenceOrToad(_source) || _source.IsUnableActionState() || (_source.IsDead || num > (double)Value[eValueNumber.VALUE_1] / 100.0) || (actionDone || (long)_source.Hp > (double)Value[eValueNumber.VALUE_3] / 100.0 * (long)_source.MaxHp))
+                            return;
+                        actionDone = true;
+                        Action<bool> action = _waitUbTurn =>
+                        {
+                            if (judgeSilenceOrToad(_source) || _source.IsUnableActionState())
+                            {
+                                actionDone = false;
+                            }
+                            else
+                            {
+                                if (_skill.BlackOutTime > 0.0 & _waitUbTurn)
+                                    battleManager.OCAMDIOPEFP = true;
+                                _source.SkillUseCount[_skill.SkillId]++;
+                                _source.CancelByAwake = true;
+                                _source.CurrentTriggerSkillId = _skill.SkillId;
+                                if (_skill.BlackOutTime > 0.0)
+                                {
+                                    battleManager.GamePause(true);
+                                    battleManager.SetSkillExeScreen(_source, _skill.BlackOutTime, _skill.BlackoutColor, _skill.BlackoutEndWithMotion);
+                                    _source.SetSortOrderFront();
+                                }
+                                _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                            }
+                        };
+                        if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
+                            _source.AppendCoroutine(waitStateIdle(action, _source), ePauseType.SYSTEM, _source);
+                        else if (battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE)
+                            action.Call(false);
+                        else
+                            _source.AppendCoroutine(waitChargeSkillTurnNone(action, _source), ePauseType.SYSTEM, _source);
+                    };
                     break;
                 case 4:
-                    if (this.ActionDetail3 != 0 && target.SkillUseCount[_skill.SkillId] >= this.ActionDetail3)
+                    if (ActionDetail3 != 0 && target.SkillUseCount[_skill.SkillId] >= ActionDetail3)
                         break;
-                    target.OnDeadForRevival += (UnitCtrl.OnDeadDelegate)(owner =>
-                   {
-              //if (target.EnemyPoint != 0 && this.battleManager.FICLPNJNOEP >= (int) HatsuneUtility.GetHatsuneSpecialBattle().purpose_count || this.judgeSilenceOrToad(_source))
-              // return;
-              _source.SkillUseCount[_skill.SkillId]++;
-                       if ((double)BattleManager.Random(0.0f, 1f,
-                           new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) <= (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                       {
-                           if (this.ActionDetail3 != 0 && actionCount >= this.ActionDetail3)
-                               return;
-                           int skillId = _skill.SkillId;
-                           ++actionCount;
-                           if (this.ActionDetail3 != 0 && actionCount == this.ActionDetail3)
-                               target.OnDeadForRevival = (UnitCtrl.OnDeadDelegate)null;
-                           if (skillId == owner.UnionBurstSkillId)
-                               _sourceActionController.AppendCoroutine(owner.SetStateWithDelayForRevival(this.ExecTime[0], UnitCtrl.ActionState.SKILL_1, skillId: skillId), ePauseType.SYSTEM, owner);
-                           else
-                               _sourceActionController.AppendCoroutine(owner.SetStateWithDelayForRevival(this.ExecTime[0], UnitCtrl.ActionState.SKILL, skillId: skillId), ePauseType.SYSTEM, (double)_skill.BlackOutTime > 0.0 ? owner : (UnitCtrl)null);
-                       }
-                       else
-                       {
-                           _source.IsDead = true;
-                           this.battleManager.CallbackDead(_source);
-                           _source.gameObject.SetActive(false);
-                           this.battleManager.CallbackFadeOutDone(_source);
-                       }
-                   });
+                    target.OnDeadForRevival += owner =>
+                    {
+                        //if (target.EnemyPoint != 0 && this.battleManager.FICLPNJNOEP >= (int) HatsuneUtility.GetHatsuneSpecialBattle().purpose_count || this.judgeSilenceOrToad(_source))
+                        // return;
+                        _source.SkillUseCount[_skill.SkillId]++;
+                        if (BattleManager.Random(0.0f, 1f,
+                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) <= (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        {
+                            if (ActionDetail3 != 0 && actionCount >= ActionDetail3)
+                                return;
+                            int skillId = _skill.SkillId;
+                            ++actionCount;
+                            if (ActionDetail3 != 0 && actionCount == ActionDetail3)
+                                target.OnDeadForRevival = null;
+                            if (skillId == owner.UnionBurstSkillId)
+                                _sourceActionController.AppendCoroutine(owner.SetStateWithDelayForRevival(ExecTime[0], UnitCtrl.ActionState.SKILL_1, skillId: skillId), ePauseType.SYSTEM, owner);
+                            else
+                                _sourceActionController.AppendCoroutine(owner.SetStateWithDelayForRevival(ExecTime[0], UnitCtrl.ActionState.SKILL, skillId: skillId), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? owner : null);
+                        }
+                        else
+                        {
+                            _source.IsDead = true;
+                            battleManager.CallbackDead(_source);
+                            _source.gameObject.SetActive(false);
+                            battleManager.CallbackFadeOutDone(_source);
+                        }
+                    };
                     break;
                 case 5:
-                    target.OnDamage += (UnitCtrl.OnDamageDelegate)((byAtack, damage, critical) =>
-                   {
-                       if (_source.IsDead || _source.IdleOnly || (this.judgeSilenceOrToad(_source) || !critical) || (double)BattleManager.Random(0.0f, 1f,
-                           new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       if ((double)this.Value[eValueNumber.VALUE_4] != 1.0)
-                       {
-                           _source.CancelByAwake = true;
-                           _source.CurrentTriggerSkillId = _skill.SkillId;
-                           _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                       }
-                       else
-                           _sourceActionController.StartAction(_skill.SkillId);
-                   });
+                    target.OnDamage += (byAtack, damage, critical) =>
+                    {
+                        if (_source.IsDead || _source.IdleOnly || (judgeSilenceOrToad(_source) || !critical) || BattleManager.Random(0.0f, 1f,
+                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        if ((double)Value[eValueNumber.VALUE_4] != 1.0)
+                        {
+                            _source.CancelByAwake = true;
+                            _source.CurrentTriggerSkillId = _skill.SkillId;
+                            _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                        }
+                        else
+                            _sourceActionController.StartAction(_skill.SkillId);
+                    };
                     break;
                 case 6:
-                    target.OnDamage += (UnitCtrl.OnDamageDelegate)((byAtack, damage, critical) =>
-                   {
-                       bool flag = false;
-                       foreach (KeyValuePair<int, UnitCtrl> summonUnit in target.SummonUnitDictionary)
-                       {
-                           if (!summonUnit.Value.IsDead)
-                               flag = true;
-                       }
-                       if (!flag || _source.IsDead || (_source.IdleOnly || this.judgeSilenceOrToad(_source)) || (!critical || (double)BattleManager.Random(0.0f, 1f,
-                           new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0))
-                           return;
-                       _source.CancelByAwake = true;
-                       _source.CurrentTriggerSkillId = _skill.SkillId;
-                       _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                   });
+                    target.OnDamage += (byAtack, damage, critical) =>
+                    {
+                        bool flag = false;
+                        foreach (KeyValuePair<int, UnitCtrl> summonUnit in target.SummonUnitDictionary)
+                        {
+                            if (!summonUnit.Value.IsDead)
+                                flag = true;
+                        }
+                        if (!flag || _source.IsDead || (_source.IdleOnly || judgeSilenceOrToad(_source)) || (!critical || BattleManager.Random(0.0f, 1f,
+                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0))
+                            return;
+                        _source.CancelByAwake = true;
+                        _source.CurrentTriggerSkillId = _skill.SkillId;
+                        _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                    };
                     break;
                 case 7:
                     bool used1 = false;
-                    target.OnUpdateWhenIdle += (Action<float>)(_limitTime =>
-                   {
-                       if (this.judgeSilenceOrToad(_source) || used1 || (double)_limitTime > (double)this.Value[eValueNumber.VALUE_3])
-                           return;
-                       used1 = true;
-                       if ((double)BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       _source.CancelByAwake = true;
-                       _source.CurrentTriggerSkillId = _skill.SkillId;
-                       _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                   });
+                    target.OnUpdateWhenIdle += _limitTime =>
+                    {
+                        if (judgeSilenceOrToad(_source) || used1 || _limitTime > (double)Value[eValueNumber.VALUE_3])
+                            return;
+                        used1 = true;
+                        if (BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        _source.CancelByAwake = true;
+                        _source.CurrentTriggerSkillId = _skill.SkillId;
+                        _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                    };
                     break;
                 case 8:
                     bool used2 = false;
-                    _source.IsTough = (double)this.Value[eValueNumber.VALUE_3] == 0.0;
-                    _source.OnUpdateWhenIdle += (Action<float>)(_limitTime =>
-                   {
-                       if (this.judgeSilenceOrToad(_source) || used2 || (!_source.IsStealth || _source.ActionsTargetOnMe.Count != 0))
-                           return;
-                       used2 = true;
-                       if ((double)BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       _source.CancelByAwake = true;
-                       _source.CurrentTriggerSkillId = _skill.SkillId;
-                       _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                   });
+                    _source.IsTough = (double)Value[eValueNumber.VALUE_3] == 0.0;
+                    _source.OnUpdateWhenIdle += _limitTime =>
+                    {
+                        if (judgeSilenceOrToad(_source) || used2 || (!_source.IsStealth || _source.ActionsTargetOnMe.Count != 0))
+                            return;
+                        used2 = true;
+                        if (BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        _source.CancelByAwake = true;
+                        _source.CurrentTriggerSkillId = _skill.SkillId;
+                        _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                    };
                     break;
                 case 9:
                     parts.BreakEffectList = _skill.SkillEffects;
-                    _source.OnUpdateWhenIdle += (Action<float>)(_limitTime =>
-                   {
-                       if ((int)parts.BreakPoint != 0 || parts.IsBreak || (this.judgeSilenceOrToad(_source) || this.battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) || (double)BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       _source.AppendBreakLog(parts.BreakSource);
-                       parts.IsBreak = true;
-                       parts.OnBreak.Call();
-                       parts.SetBreak(true,
-                  //this.battleManager.UnitUiCtrl.transform
-                  battleManager.transform);
-                       _source.AppendCoroutine(_source.UpdateBreak(this.Value[eValueNumber.VALUE_3], parts), ePauseType.SYSTEM);
-                   });
+                    _source.OnUpdateWhenIdle += _limitTime =>
+                    {
+                        if (parts.BreakPoint != 0 || parts.IsBreak || (judgeSilenceOrToad(_source) || battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) || BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        _source.AppendBreakLog(parts.BreakSource);
+                        parts.IsBreak = true;
+                        parts.OnBreak.Call();
+                        parts.SetBreak(true,
+                            //this.battleManager.UnitUiCtrl.transform
+                            battleManager.transform);
+                        _source.AppendCoroutine(_source.UpdateBreak(Value[eValueNumber.VALUE_3], parts), ePauseType.SYSTEM);
+                    };
                     break;
                 case 10:
-                    target.OnSlipDamage += (Action)(() =>
-                   {
-                       if (_source.TargetEnemyList.Count == 0 || this.judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || (double)BattleManager.Random(0.0f, 1f,
-                           new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       if ((double)this.Value[eValueNumber.VALUE_4] != 1.0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
-                           _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                       else
-                           _sourceActionController.StartAction(_skill.SkillId);
-                   });
+                    target.OnSlipDamage += () =>
+                    {
+                        if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || BattleManager.Random(0.0f, 1f,
+                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        if ((double)Value[eValueNumber.VALUE_4] != 1.0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
+                            _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                        else
+                            _sourceActionController.StartAction(_skill.SkillId);
+                    };
                     break;
                 case 11:
-                    target.OnBreakAll += (Action)(() =>
-                   {
-                       if (this.judgeSilenceOrToad(_source) || (double)BattleManager.Random(0.0f, 1f,
-                           new PCRCaculator.Guild.RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)this.Value[eValueNumber.VALUE_1] / 100.0)
-                           return;
-                       if ((double)this.Value[eValueNumber.VALUE_4] != 1.0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
-                           _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                       else
-                           _sourceActionController.StartAction(_skill.SkillId);
-                   });
+                    target.OnBreakAll += () =>
+                    {
+                        if (judgeSilenceOrToad(_source) || BattleManager.Random(0.0f, 1f,
+                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        if ((double)Value[eValueNumber.VALUE_4] != 1.0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
+                            _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
+                        else
+                            _sourceActionController.StartAction(_skill.SkillId);
+                    };
                     break;
             }
         }
@@ -253,8 +254,8 @@ namespace Elements
         private IEnumerator waitStateIdle(Action<bool> _callback, UnitCtrl _source)
         {
             while (_source.CurrentState != UnitCtrl.ActionState.IDLE)
-                yield return (object)null;
-            _callback.Call<bool>(false);
+                yield return null;
+            _callback.Call(false);
         }
 
         private IEnumerator waitChargeSkillTurnNone(Action<bool> _callback, UnitCtrl _source)
@@ -262,11 +263,11 @@ namespace Elements
             TriggerAction triggerAction = this;
             do
             {
-                yield return (object)null;
+                yield return null;
             }
             while (triggerAction.battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE);
             if ((double)triggerAction.Value[eValueNumber.VALUE_3] == 0.0 || (long)_source.Hp != 0L)
-                _callback.Call<bool>(true);
+                _callback.Call(true);
         }
 
         public override void ExecAction(
@@ -280,12 +281,12 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            if (this.ActionDetail1 != 8)
+            if (ActionDetail1 != 8)
                 return;
             _source.IdleOnly = true;
             _source.CurrentState = UnitCtrl.ActionState.IDLE;
-            this.battleManager.CallbackIdleOnlyDone(_source);
-            List<UnitCtrl> unitCtrlList = _source.IsOther ? this.battleManager.EnemyList : this.battleManager.UnitList;
+            battleManager.CallbackIdleOnlyDone(_source);
+            List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.EnemyList : battleManager.UnitList;
             if (unitCtrlList.Contains(_source))
                 unitCtrlList.Remove(_source);
             _source.IsDead = true;
@@ -295,15 +296,15 @@ namespace Elements
               if (!(repeatEffect is ChangeColorEffect))
                 repeatEffect.SetTimeToDie(true);
             }*/
-            this.battleManager.CallbackFadeOutDone(_source);
-            this.battleManager.CallbackDead(_source);
+            battleManager.CallbackFadeOutDone(_source);
+            battleManager.CallbackDead(_source);
             _source.gameObject.SetActive(false);
         }
 
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
         }
 
         private enum eTriggerType

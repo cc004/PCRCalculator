@@ -229,7 +229,7 @@ namespace Spine
 				{
 					num20 = 1f;
 				}
-				num21 = (float)Math.Acos(num20) * (float)bendDir;
+				num21 = (float)Math.Acos(num20) * bendDir;
 				a = num18 + num19 * num20;
 				b = num19 * (float)Math.Sin(num21);
 				num22 = (float)Math.Atan2(num15 * a - num14 * b, num14 * a + num15 * b);
@@ -259,7 +259,7 @@ namespace Spine
 					float num32 = ((Math.Abs(num30) < Math.Abs(num31)) ? num30 : num31);
 					if (num32 * num32 <= num25)
 					{
-						num13 = Mathf.Sqrt(num25 - num32 * num32) * (float)bendDir;
+						num13 = Mathf.Sqrt(num25 - num32 * num32) * bendDir;
 						num22 = num26 - (float)Math.Atan2(num13, num32);
 						num21 = (float)Math.Atan2(num13 / num2, (num32 - num18) / num);
 						goto IL_04af;
@@ -297,20 +297,20 @@ namespace Spine
 				}
 				if (num25 <= (num35 + num39) / 2f)
 				{
-					num22 = num26 - (float)Math.Atan2(num36 * (float)bendDir, num34);
-					num21 = num33 * (float)bendDir;
+					num22 = num26 - (float)Math.Atan2(num36 * bendDir, num34);
+					num21 = num33 * bendDir;
 				}
 				else
 				{
-					num22 = num26 - (float)Math.Atan2(num40 * (float)bendDir, num38);
-					num21 = num37 * (float)bendDir;
+					num22 = num26 - (float)Math.Atan2(num40 * bendDir, num38);
+					num21 = num37 * bendDir;
 				}
 			}
-			goto IL_04af;
-			IL_04af:
-			float num41 = (float)Math.Atan2(num8, ax2) * (float)num5;
+
+            IL_04af:
+			float num41 = (float)Math.Atan2(num8, ax2) * num5;
 			float arotation = parent.arotation;
-			num22 = (num22 - num41) * (180f / (float)Math.PI) + (float)num4 - arotation;
+			num22 = (num22 - num41) * (180f / (float)Math.PI) + num4 - arotation;
 			if (num22 > 180f)
 			{
 				num22 -= 360f;
@@ -321,7 +321,7 @@ namespace Spine
 			}
 			parent.UpdateWorldTransform(ax, ay, arotation + num22 * alpha, parent.scaleX, parent.ascaleY, 0f, 0f);
 			arotation = child.arotation;
-			num21 = ((num21 + num41) * (180f / (float)Math.PI) - child.ashearX) * (float)num5 + (float)num6 - arotation;
+			num21 = ((num21 + num41) * (180f / (float)Math.PI) - child.ashearX) * num5 + num6 - arotation;
 			if (num21 > 180f)
 			{
 				num21 -= 360f;

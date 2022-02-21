@@ -4,11 +4,10 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System.Collections.Generic;
 using Cute;
 using Elements.Battle;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
+using PCRCaculator.Guild;
 using UnityEngine;
 
 namespace Elements
@@ -24,10 +23,10 @@ namespace Elements
           Skill _skill)
         {
             base.ReadyAction(_source, _sourceActionController, _skill);
-            for (int index = 0; index < this.HitOnceKeyList.Count; ++index)
-                this.HitOnceDic[this.HitOnceKeyList[index]] = false;
-            this.CriticalDataDictionary.Clear();
-            this.TotalDamageDictionary.Clear();
+            for (int index = 0; index < HitOnceKeyList.Count; ++index)
+                HitOnceDic[HitOnceKeyList[index]] = false;
+            CriticalDataDictionary.Clear();
+            TotalDamageDictionary.Clear();
         }
 
         public override void ExecActionOnStart(
@@ -36,7 +35,7 @@ namespace Elements
           UnitActionController _sourceActionController)
         {
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
-            this.parts = (BasePartsData)_source.BossPartsListForBattle.Find((Predicate<PartsData>)(e => e.Index == _skill.ParameterTarget));
+            parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
         }
 
         public override void ExecAction(
@@ -59,15 +58,15 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          AttackActionBase.eAttackType _actionDetail1)
+          eAttackType _actionDetail1)
         {
             //start add
             if (MyGameCtrl.Instance.tempData.isGuildBattle && (MyGameCtrl.Instance.tempData.randomData.ForceIgnoreDodge_player && !_source.IsOther || MyGameCtrl.Instance.tempData.randomData.ForceIgnoreDodge_enemy && _source.IsOther))
                 return false;
             //end add
-            int _accuracy = _source.IsPartsBoss ? this.parts.GetAccuracyZero() : (int)_source.AccuracyZero;
+            var _accuracy = _source.IsPartsBoss ? parts.GetAccuracyZero() : (int)_source.AccuracyZero;
 
-            float num = BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 2, _target.GetDodgeRate(_accuracy)));
+            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 2, _target.GetDodgeRate(_accuracy)));
             //start add
             if(MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source,_target.Owner,_skill,ActionType,BattleHeaderController.CurrentFrameCount,out float fix))
             {
@@ -76,46 +75,46 @@ namespace Elements
             //end add
             if (_skill.CountBlind && _skill.CountBlindType == _actionDetail1)
             {
-                if ((double)num < (double)_target.GetDodgeRate(_accuracy) && _actionDetail1 == AttackActionBase.eAttackType.PHYSICAL)
+                if (num < (double)_target.GetDodgeRate(_accuracy) && _actionDetail1 == eAttackType.PHYSICAL)
                     _target.Owner.OnDodge.Call();
-                _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK_DARK, this.ActionExecTimeList[_num].DamageNumType, this.ActionExecTimeList[_num].DamageNumScale);
+                _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK_DARK, ActionExecTimeList[_num].DamageNumType, ActionExecTimeList[_num].DamageNumScale);
                 return true;
             }
             if (_source.IsAbnormalState(UnitCtrl.eAbnormalState.COUNT_BLIND))
             {
-                _skill.CountBlindType = (AttackActionBase.eAttackType)_source.GetAbnormalStateSubValue(UnitCtrl.eAbnormalStateCategory.COUNT_BLIND);
+                _skill.CountBlindType = (eAttackType)_source.GetAbnormalStateSubValue(UnitCtrl.eAbnormalStateCategory.COUNT_BLIND);
                 if (_skill.CountBlindType == _actionDetail1)
                 {
-                    if ((double)num < (double)_target.GetDodgeRate(_accuracy) && _actionDetail1 == AttackActionBase.eAttackType.PHYSICAL)
+                    if (num < (double)_target.GetDodgeRate(_accuracy) && _actionDetail1 == eAttackType.PHYSICAL)
                         _target.Owner.OnDodge.Call();
                     _skill.CountBlind = true;
                     _source.DecreaseCountBlind();
-                    _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK_DARK, this.ActionExecTimeList[_num].DamageNumType, this.ActionExecTimeList[_num].DamageNumScale);
+                    _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK_DARK, ActionExecTimeList[_num].DamageNumType, ActionExecTimeList[_num].DamageNumScale);
                     return true;
                 }
             }
-            if ((double)num < (double)_target.GetDodgeRate(_accuracy) && _actionDetail1 == AttackActionBase.eAttackType.PHYSICAL)
+            if (num < (double)_target.GetDodgeRate(_accuracy) && _actionDetail1 == eAttackType.PHYSICAL)
             {
-                _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK, this.ActionExecTimeList[_num].DamageNumType, this.ActionExecTimeList[_num].DamageNumScale);
+                _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK, ActionExecTimeList[_num].DamageNumType, ActionExecTimeList[_num].DamageNumScale);
                 _target.Owner.OnDodge.Call();
                 return true;
             }
-            return this.judgeDarkMiss(UnitCtrl.eAbnormalState.PHYSICS_DARK, _actionDetail1, _target, _source, _num) || this.judgeDarkMiss(UnitCtrl.eAbnormalState.MAGIC_DARK, _actionDetail1, _target, _source, _num);
+            return judgeDarkMiss(UnitCtrl.eAbnormalState.PHYSICS_DARK, _actionDetail1, _target, _source, _num) || judgeDarkMiss(UnitCtrl.eAbnormalState.MAGIC_DARK, _actionDetail1, _target, _source, _num);
         }
-        private bool judgeDarkMiss(  UnitCtrl.eAbnormalState _abnormalState,  AttackActionBase.eAttackType _attackType,  BasePartsData _target,UnitCtrl _source,  int _num)
+        private bool judgeDarkMiss(  UnitCtrl.eAbnormalState _abnormalState,  eAttackType _attackType,  BasePartsData _target,UnitCtrl _source,  int _num)
         {
             if (!_source.IsAbnormalState(_abnormalState))
                 return false;
             bool flag = _abnormalState == UnitCtrl.eAbnormalState.PHYSICS_DARK;
-            AttackActionBase.eAttackType eAttackType = flag ? AttackActionBase.eAttackType.PHYSICAL : AttackActionBase.eAttackType.MAGIC;
+            eAttackType eAttackType = flag ? eAttackType.PHYSICAL : eAttackType.MAGIC;
             if (_attackType != eAttackType)
                 return false;
             UnitCtrl.eAbnormalStateCategory _abnormalStateCategory = flag ? UnitCtrl.eAbnormalStateCategory.PHYSICAL_DARK : UnitCtrl.eAbnormalStateCategory.MAGIC_DARK;
-            double pp = 1.0 - (double)_source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0;
-            if ((double)BattleManager.Random(0.0f, 1f,
-                new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 3, (float)pp)) >= 1.0 - (double)_source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0)
+            double pp = 1.0 - _source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0;
+            if (BattleManager.Random(0.0f, 1f,
+                    new RandomData(_source, _target.Owner, ActionId, 3, (float)pp)) >= 1.0 - _source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0)
                 return false;
-            ActionExecTime actionExecTime = this.ActionExecTimeList[_num];
+            ActionExecTime actionExecTime = ActionExecTimeList[_num];
             _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK_DARK, actionExecTime.DamageNumType, actionExecTime.DamageNumScale);
             return true;
         }
@@ -126,57 +125,57 @@ namespace Elements
           BasePartsData _target,
           int _num,
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-          AttackActionBase.eAttackType _actionDetail1,
+          eAttackType _actionDetail1,
           bool _isCritical,
           Skill _skill,
           eActionType _actionType)
         {
 
-            bool flag = this.judgeIsPhysical(_actionDetail1);
+            bool flag = judgeIsPhysical(_actionDetail1);
             FloatWithEx num1;
             int num2;
             int level;
             if (!_source.IsPartsBoss)
             {
                 num1 = (flag ? _source.AtkZero : _source.MagicStrZero);
-                num2 = (int)(flag ? _source.PhysicalCriticalZero : _source.MagicCriticalZero);
-                level = (int)_source.Level;
+                num2 = flag ? _source.PhysicalCriticalZero : _source.MagicCriticalZero;
+                level = _source.Level;
             }
             else
             {
-                num1 = flag ? this.parts.GetAtkZero() : this.parts.GetMagicStrZero();
-                num2 = flag ? this.parts.GetPhysicalCriticalZero() : this.parts.GetMagicCriticalZero();
-                level = this.parts.GetLevel();
+                num1 = flag ? parts.GetAtkZero() : parts.GetMagicStrZero();
+                num2 = flag ? parts.GetPhysicalCriticalZero() : parts.GetMagicCriticalZero();
+                level = parts.GetLevel();
             }
             var num3 = BattleUtil.FloatToInt(_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]);
-            var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+            var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]) * ActionExecTimeList[_num].Weight / ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.ContainsKey(_source))
             {
                 AccumulativeDamageData accumulativeDamageData = _target.Owner.AccumulativeDamageDataDictionary[_source];
                 switch (accumulativeDamageData.AccumulativeDamageType)
                 {
                     case eAccumulativeDamageType.FIXED:
-                        num4 = num4 + (float)(int)((double)accumulativeDamageData.DamagedCount * (double)accumulativeDamageData.FixedValue);
+                        num4 = num4 + (float)(int)(accumulativeDamageData.DamagedCount * (double)accumulativeDamageData.FixedValue);
                         break;
                     case eAccumulativeDamageType.PERCENTAGE:
-                        num4 = num4 + (float)(int)((double)(num4 * (float)accumulativeDamageData.DamagedCount) * (double)accumulativeDamageData.PercentageValue / 100.0);
+                        num4 = num4 + (float)(int)((double)(num4 * (float)accumulativeDamageData.DamagedCount) * accumulativeDamageData.PercentageValue / 100.0);
                         break;
                 }
                 accumulativeDamageData.DamagedCount = Mathf.Min(accumulativeDamageData.DamagedCount + 1, accumulativeDamageData.CountLimit);
             }
-            float num5 = this.getCriticalDamageRate(_valueDictionary) * (flag ? (float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f : (float)(int)_source.MagicCriticalDamageRateOrMin / 100f);
-            return new DamageData()
+            float num5 = getCriticalDamageRate(_valueDictionary) * (flag ? _source.PhysicalCriticalDamageRateOrMin / 100f : (int)_source.MagicCriticalDamageRateOrMin / 100f);
+            return new DamageData
             {
                 TotalDamageForLogBarrier = num3,
                 Damage = num4,
                 Target = _target,
                 Source = _source,
                 DamageType = flag ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC,
-                CriticalRate = _isCritical ? 1f : BattleUtil.GetCriticalRate((float)num2, level, _target.GetLevel()),
-                DamegeEffectType = this.ActionExecTimeList[_num].DamageNumType,
-                DamegeNumScale = this.ActionExecTimeList[_num].DamageNumScale,
-                DefPenetrate = (int)(flag ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero),
-                LifeSteal = _source.IsPartsBoss ? this.parts.GetLifeStealZero() : (int)_source.LifeStealZero,
+                CriticalRate = _isCritical ? 1f : BattleUtil.GetCriticalRate(num2, level, _target.GetLevel()),
+                DamegeEffectType = ActionExecTimeList[_num].DamageNumType,
+                DamegeNumScale = ActionExecTimeList[_num].DamageNumScale,
+                DefPenetrate = flag ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero,
+                LifeSteal = _source.IsPartsBoss ? parts.GetLifeStealZero() : (int)_source.LifeStealZero,
                 CriticalDamageRate = num5,
                 ActionType = _actionType
             };
@@ -187,11 +186,11 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
-            this.Value[eValueNumber.VALUE_3] = (float)((double)this.MasterData.action_value_3 + (double)this.MasterData.action_value_4 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+            Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
 
-        protected bool judgeIsPhysical(AttackActionBase.eAttackType _attackType) => _attackType == AttackActionBase.eAttackType.INEVITABLE_PHYSICAL || _attackType == AttackActionBase.eAttackType.PHYSICAL;
+        protected bool judgeIsPhysical(eAttackType _attackType) => _attackType == eAttackType.INEVITABLE_PHYSICAL || _attackType == eAttackType.PHYSICAL;
 
         public enum eAttackType
         {

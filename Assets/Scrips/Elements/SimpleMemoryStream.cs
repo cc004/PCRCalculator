@@ -14,14 +14,14 @@ namespace Elements
     private byte[] data;
     private long position;
 
-    public SimpleMemoryStream(byte[] _data) => this.data = _data;
+    public SimpleMemoryStream(byte[] _data) => data = _data;
 
-    public int ReadByte() => (int) this.data[this.position++];
+    public int ReadByte() => data[position++];
 
     public int Read(byte[] _dest_buffer, int _dest_offset, int _copy_size)
     {
-      Buffer.BlockCopy((Array) this.data, (int) this.position, (Array) _dest_buffer, _dest_offset, _copy_size);
-      this.position += (long) _copy_size;
+      Buffer.BlockCopy(data, (int) position, _dest_buffer, _dest_offset, _copy_size);
+      position += _copy_size;
       return _copy_size;
     }
 
@@ -30,19 +30,19 @@ namespace Elements
       switch (_origin)
       {
         case SeekOrigin.Begin:
-          this.position = _position;
+          position = _position;
           break;
         case SeekOrigin.Current:
-          this.position += _position;
+          position += _position;
           break;
       }
-      return this.position;
+      return position;
     }
 
     public long Position
     {
-      get => this.position;
-      set => this.position = value;
+      get => position;
+      set => position = value;
     }
 
     public void Close()

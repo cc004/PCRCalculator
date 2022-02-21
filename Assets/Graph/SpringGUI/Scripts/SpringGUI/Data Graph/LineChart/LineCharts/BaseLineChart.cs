@@ -21,9 +21,9 @@ namespace SpringGUI
 
         public virtual VertexHelper DrawLineChart( VertexHelper vh , Rect vRect , LineChartData vBasis )
         {
-            this.basis = vBasis;
+            basis = vBasis;
             lines = vBasis.Lines;
-            this.rect = vRect;
+            rect = vRect;
             size = rect.size;
             origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
             vh = DrawMesh(vh);
@@ -46,7 +46,7 @@ namespace SpringGUI
                 var xFirst = endPosX + new Vector2(0, basis.AxisWidth);
                 var xSecond = endPosX + new Vector2(1.73f * basis.AxisWidth, 0);
                 var xThird = endPosX + new Vector2(0 , -basis.AxisWidth);
-                vh.AddUIVertexQuad(new UIVertex[]
+                vh.AddUIVertexQuad(new[]
                 {
                     GetUIVertex(xFirst,basis.AxisColor),
                     GetUIVertex(xSecond,basis.AxisColor),
@@ -57,7 +57,7 @@ namespace SpringGUI
                 var yFirst = endPosY + new Vector2(-basis.AxisWidth, 0);
                 var ySecond = endPosY + new Vector2(0 , 1.73f * basis.AxisWidth);
                 var yThird = endPosY + new Vector2(basis.AxisWidth , 0);
-                vh.AddUIVertexQuad(new UIVertex[]
+                vh.AddUIVertexQuad(new[]
                 {
                     GetUIVertex(yFirst,basis.AxisColor),
                     GetUIVertex(ySecond,basis.AxisColor),

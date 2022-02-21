@@ -4,11 +4,10 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cute;
 
 namespace Elements
 {
@@ -17,7 +16,7 @@ namespace Elements
     //protected static readonly Yggdrasil<StrikeBackData> SINGLETON_TREE = SingletonTreeTreeFunc.CreateSingletonTree<StrikeBackData>();
     //private BattleEffectPoolInterface battleEffectPool;
 
-    public StrikeBackData.eStrikeBackType StrikeBackType { get; set; }
+    public eStrikeBackType StrikeBackType { get; set; }
 
     public int Damage { get; set; }
 
@@ -39,37 +38,37 @@ namespace Elements
 
     public void Exec(UnitCtrl _target, UnitCtrl _source, int _recovery, Action _callback)
     {
-      this.Execed = true;
+      Execed = true;
       if (_target.CurrentState == UnitCtrl.ActionState.SKILL_1)
-        _target.AppendCoroutine(this.waitStateIdle(_target, (Action) (() => this.execImpl(_target, _source, _recovery, _callback))), ePauseType.SYSTEM, _source);
+        _target.AppendCoroutine(waitStateIdle(_target, () => execImpl(_target, _source, _recovery, _callback)), ePauseType.SYSTEM, _source);
       else
-        this.execImpl(_target, _source, _recovery, _callback);
+        execImpl(_target, _source, _recovery, _callback);
     }
 
     private IEnumerator waitStateIdle(UnitCtrl _target, Action _callback)
     {
       while (_target.CurrentState == UnitCtrl.ActionState.SKILL_1)
-        yield return (object) null;
+        yield return null;
       _callback.Call();
     }
 
     private void execImpl(UnitCtrl _target, UnitCtrl _source, int _recovery, Action _callback)
     {
-      this.IsDieing = true;
-      DamageData _damageData = new DamageData()
+      IsDieing = true;
+      DamageData _damageData = new DamageData
       {
         Target = _target.GetFirstParts(true),
-        Damage = (long) this.Damage,
+        Damage = (long) Damage,
         DamageType = DamageData.eDamageType.NONE,
         ActionType = eActionType.ENCHANT_STRIKE_BACK
       };
-      _target.SetDamage(_damageData, false, this.ActionId);
+      _target.SetDamage(_damageData, false, ActionId);
       //CircleEffectController skillEffect = this.DataSet.SkillEffect as CircleEffectController;
-      switch (this.StrikeBackType)
+      switch (StrikeBackType)
       {
-        case StrikeBackData.eStrikeBackType.PHYSICAL_DRAIN:
-        case StrikeBackData.eStrikeBackType.MAGIC_DRAIN:
-        case StrikeBackData.eStrikeBackType.BOTH_DRAIN:
+        case eStrikeBackType.PHYSICAL_DRAIN:
+        case eStrikeBackType.MAGIC_DRAIN:
+        case eStrikeBackType.BOTH_DRAIN:
           _source.SetRecovery(_recovery, UnitCtrl.eInhibitHealType.PHYSICS, _source);
           break;
       }

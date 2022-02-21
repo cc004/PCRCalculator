@@ -4,8 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -27,7 +25,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.parts = (BasePartsData) _source.BossPartsListForBattle.Find((Predicate<PartsData>) (e => e.Index == _skill.ParameterTarget));
+      parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
     }
 
     public override void ExecAction(
@@ -41,30 +39,30 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      float num = this.ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? (float) this.parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? (float) this.parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);
+      float num = ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);
       HealFieldData healFieldData = new HealFieldData();
       healFieldData.KNLCAOOKHPP = eFieldType.HEAL;
-      healFieldData.HKDBJHAIOMB = this.ActionDetail1 > 2 ? eFieldExecType.REPEAT : eFieldExecType.NORMAL;
+      healFieldData.HKDBJHAIOMB = ActionDetail1 > 2 ? eFieldExecType.REPEAT : eFieldExecType.NORMAL;
       healFieldData.StayTime = _valueDictionary[eValueNumber.VALUE_5];
-      healFieldData.CenterX = _target.GetLocalPosition().x + this.Position;
+      healFieldData.CenterX = _target.GetLocalPosition().x + Position;
       healFieldData.Size = _valueDictionary[eValueNumber.VALUE_7];
       healFieldData.LCHLGLAFJED = _source.IsOther ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER;
-      healFieldData.EGEPDDJBILL = (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null;
-      healFieldData.ValueType = (HealFieldData.eValueType) this.ActionDetail2;
-      healFieldData.EffectType = (HealFieldData.eEffectType) this.ActionDetail3;
+      healFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
+      healFieldData.ValueType = (HealFieldData.eValueType) ActionDetail2;
+      healFieldData.EffectType = (HealFieldData.eEffectType) ActionDetail3;
       healFieldData.TargetList = new List<BasePartsData>();
       healFieldData.Value = num;
       healFieldData.PPOJKIDHGNJ = _source;
-      healFieldData.IsMagic = this.ActionDetail1 % 2 == 0;
-      this.battleManager.ExecField(healFieldData, this.ActionId);
+      healFieldData.IsMagic = ActionDetail1 % 2 == 0;
+      battleManager.ExecField(healFieldData, ActionId);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
-      this.Value[eValueNumber.VALUE_5] = (float) ((double) this.MasterData.action_value_5 + (double) this.MasterData.action_value_6 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_5] = (float) (MasterData.action_value_5 + MasterData.action_value_6 * _level);
     }
   }
 }

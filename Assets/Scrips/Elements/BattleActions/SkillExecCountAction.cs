@@ -17,9 +17,9 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnWaveStart(_skill, _source, _sourceActionController);
-      if (!_source.SkillExecCountDictionary.ContainsKey(this.ActionDetail1))
+      if (!_source.SkillExecCountDictionary.ContainsKey(ActionDetail1))
         return;
-      _source.SkillExecCountDictionary[this.ActionDetail1] = 0;
+      _source.SkillExecCountDictionary[ActionDetail1] = 0;
     }
 
     public override void ExecActionOnStart(
@@ -37,9 +37,9 @@ namespace Elements
       Dictionary<int, bool> _enabledChildAction,
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
-      if (!_source.SkillExecCountDictionary.ContainsKey(this.ActionDetail1))
-        _source.SkillExecCountDictionary.Add(this.ActionDetail1, 0);
-      _source.SkillExecCountDictionary[this.ActionDetail1] = Mathf.Min((int) _valueDictionary[eValueNumber.VALUE_1], _source.SkillExecCountDictionary[this.ActionDetail1] + 1);
+      if (!_source.SkillExecCountDictionary.ContainsKey(ActionDetail1))
+        _source.SkillExecCountDictionary.Add(ActionDetail1, 0);
+      _source.SkillExecCountDictionary[ActionDetail1] = Mathf.Min((int) _valueDictionary[eValueNumber.VALUE_1], _source.SkillExecCountDictionary[ActionDetail1] + 1);
     }
 
     public override void SetLevel(float _level) => base.SetLevel(_level);

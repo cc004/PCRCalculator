@@ -4,9 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
 //using Sqlite3Plugin;
-using System.Collections.Generic;
 
 namespace Elements
 {
@@ -114,12 +112,12 @@ namespace Elements
 
         public class EnemyMParts
         {
-            /*protected ObscuredInt _enemy_id;
-            protected ObscuredInt _child_enemy_parameter_1;
-            protected ObscuredInt _child_enemy_parameter_2;
-            protected ObscuredInt _child_enemy_parameter_3;
-            protected ObscuredInt _child_enemy_parameter_4;
-            protected ObscuredInt _child_enemy_parameter_5;*/
+            /*protected int _enemy_id;
+            protected int _child_enemy_parameter_1;
+            protected int _child_enemy_parameter_2;
+            protected int _child_enemy_parameter_3;
+            protected int _child_enemy_parameter_4;
+            protected int _child_enemy_parameter_5;*/
 
             public int enemy_id;// => this._enemy_id;
 

@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,7 +22,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.action = _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail1));
+      action = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1);
     }
 
     public override void ReadyAction(
@@ -32,9 +31,9 @@ namespace Elements
       Skill _skill)
     {
       base.ReadyAction(_source, _sourceActionController, _skill);
-      if (this.action == null)
+      if (action == null)
         return;
-      this.action.CancelByIfForAll = true;
+      action.CancelByIfForAll = true;
     }
 
     public override void ExecAction(
@@ -48,12 +47,12 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
+      AppendIsAlreadyExeced(_target.Owner, _num);
       _target.Owner.IsStealth = true;
-      _target.Owner.AppendCoroutine(this.updateStealth(_valueDictionary[eValueNumber.VALUE_1], _target.Owner), ePauseType.SYSTEM);
+      _target.Owner.AppendCoroutine(updateStealth(_valueDictionary[eValueNumber.VALUE_1], _target.Owner), ePauseType.SYSTEM);
       if (_skill.AnimId == eSpineCharacterAnimeId.NONE || !_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum, 1))
         return;
-      _sourceActionController.AppendCoroutine(this.updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private IEnumerator updateStartMotion(
@@ -61,16 +60,16 @@ namespace Elements
       UnitActionController _sourceActionController,
       Skill _skill)
     {
-      while (!this.isActionCancel(_source, _sourceActionController, _skill))
+      while (!isActionCancel(_source, _sourceActionController, _skill))
       {
         if (!_source.UnitSpineCtrl.IsPlayAnimeBattle)
         {
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false);
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, _isLoop: true);
-          _sourceActionController.AppendCoroutine(this.updateLoopMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _sourceActionController.AppendCoroutine(updateLoopMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           break;
         }
-        yield return (object) null;
+        yield return null;
       }
     }
 
@@ -79,22 +78,22 @@ namespace Elements
       UnitActionController _sourceActionController,
       Skill _skill)
     {
-      yield return (object) null;
-      while (!this.isActionCancel(_source, _sourceActionController, _skill))
+      yield return null;
+      while (!isActionCancel(_source, _sourceActionController, _skill))
       {
         if (_source.ActionsTargetOnMe.Count == 0)
         {
           for (int index = 0; index < _skill.LoopEffectObjs.Count; ++index)
             _skill.LoopEffectObjs[index].SetTimeToDie(true);
           _skill.LoopEffectObjs.Clear();
-          this.action.CancelByIfForAll = false;
+          action.CancelByIfForAll = false;
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);
-          _sourceActionController.ExecUnitActionWithDelay(this.action, _skill, false, false);
+          _sourceActionController.ExecUnitActionWithDelay(action, _skill, false, false);
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 2);
-          _sourceActionController.AppendCoroutine(this.updateEndMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _sourceActionController.AppendCoroutine(updateEndMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           break;
         }
-        yield return (object) null;
+        yield return null;
       }
     }
 
@@ -121,7 +120,7 @@ namespace Elements
           _source.gameObject.SetActive(false);
           break;
         }
-        yield return (object) null;
+        yield return null;
       }
     }
 
@@ -129,10 +128,10 @@ namespace Elements
     {
       StealthAction stealthAction = this;
       float timer = _duration;
-      while ((double) timer > 0.0)
+      while (timer > 0.0)
       {
         timer -= stealthAction.battleManager.DeltaTime_60fps;
-        yield return (object) null;
+        yield return null;
       }
       _target.IsStealth = false;
     }

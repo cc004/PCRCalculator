@@ -14,8 +14,8 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.IgnoreDecoy = true;
-      foreach (int actionChildrenIndex in this.ActionChildrenIndexes)
+      IgnoreDecoy = true;
+      foreach (int actionChildrenIndex in ActionChildrenIndexes)
         _skill.ActionParameters[actionChildrenIndex].IgnoreDecoy = true;
     }
   }

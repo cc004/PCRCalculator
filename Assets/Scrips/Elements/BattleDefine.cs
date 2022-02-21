@@ -143,7 +143,7 @@ namespace Elements
         (eBGM[]) null
       }
     };*/
-    public static readonly List<eUnitRespawnPos> UnitRespawnPosList = new List<eUnitRespawnPos>()
+    public static readonly List<eUnitRespawnPos> UnitRespawnPosList = new List<eUnitRespawnPos>
     {
       eUnitRespawnPos.MAIN_POS_3,
       eUnitRespawnPos.MAIN_POS_5,
@@ -151,7 +151,7 @@ namespace Elements
       eUnitRespawnPos.MAIN_POS_4,
       eUnitRespawnPos.MAIN_POS_2
     };
-    public static readonly List<eUnitRespawnPos> UnitRespawnPosTopToBottom = new List<eUnitRespawnPos>()
+    public static readonly List<eUnitRespawnPos> UnitRespawnPosTopToBottom = new List<eUnitRespawnPos>
     {
       eUnitRespawnPos.MAIN_POS_1,
       eUnitRespawnPos.MAIN_POS_2,
@@ -159,7 +159,7 @@ namespace Elements
       eUnitRespawnPos.MAIN_POS_4,
       eUnitRespawnPos.MAIN_POS_5
     };
-    private static readonly List<eUnitRespawnPos> enemyRespawnPosList = new List<eUnitRespawnPos>()
+    private static readonly List<eUnitRespawnPos> enemyRespawnPosList = new List<eUnitRespawnPos>
     {
       eUnitRespawnPos.MAIN_POS_3,
       eUnitRespawnPos.MAIN_POS_5,
@@ -174,7 +174,7 @@ namespace Elements
     public const int FRONT_CHARA_ORDER = 10850;
     public const int CHANGE_WAVE_FRAME_NUM = 100000;
     public const string BATTLE_PATH = "Assets/_ElementsResources/Resources/All/Battle";
-    private static readonly Dictionary<eUnitRespawnPos, int> unitSortOrderDictionary = new Dictionary<eUnitRespawnPos, int>()
+    private static readonly Dictionary<eUnitRespawnPos, int> unitSortOrderDictionary = new Dictionary<eUnitRespawnPos, int>
     {
       {
         eUnitRespawnPos.MAIN_POS_1,
@@ -242,7 +242,7 @@ namespace Elements
     public const string SKILL_FX_FILENAME_PREFIX_SAMPLE = "fxsk_0000_CUT_";
     public const float QUEST_WIN_OFFSET = 280f;
     public const float QUEST_WIN_POS_Y = -100f;
-    public static readonly Dictionary<eUnitRespawnPos, float> RESPAWN_POS = new Dictionary<eUnitRespawnPos, float>()
+    public static readonly Dictionary<eUnitRespawnPos, float> RESPAWN_POS = new Dictionary<eUnitRespawnPos, float>
     {
       {
         eUnitRespawnPos.MAIN_POS_1,
@@ -285,11 +285,11 @@ namespace Elements
         -186f
       }
     };
-    public static readonly Dictionary<eUnitRespawnPos, List<eUnitRespawnPos>> SUMMON_RESPAWN_PRIORITY = new Dictionary<eUnitRespawnPos, List<eUnitRespawnPos>>()
+    public static readonly Dictionary<eUnitRespawnPos, List<eUnitRespawnPos>> SUMMON_RESPAWN_PRIORITY = new Dictionary<eUnitRespawnPos, List<eUnitRespawnPos>>
     {
       {
         eUnitRespawnPos.MAIN_POS_1,
-        new List<eUnitRespawnPos>()
+        new List<eUnitRespawnPos>
         {
           eUnitRespawnPos.SUB_POS_5,
           eUnitRespawnPos.MAIN_POS_5,
@@ -305,7 +305,7 @@ namespace Elements
       },
       {
         eUnitRespawnPos.MAIN_POS_2,
-        new List<eUnitRespawnPos>()
+        new List<eUnitRespawnPos>
         {
           eUnitRespawnPos.SUB_POS_5,
           eUnitRespawnPos.MAIN_POS_5,
@@ -321,7 +321,7 @@ namespace Elements
       },
       {
         eUnitRespawnPos.MAIN_POS_3,
-        new List<eUnitRespawnPos>()
+        new List<eUnitRespawnPos>
         {
           eUnitRespawnPos.SUB_POS_5,
           eUnitRespawnPos.MAIN_POS_5,
@@ -337,7 +337,7 @@ namespace Elements
       },
       {
         eUnitRespawnPos.MAIN_POS_4,
-        new List<eUnitRespawnPos>()
+        new List<eUnitRespawnPos>
         {
           eUnitRespawnPos.MAIN_POS_1,
           eUnitRespawnPos.SUB_POS_1,
@@ -353,7 +353,7 @@ namespace Elements
       },
       {
         eUnitRespawnPos.MAIN_POS_5,
-        new List<eUnitRespawnPos>()
+        new List<eUnitRespawnPos>
         {
           eUnitRespawnPos.MAIN_POS_1,
           eUnitRespawnPos.SUB_POS_1,
@@ -369,7 +369,7 @@ namespace Elements
       },
       {
         eUnitRespawnPos.SUB_POS_5,
-        new List<eUnitRespawnPos>()
+        new List<eUnitRespawnPos>
         {
           eUnitRespawnPos.MAIN_POS_1,
           eUnitRespawnPos.SUB_POS_1,
@@ -485,7 +485,7 @@ namespace Elements
         eSE.BTL_HIT_WAND_1
       }
     };*/
-    public static readonly Dictionary<SystemIdDefine.eWeaponSeType, eResourceId> WEAPON_HIT_EFFECT_DIC = new Dictionary<SystemIdDefine.eWeaponSeType, eResourceId>()
+    public static readonly Dictionary<SystemIdDefine.eWeaponSeType, eResourceId> WEAPON_HIT_EFFECT_DIC = new Dictionary<SystemIdDefine.eWeaponSeType, eResourceId>
     {
       {
         SystemIdDefine.eWeaponSeType.ARROW,
@@ -564,7 +564,7 @@ namespace Elements
         eResourceId.FX_HIT1_CENTER
       }
     };
-    public static readonly Dictionary<eResourceId, eResourceId> WEAPON_HIT_EFFECT_DIC_L = new Dictionary<eResourceId, eResourceId>()
+    public static readonly Dictionary<eResourceId, eResourceId> WEAPON_HIT_EFFECT_DIC_L = new Dictionary<eResourceId, eResourceId>
     {
       {
         eResourceId.FX_HIT3,
@@ -583,7 +583,7 @@ namespace Elements
         eResourceId.FX_HIT4_L
       }
     };
-    public static readonly Dictionary<SystemIdDefine.eWeaponMotionType, float> WEAPON_HIT_DELAY_DIC = new Dictionary<SystemIdDefine.eWeaponMotionType, float>()
+    public static readonly Dictionary<SystemIdDefine.eWeaponMotionType, float> WEAPON_HIT_DELAY_DIC = new Dictionary<SystemIdDefine.eWeaponMotionType, float>
     {
       {
         SystemIdDefine.eWeaponMotionType.ARROW,
@@ -658,7 +658,7 @@ namespace Elements
         0.0f
       }
     };
-    public static readonly Dictionary<SystemIdDefine.eWeaponMotionType, float> WEAPON_EFFECT_DELAY_DIC = new Dictionary<SystemIdDefine.eWeaponMotionType, float>()
+    public static readonly Dictionary<SystemIdDefine.eWeaponMotionType, float> WEAPON_EFFECT_DELAY_DIC = new Dictionary<SystemIdDefine.eWeaponMotionType, float>
     {
       {
         SystemIdDefine.eWeaponMotionType.ARROW,
@@ -936,9 +936,9 @@ namespace Elements
 
     public static eUnitRespawnPos GetUnitRespawnPos(int index, bool isEnemySide = false)
     {
-      if (index < 0 || index >= BattleDefine.UnitRespawnPosList.Count)
+      if (index < 0 || index >= UnitRespawnPosList.Count)
         return eUnitRespawnPos.MAIN_POS_3;
-      return !isEnemySide ? BattleDefine.UnitRespawnPosList[index] : BattleDefine.enemyRespawnPosList[index];
+      return !isEnemySide ? UnitRespawnPosList[index] : enemyRespawnPosList[index];
     }
 
     public static int GetUnitSortOrder(UnitCtrl _unit)
@@ -948,9 +948,9 @@ namespace Elements
       bool isOther = _unit.IsOther;
       if (num != 0)
         return 350;
-      if (!BattleDefine.unitSortOrderDictionary.ContainsKey(respawnPos))
+      if (!unitSortOrderDictionary.ContainsKey(respawnPos))
         return 0;
-      int unitSortOrder = BattleDefine.unitSortOrderDictionary[respawnPos];
+      int unitSortOrder = unitSortOrderDictionary[respawnPos];
       return !isOther ? unitSortOrder : unitSortOrder - 500;
     }
 
@@ -976,7 +976,7 @@ namespace Elements
       public CustomEasing EndPosXEasing;
       public CustomEasing StartPosYEasing;
       public CustomEasing EndPosYEasing;
-      public List<BattleDefine.ZoomEffectPlual> ZoomEffectList = new List<BattleDefine.ZoomEffectPlual>();
+      public List<ZoomEffectPlual> ZoomEffectList = new List<ZoomEffectPlual>();
       public CustomEasing.eType StartEasingType = CustomEasing.eType.outQuad;
       public CustomEasing.eType EndEasingType = CustomEasing.eType.outQuad;
 

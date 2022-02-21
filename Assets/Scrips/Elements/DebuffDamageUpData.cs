@@ -14,7 +14,7 @@ namespace Elements
 
     public float DebuffDamageUpTimer { get; set; }
 
-    public DebuffDamageUpData.eEffectType EffectType { get; set; }
+    public eEffectType EffectType { get; set; }
 
     public enum eEffectType
     {

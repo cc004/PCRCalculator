@@ -37,7 +37,7 @@ namespace Spine.Unity.Modules
 					skeletonRenderer.GenerateMeshOverride -= HandleRender;
 				}
 				skeletonRenderer = value;
-				base.enabled = false;
+				enabled = false;
 			}
 		}
 

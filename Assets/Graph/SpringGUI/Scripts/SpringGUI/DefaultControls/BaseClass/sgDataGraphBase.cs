@@ -38,7 +38,7 @@ namespace SpringGUI
                 var xFirst = endPosX + new Vector2(0 , arrowSize);
                 var xSecond = endPosX + new Vector2(1.73f * arrowSize , 0);
                 var xThird = endPosX + new Vector2(0 , -arrowSize);
-                vh.AddUIVertexQuad(new UIVertex[]
+                vh.AddUIVertexQuad(new[]
                 {
                     GetUIVertex(xFirst,BaseSetting.AxisColor),
                     GetUIVertex(xSecond,BaseSetting.AxisColor),
@@ -49,7 +49,7 @@ namespace SpringGUI
                 var yFirst = endPosY + new Vector2(-arrowSize , 0);
                 var ySecond = endPosY + new Vector2(0 , 1.73f * arrowSize);
                 var yThird = endPosY + new Vector2(arrowSize , 0);
-                vh.AddUIVertexQuad(new UIVertex[]
+                vh.AddUIVertexQuad(new[]
                 {
                     GetUIVertex(yFirst,BaseSetting.AxisColor),
                     GetUIVertex(ySecond,BaseSetting.AxisColor),

@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEngine;
+
 namespace PCRCaculator.Battle
 {
     public enum BuffParamKind
@@ -783,10 +783,8 @@ namespace PCRCaculator.Battle
             {
                 return Mathf.FloorToInt(num);
             }
-            else
-            {
-                return Mathf.CeilToInt(num);
-            }
+
+            return Mathf.CeilToInt(num);
         }
         /// <summary>
         /// 返回等级差的概率补正

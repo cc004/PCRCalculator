@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Newtonsoft0.Json;
-using System.IO;
 
 namespace PCRCaculator
 {
@@ -23,8 +20,8 @@ namespace PCRCaculator
 
         private List<AddedPlayerData> players = new List<AddedPlayerData>();
         private List<GameObject> selectButtons = new List<GameObject>();
-        private int waitDeletePlayerPos = 0;//等待删除的玩家
-        private int attackplayerPos = 0;//战斗对手的序号
+        private int waitDeletePlayerPos;//等待删除的玩家
+        private int attackplayerPos;//战斗对手的序号
         private void Awake()
         {
             Instance = this;
@@ -93,7 +90,6 @@ namespace PCRCaculator
             try
             {
                 players = SaveManager.Load<List<AddedPlayerData>>();
-                return;
             }
             catch
             {
@@ -135,7 +131,7 @@ namespace PCRCaculator
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class AddedPlayerData
     {
         public string playerName = "未命名";

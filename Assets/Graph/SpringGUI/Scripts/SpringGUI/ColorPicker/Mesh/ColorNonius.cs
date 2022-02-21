@@ -28,7 +28,7 @@ namespace SpringGUI
                 var inStartPos = new Vector2(Mathf.Cos(startRadian) , Mathf.Sin(startRadian)) * m_radius;
                 var outEndPos = new Vector2(Mathf.Cos(endRadian) , Mathf.Sin(endRadian)) * outRadius;
                 var inEndPos = new Vector2(Mathf.Cos(endRadian) , Mathf.Sin(endRadian)) * m_radius;
-                vh.AddUIVertexQuad(new UIVertex[]
+                vh.AddUIVertexQuad(new[]
                 {
                     GetUIVertex(outStartPos,Color.black),
                     GetUIVertex(inStartPos,Color.black),

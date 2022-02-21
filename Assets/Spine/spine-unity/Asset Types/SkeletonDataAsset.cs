@@ -37,7 +37,7 @@ namespace Spine.Unity
 		private float skeletonDataScale = 1f;
 
 		public bool IsLoaded => skeletonData != null;
-		private bool useOwnBytes = false;
+		private bool useOwnBytes;
 		private byte[] skelBytes;
 
 		private void Reset()
@@ -55,7 +55,7 @@ namespace Spine.Unity
 
 		public static SkeletonDataAsset CreateRuntimeInstance(TextAsset skeletonDataFile, AtlasAsset[] atlasAssets, bool initialize, float scale = 0.01f)
 		{
-			SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+			SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
 			skeletonDataAsset.Clear();
 			skeletonDataAsset.skeletonJSON = skeletonDataFile;
 			skeletonDataAsset.atlasAssets = atlasAssets;
@@ -68,13 +68,13 @@ namespace Spine.Unity
 		}
 		public static SkeletonDataAsset CreateRuntimeInstance(byte[] skeletonDataBytes, string name, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f)
 		{
-			SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+			SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
 			skeletonDataAsset.Clear();
 			skeletonDataAsset.skeletonJSON = new TextAsset("default");
 			skeletonDataAsset.skeletonJSON.name = name;
 			skeletonDataAsset.useOwnBytes = true;
 			skeletonDataAsset.skelBytes = skeletonDataBytes;
-			skeletonDataAsset.atlasAssets = new AtlasAsset[] { atlasAsset };
+			skeletonDataAsset.atlasAssets = new[] { atlasAsset };
 			skeletonDataAsset.scale = scale;
 
 			if (initialize)
@@ -105,7 +105,7 @@ namespace Spine.Unity
 			{
 				if (useOwnBytes)
 				{
-					sd = SkeletonDataAsset.ReadSkeletonData(skelBytes, attachmentLoader, skeletonDataScale);
+					sd = ReadSkeletonData(skelBytes, attachmentLoader, skeletonDataScale);
 				}
 				else
 				{

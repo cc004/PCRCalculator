@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -80,7 +79,7 @@ namespace PCRCaculator
                         b.transform.localScale = new Vector3(1, 1, 1);
                         b.transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 3), -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 3))), 0);
                         int id0 = id;
-                        b.GetComponent<Button>().onClick.AddListener(delegate () { DetailButton(id0); });
+                        b.GetComponent<Button>().onClick.AddListener(delegate { DetailButton(id0); });
                         b.GetComponent<CharacterPageButton>().SetButton(id0);
                         buttons.Add(b);
                         count++;

@@ -34,7 +34,7 @@ namespace SpringGUI
                         Vector2 startPosS = new Vector2(Mathf.Cos(startRadian) , Mathf.Sin(startRadian)) * ( radius - perRadius );
                         Vector2 endPosS = new Vector2(Mathf.Cos(endRadian) , Mathf.Sin(endRadian)) * ( radius - perRadius );
 
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                         {
                             GetUIVertex(startPosF,color),
                             GetUIVertex(startPosS,color),
@@ -77,7 +77,7 @@ namespace SpringGUI
                     vh.AddUIVertexQuad(newVertexs);
                     if ( j > 0 )
                     {
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                             {
                                 oldVertexs[1],
                                 newVertexs[0],
@@ -118,7 +118,7 @@ namespace SpringGUI
                     var startPos = new Vector2(Mathf.Cos(startradian) , Mathf.Sin(startradian)) * startradius;
                     Vector2 endPos = new Vector2(Mathf.Cos(endRadian) , Mathf.Sin(endRadian)) * endRadius;
                     var newVertexs = GetQuad(startPos , endPos , lineColor , radarData.LineWidth);
-                    vh.AddUIVertexQuad( new UIVertex[]
+                    vh.AddUIVertexQuad( new[]
                     {
                         GetUIVertex(startPos,fillColor),
                         GetUIVertex(endPos,fillColor),
@@ -128,7 +128,7 @@ namespace SpringGUI
                     vh.AddUIVertexQuad(newVertexs);
                     if ( j > 0 )
                     {
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                             {
                                 oldVertexs[1],
                                 newVertexs[0],
@@ -232,7 +232,7 @@ namespace SpringGUI
                         Vector2 startPosS = new Vector2(Mathf.Cos(startRadian) , Mathf.Sin(startRadian)) * ( radius - perRadius );
                         Vector2 endPosS = new Vector2(Mathf.Cos(endRadian) , Mathf.Sin(endRadian)) * ( radius - perRadius );
 
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                         {
                             GetUIVertex(startPosF,color),
                             GetUIVertex(startPosS,color),

@@ -24,30 +24,30 @@ namespace Elements
           UnitActionController _sourceActionController)
         {
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
-            PartsData partsData = _source.BossPartsListForBattle.Find((Predicate<PartsData>)(e => e.Index == _skill.ParameterTarget));
-            if (this.ActionDetail2 != 2)
+            PartsData partsData = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
+            if (ActionDetail2 != 2)
                 return;
             Dictionary<BasePartsData, FloatWithEx> buffParam = new Dictionary<BasePartsData, FloatWithEx>();
-            bool isDebuff = this.ActionDetail1 % 10 == 1;
-            UnitCtrl.BuffParamKind buffParamKind = BuffDebuffAction.GetChangeParamKind(this.ActionDetail1);
-            partsData.OnBreak += (Action)(() =>
-           {
-               if (_source.IsPartsBoss)
-               {
-                   for (int index = 0; index < _source.BossPartsListForBattle.Count; ++index)
-                       buffParam.Add((BasePartsData)_source.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam((BasePartsData)_source.BossPartsListForBattle[index], this.Value[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType)(float)this.Value[eValueNumber.VALUE_1], buffParamKind, isDebuff));
-               }
-               _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParam, 0.0f, 0, (UnitCtrl)null, true, eEffectType.COMMON, !isDebuff, this.getIsAdditional());
-               _source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, this.getIsAdditional(),90);
-           });
-            partsData.OnBreakEnd += (Action)(() =>
-           {
-               _source.EnableBuffParam(buffParamKind, buffParam, false, _source, !isDebuff, this.getIsAdditional(),90);
-               buffParam.Clear();
-           });
+            bool isDebuff = ActionDetail1 % 10 == 1;
+            UnitCtrl.BuffParamKind buffParamKind = GetChangeParamKind(ActionDetail1);
+            partsData.OnBreak += () =>
+            {
+                if (_source.IsPartsBoss)
+                {
+                    for (int index = 0; index < _source.BossPartsListForBattle.Count; ++index)
+                        buffParam.Add(_source.BossPartsListForBattle[index], CalculateBuffDebuffParam(_source.BossPartsListForBattle[index], Value[eValueNumber.VALUE_2], (eChangeParameterType)(float)Value[eValueNumber.VALUE_1], buffParamKind, isDebuff));
+                }
+                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParam, 0.0f, 0, null, true, eEffectType.COMMON, !isDebuff, getIsAdditional());
+                _source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, getIsAdditional(),90);
+            };
+            partsData.OnBreakEnd += () =>
+            {
+                _source.EnableBuffParam(buffParamKind, buffParam, false, _source, !isDebuff, getIsAdditional(),90);
+                buffParam.Clear();
+            };
         }
 
-        private bool getIsAdditional() => this.ActionDetail1 / 1000 == 1;
+        private bool getIsAdditional() => ActionDetail1 / 1000 == 1;
 
         public override void ExecAction(
           UnitCtrl _source,
@@ -58,29 +58,29 @@ namespace Elements
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-          System.Action<string> action = null)
+          Action<string> action = null)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            this.AppendIsAlreadyExeced(_target.Owner, _num);
-            if (this.ActionDetail2 == 2)
+            AppendIsAlreadyExeced(_target.Owner, _num);
+            if (ActionDetail2 == 2)
                 return;
-            UnitCtrl.BuffParamKind changeParamKind = BuffDebuffAction.GetChangeParamKind(this.ActionDetail1);
+            UnitCtrl.BuffParamKind changeParamKind = GetChangeParamKind(ActionDetail1);
             Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
             if (_target.Owner.IsPartsBoss && changeParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (changeParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE) && (changeParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE && changeParamKind != UnitCtrl.BuffParamKind.MAX_HP))
             {
                 for (int index = 0; index < _target.Owner.BossPartsListForBattle.Count; ++index)
-                    dictionary.Add((BasePartsData)_target.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam((BasePartsData)_target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, this.ActionDetail1 % 10 == 1));
+                    dictionary.Add(_target.Owner.BossPartsListForBattle[index], CalculateBuffDebuffParam(_target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
             }
             else
-                dictionary.Add(_target.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, this.ActionDetail1 % 10 == 1));
+                dictionary.Add(_target.Owner.DummyPartsData, CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
             bool _despelable = (double)_valueDictionary[eValueNumber.VALUE_7] != 2.0;
-            _target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, this.EffectType, this.ActionDetail1 % 10 != 1, this.getIsAdditional(),action);
+            _target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
         }
 
         public static FloatWithEx CalculateBuffDebuffParam(
           BasePartsData _target,
           FloatWithEx _value,
-          BuffDebuffAction.eChangeParameterType _changeParamType,
+          eChangeParameterType _changeParamType,
           UnitCtrl.BuffParamKind _targetChangeParamKind,
           bool _isDebuf)
         {
@@ -89,10 +89,10 @@ namespace Elements
                 _isDebuf = true;
             switch (_changeParamType)
             {
-                case BuffDebuffAction.eChangeParameterType.FIXED:
+                case eChangeParameterType.FIXED:
                     f = BattleUtil.FloatToIntReverseTruncate(_value);
                     break;
-                case BuffDebuffAction.eChangeParameterType.PERCENTAGE:
+                case eChangeParameterType.PERCENTAGE:
                     var num1 = _value / 100f;
                     switch (_targetChangeParamKind)
                     {
@@ -160,8 +160,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_2] = (float)((double)this.MasterData.action_value_2 + (double)this.MasterData.action_value_3 * (double)_level);
-            this.Value[eValueNumber.VALUE_4] = (float)((double)this.MasterData.action_value_4 + (double)this.MasterData.action_value_5 * (double)_level);
+            Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
+            Value[eValueNumber.VALUE_4] = (float)(MasterData.action_value_4 + MasterData.action_value_5 * _level);
         }
 
         public enum eChangeParameterType

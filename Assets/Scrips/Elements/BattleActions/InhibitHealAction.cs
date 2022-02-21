@@ -4,8 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -29,15 +30,15 @@ namespace Elements
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
 
-            if ((double) BattleManager.Random(0.0f, 1f, 
-                new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 13, (float)pp)) < (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (BattleManager.Random(0.0f, 1f, 
+                    new RandomData(_source, _target.Owner, ActionId, 13, (float)pp)) < (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
       {
-        this.AppendIsAlreadyExeced(_target.Owner, _num);
-        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.INHIBIT_HEAL, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_2] : 9999f, (ActionParameter) this, _skill, _valueDictionary[eValueNumber.VALUE_1]);
+        AppendIsAlreadyExeced(_target.Owner, _num);
+        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.INHIBIT_HEAL, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_2] : 9999f, this, _skill, _valueDictionary[eValueNumber.VALUE_1]);
       }
       else
       {
-        ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+        ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
         if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
           return;
         if (actionExecedData.TargetPartsNumber == 1)
@@ -50,7 +51,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
     }
   }
 }

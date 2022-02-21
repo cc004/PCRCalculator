@@ -1,11 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-using System.IO;
-using Spine.Unity;
 using Elements;
-using System;
+using Spine.Unity;
+using UnityEngine;
+
 namespace PCRCaculator.Battle
 {
 
@@ -162,7 +161,7 @@ namespace PCRCaculator.Battle
 
                     }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     Debug.LogError("load " + path_0 + " failed beacuse " + e.Message);
                 }
@@ -172,7 +171,6 @@ namespace PCRCaculator.Battle
                 //    Debug.Log("fail!");
                 //}
             }
-            yield break;
         }
         IEnumerator LoadSpecial_0(string path)
         {         //文件路径，也就是我们打包的那个         
@@ -208,7 +206,7 @@ namespace PCRCaculator.Battle
                         g.SetActive(false);
                     }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     Debug.LogError("load " + path_0 + " failed beacuse " + e.Message);
                 }
@@ -218,7 +216,6 @@ namespace PCRCaculator.Battle
                 //    Debug.Log("fail!");
                 //}
             }
-            yield break;
         }
 
         public IEnumerator LoadCharacterPrefab(int unitid)
@@ -239,7 +236,7 @@ namespace PCRCaculator.Battle
                             b.SetActive(false);
                         }
                     }
-                    catch (System.Exception e)
+                    catch (Exception e)
                     {
                         Debug.LogError("load " + path_0 + " failed beacuse " + e.Message);
                     }
@@ -258,7 +255,7 @@ namespace PCRCaculator.Battle
                             //CreateSpine(unitid,a.transform);
                             if (CreateJson)
                             {
-                                a.GetComponent<Elements.UnitActionController>().SaveDataToJson();
+                                a.GetComponent<UnitActionController>().SaveDataToJson();
                                 //Debug.LogError("鸽了！");
                             }
                             if (destroyImmediate)
@@ -271,7 +268,7 @@ namespace PCRCaculator.Battle
                             }
                         }
                     }
-                    catch (System.Exception e)
+                    catch (Exception e)
                     {
                         Debug.LogError("load " + path_0 + " failed beacuse " + e.Message);
                     }
@@ -318,10 +315,10 @@ namespace PCRCaculator.Battle
             ResourceDefineScriptableObjectInBdl scriptableObjectInBdl = null;// = www.assetBundle.LoadAsset<ResourceDefineScriptableObjectInBdl>("Bdl/ResourceDefine/ResourceDefine");
             foreach (string path_0 in www.assetBundle.GetAllAssetNames())
                 scriptableObjectInBdl = www.assetBundle.LoadAsset<ResourceDefineScriptableObjectInBdl>(path_0);
-            this.resourceDefineAllDictionary = new Dictionary<eResourceId, ResourceDefineRecord>();
-            this.bundleDefineAllDictionary = new Dictionary<eBundleId, BundleDefineRecord>();
-            scriptableObjectInBdl.ResourceDefineArray.ForEach<ResourceDefineRecord>((Action<ResourceDefineRecord>)(_srcRecord => this.resourceDefineAllDictionary.Add(_srcRecord.ResourceId, _srcRecord)));
-            scriptableObjectInBdl.BundleDefineArray.ForEach<BundleDefineRecord>((Action<BundleDefineRecord>)(_srcRecord => this.bundleDefineAllDictionary.Add(_srcRecord.BundleId, _srcRecord)));
+            resourceDefineAllDictionary = new Dictionary<eResourceId, ResourceDefineRecord>();
+            bundleDefineAllDictionary = new Dictionary<eBundleId, BundleDefineRecord>();
+            scriptableObjectInBdl.ResourceDefineArray.ForEach(_srcRecord => resourceDefineAllDictionary.Add(_srcRecord.ResourceId, _srcRecord));
+            scriptableObjectInBdl.BundleDefineArray.ForEach(_srcRecord => bundleDefineAllDictionary.Add(_srcRecord.BundleId, _srcRecord));
             FindAllPath1(eResourceId.UNIT_BATTLE);
             
         }
@@ -330,7 +327,7 @@ namespace PCRCaculator.Battle
             if (resourceDefineAllDictionary.ContainsKey(resourceId))
             {
                 Debug.Log(resourceDefineAllDictionary[resourceId].PathName);
-                resourceDefineAllDictionary[resourceId].PreloadResource.ForEach<eResourceId>(a => FindAllPath1(a));
+                resourceDefineAllDictionary[resourceId].PreloadResource.ForEach(a => FindAllPath1(a));
             }
         }
         private void FindAllPath2(eBundleId bundleId)
@@ -361,7 +358,7 @@ namespace PCRCaculator.Battle
                         b.SetActive(false);
                     }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     Debug.LogError("load " + path_0 + " failed beacuse " + e.Message);
                 }

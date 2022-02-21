@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using System;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -20,7 +20,7 @@ namespace Elements
       Skill _skill)
     {
       base.ReadyAction(_source, _sourceActionController, _skill);
-      if (this.ActionDetail1 != 1001)
+      if (ActionDetail1 != 1001)
         return;
       _skill.CriticalPartsList.Clear();
     }
@@ -31,7 +31,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      if (this.ActionDetail1 != 1001)
+      if (ActionDetail1 != 1001)
         return;
       _skill.CriticalPartsList = new List<BasePartsData>();
     }
@@ -47,12 +47,12 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictinary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
-      if (!_enabledChildAction.ContainsKey(this.ActionDetail2))
-        _enabledChildAction.Add(this.ActionDetail2, false);
-      if (!_enabledChildAction.ContainsKey(this.ActionDetail3))
-        _enabledChildAction.Add(this.ActionDetail3, false);
+      if (!_enabledChildAction.ContainsKey(ActionDetail2))
+        _enabledChildAction.Add(ActionDetail2, false);
+      if (!_enabledChildAction.ContainsKey(ActionDetail3))
+        _enabledChildAction.Add(ActionDetail3, false);
       bool flag = false;
-      switch ((eIfType) this.ActionDetail1)
+      switch ((eIfType) ActionDetail1)
       {
         case eIfType.STOP:
           flag = _target.Owner.IsUnableActionState();
@@ -85,8 +85,8 @@ namespace Elements
           flag = _target.Owner.IsSlipDamageState();
           break;
         case eIfType.ALONE:
-          List<UnitCtrl> unitCtrlList = _source.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
-          flag = !unitCtrlList.Exists((Predicate<UnitCtrl>) (e => e.IsPartsBoss && !e.IsDead)) && unitCtrlList.FindAll((Predicate<UnitCtrl>) (e => (!e.IsDead && (long) e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth)).Count == 1;
+          List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
+          flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long) e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth).Count == 1;
           break;
         case eIfType.BREAK:
           if (_target.Owner.IsPartsBoss)
@@ -99,11 +99,10 @@ namespace Elements
                 break;
               }
             }
-            break;
           }
           break;
         case eIfType.UNIT_ID:
-          flag = this.TargetList.FindAll((Predicate<BasePartsData>) (e => IfForAllAction.JudgeCountableUnit(e.Owner))).Exists((Predicate<BasePartsData>) (e => (double) e.Owner.UnitId == (double) _valueDictinary[eValueNumber.VALUE_3]));
+          flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner)).Exists(e => e.Owner.UnitId == (double) _valueDictinary[eValueNumber.VALUE_3]);
           break;
         case eIfType.CRITICAL:
           flag = _skill.CriticalPartsList.Contains(_target);
@@ -112,40 +111,39 @@ namespace Elements
           flag = _target.Owner.AtkType == 1;
           break;
         default:
-          if (this.ActionDetail1 < 100)
+          if (ActionDetail1 < 100)
           {
-            flag = (double) BattleManager.Random(0.0f, 100f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double) this.ActionDetail1;
+            flag = BattleManager.Random(0.0f, 100f, new RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double) ActionDetail1;
             break;
           }
-          if (this.ActionDetail1 > 900)
+          if (ActionDetail1 > 900)
           {
-            flag = (double) (long) _target.Owner.Hp / (double) (long) _target.Owner.MaxHp < (double) (this.ActionDetail1 % 100) / 100.0;
+            flag = (long) _target.Owner.Hp / (double) (long) _target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
             break;
           }
-          if (this.ActionDetail1 > 700)
+          if (ActionDetail1 > 700)
           {
-            flag = this.TargetList.FindAll((Predicate<BasePartsData>) (e => IfForAllAction.JudgeCountableUnit(e.Owner))).Count == this.ActionDetail1 - 700;
+            flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner)).Count == ActionDetail1 - 700;
             break;
           }
-          if (this.ActionDetail1 > 600)
+          if (ActionDetail1 > 600)
           {
-            eStateIconType key = (eStateIconType) (this.ActionDetail1 - 600);
-            flag = _target.Owner.SealDictionary.ContainsKey(key) && ((double) _valueDictinary[eValueNumber.VALUE_3] != 0.0 ? (double) _target.Owner.SealDictionary[key].GetCurrentCount() >= (double) _valueDictinary[eValueNumber.VALUE_3] : _target.Owner.SealDictionary[key].GetCurrentCount() > 0);
-            break;
+            eStateIconType key = (eStateIconType) (ActionDetail1 - 600);
+            flag = _target.Owner.SealDictionary.ContainsKey(key) && ((double) _valueDictinary[eValueNumber.VALUE_3] != 0.0 ? _target.Owner.SealDictionary[key].GetCurrentCount() >= (double) _valueDictinary[eValueNumber.VALUE_3] : _target.Owner.SealDictionary[key].GetCurrentCount() > 0);
           }
           break;
       }
       if (flag)
       {
-        _enabledChildAction[this.ActionDetail2] = true;
-        _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_1];
+        _enabledChildAction[ActionDetail2] = true;
+        _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_1];
       }
       else
       {
-        _enabledChildAction[this.ActionDetail3] = true;
-        _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_2];
+        _enabledChildAction[ActionDetail3] = true;
+        _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_2];
       }
-      _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion((ActionParameter) this, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion(this, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
   }
 }

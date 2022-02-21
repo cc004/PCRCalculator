@@ -7,6 +7,7 @@
 using System;
 using System.Security;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Cute
 {
@@ -131,7 +132,7 @@ namespace Cute
     public static void CaptureScreenshot(string NACGNDIHOBK, int BLADPNKFCFO) => ScreenCapture.CaptureScreenshot(NACGNDIHOBK, BLADPNKFCFO);
 
     [Obsolete("Use Object.DontDestroyOnLoad instead")]
-    public static void DontDestroyOnLoad(UnityEngine.Object JFBEPGMFCDL) => Application.DontDestroyOnLoad(JFBEPGMFCDL);
+    public static void DontDestroyOnLoad(Object JFBEPGMFCDL) => Application.DontDestroyOnLoad(JFBEPGMFCDL);
 
     public static void ExternalCall(string ADIAIMIJCNC, params object[] KMHKMIMACEM) => Application.ExternalCall(ADIAIMIJCNC, KMHKMIMACEM);
 

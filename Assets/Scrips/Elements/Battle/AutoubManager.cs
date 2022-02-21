@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Elements.Battle
 {
@@ -28,7 +26,7 @@ namespace Elements.Battle
                 return;
             }
 
-            this.enabled = true;
+            enabled = true;
             this.count = count;
             queues = ublists.SelectMany((l, i) => l.Select(t => (time: t, pos: i)))
                 .GroupBy(g => (int) (g.time)).SelectMany(g => g.OrderBy(t => t.time).Aggregate(new List<(UbStatus sta, int pos)>(),
@@ -43,7 +41,7 @@ namespace Elements.Battle
                         }, tuple.pos));
                         return result;
                     })).GroupBy(t => t.pos).OrderBy(g => g.Key)
-                .Select(g => (g.Key, new Queue<UbStatus>(g.Select(t => t.sta).OrderBy(t => t.frame)))).Aggregate(new Queue<UbStatus>[]
+                .Select(g => (g.Key, new Queue<UbStatus>(g.Select(t => t.sta).OrderBy(t => t.frame)))).Aggregate(new[]
                 {
                     new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>(), new Queue<UbStatus>()
                 }, (arr, tuple) =>

@@ -4,11 +4,11 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using Cute;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -22,7 +22,7 @@ namespace Elements
     private eMovieType currentMovieType = eMovieType.PRINCESS_FORM_SKILL_NORMAL;
     private long currentMovieId;
     private long currentMovieIndex;
-    private Dictionary<int, Dictionary<int, PrincessFormProcessor.MovieVoiceData>> MovieVoiceDataDictionary = new Dictionary<int, Dictionary<int, PrincessFormProcessor.MovieVoiceData>>();
+    private Dictionary<int, Dictionary<int, MovieVoiceData>> MovieVoiceDataDictionary = new Dictionary<int, Dictionary<int, MovieVoiceData>>();
     private bool forceNormalSD;
 
     public void Initialize(
@@ -32,53 +32,53 @@ namespace Elements
       BattleSpeedInterface _battleTimeScale)
     {
       //this.movieManager = ManagerSingleton<MovieManager>.Instance;
-      this.battleManager = _battleManager;
-      this.owner = _unitCtrl;
-      this.unitActionController = _unitActionController;
-      this.battleTimeScale = _battleTimeScale;
+      battleManager = _battleManager;
+      owner = _unitCtrl;
+      unitActionController = _unitActionController;
+      battleTimeScale = _battleTimeScale;
       //this.forceNormalSD = _battleManager.GetForceNormalSD();
     }
 
     public void StartPrincessFormSkill(
       List<PrincessSkillMovieData> _princessSkillMovieDatas)
     {
-      int unionBurstSkillId = this.owner.UnionBurstSkillId;
-      eSpineCharacterAnimeId spineCharacterAnimeId = this.unitActionController.GetSkillMotionType(unionBurstSkillId) == SkillMotionType.EVOLUTION ? eSpineCharacterAnimeId.PRINCESS_SKILL_EVOLUTION : eSpineCharacterAnimeId.PRINCESS_SKILL;
-      this.unitActionController.StartAction(unionBurstSkillId);
+      int unionBurstSkillId = owner.UnionBurstSkillId;
+      eSpineCharacterAnimeId spineCharacterAnimeId = unitActionController.GetSkillMotionType(unionBurstSkillId) == SkillMotionType.EVOLUTION ? eSpineCharacterAnimeId.PRINCESS_SKILL_EVOLUTION : eSpineCharacterAnimeId.PRINCESS_SKILL;
+      unitActionController.StartAction(unionBurstSkillId);
       int current = 0;
-      System.Action func = (System.Action) null;
-      func = (System.Action) (() =>
+      Action func = null;
+      func = () =>
       {
-        ++current;
-        if (current > _princessSkillMovieDatas.Count)
-        {
-          this.finishSkill();
-        }
-        else
-        {
-          this.battleManager.IsPlayingPrincessMovie = true;
-          if (current == 1)
-            this.battleManager.CAOHLDNADPB = true;
-          this.playPrincessFormMovie(current, _princessSkillMovieDatas, (System.Action) (() =>
+          ++current;
+          if (current > _princessSkillMovieDatas.Count)
           {
-            this.battleManager.IsPlayingPrincessMovie = false;
-            if (!this.owner.GetCurrentSpineCtrl().IsAnimation(spineCharacterAnimeId, current, _index3: this.owner.MotionPrefix))
-            {
-                  //this.finishSkill();
-                  owner.AppendCoroutine(WaitFinishSkill(3, finishSkill), ePauseType.SYSTEM, owner);
-            }
-            else
-            {
-              this.owner.PlayAnime(spineCharacterAnimeId, current, _index3: this.owner.MotionPrefix, _isLoop: false);
-              this.owner.AppendCoroutine(this.waitAnimationEnd((System.Action) (() => func.Call())), ePauseType.SYSTEM, this.owner);
-            }
-          }));
-        }
-      });
+              finishSkill();
+          }
+          else
+          {
+              battleManager.IsPlayingPrincessMovie = true;
+              if (current == 1)
+                  battleManager.CAOHLDNADPB = true;
+              playPrincessFormMovie(current, _princessSkillMovieDatas, () =>
+              {
+                  battleManager.IsPlayingPrincessMovie = false;
+                  if (!owner.GetCurrentSpineCtrl().IsAnimation(spineCharacterAnimeId, current, _index3: owner.MotionPrefix))
+                  {
+                      //this.finishSkill();
+                      owner.AppendCoroutine(WaitFinishSkill(3, finishSkill), ePauseType.SYSTEM, owner);
+                  }
+                  else
+                  {
+                      owner.PlayAnime(spineCharacterAnimeId, current, _index3: owner.MotionPrefix, _isLoop: false);
+                      owner.AppendCoroutine(waitAnimationEnd(() => func.Call()), ePauseType.SYSTEM, owner);
+                  }
+              });
+          }
+      };
       func.Call();
     }
         //add
-        private IEnumerator WaitFinishSkill(int waitFrame,System.Action action)
+        private IEnumerator WaitFinishSkill(int waitFrame,Action action)
         {
             for (int i = 0; i < waitFrame; i++)
                 yield return null;
@@ -86,21 +86,21 @@ namespace Elements
         }
     private void finishSkill()
     {
-      this.battleManager.BFKPGHCBBKM = false;
+      battleManager.BFKPGHCBBKM = false;
       //this.movieManager.SetMirrorMode(false);
-      this.battleManager.SetBlackoutTimeZero();
-      this.owner.SkillEndProcess();
+      battleManager.SetBlackoutTimeZero();
+      owner.SkillEndProcess();
     }
 
     private void playPrincessFormMovie(
       int _movieIndex,
       List<PrincessSkillMovieData> _movieDataList,
-      System.Action _callback)
+      Action _callback)
     {
       PrincessSkillMovieData movieData = _movieDataList[_movieIndex - 1];
-      bool flag = !this.forceNormalSD && this.owner.IsShadow;
-      this.currentMovieType = !this.battleTimeScale.IsSpeedQuadruple ? (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW : eMovieType.PRINCESS_FORM_SKILL_NORMAL) : (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW_4X : eMovieType.PRINCESS_FORM_SKILL_NORMAL_4X);
-      int unionBurstSkillId = this.owner.UnionBurstSkillId;
+      bool flag = !forceNormalSD && owner.IsShadow;
+      currentMovieType = !battleTimeScale.IsSpeedQuadruple ? (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW : eMovieType.PRINCESS_FORM_SKILL_NORMAL) : (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW_4X : eMovieType.PRINCESS_FORM_SKILL_NORMAL_4X);
+      int unionBurstSkillId = owner.UnionBurstSkillId;
       float num = 0.75f;
       //ViewManager instance1 = ManagerSingleton<ViewManager>.Instance;
       //SoundManager instance2 = ManagerSingleton<SoundManager>.Instance;
@@ -120,33 +120,33 @@ namespace Elements
       //if (changeFPS)
       //  PABCCELMCAJ.IKMGFNGHDPJ = (int) ((double) this.battleTimeScale.SpeedUpRate * 30.0);
       bool alreadyCalled = false;
-      System.Action action = (System.Action) (() =>
+      Action action = () =>
       {
-        if (alreadyCalled)
-          return;
-        alreadyCalled = true;
-        //if (changeFPS)
-        //  PABCCELMCAJ.IKMGFNGHDPJ = 30;
-        _callback.Call();
-      });
+          if (alreadyCalled)
+              return;
+          alreadyCalled = true;
+          //if (changeFPS)
+          //  PABCCELMCAJ.IKMGFNGHDPJ = 30;
+          _callback.Call();
+      };
       if (movieData.UseFade)
       {
         //this.movieManager.Play(this.currentMovieType, (long) unionBurstSkillId, eMoviePlayType.NORMAL, action, _fadeStartTime: movieData.FadeStartTime, _fadeDurationTime: movieData.FadeDuration, _movieIndex: ((long) _movieIndex));
-        this.battleManager.StartCoroutine(this.waitMovieEndFrame((System.Action) null, (long) unionBurstSkillId, this.currentMovieType, _movieIndex));
+        battleManager.StartCoroutine(waitMovieEndFrame(null, unionBurstSkillId, currentMovieType, _movieIndex));
       }
       else
       {
        // this.movieManager.Play(this.currentMovieType, (long) unionBurstSkillId, eMoviePlayType.NORMAL, _movieIndex: ((long) _movieIndex));
-        this.battleManager.StartCoroutine(this.waitMovieEndFrame(action, (long) unionBurstSkillId, this.currentMovieType, _movieIndex));
+        battleManager.StartCoroutine(waitMovieEndFrame(action, unionBurstSkillId, currentMovieType, _movieIndex));
       }
       //if (!this.battleTimeScale.IsSpeedQuadruple)
       //  this.movieManager.SetPlaySpeed(this.currentMovieType, (long) unionBurstSkillId, this.battleTimeScale.SpeedUpFlag ? this.battleTimeScale.SpeedUpRate : 1f, (long) _movieIndex);
-      this.currentMovieId = (long) unionBurstSkillId;
-      this.currentMovieIndex = (long) _movieIndex;
+      currentMovieId = unionBurstSkillId;
+      currentMovieIndex = _movieIndex;
     }
 
     public IEnumerator waitMovieEndFrame(
-      System.Action _callback,
+      Action _callback,
       long _movieId,
       eMovieType _movieType,
       int _movieIndex)
@@ -158,8 +158,8 @@ namespace Elements
       {
                 //duration = movieManager.GetDurationTime(_movieType, _movieId, (long) _movieIndex);
                 duration = 2.5f;
-        if ((double) duration == 0.0)
-          yield return (object) null;
+        if (duration == 0.0)
+          yield return null;
         else
           break;
       }
@@ -168,24 +168,24 @@ namespace Elements
             while (true)
       {
                 seekPositionTime += 0.05f;//movieManager.GetSeekPositionTime(_movieType, _movieId, (long) _movieIndex);
-        if (!resetAnime && (double) seekPositionTime >= (double) duration / 2.0)
+        if (!resetAnime && seekPositionTime >= duration / 2.0)
         {
           resetAnime = true;
-          eSpineCharacterAnimeId _animeId = this.unitActionController.GetSkillMotionType((int) _movieId) == SkillMotionType.EVOLUTION ? eSpineCharacterAnimeId.PRINCESS_SKILL_EVOLUTION : eSpineCharacterAnimeId.PRINCESS_SKILL;
-          BattleSpineController currentSpineCtrl = this.owner.GetCurrentSpineCtrl();
-          if (currentSpineCtrl.IsAnimation(_animeId, _movieIndex, _index3: this.owner.MotionPrefix))
-            this.owner.PlayAnime(_animeId, _movieIndex, _index3: this.owner.MotionPrefix, _isLoop: false);
+          eSpineCharacterAnimeId _animeId = unitActionController.GetSkillMotionType((int) _movieId) == SkillMotionType.EVOLUTION ? eSpineCharacterAnimeId.PRINCESS_SKILL_EVOLUTION : eSpineCharacterAnimeId.PRINCESS_SKILL;
+          BattleSpineController currentSpineCtrl = owner.GetCurrentSpineCtrl();
+          if (currentSpineCtrl.IsAnimation(_animeId, _movieIndex, _index3: owner.MotionPrefix))
+            owner.PlayAnime(_animeId, _movieIndex, _index3: owner.MotionPrefix, _isLoop: false);
           else
-            this.owner.PlayAnime(eSpineCharacterAnimeId.IDLE, this.owner.MotionPrefix);
+            owner.PlayAnime(eSpineCharacterAnimeId.IDLE, owner.MotionPrefix);
           currentSpineCtrl.RealUpdate();
           currentSpineCtrl.RealLateUpdate();
           if (_movieIndex == 1)
-            this.battleManager.CAOHLDNADPB = false;
+            battleManager.CAOHLDNADPB = false;
           if (_callback == null)
             break;
         }
-        if ((double) seekPositionTime + (double) oneFrame + (double) oneFrame * 0.5 < (double) duration)
-          yield return (object) null;
+        if (seekPositionTime + (double) oneFrame + oneFrame * 0.5 < duration)
+          yield return null;
         else
           goto label_13;
       }
@@ -196,9 +196,9 @@ label_13:
 
     public void Prepare()
     {
-      this.battleManager.BFKPGHCBBKM = true;
-      bool flag = !this.forceNormalSD && this.owner.IsShadow;
-      this.currentMovieType = !this.battleTimeScale.IsSpeedQuadruple ? (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW : eMovieType.PRINCESS_FORM_SKILL_NORMAL) : (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW_4X : eMovieType.PRINCESS_FORM_SKILL_NORMAL_4X);
+      battleManager.BFKPGHCBBKM = true;
+      bool flag = !forceNormalSD && owner.IsShadow;
+      currentMovieType = !battleTimeScale.IsSpeedQuadruple ? (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW : eMovieType.PRINCESS_FORM_SKILL_NORMAL) : (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW_4X : eMovieType.PRINCESS_FORM_SKILL_NORMAL_4X);
       //this.movieManager.Load(this.currentMovieType, (long) this.owner.UnionBurstSkillId, _movieIndex: 1L);
       /*foreach (KeyValuePair<int, Dictionary<int, PrincessFormProcessor.MovieVoiceData>> movieVoiceData in this.MovieVoiceDataDictionary)
       {
@@ -278,21 +278,21 @@ label_13:
       }
     }*/
 
-    private string buildSkillMovieName(int _a, int _b) => string.Format("p_skill_{0}_{1}", (object) _a, (object) _b);
+    private string buildSkillMovieName(int _a, int _b) => string.Format("p_skill_{0}_{1}", _a, _b);
 
-    private IEnumerator waitAnimationEnd(System.Action _callback)
+    private IEnumerator waitAnimationEnd(Action _callback)
     {
       do
       {
-        yield return (object) null;
+        yield return null;
       }
-      while (this.owner.GetCurrentSpineCtrl().IsPlayAnimeBattle);
+      while (owner.GetCurrentSpineCtrl().IsPlayAnimeBattle);
       _callback.Call();
     }
 
     public void Pause(bool _pause)
     {
-      if (!this.battleManager.IsPlayingPrincessMovie)
+      if (!battleManager.IsPlayingPrincessMovie)
         return;
       //this.movieManager.Pause(this.currentMovieType, this.currentMovieId, _pause, this.currentMovieIndex);
     }

@@ -18,40 +18,40 @@ namespace Elements.Battle
 
         public BattleEffectPool()
         {
-            this.effectDictionary = new Dictionary<string, List<SkillEffectCtrl>>();
+            effectDictionary = new Dictionary<string, List<SkillEffectCtrl>>();
             //this.numberEffectDictionary = new Dictionary<string, List<DamageEffectCtrlBase>>();
         }
 
         public SkillEffectCtrl GetEffect(GameObject effectPrefab, UnitCtrl source = null)
         {
-            bool _isShadow = !((Object)source == (Object)null) && !this.BACHGMADMKC && source.IsShadow;
+            bool _isShadow = !(source == null) && !BACHGMADMKC && source.IsShadow;
             SkillEffectCtrl component;
-            if (!this.effectDictionary.ContainsKey(effectPrefab.name))
+            if (!effectDictionary.ContainsKey(effectPrefab.name))
             {
-                component = Object.Instantiate<GameObject>(effectPrefab).GetComponent<SkillEffectCtrl>();
-                List<SkillEffectCtrl> skillEffectCtrlList = new List<SkillEffectCtrl>()
-        {
+                component = Object.Instantiate(effectPrefab).GetComponent<SkillEffectCtrl>();
+                List<SkillEffectCtrl> skillEffectCtrlList = new List<SkillEffectCtrl>
+                {
           component
         };
-                this.effectDictionary.Add(effectPrefab.name, skillEffectCtrlList);
+                effectDictionary.Add(effectPrefab.name, skillEffectCtrlList);
             }
             else
             {
-                List<SkillEffectCtrl> effect = this.effectDictionary[effectPrefab.name];
+                List<SkillEffectCtrl> effect = effectDictionary[effectPrefab.name];
                 for (int index = 0; index < effect.Count; ++index)
                 {
                     SkillEffectCtrl skillEffectCtrl = effect[index];
                     if (!skillEffectCtrl.IsPlaying)
                     {
                         skillEffectCtrl.gameObject.SetActive(true);
-                        skillEffectCtrl.ResetParameter(effectPrefab, (Object)source != (Object)null ? UnitUtility.GetSkinId(source.SoundUnitId, source.SDSkin) : 0, _isShadow);
+                        skillEffectCtrl.ResetParameter(effectPrefab, source != null ? UnitUtility.GetSkinId(source.SoundUnitId, source.SDSkin) : 0, _isShadow);
                         return skillEffectCtrl;
                     }
                 }
-                component = Object.Instantiate<GameObject>(effectPrefab).GetComponent<SkillEffectCtrl>();
+                component = Object.Instantiate(effectPrefab).GetComponent<SkillEffectCtrl>();
                 effect.Add(component);
             }
-            component.ResetParameter(effectPrefab, (Object)source != (Object)null ? UnitUtility.GetSkinId(source.SoundUnitId, source.SDSkin) : 0, _isShadow);
+            component.ResetParameter(effectPrefab, source != null ? UnitUtility.GetSkinId(source.SoundUnitId, source.SDSkin) : 0, _isShadow);
             return component;
         }
 
@@ -98,11 +98,11 @@ namespace Elements.Battle
               for (int index = 0; index < numberEffect.Value.Count; ++index)
                 numberEffect.Value[index].SetActive(false);
             }*/
-            foreach (KeyValuePair<string, List<SkillEffectCtrl>> effect in this.effectDictionary)
+            foreach (KeyValuePair<string, List<SkillEffectCtrl>> effect in effectDictionary)
             {
                 for (int index = 0; index < effect.Value.Count; ++index)
                 {
-                    if ((Object)effect.Value[index] != (Object)null && !(effect.Value[index].IsAura & MMEHPMCNCGF))
+                    if (effect.Value[index] != null && !(effect.Value[index].IsAura & MMEHPMCNCGF))
                         effect.Value[index].SetActive(false);
                 }
             }
@@ -110,7 +110,7 @@ namespace Elements.Battle
 
         public void Release()
         {
-            this.effectDictionary = (Dictionary<string, List<SkillEffectCtrl>>)null;
+            effectDictionary = null;
             //this.numberEffectDictionary = (Dictionary<string, List<DamageEffectCtrlBase>>) null;
         }
 

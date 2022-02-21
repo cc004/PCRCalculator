@@ -50,7 +50,7 @@ namespace Spine.Unity.Modules
 				targetPosition = target.position;
 			}
 			Vector3 a = targetPosition;
-			Vector3 b = base.transform.TransformPoint(centerPoint);
+			Vector3 b = transform.TransformPoint(centerPoint);
 			Vector3 a2 = a - b;
 			if (a2.magnitude > 1f)
 			{
@@ -58,7 +58,7 @@ namespace Spine.Unity.Modules
 			}
 			for (int i = 0; i < eyes.Length; i++)
 			{
-				b = base.transform.TransformPoint(origins[i]);
+				b = transform.TransformPoint(origins[i]);
 				eyes[i].position = Vector3.MoveTowards(eyes[i].position, b + a2 * radius, speed * Time.deltaTime);
 			}
 		}

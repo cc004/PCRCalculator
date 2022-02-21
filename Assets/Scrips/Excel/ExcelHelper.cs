@@ -1,22 +1,26 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Runtime.InteropServices;
-using UnityEngine;
-using UnityEngine.UI;
-using Excel;
+using System.Text.RegularExpressions;
+using Elements;
 using ExcelDataReader;
-using System.Data;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using Newtonsoft0.Json;
+using OfficeOpenXml;
+using OfficeOpenXml.Drawing;
+using OfficeOpenXml.Style;
 using PCRCaculator;
 using PCRCaculator.Guild;
-using System.Text.RegularExpressions;
-using System.Drawing;
-using OfficeOpenXml.Drawing;
-using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
+using FontStyle = System.Drawing.FontStyle;
+using Graphics = System.Drawing.Graphics;
+using UnitData = PCRCaculator.UnitData;
 
 namespace ExcelHelper
 {
@@ -37,13 +41,13 @@ namespace ExcelHelper
 #if UNITY_EDITOR
     public class OutPutExcelEditor
     {
-        [UnityEditor.MenuItem("PCRTools/生成Excel")]
+        [MenuItem("PCRTools/生成Excel")]
         public static void OutPutExcel()
         {
             ExcelHelper.LoadDic();
             ExcelHelper.SaveExcel(1);
         }
-        [UnityEditor.MenuItem("PCRTools/从Excel生成别名json")]
+        [MenuItem("PCRTools/从Excel生成别名json")]
         public static void CreateNicName()
         {
             ExcelHelper.ReadExcelNicName();
@@ -54,9 +58,9 @@ namespace ExcelHelper
 
     public static class ExcelHelper// : MonoBehaviour
     {
-        public static Dictionary<int, PCRCaculator.UnitSkillTimeData> DataDic = new Dictionary<int, PCRCaculator.UnitSkillTimeData>();
+        public static Dictionary<int, UnitSkillTimeData> DataDic = new Dictionary<int, UnitSkillTimeData>();
         public static GuildTimelineData TimelineData;
-        public static List<System.Drawing.Color> stateColors;
+        public static List<Color> stateColors;
         const float DEFAULT_DPI = 96;
         public static void OutputGuildTimeLine(GuildTimelineData timelineData,string defaultName = "")
         {
@@ -66,16 +70,16 @@ namespace ExcelHelper
         }
         private static void AddStateColors()
         {
-            stateColors = new List<System.Drawing.Color>();
-            stateColors.Add(System.Drawing.Color.FromArgb(178,178,178));
-            stateColors.Add(System.Drawing.Color.FromArgb(255,134,134));
-            stateColors.Add(System.Drawing.Color.FromArgb(255,173,95));
-            stateColors.Add(System.Drawing.Color.FromArgb(151,168,255));
-            stateColors.Add(System.Drawing.Color.FromArgb(190,190,190));
-            stateColors.Add(System.Drawing.Color.FromArgb(185,120,100));
-            stateColors.Add(System.Drawing.Color.FromArgb(135,135,135));
-            stateColors.Add(System.Drawing.Color.FromArgb(172,255,167));
-            stateColors.Add(System.Drawing.Color.FromArgb(215, 213, 255));
+            stateColors = new List<Color>();
+            stateColors.Add(Color.FromArgb(178,178,178));
+            stateColors.Add(Color.FromArgb(255,134,134));
+            stateColors.Add(Color.FromArgb(255,173,95));
+            stateColors.Add(Color.FromArgb(151,168,255));
+            stateColors.Add(Color.FromArgb(190,190,190));
+            stateColors.Add(Color.FromArgb(185,120,100));
+            stateColors.Add(Color.FromArgb(135,135,135));
+            stateColors.Add(Color.FromArgb(172,255,167));
+            stateColors.Add(Color.FromArgb(215, 213, 255));
 
         }
         public static void LoadDic()
@@ -90,7 +94,7 @@ namespace ExcelHelper
                     sr.Close();
                     if (jsonStr != "")
                     {
-                        PCRCaculator.UnitSkillTimeData skillTimeData = JsonConvert.DeserializeObject<PCRCaculator.UnitSkillTimeData>(jsonStr);
+                        UnitSkillTimeData skillTimeData = JsonConvert.DeserializeObject<UnitSkillTimeData>(jsonStr);
                         DataDic.Add(skillTimeData.unitId, skillTimeData);
                     }
                 }
@@ -189,12 +193,12 @@ namespace ExcelHelper
                 }
                 catch (IOException e)
                 {
-                    MainManager.Instance.WindowConfigMessage("读取错误，请保证excel文件没有被其他程序占用！", null, null);
+                    MainManager.Instance.WindowConfigMessage("读取错误，请保证excel文件没有被其他程序占用！", null);
                     guildTimelineData = new GuildTimelineData();
                     return false;
                 }
                 //IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
-                using (ExcelDataReader.IExcelDataReader excelReader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream))
+                using (IExcelDataReader excelReader = ExcelReaderFactory.CreateReader(stream))
                 {
                     //var result = excelReader.AsDataSet();
                     //IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
@@ -229,30 +233,30 @@ namespace ExcelHelper
                                     guildTimelineData = JsonConvert.DeserializeObject<GuildTimelineData>(jsonStr);
                                     return true;
                                 }
-                                catch (System.Exception e)
+                                catch (Exception e)
                                 {
-                                    MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message + "\n请手动输入存档数据！", failedAction, null);
+                                    MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message + "\n请手动输入存档数据！", failedAction);
                                 }
                             }
                             else
                             {
-                                MainManager.Instance.WindowConfigMessage("没有数据！\n请手动输入存档数据！", failedAction, null);
+                                MainManager.Instance.WindowConfigMessage("没有数据！\n请手动输入存档数据！", failedAction);
                             }
                         }
                         else
                         {
-                            MainManager.Instance.WindowConfigMessage("未找到savePage页！\n请手动输入存档数据！", failedAction, null);
+                            MainManager.Instance.WindowConfigMessage("未找到savePage页！\n请手动输入存档数据！", failedAction);
                         }
                     }
                     else
                     {
-                        MainManager.Instance.WindowConfigMessage("文件读取失败！\n请手动输入存档数据！", failedAction, null);
+                        MainManager.Instance.WindowConfigMessage("文件读取失败！\n请手动输入存档数据！", failedAction);
                     }
                 }
             }
             else
             {
-                MainManager.Instance.WindowConfigMessage("文件读取失败！\n请手动输入存档数据！", failedAction, null);
+                MainManager.Instance.WindowConfigMessage("文件读取失败！\n请手动输入存档数据！", failedAction);
             }
             guildTimelineData = new GuildTimelineData();
             return false;
@@ -338,7 +342,7 @@ namespace ExcelHelper
                 }
                 if (Application.platform == RuntimePlatform.Android)
                 {
-                    MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n请自行前往查看！", null, null);
+                    MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n请自行前往查看！", null);
                 }
 
 
@@ -384,9 +388,9 @@ namespace ExcelHelper
                 var unitName_cn = MainManager.Instance.UnitName_cn;
                 var skillNameAndDescribe_cn = MainManager.Instance.SkillNameAndDescribe_cn;
                 var skillDataDic = MainManager.Instance.SkillDataDic;
-                string[] execStr = new string[] { "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+                string[] execStr = { "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
                 int i = 2;
-                foreach (PCRCaculator.UnitSkillTimeData timeData in DataDic.Values)
+                foreach (UnitSkillTimeData timeData in DataDic.Values)
                 {
                     worksheet.Cells["A" + i].Value = timeData.unitId;
                     int id = timeData.unitId;
@@ -536,7 +540,7 @@ namespace ExcelHelper
                 foreach(var a in UBList)
                 {
                     worksheet0.MySetValue(currentLineNum, 1, a.UBTime);
-                    int second = (Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime - a.UBTime / 60);
+                    int second = (MyGameCtrl.Instance.tempData.SettingData.limitTime - a.UBTime / 60);
                     if (second >= 60)
                     {
                         second -= 60;
@@ -570,7 +574,7 @@ namespace ExcelHelper
                     r.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                     r.Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
-                    System.Drawing.Color color0 = System.Drawing.Color.FromArgb(lineColor[0], lineColor[1], lineColor[2]);
+                    Color color0 = Color.FromArgb(lineColor[0], lineColor[1], lineColor[2]);
                     r.Style.Border.Top.Color.SetColor(color0) ;
                     r.Style.Border.Bottom.Color.SetColor(color0);
                     r.Style.Border.Left.Color.SetColor(color0);
@@ -628,7 +632,7 @@ namespace ExcelHelper
                 worksheet1.Cells[lineNum,1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet1.Cells[lineNum,1].Value = "BOSS详情";
                 lineNum++;
-                EnemyData enemyData = Elements.MyGameCtrl.Instance.tempData.guildEnemy;
+                EnemyData enemyData = MyGameCtrl.Instance.tempData.guildEnemy;
                 worksheet1.Cells[lineNum, 1].Value = enemyData.unit_id;
                 worksheet1.Cells[lineNum, 2].Value = enemyData.detailData.unit_name;
                 string str = "";
@@ -675,7 +679,7 @@ namespace ExcelHelper
                     {
                         if(UBexecTimeList[i]!=null && count0 < UBexecTimeList[i].Count)
                         {
-                            worksheet1.Cells[lineNum, 1 + i].Value = (Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime - UBexecTimeList[i][count0]/60.0f);
+                            worksheet1.Cells[lineNum, 1 + i].Value = (MyGameCtrl.Instance.tempData.SettingData.limitTime - UBexecTimeList[i][count0]/60.0f);
                             flag = true;
                         }
                     }
@@ -711,7 +715,7 @@ namespace ExcelHelper
                         //int length = Mathf.RoundToInt((exec.currentFrameCount - lastFrameCount) / 60.0f);
                         int endLoc = Mathf.RoundToInt(exec.currentFrameCount / 30.0f)+3;
                         int length = endLoc - currentLoc;
-                        if (length < 1 && exec.changStateFrom == Elements.UnitCtrl.ActionState.SKILL_1)
+                        if (length < 1 && exec.changStateFrom == UnitCtrl.ActionState.SKILL_1)
                         {
                             worksheet2.Cells[lineNum - 1, currentLoc].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             worksheet2.Cells[lineNum - 1, currentLoc].Style.Fill.PatternType = ExcelFillStyle.DarkGray;
@@ -1002,11 +1006,11 @@ namespace ExcelHelper
                 worksheet.Cells[x,y].Value = regex.Replace(describe, "");
                 if (describe.Contains("暴击"))
                 {
-                    worksheet.Cells[x, y].Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(199,203,0));
+                    worksheet.Cells[x, y].Style.Font.Color.SetColor(Color.FromArgb(199,203,0));
                 }
                 if (describe.Contains("MISS"))
                 {
-                    worksheet.Cells[x, y].Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(255, 0, 0));
+                    worksheet.Cells[x, y].Style.Font.Color.SetColor(Color.FromArgb(255, 0, 0));
                 }
 
             }
@@ -1031,7 +1035,7 @@ namespace ExcelHelper
                 ofn.file = ofn.file.Replace("\\", "/");
                 FileInfo info = new FileInfo(ofn.file);
                 FileStream stream = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                ExcelDataReader.IExcelDataReader excelReader = ExcelDataReader.ExcelReaderFactory.CreateOpenXmlReader(stream);
+                IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                 DataSet result = excelReader.AsDataSet();
                 stream.Close();
                 DataTable nameTable = result.Tables["NameData"];
@@ -1064,7 +1068,7 @@ namespace ExcelHelper
             if(blod)
                 worksheet.Cells[posx, posy].Style.Font.Bold = true; //字体大小
             if (fontColor != null && fontColor.Length >= 3)
-                worksheet.Cells[posx, posy].Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(fontColor[0], fontColor[1], fontColor[2]));
+                worksheet.Cells[posx, posy].Style.Font.Color.SetColor(Color.FromArgb(fontColor[0], fontColor[1], fontColor[2]));
             if (centre)
             {
                 worksheet.Cells[posx, posy].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; //对其方式
@@ -1075,7 +1079,7 @@ namespace ExcelHelper
             if (backColor != null&&backColor.Length>=3)
             {
                 worksheet.Cells[posx, posy].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                worksheet.Cells[posx, posy].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(backColor[0], backColor[1], backColor[2]));
+                worksheet.Cells[posx, posy].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(backColor[0], backColor[1], backColor[2]));
             }
         }
         private static void MySetValue(this ExcelWorksheet worksheet, int posx, int posy, int value,
@@ -1085,7 +1089,7 @@ namespace ExcelHelper
             if (blod)
                 worksheet.Cells[posx, posy].Style.Font.Bold = true; //字体大小
             if (fontColor != null && fontColor.Length >= 3)
-                worksheet.Cells[posx, posy].Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(fontColor[0], fontColor[1], fontColor[2]));
+                worksheet.Cells[posx, posy].Style.Font.Color.SetColor(Color.FromArgb(fontColor[0], fontColor[1], fontColor[2]));
             if (centre)
             {
                 worksheet.Cells[posx, posy].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; //对其方式
@@ -1096,13 +1100,13 @@ namespace ExcelHelper
             if (backColor != null && backColor.Length >= 3)
             {
                 worksheet.Cells[posx, posy].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                worksheet.Cells[posx, posy].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(backColor[0], backColor[1], backColor[2]));
+                worksheet.Cells[posx, posy].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(backColor[0], backColor[1], backColor[2]));
             }
         }
 
         public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit, int widthCount,int hightCount)
         {
-            using (var image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
+            using (var image = Image.FromStream(new MemoryStream(imageBytes)))
             {
                 var picture = worksheet.Drawings.AddPicture(rowNum+"0"+columnNum, image);
                 /*int adjustImageWidthInPix = cellColumnWidthInPix;
@@ -1140,7 +1144,7 @@ namespace ExcelHelper
         /// <param name="cellColumnWidthInPix"></param>
         /// <param name="cellRowHeightInPix"></param>
         /// <returns>item1:调整后的图片宽度; item2:调整后的图片高度</returns>
-        private static Tuple<int, int> GetAdjustImageSize(System.Drawing.Image image, int cellColumnWidthInPix, int cellRowHeightInPix)
+        private static Tuple<int, int> GetAdjustImageSize(Image image, int cellColumnWidthInPix, int cellRowHeightInPix)
         {
             int imageWidthInPix = image.Width;
             int imageHeightInPix = image.Height;
@@ -1171,7 +1175,7 @@ namespace ExcelHelper
         private static int GetWidthInPixels(ExcelRange cell)
         {
             double columnWidth = cell.Worksheet.Column(cell.Start.Column).Width;
-            System.Drawing.Font font = new System.Drawing.Font(cell.Style.Font.Name, cell.Style.Font.Size, System.Drawing.FontStyle.Regular);
+            Font font = new Font(cell.Style.Font.Name, cell.Style.Font.Size, FontStyle.Regular);
             double pxBaseline = Math.Round(MeasureString("1234567890", font) / 10);
             return (int)(columnWidth * pxBaseline);
         }
@@ -1184,7 +1188,7 @@ namespace ExcelHelper
         {
             double rowHeight = cell.Worksheet.Row(cell.Start.Row).Height;
             return (int)rowHeight;
-            using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
             {
                 float dpiY = graphics.DpiY;
                 return (int)(rowHeight * (1.0 / DEFAULT_DPI) * dpiY);
@@ -1196,11 +1200,11 @@ namespace ExcelHelper
         /// <param name="s"></param>
         /// <param name="font"></param>
         /// <returns></returns>
-        private static float MeasureString(string s, System.Drawing.Font font)
+        private static float MeasureString(string s, Font font)
         {
-            using (var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+            using (var g = Graphics.FromHwnd(IntPtr.Zero))
             {
-                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                g.TextRenderingHint = TextRenderingHint.AntiAlias;
                 return g.MeasureString(s, font, int.MaxValue, StringFormat.GenericTypographic).Width;
             }
         }

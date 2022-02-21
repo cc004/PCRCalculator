@@ -27,12 +27,12 @@ namespace Elements
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-      System.Action<string> action)
+      Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
+      AppendIsAlreadyExeced(_target.Owner, _num);
       float _energy = 0.0f;
-      switch (this.ActionDetail1)
+      switch (ActionDetail1)
       {
         case 1:
           _energy = _valueDictionary[eValueNumber.VALUE_1];
@@ -44,13 +44,13 @@ namespace Elements
           _energy = (float) ((double) _target.Owner.Energy * (double) _valueDictionary[eValueNumber.VALUE_1] / 100.0) - _target.Owner.Energy;
           break;
       }
-      _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, this.ActionDetail1 == 1, _source, _effectType: this.EffectType,action:action);
+      _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1, _source, _effectType: EffectType,action:action);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + Math.Ceiling((double) this.MasterData.action_value_2 * (double) _level));
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + Math.Ceiling(MasterData.action_value_2 * _level));
     }
   }
 }

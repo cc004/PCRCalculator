@@ -4,8 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Battle;
 
 namespace Elements
 {
@@ -15,7 +16,7 @@ namespace Elements
 
         public UnitCtrl.BuffParamKind BuffParamKind { get; set; }
 
-        public ChangeParameterFieldData.eEffectType EffectType { get; set; }
+        public eEffectType EffectType { get; set; }
 
         public float Value { get; set; }
 
@@ -25,7 +26,7 @@ namespace Elements
 
         public Dictionary<UnitCtrl, int> AlreadyExecedTargetCount { get; set; }
 
-        protected override int getClearedIndex(UnitCtrl _unit) => !this.IsBuff ? _unit.ClearedDebuffFieldIndex : _unit.ClearedBuffFieldIndex;
+        protected override int getClearedIndex(UnitCtrl _unit) => !IsBuff ? _unit.ClearedDebuffFieldIndex : _unit.ClearedBuffFieldIndex;
 
         public override void StartField()
         {
@@ -40,7 +41,7 @@ namespace Elements
                 this.initializeSkillEffect();
                 break;
             }*/
-            PCRCaculator.Battle.BattleUIManager.Instance.StartFieldEffect(this);
+            BattleUIManager.Instance.StartFieldEffect(this);
 
             base.StartField();
         }
@@ -52,42 +53,42 @@ namespace Elements
         public override void OnExit(BasePartsData _parts)
         {
             base.OnExit(_parts);
-            this.AlreadyExecedTargetCount[_parts.Owner]--;
-            if (this.AlreadyExecedTargetCount[_parts.Owner] != 0)
+            AlreadyExecedTargetCount[_parts.Owner]--;
+            if (AlreadyExecedTargetCount[_parts.Owner] != 0)
                 return;
             Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
-            if (_parts.Owner.IsPartsBoss && this.BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (this.BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && this.BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE) && this.BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE)
+            if (_parts.Owner.IsPartsBoss && BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE) && BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE)
             {
                 for (int index = 0; index < _parts.Owner.BossPartsListForBattle.Count; ++index)
-                    dictionary.Add((BasePartsData)_parts.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam((BasePartsData)_parts.Owner.BossPartsListForBattle[index], this.Value, this.ValueType, this.BuffParamKind, !this.IsBuff));
+                    dictionary.Add(_parts.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam(_parts.Owner.BossPartsListForBattle[index], Value, ValueType, BuffParamKind, !IsBuff));
             }
             else
-                dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, this.Value, this.ValueType, this.BuffParamKind, !this.IsBuff));
-            _parts.Owner.EnableBuffParam(this.BuffParamKind, dictionary, false, (UnitCtrl)null, this.IsBuff, false, 90);
+                dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
+            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, false, null, IsBuff, false, 90);
         }
 
         public override void OnEnter(BasePartsData _parts)
         {
             UnitCtrl owner = _parts.Owner;
             base.OnEnter(_parts);
-            if (this.AlreadyExecedTargetCount.ContainsKey(_parts.Owner))
+            if (AlreadyExecedTargetCount.ContainsKey(_parts.Owner))
             {
-                this.AlreadyExecedTargetCount[_parts.Owner]++;
-                if (this.AlreadyExecedTargetCount[_parts.Owner] != 1)
+                AlreadyExecedTargetCount[_parts.Owner]++;
+                if (AlreadyExecedTargetCount[_parts.Owner] != 1)
                     return;
             }
             else
-                this.AlreadyExecedTargetCount.Add(_parts.Owner, 1);
+                AlreadyExecedTargetCount.Add(_parts.Owner, 1);
             Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
-            if (_parts.Owner.IsPartsBoss && this.BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (this.BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && this.BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE) && this.BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE)
+            if (_parts.Owner.IsPartsBoss && BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE) && BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE)
             {
                 for (int index = 0; index < _parts.Owner.BossPartsListForBattle.Count; ++index)
-                    dictionary.Add((BasePartsData)_parts.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam((BasePartsData)_parts.Owner.BossPartsListForBattle[index], this.Value, this.ValueType, this.BuffParamKind, !this.IsBuff));
+                    dictionary.Add(_parts.Owner.BossPartsListForBattle[index], BuffDebuffAction.CalculateBuffDebuffParam(_parts.Owner.BossPartsListForBattle[index], Value, ValueType, BuffParamKind, !IsBuff));
             }
             else
-                dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, this.Value, this.ValueType, this.BuffParamKind, !this.IsBuff));
-            owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.0f, 0, (UnitCtrl)null, true, Elements.eEffectType.COMMON, this.IsBuff, false);
-            owner.EnableBuffParam(this.BuffParamKind, dictionary, true, (UnitCtrl)null, this.IsBuff, false, 90);
+                dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
+            owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.0f, 0, null, true, Elements.eEffectType.COMMON, IsBuff, false);
+            owner.EnableBuffParam(BuffParamKind, dictionary, true, null, IsBuff, false, 90);
         }
 
         public enum eValueType

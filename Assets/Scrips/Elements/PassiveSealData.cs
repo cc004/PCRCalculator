@@ -30,9 +30,9 @@ namespace Elements
     {
       while (true)
       {
-        this.LifeTime -= this.Target.DeltaTimeForPause;
-        if ((double) this.LifeTime >= 0.0)
-          yield return (object) null;
+        LifeTime -= Target.DeltaTimeForPause;
+        if (LifeTime >= 0.0)
+          yield return null;
         else
           break;
       }

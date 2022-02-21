@@ -11,7 +11,7 @@ namespace Spine.Unity
 		public SkeletonRenderer skeletonRenderer;
 
 		[SerializeField]
-		[SpineBone("", "skeletonRenderer", true)]
+		[SpineBone("", "skeletonRenderer")]
 		public string boneName;
 
 		public bool followZPosition = true;
@@ -83,7 +83,7 @@ namespace Spine.Unity
 				skeletonTransform = skeletonRenderer.transform;
 				skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 				skeletonRenderer.OnRebuild += HandleRebuildRenderer;
-				skeletonTransformIsParent = (object)skeletonTransform == base.transform.parent;
+				skeletonTransformIsParent = (object)skeletonTransform == transform.parent;
 				if (!string.IsNullOrEmpty(boneName))
 				{
 					bone = skeletonRenderer.skeleton.FindBone(boneName);
@@ -118,7 +118,7 @@ namespace Spine.Unity
 					return;
 				}
 			}
-			Transform transform = base.transform;
+			Transform transform = this.transform;
 			if (skeletonTransformIsParent)
 			{
 				transform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : transform.localPosition.z);

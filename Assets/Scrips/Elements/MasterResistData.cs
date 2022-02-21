@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-//using Sqlite3Plugin;
 using System.Collections.Generic;
+
+//using Sqlite3Plugin;
 
 namespace Elements
 {
@@ -14,7 +14,7 @@ namespace Elements
   {
     public const string TABLE_NAME = "resist_data";
     //private MasterEnemyDatabase _db;
-    private Dictionary<int, MasterResistData.ResistData> _lazyPrimaryKeyDictionary;
+    private Dictionary<int, ResistData> _lazyPrimaryKeyDictionary;
 
     /*public MasterResistData(MasterEnemyDatabase db)
       : base((AbstractMasterDatabase) db)
@@ -119,159 +119,159 @@ namespace Elements
 
     public class ResistData
     {
-      protected ObscuredInt _resist_status_id;
-      protected ObscuredInt _ailment_1;
-      protected ObscuredInt _ailment_2;
-      protected ObscuredInt _ailment_3;
-      protected ObscuredInt _ailment_4;
-      protected ObscuredInt _ailment_5;
-      protected ObscuredInt _ailment_6;
-      protected ObscuredInt _ailment_7;
-      protected ObscuredInt _ailment_8;
-      protected ObscuredInt _ailment_9;
-      protected ObscuredInt _ailment_10;
-      protected ObscuredInt _ailment_11;
-      protected ObscuredInt _ailment_12;
-      protected ObscuredInt _ailment_13;
-      protected ObscuredInt _ailment_14;
-      protected ObscuredInt _ailment_15;
-      protected ObscuredInt _ailment_16;
-      protected ObscuredInt _ailment_17;
-      protected ObscuredInt _ailment_18;
-      protected ObscuredInt _ailment_19;
-      protected ObscuredInt _ailment_20;
-      protected ObscuredInt _ailment_21;
-      protected ObscuredInt _ailment_22;
-      protected ObscuredInt _ailment_23;
-      protected ObscuredInt _ailment_24;
-      protected ObscuredInt _ailment_25;
-      protected ObscuredInt _ailment_26;
-      protected ObscuredInt _ailment_27;
-      protected ObscuredInt _ailment_28;
-      protected ObscuredInt _ailment_29;
-      protected ObscuredInt _ailment_30;
-      protected ObscuredInt _ailment_31;
-      protected ObscuredInt _ailment_32;
-      protected ObscuredInt _ailment_33;
-      protected ObscuredInt _ailment_34;
-      protected ObscuredInt _ailment_35;
-      protected ObscuredInt _ailment_36;
-      protected ObscuredInt _ailment_37;
-      protected ObscuredInt _ailment_38;
-      protected ObscuredInt _ailment_39;
-      protected ObscuredInt _ailment_40;
-      protected ObscuredInt _ailment_41;
-      protected ObscuredInt _ailment_42;
-      protected ObscuredInt _ailment_43;
-      protected ObscuredInt _ailment_44;
-      protected ObscuredInt _ailment_45;
-      protected ObscuredInt _ailment_46;
-      protected ObscuredInt _ailment_47;
-      protected ObscuredInt _ailment_48;
-      protected ObscuredInt _ailment_49;
-      protected ObscuredInt _ailment_50;
+      protected int _resist_status_id;
+      protected int _ailment_1;
+      protected int _ailment_2;
+      protected int _ailment_3;
+      protected int _ailment_4;
+      protected int _ailment_5;
+      protected int _ailment_6;
+      protected int _ailment_7;
+      protected int _ailment_8;
+      protected int _ailment_9;
+      protected int _ailment_10;
+      protected int _ailment_11;
+      protected int _ailment_12;
+      protected int _ailment_13;
+      protected int _ailment_14;
+      protected int _ailment_15;
+      protected int _ailment_16;
+      protected int _ailment_17;
+      protected int _ailment_18;
+      protected int _ailment_19;
+      protected int _ailment_20;
+      protected int _ailment_21;
+      protected int _ailment_22;
+      protected int _ailment_23;
+      protected int _ailment_24;
+      protected int _ailment_25;
+      protected int _ailment_26;
+      protected int _ailment_27;
+      protected int _ailment_28;
+      protected int _ailment_29;
+      protected int _ailment_30;
+      protected int _ailment_31;
+      protected int _ailment_32;
+      protected int _ailment_33;
+      protected int _ailment_34;
+      protected int _ailment_35;
+      protected int _ailment_36;
+      protected int _ailment_37;
+      protected int _ailment_38;
+      protected int _ailment_39;
+      protected int _ailment_40;
+      protected int _ailment_41;
+      protected int _ailment_42;
+      protected int _ailment_43;
+      protected int _ailment_44;
+      protected int _ailment_45;
+      protected int _ailment_46;
+      protected int _ailment_47;
+      protected int _ailment_48;
+      protected int _ailment_49;
+      protected int _ailment_50;
 
-      public ObscuredInt resist_status_id => this._resist_status_id;
+      public int resist_status_id => _resist_status_id;
 
-      public ObscuredInt ailment_1 => this._ailment_1;
+      public int ailment_1 => _ailment_1;
 
-      public ObscuredInt ailment_2 => this._ailment_2;
+      public int ailment_2 => _ailment_2;
 
-      public ObscuredInt ailment_3 => this._ailment_3;
+      public int ailment_3 => _ailment_3;
 
-      public ObscuredInt ailment_4 => this._ailment_4;
+      public int ailment_4 => _ailment_4;
 
-      public ObscuredInt ailment_5 => this._ailment_5;
+      public int ailment_5 => _ailment_5;
 
-      public ObscuredInt ailment_6 => this._ailment_6;
+      public int ailment_6 => _ailment_6;
 
-      public ObscuredInt ailment_7 => this._ailment_7;
+      public int ailment_7 => _ailment_7;
 
-      public ObscuredInt ailment_8 => this._ailment_8;
+      public int ailment_8 => _ailment_8;
 
-      public ObscuredInt ailment_9 => this._ailment_9;
+      public int ailment_9 => _ailment_9;
 
-      public ObscuredInt ailment_10 => this._ailment_10;
+      public int ailment_10 => _ailment_10;
 
-      public ObscuredInt ailment_11 => this._ailment_11;
+      public int ailment_11 => _ailment_11;
 
-      public ObscuredInt ailment_12 => this._ailment_12;
+      public int ailment_12 => _ailment_12;
 
-      public ObscuredInt ailment_13 => this._ailment_13;
+      public int ailment_13 => _ailment_13;
 
-      public ObscuredInt ailment_14 => this._ailment_14;
+      public int ailment_14 => _ailment_14;
 
-      public ObscuredInt ailment_15 => this._ailment_15;
+      public int ailment_15 => _ailment_15;
 
-      public ObscuredInt ailment_16 => this._ailment_16;
+      public int ailment_16 => _ailment_16;
 
-      public ObscuredInt ailment_17 => this._ailment_17;
+      public int ailment_17 => _ailment_17;
 
-      public ObscuredInt ailment_18 => this._ailment_18;
+      public int ailment_18 => _ailment_18;
 
-      public ObscuredInt ailment_19 => this._ailment_19;
+      public int ailment_19 => _ailment_19;
 
-      public ObscuredInt ailment_20 => this._ailment_20;
+      public int ailment_20 => _ailment_20;
 
-      public ObscuredInt ailment_21 => this._ailment_21;
+      public int ailment_21 => _ailment_21;
 
-      public ObscuredInt ailment_22 => this._ailment_22;
+      public int ailment_22 => _ailment_22;
 
-      public ObscuredInt ailment_23 => this._ailment_23;
+      public int ailment_23 => _ailment_23;
 
-      public ObscuredInt ailment_24 => this._ailment_24;
+      public int ailment_24 => _ailment_24;
 
-      public ObscuredInt ailment_25 => this._ailment_25;
+      public int ailment_25 => _ailment_25;
 
-      public ObscuredInt ailment_26 => this._ailment_26;
+      public int ailment_26 => _ailment_26;
 
-      public ObscuredInt ailment_27 => this._ailment_27;
+      public int ailment_27 => _ailment_27;
 
-      public ObscuredInt ailment_28 => this._ailment_28;
+      public int ailment_28 => _ailment_28;
 
-      public ObscuredInt ailment_29 => this._ailment_29;
+      public int ailment_29 => _ailment_29;
 
-      public ObscuredInt ailment_30 => this._ailment_30;
+      public int ailment_30 => _ailment_30;
 
-      public ObscuredInt ailment_31 => this._ailment_31;
+      public int ailment_31 => _ailment_31;
 
-      public ObscuredInt ailment_32 => this._ailment_32;
+      public int ailment_32 => _ailment_32;
 
-      public ObscuredInt ailment_33 => this._ailment_33;
+      public int ailment_33 => _ailment_33;
 
-      public ObscuredInt ailment_34 => this._ailment_34;
+      public int ailment_34 => _ailment_34;
 
-      public ObscuredInt ailment_35 => this._ailment_35;
+      public int ailment_35 => _ailment_35;
 
-      public ObscuredInt ailment_36 => this._ailment_36;
+      public int ailment_36 => _ailment_36;
 
-      public ObscuredInt ailment_37 => this._ailment_37;
+      public int ailment_37 => _ailment_37;
 
-      public ObscuredInt ailment_38 => this._ailment_38;
+      public int ailment_38 => _ailment_38;
 
-      public ObscuredInt ailment_39 => this._ailment_39;
+      public int ailment_39 => _ailment_39;
 
-      public ObscuredInt ailment_40 => this._ailment_40;
+      public int ailment_40 => _ailment_40;
 
-      public ObscuredInt ailment_41 => this._ailment_41;
+      public int ailment_41 => _ailment_41;
 
-      public ObscuredInt ailment_42 => this._ailment_42;
+      public int ailment_42 => _ailment_42;
 
-      public ObscuredInt ailment_43 => this._ailment_43;
+      public int ailment_43 => _ailment_43;
 
-      public ObscuredInt ailment_44 => this._ailment_44;
+      public int ailment_44 => _ailment_44;
 
-      public ObscuredInt ailment_45 => this._ailment_45;
+      public int ailment_45 => _ailment_45;
 
-      public ObscuredInt ailment_46 => this._ailment_46;
+      public int ailment_46 => _ailment_46;
 
-      public ObscuredInt ailment_47 => this._ailment_47;
+      public int ailment_47 => _ailment_47;
 
-      public ObscuredInt ailment_48 => this._ailment_48;
+      public int ailment_48 => _ailment_48;
 
-      public ObscuredInt ailment_49 => this._ailment_49;
+      public int ailment_49 => _ailment_49;
 
-      public ObscuredInt ailment_50 => this._ailment_50;
+      public int ailment_50 => _ailment_50;
 
       public ResistData(
         int resist_status_id = 0,
@@ -326,115 +326,115 @@ namespace Elements
         int ailment_49 = 0,
         int ailment_50 = 0)
       {
-        this._resist_status_id = (ObscuredInt) resist_status_id;
-        this._ailment_1 = (ObscuredInt) ailment_1;
-        this._ailment_2 = (ObscuredInt) ailment_2;
-        this._ailment_3 = (ObscuredInt) ailment_3;
-        this._ailment_4 = (ObscuredInt) ailment_4;
-        this._ailment_5 = (ObscuredInt) ailment_5;
-        this._ailment_6 = (ObscuredInt) ailment_6;
-        this._ailment_7 = (ObscuredInt) ailment_7;
-        this._ailment_8 = (ObscuredInt) ailment_8;
-        this._ailment_9 = (ObscuredInt) ailment_9;
-        this._ailment_10 = (ObscuredInt) ailment_10;
-        this._ailment_11 = (ObscuredInt) ailment_11;
-        this._ailment_12 = (ObscuredInt) ailment_12;
-        this._ailment_13 = (ObscuredInt) ailment_13;
-        this._ailment_14 = (ObscuredInt) ailment_14;
-        this._ailment_15 = (ObscuredInt) ailment_15;
-        this._ailment_16 = (ObscuredInt) ailment_16;
-        this._ailment_17 = (ObscuredInt) ailment_17;
-        this._ailment_18 = (ObscuredInt) ailment_18;
-        this._ailment_19 = (ObscuredInt) ailment_19;
-        this._ailment_20 = (ObscuredInt) ailment_20;
-        this._ailment_21 = (ObscuredInt) ailment_21;
-        this._ailment_22 = (ObscuredInt) ailment_22;
-        this._ailment_23 = (ObscuredInt) ailment_23;
-        this._ailment_24 = (ObscuredInt) ailment_24;
-        this._ailment_25 = (ObscuredInt) ailment_25;
-        this._ailment_26 = (ObscuredInt) ailment_26;
-        this._ailment_27 = (ObscuredInt) ailment_27;
-        this._ailment_28 = (ObscuredInt) ailment_28;
-        this._ailment_29 = (ObscuredInt) ailment_29;
-        this._ailment_30 = (ObscuredInt) ailment_30;
-        this._ailment_31 = (ObscuredInt) ailment_31;
-        this._ailment_32 = (ObscuredInt) ailment_32;
-        this._ailment_33 = (ObscuredInt) ailment_33;
-        this._ailment_34 = (ObscuredInt) ailment_34;
-        this._ailment_35 = (ObscuredInt) ailment_35;
-        this._ailment_36 = (ObscuredInt) ailment_36;
-        this._ailment_37 = (ObscuredInt) ailment_37;
-        this._ailment_38 = (ObscuredInt) ailment_38;
-        this._ailment_39 = (ObscuredInt) ailment_39;
-        this._ailment_40 = (ObscuredInt) ailment_40;
-        this._ailment_41 = (ObscuredInt) ailment_41;
-        this._ailment_42 = (ObscuredInt) ailment_42;
-        this._ailment_43 = (ObscuredInt) ailment_43;
-        this._ailment_44 = (ObscuredInt) ailment_44;
-        this._ailment_45 = (ObscuredInt) ailment_45;
-        this._ailment_46 = (ObscuredInt) ailment_46;
-        this._ailment_47 = (ObscuredInt) ailment_47;
-        this._ailment_48 = (ObscuredInt) ailment_48;
-        this._ailment_49 = (ObscuredInt) ailment_49;
-        this._ailment_50 = (ObscuredInt) ailment_50;
-        this.SetUp();
+        _resist_status_id = resist_status_id;
+        _ailment_1 = ailment_1;
+        _ailment_2 = ailment_2;
+        _ailment_3 = ailment_3;
+        _ailment_4 = ailment_4;
+        _ailment_5 = ailment_5;
+        _ailment_6 = ailment_6;
+        _ailment_7 = ailment_7;
+        _ailment_8 = ailment_8;
+        _ailment_9 = ailment_9;
+        _ailment_10 = ailment_10;
+        _ailment_11 = ailment_11;
+        _ailment_12 = ailment_12;
+        _ailment_13 = ailment_13;
+        _ailment_14 = ailment_14;
+        _ailment_15 = ailment_15;
+        _ailment_16 = ailment_16;
+        _ailment_17 = ailment_17;
+        _ailment_18 = ailment_18;
+        _ailment_19 = ailment_19;
+        _ailment_20 = ailment_20;
+        _ailment_21 = ailment_21;
+        _ailment_22 = ailment_22;
+        _ailment_23 = ailment_23;
+        _ailment_24 = ailment_24;
+        _ailment_25 = ailment_25;
+        _ailment_26 = ailment_26;
+        _ailment_27 = ailment_27;
+        _ailment_28 = ailment_28;
+        _ailment_29 = ailment_29;
+        _ailment_30 = ailment_30;
+        _ailment_31 = ailment_31;
+        _ailment_32 = ailment_32;
+        _ailment_33 = ailment_33;
+        _ailment_34 = ailment_34;
+        _ailment_35 = ailment_35;
+        _ailment_36 = ailment_36;
+        _ailment_37 = ailment_37;
+        _ailment_38 = ailment_38;
+        _ailment_39 = ailment_39;
+        _ailment_40 = ailment_40;
+        _ailment_41 = ailment_41;
+        _ailment_42 = ailment_42;
+        _ailment_43 = ailment_43;
+        _ailment_44 = ailment_44;
+        _ailment_45 = ailment_45;
+        _ailment_46 = ailment_46;
+        _ailment_47 = ailment_47;
+        _ailment_48 = ailment_48;
+        _ailment_49 = ailment_49;
+        _ailment_50 = ailment_50;
+        SetUp();
       }
 
       public int[] Ailments { get; set; }
 
       public void SetUp()
       {
-        this.Ailments = new int[50];
-        this.Ailments[0] = (int) this.ailment_1;
-        this.Ailments[1] = (int) this.ailment_2;
-        this.Ailments[2] = (int) this.ailment_3;
-        this.Ailments[3] = (int) this.ailment_4;
-        this.Ailments[4] = (int) this.ailment_5;
-        this.Ailments[5] = (int) this.ailment_6;
-        this.Ailments[6] = (int) this.ailment_7;
-        this.Ailments[7] = (int) this.ailment_8;
-        this.Ailments[8] = (int) this.ailment_9;
-        this.Ailments[9] = (int) this.ailment_10;
-        this.Ailments[10] = (int) this.ailment_11;
-        this.Ailments[11] = (int) this.ailment_12;
-        this.Ailments[12] = (int) this.ailment_13;
-        this.Ailments[13] = (int) this.ailment_14;
-        this.Ailments[14] = (int) this.ailment_15;
-        this.Ailments[15] = (int) this.ailment_16;
-        this.Ailments[16] = (int) this.ailment_17;
-        this.Ailments[17] = (int) this.ailment_18;
-        this.Ailments[18] = (int) this.ailment_19;
-        this.Ailments[19] = (int) this.ailment_20;
-        this.Ailments[20] = (int) this.ailment_21;
-        this.Ailments[21] = (int) this.ailment_22;
-        this.Ailments[22] = (int) this.ailment_23;
-        this.Ailments[23] = (int) this.ailment_24;
-        this.Ailments[24] = (int) this.ailment_25;
-        this.Ailments[25] = (int) this.ailment_26;
-        this.Ailments[26] = (int) this.ailment_27;
-        this.Ailments[27] = (int) this.ailment_28;
-        this.Ailments[28] = (int) this.ailment_29;
-        this.Ailments[29] = (int) this.ailment_30;
-        this.Ailments[30] = (int) this.ailment_31;
-        this.Ailments[31] = (int) this.ailment_32;
-        this.Ailments[32] = (int) this.ailment_33;
-        this.Ailments[33] = (int) this.ailment_34;
-        this.Ailments[34] = (int) this.ailment_35;
-        this.Ailments[35] = (int) this.ailment_36;
-        this.Ailments[36] = (int) this.ailment_37;
-        this.Ailments[37] = (int) this.ailment_38;
-        this.Ailments[38] = (int) this.ailment_39;
-        this.Ailments[39] = (int) this.ailment_40;
-        this.Ailments[40] = (int) this.ailment_41;
-        this.Ailments[41] = (int) this.ailment_42;
-        this.Ailments[42] = (int) this.ailment_43;
-        this.Ailments[43] = (int) this.ailment_44;
-        this.Ailments[44] = (int) this.ailment_45;
-        this.Ailments[45] = (int) this.ailment_46;
-        this.Ailments[46] = (int) this.ailment_47;
-        this.Ailments[47] = (int) this.ailment_48;
-        this.Ailments[48] = (int) this.ailment_49;
-        this.Ailments[49] = (int) this.ailment_50;
+        Ailments = new int[50];
+        Ailments[0] = ailment_1;
+        Ailments[1] = ailment_2;
+        Ailments[2] = ailment_3;
+        Ailments[3] = ailment_4;
+        Ailments[4] = ailment_5;
+        Ailments[5] = ailment_6;
+        Ailments[6] = ailment_7;
+        Ailments[7] = ailment_8;
+        Ailments[8] = ailment_9;
+        Ailments[9] = ailment_10;
+        Ailments[10] = ailment_11;
+        Ailments[11] = ailment_12;
+        Ailments[12] = ailment_13;
+        Ailments[13] = ailment_14;
+        Ailments[14] = ailment_15;
+        Ailments[15] = ailment_16;
+        Ailments[16] = ailment_17;
+        Ailments[17] = ailment_18;
+        Ailments[18] = ailment_19;
+        Ailments[19] = ailment_20;
+        Ailments[20] = ailment_21;
+        Ailments[21] = ailment_22;
+        Ailments[22] = ailment_23;
+        Ailments[23] = ailment_24;
+        Ailments[24] = ailment_25;
+        Ailments[25] = ailment_26;
+        Ailments[26] = ailment_27;
+        Ailments[27] = ailment_28;
+        Ailments[28] = ailment_29;
+        Ailments[29] = ailment_30;
+        Ailments[30] = ailment_31;
+        Ailments[31] = ailment_32;
+        Ailments[32] = ailment_33;
+        Ailments[33] = ailment_34;
+        Ailments[34] = ailment_35;
+        Ailments[35] = ailment_36;
+        Ailments[36] = ailment_37;
+        Ailments[37] = ailment_38;
+        Ailments[38] = ailment_39;
+        Ailments[39] = ailment_40;
+        Ailments[40] = ailment_41;
+        Ailments[41] = ailment_42;
+        Ailments[42] = ailment_43;
+        Ailments[43] = ailment_44;
+        Ailments[44] = ailment_45;
+        Ailments[45] = ailment_46;
+        Ailments[46] = ailment_47;
+        Ailments[47] = ailment_48;
+        Ailments[48] = ailment_49;
+        Ailments[49] = ailment_50;
       }
     }
   }

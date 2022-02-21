@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Spine.Unity
 {
@@ -15,7 +16,7 @@ namespace Spine.Unity
 			{
 				if (mesh != null)
 				{
-					UnityEngine.Object.Destroy(mesh);
+					Object.Destroy(mesh);
 				}
 				mesh = null;
 			}

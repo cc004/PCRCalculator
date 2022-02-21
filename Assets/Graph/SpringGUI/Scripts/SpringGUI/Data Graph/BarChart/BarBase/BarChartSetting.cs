@@ -1,7 +1,6 @@
 ﻿
 using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace SpringGUI
 {
@@ -34,6 +33,6 @@ namespace SpringGUI
         [Space(5)]
         [Header("BarChart Color Setting")]
         public ColorStyle ColorStyle = ColorStyle.SingleColorful;
-        public Color[] BarColors = new Color[]{};
+        public Color[] BarColors = {};
     }
 }

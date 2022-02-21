@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Spine.Unity.Modules.AttachmentTools
 {
@@ -257,7 +258,7 @@ namespace Spine.Unity.Modules.AttachmentTools
 		{
 			foreach (Texture2D cachedRegionTextures in CachedRegionTexturesList)
 			{
-				UnityEngine.Object.Destroy(cachedRegionTextures);
+				Object.Destroy(cachedRegionTextures);
 			}
 			CachedRegionTextures.Clear();
 			CachedRegionTexturesList.Clear();
@@ -323,7 +324,7 @@ namespace Spine.Unity.Modules.AttachmentTools
 
 		private static Rect SpineUnityFlipRect(this Rect rect, int textureHeight)
 		{
-			rect.y = (float)textureHeight - rect.y - rect.height;
+			rect.y = textureHeight - rect.y - rect.height;
 			return rect;
 		}
 

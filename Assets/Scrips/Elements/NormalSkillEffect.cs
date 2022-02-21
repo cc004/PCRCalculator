@@ -6,8 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft0.Json;
+using UnityEngine;
 
 namespace Elements
 {
@@ -61,15 +61,15 @@ namespace Elements
 
         public bool AppendAndJudgeAlreadyExeced(UnitCtrl _target)
         {
-            if (!this.AlreadyFireArmExecedData.ContainsKey(_target))
+            if (!AlreadyFireArmExecedData.ContainsKey(_target))
             {
-                this.AlreadyFireArmExecedData.Add(_target, true);
-                this.AlreadyFireArmExecedKeys.Add(_target);
+                AlreadyFireArmExecedData.Add(_target, true);
+                AlreadyFireArmExecedKeys.Add(_target);
                 return false;
             }
-            if (this.AlreadyFireArmExecedData[_target])
+            if (AlreadyFireArmExecedData[_target])
                 return true;
-            this.AlreadyFireArmExecedData[_target] = true;
+            AlreadyFireArmExecedData[_target] = true;
             return false;
         }
     }

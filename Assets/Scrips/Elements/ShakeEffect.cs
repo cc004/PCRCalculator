@@ -6,6 +6,7 @@
 
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Elements
 {
@@ -41,39 +42,39 @@ namespace Elements
     {
       this.skill = skill;
       this.owner = owner;
-      this.timer = 0.0f;
-      this.numberOfShake = 0;
-      this.CurrentAmplutude = this.StartAmplitude;
-      this.CurrentShakePos = Vector3.zero;
-      this.EasingFrequency = new CustomEasing(CustomEasing.eType.outQuad, this.StartFrequency, this.EndFrequency, this.Duration);
-      this.EasingAmplitude = new CustomEasing(CustomEasing.eType.outQuad, this.StartAmplitude, this.EndAmplitude, this.Duration);
+      timer = 0.0f;
+      numberOfShake = 0;
+      CurrentAmplutude = StartAmplitude;
+      CurrentShakePos = Vector3.zero;
+      EasingFrequency = new CustomEasing(CustomEasing.eType.outQuad, StartFrequency, EndFrequency, Duration);
+      EasingAmplitude = new CustomEasing(CustomEasing.eType.outQuad, StartAmplitude, EndAmplitude, Duration);
     }
 
-    public bool GetOwnerPause() => (UnityEngine.Object) this.owner != (UnityEngine.Object) null && this.owner.Pause;
+    public bool GetOwnerPause() => owner != null && owner.Pause;
 
     public bool Simulate(float deltaTime)
     {
-      if (this.ShakeLoopEnd)
+      if (ShakeLoopEnd)
         return true;
-      if (this.skill != null && this.skill.Cancel)
+      if (skill != null && skill.Cancel)
       {
-        this.ResetStart((Skill) null, (UnitCtrl) null);
+        ResetStart(null, null);
         return true;
       }
-      if ((UnityEngine.Object) this.owner != (UnityEngine.Object) null && this.owner.Pause)
+      if (owner != null && owner.Pause)
         return false;
-      this.timer += deltaTime;
-      int numberOfShake1 = this.numberOfShake;
-      float curVal = this.EasingFrequency.GetCurVal(deltaTime);
-      this.CurrentAmplutude = this.EasingAmplitude.GetCurVal(deltaTime);
-      this.numberOfShake = (int) ((double) curVal * 2.0 * 3.14159274101257 * (double) this.timer / 3.14159274101257 / 2.0);
-      int numberOfShake2 = this.numberOfShake;
-      if (numberOfShake1 != numberOfShake2 && this.ShakeType == ShakeType.RANDOM)
-        this.Rotation = UnityEngine.Random.Range(0.0f, 360f);
-      this.CurrentShakePos = new Vector3(this.CurrentAmplutude * Mathf.Sin((float) ((double) curVal * 2.0 * 3.14159274101257) * this.timer) * Mathf.Cos((float) ((double) this.Rotation / 180.0 * 3.14159274101257)), this.CurrentAmplutude * Mathf.Sin((float) ((double) curVal * 2.0 * 3.14159274101257) * this.timer) * Mathf.Sin((float) ((double) this.Rotation / 180.0 * 3.14159274101257)), 0.0f);
-      if ((double) this.timer <= (double) this.Duration)
+      timer += deltaTime;
+      int numberOfShake1 = numberOfShake;
+      float curVal = EasingFrequency.GetCurVal(deltaTime);
+      CurrentAmplutude = EasingAmplitude.GetCurVal(deltaTime);
+      numberOfShake = (int) (curVal * 2.0 * 3.14159274101257 * timer / 3.14159274101257 / 2.0);
+      int numberOfShake2 = numberOfShake;
+      if (numberOfShake1 != numberOfShake2 && ShakeType == ShakeType.RANDOM)
+        Rotation = Random.Range(0.0f, 360f);
+      CurrentShakePos = new Vector3(CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Cos((float) (Rotation / 180.0 * 3.14159274101257)), CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Sin((float) (Rotation / 180.0 * 3.14159274101257)), 0.0f);
+      if (timer <= (double) Duration)
         return false;
-      this.ResetStart((Skill) null, (UnitCtrl) null);
+      ResetStart(null, null);
       return true;
     }
   }

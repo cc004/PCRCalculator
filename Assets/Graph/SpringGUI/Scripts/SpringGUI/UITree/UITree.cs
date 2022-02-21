@@ -7,9 +7,9 @@
 ==========================================*/
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 
 namespace SpringGUI
 {
@@ -52,9 +52,9 @@ namespace SpringGUI
         #region private && public members
         
         [HideInInspector]
-        public UITreeNode TreeRootNode = null; 
-        private Transform m_container = null;
-        private GameObject m_nodePrefab = null;
+        public UITreeNode TreeRootNode; 
+        private Transform m_container;
+        private GameObject m_nodePrefab;
         public GameObject NodePrefab
         {
             get { return m_nodePrefab ?? ( m_nodePrefab = m_container.GetChild(0).gameObject ); }
@@ -78,7 +78,7 @@ namespace SpringGUI
         #region cache pool functions
 
         private readonly List<GameObject> m_pool = new List<GameObject>();
-        private Transform m_poolParent = null;
+        private Transform m_poolParent;
 
         public List<GameObject> pop( List<UITreeData> datas ,int siblingIndex )
         {
@@ -121,7 +121,7 @@ namespace SpringGUI
         
         private GameObject cloneTreeNode( )
         {
-            GameObject result = GameObject.Instantiate(NodePrefab) as GameObject;
+            GameObject result = Instantiate(NodePrefab);
             result.transform.SetParent(m_container);
             return result;
         }

@@ -4,8 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -28,25 +29,25 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = _valueDictionary[eValueNumber.VALUE_3] * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
-            if ((double) BattleManager.Random(0.0f, 1f,
-                new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 14, (float)pp)) < (double) _valueDictionary[eValueNumber.VALUE_3] * (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (BattleManager.Random(0.0f, 1f,
+                    new RandomData(_source, _target.Owner, ActionId, 14, (float)pp)) < (double) _valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
       {
         UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.SILENCE;
-        switch ((SilenceAction.eSilenceType) this.ActionDetail1)
+        switch ((eSilenceType) ActionDetail1)
         {
-          case SilenceAction.eSilenceType.NORMAL:
+          case eSilenceType.NORMAL:
             _abnormalState = UnitCtrl.eAbnormalState.SILENCE;
             break;
-          case SilenceAction.eSilenceType.UB:
+          case eSilenceType.UB:
             _abnormalState = UnitCtrl.eAbnormalState.UB_SILENCE;
             break;
         }
-        this.AppendIsAlreadyExeced(_target.Owner, _num);
-        _target.Owner.SetAbnormalState(_source, _abnormalState, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, (ActionParameter) this, _skill);
+        AppendIsAlreadyExeced(_target.Owner, _num);
+        _target.Owner.SetAbnormalState(_source, _abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill);
       }
       else
       {
-        ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+        ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
         if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
           return;
         if (actionExecedData.TargetPartsNumber == 1)
@@ -59,8 +60,8 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     private enum eSilenceType

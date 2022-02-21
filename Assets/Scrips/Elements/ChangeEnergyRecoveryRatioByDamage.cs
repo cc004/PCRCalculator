@@ -24,7 +24,7 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       Queue<List<int>> intListQueue = new Queue<List<int>>();
-      intListQueue.Enqueue(this.ActionChildrenIndexes);
+      intListQueue.Enqueue(ActionChildrenIndexes);
       while (intListQueue.Count > 0)
       {
         List<int> intList = intListQueue.Dequeue();

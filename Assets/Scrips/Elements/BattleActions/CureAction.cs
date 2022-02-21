@@ -26,13 +26,13 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      _target.Owner.CureAbnormalState((CureAction.eCureActionType) this.ActionDetail1);
+      _target.Owner.CureAbnormalState((eCureActionType) ActionDetail1);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
     }
 
     public enum eCureActionType

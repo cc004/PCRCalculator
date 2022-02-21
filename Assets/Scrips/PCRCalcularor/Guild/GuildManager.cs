@@ -1,12 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System.IO;
-using Newtonsoft0.Json;
-using UnityEngine.UI;
-using System;
-using System.Threading.Tasks;
+using System.Globalization;
 using Elements;
+using Newtonsoft0.Json;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace PCRCaculator.Guild
 {
@@ -56,7 +56,7 @@ namespace PCRCaculator.Guild
         //public List<Sprite> bossSprites;
         //public List<string> bossNames;
         //public List<int> enemy_ids;
-        public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
+        public Dictionary<int, GuildEnemyData> guildEnemyDatas;
         public List<int> specialEnemyDatas;
 
         //public GuildExecTimeSetting GuildExecTimeSetting;
@@ -67,7 +67,7 @@ namespace PCRCaculator.Guild
 
         //private List<AddedPlayerData> addedPlayerDatas;
         private static Dictionary<int, EnemyData> enemyDataDic;
-        private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
+        private Dictionary<int, MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, MasterEnemyMParts.EnemyMParts>();
         public GuildSettingData SettingData => StaticsettingData;
 
         private static GuildSettingData staticsettingData;
@@ -86,7 +86,7 @@ namespace PCRCaculator.Guild
         private bool isEditongUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
         private int currentPage;
-        private bool isInit = false;
+        private bool isInit;
         private int specialEnemyid;
         private int specialInputValue;
 
@@ -136,15 +136,15 @@ namespace PCRCaculator.Guild
             string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
             if (!string.IsNullOrEmpty(guildenemyDatasStr))
             {
-                guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, Guild.GuildEnemyData>>(guildenemyDatasStr);
+                guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, GuildEnemyData>>(guildenemyDatasStr);
             }
             string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
-            enemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>>(enemyMParts);
+            enemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, MasterEnemyMParts.EnemyMParts>>(enemyMParts);
             CreateSpecialEnemyData();
         }
         public void SelectCharacterButton()
         {
-            ChoosePannelManager.Instance.CallChooseBack(3, null);
+            ChoosePannelManager.Instance.CallChooseBack(3);
         }
         public void ShowCharacterDetailPage(int idx)
         {
@@ -155,7 +155,7 @@ namespace PCRCaculator.Guild
             characterDetailPage.SetActive(true);
             UnitData unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
             characterDetailButton.SetButton(unitData);
-            BaseData baseData = PCRCaculator.MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData,false,false);
+            BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
             characterDetailTexts[0].text = "" + baseData.Hp;
             for (int i = 1; i < baseData.dataint.Length; i++)
             {
@@ -239,7 +239,7 @@ namespace PCRCaculator.Guild
         {
             if(!isGuildBoss && dropdowns_ChooseBoss[3].value == 2)
             {
-                int bossid = int.Parse(specialInput.text, System.Globalization.NumberStyles.Any);
+                int bossid = int.Parse(specialInput.text, NumberStyles.Any);
                 if(enemyDataDic.TryGetValue(bossid,out var data))
                 {
                     //string Path = "GuildEnemy/icon_unit_" + data.unit_id;
@@ -256,7 +256,7 @@ namespace PCRCaculator.Guild
             }
             else if (!isGuildBoss)
             {
-                specialInputValue = int.Parse(specialInput.text, System.Globalization.NumberStyles.Any);
+                specialInputValue = int.Parse(specialInput.text, NumberStyles.Any);
             }
         }
         public void FinishChooseBossButton()
@@ -473,7 +473,7 @@ namespace PCRCaculator.Guild
                 }
                 else
                 {
-                    charactersUI[i].SetButton(0, null);
+                    charactersUI[i].SetButton(0);
                     UnitUBTimes[i].SetUBTimes(new List<float>());
                 }
             }
@@ -590,7 +590,7 @@ namespace PCRCaculator.Guild
             }
             catch
             {
-                MainManager.Instance.WindowConfigMessage("输入错误！", null, null);
+                MainManager.Instance.WindowConfigMessage("输入错误！", null);
                 //SettingData.RandomSeed = 666;
 
             }
@@ -614,7 +614,6 @@ namespace PCRCaculator.Guild
             try
             {
                 staticsettingData = SaveManager.Load<GuildSettingData>();
-                return;
             }
             catch
             {
@@ -667,7 +666,7 @@ namespace PCRCaculator.Guild
         public void UBTimeHelpButton()
         {
             string msg = "输入UB时间，可以输入帧（>100）或秒(<90),秒支持小数\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入60表示在倒计时60秒末跳到59秒前释放UB\n勾选自动模式则手动输入的UB时间无效";
-            MainManager.Instance.WindowConfigMessage(msg, null, null);
+            MainManager.Instance.WindowConfigMessage(msg, null);
         }
         public void GuildBossDataEditButton()
         {
@@ -688,7 +687,7 @@ namespace PCRCaculator.Guild
             //MainManager.Instance.WindowConfigMessage("在做了", null, null);
             if (ExcelHelper.ExcelHelper.ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,()=> { LoadDataFromexcel_failed(); }))
             {
-                MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); }, null);
+                MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); });
             }
         }
         private void LoadDataFromexcel_failed()
@@ -701,7 +700,7 @@ namespace PCRCaculator.Guild
         {
             if(guildTimelineData == null || guildTimelineData.playerGroupData == null)
             {
-                MainManager.Instance.WindowConfigMessage("无效的存档！" , null, null);
+                MainManager.Instance.WindowConfigMessage("无效的存档！" , null);
                 return;
             }
             if (guildTimelineData.playerGroupData.UBExecTimeData.Count == 5)
@@ -730,12 +729,12 @@ namespace PCRCaculator.Guild
             {
                 string jsonStr = MainManager.DecryptDES(dataStr);
                 GuildTimelineData guildTimelineData = JsonConvert.DeserializeObject<GuildTimelineData>(jsonStr);
-                MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); }, null);
+                MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); });
 
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
-                MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message, null, null);
+                MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message, null);
 
             }
         }
@@ -786,11 +785,11 @@ namespace PCRCaculator.Guild
         {
             if (currentPage >= 20)
             {
-                MainManager.Instance.WindowConfigMessage("已达上限！", null, null);
+                MainManager.Instance.WindowConfigMessage("已达上限！", null);
             }
             if (SettingData.guildPlayerGroupDatas.Count < currentPage * 5 + 5)
             {
-                MainManager.Instance.WindowConfigMessage("是否增加5组预设阵容？", EnlargePlayerDatas, null);
+                MainManager.Instance.WindowConfigMessage("是否增加5组预设阵容？", EnlargePlayerDatas);
             }
             else
             {
@@ -825,11 +824,11 @@ namespace PCRCaculator.Guild
         }
         public void HideButton()
         {
-            MainManager.Instance.WindowConfigMessage("是否切换到jjc模拟器？", SwitchScene, null);
+            MainManager.Instance.WindowConfigMessage("是否切换到jjc模拟器？", SwitchScene);
         }
         public void SwitchScene()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("BeginScene");
+            SceneManager.LoadScene("BeginScene");
         }
         public void CopyButon()
         {
@@ -864,7 +863,6 @@ namespace PCRCaculator.Guild
             catch
             {
                 MainManager.Instance.WindowMessage("输入的信息无效！");
-                return;
             }
         }
         public void DeleteButton()
@@ -879,7 +877,7 @@ namespace PCRCaculator.Guild
         }
         public void OpenUpdatePage()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Test");
+            SceneManager.LoadScene("Test");
         }
         private void CreateSpecialEnemyData()
         {
@@ -932,7 +930,7 @@ namespace PCRCaculator.Guild
                 yield return new WaitForSecondsRealtime(2);
                 if (MainManager.Instance.AutoCalculatorData.isPaues)
                     continue;
-                else if (MainManager.Instance.AutoCalculatorData.isGoing)
+                if (MainManager.Instance.AutoCalculatorData.isGoing)
                 {                    
                     StartCalButton();
                 }
@@ -949,12 +947,12 @@ namespace PCRCaculator.Guild
 
 
     }
-    [System.Serializable]
+    [Serializable]
     public class GuildEnemyData
     {
         public int[][] enemyIds;
     }
-    [System.Serializable]
+    [Serializable]
     public class GuildSettingData
     {
         /*public List<AddedPlayerData> addedPlayerDatas;
@@ -1117,7 +1115,7 @@ namespace PCRCaculator.Guild
             GetCurrentPlayerGroup().UBExecTimeData = data;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class GuildPlayerGroupData
     {
         public AddedPlayerData playerData;
@@ -1127,7 +1125,7 @@ namespace PCRCaculator.Guild
         public int currentGuildMonth=9;
         public int currentGuildEnemyNum=1;
         public int currentTurn=1;
-        public int selectedEnemyID = 0;
+        public int selectedEnemyID;
         public bool isViolent;
         public bool usePlayerSettingHP;
         public int playerSetingHP;
@@ -1143,9 +1141,7 @@ namespace PCRCaculator.Guild
         public bool isSpecialBoss;
         public int specialBossID;
         public int specialInputValue;
-        public GuildPlayerGroupData()
-        {
-        }
+
         public void Init()
         {
             playerData = new AddedPlayerData();

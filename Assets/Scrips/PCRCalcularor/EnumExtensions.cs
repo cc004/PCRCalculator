@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
-using System.Linq;
-using System;
-using System.Collections;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+
 public static class EnumExtensions
 {
     private static readonly ConcurrentDictionary<Type, Dictionary<long, string>> descDictionary
@@ -57,7 +58,7 @@ public static class EnumExtensions
         var enumType = typeof(TEnum);
         if (enumType.IsEnum && descDictionary.TryGetValue(enumType, out Dictionary<long, string> dic) && dic != null)
         {
-            return dic.ToDictionary(k=>((Enum.TryParse<TEnum>(k.Key.ToString(), true, out TEnum result))?result:result), v => v.Value);
+            return dic.ToDictionary(k=>((Enum.TryParse(k.Key.ToString(), true, out TEnum result))?result:result), v => v.Value);
         }
         return null;
     }
@@ -82,7 +83,7 @@ public static class EnumExtensions
     public static void RegisterDescription<TEnum>()
         where TEnum : struct
     {
-        RegisterDescription<TEnum, System.ComponentModel.DescriptionAttribute>();
+        RegisterDescription<TEnum, DescriptionAttribute>();
     }
     /// <summary>
     /// 注册枚举的描述，注意此处的注册会替换已有的描述枚举（假如有）

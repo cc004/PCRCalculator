@@ -5,8 +5,8 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Elements
 {
@@ -22,8 +22,8 @@ namespace Elements
           Skill _skill)
         {
             base.ReadyAction(_source, _sourceActionController, _skill);
-            for (int index = 0; index < this.HitOnceKeyList.Count; ++index)
-                this.HitOnceDic[this.HitOnceKeyList[index]] = false;
+            for (int index = 0; index < HitOnceKeyList.Count; ++index)
+                HitOnceDic[HitOnceKeyList[index]] = false;
         }
 
         public override void ExecActionOnStart(
@@ -32,10 +32,10 @@ namespace Elements
           UnitActionController _sourceActionController)
         {
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
-            this.parts = (BasePartsData)_source.BossPartsListForBattle.Find((Predicate<PartsData>)(e => e.Index == _skill.ParameterTarget));
-            if (this.targetCurrentHps != null)
+            parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
+            if (targetCurrentHps != null)
                 return;
-            this.targetCurrentHps = new Dictionary<BasePartsData, FloatWithEx>();
+            targetCurrentHps = new Dictionary<BasePartsData, FloatWithEx>();
         }
 
         public override void ExecAction(
@@ -47,62 +47,62 @@ namespace Elements
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-          System.Action<string> action)
+          Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             ++_target.UbAttackHitCount;
-            int actionDetail1 = this.ActionDetail1;
-            if (!this.HitOnceDic.ContainsKey(_target))
+            int actionDetail1 = ActionDetail1;
+            if (!HitOnceDic.ContainsKey(_target))
             {
-                this.HitOnceDic.Add(_target, false);
-                this.HitOnceKeyList.Add(_target);
+                HitOnceDic.Add(_target, false);
+                HitOnceKeyList.Add(_target);
             }
-            if (!this.HitOnceDic[_target])
-                this.targetCurrentHps[_target] = _target.Owner.Hp;
+            if (!HitOnceDic[_target])
+                targetCurrentHps[_target] = _target.Owner.Hp;
             FloatWithEx num = 0;
-            switch ((RatioDamageAction.eTargetParameter)this.ActionDetail1)
+            switch ((eTargetParameter)ActionDetail1)
             {
-                case RatioDamageAction.eTargetParameter.MAX_HP:
-                    num = BattleUtil.FloatToInt(((float)_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100f) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+                case eTargetParameter.MAX_HP:
+                    num = BattleUtil.FloatToInt(((float)_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
-                case RatioDamageAction.eTargetParameter.CURRENT_HP:
-                    num = BattleUtil.FloatToInt((this.targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100f) * this.ActionExecTimeList[_num].Weight / this.ActionWeightSum);
+                case eTargetParameter.CURRENT_HP:
+                    num = BattleUtil.FloatToInt((targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
             }
-            DamageData damageData = new DamageData()
+            DamageData damageData = new DamageData
             {
                 Target = _target,
                 Damage = num,
-                DamageType = (DamageData.eDamageType)this.ActionDetail2,
+                DamageType = (DamageData.eDamageType)ActionDetail2,
                 Source = _source,
                 DamageSoundType = DamageData.eDamageSoundType.HIT,
-                DamegeEffectType = this.ActionExecTimeList[_num].DamageNumType,
-                DamegeNumScale = this.ActionExecTimeList[_num].DamageNumScale,
+                DamegeEffectType = ActionExecTimeList[_num].DamageNumType,
+                DamegeNumScale = ActionExecTimeList[_num].DamageNumScale,
                 IgnoreDef = true,
-                LifeSteal = _source.IsPartsBoss ? this.parts.GetLifeStealZero() : (int)_source.LifeStealZero,
+                LifeSteal = _source.IsPartsBoss ? parts.GetLifeStealZero() : (int)_source.LifeStealZero,
                 ActionType = eActionType.RATIO_DAMAGE
             };
             UnitCtrl owner = _target.Owner;
             DamageData _damageData = damageData;
-            ActionParameter.OnDamageHitDelegate onDamageHit = this.OnDamageHit;
+            OnDamageHitDelegate onDamageHit = OnDamageHit;
             Skill skill = _skill;
-            int actionId = this.ActionId;
-            ActionParameter.OnDamageHitDelegate _onDamageHit = onDamageHit;
+            int actionId = ActionId;
+            OnDamageHitDelegate _onDamageHit = onDamageHit;
             Skill _skill1 = skill;
-            double weight = (double)this.ActionExecTimeList[_num].Weight;
-            double actionWeightSum = (double)this.ActionWeightSum;
-            double energyChargeMultiple = (double)this.EnergyChargeMultiple;
+            double weight = ActionExecTimeList[_num].Weight;
+            double actionWeightSum = ActionWeightSum;
+            double energyChargeMultiple = EnergyChargeMultiple;
             action?.Invoke(((eTargetParameter)ActionDetail1).GetDescription() + "的" + _valueDictionary[eValueNumber.VALUE_1] + "%伤害\n");
             if (owner.SetDamage(_damageData, true, actionId, _onDamageHit, _skill: _skill1, _damageWeight: ((float)weight), _damageWeightSum: ((float)actionWeightSum), _energyChargeMultiple: ((float)energyChargeMultiple),callBack:action) == 0L)
                 return;
-            this.HitOnceDic[_target] = true;
+            HitOnceDic[_target] = true;
 
         }
 
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
         }
 
         private enum eTargetParameter

@@ -5,7 +5,6 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Elements
 {
@@ -17,53 +16,53 @@ namespace Elements
 
     private List<UnitCtrl> keyList { get; set; }
 
-    public void Init(List<UnitCtrl> _blackOutUnitList) => this.blackOutUnitList = _blackOutUnitList;
+    public void Init(List<UnitCtrl> _blackOutUnitList) => blackOutUnitList = _blackOutUnitList;
 
     public override void Update()
     {
-      if (this.blackOutUnitList.Count != 0)
+      if (blackOutUnitList.Count != 0)
       {
-        for (int index = this.blackOutUnitList.Count - 1; index >= 0; --index)
+        for (int index = blackOutUnitList.Count - 1; index >= 0; --index)
         {
-          CoroutineDataBase coroutineDataBase = (CoroutineDataBase) null;
-          if (this.CoroutineDataDictionary.TryGetValue(this.blackOutUnitList[index], out coroutineDataBase))
+          CoroutineDataBase coroutineDataBase = null;
+          if (CoroutineDataDictionary.TryGetValue(blackOutUnitList[index], out coroutineDataBase))
             coroutineDataBase.Update();
-          while (this.blackOutUnitList.Count <= index - 1)
+          while (blackOutUnitList.Count <= index - 1)
             --index;
         }
       }
       else
       {
         base.Update();
-        if (this.keyList == null)
+        if (keyList == null)
         {
-          this.keyList = new List<UnitCtrl>((IEnumerable<UnitCtrl>) this.CoroutineDataDictionary.Keys);
+          keyList = new List<UnitCtrl>(CoroutineDataDictionary.Keys);
         }
         else
         {
-          foreach (UnitCtrl key in this.CoroutineDataDictionary.Keys)
+          foreach (UnitCtrl key in CoroutineDataDictionary.Keys)
           {
-            if (!this.keyList.Contains(key))
-              this.keyList.Add(key);
+            if (!keyList.Contains(key))
+              keyList.Add(key);
           }
-          for (int index = this.keyList.Count - 1; index >= 0; --index)
+          for (int index = keyList.Count - 1; index >= 0; --index)
           {
-            if (!this.CoroutineDataDictionary.ContainsKey(this.keyList[index]))
-              this.keyList.RemoveAt(index);
+            if (!CoroutineDataDictionary.ContainsKey(keyList[index]))
+              keyList.RemoveAt(index);
           }
         }
-        for (int index = 0; index < this.keyList.Count; ++index)
+        for (int index = 0; index < keyList.Count; ++index)
         {
-          UnitCtrl key = this.keyList[index];
-          if ((Object) key == (Object) null)
-            this.coroutineDataRemoveKeyList.Add(key);
+          UnitCtrl key = keyList[index];
+          if (key == null)
+            coroutineDataRemoveKeyList.Add(key);
           else
-            this.CoroutineDataDictionary[key].Update();
+            CoroutineDataDictionary[key].Update();
         }
-        for (int index = this.coroutineDataRemoveKeyList.Count - 1; index >= 0; --index)
+        for (int index = coroutineDataRemoveKeyList.Count - 1; index >= 0; --index)
         {
-          this.CoroutineDataDictionary.Remove(this.coroutineDataRemoveKeyList[index]);
-          this.coroutineDataRemoveKeyList.RemoveAt(index);
+          CoroutineDataDictionary.Remove(coroutineDataRemoveKeyList[index]);
+          coroutineDataRemoveKeyList.RemoveAt(index);
         }
       }
     }

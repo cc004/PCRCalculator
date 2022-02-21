@@ -32,7 +32,7 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      _sourceActionController.AppendCoroutine(this.updateContinuousAttack(_target, _skill, _source, _sourceActionController, this.ActionDetail2 == 0 ? (ActionParameter) null : _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2))), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceActionController.AppendCoroutine(updateContinuousAttack(_target, _skill, _source, _sourceActionController, ActionDetail2 == 0 ? null : _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2)), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private IEnumerator updateContinuousAttack(
@@ -57,7 +57,7 @@ namespace Elements
       while (true)
       {
         time += _source.DeltaTimeForPause;
-        if ((double) time - (double) lastAttacktime > (double) continuousAttackAction.Value[eValueNumber.VALUE_1])
+        if (time - (double) lastAttacktime > (double) continuousAttackAction.Value[eValueNumber.VALUE_1])
         {
           if ((long) _target.Owner.Hp > 0L)
           {
@@ -71,19 +71,19 @@ namespace Elements
         switch (continuousAttackAction.ActionDetail1)
         {
           case 1:
-            if ((double) continuousAttackAction.continuousDeltaHp != 0.0)
+            if (continuousAttackAction.continuousDeltaHp != 0.0)
               break;
             goto label_20;
           case 2:
-            if ((double) time <= (double) continuousAttackAction.Value[eValueNumber.VALUE_3])
+            if (time <= (double) continuousAttackAction.Value[eValueNumber.VALUE_3])
               break;
             goto label_26;
           case 3:
-            if ((double) time <= (double) continuousAttackAction.Value[eValueNumber.VALUE_3])
+            if (time <= (double) continuousAttackAction.Value[eValueNumber.VALUE_3])
               break;
             goto label_29;
         }
-        yield return (object) null;
+        yield return null;
       }
       continuousAttackAction.ContinuousTargetCount--;
       if (continuousAttackAction.ContinuousTargetCount <= 0)
@@ -104,7 +104,7 @@ namespace Elements
       }
       for (int index = 0; index < _skill.LoopEffectObjs.Count; ++index)
       {
-        if ((UnityEngine.Object) _skill.LoopEffectObjs[index] != (UnityEngine.Object) null && (UnityEngine.Object) _skill.LoopEffectObjs[index].GetComponent<SkillEffectCtrl>().SortTarget == (UnityEngine.Object) _target.Owner)
+        if (_skill.LoopEffectObjs[index] != null && _skill.LoopEffectObjs[index].GetComponent<SkillEffectCtrl>().SortTarget == _target.Owner)
         {
           _skill.LoopEffectObjs[index].SetTimeToDie(true);
           _skill.LoopEffectObjs.RemoveAt(index);
@@ -115,14 +115,12 @@ namespace Elements
       {
         yield break;
       }
-      else
-      {
-        long int64 = Convert.ToInt64(continuousAttackAction.ActionId);
-        _target.Owner.ActionsTargetOnMe.Remove(int64 * 100L + continuousAttackAction.IdOffsetDictionary[_target]);
-        continuousAttackAction.battleManager.CallbackActionEnd(int64 * 100L + continuousAttackAction.IdOffsetDictionary[_target]);
-        yield break;
-      }
-label_20:
+
+      long int64 = Convert.ToInt64(continuousAttackAction.ActionId);
+      _target.Owner.ActionsTargetOnMe.Remove(int64 * 100L + continuousAttackAction.IdOffsetDictionary[_target]);
+      continuousAttackAction.battleManager.CallbackActionEnd(int64 * 100L + continuousAttackAction.IdOffsetDictionary[_target]);
+      yield break;
+      label_20:
       yield break;
 label_26:
       yield break;
@@ -148,10 +146,10 @@ label_29:
       {
         if (continuousAttackAction.ActionDetail1 == 1)
         {
-          if ((double) continuousAttackAction.continuousDeltaHp > 0.0)
-            _source.SetDamage(new DamageData()
+          if (continuousAttackAction.continuousDeltaHp > 0.0)
+            _source.SetDamage(new DamageData
             {
-              Target = (BasePartsData) null,
+              Target = null,
               Damage = (long) BattleUtil.FloatToInt(Math.Max(continuousAttackAction.continuousDeltaHp * _source.DeltaTimeForPause, 1f)),
               DamageType = DamageData.eDamageType.NONE,
               ActionType = eActionType.CONTINUOUS_ATTACK
@@ -176,7 +174,7 @@ label_29:
           if (continuousAttackAction.ContinuousTargetCount == 0)
             goto label_18;
         }
-        yield return (object) null;
+        yield return null;
       }
       for (int index = 0; index < skill.LoopEffectObjs.Count; ++index)
         skill.LoopEffectObjs[index].SetTimeToDie(true);
@@ -193,8 +191,8 @@ label_18:
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     public enum eContinuouAttackType

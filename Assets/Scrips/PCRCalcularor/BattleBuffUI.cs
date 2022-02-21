@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using Elements;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 
 namespace PCRCaculator.Battle
 {
@@ -21,18 +21,18 @@ namespace PCRCaculator.Battle
         {
             buffIcon.sprite = icon;
             this.stateIconType = stateIconType;
-            this.detailText.text = detail;
+            detailText.text = detail;
             describe = detail;
             removeThis = remove;
-            StartCoroutine(ReflashTime(stayTime, Elements.BattleHeaderController.CurrentFrameCount));
+            StartCoroutine(ReflashTime(stayTime, BattleHeaderController.CurrentFrameCount));
         }
         public IEnumerator ReflashTime(float stayTime,int startFrame)
         {
             int stayFrame =(int)(stayTime * 60);
             while (true)
             {
-                int currentFrame = Elements.BattleHeaderController.CurrentFrameCount;
-                float v = (float)(currentFrame - startFrame) / (float)stayFrame;
+                int currentFrame = BattleHeaderController.CurrentFrameCount;
+                float v = (currentFrame - startFrame) / (float)stayFrame;
                 if (v <= 1 && v >= 0)
                     timeCountSlider.value = v;
                 else

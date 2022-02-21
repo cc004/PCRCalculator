@@ -1,8 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using PCRCaculator.Guild;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+
 namespace PCRCaculator
 {
     public class ChoosePannelManager : MonoBehaviour
@@ -42,7 +43,7 @@ namespace PCRCaculator
         private Dictionary<int, Toggle> togglePerferbs = new Dictionary<int, Toggle>();
         private bool togglesEnable;
         private AddedPlayerData playerData = new AddedPlayerData();
-        private int selectedCharacterId_setting = 0;
+        private int selectedCharacterId_setting;
 
         private AddedPlayerData playerDataForGuild;
 
@@ -244,11 +245,11 @@ namespace PCRCaculator
             }
             else if(type == 3)
             {
-                Guild.GuildManager.Instance.FinishEditingPlayers(playerData);
+                GuildManager.Instance.FinishEditingPlayers(playerData);
             }
             else if(type == 4)
             {
-                Guild.GuildManager.Instance.FinishEditCharacterdetail();
+                GuildManager.Instance.FinishEditCharacterdetail();
             }
         }
         public void OnToggleSwitched(bool k, int unitid)
@@ -463,7 +464,7 @@ namespace PCRCaculator
                         {
                             b.GetComponent<Toggle>().isOn = true;
                         }
-                        b.GetComponent<Toggle>().onValueChanged.AddListener((bool value) => OnToggleSwitched(value, id0));
+                        b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
                         b.GetComponent<CharacterPageButton>().SetButton(id);
                         togglePerferbs.Add(id0, b.GetComponent<Toggle>());
                         count++;

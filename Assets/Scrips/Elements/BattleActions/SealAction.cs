@@ -4,9 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
 using System.Collections.Generic;
+using Cute;
 using UnityEngine;
 
 namespace Elements
@@ -37,14 +36,14 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
+      AppendIsAlreadyExeced(_target.Owner, _num);
       eStateIconType eStateIconType = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2];
       if (!_target.Owner.SealDictionary.ContainsKey(eStateIconType))
       {
-        SealData sealData = new SealData()
+        SealData sealData = new SealData
         {
           Max = (int) _valueDictionary[eValueNumber.VALUE_1],
-          DisplayCount = this.ActionDetail1 == 1
+          DisplayCount = ActionDetail1 == 1
         };
         _target.Owner.SealDictionary.Add(eStateIconType, sealData);
       }
@@ -55,7 +54,7 @@ namespace Elements
       SealData seal = _target.Owner.SealDictionary[eStateIconType];
       if (seal.GetCurrentCount() == 0 && (double) _valueDictionary[eValueNumber.VALUE_4] > 0.0)
       {
-        _target.Owner.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(_target.Owner, eStateIconType, true);
+        _target.Owner.OnChangeState.Call(_target.Owner, eStateIconType, true);
                 _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType, true, 90, "NaN");
 
                 /*if (this.ActionEffectList.Count != 0)

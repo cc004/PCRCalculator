@@ -4,9 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Elements
 {
@@ -20,7 +18,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.parts = (BasePartsData) _source.BossPartsListForBattle.Find((Predicate<PartsData>) (e => e.Index == _skill.ParameterTarget));
+      parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
     }
 
     public override void ExecAction(
@@ -35,15 +33,15 @@ namespace Elements
     {
       if ((long) _target.Owner.Hp <= 0L)
         return;
-      KnightGuardAction.eValueType eValueType = (KnightGuardAction.eValueType)(float)_valueDictionary[eValueNumber.VALUE_1];
-      float num = _source.IsPartsBoss ? (eValueType == KnightGuardAction.eValueType.PHYSICS ? (float) this.parts.GetAtkZero() : (float) this.parts.GetMagicStrZero()) : (float) (int) (eValueType == KnightGuardAction.eValueType.PHYSICS ? _source.AtkZero : _source.MagicStrZero);
-      KnightGuardData _knightGuardData = new KnightGuardData()
+      eValueType eValueType = (eValueType)(float)_valueDictionary[eValueNumber.VALUE_1];
+      float num = _source.IsPartsBoss ? (eValueType == eValueType.PHYSICS ? parts.GetAtkZero() : (float) parts.GetMagicStrZero()) : (int) (eValueType == eValueType.PHYSICS ? _source.AtkZero : _source.MagicStrZero);
+      KnightGuardData _knightGuardData = new KnightGuardData
       {
-        Value = (int) ((double) _valueDictionary[eValueNumber.VALUE_2] + (double) _valueDictionary[eValueNumber.VALUE_4] * (double) num),
+        Value = (int) ((double) _valueDictionary[eValueNumber.VALUE_2] + (double) _valueDictionary[eValueNumber.VALUE_4] * num),
         LifeTime = _valueDictionary[eValueNumber.VALUE_6],
-        KnightGuardType = (KnightGuardAction.eKnightGuardType) this.ActionDetail1,
-        StateIconType = this.ActionDetail2 == 0 ? eStateIconType.INVALID_VALUE : (eStateIconType) this.ActionDetail2,
-        InhibitHealType = eValueType == KnightGuardAction.eValueType.PHYSICS ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC,
+        KnightGuardType = (eKnightGuardType) ActionDetail1,
+        StateIconType = ActionDetail2 == 0 ? eStateIconType.INVALID_VALUE : (eStateIconType) ActionDetail2,
+        InhibitHealType = eValueType == eValueType.PHYSICS ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC,
         Skill = _skill,
         Source = _source
       };
@@ -60,16 +58,16 @@ namespace Elements
       }*/
       //if (this.ActionEffectList.Count > 1)
       //  _knightGuardData.ExecEffectData = this.ActionEffectList[1];
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
+      AppendIsAlreadyExeced(_target.Owner, _num);
       _target.Owner.AddKnightGuard(_knightGuardData);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
-      this.Value[eValueNumber.VALUE_4] = (float) ((double) this.MasterData.action_value_4 + (double) this.MasterData.action_value_5 * (double) _level);
-      this.Value[eValueNumber.VALUE_6] = (float) ((double) this.MasterData.action_value_6 + (double) this.MasterData.action_value_7 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_4] = (float) (MasterData.action_value_4 + MasterData.action_value_5 * _level);
+      Value[eValueNumber.VALUE_6] = (float) (MasterData.action_value_6 + MasterData.action_value_7 * _level);
     }
 
     public enum eKnightGuardType

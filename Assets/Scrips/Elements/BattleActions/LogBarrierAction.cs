@@ -5,23 +5,24 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System.Collections.Generic;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
   public class LogBarrierAction : ActionParameter
   {
-    private static readonly Dictionary<LogBarrierAction.eDamageCutType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<LogBarrierAction.eDamageCutType, UnitCtrl.eAbnormalState>()
+    private static readonly Dictionary<eDamageCutType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eDamageCutType, UnitCtrl.eAbnormalState>
     {
       {
-        LogBarrierAction.eDamageCutType.ATK,
+        eDamageCutType.ATK,
         UnitCtrl.eAbnormalState.LOG_ATK_BARRIR
       },
       {
-        LogBarrierAction.eDamageCutType.MGC,
+        eDamageCutType.MGC,
         UnitCtrl.eAbnormalState.LOG_MGC_BARRIR
       },
       {
-        LogBarrierAction.eDamageCutType.ALL,
+        eDamageCutType.ALL,
         UnitCtrl.eAbnormalState.LOG_ALL_BARRIR
       }
     };
@@ -42,19 +43,19 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
-      if (PCRCaculator.Guild.GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew != PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.FullBarrier)
+      AppendIsAlreadyExeced(_target.Owner, _num);
+      if (GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew != GuildPlayerGroupData.LogBarrierType.FullBarrier)
             {
                 return;
             }
-      _target.Owner.SetAbnormalState(_source, LogBarrierAction.abnormalStateDic[(LogBarrierAction.eDamageCutType) this.ActionDetail1], _valueDictionary[eValueNumber.VALUE_3], (ActionParameter) this, _skill, _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5]);
+      _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eDamageCutType) ActionDetail1], _valueDictionary[eValueNumber.VALUE_3], this, _skill, _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5]);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     private enum eDamageCutType

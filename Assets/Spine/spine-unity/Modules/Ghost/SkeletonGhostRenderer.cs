@@ -17,18 +17,18 @@ namespace Spine.Unity.Modules
 
 		private void Awake()
 		{
-			meshRenderer = base.gameObject.AddComponent<MeshRenderer>();
-			meshFilter = base.gameObject.AddComponent<MeshFilter>();
+			meshRenderer = gameObject.AddComponent<MeshRenderer>();
+			meshFilter = gameObject.AddComponent<MeshFilter>();
 		}
 
 		public void Initialize(Mesh mesh, Material[] materials, Color32 color, bool additive, float speed, int sortingLayerID, int sortingOrder)
 		{
 			StopAllCoroutines();
-			base.gameObject.SetActive(value: true);
+			gameObject.SetActive(value: true);
 			meshRenderer.sharedMaterials = materials;
 			meshRenderer.sortingLayerID = sortingLayerID;
 			meshRenderer.sortingOrder = sortingOrder;
-			meshFilter.sharedMesh = Object.Instantiate(mesh);
+			meshFilter.sharedMesh = Instantiate(mesh);
 			colors = meshFilter.sharedMesh.colors32;
 			if (color.a + color.r + color.g + color.b > 0)
 			{
@@ -69,8 +69,8 @@ namespace Spine.Unity.Modules
 				}
 				yield return null;
 			}
-			Object.Destroy(meshFilter.sharedMesh);
-			base.gameObject.SetActive(value: false);
+			Destroy(meshFilter.sharedMesh);
+			gameObject.SetActive(value: false);
 		}
 
 		private IEnumerator FadeAdditive()
@@ -96,17 +96,17 @@ namespace Spine.Unity.Modules
 				}
 				yield return null;
 			}
-			Object.Destroy(meshFilter.sharedMesh);
-			base.gameObject.SetActive(value: false);
+			Destroy(meshFilter.sharedMesh);
+			gameObject.SetActive(value: false);
 		}
 
 		public void Cleanup()
 		{
 			if (meshFilter != null && meshFilter.sharedMesh != null)
 			{
-				Object.Destroy(meshFilter.sharedMesh);
+				Destroy(meshFilter.sharedMesh);
 			}
-			Object.Destroy(base.gameObject);
+			Destroy(gameObject);
 		}
 	}
 }

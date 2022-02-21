@@ -6,7 +6,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace Elements.Battle
@@ -20,26 +19,26 @@ namespace Elements.Battle
     private float speedUpRate = 2f;
     private bool isSpeedQuadruple;
 
-    public float BaseTimeScale => this.baseTimeScale;
+    public float BaseTimeScale => baseTimeScale;
 
     public bool SpeedUpFlag
     {
       set
       {
-        this.speedupFlag = value;
+        speedupFlag = value;
         //SoundManager instance = ManagerSingleton<SoundManager>.Instance;
-        if (this.speedupFlag)
+        if (speedupFlag)
         {
-          Time.timeScale = this.speedUpRate * this.BaseTimeScale;
+          Time.timeScale = speedUpRate * BaseTimeScale;
           //instance.SetSoundSpeed(this.speedUpRate * this.BaseTimeScale);
         }
         else
         {
-          Time.timeScale = this.BaseTimeScale;
+          Time.timeScale = BaseTimeScale;
           //instance.SetSoundSpeed(this.BaseTimeScale);
         }
       }
-      get => this.speedupFlag;
+      get => speedupFlag;
     }
 
     public float SpeedUpRate
@@ -60,24 +59,24 @@ namespace Elements.Battle
 
     public bool IsSpeedQuadruple
     {
-      get => this.isSpeedQuadruple;
+      get => isSpeedQuadruple;
       set
       {
-        this.isSpeedQuadruple = value;
-        if (this.isSpeedQuadruple)
-          this.speedUpRate = 4f;
+        isSpeedQuadruple = value;
+        if (isSpeedQuadruple)
+          speedUpRate = 4f;
         else
-          this.speedUpRate = 2f;
+          speedUpRate = 2f;
       }
     }
 
-    public BattleSpeedManager(BattleManager_Time KHPJAFEGFBO) => this.battleManager = KHPJAFEGFBO;
+    public BattleSpeedManager(BattleManager_Time KHPJAFEGFBO) => battleManager = KHPJAFEGFBO;
 
-    public void SetBaseTimeScale(float EGAMDNELEIL) => this.baseTimeScale = EGAMDNELEIL;
+    public void SetBaseTimeScale(float EGAMDNELEIL) => baseTimeScale = EGAMDNELEIL;
 
     //[Conditional("UNITY_STANDALONE_LINUX")]
     //[Conditional("CYG_DEBUG")]
-    public void SetSpeedUpRate(float JKKFBGMONMB) => this.speedUpRate = JKKFBGMONMB;
+    public void SetSpeedUpRate(float JKKFBGMONMB) => speedUpRate = JKKFBGMONMB;
 
     public void StartSlowEffect(
       BattleDefine.SlowEffect SlowEffect,
@@ -86,18 +85,18 @@ namespace Elements.Battle
       bool ignoreFPS)
     {
       if (ignoreFPS)
-        this.battleManager.StartCoroutineIgnoreFps(this.updateSlowEffect(SlowEffect, Owner, Time));
+        battleManager.StartCoroutineIgnoreFps(updateSlowEffect(SlowEffect, Owner, Time));
       else
-        this.battleManager.AppendCoroutine(this.updateSlowEffect(SlowEffect, Owner, Time), ePauseType.VISUAL, Owner);
+        battleManager.AppendCoroutine(updateSlowEffect(SlowEffect, Owner, Time), ePauseType.VISUAL, Owner);
     }
 
     public void StopSlowEffect()
     {
-      List<UnitCtrl> unitCtrlList = new List<UnitCtrl>((IEnumerable<UnitCtrl>) this.slowStopFlagDic.Keys);
+      List<UnitCtrl> unitCtrlList = new List<UnitCtrl>(slowStopFlagDic.Keys);
       for (int index = 0; index < unitCtrlList.Count; ++index)
-        this.slowStopFlagDic[unitCtrlList[index]] = true;
-      this.baseTimeScale = 1f;
-      Time.timeScale = (this.speedupFlag ? this.speedUpRate : 1f) * this.BaseTimeScale;
+        slowStopFlagDic[unitCtrlList[index]] = true;
+      baseTimeScale = 1f;
+      Time.timeScale = (speedupFlag ? speedUpRate : 1f) * BaseTimeScale;
     }
 
     private IEnumerator updateSlowEffect(
@@ -108,56 +107,56 @@ namespace Elements.Battle
       float time = Time;
       while (true)
       {
-        time += this.battleManager.DeltaTime_60fps;
-        if ((double) time <= (double) SlowEffect.StartDelay)
-          yield return (object) null;
+        time += battleManager.DeltaTime_60fps;
+        if (time <= (double) SlowEffect.StartDelay)
+          yield return null;
         else
           break;
       }
-      List<UnitCtrl> unitCtrlList = new List<UnitCtrl>((IEnumerable<UnitCtrl>) this.slowStopFlagDic.Keys);
+      List<UnitCtrl> unitCtrlList = new List<UnitCtrl>(slowStopFlagDic.Keys);
       for (int index = 0; index < unitCtrlList.Count; ++index)
-        this.slowStopFlagDic[unitCtrlList[index]] = true;
-      if (this.slowStopFlagDic.ContainsKey(Source))
-        this.slowStopFlagDic[Source] = false;
+        slowStopFlagDic[unitCtrlList[index]] = true;
+      if (slowStopFlagDic.ContainsKey(Source))
+        slowStopFlagDic[Source] = false;
       else
-        this.slowStopFlagDic.Add(Source, false);
-      SlowEffect.StartEasing = new CustomEasing(CustomEasing.eType.outQuad, this.BaseTimeScale, SlowEffect.To, SlowEffect.StartDuration);
+        slowStopFlagDic.Add(Source, false);
+      SlowEffect.StartEasing = new CustomEasing(CustomEasing.eType.outQuad, BaseTimeScale, SlowEffect.To, SlowEffect.StartDuration);
       SlowEffect.EndEasing = new CustomEasing(CustomEasing.eType.outQuad, SlowEffect.To, 1f, SlowEffect.EndDuration);
       time = 0.0f;
-      while (!this.slowStopFlagDic[Source])
+      while (!slowStopFlagDic[Source])
       {
-        time += this.battleManager.DeltaTime_60fps;
-        this.baseTimeScale = SlowEffect.StartEasing.GetCurVal(this.battleManager.DeltaTime_60fps);
-                UnityEngine.Time.timeScale = (this.speedupFlag ? this.speedUpRate : 1f) * this.BaseTimeScale;
-        if ((double) time <= (double) SlowEffect.StartDuration)
+        time += battleManager.DeltaTime_60fps;
+        baseTimeScale = SlowEffect.StartEasing.GetCurVal(battleManager.DeltaTime_60fps);
+                UnityEngine.Time.timeScale = (speedupFlag ? speedUpRate : 1f) * BaseTimeScale;
+        if (time <= (double) SlowEffect.StartDuration)
         {
-          yield return (object) null;
+          yield return null;
         }
         else
         {
           time = 0.0f;
-          while (!this.slowStopFlagDic[Source])
+          while (!slowStopFlagDic[Source])
           {
-            time += this.battleManager.DeltaTime_60fps;
-            if ((double) time <= (double) SlowEffect.Duration)
+            time += battleManager.DeltaTime_60fps;
+            if (time <= (double) SlowEffect.Duration)
             {
-              yield return (object) null;
+              yield return null;
             }
             else
             {
               time = 0.0f;
-              while (!this.slowStopFlagDic[Source])
+              while (!slowStopFlagDic[Source])
               {
-                time += this.battleManager.DeltaTime_60fps;
-                this.baseTimeScale = SlowEffect.EndEasing.GetCurVal(this.battleManager.DeltaTime_60fps);
-                                UnityEngine.Time.timeScale = (this.speedupFlag ? this.speedUpRate : 1f) * this.BaseTimeScale;
-                if ((double) time <= (double) SlowEffect.EndDuration)
+                time += battleManager.DeltaTime_60fps;
+                baseTimeScale = SlowEffect.EndEasing.GetCurVal(battleManager.DeltaTime_60fps);
+                                UnityEngine.Time.timeScale = (speedupFlag ? speedUpRate : 1f) * BaseTimeScale;
+                if (time <= (double) SlowEffect.EndDuration)
                 {
-                  yield return (object) null;
+                  yield return null;
                 }
                 else
                 {
-                  this.baseTimeScale = 1f;
+                  baseTimeScale = 1f;
                   break;
                 }
               }

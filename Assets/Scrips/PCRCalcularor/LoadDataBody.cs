@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace PCRCaculator.Calc
 {
@@ -180,10 +178,6 @@ namespace PCRCaculator.Calc
         public int power = -1;
         //public SkinData skin_data;
         public Unlock6Item unlock_rarity_6_item = new Unlock6Item(0);
-        public UnitDataS()
-        {
-
-        }
 
 
         public string GetEquipList()
@@ -265,10 +259,6 @@ namespace PCRCaculator.Calc
         public int enhancement_level;
         public int enhancement_pt;
         //public int rank;
-        public EquipSlot()
-        {
-
-        }
 
         public int GetLv()
         {
@@ -314,7 +304,7 @@ namespace PCRCaculator.Calc
     public class UserEquipData
     {
         public int id;
-        public int count;//没用，为0
+        public int count;//没锟矫ｏ拷为0
         public int stock;
     }
 }

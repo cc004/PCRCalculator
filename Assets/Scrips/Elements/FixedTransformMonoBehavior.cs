@@ -10,32 +10,32 @@ namespace Elements
 {
     public class FixedTransformMonoBehavior : MonoBehaviour
     {
-        private FixedTransformMonoBehavior.FixedTransform transformRaw;
+        private FixedTransform transformRaw;
 
-        public void OnAwake() => this.transformRaw = new FixedTransformMonoBehavior.FixedTransform(base.transform);
+        public void OnAwake() => transformRaw = new FixedTransform(base.transform);
 
-        public void OnDestroy() => this.DestructByOnDestroy();
+        public void OnDestroy() => DestructByOnDestroy();
 
-        protected virtual void DestructByOnDestroy() => this.transformRaw = (FixedTransformMonoBehavior.FixedTransform)null;
+        protected virtual void DestructByOnDestroy() => transformRaw = null;
 
-        public new FixedTransformMonoBehavior.FixedTransform transform
+        public new FixedTransform transform
         {
             get
             {
-                if (this.transformRaw == null)
-                    this.transformRaw = new FixedTransformMonoBehavior.FixedTransform(base.transform);
-                if ((Object)this.transformRaw.TargetTransform == (Object)null)
-                    this.transformRaw.TargetTransform = base.transform;
-                return this.transformRaw;
+                if (transformRaw == null)
+                    transformRaw = new FixedTransform(base.transform);
+                if (transformRaw.TargetTransform == null)
+                    transformRaw.TargetTransform = base.transform;
+                return transformRaw;
             }
             set
             {
             }
         }
 
-        public void SetLocalPosX(float _x) => this.transform.SetLocalPosX(_x);
+        public void SetLocalPosX(float _x) => transform.SetLocalPosX(_x);
 
-        public void SetLocalPosY(float _y) => this.transform.SetLocalPosY(_y);
+        public void SetLocalPosY(float _y) => transform.SetLocalPosY(_y);
 
         public class FixedTransform
         {
@@ -45,33 +45,33 @@ namespace Elements
             private int positionY;
             public Transform TargetTransform;
 
-            public FixedTransform(Transform _targetTransform) => this.TargetTransform = _targetTransform;
+            public FixedTransform(Transform _targetTransform) => TargetTransform = _targetTransform;
 
             public Vector3 localPosition
             {
-                get => new Vector3((float)this.positionX*SCALE / DIGID, (float)this.positionY*SCALE / DIGID);
+                get => new Vector3(positionX*SCALE / DIGID, positionY*SCALE / DIGID);
                 set
                 {
-                    this.SetLocalPosX(value.x);
-                    this.SetLocalPosY(value.y);
+                    SetLocalPosX(value.x);
+                    SetLocalPosY(value.y);
                 }
             }
 
             public Vector3 position
             {
-                get => !((Object)this.TargetTransform.parent == (Object)null) ? this.TargetTransform.parent.TransformPoint(this.localPosition) : this.localPosition;
-                set => this.localPosition = (Object)this.TargetTransform.parent == (Object)null ? value : this.TargetTransform.parent.InverseTransformPoint(value);
+                get => !(TargetTransform.parent == null) ? TargetTransform.parent.TransformPoint(localPosition) : localPosition;
+                set => localPosition = TargetTransform.parent == null ? value : TargetTransform.parent.InverseTransformPoint(value);
             }
 
             public Transform parent
             {
-                get => this.TargetTransform.parent;
-                set => this.TargetTransform.parent = value;
+                get => TargetTransform.parent;
+                set => TargetTransform.parent = value;
             }
 
             public Vector3 lossyScale
             {
-                get => this.TargetTransform.lossyScale;
+                get => TargetTransform.lossyScale;
                 private set
                 {
                 }
@@ -79,21 +79,21 @@ namespace Elements
 
             public Vector3 localScale
             {
-                get => this.TargetTransform.localScale;
-                set => this.TargetTransform.localScale = value;
+                get => TargetTransform.localScale;
+                set => TargetTransform.localScale = value;
             }
 
             public void SetLocalPosX(float _x)
             {
-                this.positionX = BattleUtil.FloatToInt(_x * DIGID / SCALE);
-                this.TargetTransform.SetLocalPosX((float)this.positionX / DIGID);
+                positionX = BattleUtil.FloatToInt(_x * DIGID / SCALE);
+                TargetTransform.SetLocalPosX(positionX / DIGID);
             }
 
             public void SetLocalPosY(float _y)
             {
-                this.positionY = (int)((double)_y * DIGID / SCALE);
-                this.TargetTransform.SetLocalPosY((float)this.positionY / DIGID);
-                this.TargetTransform.SetLocalPosZ((float)this.positionY / DIGID);
+                positionY = (int)((double)_y * DIGID / SCALE);
+                TargetTransform.SetLocalPosY(positionY / DIGID);
+                TargetTransform.SetLocalPosZ(positionY / DIGID);
             }
         }
     }

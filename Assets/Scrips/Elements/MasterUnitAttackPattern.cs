@@ -4,9 +4,10 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-//using Sqlite3Plugin;
 using System.Collections.Generic;
+
+using PCRCaculator;
+//using Sqlite3Plugin;
 
 namespace Elements
 {
@@ -95,104 +96,104 @@ namespace Elements
         */
         public class UnitAttackPattern
         {
-            protected ObscuredInt _pattern_id;
-            protected ObscuredInt _unit_id;
-            protected ObscuredInt _loop_start;
-            protected ObscuredInt _loop_end;
-            protected ObscuredInt _atk_pattern_1;
-            protected ObscuredInt _atk_pattern_2;
-            protected ObscuredInt _atk_pattern_3;
-            protected ObscuredInt _atk_pattern_4;
-            protected ObscuredInt _atk_pattern_5;
-            protected ObscuredInt _atk_pattern_6;
-            protected ObscuredInt _atk_pattern_7;
-            protected ObscuredInt _atk_pattern_8;
-            protected ObscuredInt _atk_pattern_9;
-            protected ObscuredInt _atk_pattern_10;
-            protected ObscuredInt _atk_pattern_11;
-            protected ObscuredInt _atk_pattern_12;
-            protected ObscuredInt _atk_pattern_13;
-            protected ObscuredInt _atk_pattern_14;
-            protected ObscuredInt _atk_pattern_15;
-            protected ObscuredInt _atk_pattern_16;
-            protected ObscuredInt _atk_pattern_17;
-            protected ObscuredInt _atk_pattern_18;
-            protected ObscuredInt _atk_pattern_19;
-            protected ObscuredInt _atk_pattern_20;
+            protected int _pattern_id;
+            protected int _unit_id;
+            protected int _loop_start;
+            protected int _loop_end;
+            protected int _atk_pattern_1;
+            protected int _atk_pattern_2;
+            protected int _atk_pattern_3;
+            protected int _atk_pattern_4;
+            protected int _atk_pattern_5;
+            protected int _atk_pattern_6;
+            protected int _atk_pattern_7;
+            protected int _atk_pattern_8;
+            protected int _atk_pattern_9;
+            protected int _atk_pattern_10;
+            protected int _atk_pattern_11;
+            protected int _atk_pattern_12;
+            protected int _atk_pattern_13;
+            protected int _atk_pattern_14;
+            protected int _atk_pattern_15;
+            protected int _atk_pattern_16;
+            protected int _atk_pattern_17;
+            protected int _atk_pattern_18;
+            protected int _atk_pattern_19;
+            protected int _atk_pattern_20;
 
             public List<int> PatternList { get; set; }
 
             public void SetUp()
             {
-                this.PatternList = new List<int>();
-                this.PatternList.Add((int)this.atk_pattern_1);
-                this.PatternList.Add((int)this.atk_pattern_2);
-                this.PatternList.Add((int)this.atk_pattern_3);
-                this.PatternList.Add((int)this.atk_pattern_4);
-                this.PatternList.Add((int)this.atk_pattern_5);
-                this.PatternList.Add((int)this.atk_pattern_6);
-                this.PatternList.Add((int)this.atk_pattern_7);
-                this.PatternList.Add((int)this.atk_pattern_8);
-                this.PatternList.Add((int)this.atk_pattern_9);
-                this.PatternList.Add((int)this.atk_pattern_10);
-                this.PatternList.Add((int)this.atk_pattern_11);
-                this.PatternList.Add((int)this.atk_pattern_12);
-                this.PatternList.Add((int)this.atk_pattern_13);
-                this.PatternList.Add((int)this.atk_pattern_15);
-                this.PatternList.Add((int)this.atk_pattern_16);
-                this.PatternList.Add((int)this.atk_pattern_17);
-                this.PatternList.Add((int)this.atk_pattern_18);
-                this.PatternList.Add((int)this.atk_pattern_19);
-                this.PatternList.Add((int)this.atk_pattern_20);
+                PatternList = new List<int>();
+                PatternList.Add(atk_pattern_1);
+                PatternList.Add(atk_pattern_2);
+                PatternList.Add(atk_pattern_3);
+                PatternList.Add(atk_pattern_4);
+                PatternList.Add(atk_pattern_5);
+                PatternList.Add(atk_pattern_6);
+                PatternList.Add(atk_pattern_7);
+                PatternList.Add(atk_pattern_8);
+                PatternList.Add(atk_pattern_9);
+                PatternList.Add(atk_pattern_10);
+                PatternList.Add(atk_pattern_11);
+                PatternList.Add(atk_pattern_12);
+                PatternList.Add(atk_pattern_13);
+                PatternList.Add(atk_pattern_15);
+                PatternList.Add(atk_pattern_16);
+                PatternList.Add(atk_pattern_17);
+                PatternList.Add(atk_pattern_18);
+                PatternList.Add(atk_pattern_19);
+                PatternList.Add(atk_pattern_20);
             }
 
-            public ObscuredInt pattern_id => this._pattern_id;
+            public int pattern_id => _pattern_id;
 
-            public ObscuredInt unit_id => this._unit_id;
+            public int unit_id => _unit_id;
 
-            public ObscuredInt loop_start => this._loop_start;
+            public int loop_start => _loop_start;
 
-            public ObscuredInt loop_end => this._loop_end;
+            public int loop_end => _loop_end;
 
-            public ObscuredInt atk_pattern_1 => this._atk_pattern_1;
+            public int atk_pattern_1 => _atk_pattern_1;
 
-            public ObscuredInt atk_pattern_2 => this._atk_pattern_2;
+            public int atk_pattern_2 => _atk_pattern_2;
 
-            public ObscuredInt atk_pattern_3 => this._atk_pattern_3;
+            public int atk_pattern_3 => _atk_pattern_3;
 
-            public ObscuredInt atk_pattern_4 => this._atk_pattern_4;
+            public int atk_pattern_4 => _atk_pattern_4;
 
-            public ObscuredInt atk_pattern_5 => this._atk_pattern_5;
+            public int atk_pattern_5 => _atk_pattern_5;
 
-            public ObscuredInt atk_pattern_6 => this._atk_pattern_6;
+            public int atk_pattern_6 => _atk_pattern_6;
 
-            public ObscuredInt atk_pattern_7 => this._atk_pattern_7;
+            public int atk_pattern_7 => _atk_pattern_7;
 
-            public ObscuredInt atk_pattern_8 => this._atk_pattern_8;
+            public int atk_pattern_8 => _atk_pattern_8;
 
-            public ObscuredInt atk_pattern_9 => this._atk_pattern_9;
+            public int atk_pattern_9 => _atk_pattern_9;
 
-            public ObscuredInt atk_pattern_10 => this._atk_pattern_10;
+            public int atk_pattern_10 => _atk_pattern_10;
 
-            public ObscuredInt atk_pattern_11 => this._atk_pattern_11;
+            public int atk_pattern_11 => _atk_pattern_11;
 
-            public ObscuredInt atk_pattern_12 => this._atk_pattern_12;
+            public int atk_pattern_12 => _atk_pattern_12;
 
-            public ObscuredInt atk_pattern_13 => this._atk_pattern_13;
+            public int atk_pattern_13 => _atk_pattern_13;
 
-            public ObscuredInt atk_pattern_14 => this._atk_pattern_14;
+            public int atk_pattern_14 => _atk_pattern_14;
 
-            public ObscuredInt atk_pattern_15 => this._atk_pattern_15;
+            public int atk_pattern_15 => _atk_pattern_15;
 
-            public ObscuredInt atk_pattern_16 => this._atk_pattern_16;
+            public int atk_pattern_16 => _atk_pattern_16;
 
-            public ObscuredInt atk_pattern_17 => this._atk_pattern_17;
+            public int atk_pattern_17 => _atk_pattern_17;
 
-            public ObscuredInt atk_pattern_18 => this._atk_pattern_18;
+            public int atk_pattern_18 => _atk_pattern_18;
 
-            public ObscuredInt atk_pattern_19 => this._atk_pattern_19;
+            public int atk_pattern_19 => _atk_pattern_19;
 
-            public ObscuredInt atk_pattern_20 => this._atk_pattern_20;
+            public int atk_pattern_20 => _atk_pattern_20;
 
             public UnitAttackPattern(
               int pattern_id = 0,
@@ -220,88 +221,88 @@ namespace Elements
               int atk_pattern_19 = 0,
               int atk_pattern_20 = 0)
             {
-                this._pattern_id = (ObscuredInt)pattern_id;
-                this._unit_id = (ObscuredInt)unit_id;
-                this._loop_start = (ObscuredInt)loop_start;
-                this._loop_end = (ObscuredInt)loop_end;
-                this._atk_pattern_1 = (ObscuredInt)atk_pattern_1;
-                this._atk_pattern_2 = (ObscuredInt)atk_pattern_2;
-                this._atk_pattern_3 = (ObscuredInt)atk_pattern_3;
-                this._atk_pattern_4 = (ObscuredInt)atk_pattern_4;
-                this._atk_pattern_5 = (ObscuredInt)atk_pattern_5;
-                this._atk_pattern_6 = (ObscuredInt)atk_pattern_6;
-                this._atk_pattern_7 = (ObscuredInt)atk_pattern_7;
-                this._atk_pattern_8 = (ObscuredInt)atk_pattern_8;
-                this._atk_pattern_9 = (ObscuredInt)atk_pattern_9;
-                this._atk_pattern_10 = (ObscuredInt)atk_pattern_10;
-                this._atk_pattern_11 = (ObscuredInt)atk_pattern_11;
-                this._atk_pattern_12 = (ObscuredInt)atk_pattern_12;
-                this._atk_pattern_13 = (ObscuredInt)atk_pattern_13;
-                this._atk_pattern_14 = (ObscuredInt)atk_pattern_14;
-                this._atk_pattern_15 = (ObscuredInt)atk_pattern_15;
-                this._atk_pattern_16 = (ObscuredInt)atk_pattern_16;
-                this._atk_pattern_17 = (ObscuredInt)atk_pattern_17;
-                this._atk_pattern_18 = (ObscuredInt)atk_pattern_18;
-                this._atk_pattern_19 = (ObscuredInt)atk_pattern_19;
-                this._atk_pattern_20 = (ObscuredInt)atk_pattern_20;
-                this.SetUp();
+                _pattern_id = pattern_id;
+                _unit_id = unit_id;
+                _loop_start = loop_start;
+                _loop_end = loop_end;
+                _atk_pattern_1 = atk_pattern_1;
+                _atk_pattern_2 = atk_pattern_2;
+                _atk_pattern_3 = atk_pattern_3;
+                _atk_pattern_4 = atk_pattern_4;
+                _atk_pattern_5 = atk_pattern_5;
+                _atk_pattern_6 = atk_pattern_6;
+                _atk_pattern_7 = atk_pattern_7;
+                _atk_pattern_8 = atk_pattern_8;
+                _atk_pattern_9 = atk_pattern_9;
+                _atk_pattern_10 = atk_pattern_10;
+                _atk_pattern_11 = atk_pattern_11;
+                _atk_pattern_12 = atk_pattern_12;
+                _atk_pattern_13 = atk_pattern_13;
+                _atk_pattern_14 = atk_pattern_14;
+                _atk_pattern_15 = atk_pattern_15;
+                _atk_pattern_16 = atk_pattern_16;
+                _atk_pattern_17 = atk_pattern_17;
+                _atk_pattern_18 = atk_pattern_18;
+                _atk_pattern_19 = atk_pattern_19;
+                _atk_pattern_20 = atk_pattern_20;
+                SetUp();
             }
-            public UnitAttackPattern(int unitid,PCRCaculator.UnitSkillData data)
+            public UnitAttackPattern(int unitid,UnitSkillData data)
             {
-                this._pattern_id = (ObscuredInt)unitid*100+1;
-                this._unit_id = (ObscuredInt)unitid;
-                this._loop_start = (ObscuredInt)data.loopStart;
-                this._loop_end = (ObscuredInt)data.loopEnd;
-                this._atk_pattern_1 = (ObscuredInt)data.atkPatterns[0];
-                this._atk_pattern_2 = (ObscuredInt)data.atkPatterns[1];
-                this._atk_pattern_3 = (ObscuredInt)data.atkPatterns[2];
-                this._atk_pattern_4 = (ObscuredInt)data.atkPatterns[3];
-                this._atk_pattern_5 = (ObscuredInt)data.atkPatterns[4];
-                this._atk_pattern_6 = (ObscuredInt)data.atkPatterns[5];
-                this._atk_pattern_7 = (ObscuredInt)data.atkPatterns[6];
-                this._atk_pattern_8 = (ObscuredInt)data.atkPatterns[7];
-                this._atk_pattern_9 = (ObscuredInt)data.atkPatterns[8];
-                this._atk_pattern_10 = (ObscuredInt)data.atkPatterns[9];
-                this._atk_pattern_11 = (ObscuredInt)data.atkPatterns[10];
-                this._atk_pattern_12 = (ObscuredInt)data.atkPatterns[11];
-                this._atk_pattern_13 = (ObscuredInt)data.atkPatterns[12];
-                this._atk_pattern_14 = (ObscuredInt)data.atkPatterns[13];
-                this._atk_pattern_15 = (ObscuredInt)data.atkPatterns[14];
-                this._atk_pattern_16 = (ObscuredInt)data.atkPatterns[15];
-                this._atk_pattern_17 = (ObscuredInt)data.atkPatterns[16];
-                this._atk_pattern_18 = (ObscuredInt)data.atkPatterns[17];
-                this._atk_pattern_19 = (ObscuredInt)data.atkPatterns[18];
-                this._atk_pattern_20 = (ObscuredInt)data.atkPatterns[19];
-                this.SetUp();
+                _pattern_id = (int)unitid*100+1;
+                _unit_id = unitid;
+                _loop_start = data.loopStart;
+                _loop_end = data.loopEnd;
+                _atk_pattern_1 = data.atkPatterns[0];
+                _atk_pattern_2 = data.atkPatterns[1];
+                _atk_pattern_3 = data.atkPatterns[2];
+                _atk_pattern_4 = data.atkPatterns[3];
+                _atk_pattern_5 = data.atkPatterns[4];
+                _atk_pattern_6 = data.atkPatterns[5];
+                _atk_pattern_7 = data.atkPatterns[6];
+                _atk_pattern_8 = data.atkPatterns[7];
+                _atk_pattern_9 = data.atkPatterns[8];
+                _atk_pattern_10 = data.atkPatterns[9];
+                _atk_pattern_11 = data.atkPatterns[10];
+                _atk_pattern_12 = data.atkPatterns[11];
+                _atk_pattern_13 = data.atkPatterns[12];
+                _atk_pattern_14 = data.atkPatterns[13];
+                _atk_pattern_15 = data.atkPatterns[14];
+                _atk_pattern_16 = data.atkPatterns[15];
+                _atk_pattern_17 = data.atkPatterns[16];
+                _atk_pattern_18 = data.atkPatterns[17];
+                _atk_pattern_19 = data.atkPatterns[18];
+                _atk_pattern_20 = data.atkPatterns[19];
+                SetUp();
 
             }
             public UnitAttackPattern(PCRCaculator.UnitAttackPattern data)
             {
-                this._pattern_id = (ObscuredInt)data.pattern_id;
-                this._unit_id = (ObscuredInt)data.unit_id;
-                this._loop_start = (ObscuredInt)data.loop_start;
-                this._loop_end = (ObscuredInt)data.loop_end;
-                this._atk_pattern_1 = (ObscuredInt)data.atk_patterns[0];
-                this._atk_pattern_2 = (ObscuredInt)data.atk_patterns[1];
-                this._atk_pattern_3 = (ObscuredInt)data.atk_patterns[2];
-                this._atk_pattern_4 = (ObscuredInt)data.atk_patterns[3];
-                this._atk_pattern_5 = (ObscuredInt)data.atk_patterns[4];
-                this._atk_pattern_6 = (ObscuredInt)data.atk_patterns[5];
-                this._atk_pattern_7 = (ObscuredInt)data.atk_patterns[6];
-                this._atk_pattern_8 = (ObscuredInt)data.atk_patterns[7];
-                this._atk_pattern_9 = (ObscuredInt)data.atk_patterns[8];
-                this._atk_pattern_10 = (ObscuredInt)data.atk_patterns[9];
-                this._atk_pattern_11 = (ObscuredInt)data.atk_patterns[10];
-                this._atk_pattern_12 = (ObscuredInt)data.atk_patterns[11];
-                this._atk_pattern_13 = (ObscuredInt)data.atk_patterns[12];
-                this._atk_pattern_14 = (ObscuredInt)data.atk_patterns[13];
-                this._atk_pattern_15 = (ObscuredInt)data.atk_patterns[14];
-                this._atk_pattern_16 = (ObscuredInt)data.atk_patterns[15];
-                this._atk_pattern_17 = (ObscuredInt)data.atk_patterns[16];
-                this._atk_pattern_18 = (ObscuredInt)data.atk_patterns[17];
-                this._atk_pattern_19 = (ObscuredInt)data.atk_patterns[18];
-                this._atk_pattern_20 = (ObscuredInt)data.atk_patterns[19];
-                this.SetUp();
+                _pattern_id = data.pattern_id;
+                _unit_id = data.unit_id;
+                _loop_start = data.loop_start;
+                _loop_end = data.loop_end;
+                _atk_pattern_1 = data.atk_patterns[0];
+                _atk_pattern_2 = data.atk_patterns[1];
+                _atk_pattern_3 = data.atk_patterns[2];
+                _atk_pattern_4 = data.atk_patterns[3];
+                _atk_pattern_5 = data.atk_patterns[4];
+                _atk_pattern_6 = data.atk_patterns[5];
+                _atk_pattern_7 = data.atk_patterns[6];
+                _atk_pattern_8 = data.atk_patterns[7];
+                _atk_pattern_9 = data.atk_patterns[8];
+                _atk_pattern_10 = data.atk_patterns[9];
+                _atk_pattern_11 = data.atk_patterns[10];
+                _atk_pattern_12 = data.atk_patterns[11];
+                _atk_pattern_13 = data.atk_patterns[12];
+                _atk_pattern_14 = data.atk_patterns[13];
+                _atk_pattern_15 = data.atk_patterns[14];
+                _atk_pattern_16 = data.atk_patterns[15];
+                _atk_pattern_17 = data.atk_patterns[16];
+                _atk_pattern_18 = data.atk_patterns[17];
+                _atk_pattern_19 = data.atk_patterns[18];
+                _atk_pattern_20 = data.atk_patterns[19];
+                SetUp();
 
             }
 

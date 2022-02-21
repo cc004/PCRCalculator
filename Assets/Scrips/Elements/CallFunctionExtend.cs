@@ -72,7 +72,7 @@ namespace Cute
       T2 IDAFJHFJKOL,
       T3 ADIFIOLCOPN) => GJOLOFLPBGH == null ? default (TR) : GJOLOFLPBGH(JEOCPILJNAD, IDAFJHFJKOL, ADIFIOLCOPN);
 
-    public static TR[] GetAllFuncCallResults<TR>(this Func<TR> GJOLOFLPBGH) => GJOLOFLPBGH == null ? new TR[0] : CallFunctionExtend.CallAllFunc<TR>((Delegate) GJOLOFLPBGH, (Func<Delegate, TR>) (ABCBPPLJGML => ((Func<TR>) ABCBPPLJGML)()));
+    public static TR[] GetAllFuncCallResults<TR>(this Func<TR> GJOLOFLPBGH) => GJOLOFLPBGH == null ? new TR[0] : CallAllFunc(GJOLOFLPBGH, ABCBPPLJGML => ((Func<TR>) ABCBPPLJGML)());
 
     /*public static TR[] GetAllFuncCallResults<T1, TR>(this Func<T1, TR> GJOLOFLPBGH, T1 JEOCPILJNAD) => GJOLOFLPBGH == null ? new TR[0] : PEOJMLFEHPE.CallAllFunc<TR>((Delegate) GJOLOFLPBGH, new Func<Delegate, TR>(new PEOJMLFEHPE.MBCJLGKDOCC<T1, TR>()
     {

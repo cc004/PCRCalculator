@@ -4,9 +4,9 @@ namespace Spine.Unity
 	{
 		public SpineSkin(string startsWith = "", string dataField = "", bool includeNone = true)
 		{
-			base.startsWith = startsWith;
-			base.dataField = dataField;
-			base.includeNone = includeNone;
+			this.startsWith = startsWith;
+			this.dataField = dataField;
+			this.includeNone = includeNone;
 		}
 	}
 }

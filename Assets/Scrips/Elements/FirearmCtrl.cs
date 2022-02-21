@@ -4,10 +4,10 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cute;
 using UnityEngine;
 
 namespace Elements
@@ -69,19 +69,19 @@ namespace Elements
 
         protected override void onDestroy()
         {
-            this.FireTarget = (BasePartsData)null;
-            this.SkillHitEffects = (List<NormalSkillEffect>)null;
-            this.EndActions = (List<ActionParameter>)null;
-            this.Skill = (Skill)null;
-            this.OnHitAction = (Action<FirearmCtrl>)null;
-            this.ShakeEffects = (List<ShakeEffect>)null;
-            this.easingX = (CustomEasing)null;
-            this.easingUpY = (CustomEasing)null;
-            this.easingDownY = (CustomEasing)null;
-            this.easingUpRotate = (CustomEasing)null;
-            this.easingDownRotate = (CustomEasing)null;
-            this.owner = (UnitCtrl)null;
-            this.onCowHit = (Action)null;
+            FireTarget = null;
+            SkillHitEffects = null;
+            EndActions = null;
+            Skill = null;
+            OnHitAction = null;
+            ShakeEffects = null;
+            easingX = null;
+            easingUpY = null;
+            easingDownY = null;
+            easingUpRotate = null;
+            easingDownRotate = null;
+            owner = null;
+            onCowHit = null;
         }
 
         protected virtual Vector3 getHeadBonePos(BasePartsData _target) => _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
@@ -104,50 +104,50 @@ namespace Elements
           List<ShakeEffect> _shakes,
           eTargetBone _targetBone)
         {
-            this.ShakeEffects = _shakes;
-            this.IsAbsolute = _isAbsolute;
-            this.Skill = _skill;
+            ShakeEffects = _shakes;
+            IsAbsolute = _isAbsolute;
+            Skill = _skill;
             if (_isAbsolute)
             {
-                this.TargetPos = _targetPosition;
+                TargetPos = _targetPosition;
             }
             else
             {
                 switch (_targetBone)
                 {
                     case eTargetBone.BOTTOM:
-                        this.TargetPos = _target.GetBottomTransformPosition();
+                        TargetPos = _target.GetBottomTransformPosition();
                         break;
                     case eTargetBone.HEAD:
-                        this.TargetPos = this.getHeadBonePos(_target);
+                        TargetPos = getHeadBonePos(_target);
                         break;
                     case eTargetBone.CENTER:
                     case eTargetBone.FIXED_CENETER:
-                        this.TargetPos = _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
+                        TargetPos = _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
                         break;
                 }
             }
-            this.FireTarget = _target;
+            FireTarget = _target;
             _target.Owner.FirearmCtrlsOnMe.Add(this);
-            this.EndActions = _actions;
-            this.SkillHitEffects = _skillEffect;
-            this.owner = _owner;
-            this.setInitialPosition();
-            this.initMoveType(_height, _owner);
-            this.battleManager.AppendCoroutine(this.updatePosition(Vector3.Distance(this.TargetPos, this.initialPosistion) + 1f), ePauseType.SYSTEM, _hasBlackOutTime ? _owner : (UnitCtrl)null);
-            this.battleManager.AppendEffect((SkillEffectCtrl)this, _hasBlackOutTime ? _owner : (UnitCtrl)null, false);
+            EndActions = _actions;
+            SkillHitEffects = _skillEffect;
+            owner = _owner;
+            setInitialPosition();
+            initMoveType(_height, _owner);
+            battleManager.AppendCoroutine(updatePosition(Vector3.Distance(TargetPos, initialPosistion) + 1f), ePauseType.SYSTEM, _hasBlackOutTime ? _owner : null);
+            battleManager.AppendEffect(this, _hasBlackOutTime ? _owner : null);
         }
 
-        protected virtual void setInitialPosition() => this.initialPosistion = this.transform.position;
+        protected virtual void setInitialPosition() => initialPosistion = transform.position;
 
-        protected virtual void Awake() => this.isRepeat = true;
+        protected virtual void Awake() => isRepeat = true;
 
         private void initMoveType(float _height, UnitCtrl _owner)
         {
-            switch (this.MoveType)
+            switch (MoveType)
             {
                 case eMoveTypes.LINEAR:
-                    Vector3 toDirection = this.TargetPos - this.transform.position;
+                    Vector3 toDirection = TargetPos - transform.position;
                     toDirection.Normalize();
                     //this.speed = this.MoveRate * toDirection;
                     //this.speed = this.MoveRate * toDirection*SPEED_FIX;
@@ -159,23 +159,23 @@ namespace Elements
                     break;
                 case eMoveTypes.PARABORIC:
                 case eMoveTypes.PARABORIC_ROTATE:
-                    float durationTime = this.duration / 2f;
-                    this.easingUpY = new CustomEasing(CustomEasing.eType.outCubic, this.transform.position.y, this.transform.position.y + _height, durationTime);
-                    this.easingDownY = new CustomEasing(CustomEasing.eType.inQuad, this.transform.position.y + _height, this.TargetPos.y, durationTime);
-                    this.easingX = new CustomEasing(CustomEasing.eType.linear, this.transform.position.x, this.TargetPos.x, this.duration);
+                    float durationTime = duration / 2f;
+                    easingUpY = new CustomEasing(CustomEasing.eType.outCubic, transform.position.y, transform.position.y + _height, durationTime);
+                    easingDownY = new CustomEasing(CustomEasing.eType.inQuad, transform.position.y + _height, TargetPos.y, durationTime);
+                    easingX = new CustomEasing(CustomEasing.eType.linear, transform.position.x, TargetPos.x, duration);
                     break;
             }
-            if (this.MoveType != eMoveTypes.PARABORIC_ROTATE)
+            if (MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return;
-            this.easingUpRotate = new CustomEasing(CustomEasing.eType.inQuad, this.startRotate, 0.0f, this.duration / 2f);
-            this.easingDownRotate = new CustomEasing(CustomEasing.eType.linear, 0.0f, this.endRotate, this.duration / 2f);
+            easingUpRotate = new CustomEasing(CustomEasing.eType.inQuad, startRotate, 0.0f, duration / 2f);
+            easingDownRotate = new CustomEasing(CustomEasing.eType.linear, 0.0f, endRotate, duration / 2f);
         }
 
         private Vector3 GetParaboricPosition(float _currentTime, float _deltaTime)
         {
-            Vector3 vector3 = this.transform.position;
-            if (this.easingX.IsMoving)
-                vector3 = new Vector3(this.easingX.GetCurVal(_deltaTime, true), (double)_currentTime >= (double)this.duration / 2.0 ? this.easingDownY.GetCurVal(_deltaTime, true) : this.easingUpY.GetCurVal(_deltaTime, true), this.transform.position.z);
+            Vector3 vector3 = transform.position;
+            if (easingX.IsMoving)
+                vector3 = new Vector3(easingX.GetCurVal(_deltaTime, true), _currentTime >= duration / 2.0 ? easingDownY.GetCurVal(_deltaTime, true) : easingUpY.GetCurVal(_deltaTime, true), transform.position.z);
             return vector3;
         }
 
@@ -190,7 +190,7 @@ namespace Elements
             {
                 if (!firearmCtrl.activeSelf)
                 {
-                    yield return (object)null;
+                    yield return null;
                 }
                 else
                 {
@@ -199,7 +199,7 @@ namespace Elements
                     {
                         hitTimer += fnhfjlaenpf;
                         float _b = firearmCtrl.MoveType == eMoveTypes.LINEAR ? 0.2f / firearmCtrl.MoveRate : firearmCtrl.HitDelay;
-                        if ((double)hitTimer > (double)_b || BattleUtil.Approximately(hitTimer, _b))
+                        if (hitTimer > (double)_b || BattleUtil.Approximately(hitTimer, _b))
                         {
                             hitTimer = 0.0f;
                             hitFlag = false;
@@ -210,7 +210,7 @@ namespace Elements
                                 firearmCtrl.OnHitAction(firearmCtrl);
                             }
                             firearmCtrl.onCowHit.Call();
-                            firearmCtrl.onCowHit = (Action)null;
+                            firearmCtrl.onCowHit = null;
                         }
                     }
                     if (firearmCtrl.getStopFlag())
@@ -221,7 +221,7 @@ namespace Elements
                     }
                     else
                     {
-                        if ((UnityEngine.Object)firearmCtrl == (UnityEngine.Object)null)
+                        if (firearmCtrl == null)
                             break;
                         Vector3 b = firearmCtrl.transform.position;
                         switch (firearmCtrl.MoveType)
@@ -235,78 +235,76 @@ namespace Elements
                             case eMoveTypes.PARABORIC_ROTATE:
                                 currentTime += fnhfjlaenpf;
                                 b = firearmCtrl.GetParaboricPosition(currentTime, fnhfjlaenpf);
-                                if ((double)currentTime > (double)firearmCtrl.duration)
+                                if (currentTime > (double)firearmCtrl.duration)
                                 {
                                     hitFlag = true;
-                                    break;
                                 }
                                 break;
                         }
                         if (firearmCtrl.MoveType == eMoveTypes.PARABORIC_ROTATE)
-                            firearmCtrl.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, (double)currentTime >= (double)firearmCtrl.duration / 2.0 ? firearmCtrl.easingDownRotate.GetCurVal(fnhfjlaenpf, true) : firearmCtrl.easingUpRotate.GetCurVal(fnhfjlaenpf, true));
+                            firearmCtrl.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, currentTime >= firearmCtrl.duration / 2.0 ? firearmCtrl.easingDownRotate.GetCurVal(fnhfjlaenpf, true) : firearmCtrl.easingUpRotate.GetCurVal(fnhfjlaenpf, true));
                         firearmCtrl.transform.position = b;
                         switch (firearmCtrl.MoveType)
                         {
                             case eMoveTypes.LINEAR:
                             case eMoveTypes.HORIZONTAL:
-                                if ((double)Vector3.Distance(firearmCtrl.initialPosistion, b) > (double)_lifeDistance)
+                                if (Vector3.Distance(firearmCtrl.initialPosistion, b) > (double)_lifeDistance)
                                 //if ((double)Mathf.Abs(firearmCtrl.initialPosistion.x- b.x) > (double)3*_lifeDistance)
 
                                 {
                                     firearmCtrl.FireTarget.Owner.FirearmCtrlsOnMe.Remove(firearmCtrl);
                                     firearmCtrl.timeToDie = true;
-                                    break;
                                 }
                                 break;
                         }
                     }
                     if (!firearmCtrl.IsAbsolute)
                         hitFlag = firearmCtrl.collisionDetection(hitFlag, currentTime);
-                    yield return (object)null;
+                    yield return null;
                 }
             }
         }
 
         public override bool _Update()
         {
-            if (!this.activeSelf)
-                this.gameObject.SetActive(false);
-            if (!this.timeToDie)
+            if (!activeSelf)
+                gameObject.SetActive(false);
+            if (!timeToDie)
                 return true;
             //this.skillSeSource.Stop();
-            this.IsPlaying = false;
-            this.gameObject.SetActive(false);
+            IsPlaying = false;
+            gameObject.SetActive(false);
             return false;
         }
 
         private bool collisionDetection(bool _hitFlag, float _currentTime)
         {
-            if ((this.MoveType == eMoveTypes.PARABORIC || this.MoveType == eMoveTypes.PARABORIC_ROTATE) && (double)_currentTime < (double)this.duration * 0.5 || (_hitFlag || this.InFlag))
+            if ((MoveType == eMoveTypes.PARABORIC || MoveType == eMoveTypes.PARABORIC_ROTATE) && _currentTime < duration * 0.5 || (_hitFlag || InFlag))
                 return _hitFlag;
-            float num1 = this.transform.position.x + this.ColliderBox.center.x;
-            float num2 = this.ColliderBox.extents.x * 0.5f;
-            double num3 = (double)this.FireTarget.GetColliderCenter().x + (double)this.FireTarget.GetPosition().x;
-            float num4 = this.FireTarget.GetColliderSize().x * 0.5f;
+            float num1 = transform.position.x + ColliderBox.center.x;
+            float num2 = ColliderBox.extents.x * 0.5f;
+            double num3 = FireTarget.GetColliderCenter().x + (double)FireTarget.GetPosition().x;
+            float num4 = FireTarget.GetColliderSize().x * 0.5f;
             float _b1 = num1 - num2;
             float _b2 = num1 + num2;
             float _a1 = (float)num3 - num4;
             float _a2 = (float)num3 + num4;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "-弹道检测：" + num1 + "--" + num2 + "--" + num3+"--"+num4);
-            if ((double)_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || (double)_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
+            if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || _a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
                 return _hitFlag;
-            if (this.MoveType != eMoveTypes.PARABORIC && this.MoveType != eMoveTypes.PARABORIC_ROTATE)
+            if (MoveType != eMoveTypes.PARABORIC && MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return true;
-            this.InFlag = true;
+            InFlag = true;
             return _hitFlag;
         }
 
-        protected virtual bool getStopFlag() => this.stopFlag;
+        protected virtual bool getStopFlag() => stopFlag;
 
         public override void ResetParameter(GameObject _prefab, int _skinId, bool _isShadow)
         {
             base.ResetParameter(_prefab, _skinId);
-            this.activeSelf = true;
-            this.stopFlag = false;
+            activeSelf = true;
+            stopFlag = false;
         }
         public FirearmCtrlData GetPrefabData()
         {

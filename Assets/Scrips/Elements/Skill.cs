@@ -6,8 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft0.Json;
+using UnityEngine;
 
 namespace Elements
 {
@@ -51,7 +51,7 @@ namespace Elements
         public bool BlackoutEndWithMotion;
         public bool ForceComboDamage;
         [JsonIgnore]
-        public Color BlackoutColor = (Color)new Color32((byte)0, (byte)0, (byte)0, (byte)245);
+        public Color BlackoutColor = new Color32(0, 0, 0, 245);
         public float CutInMovieFadeStartTime = 1.9f;
         public float CutInMovieFadeDurationTime = 0.1f;
         public float CutInSkipTime;
@@ -71,17 +71,17 @@ namespace Elements
         [JsonIgnore]
         public List<ActionParameter> ActionParameters
         {
-            get => this.actionParameters;
-            set => this.actionParameters = value;
+            get => actionParameters;
+            set => actionParameters = value;
         }
         [JsonIgnore]
         public float CastTime { get; set; }
         [JsonIgnore]
         public int SkillNum { get; set; }
         [JsonIgnore]
-        public List<SkillEffectCtrl> EffectObjs => this.effectObjs;
+        public List<SkillEffectCtrl> EffectObjs => effectObjs;
         [JsonIgnore]
-        public List<SkillEffectCtrl> LoopEffectObjs => this.loopEffectObjs;
+        public List<SkillEffectCtrl> LoopEffectObjs => loopEffectObjs;
         [JsonIgnore]
         public List<int> HasParentIndexes { get; set; }
         [JsonIgnore]
@@ -122,18 +122,18 @@ namespace Elements
         public int AbsorberValue { get; set; }
         public void SetLevel(int _level)
         {
-            this.Level = _level;
-            for (int index = 0; index < this.actionParameters.Count; ++index)
-                this.actionParameters[index].SetLevel((float)_level);
+            Level = _level;
+            for (int index = 0; index < actionParameters.Count; ++index)
+                actionParameters[index].SetLevel(_level);
         }
 
         public void ReadySkill()
         {
-            this.TotalDamage = 0f;
-            this.DamagedPartsList.Clear();
-            for (int index1 = 0; index1 < this.SkillEffects.Count; ++index1)
+            TotalDamage = 0f;
+            DamagedPartsList.Clear();
+            for (int index1 = 0; index1 < SkillEffects.Count; ++index1)
             {
-                NormalSkillEffect skillEffect = this.SkillEffects[index1];
+                NormalSkillEffect skillEffect = SkillEffects[index1];
                 for (int index2 = 0; index2 < skillEffect.AlreadyFireArmExecedKeys.Count; ++index2)
                     skillEffect.AlreadyFireArmExecedData[skillEffect.AlreadyFireArmExecedKeys[index2]] = false;
             }

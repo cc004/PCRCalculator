@@ -4,9 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using System;
 using System.Collections.Generic;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -20,22 +19,22 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      switch ((GiveValueAction.eAdditiveValueType)(float)this.Value[eValueNumber.VALUE_1])
+      switch ((eAdditiveValueType)(float)Value[eValueNumber.VALUE_1])
       {
-        case GiveValueAction.eAdditiveValueType.DEFEAT_NUMBER:
+        case eAdditiveValueType.DEFEAT_NUMBER:
           ActionParameter actionParameter1 = _skill.ActionParameters[0];
           int index = 0;
           for (int count = _skill.ActionParameters.Count; index < count; ++index)
           {
             ActionParameter actionParameter2 = _skill.ActionParameters[index];
-            actionParameter2.OnDefeatEnemy += (Action) (() => ++_skill.DefeatEnemyCount);
-            if (actionParameter2.ActionId != this.ActionDetail2 && actionParameter2.ActionId != this.ActionDetail3)
-              actionParameter1 = (double) actionParameter1.ExecTime[actionParameter1.ExecTime.Length - 1] > (double) actionParameter2.ExecTime[actionParameter2.ExecTime.Length - 1] ? actionParameter1 : actionParameter2;
+            actionParameter2.OnDefeatEnemy += () => ++_skill.DefeatEnemyCount;
+            if (actionParameter2.ActionId != ActionDetail2 && actionParameter2.ActionId != ActionDetail3)
+              actionParameter1 = actionParameter1.ExecTime[actionParameter1.ExecTime.Length - 1] > (double) actionParameter2.ExecTime[actionParameter2.ExecTime.Length - 1] ? actionParameter1 : actionParameter2;
           }
           break;
-        case GiveValueAction.eAdditiveValueType.AHEAD_UNIT_NUM:
-        case GiveValueAction.eAdditiveValueType.BEHIND_UNIT_NUM:
-          this.parts = _source.IsPartsBoss ? (BasePartsData) _source.BossPartsListForBattle.Find((Predicate<PartsData>) (e => e.Index == _skill.ParameterTarget)) : _source.GetFirstParts();
+        case eAdditiveValueType.AHEAD_UNIT_NUM:
+        case eAdditiveValueType.BEHIND_UNIT_NUM:
+          parts = _source.IsPartsBoss ? _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget) : _source.GetFirstParts();
           break;
       }
     }
@@ -52,17 +51,17 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       Dictionary<eValueNumber, FloatWithEx> _addValue = new Dictionary<eValueNumber, FloatWithEx>();
-      eValueNumber eValueNumber = (eValueNumber)(this.ActionDetail2 - 1);
+      eValueNumber eValueNumber = (eValueNumber)(ActionDetail2 - 1);
       _addValue.Add(eValueNumber, 0.0f);
-      this.createValue(_source, _skill, _valueDictionary, _addValue, eValueNumber, _target);
+      createValue(_source, _skill, _valueDictionary, _addValue, eValueNumber, _target);
       BattleLogIntreface battleLog = this.battleLog;
       UnitCtrl unitCtrl = _source;
       UnitCtrl owner = _target.Owner;
-      int actionId = this.ActionId;
+      int actionId = ActionId;
       UnitCtrl JELADBAMFKH = unitCtrl;
       UnitCtrl LIMEKPEENOB = owner;
       battleLog.AppendBattleLog(eBattleLogType.GIVE_VALUE_ADDITIONAL, 0, 0L, 0L, 0, actionId, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
-      this.setValue(_addValue, _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail1)));
+      setValue(_addValue, _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1));
     }
 
         /*protected virtual void createValue(
@@ -156,7 +155,7 @@ namespace Elements
                 case 3:
                     break;
                 case 4:
-                    _addValue[_evalue] = (float)this.TargetList.Count * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (float)TargetList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 5:
                     _addValue[_evalue] = (float)_skill.DamagedPartsList.Count * _valueDictionary[eValueNumber.VALUE_2];
@@ -165,10 +164,10 @@ namespace Elements
                     _addValue[_evalue] = _skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 7:
-                    _addValue[_evalue] = (float)(int)(FloatWithEx)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (float)(int)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 8:
-                    _addValue[_evalue] = (float)(int)(FloatWithEx)_target.Owner.MagicStr * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (float)(int)_target.Owner.MagicStr * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 9:
                     _addValue[_evalue] = (float)(int)_target.Owner.Def * _valueDictionary[eValueNumber.VALUE_2];
@@ -177,18 +176,18 @@ namespace Elements
                     _addValue[_evalue] = (float)(int)_target.Owner.MagicDef * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 11:
-                    List<UnitCtrl> _targetList1 = !_source.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
-                    _addValue[_evalue] = (float)this.countUnitNumCompareX(_targetList1, this.parts, true) * _valueDictionary[eValueNumber.VALUE_2];
+                    List<UnitCtrl> _targetList1 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
+                    _addValue[_evalue] = (float)countUnitNumCompareX(_targetList1, parts, true) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 12:
-                    List<UnitCtrl> _targetList2 = !_source.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
-                    _addValue[_evalue] = (float)this.countUnitNumCompareX(_targetList2, this.parts, false) * _valueDictionary[eValueNumber.VALUE_2];
+                    List<UnitCtrl> _targetList2 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
+                    _addValue[_evalue] = (float)countUnitNumCompareX(_targetList2, parts, false) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 default:
                     if ((double)_valueDictionary[eValueNumber.VALUE_1] > 200.0)
                     {
                         eStateIconType key = (double)_valueDictionary[eValueNumber.VALUE_1] <= 2000.0 ? (eStateIconType)((double)_valueDictionary[eValueNumber.VALUE_1] % 200.0) : (eStateIconType)((double)_valueDictionary[eValueNumber.VALUE_1] % 2000.0);
-                        SealData sealData = (SealData)null;
+                        SealData sealData = null;
                         if (!_target.Owner.SealDictionary.TryGetValue(key, out sealData))
                             break;
                         _addValue[_evalue] = (float)sealData.GetCurrentCount() * _valueDictionary[eValueNumber.VALUE_2];
@@ -196,7 +195,7 @@ namespace Elements
                     }
                     if ((double)_valueDictionary[eValueNumber.VALUE_1] <= 100.0)
                         break;
-                    StrikeBackDataSet strikeBackDataSet = (StrikeBackDataSet)null;
+                    StrikeBackDataSet strikeBackDataSet = null;
                     if (!_target.Owner.StrikeBackDictionary.TryGetValue((EnchantStrikeBackAction.eStrikeBackEffectType)((int)_valueDictionary[eValueNumber.VALUE_1] - 100), out strikeBackDataSet))
                         break;
                     break;
@@ -227,11 +226,11 @@ namespace Elements
         {
           foreach (PartsData partsData in target.BossPartsListForBattle)
           {
-            if (this.comparePosition(_source, (BasePartsData) partsData, _ahead))
+            if (comparePosition(_source, partsData, _ahead))
               ++num;
           }
         }
-        else if (this.comparePosition(_source, target.GetFirstParts(), _ahead))
+        else if (comparePosition(_source, target.GetFirstParts(), _ahead))
           ++num;
       }
       return num;
@@ -245,7 +244,7 @@ namespace Elements
       float x2 = _target.GetBottomTransformPosition().x;
       if (BattleUtil.Approximately(x1, x2))
         return true;
-      return !_source.Owner.IsLeftDir ? (double) x1 < (double) x2 == _ahead : (double) x1 > (double) x2 == _ahead;
+      return !_source.Owner.IsLeftDir ? x1 < (double) x2 == _ahead : x1 > (double) x2 == _ahead;
     }
 
     public enum eAdditiveValueType

@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
 using System.Collections.Generic;
 
 namespace Elements
@@ -17,12 +16,12 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      if (this.ActionDetail1 != 1)
+      if (ActionDetail1 != 1)
         return;
       _source.CreateAttackPattern(
           //ManagerSingleton<MasterDataManager>.Instance.masterUnitSkillData[_source.CharacterUnitId]
           _source.unitParameter.SkillData
-          , this.ActionDetail2);
+          , ActionDetail2);
     }
 
     public override void ExecAction(
@@ -36,25 +35,25 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendTargetNum(_target.Owner, _num);
+      AppendTargetNum(_target.Owner, _num);
       //this.endAllBeforeEffect();
       //for (int index = 0; index < this.ActionEffectList.Count; ++index)
       //  this.playActionEffect(_source, _skill, this.ActionEffectList[index]);
-      switch ((ChangePatternAction.eChangePatternType) this.ActionDetail1)
+      switch ((eChangePatternType) ActionDetail1)
       {
-        case ChangePatternAction.eChangePatternType.ATTACK_PATTERN:
-          _target.Owner.ChangeAttackPattern(this.ActionDetail2, _skill.Level, _valueDictionary[eValueNumber.VALUE_1]);
+        case eChangePatternType.ATTACK_PATTERN:
+          _target.Owner.ChangeAttackPattern(ActionDetail2, _skill.Level, _valueDictionary[eValueNumber.VALUE_1]);
           break;
-        case ChangePatternAction.eChangePatternType.UNION_BURST:
-          _target.Owner.ChangeChargeSkill(this.ActionDetail2, _valueDictionary[eValueNumber.VALUE_1]);
+        case eChangePatternType.UNION_BURST:
+          _target.Owner.ChangeChargeSkill(ActionDetail2, _valueDictionary[eValueNumber.VALUE_1]);
           break;
       }
-            switch ((ChangePatternAction.eUbActive)this.ActionDetail3)
+            switch ((eUbActive)ActionDetail3)
             {
-                case ChangePatternAction.eUbActive.ENABLE:
+                case eUbActive.ENABLE:
                     _target.Owner.UbIsDisableByChangePattern = false;
                     break;
-                case ChangePatternAction.eUbActive.DISABLE:
+                case eUbActive.DISABLE:
                     _target.Owner.UbIsDisableByChangePattern = true;
                     break;
             }

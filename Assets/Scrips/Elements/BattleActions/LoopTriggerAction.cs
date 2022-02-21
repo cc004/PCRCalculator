@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -30,18 +29,18 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      if (this.ActionDetail2 != 0)
-        this.actionParameter1 = _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2));
-      if (this.ActionDetail3 != 0)
-        this.actionParameter2 = _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail3));
-      if (this.ActionDetail1 != 2)
+      if (ActionDetail2 != 0)
+        actionParameter1 = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2);
+      if (ActionDetail3 != 0)
+        actionParameter2 = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail3);
+      if (ActionDetail1 != 2)
         return;
-      _source.OnDamageForLoopTrigger = (Action<bool, float, bool>) ((_byAttack, _damage, _critical) =>
+      _source.OnDamageForLoopTrigger = (_byAttack, _damage, _critical) =>
       {
-        if (!_byAttack)
-          return;
-        this.triggerSuccess = true;
-      });
+          if (!_byAttack)
+              return;
+          triggerSuccess = true;
+      };
     }
 
     public override void ReadyAction(
@@ -50,11 +49,11 @@ namespace Elements
       Skill _skill)
     {
       base.ReadyAction(_source, _sourceActionController, _skill);
-      if (this.actionParameter1 != null)
-        this.actionParameter1.CancelByIfForAll = true;
-      if (this.actionParameter2 == null)
+      if (actionParameter1 != null)
+        actionParameter1.CancelByIfForAll = true;
+      if (actionParameter2 == null)
         return;
-      this.actionParameter2.CancelByIfForAll = true;
+      actionParameter2.CancelByIfForAll = true;
     }
 
     public override void ExecAction(
@@ -68,9 +67,9 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.triggerSuccess = false;
-      this.duration = _valueDictionary[eValueNumber.VALUE_4];
-      _sourceActionController.AppendCoroutine(this.updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      triggerSuccess = false;
+      duration = _valueDictionary[eValueNumber.VALUE_4];
+      _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private IEnumerator updateStartMotion(
@@ -78,16 +77,16 @@ namespace Elements
       UnitActionController _sourceActionController,
       Skill _skill)
     {
-      while (!this.isActionCancel(_source, _sourceActionController, _skill, true))
+      while (!isActionCancel(_source, _sourceActionController, _skill, true))
       {
         if (!_source.UnitSpineCtrl.IsPlayAnimeBattle)
         {
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false);
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, _isLoop: true);
-          _sourceActionController.AppendCoroutine(this.updateLoopMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _sourceActionController.AppendCoroutine(updateLoopMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           break;
         }
-        yield return (object) null;
+        yield return null;
       }
     }
 
@@ -97,7 +96,7 @@ namespace Elements
       Skill _skill)
     {
       LoopTriggerAction loopTriggerAction = this;
-      yield return (object) null;
+      yield return null;
       float timer = loopTriggerAction.duration;
       while (!loopTriggerAction.isActionCancel(_source, _sourceActionController, _skill, false))
       {
@@ -122,13 +121,13 @@ namespace Elements
           break;
         }
         timer -= loopTriggerAction.battleManager.DeltaTime_60fps;
-        if ((double) timer < 0.0)
+        if (timer < 0.0)
         {
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 3);
           _sourceActionController.AppendCoroutine(loopTriggerAction.updateEndMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _source);
           break;
         }
-        yield return (object) null;
+        yield return null;
       }
     }
 
@@ -137,14 +136,14 @@ namespace Elements
       UnitActionController _sourceActionController,
       Skill _skill)
     {
-      while (!this.isActionCancel(_source, _sourceActionController, _skill, false))
+      while (!isActionCancel(_source, _sourceActionController, _skill, false))
       {
         if (!_source.UnitSpineCtrl.IsPlayAnimeBattle)
         {
           _source.SetState(UnitCtrl.ActionState.IDLE);
           break;
         }
-        yield return (object) null;
+        yield return null;
       }
     }
 
@@ -169,7 +168,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
     }
 
     private enum eTriggerType

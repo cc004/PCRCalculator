@@ -4,9 +4,9 @@
 * Description: SpringGUI.UITree example
 ==========================================*/
 
-using UnityEngine;
 using System.Collections.Generic;
 using SpringGUI;
+using UnityEngine;
 
 public class UITreeExample : MonoBehaviour
 {
@@ -14,21 +14,21 @@ public class UITreeExample : MonoBehaviour
 
     public void Awake()
     {
-        var data = new UITreeData("SpringGUI",new List<UITreeData>()
+        var data = new UITreeData("SpringGUI",new List<UITreeData>
         {
-            new UITreeData("Button",new List<UITreeData>()
+            new UITreeData("Button",new List<UITreeData>
             {
                 new UITreeData("DoubleClickButton"),
                 new UITreeData("LongClickButton")
             }),
             new UITreeData("Pie"),
             new UITreeData("DatePicker"),
-            new UITreeData("C#",new List<UITreeData>()
+            new UITreeData("C#",new List<UITreeData>
             {
-                new UITreeData("high-level syntax",new List<UITreeData>()
+                new UITreeData("high-level syntax",new List<UITreeData>
                 {
-                    new UITreeData("Action",new List<UITreeData>()
-                        {
+                    new UITreeData("Action",new List<UITreeData>
+                    {
                             new UITreeData("One parameter"),
                             new UITreeData("Two parameter"),
                             new UITreeData("Three parameter"),

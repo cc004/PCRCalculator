@@ -10,8 +10,8 @@ namespace Spine
 
 		public override void Apply(Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixPose pose, MixDirection direction)
 		{
-			Bone bone = skeleton.bones.Items[base.BoneIndex];
-			float[] frames = base.frames;
+			Bone bone = skeleton.bones.Items[BoneIndex];
+			float[] frames = this.frames;
 			if (time < frames[0])
 			{
 				switch (pose)
@@ -64,13 +64,13 @@ namespace Spine
 			}
 			if (direction == MixDirection.Out)
 			{
-				num = ((num >= 0f) ? num : (0f - num)) * (float)((num5 >= 0f) ? 1 : (-1));
-				num2 = ((num2 >= 0f) ? num2 : (0f - num2)) * (float)((num6 >= 0f) ? 1 : (-1));
+				num = ((num >= 0f) ? num : (0f - num)) * ((num5 >= 0f) ? 1 : (-1));
+				num2 = ((num2 >= 0f) ? num2 : (0f - num2)) * ((num6 >= 0f) ? 1 : (-1));
 			}
 			else
 			{
-				num5 = ((num5 >= 0f) ? num5 : (0f - num5)) * (float)((num >= 0f) ? 1 : (-1));
-				num6 = ((num6 >= 0f) ? num6 : (0f - num6)) * (float)((num2 >= 0f) ? 1 : (-1));
+				num5 = ((num5 >= 0f) ? num5 : (0f - num5)) * ((num >= 0f) ? 1 : (-1));
+				num6 = ((num6 >= 0f) ? num6 : (0f - num6)) * ((num2 >= 0f) ? 1 : (-1));
 			}
 			bone.scaleX = num5 + (num - num5) * alpha;
 			bone.scaleY = num6 + (num2 - num6) * alpha;

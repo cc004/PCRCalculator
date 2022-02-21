@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -27,19 +26,19 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictinary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
-      if (!this.battleManager.ExistsField(this.ActionDetail1, _source.IsOther))
+      if (!battleManager.ExistsField(ActionDetail1, _source.IsOther))
       {
-        _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_2];
-        if (this.ActionDetail2 != 0)
-          this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2)), _skill);
+        _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_2];
+        if (ActionDetail2 != 0)
+          cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail2), _skill);
       }
       else
       {
-        _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_1];
-        if (this.ActionDetail3 != 0)
-          this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail3)), _skill);
+        _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_1];
+        if (ActionDetail3 != 0)
+          cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail3), _skill);
       }
-      _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion((ActionParameter) this, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion(this, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private void cancelAction(ActionParameter _action, Skill _skill)
@@ -52,11 +51,11 @@ namespace Elements
 
     public void CancelBoth(Skill _skill)
     {
-      if (this.ActionDetail2 != 0)
-        this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2)), _skill);
-      if (this.ActionDetail3 == 0)
+      if (ActionDetail2 != 0)
+        cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail2), _skill);
+      if (ActionDetail3 == 0)
         return;
-      this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail3)), _skill);
+      cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail3), _skill);
     }
   }
 }

@@ -4,30 +4,28 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-using Cute;
-//using LitJson;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+
+//using LitJson;
 
 namespace Elements
 {
     public class UnitData
     {
-        public ObscuredInt Id { get; private set; }
+        public int Id { get; private set; }
 
         public DateTime GetTime { get; private set; }
 
-        public ObscuredInt StartRarety { get; private set; }
+        public int StartRarety { get; private set; }
 
-        public ObscuredInt UnitRarity { get; private set; }
+        public int UnitRarity { get; private set; }
 
-        public ObscuredInt BattleRarity { get; private set; }
+        public int BattleRarity { get; private set; }
 
-        public ObscuredInt UnitLevel { get; private set; }
+        public int UnitLevel { get; private set; }
 
-        public ObscuredInt UnitExp { get; private set; }
+        public int UnitExp { get; private set; }
 
         public ePromotionLevel PromotionLevel { get; private set; }
 
@@ -39,26 +37,26 @@ namespace Elements
 
         public List<SkillLevelInfo> FreeSkill { get; private set; }
 
-        public List<Elements.EquipSlot> EquipSlot { get; private set; }
+        public List<EquipSlot> EquipSlot { get; private set; }
 
-        public List<Elements.EquipSlot> UniqueEquipSlot { get; private set; }
+        public List<EquipSlot> UniqueEquipSlot { get; private set; }
 
         public UnitParam UnitParam { get; private set; }
 
         public StatusParamShort BonusParam { get; private set; }
 
-        public ObscuredInt ResistStatusId { get; private set; }
+        public int ResistStatusId { get; private set; }
 
-        public ObscuredInt Power { get; private set; }
+        public int Power { get; private set; }
 
         //public SkinData SkinData { get; private set; }
 
-        public ObscuredInt IdentifyNum { get; private set; }
+        public int IdentifyNum { get; private set; }
 
-        public ObscuredInt FavoriteFlag { get; private set; }
+        public int FavoriteFlag { get; private set; }
 
         //public UnlockRarity6Slot UnlockRarity6Item { get; private set; }
-        public UnitData(ObscuredInt id, DateTime getTime, ObscuredInt startRarety, ObscuredInt unitRarity, ObscuredInt battleRarity, ObscuredInt unitLevel, ObscuredInt unitExp, ePromotionLevel promotionLevel, List<SkillLevelInfo> unionBurst, List<SkillLevelInfo> mainSkill, List<SkillLevelInfo> exSkill, List<SkillLevelInfo> freeSkill ,ObscuredInt resistStatusId)
+        public UnitData(int id, DateTime getTime, int startRarety, int unitRarity, int battleRarity, int unitLevel, int unitExp, ePromotionLevel promotionLevel, List<SkillLevelInfo> unionBurst, List<SkillLevelInfo> mainSkill, List<SkillLevelInfo> exSkill, List<SkillLevelInfo> freeSkill ,int resistStatusId)
         {
             Id = id;
             GetTime = getTime;
@@ -75,25 +73,25 @@ namespace Elements
             ResistStatusId = resistStatusId;
         }
 
-        public void SetId(int _id) => this.Id = (ObscuredInt)_id;
+        public void SetId(int _id) => Id = _id;
 
-        public void SetUnitRarity(int _unitRarity) => this.UnitRarity = (ObscuredInt)_unitRarity;
+        public void SetUnitRarity(int _unitRarity) => UnitRarity = _unitRarity;
 
-        public void SetBattleRarity(int _battleRarity) => this.BattleRarity = (ObscuredInt)_battleRarity;
+        public void SetBattleRarity(int _battleRarity) => BattleRarity = _battleRarity;
 
-        public void SetUnitLevel(int _unitLevel) => this.UnitLevel = (ObscuredInt)_unitLevel;
+        public void SetUnitLevel(int _unitLevel) => UnitLevel = _unitLevel;
 
-        public void SetUnitExp(int _unitExp) => this.UnitExp = (ObscuredInt)_unitExp;
+        public void SetUnitExp(int _unitExp) => UnitExp = _unitExp;
 
-        public void SetPromotionLevel(ePromotionLevel _promotionLevel) => this.PromotionLevel = _promotionLevel;
+        public void SetPromotionLevel(ePromotionLevel _promotionLevel) => PromotionLevel = _promotionLevel;
 
-        public void SetUnionBurst(List<SkillLevelInfo> _unionBurst) => this.UnionBurst = _unionBurst;
+        public void SetUnionBurst(List<SkillLevelInfo> _unionBurst) => UnionBurst = _unionBurst;
 
-        public void SetMainSkill(List<SkillLevelInfo> _mainSkill) => this.MainSkill = _mainSkill;
+        public void SetMainSkill(List<SkillLevelInfo> _mainSkill) => MainSkill = _mainSkill;
 
-        public void SetExSkill(List<SkillLevelInfo> _exSkill) => this.ExSkill = _exSkill;
+        public void SetExSkill(List<SkillLevelInfo> _exSkill) => ExSkill = _exSkill;
 
-        public void SetFreeSkill(List<SkillLevelInfo> _freeSkill) => this.FreeSkill = _freeSkill;
+        public void SetFreeSkill(List<SkillLevelInfo> _freeSkill) => FreeSkill = _freeSkill;
 
         /*public void SetEquipSlot(List<Elements.EquipSlot> _equipSlot) => this.EquipSlot = _equipSlot;
 
@@ -103,25 +101,25 @@ namespace Elements
 
         public void SetBonusParam(StatusParamShort _bonusParam) => this.BonusParam = _bonusParam;
 
-        public void SetResistStatusId(int _resistStatusId) => this.ResistStatusId = (ObscuredInt) _resistStatusId;
+        public void SetResistStatusId(int _resistStatusId) => this.ResistStatusId = (int) _resistStatusId;
 
-        public void SetPower(int _power) => this.Power = (ObscuredInt) _power;
+        public void SetPower(int _power) => this.Power = (int) _power;
 
         public void SetSkinData(SkinData _skinData) => this.SkinData = _skinData;
 
-        public void SetFavoriteFlag(int _favoriteFlag) => this.FavoriteFlag = (ObscuredInt) _favoriteFlag;
+        public void SetFavoriteFlag(int _favoriteFlag) => this.FavoriteFlag = (int) _favoriteFlag;
 
         public void SetUnlockRarity6Item(UnlockRarity6Slot _unlockRarity6Item) => this.UnlockRarity6Item = _unlockRarity6Item;
 
         private void initializeUnitData()
         {
-          this.Id = (ObscuredInt) 0;
+          this.Id = (int) 0;
           this.GetTime = new DateTime();
-          this.StartRarety = (ObscuredInt) 0;
-          this.UnitRarity = (ObscuredInt) 0;
-          this.BattleRarity = (ObscuredInt) 0;
-          this.UnitLevel = (ObscuredInt) 0;
-          this.UnitExp = (ObscuredInt) 0;
+          this.StartRarety = (int) 0;
+          this.UnitRarity = (int) 0;
+          this.BattleRarity = (int) 0;
+          this.UnitLevel = (int) 0;
+          this.UnitExp = (int) 0;
           this.PromotionLevel = ePromotionLevel.INVALID_VALUE;
           this.UnionBurst = new List<SkillLevelInfo>();
           this.MainSkill = new List<SkillLevelInfo>();
@@ -131,11 +129,11 @@ namespace Elements
           this.UniqueEquipSlot = new List<Elements.EquipSlot>();
           this.UnitParam = (UnitParam) null;
           this.BonusParam = (StatusParamShort) null;
-          this.ResistStatusId = (ObscuredInt) 0;
-          this.Power = (ObscuredInt) -1;
+          this.ResistStatusId = (int) 0;
+          this.Power = (int) -1;
           this.SkinData = (SkinData) null;
-          this.IdentifyNum = (ObscuredInt) 0;
-          this.FavoriteFlag = (ObscuredInt) 0;
+          this.IdentifyNum = (int) 0;
+          this.FavoriteFlag = (int) 0;
           this.UnlockRarity6Item = (UnlockRarity6Slot) null;
         }
 
@@ -152,17 +150,17 @@ namespace Elements
         {
           if (_json.Count == 0)
             return;
-          this.Id = (ObscuredInt) _json["id"].ToInt();
+          this.Id = (int) _json["id"].ToInt();
           if (_json.Keys.Contains("get_time"))
             this.GetTime = JMFOFKDCHEC.FromUnixTime(_json["get_time"].ToLong());
           if (_json.Keys.Contains("start_rarety"))
-            this.StartRarety = (ObscuredInt) _json["start_rarety"].ToInt();
-          this.UnitRarity = (ObscuredInt) _json["unit_rarity"].ToInt();
+            this.StartRarety = (int) _json["start_rarety"].ToInt();
+          this.UnitRarity = (int) _json["unit_rarity"].ToInt();
           if (_json.Keys.Contains("battle_rarity"))
-            this.BattleRarity = (ObscuredInt) _json["battle_rarity"].ToInt();
-          this.UnitLevel = (ObscuredInt) _json["unit_level"].ToInt();
+            this.BattleRarity = (int) _json["battle_rarity"].ToInt();
+          this.UnitLevel = (int) _json["unit_level"].ToInt();
           if (_json.Keys.Contains("unit_exp"))
-            this.UnitExp = (ObscuredInt) _json["unit_exp"].ToInt();
+            this.UnitExp = (int) _json["unit_exp"].ToInt();
           this.PromotionLevel = (ePromotionLevel) _json["promotion_level"].ToInt();
           JsonData jsonData1 = _json["union_burst"];
           this.UnionBurst = new List<SkillLevelInfo>();
@@ -228,9 +226,9 @@ namespace Elements
               this.BonusParam = new StatusParamShort(_json1);
           }
           if (_json.Keys.Contains("resist_status_id"))
-            this.ResistStatusId = (ObscuredInt) _json["resist_status_id"].ToInt();
+            this.ResistStatusId = (int) _json["resist_status_id"].ToInt();
           if (_json.Keys.Contains("power"))
-            this.Power = (ObscuredInt) _json["power"].ToInt();
+            this.Power = (int) _json["power"].ToInt();
           if (_json.Keys.Contains("skin_data"))
           {
             JsonData _json1 = _json["skin_data"];
@@ -238,9 +236,9 @@ namespace Elements
               this.SkinData = new SkinData(_json1);
           }
           if (_json.Keys.Contains("identify_num"))
-            this.IdentifyNum = (ObscuredInt) _json["identify_num"].ToInt();
+            this.IdentifyNum = (int) _json["identify_num"].ToInt();
           if (_json.Keys.Contains("favorite_flag"))
-            this.FavoriteFlag = (ObscuredInt) _json["favorite_flag"].ToInt();
+            this.FavoriteFlag = (int) _json["favorite_flag"].ToInt();
           if (!_json.Keys.Contains("unlock_rarity_6_item"))
             return;
           JsonData _json2 = _json["unlock_rarity_6_item"];
@@ -729,7 +727,7 @@ namespace Elements
           this.StartRarety = _unitDataLight.StartRarety;
           this.UnitRarity = _unitDataLight.UnitRarity;
           this.BattleRarity = _unitDataLight.BattleRarity;
-          this.UnitLevel = (ObscuredInt) Mathf.Min((int) _unitDataLight.UnitLevel, num1);
+          this.UnitLevel = (int) Mathf.Min((int) _unitDataLight.UnitLevel, num1);
           this.UnitExp = _unitDataLight.UnitExp;
           this.PromotionLevel = _unitDataLight.PromotionLevel;
           this.setSkillLevelInfo(this.UnionBurst, _unitDataLight.UnionBurst, unionBurstIds, num1);
@@ -851,7 +849,7 @@ namespace Elements
           }
           this.BonusParam = _unitDataLight.BonusParam;
           this.ResistStatusId = _unitDataLight.ResistStatusId;
-          this.Power = (ObscuredInt) -1;
+          this.Power = (int) -1;
           this.SkinData = _unitDataLight.SkinData;
           this.IdentifyNum = _unitDataLight.IdentifyNum;
           this.FavoriteFlag = _unitDataLight.FavoriteFlag;
@@ -889,10 +887,10 @@ namespace Elements
           this.initializeUnitData();
           this.Id = _enemyParameter.enemy_id;
           this.UnitRarity = _enemyParameter.rarity;
-          this.BattleRarity = (ObscuredInt) 0;
+          this.BattleRarity = (int) 0;
           this.UnitLevel = _enemyParameter.level;
           this.PromotionLevel = (ePromotionLevel) (int) _enemyParameter.promotion_level;
-          this.UnitExp = (ObscuredInt) 0;
+          this.UnitExp = (int) 0;
           this.GetTime = DateTime.MinValue;
           this.UnionBurst = this.createSkillLevelInfo((int) unitSkillData.union_burst, (int) _enemyParameter.union_burst_level);
           this.MainSkill = this.createSkillLevelInfo((int) unitSkillData.main_skill_1, (int) _enemyParameter.main_skill_lv_1, (int) unitSkillData.main_skill_2, (int) _enemyParameter.main_skill_lv_2, (int) unitSkillData.main_skill_3, (int) _enemyParameter.main_skill_lv_3, (int) unitSkillData.main_skill_4, (int) _enemyParameter.main_skill_lv_4, (int) unitSkillData.main_skill_5, (int) _enemyParameter.main_skill_lv_5, (int) unitSkillData.main_skill_6, (int) _enemyParameter.main_skill_lv_6, (int) unitSkillData.main_skill_7, (int) _enemyParameter.main_skill_lv_7, (int) unitSkillData.main_skill_8, (int) _enemyParameter.main_skill_lv_8, (int) unitSkillData.main_skill_9, (int) _enemyParameter.main_skill_lv_9, (int) unitSkillData.main_skill_10, (int) _enemyParameter.main_skill_lv_10);

@@ -4,10 +4,11 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
+using System.Collections.Generic;
+
+using PCRCaculator;
 //using LitJson;
 //using Sqlite3Plugin;
-using System.Collections.Generic;
 
 namespace Elements
 {
@@ -15,9 +16,9 @@ namespace Elements
     {
         public const string TABLE_NAME = "skill_data";
         //private MasterSkillDatabase _db;
-        private Dictionary<int, MasterSkillData.SkillData> _lazyPrimaryKeyDictionary = new Dictionary<int, SkillData>();
+        private Dictionary<int, SkillData> _lazyPrimaryKeyDictionary = new Dictionary<int, SkillData>();
 
-        public MasterSkillData.SkillData this[int id] => this.Get(id);
+        public SkillData this[int id] => Get(id);
 
         /**public MasterSkillData(MasterSkillDatabase db)
           : base((AbstractMasterDatabase) db)
@@ -26,11 +27,11 @@ namespace Elements
           this._db = db;
         }*/
 
-        public MasterSkillData.SkillData Get(int skill_id)
+        public SkillData Get(int skill_id)
         {
             int key = skill_id;
-            MasterSkillData.SkillData skillData = (MasterSkillData.SkillData)null;
-            if (!this._lazyPrimaryKeyDictionary.TryGetValue(key, out skillData))
+            SkillData skillData = null;
+            if (!_lazyPrimaryKeyDictionary.TryGetValue(key, out skillData))
             {
                 //skillData = this._db != null ? this._SelectOne(skill_id) : (MasterSkillData.SkillData) null;
                 //this._lazyPrimaryKeyDictionary[key] = skillData;
@@ -38,7 +39,7 @@ namespace Elements
             return skillData;
         }
 
-        public bool HasKey(int skill_id) => this.Get(skill_id) != null;
+        public bool HasKey(int skill_id) => Get(skill_id) != null;
 
         /*private MasterSkillData.SkillData _SelectOne(int skill_id)
         {
@@ -92,33 +93,33 @@ namespace Elements
 
         public class SkillData
         {
-            public List<MasterSkillData.MainSkillRateData> SkillValue = new List<MasterSkillData.MainSkillRateData>();
+            public List<MainSkillRateData> SkillValue = new List<MainSkillRateData>();
             //private MasterDataManager masterDataMng = ManagerSingleton<MasterDataManager>.Instance;
-            protected ObscuredInt _skill_id;
-            protected ObscuredString _name;
-            protected ObscuredInt _skill_type;
-            protected ObscuredInt _skill_area_width;
-            protected ObscuredDouble _skill_cast_time;
-            protected ObscuredInt _action_1;
-            protected ObscuredInt _action_2;
-            protected ObscuredInt _action_3;
-            protected ObscuredInt _action_4;
-            protected ObscuredInt _action_5;
-            protected ObscuredInt _action_6;
-            protected ObscuredInt _action_7;
-            protected ObscuredInt _depend_action_1;
-            protected ObscuredInt _depend_action_2;
-            protected ObscuredInt _depend_action_3;
-            protected ObscuredInt _depend_action_4;
-            protected ObscuredInt _depend_action_5;
-            protected ObscuredInt _depend_action_6;
-            protected ObscuredInt _depend_action_7;
-            protected ObscuredString _description;
-            protected ObscuredInt _icon_type;
+            protected int _skill_id;
+            protected string _name;
+            protected int _skill_type;
+            protected int _skill_area_width;
+            protected double _skill_cast_time;
+            protected int _action_1;
+            protected int _action_2;
+            protected int _action_3;
+            protected int _action_4;
+            protected int _action_5;
+            protected int _action_6;
+            protected int _action_7;
+            protected int _depend_action_1;
+            protected int _depend_action_2;
+            protected int _depend_action_3;
+            protected int _depend_action_4;
+            protected int _depend_action_5;
+            protected int _depend_action_6;
+            protected int _depend_action_7;
+            protected string _description;
+            protected int _icon_type;
 
-            public int SkillId => (int)this.skill_id;
+            public int SkillId => skill_id;
 
-            public string Name => (string)this.name;
+            public string Name => name;
 
             public List<int> ActionIds { get; private set; }
 
@@ -128,86 +129,86 @@ namespace Elements
 
             public void SetUp()
             {
-                this.ActionIds = new List<int>();
-                this.ActionIds.Add((int)this.action_1);
-                this.ActionIds.Add((int)this.action_2);
-                this.ActionIds.Add((int)this.action_3);
-                this.ActionIds.Add((int)this.action_4);
-                this.ActionIds.Add((int)this.action_5);
-                this.ActionIds.Add((int)this.action_6);
-                this.ActionIds.Add((int)this.action_7);
-                this.DependedIds = new List<int>();
-                this.DependedIds.Add((int)this.depend_action_1);
-                this.DependedIds.Add((int)this.depend_action_2);
-                this.DependedIds.Add((int)this.depend_action_3);
-                this.DependedIds.Add((int)this.depend_action_4);
-                this.DependedIds.Add((int)this.depend_action_5);
-                this.DependedIds.Add((int)this.depend_action_6);
-                this.DependedIds.Add((int)this.depend_action_7);
-                this.ActionDataList = new List<MasterSkillAction.SkillAction>();
+                ActionIds = new List<int>();
+                ActionIds.Add(action_1);
+                ActionIds.Add(action_2);
+                ActionIds.Add(action_3);
+                ActionIds.Add(action_4);
+                ActionIds.Add(action_5);
+                ActionIds.Add(action_6);
+                ActionIds.Add(action_7);
+                DependedIds = new List<int>();
+                DependedIds.Add(depend_action_1);
+                DependedIds.Add(depend_action_2);
+                DependedIds.Add(depend_action_3);
+                DependedIds.Add(depend_action_4);
+                DependedIds.Add(depend_action_5);
+                DependedIds.Add(depend_action_6);
+                DependedIds.Add(depend_action_7);
+                ActionDataList = new List<MasterSkillAction.SkillAction>();
                 int index = 0;
-                for (int count = this.ActionIds.Count; index < count; ++index)
+                for (int count = ActionIds.Count; index < count; ++index)
                 {
-                    if (this.ActionIds[index] != 0)
+                    if (ActionIds[index] != 0)
                     {
-                        PCRCaculator.SkillAction skillAction1 = null;
+                        SkillAction skillAction1 = null;
                         MasterSkillAction.SkillAction skillAction = null;
-                        if(PCRCaculator.MainManager.Instance.SkillActionDic.TryGetValue(ActionIds[index],out skillAction1))
+                        if(MainManager.Instance.SkillActionDic.TryGetValue(ActionIds[index],out skillAction1))
                         {
                             skillAction = new MasterSkillAction.SkillAction(skillAction1);
                         }                        
                         if (skillAction != null)
                         {
-                            skillAction.DependActionId = this.DependedIds[index];
-                            this.ActionDataList.Add(skillAction);
+                            skillAction.DependActionId = DependedIds[index];
+                            ActionDataList.Add(skillAction);
                         }
                     }
                 }
             }
 
-            public ObscuredInt skill_id => this._skill_id;
+            public int skill_id => _skill_id;
 
-            public ObscuredString name => this._name;
+            public string name => _name;
 
             public bool nameIsNull { get; private set; }
 
-            public ObscuredInt skill_type => this._skill_type;
+            public int skill_type => _skill_type;
 
-            public ObscuredInt skill_area_width => this._skill_area_width;
+            public int skill_area_width => _skill_area_width;
 
-            public ObscuredDouble skill_cast_time => this._skill_cast_time;
+            public double skill_cast_time => _skill_cast_time;
 
-            public ObscuredInt action_1 => this._action_1;
+            public int action_1 => _action_1;
 
-            public ObscuredInt action_2 => this._action_2;
+            public int action_2 => _action_2;
 
-            public ObscuredInt action_3 => this._action_3;
+            public int action_3 => _action_3;
 
-            public ObscuredInt action_4 => this._action_4;
+            public int action_4 => _action_4;
 
-            public ObscuredInt action_5 => this._action_5;
+            public int action_5 => _action_5;
 
-            public ObscuredInt action_6 => this._action_6;
+            public int action_6 => _action_6;
 
-            public ObscuredInt action_7 => this._action_7;
+            public int action_7 => _action_7;
 
-            public ObscuredInt depend_action_1 => this._depend_action_1;
+            public int depend_action_1 => _depend_action_1;
 
-            public ObscuredInt depend_action_2 => this._depend_action_2;
+            public int depend_action_2 => _depend_action_2;
 
-            public ObscuredInt depend_action_3 => this._depend_action_3;
+            public int depend_action_3 => _depend_action_3;
 
-            public ObscuredInt depend_action_4 => this._depend_action_4;
+            public int depend_action_4 => _depend_action_4;
 
-            public ObscuredInt depend_action_5 => this._depend_action_5;
+            public int depend_action_5 => _depend_action_5;
 
-            public ObscuredInt depend_action_6 => this._depend_action_6;
+            public int depend_action_6 => _depend_action_6;
 
-            public ObscuredInt depend_action_7 => this._depend_action_7;
+            public int depend_action_7 => _depend_action_7;
 
-            public ObscuredString description => this._description;
+            public string description => _description;
 
-            public ObscuredInt icon_type => this._icon_type;
+            public int icon_type => _icon_type;
 
             public SkillData(
               int skill_id = 0,
@@ -233,55 +234,55 @@ namespace Elements
               string description = "",
               int icon_type = 0)
             {
-                this._skill_id = (ObscuredInt)skill_id;
+                _skill_id = skill_id;
                 this.nameIsNull = nameIsNull;
-                this._name = (ObscuredString)name;
-                this._skill_type = (ObscuredInt)skill_type;
-                this._skill_area_width = (ObscuredInt)skill_area_width;
-                this._skill_cast_time = (ObscuredDouble)skill_cast_time;
-                this._action_1 = (ObscuredInt)action_1;
-                this._action_2 = (ObscuredInt)action_2;
-                this._action_3 = (ObscuredInt)action_3;
-                this._action_4 = (ObscuredInt)action_4;
-                this._action_5 = (ObscuredInt)action_5;
-                this._action_6 = (ObscuredInt)action_6;
-                this._action_7 = (ObscuredInt)action_7;
-                this._depend_action_1 = (ObscuredInt)depend_action_1;
-                this._depend_action_2 = (ObscuredInt)depend_action_2;
-                this._depend_action_3 = (ObscuredInt)depend_action_3;
-                this._depend_action_4 = (ObscuredInt)depend_action_4;
-                this._depend_action_5 = (ObscuredInt)depend_action_5;
-                this._depend_action_6 = (ObscuredInt)depend_action_6;
-                this._depend_action_7 = (ObscuredInt)depend_action_7;
-                this._description = (ObscuredString)description;
-                this._icon_type = (ObscuredInt)icon_type;
-                this.SetUp();
+                _name = name;
+                _skill_type = skill_type;
+                _skill_area_width = skill_area_width;
+                _skill_cast_time = skill_cast_time;
+                _action_1 = action_1;
+                _action_2 = action_2;
+                _action_3 = action_3;
+                _action_4 = action_4;
+                _action_5 = action_5;
+                _action_6 = action_6;
+                _action_7 = action_7;
+                _depend_action_1 = depend_action_1;
+                _depend_action_2 = depend_action_2;
+                _depend_action_3 = depend_action_3;
+                _depend_action_4 = depend_action_4;
+                _depend_action_5 = depend_action_5;
+                _depend_action_6 = depend_action_6;
+                _depend_action_7 = depend_action_7;
+                _description = description;
+                _icon_type = icon_type;
+                SetUp();
             }
             public SkillData(PCRCaculator.SkillData data)
             {
-                this._skill_id = (ObscuredInt)data.skillid;
-                this.nameIsNull = false;
-                this._name = (ObscuredString)data.name;
-                this._skill_type = (ObscuredInt)data.type;
-                this._skill_area_width = (ObscuredInt)data.areawidth;
-                this._skill_cast_time = (ObscuredDouble)data.casttime;
-                this._action_1 = (ObscuredInt)data.skillactions[0];
-                this._action_2 = (ObscuredInt)data.skillactions[1];
-                this._action_3 = (ObscuredInt)data.skillactions[2];
-                this._action_4 = (ObscuredInt)data.skillactions[3];
-                this._action_5 = (ObscuredInt)data.skillactions[4];
-                this._action_6 = (ObscuredInt)data.skillactions[5];
-                this._action_7 = (ObscuredInt)data.skillactions[6];
-                this._depend_action_1 = (ObscuredInt)data.dependactions[0];
-                this._depend_action_2 = (ObscuredInt)data.dependactions[1];
-                this._depend_action_3 = (ObscuredInt)data.dependactions[2];
-                this._depend_action_4 = (ObscuredInt)data.dependactions[3];
-                this._depend_action_5 = (ObscuredInt)data.dependactions[4];
-                this._depend_action_6 = (ObscuredInt)data.dependactions[5];
-                this._depend_action_7 = (ObscuredInt)data.dependactions[6];
-                this._description = (ObscuredString)data.describes;
-                this._icon_type = (ObscuredInt)data.icon;
-                this.SetUp();
+                _skill_id = data.skillid;
+                nameIsNull = false;
+                _name = data.name;
+                _skill_type = data.type;
+                _skill_area_width = data.areawidth;
+                _skill_cast_time = data.casttime;
+                _action_1 = data.skillactions[0];
+                _action_2 = data.skillactions[1];
+                _action_3 = data.skillactions[2];
+                _action_4 = data.skillactions[3];
+                _action_5 = data.skillactions[4];
+                _action_6 = data.skillactions[5];
+                _action_7 = data.skillactions[6];
+                _depend_action_1 = data.dependactions[0];
+                _depend_action_2 = data.dependactions[1];
+                _depend_action_3 = data.dependactions[2];
+                _depend_action_4 = data.dependactions[3];
+                _depend_action_5 = data.dependactions[4];
+                _depend_action_6 = data.dependactions[5];
+                _depend_action_7 = data.dependactions[6];
+                _description = data.describes;
+                _icon_type = data.icon;
+                SetUp();
 
             }
             public void ChangeSkillCastTime(float time)

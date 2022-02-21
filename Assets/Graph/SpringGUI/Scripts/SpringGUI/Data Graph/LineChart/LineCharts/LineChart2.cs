@@ -27,7 +27,7 @@ namespace SpringGUI
                     var startBottom = new Vector2(startPos.x , origin.y);
                     var endBottom = new Vector2(endPos.x, origin.y);
                     Color color1 = new Color(line.Value.color.r * 0.7f , line.Value.color.g * 0.7f , line.Value.color.b * 0.7f , 1);
-                    vh.AddUIVertexQuad(new UIVertex[]
+                    vh.AddUIVertexQuad(new[]
                     {
                         GetUIVertex(startBottom,line.Value.color),
                         GetUIVertex(startPos, color1),

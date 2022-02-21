@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Elements;
+using SpringGUI;
 using UnityEngine;
 using UnityEngine.UI;
-using SpringGUI;
-using System.Linq;
 
 namespace PCRCaculator.Guild
 {
@@ -88,7 +88,7 @@ namespace PCRCaculator.Guild
                         if (showChat[i])
                         {
                             List<ValueChangeData> data1 = GuildCalculator.NormalizeLineChatData(AllUnitDamageDates[i], TotalMax);
-                            lineChart.Replace<ValueChangeData>(i, data1);
+                            lineChart.Replace(i, data1);
                             if (k1)
                             {
                                 SetPos(data1, TotalMax);
@@ -97,7 +97,7 @@ namespace PCRCaculator.Guild
                         }
                         else
                         {
-                            lineChart.Replace<ValueChangeData>(i, emptyList);
+                            lineChart.Replace(i, emptyList);
                         }
                     }
                     break;
@@ -119,7 +119,7 @@ namespace PCRCaculator.Guild
                         if (showChat[i])
                         {
                             List<ValueChangeData> data2 = GuildCalculator.NormalizeLineChatData(AllUnitTotalDamageDates[i], TotalMax);
-                            lineChart.Replace<ValueChangeData>(i, data2);
+                            lineChart.Replace(i, data2);
                             if (k2)
                             {
                                 SetPos(data2, TotalMax);
@@ -128,26 +128,26 @@ namespace PCRCaculator.Guild
                         }
                         else
                         {
-                            lineChart.Replace<ValueChangeData>(i, emptyList);
+                            lineChart.Replace(i, emptyList);
                         }
                     }
                     break;
                 case 3:
                     List<ValueChangeData> data3 = GuildCalculator.NormalizeLineChatData(BossDefData, bossDefMax);
-                    lineChart.Replace<ValueChangeData>(0, data3);
+                    lineChart.Replace(0, data3);
                     SetPos(data3, bossDefMax);
                     for (int i = 1; i < 6; i++)
                     {
-                        lineChart.Replace<ValueChangeData>(i, emptyList);
+                        lineChart.Replace(i, emptyList);
                     }
                     break;
                 case 4:
                     List<ValueChangeData> data4 = GuildCalculator.NormalizeLineChatData(BossMagicDefData, bossMagicDefMax);
-                    lineChart.Replace<ValueChangeData>(0, data4);
+                    lineChart.Replace(0, data4);
                     SetPos(data4, bossMagicDefMax);
                     for (int i = 1; i < 6; i++)
                     {
-                        lineChart.Replace<ValueChangeData>(i, emptyList);
+                        lineChart.Replace(i, emptyList);
                     }
                     break;
 
@@ -164,9 +164,9 @@ namespace PCRCaculator.Guild
                     GuildUnitToggles[0].interactable = true;                    
                     for(int i = 0; i < 5; i++)
                     {
-                        if(i < Elements.MyGameCtrl.Instance.playerUnitCtrl.Count)
+                        if(i < MyGameCtrl.Instance.playerUnitCtrl.Count)
                         {
-                            GuildUnitTexts[i + 1].text = Elements.MyGameCtrl.Instance.playerUnitCtrl[i].UnitName;
+                            GuildUnitTexts[i + 1].text = MyGameCtrl.Instance.playerUnitCtrl[i].UnitName;
                             GuildUnitToggles[i + 1].interactable = true;
                         }
                         else
@@ -178,7 +178,7 @@ namespace PCRCaculator.Guild
                     break;
                 case 3:
                 case 4:
-                    GuildUnitTexts[0].text = Elements.MyGameCtrl.Instance.enemyUnitCtrl[0].UnitName;
+                    GuildUnitTexts[0].text = MyGameCtrl.Instance.enemyUnitCtrl[0].UnitName;
                     GuildUnitToggles[0].interactable = true;
                     for (int i = 0; i < 5; i++)
                     {
@@ -230,7 +230,7 @@ namespace PCRCaculator.Guild
         {
             for(int i = 0; i < 6; i++)
             {
-                lineChart.Inject<ValueChangeData>(emptyList);
+                lineChart.Inject(emptyList);
             }
             lineChart.ShowUnit();
         }

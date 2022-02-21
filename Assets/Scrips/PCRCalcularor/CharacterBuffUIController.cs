@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Elements;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace PCRCaculator.Battle
 {
@@ -16,17 +16,17 @@ namespace PCRCaculator.Battle
         public GameObject partsDataPrefab;
         public float poszFix;
         
-        private Elements.UnitCtrl owner2;
+        private UnitCtrl owner2;
         private BattleUIManager uIManager;
         private List<eStateIconType> currentBuffs = new List<eStateIconType>();
 
 
-        private List<Elements.PartsData> bossPartsList = new List<Elements.PartsData>();
+        private List<PartsData> bossPartsList = new List<PartsData>();
         
-        public void SetBuffUI(Sprite sprite, Elements.UnitCtrl owner,bool isSummon = false)
+        public void SetBuffUI(Sprite sprite, UnitCtrl owner,bool isSummon = false)
         {
             //rular.sprite = sprite;
-            this.owner2 = owner;
+            owner2 = owner;
             uIManager = BattleUIManager.Instance;
             transform.SetParent(owner2.gameObject.transform, false);
             SetAbnormalIcons(null, eStateIconType.NONE, false);
@@ -64,7 +64,7 @@ namespace PCRCaculator.Battle
             int hpInt = Mathf.RoundToInt(Mathf.Min(1, Mathf.Max(0, normalizedHP)) * 100);
             hpHeadText.text = "HP:" + hpInt + "%";
         }
-        public void SetAbnormalIcons(Elements.UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable)
+        public void SetAbnormalIcons(UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable)
         {
             eStateIconType stateIconType = (eStateIconType)(int)stateIconType_2;
             if (stateIconType == eStateIconType.NONE)
@@ -114,7 +114,7 @@ namespace PCRCaculator.Battle
                     var mid = owner2.transform.position.x / owner2.transform.lossyScale.x;
                     var r = mid + owner2.BodyWidth / 2;
                     var l = mid - owner2.BodyWidth / 2;
-                    posText.text = $"{Mathf.RoundToInt(l)}/{Mathf.RoundToInt(r)}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / Elements.UnitDefine.MAX_ENERGY:P2}";
+                    posText.text = $"{Mathf.RoundToInt(l)}/{Mathf.RoundToInt(r)}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / UnitDefine.MAX_ENERGY:P2}";
                 }
                 catch
                 {
@@ -126,7 +126,7 @@ namespace PCRCaculator.Battle
         public void SetPartsBossData()
         {
             bossPartsList = owner2.BossPartsList;
-            foreach(Elements.PartsData partsData in bossPartsList)
+            foreach(PartsData partsData in bossPartsList)
             {
                 GameObject a = Instantiate(partsDataPrefab);
                 Vector3 tansFix = new Vector3(partsData.PositionX / 540.0f,0, 0 );

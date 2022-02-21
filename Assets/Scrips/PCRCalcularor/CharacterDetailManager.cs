@@ -1,11 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using Spine.Unity;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Spine.Unity;
-using Newtonsoft0.Json;
-using System.IO;
+using Animation = Spine.Animation;
 
 namespace PCRCaculator
 {
@@ -93,11 +92,11 @@ namespace PCRCaculator
                 dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
                 if (dataAsset == null)
                 {
-                    dataAsset = PCRCaculator.SpineCreator.Instance.Createskeletondata(unitid, 0.01f, true);
+                    dataAsset = SpineCreator.Instance.Createskeletondata(unitid, 0.01f, true);
                 }
                 if (dataAsset == null)
                 {
-                    MainManager.Instance.WindowConfigMessage("角色" + unitid + "的战斗小人丢失！", null, null);
+                    MainManager.Instance.WindowConfigMessage("角色" + unitid + "的战斗小人丢失！", null);
                     return;
                 }
                 int motiontype = MainManager.Instance.UnitRarityDic[unitid].detailData.motionType;
@@ -118,9 +117,9 @@ namespace PCRCaculator
                 spine.transform.localPosition = spinePosition;
                 spine.transform.localScale = spineScale;
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
-                MainManager.Instance.WindowConfigMessage("角色" + unitid + "的战斗小人丢失！", null, null);
+                MainManager.Instance.WindowConfigMessage("角色" + unitid + "的战斗小人丢失！", null);
             }
         }
 
@@ -164,22 +163,22 @@ namespace PCRCaculator
         private void SetDetailTexts(BaseData b, BaseData c)
         {
             string[] compare = b.Compare(c);
-            unitDetailTexts[0].text = b.Atk.ToString() + compare[1];
-            unitDetailTexts[1].text = b.Magic_str.ToString() + compare[2];
-            unitDetailTexts[2].text = b.Def.ToString() + compare[3];
-            unitDetailTexts[3].text = b.Magic_def.ToString() + compare[4];
-            unitDetailTexts[4].text = b.Hp.ToString() + compare[0];
-            unitDetailTexts[5].text = b.Physical_critical.ToString() + compare[5];
-            unitDetailTexts[6].text = b.Dodge.ToString() + compare[9];
-            unitDetailTexts[7].text = b.Magic_critical.ToString() + compare[6];
-            unitDetailTexts[8].text = b.Wave_hp_recovery.ToString() + compare[7];
-            unitDetailTexts[9].text = b.Wave_energy_recovery.ToString() + compare[8];
-            unitDetailTexts[10].text = b.Life_steal.ToString() + compare[12];
-            unitDetailTexts[11].text = b.Hp_recovery_rate.ToString() + compare[13];
-            unitDetailTexts[12].text = b.Energy_recovery_rate.ToString() + compare[14];
-            unitDetailTexts[13].text = b.Enerey_reduce_rate.ToString() + compare[15];
-            unitDetailTexts[14].text = b.Accuracy.ToString() + compare[16];
-            unitDetailTexts[15].text = data.love.ToString() + BaseData.Compare_2(data.love,data_save.love);
+            unitDetailTexts[0].text = b.Atk + compare[1];
+            unitDetailTexts[1].text = b.Magic_str + compare[2];
+            unitDetailTexts[2].text = b.Def + compare[3];
+            unitDetailTexts[3].text = b.Magic_def + compare[4];
+            unitDetailTexts[4].text = b.Hp + compare[0];
+            unitDetailTexts[5].text = b.Physical_critical + compare[5];
+            unitDetailTexts[6].text = b.Dodge + compare[9];
+            unitDetailTexts[7].text = b.Magic_critical + compare[6];
+            unitDetailTexts[8].text = b.Wave_hp_recovery + compare[7];
+            unitDetailTexts[9].text = b.Wave_energy_recovery + compare[8];
+            unitDetailTexts[10].text = b.Life_steal + compare[12];
+            unitDetailTexts[11].text = b.Hp_recovery_rate + compare[13];
+            unitDetailTexts[12].text = b.Energy_recovery_rate + compare[14];
+            unitDetailTexts[13].text = b.Enerey_reduce_rate + compare[15];
+            unitDetailTexts[14].text = b.Accuracy + compare[16];
+            unitDetailTexts[15].text = data.love + BaseData.Compare_2(data.love,data_save.love);
             int x = Mathf.RoundToInt(b.GetPowerValue(data));
             int y = Mathf.RoundToInt(c.GetPowerValue(data_save));
             unitDetailTexts[16].text = x + BaseData.Compare_2(x, y);
@@ -400,7 +399,7 @@ namespace PCRCaculator
         }
         private void PlayAnime(bool loop)
         {
-            Spine.Animation spineAnimation = null;
+            Animation spineAnimation = null;
             switch (skillAnimationDropDown.value)
             {
                 case 0:
@@ -442,10 +441,10 @@ namespace PCRCaculator
                         skillTimeData = MainManager.Instance.AllUnitSkillTimeDataDic[unitId];
                     }
                 }
-                catch(System.Exception e)
+                catch(Exception e)
                 {
                     Debug.LogError(e.Message);
-                    MainManager.Instance.WindowConfigMessage(e.Message, null, null);
+                    MainManager.Instance.WindowConfigMessage(e.Message, null);
                 }
             }
             if(skillTimeData!= null)

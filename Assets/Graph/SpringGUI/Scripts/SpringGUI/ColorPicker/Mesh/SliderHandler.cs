@@ -38,8 +38,8 @@ namespace SpringGUI
             UIVertex right6 = GetUIVertex(leftThird , Color.black);
             UIVertex right7 = GetUIVertex(leftFouth , Color.black);
 
-            vh.AddUIVertexQuad(new UIVertex[] { right0 , right1 , right2 , right3 });
-            vh.AddUIVertexQuad(new UIVertex[] { right4 , right7 , right6 , right5 });
+            vh.AddUIVertexQuad(new[] { right0 , right1 , right2 , right3 });
+            vh.AddUIVertexQuad(new[] { right4 , right7 , right6 , right5 });
         }
 
         public UIVertex GetUIVertex( Vector2 point , Color color0 )

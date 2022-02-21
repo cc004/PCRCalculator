@@ -178,17 +178,17 @@ namespace Spine
 				BoneData boneData2 = skeletonData.bones.Items[ReadVarint(input, optimizePositive: true)];
 				SlotData slotData = new SlotData(j, name2, boneData2);
 				int num3 = ReadInt(input);
-				slotData.r = (float)((num3 & 0xFF000000u) >> 24) / 255f;
-				slotData.g = (float)((num3 & 0xFF0000) >> 16) / 255f;
-				slotData.b = (float)((num3 & 0xFF00) >> 8) / 255f;
-				slotData.a = (float)(num3 & 0xFF) / 255f;
+				slotData.r = ((num3 & 0xFF000000u) >> 24) / 255f;
+				slotData.g = ((num3 & 0xFF0000) >> 16) / 255f;
+				slotData.b = ((num3 & 0xFF00) >> 8) / 255f;
+				slotData.a = (num3 & 0xFF) / 255f;
 				int num4 = ReadInt(input);
 				if (num4 != -1)
 				{
 					slotData.hasSecondColor = true;
-					slotData.r2 = (float)((num4 & 0xFF0000) >> 16) / 255f;
-					slotData.g2 = (float)((num4 & 0xFF00) >> 8) / 255f;
-					slotData.b2 = (float)(num4 & 0xFF) / 255f;
+					slotData.r2 = ((num4 & 0xFF0000) >> 16) / 255f;
+					slotData.g2 = ((num4 & 0xFF00) >> 8) / 255f;
+					slotData.b2 = (num4 & 0xFF) / 255f;
 				}
 				slotData.attachmentName = ReadString(input);
 				slotData.blendMode = (BlendMode)ReadVarint(input, optimizePositive: true);
@@ -385,17 +385,17 @@ namespace Spine
 				BoneData boneData2 = skeletonData.bones.Items[ReadVarint(input, optimizePositive: true)];
 				SlotData slotData = new SlotData(j, name2, boneData2);
 				int num3 = ReadInt(input);
-				slotData.r = (float)((num3 & 0xFF000000u) >> 24) / 255f;
-				slotData.g = (float)((num3 & 0xFF0000) >> 16) / 255f;
-				slotData.b = (float)((num3 & 0xFF00) >> 8) / 255f;
-				slotData.a = (float)(num3 & 0xFF) / 255f;
+				slotData.r = ((num3 & 0xFF000000u) >> 24) / 255f;
+				slotData.g = ((num3 & 0xFF0000) >> 16) / 255f;
+				slotData.b = ((num3 & 0xFF00) >> 8) / 255f;
+				slotData.a = (num3 & 0xFF) / 255f;
 				int num4 = ReadInt(input);
 				if (num4 != -1)
 				{
 					slotData.hasSecondColor = true;
-					slotData.r2 = (float)((num4 & 0xFF0000) >> 16) / 255f;
-					slotData.g2 = (float)((num4 & 0xFF00) >> 8) / 255f;
-					slotData.b2 = (float)(num4 & 0xFF) / 255f;
+					slotData.r2 = ((num4 & 0xFF0000) >> 16) / 255f;
+					slotData.g2 = ((num4 & 0xFF00) >> 8) / 255f;
+					slotData.b2 = (num4 & 0xFF) / 255f;
 				}
 				slotData.attachmentName = ReadString(input);
 				slotData.blendMode = (BlendMode)ReadVarint(input, optimizePositive: true);
@@ -617,10 +617,10 @@ namespace Spine
 				regionAttachment.rotation = rotation;
 				regionAttachment.width = num5 * scale;
 				regionAttachment.height = num6 * scale;
-				regionAttachment.r = (float)((num7 & 0xFF000000u) >> 24) / 255f;
-				regionAttachment.g = (float)((num7 & 0xFF0000) >> 16) / 255f;
-				regionAttachment.b = (float)((num7 & 0xFF00) >> 8) / 255f;
-				regionAttachment.a = (float)(num7 & 0xFF) / 255f;
+				regionAttachment.r = ((num7 & 0xFF000000u) >> 24) / 255f;
+				regionAttachment.g = ((num7 & 0xFF0000) >> 16) / 255f;
+				regionAttachment.b = ((num7 & 0xFF00) >> 8) / 255f;
+				regionAttachment.a = (num7 & 0xFF) / 255f;
 				regionAttachment.UpdateOffset();
 				return regionAttachment;
 			}
@@ -670,10 +670,10 @@ namespace Spine
 					return null;
 				}
 				meshAttachment.Path = text3;
-				meshAttachment.r = (float)((num8 & 0xFF000000u) >> 24) / 255f;
-				meshAttachment.g = (float)((num8 & 0xFF0000) >> 16) / 255f;
-				meshAttachment.b = (float)((num8 & 0xFF00) >> 8) / 255f;
-				meshAttachment.a = (float)(num8 & 0xFF) / 255f;
+				meshAttachment.r = ((num8 & 0xFF000000u) >> 24) / 255f;
+				meshAttachment.g = ((num8 & 0xFF0000) >> 16) / 255f;
+				meshAttachment.b = ((num8 & 0xFF00) >> 8) / 255f;
+				meshAttachment.a = (num8 & 0xFF) / 255f;
 				meshAttachment.bones = vertices2.bones;
 				meshAttachment.vertices = vertices2.vertices;
 				meshAttachment.WorldVerticesLength = num9 << 1;
@@ -713,10 +713,10 @@ namespace Spine
 					return null;
 				}
 				meshAttachment2.Path = text4;
-				meshAttachment2.r = (float)((num13 & 0xFF000000u) >> 24) / 255f;
-				meshAttachment2.g = (float)((num13 & 0xFF0000) >> 16) / 255f;
-				meshAttachment2.b = (float)((num13 & 0xFF00) >> 8) / 255f;
-				meshAttachment2.a = (float)(num13 & 0xFF) / 255f;
+				meshAttachment2.r = ((num13 & 0xFF000000u) >> 24) / 255f;
+				meshAttachment2.g = ((num13 & 0xFF0000) >> 16) / 255f;
+				meshAttachment2.b = ((num13 & 0xFF00) >> 8) / 255f;
+				meshAttachment2.a = (num13 & 0xFF) / 255f;
 				meshAttachment2.inheritDeform = inheritDeform;
 				if (nonessential)
 				{
@@ -893,10 +893,10 @@ namespace Spine
 						{
 							float time2 = ReadFloat(input);
 							int num8 = ReadInt(input);
-							float r3 = (float)((num8 & 0xFF000000u) >> 24) / 255f;
-							float g3 = (float)((num8 & 0xFF0000) >> 16) / 255f;
-							float b3 = (float)((num8 & 0xFF00) >> 8) / 255f;
-							float a2 = (float)(num8 & 0xFF) / 255f;
+							float r3 = ((num8 & 0xFF000000u) >> 24) / 255f;
+							float g3 = ((num8 & 0xFF0000) >> 16) / 255f;
+							float b3 = ((num8 & 0xFF00) >> 8) / 255f;
+							float a2 = (num8 & 0xFF) / 255f;
 							colorTimeline.SetFrame(l, time2, r3, g3, b3, a2);
 							if (l < num5 - 1)
 							{
@@ -914,14 +914,14 @@ namespace Spine
 						{
 							float time = ReadFloat(input);
 							int num6 = ReadInt(input);
-							float r = (float)((num6 & 0xFF000000u) >> 24) / 255f;
-							float g = (float)((num6 & 0xFF0000) >> 16) / 255f;
-							float b = (float)((num6 & 0xFF00) >> 8) / 255f;
-							float a = (float)(num6 & 0xFF) / 255f;
+							float r = ((num6 & 0xFF000000u) >> 24) / 255f;
+							float g = ((num6 & 0xFF0000) >> 16) / 255f;
+							float b = ((num6 & 0xFF00) >> 8) / 255f;
+							float a = (num6 & 0xFF) / 255f;
 							int num7 = ReadInt(input);
-							float r2 = (float)((num7 & 0xFF0000) >> 16) / 255f;
-							float g2 = (float)((num7 & 0xFF00) >> 8) / 255f;
-							float b2 = (float)(num7 & 0xFF) / 255f;
+							float r2 = ((num7 & 0xFF0000) >> 16) / 255f;
+							float g2 = ((num7 & 0xFF00) >> 8) / 255f;
+							float b2 = (num7 & 0xFF) / 255f;
 							twoColorTimeline.SetFrame(k, time, r, g, b, a, r2, g2, b2);
 							if (k < num5 - 1)
 							{

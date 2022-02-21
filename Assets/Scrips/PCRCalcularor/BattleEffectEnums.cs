@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace PCRCaculator.Battle
+﻿namespace PCRCaculator.Battle
 {
     public enum eMoveTypes
     {

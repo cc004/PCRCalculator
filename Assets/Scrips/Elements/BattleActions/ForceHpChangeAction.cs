@@ -20,7 +20,7 @@ namespace Elements
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
       _skill.IsLifeStealEnabled = false;
-      this.isEnergyGainEnabled = (uint) (int) this.MasterData.action_detail_1 > 0U;
+      isEnergyGainEnabled = (uint) (int) MasterData.action_detail_1 > 0U;
     }
 
     public override void ExecAction(
@@ -38,15 +38,15 @@ namespace Elements
         return;
       long _hpDiff = (long) _target.Owner.Hp - (long) _valueDictionary[eValueNumber.VALUE_1];
       if (_hpDiff >= 0L)
-        this.damageTarget(_source, _target, _num, _skill, _hpDiff);
+        damageTarget(_source, _target, _num, _skill, _hpDiff);
       else
-        this.recoverTarget(_source, _target, (int) -_hpDiff);
+        recoverTarget(_source, _target, (int) -_hpDiff);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) (double) this.MasterData.action_value_1;
+      Value[eValueNumber.VALUE_1] = (float) (double) MasterData.action_value_1;
     }
 
     private void damageTarget(
@@ -56,7 +56,7 @@ namespace Elements
       Skill _skill,
       long _hpDiff)
     {
-      DamageData _damageData = new DamageData()
+      DamageData _damageData = new DamageData
       {
         Damage = _hpDiff,
         Target = _target,
@@ -67,13 +67,13 @@ namespace Elements
         CriticalDamageRate = 0.0f,
         ActionType = eActionType.FORCE_HP_CHANGE
       };
-      _target.Owner.SetDamage(_damageData, true, this.ActionId, this.OnDamageHit, _skill: _skill, _energyAdd: this.isEnergyGainEnabled, _onDefeat: this.OnDefeatEnemy, _damageWeight: this.ActionExecTimeList[_num].Weight, _damageWeightSum: this.ActionWeightSum, _energyChargeMultiple: this.EnergyChargeMultiple);
+      _target.Owner.SetDamage(_damageData, true, ActionId, OnDamageHit, _skill: _skill, _energyAdd: isEnergyGainEnabled, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple);
     }
 
         private void recoverTarget(UnitCtrl _source, BasePartsData _target, int _hpDiff)
         {
-            int num = Mathf.Min(_hpDiff, (int)((long)_target.Owner.MaxHp - (long)_target.Owner.Hp));
-            _target.Owner.SetRecovery(num, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (this.EffectType == eEffectType.COMMON), _target: _target);
+            int num = Mathf.Min(_hpDiff, (int)(_target.Owner.MaxHp - (long)_target.Owner.Hp));
+            _target.Owner.SetRecovery(num, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _target: _target);
         }
     }
 }

@@ -4,8 +4,8 @@
 * Description: SpringGUI.LineChartGraph example.
 ==========================================*/
 
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using SpringGUI;
 using UnityEngine;
 
@@ -29,8 +29,8 @@ public class LineChartGraphExample : MonoBehaviour
 
     public void Awake()
     {
-        var data1 = new List<TestData>()
-            {
+        var data1 = new List<TestData>
+        {
                 new TestData(0.0f,0.0f),
                 new TestData(0.1f,0.9f),
                 new TestData(0.2f,0.2f),
@@ -43,8 +43,8 @@ public class LineChartGraphExample : MonoBehaviour
                 new TestData(0.9f,0.2f),
                 new TestData(1f,0.5f),
             };
-        var data2 = new List<TestData>()
-            {
+        var data2 = new List<TestData>
+        {
                 new TestData(0.0f,0.7f),
                 new TestData(0.1f,0.1f),
                 new TestData(0.2f,0.5f),
@@ -63,8 +63,8 @@ public class LineChartGraphExample : MonoBehaviour
             listb.Add(new TestData(i /10.0f, Mathf.Abs(Mathf.Cos(i*99)*15)));
         }
 
-        LineChart.Inject<TestData>(lista);
-        LineChart.Inject<TestData>(listb);
+        LineChart.Inject(lista);
+        LineChart.Inject(listb);
         LineChart.ShowUnit();
         StartCoroutine(UpdateThis());
     }
@@ -73,7 +73,7 @@ public class LineChartGraphExample : MonoBehaviour
         for(int i = 0; i < 550; i++)
         {
             lista.Add(new TestData(i / 540.0f, Mathf.Abs(Mathf.Sin(i * 99))));
-            LineChart.Replace<TestData>(0, lista);
+            LineChart.Replace(0, lista);
             yield return 0;
         }
     }

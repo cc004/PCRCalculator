@@ -6,10 +6,10 @@
 ==========================================*/
 
 using System;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SpringGUI
 {
@@ -17,14 +17,14 @@ namespace SpringGUI
     {
         #region private && public  members
         
-        private UITreeData TreeData = null;
-        private UITree UITree = null;
-        private Toggle toggle = null;
-        private Image icon = null;
-        private Text text = null;
-        private Transform _toggleTransform = null;
-        private Transform _myTransform = null;
-        private Transform _container = null;
+        private UITreeData TreeData;
+        private UITree UITree;
+        private Toggle toggle;
+        private Image icon;
+        private Text text;
+        private Transform _toggleTransform;
+        private Transform _myTransform;
+        private Transform _container;
 
         private List<GameObject> _children = new List<GameObject>();
 
@@ -34,7 +34,7 @@ namespace SpringGUI
         
         private void getComponent( )
         {
-            _myTransform = this.transform;
+            _myTransform = transform;
             _container = _myTransform.Find("Container");
             toggle = _container.Find("Toggle").GetComponent<Toggle>();
             icon = _container.Find("IconContainer/Icon").GetComponent<Image>();

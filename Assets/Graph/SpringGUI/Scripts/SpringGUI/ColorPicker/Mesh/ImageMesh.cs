@@ -43,8 +43,8 @@ namespace SpringGUI
                 vh.AddUIVertexQuad(GetQuad(startPos , endPos , Color , LineWidth));
             }
 
-            var x = (int)( XAxisCount / 2 );
-            var y = (int)( YAxisCount / 2 );
+            var x = XAxisCount / 2;
+            var y = YAxisCount / 2;
             var bottomLeft = origin + new Vector2(perWidth * x , perHeight * y);
             var bottomRight = bottomLeft + new Vector2(perWidth , 0);
             var topLeft = bottomLeft + new Vector2(0 , perHeight);

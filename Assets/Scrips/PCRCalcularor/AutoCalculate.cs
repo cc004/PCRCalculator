@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Globalization;
+using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -56,8 +56,8 @@ namespace PCRCaculator
         }
         private void StartNew_0(string  input)
         {
-            int num = int.Parse(input, System.Globalization.NumberStyles.Any);
-            Guild.GuildManager.Instance.StartAutoCalculateByButton(num);
+            int num = int.Parse(input, NumberStyles.Any);
+            GuildManager.Instance.StartAutoCalculateByButton(num);
         }
 
     }

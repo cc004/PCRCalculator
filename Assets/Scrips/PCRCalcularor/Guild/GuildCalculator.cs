@@ -1,18 +1,20 @@
 ﻿using System;
-using Elements;
-using ExcelDataReader;
-using Newtonsoft0.Json;
-using OfficeOpenXml;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using Elements;
+using Elements.Battle;
+using ExcelDataReader;
 using ExcelHelper;
+using Newtonsoft0.Json;
+using OfficeOpenXml;
+using PCRCaculator.Battle;
 using UnityEngine;
 using UnityEngine.UI;
-using Application = UnityEngine.Application;
+using BattleDefine = Elements.BattleDefine;
 using Random = UnityEngine.Random;
 
 namespace PCRCaculator.Guild
@@ -60,11 +62,11 @@ namespace PCRCaculator.Guild
         private List<UnitCtrl> players;
         private UnitCtrl boss;
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
-        private long totalDamage = 0;
-        private long totalDamageCriEX = 0;
+        private long totalDamage;
+        private long totalDamageCriEX;
         private FloatWithEx totalDamageExcept = 0;
         private bool isFinishCalc;
-        private int backTime = 0;
+        private int backTime;
 
         public List<int> PlayerIds => playerIds;
         public int BossId => bossId;
@@ -109,7 +111,7 @@ namespace PCRCaculator.Guild
             AppendChangeBaseValue(bossId, 1, boss.Def, 0, "初始化");
             AppendChangeBaseValue(bossId, 2, boss.MagicDef, 0, "初始化");
             OnToggleSwitched(0);
-            Elements.Battle.BattleManager.OnCallRandom = AppendCallRandom;
+            BattleManager.OnCallRandom = AppendCallRandom;
         }
         private void AddSkillGroupPrefab(int a, UnitCtrl b, int c, bool create = true)
         {
@@ -146,7 +148,7 @@ namespace PCRCaculator.Guild
 
         }
 
-        private int id = 0;
+        private int id;
         public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount, string describe, UnitCtrl ctrl)
         {
             try
@@ -156,7 +158,7 @@ namespace PCRCaculator.Guild
                 {
                     if (actionState == UnitCtrl.ActionState.IDLE)
                     {
-                        ctrl.critPoint = new UnitCtrl.CritPoint()
+                        ctrl.critPoint = new UnitCtrl.CritPoint
                         {
                             description = "IDLE",
                             description2 = "AUTO",
@@ -173,7 +175,7 @@ namespace PCRCaculator.Guild
                             operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null
                         });
                     //skillGroupPrefabDic[unitid].AddButtons(allUnitLastStateDic[unitid].currentFrameCount, frameCount, (int)actionState);
-                    System.Action action = null;
+                    Action action = null;
                     int startFrame = allUnitLastStateDic[unitid].currentFrameCount;
                     int oldState = (int)allUnitLastStateDic[unitid].changStateTo;
                     if (oldState >= 1 && oldState <= 3)
@@ -192,7 +194,7 @@ namespace PCRCaculator.Guild
                         allUnitLastStateDic[unitid].changStateTo, actionState, describe);
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogError("添加角色按钮时出错！" + e.Message);
             }
@@ -381,7 +383,7 @@ namespace PCRCaculator.Guild
         }
         public void OnBattleFinished(int result, int currentFrame)
         {
-            System.Action<List<UnitCtrl>> action = new System.Action<List<UnitCtrl>>(a =>
+            Action<List<UnitCtrl>> action = a =>
             {
                 foreach (UnitCtrl unitCtrl in a)
                 {
@@ -396,7 +398,7 @@ namespace PCRCaculator.Guild
                         skillGroupPrefabDic[unitid].AddAbnormalStateButtons(changeData);
                     }
                 }
-            });
+            };
             action(MyGameCtrl.Instance.playerUnitCtrl);
             action(MyGameCtrl.Instance.enemyUnitCtrl);
             AppendChangeBaseValue(bossId, 1, boss.Def, 5400, "时间耗尽");
@@ -408,7 +410,7 @@ namespace PCRCaculator.Guild
             OnToggleSwitched(0);
             if (currentFrame < 5400)
             {
-                backTime = Mathf.CeilToInt((Elements.MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
+                backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
                 ReflashTotalDamage(true, 0, false, 0, 0);
             }
             string damageStr =
@@ -456,7 +458,7 @@ namespace PCRCaculator.Guild
         {
             if (Application.platform == RuntimePlatform.Android)
             {
-                MainManager.Instance.WindowConfigMessage("手机端导出可能失败，建议使用电脑端导出！\n如要尝试请按确定继续", CallExcelHelper, null);
+                MainManager.Instance.WindowConfigMessage("手机端导出可能失败，建议使用电脑端导出！\n如要尝试请按确定继续", CallExcelHelper);
             }
             else
             {
@@ -477,22 +479,22 @@ namespace PCRCaculator.Guild
                     UBExecTime = CreateUBExecTimeData(),
                     exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expect / 10000),
                     backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
-                    charImages = PCRCaculator.Battle.BattleUIManager.Instance.GetCharactersImage(),
+                    charImages = BattleUIManager.Instance.GetCharactersImage(),
                     //string fileName = CreateExcelName();
                     timeLineName = CreateExcelName(),
                     uBDetails = CreateUBDetailList(),
                     detail = detail,
                 };
                 ExcelHelper.ExcelHelper.OutputGuildTimeLine(timelineData, fileName);
-                MainManager.Instance.WindowConfigMessage("成功！", null, null);
+                MainManager.Instance.WindowConfigMessage("成功！", null);
             }
 #if UNITY_EDITOR
-            catch (System.DuplicateWaitObjectException a)
+            catch (DuplicateWaitObjectException a)
 #else
             catch (System.Exception a)
 #endif
             {
-                MainManager.Instance.WindowConfigMessage("发生错误：" + a.Message, null, null);
+                MainManager.Instance.WindowConfigMessage("发生错误：" + a.Message, null);
             }
 
         }
@@ -615,7 +617,7 @@ namespace PCRCaculator.Guild
             GuildManager.SaveSettingData(MyGameCtrl.Instance.tempData.SettingData);
             MainManager.Instance.WindowConfigMessage("成功！", null, null);
         }*/
-        public PCRCaculator.OnceResultData GetOnceResultData(int id)
+        public OnceResultData GetOnceResultData(int id)
         {
             List<string> errorList = new List<string>();
             List<List<float>> ubExecTime = CreateUBExecTimeData();
@@ -758,7 +760,7 @@ namespace PCRCaculator.Guild
                 if (val > 0) action = hash => totalDamageExcept.Emulate(hash) >= val;
                 else
                 {
-                    var lastHp = bossValues.Last(f => (PCRCaculator.Guild.GuildManager.Instance.SettingData.limitTime - (int)(f.frame / 60) >= -val)).value;
+                    var lastHp = bossValues.Last(f => (GuildManager.Instance.SettingData.limitTime - f.frame / 60 >= -val)).value;
                     action = hash => lastHp.Emulate(hash) <= 0;
                 }
                 for (int i = 0; i < N; ++i)
@@ -830,13 +832,13 @@ namespace PCRCaculator.Guild
 
             OpenFileName ofn = new OpenFileName();
 
-            ofn.file = PCRCaculator.MainManager.GetSaveDataPath() + "/Templates/模板4 星美版2.xlsx";
+            ofn.file = MainManager.GetSaveDataPath() + "/Templates/模板4 星美版2.xlsx";
             templateSettings.Clear();
             using (IExcelDataReader reader =
-                   ExcelDataReader.ExcelReaderFactory.CreateReader(File.Open(ofn.file, FileMode.Open)))
+                   ExcelReaderFactory.CreateReader(File.Open(ofn.file, FileMode.Open)))
             {
-                System.Data.DataSet ds = reader.AsDataSet();
-                System.Data.DataTable wsh = ds.Tables["设置"];
+                DataSet ds = reader.AsDataSet();
+                DataTable wsh = ds.Tables["设置"];
                 for (int i = 1; i < wsh.Rows.Count; i++)
                 {
                     if (wsh.Rows[i][0] is string cell1 && !string.IsNullOrEmpty(cell1))
@@ -859,7 +861,7 @@ namespace PCRCaculator.Guild
                 UBExecTime = CreateUBExecTimeData(),
                 exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expect / 10000),
                 backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
-                charImages = PCRCaculator.Battle.BattleUIManager.Instance.GetCharactersImage(),
+                charImages = BattleUIManager.Instance.GetCharactersImage(),
                 //string fileName = CreateExcelName();
                 timeLineName = CreateExcelName(),
                 uBDetails = CreateUBDetailList(),
@@ -912,7 +914,7 @@ namespace PCRCaculator.Guild
             }
             if (templateSettings["BOSS名称坐标"] != null)
             {
-                sheet.Cells[templateSettings["BOSS名称坐标"]].Value = Elements.MyGameCtrl.Instance.tempData.guildEnemy.detailData.unit_name;
+                sheet.Cells[templateSettings["BOSS名称坐标"]].Value = MyGameCtrl.Instance.tempData.guildEnemy.detailData.unit_name;
             }
             
             if (templateSettings["BOSS头像"] != null)
@@ -1008,7 +1010,7 @@ namespace PCRCaculator.Guild
                 {
                     sheet.Cells[rowId, int.Parse(templateSettings["角色列"])].Value = detail.unitData.GetUnitName();
                     sheet.MySetValue(rowId, int.Parse(templateSettings["伤害列"]), detail.Damage,
-                        fontColor: detail.Critical ? new int[] { 255, 0, 0 } : new int[] { 0, 0, 0 });
+                        fontColor: detail.Critical ? new[] { 255, 0, 0 } : new[] { 0, 0, 0 });
                 }
                 ++rowId;
             }
@@ -1027,8 +1029,8 @@ namespace PCRCaculator.Guild
     {
         public int id;
         public int currentFrameCount;
-        public Elements.UnitCtrl.ActionState changStateFrom;
-        public Elements.UnitCtrl.ActionState changStateTo;
+        public UnitCtrl.ActionState changStateFrom;
+        public UnitCtrl.ActionState changStateTo;
         public string describe;
         [JsonIgnore]
         public string operation;
@@ -1039,7 +1041,7 @@ namespace PCRCaculator.Guild
             this.changStateFrom = changStateFrom;
             this.changStateTo = changStateTo;
             this.describe = describe;
-            this.operation = null;
+            operation = null;
             id = 0;
         }
         public string GetMainDescribe()
@@ -1077,12 +1079,10 @@ namespace PCRCaculator.Guild
         {
             if (isBuff)
             {
-                return ((Elements.UnitCtrl.BuffParamKind)BUFF_Type).GetDescription() + " " + MainValue;
+                return ((UnitCtrl.BuffParamKind)BUFF_Type).GetDescription() + " " + MainValue;
             }
-            else
-            {
-                return CurrentAbnormalState.GetDescription();
-            }
+
+            return CurrentAbnormalState.GetDescription();
         }
         public void ShowDetail()
         {

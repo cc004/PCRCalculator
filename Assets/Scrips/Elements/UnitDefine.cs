@@ -256,32 +256,32 @@ namespace Elements
         eTextId.ACCURACY
       }
     };*/
-    public static readonly List<UnitDefine.UnitBgFaceType> BG_FACE_TYPE_LIST = new List<UnitDefine.UnitBgFaceType>()
+    public static readonly List<UnitBgFaceType> BG_FACE_TYPE_LIST = new List<UnitBgFaceType>
     {
-      new UnitDefine.UnitBgFaceType(1, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(3, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(1, "eye_open", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(1, "eye_open", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(1, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(4, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(5, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(7, "eye_close", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(7, "eye_close", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(7, "eye_close", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(6, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(1, "eye_close", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(3, "eye_open", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(3, "eye_open", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(4, "eye_open", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(4, "eye_open", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(5, "eye_open", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(5, "eye_open", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(2, "eye_open", "mouth_open"),
-      new UnitDefine.UnitBgFaceType(2, "eye_open", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(2, "eye_open", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(6, "eye_open", "mouth_idle"),
-      new UnitDefine.UnitBgFaceType(6, "eye_open", "mouth_close"),
-      new UnitDefine.UnitBgFaceType(1, "eye_close", "mouth_close")
+      new UnitBgFaceType(1, "eye_open", "mouth_open"),
+      new UnitBgFaceType(3, "eye_open", "mouth_open"),
+      new UnitBgFaceType(1, "eye_open", "mouth_close"),
+      new UnitBgFaceType(1, "eye_open", "mouth_idle"),
+      new UnitBgFaceType(1, "eye_open", "mouth_open"),
+      new UnitBgFaceType(4, "eye_open", "mouth_open"),
+      new UnitBgFaceType(5, "eye_open", "mouth_open"),
+      new UnitBgFaceType(7, "eye_close", "mouth_close"),
+      new UnitBgFaceType(7, "eye_close", "mouth_idle"),
+      new UnitBgFaceType(7, "eye_close", "mouth_open"),
+      new UnitBgFaceType(6, "eye_open", "mouth_open"),
+      new UnitBgFaceType(1, "eye_close", "mouth_close"),
+      new UnitBgFaceType(3, "eye_open", "mouth_close"),
+      new UnitBgFaceType(3, "eye_open", "mouth_idle"),
+      new UnitBgFaceType(4, "eye_open", "mouth_idle"),
+      new UnitBgFaceType(4, "eye_open", "mouth_close"),
+      new UnitBgFaceType(5, "eye_open", "mouth_idle"),
+      new UnitBgFaceType(5, "eye_open", "mouth_close"),
+      new UnitBgFaceType(2, "eye_open", "mouth_open"),
+      new UnitBgFaceType(2, "eye_open", "mouth_idle"),
+      new UnitBgFaceType(2, "eye_open", "mouth_close"),
+      new UnitBgFaceType(6, "eye_open", "mouth_idle"),
+      new UnitBgFaceType(6, "eye_open", "mouth_close"),
+      new UnitBgFaceType(1, "eye_close", "mouth_close")
     };
     /*public static readonly List<StoryDefine.CharacterStorySort> CHARASTORY_SORT_TYPE_LIST = new List<StoryDefine.CharacterStorySort>()
     {
@@ -306,12 +306,12 @@ namespace Elements
     };*/
     public const int ALL_BATTLEUNIT_MONSTER_COMMON_NUMBER = 99;
     public const int ALL_BATTLE_UNIT_MONSTER_COMMON_DIVISOR = 100;
-    public static readonly List<eUnitBattlePos> UNIT_TOP_TAB_POSITION_LIST = new List<eUnitBattlePos>((IEnumerable<eUnitBattlePos>) new eUnitBattlePos[4]
+    public static readonly List<eUnitBattlePos> UNIT_TOP_TAB_POSITION_LIST = new List<eUnitBattlePos>(new eUnitBattlePos[4]
     {
-      eUnitBattlePos.ALL,
-      eUnitBattlePos.FRONT,
-      eUnitBattlePos.MIDDLE,
-      eUnitBattlePos.BACK
+        eUnitBattlePos.ALL,
+        eUnitBattlePos.FRONT,
+        eUnitBattlePos.MIDDLE,
+        eUnitBattlePos.BACK
     });
 
     /*public static UnitData CopyUnitData(UnitData _original)
@@ -464,26 +464,26 @@ namespace Elements
       private Vector2 position;
       private GameObject gameObject;
 
-      public int UnitId => this.unitId;
+      public int UnitId => unitId;
 
-      public int LoveLevel => this.loveLevel;
+      public int LoveLevel => loveLevel;
 
-      public Vector2 Position => !((Object) this.gameObject != (Object) null) ? this.position : (Vector2) this.gameObject.transform.position;
+      public Vector2 Position => !(gameObject != null) ? position : (Vector2)gameObject.transform.position;
 
       public UnitLoveData(int _unitId, int _loveLevel, Vector2 _position)
       {
-        this.unitId = _unitId;
-        this.loveLevel = _loveLevel;
-        this.position = _position;
-        this.gameObject = (GameObject) null;
+        unitId = _unitId;
+        loveLevel = _loveLevel;
+        position = _position;
+        gameObject = null;
       }
 
       public UnitLoveData(int _unitId, int _loveLevel, GameObject _gameObject)
       {
-        this.unitId = _unitId;
-        this.loveLevel = _loveLevel;
-        this.position = Vector2.zero;
-        this.gameObject = _gameObject;
+        unitId = _unitId;
+        loveLevel = _loveLevel;
+        position = Vector2.zero;
+        gameObject = _gameObject;
       }
     }
 
@@ -512,9 +512,9 @@ namespace Elements
 
       public UnitBgFaceType(int _faceId, string _eyeAnimation, string _mouthAnimation)
       {
-        this.FaceId = _faceId;
-        this.EyeAnimation = _eyeAnimation;
-        this.MouthAnimation = _mouthAnimation;
+        FaceId = _faceId;
+        EyeAnimation = _eyeAnimation;
+        MouthAnimation = _mouthAnimation;
       }
     }
 

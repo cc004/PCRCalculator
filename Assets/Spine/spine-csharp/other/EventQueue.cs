@@ -63,9 +63,9 @@ namespace Spine
 		internal void Start(TrackEntry entry)
 		{
 			eventQueueEntries.Add(eventQueueExtryGet(EventType.Start, entry));
-			if (this.AnimationsChanged != null)
+			if (AnimationsChanged != null)
 			{
-				this.AnimationsChanged();
+				AnimationsChanged();
 			}
 		}
 
@@ -77,9 +77,9 @@ namespace Spine
 		internal void End(TrackEntry entry)
 		{
 			eventQueueEntries.Add(eventQueueExtryGet(EventType.End, entry));
-			if (this.AnimationsChanged != null)
+			if (AnimationsChanged != null)
 			{
-				this.AnimationsChanged();
+				AnimationsChanged();
 			}
 		}
 

@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -19,7 +18,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.parts = (BasePartsData) _source.BossPartsListForBattle.Find((Predicate<PartsData>) (e => e.Index == _skill.ParameterTarget));
+      parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
     }
 
     public override void ExecAction(
@@ -33,15 +32,15 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
-      int num = this.ActionDetail1 != 1 ? (_source.IsPartsBoss ? this.parts.GetMagicStrZero() : (int) _source.MagicStrZero) : (_source.IsPartsBoss ? this.parts.GetAtkZero() : (int) _source.AtkZero);
-      switch ((RegenerationAction.eTargetType) this.ActionDetail2)
+      AppendIsAlreadyExeced(_target.Owner, _num);
+      int num = ActionDetail1 != 1 ? (_source.IsPartsBoss ? parts.GetMagicStrZero() : (int) _source.MagicStrZero) : (_source.IsPartsBoss ? parts.GetAtkZero() : (int) _source.AtkZero);
+      switch ((eTargetType) ActionDetail2)
       {
-        case RegenerationAction.eTargetType.HP:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.REGENERATION, _valueDictionary[eValueNumber.VALUE_5], (ActionParameter) this, _skill, (float) (int) ((double) _valueDictionary[eValueNumber.VALUE_1] + (double) _valueDictionary[eValueNumber.VALUE_3] * (double) num), (float) this.ActionDetail1);
+        case eTargetType.HP:
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.REGENERATION, _valueDictionary[eValueNumber.VALUE_5], this, _skill, (int) ((double) _valueDictionary[eValueNumber.VALUE_1] + (double) _valueDictionary[eValueNumber.VALUE_3] * num), ActionDetail1);
           break;
-        case RegenerationAction.eTargetType.TP:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.TP_REGENERATION, _valueDictionary[eValueNumber.VALUE_5], (ActionParameter) this, _skill, (float) (int) _valueDictionary[eValueNumber.VALUE_1], (float) this.ActionDetail1);
+        case eTargetType.TP:
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.TP_REGENERATION, _valueDictionary[eValueNumber.VALUE_5], this, _skill, (int) _valueDictionary[eValueNumber.VALUE_1], ActionDetail1);
           break;
       }
     }
@@ -49,9 +48,9 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
-      this.Value[eValueNumber.VALUE_5] = (float) ((double) this.MasterData.action_value_5 + (double) this.MasterData.action_value_6 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_5] = (float) (MasterData.action_value_5 + MasterData.action_value_6 * _level);
     }
 
     public enum eParameterType

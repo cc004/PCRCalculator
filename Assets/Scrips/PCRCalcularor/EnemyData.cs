@@ -1,11 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft0.Json;
 
 namespace PCRCaculator
 {
-    [System.Serializable]
+    [Serializable]
     public class EnemyData
     {
         public int enemy_id;
@@ -36,7 +35,7 @@ namespace PCRCaculator
             return newData;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class EnemyDetailData
     {
         public int unit_id = 0;
@@ -52,14 +51,14 @@ namespace PCRCaculator
         public int visual_change_flag;
         public string comment;
     }
-    [System.Serializable]
+    [Serializable]
     public class EnemySkillData
     {
         public int UB;
         public List<int> MainSkills = new List<int>();
         public List<EnemyAttackPattern> enemyAttackPatterns = new List<EnemyAttackPattern>();
     }
-    [System.Serializable]
+    [Serializable]
     public class EnemyAttackPattern
     {
         public int pattern_id;

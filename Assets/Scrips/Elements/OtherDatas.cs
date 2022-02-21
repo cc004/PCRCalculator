@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
-using System;
 
 namespace Elements
 {
@@ -34,12 +32,12 @@ namespace Elements
           eResourceId[] _preloadResource = null,
           eBundleId[] _preloadBundle = null)
         {
-            this.ResourceId = _resourceId;
-            this.PathName = _pathName;
-            this.Type = _dataType;
-            this.LoadType = _loadType;
-            this.PreloadResource = _preloadResource;
-            this.PreloadBundle = _preloadBundle;
+            ResourceId = _resourceId;
+            PathName = _pathName;
+            Type = _dataType;
+            LoadType = _loadType;
+            PreloadResource = _preloadResource;
+            PreloadBundle = _preloadBundle;
         }
     }
     [Serializable]
@@ -52,8 +50,8 @@ namespace Elements
 
         public BundleDefineRecord(eBundleId _bundleId, string _pathName)
         {
-            this.BundleId = _bundleId;
-            this.PathName = _pathName;
+            BundleId = _bundleId;
+            PathName = _pathName;
         }
     }
 

@@ -7,14 +7,15 @@
 *   2.multi properties custom
 ==========================================*/
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 namespace SpringGUI  
 {
     //Pie Base Data ,use this data to build Pie Graph
-    [System.Serializable]
+    [Serializable]
     public class PieData
     {
         public float Percent;
@@ -32,10 +33,10 @@ namespace SpringGUI
             // auto set color by percent
             Color = Color.white * Percent;
         }
-    };
+    }
 
     //Use this data struct to draw a Pie Graph
-    [System.Serializable]
+    [Serializable]
     public class Pies
     {
         public IList<PieData> PieDatas = new List<PieData>();
@@ -50,13 +51,13 @@ namespace SpringGUI
             foreach (PieData pieData in piedatas.PieDatas )
                 PieDatas.Add(pieData);
         }
-    };
+    }
 
     //GUI Text information for pie Graph
-    [System.Serializable]
+    [Serializable]
     public class PieText
     {
-        public string Content = null;
+        public string Content;
         public Vector2 Position;
         public bool IsLeft = true;
         public PieText(){}
@@ -83,7 +84,7 @@ namespace SpringGUI
         [Range(0.5f, 4)] public float BrokenLineWidth = 2;
 
         private Pies PieData = new Pies();
-        private List<PieText> _pieText = null;
+        private List<PieText> _pieText;
         private Vector3 _realPosition;
 
         public void Inject( IList<float> percents,IList<Color> colors )

@@ -4,13 +4,14 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-using Elements.Battle;
-using Spine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Battle;
+using PCRCaculator.Guild;
+using Spine;
 using UnityEngine;
+using Attachment = Spine.Attachment;
 
 namespace Elements
 {
@@ -19,7 +20,7 @@ namespace Elements
     {
         public float PositionX;
         public float PositionY;
-        public List<BasePartsData.AttachmentNamePair> AttachmentNamePairList = new List<BasePartsData.AttachmentNamePair>();
+        public List<AttachmentNamePair> AttachmentNamePairList = new List<AttachmentNamePair>();
         public float ChangeAttachmentStartTime;
         public float ChangeAttachmentEndTime;
         public float BodyWidthValue;
@@ -44,62 +45,62 @@ namespace Elements
 
         public bool IsBlackoutTarget { get; set; }
 
-        public void SetBattleManager(BattleManager _battleManager) => this.battleManager = _battleManager;
+        public void SetBattleManager(BattleManager _battleManager) => battleManager = _battleManager;
 
-        public virtual Vector3 GetPosition() => this.Owner.transform.position;
+        public virtual Vector3 GetPosition() => Owner.transform.position;
 
-        public virtual Vector3 GetLocalPosition() => this.Owner.transform.localPosition;
+        public virtual Vector3 GetLocalPosition() => Owner.transform.localPosition;
 
-        public virtual float GetBodyWidth() => this.Owner.BodyWidth;
+        public virtual float GetBodyWidth() => Owner.BodyWidth;
 
         //public virtual Vector3 GetBottomTransformPosition() => (UnityEngine.Object)this.Owner == (UnityEngine.Object)null ? Vector3.zero : this.Owner.BottomTransform.position;
-        public virtual Vector3 GetBottomTransformPosition() => (UnityEngine.Object)this.Owner == (UnityEngine.Object)null ? Vector3.zero : this.Owner.BottomTransform.position;
+        public virtual Vector3 GetBottomTransformPosition() => Owner == null ? Vector3.zero : Owner.BottomTransform.position;
 
         //public virtual Vector3 GetOwnerBottomTransformPosition() => this.Owner.BottomTransform.position;
-        public virtual Vector3 GetOwnerBottomTransformPosition() => this.Owner.BottomTransform.position * 60f;
+        public virtual Vector3 GetOwnerBottomTransformPosition() => Owner.BottomTransform.position * 60f;
 
         //public Vector3 GetBottomTransformLocalPosition() => this.Owner.BottomTransform.localPosition;
-        public Vector3 GetBottomTransformLocalPosition() => this.Owner.BottomTransform.localPosition;
+        public Vector3 GetBottomTransformLocalPosition() => Owner.BottomTransform.localPosition;
 
-        public Vector3 GetBottomLossyScale() => this.Owner.BottomTransform.lossyScale;
+        public Vector3 GetBottomLossyScale() => Owner.BottomTransform.lossyScale;
 
-        public virtual Bone GetStateBone() => this.Owner.StateBone;
+        public virtual Bone GetStateBone() => Owner.StateBone;
 
-        public virtual Bone GetCenterBone() => this.Owner.CenterBone;
+        public virtual Bone GetCenterBone() => Owner.CenterBone;
 
-        public virtual Vector3 GetFixedCenterPos() => this.Owner.FixedCenterPos;
+        public virtual Vector3 GetFixedCenterPos() => Owner.FixedCenterPos;
 
-        public virtual Vector3 GetColliderCenter() => this.Owner.ColliderCenter;
+        public virtual Vector3 GetColliderCenter() => Owner.ColliderCenter;
 
-        public virtual Vector3 GetColliderSize() => this.Owner.ColliderSize;
+        public virtual Vector3 GetColliderSize() => Owner.ColliderSize;
 
-        public virtual int GetLevel() => (int)this.Owner.Level;
+        public virtual int GetLevel() => Owner.Level;
 
-        public void IncrementUbAttackHitCount() => ++this.UbAttackHitCount;
+        public void IncrementUbAttackHitCount() => ++UbAttackHitCount;
 
-        public virtual int GetAtkZero() => (int)this.Owner.AtkZero;
+        public virtual int GetAtkZero() => (int)Owner.AtkZero;
 
-        public virtual int GetMagicStrZero() => (int)this.Owner.MagicStrZero;
+        public virtual int GetMagicStrZero() => (int)Owner.MagicStrZero;
 
-        public virtual FloatWithEx GetAtkZeroEx() => this.Owner.AtkZero;
+        public virtual FloatWithEx GetAtkZeroEx() => Owner.AtkZero;
 
-        public virtual FloatWithEx GetMagicStrZeroEx() => this.Owner.MagicStrZero;
+        public virtual FloatWithEx GetMagicStrZeroEx() => Owner.MagicStrZero;
 
-        public virtual int GetAccuracyZero() => (int)this.Owner.AccuracyZero;
+        public virtual int GetAccuracyZero() => Owner.AccuracyZero;
 
-        public virtual int GetPhysicalCriticalZero() => (int)this.Owner.PhysicalCriticalZero;
+        public virtual int GetPhysicalCriticalZero() => Owner.PhysicalCriticalZero;
 
-        public virtual int GetMagicCriticalZero() => (int)this.Owner.MagicCriticalZero;
+        public virtual int GetMagicCriticalZero() => Owner.MagicCriticalZero;
 
-        public virtual int GetLifeStealZero() => (int)this.Owner.LifeStealZero;
+        public virtual int GetLifeStealZero() => Owner.LifeStealZero;
 
-        public virtual float GetHpRecoverRateZero() => (float)(int)this.Owner.HpRecoveryRateZero;
+        public virtual float GetHpRecoverRateZero() => Owner.HpRecoveryRateZero;
 
-        public virtual float GetDodgeRate(int _accuracy) => this.Owner.GetDodgeRate(_accuracy);
+        public virtual float GetDodgeRate(int _accuracy) => Owner.GetDodgeRate(_accuracy);
 
-        public virtual int GetDefZero() => (int)this.Owner.DefZero;
+        public virtual int GetDefZero() => Owner.DefZero;
 
-        public virtual int GetMagicDefZero() => (int)this.Owner.MagicDefZero;
+        public virtual int GetMagicDefZero() => Owner.MagicDefZero;
 
         public virtual void SetMissAtk(
           UnitCtrl _source,
@@ -107,9 +108,9 @@ namespace Elements
           eDamageEffectType _damageEffectType,
           float _scale)
         {
-            if (this.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
+            if (Owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
                 return;
-            this.Owner.SetMissAtk(_source, _missLogType, _damageEffectType, _scale: _scale);
+            Owner.SetMissAtk(_source, _missLogType, _damageEffectType, _scale: _scale);
         }
 
         /*public void ShowHitEffect(
@@ -117,21 +118,21 @@ namespace Elements
           Skill _skill,
           bool _isLeft) => this.Owner.ShowHitEffect(_weaponSeType, _skill, _isLeft, this);*/
 
-        public virtual int GetStartAtk() => (int)this.Owner.StartAtk;
+        public virtual int GetStartAtk() => Owner.StartAtk;
 
-        public virtual int GetStartDef() => (int)this.Owner.StartDef;
+        public virtual int GetStartDef() => Owner.StartDef;
 
-        public virtual int GetStartMagicStr() => (int)this.Owner.StartMagicStr;
+        public virtual int GetStartMagicStr() => Owner.StartMagicStr;
 
-        public virtual int GetStartMagicDef() => (int)this.Owner.StartMagicDef;
+        public virtual int GetStartMagicDef() => Owner.StartMagicDef;
 
-        public virtual int GetStartDodge() => (int)this.Owner.StartDodge;
+        public virtual int GetStartDodge() => Owner.StartDodge;
 
-        public virtual int GetStartPhysicalCritical() => (int)this.Owner.StartPhysicalCritical;
+        public virtual int GetStartPhysicalCritical() => Owner.StartPhysicalCritical;
 
-        public virtual int GetStartMagicCritical() => (int)this.Owner.StartMagicCritical;
+        public virtual int GetStartMagicCritical() => Owner.StartMagicCritical;
 
-        public virtual int GetStartLifeSteal() => (int)this.Owner.StartLifeSteal;
+        public virtual int GetStartLifeSteal() => Owner.StartLifeSteal;
 
         /*public IEnumerator StartTotalDamage(bool _isLarge, float _delay)
         {
@@ -143,12 +144,12 @@ namespace Elements
                     damageNumEffect.SetSortOrder((int)((_targetParts.Owner.IsFront ? 11500 : 0) + 11250 + _targetParts.Owner.RespawnPos));
         }*/
 
-        public bool JudgeShowTotalDamage() => this.UbAttackHitCount >= 2 && (double)this.TotalDamage != 0.0;
+        public bool JudgeShowTotalDamage() => UbAttackHitCount >= 2 && TotalDamage != 0.0;
 
         public void ResetTotalDamage()
         {
-            this.TotalDamage = 0.0f;
-            this.UbAttackHitCount = 0;
+            TotalDamage = 0.0f;
+            UbAttackHitCount = 0;
         }
 
         public virtual void SetBuffDebuff(
@@ -163,7 +164,7 @@ namespace Elements
                 _value = _value * -1f;
             BattleLogIntreface mlegmhaocon = _battleLog;
             UnitCtrl unitCtrl = _source;
-            UnitCtrl owner1 = this.Owner;
+            UnitCtrl owner1 = Owner;
             int HLIKLPNIOKJ = (int)((_enable ? 1 : 2) * 10 + _kind);
             long KGNFLOPBOMB = (long)_value;
             UnitCtrl JELADBAMFKH = unitCtrl;
@@ -171,87 +172,87 @@ namespace Elements
             mlegmhaocon.AppendBattleLog(eBattleLogType.SET_BUFF_DEBUFF, HLIKLPNIOKJ, KGNFLOPBOMB, 0L, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             if (_additional)
             {
-                if (this.Owner.AdditionalBuffDictionary.ContainsKey(_kind))
-                    this.Owner.AdditionalBuffDictionary[_kind] = this.Owner.AdditionalBuffDictionary[_kind] + _value;
+                if (Owner.AdditionalBuffDictionary.ContainsKey(_kind))
+                    Owner.AdditionalBuffDictionary[_kind] = Owner.AdditionalBuffDictionary[_kind] + _value;
                 else
-                    this.Owner.AdditionalBuffDictionary.Add(_kind, _value);
+                    Owner.AdditionalBuffDictionary.Add(_kind, _value);
             }
             else
             {
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
-                        UnitCtrl owner2 = this.Owner;
+                        UnitCtrl owner2 = Owner;
                         owner2.Atk = owner2.Atk + _value;
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
-                        UnitCtrl owner3 = this.Owner;
+                        UnitCtrl owner3 = Owner;
                         owner3.Def = (int)((int)owner3.Def + _value);
                         string des = (_source==null?"???":_source.UnitName) + "的技能" + (_enable?"开始":"结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
-                        UnitCtrl owner4 = this.Owner;
+                        UnitCtrl owner4 = Owner;
                         owner4.MagicStr = owner4.MagicStr +  _value;
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
-                        UnitCtrl owner5 = this.Owner;
+                        UnitCtrl owner5 = Owner;
                         owner5.MagicDef = (int)((int)owner5.MagicDef + _value);
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
-                        UnitCtrl owner6 = this.Owner;
+                        UnitCtrl owner6 = Owner;
                         owner6.Dodge = (int)((int)owner6.Dodge + _value);
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL:
-                        UnitCtrl owner7 = this.Owner;
+                        UnitCtrl owner7 = Owner;
                         owner7.PhysicalCritical = (int)((int)owner7.PhysicalCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL:
-                        UnitCtrl owner8 = this.Owner;
+                        UnitCtrl owner8 = Owner;
                         owner8.MagicCritical = (int)((int)owner8.MagicCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE:
-                        UnitCtrl owner9 = this.Owner;
+                        UnitCtrl owner9 = Owner;
                         owner9.EnergyRecoveryRate = (int)((int)owner9.EnergyRecoveryRate + _value);
                         break;
                     case UnitCtrl.BuffParamKind.LIFE_STEAL:
-                        UnitCtrl owner10 = this.Owner;
+                        UnitCtrl owner10 = Owner;
                         owner10.LifeSteal = (int)((int)owner10.LifeSteal + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MOVE_SPEED:
-                        this.Owner.MoveSpeed += (float)_value;
+                        Owner.MoveSpeed += (float)_value;
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE:
-                        UnitCtrl owner11 = this.Owner;
+                        UnitCtrl owner11 = Owner;
                         owner11.PhysicalCriticalDamageRate = (int)((int)owner11.PhysicalCriticalDamageRate + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE:
-                        UnitCtrl owner12 = this.Owner;
+                        UnitCtrl owner12 = Owner;
                         owner12.MagicCriticalDamageRate = (int)((int)owner12.MagicCriticalDamageRate + _value);
                         break;
                     case UnitCtrl.BuffParamKind.ACCURACY:
-                        UnitCtrl owner13 = this.Owner;
-                        owner13.Accuracy = (int)(int)((int)owner13.Accuracy + _value);
+                        UnitCtrl owner13 = Owner;
+                        owner13.Accuracy = (int)((int)owner13.Accuracy + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAX_HP:
-                        if ((long)this.Owner.MaxHp + (long)_value > 0L)
+                        if (Owner.MaxHp + (long)_value > 0L)
                         {
-                            UnitCtrl owner14 = this.Owner;
-                            owner14.MaxHp = (ObscuredLong)((long)owner14.MaxHp + (long)_value);
-                            if ((long)this.Owner.MaxHp >= (long)this.Owner.Hp)
+                            UnitCtrl owner14 = Owner;
+                            owner14.MaxHp = owner14.MaxHp + (long)_value;
+                            if (Owner.MaxHp >= (long)Owner.Hp)
                                 break;
-                            this.Owner.SetCurrentHp((long)this.Owner.MaxHp);
+                            Owner.SetCurrentHp(Owner.MaxHp);
                             break;
                         }
-                        if ((long)this.Owner.Hp <= 0L)
+                        if ((long)Owner.Hp <= 0L)
                             break;
-                        this.Owner.SetCurrentHpZero();
-                        this.Owner.ClearKnightGuard();
-                        if (this.Owner.IsDead || this.Owner.CurrentState >= UnitCtrl.ActionState.DIE)
+                        Owner.SetCurrentHpZero();
+                        Owner.ClearKnightGuard();
+                        if (Owner.IsDead || Owner.CurrentState >= UnitCtrl.ActionState.DIE)
                             break;
-                        this.Owner.SetState(UnitCtrl.ActionState.DIE);
+                        Owner.SetState(UnitCtrl.ActionState.DIE);
                         break;
 
                 }
@@ -308,10 +309,10 @@ namespace Elements
                this.ResistStatusDictionary[ailmentAction][(int) ailmentData.ailment_detail_1] = resistData.Ailments[index];
              }*/
             Dictionary<eActionType, Dictionary<int, int>> resistDic = new Dictionary<eActionType, Dictionary<int, int>>();
-            PCRCaculator.Battle.ResistData unitResistdata = new PCRCaculator.Battle.ResistData(resistId);
-            for (int i = 0; i < PCRCaculator.Battle.StaticAilmentData.ailmentDatas.Length; i++)
+            ResistData unitResistdata = new ResistData(resistId);
+            for (int i = 0; i < StaticAilmentData.ailmentDatas.Length; i++)
             {
-                PCRCaculator.Battle.AilmentData ailment = PCRCaculator.Battle.StaticAilmentData.ailmentDatas[i];
+                AilmentData ailment = StaticAilmentData.ailmentDatas[i];
                 if (!resistDic.ContainsKey((eActionType)ailment.ailment_action))
                 {
                     resistDic.Add((eActionType)ailment.ailment_action, new Dictionary<int, int>());
@@ -330,20 +331,20 @@ namespace Elements
       bool _targetOneParts,
       BasePartsData _target)
         {
-            if (!this.ResistStatusDictionary.ContainsKey(_actionType))
+            if (!ResistStatusDictionary.ContainsKey(_actionType))
                 return false;
-            Dictionary<int, int> resistStatus = this.ResistStatusDictionary[_actionType];
+            Dictionary<int, int> resistStatus = ResistStatusDictionary[_actionType];
             if (resistStatus.ContainsKey(-1))
                 _detail1 = -1;
-            if (!resistStatus.ContainsKey(_detail1) || (double)BattleManager.Random(0.0f, 1f, 
-                new PCRCaculator.Guild.RandomData(_source,_target.Owner, (int)_actionType, 9, resistStatus[_detail1] / 100.0f)) >= (double)resistStatus[_detail1] / 100.0)
+            if (!resistStatus.ContainsKey(_detail1) || BattleManager.Random(0.0f, 1f, 
+                    new RandomData(_source,_target.Owner, (int)_actionType, 9, resistStatus[_detail1] / 100.0f)) >= resistStatus[_detail1] / 100.0)
                 return false;
             if (_last)
             {
                 if (_targetOneParts)
-                    this.Owner.SetMissAtk(_source, eMissLogType.DODGE_ATTACK, _parts: _target);
+                    Owner.SetMissAtk(_source, eMissLogType.DODGE_ATTACK, _parts: _target);
                 else
-                    this.Owner.SetMissAtk(_source, eMissLogType.DODGE_ATTACK);
+                    Owner.SetMissAtk(_source, eMissLogType.DODGE_ATTACK);
             }
             return true;
         }

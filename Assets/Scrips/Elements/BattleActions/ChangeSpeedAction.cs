@@ -4,59 +4,60 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
     public class ChangeSpeedAction : ActionParameter
     {
-        private static readonly Dictionary<ChangeSpeedAction.eChangeSpeedType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<ChangeSpeedAction.eChangeSpeedType, UnitCtrl.eAbnormalState>((IEqualityComparer<ChangeSpeedAction.eChangeSpeedType>)new ChangeSpeedAction.eChangeSpeedType_DictComparer())
+        private static readonly Dictionary<eChangeSpeedType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eChangeSpeedType, UnitCtrl.eAbnormalState>(new eChangeSpeedType_DictComparer())
     {
       {
-        ChangeSpeedAction.eChangeSpeedType.SLOW,
+        eChangeSpeedType.SLOW,
         UnitCtrl.eAbnormalState.SLOW
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.HASTE,
+        eChangeSpeedType.HASTE,
         UnitCtrl.eAbnormalState.HASTE
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.PARALYSIS,
+        eChangeSpeedType.PARALYSIS,
         UnitCtrl.eAbnormalState.PARALYSIS
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.FREEZE,
+        eChangeSpeedType.FREEZE,
         UnitCtrl.eAbnormalState.FREEZE
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.CHAINED,
+        eChangeSpeedType.CHAINED,
         UnitCtrl.eAbnormalState.CHAINED
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.SLEEP,
+        eChangeSpeedType.SLEEP,
         UnitCtrl.eAbnormalState.SLEEP
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.STUN,
+        eChangeSpeedType.STUN,
         UnitCtrl.eAbnormalState.STUN
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.STONE,
+        eChangeSpeedType.STONE,
         UnitCtrl.eAbnormalState.STONE
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.DETAIN,
+        eChangeSpeedType.DETAIN,
         UnitCtrl.eAbnormalState.DETAIN
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.FAINT,
+        eChangeSpeedType.FAINT,
         UnitCtrl.eAbnormalState.FAINT
       },
       {
-        ChangeSpeedAction.eChangeSpeedType.PAUSE_ACTION,
+        eChangeSpeedType.PAUSE_ACTION,
         UnitCtrl.eAbnormalState.PAUSE_ACTION
       }
     };
@@ -75,20 +76,20 @@ namespace Elements
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-          System.Action<string> action)
+          Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
-            float num = BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 6, (float)pp));
+            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 6, (float)pp));
             //start add
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, ActionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
                 num = 1 - fix;
             }
-            if ((double)num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || this.TargetAssignment == eTargetAssignment.OWNER_SITE)
+            if (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || TargetAssignment == eTargetAssignment.OWNER_SITE)
             {
-                this.AppendIsAlreadyExeced(_target.Owner, _num);
-                UnitCtrl.eAbnormalState abnormalState = ChangeSpeedAction.abnormalStateDic[(ChangeSpeedAction.eChangeSpeedType)this.ActionDetail1];
+                AppendIsAlreadyExeced(_target.Owner, _num);
+                UnitCtrl.eAbnormalState abnormalState = abnormalStateDic[(eChangeSpeedType)ActionDetail1];
                 if (abnormalState == UnitCtrl.eAbnormalState.HASTE)
                 {
                     UnitCtrl owner = _target.Owner;
@@ -107,10 +108,10 @@ namespace Elements
                         //_valueDictionary[eValueNumber.VALUE_3] += myGameCtrl.tempData.SettingData.BossAbnormalAddValue;
                     }
                 }
-                _target.Owner.SetAbnormalState(_source, abnormalState, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (this.ActionDetail2 == 1));
-                string describe = ((ChangeSpeedAction.eChangeSpeedType)this.ActionDetail1).GetDescription() + ",值" + _valueDictionary[eValueNumber.VALUE_1] + ",持续时间：" + _valueDictionary[eValueNumber.VALUE_3] + "秒";
+                _target.Owner.SetAbnormalState(_source, abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (ActionDetail2 == 1));
+                string describe = ((eChangeSpeedType)ActionDetail1).GetDescription() + ",值" + _valueDictionary[eValueNumber.VALUE_1] + ",持续时间：" + _valueDictionary[eValueNumber.VALUE_3] + "秒";
                 
-                if (this.ActionDetail2 != 1 || _target.Owner.OnDamageListForChangeSpeedDisableByAttack.ContainsKey(this.ActionId))
+                if (ActionDetail2 != 1 || _target.Owner.OnDamageListForChangeSpeedDisableByAttack.ContainsKey(ActionId))
                 {
                     action(describe);
                     return;
@@ -118,17 +119,17 @@ namespace Elements
                 describe += ",受到伤害后取消";
                 action(describe);
 
-                _target.Owner.OnDamageListForChangeSpeedDisableByAttack.Add(this.ActionId, (Action<bool>)(byAttack =>
-               {
-                   if (!byAttack || !_target.Owner.IsAbnormalState(abnormalState))
-                       return;
-                   _target.Owner.DisableAbnormalStateById(abnormalState, this.ActionId, true);
-               }));
+                _target.Owner.OnDamageListForChangeSpeedDisableByAttack.Add(ActionId, byAttack =>
+                {
+                    if (!byAttack || !_target.Owner.IsAbnormalState(abnormalState))
+                        return;
+                    _target.Owner.DisableAbnormalStateById(abnormalState, ActionId, true);
+                });
 
             }
             else
             {
-                ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+                ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
                 if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
                     return;
                 if (actionExecedData.TargetPartsNumber == 1)
@@ -142,8 +143,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
-            this.Value[eValueNumber.VALUE_3] = (float)((double)this.MasterData.action_value_3 + (double)this.MasterData.action_value_4 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+            Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
 
         public enum eChangeSpeedType
@@ -178,13 +179,13 @@ namespace Elements
             DAMAGED,
         }
 
-        public class eChangeSpeedType_DictComparer : IEqualityComparer<ChangeSpeedAction.eChangeSpeedType>
+        public class eChangeSpeedType_DictComparer : IEqualityComparer<eChangeSpeedType>
         {
             public bool Equals(
-              ChangeSpeedAction.eChangeSpeedType _x,
-              ChangeSpeedAction.eChangeSpeedType _y) => _x == _y;
+              eChangeSpeedType _x,
+              eChangeSpeedType _y) => _x == _y;
 
-            public int GetHashCode(ChangeSpeedAction.eChangeSpeedType _obj) => (int)_obj;
+            public int GetHashCode(eChangeSpeedType _obj) => (int)_obj;
         }
     }
 }

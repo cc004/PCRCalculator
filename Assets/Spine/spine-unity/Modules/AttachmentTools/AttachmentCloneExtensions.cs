@@ -219,8 +219,8 @@ namespace Spine.Unity.Modules.AttachmentTools
 				clone.SetRegion(atlasRegion, updateOffset: false);
 				if (!useOriginalRegionSize)
 				{
-					clone.width = (float)atlasRegion.width * scale;
-					clone.height = (float)atlasRegion.height * scale;
+					clone.width = atlasRegion.width * scale;
+					clone.height = atlasRegion.height * scale;
 				}
 				clone.UpdateOffset();
 				return clone;

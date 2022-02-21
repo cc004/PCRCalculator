@@ -10,18 +10,18 @@ namespace Elements
 {
   public class DamageCutAction : ActionParameter
   {
-    private static readonly Dictionary<DamageCutAction.eDamageCutType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<DamageCutAction.eDamageCutType, UnitCtrl.eAbnormalState>()
+    private static readonly Dictionary<eDamageCutType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eDamageCutType, UnitCtrl.eAbnormalState>
     {
       {
-        DamageCutAction.eDamageCutType.ATK,
+        eDamageCutType.ATK,
         UnitCtrl.eAbnormalState.CUT_ATK_DAMAGE
       },
       {
-        DamageCutAction.eDamageCutType.MGC,
+        eDamageCutType.MGC,
         UnitCtrl.eAbnormalState.CUT_MGC_DAMAGE
       },
       {
-        DamageCutAction.eDamageCutType.ALL,
+        eDamageCutType.ALL,
         UnitCtrl.eAbnormalState.CUT_ALL_DAMAGE
       }
     };
@@ -42,15 +42,15 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
-      _target.Owner.SetAbnormalState(_source, DamageCutAction.abnormalStateDic[(DamageCutAction.eDamageCutType) this.ActionDetail1], _valueDictionary[eValueNumber.VALUE_3], (ActionParameter) this, _skill, (float) (int) _valueDictionary[eValueNumber.VALUE_1]);
+      AppendIsAlreadyExeced(_target.Owner, _num);
+      _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eDamageCutType) ActionDetail1], _valueDictionary[eValueNumber.VALUE_3], this, _skill, (int) _valueDictionary[eValueNumber.VALUE_1]);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     private enum eDamageCutType

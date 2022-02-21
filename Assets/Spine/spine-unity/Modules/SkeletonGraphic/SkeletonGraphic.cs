@@ -11,14 +11,14 @@ namespace Spine.Unity
 	{
 		public SkeletonDataAsset skeletonDataAsset;
 
-		[SpineSkin("", "skeletonDataAsset", true)]
+		[SpineSkin("", "skeletonDataAsset")]
 		public string initialSkinName = "default";
 
 		public bool initialFlipX;
 
 		public bool initialFlipY;
 
-		[SpineAnimation("", "skeletonDataAsset", true)]
+		[SpineAnimation("", "skeletonDataAsset")]
 		public string startingAnimation;
 
 		public bool startingLoop;
@@ -53,7 +53,7 @@ namespace Spine.Unity
 			set
 			{
 				overrideTexture = value;
-				base.canvasRenderer.SetTexture(mainTexture);
+				canvasRenderer.SetTexture(mainTexture);
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace Spine.Unity
 		public override void Rebuild(CanvasUpdate update)
 		{
 			base.Rebuild(update);
-			if (!base.canvasRenderer.cull && update == CanvasUpdate.PreRender)
+			if (!canvasRenderer.cull && update == CanvasUpdate.PreRender)
 			{
 				UpdateMesh();
 			}
@@ -157,19 +157,19 @@ namespace Spine.Unity
 				skeleton.Update(deltaTime);
 				state.Update(deltaTime);
 				state.Apply(skeleton);
-				if (this.UpdateLocal != null)
+				if (UpdateLocal != null)
 				{
-					this.UpdateLocal(this);
+					UpdateLocal(this);
 				}
 				skeleton.UpdateWorldTransform();
-				if (this.UpdateWorld != null)
+				if (UpdateWorld != null)
 				{
-					this.UpdateWorld(this);
+					UpdateWorld(this);
 					skeleton.UpdateWorldTransform();
 				}
-				if (this.UpdateComplete != null)
+				if (UpdateComplete != null)
 				{
-					this.UpdateComplete(this);
+					UpdateComplete(this);
 				}
 			}
 		}
@@ -190,7 +190,7 @@ namespace Spine.Unity
 		public void Clear()
 		{
 			skeleton = null;
-			base.canvasRenderer.Clear();
+			canvasRenderer.Clear();
 		}
 
 		public void Initialize(bool overwrite)
@@ -216,7 +216,7 @@ namespace Spine.Unity
 				flipY = initialFlipY
 			};
 			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
-			base.canvasRenderer.SetTexture(mainTexture);
+			canvasRenderer.SetTexture(mainTexture);
 			if (!string.IsNullOrEmpty(initialSkinName))
 			{
 				skeleton.SetSkin(initialSkinName);
@@ -246,13 +246,13 @@ namespace Spine.Unity
 				{
 					meshGenerator.BuildMeshWithArrays(skeletonRendererInstruction, flag);
 				}
-				if (base.canvas != null)
+				if (canvas != null)
 				{
-					meshGenerator.ScaleVertexData(base.canvas.referencePixelsPerUnit);
+					meshGenerator.ScaleVertexData(canvas.referencePixelsPerUnit);
 				}
-				if (this.OnPostProcessVertices != null)
+				if (OnPostProcessVertices != null)
 				{
-					this.OnPostProcessVertices(meshGenerator.Buffers);
+					OnPostProcessVertices(meshGenerator.Buffers);
 				}
 				Mesh mesh = next.mesh;
 				meshGenerator.FillVertexData(mesh);
@@ -260,7 +260,7 @@ namespace Spine.Unity
 				{
 					meshGenerator.FillTrianglesSingle(mesh);
 				}
-				base.canvasRenderer.SetMesh(mesh);
+				canvasRenderer.SetMesh(mesh);
 				next.instructionUsed.Set(skeletonRendererInstruction);
 			}
 		}

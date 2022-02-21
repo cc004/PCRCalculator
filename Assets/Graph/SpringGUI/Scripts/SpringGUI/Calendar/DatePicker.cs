@@ -14,8 +14,8 @@ namespace SpringGUI
 {
     public class DatePicker : UIBehaviour
     {
-        private Text _dateText = null;
-        private Calendar _calendar = null;
+        private Text _dateText;
+        private Calendar _calendar;
         private DateTime _dateTime = DateTime.Today;
 
         // get data from this property
@@ -31,8 +31,8 @@ namespace SpringGUI
 
         protected override void Awake()
         {
-            _dateText = this.transform.Find("DateText").GetComponent<Text>();
-            _calendar = this.transform.Find("Calendar").GetComponent<Calendar>();
+            _dateText = transform.Find("DateText").GetComponent<Text>();
+            _calendar = transform.Find("Calendar").GetComponent<Calendar>();
             _calendar.onDayClick.AddListener(dateTime => { DateTime = dateTime; });
             transform.Find("PickButton").GetComponent<Button>().onClick.AddListener(( ) =>
              { _calendar.gameObject.SetActive(true); });

@@ -1,12 +1,11 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Elements.Battle;
-using PCRCaculator.Battle;
+
 namespace Elements
 {
 
-    [System.Serializable]
+    [Serializable]
     public class FirearmCtrlData
     {
         public float HitDelay = 0.5f;
@@ -33,8 +32,8 @@ namespace Elements
             this.startRotate = startRotate;
             this.endRotate = endRotate;
             //ColliderBox = colliderBox;
-            ColliderBoxCentre = new float[] { colliderBox.center.x, colliderBox.center.y, colliderBox.center.z };
-            ColliderBoxSize = new float[] { colliderBox.extents.x, colliderBox.extents.y, colliderBox.extents.z };
+            ColliderBoxCentre = new[] { colliderBox.center.x, colliderBox.center.y, colliderBox.center.z };
+            ColliderBoxSize = new[] { colliderBox.extents.x, colliderBox.extents.y, colliderBox.extents.z };
         }
 
     }
@@ -68,10 +67,10 @@ namespace Elements
             Annihilation = annihilation;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class UnitPrefabData
     {
         public UnitActionControllerData2 UnitActionControllerData;
-        public Dictionary<string, List<Elements.FirearmCtrlData>> unitFirearmDatas;
+        public Dictionary<string, List<FirearmCtrlData>> unitFirearmDatas;
     }
 }

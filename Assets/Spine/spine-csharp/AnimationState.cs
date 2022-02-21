@@ -402,9 +402,9 @@ namespace Spine
 				float num4 = frames[num2];
 				float curvePercent = rotateTimeline.GetCurvePercent((num2 >> 1) - 1, 1f - (time - num4) / (frames[num2 + -2] - num4));
 				num = frames[num2 + 1] - num3;
-				num -= (float)((16384 - (int)(16384.499999999996 - (double)(num / 360f))) * 360);
+				num -= (16384 - (int)(16384.499999999996 - num / 360f)) * 360;
 				num = num3 + num * curvePercent + bone.data.rotation;
-				num -= (float)((16384 - (int)(16384.499999999996 - (double)(num / 360f))) * 360);
+				num -= (16384 - (int)(16384.499999999996 - num / 360f)) * 360;
 			}
 			float num5 = ((pose == MixPose.Setup) ? bone.data.rotation : bone.rotation);
 			float num6 = num - num5;
@@ -415,7 +415,7 @@ namespace Spine
 			}
 			else
 			{
-				num6 -= (float)((16384 - (int)(16384.499999999996 - (double)(num6 / 360f))) * 360);
+				num6 -= (16384 - (int)(16384.499999999996 - num6 / 360f)) * 360;
 				float num8;
 				float value;
 				if (firstFrame)
@@ -434,20 +434,20 @@ namespace Spine
 				{
 					if (Math.Abs(num8) > 180f)
 					{
-						num8 += (float)(360 * Math.Sign(num8));
+						num8 += 360 * Math.Sign(num8);
 					}
 					flag2 = flag;
 				}
 				num7 = num6 + num8 - num8 % 360f;
 				if (flag2 != flag)
 				{
-					num7 += (float)(360 * Math.Sign(num8));
+					num7 += 360 * Math.Sign(num8);
 				}
 				timelinesRotation[i] = num7;
 			}
 			timelinesRotation[i + 1] = num6;
 			num5 += num7 * alpha;
-			bone.rotation = num5 - (float)((16384 - (int)(16384.499999999996 - (double)(num5 / 360f))) * 360);
+			bone.rotation = num5 - (16384 - (int)(16384.499999999996 - num5 / 360f)) * 360;
 		}
 
 		private void QueueEvents(TrackEntry entry, float animationTime)
@@ -625,7 +625,7 @@ namespace Spine
 				if (delay <= 0f)
 				{
 					float num = trackEntry.animationEnd - trackEntry.animationStart;
-					delay = ((num == 0f) ? 0f : (delay + (num * (float)(1 + (int)(trackEntry.trackTime / num)) - data.GetMix(trackEntry.animation, animation))));
+					delay = ((num == 0f) ? 0f : (delay + (num * (1 + (int)(trackEntry.trackTime / num)) - data.GetMix(trackEntry.animation, animation))));
 				}
 			}
 			trackEntry2.delay = delay;
@@ -752,7 +752,7 @@ namespace Spine
 					{
 						stringBuilder.Append(", ");
 					}
-					stringBuilder.Append(trackEntry.ToString());
+					stringBuilder.Append(trackEntry);
 				}
 			}
 			if (stringBuilder.Length != 0)
@@ -764,49 +764,49 @@ namespace Spine
 
 		internal void OnStart(TrackEntry entry)
 		{
-			if (this.Start != null)
+			if (Start != null)
 			{
-				this.Start(entry);
+				Start(entry);
 			}
 		}
 
 		internal void OnInterrupt(TrackEntry entry)
 		{
-			if (this.Interrupt != null)
+			if (Interrupt != null)
 			{
-				this.Interrupt(entry);
+				Interrupt(entry);
 			}
 		}
 
 		internal void OnEnd(TrackEntry entry)
 		{
-			if (this.End != null)
+			if (End != null)
 			{
-				this.End(entry);
+				End(entry);
 			}
 		}
 
 		internal void OnDispose(TrackEntry entry)
 		{
-			if (this.Dispose != null)
+			if (Dispose != null)
 			{
-				this.Dispose(entry);
+				Dispose(entry);
 			}
 		}
 
 		internal void OnComplete(TrackEntry entry)
 		{
-			if (this.Complete != null)
+			if (Complete != null)
 			{
-				this.Complete(entry);
+				Complete(entry);
 			}
 		}
 
 		internal void OnEvent(TrackEntry entry, Event e)
 		{
-			if (this.Event != null)
+			if (Event != null)
 			{
-				this.Event(entry, e);
+				Event(entry, e);
 			}
 		}
 	}

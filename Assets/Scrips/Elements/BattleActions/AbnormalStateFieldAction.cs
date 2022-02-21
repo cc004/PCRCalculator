@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,8 +22,8 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.targetAction = _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail1));
-      this.targetAction.AbnormalStateFieldAction = this;
+      targetAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1);
+      targetAction.AbnormalStateFieldAction = this;
     }
 
     public override void ReadyAction(
@@ -33,7 +32,7 @@ namespace Elements
       Skill _skill)
     {
       base.ReadyAction(_source, _sourceActionController, _skill);
-      this.targetAction.CancelByIfForAll = true;
+      targetAction.CancelByIfForAll = true;
     }
 
     public override void ExecAction(
@@ -48,25 +47,25 @@ namespace Elements
       Action<string> action = null)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      GameObject gameObject1 = (GameObject) null;
-      GameObject gameObject2 = (GameObject) null;
-      if (this.ActionEffectList.Count > 0)
+      GameObject gameObject1 = null;
+      GameObject gameObject2 = null;
+      if (ActionEffectList.Count > 0)
       {
-        gameObject1 = this.ActionEffectList[0].Prefab;
-        gameObject2 = this.ActionEffectList[0].PrefabLeft;
+        gameObject1 = ActionEffectList[0].Prefab;
+        gameObject2 = ActionEffectList[0].PrefabLeft;
       }
       AbnormalStateFieldData abnormalStateFieldData = new AbnormalStateFieldData();
       abnormalStateFieldData.KNLCAOOKHPP = eFieldType.HEAL;
       abnormalStateFieldData.HKDBJHAIOMB = eFieldExecType.NORMAL;
       abnormalStateFieldData.StayTime = _valueDictionary[eValueNumber.VALUE_1];
-      abnormalStateFieldData.CenterX = _target.GetLocalPosition().x + this.Position;
+      abnormalStateFieldData.CenterX = _target.GetLocalPosition().x + Position;
       abnormalStateFieldData.Size = _valueDictionary[eValueNumber.VALUE_3];
-      abnormalStateFieldData.EGEPDDJBILL = (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null;
+      abnormalStateFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
       abnormalStateFieldData.TargetList = new List<BasePartsData>();
       abnormalStateFieldData.PPOJKIDHGNJ = _source;
       abnormalStateFieldData.HGMNJJBLJIO = gameObject1;
       abnormalStateFieldData.LALMMFAOJDP = gameObject2;
-      abnormalStateFieldData.TargetAction = this.targetAction;
+      abnormalStateFieldData.TargetAction = targetAction;
       abnormalStateFieldData.SourceActionController = _sourceActionController;
       abnormalStateFieldData.LCHLGLAFJED = _source.IsOther ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
       abnormalStateFieldData.PMHDBOJMEAD = _skill;
@@ -74,13 +73,13 @@ namespace Elements
             string describe = "展开中心为" + abnormalStateFieldData.CenterX +"，大小为" + abnormalStateFieldData.Size + "的领域";
             action(describe);
             //end add
-      this.battleManager.ExecField((AbnormalStateDataBase) abnormalStateFieldData, this.ActionId);
+      battleManager.ExecField(abnormalStateFieldData, ActionId);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
     }
   }
 }

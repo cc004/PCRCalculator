@@ -21,7 +21,7 @@ namespace SpringGUI
                 if ( line.Value.vertexs.Count <= 1 )
                     continue;
                 var startPos = GetPos(line.Value.vertexs[0]);
-                UIVertex[] oldVertexs = new UIVertex[] {};
+                UIVertex[] oldVertexs = {};
                 for ( int i = 1 ; i < line.Value.vertexs.Count ; i++ )
                 {
                     var endPos = GetPos(line.Value.vertexs[i]);
@@ -32,14 +32,14 @@ namespace SpringGUI
                     }
                     else
                     {
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                         {
                             oldVertexs[1],
                             newVertexs[1],
                             oldVertexs[2],
                             newVertexs[0]
                         });
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                         {
                             newVertexs[0],
                             oldVertexs[1],

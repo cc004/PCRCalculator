@@ -14,7 +14,7 @@ namespace Spine
 		public override void Apply(Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixPose pose, MixDirection direction)
 		{
 			PathConstraint pathConstraint = skeleton.pathConstraints.Items[pathConstraintIndex];
-			float[] frames = base.frames;
+			float[] frames = this.frames;
 			if (time < frames[0])
 			{
 				switch (pose)

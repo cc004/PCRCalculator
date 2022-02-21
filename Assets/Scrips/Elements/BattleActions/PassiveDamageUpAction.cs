@@ -21,14 +21,14 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      if (this.ActionDetail1 != 1)
+      if (ActionDetail1 != 1)
         return;
-      DebuffDamageUpData _debuffDamageUpData = new DebuffDamageUpData()
+      DebuffDamageUpData _debuffDamageUpData = new DebuffDamageUpData
       {
         DebuffDamageUpLimitValue = _valueDictionary[eValueNumber.VALUE_2],
         DebuffDamageUpValue = _valueDictionary[eValueNumber.VALUE_1],
         DebuffDamageUpTimer = _valueDictionary[eValueNumber.VALUE_3],
-        EffectType = (DebuffDamageUpData.eEffectType) this.ActionDetail2
+        EffectType = (DebuffDamageUpData.eEffectType) ActionDetail2
       };
       _target.Owner.AddDebuffDamageUpData(_debuffDamageUpData);
     }
@@ -36,7 +36,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     public enum eCountType

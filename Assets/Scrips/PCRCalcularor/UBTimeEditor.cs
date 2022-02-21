@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using PCRCaculator.Guild;
+﻿using System.Collections.Generic;
 using Elements;
+using PCRCaculator.Guild;
+using UnityEngine;
 
 namespace PCRCaculator
 {
@@ -35,7 +33,7 @@ namespace PCRCaculator
         }
         public void ReplaceUBTime()
         {
-            MainManager.Instance.WindowConfigMessage("是否将预设阵容的UB时间改为当前的UB时间？", ReplaceUBTime_0, null);
+            MainManager.Instance.WindowConfigMessage("是否将预设阵容的UB时间改为当前的UB时间？", ReplaceUBTime_0);
         }
         private void ReplaceUBTime_0()
         {

@@ -4,20 +4,17 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
-//using Elements.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using Elements.Battle;
 using UnityEngine;
+//using Elements.Data;
 
 namespace Elements
 {
     public class BattleHeaderController : MonoBehaviour // : SingletonMonoBehaviour<BattleHeaderController>, ISingletonField
     {
         public static BattleHeaderController Instance;
-        public static int CurrentFrameCount = 0;
+        public static int CurrentFrameCount;
         private void Awake()
         {
             Instance = this;
@@ -34,9 +31,9 @@ namespace Elements
         }*/
         public void PauseNoMoreTimeUp(bool _pause)
         {
-            if (!this.isNoMoreTime || _pause == this.noMoreTimePause)
+            if (!isNoMoreTime || _pause == noMoreTimePause)
                 return;
-            this.noMoreTimePause = _pause;
+            noMoreTimePause = _pause;
             //this.timeUpFrameSprite.SetActive(!_pause);
             //this.timeLabel2.SetActive(!_pause);
             //for (int index = 0; index < this.noMoreTimeTweeners.Count; ++index)
@@ -1036,25 +1033,25 @@ false
 
         public bool GetIsPause()
         {
-            if (this.BattleManager.GetIsPlayCutin())// || this.IsPaused)
+            if (BattleManager.GetIsPlayCutin())// || this.IsPaused)
                 return false;
             return IsPaused;
 
         }
         public void OnClickPauseButton()
         {
-            if (this.BattleManager.GetIsPlayCutin())// || this.IsPaused)
+            if (BattleManager.GetIsPlayCutin())// || this.IsPaused)
                 return;
             if (!IsPaused)
             {
-                this.IsPaused = true;
-                this.battleManager.GamePause(true, false);
+                IsPaused = true;
+                battleManager.GamePause(true);
             }
             else
             {
-                this.battleManager.GamePause(false, false);
+                battleManager.GamePause(false);
                 //this.battleManager.ResumeAbnormalEffect();
-                this.IsPaused = false;
+                IsPaused = false;
 
             }
             /*EHPLBCOOOPK tempData = Singleton<EHPLBCOOOPK>.Instance;
@@ -1343,13 +1340,13 @@ false
             REWARD,
         }
 
-        private class eHeaderContents_DictComparer : IEqualityComparer<BattleHeaderController.eHeaderContents>
+        private class eHeaderContents_DictComparer : IEqualityComparer<eHeaderContents>
         {
             public bool Equals(
-            BattleHeaderController.eHeaderContents _x,
-            BattleHeaderController.eHeaderContents _y) => _x == _y;
+            eHeaderContents _x,
+            eHeaderContents _y) => _x == _y;
 
-            public int GetHashCode(BattleHeaderController.eHeaderContents _obj) => (int)_obj;
+            public int GetHashCode(eHeaderContents _obj) => (int)_obj;
         }
     }
 }

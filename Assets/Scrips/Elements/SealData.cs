@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
 using System.Collections;
 using System.Collections.Generic;
+using Cute;
 using UnityEngine;
 
 namespace Elements
@@ -15,7 +15,7 @@ namespace Elements
     {
         public SkillEffectCtrl Effect { get; set; }
 
-        public int GetCurrentCount() => Mathf.Min(this.Count, this.Max);
+        public int GetCurrentCount() => Mathf.Min(Count, Max);
 
         public int Count { get; set; }
 
@@ -29,30 +29,30 @@ namespace Elements
 
         public void RemoveSeal(int _count)
         {
-            if (this.enableSealIdList == null)
+            if (enableSealIdList == null)
                 return;
-            _count = Mathf.Min(_count, this.enableSealIdList.Count);
+            _count = Mathf.Min(_count, enableSealIdList.Count);
             for (int index = 0; index < _count; ++index)
-                this.enableSealIdList.RemoveAt(0);
+                enableSealIdList.RemoveAt(0);
         }
 
         public void AddSeal(float _limitTime, UnitCtrl _target, eStateIconType _iconType, int _count)
         {
-            this.RemoveSeal(Mathf.Max(0, this.GetCurrentCount() + _count - this.Max));
+            RemoveSeal(Mathf.Max(0, GetCurrentCount() + _count - Max));
             for (int index = 0; index < _count; ++index)
-                this.addSealImpl(_limitTime, _target, _iconType);
+                addSealImpl(_limitTime, _target, _iconType);
         }
 
         private void addSealImpl(float _limitTime, UnitCtrl _target, eStateIconType _iconType)
         {
-            if (this.currentSealId == 0)
-                this.enableSealIdList = new List<int>();
-            this.enableSealIdList.Add(this.currentSealId);
-            ++this.Count;
-            if (this.DisplayCount)
-                _target.OnChangeStateNum.Call<UnitCtrl, eStateIconType, int>(_target, _iconType, this.GetCurrentCount());
-            _target.AppendCoroutine(this.updateData(_limitTime, _target, _iconType, this.currentSealId), ePauseType.SYSTEM);
-            ++this.currentSealId;
+            if (currentSealId == 0)
+                enableSealIdList = new List<int>();
+            enableSealIdList.Add(currentSealId);
+            ++Count;
+            if (DisplayCount)
+                _target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
+            _target.AppendCoroutine(updateData(_limitTime, _target, _iconType, currentSealId), ePauseType.SYSTEM);
+            ++currentSealId;
         }
 
         private IEnumerator updateData(
@@ -61,20 +61,20 @@ namespace Elements
           eStateIconType _iconType,
           int _sealId)
         {
-            while ((double)_limitTime > 0.0 && !_target.IdleOnly && (!_target.IsDead && this.enableSealIdList.Contains(_sealId)))
+            while (_limitTime > 0.0 && !_target.IdleOnly && (!_target.IsDead && enableSealIdList.Contains(_sealId)))
             {
                 _limitTime -= _target.DeltaTimeForPause;
-                yield return (object)null;
+                yield return null;
             }
-            this.enableSealIdList.Remove(_sealId);
-            this.Count--;
-            if (this.DisplayCount)
-                _target.OnChangeStateNum.Call<UnitCtrl, eStateIconType, int>(_target, _iconType, this.GetCurrentCount());
-            if (this.Count == 0 && this.GetCurrentCount() == 0)
+            enableSealIdList.Remove(_sealId);
+            Count--;
+            if (DisplayCount)
+                _target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
+            if (Count == 0 && GetCurrentCount() == 0)
             {
                 //if ((Object) this.Effect != (Object) null)
                 //  this.Effect.SetTimeToDie(true);
-                _target.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(_target, _iconType, false);
+                _target.OnChangeState.Call(_target, _iconType, false);
                 _target.MyOnChangeAbnormalState?.Invoke(_target, _iconType, false, 0, "NaN");
             }
         }

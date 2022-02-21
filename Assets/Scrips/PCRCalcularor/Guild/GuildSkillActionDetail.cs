@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace PCRCaculator.Guild
 {
     public class GuildSkillActionDetail : MonoBehaviour

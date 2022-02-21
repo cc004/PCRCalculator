@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 namespace PCRCaculator
 {
@@ -16,7 +15,7 @@ namespace PCRCaculator
         public Text totalPointText;//总战力
         public List<CharacterPageButton> characters;
 
-        private int pos = 0;
+        private int pos;
         public void SetButton(AddedPlayerData player, int pos)
         {
             this.pos = pos;

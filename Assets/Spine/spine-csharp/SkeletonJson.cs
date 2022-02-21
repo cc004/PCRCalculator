@@ -1019,7 +1019,7 @@ namespace Spine
 			{
 				throw new ArgumentException("Color hexidecimal length must be " + expectedLength + ", recieved: " + hexString, "hexString");
 			}
-			return (float)Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / 255f;
+			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / 255f;
 		}
 	}
 }

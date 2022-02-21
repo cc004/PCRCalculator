@@ -4,15 +4,17 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-using Cute;
-//using Elements.Data;
-//using Elements.Uek;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Cute;
+using PCRCaculator;
+using PCRCaculator.Guild;
 using UnityEngine;
+using Random = UnityEngine.Random;
+//using Elements.Data;
+//using Elements.Uek;
+
 //using UnityStandardAssets.ImageEffects;
 
 namespace Elements.Battle
@@ -72,7 +74,7 @@ namespace Elements.Battle
         private Vector3 playCameraPos0;
         private UnitCtrl voiceOnUnit;
         private bool isAdminChanging;
-        private UnityEngine.Random.State tempRandomState;
+        private Random.State tempRandomState;
         private Dictionary<int, UnitCtrl> currentEnemyUnitCtrlDictionary = new Dictionary<int, UnitCtrl>();
         private List<UnitCtrl>[] allWaveEnemyUnitCtrlListArray;
         public UnitCtrl BossUnit;
@@ -107,7 +109,7 @@ namespace Elements.Battle
         private float blackoutTime;
         private float blackoutTimeCounter;
         private float fadeoutDuration = 0.5f;
-        private System.Action onEndFadeOut;
+        private Action onEndFadeOut;
         /*[SerializeField]
         private UITexture skillExeScreenTexture;*/
         private float startalpha;
@@ -140,27 +142,27 @@ namespace Elements.Battle
         //private CustomUIButton focusButton;
         //private List<EventDelegate> cacheEventDelegate;
 
-        public float EnergyGainValueSkillFront => this.energyGainValueSkillFront;
+        public float EnergyGainValueSkillFront => energyGainValueSkillFront;
 
-        public float EnergyGainValueSkillMiddle => this.energyGainValueSkillMiddle;
+        public float EnergyGainValueSkillMiddle => energyGainValueSkillMiddle;
 
-        public float EnergyGainValueSkillBack => this.energyGainValueSkillBack;
+        public float EnergyGainValueSkillBack => energyGainValueSkillBack;
 
-        public float EnergyStackValueDefeat => this.energyStackValueDefeat;
+        public float EnergyStackValueDefeat => energyStackValueDefeat;
 
-        public float EnergyStackRatioDamagedFront => this.energyStackRatioDamagedFront;
+        public float EnergyStackRatioDamagedFront => energyStackRatioDamagedFront;
 
-        public float EnergyStackRatioDamagedMiddle => this.energyStackRatioDamagedMiddle;
+        public float EnergyStackRatioDamagedMiddle => energyStackRatioDamagedMiddle;
 
-        public float EnergyStackRationDamageBack => this.energyStackRationDamageBack;
+        public float EnergyStackRationDamageBack => energyStackRationDamageBack;
 
-        public Vector3 LNKFACBHNBC => this.playCameraPos0;
+        public Vector3 LNKFACBHNBC => playCameraPos0;
 
-        public bool PMPACJOAECP => this.isAdminChanging;
+        public bool PMPACJOAECP => isAdminChanging;
 
-        public void SetAdminChanging(bool AAFJOOCLABG) => this.isAdminChanging = AAFJOOCLABG;
+        public void SetAdminChanging(bool AAFJOOCLABG) => isAdminChanging = AAFJOOCLABG;
 
-        public UnitCtrl GetBossUnit() => this.BossUnit;
+        public UnitCtrl GetBossUnit() => BossUnit;
 
         private float StoryStartTime { get; set; }
 
@@ -184,27 +186,27 @@ namespace Elements.Battle
 
         public float BattleLeftTime { get; set; }
 
-        public int GetMiliLimitTime() => (int)((double)this.BattleLeftTime * 1000.0);
+        public int GetMiliLimitTime() => (int)(BattleLeftTime * 1000.0);
 
         public int CurrentWave { get; set; }
 
-        public void SetPauseTimeLimit(bool AAFJOOCLABG) => this.isPauseTimeLimit = AAFJOOCLABG;
+        public void SetPauseTimeLimit(bool AAFJOOCLABG) => isPauseTimeLimit = AAFJOOCLABG;
 
         public List<UnitCtrl> LPBCBINDJLJ { get; set; }
 
         public List<UnitCtrl> UnitList { get; set; }
 
-        public int GetUnitCtrlLength() => this.UnitList.Count;
+        public int GetUnitCtrlLength() => UnitList.Count;
 
-        public UnitCtrl GetUnitCtrl(int DNGOJHOHHMF) => this.UnitList[DNGOJHOHHMF];
+        public UnitCtrl GetUnitCtrl(int DNGOJHOHHMF) => UnitList[DNGOJHOHHMF];
 
         public List<UnitCtrl> EnemyList { get; set; }
 
-        public int GetEnemyCtrlLength() => this.EnemyList.Count;
+        public int GetEnemyCtrlLength() => EnemyList.Count;
 
-        public UnitCtrl GetEnemyCtrl(int DNGOJHOHHMF) => this.EnemyList[DNGOJHOHHMF];
+        public UnitCtrl GetEnemyCtrl(int DNGOJHOHHMF) => EnemyList[DNGOJHOHHMF];
 
-        public UnitCtrl FindEnemy(int unitId) => this.EnemyList.Find((a => a.UnitId == unitId));
+        public UnitCtrl FindEnemy(int unitId) => EnemyList.Find((a => a.UnitId == unitId));
 
         public bool IsDefenceReplayMode { get; set; }
 
@@ -230,13 +232,13 @@ namespace Elements.Battle
 
         public float DeltaTime_60fps { get; private set; }
 
-        public bool GetIsPlayCutin() => this.IsPlayCutin;
+        public bool GetIsPlayCutin() => IsPlayCutin;
 
         public List<long> PBCLBKCKHAI { get; private set; }
 
         public eBattleResult battleResult { get; private set; }
 
-        public void SetBattleResult(eBattleResult CCNMAFPNDNB) => this.battleResult = CCNMAFPNDNB;
+        public void SetBattleResult(eBattleResult CCNMAFPNDNB) => battleResult = CCNMAFPNDNB;
 
         public int AMNJIJHNJGC { get; set; }
 
@@ -258,9 +260,9 @@ namespace Elements.Battle
 
         public List<UnitCtrl> BlackoutUnitTargetList { get; private set; }
 
-        public int GetBlackoutUnitTargetLength() => this.BlackoutUnitTargetList.Count;
+        public int GetBlackoutUnitTargetLength() => BlackoutUnitTargetList.Count;
 
-        public UnitCtrl GetBlackoutUnitTarget(int DNGOJHOHHMF) => this.BlackoutUnitTargetList[DNGOJHOHHMF];
+        public UnitCtrl GetBlackoutUnitTarget(int DNGOJHOHHMF) => BlackoutUnitTargetList[DNGOJHOHHMF];
 
         public Dictionary<string, GameObject> DAIFDPFABCM { get; private set; }
 
@@ -270,43 +272,43 @@ namespace Elements.Battle
 
         public bool IsBossBattle { get; private set; }
 
-        public bool BKLOEOBLEDB => this.BattleCategory == eBattleCategory.CLAN_BATTLE;
+        public bool BKLOEOBLEDB => BattleCategory == eBattleCategory.CLAN_BATTLE;
 
-        public bool OPCIJEAJPAG => this.BattleCategory == eBattleCategory.GLOBAL_RAID || this.BattleCategory == eBattleCategory.CLAN_BATTLE;
+        public bool OPCIJEAJPAG => BattleCategory == eBattleCategory.GLOBAL_RAID || BattleCategory == eBattleCategory.CLAN_BATTLE;
 
         public int IJGJOGNIGLH { get; set; }
 
         public int EBDCFPAJFOK { get; set; }
 
-        public bool IJBLCADFNJP => this.BattleCategory == eBattleCategory.HATSUNE_BATTLE;
+        public bool IJBLCADFNJP => BattleCategory == eBattleCategory.HATSUNE_BATTLE;
 
-        public bool DMALFANMBMM => this.BattleCategory == eBattleCategory.HATSUNE_BOSS_BATTLE;
+        public bool DMALFANMBMM => BattleCategory == eBattleCategory.HATSUNE_BOSS_BATTLE;
 
-        public bool OPODPPJNNJM => this.BattleCategory == eBattleCategory.UEK_BOSS_BATTLE;
+        public bool OPODPPJNNJM => BattleCategory == eBattleCategory.UEK_BOSS_BATTLE;
 
-        public bool NOMOBFGLCCO => this.BattleCategory == eBattleCategory.SPACE_BATTLE;
+        public bool NOMOBFGLCCO => BattleCategory == eBattleCategory.SPACE_BATTLE;
 
         public bool IsSpecialBattle => false;//this.battleProcessor.IsSpecialBattle();
 
-        public bool EMKDFABDFAH => this.BattleCategory == eBattleCategory.TOWER || this.BattleCategory == eBattleCategory.TOWER_EX || this.BattleCategory == eBattleCategory.TOWER_REHEARSAL || this.BattleCategory == eBattleCategory.TOWER_CLOISTER;
+        public bool EMKDFABDFAH => BattleCategory == eBattleCategory.TOWER || BattleCategory == eBattleCategory.TOWER_EX || BattleCategory == eBattleCategory.TOWER_REHEARSAL || BattleCategory == eBattleCategory.TOWER_CLOISTER;
 
-        public bool NAIOBCOHILK => this.BattleCategory == eBattleCategory.HIGH_RARITY;
+        public bool NAIOBCOHILK => BattleCategory == eBattleCategory.HIGH_RARITY;
 
-        public bool NFDBEJOPBIJ => this.BattleCategory == eBattleCategory.TOWER_REPLAY || this.BattleCategory == eBattleCategory.TOWER_EX_REPLAY || this.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY;
+        public bool NFDBEJOPBIJ => BattleCategory == eBattleCategory.TOWER_REPLAY || BattleCategory == eBattleCategory.TOWER_EX_REPLAY || BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY;
 
-        public bool DOBCMFAJGCF => this.BattleCategory == eBattleCategory.KAISER_BATTLE_MAIN || this.BattleCategory == eBattleCategory.KAISER_BATTLE_SUB;
+        public bool DOBCMFAJGCF => BattleCategory == eBattleCategory.KAISER_BATTLE_MAIN || BattleCategory == eBattleCategory.KAISER_BATTLE_SUB;
 
         public float IDFHINDNPKK { get; set; }
 
         public float GGCJPDLOAKI { get; set; }
 
-        public bool GetOnlyAutoClearFlag() => this.OnlyAutoClearFlag;
+        public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
 
-        public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => this.OnlyAutoClearFlag = IJLDFEJCCMO;
+        public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
 
         public bool LOGNEDLPEIJ { get; set; }
 
-        private bool FELHBMBCMPD => this.BattleCategory == eBattleCategory.DUNGEON;
+        private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
 
         public bool IsPlayingPrincessMovie { get; set; }
 
@@ -314,7 +316,7 @@ namespace Elements.Battle
 
         public bool BFKPGHCBBKM { get; set; }
 
-        private bool ANHHNJFCMDB => this.BattleCategory == eBattleCategory.ARENA || this.BattleCategory == eBattleCategory.ARENA_REPLAY || this.BattleCategory == eBattleCategory.GRAND_ARENA || this.BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY;
+        private bool ANHHNJFCMDB => BattleCategory == eBattleCategory.ARENA || BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY;
 
         /*public bool BIAMINGPMMB
         {
@@ -332,14 +334,14 @@ namespace Elements.Battle
 
         public void GamePauseOnFrameEnd()
         {
-            this.isToPauseOnFrameEnd = true;
-            this.isToResumeOnFrameEnd = false;
+            isToPauseOnFrameEnd = true;
+            isToResumeOnFrameEnd = false;
         }
 
         public void GameResumeOnFrameEnd()
         {
-            this.isToPauseOnFrameEnd = false;
-            this.isToResumeOnFrameEnd = true;
+            isToPauseOnFrameEnd = false;
+            isToResumeOnFrameEnd = true;
         }
 
         /*private void incrementWave(System.Action ACGNCFFDNON)
@@ -447,7 +449,7 @@ namespace Elements.Battle
 
         private void Update()
         {
-            this.isUpdateFrameExecuted = false;
+            isUpdateFrameExecuted = false;
             //int index1 = 0;
             /*for (int length = this.UnitUiCtrl.UnitCtrls.Length; index1 < length; ++index1)
             {
@@ -462,31 +464,31 @@ namespace Elements.Battle
             for (int length = MyGameCtrl.Instance.playerUnitCtrl.Count; index1 < length; ++index1)
             {
                 UnitCtrl unitCtrl = MyGameCtrl.Instance.playerUnitCtrl[index1];
-                if (!((UnityEngine.Object)unitCtrl == (UnityEngine.Object)null))
+                if (!(unitCtrl == null))
                 {
-                    while (this.JJCJONPDGIM < unitCtrl.CutInFrameSet.ServerCutInFrame)
-                        this.updateFrameWithSkip(unitCtrl);
+                    while (JJCJONPDGIM < unitCtrl.CutInFrameSet.ServerCutInFrame)
+                        updateFrameWithSkip(unitCtrl);
                 }
             }
 
             if (!BattleHeaderController.Instance.IsPaused)
-                this.cutinSkipTimeAccumulated += Time.deltaTime;
-            for (; (double)this.cutinSkipTimeAccumulated >= (double)this.DeltaTime_60fps; this.cutinSkipTimeAccumulated -= this.DeltaTime_60fps)
-                this.CoroutineManager.NoDialogUpdate();
-            if (this.IsPlayingPrincessMovie)
+                cutinSkipTimeAccumulated += Time.deltaTime;
+            for (; cutinSkipTimeAccumulated >= (double)DeltaTime_60fps; cutinSkipTimeAccumulated -= DeltaTime_60fps)
+                CoroutineManager.NoDialogUpdate();
+            if (IsPlayingPrincessMovie)
             {
-                this.unitSpineControllerList.ForEach((System.Action<BattleSpineController>)(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync()));
-                this.unitSpineControllerList.ForEach((System.Action<BattleSpineController>)(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync()));
+                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
+                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());
             }
             else
             {
-                if (!this.IsFramePause)
-                    this.deltaTimeAccumulated += Time.deltaTime;
+                if (!IsFramePause)
+                    deltaTimeAccumulated += Time.deltaTime;
                 do
                 {
-                    if (this.IsFramePause && !this.CoroutineManager.VisualPause)
+                    if (IsFramePause && !CoroutineManager.VisualPause)
                     {
-                        this.CoroutineManager.VisualPause = true;
+                        CoroutineManager.VisualPause = true;
                         //int index2 = 0;
                         /*for (int count = this.UnitList.Count; index2 < count; ++index2)
                         {
@@ -506,71 +508,71 @@ namespace Elements.Battle
                         }*/
                         //this.battleEffectManager.Pause();
                     }
-                    if (!this.IsFramePause && (double)this.deltaTimeAccumulated >= 0.0)
+                    if (!IsFramePause && deltaTimeAccumulated >= 0.0)
                     {
-                        this.updateFrame();
-                        this.deltaTimeAccumulated -= this.DeltaTime_60fps;
+                        updateFrame();
+                        deltaTimeAccumulated -= DeltaTime_60fps;
                     }
                     else
                         break;
                 }
-                while (!this.IsPlayingPrincessMovie && (double)this.deltaTimeAccumulated >= (double)this.DeltaTime_60fps);
-                while (this.JJCJONPDGIM < this.PPNHIMOOKDD && !this.IsFramePause)
+                while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps);
+                while (JJCJONPDGIM < PPNHIMOOKDD && !IsFramePause)
                 {
-                    this.updateFrame();
-                    if (this.IsPlayingPrincessMovie)
+                    updateFrame();
+                    if (IsPlayingPrincessMovie)
                         break;
                 }
-                if (this.isToPauseOnFrameEnd && !this.isToResumeOnFrameEnd)
-                    this.GamePause(true, false);
-                else if (!this.isToPauseOnFrameEnd && this.isToResumeOnFrameEnd)
-                    this.GamePause(false, false);
-                if (this.isUpdateFrameExecuted)
+                if (isToPauseOnFrameEnd && !isToResumeOnFrameEnd)
+                    GamePause(true);
+                else if (!isToPauseOnFrameEnd && isToResumeOnFrameEnd)
+                    GamePause(false);
+                if (isUpdateFrameExecuted)
                     return;
-                this.unitSpineControllerList.ForEach((System.Action<BattleSpineController>)(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync()));
-                this.unitSpineControllerList.ForEach((System.Action<BattleSpineController>)(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync()));
+                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
+                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());
             }
         }
 
         private void updateFrame()
         {
-            if (PCRCaculator.Guild.GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
+            if (GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
             {
-                PCRCaculator.Guild.GuildManager.Instance.stoptime = -1;
+                GuildManager.Instance.stoptime = -1;
                 MyGameCtrl.Instance.PauseButton();
             }
-            bool _canUpdateTime = !this.isPauseTimeLimit && this.BlackOutUnitList.Count == 0;
+            bool _canUpdateTime = !isPauseTimeLimit && BlackOutUnitList.Count == 0;
             //BattleHeaderController instance = BattleHeaderController..Instance;
 
-            BattleHeaderController.Instance.PauseNoMoreTimeUp((uint)this.BlackoutUnitTargetList.Count > 0U);
-            if ((double)this.ActionStartTimeCounter > 0.0)
-                this.ActionStartTimeCounter -= this.DeltaTime_60fps;
-            if ((double)this.StoryStartTime > 0.0)
-                this.StoryStartTime -= this.DeltaTime_60fps;
-            else if (this.StartStoryId != 0)
+            BattleHeaderController.Instance.PauseNoMoreTimeUp((uint)BlackoutUnitTargetList.Count > 0U);
+            if (ActionStartTimeCounter > 0.0)
+                ActionStartTimeCounter -= DeltaTime_60fps;
+            if (StoryStartTime > 0.0)
+                StoryStartTime -= DeltaTime_60fps;
+            else if (StartStoryId != 0)
             {
-                this.PlayStory((System.Action)null, this.StartStoryId, false);
-                this.StartStoryId = 0;
+                PlayStory(null, StartStoryId, false);
+                StartStoryId = 0;
             }
             if (_canUpdateTime)
             {
-                this.BattleLeftTime -= this.DeltaTime_60fps;
+                BattleLeftTime -= DeltaTime_60fps;
                 BattleHeaderController.CurrentFrameCount++;
-                BattleHeaderController.Instance.SetRestTime(this.BattleLeftTime);
-                if ((double)this.BattleLeftTime <= 0.0)
+                BattleHeaderController.Instance.SetRestTime(BattleLeftTime);
+                if (BattleLeftTime <= 0.0)
                 {
-                    this.BattleLeftTime = 0.0f;
-                    this.isPauseTimeLimit = true;
+                    BattleLeftTime = 0.0f;
+                    isPauseTimeLimit = true;
                     //this.stopAllAbnormalEffect(this.UnitList);
                     //this.stopAllAbnormalEffect(this.EnemyList);
                     //this.appendWaveEndLog();
-                    BattleHeaderController.Instance.SetRestTime(this.BattleLeftTime);
-                    this.GamePause(true, false);
-                    if (this.PPNHIMOOKDD > 0)
-                        this.PPNHIMOOKDD = this.JJCJONPDGIM;
+                    BattleHeaderController.Instance.SetRestTime(BattleLeftTime);
+                    GamePause(true);
+                    if (PPNHIMOOKDD > 0)
+                        PPNHIMOOKDD = JJCJONPDGIM;
                     //BattleHeaderController.Instance.gameObject.SetActive(false);
                     //this.UnitUiCtrl.HidePopUp();
-                    this.GameState = eBattleGameState.WAIT_WAVE_END;
+                    GameState = eBattleGameState.WAIT_WAVE_END;
                     //this.Timer(0.5f, (System.Action)(() => this.battleProcessor.PlayTimeup((System.Action)(() => this.finishBattle(eBattleResult.TIME_OVER)))));
                     finishBattle(eBattleResult.TIME_OVER);
                     //BattleHeaderController.Instance.gameObject.SetActive(false);
@@ -578,37 +580,37 @@ namespace Elements.Battle
                     return;
                 }
             }
-            ++this.JJCJONPDGIM;
-            if ((double)this.BattleLeftTime <= 0.0 && this.battleResult != eBattleResult.WIN)
+            ++JJCJONPDGIM;
+            if (BattleLeftTime <= 0.0 && battleResult != eBattleResult.WIN)
                 return;
             //this.UnitUiCtrl._Update(_canUpdateTime);
-            switch (this.GameState)
+            switch (GameState)
             {
                 case eBattleGameState.PLAY:
                 case eBattleGameState.WAIT_WAVE_END:
                     int index1 = 0;
-                    for (int count = this.UnitList.Count; index1 < count; ++index1)
-                        this.UnitList[index1]._Update();
-                    for (int index2 = 0; index2 < this.EnemyList.Count; ++index2)
-                        this.EnemyList[index2]._Update();
+                    for (int count = UnitList.Count; index1 < count; ++index1)
+                        UnitList[index1]._Update();
+                    for (int index2 = 0; index2 < EnemyList.Count; ++index2)
+                        EnemyList[index2]._Update();
                     break;
             }
             //this.battleCameraEffect.UpdateShake();
-            for (int index2 = this.effectUpdateList.Count - 1; index2 >= 0; --index2)
+            for (int index2 = effectUpdateList.Count - 1; index2 >= 0; --index2)
             {
-                if (!this.effectUpdateList[index2]._Update())
-                    this.effectUpdateList.RemoveAt(index2);
+                if (!effectUpdateList[index2]._Update())
+                    effectUpdateList.RemoveAt(index2);
             }
             //if (this.JJCJONPDGIM != 0 && this.UnitUiCtrl.UnitCtrls != null && (this.EnemyList != null && !this.callStartCutIn()))
-            if (this.JJCJONPDGIM != 0 && (this.EnemyList != null && !this.callStartCutIn()))
-                this.CoroutineManager._Update();
-            this.unitSpineControllerList.ForEach((System.Action<BattleSpineController>)(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate()));
-            this.unitSpineControllerList.ForEach((System.Action<BattleSpineController>)(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate()));
-            this.battleUnionBurstController.TryExecUnionBurst();
-            this.isUpdateFrameExecuted = true;
+            if (JJCJONPDGIM != 0 && (EnemyList != null && !callStartCutIn()))
+                CoroutineManager._Update();
+            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
+            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
+            battleUnionBurstController.TryExecUnionBurst();
+            isUpdateFrameExecuted = true;
         }
 
-        private bool callStartCutIn() => this.GameState == eBattleGameState.PLAY && (this.updateMainUnit() || this.updateEnemyUnit());
+        private bool callStartCutIn() => GameState == eBattleGameState.PLAY && (updateMainUnit() || updateEnemyUnit());
 
         //public void PauseAbnormalEffect() => this.battleEffectManager.PauseAbnormalEffect();
 
@@ -620,16 +622,16 @@ namespace Elements.Battle
             //    this.battleEffectManager.Pause();
             //else
             //    this.battleEffectManager.Resume();
-            if (this.isUBExecing)
+            if (isUBExecing)
                 return;
-            this.setPauseAllUnit(Pause);
+            setPauseAllUnit(Pause);
             if (!ignoreFamePause)
-                this.IsFramePause = Pause;
-            this.CoroutineManager.SystemPause = Pause;
-            this.CoroutineManager.VisualPause = Pause;
+                IsFramePause = Pause;
+            CoroutineManager.SystemPause = Pause;
+            CoroutineManager.VisualPause = Pause;
             //BattleHeaderController.Instance.Pause(Pause);
-            this.isToPauseOnFrameEnd = false;
-            this.isToResumeOnFrameEnd = false;
+            isToPauseOnFrameEnd = false;
+            isToResumeOnFrameEnd = false;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "--" + (Pause ? "STOP" : "RESUME"));
         }
 
@@ -643,19 +645,19 @@ namespace Elements.Battle
 
         public void FrameCountPause(UnitCtrl FNHGFDNICFG)
         {
-            this.voiceOnUnit = FNHGFDNICFG;
+            voiceOnUnit = FNHGFDNICFG;
             //this.skillExeScreenTexture.color = Color.black;
             //this.skillExeScreen.gameObject.SetActive(true);
             //this.skillExeScreen.transform.position = Vector3.zero;
             //this.skillExeScreen.sortingOrder = 4899;
-            this.IsFramePause = true;
+            IsFramePause = true;
         }
 
         private IEnumerator resumeFrameCount()
         {
             BattleManager battleManager = this;
             // ISSUE: explicit non-virtual call
-            if (!((UnityEngine.Object)battleManager == (UnityEngine.Object)null))// && !((UnityEngine.Object)(battleManager.UnitUiCtrl) == (UnityEngine.Object)null))
+            if (!(battleManager == null))// && !((UnityEngine.Object)(battleManager.UnitUiCtrl) == (UnityEngine.Object)null))
             {
                 // ISSUE: explicit non-virtual call
                 //(battleManager.UnitUiCtrl).UpdateAllEnemyHp0();
@@ -664,7 +666,7 @@ namespace Elements.Battle
                 if ((battleManager.GameState) != eBattleGameState.PLAY)// || (battleManager.UnitUiCtrl).AllEnemyHp0)
                 {
                     // ISSUE: explicit non-virtual call
-                    battleManager.GamePause(false, false);
+                    battleManager.GamePause(false);
                 }
                 else
                 {
@@ -680,7 +682,7 @@ namespace Elements.Battle
                                 flag = false;
                         }
                         if (!flag)
-                            yield return (object)null;
+                            yield return null;
                         else
                             break;
                     }
@@ -775,39 +777,39 @@ namespace Elements.Battle
             }
         }*/
 
-        public bool IsSkillExeUnit(UnitCtrl AIMGFOAEPLO) => this.BlackOutUnitList.Contains(AIMGFOAEPLO) || (UnityEngine.Object)this.LPAAPDHAIIB == (UnityEngine.Object)AIMGFOAEPLO;
+        public bool IsSkillExeUnit(UnitCtrl AIMGFOAEPLO) => BlackOutUnitList.Contains(AIMGFOAEPLO) || LPAAPDHAIIB == AIMGFOAEPLO;
 
-        public void AddUnitSpineControllerList(BattleSpineController NLLGNCKLGHL) => this.unitSpineControllerList.Add(NLLGNCKLGHL);
+        public void AddUnitSpineControllerList(BattleSpineController NLLGNCKLGHL) => unitSpineControllerList.Add(NLLGNCKLGHL);
 
         public void RemoveUnitSpineControllerList(BattleSpineController NLLGNCKLGHL)
         {
-            if (this.unitSpineControllerList == null)
+            if (unitSpineControllerList == null)
                 return;
-            this.unitSpineControllerList.Remove(NLLGNCKLGHL);
+            unitSpineControllerList.Remove(NLLGNCKLGHL);
         }
 
         public void AppendCoroutine(
           IEnumerator PGEADNDHDIL,
           ePauseType MHPJECIHDDL,
-          UnitCtrl GEDLBPMPOKB = null) => this.CoroutineManager.AppendCoroutine(PGEADNDHDIL, MHPJECIHDDL, GEDLBPMPOKB);
+          UnitCtrl GEDLBPMPOKB = null) => CoroutineManager.AppendCoroutine(PGEADNDHDIL, MHPJECIHDDL, GEDLBPMPOKB);
 
-        public void StartCoroutineIgnoreFps(IEnumerator DFMFLELLMCA) => this.StartCoroutine(this.updateIgnoreFps(DFMFLELLMCA));
+        public void StartCoroutineIgnoreFps(IEnumerator DFMFLELLMCA) => StartCoroutine(updateIgnoreFps(DFMFLELLMCA));
 
         private IEnumerator updateIgnoreFps(IEnumerator HEINAOHCPPE)
         {
             float deltaTimeAccumulated = 0.0f;
             while (true)
             {
-                for (deltaTimeAccumulated += Time.deltaTime; (double)deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= this.DeltaTime_60fps)
+                for (deltaTimeAccumulated += Time.deltaTime; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= DeltaTime_60fps)
                 {
                     if (!HEINAOHCPPE.MoveNext())
                         yield break;
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
 
-        public void RemoveCoroutine(UnitCtrl FNHGFDNICFG) => this.CoroutineManager.RemoveCoroutine(FNHGFDNICFG);
+        public void RemoveCoroutine(UnitCtrl FNHGFDNICFG) => CoroutineManager.RemoveCoroutine(FNHGFDNICFG);
 
         public void AppendEffect(SkillEffectCtrl NJDBDNAANNG, UnitCtrl FNHGFDNICFG = null, bool KFFAEDDEICK = false) { }// => this.battleEffectManager.AppendEffect(NJDBDNAANNG, FNHGFDNICFG, KFFAEDDEICK);
 
@@ -815,30 +817,30 @@ namespace Elements.Battle
 
         public void AddEffectToUpdateList(SkillEffectCtrl FJOPFIJMADE)
         {
-            if (this.effectUpdateList.Contains(FJOPFIJMADE))
+            if (effectUpdateList.Contains(FJOPFIJMADE))
                 return;
-            this.effectUpdateList.Add(FJOPFIJMADE);
+            effectUpdateList.Add(FJOPFIJMADE);
         }
 
         public void RemoveEffectToUpdateList(SkillEffectCtrl FJOPFIJMADE)
         {
-            if (this.effectUpdateList == null)
+            if (effectUpdateList == null)
                 return;
-            this.effectUpdateList.Remove(FJOPFIJMADE);
+            effectUpdateList.Remove(FJOPFIJMADE);
         }
-        public static Action<PCRCaculator.Guild.RandomData> OnCallRandom;        
+        public static Action<RandomData> OnCallRandom;        
         //public static float Random(float Min, float Max) => (float)BattleManager.Random((int)((double)Min * 1000.0), (int)((double)Max * 1000.0)) / 1000f;
-        public static float Random(float Min, float Max, PCRCaculator.Guild.RandomData data)
+        public static float Random(float Min, float Max, RandomData data)
         {
-            return (float)BattleManager.Random((int)((double)Min * 1000.0), (int)((double)Max * 1000.0),data) / 1000f;
+            return Random((int)(Min * 1000.0), (int)(Max * 1000.0),data) / 1000f;
         }
 
         //public static int Random(int Min, int Max) => Min == Max ? Min : UnityEngine.Random.Range(Min, Max);
-        public static int Random(int Min, int Max, PCRCaculator.Guild.RandomData data) 
+        public static int Random(int Min, int Max, RandomData data) 
         {
             if (Min == Max)
                 return Min;
-            if (data.type == 1 && PCRCaculator.MainManager.Instance.PlayerSetting.ignoreLogBarrierCritical)
+            if (data.type == 1 && MainManager.Instance.PlayerSetting.ignoreLogBarrierCritical)
                 return Min;
             int result = UnityEngine.Random.Range(Min, Max);
             data.randomResult = result;
@@ -850,7 +852,7 @@ namespace Elements.Battle
         {
             if (Min == Max)
                 return Min;
-            UnityEngine.Random.State state = UnityEngine.Random.state;
+            Random.State state = UnityEngine.Random.state;
             int num = UnityEngine.Random.Range(Min, Max);
             UnityEngine.Random.state = state;
             return num;
@@ -989,13 +991,13 @@ namespace Elements.Battle
             this.StartCoroutine(this.updateNextBattleWalk());
         }*/
 
-        public void StopResume() => this.GamePause(true, false);
+        public void StopResume() => GamePause(true);
 
         public void CancelInvalidSupportSkill(UnitCtrl FNHGFDNICFG)
         {
             FNHGFDNICFG.CutInFrameSet.CutInFrame = -1;
             FNHGFDNICFG.CutInFrameSet.ServerCutInFrame = -1;
-            this.OnBlackOutEnd(FNHGFDNICFG, true);
+            OnBlackOutEnd(FNHGFDNICFG, true);
         }
 
         /*private IEnumerator updateNextBattleWalk()
@@ -1058,7 +1060,7 @@ namespace Elements.Battle
 
         private void sortAndSetPositionOneWave(Dictionary<int, UnitCtrl> enemyDic)
         {
-            List<UnitCtrl> enemyList = new List<UnitCtrl>((IEnumerable<UnitCtrl>)enemyDic.Values);
+            List<UnitCtrl> enemyList = new List<UnitCtrl>(enemyDic.Values);
             int count = enemyList.Count;
             float[] SearchAreaSizeArray = new float[count];
             int[] indexArray = new int[count];
@@ -1070,7 +1072,7 @@ namespace Elements.Battle
             }
             //this.battleProcessor.SortPosition(CNBJIKBCFIC, MHCFBOGJNIO, AAENDEGPKJE);
             Dictionary<int, int> dictionary = new Dictionary<int, int>();
-            this.EnemyList.Clear();
+            EnemyList.Clear();
             for (int index = 0; index < count; ++index)
             {
                 int unitId = enemyList[indexArray[index]].UnitId;
@@ -1078,30 +1080,30 @@ namespace Elements.Battle
                     ++dictionary[unitId];
                 else
                     dictionary.Add(unitId, 0);
-                float overlapPosX = 100f * (float)dictionary[unitId];
+                float overlapPosX = 100f * dictionary[unitId];
                 UnitCtrl unitCtrl = enemyList[indexArray[index]];
                 unitCtrl.SetOverlapPos(overlapPosX);
-                if (this.IsFramePause)
+                if (IsFramePause)
                     unitCtrl.Pause = true;
-                this.EnemyList.Add(unitCtrl);
+                EnemyList.Add(unitCtrl);
             }
         }
 
         private void setupEnemyProcess()
         {
-            if (this.EnemyList.FindIndex((Predicate<UnitCtrl>)(JNOIHMMFADD => JNOIHMMFADD.BossSortIsBack)) != -1)
-                this.HasBoss = true;
-            for (int index = 0; index < this.EnemyList.Count; ++index)
+            if (EnemyList.FindIndex(JNOIHMMFADD => JNOIHMMFADD.BossSortIsBack) != -1)
+                HasBoss = true;
+            for (int index = 0; index < EnemyList.Count; ++index)
             {
-                UnitCtrl DAFOBMOGLKA = this.EnemyList[index];
-                DAFOBMOGLKA.OnDieForZeroHp += new System.Action<UnitCtrl>(this.onDieEnemy);
-                this.SetupEnemyStartProcess(DAFOBMOGLKA, index);
+                UnitCtrl DAFOBMOGLKA = EnemyList[index];
+                DAFOBMOGLKA.OnDieForZeroHp += onDieEnemy;
+                SetupEnemyStartProcess(DAFOBMOGLKA, index);
             }
         }
         private void SetupEnemyStartProcess(UnitCtrl unit, int index)
         {
-            eUnitRespawnPos respawnPos = this.getUnitRespawnPos(index, true);
-            if (this.HasBoss && respawnPos == eUnitRespawnPos.MAIN_POS_1)
+            eUnitRespawnPos respawnPos = getUnitRespawnPos(index, true);
+            if (HasBoss && respawnPos == eUnitRespawnPos.MAIN_POS_1)
                 respawnPos = eUnitRespawnPos.SUB_POS_1;
             if (unit.IsBoss)
             {
@@ -1122,7 +1124,7 @@ namespace Elements.Battle
         private void onDieEnemy(UnitCtrl IMDKENFNOMF)
         {
             Vector3 localPosition = IMDKENFNOMF.transform.localPosition;
-            localPosition.y = this.GetRespawnPos(IMDKENFNOMF.RespawnPos);
+            localPosition.y = GetRespawnPos(IMDKENFNOMF.RespawnPos);
             localPosition.x += IMDKENFNOMF.OverlapPosX;
             //this.AppendCoroutine(this.playGoldEffectWithDelay(IMDKENFNOMF), ePauseType.IGNORE_BLACK_OUT);
             //this.AppendCoroutine(this.dropTreasureBox(IMDKENFNOMF), ePauseType.IGNORE_BLACK_OUT);
@@ -1212,7 +1214,7 @@ namespace Elements.Battle
         {
             // ISSUE: object of a compiler-generated type is created
             // ISSUE: reference to a compiler-generated method
-            System.Action<List<UnitCtrl>> action = (list) =>
+            Action<List<UnitCtrl>> action = list =>
             {
                 foreach (UnitCtrl unit in list)
                 {
@@ -1231,19 +1233,19 @@ namespace Elements.Battle
                     }
                 }
             };
-            action(this.UnitList);
-            action(this.EnemyList);
+            action(UnitList);
+            action(EnemyList);
         }
 
         private void checkBossBattle(Dictionary<int, UnitCtrl> IGIJGFNEKHB)
         {
-            this.IsBossBattle = false;
-            List<UnitCtrl> unitCtrlList = new List<UnitCtrl>((IEnumerable<UnitCtrl>)IGIJGFNEKHB.Values);
+            IsBossBattle = false;
+            List<UnitCtrl> unitCtrlList = new List<UnitCtrl>(IGIJGFNEKHB.Values);
             for (int index = 0; index < unitCtrlList.Count; ++index)
             {
                 if (UnitUtility.JudgeIsBoss(unitCtrlList[index].UnitId))
                 {
-                    this.IsBossBattle = true;
+                    IsBossBattle = true;
                     break;
                 }
             }
@@ -1255,38 +1257,38 @@ namespace Elements.Battle
         {
             int index = 0;
             //for (int length = this.UnitUiCtrl.UnitCtrls.Length; index < length; ++index)
-            for (int length = this.UnitList.Count; index < length; ++index)
+            for (int length = UnitList.Count; index < length; ++index)
             {
-                UnitCtrl unitCtrl = this.UnitList[index];
-                if (!((UnityEngine.Object)unitCtrl == (UnityEngine.Object)null))
+                UnitCtrl unitCtrl = UnitList[index];
+                if (!(unitCtrl == null))
                 {
-                    if (this.JJCJONPDGIM == unitCtrl.CutInFrameSet.CutInFrame)
+                    if (JJCJONPDGIM == unitCtrl.CutInFrameSet.CutInFrame)
                     {
                         if (!unitCtrl.IsSkillReady)
                         {
                             unitCtrl.CutInFrameSet.CutInFrame = -1;
                             unitCtrl.CutInFrameSet.ServerCutInFrame = -1;
-                            this.ChargeSkillTurn = eChargeSkillTurn.NONE;
+                            ChargeSkillTurn = eChargeSkillTurn.NONE;
                             return false;
                         }
                         unitCtrl.StartCutIn();
                         return true;
                     }
-                    if (this.JJCJONPDGIM == unitCtrl.CutInFrameSet.ServerCutInFrame + 1)
+                    if (JJCJONPDGIM == unitCtrl.CutInFrameSet.ServerCutInFrame + 1)
                     {
-                        this.onSyncEnd(unitCtrl);
-                        if (unitCtrl.ConsumeEnergy() == eConsumeResult.FAILED || this.GameState != eBattleGameState.PLAY)
+                        onSyncEnd(unitCtrl);
+                        if (unitCtrl.ConsumeEnergy() == eConsumeResult.FAILED || GameState != eBattleGameState.PLAY)
                             unitCtrl.CutInFrameSet.ServerCutInFrame = -3;
                         else
                             unitCtrl.SetState(UnitCtrl.ActionState.SKILL_1);
-                        this.LJFFAACGDMF = false;
+                        LJFFAACGDMF = false;
                     }
                     if (unitCtrl.CutInFrameSet.ServerCutInFrame == -3)
                     {
-                        this.LJFFAACGDMF = false;
+                        LJFFAACGDMF = false;
                         unitCtrl.CutInFrameSet.CutInFrame = -1;
                         unitCtrl.CutInFrameSet.ServerCutInFrame = -1;
-                        this.OnBlackOutEnd(unitCtrl);
+                        OnBlackOutEnd(unitCtrl);
                     }
                 }
             }
@@ -1296,42 +1298,42 @@ namespace Elements.Battle
         private bool updateEnemyUnit()
         {
             int index = 0;
-            for (int count = this.EnemyList.Count; index < count; ++index)
+            for (int count = EnemyList.Count; index < count; ++index)
             {
-                UnitCtrl enemy = this.EnemyList[index];
-                if (!((UnityEngine.Object)enemy == (UnityEngine.Object)null))
+                UnitCtrl enemy = EnemyList[index];
+                if (!(enemy == null))
                 {
-                    if (this.JJCJONPDGIM == enemy.CutInFrameSet.CutInFrame)
+                    if (JJCJONPDGIM == enemy.CutInFrameSet.CutInFrame)
                     {
                         if (!enemy.IsSkillReady)
                         {
                             enemy.CutInFrameSet.CutInFrame = -1;
                             enemy.CutInFrameSet.ServerCutInFrame = -1;
-                            this.ChargeSkillTurn = eChargeSkillTurn.NONE;
+                            ChargeSkillTurn = eChargeSkillTurn.NONE;
                             return false;
                         }
                         enemy.StartCutIn();
                         return true;
                     }
-                    if (this.JJCJONPDGIM == enemy.CutInFrameSet.CutInFrame + 1)
+                    if (JJCJONPDGIM == enemy.CutInFrameSet.CutInFrame + 1)
                     {
-                        this.onSyncEnd(enemy);
-                        this.LJFFAACGDMF = false;
+                        onSyncEnd(enemy);
+                        LJFFAACGDMF = false;
                         if (enemy.ConsumeEnergy() == eConsumeResult.FAILED)
                         {
                             enemy.CutInFrameSet.CutInFrame = -1;
                             enemy.CutInFrameSet.ServerCutInFrame = -1;
-                            this.OnBlackOutEnd(enemy);
+                            OnBlackOutEnd(enemy);
                         }
                         else
                             enemy.SetState(UnitCtrl.ActionState.SKILL_1);
                     }
                     if (enemy.CutInFrameSet.ServerCutInFrame == -3)
                     {
-                        this.LJFFAACGDMF = false;
+                        LJFFAACGDMF = false;
                         enemy.CutInFrameSet.CutInFrame = -1;
                         enemy.CutInFrameSet.ServerCutInFrame = -1;
-                        this.OnBlackOutEnd(enemy);
+                        OnBlackOutEnd(enemy);
                     }
                 }
             }
@@ -1341,20 +1343,20 @@ namespace Elements.Battle
         private void onSyncEnd(UnitCtrl FNHGFDNICFG)
         {
             FNHGFDNICFG.SetSortOrderFront();
-            this.setPauseAllUnit(true);
+            setPauseAllUnit(true);
         }
 
         private void resetUnitFrame()
         {
-            for (int index = 0; index < this.UnitList.Count; ++index)
+            for (int index = 0; index < UnitList.Count; ++index)
             {
-                this.UnitList[index].CutInFrameSet.CutInFrame = -1;
-                this.UnitList[index].CutInFrameSet.ServerCutInFrame = -1;
+                UnitList[index].CutInFrameSet.CutInFrame = -1;
+                UnitList[index].CutInFrameSet.ServerCutInFrame = -1;
             }
-            for (int index = 0; index < this.EnemyList.Count; ++index)
+            for (int index = 0; index < EnemyList.Count; ++index)
             {
-                this.EnemyList[index].CutInFrameSet.CutInFrame = -1;
-                this.EnemyList[index].CutInFrameSet.ServerCutInFrame = -1;
+                EnemyList[index].CutInFrameSet.CutInFrame = -1;
+                EnemyList[index].CutInFrameSet.ServerCutInFrame = -1;
             }
         }
 
@@ -1425,11 +1427,11 @@ namespace Elements.Battle
         public void RunOutBattleResult()
         {
             int index = 0;
-            for (int count = this.UnitList.Count; index < count; ++index)
-                this.UnitList[index].RunOutBattleResult();
+            for (int count = UnitList.Count; index < count; ++index)
+                UnitList[index].RunOutBattleResult();
         }
 
-        public IEnumerator RecreateDeadUnits(System.Action MELLIBIDKGI, eBattleResult JJHEBNEEHPB)
+        public IEnumerator RecreateDeadUnits(Action MELLIBIDKGI, eBattleResult JJHEBNEEHPB)
         {
             yield return null;
             /*// ISSUE: object of a compiler-generated type is created
@@ -1511,15 +1513,15 @@ namespace Elements.Battle
 
         private void updateFrameWithSkip(UnitCtrl IMDKENFNOMF)
         {
-            if (this.GameState == eBattleGameState.PLAY)
+            if (GameState == eBattleGameState.PLAY)
             {
-                this.updateFrame();
+                updateFrame();
             }
             else
             {
                 IMDKENFNOMF.CutInFrameSet.CutInFrame = -1;
                 IMDKENFNOMF.CutInFrameSet.ServerCutInFrame = -1;
-                this.OnBlackOutEnd(IMDKENFNOMF);
+                OnBlackOutEnd(IMDKENFNOMF);
             }
         }
 
@@ -1540,15 +1542,15 @@ namespace Elements.Battle
         {
         }
 
-        public void UpdateSpeedupFlag() => this.battleTimeScale.SpeedUpFlag = this.battleTimeScale.SpeedUpFlag;
+        public void UpdateSpeedupFlag() => battleTimeScale.SpeedUpFlag = battleTimeScale.SpeedUpFlag;
 
         //public int GetLatestClearStarNum() => 3 - Mathf.Min(2, Array.FindAll<UnitCtrl>(this.UnitUiCtrl.UnitCtrls, (Predicate<UnitCtrl>)(JKIPJDENMKE => (UnityEngine.Object)JKIPJDENMKE != (UnityEngine.Object)null && JKIPJDENMKE.IsDead)).Length);
 
-        public List<UnitCtrl> GetAliveUnitList() => this.UnitList.FindAll((Predicate<UnitCtrl>)(IMDKENFNOMF => !IMDKENFNOMF.IsDead && !IMDKENFNOMF.IsSummonOrPhantom));
+        public List<UnitCtrl> GetAliveUnitList() => UnitList.FindAll(IMDKENFNOMF => !IMDKENFNOMF.IsDead && !IMDKENFNOMF.IsSummonOrPhantom);
 
-        public IEnumerator CallTimer(float EENBKIBPKLA, System.Action JMIONGNECLD) => this.Timer(EENBKIBPKLA, JMIONGNECLD);
+        public IEnumerator CallTimer(float EENBKIBPKLA, Action JMIONGNECLD) => this.Timer(EENBKIBPKLA, JMIONGNECLD);
 
-        public IEnumerator CallTimer(System.Action JMIONGNECLD) => this.Timer(JMIONGNECLD);
+        public IEnumerator CallTimer(Action JMIONGNECLD) => this.Timer(JMIONGNECLD);
 
         /* public IEnumerator CallFade(
            float OHPDCMHNOKJ,
@@ -1559,36 +1561,36 @@ namespace Elements.Battle
 
         //public int GetCurrentTowerExPartyIndex() => this.replayTempData.IsReplay ? this.replayTempData.CurrentPartyIndex : this.towerTempData.CurrentExPartyIndex;
 
-        public UnitCtrl FindUnitForSoundUnitId(int id) => this.UnitList.Find(a => a.SoundUnitId == id);
+        public UnitCtrl FindUnitForSoundUnitId(int id) => UnitList.Find(a => a.SoundUnitId == id);
 
-        public UnitCtrl FindEnemyForResourceId(int id) => this.EnemyList.Find(a => a.UnitId == id);
+        public UnitCtrl FindEnemyForResourceId(int id) => EnemyList.Find(a => a.UnitId == id);
 
-        public void RestFrameCount() => this.JJCJONPDGIM = 0;
+        public void RestFrameCount() => JJCJONPDGIM = 0;
 
-        public void IncrementNoneVoiceAttackCount() => ++this.noneVoiceCount;
+        public void IncrementNoneVoiceAttackCount() => ++noneVoiceCount;
 
         public bool JudgeVoicePlay(int AGAPBBHBIJD, int LGFELHNKABN, float FMDLJBEBFOD)
         {
-            int count = this.UnitList.FindAll((Predicate<UnitCtrl>)(JNOIHMMFADD => (long)JNOIHMMFADD.Hp > 0L && !JNOIHMMFADD.IsSummonOrPhantom)).Count;
+            int count = UnitList.FindAll(JNOIHMMFADD => (long)JNOIHMMFADD.Hp > 0L && !JNOIHMMFADD.IsSummonOrPhantom).Count;
             if (count == 1)
                 return true;
-            if (this.lastVoiceId != 0)
+            if (lastVoiceId != 0)
                 --count;
-            bool flag = (double)BattleManager.HeldRandom(0, Mathf.Max(count - this.noneVoiceCount, 1) * 1000) <= ((double)LGFELHNKABN - (double)FMDLJBEBFOD) * 1000.0;
-            if (AGAPBBHBIJD != this.lastVoiceId && count == 0 | flag)
+            bool flag = HeldRandom(0, Mathf.Max(count - noneVoiceCount, 1) * 1000) <= (LGFELHNKABN - (double)FMDLJBEBFOD) * 1000.0;
+            if (AGAPBBHBIJD != lastVoiceId && count == 0 | flag)
             {
-                this.lastVoiceId = AGAPBBHBIJD;
-                this.noneVoiceCount = 0;
+                lastVoiceId = AGAPBBHBIJD;
+                noneVoiceCount = 0;
                 return true;
             }
-            ++this.noneVoiceCount;
+            ++noneVoiceCount;
             return false;
         }
 
         public void TurnOffAllEffects()
         {
             //this.battleEffectManager.DisableAllEffect(false);
-            this.battleEffectPool.DisableAllEffect(false);
+            battleEffectPool.DisableAllEffect(false);
         }
 
         //public void OffSkillExeScreen() => this.skillExeScreen.SetActive(false);
@@ -1597,43 +1599,43 @@ namespace Elements.Battle
 
         public void ExecField(AbnormalStateDataBase PFDAEFDOBIP, int OJHBHHCOAGK)
         {
-            if (this.FieldDataDictionary.ContainsKey(OJHBHHCOAGK))
-                this.FieldDataDictionary[OJHBHHCOAGK].Add(PFDAEFDOBIP);
+            if (FieldDataDictionary.ContainsKey(OJHBHHCOAGK))
+                FieldDataDictionary[OJHBHHCOAGK].Add(PFDAEFDOBIP);
             else
-                this.FieldDataDictionary.Add(OJHBHHCOAGK, new List<AbnormalStateDataBase>()
-        {
+                FieldDataDictionary.Add(OJHBHHCOAGK, new List<AbnormalStateDataBase>
+                {
           PFDAEFDOBIP
         });
-            PFDAEFDOBIP.ALFDJACNNCL = PFDAEFDOBIP.LCHLGLAFJED == eFieldTargetType.ENEMY ? this.EnemyList : this.UnitList;
+            PFDAEFDOBIP.ALFDJACNNCL = PFDAEFDOBIP.LCHLGLAFJED == eFieldTargetType.ENEMY ? EnemyList : UnitList;
             PFDAEFDOBIP.StartField();
         }
 
         public void StopField(int OJHBHHCOAGK, eTargetAssignment OAHLOGOLMHD, bool MOBKHPNMEDM)
         {
-            Dictionary<int, List<AbnormalStateDataBase>>.Enumerator enumerator = this.FieldDataDictionary.GetEnumerator();
+            Dictionary<int, List<AbnormalStateDataBase>>.Enumerator enumerator = FieldDataDictionary.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 int key = enumerator.Current.Key;
-                for (int index = 0; index < this.FieldDataDictionary[key].Count; ++index)
+                for (int index = 0; index < FieldDataDictionary[key].Count; ++index)
                 {
                     if (OJHBHHCOAGK == 0 || OJHBHHCOAGK == key)
-                        this.FieldDataDictionary[key][index].StopField(OAHLOGOLMHD, MOBKHPNMEDM);
+                        FieldDataDictionary[key][index].StopField(OAHLOGOLMHD, MOBKHPNMEDM);
                 }
             }
         }
 
         public void RestartAbnormalStateField(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL)
         {
-            Dictionary<int, List<AbnormalStateDataBase>>.Enumerator enumerator = this.FieldDataDictionary.GetEnumerator();
+            Dictionary<int, List<AbnormalStateDataBase>>.Enumerator enumerator = FieldDataDictionary.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                List<AbnormalStateDataBase> plfcllhldooList = this.FieldDataDictionary[enumerator.Current.Key];
+                List<AbnormalStateDataBase> plfcllhldooList = FieldDataDictionary[enumerator.Current.Key];
                 for (int index = 0; index < plfcllhldooList.Count; ++index)
                     plfcllhldooList[index].ResetTarget(FNHGFDNICFG, GMDFAELOLFL);
             }
         }
 
-        public bool ExistsField(int FieldDataId, bool isOther) => this.FieldDataDictionary.ContainsKey(FieldDataId) && this.FieldDataDictionary[FieldDataId].FindIndex(a => a.isPlaying && a.PPOJKIDHGNJ.IsOther == isOther) != -1;
+        public bool ExistsField(int FieldDataId, bool isOther) => FieldDataDictionary.ContainsKey(FieldDataId) && FieldDataDictionary[FieldDataId].FindIndex(a => a.isPlaying && a.PPOJKIDHGNJ.IsOther == isOther) != -1;
 
         //public AEIBKBBBIHG GetBattleCameraEffectForBattleProcessor() => (AEIBKBBBIHG)this.battleCameraEffect;
 
@@ -1656,7 +1658,7 @@ namespace Elements.Battle
 
         public void StartChangeScale(Skill COKKKOEFNAB, float KCLCLFDDAHK)
         {
-            foreach (UnitCtrl unitCtrl in this.BlackoutUnitTargetList)
+            foreach (UnitCtrl unitCtrl in BlackoutUnitTargetList)
             {
                 if (unitCtrl.IsScaleChangeTarget)
                 {
@@ -1668,12 +1670,12 @@ namespace Elements.Battle
 
         public void SetForegroundEnable(bool GABGIKMFNFG) { }// => this.foregroundPanel.SetActive(GABGIKMFNFG);
 
-        public float GetRespawnPos(eUnitRespawnPos OKDOFGMKNOJ) => (UnityEngine.Object)this.BossUnit != (UnityEngine.Object)null ? BattleDefine.RESPAWN_POS[OKDOFGMKNOJ] + this.BossUnit.AllUnitCenter : BattleDefine.RESPAWN_POS[OKDOFGMKNOJ];
+        public float GetRespawnPos(eUnitRespawnPos OKDOFGMKNOJ) => BossUnit != null ? BattleDefine.RESPAWN_POS[OKDOFGMKNOJ] + BossUnit.AllUnitCenter : BattleDefine.RESPAWN_POS[OKDOFGMKNOJ];
 
         private void resetAllUnitY()
         {
-            foreach (UnitCtrl unitCtrl in this.UnitList)
-                unitCtrl.transform.SetLocalPosY(this.GetRespawnPos(unitCtrl.RespawnPos));
+            foreach (UnitCtrl unitCtrl in UnitList)
+                unitCtrl.transform.SetLocalPosY(GetRespawnPos(unitCtrl.RespawnPos));
         }
 
         /*public void ChangeAllUnitDefaultShader()
@@ -1694,11 +1696,11 @@ namespace Elements.Battle
 
         public List<UnitCtrl> BlackOutUnitList { get; private set; }
 
-        public int GetBlackOutUnitLength() => this.BlackOutUnitList.Count;
+        public int GetBlackOutUnitLength() => BlackOutUnitList.Count;
 
         public UnitCtrl LPAAPDHAIIB { get; set; }
 
-        public void SetStarted(bool AAFJOOCLABG) => this.isStarted = AAFJOOCLABG;
+        public void SetStarted(bool AAFJOOCLABG) => isStarted = AAFJOOCLABG;
 
         public UnitCtrl HELHEEOHPFO { get; set; }
 
@@ -1712,57 +1714,57 @@ namespace Elements.Battle
 
         public void OnBlackOutEnd(UnitCtrl FNHGFDNICFG, bool ADJGECMDGDK = false)
         {
-            this.ChargeSkillTurn = eChargeSkillTurn.NONE;
+            ChargeSkillTurn = eChargeSkillTurn.NONE;
             //this.showTotalDamage();
-            System.Action<List<UnitCtrl>> action = (System.Action<List<UnitCtrl>>)(list =>
-           {
-               for (int index = 0; index < list.Count; ++index)
-               {
-                   // ISSUE: object of a compiler-generated type is created
-                   // ISSUE: variable of a compiler-generated type
-                   //BattleManager.JILFAOKEEHI jilfaokeehi = new BattleManager.JILFAOKEEHI()
-                   //{
-                   //  4__this = this,
-                   UnitCtrl unitCtrl = list[index];
-                   //};
-                   // ISSUE: reference to a compiler-generated field
-                   unitCtrl.CutInFrameSet.CutInFrame = -1;
-                   // ISSUE: reference to a compiler-generated method
-                   this.onEndFadeOut += () =>
-                   {
-                       if (!BlackOutUnitList.Contains(unitCtrl) && !BlackoutUnitTargetList.Contains(unitCtrl))
-                       {
-                           unitCtrl.SetSortOrderBack();
-                       };
-                   };
-               }
-           });
-            action(this.BlackOutUnitList);
-            action(this.BlackoutUnitTargetList);
+            Action<List<UnitCtrl>> action = list =>
+            {
+                for (int index = 0; index < list.Count; ++index)
+                {
+                    // ISSUE: object of a compiler-generated type is created
+                    // ISSUE: variable of a compiler-generated type
+                    //BattleManager.JILFAOKEEHI jilfaokeehi = new BattleManager.JILFAOKEEHI()
+                    //{
+                    //  4__this = this,
+                    UnitCtrl unitCtrl = list[index];
+                    //};
+                    // ISSUE: reference to a compiler-generated field
+                    unitCtrl.CutInFrameSet.CutInFrame = -1;
+                    // ISSUE: reference to a compiler-generated method
+                    onEndFadeOut += () =>
+                    {
+                        if (!BlackOutUnitList.Contains(unitCtrl) && !BlackoutUnitTargetList.Contains(unitCtrl))
+                        {
+                            unitCtrl.SetSortOrderBack();
+                        };
+                    };
+                }
+            };
+            action(BlackOutUnitList);
+            action(BlackoutUnitTargetList);
             //this.onEndFadeOut += (System.Action)(() => this.battleEffectManager.SetSortOrderBack());
-            this.BlackOutUnitList.Clear();
-            this.BlackoutUnitTargetList.Clear();
-            this.GamePause(false, true);
-            this.AppendCoroutine(this.updateBlackOutFadeOut(FNHGFDNICFG, ADJGECMDGDK), ePauseType.IGNORE_BLACK_OUT);
+            BlackOutUnitList.Clear();
+            BlackoutUnitTargetList.Clear();
+            GamePause(false, true);
+            AppendCoroutine(updateBlackOutFadeOut(FNHGFDNICFG, ADJGECMDGDK), ePauseType.IGNORE_BLACK_OUT);
         }
 
         public void OnCutInEnd(bool MOBKHPNMEDM, UnitCtrl FNHGFDNICFG)
         {
-            this.LPAAPDHAIIB = (UnitCtrl)null;
+            LPAAPDHAIIB = null;
             //this.blockLayerManager.SetBlockDialog(true);
-            if ((UnityEngine.Object)this == (UnityEngine.Object)null)
+            if (this == null)
                 return;
-            this.StartCoroutine(this.resumeFrameCount());
-            this.onSyncEnd(FNHGFDNICFG);
-            if (FNHGFDNICFG.ConsumeEnergy() == eConsumeResult.FAILED || this.GameState != eBattleGameState.PLAY)
+            StartCoroutine(resumeFrameCount());
+            onSyncEnd(FNHGFDNICFG);
+            if (FNHGFDNICFG.ConsumeEnergy() == eConsumeResult.FAILED || GameState != eBattleGameState.PLAY)
                 FNHGFDNICFG.CutInFrameSet.ServerCutInFrame = -3;
             else
                 FNHGFDNICFG.SetState(UnitCtrl.ActionState.SKILL_1);
-            this.LJFFAACGDMF = false;
-            this.IsPlayCutin = false;
+            LJFFAACGDMF = false;
+            IsPlayCutin = false;
             if (MOBKHPNMEDM)
                 return;
-            this.IsPlayCutin = false;
+            IsPlayCutin = false;
         }
 
         public void SetSkillExeScreen(
@@ -1771,25 +1773,25 @@ namespace Elements.Battle
           Color BHIJOLHCGKC,
           bool AJMFAOIFPKA)
         {
-            this.ChargeSkillTurn = !PKHLDNEDPBH.IsOther ? eChargeSkillTurn.PLAYER : eChargeSkillTurn.ENEMY;
-            this.LNMLGGPGEIG = PKHLDNEDPBH;
-            this.FGBCOBGHGKE = ++PKHLDNEDPBH.UbUsedCount;
+            ChargeSkillTurn = !PKHLDNEDPBH.IsOther ? eChargeSkillTurn.PLAYER : eChargeSkillTurn.ENEMY;
+            LNMLGGPGEIG = PKHLDNEDPBH;
+            FGBCOBGHGKE = ++PKHLDNEDPBH.UbUsedCount;
             //this.skillExeScreen.gameObject.SetActive(true);
             //this.skillExeScreenTexture.color = BHIJOLHCGKC;
-            this.startalpha = BHIJOLHCGKC.a;
-            if (!this.BlackOutUnitList.Contains(PKHLDNEDPBH))
-                this.BlackOutUnitList.Add(PKHLDNEDPBH);
-            if ((double)this.blackoutTime - (double)this.blackoutTimeCounter < (double)blackOutTime)
+            startalpha = BHIJOLHCGKC.a;
+            if (!BlackOutUnitList.Contains(PKHLDNEDPBH))
+                BlackOutUnitList.Add(PKHLDNEDPBH);
+            if (blackoutTime - (double)blackoutTimeCounter < blackOutTime)
             {
-                this.blackoutTimeCounter = 0.0f;
-                this.blackoutTime = blackOutTime;
+                blackoutTimeCounter = 0.0f;
+                blackoutTime = blackOutTime;
             }
-            if (!this.isStarted)
+            if (!isStarted)
             {
-                this.isStarted = true;
-                this.AppendCoroutine(this.updateBlackoutUnit(PKHLDNEDPBH, AJMFAOIFPKA), ePauseType.IGNORE_BLACK_OUT);
+                isStarted = true;
+                AppendCoroutine(updateBlackoutUnit(PKHLDNEDPBH, AJMFAOIFPKA), ePauseType.IGNORE_BLACK_OUT);
             }
-            this.GamePause(false, false);
+            GamePause(false);
         }
 
         public void SetSkillExeScreenActive(UnitCtrl FNHGFDNICFG, Color BHIJOLHCGKC)
@@ -1797,8 +1799,8 @@ namespace Elements.Battle
             //this.skillExeScreen.sortingOrder = 11500;
             //this.skillExeScreen.transform.localPosition = Vector3.zero;
             //this.skillExeScreenTexture.color = BHIJOLHCGKC;
-            this.LNMLGGPGEIG = FNHGFDNICFG;
-            this.FGBCOBGHGKE = ++FNHGFDNICFG.UbUsedCount;
+            LNMLGGPGEIG = FNHGFDNICFG;
+            FGBCOBGHGKE = ++FNHGFDNICFG.UbUsedCount;
             //this.skillExeScreen.gameObject.SetActive(true);
         }
 
@@ -1808,36 +1810,36 @@ namespace Elements.Battle
             while (true)
             {
                 if (AJMFAOIFPKA && FNHGFDNICFG.IsDead)
-                    this.blackoutTime = 0.0f;
-                this.blackoutTimeCounter += this.DeltaTime_60fps;
-                if ((UnityEngine.Object)blackOutUnit != (UnityEngine.Object)this.LNMLGGPGEIG)
-                    blackOutUnit = this.LNMLGGPGEIG;
-                if ((double)this.blackoutTimeCounter <= (double)this.blackoutTime)
-                    yield return (object)null;
+                    blackoutTime = 0.0f;
+                blackoutTimeCounter += DeltaTime_60fps;
+                if (blackOutUnit != LNMLGGPGEIG)
+                    blackOutUnit = LNMLGGPGEIG;
+                if (blackoutTimeCounter <= (double)blackoutTime)
+                    yield return null;
                 else
                     break;
             }
-            this.blackoutTime = 0.0f;
-            this.OnBlackOutEnd(blackOutUnit);
-            this.isStarted = false;
+            blackoutTime = 0.0f;
+            OnBlackOutEnd(blackOutUnit);
+            isStarted = false;
         }
 
-        public void SetBlackoutTimeZero() => this.blackoutTime = 0.0f;
+        public void SetBlackoutTimeZero() => blackoutTime = 0.0f;
 
         private IEnumerator updateBlackOutFadeOut(UnitCtrl IMDKENFNOMF, bool ADJGECMDGDK)
         {
-            int tmpUbUsedCount = this.FGBCOBGHGKE;
-            float fadeoutTime = this.fadeoutDuration;
+            int tmpUbUsedCount = FGBCOBGHGKE;
+            float fadeoutTime = fadeoutDuration;
             while (true)
             {
-                fadeoutTime -= this.DeltaTime_60fps;
-                bool flag = (UnityEngine.Object)IMDKENFNOMF != (UnityEngine.Object)null && (UnityEngine.Object)this.LNMLGGPGEIG == (UnityEngine.Object)IMDKENFNOMF && tmpUbUsedCount != IMDKENFNOMF.UbUsedCount;
-                if (!((UnityEngine.Object)this.LNMLGGPGEIG != (UnityEngine.Object)IMDKENFNOMF | flag | ADJGECMDGDK) && !this.OCAMDIOPEFP)
+                fadeoutTime -= DeltaTime_60fps;
+                bool flag = IMDKENFNOMF != null && LNMLGGPGEIG == IMDKENFNOMF && tmpUbUsedCount != IMDKENFNOMF.UbUsedCount;
+                if (!(LNMLGGPGEIG != IMDKENFNOMF | flag | ADJGECMDGDK) && !OCAMDIOPEFP)
                 {
-                    if ((double)fadeoutTime > 0.0)
+                    if (fadeoutTime > 0.0)
                     {
                         //this.skillExeScreenTexture.alpha = this.startalpha * fadeoutTime / this.fadeoutDuration;
-                        yield return (object)null;
+                        yield return null;
                     }
                     else
                         goto label_7;
@@ -1845,20 +1847,18 @@ namespace Elements.Battle
                 else
                     break;
             }
-            this.OCAMDIOPEFP = false;
-            this.FinishBlackFadeOut(IMDKENFNOMF);
+            OCAMDIOPEFP = false;
+            FinishBlackFadeOut(IMDKENFNOMF);
             if (!ADJGECMDGDK)
             {
                 yield break;
             }
-            else
-            {
-                //this.skillExeScreen.gameObject.SetActive(false);
-                yield break;
-            }
-        label_7:
+
             //this.skillExeScreen.gameObject.SetActive(false);
-            this.FinishBlackFadeOut(IMDKENFNOMF);
+            yield break;
+            label_7:
+            //this.skillExeScreen.gameObject.SetActive(false);
+            FinishBlackFadeOut(IMDKENFNOMF);
         }
 
         public void AddBlackOutTarget(
@@ -1870,12 +1870,12 @@ namespace Elements.Battle
             if (!LIMEKPEENOB.DisableSortOrderFrontOnBlackoutTarget)
                 LIMEKPEENOB.SetSortOrderFront();
             LIMEKPEENOB.ResetTotalDamage();
-            if (this.BlackoutUnitTargetList.Contains(LIMEKPEENOB))
+            if (BlackoutUnitTargetList.Contains(LIMEKPEENOB))
                 return;
-            this.BlackoutUnitTargetList.Add(LIMEKPEENOB);
+            BlackoutUnitTargetList.Add(LIMEKPEENOB);
             //if (JELADBAMFKH.UbResponceVoiceType == eUbResponceVoiceType.THANKS)
             //    LIMEKPEENOB.ThanksTargetUnitId = JELADBAMFKH.UnitId;
-            if (!((UnityEngine.Object)LIMEKPEENOB != (UnityEngine.Object)JELADBAMFKH))
+            if (!(LIMEKPEENOB != JELADBAMFKH))
                 return;
             LIMEKPEENOB.PlayDamageWhenIdle();
         }
@@ -1884,10 +1884,10 @@ namespace Elements.Battle
         {
             //if ((UnityEngine.Object)this.FICPCPIFKCD != (UnityEngine.Object)null)
                //this.FICPCPIFKCD.SetSortOrderBack();
-            if (this.onEndFadeOut == null)
+            if (onEndFadeOut == null)
                 return;
-            this.onEndFadeOut();
-            this.onEndFadeOut = (System.Action)null;
+            onEndFadeOut();
+            onEndFadeOut = null;
             //this.skillExeScreenTexture.alpha = this.startalpha;
             //if ((double)this.battleCameraEffect.PNNMBKNLFCL == 1.0)
             //    return;
@@ -1985,16 +1985,16 @@ namespace Elements.Battle
             /*if (BattleHeaderController.Instance.IsPaused && this.dialogManager.IsUse(eDialogId.BATTLE_MENU))
                 this.dialogManager.ForceCloseOne(eDialogId.BATTLE_MENU);*/
             MyGameCtrl.Instance.OnBattleFinished((int)JJHEBNEEHPB);
-            UnityEngine.Random.state = this.tempRandomState;
-            this.battleResult = JJHEBNEEHPB;
-            this.isPauseTimeLimit = true;
-            this.battleTimeScale.SetBaseTimeScale(1f);
-            this.battleTimeScale.SpeedUpFlag = false;
-            for (int index = 0; index < this.EnemyList.Count; ++index)
-                this.EnemyList[index].IdleOnly = true;
-            for (int index = 0; index < this.UnitList.Count; ++index)
-                this.UnitList[index].IdleOnly = true;
-            this.createHpList();
+            UnityEngine.Random.state = tempRandomState;
+            battleResult = JJHEBNEEHPB;
+            isPauseTimeLimit = true;
+            battleTimeScale.SetBaseTimeScale(1f);
+            battleTimeScale.SpeedUpFlag = false;
+            for (int index = 0; index < EnemyList.Count; ++index)
+                EnemyList[index].IdleOnly = true;
+            for (int index = 0; index < UnitList.Count; ++index)
+                UnitList[index].IdleOnly = true;
+            createHpList();
             /*this.battleProcessor.FinishBattle();*/
         }
 
@@ -2123,16 +2123,16 @@ namespace Elements.Battle
 
         private void createHpList()
         {
-            if (this.BattleCategory != eBattleCategory.FRIEND)
+            if (BattleCategory != eBattleCategory.FRIEND)
                 return;
-            List<UnitCtrl> all1 = this.UnitList.FindAll((Predicate<UnitCtrl>)(IEODDJAPMND => !IEODDJAPMND.IsSummonOrPhantom));
-            List<UnitCtrl> all2 = this.EnemyList.FindAll((Predicate<UnitCtrl>)(IEODDJAPMND => !IEODDJAPMND.IsSummonOrPhantom));
-            this.PFDJJPGCDCE.Clear();
-            this.PKAEGMJPJAH.Clear();
+            List<UnitCtrl> all1 = UnitList.FindAll(IEODDJAPMND => !IEODDJAPMND.IsSummonOrPhantom);
+            List<UnitCtrl> all2 = EnemyList.FindAll(IEODDJAPMND => !IEODDJAPMND.IsSummonOrPhantom);
+            PFDJJPGCDCE.Clear();
+            PKAEGMJPJAH.Clear();
             foreach (UnitCtrl unitCtrl in all1)
-                this.PFDJJPGCDCE.Add(unitCtrl.UnitId, Mathf.CeilToInt((float)((double)(long)unitCtrl.Hp / (double)(long)unitCtrl.MaxHp * 1000.0)));
+                PFDJJPGCDCE.Add(unitCtrl.UnitId, Mathf.CeilToInt((float)((long)unitCtrl.Hp / (double)(long)unitCtrl.MaxHp * 1000.0)));
             foreach (UnitCtrl unitCtrl in all2)
-                this.PKAEGMJPJAH.Add(unitCtrl.UnitId, Mathf.CeilToInt((float)((double)(long)unitCtrl.Hp / (double)(long)unitCtrl.MaxHp * 1000.0)));
+                PKAEGMJPJAH.Add(unitCtrl.UnitId, Mathf.CeilToInt((float)((long)unitCtrl.Hp / (double)(long)unitCtrl.MaxHp * 1000.0)));
         }
 
         //private void waitAndStartUnitMove() => this.Timer(this.battleProcessor.GetWaitTimeWhenFinishBattle(), (System.Action)(() => this.startUnitMove()));
@@ -2344,8 +2344,8 @@ namespace Elements.Battle
 
         private bool isReached(bool IPLFAFOAGOA, Vector2 HBJAAHCJMMP, Vector2 AFLDBMLKLKF)
         {
-            bool flag = IPLFAFOAGOA ? (double)AFLDBMLKLKF.x >= (double)HBJAAHCJMMP.x : (double)HBJAAHCJMMP.x >= (double)AFLDBMLKLKF.x;
-            return (double)Mathf.Abs(HBJAAHCJMMP.x - AFLDBMLKLKF.x) <= 0.100000001490116 | flag;
+            bool flag = IPLFAFOAGOA ? AFLDBMLKLKF.x >= (double)HBJAAHCJMMP.x : HBJAAHCJMMP.x >= (double)AFLDBMLKLKF.x;
+            return Mathf.Abs(HBJAAHCJMMP.x - AFLDBMLKLKF.x) <= 0.100000001490116 | flag;
         }
 
         /*public void PlayPartyUnitJoyMotion()
@@ -2465,7 +2465,7 @@ namespace Elements.Battle
 
         private bool isRecreateDeadUnit()
         {
-            switch (this.BattleCategory)
+            switch (BattleCategory)
             {
                 case eBattleCategory.DUNGEON:
                 case eBattleCategory.GRAND_ARENA:
@@ -2656,7 +2656,7 @@ namespace Elements.Battle
             float alpha = NLLGNCKLGHL.CurColor.a;
             while (true)
             {
-                for (this.deltaTimeAccumulated += Time.deltaTime; (double)this.deltaTimeAccumulated > 0.0; this.deltaTimeAccumulated -= this.DeltaTime_60fps)
+                for (deltaTimeAccumulated += Time.deltaTime; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= DeltaTime_60fps)
                 {
                     NLLGNCKLGHL.RealUpdate();
                     NLLGNCKLGHL.RealLateUpdate();
@@ -2664,18 +2664,18 @@ namespace Elements.Battle
                 if (NLLGNCKLGHL.AnimationName == NLLGNCKLGHL.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DIE, _index2: FBBPPDMDEII) && !NLLGNCKLGHL.IsPlayAnime)
                 {
                     alpha -= Time.deltaTime;
-                    if ((double)alpha < 0.0)
+                    if (alpha < 0.0)
                         alpha = 0.0f;
                     NLLGNCKLGHL.CurColor = new Color(1f, 1f, 1f, alpha);
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
 
         public void ForceFadeUnitOut()
         {
-            for (int index = 0; index < this.LPBCBINDJLJ.Count; ++index)
-                this.LPBCBINDJLJ[index].ForceFadeOut();
+            for (int index = 0; index < LPBCBINDJLJ.Count; ++index)
+                LPBCBINDJLJ[index].ForceFadeOut();
         }
 
         /*private void stopAllAbnormalEffect(List<UnitCtrl> CNBJIKBCFIC)
@@ -2758,7 +2758,7 @@ namespace Elements.Battle
 
         //public void AddTempDataBattleLog() => this.battleLog.AddTempDataBattleLog();
 
-        public bool IsAuraRemainBattle() => this.BattleCategory == eBattleCategory.KAISER_BATTLE_MAIN;
+        public bool IsAuraRemainBattle() => BattleCategory == eBattleCategory.KAISER_BATTLE_MAIN;
 
         private bool IIGBIBPPNDA { get; set; }
 
@@ -2768,68 +2768,68 @@ namespace Elements.Battle
 
         private bool PEGOKDOFFIL { get; set; }
 
-        private BattleManager.ACIIMEDNDDJ NBLLPKDOANI { get; set; }
+        private ACIIMEDNDDJ NBLLPKDOANI { get; set; }
 
         public void CallbackActionEnd(long NBLAEJPILJM)
         {
-            this.PBCLBKCKHAI.Remove(NBLAEJPILJM);
-            if (this.isAllActionDone || this.PBCLBKCKHAI.Count != 0)
+            PBCLBKCKHAI.Remove(NBLAEJPILJM);
+            if (isAllActionDone || PBCLBKCKHAI.Count != 0)
                 return;
-            this.isAllActionDone = true;
-            this.onExecutedActionListCountZero();
+            isAllActionDone = true;
+            onExecutedActionListCountZero();
         }
 
         private void onExecutedActionListCountZero()
         {
-            if (this.GameState == eBattleGameState.PLAY || !this.NCBEMPGABMP || !this.isAllActionDone && !this.PEGOKDOFFIL || !this.idleonlyDone)
+            if (GameState == eBattleGameState.PLAY || !NCBEMPGABMP || !isAllActionDone && !PEGOKDOFFIL || !idleonlyDone)
                 return;
-            this.finishWave(this.otherAllDead);
+            finishWave(otherAllDead);
         }
 
         public void CallbackIdleOnlyDone(UnitCtrl GEDLBPMPOKB)
         {
-            if (this.GameState != eBattleGameState.WAIT_WAVE_END || !(GEDLBPMPOKB.IsOther ? this.EnemyList : this.UnitList).Contains(GEDLBPMPOKB))
+            if (GameState != eBattleGameState.WAIT_WAVE_END || !(GEDLBPMPOKB.IsOther ? EnemyList : UnitList).Contains(GEDLBPMPOKB))
                 return;
             int index1 = 0;
-            for (int count = this.UnitList.Count; index1 < count; ++index1)
+            for (int count = UnitList.Count; index1 < count; ++index1)
             {
-                if (!this.UnitList[index1].IsDead)
+                if (!UnitList[index1].IsDead)
                 {
-                    this.idleonlyDone = this.UnitList[index1].CurrentState == UnitCtrl.ActionState.IDLE;
-                    if (!this.idleonlyDone)
+                    idleonlyDone = UnitList[index1].CurrentState == UnitCtrl.ActionState.IDLE;
+                    if (!idleonlyDone)
                         return;
                 }
             }
             int index2 = 0;
-            for (int count = this.EnemyList.Count; index2 < count; ++index2)
+            for (int count = EnemyList.Count; index2 < count; ++index2)
             {
-                if (!this.EnemyList[index2].IsDead)
+                if (!EnemyList[index2].IsDead)
                 {
-                    this.idleonlyDone = this.EnemyList[index2].CurrentState == UnitCtrl.ActionState.IDLE;
-                    if (!this.idleonlyDone)
+                    idleonlyDone = EnemyList[index2].CurrentState == UnitCtrl.ActionState.IDLE;
+                    if (!idleonlyDone)
                         return;
                 }
             }
-            int num = this.idleonlyDone ? 1 : 0;
-            if (!this.NCBEMPGABMP || !this.isAllActionDone && !this.PEGOKDOFFIL || !this.idleonlyDone)
+            int num = idleonlyDone ? 1 : 0;
+            if (!NCBEMPGABMP || !isAllActionDone && !PEGOKDOFFIL || !idleonlyDone)
                 return;
-            this.GameState = eBattleGameState.IDLE;
-            this.Timer((System.Action)(() => this.finishWave(this.otherAllDead)));
+            GameState = eBattleGameState.IDLE;
+            this.Timer(() => finishWave(otherAllDead));
         }
 
         public void CallbackFadeOutDone(UnitCtrl GEDLBPMPOKB)
         {
-            if (this.NCBEMPGABMP)
+            if (NCBEMPGABMP)
                 return;
-            if (this.IIGBIBPPNDA)
+            if (IIGBIBPPNDA)
             {
-                if (this.otherAllDead && GEDLBPMPOKB.IsOther || this.playerAllDead && !GEDLBPMPOKB.IsOther)
+                if (otherAllDead && GEDLBPMPOKB.IsOther || playerAllDead && !GEDLBPMPOKB.IsOther)
                     return;
-                this.judgeWinUnitFadeOutDone(GEDLBPMPOKB.IsOther);
+                judgeWinUnitFadeOutDone(GEDLBPMPOKB.IsOther);
             }
             else
             {
-                List<UnitCtrl> unitCtrlList = GEDLBPMPOKB.IsOther ? this.EnemyList : this.UnitList;
+                List<UnitCtrl> unitCtrlList = GEDLBPMPOKB.IsOther ? EnemyList : UnitList;
                 int index = 0;
                 for (int count = unitCtrlList.Count; index < count; ++index)
                 {
@@ -2839,42 +2839,42 @@ namespace Elements.Battle
                         if (FNHGFDNICFG.HasDieLoop)
                         {
                             BattleSpineController currentSpineCtrl = FNHGFDNICFG.GetCurrentSpineCtrl();
-                            this.BKIIPLLBGBA = currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DIE_LOOP);
+                            BKIIPLLBGBA = currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DIE_LOOP);
                         }
                         else
-                            this.BKIIPLLBGBA = !FNHGFDNICFG.gameObject.activeSelf;
-                        if (!this.BKIIPLLBGBA)
+                            BKIIPLLBGBA = !FNHGFDNICFG.gameObject.activeSelf;
+                        if (!BKIIPLLBGBA)
                             return;
                     }
                 }
-                this.judgeWinUnitFadeOutDone(!GEDLBPMPOKB.IsOther);
+                judgeWinUnitFadeOutDone(!GEDLBPMPOKB.IsOther);
             }
         }
 
         private void judgeWinUnitFadeOutDone(bool LFMEFHAMKLM)
         {
-            List<UnitCtrl> unitCtrlList = LFMEFHAMKLM ? this.EnemyList : this.UnitList;
+            List<UnitCtrl> unitCtrlList = LFMEFHAMKLM ? EnemyList : UnitList;
             for (int index = 0; index < unitCtrlList.Count; ++index)
             {
                 UnitCtrl unitCtrl = unitCtrlList[index];
                 if (unitCtrl.IsDead && unitCtrl.gameObject.activeSelf)
                 {
-                    this.IIGBIBPPNDA = true;
+                    IIGBIBPPNDA = true;
                     return;
                 }
             }
-            this.IIGBIBPPNDA = false;
-            this.NCBEMPGABMP = true;
-            if (!this.NCBEMPGABMP || !this.isAllActionDone && !this.PEGOKDOFFIL || !this.idleonlyDone)
+            IIGBIBPPNDA = false;
+            NCBEMPGABMP = true;
+            if (!NCBEMPGABMP || !isAllActionDone && !PEGOKDOFFIL || !idleonlyDone)
                 return;
-            this.finishWave(!LFMEFHAMKLM);
+            finishWave(!LFMEFHAMKLM);
         }
 
         public void CallbackDead(UnitCtrl unitctrl)
         {
-            this.CallbackIdleOnlyDone(unitctrl);
+            CallbackIdleOnlyDone(unitctrl);
             //this.UnitUiCtrl.UpdateAllEnemyHp0();
-            List<UnitCtrl> unitCtrlList1 = unitctrl.IsOther ? this.EnemyList : this.UnitList;
+            List<UnitCtrl> unitCtrlList1 = unitctrl.IsOther ? EnemyList : UnitList;
             if (unitCtrlList1 == null)
                 return;
             int index1 = 0;
@@ -2885,33 +2885,33 @@ namespace Elements.Battle
                 {
                     if (unitctrl.IsOther)
                     {
-                        this.otherAllDead = unit.IsDead;
-                        if (!this.otherAllDead)
+                        otherAllDead = unit.IsDead;
+                        if (!otherAllDead)
                             return;
                     }
                     else
                     {
-                        this.playerAllDead = unit.IsDead;
-                        if (!this.playerAllDead)
+                        playerAllDead = unit.IsDead;
+                        if (!playerAllDead)
                             return;
                     }
                 }
             }
             //this.battleProcessor.OnDeadLastUnit(FNHGFDNICFG);
-            int num = this.GameState == eBattleGameState.PLAY ? 1 : 0;
-            this.GameState = eBattleGameState.WAIT_WAVE_END;
-            if (this.PBCLBKCKHAI.Count > 0)
+            int num = GameState == eBattleGameState.PLAY ? 1 : 0;
+            GameState = eBattleGameState.WAIT_WAVE_END;
+            if (PBCLBKCKHAI.Count > 0)
             {
-                this.isAllActionDone = false;
-                if (this.NBLLPKDOANI == BattleManager.ACIIMEDNDDJ.NOT_RUNNING)
+                isAllActionDone = false;
+                if (NBLLPKDOANI == ACIIMEDNDDJ.NOT_RUNNING)
                 {
-                    this.NBLLPKDOANI = BattleManager.ACIIMEDNDDJ.RUNNING;
-                    this.StartCoroutine(this.updateIgnoreAllActionDoneCounter());
+                    NBLLPKDOANI = ACIIMEDNDDJ.RUNNING;
+                    StartCoroutine(updateIgnoreAllActionDoneCounter());
                 }
             }
-            this.CallbackIdleOnlyDone(unitctrl);
-            List<UnitCtrl> unitCtrlList2 = unitctrl.IsOther ? this.UnitList : this.EnemyList;
-            this.isPauseTimeLimit = true;
+            CallbackIdleOnlyDone(unitctrl);
+            List<UnitCtrl> unitCtrlList2 = unitctrl.IsOther ? UnitList : EnemyList;
+            isPauseTimeLimit = true;
             if (num != 0)
             {
                 int index2 = 0;
@@ -2927,7 +2927,6 @@ namespace Elements.Battle
                 return;
             //UnitCtrl GEDLBPMPOKB = this.EnemyList.Find((Predicate<UnitCtrl>)(JNOIHMMFADD => this.battleProcessor.JudgeIgnoreUnit(JNOIHMMFADD)));
             //if (!((UnityEngine.Object)GEDLBPMPOKB != (UnityEngine.Object)null))
-            return;
             //GEDLBPMPOKB.IdleOnly = true;
             //GEDLBPMPOKB.CureAllAbnormalState();
             //this.CallbackFadeOutDone(GEDLBPMPOKB);
@@ -2939,22 +2938,22 @@ namespace Elements.Battle
             while (true)
             {
                 timer -= Time.deltaTime;
-                if (this.NBLLPKDOANI != BattleManager.ACIIMEDNDDJ.STOP_PULSE)
+                if (NBLLPKDOANI != ACIIMEDNDDJ.STOP_PULSE)
                 {
-                    if ((double)timer >= 0.0)
-                        yield return (object)null;
+                    if (timer >= 0.0)
+                        yield return null;
                     else
                         goto label_4;
                 }
                 else
                     break;
             }
-            this.NBLLPKDOANI = BattleManager.ACIIMEDNDDJ.NOT_RUNNING;
+            NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
             yield break;
         label_4:
-            this.PEGOKDOFFIL = true;
-            this.CallbackActionEnd(this.PBCLBKCKHAI.Count == 0 ? 0L : this.PBCLBKCKHAI[0]);
-            this.NBLLPKDOANI = BattleManager.ACIIMEDNDDJ.NOT_RUNNING;
+            PEGOKDOFFIL = true;
+            CallbackActionEnd(PBCLBKCKHAI.Count == 0 ? 0L : PBCLBKCKHAI[0]);
+            NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
         }
 
         /*public void UekOnDeadLastUnit(UnitCtrl FNHGFDNICFG, int MACAPGACEFI)
@@ -2971,7 +2970,7 @@ namespace Elements.Battle
                     FNHGFDNICFG.TreasureAnimeIdList.Add((eSpineCharacterAnimeId)(158 + rewardType));
                 }
             }
-            FNHGFDNICFG.RewardCount = (ObscuredInt)num;
+            FNHGFDNICFG.RewardCount = (int)num;
         }*/
 
         /*public void TowerOnDeadLastUnit(UnitCtrl FNHGFDNICFG)
@@ -2979,7 +2978,7 @@ namespace Elements.Battle
             if (this.playerAllDead || FNHGFDNICFG.IsSummonOrPhantom)
                 return;
             List<eBattleTreasureBoxType> treasureTypeList = this.towerTempData.TreasureTypeList;
-            FNHGFDNICFG.RewardCount = (ObscuredInt)treasureTypeList.Count;
+            FNHGFDNICFG.RewardCount = (int)treasureTypeList.Count;
             for (int index = 0; index < (int)FNHGFDNICFG.RewardCount; ++index)
             {
                 int num = (int)(treasureTypeList[index] - 1);
@@ -2992,31 +2991,31 @@ namespace Elements.Battle
             if (this.playerAllDead || FNHGFDNICFG.IsSummonOrPhantom)
                 return;
             int num = (int)(GGACEPBHGBE - 1);
-            FNHGFDNICFG.RewardCount = (ObscuredInt)1;
+            FNHGFDNICFG.RewardCount = (int)1;
             FNHGFDNICFG.TreasureAnimeIdList.Add((eSpineCharacterAnimeId)(158 + num));
         }*/
 
         private void finishWave(bool GIMAJHFCKNE)
         {
-            if (this.NBLLPKDOANI == BattleManager.ACIIMEDNDDJ.RUNNING)
-                this.NBLLPKDOANI = BattleManager.ACIIMEDNDDJ.STOP_PULSE;
-            this.PEGOKDOFFIL = false;
-            for (int index = 0; index < this.UnitList.Count; ++index)
+            if (NBLLPKDOANI == ACIIMEDNDDJ.RUNNING)
+                NBLLPKDOANI = ACIIMEDNDDJ.STOP_PULSE;
+            PEGOKDOFFIL = false;
+            for (int index = 0; index < UnitList.Count; ++index)
             {
-                UnitCtrl unitCtrl = this.UnitList[index];
+                UnitCtrl unitCtrl = UnitList[index];
                 unitCtrl.CureAllAbnormalState();
                 unitCtrl.CutInFrameSet.CutInFrame = -1;
             }
-            if (!GIMAJHFCKNE && this.otherAllDead)
-                GIMAJHFCKNE = this.otherAllDead;
-            this.ChargeSkillTurn = eChargeSkillTurn.NONE;
+            if (!GIMAJHFCKNE && otherAllDead)
+                GIMAJHFCKNE = otherAllDead;
+            ChargeSkillTurn = eChargeSkillTurn.NONE;
             //this.UnitUiCtrl.HidePopUp();
-            this.playerAllDead = false;
-            this.otherAllDead = false;
-            this.NCBEMPGABMP = false;
-            this.BKIIPLLBGBA = false;
-            this.idleonlyDone = false;
-            this.GameState = eBattleGameState.IDLE;
+            playerAllDead = false;
+            otherAllDead = false;
+            NCBEMPGABMP = false;
+            BKIIPLLBGBA = false;
+            idleonlyDone = false;
+            GameState = eBattleGameState.IDLE;
             //this.appendWaveEndLog();
             /*if (GIMAJHFCKNE)
             {
@@ -3036,7 +3035,7 @@ namespace Elements.Battle
             {
                 //BattleHeaderController.Instance.gameObject.SetActive(false);
                 //this.UnitUiCtrl.HideSettingButtons();
-                this.finishBattle(eBattleResult.LOSE);
+                finishBattle(eBattleResult.LOSE);
             }
         }
 
@@ -3064,12 +3063,12 @@ namespace Elements.Battle
 
         public bool BattleReady { get; private set; }
 
-        public bool BOEDFIHEEOL => this.isValid;
+        public bool BOEDFIHEEOL => isValid;
 
         private void Awake()
         {
             Instance = this;
-            this.isValid = true;
+            isValid = true;
             //this.singletonTree = this.CreateSingletonTree<BattleManager>();
             //UekTempData PPNELKAAIKP = this.singletonTree.Get<UekTempData>();
             //this.towerTempData = this.singletonTree.Get<TowerTempData>();
@@ -3077,11 +3076,11 @@ namespace Elements.Battle
             //this.replayTempData = this.singletonTree.Get<ReplayTempData>();
             // this.battleManagerNode = this.singletonTree.GetCurrentNodeForInstanceEditing();
             // this.battleLog = new GJNIHENNINA((LGFJGKOMLCN)this);
-            this.battleUnionBurstController = new BattleUnionBurstController(this);
+            battleUnionBurstController = new BattleUnionBurstController(this);
             //this.battleCameraEffect = new CMMLKFHCEPD((OKKJGOIAIFK)this, this.playCamera, this.motionBlur, this.playCameraBlurOptimized);
-            this.battleEffectPool = new BattleEffectPool();
-            this.battleTimeScale = new BattleSpeedManager((BattleManager_Time)this);
-            this.NOMJJDDCBAN = new List<int>();
+            battleEffectPool = new BattleEffectPool();
+            battleTimeScale = new BattleSpeedManager(this);
+            NOMJJDDCBAN = new List<int>();
             // this.battleManagerNode.AddInstance((object)this);
             //this.battleManagerNode.AddInstance((object)this.battleLog);
             //this.battleManagerNode.AddInstance((object)this.battleCameraEffect);
@@ -3096,22 +3095,22 @@ namespace Elements.Battle
             // if (Singleton<UserData>.Instance.InitSettingParameter.BattleLogType != null)
             //     this.BattleLogEnable = this.battleLog.GetLogEnable(Singleton<UserData>.Instance.InitSettingParameter.BattleLogType);
             //this.BattleCategory = this.tempData.PHDACAOAOMA.CLCOKFOINCL;
-            this.BattleCategory = eBattleCategory.ARENA;//设定战斗系统为JJC
+            BattleCategory = eBattleCategory.ARENA;//设定战斗系统为JJC
                                                         //this.battleProcessor = this.createBattleProcessor(PPNELKAAIKP);
                                                         //this.battleEffectPool.BACHGMADMKC = this.battleProcessor.GetForceNormalSD();
                                                         //this.FICLPNJNOEP = this.battleProcessor.GetEnemyPoint();
                                                         // this.currentWaveOffset = this.battleProcessor.GetCurrentWaveOffset();
-            this.battleTimeScale.SetBaseTimeScale(1f);
-            this.UnitList = new List<UnitCtrl>();
-            this.EnemyList = new List<UnitCtrl>();
-            this.LPBCBINDJLJ = new List<UnitCtrl>();
-            this.PBCLBKCKHAI = new List<long>();
-            this.BlackoutUnitTargetList = new List<UnitCtrl>();
-            this.BlackOutUnitList = new List<UnitCtrl>();
-            this.JJCJONPDGIM = 0;
-            this.AMLOLHFMOPP = false;
-            this.DAIFDPFABCM = new Dictionary<string, GameObject>();
-            this.FieldDataDictionary = new Dictionary<int, List<AbnormalStateDataBase>>();
+            battleTimeScale.SetBaseTimeScale(1f);
+            UnitList = new List<UnitCtrl>();
+            EnemyList = new List<UnitCtrl>();
+            LPBCBINDJLJ = new List<UnitCtrl>();
+            PBCLBKCKHAI = new List<long>();
+            BlackoutUnitTargetList = new List<UnitCtrl>();
+            BlackOutUnitList = new List<UnitCtrl>();
+            JJCJONPDGIM = 0;
+            AMLOLHFMOPP = false;
+            DAIFDPFABCM = new Dictionary<string, GameObject>();
+            FieldDataDictionary = new Dictionary<int, List<AbnormalStateDataBase>>();
             /*switch (this.BattleCategory)
             {
                 case eBattleCategory.CLAN_BATTLE:
@@ -3128,23 +3127,23 @@ namespace Elements.Battle
                     break;
             }*/
 
-            this.BattleLogEnable = true;// !TutorialManager.IsStartTutorial && this.battleProcessor.GetBattleLogEnable(this.BattleLogEnable);
-            this.FameRate = 60;// this.battleProcessor.GetFrameRate();
-            this.IsDefenceReplayMode = false;// this.battleProcessor.GetIsDefenceReplayMode();
-            this.DeltaTime_60fps = 0.01666667f;
+            BattleLogEnable = true;// !TutorialManager.IsStartTutorial && this.battleProcessor.GetBattleLogEnable(this.BattleLogEnable);
+            FameRate = 60;// this.battleProcessor.GetFrameRate();
+            IsDefenceReplayMode = false;// this.battleProcessor.GetIsDefenceReplayMode();
+            DeltaTime_60fps = 0.01666667f;
             UnitCtrl.DamageFlashFrame = 8;
             UnitCtrl.FlashDelayFrame = 0;
-            this.CoroutineManager = this.gameObject.AddComponent<CoroutineManager>();
-            this.CoroutineManager.Init(this.BlackOutUnitList);
+            CoroutineManager = gameObject.AddComponent<CoroutineManager>();
+            CoroutineManager.Init(BlackOutUnitList);
             //this.battleEffectManager = this.gameObject.AddComponent<BattleEffectManager>();
             //this.battleEffectManager.Init(this.BlackOutUnitList, this.UnitList, this.EnemyList);
             //this.skillExeScreen.sortingOrder = 11500;
             //this.skillExeScreen.transform.localScale = new Vector3(2f, 2f);
-            this.enabled = false;
-            this.IsBossBattle = false;
+            enabled = false;
+            IsBossBattle = false;
             //this.motionBlur.enabled = false;
             //this.battleCameraEffect.SetBgBlur(false);
-            this.battleResult = eBattleResult.INVALID_VALUE;
+            battleResult = eBattleResult.INVALID_VALUE;
             //this.battleCameraEffect.PNNMBKNLFCL = 1f;
         }
 
@@ -3334,12 +3333,12 @@ namespace Elements.Battle
         }*/
 
         //public void Init(ViewBattle GJABBKPIEHH) => this.StartCoroutine(this.coroutineStartProcess(GJABBKPIEHH));
-        public void Init(MyGameCtrl gameCtrl) => this.StartCoroutine(this.coroutineStartProcess(gameCtrl));
+        public void Init(MyGameCtrl gameCtrl) => StartCoroutine(coroutineStartProcess(gameCtrl));
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
-            PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Clear();
-            PCRCaculator.Guild.GuildCalculator.Instance.bossValues.Clear();
+            GuildCalculator.Instance.dmglist.Clear();
+            GuildCalculator.Instance.bossValues.Clear();
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             // ISSUE: object of a compiler-generated type is created
@@ -3349,7 +3348,7 @@ namespace Elements.Battle
             //fdedccjjghm.4__this = this;
             //battleManager.viewBattle = PCRbattleManager;
             // battleManager.battleCameraEffect.orthographicSize = 2.044444f * (float)Screen.height / (float)Screen.width;
-            battleManager.playCamera.orthographicSize = 2.044444f * (float)Screen.height / (float)Screen.width;
+            battleManager.playCamera.orthographicSize = 2.044444f * Screen.height / Screen.width;
             // battleManager.viewBattle.TransformEffectCtrl.SetHalfDurationCallback(new System.Action<System.Action>(battleManager.incrementWave));
 
             //battleManager.viewBattle.TransformEffectCtrlForBoss.SetHalfDurationCallback(new System.Action<System.Action>(battleManager.incrementWave));
@@ -3460,11 +3459,11 @@ namespace Elements.Battle
                 yield return null;
             }
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
-            yield return (object)battleManager.InitializeEnemyFirst();
+            yield return battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
             battleManager.sortAndSetPositionOneWave(battleManager.currentEnemyUnitCtrlDictionary);
-            if ((UnityEngine.Object)battleManager.BossUnit != (UnityEngine.Object)null)
+            if (battleManager.BossUnit != null)
                 battleManager.resetAllUnitY();
             // ISSUE: explicit non-virtual call
             /*if ((battleManager.IsDefenceReplayMode))
@@ -3513,7 +3512,7 @@ namespace Elements.Battle
             //battleManager.CMINMBPDEOL = new BattleVoiceFlagManager(battleManager.GetMyUnitList(), battleManager.GetOpponentUnitList());
             // ISSUE: explicit non-virtual call
             // ISSUE: explicit non-virtual call
-            (battleManager.UnitList)[BattleManager.HeldRandom(0, (battleManager.UnitList).Count)].IsStartVoicePlay = true;
+            (battleManager.UnitList)[HeldRandom(0, (battleManager.UnitList).Count)].IsStartVoicePlay = true;
             int index1 = 0;
             // ISSUE: explicit non-virtual call
             for (int count = (battleManager.UnitList).Count; index1 < count; ++index1)
@@ -3631,39 +3630,39 @@ namespace Elements.Battle
 
         }
 
-        public List<UnitCtrl> GetMyUnitList() => (this.BattleCategory == eBattleCategory.ARENA_REPLAY || this.BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (this.IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? this.UnitList : this.EnemyList;
+        public List<UnitCtrl> GetMyUnitList() => (BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? UnitList : EnemyList;
 
-        public List<UnitCtrl> GetOpponentUnitList() => (this.BattleCategory == eBattleCategory.ARENA_REPLAY || this.BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (this.IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? this.EnemyList : this.UnitList;
+        public List<UnitCtrl> GetOpponentUnitList() => (BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? EnemyList : UnitList;
 
         private void initializePassiveSkill()
         {
-            this.PassiveDic_1 = new List<Dictionary<eParamType, PassiveActionValue>>()
-      {
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer())
+            PassiveDic_1 = new List<Dictionary<eParamType, PassiveActionValue>>
+            {
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer())
       };
-            this.PassiveDic_2 = new List<Dictionary<eParamType, PassiveActionValue>>()
-      {
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer())
+            PassiveDic_2 = new List<Dictionary<eParamType, PassiveActionValue>>
+            {
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer())
       };
-            this.PassiveDic_3 = new List<Dictionary<eParamType, PassiveActionValue>>()
-      {
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer())
+            PassiveDic_3 = new List<Dictionary<eParamType, PassiveActionValue>>
+            {
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer())
       };
-            this.PassiveDic_4 = new List<Dictionary<eParamType, PassiveActionValue>>()
-      {
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer()),
-        new Dictionary<eParamType, PassiveActionValue>((IEqualityComparer<eParamType>) new eParamType_DictComparer())
+            PassiveDic_4 = new List<Dictionary<eParamType, PassiveActionValue>>
+            {
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer()),
+        new Dictionary<eParamType, PassiveActionValue>(new eParamType_DictComparer())
             };
             int num = 0;
-            for (int count = this.tempData.AllUnitParameters.Count; num < count; ++num)
-                this.InitializePassiveSkillUnitList(this.tempData.AllUnitParameters[num], ePassiveInitType.ALL_BY_ENEMY, num);
+            for (int count = tempData.AllUnitParameters.Count; num < count; ++num)
+                InitializePassiveSkillUnitList(tempData.AllUnitParameters[num], ePassiveInitType.ALL_BY_ENEMY, num);
         }
 
         public void InitializePassiveSkillUnitList(
@@ -3673,16 +3672,16 @@ namespace Elements.Battle
         {
             int index = 0;
             for (int count = CNBJIKBCFIC.Count; index < count; ++index)
-                UnitCtrl.InitializeExAndFreeSkill(CNBJIKBCFIC[index].UniqueData, DPLDGBDGLDK, OFEBCDLGGGL, (UnitCtrl)null);
+                UnitCtrl.InitializeExAndFreeSkill(CNBJIKBCFIC[index].UniqueData, DPLDGBDGLDK, OFEBCDLGGGL, null);
         }
 
         private IEnumerator InitializeEnemyFirst()
         {
             //int count = this.tempData.enemyList.Count;
             int count = 1;
-            this.allWaveEnemyUnitCtrlListArray = new List<UnitCtrl>[count];
+            allWaveEnemyUnitCtrlListArray = new List<UnitCtrl>[count];
             for (int index = 0; index < count; ++index)
-                this.allWaveEnemyUnitCtrlListArray[index] = new List<UnitCtrl>();
+                allWaveEnemyUnitCtrlListArray[index] = new List<UnitCtrl>();
             for (int i = 0; i < count; ++i)
             {
                 // ISSUE: object of a compiler-generated type is created
@@ -3695,41 +3694,41 @@ namespace Elements.Battle
                 MyGameCtrl.Instance.LoadEnemy(() => { isCallbackCalled = true; });
                 // ISSUE: reference to a compiler-generated field
                 while (!isCallbackCalled)
-                    yield return (object)null;
-                this.allWaveEnemyUnitCtrlListArray[0] = MyGameCtrl.Instance.enemyUnitCtrl;
+                    yield return null;
+                allWaveEnemyUnitCtrlListArray[0] = MyGameCtrl.Instance.enemyUnitCtrl;
                 //modnipfemjd = (BattleManager.MODNIPFEMJD) null;
             }
-            this.setupCurrentEnemy(0);
+            setupCurrentEnemy(0);
         }
 
-        public void InitializeEnemyForIncliment(System.Action ACGNCFFDNON)
+        public void InitializeEnemyForIncliment(Action ACGNCFFDNON)
         {
-            this.setupCurrentEnemy(this.CurrentWave);
+            setupCurrentEnemy(CurrentWave);
             ACGNCFFDNON();
         }
 
         private void setupCurrentEnemy(int currentWave)
         {
-            for (int index1 = 0; index1 < this.allWaveEnemyUnitCtrlListArray.Length; ++index1)
+            for (int index1 = 0; index1 < allWaveEnemyUnitCtrlListArray.Length; ++index1)
             {
                 if (index1 != currentWave)
                 {
-                    for (int index2 = 0; index2 < this.allWaveEnemyUnitCtrlListArray[index1].Count; ++index2)
+                    for (int index2 = 0; index2 < allWaveEnemyUnitCtrlListArray[index1].Count; ++index2)
                     {
-                        UnitCtrl _self = this.allWaveEnemyUnitCtrlListArray[index1][index2];
-                        if ((UnityEngine.Object)_self != (UnityEngine.Object)null)
+                        UnitCtrl _self = allWaveEnemyUnitCtrlListArray[index1][index2];
+                        if (_self != null)
                             _self.SetActive(false);
                     }
                 }
             }
             Dictionary<int, UnitCtrl> dictionary = new Dictionary<int, UnitCtrl>();
-            for (int index = 0; index < this.allWaveEnemyUnitCtrlListArray[currentWave].Count; ++index)
+            for (int index = 0; index < allWaveEnemyUnitCtrlListArray[currentWave].Count; ++index)
             {
-                UnitCtrl _self = this.allWaveEnemyUnitCtrlListArray[currentWave][index];
+                UnitCtrl _self = allWaveEnemyUnitCtrlListArray[currentWave][index];
                 _self.SetActive(true);
                 dictionary.Add(index, _self);
             }
-            this.currentEnemyUnitCtrlDictionary = dictionary;
+            currentEnemyUnitCtrlDictionary = dictionary;
         }
 
         /*private void loadEnemy(int wave, System.Action EACMDCOJIPL)
@@ -4007,40 +4006,40 @@ namespace Elements.Battle
 
         public int LAMHAIODABF { get; set; }
 
-        public bool GetAdvPlayed() => this.LKLFFOFDCHK;
+        public bool GetAdvPlayed() => LKLFFOFDCHK;
 
         public void CallbackStanbyDone(UnitCtrl FNHGFDNICFG)
         {
-            if (this.GPFLCBONNMK)
+            if (GPFLCBONNMK)
                 return;
-            for (int index = 0; index < this.UnitList.Count; ++index)
+            for (int index = 0; index < UnitList.Count; ++index)
             {
-                if (!this.UnitList[index].StandByDone)
+                if (!UnitList[index].StandByDone)
                     return;
             }
-            this.GPFLCBONNMK = true;
-            this.PlayStory((System.Action)(() => this.LKLFFOFDCHK = true), 
+            GPFLCBONNMK = true;
+            PlayStory(() => LKLFFOFDCHK = true, 
                 0,//this.battleProcessor.GetNextWaveStartStoryId(), 
                 false);
         }
 
         public void CallbackStartDashDone(UnitCtrl FNHGFDNICFG)
         {
-            if (this.LAMHAIODABF == 0)
+            if (LAMHAIODABF == 0)
                 return;
             FNHGFDNICFG.StartDashDone = true;
-            for (int index = 0; index < this.UnitList.Count; ++index)
+            for (int index = 0; index < UnitList.Count; ++index)
             {
-                if (!this.UnitList[index].IsDead && !this.UnitList[index].StartDashDone)
+                if (!UnitList[index].IsDead && !UnitList[index].StartDashDone)
                     return;
             }
-            for (int index = 0; index < this.UnitList.Count; ++index)
-                this.UnitList[index].StartDashDone = false;
-            this.PlayStory((System.Action)(() => this.LKLFFOFDCHK = true), this.LAMHAIODABF, false);
-            this.LAMHAIODABF = 0;
+            for (int index = 0; index < UnitList.Count; ++index)
+                UnitList[index].StartDashDone = false;
+            PlayStory(() => LKLFFOFDCHK = true, LAMHAIODABF, false);
+            LAMHAIODABF = 0;
         }
 
-        public void PlayStory(System.Action callBack, int id, bool COJBLEMPHOC)
+        public void PlayStory(Action callBack, int id, bool COJBLEMPHOC)
         {
             if (id == 0)
             {
@@ -4049,7 +4048,7 @@ namespace Elements.Battle
             else
             {
                 //this.UnitUiCtrl.HidePopUp();
-                this.GamePause(true, false);
+                GamePause(true);
                 //this.battleProcessor.PlayStory(MELLIBIDKGI, IDIPPNOCLLK, COJBLEMPHOC, this.viewBattle);
             }
         }
@@ -4333,9 +4332,9 @@ namespace Elements.Battle
             // ISSUE: reference to a compiler-generated field
             //onnmaebgcib._unitId = unitId;
             // ISSUE: reference to a compiler-generated method
-            UnitCtrl unitCtrl = this.UnitList.Find(a => a.UnitId == unitId);
+            UnitCtrl unitCtrl = UnitList.Find(a => a.UnitId == unitId);
             // ISSUE: reference to a compiler-generated method
-            return (UnityEngine.Object)unitCtrl != (UnityEngine.Object)null ? unitCtrl : this.EnemyList.Find(a => a.UnitId == unitId);
+            return unitCtrl != null ? unitCtrl : EnemyList.Find(a => a.UnitId == unitId);
         }
 
         public UnitCtrl Summon(SummonData data)
@@ -4344,7 +4343,7 @@ namespace Elements.Battle
             
             // ISSUE: object of a compiler-generated type is created
             // ISSUE: variable of a compiler-generated type
-            BattleManager.DisplayClass1 defaultClass = new BattleManager.DisplayClass1()
+            DisplayClass1 defaultClass = new DisplayClass1
             {
                 _summonData = data,
                 _this = this
@@ -4362,7 +4361,7 @@ namespace Elements.Battle
             defaultClass.ucTransform.localScale = Vector3.one;
             // ISSUE: reference to a compiler-generated field
             // ISSUE: reference to a compiler-generated field
-            defaultClass.moveType = (double)defaultClass._summonData.MoveSpeed <= 1.0 ? SummonAction.eMoveType.NORMAL : SummonAction.eMoveType.LINEAR;
+            defaultClass.moveType = defaultClass._summonData.MoveSpeed <= 1.0 ? SummonAction.eMoveType.NORMAL : SummonAction.eMoveType.LINEAR;
             // ISSUE: reference to a compiler-generated field
             // ISSUE: reference to a compiler-generated field
             // ISSUE: reference to a compiler-generated field
@@ -4417,106 +4416,106 @@ namespace Elements.Battle
                 //{
                 //    _obj = sa
                 //};
-                this.unitCtrl.UnitSpineCtrl = sa;
-                sa.Owner = this.unitCtrl;
+                unitCtrl.UnitSpineCtrl = sa;
+                sa.Owner = unitCtrl;
                 //sa.LoadAnimationIDImmediately(eSpineBinaryAnimationId.COMMON_BATTLE);
                 //sa.LoadAnimationIDImmediately(eSpineBinaryAnimationId.BATTLE);
-                sa.SetAnimeEventDelegateForBattle(()=> { sa.IsStopState = true; }, -1);
-                this.unitCtrl.CenterBone = sa.skeleton.FindBone("Center");
-                this.unitCtrl.StateBone = sa.skeleton.FindBone("State");
+                sa.SetAnimeEventDelegateForBattle(()=> { sa.IsStopState = true; });
+                unitCtrl.CenterBone = sa.skeleton.FindBone("Center");
+                unitCtrl.StateBone = sa.skeleton.FindBone("State");
                 UnitParameter parameter = null;
                 PCRCaculator.UnitData unitData_my = new PCRCaculator.UnitData();
-                if (UnitUtility.IsQuestMonsterUnit(this._summonData.SummonId))
+                if (UnitUtility.IsQuestMonsterUnit(_summonData.SummonId))
                 {
                     //parameter = UnitUtility.CreateUnitParameterFromEnemyParameter(this._summonData.SummonId);
                     //Debug.LogError("特殊召唤物鸽了！");
-                    PCRCaculator.EnemyData enemyData = PCRCaculator.Guild.GuildManager.EnemyDataDic[this._summonData.SummonId];
+                    EnemyData enemyData = GuildManager.EnemyDataDic[_summonData.SummonId];
                     unitData_my = enemyData.CreateUnitData();
-                    parameter = TempData.CreateUnitParameter(enemyData, PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.FullBarrier);
+                    parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
                 }
                 else
                 {
                     //parameter = UnitUtility.CreateSummonUnitParameter(this._summonData.Owner.UnitParameter, this._summonData.SummonId, this._summonData.Skill.Level, this._summonData.ConsiderEquipmentAndBonus, this._summonData.Owner.MainSkill1Evolved);
                     PCRCaculator.UnitData ownerData = _summonData.Owner.unitData;
-                    unitData_my = new PCRCaculator.UnitData(_summonData.SummonId, this._summonData.Skill.Level,ownerData.rarity,ownerData.rank);
+                    unitData_my = new PCRCaculator.UnitData(_summonData.SummonId, _summonData.Skill.Level,ownerData.rarity,ownerData.rank);
                     parameter = TempData.CreateUnitParameter(unitData_my);
                 }
-                bool flag = (this._summonData.SummonSide == SummonAction.eSummonSide.OURS) ? this._summonData.Owner.IsOther : !this._summonData.Owner.IsOther;
+                bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
 
-                PCRCaculator.BaseData additional = null;
+                BaseData additional = null;
 
                 if (_summonData.ConsiderEquipmentAndBonus)
                 {
-                    additional = PCRCaculator.MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData);
+                    additional = MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData);
                 }
 
 
-                this.unitCtrl.Initialize(parameter,unitData_my, flag, true, false, additional);
-                if (this._summonData.ConsiderEquipmentAndBonus)
+                unitCtrl.Initialize(parameter,unitData_my, flag, true, false, additional);
+                if (_summonData.ConsiderEquipmentAndBonus)
                 {
-                    this.unitCtrl.ApplyPassiveSkillValue(true);
+                    unitCtrl.ApplyPassiveSkillValue(true);
                 }
                 if (flag)
                 {
-                    this.unitCtrl.OnDieForZeroHp = (Action<UnitCtrl>)Delegate.Combine(this.unitCtrl.OnDieForZeroHp, new Action<UnitCtrl>(this._this.onDieEnemy));
-                    this._this.EnemyList.Add(this.unitCtrl);
+                    unitCtrl.OnDieForZeroHp = (Action<UnitCtrl>)Delegate.Combine(unitCtrl.OnDieForZeroHp, new Action<UnitCtrl>(_this.onDieEnemy));
+                    _this.EnemyList.Add(unitCtrl);
                 }
                 else
                 {
-                    this._this.UnitList.Add(this.unitCtrl);
+                    _this.UnitList.Add(unitCtrl);
                 }
-                this.unitCtrl.ExecActionOnStartAndDetermineInstanceID();
-                this.unitCtrl.SummonType = this._summonData.SummonType;
-                this.unitCtrl.SetLeftDirection(this._summonData.Owner.IsLeftDir);
-                int skillNum = this._summonData.Skill.SkillNum;
+                unitCtrl.ExecActionOnStartAndDetermineInstanceID();
+                unitCtrl.SummonType = _summonData.SummonType;
+                unitCtrl.SetLeftDirection(_summonData.Owner.IsLeftDir);
+                int skillNum = _summonData.Skill.SkillNum;
                 //if (this.unitCtrl.SummonEffects.Count > 0)
                 //{
                 //    this.unitCtrl.AppendCoroutine(this.unitCtrl.CreatePrefabWithTime(this.unitCtrl.SummonEffects, false, skillNum, false, false, false), ePauseType.VISUAL, (this._summonData.Skill.BlackOutTime > 0f) ? this._summonData.Owner : null);
                 //}
                 eUnitRespawnPos respawnPos = eUnitRespawnPos.MAIN_POS_1;
-                SummonAction.eSummonType type = this._summonData.SummonType;
+                SummonAction.eSummonType type = _summonData.SummonType;
                 if ((type - 1) > SummonAction.eSummonType.SUMMON)
                 {
                     if (type == SummonAction.eSummonType.DIVISION)
                     {
-                        respawnPos = this._summonData.RespawnPos;
+                        respawnPos = _summonData.RespawnPos;
                     }
                 }
-                else if (this._summonData.UseRespawnPos)
+                else if (_summonData.UseRespawnPos)
                 {
-                    respawnPos = this._summonData.RespawnPos;
+                    respawnPos = _summonData.RespawnPos;
                 }
                 else
                 {
-                    respawnPos = this._this.SearchRespawnPos(this._summonData.Owner.RespawnPos, flag ? this._this.EnemyList : this._this.UnitList, this._summonData.SummonId);
+                    respawnPos = _this.SearchRespawnPos(_summonData.Owner.RespawnPos, flag ? _this.EnemyList : _this.UnitList, _summonData.SummonId);
                 }
-                this.unitCtrl.SummonRespawnPos = respawnPos;
-                if (this.unitCtrl.GetCurrentSpineCtrl().IsAnimation(eSpineCharacterAnimeId.SUMMON, skillNum, -1, -1) || (this.moveType == SummonAction.eMoveType.LINEAR))
+                unitCtrl.SummonRespawnPos = respawnPos;
+                if (unitCtrl.GetCurrentSpineCtrl().IsAnimation(eSpineCharacterAnimeId.SUMMON, skillNum) || (moveType == SummonAction.eMoveType.LINEAR))
                 {
-                    this.unitCtrl.RespawnPos = this._summonData.Owner.RespawnPos;
-                    if (this.unitCtrl.GetCurrentSpineCtrl().IsAnimation(eSpineCharacterAnimeId.SUMMON, skillNum, -1, -1))
+                    unitCtrl.RespawnPos = _summonData.Owner.RespawnPos;
+                    if (unitCtrl.GetCurrentSpineCtrl().IsAnimation(eSpineCharacterAnimeId.SUMMON, skillNum))
                     {
-                        this.unitCtrl.PlayAnime(eSpineCharacterAnimeId.SUMMON, skillNum, -1, -1, false, null, false, 0f, false);
+                        unitCtrl.PlayAnime(eSpineCharacterAnimeId.SUMMON, skillNum, -1, -1, false);
                     }
-                    if ((this._summonData.Skill.BlackOutTime > 0f) && (this._this.BlackOutUnitList.Count > 0))
+                    if ((_summonData.Skill.BlackOutTime > 0f) && (_this.BlackOutUnitList.Count > 0))
                     {
-                        this.unitCtrl.SetSortOrderFront();
-                        this._this.BlackOutUnitList.Add(this.unitCtrl);
-                        this._this.AppendCoroutine(this.unitCtrl.UpdateSummon(skillNum, this.unitCtrl.SummonRespawnPos, this.moveType, this._summonData.TargetPosition, this._summonData.MoveSpeed), ePauseType.SYSTEM, this._summonData.Owner);
+                        unitCtrl.SetSortOrderFront();
+                        _this.BlackOutUnitList.Add(unitCtrl);
+                        _this.AppendCoroutine(unitCtrl.UpdateSummon(skillNum, unitCtrl.SummonRespawnPos, moveType, _summonData.TargetPosition, _summonData.MoveSpeed), ePauseType.SYSTEM, _summonData.Owner);
                     }
                     else
                     {
-                        this.unitCtrl.SetSortOrderBack();
-                        this._this.AppendCoroutine(this.unitCtrl.UpdateSummon(skillNum, this.unitCtrl.SummonRespawnPos, this.moveType, this._summonData.TargetPosition, this._summonData.MoveSpeed), ePauseType.SYSTEM, null);
+                        unitCtrl.SetSortOrderBack();
+                        _this.AppendCoroutine(unitCtrl.UpdateSummon(skillNum, unitCtrl.SummonRespawnPos, moveType, _summonData.TargetPosition, _summonData.MoveSpeed), ePauseType.SYSTEM);
                     }
-                    this.unitCtrl.SortOrder--;
+                    unitCtrl.SortOrder--;
                 }
                 else
                 {
-                    this.unitCtrl.BattleStartProcess(respawnPos);
-                    this.ucTransform.SetLocalPosY(this._this.GetRespawnPos(respawnPos));
-                    this.unitCtrl.SetState(UnitCtrl.ActionState.WALK, 0, 0, false);
+                    unitCtrl.BattleStartProcess(respawnPos);
+                    ucTransform.SetLocalPosY(_this.GetRespawnPos(respawnPos));
+                    unitCtrl.SetState(UnitCtrl.ActionState.WALK);
                 }
             }
         }

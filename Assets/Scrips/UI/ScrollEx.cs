@@ -1,9 +1,7 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
-using System;
 
 public class ScrollEx : MonoBehaviour
 {
@@ -19,8 +17,8 @@ public class ScrollEx : MonoBehaviour
 
     private Vector2 parentOriginSize;
     private List<GameObject> prefabs = new List<GameObject>();
-    private int prefabCount = 0;
-    private bool init = false;
+    private int prefabCount;
+    private bool init;
     public IReadOnlyList<GameObject> Prefabs => prefabs;
     public void ClearAll()
     {

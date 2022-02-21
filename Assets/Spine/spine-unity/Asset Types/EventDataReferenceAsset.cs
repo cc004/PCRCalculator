@@ -54,8 +54,8 @@ namespace Spine.Unity {
 		public void Initialize () {
 			if (skeletonDataAsset == null)
 				return;
-			this.eventData = skeletonDataAsset.GetSkeletonData(EventDataReferenceAsset.QuietSkeletonData).FindEvent(eventName);
-			if (this.eventData == null)
+			eventData = skeletonDataAsset.GetSkeletonData(QuietSkeletonData).FindEvent(eventName);
+			if (eventData == null)
 				Debug.LogWarningFormat("Event Data '{0}' not found in SkeletonData : {1}.", eventName, skeletonDataAsset.name);
 		}
 

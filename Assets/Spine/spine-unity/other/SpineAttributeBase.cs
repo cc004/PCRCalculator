@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Spine.Unity
 {
-	[AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Field)]
 	public abstract class SpineAttributeBase : PropertyAttribute
 	{
 		public string dataField = "";

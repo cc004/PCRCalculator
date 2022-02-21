@@ -27,7 +27,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.endAction = _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2));
+      endAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2);
     }
 
     public override void ExecAction(
@@ -41,10 +41,10 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      if (this.ActionDetail2 != 0)
-        this.endAction.CancelByIfForAll = true;
+      if (ActionDetail2 != 0)
+        endAction.CancelByIfForAll = true;
       FixedTransformMonoBehavior.FixedTransform sourceTransform = _sourceActionController.transform;
-      switch (this.ActionDetail1)
+      switch (ActionDetail1)
       {
         case 1:
           if (_num % 2 == 0)
@@ -52,7 +52,7 @@ namespace Elements
             sourceTransform.SetLocalPosX(_target.GetBottomTransformLocalPosition().x + _target.GetLocalPosition().x);
             if ((double) _valueDictionary[eValueNumber.VALUE_3] == 1.0)
               sourceTransform.SetLocalPosY(_target.GetLocalPosition().y);
-            sourceTransform.localPosition += MoveAction.calculatePosotion(_source, _target, _sourceActionController, _valueDictionary);
+            sourceTransform.localPosition += calculatePosotion(_source, _target, _sourceActionController, _valueDictionary);
             break;
           }
           sourceTransform.localPosition = _skill.OwnerReturnPosition;
@@ -61,20 +61,20 @@ namespace Elements
           if (_num % 2 == 0)
           {
             sourceTransform.localPosition += new Vector3(_source.IsLeftDir ? -_valueDictionary[eValueNumber.VALUE_1] : (float)_valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
-            this.OnActionEnd = (ActionParameter.OnActionEndDelegate) (() =>
+            OnActionEnd = () =>
             {
-              sourceTransform.localPosition = _skill.OwnerReturnPosition;
-              this.OnActionEnd = (ActionParameter.OnActionEndDelegate) null;
-            });
+                sourceTransform.localPosition = _skill.OwnerReturnPosition;
+                OnActionEnd = null;
+            };
             break;
           }
           sourceTransform.localPosition = _skill.OwnerReturnPosition;
-          this.OnActionEnd = (ActionParameter.OnActionEndDelegate) null;
+          OnActionEnd = null;
           break;
         case 3:
           _source.transform.SetLocalPosX(_target.GetBottomTransformLocalPosition().x + _target.GetLocalPosition().x);
-          _source.transform.localPosition += MoveAction.calculatePosotion(_source, _target, _sourceActionController, _valueDictionary);
-          _sourceActionController.AppendCoroutine(this.resetPositionY(_skill, _source), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _source.transform.localPosition += calculatePosotion(_source, _target, _sourceActionController, _valueDictionary);
+          _sourceActionController.AppendCoroutine(resetPositionY(_skill, _source), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           break;
         case 4:
           _source.transform.localPosition += new Vector3(_source.IsLeftDir ? -_valueDictionary[eValueNumber.VALUE_1] : (float)_valueDictionary[eValueNumber.VALUE_1], 0.0f, 0.0f);
@@ -82,11 +82,11 @@ namespace Elements
         case 5:
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, _isLoop: true);
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false);
-          _sourceActionController.AppendCoroutine(this.targetMoveByVerocity(_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _target, _sourceActionController, _source, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _sourceActionController.AppendCoroutine(targetMoveByVerocity(_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _target, _sourceActionController, _source, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           break;
         case 6:
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, _isLoop: true);
-          _sourceActionController.AppendCoroutine(this.absoluteMoveByVerocity(_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _sourceActionController, _source, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _sourceActionController.AppendCoroutine(absoluteMoveByVerocity(_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _sourceActionController, _source, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           break;
         case 7:
           if (_num % 2 == 0)
@@ -98,16 +98,16 @@ namespace Elements
           sourceTransform.localPosition = _skill.OwnerReturnPosition;
           break;
       }
-      switch ((MoveAction.eMoveType) this.ActionDetail1)
+      switch ((eMoveType) ActionDetail1)
       {
-        case MoveAction.eMoveType.TARGET_POS_RETURN:
-        case MoveAction.eMoveType.ABSOLUTE_POS_RETURN:
-        case MoveAction.eMoveType.TARGET_POS:
-        case MoveAction.eMoveType.ABSOLUTE_POS:
-        case MoveAction.eMoveType.ABSOLUTE_MOVE_DONOT_USE_DIRECTION:
-          if ((double) sourceTransform.localPosition.x > (double) BattleDefine.BATTLE_FIELD_SIZE)
+        case eMoveType.TARGET_POS_RETURN:
+        case eMoveType.ABSOLUTE_POS_RETURN:
+        case eMoveType.TARGET_POS:
+        case eMoveType.ABSOLUTE_POS:
+        case eMoveType.ABSOLUTE_MOVE_DONOT_USE_DIRECTION:
+          if (sourceTransform.localPosition.x > (double) BattleDefine.BATTLE_FIELD_SIZE)
             sourceTransform.SetLocalPosX(BattleDefine.BATTLE_FIELD_SIZE);
-          if ((double) sourceTransform.localPosition.x >= -(double) BattleDefine.BATTLE_FIELD_SIZE)
+          if (sourceTransform.localPosition.x >= -(double) BattleDefine.BATTLE_FIELD_SIZE)
             break;
           sourceTransform.SetLocalPosX(-BattleDefine.BATTLE_FIELD_SIZE);
           break;
@@ -128,14 +128,14 @@ namespace Elements
       while (true)
       {
         sourceTransform.localPosition += new Vector3((!_source.IsLeftDir ? _speed : -_speed) * moveAction.battleManager.DeltaTime_60fps, 0.0f, 0.0f);
-        if ((double) Mathf.Abs(startPosx - sourceTransform.localPosition.x) < (double) _distance)
-          yield return (object) null;
+        if (Mathf.Abs(startPosx - sourceTransform.localPosition.x) < (double) _distance)
+          yield return null;
         else
           break;
       }
       _sourceUnitActionController.MoveEnd = true;
       _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 2);
-      _sourceUnitActionController.AppendCoroutine(moveAction.moveByVerocityEnd(_sourceUnitActionController, _source, _skill, _speed), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceUnitActionController.AppendCoroutine(moveAction.moveByVerocityEnd(_sourceUnitActionController, _source, _skill, _speed), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private IEnumerator targetMoveByVerocity(
@@ -150,12 +150,12 @@ namespace Elements
       _main += _target.GetBodyWidth() / 2f;
       _sourceUnitActionController.MoveEnd = false;
       FixedTransformMonoBehavior.FixedTransform sourceTransform = _sourceUnitActionController.transform;
-      bool isRight = (double) sourceTransform.position.x < (double) _target.GetPosition().x;
+      bool isRight = sourceTransform.position.x < (double) _target.GetPosition().x;
       bool isUnionBurst = _skill.SkillId == _source.UnionBurstSkillId;
       while (!_source.IsCancelActionState(isUnionBurst) && (isUnionBurst || !_source.IsUnableActionState()))
       {
         sourceTransform.localPosition += new Vector3((!isRight ? -_sub : _sub) * moveAction.battleManager.DeltaTime_60fps, 0.0f, 0.0f);
-        if (((double) _target.GetLocalPosition().x - (double) sourceTransform.localPosition.x) * (isRight ? 1.0 : -1.0) <= (double) _main)
+        if ((_target.GetLocalPosition().x - (double) sourceTransform.localPosition.x) * (isRight ? 1.0 : -1.0) <= _main)
         {
           _sourceUnitActionController.MoveEnd = true;
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 2);
@@ -163,11 +163,11 @@ namespace Elements
             _skill.LoopEffectObjs[index].SetTimeToDie(true);
           _skill.LoopEffectObjs.Clear();
           _skill.LoopEffectAlreadyDone = true;
-          _sourceUnitActionController.AppendCoroutine(moveAction.moveByVerocityEnd(_sourceUnitActionController, _source, _skill, _sub), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+          _sourceUnitActionController.AppendCoroutine(moveAction.moveByVerocityEnd(_sourceUnitActionController, _source, _skill, _sub), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           yield break;
         }
-        else
-          yield return (object) null;
+
+        yield return null;
       }
       for (int index = 0; index < _skill.LoopEffectObjs.Count; ++index)
         _skill.LoopEffectObjs[index].SetTimeToDie(true);
@@ -181,18 +181,18 @@ namespace Elements
       Skill _skill,
       float _velocity)
     {
-      if (this.endAction != null)
+      if (endAction != null)
       {
-        this.endAction.CancelByIfForAll = false;
-        _sourceActionController.ExecUnitActionWithDelay(this.endAction, _skill, false, false);
+        endAction.CancelByIfForAll = false;
+        _sourceActionController.ExecUnitActionWithDelay(endAction, _skill, false, false);
       }
       _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);
       while (_source.UnitSpineCtrl.IsPlayAnimeBattle)
-        yield return (object) null;
+        yield return null;
       if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum, 3))
       {
         _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 3, _isLoop: true);
-        _sourceActionController.AppendCoroutine(this.moveByVerocityReturn(_sourceActionController, _source, _skill, _velocity), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+        _sourceActionController.AppendCoroutine(moveByVerocityReturn(_sourceActionController, _source, _skill, _velocity), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
       }
       else
         _source.SkillEndProcess();
@@ -206,12 +206,12 @@ namespace Elements
     {
       MoveAction moveAction = this;
       FixedTransformMonoBehavior.FixedTransform sourceTransform = _sourceActionController.transform;
-      bool isRight = (double) sourceTransform.localPosition.x < (double) _skill.OwnerReturnPosition.x;
+      bool isRight = sourceTransform.localPosition.x < (double) _skill.OwnerReturnPosition.x;
       while (true)
       {
         sourceTransform.localPosition += new Vector3((!isRight ? -_velocity : _velocity) * moveAction.battleManager.DeltaTime_60fps, 0.0f, 0.0f);
-        if (((double) _skill.OwnerReturnPosition.x - (double) sourceTransform.localPosition.x) * (isRight ? 1.0 : -1.0) >= 0.0 && !BattleUtil.Approximately(_skill.OwnerReturnPosition.x, sourceTransform.localPosition.x))
-          yield return (object) null;
+        if ((_skill.OwnerReturnPosition.x - (double) sourceTransform.localPosition.x) * (isRight ? 1.0 : -1.0) >= 0.0 && !BattleUtil.Approximately(_skill.OwnerReturnPosition.x, sourceTransform.localPosition.x))
+          yield return null;
         else
           break;
       }
@@ -219,14 +219,14 @@ namespace Elements
       localPosition.x = _skill.OwnerReturnPosition.x;
       sourceTransform.localPosition = localPosition;
       _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 4);
-      _sourceActionController.AppendCoroutine(moveAction.moveType4ReturnEnd(_source, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceActionController.AppendCoroutine(moveAction.moveType4ReturnEnd(_source, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private IEnumerator moveType4ReturnEnd(UnitCtrl _source, Skill _skill)
     {
       MoveAction moveAction = this;
       while (_source.UnitSpineCtrl.IsPlayAnimeBattle)
-        yield return (object) null;
+        yield return null;
       _source.SkillEndProcess();
       if (_skill.BlackoutEndWithMotion)
         moveAction.battleManager.SetBlackoutTimeZero();
@@ -236,7 +236,7 @@ namespace Elements
     {
       MoveAction moveAction = this;
       while (_source.GetCurrentSpineCtrl().IsPlayAnimeBattle && !_source.IsUnableActionState() && _source.CurrentState != UnitCtrl.ActionState.DAMAGE)
-        yield return (object) null;
+        yield return null;
       _source.transform.localPosition += new Vector3(0.0f, _skill.OwnerReturnPosition.y - _source.transform.localPosition.y, 0.0f);
       List<UnitCtrl> unitCtrlList = _source.IsOther ? moveAction.battleManager.UnitList : moveAction.battleManager.EnemyList;
       for (int index = 0; index < unitCtrlList.Count; ++index)
@@ -251,7 +251,7 @@ namespace Elements
       UnitCtrl _source,
       BasePartsData _target,
       UnitActionController _sourceActionController,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => new Vector3((float) ((_source.IsLeftDir ? 1.0 : -1.0) * ((double) _valueDictionary[eValueNumber.VALUE_1] + (double) Math.Sign(_valueDictionary[eValueNumber.VALUE_1]) * ((double) _target.GetBodyWidth() / 2.0 + (double) _source.BodyWidth / 2.0))), 0.0f, 0.0f);
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => new Vector3((float) ((_source.IsLeftDir ? 1.0 : -1.0) * ((double) _valueDictionary[eValueNumber.VALUE_1] + Math.Sign(_valueDictionary[eValueNumber.VALUE_1]) * (_target.GetBodyWidth() / 2.0 + _source.BodyWidth / 2.0))), 0.0f, 0.0f);
 
     private enum eMoveType
     {

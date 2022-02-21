@@ -333,12 +333,12 @@ namespace Spine
 			timelineData.Clear();
 			timelineDipMix.Clear();
 			timelinesRotation.Clear();
-			this.Start = null;
-			this.Interrupt = null;
-			this.End = null;
-			this.Dispose = null;
-			this.Complete = null;
-			this.Event = null;
+			Start = null;
+			Interrupt = null;
+			End = null;
+			Dispose = null;
+			Complete = null;
+			Event = null;
 		}
 
 		internal TrackEntry SetTimelineData(TrackEntry to, ExposedList<TrackEntry> mixingToArray, HashSet<int> propertyIDs)
@@ -413,49 +413,49 @@ namespace Spine
 
 		internal void OnStart()
 		{
-			if (this.Start != null)
+			if (Start != null)
 			{
-				this.Start(this);
+				Start(this);
 			}
 		}
 
 		internal void OnInterrupt()
 		{
-			if (this.Interrupt != null)
+			if (Interrupt != null)
 			{
-				this.Interrupt(this);
+				Interrupt(this);
 			}
 		}
 
 		internal void OnEnd()
 		{
-			if (this.End != null)
+			if (End != null)
 			{
-				this.End(this);
+				End(this);
 			}
 		}
 
 		internal void OnDispose()
 		{
-			if (this.Dispose != null)
+			if (Dispose != null)
 			{
-				this.Dispose(this);
+				Dispose(this);
 			}
 		}
 
 		internal void OnComplete()
 		{
-			if (this.Complete != null)
+			if (Complete != null)
 			{
-				this.Complete(this);
+				Complete(this);
 			}
 		}
 
 		internal void OnEvent(Event e)
 		{
-			if (this.Event != null)
+			if (Event != null)
 			{
-				this.Event(this, e);
+				Event(this, e);
 			}
 		}
 

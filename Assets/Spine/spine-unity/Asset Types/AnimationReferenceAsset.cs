@@ -56,8 +56,8 @@ namespace Spine.Unity {
 		
 		public void Initialize () {
 			if (skeletonDataAsset == null) return;
-			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
-			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
+			animation = skeletonDataAsset.GetSkeletonData(QuietSkeletonData).FindAnimation(animationName);
+			if (animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
 		}
 		
 		public static implicit operator Animation (AnimationReferenceAsset asset) {

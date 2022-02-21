@@ -4,44 +4,44 @@
 // MVID: EE4A7FA8-7E00-4124-8344-C695120E3AA4
 // Assembly location: C:\Users\user\Desktop\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
+
 
 namespace Elements
 {
     public class EquipSlot
     {
-        public ObscuredInt Id { get; private set; }
+        public int Id { get; private set; }
 
-        public ObscuredBool IsSlot { get; private set; }
+        public bool IsSlot { get; private set; }
 
-        public ObscuredInt EnhancementLevel { get; private set; }
+        public int EnhancementLevel { get; private set; }
 
-        public ObscuredInt EnhancementPt { get; private set; }
+        public int EnhancementPt { get; private set; }
 
-        public ObscuredInt Rank { get; private set; }
+        public int Rank { get; private set; }
 
-        public ObscuredInt Status { get; private set; }
+        public int Status { get; private set; }
 
-        public void SetId(int _id) => this.Id = (ObscuredInt)_id;
+        public void SetId(int _id) => Id = _id;
 
-        public void SetIsSlot(bool _isSlot) => this.IsSlot = (ObscuredBool)_isSlot;
+        public void SetIsSlot(bool _isSlot) => IsSlot = _isSlot;
 
-        public void SetEnhancementLevel(int _enhancementLevel) => this.EnhancementLevel = (ObscuredInt)_enhancementLevel;
+        public void SetEnhancementLevel(int _enhancementLevel) => EnhancementLevel = _enhancementLevel;
 
-        public void SetEnhancementPt(int _enhancementPt) => this.EnhancementPt = (ObscuredInt)_enhancementPt;
+        public void SetEnhancementPt(int _enhancementPt) => EnhancementPt = _enhancementPt;
 
-        public void SetRank(int _rank) => this.Rank = (ObscuredInt)_rank;
+        public void SetRank(int _rank) => Rank = _rank;
 
-        public void SetStatus(int _status) => this.Status = (ObscuredInt)_status;
+        public void SetStatus(int _status) => Status = _status;
 
         private void initializeEquipSlot()
         {
-            this.Id = (ObscuredInt)0;
-            this.IsSlot = (ObscuredBool)false;
-            this.EnhancementLevel = (ObscuredInt)0;
-            this.EnhancementPt = (ObscuredInt)0;
-            this.Rank = (ObscuredInt)0;
-            this.Status = (ObscuredInt)0;
+            Id = 0;
+            IsSlot = false;
+            EnhancementLevel = 0;
+            EnhancementPt = 0;
+            Rank = 0;
+            Status = 0;
         }
 
 

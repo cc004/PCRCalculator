@@ -17,7 +17,7 @@ namespace Spine.Unity
 
 		public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Material[] materials, bool initialize)
 		{
-			AtlasAsset atlasAsset = ScriptableObject.CreateInstance<AtlasAsset>();
+			AtlasAsset atlasAsset = CreateInstance<AtlasAsset>();
 			atlasAsset.Reset();
 			atlasAsset.atlasFile = atlasText;
 			atlasAsset.materials = materials;
@@ -142,9 +142,9 @@ namespace Spine.Unity
 					3,
 					0
 				};
-				float num = (float)atlasRegion.width / -2f;
+				float num = atlasRegion.width / -2f;
 				float x = num * -1f;
-				float num2 = (float)atlasRegion.height / 2f;
+				float num2 = atlasRegion.height / 2f;
 				float y = num2 * -1f;
 				array[0] = new Vector3(num, y, 0f) * scale;
 				array[1] = new Vector3(num, num2, 0f) * scale;

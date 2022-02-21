@@ -74,8 +74,8 @@ namespace Spine
 						}
 						break;
 					}
-					goto IL_0169;
-					IL_0169:
+
+                    IL_0169:
 					if (num5 == 0)
 					{
 						while (items3[num4])

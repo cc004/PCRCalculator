@@ -35,8 +35,8 @@ namespace Elements
       new SpineResourceInfo(eSpineType.GACHA_PRIZE_RANK, eBundleId.PRIZE_GACHA_RANK, eResourceId.SPINE_GACHA_PRIZE_RANK_SKELETONDATA, eResourceId.SPINE_CONTROLLER)
     };
 
-    public static SpineResourceInfo GetResource(eSpineType _spineType) => ResourceDefineSpine.resouceInfoArray[(int) _spineType];
+    public static SpineResourceInfo GetResource(eSpineType _spineType) => resouceInfoArray[(int) _spineType];
 
-    public static bool IsSkinIdSpineType(eSpineType _spineType) => ResourceDefineSpine.resouceInfoArray[(int) _spineType].IsSkinId;
+    public static bool IsSkinIdSpineType(eSpineType _spineType) => resouceInfoArray[(int) _spineType].IsSkinId;
   }
 }

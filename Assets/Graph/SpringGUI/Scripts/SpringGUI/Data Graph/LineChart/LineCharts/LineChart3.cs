@@ -21,14 +21,14 @@ namespace SpringGUI
                 if ( line.Value.vertexs.Count <= 1 )
                     continue;
                 var startPos = GetPos(line.Value.vertexs[0]);
-                UIVertex[] oldVertexs = new UIVertex[] { };
+                UIVertex[] oldVertexs = { };
                 for ( int i = 1 ; i < line.Value.vertexs.Count ; i++ )
                 {
                     var endPos = GetPos(line.Value.vertexs[i]);
                     var startBottom = new Vector2(startPos.x , origin.y);
                     var endBottom = new Vector2(endPos.x , origin.y);
                     Color color = new Color(line.Value.color.r , line.Value.color.g , line.Value.color.b , 0.6f);
-                    vh.AddUIVertexQuad(new UIVertex[]
+                    vh.AddUIVertexQuad(new[]
                     {
                         GetUIVertex(startBottom,line.Value.color),
                         GetUIVertex(startPos,color),
@@ -43,14 +43,14 @@ namespace SpringGUI
                     // 补足缺陷
                     else
                     {
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                         {
                             oldVertexs[1],
                             newVertexs[1],
                             oldVertexs[2],
                             newVertexs[0]
                         });
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                         {
                             newVertexs[0],
                             oldVertexs[1],

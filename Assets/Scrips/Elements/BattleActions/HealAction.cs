@@ -21,7 +21,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.parts = (BasePartsData) _source.BossPartsListForBattle.Find((Predicate<PartsData>) (e => e.Index == _skill.ParameterTarget));
+      parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
     }
 
     public override void ExecAction(
@@ -37,28 +37,28 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       int num1 = 0;
-      bool flag = this.ActionDetail1 == 1;
-      switch ((HealAction.eValueType)(float)_valueDictionary[eValueNumber.VALUE_1])
+      bool flag = ActionDetail1 == 1;
+      switch ((eValueType)(float)_valueDictionary[eValueNumber.VALUE_1])
       {
-        case HealAction.eValueType.FIXED:
-          int num2 = _source.IsPartsBoss ? (flag ? this.parts.GetAtkZero() : this.parts.GetMagicStrZero()) : (int) (flag ? _source.AtkZero : _source.MagicStrZero);
-          num1 = (int) _valueDictionary[eValueNumber.VALUE_2] + (int) ((double) num2 * (double) _valueDictionary[eValueNumber.VALUE_4]);
+        case eValueType.FIXED:
+          int num2 = _source.IsPartsBoss ? (flag ? parts.GetAtkZero() : parts.GetMagicStrZero()) : (int) (flag ? _source.AtkZero : _source.MagicStrZero);
+          num1 = (int) _valueDictionary[eValueNumber.VALUE_2] + (int) (num2 * (double) _valueDictionary[eValueNumber.VALUE_4]);
           break;
-        case HealAction.eValueType.PERCENTAGE:
-          num1 = (int) ((double) (long) _target.Owner.MaxHp * (double) _valueDictionary[eValueNumber.VALUE_2] / 100.0);
+        case eValueType.PERCENTAGE:
+          num1 = (int) (_target.Owner.MaxHp * (double) _valueDictionary[eValueNumber.VALUE_2] / 100.0);
           break;
       }
-      int num3 = (int) ((double) ((int) ((double) num1 * ((_source.IsPartsBoss ? (double) this.parts.GetHpRecoverRateZero() : (double) (int) _source.HpRecoveryRateZero) + 100.0) / 100.0) / this.ExecTime.Length) * (double) _skill.AweValue);
+      int num3 = (int) ((int) (num1 * ((_source.IsPartsBoss ? parts.GetHpRecoverRateZero() : (double) (int) _source.HpRecoveryRateZero) + 100.0) / 100.0) / ExecTime.Length * (double) _skill.AweValue);
             //_target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, this.EffectType == eEffectType.COMMON, _target: _target,action:action);
-            _target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), this.EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
+            _target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
 
         }
 
         public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
-      this.Value[eValueNumber.VALUE_4] = (float) ((double) this.MasterData.action_value_4 + (double) this.MasterData.action_value_5 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_4] = (float) (MasterData.action_value_4 + MasterData.action_value_5 * _level);
     }
 
     private enum eValueType

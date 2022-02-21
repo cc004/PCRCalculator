@@ -20,13 +20,13 @@ namespace Elements
 
         public void AddSeal(UnitCtrl _target)
         {
-            SealData seal = _target.SealDictionary[this.IconType];
+            SealData seal = _target.SealDictionary[IconType];
             if (seal.GetCurrentCount() == 0)
             {
-                _target.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(_target, this.IconType, true);
-                _target.MyOnChangeAbnormalState?.Invoke(_target, this.IconType, true, this.LimitTime, "NaN");
+                _target.OnChangeState.Call(_target, IconType, true);
+                _target.MyOnChangeAbnormalState?.Invoke(_target, IconType, true, LimitTime, "NaN");
             }
-            seal.AddSeal(this.LimitTime, _target, this.IconType, 1);
+            seal.AddSeal(LimitTime, _target, IconType, 1);
         }
     }
 }

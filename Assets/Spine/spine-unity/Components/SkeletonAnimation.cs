@@ -10,7 +10,7 @@ namespace Spine.Unity
 		public AnimationState state;
 
 		[SerializeField]
-		[SpineAnimation("", "", true)]
+		[SpineAnimation]
 		private string _animationName;
 
 		public bool loop;
@@ -89,12 +89,12 @@ namespace Spine.Unity
 
 		public static SkeletonAnimation AddToGameObject(GameObject gameObject, SkeletonDataAsset skeletonDataAsset)
 		{
-			return SkeletonRenderer.AddSpineComponent<SkeletonAnimation>(gameObject, skeletonDataAsset);
+			return AddSpineComponent<SkeletonAnimation>(gameObject, skeletonDataAsset);
 		}
 
 		public static SkeletonAnimation NewSkeletonAnimationGameObject(SkeletonDataAsset skeletonDataAsset)
 		{
-			return SkeletonRenderer.NewSpineGameObject<SkeletonAnimation>(skeletonDataAsset);
+			return NewSpineGameObject<SkeletonAnimation>(skeletonDataAsset);
 		}
 
 		public override void ClearState()
@@ -137,19 +137,19 @@ namespace Spine.Unity
 				skeleton.Update(deltaTime);
 				state.Update(deltaTime);
 				state.Apply(skeleton);
-				if (this._UpdateLocal != null)
+				if (_UpdateLocal != null)
 				{
-					this._UpdateLocal(this);
+					_UpdateLocal(this);
 				}
 				skeleton.UpdateWorldTransform();
-				if (this._UpdateWorld != null)
+				if (_UpdateWorld != null)
 				{
-					this._UpdateWorld(this);
+					_UpdateWorld(this);
 					skeleton.UpdateWorldTransform();
 				}
-				if (this._UpdateComplete != null)
+				if (_UpdateComplete != null)
 				{
-					this._UpdateComplete(this);
+					_UpdateComplete(this);
 				}
 			}
 		}

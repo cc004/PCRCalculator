@@ -1,7 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using Elements;
 using UnityEngine;
-
 
 namespace PCRCaculator.Battle
 {
@@ -12,21 +11,21 @@ namespace PCRCaculator.Battle
         public TextMesh hpHeadText;
         public TextMesh hpDetauil;
 
-        private Elements.PartsData partsData;
+        private PartsData partsData;
         private int recoverTime;
-        public void Init(Elements.PartsData partsData)
+        public void Init(PartsData partsData)
         {
             this.partsData = partsData;
             StartCoroutine(upDateHP());
         }
         private IEnumerator upDateHP()
         {
-            yield return (object)null;
-            yield return (object)null;
-            yield return (object)null;
+            yield return null;
+            yield return null;
+            yield return null;
             while (true)
             {
-                if ((int)partsData.BreakPoint == 0 && partsData.IsBreak)
+                if (partsData.BreakPoint == 0 && partsData.IsBreak)
                 {
                     hpHeadText.text = string.Format("{0:N2}s后恢复", partsData.BreakTime + partsData.RecoverTime);
                 }
@@ -40,7 +39,7 @@ namespace PCRCaculator.Battle
                     posText.text = "" + Mathf.RoundToInt(partsData.Owner.transform.localPosition.x + partsData.PositionX);
                 else
                     posText.text = "???";
-                yield return (object)null;
+                yield return null;
             }
 
         }

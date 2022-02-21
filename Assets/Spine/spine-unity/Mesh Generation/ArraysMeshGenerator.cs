@@ -125,7 +125,7 @@ namespace Spine.Unity.MeshGeneration
 			{
 				Slot slot = items[i];
 				Attachment attachment = slot.attachment;
-				float z = (float)i * zSpacing;
+				float z = i * zSpacing;
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null)
 				{
@@ -153,9 +153,9 @@ namespace Spine.Unity.MeshGeneration
 					if (pmaColors)
 					{
 						color.a = (byte)(num * slot.a * regionAttachment.a);
-						color.r = (byte)(r * slot.r * regionAttachment.r * (float)(int)color.a);
-						color.g = (byte)(g * slot.g * regionAttachment.g * (float)(int)color.a);
-						color.b = (byte)(b * slot.b * regionAttachment.b * (float)(int)color.a);
+						color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
+						color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
+						color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
 						if (slot.data.blendMode == BlendMode.Additive)
 						{
 							color.a = 0;
@@ -262,9 +262,9 @@ namespace Spine.Unity.MeshGeneration
 				if (pmaColors)
 				{
 					color.a = (byte)(num * slot.a * meshAttachment.a);
-					color.r = (byte)(r * slot.r * meshAttachment.r * (float)(int)color.a);
-					color.g = (byte)(g * slot.g * meshAttachment.g * (float)(int)color.a);
-					color.b = (byte)(b * slot.b * meshAttachment.b * (float)(int)color.a);
+					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
+					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
+					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
 					if (slot.data.blendMode == BlendMode.Additive)
 					{
 						color.a = 0;

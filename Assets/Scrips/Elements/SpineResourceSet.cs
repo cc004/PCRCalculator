@@ -33,11 +33,11 @@ namespace Elements
       int _trgIdx0,
       int _trgIdx1)
     {
-      this.SpineResourceInfo = _spineResourceInfo;
-      this.SkinId = _skinId;
-      this.UnitId = UnitUtility.SkinIdToUnitId(_skinId);
-      this.TrgIdx0 = _trgIdx0;
-      this.TrgIdx1 = _trgIdx1;
+      SpineResourceInfo = _spineResourceInfo;
+      SkinId = _skinId;
+      UnitId = UnitUtility.SkinIdToUnitId(_skinId);
+      TrgIdx0 = _trgIdx0;
+      TrgIdx1 = _trgIdx1;
       //this.ResourceIndex = ResourceManager.CreateIndex((long) _trgIdx0, (long) _trgIdx1);
     }
   }

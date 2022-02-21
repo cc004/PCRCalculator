@@ -168,9 +168,9 @@ namespace Spine.Unity
 
 		private void HandleRendererReset(SkeletonRenderer r)
 		{
-			if (this.OnReset != null)
+			if (OnReset != null)
 			{
-				this.OnReset();
+				OnReset();
 			}
 			CollectBones();
 		}
@@ -316,7 +316,7 @@ namespace Spine.Unity
 				return boneRoot;
 			}
 			boneRoot = new GameObject("SkeletonUtility-Root").transform;
-			boneRoot.parent = base.transform;
+			boneRoot.parent = transform;
 			boneRoot.localPosition = Vector3.zero;
 			boneRoot.localRotation = Quaternion.identity;
 			boneRoot.localScale = Vector3.one;

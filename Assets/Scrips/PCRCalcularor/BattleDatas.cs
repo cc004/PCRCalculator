@@ -1,12 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
 using Newtonsoft0.Json;
 
 namespace PCRCaculator.Battle
 {
-    [System.Serializable]
+    [Serializable]
     public class ActionParameterOnPrefabDetail
     {
         //public Data data;
@@ -29,7 +27,7 @@ namespace PCRCaculator.Battle
 
         }*/
     }
-    [System.Serializable]
+    [Serializable]
     public class ActionExecTimeCombo
     {
         public float StartTime;
@@ -45,7 +43,7 @@ namespace PCRCaculator.Battle
 
         public Attachment(string name)
         {
-            this.Name = name;
+            Name = name;
         }
 
         public string Name { get => name; set => name = value; }
@@ -54,7 +52,7 @@ namespace PCRCaculator.Battle
 
         
     }
-    [System.Serializable]
+    [Serializable]
     public class ActionExecTime
     {
         public float Time;

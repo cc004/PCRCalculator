@@ -1,11 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using Elements;
 using UnityEngine;
 using UnityEngine.UI;
-using Newtonsoft0.Json;
-using System.IO;
-using System;
-using Elements;
 
 namespace PCRCaculator.Guild
 {
@@ -30,12 +27,12 @@ namespace PCRCaculator.Guild
         private int unitId;
         //private UnitData unitData;
         //private EnemyData enemyData;
-        private Elements.SystemIdDefine.eWeaponMotionType motionType;
+        private SystemIdDefine.eWeaponMotionType motionType;
         //private Elements.UnitPrefabData prefabData;
         //private Elements.UnitActionControllerData2 actionControllerData;
-        private Elements.UnitActionController actionController;
+        private UnitActionController actionController;
 
-        private Dictionary<string, List<Elements.FirearmCtrlData>> unitFirearmDatas = new Dictionary<string, List<Elements.FirearmCtrlData>>();
+        private Dictionary<string, List<FirearmCtrlData>> unitFirearmDatas = new Dictionary<string, List<FirearmCtrlData>>();
         private int currentPosY;
         private List<GameObject> skillButtonPrefabList = new List<GameObject>();
 
@@ -51,9 +48,9 @@ namespace PCRCaculator.Guild
             basePannel.SetActive(true);
             pannelA.SetActive(true);
             pannelB.SetActive(false);
-            this.unitId = unitid;
+            unitId = unitid;
             //this.unitData = unitData;
-            motionType = (Elements.SystemIdDefine.eWeaponMotionType)MainManager.Instance.UnitRarityDic[unitId].detailData.motionType;
+            motionType = (SystemIdDefine.eWeaponMotionType)MainManager.Instance.UnitRarityDic[unitId].detailData.motionType;
             LoadActionControllerData();
             foreach(GameObject a in skillButtonPrefabList)
             {
@@ -62,8 +59,8 @@ namespace PCRCaculator.Guild
             skillButtonPrefabList.Clear();
             currentPosY = (int)basePosA.y;
             parentA.sizeDelta = parentSizeBase;
-            AddButton("普攻", 1, "攻击类", 1, () => { OpenDetailPage(1,0,1,new string[] { "普攻", "1", "攻击类", "1" }); });
-            int[] skillList = MainManager.Instance.UnitRarityDic[unitId].skillData.GetSkillList(null);
+            AddButton("普攻", 1, "攻击类", 1, () => { OpenDetailPage(1,0,1,new[] { "普攻", "1", "攻击类", "1" }); });
+            int[] skillList = MainManager.Instance.UnitRarityDic[unitId].skillData.GetSkillList();
             //SkillData skillData_UB = MainManager.Instance.SkillDataDic[skillList[0]];
             //string skillName = MainManager.Instance.SkillNameAndDescribe_cn.TryGetValue(skillList[0], out string[] names) ? names[0] : skillData_UB.name;
             void action(int a,int SkillType)
@@ -75,8 +72,8 @@ namespace PCRCaculator.Guild
                     if (actionid > 0)
                     {
                         int actonType = MainManager.Instance.SkillActionDic[actionid].type;
-                        AddButton(skillName, a, ((Elements.eActionType)actonType).GetDescription(), actionid,
-                            () => { OpenDetailPage(actionid,SkillType,actonType,new string[] { skillName,a+"", ((Elements.eActionType)actonType).GetDescription() ,actionid + ""}); });
+                        AddButton(skillName, a, ((eActionType)actonType).GetDescription(), actionid,
+                            () => { OpenDetailPage(actionid,SkillType,actonType,new[] { skillName,a+"", ((eActionType)actonType).GetDescription() ,actionid + ""}); });
                     }
                 }
             }
@@ -90,9 +87,9 @@ namespace PCRCaculator.Guild
             basePannel.SetActive(true);
             pannelA.SetActive(true);
             pannelB.SetActive(false);
-            this.unitId = enemyData.unit_id;
+            unitId = enemyData.unit_id;
             //this.enemyData = enemyData;
-            motionType = (Elements.SystemIdDefine.eWeaponMotionType)enemyData.detailData.motion_type;
+            motionType = (SystemIdDefine.eWeaponMotionType)enemyData.detailData.motion_type;
             LoadActionControllerData();
             foreach (GameObject a in skillButtonPrefabList)
             {
@@ -101,7 +98,7 @@ namespace PCRCaculator.Guild
             skillButtonPrefabList.Clear();
             currentPosY = (int)basePosA.y;
             parentA.sizeDelta = parentSizeBase;
-            AddButton("普攻", 1, "攻击类", 1, () => { OpenDetailPage(1, 0, 1, new string[] { "普攻", "1", "攻击类", "1" }); });
+            AddButton("普攻", 1, "攻击类", 1, () => { OpenDetailPage(1, 0, 1, new[] { "普攻", "1", "攻击类", "1" }); });
             int[] skillList = enemyData.skillData.MainSkills.ToArray();
             //SkillData skillData_UB = MainManager.Instance.SkillDataDic[skillList[0]];
             //string skillName = MainManager.Instance.SkillNameAndDescribe_cn.TryGetValue(skillList[0], out string[] names) ? names[0] : skillData_UB.name;
@@ -114,8 +111,8 @@ namespace PCRCaculator.Guild
                     if (actionid > 0)
                     {
                         int actonType = MainManager.Instance.SkillActionDic[actionid].type;
-                        AddButton(skillName, a, ((Elements.eActionType)actonType).GetDescription(), actionid,
-                            () => { OpenDetailPage(actionid, SkillType, actonType, new string[] { skillName, a + "", ((Elements.eActionType)actonType).GetDescription(), actionid + "" }); });
+                        AddButton(skillName, a, ((eActionType)actonType).GetDescription(), actionid,
+                            () => { OpenDetailPage(actionid, SkillType, actonType, new[] { skillName, a + "", ((eActionType)actonType).GetDescription(), actionid + "" }); });
                     }
                 }
             }
@@ -149,9 +146,9 @@ namespace PCRCaculator.Guild
             }
             MainManager.Instance.WindowConfigMessage("无需重置！", null, null);*/
             if (MainManager.Instance.FirearmData.ResetData(unitId))
-                MainManager.Instance.WindowConfigMessage("成功！", null, null);
+                MainManager.Instance.WindowConfigMessage("成功！", null);
             else
-                MainManager.Instance.WindowConfigMessage("无需重置！", null, null);
+                MainManager.Instance.WindowConfigMessage("无需重置！", null);
 
 
         }
@@ -159,7 +156,7 @@ namespace PCRCaculator.Guild
         {
             SaveDataToJson();
             ExitButton();
-            MainManager.Instance.WindowConfigMessage("成功！", null, null);
+            MainManager.Instance.WindowConfigMessage("成功！", null);
         }
         public void ExitButton_B()
         {
@@ -174,7 +171,7 @@ namespace PCRCaculator.Guild
             ExitButton_B();
             SaveDataToJson();
             Init(unitId);
-            MainManager.Instance.WindowConfigMessage("保存成功！", null, null);
+            MainManager.Instance.WindowConfigMessage("保存成功！", null);
         }
         /*public void SaveDataToJson()
         {
@@ -213,7 +210,7 @@ namespace PCRCaculator.Guild
             currentPosY_2 = (int)basePosB.y;
             parentB.sizeDelta = parentSizeBaseB;
             int id = 1;
-            Elements.Skill skill = null;
+            Skill skill = null;
             string key = "";
             switch (skillType)
             {
@@ -225,7 +222,7 @@ namespace PCRCaculator.Guild
                     }
                     if (fireActions.ContainsKey(1))
                     {
-                        if(unitFirearmDatas.TryGetValue("attack",out List<Elements.FirearmCtrlData> value))
+                        if(unitFirearmDatas.TryGetValue("attack",out List<FirearmCtrlData> value))
                         {
                             foreach(var a in value)
                             {
@@ -236,10 +233,10 @@ namespace PCRCaculator.Guild
                     else
                     {
                         float execTime = 0;
-                        if (actionController.UseDefaultDelay && Elements.BattleDefine.WEAPON_HIT_DELAY_DIC.TryGetValue(
+                        if (actionController.UseDefaultDelay && BattleDefine.WEAPON_HIT_DELAY_DIC.TryGetValue(
                            motionType, out execTime))
                         {
-                            AddDetailButton(0).Init(new Elements.ActionExecTime(),id++, "默认延时", execTime, "普通", 1, "正常", false);
+                            AddDetailButton(0).Init(new ActionExecTime(),id++, "默认延时", execTime, "普通", 1, "正常", false);
                         }
                         else
                         {
@@ -281,7 +278,7 @@ namespace PCRCaculator.Guild
             Dictionary<int, float[]> fireActions2 = FindFirearmAction(skill,skill.SkillEffects, false);
             if (fireActions2.ContainsKey(actionId))
             {
-                if (unitFirearmDatas.TryGetValue(key, out List<Elements.FirearmCtrlData> value))
+                if (unitFirearmDatas.TryGetValue(key, out List<FirearmCtrlData> value))
                 {
                     foreach (var a in value)
                     {
@@ -304,27 +301,27 @@ namespace PCRCaculator.Guild
                 }
             }
         }
-        private Dictionary<int,float[]> FindFirearmAction(Elements.Skill _skill,
-          List<Elements.NormalSkillEffect> _skillList,bool isAttack)
+        private Dictionary<int,float[]> FindFirearmAction(Skill _skill,
+          List<NormalSkillEffect> _skillList,bool isAttack)
         {
             Dictionary<int, float[]> firearmActionDelayDic = new Dictionary<int, float[]>();
             int index1 = 0;
             for (int count = _skillList.Count; index1 < count; ++index1)
             {
-                Elements.NormalSkillEffect effect = _skillList[index1];                
+                NormalSkillEffect effect = _skillList[index1];                
                 switch (effect.EffectBehavior)
                 {
-                    case Elements.eEffectBehavior.FIREARM:
-                    case Elements.eEffectBehavior.SERIES:
-                    case Elements.eEffectBehavior.SERIES_FIREARM:
+                    case eEffectBehavior.FIREARM:
+                    case eEffectBehavior.SERIES:
+                    case eEffectBehavior.SERIES_FIREARM:
                         float[] delayTime = new float[2] { effect.ExecTime[0], 0 };
                         if (isAttack)
                         {
                             //effect.FireAction = _skill.ActionParameters[0];
                             //effect.FireAction.ReferencedByEffect = true;
-                            if(actionController.UseDefaultDelay && effect.EffectBehavior == Elements.eEffectBehavior.FIREARM)
+                            if(actionController.UseDefaultDelay && effect.EffectBehavior == eEffectBehavior.FIREARM)
                             {
-                                if (Elements.BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(motionType, out delayTime[0]))
+                                if (BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(motionType, out delayTime[0]))
                                 {
                                     delayTime[1] = 1;
                                 }
@@ -337,7 +334,6 @@ namespace PCRCaculator.Guild
                             //effect.FireAction = _skill.ActionParameters.Find((Predicate<ActionParameter>)(e => e.ActionId == effect.FireActionId));
                             //effect.FireAction.ReferencedByEffect = true;
                             firearmActionDelayDic.Add(effect.FireActionId,delayTime);
-                            break;
                         }
                         break;
                 }

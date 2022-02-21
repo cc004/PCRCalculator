@@ -4,10 +4,10 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -24,7 +24,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      switch ((eIfType) this.ActionDetail1)
+      switch ((eIfType) ActionDetail1)
       {
         case eIfType.DEFEAT:
           ActionParameter actionParameter1 = _skill.ActionParameters[0];
@@ -32,25 +32,25 @@ namespace Elements
           for (int count = _skill.ActionParameters.Count; index < count; ++index)
           {
             ActionParameter actionParameter2 = _skill.ActionParameters[index];
-            actionParameter2.OnDefeatEnemy += (Action) (() =>
+            actionParameter2.OnDefeatEnemy += () =>
             {
-              _skill.DefeatByThisSkill = true;
-              _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_1];
-              if (this.ActionDetail3 == 0)
-                return;
-              _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail3)).CancelByIfForAll = true;
-            });
-            if (actionParameter2.ActionId != this.ActionDetail2 && actionParameter2.ActionId != this.ActionDetail3 && actionParameter2 != this)
-              actionParameter1 = (double) actionParameter1.ExecTime[actionParameter1.ExecTime.Length - 1] > (double) actionParameter2.ExecTime[actionParameter2.ExecTime.Length - 1] ? actionParameter1 : actionParameter2;
+                _skill.DefeatByThisSkill = true;
+                _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_1];
+                if (ActionDetail3 == 0)
+                    return;
+                _skill.ActionParameters.Find(e => e.ActionId == ActionDetail3).CancelByIfForAll = true;
+            };
+            if (actionParameter2.ActionId != ActionDetail2 && actionParameter2.ActionId != ActionDetail3 && actionParameter2 != this)
+              actionParameter1 = actionParameter1.ExecTime[actionParameter1.ExecTime.Length - 1] > (double) actionParameter2.ExecTime[actionParameter2.ExecTime.Length - 1] ? actionParameter1 : actionParameter2;
           }
-          actionParameter1.OnActionEnd += (ActionParameter.OnActionEndDelegate) (() => _source.AppendCoroutine(this.waitFrameEnd(_skill), ePauseType.SYSTEM, _source));
-          actionParameter1.OnInitWhenNoTarget += (Action) (() =>
+          actionParameter1.OnActionEnd += () => _source.AppendCoroutine(waitFrameEnd(_skill), ePauseType.SYSTEM, _source);
+          actionParameter1.OnInitWhenNoTarget += () =>
           {
-            if (this.ActionDetail2 == 0)
-              return;
-            _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_2];
-            _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2)).CancelByIfForAll = true;
-          });
+              if (ActionDetail2 == 0)
+                  return;
+              _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_2];
+              _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2).CancelByIfForAll = true;
+          };
           break;
         case eIfType.CRITICAL:
           _skill.CriticalPartsList = new List<BasePartsData>();
@@ -61,7 +61,7 @@ namespace Elements
     private IEnumerator waitFrameEnd(Skill _skill)
     {
       IfForAllAction ifForAllAction = this;
-      yield return (object) null;
+      yield return null;
       if (!_skill.DefeatByThisSkill && ifForAllAction.ActionDetail2 != 0)
       {
         _skill.EffectBranchId = (int) ifForAllAction.Value[eValueNumber.VALUE_2];
@@ -76,7 +76,7 @@ namespace Elements
       Skill _skill)
     {
       base.ReadyAction(_source, _sourceActionController, _skill);
-      if (this.ActionDetail1 != 1001)
+      if (ActionDetail1 != 1001)
         return;
       _skill.CriticalPartsList.Clear();
     }
@@ -93,9 +93,9 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
       bool flag = false;
-      if (this.ActionDetail1 == 1000)
+      if (ActionDetail1 == 1000)
         return;
-      switch ((eIfType) this.ActionDetail1)
+      switch ((eIfType) ActionDetail1)
       {
         case eIfType.STOP:
           flag = _target.Owner.IsUnableActionState();
@@ -128,8 +128,8 @@ namespace Elements
           flag = _target.Owner.IsSlipDamageState();
           break;
         case eIfType.ALONE:
-          List<UnitCtrl> unitCtrlList = _source.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
-          flag = !unitCtrlList.Exists((Predicate<UnitCtrl>) (e => e.IsPartsBoss && !e.IsDead)) && unitCtrlList.FindAll((Predicate<UnitCtrl>) (e => (!e.IsDead && (long) e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth)).Count == 1;
+          List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
+          flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long) e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth).Count == 1;
           break;
         case eIfType.BREAK:
           if (_target.Owner.IsPartsBoss)
@@ -142,11 +142,10 @@ namespace Elements
                 break;
               }
             }
-            break;
           }
           break;
         case eIfType.UNIT_ID:
-          flag = this.TargetList.FindAll((Predicate<BasePartsData>) (e => IfForAllAction.JudgeCountableUnit(e.Owner))).Exists((Predicate<BasePartsData>) (e => (double) e.Owner.SoundUnitId == (double) _valueDictinary[eValueNumber.VALUE_3]));
+          flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner)).Exists(e => e.Owner.SoundUnitId == (double) _valueDictinary[eValueNumber.VALUE_3]);
           break;
         case eIfType.CRITICAL:
           flag = _skill.CriticalPartsList.Count > 0;
@@ -155,49 +154,48 @@ namespace Elements
           flag = _target.Owner.AtkType == 1;
           break;
         default:
-          if (this.ActionDetail1 < 100)
+          if (ActionDetail1 < 100)
           {
-            flag = (double) BattleManager.Random(0.0f, 100f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double) this.ActionDetail1;
+            flag = BattleManager.Random(0.0f, 100f, new RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double) ActionDetail1;
             break;
           }
-          if (this.ActionDetail1 > 1200)
+          if (ActionDetail1 > 1200)
           {
             int num = 0;
-            _target.Owner.SkillExecCountDictionary.TryGetValue(this.ActionDetail1 % 100 / 10, out num);
-            flag = num == this.ActionDetail1 % 10;
+            _target.Owner.SkillExecCountDictionary.TryGetValue(ActionDetail1 % 100 / 10, out num);
+            flag = num == ActionDetail1 % 10;
             break;
           }
-          if (this.ActionDetail1 > 900)
+          if (ActionDetail1 > 900)
           {
-            flag = (double) (long) _target.Owner.Hp / (double) (long) _target.Owner.MaxHp < (double) (this.ActionDetail1 % 100) / 100.0;
+            flag = (long) _target.Owner.Hp / (double) (long) _target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
             break;
           }
-          if (this.ActionDetail1 > 700)
+          if (ActionDetail1 > 700)
           {
-            flag = this.TargetList.FindAll((Predicate<BasePartsData>) (e => IfForAllAction.JudgeCountableUnit(e.Owner))).Count == this.ActionDetail1 - 700;
+            flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner)).Count == ActionDetail1 - 700;
             break;
           }
-          if (this.ActionDetail1 > 600)
+          if (ActionDetail1 > 600)
           {
-            eStateIconType key = (eStateIconType) (this.ActionDetail1 - 600);
-            flag = _target.Owner.SealDictionary.ContainsKey(key) && ((double) _valueDictinary[eValueNumber.VALUE_3] != 0.0 ? (double) _target.Owner.SealDictionary[key].GetCurrentCount() >= (double) _valueDictinary[eValueNumber.VALUE_3] : _target.Owner.SealDictionary[key].GetCurrentCount() > 0);
-            break;
+            eStateIconType key = (eStateIconType) (ActionDetail1 - 600);
+            flag = _target.Owner.SealDictionary.ContainsKey(key) && ((double) _valueDictinary[eValueNumber.VALUE_3] != 0.0 ? _target.Owner.SealDictionary[key].GetCurrentCount() >= (double) _valueDictinary[eValueNumber.VALUE_3] : _target.Owner.SealDictionary[key].GetCurrentCount() > 0);
           }
           break;
       }
       if (!flag)
       {
-        _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_2];
-        if (this.ActionDetail2 != 0)
-          this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2)), _skill);
+        _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_2];
+        if (ActionDetail2 != 0)
+          cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail2), _skill);
       }
       else
       {
-        _skill.EffectBranchId = (int) this.Value[eValueNumber.VALUE_1];
-        if (this.ActionDetail3 != 0)
-          this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail3)), _skill);
+        _skill.EffectBranchId = (int) Value[eValueNumber.VALUE_1];
+        if (ActionDetail3 != 0)
+          cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail3), _skill);
       }
-      _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion((ActionParameter) this, _skill), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion(this, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }
 
     private void cancelAction(ActionParameter _action, Skill _skill)
@@ -210,11 +208,11 @@ namespace Elements
 
     public void CancelBoth(Skill _skill)
     {
-      if (this.ActionDetail2 != 0)
-        this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail2)), _skill);
-      if (this.ActionDetail3 == 0)
+      if (ActionDetail2 != 0)
+        cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail2), _skill);
+      if (ActionDetail3 == 0)
         return;
-      this.cancelAction(_skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail3)), _skill);
+      cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail3), _skill);
     }
   }
 }

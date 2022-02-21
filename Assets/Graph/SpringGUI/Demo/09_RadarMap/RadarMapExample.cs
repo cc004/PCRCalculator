@@ -5,9 +5,9 @@
 * Description:SpringGUI.RadarMap example.
 ==========================================*/
 
-using UnityEngine;
-using SpringGUI;
 using System.Collections.Generic;
+using SpringGUI;
+using UnityEngine;
 
 public class RMExampleData
 {
@@ -30,8 +30,8 @@ public class RadarMapExample : MonoBehaviour
 
     private void Awake()
     {
-        IList<RMExampleData> radarone = new List<RMExampleData>()
-            {
+        IList<RMExampleData> radarone = new List<RMExampleData>
+        {
                 new RMExampleData(0.36f),
                 new RMExampleData(0.6f),
                 new RMExampleData(0.69f),
@@ -39,8 +39,8 @@ public class RadarMapExample : MonoBehaviour
                 new RMExampleData(0.2f),
                 new RMExampleData(0.5f)
             };
-        IList<RMExampleData> radartwo = new List<RMExampleData>()
-            {
+        IList<RMExampleData> radartwo = new List<RMExampleData>
+        {
                 new RMExampleData(0.1f),
                 new RMExampleData(0.3f),
                 new RMExampleData(0.5f),
@@ -64,8 +64,8 @@ public class RadarMapExample : MonoBehaviour
         RadarMap5.Inject(radarone);
         RadarMap5.Inject(radartwo);
 
-        IList<RMExampleData> radarthree = new List<RMExampleData>()
-            {
+        IList<RMExampleData> radarthree = new List<RMExampleData>
+        {
                 new RMExampleData(0.0f),
                 new RMExampleData(0.1f),
                 new RMExampleData(0.2f),

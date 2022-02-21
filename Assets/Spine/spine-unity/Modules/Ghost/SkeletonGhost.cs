@@ -63,7 +63,7 @@ namespace Spine.Unity.Modules
 			pool = new SkeletonGhostRenderer[maximumGhosts];
 			for (int i = 0; i < maximumGhosts; i++)
 			{
-				GameObject gameObject = new GameObject(base.gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
+				GameObject gameObject = new GameObject(this.gameObject.name + " Ghost", typeof(SkeletonGhostRenderer));
 				pool[i] = gameObject.GetComponent<SkeletonGhostRenderer>();
 				gameObject.SetActive(value: false);
 				gameObject.hideFlags = HideFlags.HideInHierarchy;
@@ -126,7 +126,7 @@ namespace Spine.Unity.Modules
 				sharedMaterials[i] = material2;
 			}
 			Transform transform = gameObject.transform;
-			transform.parent = base.transform;
+			transform.parent = this.transform;
 			pool[poolIndex].Initialize(meshFilter.sharedMesh, sharedMaterials, color, additive, fadeSpeed, meshRenderer.sortingLayerID, sortWithDistanceOnly ? meshRenderer.sortingOrder : (meshRenderer.sortingOrder - 1));
 			transform.localPosition = new Vector3(0f, 0f, zOffset);
 			transform.localRotation = Quaternion.identity;
@@ -154,7 +154,7 @@ namespace Spine.Unity.Modules
 			}
 			foreach (Material value in materialTable.Values)
 			{
-				UnityEngine.Object.Destroy(value);
+				Destroy(value);
 			}
 		}
 

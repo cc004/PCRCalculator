@@ -4,12 +4,12 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using Spine;
-using Spine.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
+using Spine;
+using Spine.Unity;
 using UnityEngine;
 
 namespace Elements
@@ -41,9 +41,9 @@ namespace Elements
         [SerializeField]
         private eBattleSkillSeType seType;
         [SerializeField]
-        private List<SkillEffectCtrl.RarityUpTextureChangeDataSet> textureChangeParticles;
+        private List<RarityUpTextureChangeDataSet> textureChangeParticles;
         [SerializeField]
-        private List<SkillEffectCtrl.DefenceModeTextureChange> defenceModeTextureSetting;
+        private List<DefenceModeTextureChange> defenceModeTextureSetting;
         protected bool timeToDie;
         protected bool isPause;
         //private SoundManager soundManager = ManagerSingleton<SoundManager>.Instance;
@@ -58,11 +58,11 @@ namespace Elements
 
         public bool IsCommon
         {
-            get => this.isCommon;
-            set => this.isCommon = value;
+            get => isCommon;
+            set => isCommon = value;
         }
 
-        public System.Action<SkillEffectCtrl> OnEffectEnd { set; get; }
+        public Action<SkillEffectCtrl> OnEffectEnd { set; get; }
 
         public UnitCtrl SortTarget { get; set; }
 
@@ -70,8 +70,8 @@ namespace Elements
 
         public bool IsRepeat
         {
-            get => this.isRepeat;
-            set => this.isRepeat = value;
+            get => isRepeat;
+            set => isRepeat = value;
         }
 
         public bool IsPlaying { get; set; }
@@ -84,17 +84,17 @@ namespace Elements
 
         //protected Yggdrasil<SkillEffectCtrl> singletonTree => SkillEffectCtrl.staticSingletonTree;
 
-        protected BattleManager battleManager => SkillEffectCtrl.staticBattleManager;
+        protected BattleManager battleManager => staticBattleManager;
 
         // public static void StaticInitSingletonTree() => SkillEffectCtrl.staticSingletonTree = (Yggdrasil<SkillEffectCtrl>) null;
 
         public static void StaticRelease()
         {
             //SkillEffectCtrl.staticSingletonTree = (Yggdrasil<SkillEffectCtrl>) null;
-            SkillEffectCtrl.staticBattleManager = null;
+            staticBattleManager = null;
         }
 
-        private void Awake() => this.awakeImpl();
+        private void Awake() => awakeImpl();
 
         protected void awakeImpl()
         {
@@ -110,20 +110,20 @@ namespace Elements
 
         private void OnDestroy()
         {
-            if (this.battleManager != null && this.battleManager.BOEDFIHEEOL)
-                this.battleManager.RemoveEffectToUpdateList(this);
-            this.particle = (ParticleSystem)null;
+            if (battleManager != null && battleManager.BOEDFIHEEOL)
+                battleManager.RemoveEffectToUpdateList(this);
+            particle = null;
             //this.TweenerList = (TweenPosition[])null;
             //this.TweenRotList = (TweenRotation[])null;
             //this.skillSeSource = (CriAtomSource)null;
-            this.source = (UnitCtrl)null;
-            this.textureChangeParticles = (List<SkillEffectCtrl.RarityUpTextureChangeDataSet>)null;
-            this.OnEffectEnd = (System.Action<SkillEffectCtrl>)null;
-            this.SortTarget = (UnitCtrl)null;
-            this.Target = (UnitCtrl)null;
+            source = null;
+            textureChangeParticles = null;
+            OnEffectEnd = null;
+            SortTarget = null;
+            Target = null;
             //this.soundManager = (SoundManager)null;
-            this.particleRendererDictionary = (Dictionary<Renderer, int>)null;
-            this.onDestroy();
+            particleRendererDictionary = null;
+            onDestroy();
         }
 
         protected virtual void onDestroy()
@@ -132,9 +132,9 @@ namespace Elements
 
         private void setLayerName(string value)
         {
-            if (this.particleRendererDictionary == null)
+            if (particleRendererDictionary == null)
                 return;
-            foreach (KeyValuePair<Renderer, int> particleRenderer in this.particleRendererDictionary)
+            foreach (KeyValuePair<Renderer, int> particleRenderer in particleRendererDictionary)
                 particleRenderer.Key.sortingLayerName = value;
         }
 
@@ -142,39 +142,39 @@ namespace Elements
 
         public virtual void InitializeSort()
         {
-            this.battleManager.AddEffectToUpdateList(this);
-            this.setLayerName(SkillEffectCtrl.LAYER_NAME);
-            this.particleRendererDictionaryInitialize();
+            battleManager.AddEffectToUpdateList(this);
+            setLayerName(LAYER_NAME);
+            particleRendererDictionaryInitialize();
         }
 
         public void InitializeSortForWithOutBattle()
         {
-            this.setLayerName(SkillEffectCtrl.LAYER_NAME);
-            this.particleRendererDictionaryInitialize();
+            setLayerName(LAYER_NAME);
+            particleRendererDictionaryInitialize();
         }
 
         public virtual void ExecAppendCoroutine(UnitCtrl _unit = null, bool _isAbnormal = false)
         {
-            if (!this.isRepeat)
-                this.AppendCoroutine(this.UpdateTimer(), ePauseType.VISUAL, _unit);
+            if (!isRepeat)
+                AppendCoroutine(UpdateTimer(), ePauseType.VISUAL, _unit);
             else
-                this.AppendCoroutine(this.UpdateTimerRepeat(), ePauseType.VISUAL);
-            this.battleManager.AppendEffect(this, _unit, _isAbnormal);
+                AppendCoroutine(UpdateTimerRepeat(), ePauseType.VISUAL);
+            battleManager.AppendEffect(this, _unit, _isAbnormal);
         }
 
         private void particleRendererDictionaryInitialize()
         {
-            if (this.particleRendererDictionary != null)
+            if (particleRendererDictionary != null)
                 return;
-            this.particleRendererDictionary = new Dictionary<Renderer, int>();
-            this.particles = this.gameObject.GetComponentsInChildren<ParticleSystem>(true);
-            this.particleStartDelayDictionary = new Dictionary<ParticleSystem, float>();
-            for (int index = 0; index < this.particles.Length; ++index)
+            particleRendererDictionary = new Dictionary<Renderer, int>();
+            particles = gameObject.GetComponentsInChildren<ParticleSystem>(true);
+            particleStartDelayDictionary = new Dictionary<ParticleSystem, float>();
+            for (int index = 0; index < particles.Length; ++index)
             {
-                Renderer component = this.particles[index].GetComponent<Renderer>();
+                Renderer component = particles[index].GetComponent<Renderer>();
                 component.sortingOrder = Mathf.Min(5000, component.sortingOrder);
-                this.particleRendererDictionary.Add(component, component.sortingOrder);
-                this.particleStartDelayDictionary.Add(this.particles[index], this.particles[index].main.startDelayMultiplier);
+                particleRendererDictionary.Add(component, component.sortingOrder);
+                particleStartDelayDictionary.Add(particles[index], particles[index].main.startDelayMultiplier);
             }
         }
 
@@ -184,9 +184,9 @@ namespace Elements
           UnitCtrl _owner,
           Skill skill)
         {
-            this.source = _owner;
+            source = _owner;
             Vector3 vector3 = new Vector3(0.0f, 9.259259f, 0.0f);
-            Bone bone = (Bone)null;
+            Bone bone = null;
             switch (skillEffect.EffectTarget)
             {
                 case eEffectTarget.OWNER:
@@ -195,7 +195,7 @@ namespace Elements
                 case eEffectTarget.BACK_TARGET:
                 case eEffectTarget.ALL_OTHER:
                 case eEffectTarget.ALL_UNIT_EXCEPT_OWNER:
-                    this.SortTarget = target.Owner;
+                    SortTarget = target.Owner;
                     switch (skillEffect.TargetBone)
                     {
                         case eTargetBone.BOTTOM:
@@ -213,20 +213,20 @@ namespace Elements
                             vector3 = target.GetBottomTransformPosition() + target.GetFixedCenterPos();
                             break;
                         case eTargetBone.ANY_BONE:
-                            bone = (this.SortTarget.MotionPrefix == -1 ? (SkeletonRenderer)this.SortTarget.UnitSpineCtrl : (SkeletonRenderer)this.SortTarget.UnitSpineCtrlModeChange).skeleton.FindBone(skillEffect.TargetBoneName);
+                            bone = (SortTarget.MotionPrefix == -1 ? SortTarget.UnitSpineCtrl : (SkeletonRenderer)SortTarget.UnitSpineCtrlModeChange).skeleton.FindBone(skillEffect.TargetBoneName);
                             skillEffect.TrackType = eTrackType.BONE;
                             skillEffect.TrackDimension = eTrackDimension.XY;
-                            vector3 = BattleUnitBaseSpineController.BoneWorldToGlobalPosConsiderRotate(bone, this.SortTarget.RotateCenter, this.SortTarget.BottomTransform.lossyScale);
+                            vector3 = BattleUnitBaseSpineController.BoneWorldToGlobalPosConsiderRotate(bone, SortTarget.RotateCenter, SortTarget.BottomTransform.lossyScale);
                             break;
                     }
                     break;
             }
-            if (skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM || skillEffect.EffectBehavior == eEffectBehavior.FIREARM && skillEffect.TargetBone != eTargetBone.BOTTOM && (UnityEngine.Object)this.particle != (UnityEngine.Object)null)
+            if (skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM || skillEffect.EffectBehavior == eEffectBehavior.FIREARM && skillEffect.TargetBone != eTargetBone.BOTTOM && particle != null)
             {
-                this.particle.transform.position += vector3 - target.GetBottomTransformPosition() - target.GetFixedCenterPos();
+                particle.transform.position += vector3 - target.GetBottomTransformPosition() - target.GetFixedCenterPos();
                 vector3 = target.GetBottomTransformPosition() + target.GetFixedCenterPos();
             }
-            this.transform.position += vector3;
+            transform.position += vector3;
             switch (skillEffect.EffectBehavior)
             {
                 case eEffectBehavior.FIREARM:
@@ -234,20 +234,20 @@ namespace Elements
                     skillEffect.TrackType = eTrackType.NONE;
                     break;
             }
-            Vector3 absolutePosition = this.transform.position - target.GetBottomTransformPosition();
+            Vector3 absolutePosition = transform.position - target.GetBottomTransformPosition();
             switch (skillEffect.TrackType)
             {
                 case eTrackType.BONE:
                     switch (skillEffect.TrackDimension)
                     {
                         case eTrackDimension.XY:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, bone: bone, _trackRotation: skillEffect.TrackRotation));
+                            battleManager.StartCoroutine(TrackTarget(target, absolutePosition, bone: bone, _trackRotation: skillEffect.TrackRotation));
                             return;
                         case eTrackDimension.X:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, followY: false, bone: bone));
+                            battleManager.StartCoroutine(TrackTarget(target, absolutePosition, followY: false, bone: bone));
                             return;
                         case eTrackDimension.Y:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, false, bone: bone));
+                            battleManager.StartCoroutine(TrackTarget(target, absolutePosition, false, bone: bone));
                             return;
                         default:
                             return;
@@ -256,13 +256,13 @@ namespace Elements
                     switch (skillEffect.TrackDimension)
                     {
                         case eTrackDimension.XY:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition));
+                            battleManager.StartCoroutine(TrackTarget(target, absolutePosition));
                             return;
                         case eTrackDimension.X:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, followY: false));
+                            battleManager.StartCoroutine(TrackTarget(target, absolutePosition, followY: false));
                             return;
                         case eTrackDimension.Y:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, false));
+                            battleManager.StartCoroutine(TrackTarget(target, absolutePosition, false));
                             return;
                         default:
                             return;
@@ -279,7 +279,7 @@ namespace Elements
           bool _trackRotation = false)
         {
             SkillEffectCtrl skillEffectCtrl = this;
-            while (!((UnityEngine.Object)skillEffectCtrl == (UnityEngine.Object)null) && trans != null && (!skillEffectCtrl.timeToDie && !((UnityEngine.Object)trans.Owner == (UnityEngine.Object)null)))
+            while (!(skillEffectCtrl == null) && trans != null && (!skillEffectCtrl.timeToDie && !(trans.Owner == null)))
             {
                 if (followX & followY)
                     skillEffectCtrl.transform.position = bone == null ? trans.GetBottomTransformPosition() + absolutePosition : BattleUnitBaseSpineController.BoneWorldToGlobalPosConsiderRotate(bone, trans.Owner.RotateCenter, trans.Owner.BottomTransform.lossyScale);
@@ -297,11 +297,11 @@ namespace Elements
                 }
                 if (_trackRotation && bone != null)
                 {
-                    float num = bone.skeleton.flipX ^ bone.skeleton.flipY ^ (double)trans.Owner.BottomTransform.localScale.x < 0.0 ? -1f : 1f;
+                    float num = bone.skeleton.flipX ^ bone.skeleton.flipY ^ trans.Owner.BottomTransform.localScale.x < 0.0 ? -1f : 1f;
                     Vector3 eulerAngles = skillEffectCtrl.transform.localRotation.eulerAngles;
                     skillEffectCtrl.transform.localRotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, bone.WorldRotationX * num);
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
 
@@ -318,7 +318,7 @@ namespace Elements
         {
             SkillEffectCtrl skillEffectCtrl = this;
             Vector3 baseLocalScale = skillEffectCtrl.transform.localScale;
-            while (!((UnityEngine.Object)skillEffectCtrl == (UnityEngine.Object)null) && !((UnityEngine.Object)_spine == (UnityEngine.Object)null) && !skillEffectCtrl.timeToDie)
+            while (!(skillEffectCtrl == null) && !(_spine == null) && !skillEffectCtrl.timeToDie)
             {
                 if (_followX & _followY)
                     skillEffectCtrl.transform.position = _bone == null ? _spine.transform.position + _absolutePosition : BattleUnitBaseSpineController.BoneWorldToGlobalPosConsiderRotate(_bone, _spine.transform, _spine.transform.lossyScale, _callFromBossDialog);
@@ -336,13 +336,13 @@ namespace Elements
                 }
                 if (_trackRotation && _bone != null)
                 {
-                    float num = _bone.skeleton.flipX ^ _bone.skeleton.flipY ^ (double)_spine.transform.localScale.x < 0.0 ? -1f : 1f;
+                    float num = _bone.skeleton.flipX ^ _bone.skeleton.flipY ^ _spine.transform.localScale.x < 0.0 ? -1f : 1f;
                     Vector3 eulerAngles = skillEffectCtrl.transform.localRotation.eulerAngles;
                     skillEffectCtrl.transform.localRotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, _bone.WorldRotationX * num);
                 }
-                if ((UnityEngine.Object)_traskScale != (UnityEngine.Object)null)
+                if (_traskScale != null)
                     skillEffectCtrl.transform.localScale = Vector3.Scale(baseLocalScale * _coefficient, _traskScale.localScale);
-                yield return (object)null;
+                yield return null;
             }
         }
 
@@ -350,7 +350,7 @@ namespace Elements
         {
             SkillEffectCtrl skillEffectCtrl = this;
             bool startDepthBack = unit.IsDepthBack;
-            while (!((UnityEngine.Object)skillEffectCtrl == (UnityEngine.Object)null) && !((UnityEngine.Object)unit == (UnityEngine.Object)null) && !skillEffectCtrl.timeToDie)
+            while (!(skillEffectCtrl == null) && !(unit == null) && !skillEffectCtrl.timeToDie)
             {
                 if (startDepthBack && !unit.IsDepthBack)
                 {
@@ -361,7 +361,7 @@ namespace Elements
                     skillEffectCtrl.SetSortOrderFront();
                 else if (!unit.IsFront && skillEffectCtrl.isFront)
                     skillEffectCtrl.SetSortOrderBack();
-                yield return (object)null;
+                yield return null;
             }
         }
 
@@ -375,12 +375,12 @@ namespace Elements
                 {
                     do
                     {
-                        yield return (object)null;
-                        if ((UnityEngine.Object)skillEffectCtrl == (UnityEngine.Object)null)
+                        yield return null;
+                        if (skillEffectCtrl == null)
                             yield break;
                     }
                     while (skillEffectCtrl.isPause);
-                    if ((UnityEngine.Object)skillEffectCtrl.Target != (UnityEngine.Object)null && skillEffectCtrl.Target.IsDead)
+                    if (skillEffectCtrl.Target != null && skillEffectCtrl.Target.IsDead)
                     {
                         skillEffectCtrl.OnEffectEnd?.Invoke(skillEffectCtrl);
                         if (!(skillEffectCtrl is FirearmCtrl))
@@ -388,7 +388,7 @@ namespace Elements
                     }
                     time += skillEffectCtrl.battleManager.DeltaTime_60fps;
                 }
-                while ((double)time < (double)skillEffectCtrl.particle.main.duration);
+                while (time < (double)skillEffectCtrl.particle.main.duration);
                 skillEffectCtrl.OnEffectEnd?.Invoke(skillEffectCtrl);
             }
             while (skillEffectCtrl is FirearmCtrl);
@@ -404,9 +404,9 @@ namespace Elements
                 {
                     do
                     {
-                        yield return (object)null;
+                        yield return null;
                     }
-                    while (skillEffectCtrl.isPause || !((UnityEngine.Object)skillEffectCtrl.Target != (UnityEngine.Object)null) || !skillEffectCtrl.Target.IsDead);
+                    while (skillEffectCtrl.isPause || !(skillEffectCtrl.Target != null) || !skillEffectCtrl.Target.IsDead);
                     skillEffectCtrl.OnEffectEnd?.Invoke(skillEffectCtrl);
                 }
                 while (skillEffectCtrl is FirearmCtrl);
@@ -416,21 +416,21 @@ namespace Elements
 
         public virtual bool _Update()
         {
-            if (this.timeToDie)
+            if (timeToDie)
             {
                 //this.skillSeSource.Stop();
-                this.IsPlaying = false;
-                this.gameObject.SetActive(false);
+                IsPlaying = false;
+                gameObject.SetActive(false);
             }
-            return !this.timeToDie;
+            return !timeToDie;
         }
 
         public virtual void Pause()
         {
-            if ((UnityEngine.Object)this.particle != (UnityEngine.Object)null)
+            if (particle != null)
             {
-                this.particle.Pause(true);
-                this.resumeTime = this.particle.time;
+                particle.Pause(true);
+                resumeTime = particle.time;
                 //this.pauseSe(true);
             }
             //for (int index = 0; index < this.TweenerList.Length; ++index)
@@ -439,26 +439,26 @@ namespace Elements
             //    this.TweenRotList[index].enabled = false;
             //for (int index = 0; index < this.AnimatorList.Length; ++index)
             //    this.AnimatorList[index].enabled = false;
-            this.isPause = true;
+            isPause = true;
         }
 
         protected virtual void resetStartDelay()
         {
-            for (int index = 0; index < this.particles.Length; ++index)
+            for (int index = 0; index < particles.Length; ++index)
             {
-                ParticleSystem.MainModule main = this.particles[index].main;
-                float num = this.particleStartDelayDictionary != null ? this.particleStartDelayDictionary[this.particles[index]] : main.startDelayMultiplier;
-                if ((double)num > (double)this.resumeTime)
-                    main.startDelayMultiplier = num - this.resumeTime;
+                ParticleSystem.MainModule main = particles[index].main;
+                float num = particleStartDelayDictionary != null ? particleStartDelayDictionary[particles[index]] : main.startDelayMultiplier;
+                if (num > (double)resumeTime)
+                    main.startDelayMultiplier = num - resumeTime;
             }
         }
 
         public virtual void Resume()
         {
-            if ((UnityEngine.Object)this.particle != (UnityEngine.Object)null && this.particle.isPaused && ((UnityEngine.Object)this.gameObject != (UnityEngine.Object)null && this.gameObject.activeSelf))
+            if (particle != null && particle.isPaused && (gameObject != null && gameObject.activeSelf))
             {
-                this.particle.Play();
-                this.resetStartDelay();
+                particle.Play();
+                resetStartDelay();
                 //this.pauseSe(false);
             }
             //for (int index = 0; index < this.TweenerList.Length; ++index)
@@ -467,7 +467,7 @@ namespace Elements
             //    this.TweenRotList[index].enabled = true;
             //for (int index = 0; index < this.AnimatorList.Length; ++index)
             //    this.AnimatorList[index].enabled = true;
-            this.isPause = false;
+            isPause = false;
         }
 
         /*protected virtual void initTweener(UITweener _tweener)
@@ -478,46 +478,46 @@ namespace Elements
 
         public virtual void SetSortOrderBack()
         {
-            this.isFront = false;
-            this.particleRendererDictionaryInitialize();
-            foreach (KeyValuePair<Renderer, int> particleRenderer in this.particleRendererDictionary)
-                particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value > 0 ? (particleRenderer.Value >= 1000 ? 11000 : BattleDefine.GetUnitSortOrder(this.SortTarget) + 300) : BattleDefine.GetUnitSortOrder(this.SortTarget) - 300) : 690;
+            isFront = false;
+            particleRendererDictionaryInitialize();
+            foreach (KeyValuePair<Renderer, int> particleRenderer in particleRendererDictionary)
+                particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value > 0 ? (particleRenderer.Value >= 1000 ? 11000 : BattleDefine.GetUnitSortOrder(SortTarget) + 300) : BattleDefine.GetUnitSortOrder(SortTarget) - 300) : 690;
         }
 
         public virtual void SetSortOrderFront()
         {
-            this.isFront = true;
-            this.particleRendererDictionaryInitialize();
-            foreach (KeyValuePair<Renderer, int> particleRenderer in this.particleRendererDictionary)
+            isFront = true;
+            particleRendererDictionaryInitialize();
+            foreach (KeyValuePair<Renderer, int> particleRenderer in particleRendererDictionary)
             {
                 Renderer key = particleRenderer.Key;
-                key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value > 0 ? (particleRenderer.Value >= 1000 ? 11000 : BattleDefine.GetUnitSortOrder(this.SortTarget) + 300) : BattleDefine.GetUnitSortOrder(this.SortTarget) - 300) : 690;
+                key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value > 0 ? (particleRenderer.Value >= 1000 ? 11000 : BattleDefine.GetUnitSortOrder(SortTarget) + 300) : BattleDefine.GetUnitSortOrder(SortTarget) - 300) : 690;
                 key.sortingOrder += 11500;
             }
         }
 
         public void SetSortOrderStatus(int offset)
         {
-            this.particleRendererDictionaryInitialize();
-            foreach (KeyValuePair<Renderer, int> particleRenderer in this.particleRendererDictionary)
-                particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value >= 0 ? (particleRenderer.Value >= 1000 ? 11000 : BattleDefine.GetUnitSortOrder(this.SortTarget) + 350 + offset) : BattleDefine.GetUnitSortOrder(this.SortTarget) - 300) : 690;
+            particleRendererDictionaryInitialize();
+            foreach (KeyValuePair<Renderer, int> particleRenderer in particleRendererDictionary)
+                particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value >= 0 ? (particleRenderer.Value >= 1000 ? 11000 : BattleDefine.GetUnitSortOrder(SortTarget) + 350 + offset) : BattleDefine.GetUnitSortOrder(SortTarget) - 300) : 690;
         }
 
         public void SetSortOrderHit(int _offset)
         {
-            this.particleRendererDictionaryInitialize();
-            foreach (KeyValuePair<Renderer, int> particleRenderer in this.particleRendererDictionary)
-                particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value >= 0 ? (particleRenderer.Value >= 1000 ? 11000 : 11000 + _offset) : BattleDefine.GetUnitSortOrder(this.SortTarget) - 300) : 690;
+            particleRendererDictionaryInitialize();
+            foreach (KeyValuePair<Renderer, int> particleRenderer in particleRendererDictionary)
+                particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value >= 0 ? (particleRenderer.Value >= 1000 ? 11000 : 11000 + _offset) : BattleDefine.GetUnitSortOrder(SortTarget) - 300) : 690;
         }
 
         public void SetSortOrderForSummon(int _sortOrder)
         {
-            this.particleRendererDictionaryInitialize();
-            foreach (KeyValuePair<Renderer, int> particleRenderer in this.particleRendererDictionary)
+            particleRendererDictionaryInitialize();
+            foreach (KeyValuePair<Renderer, int> particleRenderer in particleRendererDictionary)
                 particleRenderer.Key.sortingOrder = particleRenderer.Value >= -1000 ? (particleRenderer.Value > 0 ? (particleRenderer.Value >= 1000 ? 11000 : _sortOrder + 300) : _sortOrder - 300) : 690;
         }
 
-        protected void AppendCoroutine(IEnumerator cr, ePauseType pauseType, UnitCtrl unit = null) => this.battleManager.AppendCoroutine(cr, pauseType, unit);
+        protected void AppendCoroutine(IEnumerator cr, ePauseType pauseType, UnitCtrl unit = null) => battleManager.AppendCoroutine(cr, pauseType, unit);
 
         /*public void PlaySe(int soundUnitId, bool isEnemySide)
         {
@@ -563,8 +563,8 @@ namespace Elements
         {
             if (_skinID != 0)
             {
-                for (int index = 0; index < this.textureChangeParticles.Count; ++index)
-                    this.textureChangeParticles[index].ParticleSystemRenderer.material.mainTexture = this.textureChangeParticles[index].TextureAndSkinIdList.Find((Predicate<SkillEffectCtrl.RarityUpTextureChangeDataSet.TextureAndSkinId>)(e => e.SkinId == _skinID)).Texture;
+                for (int index = 0; index < textureChangeParticles.Count; ++index)
+                    textureChangeParticles[index].ParticleSystemRenderer.material.mainTexture = textureChangeParticles[index].TextureAndSkinIdList.Find(e => e.SkinId == _skinID).Texture;
             }
             /*if (this.battleManager.IsDefenceReplayMode)
             {
@@ -581,19 +581,19 @@ namespace Elements
                 if ((UnityEngine.Object)component != (UnityEngine.Object)null)
                     component.Apply();
             }*/
-            this.timeToDie = false;
-            this.IsPlaying = true;
-            this.OnEffectEnd = (System.Action<SkillEffectCtrl>)null;
+            timeToDie = false;
+            IsPlaying = true;
+            OnEffectEnd = null;
             //this.pauseSe(false);
-            this.transform.localPosition = _prefab.transform.localPosition;
-            if ((UnityEngine.Object)this.particle != (UnityEngine.Object)null)
+            transform.localPosition = _prefab.transform.localPosition;
+            if (particle != null)
             {
-                this.particle.transform.localPosition = _prefab.transform.GetChild(0).localPosition;
-                this.particle.transform.localEulerAngles = _prefab.transform.GetChild(0).localEulerAngles;
-                this.particle.Simulate(0.0f, true, true, true);
-                this.particle.Play(true);
+                particle.transform.localPosition = _prefab.transform.GetChild(0).localPosition;
+                particle.transform.localEulerAngles = _prefab.transform.GetChild(0).localEulerAngles;
+                particle.Simulate(0.0f, true, true, true);
+                particle.Play(true);
             }
-            if (this.particleStartDelayDictionary == null)
+            if (particleStartDelayDictionary == null)
                 return;
             //foreach (KeyValuePair<ParticleSystem, float> particleStartDelay in this.particleStartDelayDictionary)
                 //particleStartDelay.Key.main.startDelayMultiplier = particleStartDelay.Value;
@@ -612,7 +612,7 @@ namespace Elements
             }*/
         }
 
-        public void SetTimeToDie(bool value) => this.timeToDie = value;
+        public void SetTimeToDie(bool value) => timeToDie = value;
 
         /*public IEnumerator TrackTargetSortForSummon(UnitCtrl _unitCtrl)
         {
@@ -631,9 +631,9 @@ namespace Elements
         }*/
         public virtual void SetStartTime(float _starttime)
         {
-            for (int index = 0; index < this.AnimatorList.Length; ++index)
+            for (int index = 0; index < AnimatorList.Length; ++index)
             {
-                Animator animator = this.AnimatorList[index];
+                Animator animator = AnimatorList[index];
                 AnimatorClipInfo[] animatorClipInfo = animator.GetCurrentAnimatorClipInfo(0);
                 if (animatorClipInfo.Length != 0)
                 {
@@ -642,13 +642,13 @@ namespace Elements
                     animator.Play(animatorStateInfo.fullPathHash, -1, Mathf.Min(1f, _starttime / clip.length));
                 }
             }
-            if (!((UnityEngine.Object)this.particle != (UnityEngine.Object)null))
+            if (!(particle != null))
                 return;
-            foreach (KeyValuePair<ParticleSystem, float> particleStartDelay in this.particleStartDelayDictionary)
+            foreach (KeyValuePair<ParticleSystem, float> particleStartDelay in particleStartDelayDictionary)
             {
                 ParticleSystem key = particleStartDelay.Key;
                 ParticleSystem.MainModule main = key.main;
-                if ((double)particleStartDelay.Value > (double)_starttime)
+                if (particleStartDelay.Value > (double)_starttime)
                 {
                     main.startDelayMultiplier = particleStartDelay.Value - _starttime;
                     key.Simulate(0.0f, true, true, true);
@@ -659,7 +659,7 @@ namespace Elements
                     key.Simulate(_starttime - particleStartDelay.Value, true, true, true);
                 }
             }
-            this.particle.Play(true);
+            particle.Play(true);
         }
 
         public virtual void OnAwakeWhenSkipCutIn()
@@ -674,7 +674,7 @@ namespace Elements
         private class RarityUpTextureChangeDataSet
         {
             public ParticleSystemRenderer ParticleSystemRenderer;
-            public List<SkillEffectCtrl.RarityUpTextureChangeDataSet.TextureAndSkinId> TextureAndSkinIdList;
+            public List<TextureAndSkinId> TextureAndSkinIdList;
 
             [Serializable]
             public class TextureAndSkinId

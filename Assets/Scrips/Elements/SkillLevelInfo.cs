@@ -4,33 +4,34 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
+
+
 //using LitJson;
 
 namespace Elements
 {
     public class SkillLevelInfo
     {
-        public ObscuredInt SkillId { get; private set; }
+        public int SkillId { get; private set; }
 
-        public ObscuredInt SkillLevel { get; private set; }
+        public int SkillLevel { get; private set; }
 
-        public ObscuredInt SlotNumber { get; private set; }
+        public int SlotNumber { get; private set; }
 
-        public void SetSkillId(int _skillId) => this.SkillId = (ObscuredInt)_skillId;
+        public void SetSkillId(int _skillId) => SkillId = _skillId;
 
-        public void SetSkillLevel(int _skillLevel) => this.SkillLevel = (ObscuredInt)_skillLevel;
+        public void SetSkillLevel(int _skillLevel) => SkillLevel = _skillLevel;
 
-        public void SetSlotNumber(int _slotNumber) => this.SlotNumber = (ObscuredInt)_slotNumber;
+        public void SetSlotNumber(int _slotNumber) => SlotNumber = _slotNumber;
 
         private void initializeSkillLevelInfo()
         {
-            this.SkillId = (ObscuredInt)0;
-            this.SkillLevel = (ObscuredInt)0;
-            this.SlotNumber = (ObscuredInt)0;
+            SkillId = 0;
+            SkillLevel = 0;
+            SlotNumber = 0;
         }
 
-        public SkillLevelInfo() => this.initializeSkillLevelInfo();
+        public SkillLevelInfo() => initializeSkillLevelInfo();
 
         public SkillLevelInfo(int skillId,int skillLevel,int slotNumber)
         {
@@ -48,11 +49,11 @@ namespace Elements
         {
           if (_json.Count == 0)
             return;
-          this.SkillId = (ObscuredInt) _json["skill_id"].ToInt();
-          this.SkillLevel = (ObscuredInt) _json["skill_level"].ToInt();
+          this.SkillId = (int) _json["skill_id"].ToInt();
+          this.SkillLevel = (int) _json["skill_level"].ToInt();
           if (!_json.Keys.Contains("slot_number"))
             return;
-          this.SlotNumber = (ObscuredInt) _json["slot_number"].ToInt();
+          this.SlotNumber = (int) _json["slot_number"].ToInt();
         }*/
     }
 }

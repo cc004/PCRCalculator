@@ -32,10 +32,10 @@ namespace Spine.Unity
 
 		public static void SetColor(this Skeleton skeleton, Color32 color)
 		{
-			skeleton.A = (float)(int)color.a * 0.003921569f;
-			skeleton.R = (float)(int)color.r * 0.003921569f;
-			skeleton.G = (float)(int)color.g * 0.003921569f;
-			skeleton.B = (float)(int)color.b * 0.003921569f;
+			skeleton.A = color.a * 0.003921569f;
+			skeleton.R = color.r * 0.003921569f;
+			skeleton.G = color.g * 0.003921569f;
+			skeleton.B = color.b * 0.003921569f;
 		}
 
 		public static void SetColor(this Slot slot, Color color)
@@ -48,10 +48,10 @@ namespace Spine.Unity
 
 		public static void SetColor(this Slot slot, Color32 color)
 		{
-			slot.A = (float)(int)color.a * 0.003921569f;
-			slot.R = (float)(int)color.r * 0.003921569f;
-			slot.G = (float)(int)color.g * 0.003921569f;
-			slot.B = (float)(int)color.b * 0.003921569f;
+			slot.A = color.a * 0.003921569f;
+			slot.R = color.r * 0.003921569f;
+			slot.G = color.g * 0.003921569f;
+			slot.B = color.b * 0.003921569f;
 		}
 
 		public static void SetColor(this RegionAttachment attachment, Color color)
@@ -64,10 +64,10 @@ namespace Spine.Unity
 
 		public static void SetColor(this RegionAttachment attachment, Color32 color)
 		{
-			attachment.A = (float)(int)color.a * 0.003921569f;
-			attachment.R = (float)(int)color.r * 0.003921569f;
-			attachment.G = (float)(int)color.g * 0.003921569f;
-			attachment.B = (float)(int)color.b * 0.003921569f;
+			attachment.A = color.a * 0.003921569f;
+			attachment.R = color.r * 0.003921569f;
+			attachment.G = color.g * 0.003921569f;
+			attachment.B = color.b * 0.003921569f;
 		}
 
 		public static void SetColor(this MeshAttachment attachment, Color color)
@@ -80,10 +80,10 @@ namespace Spine.Unity
 
 		public static void SetColor(this MeshAttachment attachment, Color32 color)
 		{
-			attachment.A = (float)(int)color.a * 0.003921569f;
-			attachment.R = (float)(int)color.r * 0.003921569f;
-			attachment.G = (float)(int)color.g * 0.003921569f;
-			attachment.B = (float)(int)color.b * 0.003921569f;
+			attachment.A = color.a * 0.003921569f;
+			attachment.R = color.r * 0.003921569f;
+			attachment.G = color.g * 0.003921569f;
+			attachment.B = color.b * 0.003921569f;
 		}
 
 		public static void SetPosition(this Bone bone, Vector2 position)

@@ -22,7 +22,7 @@ namespace SpringGUI
         private BarChartData barChartData = new BarChartData();
         private BarChartDataProxy dataProxy = new BarChartDataProxy();
 
-        private IBarChartFactory m_barChartFactory = null;
+        private IBarChartFactory m_barChartFactory;
         private IBarChartFactory barChartFactory
         {
             get 
@@ -48,7 +48,7 @@ namespace SpringGUI
             GameObject verticalText = transform.Find("VerticalUnitTemplate").gameObject;
             horizontalText.SetActive(false);
             verticalText.SetActive(false);
-            (barChartFactory as BarChartFactory).UnitEnable(verticalText,horizontalText,GetPixelAdjustedRect(),this.transform,BaseSetting ,BarChartSetting , barChartData);
+            (barChartFactory as BarChartFactory).UnitEnable(verticalText,horizontalText,GetPixelAdjustedRect(),transform,BaseSetting ,BarChartSetting , barChartData);
         }
 
         // inject data for simple bar graph

@@ -4,8 +4,8 @@
 * Description: SpringGUI.Calendar example.
 ==========================================*/
 
-using UnityEngine;
 using SpringGUI;
+using UnityEngine;
 
 public class DatePickerExample : MonoBehaviour
 {

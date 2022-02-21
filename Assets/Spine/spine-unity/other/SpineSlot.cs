@@ -6,10 +6,10 @@ namespace Spine.Unity
 
 		public SpineSlot(string startsWith = "", string dataField = "", bool containsBoundingBoxes = false, bool includeNone = true)
 		{
-			base.startsWith = startsWith;
-			base.dataField = dataField;
+			this.startsWith = startsWith;
+			this.dataField = dataField;
 			this.containsBoundingBoxes = containsBoundingBoxes;
-			base.includeNone = includeNone;
+			this.includeNone = includeNone;
 		}
 	}
 }

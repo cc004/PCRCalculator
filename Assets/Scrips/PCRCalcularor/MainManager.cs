@@ -1,15 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.IO;
-using Newtonsoft0.Json;
-using Mono.Data.Sqlite;
-using TMPro;
-using Elements;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using Newtonsoft0.Json;
+using PCRCaculator.Calc;
+using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using CompressionLevel = System.IO.Compression.CompressionLevel;
+using Object = UnityEngine.Object;
 
 namespace PCRCaculator
 {
@@ -81,7 +84,8 @@ namespace PCRCaculator
             get
             {
                 if (BaseBackManager.Instance != null) { return BaseBackManager.Instance.latestUIback; }
-                else { return null; }
+
+                return null;
             }
         }
 
@@ -128,7 +132,7 @@ namespace PCRCaculator
                 Load();
                 CreateShowUnitIDS();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debugtext.text += e.Message;
             }
@@ -212,12 +216,10 @@ namespace PCRCaculator
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
-            string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData",true);
+            string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
             if (!string.IsNullOrEmpty(firearmStr))
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
             Debugtext.text += "\n数据加载完毕！";
-
-            return;
         }
         private void LoadUnitData()
         {
@@ -251,7 +253,6 @@ namespace PCRCaculator
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
                 }
-                return;
             }
             catch
             {
@@ -281,7 +282,6 @@ namespace PCRCaculator
             {
                 unitDataDic = SaveManager.Load<Dictionary<int, UnitData>>();
                 unitDataDic_save = SaveManager.Load<Dictionary<int, UnitData>>();
-                return;
             }
             catch
             {
@@ -322,7 +322,7 @@ namespace PCRCaculator
             b.SetWindowMassage(word, configDelegate, cancelDelegate);
             return b;
         }
-        public void WindowInputMessage(string helpword,System.Action<string> finishAction,System.Action cancelAction = null)
+        public void WindowInputMessage(string helpword,Action<string> finishAction,Action cancelAction = null)
         {
             GameObject a = Instantiate(SystemInputPrefab);
             a.transform.SetParent(LatestUIback.transform, false);
@@ -367,7 +367,7 @@ namespace PCRCaculator
         public void CalculatorButton()
         {
             TurnAllPageOff();
-            Calc.CalculatorManager.Instance.SwitchPage(1);
+            CalculatorManager.Instance.SwitchPage(1);
             stayPage = StayPage.calculator;
         }
         private void TurnAllPageOff()
@@ -407,8 +407,8 @@ namespace PCRCaculator
         {
             playerDataForBattle = data.players.playrCharacters;
             isGuildBattle = true;
-            this.isAutoMode = data.isAutoMode;
-            this.forceAutoMode = data.forceAutoMode;
+            isAutoMode = data.isAutoMode;
+            forceAutoMode = data.forceAutoMode;
             guildBattleData = data;
             bool isok = CheckIsAllCharacterAble(out string mess);
             if (isok)
@@ -535,7 +535,7 @@ namespace PCRCaculator
                     }
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 WindowConfigMessage("初始化存档文件时出现异常:" + ex.Message,null);
             }
@@ -558,7 +558,7 @@ namespace PCRCaculator
         }
         public void SaveAllUnitFriearmData()
         {
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Datas/AllUnitFirearmData.json";
+            string filePath = GetSaveDataPath() + "/Datas/AllUnitFirearmData.json";
             string saveJsonStr = JsonConvert.SerializeObject(firearmData);
             StreamWriter sw = new StreamWriter(filePath);
             sw.Write(saveJsonStr);
@@ -567,7 +567,7 @@ namespace PCRCaculator
 
         public string LoadJsonDatas(string path,bool forceStreaming = true)
         {
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/" + path + ".json";
+            string filePath = GetSaveDataPath() + "/" + path + ".json";
             return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
         }
         public static Sprite LoadSourceSprite(string relativePath)
@@ -586,7 +586,7 @@ namespace PCRCaculator
                     tmpsprite = Instantiate(Preb) as Sprite;
                     Instance.spriteCacheDic.Add(relativePath, tmpsprite);
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     Debug.Log(relativePath + "图片加载失败，原因：" + ex.Message);
                 }
@@ -605,11 +605,11 @@ namespace PCRCaculator
         public static string EncryptDES(string encryptString, string encryptKey = "PCRGuild")  
         {
             var ms = new MemoryStream();
-            var stream = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionLevel.Optimal);
+            var stream = new GZipStream(ms, CompressionLevel.Optimal);
             var bytes = Encoding.UTF8.GetBytes(encryptString);
             stream.Write(bytes, 0, bytes.Length);
             stream.Dispose();
-            var res = System.Convert.ToBase64String(ms.ToArray());
+            var res = Convert.ToBase64String(ms.ToArray());
             ms.Dispose();
             return res;
 
@@ -624,7 +624,7 @@ namespace PCRCaculator
         {
             try
             {
-                var stream = new System.IO.Compression.GZipStream(new MemoryStream(System.Convert.FromBase64String(decryptString)), System.IO.Compression.CompressionMode.Decompress);
+                var stream = new GZipStream(new MemoryStream(Convert.FromBase64String(decryptString)), CompressionMode.Decompress);
                 var ms = new MemoryStream();
                 byte[] buf = new byte[1024];
                 int len;
@@ -643,7 +643,7 @@ namespace PCRCaculator
             {
                 byte[] rgbKey = Encoding.UTF8.GetBytes(decryptKey);
                 byte[] rgbIV = Keys;
-                byte[] inputByteArray = System.Convert.FromBase64String(decryptString);
+                byte[] inputByteArray = Convert.FromBase64String(decryptString);
                 DESCryptoServiceProvider DCSP = new DESCryptoServiceProvider();
                 MemoryStream mStream = new MemoryStream();
                 CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateDecryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
@@ -651,7 +651,7 @@ namespace PCRCaculator
                 cStream.FlushFinalBlock();
                 return Encoding.UTF8.GetString(mStream.ToArray());
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 return decryptString;
             }
@@ -660,8 +660,7 @@ namespace PCRCaculator
         {
             if (Application.platform == RuntimePlatform.Android)
                 return Application.persistentDataPath;
-            else
-                return Application.streamingAssetsPath;
+            return Application.streamingAssetsPath;
         }
         [ContextMenu("生成排刀器用unitdetail文件")]
         public void CreateUnitDetailDic()
@@ -671,7 +670,7 @@ namespace PCRCaculator
             {
                 dic.Add(unit.unitId, new UnitDetail_other(unit.unitId, unit.detailData.searchAreaWidth, GetUnitNickName(unit.unitId)));
             }
-            string filePath = PCRCaculator.MainManager.GetSaveDataPath() + "/Datas/UnitDetailDic.txt";
+            string filePath = GetSaveDataPath() + "/Datas/UnitDetailDic.txt";
             string saveJsonStr = JsonConvert.SerializeObject(dic);
             StreamWriter sw = new StreamWriter(filePath);
             sw.Write(saveJsonStr);
@@ -682,8 +681,8 @@ namespace PCRCaculator
     public class UnitData_other
     {
         public string name = "未定义";
-        public int type = 0;
-        public bool hasRarity6 = false;
+        public int type;
+        public bool hasRarity6;
 
         public UnitData_other(string name, int type, bool hasRarity6)
         {
@@ -715,7 +714,7 @@ namespace PCRCaculator
         public bool isPaues;
         public bool isCanceled;
         public int execTime;
-        public bool isConfig = false;
+        public bool isConfig;
         public List<OnceResultData> resultDatas = new List<OnceResultData>();
         public int execedTime => resultDatas.Count;
         public bool isFinish => execTime <= resultDatas.Count || isCanceled;

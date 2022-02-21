@@ -21,7 +21,7 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.battleManager.StopField(this.ActionDetail1, this.TargetAssignment, _source.IsOther);
+      battleManager.StopField(ActionDetail1, TargetAssignment, _source.IsOther);
     }
 
     public override void SetLevel(float _level) => base.SetLevel(_level);

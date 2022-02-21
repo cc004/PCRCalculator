@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-//using Sqlite3Plugin;
 using System.Collections.Generic;
+
+//using Sqlite3Plugin;
 
 namespace Elements
 {
@@ -102,38 +102,38 @@ namespace Elements
     */
     public class UnitSkillData
     {
-      protected ObscuredInt _unit_id;
-      protected ObscuredInt _union_burst;
-      protected ObscuredInt _main_skill_1;
-      protected ObscuredInt _main_skill_2;
-      protected ObscuredInt _main_skill_3;
-      protected ObscuredInt _main_skill_4;
-      protected ObscuredInt _main_skill_5;
-      protected ObscuredInt _main_skill_6;
-      protected ObscuredInt _main_skill_7;
-      protected ObscuredInt _main_skill_8;
-      protected ObscuredInt _main_skill_9;
-      protected ObscuredInt _main_skill_10;
-      protected ObscuredInt _ex_skill_1;
-      protected ObscuredInt _ex_skill_evolution_1;
-      protected ObscuredInt _ex_skill_2;
-      protected ObscuredInt _ex_skill_evolution_2;
-      protected ObscuredInt _ex_skill_3;
-      protected ObscuredInt _ex_skill_evolution_3;
-      protected ObscuredInt _ex_skill_4;
-      protected ObscuredInt _ex_skill_evolution_4;
-      protected ObscuredInt _ex_skill_5;
-      protected ObscuredInt _ex_skill_evolution_5;
-      protected ObscuredInt _sp_skill_1;
-      protected ObscuredInt _sp_skill_2;
-      protected ObscuredInt _sp_skill_3;
-      protected ObscuredInt _sp_skill_4;
-      protected ObscuredInt _sp_skill_5;
-      protected ObscuredInt _union_burst_evolution;
-      protected ObscuredInt _main_skill_evolution_1;
-      protected ObscuredInt _main_skill_evolution_2;
-      protected ObscuredInt _sp_skill_evolution_1;
-      protected ObscuredInt _sp_skill_evolution_2;
+      protected int _unit_id;
+      protected int _union_burst;
+      protected int _main_skill_1;
+      protected int _main_skill_2;
+      protected int _main_skill_3;
+      protected int _main_skill_4;
+      protected int _main_skill_5;
+      protected int _main_skill_6;
+      protected int _main_skill_7;
+      protected int _main_skill_8;
+      protected int _main_skill_9;
+      protected int _main_skill_10;
+      protected int _ex_skill_1;
+      protected int _ex_skill_evolution_1;
+      protected int _ex_skill_2;
+      protected int _ex_skill_evolution_2;
+      protected int _ex_skill_3;
+      protected int _ex_skill_evolution_3;
+      protected int _ex_skill_4;
+      protected int _ex_skill_evolution_4;
+      protected int _ex_skill_5;
+      protected int _ex_skill_evolution_5;
+      protected int _sp_skill_1;
+      protected int _sp_skill_2;
+      protected int _sp_skill_3;
+      protected int _sp_skill_4;
+      protected int _sp_skill_5;
+      protected int _union_burst_evolution;
+      protected int _main_skill_evolution_1;
+      protected int _main_skill_evolution_2;
+      protected int _sp_skill_evolution_1;
+      protected int _sp_skill_evolution_2;
 
       public List<int> UnionBurstIds { get; set; }
 
@@ -153,110 +153,110 @@ namespace Elements
 
       public void SetUp()
       {
-        this.UnionBurstIds = new List<int>();
-        this.MainSkillIds = new List<int>();
-        this.ExSkillIds = new List<int>();
-        this.ExSkillEvolutionIds = new List<int>();
-        this.SpSkillIds = new List<int>();
-        this.UnionBurstEvolutionIds = new List<int>();
-        this.MainSkillEvolutionIds = new List<int>();
-        this.SpSkillEvolutionIds = new List<int>();
-        this.UnionBurstIds.Add((int) this.union_burst);
-        this.MainSkillIds.Add((int) this.main_skill_1);
-        this.MainSkillIds.Add((int) this.main_skill_2);
-        this.MainSkillIds.Add((int) this.main_skill_3);
-        this.MainSkillIds.Add((int) this.main_skill_4);
-        this.MainSkillIds.Add((int) this.main_skill_5);
-        this.MainSkillIds.Add((int) this.main_skill_6);
-        this.MainSkillIds.Add((int) this.main_skill_7);
-        this.MainSkillIds.Add((int) this.main_skill_8);
-        this.MainSkillIds.Add((int) this.main_skill_9);
-        this.MainSkillIds.Add((int) this.main_skill_10);
-        this.ExSkillIds.Add((int) this.ex_skill_1);
-        this.ExSkillIds.Add((int) this.ex_skill_2);
-        this.ExSkillIds.Add((int) this.ex_skill_3);
-        this.ExSkillIds.Add((int) this.ex_skill_4);
-        this.ExSkillIds.Add((int) this.ex_skill_5);
-        this.ExSkillEvolutionIds.Add((int) this.ex_skill_evolution_1);
-        this.ExSkillEvolutionIds.Add((int) this.ex_skill_evolution_2);
-        this.ExSkillEvolutionIds.Add((int) this.ex_skill_evolution_3);
-        this.ExSkillEvolutionIds.Add((int) this.ex_skill_evolution_4);
-        this.ExSkillEvolutionIds.Add((int) this.ex_skill_evolution_5);
-        this.SpSkillIds.Add((int) this.sp_skill_1);
-        this.SpSkillIds.Add((int) this.sp_skill_2);
-        this.SpSkillIds.Add((int) this.sp_skill_3);
-        this.SpSkillIds.Add((int) this.sp_skill_4);
-        this.SpSkillIds.Add((int) this.sp_skill_5);
-        this.UnionBurstEvolutionIds.Add((int) this.union_burst_evolution);
-        this.MainSkillEvolutionIds.Add((int) this.main_skill_evolution_1);
-        this.MainSkillEvolutionIds.Add((int) this.main_skill_evolution_2);
-        this.SpSkillEvolutionIds.Add((int) this.sp_skill_evolution_1);
-        this.SpSkillEvolutionIds.Add((int) this.sp_skill_evolution_2);
+        UnionBurstIds = new List<int>();
+        MainSkillIds = new List<int>();
+        ExSkillIds = new List<int>();
+        ExSkillEvolutionIds = new List<int>();
+        SpSkillIds = new List<int>();
+        UnionBurstEvolutionIds = new List<int>();
+        MainSkillEvolutionIds = new List<int>();
+        SpSkillEvolutionIds = new List<int>();
+        UnionBurstIds.Add(union_burst);
+        MainSkillIds.Add(main_skill_1);
+        MainSkillIds.Add(main_skill_2);
+        MainSkillIds.Add(main_skill_3);
+        MainSkillIds.Add(main_skill_4);
+        MainSkillIds.Add(main_skill_5);
+        MainSkillIds.Add(main_skill_6);
+        MainSkillIds.Add(main_skill_7);
+        MainSkillIds.Add(main_skill_8);
+        MainSkillIds.Add(main_skill_9);
+        MainSkillIds.Add(main_skill_10);
+        ExSkillIds.Add(ex_skill_1);
+        ExSkillIds.Add(ex_skill_2);
+        ExSkillIds.Add(ex_skill_3);
+        ExSkillIds.Add(ex_skill_4);
+        ExSkillIds.Add(ex_skill_5);
+        ExSkillEvolutionIds.Add(ex_skill_evolution_1);
+        ExSkillEvolutionIds.Add(ex_skill_evolution_2);
+        ExSkillEvolutionIds.Add(ex_skill_evolution_3);
+        ExSkillEvolutionIds.Add(ex_skill_evolution_4);
+        ExSkillEvolutionIds.Add(ex_skill_evolution_5);
+        SpSkillIds.Add(sp_skill_1);
+        SpSkillIds.Add(sp_skill_2);
+        SpSkillIds.Add(sp_skill_3);
+        SpSkillIds.Add(sp_skill_4);
+        SpSkillIds.Add(sp_skill_5);
+        UnionBurstEvolutionIds.Add(union_burst_evolution);
+        MainSkillEvolutionIds.Add(main_skill_evolution_1);
+        MainSkillEvolutionIds.Add(main_skill_evolution_2);
+        SpSkillEvolutionIds.Add(sp_skill_evolution_1);
+        SpSkillEvolutionIds.Add(sp_skill_evolution_2);
       }
 
-      public ObscuredInt unit_id => this._unit_id;
+      public int unit_id => _unit_id;
 
-      public ObscuredInt union_burst => this._union_burst;
+      public int union_burst => _union_burst;
 
-      public ObscuredInt main_skill_1 => this._main_skill_1;
+      public int main_skill_1 => _main_skill_1;
 
-      public ObscuredInt main_skill_2 => this._main_skill_2;
+      public int main_skill_2 => _main_skill_2;
 
-      public ObscuredInt main_skill_3 => this._main_skill_3;
+      public int main_skill_3 => _main_skill_3;
 
-      public ObscuredInt main_skill_4 => this._main_skill_4;
+      public int main_skill_4 => _main_skill_4;
 
-      public ObscuredInt main_skill_5 => this._main_skill_5;
+      public int main_skill_5 => _main_skill_5;
 
-      public ObscuredInt main_skill_6 => this._main_skill_6;
+      public int main_skill_6 => _main_skill_6;
 
-      public ObscuredInt main_skill_7 => this._main_skill_7;
+      public int main_skill_7 => _main_skill_7;
 
-      public ObscuredInt main_skill_8 => this._main_skill_8;
+      public int main_skill_8 => _main_skill_8;
 
-      public ObscuredInt main_skill_9 => this._main_skill_9;
+      public int main_skill_9 => _main_skill_9;
 
-      public ObscuredInt main_skill_10 => this._main_skill_10;
+      public int main_skill_10 => _main_skill_10;
 
-      public ObscuredInt ex_skill_1 => this._ex_skill_1;
+      public int ex_skill_1 => _ex_skill_1;
 
-      public ObscuredInt ex_skill_evolution_1 => this._ex_skill_evolution_1;
+      public int ex_skill_evolution_1 => _ex_skill_evolution_1;
 
-      public ObscuredInt ex_skill_2 => this._ex_skill_2;
+      public int ex_skill_2 => _ex_skill_2;
 
-      public ObscuredInt ex_skill_evolution_2 => this._ex_skill_evolution_2;
+      public int ex_skill_evolution_2 => _ex_skill_evolution_2;
 
-      public ObscuredInt ex_skill_3 => this._ex_skill_3;
+      public int ex_skill_3 => _ex_skill_3;
 
-      public ObscuredInt ex_skill_evolution_3 => this._ex_skill_evolution_3;
+      public int ex_skill_evolution_3 => _ex_skill_evolution_3;
 
-      public ObscuredInt ex_skill_4 => this._ex_skill_4;
+      public int ex_skill_4 => _ex_skill_4;
 
-      public ObscuredInt ex_skill_evolution_4 => this._ex_skill_evolution_4;
+      public int ex_skill_evolution_4 => _ex_skill_evolution_4;
 
-      public ObscuredInt ex_skill_5 => this._ex_skill_5;
+      public int ex_skill_5 => _ex_skill_5;
 
-      public ObscuredInt ex_skill_evolution_5 => this._ex_skill_evolution_5;
+      public int ex_skill_evolution_5 => _ex_skill_evolution_5;
 
-      public ObscuredInt sp_skill_1 => this._sp_skill_1;
+      public int sp_skill_1 => _sp_skill_1;
 
-      public ObscuredInt sp_skill_2 => this._sp_skill_2;
+      public int sp_skill_2 => _sp_skill_2;
 
-      public ObscuredInt sp_skill_3 => this._sp_skill_3;
+      public int sp_skill_3 => _sp_skill_3;
 
-      public ObscuredInt sp_skill_4 => this._sp_skill_4;
+      public int sp_skill_4 => _sp_skill_4;
 
-      public ObscuredInt sp_skill_5 => this._sp_skill_5;
+      public int sp_skill_5 => _sp_skill_5;
 
-      public ObscuredInt union_burst_evolution => this._union_burst_evolution;
+      public int union_burst_evolution => _union_burst_evolution;
 
-      public ObscuredInt main_skill_evolution_1 => this._main_skill_evolution_1;
+      public int main_skill_evolution_1 => _main_skill_evolution_1;
 
-      public ObscuredInt main_skill_evolution_2 => this._main_skill_evolution_2;
+      public int main_skill_evolution_2 => _main_skill_evolution_2;
 
-      public ObscuredInt sp_skill_evolution_1 => this._sp_skill_evolution_1;
+      public int sp_skill_evolution_1 => _sp_skill_evolution_1;
 
-      public ObscuredInt sp_skill_evolution_2 => this._sp_skill_evolution_2;
+      public int sp_skill_evolution_2 => _sp_skill_evolution_2;
 
       public UnitSkillData(
         int unit_id = 0,
@@ -292,39 +292,39 @@ namespace Elements
         int sp_skill_evolution_1 = 0,
         int sp_skill_evolution_2 = 0)
       {
-        this._unit_id = (ObscuredInt) unit_id;
-        this._union_burst = (ObscuredInt) union_burst;
-        this._main_skill_1 = (ObscuredInt) main_skill_1;
-        this._main_skill_2 = (ObscuredInt) main_skill_2;
-        this._main_skill_3 = (ObscuredInt) main_skill_3;
-        this._main_skill_4 = (ObscuredInt) main_skill_4;
-        this._main_skill_5 = (ObscuredInt) main_skill_5;
-        this._main_skill_6 = (ObscuredInt) main_skill_6;
-        this._main_skill_7 = (ObscuredInt) main_skill_7;
-        this._main_skill_8 = (ObscuredInt) main_skill_8;
-        this._main_skill_9 = (ObscuredInt) main_skill_9;
-        this._main_skill_10 = (ObscuredInt) main_skill_10;
-        this._ex_skill_1 = (ObscuredInt) ex_skill_1;
-        this._ex_skill_evolution_1 = (ObscuredInt) ex_skill_evolution_1;
-        this._ex_skill_2 = (ObscuredInt) ex_skill_2;
-        this._ex_skill_evolution_2 = (ObscuredInt) ex_skill_evolution_2;
-        this._ex_skill_3 = (ObscuredInt) ex_skill_3;
-        this._ex_skill_evolution_3 = (ObscuredInt) ex_skill_evolution_3;
-        this._ex_skill_4 = (ObscuredInt) ex_skill_4;
-        this._ex_skill_evolution_4 = (ObscuredInt) ex_skill_evolution_4;
-        this._ex_skill_5 = (ObscuredInt) ex_skill_5;
-        this._ex_skill_evolution_5 = (ObscuredInt) ex_skill_evolution_5;
-        this._sp_skill_1 = (ObscuredInt) sp_skill_1;
-        this._sp_skill_2 = (ObscuredInt) sp_skill_2;
-        this._sp_skill_3 = (ObscuredInt) sp_skill_3;
-        this._sp_skill_4 = (ObscuredInt) sp_skill_4;
-        this._sp_skill_5 = (ObscuredInt) sp_skill_5;
-        this._union_burst_evolution = (ObscuredInt) union_burst_evolution;
-        this._main_skill_evolution_1 = (ObscuredInt) main_skill_evolution_1;
-        this._main_skill_evolution_2 = (ObscuredInt) main_skill_evolution_2;
-        this._sp_skill_evolution_1 = (ObscuredInt) sp_skill_evolution_1;
-        this._sp_skill_evolution_2 = (ObscuredInt) sp_skill_evolution_2;
-        this.SetUp();
+        _unit_id = unit_id;
+        _union_burst = union_burst;
+        _main_skill_1 = main_skill_1;
+        _main_skill_2 = main_skill_2;
+        _main_skill_3 = main_skill_3;
+        _main_skill_4 = main_skill_4;
+        _main_skill_5 = main_skill_5;
+        _main_skill_6 = main_skill_6;
+        _main_skill_7 = main_skill_7;
+        _main_skill_8 = main_skill_8;
+        _main_skill_9 = main_skill_9;
+        _main_skill_10 = main_skill_10;
+        _ex_skill_1 = ex_skill_1;
+        _ex_skill_evolution_1 = ex_skill_evolution_1;
+        _ex_skill_2 = ex_skill_2;
+        _ex_skill_evolution_2 = ex_skill_evolution_2;
+        _ex_skill_3 = ex_skill_3;
+        _ex_skill_evolution_3 = ex_skill_evolution_3;
+        _ex_skill_4 = ex_skill_4;
+        _ex_skill_evolution_4 = ex_skill_evolution_4;
+        _ex_skill_5 = ex_skill_5;
+        _ex_skill_evolution_5 = ex_skill_evolution_5;
+        _sp_skill_1 = sp_skill_1;
+        _sp_skill_2 = sp_skill_2;
+        _sp_skill_3 = sp_skill_3;
+        _sp_skill_4 = sp_skill_4;
+        _sp_skill_5 = sp_skill_5;
+        _union_burst_evolution = union_burst_evolution;
+        _main_skill_evolution_1 = main_skill_evolution_1;
+        _main_skill_evolution_2 = main_skill_evolution_2;
+        _sp_skill_evolution_1 = sp_skill_evolution_1;
+        _sp_skill_evolution_2 = sp_skill_evolution_2;
+        SetUp();
       }
     }
   }

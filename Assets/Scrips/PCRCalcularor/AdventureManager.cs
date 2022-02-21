@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace PCRCaculator
 {
@@ -42,13 +41,13 @@ namespace PCRCaculator
                     JJCback.GetComponent<JJCManager>().Reflash();
                     break;
                 case 3:
-                    MainManager.Instance.WindowConfigMessage("是否切换到会战计算器？", SwitchScene, null);
+                    MainManager.Instance.WindowConfigMessage("是否切换到会战计算器？", SwitchScene);
                     break;
             }
         }
         public void SwitchScene()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GuildScene");
+            SceneManager.LoadScene("GuildScene");
         }
     }
 }

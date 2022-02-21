@@ -2,7 +2,7 @@ namespace Spine
 {
 	public class VertexAttachment : Attachment
 	{
-		private static int nextID = 0;
+		private static int nextID;
 
 		private static readonly object nextIdLock = new object();
 

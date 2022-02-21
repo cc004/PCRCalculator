@@ -1,9 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using SpringGUI;
 using UnityEngine;
 using UnityEngine.UI;
-using SpringGUI;
-
 
 namespace PCRCaculator.Guild
 {
@@ -41,7 +40,7 @@ namespace PCRCaculator.Guild
         private bool showTPLine;
         private List<GameObject> lineChatXPrefabList = new List<GameObject>();
         private List<ToEndAbnormalState> toEndAbnormalData = new List<ToEndAbnormalState>();
-        private int MaxHight = 0;
+        private int MaxHight;
 
         public void Initialize(string name, Color color)
         {
@@ -54,7 +53,7 @@ namespace PCRCaculator.Guild
         /// </summary>
         /// <param name="frameCount">帧数</param>
         /// <param name="stateInt">状态</param>
-        public void AddButtons(int frameCount, int endCount, int stateInt,System.Action action = null)
+        public void AddButtons(int frameCount, int endCount, int stateInt,Action action = null)
         {
             GameObject a = Instantiate(stateInt == 2 ? skillButtonPrefab_UB : skillButtonPrefab);
             a.transform.SetParent(prefabParent_A, false);
@@ -65,7 +64,7 @@ namespace PCRCaculator.Guild
             a.GetComponent<GuildCalcButton>().SetButton(stateColors[stateInt], stateNames[stateInt], frameCount,action);
             prefabs.Add(a);
         }
-        public void AddAbnormalStateButtons(UnitAbnormalStateChangeData changeData,System.Action action = null)
+        public void AddAbnormalStateButtons(UnitAbnormalStateChangeData changeData,Action action = null)
         {
             int i = 0;
             bool flag1 = false;
@@ -126,10 +125,8 @@ namespace PCRCaculator.Guild
                 rectTransform.sizeDelta = new Vector2(sizeX,sizeY);
                 return sizeY;
             }
-            else
-            {
-                return rectTransform.sizeDelta.y;
-            }
+
+            return rectTransform.sizeDelta.y;
         }
         public void SwitchPage(int idx)
         {
@@ -157,21 +154,21 @@ namespace PCRCaculator.Guild
         {
             if(showHPLine)
             {
-                lineChart.Replace<ValueChangeData>(0, hpValueList);
+                lineChart.Replace(0, hpValueList);
                 SetLineChatXpos(hpValueList);
             }
             else
             {
-                lineChart.Replace<ValueChangeData>(0, emptyList);
+                lineChart.Replace(0, emptyList);
             }
             if (showTPLine)
             {
-                lineChart.Replace<ValueChangeData>(1, tpValueList);
+                lineChart.Replace(1, tpValueList);
                 SetLineChatXpos(tpValueList);
             }
             else
             {
-                lineChart.Replace<ValueChangeData>(1, emptyList);
+                lineChart.Replace(1, emptyList);
             }
             
         }
@@ -203,8 +200,8 @@ namespace PCRCaculator.Guild
         {
             List<ValueChangeData> data1 = new List<ValueChangeData> { new ValueChangeData(0, 1), new ValueChangeData(1, 1) };
             List<ValueChangeData> data2 = new List<ValueChangeData> { new ValueChangeData(0, 0), new ValueChangeData(1, 0) };
-            lineChart.Inject<ValueChangeData>(data1);
-            lineChart.Inject<ValueChangeData>(data2);
+            lineChart.Inject(data1);
+            lineChart.Inject(data2);
             lineChart.ShowUnit();
         }
         private Color GetButtonColor(UnitAbnormalStateChangeData data)
@@ -213,10 +210,8 @@ namespace PCRCaculator.Guild
             {
                 return buffColors[data.BUFF_Type % buffColors.Count];
             }
-            else
-            {
-                return abnormalStateColors[(int)data.CurrentAbnormalState % abnormalStateColors.Count];
-            }
+
+            return abnormalStateColors[(int)data.CurrentAbnormalState % abnormalStateColors.Count];
         }
     }
     public class ToEndAbnormalState

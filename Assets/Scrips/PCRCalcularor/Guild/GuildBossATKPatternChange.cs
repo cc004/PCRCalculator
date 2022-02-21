@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
+
 namespace PCRCaculator.Guild
 {
     public class GuildBossATKPatternChange : MonoBehaviour
@@ -47,7 +47,7 @@ namespace PCRCaculator.Guild
             }
             catch
             {
-                MainManager.Instance.WindowConfigMessage("输入错误！", null, null);
+                MainManager.Instance.WindowConfigMessage("输入错误！", null);
             }
         }
         public void Reflash()
@@ -82,28 +82,25 @@ namespace PCRCaculator.Guild
                 }
                 return 0;
             }
-            else
-            {
-                switch (value)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 1;
-                    case 2:
-                        return 1001;
-                    case 3:
-                        return 1002;
-                    case 4:
-                        return 1003;
-                    case 5:
-                        return 1004;
-                    case 6:
-                        return 1005;
-                }
-                return 0;
 
+            switch (value)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    return 1;
+                case 2:
+                    return 1001;
+                case 3:
+                    return 1002;
+                case 4:
+                    return 1003;
+                case 5:
+                    return 1004;
+                case 6:
+                    return 1005;
             }
+            return 0;
         }
     }
 }

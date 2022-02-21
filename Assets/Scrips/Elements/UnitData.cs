@@ -16,9 +16,9 @@ namespace Elements.SpineConvert
 
     public UnitData(string[] _csvParam)
     {
-      this.UnitId = int.Parse(_csvParam[0]);
-      this.UnitName = _csvParam[1];
-      this.MotionType = int.Parse(_csvParam[6]);
+      UnitId = int.Parse(_csvParam[0]);
+      UnitName = _csvParam[1];
+      MotionType = int.Parse(_csvParam[6]);
     }
   }
 }

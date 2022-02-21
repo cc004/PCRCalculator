@@ -210,7 +210,7 @@ namespace Spine.Unity
 			{
 				if (reversed)
 				{
-					normalizedTime = 1f - normalizedTime + (float)(int)normalizedTime + (float)(int)normalizedTime;
+					normalizedTime = 1f - normalizedTime + (int)normalizedTime + (int)normalizedTime;
 				}
 				float num = normalizedTime * clipLength;
 				if (loop)
@@ -228,7 +228,7 @@ namespace Spine.Unity
 			{
 				if (reversed)
 				{
-					normalizedTime = 1f - normalizedTime + (float)(int)normalizedTime + (float)(int)normalizedTime;
+					normalizedTime = 1f - normalizedTime + (int)normalizedTime + (int)normalizedTime;
 				}
 				return normalizedTime * clipLength;
 			}
@@ -331,19 +331,19 @@ namespace Spine.Unity
 			if (valid)
 			{
 				translator.Apply(skeleton);
-				if (this._UpdateLocal != null)
+				if (_UpdateLocal != null)
 				{
-					this._UpdateLocal(this);
+					_UpdateLocal(this);
 				}
 				skeleton.UpdateWorldTransform();
-				if (this._UpdateWorld != null)
+				if (_UpdateWorld != null)
 				{
-					this._UpdateWorld(this);
+					_UpdateWorld(this);
 					skeleton.UpdateWorldTransform();
 				}
-				if (this._UpdateComplete != null)
+				if (_UpdateComplete != null)
 				{
-					this._UpdateComplete(this);
+					_UpdateComplete(this);
 				}
 			}
 		}

@@ -25,19 +25,19 @@ namespace Spine.Unity.Modules
 
 		private void Start()
 		{
-			shadowRoot = Object.Instantiate(base.gameObject);
-			Object.Destroy(shadowRoot.GetComponent<SkeletonUtilityKinematicShadow>());
+			shadowRoot = Instantiate(gameObject);
+			Destroy(shadowRoot.GetComponent<SkeletonUtilityKinematicShadow>());
 			Transform transform = shadowRoot.transform;
-			transform.position = base.transform.position;
-			transform.rotation = base.transform.rotation;
-			Vector3 b = base.transform.TransformPoint(Vector3.right);
-			float num = Vector3.Distance(base.transform.position, b);
+			transform.position = this.transform.position;
+			transform.rotation = this.transform.rotation;
+			Vector3 b = this.transform.TransformPoint(Vector3.right);
+			float num = Vector3.Distance(this.transform.position, b);
 			transform.localScale = Vector3.one;
 			if (!detachedShadow)
 			{
 				if (parent == null)
 				{
-					transform.parent = base.transform.root;
+					transform.parent = this.transform.root;
 				}
 				else
 				{
@@ -58,7 +58,7 @@ namespace Spine.Unity.Modules
 			SkeletonUtilityBone[] array = componentsInChildren2;
 			foreach (SkeletonUtilityBone skeletonUtilityBone in array)
 			{
-				if (skeletonUtilityBone.gameObject == base.gameObject)
+				if (skeletonUtilityBone.gameObject == gameObject)
 				{
 					continue;
 				}
@@ -91,15 +91,15 @@ namespace Spine.Unity.Modules
 			int i = 0;
 			for (int num = components.Length; i < num; i++)
 			{
-				Object.Destroy(components[i]);
+				Destroy(components[i]);
 			}
 		}
 
 		private void FixedUpdate()
 		{
 			Rigidbody component = shadowRoot.GetComponent<Rigidbody>();
-			component.MovePosition(base.transform.position);
-			component.MoveRotation(base.transform.rotation);
+			component.MovePosition(transform.position);
+			component.MoveRotation(transform.rotation);
 			int i = 0;
 			for (int count = shadowTable.Count; i < count; i++)
 			{

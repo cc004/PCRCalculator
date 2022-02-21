@@ -13,7 +13,7 @@ namespace Spine.Unity
 		public bool initializeOnAwake = true;
 
 		[SerializeField]
-		[SpineBone("", "skeletonGraphic", true)]
+		[SpineBone("", "skeletonGraphic")]
 		public string boneName;
 
 		public bool followBoneRotation = true;
@@ -75,7 +75,7 @@ namespace Spine.Unity
 			if (valid)
 			{
 				skeletonTransform = skeletonGraphic.transform;
-				skeletonTransformIsParent = (object)skeletonTransform == base.transform.parent;
+				skeletonTransformIsParent = (object)skeletonTransform == transform.parent;
 				if (!string.IsNullOrEmpty(boneName))
 				{
 					bone = skeletonGraphic.Skeleton.FindBone(boneName);
@@ -102,7 +102,7 @@ namespace Spine.Unity
 					return;
 				}
 			}
-			RectTransform rectTransform = base.transform as RectTransform;
+			RectTransform rectTransform = transform as RectTransform;
 			if (rectTransform == null)
 			{
 				return;

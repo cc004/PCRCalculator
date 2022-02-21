@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 namespace PCRCaculator.Battle
 {
@@ -23,7 +23,7 @@ namespace PCRCaculator.Battle
 
         public void Init(int[] skilllist,int skillEV1,int skillEV2)
         {
-            System.Action<int> action = (a) =>
+            Action<int> action = a =>
             {
                 //string path = "skills/icon_skill_" + MainManager.Instance.SkillDataDic[a].icon;
                 //Sprite im = MainManager.LoadSourceSprite(path);

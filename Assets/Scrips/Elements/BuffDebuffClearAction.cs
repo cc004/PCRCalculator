@@ -4,8 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -29,11 +30,11 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      bool flag = (double) BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 18, BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))) >= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) && this.ActionDetail1 == 1;
-      if ((double) BattleManager.Random(0.0f, 1f,
-          new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 18, Value[eValueNumber.VALUE_1] / 100.0f)) > (double) _valueDictionary[eValueNumber.VALUE_1] / 100.0 | flag && (double) this.Value[eValueNumber.VALUE_3] == 0.0)
+      bool flag = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 18, BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))) >= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) && ActionDetail1 == 1;
+      if (BattleManager.Random(0.0f, 1f,
+              new RandomData(_source, _target.Owner, ActionId, 18, Value[eValueNumber.VALUE_1] / 100.0f)) > (double) _valueDictionary[eValueNumber.VALUE_1] / 100.0 | flag && (double) Value[eValueNumber.VALUE_3] == 0.0)
       {
-        ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+        ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
         if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
           return;
         if (actionExecedData.TargetPartsNumber == 1)
@@ -43,14 +44,14 @@ namespace Elements
       }
       else
       {
-        this.AppendIsAlreadyExeced(_target.Owner, _num);
-        switch ((BuffDebuffClearAction.eDetail1Type) this.ActionDetail1)
+        AppendIsAlreadyExeced(_target.Owner, _num);
+        switch ((eDetail1Type) ActionDetail1)
         {
-          case BuffDebuffClearAction.eDetail1Type.BUFF:
-            _target.Owner.DespeleBuffDebuff(true, this.CreateAbnormalEffectData());
+          case eDetail1Type.BUFF:
+            _target.Owner.DespeleBuffDebuff(true, CreateAbnormalEffectData());
             break;
-          case BuffDebuffClearAction.eDetail1Type.DEBUFF:
-            _target.Owner.DespeleBuffDebuff(false, this.CreateAbnormalEffectData());
+          case eDetail1Type.DEBUFF:
+            _target.Owner.DespeleBuffDebuff(false, CreateAbnormalEffectData());
             break;
         }
       }
@@ -59,7 +60,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
     }
 
     private enum eDetail1Type

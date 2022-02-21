@@ -24,7 +24,7 @@ namespace Spine.Unity
 		public bool initialFlipY;
 
 		[FormerlySerializedAs("submeshSeparators")]
-		[SpineSlot("", "", false, true)]
+		[SpineSlot]
 		public string[] separatorSlotNames = new string[0];
 
 		[NonSerialized]
@@ -108,7 +108,7 @@ namespace Spine.Unity
 			add
 			{
 				generateMeshOverride += value;
-				if (disableRenderingOnOverride && this.generateMeshOverride != null)
+				if (disableRenderingOnOverride && generateMeshOverride != null)
 				{
 					Initialize(overwrite: false);
 					meshRenderer.enabled = false;
@@ -117,7 +117,7 @@ namespace Spine.Unity
 			remove
 			{
 				generateMeshOverride -= value;
-				if (disableRenderingOnOverride && this.generateMeshOverride == null)
+				if (disableRenderingOnOverride && generateMeshOverride == null)
 				{
 					Initialize(overwrite: false);
 					meshRenderer.enabled = true;
@@ -173,7 +173,7 @@ namespace Spine.Unity
 			{
 				for (int i = 0; i < copyMaterials.Length; i++)
 				{
-					UnityEngine.Object.Destroy(copyMaterials[i]);
+					Destroy(copyMaterials[i]);
 				}
 			}
 		}
@@ -235,9 +235,9 @@ namespace Spine.Unity
 					separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 				}
 				LateUpdate();
-				if (this.OnRebuild != null)
+				if (OnRebuild != null)
 				{
-					this.OnRebuild(this);
+					OnRebuild(this);
 				}
 			}
 		}
@@ -248,7 +248,7 @@ namespace Spine.Unity
 			{
 				return;
 			}
-			bool flag = this.generateMeshOverride != null;
+			bool flag = generateMeshOverride != null;
 			if (!meshRenderer.enabled && !flag)
 			{
 				return;
@@ -294,7 +294,7 @@ namespace Spine.Unity
 				}
 				if (flag)
 				{
-					this.generateMeshOverride(skeletonRendererInstruction);
+					generateMeshOverride(skeletonRendererInstruction);
 					if (disableRenderingOnOverride)
 					{
 						return;
@@ -320,9 +320,9 @@ namespace Spine.Unity
 					meshGenerator.BuildMeshWithArrays(skeletonRendererInstruction, flag2);
 				}
 			}
-			if (this.OnPostProcessVertices != null)
+			if (OnPostProcessVertices != null)
 			{
-				this.OnPostProcessVertices(meshGenerator.Buffers);
+				OnPostProcessVertices(meshGenerator.Buffers);
 			}
 			Mesh mesh = nextMesh.mesh;
 			meshGenerator.FillVertexData(mesh);

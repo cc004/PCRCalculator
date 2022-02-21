@@ -4,8 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -29,8 +30,8 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
-                        double randomNum = (double)BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 5, (float)judgeNum));
+            double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
+                        double randomNum = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 5, (float)judgeNum));
 
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, eActionType.BLIND, BattleHeaderController.CurrentFrameCount, out float fix))
             {
@@ -38,12 +39,12 @@ namespace Elements
             }
             if (randomNum <=judgeNum)
             {
-                this.AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, (ActionParameter)this, _skill, (float)this.ActionDetail1);
+                AppendIsAlreadyExeced(_target.Owner, _num);
+                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, ActionDetail1);
             }
             else
             {
-                ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+                ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
                 if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
                     return;
                 if (actionExecedData.TargetPartsNumber == 1)
@@ -56,8 +57,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
-            this.Value[eValueNumber.VALUE_3] = (float)((double)this.MasterData.action_value_3 + (double)this.MasterData.action_value_4 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+            Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
     }
 }

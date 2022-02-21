@@ -28,14 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 //using UnityEngine.Playables;
-
-using Spine;
-using Spine.Unity;
-using Spine.Unity.Playables;
 
 namespace Spine.Unity.Playables {
 
@@ -47,7 +41,7 @@ namespace Spine.Unity.Playables {
 
 		#if UNITY_EDITOR
 		void OnValidate () {
-			if (this.skeletonAnimation == null)
+			if (skeletonAnimation == null)
 				skeletonAnimation = GetComponent<SkeletonAnimation>();
 		}
 		#endif

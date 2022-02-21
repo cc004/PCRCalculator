@@ -13,7 +13,7 @@ namespace Spine.Unity
 		protected virtual void OnEnable()
 		{
 			utilBone = GetComponent<SkeletonUtilityBone>();
-			skeletonUtility = base.transform.GetComponentInParent<SkeletonUtility>();
+			skeletonUtility = transform.GetComponentInParent<SkeletonUtility>();
 			skeletonUtility.RegisterConstraint(this);
 		}
 

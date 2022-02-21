@@ -4,6 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using PCRCaculator;
+
 namespace Elements
 {
     public class UnitParameter
@@ -17,12 +19,12 @@ namespace Elements
         public MasterUnitData.UnitData MasterData { get; set; }
 
         public MasterUnitSkillData.UnitSkillData SkillData { get; set; }
-        public PCRCaculator.EnemyData EnemyData { get; set; }
+        public EnemyData EnemyData { get; set; }
 
         public int EnemyColor
         {
-            get => this._enemyColor;
-            set => this._enemyColor = value;
+            get => _enemyColor;
+            set => _enemyColor = value;
         }
 
         public UnitParameter()
@@ -31,13 +33,13 @@ namespace Elements
 
         public UnitParameter(UnitData _unitData)
         {
-            this.UniqueData = _unitData;
+            UniqueData = _unitData;
             //if (ManagerSingleton<MasterDataManager>.Instance.masterUnitData == null)
             //  return;
             //this.SetMasterData();
         }
 
-        public UnitParameter(UnitData uniqueData, UnitDataForView uniqueDataForView, MasterUnitData.UnitData masterData, MasterUnitSkillData.UnitSkillData skillData,PCRCaculator.EnemyData enemyData=null) : this(uniqueData)
+        public UnitParameter(UnitData uniqueData, UnitDataForView uniqueDataForView, MasterUnitData.UnitData masterData, MasterUnitSkillData.UnitSkillData skillData,EnemyData enemyData=null) : this(uniqueData)
         {
             UniqueDataForView = uniqueDataForView;
             MasterData = masterData;

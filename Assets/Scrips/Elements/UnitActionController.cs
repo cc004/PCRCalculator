@@ -4,14 +4,16 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
-using Spine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cute;
+using Elements.Battle;
 using PCRCaculator;
+using PCRCaculator.Battle;
+using PCRCaculator.Guild;
+using Spine;
 using UnityEngine;
 
 namespace Elements
@@ -40,9 +42,9 @@ namespace Elements
         private const int LOOP_MOTION_NUMBER = 1;
         private const int FIRST_TARGET_INDEX = 0;
 
-        public bool GetIsSkillPrincessForm(int _skillId) => this.skillDictionary[_skillId].IsPrincessForm;
+        public bool GetIsSkillPrincessForm(int _skillId) => skillDictionary[_skillId].IsPrincessForm;
 
-        public List<PrincessSkillMovieData> GetPrincessFormMovieData(int _skillId) => this.skillDictionary[_skillId].PrincessSkillMovieDataList;
+        public List<PrincessSkillMovieData> GetPrincessFormMovieData(int _skillId) => skillDictionary[_skillId].PrincessSkillMovieDataList;
 
         public UnitCtrl Owner { get; set; }
 
@@ -64,33 +66,33 @@ namespace Elements
 
         private bool updateBranchMotionRunning { get; set; }
 
-        private BattleManagerForActionController battleManager => UnitActionController.staticBattleManager;
+        private BattleManagerForActionController battleManager => staticBattleManager;
 
         //private BMIOELFOCPE battleCameraEffect => UnitActionController.staticBattleCameraEffect;
 
-        private BattleEffectPoolInterface battleEffectPool => UnitActionController.staticBattleEffectPool;
+        private BattleEffectPoolInterface battleEffectPool => staticBattleEffectPool;
 
         //private JFJNEHKINFI battleTimeScale => UnitActionController.staticBattleTimeScale;
 
         public static void StaticRelease()
         {
             //UnitActionController.staticSingletonTree = (Yggdrasil<UnitActionController>) null;
-            UnitActionController.staticBattleManager = (BattleManagerForActionController)null;
+            staticBattleManager = null;
             //UnitActionController.staticBattleCameraEffect = (BMIOELFOCPE) null;
-            UnitActionController.staticBattleEffectPool = (BattleEffectPoolInterface)null;
+            staticBattleEffectPool = null;
             //UnitActionController.staticBattleTimeScale = (JFJNEHKINFI) null;
         }
 
         private void OnDestroy()
         {
-            this.AttackDetail = (ActionParameterOnPrefabDetail)null;
-            this.Attack = (Skill)null;
-            this.UnionBurstList = (List<Skill>)null;
-            this.MainSkillList = (List<Skill>)null;
-            this.SpecialSkillList = (List<Skill>)null;
-            this.SpecialSkillEvolutionList = (List<Skill>)null;
-            this.Owner = (UnitCtrl)null;
-            this.skillDictionary = (Dictionary<int, Skill>)null;
+            AttackDetail = null;
+            Attack = null;
+            UnionBurstList = null;
+            MainSkillList = null;
+            SpecialSkillList = null;
+            SpecialSkillEvolutionList = null;
+            Owner = null;
+            skillDictionary = null;
         }
 
         public void Initialize(
@@ -111,25 +113,25 @@ namespace Elements
             staticBattleManager = BattleManager.Instance;
             staticBattleEffectPool = BattleManager.Instance.battleEffectPool;
 
-            this.Owner = _owner;
-            this.transform = _owner.transform;
+            Owner = _owner;
+            transform = _owner.transform;
             //MyGameCtrl.ResetSkillEffects(this);
-            this.skillDictionary = new Dictionary<int, Skill>();
-            this.Attack.AnimId = eSpineCharacterAnimeId.ATTACK;
-            this.Attack.WeaponType = _initializeAttackOnly ? _seOwner.WeaponSeType : this.Owner.WeaponSeType;
-            this.Attack.skillAreaWidth = this.Owner.SearchAreaSize;
-            this.Attack.SkillId = 1;
-            this.Attack.SkillName = "普攻";
+            skillDictionary = new Dictionary<int, Skill>();
+            Attack.AnimId = eSpineCharacterAnimeId.ATTACK;
+            Attack.WeaponType = _initializeAttackOnly ? _seOwner.WeaponSeType : Owner.WeaponSeType;
+            Attack.skillAreaWidth = Owner.SearchAreaSize;
+            Attack.SkillId = 1;
+            Attack.SkillName = "普攻";
             AttackAction attackAction = new AttackAction();
             attackAction.Initialize();
             attackAction.TargetAssignment = eTargetAssignment.OTHER_SIDE;
             attackAction.TargetSort = PriorityPattern.NEAR;
             attackAction.TargetNth = 0;
             attackAction.TargetNum = 1;
-            attackAction.TargetWidth = this.Owner.SearchAreaSize;
+            attackAction.TargetWidth = Owner.SearchAreaSize;
             attackAction.Direction = DirectionType.FRONT;
             attackAction.ActionType = eActionType.ATTACK;
-            attackAction.Value = new Dictionary<eValueNumber, FloatWithEx>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer())
+            attackAction.Value = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer())
       {
         {
           eValueNumber.VALUE_1,
@@ -142,11 +144,11 @@ namespace Elements
       };
             attackAction.ActionDetail1 = _owner.AtkType;
             float num = 0.0f;
-            if (this.UseDefaultDelay && BattleDefine.WEAPON_HIT_DELAY_DIC.TryGetValue(_initializeAttackOnly ? _seOwner.WeaponMotionType : this.Owner.WeaponMotionType, out num))
+            if (UseDefaultDelay && BattleDefine.WEAPON_HIT_DELAY_DIC.TryGetValue(_initializeAttackOnly ? _seOwner.WeaponMotionType : Owner.WeaponMotionType, out num))
             {
-                attackAction.ActionExecTimeList = new List<ActionExecTime>()
-        {
-          new ActionExecTime()
+                attackAction.ActionExecTimeList = new List<ActionExecTime>
+                {
+          new ActionExecTime
           {
             Weight = 1f,
             DamageNumType = eDamageEffectType.NORMAL
@@ -157,8 +159,8 @@ namespace Elements
             }
             else
             {
-                ActionParameterOnPrefabDetail attackDetail = this.AttackDetail;
-                attackDetail.ExecTime = new List<ActionExecTime>((IEnumerable<ActionExecTime>)attackDetail.ExecTimeForPrefab);
+                ActionParameterOnPrefabDetail attackDetail = AttackDetail;
+                attackDetail.ExecTime = new List<ActionExecTime>(attackDetail.ExecTimeForPrefab);
                 int index1 = 0;
                 for (int count = attackDetail.ExecTimeCombo.Count; index1 < count; ++index1)
                 {
@@ -168,23 +170,23 @@ namespace Elements
                         switch (actionExecTimeCombo.InterporationType)
                         {
                             case eComboInterporationType.LINEAR:
-                                attackDetail.ExecTime.Add(new ActionExecTime()
+                                attackDetail.ExecTime.Add(new ActionExecTime
                                 {
-                                    Time = actionExecTimeCombo.StartTime + (float)index2 * actionExecTimeCombo.OffsetTime,
+                                    Time = actionExecTimeCombo.StartTime + index2 * actionExecTimeCombo.OffsetTime,
                                     DamageNumType = eDamageEffectType.COMBO
                                 });
                                 break;
                             case eComboInterporationType.CURVE:
-                                attackDetail.ExecTime.Add(new ActionExecTime()
+                                attackDetail.ExecTime.Add(new ActionExecTime
                                 {
-                                    Time = actionExecTimeCombo.StartTime + actionExecTimeCombo.Curve.Evaluate((float)index2 / (float)actionExecTimeCombo.Count) * (float)actionExecTimeCombo.Count * actionExecTimeCombo.OffsetTime,
+                                    Time = actionExecTimeCombo.StartTime + actionExecTimeCombo.Curve.Evaluate(index2 / (float)actionExecTimeCombo.Count) * actionExecTimeCombo.Count * actionExecTimeCombo.OffsetTime,
                                     DamageNumType = eDamageEffectType.COMBO
                                 });
                                 break;
                         }
                     }
                 }
-                attackDetail.ExecTime.Sort((Comparison<ActionExecTime>)((a, b) => a.Time.CompareTo(b.Time)));
+                attackDetail.ExecTime.Sort((a, b) => a.Time.CompareTo(b.Time));
                 attackAction.ActionExecTimeList = attackDetail.ExecTime;
                 attackAction.ExecTime = new float[attackDetail.ExecTime.Count];
                 for (int index2 = 0; index2 < attackDetail.ExecTime.Count; ++index2)
@@ -196,25 +198,25 @@ namespace Elements
             attackAction.ActionChildrenIndexes = new List<int>();
             attackAction.ActionId = UnitUtility.GetCharaId(_owner.UnitId) * 10000;
             attackAction.TargetList = new List<BasePartsData>();
-            this.Attack.ActionParameters = new List<ActionParameter>();
-            this.Attack.ActionParameters.Add((ActionParameter)attackAction);
-            this.skillDictionary.Add(1, this.Attack);
-            this.dependActionSolve(this.Attack);
-            this.execActionOnStart(this.Attack);
+            Attack.ActionParameters = new List<ActionParameter>();
+            Attack.ActionParameters.Add(attackAction);
+            skillDictionary.Add(1, Attack);
+            dependActionSolve(Attack);
+            execActionOnStart(Attack);
             if (_initializeAttackOnly)
                 return;
             MasterUnitSkillData.UnitSkillData skillData = _unitParameter.SkillData;
-            if (this.UnionBurstList.Count != 0)
+            if (UnionBurstList.Count != 0)
             {
                 List<int> unionBurstIds = skillData.UnionBurstIds;
-                this.skillDictionary.Add(unionBurstIds[0], this.UnionBurstList[0]);
-                this.isUnionBurstOnlyOwner = (uint)unionBurstIds[0] > 0U;
-                this.UnionBurstList[0].SkillNum = 0;
+                skillDictionary.Add(unionBurstIds[0], UnionBurstList[0]);
+                isUnionBurstOnlyOwner = (uint)unionBurstIds[0] > 0U;
+                UnionBurstList[0].SkillNum = 0;
             }
-            if (this.UnionBurstEvolutionList.Count != 0)
+            if (UnionBurstEvolutionList.Count != 0)
             {
-                this.skillDictionary.Add(skillData.UnionBurstEvolutionIds[0], this.UnionBurstEvolutionList[0]);
-                this.UnionBurstEvolutionList[0].SkillNum = 0;
+                skillDictionary.Add(skillData.UnionBurstEvolutionIds[0], UnionBurstEvolutionList[0]);
+                UnionBurstEvolutionList[0].SkillNum = 0;
             }
             List<int> mainSkillIds = skillData.MainSkillIds;
             int index3 = 0;
@@ -224,8 +226,8 @@ namespace Elements
                 {
                     if (MainSkillList.Count > index3)
                     {
-                        this.MainSkillList[index3].SkillNum = index3 + 1;
-                        this.skillDictionary.Add(mainSkillIds[index3], this.MainSkillList[index3]);
+                        MainSkillList[index3].SkillNum = index3 + 1;
+                        skillDictionary.Add(mainSkillIds[index3], MainSkillList[index3]);
                     }
                     else if (index3 == MainSkillList.Count)
                     {
@@ -240,17 +242,17 @@ namespace Elements
             {
                 if (skillEvolutionIds1[index1] != 0 && index1 < MainSkillEvolutionList.Count)
                 {
-                    this.MainSkillEvolutionList[index1].SkillNum = index1 + 1;
-                    this.skillDictionary.Add(skillEvolutionIds1[index1], this.MainSkillEvolutionList[index1]);
+                    MainSkillEvolutionList[index1].SkillNum = index1 + 1;
+                    skillDictionary.Add(skillEvolutionIds1[index1], MainSkillEvolutionList[index1]);
                 }
             }
             List<int> spSkillIds = skillData.SpSkillIds;
             int index4 = 0;
             for (int count = spSkillIds.Count; index4 < count && spSkillIds[index4] != 0; ++index4)
             {
-                this.SpecialSkillList[index4].SkillNum = index4 + 1;
-                this.skillDictionary.Add(spSkillIds[index4], this.SpecialSkillList[index4]);
-                this.Owner.SkillLevels[spSkillIds[index4]] = (int)this.Owner.Level;
+                SpecialSkillList[index4].SkillNum = index4 + 1;
+                skillDictionary.Add(spSkillIds[index4], SpecialSkillList[index4]);
+                Owner.SkillLevels[spSkillIds[index4]] = Owner.Level;
             }
             List<int> skillEvolutionIds2 = skillData.SpSkillEvolutionIds;
             for (int index1 = 0; index1 < skillEvolutionIds2.Count; ++index1)
@@ -258,14 +260,14 @@ namespace Elements
                 int key = skillEvolutionIds2[index1];
                 if (key != 0)
                 {
-                    this.SpecialSkillEvolutionList[index1].SkillNum = index1 + 1;
-                    this.skillDictionary.Add(key, this.SpecialSkillEvolutionList[index1]);
-                    this.Owner.SkillLevels[key] = (int)this.Owner.Level;
+                    SpecialSkillEvolutionList[index1].SkillNum = index1 + 1;
+                    skillDictionary.Add(key, SpecialSkillEvolutionList[index1]);
+                    Owner.SkillLevels[key] = Owner.Level;
                 }
                 else
                     break;
             }
-            foreach (KeyValuePair<int, Skill> skill in this.skillDictionary)
+            foreach (KeyValuePair<int, Skill> skill in skillDictionary)
             {
                 Skill _skill = skill.Value;
                 int key = skill.Key;
@@ -275,31 +277,30 @@ namespace Elements
                     case 1:
                         continue;
                     default:
-                        if (this.Owner.SkillLevels[key] != 0)
+                        if (Owner.SkillLevels[key] != 0)
                         {
-                            PCRCaculator.SkillData data = PCRCaculator.MainManager.Instance.SkillDataDic[key];
+                            SkillData data = MainManager.Instance.SkillDataDic[key];
                             MasterSkillData.SkillData _skillParameter = new MasterSkillData.SkillData(data);
-                            this.setSkillParameter(_skill, _skillParameter);
-                            _skill.SetLevel(this.Owner.SkillLevels[key]);
-                            continue;
+                            setSkillParameter(_skill, _skillParameter);
+                            _skill.SetLevel(Owner.SkillLevels[key]);
                         }
                         continue;
                 }
             }
-            if (this.UnionBurstList.Count != 0)
-                this.setCutInSkipTimeForPrincessForm(skillData.UnionBurstIds[0]);
-            if (this.UnionBurstEvolutionList.Count == 0)
+            if (UnionBurstList.Count != 0)
+                setCutInSkipTimeForPrincessForm(skillData.UnionBurstIds[0]);
+            if (UnionBurstEvolutionList.Count == 0)
                 return;
-            this.setCutInSkipTimeForPrincessForm(skillData.UnionBurstEvolutionIds[0]);
+            setCutInSkipTimeForPrincessForm(skillData.UnionBurstEvolutionIds[0]);
         }
 
         private void setSkillParameter(Skill _skill, MasterSkillData.SkillData _skillParameter)
         {
-            Dictionary<eActionType, int> actionCounter = new Dictionary<eActionType, int>((IEqualityComparer<eActionType>)new eActionType_DictComparer());
+            Dictionary<eActionType, int> actionCounter = new Dictionary<eActionType, int>(new eActionType_DictComparer());
             _skill.ActionParameters = new List<ActionParameter>();
             if (_skillParameter == null)
                 return;
-            if (_skillParameter.SkillId == this.Owner.UnionBurstSkillId)
+            if (_skillParameter.SkillId == Owner.UnionBurstSkillId)
             {
                 //eUbResponceVoiceType responceVoiceType = eUbResponceVoiceType.APPLOUD;
                 //if (!SkillDefine.UbResponceVoiceDictionary.TryGetValue((int) _skillParameter.icon_type, out responceVoiceType))
@@ -307,23 +308,23 @@ namespace Elements
                 //this.Owner.UbResponceVoiceType = responceVoiceType;
             }
             _skill.SkillId = _skillParameter.SkillId;
-            _skill.skillAreaWidth = (int)_skillParameter.skill_area_width == 0 ? this.Owner.SearchAreaSize : (float)(int)_skillParameter.skill_area_width;
+            _skill.skillAreaWidth = _skillParameter.skill_area_width == 0 ? Owner.SearchAreaSize : _skillParameter.skill_area_width;
             for (int index = 0; index < _skillParameter.ActionDataList.Count; ++index)
             {
                 MasterSkillAction.SkillAction actionData = _skillParameter.ActionDataList[index];
-                this.createActionValue(_skillParameter, actionData, _skill, actionCounter);
+                createActionValue(_skillParameter, actionData, _skill, actionCounter);
             }
             _skill.CastTime = (float)(double)_skillParameter.skill_cast_time;
             _skill.SkillName = _skillParameter.Name;
             //add scripts
-            if (PCRCaculator.MainManager.Instance.SkillNameAndDescribe_cn.TryGetValue(_skill.SkillId, out string[] names))
+            if (MainManager.Instance.SkillNameAndDescribe_cn.TryGetValue(_skill.SkillId, out string[] names))
             {
                 _skill.SkillName = names[0];
             }
             switch (_skill.SkillMotionType)
             {
                 case SkillMotionType.DEFAULT:
-                    _skill.AnimId = this.Owner.animeIdDictionary[_skill.SkillId];
+                    _skill.AnimId = Owner.animeIdDictionary[_skill.SkillId];
                     break;
                 case SkillMotionType.AWAKE:
                     _skill.AnimId = eSpineCharacterAnimeId.AWAKE;
@@ -338,8 +339,8 @@ namespace Elements
                     _skill.AnimId = eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION;
                     break;
             }
-            this.dependActionSolve(_skill);
-            this.initializeAction(_skill);
+            dependActionSolve(_skill);
+            initializeAction(_skill);
             /*foreach (NormalSkillEffect skillEffect in _skill.SkillEffects)
             {
                 if (!((UnityEngine.Object)skillEffect.PrefabLeft == (UnityEngine.Object)null) && !((UnityEngine.Object)skillEffect.Prefab == (UnityEngine.Object)null) && (bool)(UnityEngine.Object)skillEffect.PrefabLeft.GetComponentInChildren<MeshRenderer>())
@@ -380,7 +381,7 @@ namespace Elements
             for (int count1 = skill.ActionParameters.Count; index3 < count1; ++index3)
             {
                 ActionParameter actionParameter = skill.ActionParameters[index3];
-                skill.HasParentIndexes = skill.HasParentIndexes.Union<int>((IEnumerable<int>)actionParameter.ActionChildrenIndexes).ToList<int>();
+                skill.HasParentIndexes = skill.HasParentIndexes.Union(actionParameter.ActionChildrenIndexes).ToList();
                 if (actionParameter.ActionType == eActionType.REFLEXIVE)
                 {
                     int index1 = 0;
@@ -388,7 +389,7 @@ namespace Elements
                         skill.ActionParameters[actionParameter.ActionChildrenIndexes[index1]].ReferencedByReflection = true;
                 }
             }
-            this.UpdateEffectRunTimeData(skill, skill.SkillEffects);
+            UpdateEffectRunTimeData(skill, skill.SkillEffects);
         }
 
         public void UpdateEffectRunTimeData(
@@ -406,10 +407,10 @@ namespace Elements
             for (int count = _skillList.Count; index1 < count; ++index1)
             {
                 NormalSkillEffect effect = _skillList[index1];
-                effect.TargetAction = _skill.ActionParameters.Find((Predicate<ActionParameter>)(e => e.ActionId == effect.TargetActionId || (e.ActionId - 1000) == effect.TargetActionId));
+                effect.TargetAction = _skill.ActionParameters.Find(e => e.ActionId == effect.TargetActionId || (e.ActionId - 1000) == effect.TargetActionId);
                 if (effect.TargetAction == null)
                     effect.TargetAction = _skill.ActionParameters[0];
-                this.UpdateEffectRunTimeData(_skill, effect.FireArmEndEffects, false);
+                UpdateEffectRunTimeData(_skill, effect.FireArmEndEffects, false);
                 switch (effect.EffectBehavior)
                 {
                     case eEffectBehavior.FIREARM:
@@ -423,10 +424,9 @@ namespace Elements
                         }
                         if (effect.FireActionId != -1)
                         {
-                            effect.FireAction = _skill.ActionParameters.Find((Predicate<ActionParameter>)(e => e.ActionId == effect.FireActionId || (e.ActionId - 1000) == effect.FireActionId));
+                            effect.FireAction = _skill.ActionParameters.Find(e => e.ActionId == effect.FireActionId || (e.ActionId - 1000) == effect.FireActionId);
                             if (effect.FireAction != null)
                                 effect.FireAction.ReferencedByEffect = true;
-                            break;
                         }
                         break;
                 }
@@ -440,7 +440,7 @@ namespace Elements
                 ActionParameter actionParameter = _skill.ActionParameters[index];
                 if (actionParameter is AttackActionBase)
                     _skill.HasAttack = true;
-                actionParameter.ExecActionOnStart(_skill, this.Owner, this);
+                actionParameter.ExecActionOnStart(_skill, Owner, this);
             }
             for (int index = 0; index < _skill.SkillEffects.Count; ++index)
             {
@@ -453,13 +453,13 @@ namespace Elements
         private void execActionOnWaveStart(Skill _skill)
         {
             for (int index = 0; index < _skill.ActionParameters.Count; ++index)
-                _skill.ActionParameters[index].ExecActionOnWaveStart(_skill, this.Owner, this);
+                _skill.ActionParameters[index].ExecActionOnWaveStart(_skill, Owner, this);
         }
 
         private void initializeAction(Skill _skill)
         {
             for (int index = 0; index < _skill.ActionParameters.Count; ++index)
-                _skill.ActionParameters[index].Initialize(this.Owner);
+                _skill.ActionParameters[index].Initialize(Owner);
         }
 
         private void createActionValue(
@@ -470,14 +470,14 @@ namespace Elements
         {
             ActionParameter actionParameter = Activator.CreateInstance(SkillDefine.SkillActionTypeDictionary[(eActionType)(byte)actionParam.action_type]) as ActionParameter;
             actionParameter.TargetSort = (PriorityPattern)(int)actionParam.target_type;
-            actionParameter.TargetNth = (int)actionParam.target_number;
-            actionParameter.TargetNum = (int)actionParam.target_count;
-            actionParameter.TargetWidth = (int)actionParam.target_range <= 0 ? this.Owner.SearchAreaSize : (float)(int)actionParam.target_range;
+            actionParameter.TargetNth = actionParam.target_number;
+            actionParameter.TargetNum = actionParam.target_count;
+            actionParameter.TargetWidth = actionParam.target_range <= 0 ? Owner.SearchAreaSize : actionParam.target_range;
             actionParameter.ActionType = (eActionType)(byte)actionParam.action_type;
-            actionParameter.ActionDetail1 = (int)actionParam.action_detail_1;
-            actionParameter.ActionDetail2 = (int)actionParam.action_detail_2;
-            actionParameter.ActionDetail3 = (int)actionParam.action_detail_3;
-            actionParameter.Value = new Dictionary<eValueNumber, FloatWithEx>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer());
+            actionParameter.ActionDetail1 = actionParam.action_detail_1;
+            actionParameter.ActionDetail2 = actionParam.action_detail_2;
+            actionParameter.ActionDetail3 = actionParam.action_detail_3;
+            actionParameter.Value = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer());
             actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)actionParam.action_value_1);
             actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)actionParam.action_value_2);
             actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)actionParam.action_value_3);
@@ -494,10 +494,10 @@ namespace Elements
             }
             else
                 actionCounter.Add(actionParameter.ActionType, 1);
-            ActionParameterOnPrefab parameterOnPrefab = skill.ActionParametersOnPrefab.Find((Predicate<ActionParameterOnPrefab>)(e => e.ActionType == actionParameter.ActionType));
+            ActionParameterOnPrefab parameterOnPrefab = skill.ActionParametersOnPrefab.Find(e => e.ActionType == actionParameter.ActionType);
             if (parameterOnPrefab == null)
             {
-                parameterOnPrefab = new ActionParameterOnPrefab()
+                parameterOnPrefab = new ActionParameterOnPrefab
                 {
                     ActionType = actionParameter.ActionType
                 };
@@ -506,7 +506,7 @@ namespace Elements
             ActionParameterOnPrefabDetail parameterOnPrefabDetail;
             if (index1 >= parameterOnPrefab.Details.Count)
             {
-                parameterOnPrefabDetail = new ActionParameterOnPrefabDetail()
+                parameterOnPrefabDetail = new ActionParameterOnPrefabDetail
                 {
                     ExecTime = new List<ActionExecTime>()
                 };
@@ -515,7 +515,7 @@ namespace Elements
             else
             {
                 parameterOnPrefabDetail = parameterOnPrefab.Details[index1];
-                parameterOnPrefabDetail.ExecTime = new List<ActionExecTime>((IEnumerable<ActionExecTime>)parameterOnPrefabDetail.ExecTimeForPrefab);
+                parameterOnPrefabDetail.ExecTime = new List<ActionExecTime>(parameterOnPrefabDetail.ExecTimeForPrefab);
                 int index2 = 0;
                 for (int count = parameterOnPrefabDetail.ExecTimeCombo.Count; index2 < count; ++index2)
                 {
@@ -525,23 +525,23 @@ namespace Elements
                         switch (actionExecTimeCombo.InterporationType)
                         {
                             case eComboInterporationType.LINEAR:
-                                parameterOnPrefabDetail.ExecTime.Add(new ActionExecTime()
+                                parameterOnPrefabDetail.ExecTime.Add(new ActionExecTime
                                 {
-                                    Time = actionExecTimeCombo.StartTime + (float)index3 * actionExecTimeCombo.OffsetTime,
+                                    Time = actionExecTimeCombo.StartTime + index3 * actionExecTimeCombo.OffsetTime,
                                     DamageNumType = eDamageEffectType.COMBO
                                 });
                                 break;
                             case eComboInterporationType.CURVE:
-                                parameterOnPrefabDetail.ExecTime.Add(new ActionExecTime()
+                                parameterOnPrefabDetail.ExecTime.Add(new ActionExecTime
                                 {
-                                    Time = actionExecTimeCombo.StartTime + actionExecTimeCombo.Curve.Evaluate((float)index3 / (float)actionExecTimeCombo.Count) * (float)actionExecTimeCombo.Count * actionExecTimeCombo.OffsetTime,
+                                    Time = actionExecTimeCombo.StartTime + actionExecTimeCombo.Curve.Evaluate(index3 / (float)actionExecTimeCombo.Count) * actionExecTimeCombo.Count * actionExecTimeCombo.OffsetTime,
                                     DamageNumType = eDamageEffectType.COMBO
                                 });
                                 break;
                         }
                     }
                 }
-                parameterOnPrefabDetail.ExecTime.Sort((Comparison<ActionExecTime>)((a, b) => a.Time.CompareTo(b.Time)));
+                parameterOnPrefabDetail.ExecTime.Sort((a, b) => a.Time.CompareTo(b.Time));
             }
             actionParameter.ActionExecTimeList = parameterOnPrefabDetail.ExecTime;
             actionParameter.ExecTime = new float[parameterOnPrefabDetail.ExecTime.Count];
@@ -560,23 +560,23 @@ namespace Elements
                 actionParameter.ExecTime = time;
 
             actionParameter.DepenedActionId = actionParam.DependActionId;
-            actionParameter.ActionId = (int)actionParam.action_id;
+            actionParameter.ActionId = actionParam.action_id;
             actionParameter.TargetList = new List<BasePartsData>();
             actionParameter.ActionChildrenIndexes = new List<int>();
             actionParameter.TargetAssignment = (eTargetAssignment)(int)actionParam.target_assignment;
             actionParameter.Direction = (DirectionType)(int)actionParam.target_area;
             skill.ActionParameters.Add(actionParameter);
-            skill.SkillId = (int)skillParameter.skill_id;
+            skill.SkillId = skillParameter.skill_id;
         }
 
         public bool StartAction(int skillId)
         {
             if (!skillDictionary.ContainsKey(skillId))
             {
-                PCRCaculator.MainManager.Instance.WindowConfigMessage("角色" + Owner.UnitId + "的技能" + skillId + "错误！", null);
+                MainManager.Instance.WindowConfigMessage("角色" + Owner.UnitId + "的技能" + skillId + "错误！", null);
                 return false;
             }
-            Skill skill = this.skillDictionary[skillId];
+            Skill skill = skillDictionary[skillId];
             skill.DefeatEnemyCount = 0;
             skill.DefeatByThisSkill = false;
             skill.AlreadyAddAttackSelfSeal = false;
@@ -585,19 +585,19 @@ namespace Elements
             skill.Cancel = false;
             skill.EffectBranchId = 0;
             skill.LoopEffectAlreadyDone = false;
-            this.ContinuousActionEndDone = false;
-            skill.OwnerReturnPosition = this.transform.localPosition;
+            ContinuousActionEndDone = false;
+            skill.OwnerReturnPosition = transform.localPosition;
             skill.CountBlind = false;
-            skill.AbsorberValue = this.battleManager.KIHOGJBONDH;
+            skill.AbsorberValue = battleManager.KIHOGJBONDH;
             if (skill.HasAttack && skill.IsLifeStealEnabled)
             {
-                for (int index = this.Owner.LifeStealQueueList.Count - 1; index >= 0; --index)
+                for (int index = Owner.LifeStealQueueList.Count - 1; index >= 0; --index)
                 {
-                    skill.LifeSteal += this.Owner.LifeStealQueueList[index].Dequeue();
-                    if (this.Owner.LifeStealQueueList[index].Count == 0)
+                    skill.LifeSteal += Owner.LifeStealQueueList[index].Dequeue();
+                    if (Owner.LifeStealQueueList[index].Count == 0)
                     {
-                        this.Owner.LifeStealQueueList.RemoveAt(index);
-                        this.Owner.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(this.Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, false);
+                        Owner.LifeStealQueueList.RemoveAt(index);
+                        Owner.OnChangeState.Call(Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, false);
                         Owner.MyOnChangeAbnormalState?.Invoke(Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, false, 90, "1次");
 
                     }
@@ -610,13 +610,13 @@ namespace Elements
                 ActionParameter actionParameter1 = skill.ActionParameters[index1];
                 actionParameter1.IdOffsetDictionary = new Dictionary<BasePartsData, long>();
                 actionParameter1.CancelByIfForAll = false;
-                actionParameter1.AdditionalValue = (Dictionary<eValueNumber, FloatWithEx>)null;
-                actionParameter1.MultipleValue = (Dictionary<eValueNumber, FloatWithEx>)null;
-                actionParameter1.DivideValue = (Dictionary<eValueNumber, FloatWithEx>)null;
+                actionParameter1.AdditionalValue = null;
+                actionParameter1.MultipleValue = null;
+                actionParameter1.DivideValue = null;
                 if (!actionParameter1.ReferencedByReflection)
                 {
                     if (!actionParameter1.IsSearchAndSorted)
-                        this.searchAndSortTarget(skill, actionParameter1, this.transform.position);
+                        searchAndSortTarget(skill, actionParameter1, transform.position);
                     actionParameter1.IsSearchAndSorted = false;
                     if (actionParameter1.ActionType == eActionType.REFLEXIVE)
                     {
@@ -633,11 +633,11 @@ namespace Elements
                                 }
                                 continue;
                             case 2:
-                                _basePosition = this.transform.position + new Vector3((float)((this.Owner.IsLeftDir ? -1.0 : 1.0) * (double)actionParameter1.Value[eValueNumber.VALUE_1] / 540.0), 0.0f);
+                                _basePosition = transform.position + new Vector3((float)((Owner.IsLeftDir ? -1.0 : 1.0) * (double)actionParameter1.Value[eValueNumber.VALUE_1] / 540.0), 0.0f);
                                 break;
                             case 3:
-                                _basePosition = this.transform.position;
-                                num = (this.Owner.IsLeftDir ? -1f : 1f) * actionParameter1.Value[eValueNumber.VALUE_1];
+                                _basePosition = transform.position;
+                                num = (Owner.IsLeftDir ? -1f : 1f) * actionParameter1.Value[eValueNumber.VALUE_1];
                                 break;
                             case 4:
                                 if (actionParameter1.TargetList.Count != 0)
@@ -653,7 +653,7 @@ namespace Elements
                         {
                             ActionParameter actionParameter2 = skill.ActionParameters[actionParameter1.ActionChildrenIndexes[index2]];
                             actionParameter2.Position = num;
-                            this.searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
+                            searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
                         }
                     }
                     if (actionParameter1.TargetList.Count != 0)
@@ -661,7 +661,7 @@ namespace Elements
                 }
             }
             bool flag2 = false;
-            if ((double)skill.BlackOutTime > 0.0)
+            if (skill.BlackOutTime > 0.0)
             {
                 for (int index1 = 0; index1 < skill.ActionParameters.Count; ++index1)
                 {
@@ -674,70 +674,70 @@ namespace Elements
                             UnitCtrl owner = actionParameter.TargetList[index2].Owner;
                             if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                                 owner.IsScaleChangeTarget = true;
-                            this.battleManager.AddBlackOutTarget(this.Owner, owner, actionParameter.TargetList[index2]);
-                            if ((UnityEngine.Object)this.Owner != (UnityEngine.Object)owner && skill.DisableOtherCharaOnStart)
+                            battleManager.AddBlackOutTarget(Owner, owner, actionParameter.TargetList[index2]);
+                            if (Owner != owner && skill.DisableOtherCharaOnStart)
                                 owner.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, 0.0f);
                         }
                     }
                 }
-                this.battleManager.StartChangeScale(skill, skill.CutInSkipTime);
+                battleManager.StartChangeScale(skill, skill.CutInSkipTime);
             }
-            if (skillId == this.Owner.UnionBurstSkillId)
+            if (skillId == Owner.UnionBurstSkillId)
             {
-                this.battleManager.SetSkillExeScreen(this.Owner, skill.BlackOutTime, skill.BlackoutColor, skill.BlackoutEndWithMotion || skill.IsPrincessForm);
+                battleManager.SetSkillExeScreen(Owner, skill.BlackOutTime, skill.BlackoutColor, skill.BlackoutEndWithMotion || skill.IsPrincessForm);
                 //this.battleTimeScale.StopSlowEffect();
                 //if (skill.SlowEffect.Enable)
                 //this.battleTimeScale.StartSlowEffect(skill.SlowEffect, this.Owner, skill.CutInSkipTime, false);
-                if (this.Owner.IsOther == this.battleManager.IsDefenceReplayMode)
+                if (Owner.IsOther == battleManager.IsDefenceReplayMode)
                     flag2 = true;
             }
-            bool flag3 = flag2 || this.Owner.IsBoss;
+            bool flag3 = flag2 || Owner.IsBoss;
             //if (flag3)
             //SingletonMonoBehaviour<BattleHeaderController>.Instance.SkillWindow.Indicate(skill.SkillName, this.Owner.IsBoss);
-            BattleSpineController currentSpineCtrl = this.Owner.GetCurrentSpineCtrl();
+            BattleSpineController currentSpineCtrl = Owner.GetCurrentSpineCtrl();
             if (skill.ForcePlayNoTarget)
                 flag1 = false;
-            if (flag1 || this.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && !this.Owner.AttackWhenSilence)
+            if (flag1 || Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && !Owner.AttackWhenSilence)
             {
-                if (this.Owner.IsBoss && !this.Owner.IsConfusionOrConvert() && (!skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, _index3: this.Owner.MotionPrefix)))
+                if (Owner.IsBoss && !Owner.IsConfusionOrConvert() && (!skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix)))
                 {
-                    this.Owner.PlayAnime(skill.AnimId, skill.SkillNum, _index3: this.Owner.MotionPrefix, _isLoop: false);
-                    this.CreateNormalPrefabWithTargetMotion(skill, 0, true);
+                    Owner.PlayAnime(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix, _isLoop: false);
+                    CreateNormalPrefabWithTargetMotion(skill, 0, true);
                 }
                 return false;
             }
             if (!flag3)
-                this.Owner.IndicateSkillName(skill.SkillName);
+                Owner.IndicateSkillName(skill.SkillName);
             /*for (int index = 0; index < skill.ShakeEffects.Count; ++index)
             {
               if (skill.ShakeEffects[index].TargetMotion == 0)
                 this.AppendCoroutine(this.StartShakeWithDelay(skill.ShakeEffects[index], skill, true), ePauseType.VISUAL, (double) skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
             }*/
             //this.startBlurEffects(skill, true);
-            if (skill.AnimId != eSpineCharacterAnimeId.NONE && !skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, _index3: this.Owner.MotionPrefix))
+            if (skill.AnimId != eSpineCharacterAnimeId.NONE && !skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix))
             {
-                if (this.Owner.IsCutInSkip)
+                if (Owner.IsCutInSkip)
                 {
-                    this.Owner.IsCutInSkip = false;
-                    this.Owner.RestartPlayAnimeCoroutine(skill.CutInSkipTime, skill.AnimId, skill.SkillNum, this.Owner.MotionPrefix);
+                    Owner.IsCutInSkip = false;
+                    Owner.RestartPlayAnimeCoroutine(skill.CutInSkipTime, skill.AnimId, skill.SkillNum, Owner.MotionPrefix);
                 }
                 else
-                    this.Owner.PlayAnime(skill.AnimId, skill.SkillNum, _index3: this.Owner.MotionPrefix, _isLoop: false, _startTime: skill.CutInSkipTime);
+                    Owner.PlayAnime(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix, _isLoop: false, _startTime: skill.CutInSkipTime);
             }
             skill.ReadySkill();
-            skill.AweValue = this.Owner.CalcAweValue(skillId == this.Owner.UnionBurstSkillId, skillId == 1);
+            skill.AweValue = Owner.CalcAweValue(skillId == Owner.UnionBurstSkillId, skillId == 1);
             bool effectFlag = false;
             for (int index = 0; index < skill.ActionParameters.Count; ++index)
             {
                 ActionParameter actionParameter = skill.ActionParameters[index];
-                actionParameter.ReadyAction(this.Owner, this, skill);
+                actionParameter.ReadyAction(Owner, this, skill);
                 //if ((!hasParentIndexes.Contains(index) || actionParameter.ReferencedByReflection) && !actionParameter.ReferencedByEffect)
                 //    this.ExecUnitActionWithDelay(actionParameter, skill, true, true);
                 if (!hasParentIndexes.Contains(index) || actionParameter.ReferencedByReflection)
                 {
                     if (!actionParameter.ReferencedByEffect)
                     {
-                        this.ExecUnitActionWithDelay(actionParameter, skill, true, true);
+                        ExecUnitActionWithDelay(actionParameter, skill, true, true);
                     }
                     else
                     {
@@ -750,24 +750,24 @@ namespace Elements
                         else
                         {
                             CalcDelayByPhysice(actionParameter, skill, 0, true);
-                            this.ExecUnitActionWithDelay(actionParameter, skill, true, true);
+                            ExecUnitActionWithDelay(actionParameter, skill, true, true);
                         }
                     }
                 }
 
             }
-            for (int index = 0; index < this.battleManager.BlackoutUnitTargetList.Count; ++index)
-                this.battleManager.BlackoutUnitTargetList[index].DisableSortOrderFrontOnBlackoutTarget = false;
+            for (int index = 0; index < battleManager.BlackoutUnitTargetList.Count; ++index)
+                battleManager.BlackoutUnitTargetList[index].DisableSortOrderFrontOnBlackoutTarget = false;
             if(UseSkillEffect && effectFlag)
-                this.CreateNormalPrefabWithTargetMotion2(skill, 0, true);
+                CreateNormalPrefabWithTargetMotion2(skill, 0, true);
             //if (skill.ZoomEffect.Enable)
             // this.battleCameraEffect.StartZoomEffect(skill.ZoomEffect, this.Owner, skill.CutInSkipTime, false, false, skill.SkillId != this.Owner.UnionBurstSkillId);
-            this.Owner.StartChangeSortOrder(skill.ChangeSortDatas, skill.CutInSkipTime);
+            Owner.StartChangeSortOrder(skill.ChangeSortDatas, skill.CutInSkipTime);
             //added Scripts
-            PCRCaculator.Guild.UnitSkillExecData skillExecData = new PCRCaculator.Guild.UnitSkillExecData();
+            UnitSkillExecData skillExecData = new UnitSkillExecData();
             skillExecData.skillID = skillId;
             skillExecData.skillName = skill.SkillName;
-            skillExecData.skillState = PCRCaculator.Guild.UnitSkillExecData.SkillState.NORMAL;
+            skillExecData.skillState = UnitSkillExecData.SkillState.NORMAL;
             skillExecData.startTime = BattleHeaderController.CurrentFrameCount;
             skillExecData.unitid = Owner.UnitId;
             skillExecData.UnitName = Owner.UnitName;
@@ -775,7 +775,7 @@ namespace Elements
             {
                 skillExecData.energy = Owner.lastEnergyBeforeUB;
                 var e = Owner.lastEnergyBeforeUB;
-                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                GuildCalculator.Instance.dmglist.Add(new ProbEvent
                 {
                     unit = Owner.UnitNameEx,
                     predict = hash => e.Emulate(hash) < 1000f,
@@ -786,7 +786,7 @@ namespace Elements
             {
                 skillExecData.energy = Owner.Energy;
                 var e = Owner.Energy;
-                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                GuildCalculator.Instance.dmglist.Add(new ProbEvent
                 {
                     unit = Owner.UnitNameEx,
                     predict = hash => e.Emulate(hash) >= 1000f,
@@ -796,7 +796,7 @@ namespace Elements
             Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
             //end added Scripts
-            Owner.lastCritPoint = new UnitCtrl.CritPoint()
+            Owner.lastCritPoint = new UnitCtrl.CritPoint
             {
                 description = $"{skill.SkillName}唱名",
                 description2 = $"{skill.SkillName}唱名",
@@ -811,8 +811,8 @@ namespace Elements
           bool _quiet = false,
           bool _considerBodyWidth = true)
         {
-            this.searchTargetUnit(_action, _basePosition, _skill, _considerBodyWidth);
-            this.sortTargetListByTargetPattern(_action, this.Owner.BottomTransform, _action.Value[eValueNumber.VALUE_1], _quiet);
+            searchTargetUnit(_action, _basePosition, _skill, _considerBodyWidth);
+            sortTargetListByTargetPattern(_action, Owner.BottomTransform, _action.Value[eValueNumber.VALUE_1], _quiet);
             bool flag = false;
             for (int index = 0; index < _action.TargetList.Count - _action.TargetNth; ++index)
             {
@@ -831,30 +831,30 @@ namespace Elements
                 _action.TargetList.Clear();
                 _action.TargetList.Add(target);
             }
-            BasePartsData basePartsData = (BasePartsData)null;
+            BasePartsData basePartsData = null;
             if (_action.TargetAssignment == eTargetAssignment.OTHER_SIDE && _action.TargetNum == 1 && !_action.IgnoreDecoy)
             {
-                if (this.Owner.IsOther)
+                if (Owner.IsOther)
                 {
-                    if (this.Owner.IsConfusionOrConvert())
+                    if (Owner.IsConfusionOrConvert())
                     {
-                        if ((UnityEngine.Object)this.battleManager.DecoyEnemy != (UnityEngine.Object)null)
-                            basePartsData = this.battleManager.DecoyEnemy.GetFirstParts(_basePos: this.Owner.transform.position.x);
+                        if (battleManager.DecoyEnemy != null)
+                            basePartsData = battleManager.DecoyEnemy.GetFirstParts(_basePos: Owner.transform.position.x);
                     }
-                    else if ((UnityEngine.Object)this.battleManager.DecoyUnit != (UnityEngine.Object)null)
-                        basePartsData = this.battleManager.DecoyUnit.GetFirstParts(_basePos: this.Owner.transform.position.x);
+                    else if (battleManager.DecoyUnit != null)
+                        basePartsData = battleManager.DecoyUnit.GetFirstParts(_basePos: Owner.transform.position.x);
                 }
-                else if (this.Owner.IsConfusionOrConvert())
+                else if (Owner.IsConfusionOrConvert())
                 {
-                    if ((UnityEngine.Object)this.battleManager.DecoyUnit != (UnityEngine.Object)null)
-                        basePartsData = this.battleManager.DecoyUnit.GetFirstParts(_basePos: this.Owner.transform.position.x);
+                    if (battleManager.DecoyUnit != null)
+                        basePartsData = battleManager.DecoyUnit.GetFirstParts(_basePos: Owner.transform.position.x);
                 }
-                else if ((UnityEngine.Object)this.battleManager.DecoyEnemy != (UnityEngine.Object)null)
-                    basePartsData = this.battleManager.DecoyEnemy.GetFirstParts(_basePos: this.Owner.transform.position.x);
+                else if (battleManager.DecoyEnemy != null)
+                    basePartsData = battleManager.DecoyEnemy.GetFirstParts(_basePos: Owner.transform.position.x);
                 if (basePartsData != null && !basePartsData.Owner.IsDead)
                 {
                     //if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 2.0 + (double)this.Owner.BodyWidth / 2.0)
-                    if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 2.0 + (double)this.Owner.BodyWidth / 2.0)
+                    if (Mathf.Abs(basePartsData.GetLocalPosition().x - transform.localPosition.x) <= _action.TargetWidth + basePartsData.GetBodyWidth() / 2.0 + Owner.BodyWidth / 2.0)
                     {
                         _action.TargetList.Clear();
                         _action.TargetList.Add(basePartsData);
@@ -866,7 +866,7 @@ namespace Elements
 
         private void setCutInSkipTimeForPrincessForm(int _skillId)
         {
-            Skill skill = this.skillDictionary[_skillId];
+            Skill skill = skillDictionary[_skillId];
             if (!skill.IsPrincessForm)
                 return;
             skill.CutInSkipTime = 0.0f;
@@ -875,7 +875,7 @@ namespace Elements
         public IEnumerator StartActionWithOutCutIn(
           UnitCtrl _unit,
           int _skillId,
-          System.Action _callback)
+          Action _callback)
         {
             UnitActionController actionController = this;
             //actionController.battleTimeScale.StopSlowEffect();
@@ -889,7 +889,7 @@ namespace Elements
             actionController.AddBlackoutTarget(_skillId);
             if (skill.IsPrincessForm)
             {
-                yield return (object)null;
+                yield return null;
                 _callback.Call();
             }
             else
@@ -909,8 +909,8 @@ namespace Elements
                 if (skill.SkillId == actionController.Owner.UnionBurstSkillId)
                     actionController.Owner.StartChangeSortOrder(skill.ChangeSortDatas, 0.0f);
                 while (!actionController.battleManager.CoroutineManager.VisualPause)
-                    yield return (object)null;
-                actionController.Timer((System.Action)(() => this.battleManager.SetSkillExeScreenActive(_unit, skill.BlackoutColor)));
+                    yield return null;
+                actionController.Timer(() => battleManager.SetSkillExeScreenActive(_unit, skill.BlackoutColor));
                 actionController.Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
                 actionController.Owner.IsCutInSkip = true;
                 entry = unitSpineController.state.GetCurrent(0);
@@ -918,20 +918,20 @@ namespace Elements
                 {
                     if (!BattleHeaderController.Instance.IsPaused)
                         deltaTimeAccumulated += Time.deltaTime;
-                    for (; (double)deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= actionController.battleManager.DeltaTime_60fps)
+                    for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= actionController.battleManager.DeltaTime_60fps)
                     {
                         if (!actionController.battleManager.BlackoutUnitTargetList.Contains(actionController.Owner))
                         {
                             unitSpineController.RealUpdate();
                             unitSpineController.RealLateUpdate();
                         }
-                        actionController.battleManager.BlackoutUnitTargetList.ForEach((System.Action<UnitCtrl>)(_it => _it.GetCurrentSpineCtrl().RealUpdate()));
-                        actionController.battleManager.BlackoutUnitTargetList.ForEach((System.Action<UnitCtrl>)(_it => _it.GetCurrentSpineCtrl().RealLateUpdate()));
-                        actionController.Owner.EffectSpineControllerList.ForEach((System.Action<BattleSpineController>)(_fx => _fx.RealUpdate()));
-                        actionController.Owner.EffectSpineControllerList.ForEach((System.Action<BattleSpineController>)(_fx => _fx.RealLateUpdate()));
+                        actionController.battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealUpdate());
+                        actionController.battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealLateUpdate());
+                        actionController.Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealUpdate());
+                        actionController.Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealLateUpdate());
                     }
-                    if ((double)entry.TrackTime < (double)skill.CutInSkipTime)//TrackTime为修改过的
-                        yield return (object)null;
+                    if (entry.TrackTime < (double)skill.CutInSkipTime)//TrackTime为修改过的
+                        yield return null;
                     else
                         break;
                 }
@@ -968,7 +968,7 @@ namespace Elements
             //  actionController.Owner.StartCoroutine(actionController.updateCoroutineWithOutCutIn(actionController.StartShakeWithDelay(shakeEffect, annihilation)));
             //if (annihilation.SlowEffect.Enable)
             //actionController.battleTimeScale.StartSlowEffect(annihilation.SlowEffect, actionController.Owner, 0.0f, true);
-            if ((double)annihilation.BlackOutTime > 0.0)
+            if (annihilation.BlackOutTime > 0.0)
             {
                 actionController.battleManager.SetForegroundEnable(false);
                 actionController.StartCoroutine(actionController.updateCoroutineWithOutCutIn(actionController.foregroundActiveWithDelay(annihilation.BlackOutTime)));
@@ -976,7 +976,7 @@ namespace Elements
             actionController.Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
             while (_annihilationId == actionController.Owner.AnnihilationId)
             {
-                for (float num = 0.0f + Time.deltaTime; (double)num > 0.0; num -= actionController.battleManager.DeltaTime_60fps)
+                for (float num = 0.0f + Time.deltaTime; num > 0.0; num -= actionController.battleManager.DeltaTime_60fps)
                 {
                     //actionController.battleCameraEffect.UpdateShake();
                     if (!unitSpineController.IsPlayAnime)
@@ -985,26 +985,26 @@ namespace Elements
                         unitSpineController.loop = true;
                     }
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
 
         private IEnumerator foregroundActiveWithDelay(float _time)
         {
-            yield return (object)new WaitForSeconds(_time);
-            this.battleManager.SetForegroundEnable(true);
+            yield return new WaitForSeconds(_time);
+            battleManager.SetForegroundEnable(true);
         }
 
         public void AddBlackoutTarget(int _skillId)
         {
-            Skill skill = this.skillDictionary[_skillId];
+            Skill skill = skillDictionary[_skillId];
             int index1 = 0;
             for (int count1 = skill.ActionParameters.Count; index1 < count1; ++index1)
             {
                 ActionParameter actionParameter1 = skill.ActionParameters[index1];
                 if (!actionParameter1.ReferencedByReflection)
                 {
-                    this.searchAndSortTarget(skill, actionParameter1, this.transform.position, true);
+                    searchAndSortTarget(skill, actionParameter1, transform.position, true);
                     for (int index2 = 0; index2 < actionParameter1.TargetNum; ++index2)
                     {
                         if (actionParameter1.TargetList.Count > index2)
@@ -1012,7 +1012,7 @@ namespace Elements
                             UnitCtrl owner1 = actionParameter1.TargetList[index2].Owner;
                             if (actionParameter1.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                                 owner1.IsScaleChangeTarget = true;
-                            this.battleManager.AddBlackOutTarget(this.Owner, owner1, actionParameter1.TargetList[index2]);
+                            battleManager.AddBlackOutTarget(Owner, owner1, actionParameter1.TargetList[index2]);
                             if (actionParameter1.ActionType == eActionType.REFLEXIVE)
                             {
                                 Vector3 _basePosition = new Vector3();
@@ -1023,10 +1023,10 @@ namespace Elements
                                         _basePosition = actionParameter1.TargetList[0].GetPosition();
                                         break;
                                     case 2:
-                                        _basePosition = this.transform.position + new Vector3((float)((this.Owner.IsLeftDir ? -1.0 : 1.0) * (double)actionParameter1.Value[eValueNumber.VALUE_1] / 540.0), 0.0f);
+                                        _basePosition = transform.position + new Vector3((float)((Owner.IsLeftDir ? -1.0 : 1.0) * (double)actionParameter1.Value[eValueNumber.VALUE_1] / 540.0), 0.0f);
                                         break;
                                     case 3:
-                                        _basePosition = this.transform.position;
+                                        _basePosition = transform.position;
                                         break;
                                     case 4:
                                         _basePosition = actionParameter1.TargetList[0].GetPosition();
@@ -1037,33 +1037,33 @@ namespace Elements
                                 for (int count2 = actionParameter1.ActionChildrenIndexes.Count; index3 < count2; ++index3)
                                 {
                                     ActionParameter actionParameter2 = skill.ActionParameters[actionParameter1.ActionChildrenIndexes[index3]];
-                                    this.searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
+                                    searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
                                     for (int index4 = 0; index4 < actionParameter2.TargetNum && index4 != actionParameter2.TargetList.Count; ++index4)
                                     {
                                         UnitCtrl owner2 = actionParameter2.TargetList[index4].Owner;
                                         if (actionParameter1.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                                             owner2.IsScaleChangeTarget = true;
-                                        this.battleManager.AddBlackOutTarget(this.Owner, owner2, actionParameter2.TargetList[index4]);
+                                        battleManager.AddBlackOutTarget(Owner, owner2, actionParameter2.TargetList[index4]);
                                     }
                                 }
                             }
                         }
                     }
-                    this.battleManager.StartChangeScale(skill, 0.0f);
+                    battleManager.StartChangeScale(skill, 0.0f);
                 }
             }
         }
 
         public void SearchTargetByAction(int _skillId)
         {
-            Skill skill = this.skillDictionary[_skillId];
+            Skill skill = skillDictionary[_skillId];
             int index1 = 0;
             for (int count1 = skill.ActionParameters.Count; index1 < count1; ++index1)
             {
                 ActionParameter actionParameter1 = skill.ActionParameters[index1];
                 if (!actionParameter1.ReferencedByReflection)
                 {
-                    this.searchAndSortTarget(skill, actionParameter1, this.transform.position, true);
+                    searchAndSortTarget(skill, actionParameter1, transform.position, true);
                     actionParameter1.IsSearchAndSorted = false;
                     for (int index2 = 0; index2 < actionParameter1.TargetNum; ++index2)
                     {
@@ -1077,10 +1077,10 @@ namespace Elements
                                     _basePosition = actionParameter1.TargetList[0].GetPosition();
                                     break;
                                 case 2:
-                                    _basePosition = this.transform.position + new Vector3((float)((this.Owner.IsLeftDir ? -1.0 : 1.0) * (double)actionParameter1.Value[eValueNumber.VALUE_1] / 540.0), 0.0f);
+                                    _basePosition = transform.position + new Vector3((float)((Owner.IsLeftDir ? -1.0 : 1.0) * (double)actionParameter1.Value[eValueNumber.VALUE_1] / 540.0), 0.0f);
                                     break;
                                 case 3:
-                                    _basePosition = this.transform.position;
+                                    _basePosition = transform.position;
                                     break;
                                 case 4:
                                     _basePosition = actionParameter1.TargetList[0].GetPosition();
@@ -1091,7 +1091,7 @@ namespace Elements
                             for (int count2 = actionParameter1.ActionChildrenIndexes.Count; index3 < count2; ++index3)
                             {
                                 ActionParameter actionParameter2 = skill.ActionParameters[actionParameter1.ActionChildrenIndexes[index3]];
-                                this.searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
+                                searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
                                 actionParameter2.IsSearchAndSorted = false;
                             }
                         }
@@ -1104,10 +1104,10 @@ namespace Elements
         {
             float deltaTimeAccumulated = 0.0f;
         label_2:
-            yield return (object)null;
+            yield return null;
             //if (!SingletonMonoBehaviour<BattleHeaderController>.Instance.IsPaused)
             deltaTimeAccumulated += Time.deltaTime;
-            for (; (double)deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= this.battleManager.DeltaTime_60fps)
+            for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= battleManager.DeltaTime_60fps)
             {
                 if (!_coroutine.MoveNext())
                     yield break;
@@ -1133,13 +1133,13 @@ namespace Elements
                     bool flag = skillEffect.EffectBehavior == eEffectBehavior.NORMAL || skillEffect.EffectBehavior == eEffectBehavior.SKILL_AREA_RANDOM || skillEffect.EffectBehavior == eEffectBehavior.TARGET_CENTER || skillEffect.EffectBehavior == eEffectBehavior.WORLD_POS_CENTER;
                     if (_useStartCoroutine)
                     {
-                        this.battleManager.StartCoroutine(this.createNormalPrefabWithDelay(skillEffect, _skill, _first));
+                        battleManager.StartCoroutine(createNormalPrefabWithDelay(skillEffect, _skill, _first));
                     }
                     else
                     {
                         ePauseType pauseType = flag ? ePauseType.VISUAL : ePauseType.SYSTEM;
-                        UnitCtrl unit = (double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null;
-                        this.AppendCoroutine(this.createNormalPrefabWithDelay(skillEffect, _skill, _first, _isFirearmEndEffect: _modechangeEndEffect, _modeChangeEndEffect: _modechangeEndEffect), pauseType, unit);
+                        UnitCtrl unit = _skill.BlackOutTime > 0.0 ? Owner : null;
+                        AppendCoroutine(createNormalPrefabWithDelay(skillEffect, _skill, _first, _isFirearmEndEffect: _modechangeEndEffect, _modeChangeEndEffect: _modechangeEndEffect), pauseType, unit);
                     }
                 }
             }
@@ -1165,7 +1165,7 @@ namespace Elements
             for (int index = 0; index < _action.TargetList.Count && (index < _action.TargetNum || _action.TargetNum == 0 || index == 0); ++index)
             {
                 BasePartsData target = _action.TargetList[index];
-                this.AppendCoroutine(this.ExecActionWithDelayAndTarget(_action, _skill, target, 0.0f, _first, _boneCount, _ignoreCancel), ePauseType.SYSTEM, (double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null);
+                AppendCoroutine(ExecActionWithDelayAndTarget(_action, _skill, target, 0.0f, _first, _boneCount, _ignoreCancel), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
             }
         }
 
@@ -1176,7 +1176,7 @@ namespace Elements
             for (int index = 0; index < _action.TargetList.Count && (index < _action.TargetNum || _action.TargetNum == 0 || index == 0); ++index)
             {
                 BasePartsData target = _action.TargetList[index];
-                this.ExecAction(_action, _skill, target, 0, 0.0f);
+                ExecAction(_action, _skill, target, 0, 0.0f);
             }
         }
 
@@ -1203,19 +1203,19 @@ namespace Elements
             {
                 ids[i] = 0L;
                 long int64 = Convert.ToInt64(_action.ActionId);
-                while (this.battleManager.PBCLBKCKHAI.Contains(int64 * 100L + ids[i]))
+                while (battleManager.PBCLBKCKHAI.Contains(int64 * 100L + ids[i]))
                     ++ids[i];
                 long actionIndivisualId = int64 * 100L + ids[i];
                 _target.Owner.ActionsTargetOnMe.Add(actionIndivisualId);
-                this.battleManager.PBCLBKCKHAI.Add(actionIndivisualId);
+                battleManager.PBCLBKCKHAI.Add(actionIndivisualId);
                 float waitTime = _action.ExecTime[i];
                 while (true)
                 {
-                    time += this.battleManager.DeltaTime_60fps;
+                    time += battleManager.DeltaTime_60fps;
                     if (_ignoreCancel || !_skill.Cancel && !_action.CancelByIfForAll)
                     {
-                        if ((double)waitTime > (double)time && (_action.ActionType != eActionType.TRIGER || _action.ActionDetail1 != 4))
-                            yield return (object)null;
+                        if (waitTime > (double)time && (_action.ActionType != eActionType.TRIGER || _action.ActionDetail1 != 4))
+                            yield return null;
                         else
                             goto label_17;
                     }
@@ -1225,14 +1225,14 @@ namespace Elements
                 if (_action.OnActionEnd != null)
                     _action.OnActionEnd();
                 _target.Owner.ActionsTargetOnMe.Remove(actionIndivisualId);
-                this.battleManager.CallbackActionEnd(actionIndivisualId);
+                battleManager.CallbackActionEnd(actionIndivisualId);
                 break;
             label_17:
-                this.ExecAction(_action, _skill, _target, i, time);
+                ExecAction(_action, _skill, _target, i, time);
                 if ((_action.ActionType != eActionType.CONTINUOUS_ATTACK || _action.ActionDetail1 != 3) && (_action.ActionType != eActionType.MODE_CHANGE || _action.ActionDetail1 == 3))
                 {
                     _target.Owner.ActionsTargetOnMe.Remove(actionIndivisualId);
-                    this.battleManager.CallbackActionEnd(actionIndivisualId);
+                    battleManager.CallbackActionEnd(actionIndivisualId);
                 }
                 else if (_action.IdOffsetDictionary.ContainsKey(_target))
                     _action.IdOffsetDictionary[_target] = ids[i];
@@ -1254,22 +1254,22 @@ namespace Elements
             Dictionary<eValueNumber, FloatWithEx> multipleValue = action.MultipleValue;
             Dictionary<eValueNumber, FloatWithEx> divideValue = action.DivideValue;
             Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
-            Func<ActionParameter, eValueNumber, FloatWithEx> func = (Func<ActionParameter, eValueNumber, FloatWithEx>)((_action, _type) =>
-           {
-               FloatWithEx num1 = 0.0f;
-               if (additionalValue != null && additionalValue.ContainsKey(_type))
-                   num1 = additionalValue[_type];
-               FloatWithEx num2 = 1f;
-               if (multipleValue != null && multipleValue.ContainsKey(_type))
-                   num2 = multipleValue[_type];
-               FloatWithEx num3 = 1f;
-               if (divideValue != null && divideValue.ContainsKey(_type) && (double)divideValue[_type] != 0.0)
-                   num3 = divideValue[_type];
-               FloatWithEx num4 = 0.0f;
-               _action.Value.TryGetValue(_type, out num4);
-               return (num1 + num4) * num2 / num3;
-           });
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary = new Dictionary<eValueNumber, FloatWithEx>((IEqualityComparer<eValueNumber>)new eValueNumber_DictComparer())
+            Func<ActionParameter, eValueNumber, FloatWithEx> func = (_action, _type) =>
+            {
+                FloatWithEx num1 = 0.0f;
+                if (additionalValue != null && additionalValue.ContainsKey(_type))
+                    num1 = additionalValue[_type];
+                FloatWithEx num2 = 1f;
+                if (multipleValue != null && multipleValue.ContainsKey(_type))
+                    num2 = multipleValue[_type];
+                FloatWithEx num3 = 1f;
+                if (divideValue != null && divideValue.ContainsKey(_type) && (double)divideValue[_type] != 0.0)
+                    num3 = divideValue[_type];
+                FloatWithEx num4 = 0.0f;
+                _action.Value.TryGetValue(_type, out num4);
+                return (num1 + num4) * num2 / num3;
+            };
+            Dictionary<eValueNumber, FloatWithEx> _valueDictionary = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer())
       {
         {
           eValueNumber.VALUE_1,
@@ -1310,9 +1310,9 @@ namespace Elements
                 action.ExecAction(this.Owner, target, num, this, skill, starttime, dictionary, _valueDictionary);
             }*/
             //change start
-            bool isResisted = target.ResistStatus(action.ActionType, action.ActionDetail1, this.Owner, _last, _targetOneParts, target);
+            bool isResisted = target.ResistStatus(action.ActionType, action.ActionDetail1, Owner, _last, _targetOneParts, target);
             bool exec = !isResisted && action.JudgeIsAlreadyExeced(target.Owner, num);
-            PCRCaculator.Guild.UnitActionExecData actionExecData = new PCRCaculator.Guild.UnitActionExecData();
+            UnitActionExecData actionExecData = new UnitActionExecData();
             actionExecData.execTime = BattleHeaderController.CurrentFrameCount;
             actionExecData.describe = action.sortinfo;//"执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
             actionExecData.actionID = action.ActionId;
@@ -1323,10 +1323,10 @@ namespace Elements
             {
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
-                Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, PCRCaculator.Battle.eLogMessageType.EXEC_ACTION, this.Owner);
+                Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
                 
-                action.ExecAction(this.Owner, target, num, this, skill, starttime, dictionary, 
-                    _valueDictionary,(a)=> 
+                action.ExecAction(Owner, target, num, this, skill, starttime, dictionary, 
+                    _valueDictionary,a=> 
                 { 
                     actionExecData.describe += a;
                     //if (b > 0)
@@ -1337,11 +1337,11 @@ namespace Elements
             {
                 actionExecData.describe = "执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
             }
-            actionExecData.result = isResisted ? PCRCaculator.Guild.UnitActionExecData.ActionState.MISS : PCRCaculator.Guild.UnitActionExecData.ActionState.NORMAL;
+            actionExecData.result = isResisted ? UnitActionExecData.ActionState.MISS : UnitActionExecData.ActionState.NORMAL;
             Owner.MyOnExecAction?.Invoke(Owner.UnitId, skill.SkillId, actionExecData);
             var a = skill.ActionParameters.Count(ap => ap.ActionType == action.ActionType);
             var b = skill.ActionParameters.Where(ap => ap.ActionType == action.ActionType).TakeWhile(ap => ap != action).Count();
-            Owner.lastCritPoint = new UnitCtrl.CritPoint()
+            Owner.lastCritPoint = new UnitCtrl.CritPoint
             {
                 description = $"{skill.SkillName}的{(a == 1 ? "" : $"第{b}个")}{action.ActionType.GetDescription()}执行",
                 description2 = (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
@@ -1352,7 +1352,7 @@ namespace Elements
                 return;
             if (!action.HitOnceDic.ContainsKey(target))
             {
-                this.ExecChildrenAction(action, skill, target, num, starttime, dictionary);
+                ExecChildrenAction(action, skill, target, num, starttime, dictionary);
             }
             else
             {
@@ -1360,7 +1360,7 @@ namespace Elements
                     return;
                 if (action.HitOnceDic[target])
                 {
-                    this.ExecChildrenAction(action, skill, target, num, starttime, dictionary);
+                    ExecChildrenAction(action, skill, target, num, starttime, dictionary);
                 }
                 else
                 {
@@ -1387,7 +1387,7 @@ namespace Elements
             {
                 int actionChildrenIndex = action.ActionChildrenIndexes[index];
                 if ((skill.ActionParameters[actionChildrenIndex].ActionType != eActionType.MODE_CHANGE || skill.ActionParameters[actionChildrenIndex].ActionDetail1 != 3) && (!enabledChildAction.ContainsKey(skill.ActionParameters[actionChildrenIndex].ActionId) || enabledChildAction[skill.ActionParameters[actionChildrenIndex].ActionId]) && (action.ActionType != eActionType.ATTACK || num == action.ExecTime.Length - 1))
-                    this.AppendCoroutine(this.ExecActionWithDelayAndTarget(skill.ActionParameters[actionChildrenIndex], skill, target, starttime), ePauseType.SYSTEM, (double)skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null);
+                    AppendCoroutine(ExecActionWithDelayAndTarget(skill.ActionParameters[actionChildrenIndex], skill, target, starttime), ePauseType.SYSTEM, skill.BlackOutTime > 0.0 ? Owner : null);
             }
         }
 
@@ -1400,22 +1400,20 @@ namespace Elements
           bool _modeChangeEndEffect = false)
         {
             float time = _first ? _skill.CutInSkipTime : 0.0f;
-            string key = this.Owner.IsLeftDir || this.Owner.IsForceLeftDirOrPartsBoss ? _skilleffect.PrefabLeft.name : _skilleffect.Prefab.name;
-            if (this.battleManager.DAIFDPFABCM.ContainsKey(key))
+            string key = Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss ? _skilleffect.PrefabLeft.name : _skilleffect.Prefab.name;
+            if (battleManager.DAIFDPFABCM.ContainsKey(key))
             {
-              GameObject gameObject = this.battleManager.DAIFDPFABCM[key];
-              if ((UnityEngine.Object) gameObject == (UnityEngine.Object) null)
+              GameObject gameObject = battleManager.DAIFDPFABCM[key];
+              if (gameObject == null)
               {
                 yield break;
               }
-              else
-              {
-                this.battleManager.DAIFDPFABCM.Remove(key);
-                UnityEngine.Object.Destroy((UnityEngine.Object) gameObject);
-              }
+
+              battleManager.DAIFDPFABCM.Remove(key);
+              Destroy(gameObject);
             }
             else if (_skilleffect.IsReaction)
-              this.battleManager.DAIFDPFABCM.Add(key, (GameObject) null);
+              battleManager.DAIFDPFABCM.Add(key, null);
             int generateEffectCount = 0;
             float[] execTime = _skilleffect.ExecTime;
             switch (_skilleffect.EffectBehavior)
@@ -1436,45 +1434,45 @@ namespace Elements
             for (int execTimeIndex = 0; execTimeIndex < generateEffectCount; ++execTimeIndex)
             {
                 float waitTime = 0.0f;
-                if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !this.UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(this.Owner.WeaponMotionType, out waitTime)))
-                    waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (float)(execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
+                if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(Owner.WeaponMotionType, out waitTime)))
+                    waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
                 if (!execed[execTimeIndex])
                 {
                     float startTime = 0.0f;
-                    if (!_skipCutIn || (double)waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
+                    if (!_skipCutIn || waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
                     {
-                        if (!_skipCutIn && (double)waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
+                        if (!_skipCutIn && waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
                         {
-                            if (_skilleffect.PlayWithCutIn && this.Owner.PlayCutInFlag && this.Owner.MovieId != 0)
+                            if (_skilleffect.PlayWithCutIn && Owner.PlayCutInFlag && Owner.MovieId != 0)
                                 startTime = _skill.CutInSkipTime - waitTime;
                             else
                                 continue;
                         }
                         do
                         {
-                            yield return (object)null;
-                            time += this.battleManager.DeltaTime_60fps;
-                            if (_skill.Cancel || !this.Owner.gameObject.activeSelf || _modeChangeEndEffect && this.Owner.IsUnableActionState())
+                            yield return null;
+                            time += battleManager.DeltaTime_60fps;
+                            if (_skill.Cancel || !Owner.gameObject.activeSelf || _modeChangeEndEffect && Owner.IsUnableActionState())
                                 yield break;
                         }
-                        while ((double)waitTime > (double)time);
+                        while (waitTime > (double)time);
                         execed[execTimeIndex] = true;
-                        BasePartsData _firearmEndTarget = (BasePartsData)null;
+                        BasePartsData _firearmEndTarget = null;
                         if (_skilleffect.EffectBehavior == eEffectBehavior.FIREARM || _skilleffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM)
                         {
                             switch (_skilleffect.FireArmEndTarget)
                             {
                                 case eEffectTarget.OWNER:
-                                    _firearmEndTarget = this.Owner.GetFirstParts(true);
+                                    _firearmEndTarget = Owner.GetFirstParts(true);
                                     break;
                                 case eEffectTarget.ALL_TARGET:
                                     _firearmEndTarget = _skilleffect.TargetAction.TargetList[execTimeIndex];
                                     break;
                                 case eEffectTarget.FORWARD_TARGET:
                                 case eEffectTarget.BACK_TARGET:
-                                    bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !this.Owner.IsOther;
-                                    List<BasePartsData> basePartsDataList1 = new List<BasePartsData>((IEnumerable<BasePartsData>)_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
-                                    basePartsDataList1.Sort((Comparison<BasePartsData>)((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x)));
+                                    bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !Owner.IsOther;
+                                    List<BasePartsData> basePartsDataList1 = new List<BasePartsData>(_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
+                                    basePartsDataList1.Sort((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x));
                                     if (basePartsDataList1.Count == 0)
                                     {
                                         yield break;
@@ -1491,46 +1489,45 @@ namespace Elements
                             switch (_skilleffect.EffectTarget)
                             {
                                 case eEffectTarget.OWNER:
-                                    this.createNormalEffectPrefab(_skilleffect, _skill, this.Owner.GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex, _modeChangeEndEffect);
+                                    createNormalEffectPrefab(_skilleffect, _skill, Owner.GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex, _modeChangeEndEffect);
                                     continue;
                                 case eEffectTarget.ALL_TARGET:
                                     switch (_skilleffect.EffectBehavior)
                                     {
                                         case eEffectBehavior.SERIES:
                                         case eEffectBehavior.SERIES_FIREARM:
-                                            this.createNormalEffectPrefab(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[execTimeIndex], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
+                                            createNormalEffectPrefab(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[execTimeIndex], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                             continue;
                                         default:
                                             int index1 = 0;
                                             for (int count = _skilleffect.TargetAction.TargetList.Count; index1 < count && index1 < _skilleffect.TargetAction.TargetNum; ++index1)
-                                                this.createNormalEffectPrefab(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[index1], _firearmEndTarget, index1 == 0, startTime, _skipCutIn, execTimeIndex);
+                                                createNormalEffectPrefab(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[index1], _firearmEndTarget, index1 == 0, startTime, _skipCutIn, execTimeIndex);
                                             continue;
                                     }
                                 case eEffectTarget.FORWARD_TARGET:
                                 case eEffectTarget.BACK_TARGET:
-                                    bool flag2 = _skilleffect.EffectTarget == eEffectTarget.FORWARD_TARGET == !this.Owner.IsOther;
-                                    List<BasePartsData> basePartsDataList2 = new List<BasePartsData>((IEnumerable<BasePartsData>)_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
-                                    basePartsDataList2.Sort((Comparison<BasePartsData>)((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x)));
+                                    bool flag2 = _skilleffect.EffectTarget == eEffectTarget.FORWARD_TARGET == !Owner.IsOther;
+                                    List<BasePartsData> basePartsDataList2 = new List<BasePartsData>(_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
+                                    basePartsDataList2.Sort((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x));
                                     if (basePartsDataList2.Count != 0)
                                     {
-                                        this.createNormalEffectPrefab(_skilleffect, _skill, basePartsDataList2[flag2 ? 0 : basePartsDataList2.Count - 1], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
-                                        continue;
+                                        createNormalEffectPrefab(_skilleffect, _skill, basePartsDataList2[flag2 ? 0 : basePartsDataList2.Count - 1], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                     }
                                     continue;
                                 case eEffectTarget.ALL_OTHER:
-                                    List<UnitCtrl> unitCtrlList1 = this.Owner.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
+                                    List<UnitCtrl> unitCtrlList1 = Owner.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                                     for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
                                     {
                                         if ((long)unitCtrlList1[index2].Hp != 0L)
-                                            this.createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
+                                            createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                     }
                                     continue;
                                 case eEffectTarget.ALL_UNIT_EXCEPT_OWNER:
-                                    List<UnitCtrl> unitCtrlList2 = this.Owner.IsOther ? this.battleManager.EnemyList : this.battleManager.UnitList;
+                                    List<UnitCtrl> unitCtrlList2 = Owner.IsOther ? battleManager.EnemyList : battleManager.UnitList;
                                     for (int index2 = 0; index2 < unitCtrlList2.Count; ++index2)
                                     {
-                                        if ((UnityEngine.Object)unitCtrlList2[index2] != (UnityEngine.Object)this.Owner && !unitCtrlList2[index2].IsDead)
-                                            this.createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList2[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
+                                        if (unitCtrlList2[index2] != Owner && !unitCtrlList2[index2].IsDead)
+                                            createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList2[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                     }
                                     continue;
                                 default:
@@ -1550,15 +1547,15 @@ namespace Elements
           bool _first)
         {
           float time = _first ? _skill.CutInSkipTime : 0.0f;
-          if ((double) _delay >= (double) time)
+          if (_delay >= (double) time)
           {
             while (true)
             {
-              time += this.battleManager.DeltaTime_60fps;
+              time += battleManager.DeltaTime_60fps;
               if (!_skill.Cancel)
               {
-                if ((double) _delay > (double) time)
-                  yield return (object) null;
+                if (_delay > (double) time)
+                  yield return null;
                 else
                   goto label_6;
               }
@@ -1568,9 +1565,9 @@ namespace Elements
             yield break;
     label_6:
             if (_skilleffect.EffectTarget == eEffectTarget.OWNER)
-              this.createNormalEffectPrefab(_skilleffect, _skill, this.Owner.GetFirstParts(true), (BasePartsData) null, false, 0.0f, false);
+              createNormalEffectPrefab(_skilleffect, _skill, Owner.GetFirstParts(true), null, false, 0.0f, false);
             else
-              this.createNormalEffectPrefab(_skilleffect, _skill, _target, (BasePartsData) null, false, 0.0f, false);
+              createNormalEffectPrefab(_skilleffect, _skill, _target, null, false, 0.0f, false);
           }
         }
 
@@ -1587,16 +1584,16 @@ namespace Elements
         {
           if (_skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM && !(_skillEffect.FireAction is AttackAction) && (!(_skillEffect.FireAction is RatioDamageAction) && !(_skillEffect.FireAction is UpperLimitAttackAction)) && (!(_skillEffect.FireAction is HealAction) && _skillEffect.AppendAndJudgeAlreadyExeced(_firearmEndTarget.Owner)) || (_skillEffect.TargetBranchId != 0 && _skillEffect.TargetBranchId != _skill.EffectBranchId || _skillEffect.TargetMotionIndex == 1 && _skill.LoopEffectAlreadyDone))
             return;
-          GameObject prefab1 = (GameObject) null;
-          SkillEffectCtrl prefab2 = this.createPrefab(_skillEffect, _skill, _target, ref prefab1);
+          GameObject prefab1 = null;
+          SkillEffectCtrl prefab2 = createPrefab(_skillEffect, _skill, _target, ref prefab1);
           prefab2.InitializeSort();
           prefab2.SetStartTime(_starttime);
           //prefab2.PlaySe(this.Owner.SoundUnitId, this.Owner.IsLeftDir);
-          prefab2.SetPossitionAppearanceType(_skillEffect, _target, this.Owner, _skill);
-          prefab2.ExecAppendCoroutine((double) _skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null, prefab2 is AwakeUbNoneStopEffect);
-          prefab2.SetTimeToDieByStartHp(this.Owner.StartHpPercent);
+          prefab2.SetPossitionAppearanceType(_skillEffect, _target, Owner, _skill);
+          prefab2.ExecAppendCoroutine(_skill.BlackOutTime > 0.0 ? Owner : null, prefab2 is AwakeUbNoneStopEffect);
+          prefab2.SetTimeToDieByStartHp(Owner.StartHpPercent);
           if (_modeChangeEndEffect)
-            this.Owner.ModeChangeEndEffectList.Add(prefab2);
+            Owner.ModeChangeEndEffectList.Add(prefab2);
           if (_skipCutIn)
             prefab2.OnAwakeWhenSkipCutIn();
           switch (_skillEffect.EffectBehavior)
@@ -1607,20 +1604,20 @@ namespace Elements
               List<ActionParameter> _actions = new List<ActionParameter>();
               if (_skillEffect.FireActionId != -1 & actionStart)
                 _actions.Add(_skillEffect.FireAction);
-              firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), this.Owner, _skillEffect.Height, (double) _skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, this.transform.position + (this.Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
-              firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? (System.Action<FirearmCtrl>) (fctrl =>
+              firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), Owner, _skillEffect.Height, _skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, transform.position + (Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
+              firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? fctrl =>
               {
-                /*for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
+                  /*for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
                 {
                   if (fctrl.ShakeEffects[index1].TargetMotion == 0)
                     this.AppendCoroutine(this.StartShakeWithDelay(fctrl.ShakeEffects[index1], fctrl.Skill), ePauseType.VISUAL, (double) fctrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
                 }*/
-                if (_skillEffect.FireActionId != -1)
-                  this.AppendCoroutine(this.ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _firearmEndTarget, 0.0f), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-                int index3 = 0;
-                for (int count = _skillEffect.FireArmEndEffects.Count; index3 < count; ++index3)
-                  this.AppendCoroutine(this.createNormalPrefabWithDelayAndTarget(_skillEffect.FireArmEndEffects[index3], _skill, 0.0f, _firearmEndTarget, false), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-              }) : new System.Action<FirearmCtrl>(this.onFirearmHit);
+                  if (_skillEffect.FireActionId != -1)
+                      AppendCoroutine(ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _firearmEndTarget, 0.0f), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
+                  int index3 = 0;
+                  for (int count = _skillEffect.FireArmEndEffects.Count; index3 < count; ++index3)
+                      AppendCoroutine(createNormalPrefabWithDelayAndTarget(_skillEffect.FireArmEndEffects[index3], _skill, 0.0f, _firearmEndTarget, false), ePauseType.VISUAL, _skill.BlackOutTime > 0.0 ? Owner : null);
+              } : new Action<FirearmCtrl>(onFirearmHit);
               break;
             case eEffectBehavior.WORLD_POS_CENTER:
               switch (_skillEffect.TrackDimension)
@@ -1640,32 +1637,31 @@ namespace Elements
               Vector3 vector3_1 = new Vector3();
               int index2 = 0;
               for (int count = _skillEffect.TargetAction.TargetList.Count; index2 < count; ++index2)
-                vector3_1 += _skillEffect.TargetAction.TargetList[index2].GetPosition() / (float) count;
+                vector3_1 += _skillEffect.TargetAction.TargetList[index2].GetPosition() / count;
               prefab2.transform.position = vector3_1;
               break;
             case eEffectBehavior.SKILL_AREA_RANDOM:
               Vector3 vector3_2 = new Vector3();
-              int attackSide = UnitActionController.GetAttackSide(_skillEffect.TargetAction.Direction, this.Owner);
+              int attackSide = GetAttackSide(_skillEffect.TargetAction.Direction, Owner);
               float num1 = attackSide < 1 ? -_skillEffect.TargetAction.TargetWidth : 0.0f;
               float num2 = attackSide > -1 ? _skillEffect.TargetAction.TargetWidth : 0.0f;
-              float num3 = _skillEffect.TargetAction.ActionType == eActionType.REFLEXIVE ? _skillEffect.TargetAction.TargetList[0].GetPosition().x : this.transform.position.x;
+              float num3 = _skillEffect.TargetAction.ActionType == eActionType.REFLEXIVE ? _skillEffect.TargetAction.TargetList[0].GetPosition().x : transform.position.x;
               float num4 = num1 + num3;
               float num5 = num2 + num3;
-              if ((double) num4 < -(double) BattleDefine.BATTLE_FIELD_SIZE)
+              if (num4 < -(double) BattleDefine.BATTLE_FIELD_SIZE)
                 num4 = -BattleDefine.BATTLE_FIELD_SIZE;
-              if ((double) num5 > (double) BattleDefine.BATTLE_FIELD_SIZE)
+              if (num5 > (double) BattleDefine.BATTLE_FIELD_SIZE)
                 num5 = BattleDefine.BATTLE_FIELD_SIZE;
-              vector3_2.x = (float) (((double) num4 + ((double) num5 - (double) num4) * (double) BattleManager.Random(0.0f, 1f,
-                  new PCRCaculator.Guild.RandomData(Owner,_target.Owner,_skill.SkillId,8,0))) / 540.0);
-              vector3_2.y += (float) ((double) _skillEffect.CenterY + (double) _skillEffect.DeltaY * (double) BattleManager.Random(-1f, 1f,
-                  new PCRCaculator.Guild.RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0)) + 9.25925922393799);
+              vector3_2.x = (float) ((num4 + (num5 - (double) num4) * BattleManager.Random(0.0f, 1f,
+                  new RandomData(Owner,_target.Owner,_skill.SkillId,8,0))) / 540.0);
+              vector3_2.y += (float) (_skillEffect.CenterY + _skillEffect.DeltaY * (double) BattleManager.Random(-1f, 1f,
+                  new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0)) + 9.25925922393799);
               prefab2.transform.position = vector3_2;
               break;
             case eEffectBehavior.SERIES:
               if (_skillEffect.FireActionId != -1)
               {
-                this.AppendCoroutine(this.ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _target, 0.0f), ePauseType.SYSTEM, (double) _skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-                break;
+                AppendCoroutine(ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _target, 0.0f), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
               }
               break;
           }
@@ -1678,30 +1674,30 @@ namespace Elements
           BasePartsData target,
           ref GameObject prefab)
         {
-          prefab = this.Owner.IsLeftDir || this.Owner.IsForceLeftDirOrPartsBoss ? skillEffect.PrefabLeft : skillEffect.Prefab;
+          prefab = Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss ? skillEffect.PrefabLeft : skillEffect.Prefab;
           string name = prefab.name;
-          SkillEffectCtrl effect = this.battleEffectPool.GetEffect(prefab,skillEffect.PrefabData, this.Owner);
+          SkillEffectCtrl effect = battleEffectPool.GetEffect(prefab,skillEffect.PrefabData, Owner);
           effect.transform.parent = ExceptNGUIRoot.Transform;
           skill.EffectObjs.Add(effect);
           if (skillEffect.TargetMotionIndex == 1)
           {
             skill.LoopEffectObjs.Add(effect);
-            effect.OnEffectEnd += (System.Action<SkillEffectCtrl>) (obj => skill.LoopEffectObjs.Remove(obj));
+            effect.OnEffectEnd += obj => skill.LoopEffectObjs.Remove(obj);
           }
           if (effect.IsRepeat && !(effect is FirearmCtrl))
           {
             target.Owner.RepeatEffectList.Add(effect);
-            effect.OnEffectEnd += (System.Action<SkillEffectCtrl>) (obj => target.Owner.RepeatEffectList.Remove(obj));
+            effect.OnEffectEnd += obj => target.Owner.RepeatEffectList.Remove(obj);
           }
-          effect.OnEffectEnd += (System.Action<SkillEffectCtrl>) (destroyedEffect => skill.EffectObjs.Remove(destroyedEffect));
+          effect.OnEffectEnd += destroyedEffect => skill.EffectObjs.Remove(destroyedEffect);
           if (skillEffect.IsReaction)
-            this.battleManager.DAIFDPFABCM[name] = effect.gameObject;
+            battleManager.DAIFDPFABCM[name] = effect.gameObject;
           return effect;
         }
 
         private void onFirearmHit(FirearmCtrl firearmCtrl)
         {
-          if ((UnityEngine.Object) firearmCtrl == (UnityEngine.Object) null || firearmCtrl.FireTarget == null || firearmCtrl.Skill == null)
+          if (firearmCtrl == null || firearmCtrl.FireTarget == null || firearmCtrl.Skill == null)
             return;
           /*for (int index = 0; index < firearmCtrl.ShakeEffects.Count; ++index)
           {
@@ -1710,10 +1706,10 @@ namespace Elements
           }*/
           int index1 = 0;
           for (int count = firearmCtrl.EndActions.Count; index1 < count; ++index1)
-            this.ExecUnitActionWithDelay(firearmCtrl.EndActions[index1], firearmCtrl.Skill, false, true);
+            ExecUnitActionWithDelay(firearmCtrl.EndActions[index1], firearmCtrl.Skill, false, true);
           int index2 = 0;
           for (int count = firearmCtrl.SkillHitEffects.Count; index2 < count; ++index2)
-            this.AppendCoroutine(this.createNormalPrefabWithDelay(firearmCtrl.SkillHitEffects[index2], firearmCtrl.Skill, _isFirearmEndEffect: true), ePauseType.VISUAL, (double) firearmCtrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
+            AppendCoroutine(createNormalPrefabWithDelay(firearmCtrl.SkillHitEffects[index2], firearmCtrl.Skill, _isFirearmEndEffect: true), ePauseType.VISUAL, firearmCtrl.Skill.BlackOutTime > 0.0 ? Owner : null);
         }
 
         private void searchTargetUnit(
@@ -1722,29 +1718,29 @@ namespace Elements
           Skill skill,
           bool _considerBodyWidth)
         {
-            float x = this.transform.parent.lossyScale.x;
+            float x = transform.parent.lossyScale.x;
             actionParameter.TargetList.Clear();
-            bool isOther = this.Owner.IsOther;
-            List<UnitCtrl> unitCtrlList1 = !this.Owner.IsConfusionOrConvert() ? (isOther ? this.battleManager.UnitList : this.battleManager.EnemyList) : (!isOther ? this.battleManager.UnitList : this.battleManager.EnemyList);
-            List<UnitCtrl> unitCtrlList2 = isOther ? this.battleManager.EnemyList : this.battleManager.UnitList;
+            bool isOther = Owner.IsOther;
+            List<UnitCtrl> unitCtrlList1 = !Owner.IsConfusionOrConvert() ? (isOther ? battleManager.UnitList : battleManager.EnemyList) : (!isOther ? battleManager.UnitList : battleManager.EnemyList);
+            List<UnitCtrl> unitCtrlList2 = isOther ? battleManager.EnemyList : battleManager.UnitList;
             List<UnitCtrl> unitCtrlList3 = actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE ? unitCtrlList1 : unitCtrlList2;
             switch (actionParameter.TargetSort)
             {
                 case PriorityPattern.SUMMON:
                 case PriorityPattern.ALL_SUMMON_RANDOM:
-                    unitCtrlList3 = unitCtrlList3.FindAll((Predicate<UnitCtrl>)(e => e.IsSummonOrPhantom));
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e.IsSummonOrPhantom);
                     break;
                 case PriorityPattern.ATK_PHYSICS:
-                    unitCtrlList3 = unitCtrlList3.FindAll((Predicate<UnitCtrl>)(e => e.AtkType == 1));
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e.AtkType == 1);
                     break;
                 case PriorityPattern.ATK_MAGIC:
-                    unitCtrlList3 = unitCtrlList3.FindAll((Predicate<UnitCtrl>)(e => e.AtkType == 2));
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e.AtkType == 2);
                     break;
                 case PriorityPattern.OWN_SUMMON_RANDOM:
-                    unitCtrlList3 = this.Owner.SummonUnitDictionary.Values.ToList<UnitCtrl>().FindAll((Predicate<UnitCtrl>)(e => !e.IdleOnly && !e.IsDead));
+                    unitCtrlList3 = Owner.SummonUnitDictionary.Values.ToList().FindAll(e => !e.IdleOnly && !e.IsDead);
                     break;
                 case PriorityPattern.NEAR_MY_TEAM_WITHOUT_OWNER:
-                    unitCtrlList3 = unitCtrlList3.FindAll((Predicate<UnitCtrl>)(e => (UnityEngine.Object)e != (UnityEngine.Object)this.Owner));
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner);
                     break;
             }
             float num = actionParameter.TargetWidth;
@@ -1754,7 +1750,7 @@ namespace Elements
                 for (int count = unitCtrlList3.Count; index1 < count; ++index1)
                 {
                     UnitCtrl _unitCtrl = unitCtrlList3[index1];
-                    if (this.judgeIsTarget(_unitCtrl, actionParameter))
+                    if (judgeIsTarget(_unitCtrl, actionParameter))
                     {
                         if (_unitCtrl.IsPartsBoss)
                         {
@@ -1762,7 +1758,7 @@ namespace Elements
                             {
                                 PartsData partsData = _unitCtrl.BossPartsListForBattle[index2];
                                 if (partsData.GetTargetable())
-                                    actionParameter.TargetList.Add((BasePartsData)partsData);
+                                    actionParameter.TargetList.Add(partsData);
                             }
                         }
                         else
@@ -1772,21 +1768,21 @@ namespace Elements
             }
             else
             {
-                int attackSide = UnitActionController.GetAttackSide(actionParameter.Direction, this.Owner);
-                if ((double)num <= 0.0)
-                    num = skill.SkillId == 1 ? this.Owner.SearchAreaSize : skill.skillAreaWidth;
+                int attackSide = GetAttackSide(actionParameter.Direction, Owner);
+                if (num <= 0.0)
+                    num = skill.SkillId == 1 ? Owner.SearchAreaSize : skill.skillAreaWidth;
                 float _start = attackSide < 1 ? -num : 0.0f;
                 float _end = attackSide > -1 ? num : 0.0f;
-                BasePartsData basePartsData1 = (BasePartsData)null;
+                BasePartsData basePartsData1 = null;
                 int index1 = 0;
                 for (int count = unitCtrlList3.Count; index1 < count; ++index1)
                 {
                     UnitCtrl _unitCtrl = unitCtrlList3[index1];
                     if (!_unitCtrl.IsPartsBoss)
                     {
-                        if (this.judgeIsInTargetArea(actionParameter, basePosition, _considerBodyWidth, x, _start, _end, _unitCtrl.GetFirstParts()))
+                        if (judgeIsInTargetArea(actionParameter, basePosition, _considerBodyWidth, x, _start, _end, _unitCtrl.GetFirstParts()))
                         {
-                            if (this.judgeIsTarget(_unitCtrl, actionParameter))
+                            if (judgeIsTarget(_unitCtrl, actionParameter))
                                 actionParameter.TargetList.Add(_unitCtrl.GetFirstParts());
                             else if ((long)_unitCtrl.Hp == 0L)
                                 basePartsData1 = _unitCtrl.GetFirstParts();
@@ -1795,35 +1791,35 @@ namespace Elements
                     else
                     {
                         bool flag = actionParameter.TargetSort == PriorityPattern.HP_ASC || actionParameter.TargetSort == PriorityPattern.HP_DEC || (actionParameter.TargetSort == PriorityPattern.ENERGY_ASC || actionParameter.TargetSort == PriorityPattern.ENERGY_DEC) || actionParameter.TargetSort == PriorityPattern.ENERGY_REDUCING;
-                        BasePartsData basePartsData2 = (BasePartsData)null;
+                        BasePartsData basePartsData2 = null;
                         for (int index2 = 0; index2 < _unitCtrl.BossPartsListForBattle.Count; ++index2)
                         {
                             PartsData partsData = _unitCtrl.BossPartsListForBattle[index2];
-                            if (this.judgeIsInTargetArea(actionParameter, basePosition, _considerBodyWidth, x, _start, _end, (BasePartsData)partsData) && this.judgeIsTarget(_unitCtrl, actionParameter))
+                            if (judgeIsInTargetArea(actionParameter, basePosition, _considerBodyWidth, x, _start, _end, partsData) && judgeIsTarget(_unitCtrl, actionParameter))
                             {
                                 if (flag)
                                 {
                                     if (basePartsData2 == null)
                                     {
-                                        basePartsData2 = (BasePartsData)partsData;
+                                        basePartsData2 = partsData;
                                     }
                                     else
                                     {
-                                        float _a = Mathf.Abs(basePartsData2.GetPosition().x - this.Owner.transform.position.x);
-                                        float _b = Mathf.Abs(partsData.GetPosition().x - this.Owner.transform.position.x);
-                                        if ((double)_a > (double)_b || BattleUtil.Approximately(_a, _b))
-                                            basePartsData2 = (BasePartsData)partsData;
+                                        float _a = Mathf.Abs(basePartsData2.GetPosition().x - Owner.transform.position.x);
+                                        float _b = Mathf.Abs(partsData.GetPosition().x - Owner.transform.position.x);
+                                        if (_a > (double)_b || BattleUtil.Approximately(_a, _b))
+                                            basePartsData2 = partsData;
                                     }
                                 }
                                 else
-                                    actionParameter.TargetList.Add((BasePartsData)partsData);
+                                    actionParameter.TargetList.Add(partsData);
                             }
                         }
                         if (basePartsData2 != null)
                             actionParameter.TargetList.Add(basePartsData2);
                     }
                 }
-                if (actionParameter.TargetSort != PriorityPattern.NEAR || actionParameter.TargetList.Count != 0 || (basePartsData1 == null || this.Owner.IsConfusionOrConvert()))
+                if (actionParameter.TargetSort != PriorityPattern.NEAR || actionParameter.TargetList.Count != 0 || (basePartsData1 == null || Owner.IsConfusionOrConvert()))
                     return;
                 actionParameter.TargetList.Add(basePartsData1);
             }
@@ -1840,10 +1836,10 @@ namespace Elements
         {
             if (!_unitCtrl.GetTargetable())
                 return false;
-            float _a = (float)((double)_unitCtrl.GetPosition().x / (double)_parentLossyScale - (double)_basePosition.x / (double)_parentLossyScale);
+            float _a = (float)(_unitCtrl.GetPosition().x / (double)_parentLossyScale - _basePosition.x / (double)_parentLossyScale);
             float bodyWidth = _unitCtrl.GetBodyWidth();
             if (_considerBodyWidth)            
-                bodyWidth += this.Owner.BodyWidth;
+                bodyWidth += Owner.BodyWidth;
             //add 
             /*if (_considerBodyWidth)
             {
@@ -1854,14 +1850,14 @@ namespace Elements
             //end
             float _b1 = _start - bodyWidth * 0.5f;
             float _b2 = _end + bodyWidth * 0.5f;
-            return (double)_a >= (double)_b1 && (double)_a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2)) || _actionParameter.Direction == DirectionType.ALL;
+            return _a >= (double)_b1 && _a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2)) || _actionParameter.Direction == DirectionType.ALL;
         }
 
         private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
         {
             if (_unitCtrl.IsStealth || _unitCtrl.IsPhantom && _actionParameter.TargetSort != PriorityPattern.OWN_SUMMON_RANDOM || (_unitCtrl.IsDead || (long)_unitCtrl.Hp <= 0L) && !_unitCtrl.HasUnDeadTime)
                 return false;
-            return _actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || (UnityEngine.Object)this.Owner != (UnityEngine.Object)_unitCtrl;
+            return _actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl;
         }
 
         public static int GetAttackSide(DirectionType _direction, UnitCtrl _owner) => _direction != DirectionType.FRONT ? 0 : (!_owner.IsLeftDir ? 1 : -1);
@@ -1911,7 +1907,7 @@ namespace Elements
                 _actionParameter.sortinfo = "";
                 var str = $"对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})进行排序：\n" +
                     $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
-                Owner.UIManager.LogMessage(str, PCRCaculator.Battle.eLogMessageType.EXEC_ACTION, Owner);
+                Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
                 _actionParameter.sortinfo += str + "\n";
                 if (_array.Count == 0)
                     return;
@@ -1920,7 +1916,7 @@ namespace Elements
                 UnitCtrl.quickSortImpl(_array, 0, _array.Count - 1, instance);
                 str = $"{Owner.UnitName}对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})排序结果\n" +
                     $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
-                Owner.UIManager.LogMessage(str, PCRCaculator.Battle.eLogMessageType.EXEC_ACTION, Owner);
+                Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
                 _actionParameter.sortinfo += str + "\n";
             }
 
@@ -1942,7 +1938,7 @@ namespace Elements
                 var nth = _actionParameter.TargetNth;
                 var tgt = targetList[Math.Min(lst.Count - 1, nth)];
                 var tgth = tgt.GetHashCode();
-                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                GuildCalculator.Instance.dmglist.Add(new ProbEvent
                 {
                     unit = Owner.UnitNameEx,
                     predict = hash =>
@@ -1967,7 +1963,7 @@ namespace Elements
                     while (count > 1)
                     {
                         int index = BattleManager.Random(0, count,
-                                                    new PCRCaculator.Guild.RandomData(null,null,_actionParameter.ActionId,10,count));
+                                                    new RandomData(null,null,_actionParameter.ActionId,10,count));
                         --count;
                         BasePartsData basePartsData = targetList[index];
                         targetList[index] = targetList[count];
@@ -1976,110 +1972,110 @@ namespace Elements
                     break;
                 case PriorityPattern.NEAR:
                 case PriorityPattern.NEAR_MY_TEAM_WITHOUT_OWNER:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareDistanceAsc));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareDistanceAsc);
                     break;
                 case PriorityPattern.FAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareDistanceDec));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareDistanceDec);
                     break;
                 case PriorityPattern.HP_ASC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareLifeAsc));
+                    QuickSort(targetList, UnitCtrl.CompareLifeAsc);
                     AddProbEvent(UnitCtrl.CompareLifeAsc);
                     break;
                 case PriorityPattern.HP_DEC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareLifeDec));
+                    QuickSort(targetList, UnitCtrl.CompareLifeDec);
                     AddProbEvent(UnitCtrl.CompareLifeDec);
                     break;
                 case PriorityPattern.OWNER:
                     targetList.Clear();
-                    targetList.Add(this.Owner.GetFirstParts(_basePos: (-BattleDefine.BATTLE_FIELD_SIZE)));
+                    targetList.Add(Owner.GetFirstParts(_basePos: (-BattleDefine.BATTLE_FIELD_SIZE)));
                     break;
                 case PriorityPattern.FORWARD:
                 case PriorityPattern.BACK:
                     bool _isForwardPattern = _actionParameter.TargetSort == PriorityPattern.FORWARD;
-                    this.sortTargetPosition(targetList, _isForwardPattern, new Comparison<BasePartsData>(this.Owner.CompareLeft), new Comparison<BasePartsData>(this.Owner.CompareRight));
+                    sortTargetPosition(targetList, _isForwardPattern, Owner.CompareLeft, Owner.CompareRight);
                     break;
                 case PriorityPattern.ABSOLUTE_POSITION:
                     targetList.Clear();
-                    targetList.Add(this.Owner.GetFirstParts(true));
+                    targetList.Add(Owner.GetFirstParts(true));
                     break;
                 case PriorityPattern.ENERGY_DEC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareEnergyDec));
+                    QuickSort(targetList, UnitCtrl.CompareEnergyDec);
                     AddProbEvent(UnitCtrl.CompareEnergyDec);
                     break;
                 case PriorityPattern.ENERGY_ASC:
                 case PriorityPattern.ENERGY_REDUCING:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareEnergyAsc));
+                    QuickSort(targetList, UnitCtrl.CompareEnergyAsc);
                     AddProbEvent(UnitCtrl.CompareEnergyAsc);
                     break;
                 case PriorityPattern.ATK_DEC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareAtkDec));
+                    QuickSort(targetList, UnitCtrl.CompareAtkDec);
                     AddProbEvent(UnitCtrl.CompareAtkDec);
                     break;
                 case PriorityPattern.ATK_ASC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareAtkAsc));
+                    QuickSort(targetList, UnitCtrl.CompareAtkAsc);
                     AddProbEvent(UnitCtrl.CompareAtkAsc);
                     break;
                 case PriorityPattern.MAGIC_STR_DEC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareMagicStrDec));
+                    QuickSort(targetList, UnitCtrl.CompareMagicStrDec);
                     AddProbEvent(UnitCtrl.CompareMagicStrDec);
                     break;
                 case PriorityPattern.MAGIC_STR_ASC:
-                    QuickSort(targetList, new Func<BasePartsData, BasePartsData, int>(UnitCtrl.CompareMagicStrAsc));
+                    QuickSort(targetList, UnitCtrl.CompareMagicStrAsc);
                     AddProbEvent(UnitCtrl.CompareMagicStrAsc);
                     break;
                 case PriorityPattern.BOSS:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareBoss));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareBoss);
                     break;
                 case PriorityPattern.HP_ASC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareLifeAscNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareLifeAscNear);
                     break;
                 case PriorityPattern.HP_DEC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareLifeDecNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareLifeDecNear);
                     break;
                 case PriorityPattern.ENERGY_DEC_NEAR:
                 case PriorityPattern.ENERGY_DEC_NEAR_MAX:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareEnergyDecNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareEnergyDecNear);
                     break;
                 case PriorityPattern.ENERGY_ASC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareEnergyAscNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareEnergyAscNear);
                     break;
                 case PriorityPattern.ATK_DEC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareAtkDecNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareAtkDecNear);
                     break;
                 case PriorityPattern.ATK_ASC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareAtkAscNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareAtkAscNear);
                     break;
                 case PriorityPattern.MAGIC_STR_DEC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareMagicStrDecNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareMagicStrDecNear);
                     break;
                 case PriorityPattern.MAGIC_STR_ASC_NEAR:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareMagicStrAscNear));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareMagicStrAscNear);
                     break;
                 case PriorityPattern.SHADOW:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareShadow));
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareShadow);
                     break;
                 case PriorityPattern.HP_VALUE_DEC_NEAR_FORWARD:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    this.sortTargetPosition(targetList, true, new Comparison<BasePartsData>(this.Owner.CompareLifeValueDecSameLeft), new Comparison<BasePartsData>(this.Owner.CompareLifeValueDecSameRight));
+                    Owner.BaseX = _baseTransform.position.x;
+                    sortTargetPosition(targetList, true, Owner.CompareLifeValueDecSameLeft, Owner.CompareLifeValueDecSameRight);
                     break;
                 case PriorityPattern.HP_VALUE_ASC_NEAR_FORWARD:
-                    this.Owner.BaseX = _baseTransform.position.x;
-                    this.sortTargetPosition(targetList, true, new Comparison<BasePartsData>(this.Owner.CompareLifeValueAscSameLeft), new Comparison<BasePartsData>(this.Owner.CompareLifeValueAscSameRight));
+                    Owner.BaseX = _baseTransform.position.x;
+                    sortTargetPosition(targetList, true, Owner.CompareLifeValueAscSameLeft, Owner.CompareLifeValueAscSameRight);
                     break;
                 default:
-                    targetList.Sort(new Comparison<BasePartsData>(this.Owner.CompareDistanceAsc));
+                    targetList.Sort(Owner.CompareDistanceAsc);
                     break;
             }
             switch (_actionParameter.TargetSort)
@@ -2095,7 +2091,7 @@ namespace Elements
                         else
                             basePartsDataList2.Add(targetList[index]);
                     }
-                    basePartsDataList2.AddRange((IEnumerable<BasePartsData>)basePartsDataList1);
+                    basePartsDataList2.AddRange(basePartsDataList1);
                     _actionParameter.TargetList = basePartsDataList2;
                     break;
                 case PriorityPattern.ENERGY_REDUCING:
@@ -2108,7 +2104,7 @@ namespace Elements
                         else
                             basePartsDataList4.Add(targetList[index]);
                     }
-                    basePartsDataList3.AddRange((IEnumerable<BasePartsData>)basePartsDataList4);
+                    basePartsDataList3.AddRange(basePartsDataList4);
                     _actionParameter.TargetList = basePartsDataList3;
                     break;
             }
@@ -2120,9 +2116,9 @@ namespace Elements
           Comparison<BasePartsData> _forwardComparison,
           Comparison<BasePartsData> _backComparison)
         {
-            if (this.Owner.IsOther)
+            if (Owner.IsOther)
                 _isForwardPattern = !_isForwardPattern;
-            if (this.Owner.IsConfusionOrConvert())
+            if (Owner.IsConfusionOrConvert())
                 _isForwardPattern = !_isForwardPattern;
             if (_isForwardPattern)
                 _targetList.Sort(_forwardComparison);
@@ -2132,10 +2128,10 @@ namespace Elements
 
         public void CancelAction(int skillId)
         {
-            Skill skill = this.skillDictionary[skillId];
+            Skill skill = skillDictionary[skillId];
             for (int index = skill.EffectObjs.Count - 1; index >= 0; --index)
             {
-              if ((UnityEngine.Object) skill.EffectObjs[index] != (UnityEngine.Object) null && !(skill.EffectObjs[index] is FirearmCtrl) && !skill.EffectObjs[index].IsRepeat)
+              if (skill.EffectObjs[index] != null && !(skill.EffectObjs[index] is FirearmCtrl) && !skill.EffectObjs[index].IsRepeat)
               {
                 skill.EffectObjs[index].SetTimeToDie(true);
                 skill.EffectObjs[index].OnEffectEnd(skill.EffectObjs[index]);
@@ -2205,93 +2201,93 @@ namespace Elements
           }
         }*/
 
-        public void AppendCoroutine(IEnumerator cr, ePauseType pauseType, UnitCtrl unit = null) => this.battleManager.AppendCoroutine(cr, pauseType, unit);
+        public void AppendCoroutine(IEnumerator cr, ePauseType pauseType, UnitCtrl unit = null) => battleManager.AppendCoroutine(cr, pauseType, unit);
 
         public bool HasNextAnime(int skillId)
         {
-            Skill skill = this.skillDictionary[skillId];
+            Skill skill = skillDictionary[skillId];
             if (skill.IsPrincessForm)
                 return true;
-            return (skill.AnimId == eSpineCharacterAnimeId.SKILL || skill.AnimId == eSpineCharacterAnimeId.SKILL_EVOLUTION || skill.AnimId == eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION) && this.Owner.GetCurrentSpineCtrl().IsAnimation(skill.AnimId, skill.SkillNum, 1);
+            return (skill.AnimId == eSpineCharacterAnimeId.SKILL || skill.AnimId == eSpineCharacterAnimeId.SKILL_EVOLUTION || skill.AnimId == eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION) && Owner.GetCurrentSpineCtrl().IsAnimation(skill.AnimId, skill.SkillNum, 1);
         }
 
         public bool IsLoopMotionPlaying(int _skillId)
         {
-            Skill skill = this.skillDictionary[_skillId];
-            return this.Owner.GetCurrentSpineCtrl().AnimationName == this.Owner.GetCurrentSpineCtrl().ConvertAnimeIdToAnimeName(skill.AnimId, skill.SkillNum, 1);
+            Skill skill = skillDictionary[_skillId];
+            return Owner.GetCurrentSpineCtrl().AnimationName == Owner.GetCurrentSpineCtrl().ConvertAnimeIdToAnimeName(skill.AnimId, skill.SkillNum, 1);
         }
 
-        public SkillMotionType GetSkillMotionType(int _skillId) => this.skillDictionary[_skillId].SkillMotionType;
+        public SkillMotionType GetSkillMotionType(int _skillId) => skillDictionary[_skillId].SkillMotionType;
 
-        public int GetSkillNum(int _skillId) => this.skillDictionary[_skillId].SkillNum;
+        public int GetSkillNum(int _skillId) => skillDictionary[_skillId].SkillNum;
 
-        public bool IsModeChange(int _skillId) => this.skillDictionary[_skillId].IsModeChange;
+        public bool IsModeChange(int _skillId) => skillDictionary[_skillId].IsModeChange;
 
         public void ExecActionOnStart()
         {
-            foreach (KeyValuePair<int, Skill> skill in this.skillDictionary)
-                this.execActionOnStart(skill.Value);
+            foreach (KeyValuePair<int, Skill> skill in skillDictionary)
+                execActionOnStart(skill.Value);
         }
 
         public void ExecActionOnWaveStart()
         {
-            foreach (KeyValuePair<int, Skill> skill in this.skillDictionary)
-                this.execActionOnWaveStart(skill.Value);
+            foreach (KeyValuePair<int, Skill> skill in skillDictionary)
+                execActionOnWaveStart(skill.Value);
         }
 
         public IEnumerator UpdateBranchMotion(ActionParameter _action, Skill _skill)
         {
-            if (_skill.AnimId != eSpineCharacterAnimeId.NONE && !this.updateBranchMotionRunning)
+            if (_skill.AnimId != eSpineCharacterAnimeId.NONE && !updateBranchMotionRunning)
             {
-                this.updateBranchMotionRunning = true;
-                BattleSpineController unitSpineController = this.Owner.GetCurrentSpineCtrl();
+                updateBranchMotionRunning = true;
+                BattleSpineController unitSpineController = Owner.GetCurrentSpineCtrl();
                 if (!unitSpineController.IsAnimation(_skill.AnimId, _skill.SkillNum, 1))
                 {
-                    this.updateBranchMotionRunning = false;
+                    updateBranchMotionRunning = false;
                 }
                 else
                 {
-                    while (!this.actionCancelAndGetCancel(_skill.SkillId))
+                    while (!actionCancelAndGetCancel(_skill.SkillId))
                     {
                         if (unitSpineController.IsPlayAnimeBattle)
-                            yield return (object)null;
+                            yield return null;
                         else if (_skill.EffectBranchId == 0)
                         {
-                            this.updateBranchMotionRunning = false;
+                            updateBranchMotionRunning = false;
                             yield break;
                         }
                         else
                         {
-                            this.Owner.PlayAnime(_skill.AnimId, _skill.SkillNum, _skill.EffectBranchId, _isLoop: false);
-                            if (_skill.SkillId == this.Owner.UnionBurstSkillId)
-                                this.Owner.UnionBurstAnimeEndForIfAction = true;
-                            while (!this.actionCancelAndGetCancel(_skill.SkillId))
+                            Owner.PlayAnime(_skill.AnimId, _skill.SkillNum, _skill.EffectBranchId, _isLoop: false);
+                            if (_skill.SkillId == Owner.UnionBurstSkillId)
+                                Owner.UnionBurstAnimeEndForIfAction = true;
+                            while (!actionCancelAndGetCancel(_skill.SkillId))
                             {
                                 if (!unitSpineController.IsPlayAnimeBattle)
                                 {
-                                    this.Owner.SetState(UnitCtrl.ActionState.IDLE);
-                                    this.updateBranchMotionRunning = false;
+                                    Owner.SetState(UnitCtrl.ActionState.IDLE);
+                                    updateBranchMotionRunning = false;
                                     yield break;
                                 }
-                                else
-                                    yield return (object)null;
+
+                                yield return null;
                             }
-                            this.updateBranchMotionRunning = false;
+                            updateBranchMotionRunning = false;
                             yield break;
                         }
                     }
-                    this.updateBranchMotionRunning = false;
+                    updateBranchMotionRunning = false;
                 }
             }
         }
 
         private bool actionCancelAndGetCancel(int _skillId)
         {
-            if (!this.Owner.IsUnableActionState() && !this.Owner.IsCancelActionState(_skillId == this.Owner.UnionBurstSkillId))
+            if (!Owner.IsUnableActionState() && !Owner.IsCancelActionState(_skillId == Owner.UnionBurstSkillId))
                 return false;
-            this.Owner.CancelByAwake = false;
-            this.Owner.CancelByConvert = false;
-            this.CancelAction(_skillId);
+            Owner.CancelByAwake = false;
+            Owner.CancelByConvert = false;
+            CancelAction(_skillId);
             return true;
         }
 

@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using Newtonsoft0.Json;
 using UnityEngine;
 using UnityEngine.UI;
-using Newtonsoft0.Json;
-using System.Runtime.InteropServices;
-using System.IO;
 
 namespace PCRCaculator.Calc
 {
@@ -62,10 +62,10 @@ namespace PCRCaculator.Calc
         private List<int> skillCost;
         private static readonly int[] expCost_A;
 
-        private int cost_nama_total = 0;
-        private int cost_mana_craftEquipment = 0;//制造装备消耗的玛娜
-        private int cost_mana_leveUp_equipment = 0;
-        private int cost_mana_leveUp_skill = 0;
+        private int cost_nama_total;
+        private int cost_mana_craftEquipment;//制造装备消耗的玛娜
+        private int cost_mana_leveUp_equipment;
+        private int cost_mana_leveUp_skill;
 
         private enum CurrentStep { step1 = 1, step2 = 2, step3 = 3 }
         private CurrentStep equipmentCalPage_step;
@@ -82,7 +82,7 @@ namespace PCRCaculator.Calc
 
         static CalculatorManager()
         {
-            expCost_A = new int[]
+            expCost_A = new[]
             {
                 439506,
                 462058,485210,508962,533314,558266,583818,609970,636722,664074,692026,
@@ -139,7 +139,7 @@ namespace PCRCaculator.Calc
             equipmentCalPage_step = CurrentStep.step2;
             if (unitDataDicForCal_perverous != null && unitDataDicForCal_perverous.Count > 0)
             {
-                MainManager.Instance.WindowConfigMessage("已经设置过初始状态，是否覆盖？", Step1_A, null);
+                MainManager.Instance.WindowConfigMessage("已经设置过初始状态，是否覆盖？", Step1_A);
             }
             else
             {
@@ -298,7 +298,7 @@ namespace PCRCaculator.Calc
             {
                 if (unitDataDicForCal_perverous.ContainsKey(unitS.id))
                 {
-                    unitDataDicForCal_perverous[unitS.id] = new UnitData(unitS.id, unitS.unit_level, unitS.unit_rarity, 8, unitS.promotion_level, unitS.GetEqLv(), unitS.GetSkillLevelInfo(), null, 0);
+                    unitDataDicForCal_perverous[unitS.id] = new UnitData(unitS.id, unitS.unit_level, unitS.unit_rarity, 8, unitS.promotion_level, unitS.GetEqLv(), unitS.GetSkillLevelInfo());
                 }
             }
 
@@ -363,15 +363,13 @@ namespace PCRCaculator.Calc
                 }
                 catch (IOException e)
                 {
-                    MainManager.Instance.WindowConfigMessage("读取错误，请保证文件没有被其他程序占用！", null, null);
+                    MainManager.Instance.WindowConfigMessage("读取错误，请保证文件没有被其他程序占用！", null);
                     return null;
                 }
                 //IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
             }
-            else
-            {
-                MainManager.Instance.WindowConfigMessage("文件读取失败！", null);
-            }
+
+            MainManager.Instance.WindowConfigMessage("文件读取失败！", null);
             return null;
 
         }
@@ -510,7 +508,7 @@ namespace PCRCaculator.Calc
                     {
                         if (unitData.skillLevel[i] > skillCost.Count)
                         {
-                            MainManager.Instance.WindowConfigMessage("等级超过可计算的范围！\n可计算的最大等级：" + skillCost.Count + "\n当前技能等级：" + unitData.skillLevel[i], null, null);
+                            MainManager.Instance.WindowConfigMessage("等级超过可计算的范围！\n可计算的最大等级：" + skillCost.Count + "\n当前技能等级：" + unitData.skillLevel[i], null);
                             return;
                         }
                         cost_mana_leveUp_skill += skillCost[unitData.skillLevel[i]] - skillCost[unitdata_old.skillLevel[i]];
@@ -520,7 +518,7 @@ namespace PCRCaculator.Calc
             cost_nama_total += cost_mana_craftEquipment + cost_mana_leveUp_equipment + cost_mana_leveUp_skill;
             string word = "总共消耗玛娜：" + cost_nama_total + "\n制造装备消耗：" + cost_mana_craftEquipment + "\n升级装备消耗：" + cost_mana_leveUp_equipment +
                 "\n升级技能消耗：" + cost_mana_leveUp_skill;
-            MainManager.Instance.WindowConfigMessage(word, null, null);
+            MainManager.Instance.WindowConfigMessage(word, null);
         }
         private int CalcManaForEquipEnhance(int prolevel, int oldlevel, int newlevel)
         {
@@ -532,13 +530,13 @@ namespace PCRCaculator.Calc
                 case 2:
                     return 120 * 20 * (newlevel - oldlevel);
                 case 3:
-                    point = new int[] { 0, 30, 80, 160 };
+                    point = new[] { 0, 30, 80, 160 };
                     return 150 * (point[newlevel] - point[oldlevel]);
                 case 4:
-                    point = new int[] { 0, 60, 160, 340, 700, 1200 };
+                    point = new[] { 0, 60, 160, 340, 700, 1200 };
                     return 200 * (point[newlevel] - point[oldlevel]);
                 case 5:
-                    point = new int[] { 0, 100, 260, 540, 1020, 1800 };
+                    point = new[] { 0, 100, 260, 540, 1020, 1800 };
                     return 250 * (point[newlevel] - point[oldlevel]);
             }
             return 0;
@@ -561,13 +559,13 @@ namespace PCRCaculator.Calc
                     }
                     else
                     {
-                        MainManager.Instance.WindowConfigMessage("等级超过可计算的范围！\n可计算的最大等级：" + expCost.Count + "\n当前等级：" + a.level, null, null);
+                        MainManager.Instance.WindowConfigMessage("等级超过可计算的范围！\n可计算的最大等级：" + expCost.Count + "\n当前等级：" + a.level, null);
                         return;
                     }
                 }
             }
             int bottle = Mathf.CeilToInt(exp_total / 7500);
-            MainManager.Instance.WindowConfigMessage("所需经验：" + exp_total + "\n需要超级经验药剂：" + bottle, null, null);
+            MainManager.Instance.WindowConfigMessage("所需经验：" + exp_total + "\n需要超级经验药剂：" + bottle, null);
         }
         public void CalculateAPButton()
         {
@@ -644,7 +642,7 @@ namespace PCRCaculator.Calc
             equipmentGet.GetBestWays(true, out List<int> ways, out List<int> odds);
             if (ways.Count >= 1)
             {
-                int count = Mathf.RoundToInt(100.0f * need / (float)(odds[0] * rate));
+                int count = Mathf.RoundToInt(100.0f * need / (odds[0] * rate));
                 QuestRewardData questRewardData = questRewardDic[ways[0]];
                 if (equipmentQuestDic.ContainsKey(questRewardData))
                 {
@@ -680,7 +678,7 @@ namespace PCRCaculator.Calc
         private void LoadEquipmentCraftDic()
         {
             //string jsonStr = Resources.Load<TextAsset>("Datas/CalcDics")?.text;
-            string jsonStr = MainManager.Instance.LoadJsonDatas("Datas/CalcDics", true);
+            string jsonStr = MainManager.Instance.LoadJsonDatas("Datas/CalcDics");
             if (!string.IsNullOrEmpty(jsonStr))
             {
                 CalcDics dic = JsonConvert.DeserializeObject<CalcDics>(jsonStr);
@@ -692,13 +690,13 @@ namespace PCRCaculator.Calc
             }
             else
             {
-                MainManager.Instance.WindowConfigMessage("加载装备掉落数据失败！", null, null);
+                MainManager.Instance.WindowConfigMessage("加载装备掉落数据失败！", null);
             }
         }
 
     }
     
-    [System.Serializable]
+    [Serializable]
     public class CalcDics
     {
         //public Dictionary<int, QuestData> questDataDic = new Dictionary<int, QuestData>();//普通地图数据

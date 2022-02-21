@@ -4,14 +4,13 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-using Cute;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+
+using Cute;
 using UnityEngine;
 
 namespace Elements
@@ -21,9 +20,7 @@ namespace Elements
     public static readonly WaitForEndOfFrame WAIT_FOR_END_OF_FRAME = new WaitForEndOfFrame();
 
     public static string ToStringCurrency(this int _self) => _self.ToString("N0");
-
-    public static string ToStringCurrency(this ObscuredInt _self) => _self.ToString("N0");
-
+        
     public static string ToStringCurrency(this long _self) => _self.ToString("N0");
 
     public static bool IsNullOrEmpty(this string _self) => string.IsNullOrEmpty(_self);
@@ -179,7 +176,7 @@ namespace Elements
 
     public static void SetActiveWithCheck(this GameObject _self, bool _isActive)
     {
-      if ((UnityEngine.Object) _self == (UnityEngine.Object) null)
+      if (_self == null)
         return;
       _self.SetActive(_isActive);
     }
@@ -188,7 +185,7 @@ namespace Elements
 
     public static void SetActiveWithCheck(this MonoBehaviour _self, bool _isActive)
     {
-      if ((UnityEngine.Object) _self == (UnityEngine.Object) null)
+      if (_self == null)
         return;
       _self.gameObject.SetActive(_isActive);
     }
@@ -251,8 +248,8 @@ namespace Elements
       this IEnumerable<T> _self,
       int _chunkSize)
     {
-      for (; _self.Any<T>(); _self = _self.Skip<T>(_chunkSize))
-        yield return _self.Take<T>(_chunkSize);
+      for (; _self.Any(); _self = _self.Skip(_chunkSize))
+        yield return _self.Take(_chunkSize);
     }
 
     /*public static IEnumerator GcCollectAsync(this MonoBehaviour _self, System.Action _callback)
@@ -280,9 +277,9 @@ namespace Elements
       return routine;
     }*/
 
-    public static IEnumerator Timer(this MonoBehaviour obj, System.Action onComplete)
+    public static IEnumerator Timer(this MonoBehaviour obj, Action onComplete)
     {
-      IEnumerator routine = ExtensionMethods.timerFrameCoroutine(obj, onComplete);
+      IEnumerator routine = timerFrameCoroutine(obj, onComplete);
       obj.StartCoroutine(routine);
       return routine;
     }
@@ -290,15 +287,15 @@ namespace Elements
     public static IEnumerator Timer(
       this MonoBehaviour obj,
       float time,
-      System.Action onComplete) => obj.Timer(time, 0.0f, onComplete);
+      Action onComplete) => obj.Timer(time, 0.0f, onComplete);
 
     public static IEnumerator Timer(
       this MonoBehaviour obj,
       float time,
       float delay,
-      System.Action onComplete)
+      Action onComplete)
     {
-      IEnumerator routine = ExtensionMethods.timerCoroutine(obj, time, delay, onComplete);
+      IEnumerator routine = timerCoroutine(obj, time, delay, onComplete);
       obj.StartCoroutine(routine);
       return routine;
     }
@@ -317,9 +314,9 @@ namespace Elements
       onComplete.Call();
     }*/
 
-    private static IEnumerator timerFrameCoroutine(MonoBehaviour obj, System.Action onComplete)
+    private static IEnumerator timerFrameCoroutine(MonoBehaviour obj, Action onComplete)
     {
-      yield return (object) ExtensionMethods.WAIT_FOR_END_OF_FRAME;
+      yield return WAIT_FOR_END_OF_FRAME;
       onComplete.Call();
     }
 
@@ -327,20 +324,20 @@ namespace Elements
       MonoBehaviour obj,
       float time,
       float delay,
-      System.Action onComplete)
+      Action onComplete)
     {
-      if ((double) delay > 0.0)
-        yield return (object) new WaitForSeconds(delay);
-      yield return (object) new WaitForSeconds(time);
+      if (delay > 0.0)
+        yield return new WaitForSeconds(delay);
+      yield return new WaitForSeconds(time);
       onComplete.Call();
     }
 
     public static void StopCoroutine(this IEnumerator _ie, MonoBehaviour _obj)
     {
-      if (_ie == null || !((UnityEngine.Object) _obj != (UnityEngine.Object) null))
+      if (_ie == null || !(_obj != null))
         return;
       _obj.StopCoroutine(_ie);
-      _ie = (IEnumerator) null;
+      _ie = null;
     }
 
     public static void AddIfNoContains<T>(this List<T> _list, T _value)
@@ -352,7 +349,7 @@ namespace Elements
 
     public static void AddIfNonNull<T>(this List<T> _list, T _value)
     {
-      if ((object) _value == null)
+      if (_value == null)
         return;
       _list.Add(_value);
     }
@@ -360,16 +357,16 @@ namespace Elements
     public static void AddRangeIfNoContains<T>(this List<T> _list, List<T> _add)
     {
       for (int index = 0; index < _add.Count; ++index)
-        _list.AddIfNoContains<T>(_add[index]);
+        _list.AddIfNoContains(_add[index]);
     }
 
-    public static void ForEach<T>(this List<T> _list, System.Action<T> _callback)
+    public static void ForEach<T>(this List<T> _list, Action<T> _callback)
     {
       for (int index = 0; index < _list.Count; ++index)
-        _callback.Call<T>(_list[index]);
+        _callback.Call(_list[index]);
     }
 
-    public static void ForEach<T>(this HashSet<T> _hashSet, System.Action<T> _callback)
+    public static void ForEach<T>(this HashSet<T> _hashSet, Action<T> _callback)
     {
       foreach (T hash in _hashSet)
         _callback(hash);
@@ -382,35 +379,35 @@ namespace Elements
       _hashSet.Add(_value);
     }
 
-    public static void ForEach<T>(this T[] _array, System.Action<T> _callback)
+    public static void ForEach<T>(this T[] _array, Action<T> _callback)
     {
       for (int index = 0; index < _array.Length; ++index)
         _callback(_array[index]);
     }
 
-    public static void ForEachArrayArray<T>(this T[][] _arrayArray, System.Action<T> _action) => _arrayArray.ForEach<T[]>((System.Action<T[]>) (_array =>
+    public static void ForEachArrayArray<T>(this T[][] _arrayArray, Action<T> _action) => _arrayArray.ForEach((Action<T[]>) (_array =>
     {
       if (_array == null)
         return;
-      _array.ForEach<T>(_action);
+      _array.ForEach(_action);
     }));
 
     public static int CountArrayArray<T>(this T[][] _arrayArray)
     {
       int total = 0;
-      _arrayArray.ForEach<T[]>((System.Action<T[]>) (_array => total += _array.Length));
+      _arrayArray.ForEach((Action<T[]>) (_array => total += _array.Length));
       return total;
     }
 
     public static T[] ArrayArrayToArray<T>(this T[][] _arrayArray)
     {
-      T[] array = new T[_arrayArray.CountArrayArray<T>()];
+      T[] array = new T[_arrayArray.CountArrayArray()];
       int index = 0;
-      _arrayArray.ForEachArrayArray<T>((System.Action<T>) (_it => array[index++] = _it));
+      _arrayArray.ForEachArrayArray((Action<T>) (_it => array[index++] = _it));
       return array;
     }
 
-    public static void ArrayArrayForEach<T>(this T[][] _arrayArray, System.Action<T> _action)
+    public static void ArrayArrayForEach<T>(this T[][] _arrayArray, Action<T> _action)
     {
       for (int index1 = 0; index1 < _arrayArray.Length; ++index1)
       {
@@ -424,7 +421,7 @@ namespace Elements
 
     public static void ForEach<Tkey, TValue>(
       this Dictionary<Tkey, TValue> _dictionary,
-      System.Action<Tkey, TValue> _callback)
+      Action<Tkey, TValue> _callback)
     {
       foreach (KeyValuePair<Tkey, TValue> keyValuePair in _dictionary)
         _callback(keyValuePair.Key, keyValuePair.Value);
@@ -432,7 +429,7 @@ namespace Elements
 
     public static void ForEachValue<Tkey, TValue>(
       this Dictionary<Tkey, TValue> _dictionary,
-      System.Action<TValue> _callback)
+      Action<TValue> _callback)
     {
       foreach (KeyValuePair<Tkey, TValue> keyValuePair in _dictionary)
         _callback(keyValuePair.Value);
@@ -463,12 +460,12 @@ namespace Elements
       this Dictionary<TKey, TValue> _dictionary,
       TKey _key,
       TValue _value,
-      System.Action<TKey, TValue> _contains)
+      Action<TKey, TValue> _contains)
     {
       if (!_dictionary.ContainsKey(_key))
         _dictionary.Add(_key, _value);
       else
-        _contains.Call<TKey, TValue>(_key, _value);
+        _contains.Call(_key, _value);
     }
 
     public static void Deconstruct<TKey, TValue>(
@@ -482,7 +479,7 @@ namespace Elements
 
     public static int ToInt(this bool _self) => !_self ? 0 : 1;
 
-    public static bool IsPlaying(this Animator _self, int _layerIndex = 0) => (double) _self.GetCurrentAnimatorStateInfo(_layerIndex).normalizedTime < 1.0;
+    public static bool IsPlaying(this Animator _self, int _layerIndex = 0) => _self.GetCurrentAnimatorStateInfo(_layerIndex).normalizedTime < 1.0;
 
     /*public static void PlayPingPong(this TweenAlpha _self, bool _isIncreaseAlpha)
     {
@@ -575,7 +572,7 @@ namespace Elements
     public static void ChangeChildObjectLayer(this Transform _self, int _layer)
     {
       _self.gameObject.layer = _layer;
-      ExtensionMethods.recursivChildObjectLayer(_self, _layer);
+      recursivChildObjectLayer(_self, _layer);
     }
 
     private static void recursivChildObjectLayer(Transform _transform, int _layer)
@@ -584,7 +581,7 @@ namespace Elements
       {
         Transform child = _transform.GetChild(index);
         child.gameObject.layer = _layer;
-        ExtensionMethods.recursivChildObjectLayer(child, _layer);
+        recursivChildObjectLayer(child, _layer);
       }
     }
 
@@ -607,10 +604,10 @@ namespace Elements
         return;
       foreach (TComponent componentsInChild in _currentObj.GetComponentsInChildren<TComponent>())
       {
-        if (!((UnityEngine.Object) componentsInChild.gameObject == (UnityEngine.Object) _currentObj))
+        if (!(componentsInChild.gameObject == _currentObj))
         {
           _allChildren.Add(componentsInChild);
-          componentsInChild.gameObject.GetAllChildren<TComponent>(ref _allChildren);
+          componentsInChild.gameObject.GetAllChildren(ref _allChildren);
         }
       }
     }

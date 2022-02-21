@@ -104,17 +104,17 @@ namespace Spine
 					num3 = 0;
 					num4 = 0;
 				}
-				atlasRegion.u = (float)num / (float)atlasPage.width;
-				atlasRegion.v = (float)num2 / (float)atlasPage.height;
+				atlasRegion.u = num / (float)atlasPage.width;
+				atlasRegion.v = num2 / (float)atlasPage.height;
 				if (atlasRegion.rotate)
 				{
-					atlasRegion.u2 = (float)(num + num4) / (float)atlasPage.width;
-					atlasRegion.v2 = (float)(num2 + num3) / (float)atlasPage.height;
+					atlasRegion.u2 = (num + num4) / (float)atlasPage.width;
+					atlasRegion.v2 = (num2 + num3) / (float)atlasPage.height;
 				}
 				else
 				{
-					atlasRegion.u2 = (float)(num + num3) / (float)atlasPage.width;
-					atlasRegion.v2 = (float)(num2 + num4) / (float)atlasPage.height;
+					atlasRegion.u2 = (num + num3) / (float)atlasPage.width;
+					atlasRegion.v2 = (num2 + num4) / (float)atlasPage.height;
 				}
 				atlasRegion.x = num;
 				atlasRegion.y = num2;

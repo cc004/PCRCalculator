@@ -1,22 +1,22 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
 using System.IO;
+using PCRCaculator;
+using UnityEngine;
 
 namespace PCR_cysp2skel
 {
     public class CurrentClassAnimData
     {
         public int type = 0;
-        public int count = 0;
-        public byte[] data = new byte[] { };
+        public int count;
+        public byte[] data = { };
     }
     public class CurrentCharAnimData
     {
         public int id = 0;
-        public int count = 0;
-        public byte[] data = new byte[] { };
+        public int count;
+        public byte[] data = { };
     }
     public class LoadingSkeleton
     {
@@ -44,7 +44,7 @@ namespace PCR_cysp2skel
             int unitType = 0;
             bool isEnemy = unitId >= 199999;
             if (!isEnemy)
-                unitType = PCRCaculator.MainManager.Instance.UnitRarityDic[unitId].detailData.motionType;
+                unitType = MainManager.Instance.UnitRarityDic[unitId].detailData.motionType;
             if (unitType == 0)
                 unitType = unitId;
             string char_base = isEnemy ? "spine_" + unitId + "_chara_base.cysp.unity3d" : "spine_000000_chara_base.cysp.unity3d";
@@ -53,15 +53,15 @@ namespace PCR_cysp2skel
             string spine_battle = "spine_" + unitId + "_battle.cysp.unity3d";
             try
             {
-                byte[] CHAR_BASE = PCRCaculator.ABExTool.GetAssetBundleByName<TextAsset>(char_base).bytes;
-                byte[] BATTLE = PCRCaculator.ABExTool.GetAssetBundleByName<TextAsset>(spine_battle).bytes;
-                byte[] COMMOM_BATTLE =  (isEnemy && unitId != 407001) ? new byte[] { } : PCRCaculator.ABExTool.GetAssetBundleByName<TextAsset>(common_battle).bytes;
+                byte[] CHAR_BASE = ABExTool.GetAssetBundleByName<TextAsset>(char_base).bytes;
+                byte[] BATTLE = ABExTool.GetAssetBundleByName<TextAsset>(spine_battle).bytes;
+                byte[] COMMOM_BATTLE =  (isEnemy && unitId != 407001) ? new byte[] { } : ABExTool.GetAssetBundleByName<TextAsset>(common_battle).bytes;
                 var result = Cysp2Skel(unitId, CHAR_BASE, BATTLE, COMMOM_BATTLE, saveFile, savePath);
                 return result;
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
-                PCRCaculator.MainManager.Instance.WindowConfigMessage(
+                MainManager.Instance.WindowConfigMessage(
                     "合成角色" + unitId + "的动画时发生错误：" + e.Message + "\n可能原因：找不到" + char_base + "/" + spine_battle, null);
             }
             return null;
@@ -103,8 +103,8 @@ namespace PCR_cysp2skel
         {
             count = BitConverter.ToInt32(cysp, 12);
             int length = (count + 1) * 32;
-            byte[] buf = new byte[] { };
-            Array.Resize<byte>(ref buf, cysp.Length - length);
+            byte[] buf = { };
+            Array.Resize(ref buf, cysp.Length - length);
             /*for (int i = 0; i < (count + 1) * 32; i++)
             {
                 buf[i] = cysp[i];
@@ -215,7 +215,7 @@ namespace PCR_cysp2skel
                     newBuffSize += generalAdditionAnimations[i].Length;
             }*/
             var newBuff = new byte[] { };
-            Array.Resize<byte>(ref newBuff, newBuffSize);
+            Array.Resize(ref newBuff, newBuffSize);
             var pos = generalBattleSkeletonData.Length;
             var offset = 0;
             //Buffer.BlockCopy(generalBattleSkeletonData, 0, newBuff, offset, pos);

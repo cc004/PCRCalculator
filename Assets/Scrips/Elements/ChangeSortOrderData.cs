@@ -11,7 +11,7 @@ namespace Elements
   [Serializable]
   public class ChangeSortOrderData
   {
-    public ChangeSortOrderData.eSortType SortType;
+    public eSortType SortType;
     public float Time;
 
     public enum eSortType

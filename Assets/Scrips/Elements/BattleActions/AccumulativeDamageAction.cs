@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -24,13 +25,13 @@ namespace Elements
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-      System.Action<string> action)
+      Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
+      AppendIsAlreadyExeced(_target.Owner, _num);
       eAccumulativeDamageType accumulativeDamageType = (eAccumulativeDamageType)(float)_valueDictionary[eValueNumber.VALUE_1];
-      _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.ACCUMULATIVE_DAMAGE, this.battleManager.BattleLeftTime, (ActionParameter) this, _skill);
-      AccumulativeDamageData accumulativeDamageData = new AccumulativeDamageData()
+      _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.ACCUMULATIVE_DAMAGE, battleManager.BattleLeftTime, this, _skill);
+      AccumulativeDamageData accumulativeDamageData = new AccumulativeDamageData
       {
         AccumulativeDamageType = accumulativeDamageType,
         FixedValue = accumulativeDamageType == eAccumulativeDamageType.FIXED ? (float)_valueDictionary[eValueNumber.VALUE_2] : 0.0f,
@@ -50,8 +51,8 @@ namespace Elements
         public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
-      this.Value[eValueNumber.VALUE_4] = (float) ((double) this.MasterData.action_value_4 + (double) this.MasterData.action_value_5 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_4] = (float) (MasterData.action_value_4 + MasterData.action_value_5 * _level);
     }
   }
 }

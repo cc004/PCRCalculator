@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using Elements;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
+using eMoveTypes = PCRCaculator.Battle.eMoveTypes;
+
 namespace PCRCaculator.Guild
 {
     public class GuildExecTimeButton : MonoBehaviour
@@ -22,9 +24,9 @@ namespace PCRCaculator.Guild
         public Toggle firearmToggle;
         public InputField firearmExecInput;
 
-        private Elements.ActionExecTime actionNormal;
-        private Elements.ActionExecTimeCombo actionCombo;
-        private Elements.FirearmCtrlData firearm;
+        private ActionExecTime actionNormal;
+        private ActionExecTimeCombo actionCombo;
+        private FirearmCtrlData firearm;
 
         public void Init(string skillName, int skillID, string actionType, int actionid,Action action)
         {
@@ -43,7 +45,7 @@ namespace PCRCaculator.Guild
         {
             skillButtonAction?.Invoke();
         }
-        public void Init(Elements.ActionExecTime actionNormal,int id,string type,float execTime,string effectType,int weight,string size,bool canEdit)
+        public void Init(ActionExecTime actionNormal,int id,string type,float execTime,string effectType,int weight,string size,bool canEdit)
         {
             if (buttonType != ButtonType.ActionNormal)
             {
@@ -68,11 +70,11 @@ namespace PCRCaculator.Guild
             }
             catch
             {
-                MainManager.Instance.WindowConfigMessage("输入错误！", null, null);                
+                MainManager.Instance.WindowConfigMessage("输入错误！", null);                
             }
             return 0;
         }
-        public void Init(Elements.ActionExecTimeCombo actionCombo,int id,string type,float startTime,float offsetTime,int weight,int count,int Timetype)
+        public void Init(ActionExecTimeCombo actionCombo,int id,string type,float startTime,float offsetTime,int weight,int count,int Timetype)
         {
             if (buttonType != ButtonType.ActionCombo)
             {
@@ -103,11 +105,11 @@ namespace PCRCaculator.Guild
             }
             catch
             {
-                MainManager.Instance.WindowConfigMessage("输入错误！", null, null);
+                MainManager.Instance.WindowConfigMessage("输入错误！", null);
             }
 
         }
-        public void Init(Elements.FirearmCtrlData firearm,int id, string type, float[] startdelay, float moveRate,int weight, float hitdelay, int FirearmType,float duration)
+        public void Init(FirearmCtrlData firearm,int id, string type, float[] startdelay, float moveRate,int weight, float hitdelay, int FirearmType,float duration)
         {
             if (buttonType != ButtonType.Firearm)
             {
@@ -149,7 +151,7 @@ namespace PCRCaculator.Guild
                         firearm.MoveRate = float.Parse(actionComboInputs[1].text);
                         firearm.HitDelay = float.Parse(actionComboInputs[2].text);
                         firearm.duration = float.Parse(actionComboInputs[3].text);
-                        firearm.MoveType = (Battle.eMoveTypes)actionComboDrop.value;
+                        firearm.MoveType = (eMoveTypes)actionComboDrop.value;
                         firearm.ignoreFirearm = firearmToggle.isOn;
                         firearm.fixedExecTime = float.Parse(firearmExecInput.text);
                         break;
@@ -157,7 +159,7 @@ namespace PCRCaculator.Guild
             }
             catch
             {
-                MainManager.Instance.WindowConfigMessage("输入错误！", null, null);
+                MainManager.Instance.WindowConfigMessage("输入错误！", null);
             }
         }
 

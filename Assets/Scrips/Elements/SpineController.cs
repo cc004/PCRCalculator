@@ -4,12 +4,13 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Spine;
-using Spine.Unity;
 using System;
 using System.Collections.Generic;
+using Spine;
+using Spine.Unity;
 using UnityEngine;
+using AnimationState = Spine.AnimationState;
+using Event = Spine.Event;
 
 namespace Elements
 {
@@ -18,15 +19,15 @@ namespace Elements
         private Skin DefaultSkin;
         private Dictionary<Skin.AttachmentKeyTuple, Attachment> defaultAttachmentDic = new Dictionary<Skin.AttachmentKeyTuple, Attachment>();
         //protected SpineManager spineManager;
-        protected Spine.AnimationState.TrackEntryDelegate startEndDelegate;
-        protected Spine.AnimationState.TrackEntryDelegate startStartDelegate;
-        protected Spine.AnimationState.TrackEntryEventDelegate eventDelegate;
+        protected AnimationState.TrackEntryDelegate startEndDelegate;
+        protected AnimationState.TrackEntryDelegate startStartDelegate;
+        protected AnimationState.TrackEntryEventDelegate eventDelegate;
         //private ColorShader colorShader = new ColorShader();
         private Shader defaultShader;
         private Material[] materialArray;
         protected bool isSyncUpdate;
 
-        public string DefaultSkinName => this.DefaultSkin == null ? "" : this.DefaultSkin.Name;
+        public string DefaultSkinName => DefaultSkin == null ? "" : DefaultSkin.Name;
 
         public bool IsPlayAnime { get; protected set; }
 
@@ -56,16 +57,16 @@ namespace Elements
         {
           //this.colorShader.Destroy();
           base.OnDestroy();
-          if (this.materialArray == null)
+          if (materialArray == null)
             return;
-          for (int index = 0; index < this.materialArray.Length; ++index)
-            UnityEngine.Object.Destroy((UnityEngine.Object) this.materialArray[index]);
-          this.materialArray = (Material[]) null;
+          for (int index = 0; index < materialArray.Length; ++index)
+            Destroy(materialArray[index]);
+          materialArray = null;
         }
 
          public override void Update()
          {
-           if (this.isSyncUpdate)
+           if (isSyncUpdate)
              return;
            base.Update();
          }
@@ -84,15 +85,15 @@ namespace Elements
           return component;
         }*/
 
-        public virtual void SyncUpdate(float _time) => this.Update(_time);
+        public virtual void SyncUpdate(float _time) => Update(_time);
 
-        public void SetUseSyncUpdate(bool _isSyncUpdate) => this.isSyncUpdate = _isSyncUpdate;
+        public void SetUseSyncUpdate(bool _isSyncUpdate) => isSyncUpdate = _isSyncUpdate;
 
         public virtual void Create(SkeletonDataAsset _createSkeletonDataAsset)
         {
             //this.spineManager = ManagerSingleton<SpineManager>.Instance;
-            this.IsPlayAnime = false;
-            this.AnimeName = "";
+            IsPlayAnime = false;
+            AnimeName = "";
             //this.ChangeSkeletonDataAsset(_createSkeletonDataAsset);
             //this.colorShader.Init(this.GetComponent<Renderer>());
             //this.defaultShader = _createSkeletonDataAsset.atlasAssets[0].materials[0].shader;
@@ -109,7 +110,7 @@ namespace Elements
             }
             else
                 _resourceSpineSet.Skelton.scale = animationScale;*/
-            this.Create(_resourceSpineSet.Skelton);
+            Create(_resourceSpineSet.Skelton);
         }
 
         //public Dictionary<string, Spine.Animation> GetAnimations() => this.skeleton.data.animations;
@@ -150,90 +151,90 @@ namespace Elements
           this.Skeleton.SetSkin(this.DefaultSkin);
         }*/
 
-        public bool FindSkinData(string _skinName) => this.skeleton.Data.FindSkin(_skinName) != null;
+        public bool FindSkinData(string _skinName) => skeleton.Data.FindSkin(_skinName) != null;
 
-        public Skin GetCurrentSkin() => this.skeleton.Skin;
+        public Skin GetCurrentSkin() => skeleton.Skin;
 
         public virtual void PlayAnime(string _playAnimeName, bool _playLoop = true)
         {
-            this.loop = _playLoop;
-            this.AnimationName = _playAnimeName;
+            loop = _playLoop;
+            AnimationName = _playAnimeName;
         }
 
-        public virtual void PlayAnime(int _trackIndex, string _playAnimeName, bool _playLoop = true) => this.state.SetAnimation(_trackIndex, _playAnimeName, _playLoop);
+        public virtual void PlayAnime(int _trackIndex, string _playAnimeName, bool _playLoop = true) => state.SetAnimation(_trackIndex, _playAnimeName, _playLoop);
 
         public void PlayAnimeNoOverlap(string _playAnimeName, bool _playLoop = true)
         {
-            if (this.AnimeName == _playAnimeName)
+            if (AnimeName == _playAnimeName)
                 return;
-            this.PlayAnime(_playAnimeName, _playLoop);
+            PlayAnime(_playAnimeName, _playLoop);
         }
 
-        public void EntryAnime(string _animeName, bool _loop, float _delay = 0.0f) => this.state.AddAnimation(0, _animeName, true, _delay);
+        public void EntryAnime(string _animeName, bool _loop, float _delay = 0.0f) => state.AddAnimation(0, _animeName, true, _delay);
 
         public void StopAnime(int _trackIndex)
         {
-            this.IsPlayAnime = false;
-            this.state.ClearTrack(_trackIndex);
+            IsPlayAnime = false;
+            state.ClearTrack(_trackIndex);
         }
 
         public void StopAnimeAll()
         {
-            this.IsPlayAnime = false;
-            this.state.ClearTracks();
+            IsPlayAnime = false;
+            state.ClearTracks();
         }
 
-        public bool IsAnimation(string _animeName) => this.skeleton.data.IsAnimation(_animeName);
+        public bool IsAnimation(string _animeName) => skeleton.data.IsAnimation(_animeName);
 
-        private void SetAnimeEventDelegate(Spine.AnimationState.TrackEntryEventDelegate _eDelegate)
+        private void SetAnimeEventDelegate(AnimationState.TrackEntryEventDelegate _eDelegate)
         {
-            if (this.eventDelegate != null)
-                this.state.Event -= this.eventDelegate;
-            this.eventDelegate = _eDelegate;
-            this.state.Event += this.eventDelegate;
+            if (eventDelegate != null)
+                state.Event -= eventDelegate;
+            eventDelegate = _eDelegate;
+            state.Event += eventDelegate;
         }
 
-        public void SetAnimeEventDelegate(Action<Spine.Event> _callBack) => this.SetAnimeEventDelegate((Spine.AnimationState.TrackEntryEventDelegate)((_state, _event) => _callBack(_event)));
+        public void SetAnimeEventDelegate(Action<Event> _callBack) => SetAnimeEventDelegate((_state, _event) => _callBack(_event));
 
         protected virtual void EntryCallBack()
         {
-            this.startEndDelegate = (Spine.AnimationState.TrackEntryDelegate)(_animationState =>
-           {
-               if (!(_animationState.Animation.Name == this.AnimationName))
-                   return;
-               this.IsPlayAnime = false;
-           });
-            this.state.Complete += this.startEndDelegate;
-            this.startStartDelegate = (Spine.AnimationState.TrackEntryDelegate)(_animationState =>
-           {
-               this.IsPlayAnime = true;
-               this.AnimeName = this.AnimationName;
-           });
-            this.state.Start += this.startStartDelegate;
+            startEndDelegate = _animationState =>
+            {
+                if (!(_animationState.Animation.Name == AnimationName))
+                    return;
+                IsPlayAnime = false;
+            };
+            state.Complete += startEndDelegate;
+            startStartDelegate = _animationState =>
+            {
+                IsPlayAnime = true;
+                AnimeName = AnimationName;
+            };
+            state.Start += startStartDelegate;
         }
 
         private void DestroyCallBack()
         {
-            if (this.startEndDelegate != null)
+            if (startEndDelegate != null)
             {
-                this.state.Complete -= this.startEndDelegate;
-                this.startEndDelegate = (Spine.AnimationState.TrackEntryDelegate)null;
+                state.Complete -= startEndDelegate;
+                startEndDelegate = null;
             }
-            if (this.startStartDelegate != null)
+            if (startStartDelegate != null)
             {
-                this.state.Start -= this.startStartDelegate;
-                this.startStartDelegate = (Spine.AnimationState.TrackEntryDelegate)null;
+                state.Start -= startStartDelegate;
+                startStartDelegate = null;
             }
-            if (this.eventDelegate == null)
+            if (eventDelegate == null)
                 return;
-            this.state.Event -= this.eventDelegate;
-            this.eventDelegate = (Spine.AnimationState.TrackEntryEventDelegate)null;
+            state.Event -= eventDelegate;
+            eventDelegate = null;
         }
 
         //public void FadeIn(float _timeMax, Action _onFinish = null) => this.colorShader.FadeIn((MonoBehaviour) this, _timeMax, _onFinish);
 
         //public void FadeOut(float _timeMax, Action _onFinish = null) => this.colorShader.FadeOut((MonoBehaviour) this, _timeMax, _onFinish);
 
-        public void AddMixAnimation(string _fromAnime, string _toAnime, float _duration) => this.skeletonDataAsset.GetAnimationStateData().SetMix(_fromAnime, _toAnime, _duration);
+        public void AddMixAnimation(string _fromAnime, string _toAnime, float _duration) => skeletonDataAsset.GetAnimationStateData().SetMix(_fromAnime, _toAnime, _duration);
     }
 }

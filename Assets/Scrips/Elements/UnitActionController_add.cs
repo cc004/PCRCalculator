@@ -1,26 +1,26 @@
-﻿using Newtonsoft0.Json;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using Elements.Battle;
-using System;
-using PCRCaculator.Battle;
+using Newtonsoft0.Json;
+using PCRCaculator;
 using Spine;
 using Spine.Unity;
-
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Elements
 {
     public partial class UnitActionController
     {
-        private Dictionary<string, List<Elements.FirearmCtrlData>> unitFirearmDatas = new Dictionary<string, List<Elements.FirearmCtrlData>>();
+        private Dictionary<string, List<FirearmCtrlData>> unitFirearmDatas = new Dictionary<string, List<FirearmCtrlData>>();
         public bool UseSkillEffect = false;
         public void LoadActionControllerData(int unitid,bool isABunit=true)
         {
-            unitFirearmDatas = PCRCaculator.MainManager.Instance.FirearmData.GetData(unitid);
+            unitFirearmDatas = MainManager.Instance.FirearmData.GetData(unitid);
             if (!isABunit)
-                PCRCaculator.MainManager.Instance.WindowConfigMessage("错误！角色" + unitid + "的数据读取失败！", null, null);
+                MainManager.Instance.WindowConfigMessage("错误！角色" + unitid + "的数据读取失败！", null);
             /*
             if (isABunit)
                 return;
@@ -75,7 +75,7 @@ namespace Elements
             cache[skillid] = data;
         }
 
-        private Elements.FirearmCtrlData GetPrefabDataBySkillid(int skillid)
+        private FirearmCtrlData GetPrefabDataBySkillid(int skillid)
         {
             if (cache.TryGetValue(skillid, out var val)) return val;
             string key = "attack";
@@ -99,15 +99,15 @@ namespace Elements
                 }
                 return unitFirearmDatas[key][0];
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 //BattleUIManager.Instance.LogMessage(Owner.UnitName + "的技能特效数据丢失！", eLogMessageType.ERROR, Owner.IsOther);
                 string Msg = "加载角色" + Owner.UnitName + "的技能" + skillid + "的弹道数据时发生错误：" + e.Message;
 #if UNITY_EDITOR
                 Debug.LogError(Msg);
 #endif
-                PCRCaculator.MainManager.Instance.WindowConfigMessage(Msg, null);
-                return new Elements.FirearmCtrlData();
+                MainManager.Instance.WindowConfigMessage(Msg, null);
+                return new FirearmCtrlData();
             }
         }
         private void CalcDelayByPhysice(ActionParameter action, Skill _skill, int targetmotion, bool first = false, bool _skipCutIn = false,
@@ -138,16 +138,16 @@ namespace Elements
                 for (int execTimeIndex = 0; execTimeIndex < generateEffectCount; ++execTimeIndex)
                 {
                     float waitTime = 0.0f;
-                    if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !this.UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(this.Owner.WeaponMotionType, out waitTime)))
-                        waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (float)(execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
+                    if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(Owner.WeaponMotionType, out waitTime)))
+                        waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
                     if (!execed[execTimeIndex])
                     {
                         float startTime = 0.0f;
-                        if (!_skipCutIn || (double)waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
+                        if (!_skipCutIn || waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
                         {
-                            if (!_skipCutIn && (double)waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
+                            if (!_skipCutIn && waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
                             {
-                                if (_skilleffect.PlayWithCutIn && this.Owner.PlayCutInFlag && this.Owner.MovieId != 0)
+                                if (_skilleffect.PlayWithCutIn && Owner.PlayCutInFlag && Owner.MovieId != 0)
                                     startTime = _skill.CutInSkipTime - waitTime;
                                 else
                                     continue;
@@ -168,15 +168,15 @@ namespace Elements
                                 switch (_skilleffect.FireArmEndTarget)
                                 {
                                     case eEffectTarget.OWNER:
-                                        _firearmEndTarget = this.Owner.GetFirstParts(true);
+                                        _firearmEndTarget = Owner.GetFirstParts(true);
                                         break;
                                     case eEffectTarget.ALL_TARGET:
                                         _firearmEndTarget = _skilleffect.TargetAction.TargetList[execTimeIndex];
                                         break;
                                     case eEffectTarget.FORWARD_TARGET:
                                     case eEffectTarget.BACK_TARGET:
-                                        bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !this.Owner.IsOther;
-                                        List<BasePartsData> basePartsDataList1 = new List<BasePartsData>((IEnumerable<BasePartsData>)_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
+                                        bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !Owner.IsOther;
+                                        List<BasePartsData> basePartsDataList1 = new List<BasePartsData>(_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
                                         basePartsDataList1.Sort(((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x)));
                                         if (basePartsDataList1.Count == 0)
                                         {
@@ -266,7 +266,7 @@ namespace Elements
             {
                 if (action.ReferencedByEffect)
                 {
-                    Elements.FirearmCtrlData firearmCtrlData = GetPrefabDataBySkillid(_skill.SkillId);
+                    FirearmCtrlData firearmCtrlData = GetPrefabDataBySkillid(_skill.SkillId);
                     if (firearmCtrlData.ignoreFirearm)
                     {
                         action.ExecTime = new float[1] { firearmCtrlData.fixedExecTime };
@@ -274,14 +274,14 @@ namespace Elements
                     else
                     {
                         float MoveRate = firearmCtrlData.MoveRate;
-                        float delay = firearmCtrlData.MoveType == (PCRCaculator.Battle.eMoveTypes)(int)eMoveTypes.LINEAR ? 0.2f / MoveRate : firearmCtrlData.HitDelay;
+                        float delay = firearmCtrlData.MoveType == (int)eMoveTypes.LINEAR ? 0.2f / MoveRate : firearmCtrlData.HitDelay;
                         float speedDelay = 1.0f / MoveRate;
                         float allDelay = waitTime + speedDelay + delay;
                         if (action.ExecTime.Length == 0)
                         {
-                            action.ExecTime = new float[] { allDelay };
+                            action.ExecTime = new[] { allDelay };
                             action.ActionExecTimeList = new List<ActionExecTime>();
-                            action.ActionExecTimeList.Add(new ActionExecTime() { Time = allDelay, Weight = 1 });
+                            action.ActionExecTimeList.Add(new ActionExecTime { Time = allDelay, Weight = 1 });
                             action.ActionWeightSum = 1;
                         }
                         else
@@ -309,11 +309,11 @@ namespace Elements
             sw.Close();
             Debug.Log("成功！" + filePath);
         }
-        public PCRCaculator.UnitSkillEffectData CreateUnitSkillEffectData()
+        public UnitSkillEffectData CreateUnitSkillEffectData()
         {
-            PCRCaculator.UnitSkillEffectData data = new PCRCaculator.UnitSkillEffectData();
+            UnitSkillEffectData data = new UnitSkillEffectData();
             List<string> namelist = new List<string>();
-            System.Action<List<Skill>> action = a =>
+            Action<List<Skill>> action = a =>
             {
                 foreach (var skill in a)
                 {
@@ -503,7 +503,7 @@ namespace Elements
                             waitTime_5_7 = execTime_5_4[0];
                         }
                         //Elements.FirearmCtrlData firearmCtrlData = skillEffect.PrefabData;
-                        Elements.FirearmCtrlData firearmCtrlData = GetPrefabDataBySkillid(skill.SkillId);
+                        FirearmCtrlData firearmCtrlData = GetPrefabDataBySkillid(skill.SkillId);
                         if (firearmCtrlData.ignoreFirearm)
                         {
                             action.ExecTime = new float[1] { firearmCtrlData.fixedExecTime };
@@ -511,7 +511,7 @@ namespace Elements
                         else
                         {
                             float MoveRate = firearmCtrlData.MoveRate;
-                            float delay = firearmCtrlData.MoveType == (PCRCaculator.Battle.eMoveTypes)(int)eMoveTypes.LINEAR ? 0.2f / MoveRate : firearmCtrlData.HitDelay;
+                            float delay = firearmCtrlData.MoveType == (int)eMoveTypes.LINEAR ? 0.2f / MoveRate : firearmCtrlData.HitDelay;
                             float speedDelay = 0;
                             switch ((eMoveTypes)(int)firearmCtrlData.MoveType)
                             {
@@ -528,9 +528,9 @@ namespace Elements
                             float allDelay = waitTime_5_7 + speedDelay + delay + skill.CutInSkipTime;
                             if (action.ExecTime.Length == 0)
                             {
-                                action.ExecTime = new float[] { allDelay };
+                                action.ExecTime = new[] { allDelay };
                                 action.ActionExecTimeList = new List<ActionExecTime>();
-                                action.ActionExecTimeList.Add(new ActionExecTime() { Time = allDelay, Weight = 1 });
+                                action.ActionExecTimeList.Add(new ActionExecTime { Time = allDelay, Weight = 1 });
                                 action.ActionWeightSum = 1;
                             }
                             else
@@ -566,14 +566,14 @@ namespace Elements
                     bool flag = skillEffect.EffectBehavior == eEffectBehavior.NORMAL || skillEffect.EffectBehavior == eEffectBehavior.SKILL_AREA_RANDOM || skillEffect.EffectBehavior == eEffectBehavior.TARGET_CENTER || skillEffect.EffectBehavior == eEffectBehavior.WORLD_POS_CENTER;
                     if (_useStartCoroutine)
                     {
-                        this.battleManager.StartCoroutine(this.createNormalPrefabWithDelay2(skillEffect, _skill, _first));
+                        battleManager.StartCoroutine(createNormalPrefabWithDelay2(skillEffect, _skill, _first));
                         //Debug.Log("创建特效携程" + skillEffect.EffectBehavior.GetDescription()+index);
                     }
                     else
                     {
                         ePauseType pauseType = flag ? ePauseType.VISUAL : ePauseType.SYSTEM;
-                        UnitCtrl unit = (double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null;
-                        this.AppendCoroutine(this.createNormalPrefabWithDelay2(skillEffect, _skill, _first, _isFirearmEndEffect: _modechangeEndEffect, _modeChangeEndEffect: _modechangeEndEffect), pauseType, unit);
+                        UnitCtrl unit = _skill.BlackOutTime > 0.0 ? Owner : null;
+                        AppendCoroutine(createNormalPrefabWithDelay2(skillEffect, _skill, _first, _isFirearmEndEffect: _modechangeEndEffect, _modeChangeEndEffect: _modechangeEndEffect), pauseType, unit);
                         //Debug.Log("创建特效携程" + skillEffect.EffectBehavior.GetDescription() + index);
 
                     }
@@ -626,44 +626,44 @@ namespace Elements
             for (int execTimeIndex = 0; execTimeIndex < generateEffectCount; ++execTimeIndex)
             {
                 float waitTime = 0.0f;
-                if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !this.UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(this.Owner.WeaponMotionType, out waitTime)))
-                    waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (float)(execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
+                if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(Owner.WeaponMotionType, out waitTime)))
+                    waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
                 if (!execed[execTimeIndex])
                 {
                     float startTime = 0.0f;
-                    if (!_skipCutIn || (double)waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
+                    if (!_skipCutIn || waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
                     {
-                        if (!_skipCutIn && (double)waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
+                        if (!_skipCutIn && waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
                         {
-                            if (_skilleffect.PlayWithCutIn && this.Owner.PlayCutInFlag && this.Owner.MovieId != 0)
+                            if (_skilleffect.PlayWithCutIn && Owner.PlayCutInFlag && Owner.MovieId != 0)
                                 startTime = _skill.CutInSkipTime - waitTime;
                             else
                                 continue;
                         }
                         do
                         {
-                            yield return (object)null;
-                            time += this.battleManager.DeltaTime_60fps;
-                            if (_skill.Cancel || !this.Owner.gameObject.activeSelf || _modeChangeEndEffect && this.Owner.IsUnableActionState())
+                            yield return null;
+                            time += battleManager.DeltaTime_60fps;
+                            if (_skill.Cancel || !Owner.gameObject.activeSelf || _modeChangeEndEffect && Owner.IsUnableActionState())
                                 yield break;
                         }
-                        while ((double)waitTime > (double)time);
+                        while (waitTime > (double)time);
                         execed[execTimeIndex] = true;
-                        BasePartsData _firearmEndTarget = (BasePartsData)null;
+                        BasePartsData _firearmEndTarget = null;
                         if (_skilleffect.EffectBehavior == eEffectBehavior.FIREARM || _skilleffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM)
                         {
                             switch (_skilleffect.FireArmEndTarget)
                             {
                                 case eEffectTarget.OWNER:
-                                    _firearmEndTarget = this.Owner.GetFirstParts(true);
+                                    _firearmEndTarget = Owner.GetFirstParts(true);
                                     break;
                                 case eEffectTarget.ALL_TARGET:
                                     _firearmEndTarget = _skilleffect.TargetAction.TargetList[execTimeIndex];
                                     break;
                                 case eEffectTarget.FORWARD_TARGET:
                                 case eEffectTarget.BACK_TARGET:
-                                    bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !this.Owner.IsOther;
-                                    List<BasePartsData> basePartsDataList1 = new List<BasePartsData>((IEnumerable<BasePartsData>)_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
+                                    bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !Owner.IsOther;
+                                    List<BasePartsData> basePartsDataList1 = new List<BasePartsData>(_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
                                     basePartsDataList1.Sort((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x));
                                     if (basePartsDataList1.Count == 0)
                                     {
@@ -679,46 +679,45 @@ namespace Elements
                         switch (_skilleffect.EffectTarget)
                         {
                             case eEffectTarget.OWNER:
-                                this.createNormalEffectPrefab2(_skilleffect, _skill, this.Owner.GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex, _modeChangeEndEffect);
+                                createNormalEffectPrefab2(_skilleffect, _skill, Owner.GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex, _modeChangeEndEffect);
                                 continue;
                             case eEffectTarget.ALL_TARGET:
                                 switch (_skilleffect.EffectBehavior)
                                 {
                                     case eEffectBehavior.SERIES:
                                     case eEffectBehavior.SERIES_FIREARM:
-                                        this.createNormalEffectPrefab2(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[execTimeIndex], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
+                                        createNormalEffectPrefab2(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[execTimeIndex], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                         continue;
                                     default:
                                         int index1 = 0;
                                         for (int count = _skilleffect.TargetAction.TargetList.Count; index1 < count && index1 < _skilleffect.TargetAction.TargetNum; ++index1)
-                                            this.createNormalEffectPrefab2(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[index1], _firearmEndTarget, index1 == 0, startTime, _skipCutIn, execTimeIndex);
+                                            createNormalEffectPrefab2(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[index1], _firearmEndTarget, index1 == 0, startTime, _skipCutIn, execTimeIndex);
                                         continue;
                                 }
                             case eEffectTarget.FORWARD_TARGET:
                             case eEffectTarget.BACK_TARGET:
-                                bool flag2 = _skilleffect.EffectTarget == eEffectTarget.FORWARD_TARGET == !this.Owner.IsOther;
-                                List<BasePartsData> basePartsDataList2 = new List<BasePartsData>((IEnumerable<BasePartsData>)_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
+                                bool flag2 = _skilleffect.EffectTarget == eEffectTarget.FORWARD_TARGET == !Owner.IsOther;
+                                List<BasePartsData> basePartsDataList2 = new List<BasePartsData>(_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
                                 basePartsDataList2.Sort((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x));
                                 if (basePartsDataList2.Count != 0)
                                 {
-                                    this.createNormalEffectPrefab2(_skilleffect, _skill, basePartsDataList2[flag2 ? 0 : basePartsDataList2.Count - 1], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
-                                    continue;
+                                    createNormalEffectPrefab2(_skilleffect, _skill, basePartsDataList2[flag2 ? 0 : basePartsDataList2.Count - 1], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                 }
                                 continue;
                             case eEffectTarget.ALL_OTHER:
-                                List<UnitCtrl> unitCtrlList1 = this.Owner.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
+                                List<UnitCtrl> unitCtrlList1 = Owner.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                                 for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
                                 {
                                     if ((long)unitCtrlList1[index2].Hp != 0L)
-                                        this.createNormalEffectPrefab2(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
+                                        createNormalEffectPrefab2(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                 }
                                 continue;
                             case eEffectTarget.ALL_UNIT_EXCEPT_OWNER:
-                                List<UnitCtrl> unitCtrlList2 = this.Owner.IsOther ? this.battleManager.EnemyList : this.battleManager.UnitList;
+                                List<UnitCtrl> unitCtrlList2 = Owner.IsOther ? battleManager.EnemyList : battleManager.UnitList;
                                 for (int index2 = 0; index2 < unitCtrlList2.Count; ++index2)
                                 {
-                                    if ((UnityEngine.Object)unitCtrlList2[index2] != (UnityEngine.Object)this.Owner && !unitCtrlList2[index2].IsDead)
-                                        this.createNormalEffectPrefab2(_skilleffect, _skill, unitCtrlList2[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
+                                    if (unitCtrlList2[index2] != Owner && !unitCtrlList2[index2].IsDead)
+                                        createNormalEffectPrefab2(_skilleffect, _skill, unitCtrlList2[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                 }
                                 continue;
                             default:
@@ -742,7 +741,7 @@ namespace Elements
         {
             if (_skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM && !(_skillEffect.FireAction is AttackAction) && (!(_skillEffect.FireAction is RatioDamageAction) && !(_skillEffect.FireAction is UpperLimitAttackAction)) && (!(_skillEffect.FireAction is HealAction) && _skillEffect.AppendAndJudgeAlreadyExeced(_firearmEndTarget.Owner)) || (_skillEffect.TargetBranchId != 0 && _skillEffect.TargetBranchId != _skill.EffectBranchId || _skillEffect.TargetMotionIndex == 1 && _skill.LoopEffectAlreadyDone))
                 return;
-            GameObject prefab1 = (GameObject)null;
+            GameObject prefab1 = null;
             //SkillEffectCtrl prefab2 = this.createPrefab(_skillEffect, _skill, _target, ref prefab1);
             SkillEffectCtrl2 prefab2 = new FirearmCtrl2();
             //prefab2.InitializeSort();//没用
@@ -754,7 +753,7 @@ namespace Elements
             //    this.Owner.ModeChangeEndEffectList.Add(prefab2);
             //if (_skipCutIn)
             //    prefab2.OnAwakeWhenSkipCutIn();
-            prefab2.SetPossitionAppearanceType(_skillEffect, _target, this.Owner, _skill);
+            prefab2.SetPossitionAppearanceType(_skillEffect, _target, Owner, _skill);
             switch (_skillEffect.EffectBehavior)
             {
                 case eEffectBehavior.FIREARM:
@@ -772,8 +771,8 @@ namespace Elements
                     List<ActionParameter> _actions = new List<ActionParameter>();
                     if (_skillEffect.FireActionId != -1 & actionStart)
                         _actions.Add(_skillEffect.FireAction);
-                    firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), this.Owner, _skillEffect.Height, (double)_skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, this.transform.position + (this.Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
-                    firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? (System.Action<FirearmCtrl2>)(fctrl =>
+                    firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), Owner, _skillEffect.Height, _skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, transform.position + (Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
+                    firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? fctrl =>
                     {
                         /*for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
                         {
@@ -781,11 +780,11 @@ namespace Elements
                             this.AppendCoroutine(this.StartShakeWithDelay(fctrl.ShakeEffects[index1], fctrl.Skill), ePauseType.VISUAL, (double) fctrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
                         }*/
                         if (_skillEffect.FireActionId != -1)
-                            this.AppendCoroutine(this.ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _firearmEndTarget, 0.0f), ePauseType.SYSTEM, (double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null);
+                            AppendCoroutine(ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _firearmEndTarget, 0.0f), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
                         int index3 = 0;
                         for (int count = _skillEffect.FireArmEndEffects.Count; index3 < count; ++index3)
-                            this.AppendCoroutine(this.createNormalPrefabWithDelayAndTarget2(_skillEffect.FireArmEndEffects[index3], _skill, 0.0f, _firearmEndTarget, false), ePauseType.VISUAL, (double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null);
-                    }) : new System.Action<FirearmCtrl2>(this.onFirearmHit2);
+                            AppendCoroutine(createNormalPrefabWithDelayAndTarget2(_skillEffect.FireArmEndEffects[index3], _skill, 0.0f, _firearmEndTarget, false), ePauseType.VISUAL, _skill.BlackOutTime > 0.0 ? Owner : null);
+                    } : new Action<FirearmCtrl2>(onFirearmHit2);
                     //Debug.Log("生成弹道");
                     break;
                 case eEffectBehavior.WORLD_POS_CENTER:
@@ -829,8 +828,7 @@ namespace Elements
                 case eEffectBehavior.SERIES:
                     if (_skillEffect.FireActionId != -1)
                     {
-                        this.AppendCoroutine(this.ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _target, 0.0f), ePauseType.SYSTEM, (double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null);
-                        break;
+                        AppendCoroutine(ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _target, 0.0f), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
                     }
                     break;
             }
@@ -844,15 +842,15 @@ namespace Elements
   bool _first)
         {
             float time = _first ? _skill.CutInSkipTime : 0.0f;
-            if ((double)_delay >= (double)time)
+            if (_delay >= (double)time)
             {
                 while (true)
                 {
-                    time += this.battleManager.DeltaTime_60fps;
+                    time += battleManager.DeltaTime_60fps;
                     if (!_skill.Cancel)
                     {
-                        if ((double)_delay > (double)time)
-                            yield return (object)null;
+                        if (_delay > (double)time)
+                            yield return null;
                         else
                             goto label_6;
                     }
@@ -862,9 +860,9 @@ namespace Elements
                 yield break;
             label_6:
                 if (_skilleffect.EffectTarget == eEffectTarget.OWNER)
-                    this.createNormalEffectPrefab2(_skilleffect, _skill, this.Owner.GetFirstParts(true), (BasePartsData)null, false, 0.0f, false);
+                    createNormalEffectPrefab2(_skilleffect, _skill, Owner.GetFirstParts(true), null, false, 0.0f, false);
                 else
-                    this.createNormalEffectPrefab2(_skilleffect, _skill, _target, (BasePartsData)null, false, 0.0f, false);
+                    createNormalEffectPrefab2(_skilleffect, _skill, _target, null, false, 0.0f, false);
             }
         }
         private void onFirearmHit2(FirearmCtrl2 firearmCtrl)
@@ -879,10 +877,10 @@ namespace Elements
             }*/
             int index1 = 0;
             for (int count = firearmCtrl.EndActions.Count; index1 < count; ++index1)
-                this.ExecUnitActionWithDelay(firearmCtrl.EndActions[index1], firearmCtrl.Skill, false, true);
+                ExecUnitActionWithDelay(firearmCtrl.EndActions[index1], firearmCtrl.Skill, false, true);
             int index2 = 0;
             for (int count = firearmCtrl.SkillHitEffects.Count; index2 < count; ++index2)
-                this.AppendCoroutine(this.createNormalPrefabWithDelay2(firearmCtrl.SkillHitEffects[index2], firearmCtrl.Skill, _isFirearmEndEffect: true), ePauseType.VISUAL, (double)firearmCtrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null);
+                AppendCoroutine(createNormalPrefabWithDelay2(firearmCtrl.SkillHitEffects[index2], firearmCtrl.Skill, _isFirearmEndEffect: true), ePauseType.VISUAL, firearmCtrl.Skill.BlackOutTime > 0.0 ? Owner : null);
         }
 
     }
@@ -911,7 +909,7 @@ namespace Elements
             set => this.isCommon = value;
         }*/
 
-        public System.Action<SkillEffectCtrl> OnEffectEnd { set; get; }
+        public Action<SkillEffectCtrl> OnEffectEnd { set; get; }
 
         public UnitCtrl SortTarget { get; set; }
 
@@ -940,9 +938,9 @@ namespace Elements
   UnitCtrl _owner,
   Skill skill)
         {
-            this.source = _owner;
+            source = _owner;
             Vector3 vector3 = new Vector3(0.0f, 9.259259f, 0.0f);
-            Bone bone = (Bone)null;
+            Bone bone = null;
             switch (skillEffect.EffectTarget)
             {
                 case eEffectTarget.OWNER:
@@ -951,7 +949,7 @@ namespace Elements
                 case eEffectTarget.BACK_TARGET:
                 case eEffectTarget.ALL_OTHER:
                 case eEffectTarget.ALL_UNIT_EXCEPT_OWNER:
-                    this.SortTarget = target.Owner;
+                    SortTarget = target.Owner;
                     switch (skillEffect.TargetBone)
                     {
                         case eTargetBone.BOTTOM:
@@ -969,10 +967,10 @@ namespace Elements
                             vector3 = target.GetBottomTransformPosition() + target.GetFixedCenterPos();
                             break;
                         case eTargetBone.ANY_BONE:
-                            bone = (this.SortTarget.MotionPrefix == -1 ? (SkeletonRenderer)this.SortTarget.UnitSpineCtrl : (SkeletonRenderer)this.SortTarget.UnitSpineCtrlModeChange).skeleton.FindBone(skillEffect.TargetBoneName);
+                            bone = (SortTarget.MotionPrefix == -1 ? SortTarget.UnitSpineCtrl : (SkeletonRenderer)SortTarget.UnitSpineCtrlModeChange).skeleton.FindBone(skillEffect.TargetBoneName);
                             skillEffect.TrackType = eTrackType.BONE;
                             skillEffect.TrackDimension = eTrackDimension.XY;
-                            vector3 = BattleUnitBaseSpineController.BoneWorldToGlobalPosConsiderRotate(bone, this.SortTarget.RotateCenter, this.SortTarget.BottomTransform.lossyScale);
+                            vector3 = BattleUnitBaseSpineController.BoneWorldToGlobalPosConsiderRotate(bone, SortTarget.RotateCenter, SortTarget.BottomTransform.lossyScale);
                             break;
                     }
                     break;
@@ -1082,78 +1080,78 @@ namespace Elements
   List<ShakeEffect> _shakes,
   eTargetBone _targetBone)
         {
-            this.obj = UnityEngine.Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
-            this.ShakeEffects = _shakes;
-            this.IsAbsolute = _isAbsolute;
-            this.Skill = _skill;
+            obj = Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
+            ShakeEffects = _shakes;
+            IsAbsolute = _isAbsolute;
+            Skill = _skill;
             if (_isAbsolute)
             {
-                this.TargetPos = _targetPosition;
+                TargetPos = _targetPosition;
             }
             else
             {
                 switch (_targetBone)
                 {
                     case eTargetBone.BOTTOM:
-                        this.TargetPos = _target.GetBottomTransformPosition();
+                        TargetPos = _target.GetBottomTransformPosition();
                         break;
                     case eTargetBone.HEAD:
-                        this.TargetPos = this.getHeadBonePos(_target);
+                        TargetPos = getHeadBonePos(_target);
                         break;
                     case eTargetBone.CENTER:
                     case eTargetBone.FIXED_CENETER:
-                        this.TargetPos = _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
+                        TargetPos = _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
                         break;
                 }
             }
-            this.FireTarget = _target;
+            FireTarget = _target;
             //_target.Owner.FirearmCtrlsOnMe.Add(this);
-            this.EndActions = _actions;
-            this.SkillHitEffects = _skillEffect;
-            this.owner = _owner;
-            this.setInitialPosition();
-            this.initMoveType(_height, _owner);
-            this.battleManager.AppendCoroutine(this.updatePosition(Vector3.Distance(this.TargetPos, this.initialPosistion) + 1f), ePauseType.SYSTEM, _hasBlackOutTime ? _owner : (UnitCtrl)null);
+            EndActions = _actions;
+            SkillHitEffects = _skillEffect;
+            owner = _owner;
+            setInitialPosition();
+            initMoveType(_height, _owner);
+            battleManager.AppendCoroutine(updatePosition(Vector3.Distance(TargetPos, initialPosistion) + 1f), ePauseType.SYSTEM, _hasBlackOutTime ? _owner : null);
             //this.battleManager.AppendEffect((SkillEffectCtrl)this, _hasBlackOutTime ? _owner : (UnitCtrl)null, false);
         }
         protected virtual Vector3 getHeadBonePos(BasePartsData _target) => _target.GetBottomTransformPosition() + _target.GetFixedCenterPos();
-        protected virtual void setInitialPosition() => this.initialPosistion = position;
+        protected virtual void setInitialPosition() => initialPosistion = position;
         private void initMoveType(float _height, UnitCtrl _owner)
         {
             switch ((eMoveTypes)data.MoveType)
             {
                 case eMoveTypes.LINEAR:
-                    Vector3 toDirection = this.TargetPos - this.position;
+                    Vector3 toDirection = TargetPos - position;
                     toDirection.z = 0;
                     toDirection.Normalize();
                     //this.speed = this.MoveRate * toDirection;
-                    this.speed = this.data.MoveRate * toDirection;
+                    speed = data.MoveRate * toDirection;
                     //this.transform.rotation = Quaternion.FromToRotation((UnityEngine.Object)_owner == (UnityEngine.Object)null || !_owner.IsLeftDir ? Vector3.right : Vector3.left, toDirection);
                     break;
                 case eMoveTypes.NONE:
                 case eMoveTypes.HORIZONTAL:
-                    this.speed = new Vector3(this.data.MoveRate, 0.0f, 0.0f);
+                    speed = new Vector3(data.MoveRate, 0.0f, 0.0f);
                     break;
                 case eMoveTypes.PARABORIC:
                 case eMoveTypes.PARABORIC_ROTATE:
-                    float durationTime = this.data.duration / 2f;
-                    this.easingUpY = new CustomEasing(CustomEasing.eType.outCubic, this.position.y, this.position.y + _height, durationTime);
-                    this.easingDownY = new CustomEasing(CustomEasing.eType.inQuad, this.position.y + _height, this.TargetPos.y, durationTime);
-                    this.easingX = new CustomEasing(CustomEasing.eType.linear, this.position.x, this.TargetPos.x, this.data.duration);
+                    float durationTime = data.duration / 2f;
+                    easingUpY = new CustomEasing(CustomEasing.eType.outCubic, position.y, position.y + _height, durationTime);
+                    easingDownY = new CustomEasing(CustomEasing.eType.inQuad, position.y + _height, TargetPos.y, durationTime);
+                    easingX = new CustomEasing(CustomEasing.eType.linear, position.x, TargetPos.x, data.duration);
                     break;
             }
-            if ((eMoveTypes)this.data.MoveType != eMoveTypes.PARABORIC_ROTATE)
+            if ((eMoveTypes)data.MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return;
-            this.easingUpRotate = new CustomEasing(CustomEasing.eType.inQuad, this.data.startRotate, 0.0f, this.data.duration / 2f);
-            this.easingDownRotate = new CustomEasing(CustomEasing.eType.linear, 0.0f, this.data.endRotate, this.data.duration / 2f);
+            easingUpRotate = new CustomEasing(CustomEasing.eType.inQuad, data.startRotate, 0.0f, data.duration / 2f);
+            easingDownRotate = new CustomEasing(CustomEasing.eType.linear, 0.0f, data.endRotate, data.duration / 2f);
         }
 
         private Vector3 GetParaboricPosition(float _currentTime, float _deltaTime)
         {
             Vector3 position = base.position;
-            if (this.easingX.IsMoving)
+            if (easingX.IsMoving)
             {
-                position = new Vector3(this.easingX.GetCurVal(_deltaTime, true), (_currentTime >= this.data.duration / 2f) ? this.easingDownY.GetCurVal(_deltaTime, true) : this.easingUpY.GetCurVal(_deltaTime, true), base.position.z);
+                position = new Vector3(easingX.GetCurVal(_deltaTime, true), (_currentTime >= data.duration / 2f) ? easingDownY.GetCurVal(_deltaTime, true) : easingUpY.GetCurVal(_deltaTime, true), base.position.z);
             }
             return position;
         }
@@ -1176,12 +1174,12 @@ namespace Elements
                 {
                     hitTimer += deltaTime;
                     float _b = ((eMoveTypes)data.MoveType) == eMoveTypes.LINEAR ? 0.2f / data.MoveRate : data.HitDelay;
-                    if ((double)hitTimer > (double)_b || BattleUtil.Approximately(hitTimer, _b))
+                    if (hitTimer > (double)_b || BattleUtil.Approximately(hitTimer, _b))
                     {
                         hitTimer = 0.0f;
                         hitFlag = false;
                         stopFlag = true;
-                        UnityEngine.Object.Destroy(obj);
+                        Object.Destroy(obj);
                         obj = null;
                         if (OnHitAction != null)
                         {
@@ -1199,65 +1197,61 @@ namespace Elements
                     //data.timeToDie = true;
                     break;
                 }
-                else
+
+                if (data == null)
+                    break;
+                Vector3 b = position;
+                switch ((eMoveTypes)data.MoveType)
                 {
-                    if (data == null)
-                        break;
-                    Vector3 b = position;
-                    switch ((eMoveTypes)data.MoveType)
-                    {
-                        case eMoveTypes.LINEAR:
-                        case eMoveTypes.HORIZONTAL:
+                    case eMoveTypes.LINEAR:
+                    case eMoveTypes.HORIZONTAL:
                         //case eMoveTypes.PARABORIC:
                         //case eMoveTypes.PARABORIC_ROTATE:
 
-                            //b += new Vector3(speed.x * deltaTime,0,0);
+                        //b += new Vector3(speed.x * deltaTime,0,0);
                         b += speed * deltaTime;
-                            break;
-                        case eMoveTypes.PARABORIC:
-                        case eMoveTypes.PARABORIC_ROTATE:
-                            currentTime += deltaTime;
-                            b = GetParaboricPosition(currentTime, deltaTime);
-                            if ((double)currentTime > (double)data.duration)
-                            {
-                                hitFlag = true;
-                                break;
-                            }
-                            break;
-                    }
-                    //if ((eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE)
-                    //    data.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, (double)currentTime >= (double)data.duration / 2.0 ? data.easingDownRotate.GetCurVal(deltaTime, true) : data.easingUpRotate.GetCurVal(deltaTime, true));
-                    position = b;
-                    switch ((eMoveTypes)data.MoveType)
-                    {
-                        case eMoveTypes.LINEAR:
-                        case eMoveTypes.HORIZONTAL:
-                            if ((double)Vector3.Distance(initialPosistion, b) > (double)_lifeDistance)
+                        break;
+                    case eMoveTypes.PARABORIC:
+                    case eMoveTypes.PARABORIC_ROTATE:
+                        currentTime += deltaTime;
+                        b = GetParaboricPosition(currentTime, deltaTime);
+                        if (currentTime > (double)data.duration)
+                        {
+                            hitFlag = true;
+                        }
+                        break;
+                }
+                //if ((eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE)
+                //    data.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, (double)currentTime >= (double)data.duration / 2.0 ? data.easingDownRotate.GetCurVal(deltaTime, true) : data.easingUpRotate.GetCurVal(deltaTime, true));
+                position = b;
+                switch ((eMoveTypes)data.MoveType)
+                {
+                    case eMoveTypes.LINEAR:
+                    case eMoveTypes.HORIZONTAL:
+                        if (Vector3.Distance(initialPosistion, b) > (double)_lifeDistance)
                             //if ((double)Mathf.Abs(firearmCtrl.initialPosistion.x- b.x) > (double)3*_lifeDistance)
 
-                            {
-                                //data.FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
-                                //data.timeToDie = true;
-                                break;
-                            }
-                            break;
-                    }
+                        {
+                            //data.FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
+                            //data.timeToDie = true;
+                        }
+                        break;
                 }
                 if (!IsAbsolute)
                     hitFlag = collisionDetection(hitFlag, currentTime);
-                yield return (object)null;
+                yield return null;
 
             }
         }
-        protected virtual bool getStopFlag() => this.stopFlag;
+        protected virtual bool getStopFlag() => stopFlag;
         private bool collisionDetection(bool _hitFlag, float _currentTime)
         {
-            if ((((eMoveTypes)data.MoveType) == eMoveTypes.PARABORIC ||(eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE) && (double)_currentTime < (double)data.duration * 0.5 || (_hitFlag || this.InFlag))
+            if ((((eMoveTypes)data.MoveType) == eMoveTypes.PARABORIC ||(eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE) && _currentTime < data.duration * 0.5 || (_hitFlag || InFlag))
                 return _hitFlag;
             float num1 = position.x + data.ColliderBoxCentre[0];
             float num2 = data.ColliderBoxSize[0] * 0.5f;
-            double num3 = (double)this.FireTarget.GetColliderCenter().x + (double)this.FireTarget.GetPosition().x;
-            float num4 = this.FireTarget.GetColliderSize().x * 0.5f;
+            double num3 = FireTarget.GetColliderCenter().x + (double)FireTarget.GetPosition().x;
+            float num4 = FireTarget.GetColliderSize().x * 0.5f;
             float _b1 = num1 - num2;
             float _b2 = num1 + num2;
             float _a1 = (float)num3 - num4;
@@ -1267,17 +1261,17 @@ namespace Elements
              //   return _hitFlag;
             if (speed.x > 0)
             {
-                if ((double)_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2))
+                if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2))
                     return _hitFlag;
             }
             else
             {
-                if ((double)_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
+                if (_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
                     return _hitFlag;
             }
             if ((eMoveTypes)data.MoveType != eMoveTypes.PARABORIC && (eMoveTypes)data.MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return true;
-            this.InFlag = true;
+            InFlag = true;
             return _hitFlag;
         }
 

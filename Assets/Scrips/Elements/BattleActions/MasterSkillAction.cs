@@ -4,9 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
+
 //using Sqlite3Plugin;
-using System.Collections.Generic;
 
 namespace Elements
 {
@@ -134,71 +133,71 @@ namespace Elements
 
         public class SkillAction
         {
-            protected ObscuredInt _action_id;
-            protected ObscuredInt _class_id;
-            protected ObscuredByte _action_type;
-            protected ObscuredInt _action_detail_1;
-            protected ObscuredInt _action_detail_2;
-            protected ObscuredInt _action_detail_3;
-            protected ObscuredDouble _action_value_1;
-            protected ObscuredDouble _action_value_2;
-            protected ObscuredDouble _action_value_3;
-            protected ObscuredDouble _action_value_4;
-            protected ObscuredDouble _action_value_5;
-            protected ObscuredDouble _action_value_6;
-            protected ObscuredDouble _action_value_7;
-            protected ObscuredInt _target_assignment;
-            protected ObscuredInt _target_area;
-            protected ObscuredInt _target_range;
-            protected ObscuredInt _target_type;
-            protected ObscuredInt _target_number;
-            protected ObscuredInt _target_count;
-            protected ObscuredString _description;
-            protected ObscuredString _level_up_disp;
+            protected int _action_id;
+            protected int _class_id;
+            protected byte _action_type;
+            protected int _action_detail_1;
+            protected int _action_detail_2;
+            protected int _action_detail_3;
+            protected double _action_value_1;
+            protected double _action_value_2;
+            protected double _action_value_3;
+            protected double _action_value_4;
+            protected double _action_value_5;
+            protected double _action_value_6;
+            protected double _action_value_7;
+            protected int _target_assignment;
+            protected int _target_area;
+            protected int _target_range;
+            protected int _target_type;
+            protected int _target_number;
+            protected int _target_count;
+            protected string _description;
+            protected string _level_up_disp;
 
             public int DependActionId { get; set; }
 
-            public ObscuredInt action_id => this._action_id;
+            public int action_id => _action_id;
 
-            public ObscuredInt class_id => this._class_id;
+            public int class_id => _class_id;
 
-            public ObscuredByte action_type => this._action_type;
+            public byte action_type => _action_type;
 
-            public ObscuredInt action_detail_1 => this._action_detail_1;
+            public int action_detail_1 => _action_detail_1;
 
-            public ObscuredInt action_detail_2 => this._action_detail_2;
+            public int action_detail_2 => _action_detail_2;
 
-            public ObscuredInt action_detail_3 => this._action_detail_3;
+            public int action_detail_3 => _action_detail_3;
 
-            public ObscuredDouble action_value_1 => this._action_value_1;
+            public double action_value_1 => _action_value_1;
 
-            public ObscuredDouble action_value_2 => this._action_value_2;
+            public double action_value_2 => _action_value_2;
 
-            public ObscuredDouble action_value_3 => this._action_value_3;
+            public double action_value_3 => _action_value_3;
 
-            public ObscuredDouble action_value_4 => this._action_value_4;
+            public double action_value_4 => _action_value_4;
 
-            public ObscuredDouble action_value_5 => this._action_value_5;
+            public double action_value_5 => _action_value_5;
 
-            public ObscuredDouble action_value_6 => this._action_value_6;
+            public double action_value_6 => _action_value_6;
 
-            public ObscuredDouble action_value_7 => this._action_value_7;
+            public double action_value_7 => _action_value_7;
 
-            public ObscuredInt target_assignment => this._target_assignment;
+            public int target_assignment => _target_assignment;
 
-            public ObscuredInt target_area => this._target_area;
+            public int target_area => _target_area;
 
-            public ObscuredInt target_range => this._target_range;
+            public int target_range => _target_range;
 
-            public ObscuredInt target_type => this._target_type;
+            public int target_type => _target_type;
 
-            public ObscuredInt target_number => this._target_number;
+            public int target_number => _target_number;
 
-            public ObscuredInt target_count => this._target_count;
+            public int target_count => _target_count;
 
-            public ObscuredString description => this._description;
+            public string description => _description;
 
-            public ObscuredString level_up_disp => this._level_up_disp;
+            public string level_up_disp => _level_up_disp;
 
             public SkillAction(
               int action_id = 0,
@@ -223,51 +222,51 @@ namespace Elements
               string description = "",
               string level_up_disp = "")
             {
-                this._action_id = (ObscuredInt)action_id;
-                this._class_id = (ObscuredInt)class_id;
-                this._action_type = (ObscuredByte)action_type;
-                this._action_detail_1 = (ObscuredInt)action_detail_1;
-                this._action_detail_2 = (ObscuredInt)action_detail_2;
-                this._action_detail_3 = (ObscuredInt)action_detail_3;
-                this._action_value_1 = (ObscuredDouble)action_value_1;
-                this._action_value_2 = (ObscuredDouble)action_value_2;
-                this._action_value_3 = (ObscuredDouble)action_value_3;
-                this._action_value_4 = (ObscuredDouble)action_value_4;
-                this._action_value_5 = (ObscuredDouble)action_value_5;
-                this._action_value_6 = (ObscuredDouble)action_value_6;
-                this._action_value_7 = (ObscuredDouble)action_value_7;
-                this._target_assignment = (ObscuredInt)target_assignment;
-                this._target_area = (ObscuredInt)target_area;
-                this._target_range = (ObscuredInt)target_range;
-                this._target_type = (ObscuredInt)target_type;
-                this._target_number = (ObscuredInt)target_number;
-                this._target_count = (ObscuredInt)target_count;
-                this._description = (ObscuredString)description;
-                this._level_up_disp = (ObscuredString)level_up_disp;
+                _action_id = action_id;
+                _class_id = class_id;
+                _action_type = action_type;
+                _action_detail_1 = action_detail_1;
+                _action_detail_2 = action_detail_2;
+                _action_detail_3 = action_detail_3;
+                _action_value_1 = action_value_1;
+                _action_value_2 = action_value_2;
+                _action_value_3 = action_value_3;
+                _action_value_4 = action_value_4;
+                _action_value_5 = action_value_5;
+                _action_value_6 = action_value_6;
+                _action_value_7 = action_value_7;
+                _target_assignment = target_assignment;
+                _target_area = target_area;
+                _target_range = target_range;
+                _target_type = target_type;
+                _target_number = target_number;
+                _target_count = target_count;
+                _description = description;
+                _level_up_disp = level_up_disp;
             }
             public SkillAction(PCRCaculator.SkillAction data)
             {
-                this._action_id = (ObscuredInt)data.actionid;
-                this._class_id = (ObscuredInt)data.classid;
-                this._action_type = (ObscuredByte)data.type;
-                this._action_detail_1 = (ObscuredInt)data.details[0];
-                this._action_detail_2 = (ObscuredInt)data.details[1];
-                this._action_detail_3 = (ObscuredInt)data.details[2];
-                this._action_value_1 = (ObscuredDouble)data.values[0];
-                this._action_value_2 = (ObscuredDouble)data.values[1];
-                this._action_value_3 = (ObscuredDouble)data.values[2];
-                this._action_value_4 = (ObscuredDouble)data.values[3];
-                this._action_value_5 = (ObscuredDouble)data.values[4];
-                this._action_value_6 = (ObscuredDouble)data.values[5];
-                this._action_value_7 = (ObscuredDouble)data.values[6];
-                this._target_assignment = (ObscuredInt)data.target_assigment;
-                this._target_area = (ObscuredInt)data.target_area;
-                this._target_range = (ObscuredInt)data.target_range;
-                this._target_type = (ObscuredInt)data.target_type;
-                this._target_number = (ObscuredInt)data.target_number;
-                this._target_count = (ObscuredInt)data.target_count;
-                this._description = (ObscuredString)data.description;
-                this._level_up_disp = (ObscuredString)"";
+                _action_id = data.actionid;
+                _class_id = data.classid;
+                _action_type = (byte)data.type;
+                _action_detail_1 = data.details[0];
+                _action_detail_2 = data.details[1];
+                _action_detail_3 = data.details[2];
+                _action_value_1 = data.values[0];
+                _action_value_2 = data.values[1];
+                _action_value_3 = data.values[2];
+                _action_value_4 = data.values[3];
+                _action_value_5 = data.values[4];
+                _action_value_6 = data.values[5];
+                _action_value_7 = data.values[6];
+                _target_assignment = data.target_assigment;
+                _target_area = data.target_area;
+                _target_range = data.target_range;
+                _target_type = data.target_type;
+                _target_number = data.target_number;
+                _target_count = data.target_count;
+                _description = data.description;
+                _level_up_disp = "";
 
             }
         }

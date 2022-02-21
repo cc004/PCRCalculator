@@ -58,7 +58,7 @@ namespace SpringGUI
         }
         public void Adddata( IList<RadarData> vdatas ) 
         {
-            this.datas.AddRadarData(vdatas);
+            datas.AddRadarData(vdatas);
         }
         public void RemoveAllData()
         {
@@ -89,22 +89,22 @@ namespace SpringGUI
     public class BaseRadarFactory : sgBase, IRadarFactory
     {
         protected Vector2 origin = Vector2.zero;
-        protected RadarBaseData radarData = null;
-        protected RadarDatas radarDatas = null;
+        protected RadarBaseData radarData;
+        protected RadarDatas radarDatas;
         protected Vector2 size = Vector2.zero;
 
         //使用SpringGUIBase继承或者直接获取一个实例,如果你需要继承其他类型时，可以使用构造实例的方法，如下
         //private ISpringGUIBase springGUIBase = new SpringGUIBase();
 
-        private IRadarBase radarbase = null;
-        private IRadarline radarline = null;
+        private IRadarBase radarbase;
+        private IRadarline radarline;
 
         public BaseRadarFactory(){}
 
         public BaseRadarFactory( IRadarBase radarBase,IRadarline radarLine )
         {
-            this.radarbase = radarBase;
-            this.radarline = radarLine;
+            radarbase = radarBase;
+            radarline = radarLine;
         }
 
         /// <summary>
@@ -118,10 +118,10 @@ namespace SpringGUI
         {
             if (null == radardata)
                 return vh;
-            this.radarData = radardata;
-            this.radarDatas = this.radarData.Getdata();
-            this.size = rect.size;
-            this.origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
+            radarData = radardata;
+            radarDatas = radarData.Getdata();
+            size = rect.size;
+            origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
             DrawBase(vh);
             DrawAxis(vh);
             DrawLine(vh);
@@ -156,7 +156,7 @@ namespace SpringGUI
                     vh.AddUIVertexQuad(newVertexs);
                     if (j > 0)
                     {
-                        vh.AddUIVertexQuad(new UIVertex[]
+                        vh.AddUIVertexQuad(new[]
                             {
                                 oldVertexs[1],
                                 newVertexs[0],
@@ -191,7 +191,7 @@ namespace SpringGUI
                     var xFirst = endPosX + new Vector2(0 , radarData.ArrowSize);
                     var xSecond = endPosX + new Vector2(1.73f * radarData.ArrowSize , 0);
                     var xThird = endPosX + new Vector2(0 , -radarData.ArrowSize);
-                    vh.AddUIVertexQuad(new UIVertex[]
+                    vh.AddUIVertexQuad(new[]
                     {
                         GetUIVertex(xFirst,radarData.AxisColor),
                         GetUIVertex(xSecond,radarData.AxisColor),
@@ -202,7 +202,7 @@ namespace SpringGUI
                     var yFirst = endPosY + new Vector2(-radarData.ArrowSize , 0);
                     var ySecond = endPosY + new Vector2(0 , 1.73f * radarData.ArrowSize);
                     var yThird = endPosY + new Vector2(radarData.ArrowSize , 0);
-                    vh.AddUIVertexQuad(new UIVertex[]
+                    vh.AddUIVertexQuad(new[]
                     {
                         GetUIVertex(yFirst,radarData.AxisColor),
                         GetUIVertex(ySecond,radarData.AxisColor),
@@ -247,7 +247,7 @@ namespace SpringGUI
                     vertexs = newVertexs;
                 else
                 {
-                    vh.AddUIVertexQuad(new UIVertex[]
+                    vh.AddUIVertexQuad(new[]
                     {
                         vertexs[1],
                         newVertexs[0],
@@ -276,7 +276,7 @@ namespace SpringGUI
                             oldVertexs = newVertexs;
                         else
                         {
-                            vh.AddUIVertexQuad(new UIVertex[]
+                            vh.AddUIVertexQuad(new[]
                             {
                                 oldVertexs[1],
                                 newVertexs[0],
@@ -305,7 +305,7 @@ namespace SpringGUI
                 Debug.LogWarning("prefab"+iconPrefab.name+"can not be loaded");
                 return;
             }
-            GameObject icon = GameObject.Instantiate(iconPrefab) as GameObject;
+            GameObject icon = GameObject.Instantiate(iconPrefab);
             if (null == icon)
             {
                 Debug.LogWarning("prefab" + iconPrefab.name+ "can not be loaded");

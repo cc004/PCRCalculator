@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using Elements;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,7 +26,7 @@ namespace PCRCaculator.Battle
                 pos.z = 0;
                 this.transform.position = pos;
                 
-                    castTime -= Elements.BattleHeaderController.Instance.IsPaused ? 0 : Time.deltaTime;
+                    castTime -= BattleHeaderController.Instance.IsPaused ? 0 : Time.deltaTime;
                 
                 yield return null;
             }

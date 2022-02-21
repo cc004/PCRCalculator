@@ -4,8 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -41,39 +41,39 @@ namespace Elements
         public override void OnRepeat()
         {
             int index = 0;
-            for (int count = this.TargetList.Count; index < count; ++index)
+            for (int count = TargetList.Count; index < count; ++index)
             {
-                if (this.TargetList[index].Owner.CurrentState != UnitCtrl.ActionState.DIE)
+                if (TargetList[index].Owner.CurrentState != UnitCtrl.ActionState.DIE)
                 {
-                    DamageData damageData = new DamageData()
+                    DamageData damageData = new DamageData
                     {
-                        Target = this.TargetList[index],
-                        Damage = (long)BattleUtil.FloatToInt(this.Value),
-                        DamageType = this.DamageType,
-                        Source = this.PPOJKIDHGNJ,
+                        Target = TargetList[index],
+                        Damage = (long)BattleUtil.FloatToInt(Value),
+                        DamageType = DamageType,
+                        Source = PPOJKIDHGNJ,
                         ActionType = eActionType.ATTACK_FIELD,
-                        ExecAbsorber = (Func<int, int>)(_damage =>
-                       {
-                           if (_damage > this.AbsorberValue)
-                           {
-                               int num = _damage - this.AbsorberValue;
-                               this.BattleManager.SubstructEnemyPoint(this.AbsorberValue);
-                               this.AbsorberValue = 0;
-                               return num;
-                           }
-                           this.AbsorberValue -= _damage;
-                           this.BattleManager.SubstructEnemyPoint(_damage);
-                           return 0;
-                       })
+                        ExecAbsorber = _damage =>
+                        {
+                            if (_damage > AbsorberValue)
+                            {
+                                int num = _damage - AbsorberValue;
+                                BattleManager.SubstructEnemyPoint(AbsorberValue);
+                                AbsorberValue = 0;
+                                return num;
+                            }
+                            AbsorberValue -= _damage;
+                            BattleManager.SubstructEnemyPoint(_damage);
+                            return 0;
+                        }
                     };
-                    UnitCtrl owner = this.TargetList[index].Owner;
+                    UnitCtrl owner = TargetList[index].Owner;
                     DamageData _damageData = damageData;
-                    Skill pmhdbojmead = this.PMHDBOJMEAD;
-                    int actionId = this.ActionId;
+                    Skill pmhdbojmead = PMHDBOJMEAD;
+                    int actionId = ActionId;
                     Skill _skill = pmhdbojmead;
-                    double energyChargeMultiple = (double)this.EnergyChargeMultiple;
+                    double energyChargeMultiple = EnergyChargeMultiple;
                     //add
-                    System.Action<string> action0 = a =>
+                    Action<string> action0 = a =>
                     {
                         string msg = "(" + BattleHeaderController.CurrentFrameCount + ")目标：" + owner.UnitName + a + "\n";
                         onExec?.Invoke(msg);

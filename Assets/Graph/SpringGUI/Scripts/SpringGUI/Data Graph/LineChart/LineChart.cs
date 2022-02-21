@@ -46,14 +46,14 @@ namespace SpringGUI
         [Header("LineChart Base Data Setting")]
         [SerializeField]
         public LineChartData LineChartBasis = null;
-        private LineChartDataMediator m_dataMediator = null;
+        private LineChartDataMediator m_dataMediator;
 
         protected override void OnPopulateMesh(VertexHelper vh)
         {
             vh.Clear();
             if ( LineChartBasis.Lines.Count.Equals(0) )
                 return;
-            var rect = base.GetPixelAdjustedRect();
+            var rect = GetPixelAdjustedRect();
             LineChartCreator.DrawLineChart(vh, rect,LineChartBasis);
         }
 
@@ -66,7 +66,7 @@ namespace SpringGUI
         private void ClearUnit()
         {
             foreach (GameObject mUnit in m_units)
-                GameObject.Destroy(mUnit);
+                Destroy(mUnit);
         }
 #if UNITY_EDITOR
         public override void OnRebuildRequested()
@@ -104,7 +104,7 @@ namespace SpringGUI
         }
         private Text GeneratorUnit( Text prefab ,Vector3 position )
         {
-            Text go = GameObject.Instantiate(prefab);
+            Text go = Instantiate(prefab);
             go.gameObject.SetActive(true);
             go.transform.SetParent(transform);
             go.transform.localPosition = position;
@@ -135,7 +135,7 @@ namespace SpringGUI
         /// <param name="id"></param>
         public void RemoveLine( int id )
         {
-            RemoveLine(new int[] { id });
+            RemoveLine(new[] { id });
         }
         /// <summary>
         /// 移除折线
@@ -155,7 +155,7 @@ namespace SpringGUI
         /// <param name="vertexs"></param>
         public void Replace<T>( int id , IList<T> vertexs )
         {
-            Replace(new int[] { id } , new IList<T>[] { vertexs });
+            Replace(new[] { id } , new[] { vertexs });
         }
         /// <summary>
         /// 替换折线数据
@@ -207,12 +207,12 @@ namespace SpringGUI
                     for ( int j = 0 ; j < oldVertexs.Count - 2 ; j++ )
                         newVertexs.Add(oldVertexs[j + 1] - new Vector2(0.01f * i , 0));
                     newVertexs.Add(new Vector2(1, oldVertexs[oldVertexs.Count - 2].y + 0.1f * i * endOffset));
-                    LineChartBasis.ReplaceLines(new int[] { id } , new IList<Vector2>[] { newVertexs });
+                    LineChartBasis.ReplaceLines(new[] { id } , new[] { newVertexs });
                     OnEnable();
                     if ( i.Equals(10) )
                     {
                         newVertexs.RemoveAt(0);
-                        LineChartBasis.ReplaceLines(new int[] { id } , new IList<Vector2>[] { newVertexs });
+                        LineChartBasis.ReplaceLines(new[] { id } , new[] { newVertexs });
                     }
                     yield return new WaitForSeconds(0.05f);
                 }

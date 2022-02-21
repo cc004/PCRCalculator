@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +18,7 @@ namespace Elements
           UnitActionController _sourceActionController)
         {
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
-            if (this.ActionDetail1 != 3)
+            if (ActionDetail1 != 3)
             {
                 /*
                 BattleSpineController.LoadCreate(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, _source.SkinRarity, _source.transform.TargetTransform, (Action<BattleSpineController>)(_obj =>
@@ -30,23 +29,23 @@ namespace Elements
                    _obj.SetAnimeEventDelegateForBattle((Action)(() => _obj.IsStopState = true), 1);
                    _source.UnitSpineCtrlModeChange = _obj;
                }));*/
-                MyGameCtrl.CreateModeChangeSpine(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, _source.SkinRarity, _source.transform.TargetTransform, (Action<BattleSpineController>)(_obj =>
+                MyGameCtrl.CreateModeChangeSpine(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, _source.SkinRarity, _source.transform.TargetTransform, _obj =>
                 {
                     _obj.gameObject.SetActive(false);
                     _obj.transform.localScale = new Vector3(_source.Scale, _source.Scale, 1f);
                     _obj.Owner = _source;
-                    _obj.SetAnimeEventDelegateForBattle((Action)(() => _obj.IsStopState = true), 1);
+                    _obj.SetAnimeEventDelegateForBattle(() => _obj.IsStopState = true, 1);
                     _source.UnitSpineCtrlModeChange = _obj;
-                }));
+                });
                 _skill.IsModeChange = true;
             }
             _source.CreateAttackPattern(
                 //ManagerSingleton<MasterDataManager>.Instance.masterUnitSkillData[_source.SoundUnitId], 
                 _source.unitParameter.SkillData,
-                this.ActionDetail2);
+                ActionDetail2);
             if (_sourceActionController.Skill1IsChargeTime)
                 return;
-            _sourceActionController.Skill1IsChargeTime = _skill.SkillId == _source.UnionBurstSkillId && this.ActionDetail1 == 2;
+            _sourceActionController.Skill1IsChargeTime = _skill.SkillId == _source.UnionBurstSkillId && ActionDetail1 == 2;
         }
 
         public override void ExecAction(
@@ -60,14 +59,14 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            switch ((ModeChangeAction.eModeChangeType)this.ActionDetail1)
+            switch ((eModeChangeType)ActionDetail1)
             {
-                case ModeChangeAction.eModeChangeType.TIME:
-                case ModeChangeAction.eModeChangeType.ENERGY:
-                    if (this.ActionDetail3 == 0)
+                case eModeChangeType.TIME:
+                case eModeChangeType.ENERGY:
+                    if (ActionDetail3 == 0)
                         _sourceActionController.DisableUBByModeChange = true;
                     _sourceActionController.ModeChanging = true;
-                    ActionParameter _action = (ActionParameter)null;
+                    ActionParameter _action = null;
                     int index = 0;
                     for (int count = _skill.ActionParameters.Count; index < count; ++index)
                     {
@@ -75,27 +74,27 @@ namespace Elements
                         if (actionParameter.ActionType == eActionType.MODE_CHANGE && actionParameter.ActionDetail1 == 3)
                         {
                             _action = actionParameter;
-                            _action.TargetList = new List<BasePartsData>((IEnumerable<BasePartsData>)this.TargetList);
+                            _action.TargetList = new List<BasePartsData>(TargetList);
                         }
                     }
-                    _source.OnMotionPrefixChanged = (Action)(() =>
-                   {
-                       _source.ChangeAttackPattern(this.ActionDetail2, _skill.Level);
-                       _source.OnMotionPrefixChanged = (Action)null;
-                   });
+                    _source.OnMotionPrefixChanged = () =>
+                    {
+                        _source.ChangeAttackPattern(ActionDetail2, _skill.Level);
+                        _source.OnMotionPrefixChanged = null;
+                    };
                     if (_action == null)
                         break;
-                    _sourceActionController.AppendCoroutine(this.updateModeChange(_valueDictionary[eValueNumber.VALUE_1], (ModeChangeAction.eModeChangeType)this.ActionDetail1, _action, _skill, _source, _sourceActionController), ePauseType.SYSTEM, (double)_skill.BlackOutTime > 0.0 ? _source : (UnitCtrl)null);
+                    _sourceActionController.AppendCoroutine(updateModeChange(_valueDictionary[eValueNumber.VALUE_1], (eModeChangeType)ActionDetail1, _action, _skill, _source, _sourceActionController), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
                     break;
-                case ModeChangeAction.eModeChangeType.RELEASE:
-                    _source.ChangeAttackPattern(this.ActionDetail2, _skill.Level);
+                case eModeChangeType.RELEASE:
+                    _source.ChangeAttackPattern(ActionDetail2, _skill.Level);
                     break;
             }
         }
 
         private IEnumerator updateModeChange(
           float _value,
-          ModeChangeAction.eModeChangeType _type,
+          eModeChangeType _type,
           ActionParameter _action,
           Skill _skill,
           UnitCtrl _source,
@@ -108,7 +107,7 @@ namespace Elements
             {
                 if (_source.MotionPrefix != 1)
                 {
-                    yield return (object)null;
+                    yield return null;
                 }
                 else
                 {
@@ -116,12 +115,12 @@ namespace Elements
                     {
                         switch (_type)
                         {
-                            case ModeChangeAction.eModeChangeType.TIME:
+                            case eModeChangeType.TIME:
                                 timer += _source.DeltaTimeForPause;
-                                if ((double)timer < (double)_value || _source.CurrentState != UnitCtrl.ActionState.IDLE)
+                                if (timer < (double)_value || _source.CurrentState != UnitCtrl.ActionState.IDLE)
                                     break;
                                 goto label_7;
-                            case ModeChangeAction.eModeChangeType.ENERGY:
+                            case eModeChangeType.ENERGY:
                                 _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = true;
                                 _source.SetEnergy(_source.Energy - _source.DeltaTimeForPause * _value, eSetEnergyType.BY_MODE_CHANGE);
                                 if ((double)_source.Energy == 0.0)
@@ -138,7 +137,7 @@ namespace Elements
                         if ((long)_source.Hp != 0L)
                         {
                             if (!_source.IdleOnly || (long)_source.Hp <= 0L)
-                                yield return (object)null;
+                                yield return null;
                             else
                                 goto label_17;
                         }
@@ -155,16 +154,16 @@ namespace Elements
                     modeChangeAction.modeChangeEnd(_skill, _action, _source, _sourceActionController);
                     yield break;
                 label_15:
-                    _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-                    modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                    _source.ActionsTargetOnMe.Remove(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                    modeChangeAction.battleManager.CallbackActionEnd(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
                     yield break;
                 label_17:
                     modeChangeAction.modeChangeEnd(_skill, _action, _source, _sourceActionController);
                     yield break;
                 }
             }
-            _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-            modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+            _source.ActionsTargetOnMe.Remove(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+            modeChangeAction.battleManager.CallbackActionEnd(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
             _sourceActionController.DisableUBByModeChange = false;
             _sourceActionController.ModeChanging = false;
         }
@@ -178,8 +177,8 @@ namespace Elements
             _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = false;
             if (_source.ToadDatas.Count > 0)
             {
-                _source.ActionsTargetOnMe.Remove((long)this.ActionId * 100L + this.IdOffsetDictionary[_source.GetFirstParts(true)]);
-                this.battleManager.CallbackActionEnd((long)this.ActionId * 100L + this.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                _source.ActionsTargetOnMe.Remove(ActionId * 100L + IdOffsetDictionary[_source.GetFirstParts(true)]);
+                battleManager.CallbackActionEnd(ActionId * 100L + IdOffsetDictionary[_source.GetFirstParts(true)]);
                 _source.MotionPrefix = -1;
                 _source.UnitSpineCtrl.CurColor = _source.UnitSpineCtrl.CurColor;
                 Color curColor = _source.UnitSpineCtrl.CurColor;
@@ -199,7 +198,7 @@ namespace Elements
             {
                 _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, 1);
                 _source.ModeChangeEnd = true;
-                _sourceUnitActionController.AppendCoroutine(this.updateModeChangeEnd(_skill, _source, _sourceUnitActionController), ePauseType.SYSTEM);
+                _sourceUnitActionController.AppendCoroutine(updateModeChangeEnd(_skill, _source, _sourceUnitActionController), ePauseType.SYSTEM);
                 _sourceUnitActionController.DisableUBByModeChange = false;
                 _sourceUnitActionController.ModeChanging = false;
                 _sourceUnitActionController.ExecUnitActionWithDelay(_action, _skill, false, false);
@@ -224,8 +223,8 @@ namespace Elements
             {
                 if (_source.ToadDatas.Count > 0)
                 {
-                    _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-                    modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                    _source.ActionsTargetOnMe.Remove(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                    modeChangeAction.battleManager.CallbackActionEnd(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
                     _source.MotionPrefix = -1;
                     _source.UnitSpineCtrl.CurColor = _source.UnitSpineCtrl.CurColor;
                     Color curColor = _source.UnitSpineCtrl.CurColor;
@@ -242,45 +241,41 @@ namespace Elements
                     _sourceActionController.DisableUBByModeChange = false;
                     yield break;
                 }
-                else
+
+                if (_source.IsUnableActionState())
+                    modeChangeAction.stopEndEffects(_source);
+                if (!_source.UnitSpineCtrlModeChange.IsPlayAnimeBattle)
                 {
-                    if (_source.IsUnableActionState())
-                        modeChangeAction.stopEndEffects(_source);
-                    if (!_source.UnitSpineCtrlModeChange.IsPlayAnimeBattle)
-                    {
-                        _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-                        modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-                        _source.MotionPrefix = -1;
-                        _source.UnitSpineCtrl.gameObject.SetActive(true);
-                        _source.UnitSpineCtrlModeChange.gameObject.SetActive(false);
-                        _source.UnitSpineCtrl.CurColor = _source.UnitSpineCtrlModeChange.CurColor;
-                        Color curColor = _source.UnitSpineCtrl.CurColor;
-                        curColor.a = 1f;
-                        _source.UnitSpineCtrl.CurColor = curColor;
-                        if (_source.IsFront)
-                            _source.SetSortOrderFront();
-                        else
-                            _source.SetSortOrderBack();
-                        if (!_source.UnitSpineCtrl.IsAnimation(_source.UnitSpineCtrl.ConvertAnimeIdToAnimeName(skill.AnimId, skill.SkillNum, 1)))
-                        {
-                            _source.ModeChangeEnd = false;
-                            _source.SkillEndProcess();
-                            _source.PlayAnime(eSpineCharacterAnimeId.IDLE, _source.MotionPrefix);
-                            yield break;
-                        }
-                        else
-                        {
-                            _source.PlayAnimeNoOverlap(skill.AnimId, skill.SkillNum, 1);
-                            _sourceActionController.AppendCoroutine(modeChangeAction.updateModeChangeEnd2(_source, _sourceActionController), ePauseType.VISUAL);
-                            yield break;
-                        }
-                    }
+                    _source.ActionsTargetOnMe.Remove(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                    modeChangeAction.battleManager.CallbackActionEnd(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+                    _source.MotionPrefix = -1;
+                    _source.UnitSpineCtrl.gameObject.SetActive(true);
+                    _source.UnitSpineCtrlModeChange.gameObject.SetActive(false);
+                    _source.UnitSpineCtrl.CurColor = _source.UnitSpineCtrlModeChange.CurColor;
+                    Color curColor = _source.UnitSpineCtrl.CurColor;
+                    curColor.a = 1f;
+                    _source.UnitSpineCtrl.CurColor = curColor;
+                    if (_source.IsFront)
+                        _source.SetSortOrderFront();
                     else
-                        yield return (object)null;
+                        _source.SetSortOrderBack();
+                    if (!_source.UnitSpineCtrl.IsAnimation(_source.UnitSpineCtrl.ConvertAnimeIdToAnimeName(skill.AnimId, skill.SkillNum, 1)))
+                    {
+                        _source.ModeChangeEnd = false;
+                        _source.SkillEndProcess();
+                        _source.PlayAnime(eSpineCharacterAnimeId.IDLE, _source.MotionPrefix);
+                        yield break;
+                    }
+
+                    _source.PlayAnimeNoOverlap(skill.AnimId, skill.SkillNum, 1);
+                    _sourceActionController.AppendCoroutine(modeChangeAction.updateModeChangeEnd2(_source, _sourceActionController), ePauseType.VISUAL);
+                    yield break;
                 }
+
+                yield return null;
             }
-            _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-            modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+            _source.ActionsTargetOnMe.Remove(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+            modeChangeAction.battleManager.CallbackActionEnd(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
             _sourceActionController.DisableUBByModeChange = false;
             _sourceActionController.ModeChanging = false;
             _source.CurrentState = UnitCtrl.ActionState.IDLE;
@@ -312,11 +307,11 @@ namespace Elements
                     _source.PlayAnime(eSpineCharacterAnimeId.IDLE, _source.MotionPrefix);
                     yield break;
                 }
-                else
-                    yield return (object)null;
+
+                yield return null;
             }
-            _source.ActionsTargetOnMe.Remove((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
-            modeChangeAction.battleManager.CallbackActionEnd((long)modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+            _source.ActionsTargetOnMe.Remove(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
+            modeChangeAction.battleManager.CallbackActionEnd(modeChangeAction.ActionId * 100L + modeChangeAction.IdOffsetDictionary[_source.GetFirstParts(true)]);
             _sourceActionController.DisableUBByModeChange = false;
             _sourceActionController.ModeChanging = false;
             _source.CurrentState = UnitCtrl.ActionState.IDLE;
@@ -326,7 +321,7 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
         }
 
         public enum eModeChangeType

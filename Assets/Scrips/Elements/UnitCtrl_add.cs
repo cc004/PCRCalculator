@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using PCRCaculator.Battle;
-using PCRCaculator;
 using System.IO;
-using System;
 using System.Linq;
 using Newtonsoft0.Json;
+using PCRCaculator;
+using PCRCaculator.Battle;
+using PCRCaculator.Guild;
+using UnityEngine;
 
 namespace Elements
 {
@@ -20,11 +21,11 @@ namespace Elements
         public string UnitName = "", UnitNameEx = "";
         public int posIdx;//0-4
         public Action<int,ActionState, int,string, UnitCtrl> MyOnChangeState;
-        public Action<int, PCRCaculator.Guild.UnitAbnormalStateChangeData, int> MyOnAbnormalStateChange;
+        public Action<int, UnitAbnormalStateChangeData, int> MyOnAbnormalStateChange;
         public Action<int,float,int, int,int,string, UnitCtrl> MyOnLifeChanged;
         public Action<int,float, int,string> MyOnTPChanged;
-        public Action<int, PCRCaculator.Guild.UnitSkillExecData> MyOnStartAction;
-        public Action<int, int, PCRCaculator.Guild.UnitActionExecData> MyOnExecAction;
+        public Action<int, UnitSkillExecData> MyOnStartAction;
+        public Action<int, int, UnitActionExecData> MyOnExecAction;
         public Action<int, int, float, int> MyOnDamage;
         public Action<bool, float, bool, float, FloatWithEx> MyOnDamage2;
         public Action<int, int, float, int,string> MyOnBaseValueChanged;
@@ -37,17 +38,17 @@ namespace Elements
         public BattleUIManager UIManager { get => uIManager; }
         private const float BOSS_DELTA_FIX = -1f;
 
-        private PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType useLogBarrier;
-        private static PCRCaculator.Guild.GuildPlayerGroupData group => MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
+        private GuildPlayerGroupData.LogBarrierType useLogBarrier;
+        private static GuildPlayerGroupData group => MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
 
         public void SetUI(CharacterPageButton ui, CharacterBuffUIController buffui)
         {
             uIManager = BattleUIManager.Instance;
-            this.unitUI = ui;
-            this.unitUI.SetButton(this);
-            this.unitBuffUI = buffui;
+            unitUI = ui;
+            unitUI.SetButton(this);
+            unitBuffUI = buffui;
             //this.unitBuffUI.SetLeftDir(this.IsOther);
-            this.OnLifeAmmountChange += ui.SetHP;
+            OnLifeAmmountChange += ui.SetHP;
         }
         public void SetUIForSuommon()
         {
@@ -94,7 +95,7 @@ namespace Elements
         {
             Action action = () =>
             {
-                PCRCaculator.Guild.UnitAbnormalStateChangeData stateChangeData = new PCRCaculator.Guild.UnitAbnormalStateChangeData();
+                UnitAbnormalStateChangeData stateChangeData = new UnitAbnormalStateChangeData();
                 stateChangeData.AbsorberValue = data.AbsorberValue;
                 stateChangeData.ActionId = data.ActionId;
                 stateChangeData.CurrentAbnormalState = data.CurrentAbnormalState;
@@ -118,7 +119,7 @@ namespace Elements
             else
                 action();
         }
-        private IEnumerator WaitForFrame(System.Action action)
+        private IEnumerator WaitForFrame(Action action)
         {
             yield return null;
             action?.Invoke();
@@ -205,26 +206,26 @@ namespace Elements
                     //    VoiceType = isSpecial ? SoundManager.eVoiceType.SP_SKILL : SoundManager.eVoiceType.SKILL,
                     //    SkillNumber = index + 1
                     //});
-                    if (PCRCaculator.MainManager.Instance.SkillDataDic.ContainsKey(skillId))
+                    if (MainManager.Instance.SkillDataDic.ContainsKey(skillId))
                     {
 
 
-                        PCRCaculator.SkillData data = PCRCaculator.MainManager.Instance.SkillDataDic[skillId];
+                        SkillData data = MainManager.Instance.SkillDataDic[skillId];
                         MasterSkillData.SkillData skillData = new MasterSkillData.SkillData(data);
                         if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.SettingData.bossSkillCastTimeDic.TryGetValue(skillId, out float cast_time))
                         {
                             skillData.ChangeSkillCastTime(cast_time);
                         }
-                        if ((int)skillData.skill_area_width < 1)
-                            this.SkillAreaWidthList.Add(skillId, (float)(int)_data.MasterData.SearchAreaWidth);
+                        if (skillData.skill_area_width < 1)
+                            SkillAreaWidthList.Add(skillId, (int)_data.MasterData.SearchAreaWidth);
                         else
-                            this.SkillAreaWidthList.Add(skillId, (float)(int)skillData.skill_area_width);
-                        SkillLevelInfo skillLevelInfo = skillLevelInfoList.Find((Predicate<SkillLevelInfo>)(e => (int)e.SkillId == skillId));
-                        this.SkillLevels.Add(skillId, skillLevelInfo == null ? 0 : (int)skillLevelInfo.SkillLevel);
-                        if (!this.SkillUseCount.ContainsKey(skillId))
-                            this.SkillUseCount.Add(skillId, 0);
-                        this.castTimeDictionary.Add(skillId, (float)(double)skillData.skill_cast_time);
-                        this.animeIdDictionary.Add(skillId, animeId);
+                            SkillAreaWidthList.Add(skillId, (int)skillData.skill_area_width);
+                        SkillLevelInfo skillLevelInfo = skillLevelInfoList.Find(e => e.SkillId == skillId);
+                        SkillLevels.Add(skillId, skillLevelInfo == null ? 0 : (int)skillLevelInfo.SkillLevel);
+                        if (!SkillUseCount.ContainsKey(skillId))
+                            SkillUseCount.Add(skillId, 0);
+                        castTimeDictionary.Add(skillId, (float)(double)skillData.skill_cast_time);
+                        animeIdDictionary.Add(skillId, animeId);
                     }
                 }
             }

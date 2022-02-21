@@ -4,8 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -31,23 +32,23 @@ namespace Elements
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
 
-            if ((double) BattleManager.Random(0.0f, 1f,
-                new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 19, (float)pp)) <= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (BattleManager.Random(0.0f, 1f,
+                    new RandomData(_source, _target.Owner, ActionId, 19, (float)pp)) <= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
       {
-        this.AppendIsAlreadyExeced(_target.Owner, _num);
-        switch ((CountBlindAction.eCountBlindType)(float)_valueDictionary[eValueNumber.VALUE_1])
+        AppendIsAlreadyExeced(_target.Owner, _num);
+        switch ((eCountBlindType)(float)_valueDictionary[eValueNumber.VALUE_1])
         {
-          case CountBlindAction.eCountBlindType.TIME:
-            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, _valueDictionary[eValueNumber.VALUE_2], (ActionParameter) this, _skill, 99999f, (float) this.ActionDetail1);
+          case eCountBlindType.TIME:
+            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, _valueDictionary[eValueNumber.VALUE_2], this, _skill, 99999f, ActionDetail1);
             break;
-          case CountBlindAction.eCountBlindType.COUNT:
-            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, 90f, (ActionParameter) this, _skill, _valueDictionary[eValueNumber.VALUE_2], (float) this.ActionDetail1);
+          case eCountBlindType.COUNT:
+            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, 90f, this, _skill, _valueDictionary[eValueNumber.VALUE_2], ActionDetail1);
             break;
         }
       }
       else
       {
-        ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+        ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
         if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
           return;
         if (actionExecedData.TargetPartsNumber == 1)
@@ -60,7 +61,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
     }
 
     private enum eCountBlindType

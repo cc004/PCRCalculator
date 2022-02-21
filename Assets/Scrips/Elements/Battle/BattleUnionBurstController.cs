@@ -10,21 +10,21 @@ namespace Elements.Battle
   {
     private BattleManager battleManager;
 
-    public BattleUnionBurstController(BattleManager BattleManager) => this.battleManager = BattleManager;
+    public BattleUnionBurstController(BattleManager BattleManager) => battleManager = BattleManager;
 
     public void TryExecUnionBurst()
     {
-      if (this.battleManager.GetIsPlayCutin() || this.battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
+      if (battleManager.GetIsPlayCutin() || battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
         return;
       bool flag = false;
-      for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < this.battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
+      for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
       {
-        UnitCtrl unitCtrl = this.battleManager.GetUnitCtrl(DNGOJHOHHMF);
+        UnitCtrl unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
         if (unitCtrl.UnionBurstSkillId != 0)
           unitCtrl.UpdateSkillTarget();
         if (unitCtrl.JudgeSkillReadyAndIsMyTurn() && !unitCtrl.lastCanReleaseSkill)
         {
-            unitCtrl.critPoint = new UnitCtrl.CritPoint()
+            unitCtrl.critPoint = new UnitCtrl.CritPoint
             {
                 description = "连点",
                 description2 = "连点",
@@ -39,7 +39,7 @@ namespace Elements.Battle
           unitCtrl.UpdateSkillTarget();
           if (unitCtrl.IsAutoOrUbExecTrying() && unitCtrl.JudgeSkillReadyAndIsMyTurn())
           {
-            this.battleManager.ChargeSkillTurn = eChargeSkillTurn.PLAYER;
+            battleManager.ChargeSkillTurn = eChargeSkillTurn.PLAYER;
             //this.battleManager.UnitUiCtrl.UpdateUi();
             //if (!this.battleManager.IsDefenceReplayMode)
              // this.battleManager.UnitUiCtrl.PlaySkillOn(unitCtrl);
@@ -49,13 +49,13 @@ namespace Elements.Battle
           }
         }
       }
-      for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < this.battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
-        this.battleManager.GetUnitCtrl(DNGOJHOHHMF).IsUbExecTrying = false;
+      for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
+        battleManager.GetUnitCtrl(DNGOJHOHHMF).IsUbExecTrying = false;
       if (flag)
         return;
-      for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < this.battleManager.GetEnemyCtrlLength(); ++DNGOJHOHHMF)
+      for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetEnemyCtrlLength(); ++DNGOJHOHHMF)
       {
-        UnitCtrl enemyCtrl = this.battleManager.GetEnemyCtrl(DNGOJHOHHMF);
+        UnitCtrl enemyCtrl = battleManager.GetEnemyCtrl(DNGOJHOHHMF);
         if (enemyCtrl.UnionBurstSkillId != 0)
           enemyCtrl.UpdateSkillTarget();
         if (enemyCtrl.JudgeSkillReadyAndIsMyTurn() && enemyCtrl.CurrentState == UnitCtrl.ActionState.IDLE)
@@ -64,7 +64,7 @@ namespace Elements.Battle
           enemyCtrl.UpdateSkillTarget();
           if (enemyCtrl.JudgeSkillReadyAndIsMyTurn() && enemyCtrl.CurrentState == UnitCtrl.ActionState.IDLE)
           {
-            this.battleManager.ChargeSkillTurn = eChargeSkillTurn.ENEMY;
+            battleManager.ChargeSkillTurn = eChargeSkillTurn.ENEMY;
             //this.battleManager.UnitUiCtrl.UpdateUi();
             //if (this.battleManager.IsDefenceReplayMode)
             //  this.battleManager.UnitUiCtrl.PlaySkillOn(enemyCtrl);
@@ -75,6 +75,6 @@ namespace Elements.Battle
       }
     }
 
-    public void Release() => this.battleManager =  null;
+    public void Release() => battleManager =  null;
   }
 }

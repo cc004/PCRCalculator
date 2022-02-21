@@ -4,41 +4,43 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
+using System;
 using System.Collections.Generic;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
     public class SlipDamageAction : ActionParameter
     {
-        private static readonly Dictionary<SlipDamageAction.eSlipDamageType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<SlipDamageAction.eSlipDamageType, UnitCtrl.eAbnormalState>((IEqualityComparer<SlipDamageAction.eSlipDamageType>)new SlipDamageAction.eSlipDamageType_DictComparer())
+        private static readonly Dictionary<eSlipDamageType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eSlipDamageType, UnitCtrl.eAbnormalState>(new eSlipDamageType_DictComparer())
     {
       {
-        SlipDamageAction.eSlipDamageType.POISONE,
+        eSlipDamageType.POISONE,
         UnitCtrl.eAbnormalState.POISON
       },
       {
-        SlipDamageAction.eSlipDamageType.BURN,
+        eSlipDamageType.BURN,
         UnitCtrl.eAbnormalState.BURN
       },
       {
-        SlipDamageAction.eSlipDamageType.CURSE,
+        eSlipDamageType.CURSE,
         UnitCtrl.eAbnormalState.CURSE
       },
       {
-        SlipDamageAction.eSlipDamageType.NO_EFFECT,
+        eSlipDamageType.NO_EFFECT,
         UnitCtrl.eAbnormalState.NO_EFFECT_SLIP_DAMAGE
       },
       {
-        SlipDamageAction.eSlipDamageType.VENOM,
+        eSlipDamageType.VENOM,
         UnitCtrl.eAbnormalState.VENOM
       },
       {
-        SlipDamageAction.eSlipDamageType.HEX,
+        eSlipDamageType.HEX,
         UnitCtrl.eAbnormalState.HEX
       },
       {
-        SlipDamageAction.eSlipDamageType.COMPENSATION,
+        eSlipDamageType.COMPENSATION,
         UnitCtrl.eAbnormalState.COMPENSATION
       }
     };
@@ -57,26 +59,26 @@ namespace Elements
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-          System.Action<string> callback  )
+          Action<string> callback  )
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             //start add
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
-            float num = BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 15, (float)pp));
+            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 15, (float)pp));
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, ActionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
                 num = 1-fix;
             }
             //end add
-            if ((double)num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
             {
-                this.AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, SlipDamageAction.abnormalStateDic[(SlipDamageAction.eSlipDamageType)this.ActionDetail1], this.AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, (ActionParameter)this, _skill, (float)(int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
+                AppendIsAlreadyExeced(_target.Owner, _num);
+                _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)ActionDetail1], AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
                 callback?.Invoke("DOT伤害，参数1：" + (int)_valueDictionary[eValueNumber.VALUE_1] + "，参数2：" + (int)_valueDictionary[eValueNumber.VALUE_5]);
             }
             else
             {
-                ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+                ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
                 if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
                     return;
                 if (actionExecedData.TargetPartsNumber == 1)
@@ -90,9 +92,9 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
-            this.Value[eValueNumber.VALUE_3] = (float)((double)this.MasterData.action_value_3 + (double)this.MasterData.action_value_4 * (double)_level);
-            this.Value[eValueNumber.VALUE_5] = (float)(double)this.MasterData.action_value_5;
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+            Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
+            Value[eValueNumber.VALUE_5] = (float)(double)MasterData.action_value_5;
         }
 
         private enum eSlipDamageType
@@ -106,11 +108,11 @@ namespace Elements
             COMPENSATION,
         }
 
-        private class eSlipDamageType_DictComparer : IEqualityComparer<SlipDamageAction.eSlipDamageType>
+        private class eSlipDamageType_DictComparer : IEqualityComparer<eSlipDamageType>
         {
-            public bool Equals(SlipDamageAction.eSlipDamageType _x, SlipDamageAction.eSlipDamageType _y) => _x == _y;
+            public bool Equals(eSlipDamageType _x, eSlipDamageType _y) => _x == _y;
 
-            public int GetHashCode(SlipDamageAction.eSlipDamageType _obj) => (int)_obj;
+            public int GetHashCode(eSlipDamageType _obj) => (int)_obj;
         }
     }
 }

@@ -13,8 +13,8 @@ namespace Elements
 
     public ResultMotionInfo(int _motionId, int _depth)
     {
-      this.MotionId = _motionId;
-      this.Depth = _depth;
+      MotionId = _motionId;
+      Depth = _depth;
     }
   }
 }

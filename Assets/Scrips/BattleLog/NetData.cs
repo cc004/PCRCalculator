@@ -1,7 +1,6 @@
-﻿using CodeStage.AntiCheat.ObscuredTypes;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
+
+
 namespace Elements
 {
     public class AllNetData
@@ -21,13 +20,13 @@ namespace Elements
     
     public class ArenaStartReceiveParam : BaseReceiveParam
     {
-        public ObscuredInt MyViewerId { get; private set; }
+        public int MyViewerId { get; private set; }
 
-        public ObscuredInt BattleViewerId { get; private set; }
+        public int BattleViewerId { get; private set; }
 
-        public ObscuredInt BattleId { get; private set; }
+        public int BattleId { get; private set; }
 
-        public ObscuredInt BattleSpeed { get; private set; }
+        public int BattleSpeed { get; private set; }
 
         public List<ArenaWaveInfo> WaveInfoList { get; private set; }
     }
@@ -37,11 +36,11 @@ namespace Elements
 
         public List<UnitData> VsUserArenaDeck { get; private set; }
 
-        public ObscuredInt Seed { get; private set; }
+        public int Seed { get; private set; }
 
-        public ObscuredInt BattleLogId { get; private set; }
+        public int BattleLogId { get; private set; }
 
-        public ObscuredInt WaveNum { get; private set; }
+        public int WaveNum { get; private set; }
 
     }
     public class BaseReceiveParam

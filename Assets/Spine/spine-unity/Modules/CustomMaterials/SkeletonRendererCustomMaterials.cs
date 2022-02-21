@@ -12,7 +12,7 @@ namespace Spine.Unity.Modules
 		{
 			public bool overrideDisabled;
 
-			[SpineSlot("", "", false, true)]
+			[SpineSlot]
 			public string slotName;
 
 			public Material material;

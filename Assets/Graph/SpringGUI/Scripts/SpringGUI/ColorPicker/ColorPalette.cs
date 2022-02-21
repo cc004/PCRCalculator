@@ -13,10 +13,10 @@ namespace SpringGUI
 {
     internal class ColorPalette : MonoBehaviour , IPointerUpHandler , IDragHandler ,IPointerDownHandler
     {
-        private ColorPicker m_colorPicker = null;
-        private Transform m_transform = null;
-        private Transform m_nonius = null;
-        private bool m_canDrag = false;
+        private ColorPicker m_colorPicker;
+        private Transform m_transform;
+        private Transform m_nonius;
+        private bool m_canDrag;
         private Vector2 m_size;
         private float m_halfX;
         private float m_halfY;

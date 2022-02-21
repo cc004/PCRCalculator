@@ -4,9 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
+
 //using Sqlite3Plugin;
-using System.Collections.Generic;
 
 namespace Elements
 {
@@ -140,28 +139,28 @@ namespace Elements
     */
     public class UnitData
     {
-      protected ObscuredInt _UnitId;
-      protected ObscuredString _UnitName;
-      protected ObscuredString _Kana;
-      protected ObscuredInt _PrefabId;
-      protected ObscuredInt _IsLimited;
-      protected ObscuredInt _Rarity;
-      protected ObscuredInt _MotionType;
-      protected ObscuredInt _SeType;
-      protected ObscuredInt _MoveSpeed;
-      protected ObscuredInt _SearchAreaWidth;
-      protected ObscuredInt _AtkType;
-      protected ObscuredDouble _AtkCastTime;
-      protected ObscuredInt _CutIn1;
-      protected ObscuredInt _CutIn2;
-      protected ObscuredInt _cutin1_star6;
-      protected ObscuredInt _cutin2_star6;
-      protected ObscuredInt _GuildId;
-      protected ObscuredInt _ExskillDisplay;
-      protected ObscuredString _Comment;
-      protected ObscuredInt _OnlyDispOwned;
-      protected ObscuredString _StartTime;
-      protected ObscuredString _EndTime;
+      protected int _UnitId;
+      protected string _UnitName;
+      protected string _Kana;
+      protected int _PrefabId;
+      protected int _IsLimited;
+      protected int _Rarity;
+      protected int _MotionType;
+      protected int _SeType;
+      protected int _MoveSpeed;
+      protected int _SearchAreaWidth;
+      protected int _AtkType;
+      protected double _AtkCastTime;
+      protected int _CutIn1;
+      protected int _CutIn2;
+      protected int _cutin1_star6;
+      protected int _cutin2_star6;
+      protected int _GuildId;
+      protected int _ExskillDisplay;
+      protected string _Comment;
+      protected int _OnlyDispOwned;
+      protected string _StartTime;
+      protected string _EndTime;
 
       public int VisualChangeFlag { get; private set; }
 
@@ -184,49 +183,49 @@ namespace Elements
 
       public string UnitNameOnly() => TextUtil.DeleteVersionText((string) this.UnitName);
       */
-      public ObscuredInt UnitId => this._UnitId;
+      public int UnitId => _UnitId;
 
-      public ObscuredString UnitName => this._UnitName;
+      public string UnitName => _UnitName;
 
-      public ObscuredString Kana => this._Kana;
+      public string Kana => _Kana;
 
-      public ObscuredInt PrefabId => this._PrefabId;
+      public int PrefabId => _PrefabId;
 
-      public ObscuredInt IsLimited => this._IsLimited;
+      public int IsLimited => _IsLimited;
 
-      public ObscuredInt Rarity => this._Rarity;
+      public int Rarity => _Rarity;
 
-      public ObscuredInt MotionType => this._MotionType;
+      public int MotionType => _MotionType;
 
-      public ObscuredInt SeType => this._SeType;
+      public int SeType => _SeType;
 
-      public ObscuredInt MoveSpeed => this._MoveSpeed;
+      public int MoveSpeed => _MoveSpeed;
 
-      public ObscuredInt SearchAreaWidth => this._SearchAreaWidth;
+      public int SearchAreaWidth => _SearchAreaWidth;
 
-      public ObscuredInt AtkType => this._AtkType;
+      public int AtkType => _AtkType;
 
-      public ObscuredDouble AtkCastTime => this._AtkCastTime;
+      public double AtkCastTime => _AtkCastTime;
 
-      public ObscuredInt CutIn1 => this._CutIn1;
+      public int CutIn1 => _CutIn1;
 
-      public ObscuredInt CutIn2 => this._CutIn2;
+      public int CutIn2 => _CutIn2;
 
-      public ObscuredInt cutin1_star6 => this._cutin1_star6;
+      public int cutin1_star6 => _cutin1_star6;
 
-      public ObscuredInt cutin2_star6 => this._cutin2_star6;
+      public int cutin2_star6 => _cutin2_star6;
 
-      public ObscuredInt GuildId => this._GuildId;
+      public int GuildId => _GuildId;
 
-      public ObscuredInt ExskillDisplay => this._ExskillDisplay;
+      public int ExskillDisplay => _ExskillDisplay;
 
-      public ObscuredString Comment => this._Comment;
+      public string Comment => _Comment;
 
-      public ObscuredInt OnlyDispOwned => this._OnlyDispOwned;
+      public int OnlyDispOwned => _OnlyDispOwned;
 
-      public ObscuredString StartTime => this._StartTime;
+      public string StartTime => _StartTime;
 
-      public ObscuredString EndTime => this._EndTime;
+      public string EndTime => _EndTime;
 
       public UnitData(
         int UnitId = 0,
@@ -252,28 +251,28 @@ namespace Elements
         string StartTime = "",
         string EndTime = "")
       {
-        this._UnitId = (ObscuredInt) UnitId;
-        this._UnitName = (ObscuredString) UnitName;
-        this._Kana = (ObscuredString) Kana;
-        this._PrefabId = (ObscuredInt) PrefabId;
-        this._IsLimited = (ObscuredInt) IsLimited;
-        this._Rarity = (ObscuredInt) Rarity;
-        this._MotionType = (ObscuredInt) MotionType;
-        this._SeType = (ObscuredInt) SeType;
-        this._MoveSpeed = (ObscuredInt) MoveSpeed;
-        this._SearchAreaWidth = (ObscuredInt) SearchAreaWidth;
-        this._AtkType = (ObscuredInt) AtkType;
-        this._AtkCastTime = (ObscuredDouble) AtkCastTime;
-        this._CutIn1 = (ObscuredInt) CutIn1;
-        this._CutIn2 = (ObscuredInt) CutIn2;
-        this._cutin1_star6 = (ObscuredInt) cutin1_star6;
-        this._cutin2_star6 = (ObscuredInt) cutin2_star6;
-        this._GuildId = (ObscuredInt) GuildId;
-        this._ExskillDisplay = (ObscuredInt) ExskillDisplay;
-        this._Comment = (ObscuredString) Comment;
-        this._OnlyDispOwned = (ObscuredInt) OnlyDispOwned;
-        this._StartTime = (ObscuredString) StartTime;
-        this._EndTime = (ObscuredString) EndTime;
+        _UnitId = UnitId;
+        _UnitName = UnitName;
+        _Kana = Kana;
+        _PrefabId = PrefabId;
+        _IsLimited = IsLimited;
+        _Rarity = Rarity;
+        _MotionType = MotionType;
+        _SeType = SeType;
+        _MoveSpeed = MoveSpeed;
+        _SearchAreaWidth = SearchAreaWidth;
+        _AtkType = AtkType;
+        _AtkCastTime = AtkCastTime;
+        _CutIn1 = CutIn1;
+        _CutIn2 = CutIn2;
+        _cutin1_star6 = cutin1_star6;
+        _cutin2_star6 = cutin2_star6;
+        _GuildId = GuildId;
+        _ExskillDisplay = ExskillDisplay;
+        _Comment = Comment;
+        _OnlyDispOwned = OnlyDispOwned;
+        _StartTime = StartTime;
+        _EndTime = EndTime;
       }
     }
   }

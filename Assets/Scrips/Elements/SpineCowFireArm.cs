@@ -4,9 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Elements
@@ -46,7 +43,7 @@ namespace Elements
 
     public new static void StaticRelease()
     {
-      SpineCowFireArm.isStaticInit = false;
+      isStaticInit = false;
       //SpineCowFireArm.staticBattleCameraEffect = (KHEAEOIEDJN) null;
       //SpineCowFireArm.staticBattleEffectPool = (DAGLMEOBLAA) null;
     }
@@ -68,16 +65,16 @@ namespace Elements
 
     protected override void onDestroy()
     {
-      this.unitSpineController = (BattleSpineController) null;
-      this.WalkEffectPrefab = (GameObject) null;
-      this.ReturnWalkEffectPrefab = (GameObject) null;
-      this.AttackEffectPrefab = (GameObject) null;
-      this.effectSmoke = (SkillEffectCtrl) null;
-      this.shake = (ShakeEffect) null;
+      unitSpineController = null;
+      WalkEffectPrefab = null;
+      ReturnWalkEffectPrefab = null;
+      AttackEffectPrefab = null;
+      effectSmoke = null;
+      shake = null;
       base.onDestroy();
     }
 
-    protected override void setInitialPosition() => this.initialPosistion = new Vector3((float) ((this.isLeftDir ? -1.0 : 1.0) * -2500.0 / 540.0), this.FireTarget.GetPosition().y);
+    protected override void setInitialPosition() => initialPosistion = new Vector3((float) ((isLeftDir ? -1.0 : 1.0) * -2500.0 / 540.0), FireTarget.GetPosition().y);
 
     /*public override void Initialize(
       BasePartsData _target,
@@ -191,8 +188,8 @@ namespace Elements
       return num != 0;
     }*/
 
-    public override void Pause() => this.unitSpineController.Pause();
+    public override void Pause() => unitSpineController.Pause();
 
-    public override void Resume() => this.unitSpineController.Resume();
+    public override void Resume() => unitSpineController.Resume();
   }
 }

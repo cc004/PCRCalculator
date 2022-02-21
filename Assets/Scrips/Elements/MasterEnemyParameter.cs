@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-//using Sqlite3Plugin;
 using System.Collections.Generic;
+
+//using Sqlite3Plugin;
 
 namespace Elements
 {
@@ -14,7 +14,7 @@ namespace Elements
   {
     public const string TABLE_NAME = "enemy_parameter";
     //private MasterEnemyDatabase _db;
-    private Dictionary<int, MasterEnemyParameter.EnemyParameter> _lazyPrimaryKeyDictionary;
+    private Dictionary<int, EnemyParameter> _lazyPrimaryKeyDictionary;
 
     /*public MasterEnemyParameter(MasterEnemyDatabase db)
       : base((AbstractMasterDatabase) db)
@@ -117,129 +117,129 @@ namespace Elements
 */
     public class EnemyParameter
     {
-      protected ObscuredInt _enemy_id;
-      protected ObscuredInt _unit_id;
-      protected ObscuredString _name;
-      protected ObscuredInt _level;
-      protected ObscuredInt _rarity;
-      protected ObscuredInt _promotion_level;
-      protected ObscuredInt _hp;
-      protected ObscuredInt _atk;
-      protected ObscuredInt _magic_str;
-      protected ObscuredInt _def;
-      protected ObscuredInt _magic_def;
-      protected ObscuredInt _physical_critical;
-      protected ObscuredInt _magic_critical;
-      protected ObscuredInt _wave_hp_recovery;
-      protected ObscuredInt _wave_energy_recovery;
-      protected ObscuredInt _dodge;
-      protected ObscuredInt _physical_penetrate;
-      protected ObscuredInt _magic_penetrate;
-      protected ObscuredInt _life_steal;
-      protected ObscuredInt _hp_recovery_rate;
-      protected ObscuredInt _energy_recovery_rate;
-      protected ObscuredInt _energy_reduce_rate;
-      protected ObscuredInt _union_burst_level;
-      protected ObscuredInt _main_skill_lv_1;
-      protected ObscuredInt _main_skill_lv_2;
-      protected ObscuredInt _main_skill_lv_3;
-      protected ObscuredInt _main_skill_lv_4;
-      protected ObscuredInt _main_skill_lv_5;
-      protected ObscuredInt _main_skill_lv_6;
-      protected ObscuredInt _main_skill_lv_7;
-      protected ObscuredInt _main_skill_lv_8;
-      protected ObscuredInt _main_skill_lv_9;
-      protected ObscuredInt _main_skill_lv_10;
-      protected ObscuredInt _ex_skill_lv_1;
-      protected ObscuredInt _ex_skill_lv_2;
-      protected ObscuredInt _ex_skill_lv_3;
-      protected ObscuredInt _ex_skill_lv_4;
-      protected ObscuredInt _ex_skill_lv_5;
-      protected ObscuredInt _resist_status_id;
-      protected ObscuredInt _accuracy;
-      protected ObscuredInt _unique_equipment_flag_1;
+      protected int _enemy_id;
+      protected int _unit_id;
+      protected string _name;
+      protected int _level;
+      protected int _rarity;
+      protected int _promotion_level;
+      protected int _hp;
+      protected int _atk;
+      protected int _magic_str;
+      protected int _def;
+      protected int _magic_def;
+      protected int _physical_critical;
+      protected int _magic_critical;
+      protected int _wave_hp_recovery;
+      protected int _wave_energy_recovery;
+      protected int _dodge;
+      protected int _physical_penetrate;
+      protected int _magic_penetrate;
+      protected int _life_steal;
+      protected int _hp_recovery_rate;
+      protected int _energy_recovery_rate;
+      protected int _energy_reduce_rate;
+      protected int _union_burst_level;
+      protected int _main_skill_lv_1;
+      protected int _main_skill_lv_2;
+      protected int _main_skill_lv_3;
+      protected int _main_skill_lv_4;
+      protected int _main_skill_lv_5;
+      protected int _main_skill_lv_6;
+      protected int _main_skill_lv_7;
+      protected int _main_skill_lv_8;
+      protected int _main_skill_lv_9;
+      protected int _main_skill_lv_10;
+      protected int _ex_skill_lv_1;
+      protected int _ex_skill_lv_2;
+      protected int _ex_skill_lv_3;
+      protected int _ex_skill_lv_4;
+      protected int _ex_skill_lv_5;
+      protected int _resist_status_id;
+      protected int _accuracy;
+      protected int _unique_equipment_flag_1;
 
-      public ObscuredInt enemy_id => this._enemy_id;
+      public int enemy_id => _enemy_id;
 
-      public ObscuredInt unit_id => this._unit_id;
+      public int unit_id => _unit_id;
 
-      public ObscuredString name => this._name;
+      public string name => _name;
 
-      public ObscuredInt level => this._level;
+      public int level => _level;
 
-      public ObscuredInt rarity => this._rarity;
+      public int rarity => _rarity;
 
-      public ObscuredInt promotion_level => this._promotion_level;
+      public int promotion_level => _promotion_level;
 
-      public ObscuredInt hp => this._hp;
+      public int hp => _hp;
 
-      public ObscuredInt atk => this._atk;
+      public int atk => _atk;
 
-      public ObscuredInt magic_str => this._magic_str;
+      public int magic_str => _magic_str;
 
-      public ObscuredInt def => this._def;
+      public int def => _def;
 
-      public ObscuredInt magic_def => this._magic_def;
+      public int magic_def => _magic_def;
 
-      public ObscuredInt physical_critical => this._physical_critical;
+      public int physical_critical => _physical_critical;
 
-      public ObscuredInt magic_critical => this._magic_critical;
+      public int magic_critical => _magic_critical;
 
-      public ObscuredInt wave_hp_recovery => this._wave_hp_recovery;
+      public int wave_hp_recovery => _wave_hp_recovery;
 
-      public ObscuredInt wave_energy_recovery => this._wave_energy_recovery;
+      public int wave_energy_recovery => _wave_energy_recovery;
 
-      public ObscuredInt dodge => this._dodge;
+      public int dodge => _dodge;
 
-      public ObscuredInt physical_penetrate => this._physical_penetrate;
+      public int physical_penetrate => _physical_penetrate;
 
-      public ObscuredInt magic_penetrate => this._magic_penetrate;
+      public int magic_penetrate => _magic_penetrate;
 
-      public ObscuredInt life_steal => this._life_steal;
+      public int life_steal => _life_steal;
 
-      public ObscuredInt hp_recovery_rate => this._hp_recovery_rate;
+      public int hp_recovery_rate => _hp_recovery_rate;
 
-      public ObscuredInt energy_recovery_rate => this._energy_recovery_rate;
+      public int energy_recovery_rate => _energy_recovery_rate;
 
-      public ObscuredInt energy_reduce_rate => this._energy_reduce_rate;
+      public int energy_reduce_rate => _energy_reduce_rate;
 
-      public ObscuredInt union_burst_level => this._union_burst_level;
+      public int union_burst_level => _union_burst_level;
 
-      public ObscuredInt main_skill_lv_1 => this._main_skill_lv_1;
+      public int main_skill_lv_1 => _main_skill_lv_1;
 
-      public ObscuredInt main_skill_lv_2 => this._main_skill_lv_2;
+      public int main_skill_lv_2 => _main_skill_lv_2;
 
-      public ObscuredInt main_skill_lv_3 => this._main_skill_lv_3;
+      public int main_skill_lv_3 => _main_skill_lv_3;
 
-      public ObscuredInt main_skill_lv_4 => this._main_skill_lv_4;
+      public int main_skill_lv_4 => _main_skill_lv_4;
 
-      public ObscuredInt main_skill_lv_5 => this._main_skill_lv_5;
+      public int main_skill_lv_5 => _main_skill_lv_5;
 
-      public ObscuredInt main_skill_lv_6 => this._main_skill_lv_6;
+      public int main_skill_lv_6 => _main_skill_lv_6;
 
-      public ObscuredInt main_skill_lv_7 => this._main_skill_lv_7;
+      public int main_skill_lv_7 => _main_skill_lv_7;
 
-      public ObscuredInt main_skill_lv_8 => this._main_skill_lv_8;
+      public int main_skill_lv_8 => _main_skill_lv_8;
 
-      public ObscuredInt main_skill_lv_9 => this._main_skill_lv_9;
+      public int main_skill_lv_9 => _main_skill_lv_9;
 
-      public ObscuredInt main_skill_lv_10 => this._main_skill_lv_10;
+      public int main_skill_lv_10 => _main_skill_lv_10;
 
-      public ObscuredInt ex_skill_lv_1 => this._ex_skill_lv_1;
+      public int ex_skill_lv_1 => _ex_skill_lv_1;
 
-      public ObscuredInt ex_skill_lv_2 => this._ex_skill_lv_2;
+      public int ex_skill_lv_2 => _ex_skill_lv_2;
 
-      public ObscuredInt ex_skill_lv_3 => this._ex_skill_lv_3;
+      public int ex_skill_lv_3 => _ex_skill_lv_3;
 
-      public ObscuredInt ex_skill_lv_4 => this._ex_skill_lv_4;
+      public int ex_skill_lv_4 => _ex_skill_lv_4;
 
-      public ObscuredInt ex_skill_lv_5 => this._ex_skill_lv_5;
+      public int ex_skill_lv_5 => _ex_skill_lv_5;
 
-      public ObscuredInt resist_status_id => this._resist_status_id;
+      public int resist_status_id => _resist_status_id;
 
-      public ObscuredInt accuracy => this._accuracy;
+      public int accuracy => _accuracy;
 
-      public ObscuredInt unique_equipment_flag_1 => this._unique_equipment_flag_1;
+      public int unique_equipment_flag_1 => _unique_equipment_flag_1;
 
       public EnemyParameter(
         int enemy_id = 0,
@@ -284,47 +284,47 @@ namespace Elements
         int accuracy = 0,
         int unique_equipment_flag_1 = 0)
       {
-        this._enemy_id = (ObscuredInt) enemy_id;
-        this._unit_id = (ObscuredInt) unit_id;
-        this._name = (ObscuredString) name;
-        this._level = (ObscuredInt) level;
-        this._rarity = (ObscuredInt) rarity;
-        this._promotion_level = (ObscuredInt) promotion_level;
-        this._hp = (ObscuredInt) hp;
-        this._atk = (ObscuredInt) atk;
-        this._magic_str = (ObscuredInt) magic_str;
-        this._def = (ObscuredInt) def;
-        this._magic_def = (ObscuredInt) magic_def;
-        this._physical_critical = (ObscuredInt) physical_critical;
-        this._magic_critical = (ObscuredInt) magic_critical;
-        this._wave_hp_recovery = (ObscuredInt) wave_hp_recovery;
-        this._wave_energy_recovery = (ObscuredInt) wave_energy_recovery;
-        this._dodge = (ObscuredInt) dodge;
-        this._physical_penetrate = (ObscuredInt) physical_penetrate;
-        this._magic_penetrate = (ObscuredInt) magic_penetrate;
-        this._life_steal = (ObscuredInt) life_steal;
-        this._hp_recovery_rate = (ObscuredInt) hp_recovery_rate;
-        this._energy_recovery_rate = (ObscuredInt) energy_recovery_rate;
-        this._energy_reduce_rate = (ObscuredInt) energy_reduce_rate;
-        this._union_burst_level = (ObscuredInt) union_burst_level;
-        this._main_skill_lv_1 = (ObscuredInt) main_skill_lv_1;
-        this._main_skill_lv_2 = (ObscuredInt) main_skill_lv_2;
-        this._main_skill_lv_3 = (ObscuredInt) main_skill_lv_3;
-        this._main_skill_lv_4 = (ObscuredInt) main_skill_lv_4;
-        this._main_skill_lv_5 = (ObscuredInt) main_skill_lv_5;
-        this._main_skill_lv_6 = (ObscuredInt) main_skill_lv_6;
-        this._main_skill_lv_7 = (ObscuredInt) main_skill_lv_7;
-        this._main_skill_lv_8 = (ObscuredInt) main_skill_lv_8;
-        this._main_skill_lv_9 = (ObscuredInt) main_skill_lv_9;
-        this._main_skill_lv_10 = (ObscuredInt) main_skill_lv_10;
-        this._ex_skill_lv_1 = (ObscuredInt) ex_skill_lv_1;
-        this._ex_skill_lv_2 = (ObscuredInt) ex_skill_lv_2;
-        this._ex_skill_lv_3 = (ObscuredInt) ex_skill_lv_3;
-        this._ex_skill_lv_4 = (ObscuredInt) ex_skill_lv_4;
-        this._ex_skill_lv_5 = (ObscuredInt) ex_skill_lv_5;
-        this._resist_status_id = (ObscuredInt) resist_status_id;
-        this._accuracy = (ObscuredInt) accuracy;
-        this._unique_equipment_flag_1 = (ObscuredInt) unique_equipment_flag_1;
+        _enemy_id = enemy_id;
+        _unit_id = unit_id;
+        _name = name;
+        _level = level;
+        _rarity = rarity;
+        _promotion_level = promotion_level;
+        _hp = hp;
+        _atk = atk;
+        _magic_str = magic_str;
+        _def = def;
+        _magic_def = magic_def;
+        _physical_critical = physical_critical;
+        _magic_critical = magic_critical;
+        _wave_hp_recovery = wave_hp_recovery;
+        _wave_energy_recovery = wave_energy_recovery;
+        _dodge = dodge;
+        _physical_penetrate = physical_penetrate;
+        _magic_penetrate = magic_penetrate;
+        _life_steal = life_steal;
+        _hp_recovery_rate = hp_recovery_rate;
+        _energy_recovery_rate = energy_recovery_rate;
+        _energy_reduce_rate = energy_reduce_rate;
+        _union_burst_level = union_burst_level;
+        _main_skill_lv_1 = main_skill_lv_1;
+        _main_skill_lv_2 = main_skill_lv_2;
+        _main_skill_lv_3 = main_skill_lv_3;
+        _main_skill_lv_4 = main_skill_lv_4;
+        _main_skill_lv_5 = main_skill_lv_5;
+        _main_skill_lv_6 = main_skill_lv_6;
+        _main_skill_lv_7 = main_skill_lv_7;
+        _main_skill_lv_8 = main_skill_lv_8;
+        _main_skill_lv_9 = main_skill_lv_9;
+        _main_skill_lv_10 = main_skill_lv_10;
+        _ex_skill_lv_1 = ex_skill_lv_1;
+        _ex_skill_lv_2 = ex_skill_lv_2;
+        _ex_skill_lv_3 = ex_skill_lv_3;
+        _ex_skill_lv_4 = ex_skill_lv_4;
+        _ex_skill_lv_5 = ex_skill_lv_5;
+        _resist_status_id = resist_status_id;
+        _accuracy = accuracy;
+        _unique_equipment_flag_1 = unique_equipment_flag_1;
       }
     }
   }

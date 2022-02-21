@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 namespace Elements
 {
@@ -24,7 +23,7 @@ namespace Elements
             return cache;
         }
         
-        private static System.Random rand = new System.Random();
+        private static Random rand = new Random();
 
         public static FloatWithEx Binomial(float p, bool val)
         {
@@ -65,7 +64,7 @@ namespace Elements
             b = b ?? Default;
             var vala = a.value;
             var valb = b.value;
-            var xs = new float[]
+            var xs = new[]
             {
                 op(a.max, b.max),
                 op(a.min, b.min),
@@ -76,16 +75,16 @@ namespace Elements
             {
                 if (b.pure)
                     return op(a.value, b.value);
-                else
-                    return new FloatWithEx
-                    {
-                        value = op(vala, b.value),
-                        avg = op(vala, b.avg),
-                        root = hash => op(vala, b.Emulate(hash)),
-                        min = Mathf.Min(xs), max = Mathf.Max(xs)
-                    };
+                return new FloatWithEx
+                {
+                    value = op(vala, b.value),
+                    avg = op(vala, b.avg),
+                    root = hash => op(vala, b.Emulate(hash)),
+                    min = Mathf.Min(xs), max = Mathf.Max(xs)
+                };
             }
-            else if (b.pure)
+
+            if (b.pure)
                 return new FloatWithEx
                 {
                     value = op(a.value, valb),
@@ -94,15 +93,14 @@ namespace Elements
                     min = Mathf.Min(xs),
                     max = Mathf.Max(xs)
                 };
-            else
-                return new FloatWithEx
-                {
-                    value = op(a.value, b.value),
-                    avg = op(a.avg, b.avg),
-                    root = hash => op(a.Emulate(hash), b.Emulate(hash)),
-                    min = Mathf.Min(xs),
-                    max = Mathf.Max(xs)
-                };
+            return new FloatWithEx
+            {
+                value = op(a.value, b.value),
+                avg = op(a.avg, b.avg),
+                root = hash => op(a.Emulate(hash), b.Emulate(hash)),
+                min = Mathf.Min(xs),
+                max = Mathf.Max(xs)
+            };
         }
 
         public float Expect => avg;
@@ -136,7 +134,7 @@ namespace Elements
         {
             int s = 0;
             for (int i = 0; i < N; ++i)
-                if (predict((float)Emulate(rand.Next()))) ++s;
+                if (predict(Emulate(rand.Next()))) ++s;
             return (float)s / N;
         }
 

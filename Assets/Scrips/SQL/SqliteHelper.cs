@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
-using Mono.Data.Sqlite;
-//using SQLite4Unity3d;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Mono.Data.Sqlite;
+using PCRCaculator;
+using UnityEngine;
+//using SQLite4Unity3d;
 
 public class SQLiteHelper
 {
@@ -40,7 +40,7 @@ public class SQLiteHelper
 
         if (!File.Exists(filepath))
         {
-              PCRCaculator.MainManager.Instance.WindowConfigMessage("\nDatabase not in Persistent path",null);
+              MainManager.Instance.WindowConfigMessage("\nDatabase not in Persistent path",null);
     /*
              //Debug.Log("Database not in Persistent path");
             // if it doesn't ->

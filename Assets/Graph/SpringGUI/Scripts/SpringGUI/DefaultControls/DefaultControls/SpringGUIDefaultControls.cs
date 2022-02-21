@@ -395,7 +395,7 @@ namespace SpringGUI
             textRect.pivot = new Vector2(0,0.5f);
             textRect.sizeDelta = new Vector2(150,0);
             Text textText = dateText.GetComponent<Text>();
-            textText.text = System.DateTime.Today.ToShortDateString();
+            textText.text = DateTime.Today.ToShortDateString();
             textText.alignment = TextAnchor.MiddleLeft;
 
             // Create pick button
@@ -448,7 +448,7 @@ namespace SpringGUI
             GameObject colorPicker = CreateUIElementRoot("ColorPicker" , _defaultColorPicker);
             var mainCT = colorPicker.AddComponent<ColoredTape>();
             mainCT.TapeDirection = ColoredTape.E_DrawDirection.Vertical;
-            mainCT.SetColors(new Color[] { new Color(0.8f , 0.8f , 0.8f , 1) , new Color(0 , 0.7f , 1 , 1) });
+            mainCT.SetColors(new[] { new Color(0.8f , 0.8f , 0.8f , 1) , new Color(0 , 0.7f , 1 , 1) });
 
             #region MainColor
             var mainColor = CreateUIObject("MainColor" , colorPicker.transform , new Vector2(185 , 22)).AddComponent<MainColorTape>().gameObject.transform;
@@ -472,17 +472,17 @@ namespace SpringGUI
             var fisrtCT = firstCTGO.AddComponent<ColoredTape>();
             fisrtCT.TapeDirection  = ColoredTape.E_DrawDirection.Horizontal;;
             fisrtCT.OuelineWidth = 0.8f;
-            fisrtCT.SetColors(new Color[] { Color.white , Color.red });
+            fisrtCT.SetColors(new[] { Color.white , Color.red });
             // second ct
             var secondCTGO = CreateUIObject("SecondLayerColoredTape" , colorPalette.transform , new Vector2(150 , 150));
             var secondCT = secondCTGO.AddComponent<ColoredTape>();
             secondCT.Outline = false;
-            secondCT.SetColors(new Color[] { new Color(0 , 0 , 0 , 0) , Color.black });
+            secondCT.SetColors(new[] { new Color(0 , 0 , 0 , 0) , Color.black });
             // multi-ct
             var multiCTGO = CreateUIObject("MultiColoredTape" , colorPalette.transform , new Vector2(150 , 150));
             var multiCT = multiCTGO.AddComponent<MultiColoredTape>();
             multiCT.OuelineWidth = 0.8f;
-            multiCT.SetColors(new Color[] { Color.yellow , Color.white , Color.red , Color.magenta });
+            multiCT.SetColors(new[] { Color.yellow , Color.white , Color.red , Color.magenta });
             multiCTGO.SetActive(false);
             // left text
             var leftText = DefaultControls.CreateText(convertToDefaultResources(resources));
@@ -547,7 +547,7 @@ namespace SpringGUI
             var verticaCT = CreateUIObject("FirstLayerColoredTape", verticalSlider.transform, new Vector2(20, 150));
             var vCT = verticaCT.AddComponent<ColoredTape>();
             vCT.OuelineWidth = 0.8f;
-            vCT.SetColors(new Color[] { Color.red,Color.magenta,Color.blue,Color.cyan,Color.green,Color.yellow,Color.red });
+            vCT.SetColors(new[] { Color.red,Color.magenta,Color.blue,Color.cyan,Color.green,Color.yellow,Color.red });
             // handle slider area
             var handleArea = CreateUIObject("Handle Slider Area", verticalSlider.transform, new Vector2(0, 0));
             var handleAreaRect = handleArea.GetComponent<RectTransform>();
@@ -575,12 +575,12 @@ namespace SpringGUI
             var indexCT1 = CreateUIObject("CT1", targetContent.transform, new Vector2(9, 9));
             var indexct = indexCT1.AddComponent<ColoredTape>();
             indexct.TapeDirection = ColoredTape.E_DrawDirection.Horizontal;
-            indexct.SetColors(new Color[] { Color.white , new Color(0.6f , 0 , 0.6f , 1) });
+            indexct.SetColors(new[] { Color.white , new Color(0.6f , 0 , 0.6f , 1) });
             var indexCT2 = CreateUIObject("CT2", targetContent.transform, new Vector2(9, 9));
-            indexCT2.AddComponent<ColoredTape>().SetColors(new Color[] { new Color(1 , 1 , 1 , 0) , new Color(0 , 0 , 0 , 1) });
+            indexCT2.AddComponent<ColoredTape>().SetColors(new[] { new Color(1 , 1 , 1 , 0) , new Color(0 , 0 , 0 , 1) });
             var indexCT = CreateUIObject("CT", pmButtonTarget.transform, new Vector2(3, 9));
             indexCT.transform.localPosition = new Vector2(4.5f , 0);
-            indexCT.AddComponent<ColoredTape>().SetColors(new Color[]
+            indexCT.AddComponent<ColoredTape>().SetColors(new[]
             {
                 Color.red,Color.magenta, Color.blue,Color.cyan,Color.green,Color.yellow,Color.red
             });
@@ -596,16 +596,16 @@ namespace SpringGUI
             hCT1.transform.localPosition = new Vector3(0,3);
             var ct1 = hCT1.AddComponent<ColoredTape>();
             ct1.TapeDirection = ColoredTape.E_DrawDirection.Horizontal;
-            ct1.SetColors(new Color[] { Color.red , Color.magenta , Color.blue , Color.cyan , Color.green , Color.yellow , Color.red });
+            ct1.SetColors(new[] { Color.red , Color.magenta , Color.blue , Color.cyan , Color.green , Color.yellow , Color.red });
             var hCT2 = CreateUIObject("CT2" , cmButtonTarget.transform , new Vector2(9 , 3));
             var ct2 = hCT2.AddComponent<ColoredTape>();
             ct2.TapeDirection = ColoredTape.E_DrawDirection.Horizontal;
-            ct2.SetColors(new Color[] { Color.white , new Color(0.6f , 0 , 0.6f) });
+            ct2.SetColors(new[] { Color.white , new Color(0.6f , 0 , 0.6f) });
             var hCT3 = CreateUIObject("CT3" , cmButtonTarget.transform , new Vector2(9 , 3));
             hCT3.transform.localPosition = new Vector3(0 , -3);
             var ct3 = hCT3.AddComponent<ColoredTape>();
             ct3.TapeDirection = ColoredTape.E_DrawDirection.Horizontal;
-            ct3.SetColors(new Color[] { Color.black,Color.white });
+            ct3.SetColors(new[] { Color.black,Color.white });
             #endregion
             
             #region RGBA Inputfield && slider 
@@ -634,7 +634,7 @@ namespace SpringGUI
             rRect.anchorMin = Vector2.zero;
             rRect.anchorMax = Vector2.one;
             var rSlider = createColoredTapeSlider(rModule.transform,
-                new Color[] {Color.cyan,Color.white});
+                new[] {Color.cyan,Color.white});
             rSlider.name = "Slider";
             // G
             var gModule = CreateUIObject("G" , rgba.transform , new Vector2(216 , 28));
@@ -656,7 +656,7 @@ namespace SpringGUI
             gRect.anchorMin = Vector2.zero;
             gRect.anchorMax = Vector2.one;
             var gSlider = createColoredTapeSlider(gModule.transform ,
-                new Color[] {Color.magenta,Color.white});
+                new[] {Color.magenta,Color.white});
             gSlider.name = "Slider";
 
             // B
@@ -679,7 +679,7 @@ namespace SpringGUI
             bRect.anchorMin = Vector2.zero;
             bRect.anchorMax = Vector2.one;
             var bSlider = createColoredTapeSlider(bModule.transform ,
-                new Color[] { Color.yellow,Color.white });
+                new[] { Color.yellow,Color.white });
             bSlider.name = "Slider";
 
             // A
@@ -702,7 +702,7 @@ namespace SpringGUI
             aRect.anchorMin = Vector2.zero;
             aRect.anchorMax = Vector2.one;
             var aSlider = createColoredTapeSlider(aModule.transform ,
-                new Color[] { Color.black,Color.white });
+                new[] { Color.black,Color.white });
             aSlider.name = "Slider";
 
             #endregion

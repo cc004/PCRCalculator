@@ -55,9 +55,9 @@ namespace Spine.Unity
 			this.returnAttachmentPath = returnAttachmentPath;
 			this.placeholdersOnly = placeholdersOnly;
 			this.slotField = slotField;
-			base.dataField = dataField;
+			this.dataField = dataField;
 			this.skinField = skinField;
-			base.includeNone = includeNone;
+			this.includeNone = includeNone;
 		}
 
 		public static Hierarchy GetHierarchy(string fullPath)

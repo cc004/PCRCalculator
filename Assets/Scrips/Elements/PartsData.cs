@@ -4,15 +4,15 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-using Cute;
-using Elements.Battle;
-//using Elements.Data;
-using Spine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using Cute;
+using Elements.Battle;
+using Spine;
 using UnityEngine;
+//using Elements.Data;
 
 namespace Elements
 {
@@ -45,211 +45,211 @@ namespace Elements
 
         public FloatWithEx MagicStr { get; protected set; }
 
-        public ObscuredInt Def { get; protected set; }
+        public int Def { get; protected set; }
 
-        public ObscuredInt MagicDef { get; protected set; }
+        public int MagicDef { get; protected set; }
 
-        public ObscuredInt Dodge { get; protected set; }
+        public int Dodge { get; protected set; }
 
-        public ObscuredInt Accuracy { get; protected set; }
+        public int Accuracy { get; protected set; }
 
-        public ObscuredInt PhysicalCritical { get; protected set; }
+        public int PhysicalCritical { get; protected set; }
 
-        public ObscuredInt MagicCritical { get; protected set; }
+        public int MagicCritical { get; protected set; }
 
-        public ObscuredInt LifeSteal { get; private set; }
+        public int LifeSteal { get; private set; }
 
-        public ObscuredInt HpRecoveryRate { get; private set; }
+        public int HpRecoveryRate { get; private set; }
 
-        public ObscuredInt StartAtk { get; protected set; }
+        public int StartAtk { get; protected set; }
 
-        public ObscuredInt StartMagicStr { get; protected set; }
+        public int StartMagicStr { get; protected set; }
 
-        public ObscuredInt StartDef { get; protected set; }
+        public int StartDef { get; protected set; }
 
-        public ObscuredInt StartMagicDef { get; protected set; }
+        public int StartMagicDef { get; protected set; }
 
-        public ObscuredInt StartDodge { get; protected set; }
+        public int StartDodge { get; protected set; }
 
-        public ObscuredInt StartPhysicalCritical { get; protected set; }
+        public int StartPhysicalCritical { get; protected set; }
 
-        public ObscuredInt StartMagicCritical { get; protected set; }
+        public int StartMagicCritical { get; protected set; }
 
-        public ObscuredInt StartLifeSteal { get; private set; }
+        public int StartLifeSteal { get; private set; }
 
-        public ObscuredInt BreakPoint { get; set; }
+        public int BreakPoint { get; set; }
 
         public float BreakTime { get; set; }
 
         public float RecoverTime = 1.12f;//添加
-        public ObscuredInt MaxBreakPoint { get; private set; }
+        public int MaxBreakPoint { get; private set; }
 
         private Dictionary<UnitCtrl.BuffParamKind, FloatWithEx> additionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, FloatWithEx>();
 
         private int getAdditionalBuff(UnitCtrl.BuffParamKind _kind)
         {
             FloatWithEx num;
-            return (int)(!this.additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
+            return (int)(!additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
         private FloatWithEx getAdditionalBuffEx(UnitCtrl.BuffParamKind _kind)
         {
             FloatWithEx num;
-            return (!this.additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
+            return (!additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
-        public override bool GetTargetable() => !this.IsBreak || this.AttachmentNamePairList.Count <= 0;
+        public override bool GetTargetable() => !IsBreak || AttachmentNamePairList.Count <= 0;
 
-        public PartsData() { }// => this.battleEffectPool = (BattleEffectPoolInterface)SingletonTreeTreeFunc.CreateSingletonTree<PartsData>().Get<BattleEffectPool>();
+        // => this.battleEffectPool = (BattleEffectPoolInterface)SingletonTreeTreeFunc.CreateSingletonTree<PartsData>().Get<BattleEffectPool>();
 
         public void Initialize(MasterEnemyMParts.EnemyMParts _enemyMParts)
         {
-            BattleSpineController currentSpineCtrl = this.Owner.GetCurrentSpineCtrl();
-            foreach (BasePartsData.AttachmentNamePair attachmentNamePair in this.AttachmentNamePairList)
+            BattleSpineController currentSpineCtrl = Owner.GetCurrentSpineCtrl();
+            foreach (AttachmentNamePair attachmentNamePair in AttachmentNamePairList)
             {
-                BasePartsData.AttachmentNamePair pair = attachmentNamePair;
-                pair.TargetIndex = currentSpineCtrl.skeleton.slots.FindIndex((Predicate<Spine.Slot>)(e => e.data.Name == pair.TargetSlotName));
+                AttachmentNamePair pair = attachmentNamePair;
+                pair.TargetIndex = currentSpineCtrl.skeleton.slots.FindIndex(e => e.data.Name == pair.TargetSlotName);
                 pair.TargetAttachment = currentSpineCtrl.skeleton.GetAttachment(pair.TargetIndex, pair.TargetAttachmentName);
-                int index = currentSpineCtrl.skeleton.slots.FindIndex((Predicate<Spine.Slot>)(e => e.data.Name == pair.AppliedSlotName));
+                int index = currentSpineCtrl.skeleton.slots.FindIndex(e => e.data.Name == pair.AppliedSlotName);
                 pair.AppliedAttachment = currentSpineCtrl.skeleton.GetAttachment(index, pair.AppliedAttachmentName);
             }
-            string boneName = string.Format("Center_{0:D2}", (object)this.Index);
-            this.centerBone = currentSpineCtrl.skeleton.FindBone(boneName);
-            this.stateBone = currentSpineCtrl.skeleton.FindBone(string.Format("State_{0:D2}", (object)this.Index));
-            this.fixedCenterPos = Vector3.Scale(new Vector3(this.centerBone.worldX, this.centerBone.worldY, 0.0f), this.Owner.UnitSpineCtrl.transform.lossyScale);
-            int unit_id = this.EnemyId;
+            string boneName = string.Format("Center_{0:D2}", Index);
+            centerBone = currentSpineCtrl.skeleton.FindBone(boneName);
+            stateBone = currentSpineCtrl.skeleton.FindBone(string.Format("State_{0:D2}", Index));
+            fixedCenterPos = Vector3.Scale(new Vector3(centerBone.worldX, centerBone.worldY, 0.0f), Owner.UnitSpineCtrl.transform.lossyScale);
+            int unit_id = EnemyId;
             if (_enemyMParts != null)
             {
-                switch (this.Index)
+                switch (Index)
                 {
                     case 1:
-                        unit_id = (int)_enemyMParts.child_enemy_parameter_1;
+                        unit_id = _enemyMParts.child_enemy_parameter_1;
                         break;
                     case 2:
-                        unit_id = (int)_enemyMParts.child_enemy_parameter_2;
+                        unit_id = _enemyMParts.child_enemy_parameter_2;
                         break;
                     case 3:
-                        unit_id = (int)_enemyMParts.child_enemy_parameter_3;
+                        unit_id = _enemyMParts.child_enemy_parameter_3;
                         break;
                     case 4:
-                        unit_id = (int)_enemyMParts.child_enemy_parameter_4;
+                        unit_id = _enemyMParts.child_enemy_parameter_4;
                         break;
                     case 5:
-                        unit_id = (int)_enemyMParts.child_enemy_parameter_5;
+                        unit_id = _enemyMParts.child_enemy_parameter_5;
                         break;
                 }
             }
             // MasterEnemyParameter.EnemyParameter fromAllKind = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter.GetFromAllKind(unit_id);
             var data = MyGameCtrl.Instance.tempData.MPartsDataDic[unit_id]; 
-            this.Dodge = this.StartDodge = (ObscuredInt)data.baseData.Dodge;
-            this.LifeSteal = this.StartLifeSteal = (ObscuredInt)data.baseData.Life_steal;
-            this.HpRecoveryRate = (ObscuredInt)data.baseData.Hp_recovery_rate;
-            this.InitializeResistStatus((int)data.resist_status_id);
+            Dodge = StartDodge = (int)data.baseData.Dodge;
+            LifeSteal = StartLifeSteal = (int)data.baseData.Life_steal;
+            HpRecoveryRate = (int)data.baseData.Hp_recovery_rate;
+            InitializeResistStatus(data.resist_status_id);
             /*if (Singleton<EHPLBCOOOPK>.Instance.PHDACAOAOMA.CLCOKFOINCL == eBattleCategory.CLAN_BATTLE)
             {
               ClanBattleTopInfo clanBattleTopInfo = Singleton<ClanBattleTempData>.Instance.ClanBattleTopInfo;
               int clanBattleId = clanBattleTopInfo.ClanBattleId;
               int lapNum = clanBattleTopInfo.LapNum;
-              this.Atk = this.StartAtk = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.atk, eEnemyAdjustParamType.ATK);
-              this.Def = this.StartDef = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.def, eEnemyAdjustParamType.DEF);
-              this.MagicStr = this.StartMagicStr = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.magic_str, eEnemyAdjustParamType.MAGIC_ATK);
-              this.MagicDef = this.StartMagicDef = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.magic_def, eEnemyAdjustParamType.MAGIC_DEF);
-              this.PhysicalCritical = this.StartPhysicalCritical = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.physical_critical, eEnemyAdjustParamType.PHYSICAL_CRITICAL);
-              this.MagicCritical = this.StartMagicCritical = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.magic_critical, eEnemyAdjustParamType.MAGIC_CRITICAL);
-              this.Accuracy = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.accuracy, eEnemyAdjustParamType.ACCURACY);
+              this.Atk = this.StartAtk = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.atk, eEnemyAdjustParamType.ATK);
+              this.Def = this.StartDef = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.def, eEnemyAdjustParamType.DEF);
+              this.MagicStr = this.StartMagicStr = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.magic_str, eEnemyAdjustParamType.MAGIC_ATK);
+              this.MagicDef = this.StartMagicDef = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.magic_def, eEnemyAdjustParamType.MAGIC_DEF);
+              this.PhysicalCritical = this.StartPhysicalCritical = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.physical_critical, eEnemyAdjustParamType.PHYSICAL_CRITICAL);
+              this.MagicCritical = this.StartMagicCritical = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.magic_critical, eEnemyAdjustParamType.MAGIC_CRITICAL);
+              this.Accuracy = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.accuracy, eEnemyAdjustParamType.ACCURACY);
               this.Level = (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.level, eEnemyAdjustParamType.LEVEL);
-              this.BreakPoint = this.MaxBreakPoint = (ObscuredInt) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.hp, eEnemyAdjustParamType.HP);
+              this.BreakPoint = this.MaxBreakPoint = (int) (int) ClanBattleUtil.CalcParamAdjustStatus(clanBattleId, lapNum, (long) (int) fromAllKind.hp, eEnemyAdjustParamType.HP);
             }
             else
             {*/
-            this.Atk = (FloatWithEx)(int)(this.StartAtk = (ObscuredInt)data.baseData.Atk);
-            this.Def = this.StartDef = (ObscuredInt)data.baseData.Def;
-            this.MagicStr = (FloatWithEx)(int)(this.StartMagicStr = (ObscuredInt)data.baseData.Magic_str);
-            this.MagicDef = this.StartMagicDef = (ObscuredInt)data.baseData.Magic_def;
-            this.PhysicalCritical = this.StartPhysicalCritical = (ObscuredInt)data.baseData.Physical_critical;
-            this.MagicCritical = this.StartMagicCritical = (ObscuredInt)data.baseData.Magic_critical;
-            this.Accuracy = (ObscuredInt)data.baseData.Accuracy;
-            this.Level = (int)data.level;
-            this.BreakPoint = this.MaxBreakPoint = (ObscuredInt)data.baseData.Hp;
+            Atk = (int)(StartAtk = (int)data.baseData.Atk);
+            Def = StartDef = (int)data.baseData.Def;
+            MagicStr = (int)(StartMagicStr = (int)data.baseData.Magic_str);
+            MagicDef = StartMagicDef = (int)data.baseData.Magic_def;
+            PhysicalCritical = StartPhysicalCritical = (int)data.baseData.Physical_critical;
+            MagicCritical = StartMagicCritical = (int)data.baseData.Magic_critical;
+            Accuracy = (int)data.baseData.Accuracy;
+            Level = data.level;
+            BreakPoint = MaxBreakPoint = (int)data.baseData.Hp;
             //}
         }
 
-        public override Bone GetStateBone() => this.stateBone;
+        public override Bone GetStateBone() => stateBone;
 
-        public override Bone GetCenterBone() => this.centerBone;
+        public override Bone GetCenterBone() => centerBone;
 
-        public override Vector3 GetBottomTransformPosition() => this.Owner.BottomTransform.position + new Vector3(this.PositionX / 540f, 0.0f);
+        public override Vector3 GetBottomTransformPosition() => Owner.BottomTransform.position + new Vector3(PositionX / 540f, 0.0f);
 
         public override Vector3 GetFixedCenterPos()
         {
-            bool flag = this.Owner.IsLeftDir || this.Owner.IsForceLeftDirOrPartsBoss;
-            float num = this.InitialPositionX / 540f;
-            return new Vector3(flag ? -this.fixedCenterPos.x : this.fixedCenterPos.x, this.fixedCenterPos.y, this.fixedCenterPos.z) + new Vector3(flag ? -num : num, 0.0f);
+            bool flag = Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss;
+            float num = InitialPositionX / 540f;
+            return new Vector3(flag ? -fixedCenterPos.x : fixedCenterPos.x, fixedCenterPos.y, fixedCenterPos.z) + new Vector3(flag ? -num : num, 0.0f);
         }
 
-        public override Vector3 GetPosition() => this.Owner.transform.position + new Vector3(this.PositionX / 540f, 0.0f);
+        public override Vector3 GetPosition() => Owner.transform.position + new Vector3(PositionX / 540f, 0.0f);
 
-        public override Vector3 GetLocalPosition() => this.Owner.transform.localPosition + new Vector3(this.PositionX, 0.0f, 0.0f);
+        public override Vector3 GetLocalPosition() => Owner.transform.localPosition + new Vector3(PositionX, 0.0f, 0.0f);
 
-        public override float GetBodyWidth() => this.BodyWidthValue;
+        public override float GetBodyWidth() => BodyWidthValue;
 
-        public override Vector3 GetColliderCenter() => new Vector3((this.Owner.IsLeftDir ? 1 : (this.Owner.IsForceLeftDirOrPartsBoss ? 1 : 0)) != 0 ? -this.fixedCenterPos.x : this.fixedCenterPos.x, this.fixedCenterPos.y, this.fixedCenterPos.z);
+        public override Vector3 GetColliderCenter() => new Vector3((Owner.IsLeftDir ? 1 : (Owner.IsForceLeftDirOrPartsBoss ? 1 : 0)) != 0 ? -fixedCenterPos.x : fixedCenterPos.x, fixedCenterPos.y, fixedCenterPos.z);
 
-        public override Vector3 GetColliderSize() => new Vector3(this.BodyWidthValue / 540f, 0.0f, 0.0f);
+        public override Vector3 GetColliderSize() => new Vector3(BodyWidthValue / 540f, 0.0f, 0.0f);
 
-        public override int GetDefZero() => Mathf.Max(0, (int)this.Def) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+        public override int GetDefZero() => Mathf.Max(0, Def) + getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
 
-        public override int GetMagicDefZero() => Mathf.Max(0, (int)this.MagicDef) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
+        public override int GetMagicDefZero() => Mathf.Max(0, MagicDef) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
 
-        private int getDodgeZero() => Mathf.Max(0, (int)this.Dodge) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
+        private int getDodgeZero() => Mathf.Max(0, Dodge) + getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
 
-        public override int GetAtkZero() => Mathf.Max(0, (int)(FloatWithEx)this.Atk) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
+        public override int GetAtkZero() => Mathf.Max(0, (int)Atk) + getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
 
-        public override int GetMagicStrZero() => Mathf.Max(0, (int)(FloatWithEx)this.MagicStr) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override int GetMagicStrZero() => Mathf.Max(0, (int)MagicStr) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
 
-        public override FloatWithEx GetAtkZeroEx() => this.Atk.Max(0) + this.getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK);
+        public override FloatWithEx GetAtkZeroEx() => Atk.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK);
 
-        public override FloatWithEx GetMagicStrZeroEx() => this.MagicStr.Max(0) + this.getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override FloatWithEx GetMagicStrZeroEx() => MagicStr.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR);
 
-        public override int GetAccuracyZero() => Mathf.Max(0, (int)this.Accuracy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
+        public override int GetAccuracyZero() => Mathf.Max(0, Accuracy) + getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
 
-        public override int GetPhysicalCriticalZero() => Mathf.Max(0, (int)this.PhysicalCritical) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL);
+        public override int GetPhysicalCriticalZero() => Mathf.Max(0, PhysicalCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL);
 
-        public override int GetMagicCriticalZero() => Mathf.Max(0, (int)this.MagicCritical) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_CRITICAL);
+        public override int GetMagicCriticalZero() => Mathf.Max(0, MagicCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_CRITICAL);
 
-        public override int GetLifeStealZero() => Mathf.Max(0, (int)this.LifeSteal) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.LIFE_STEAL);
+        public override int GetLifeStealZero() => Mathf.Max(0, LifeSteal) + getAdditionalBuff(UnitCtrl.BuffParamKind.LIFE_STEAL);
 
-        public override float GetHpRecoverRateZero() => (float)Mathf.Max(0, (int)this.HpRecoveryRate);
+        public override float GetHpRecoverRateZero() => Mathf.Max(0, HpRecoveryRate);
 
-        public override int GetLevel() => this.Level;
+        public override int GetLevel() => Level;
 
         public override float GetDodgeRate(int _accuracy)
         {
-            int num = Mathf.Max(this.getDodgeZero() - _accuracy, 0);
-            return (float)num / ((float)num + 100f);
+            int num = Mathf.Max(getDodgeZero() - _accuracy, 0);
+            return num / (num + 100f);
         }
 
-        public override int GetStartAtk() => (int)this.StartAtk;
+        public override int GetStartAtk() => StartAtk;
 
-        public override int GetStartDef() => (int)this.StartDef;
+        public override int GetStartDef() => StartDef;
 
-        public override int GetStartMagicStr() => (int)this.StartMagicStr;
+        public override int GetStartMagicStr() => StartMagicStr;
 
-        public override int GetStartMagicDef() => (int)this.StartMagicDef;
+        public override int GetStartMagicDef() => StartMagicDef;
 
-        public override int GetStartDodge() => (int)this.StartDodge;
+        public override int GetStartDodge() => StartDodge;
 
-        public override int GetStartPhysicalCritical() => (int)this.StartPhysicalCritical;
+        public override int GetStartPhysicalCritical() => StartPhysicalCritical;
 
-        public override int GetStartMagicCritical() => (int)this.StartMagicCritical;
+        public override int GetStartMagicCritical() => StartMagicCritical;
 
-        public override int GetStartLifeSteal() => (int)this.StartLifeSteal;
+        public override int GetStartLifeSteal() => StartLifeSteal;
 
         public override void SetMissAtk(
           UnitCtrl _source,
           eMissLogType _missLogType,
           eDamageEffectType _damageEffectType,
-          float _scale) => this.Owner.SetMissAtk(_source, _missLogType, _damageEffectType, (BasePartsData)this, _scale);
+          float _scale) => Owner.SetMissAtk(_source, _missLogType, _damageEffectType, this, _scale);
 
         public override void SetBuffDebuff(
           bool _enable,
@@ -263,16 +263,16 @@ namespace Elements
                 _value = _value * -1f;
             if (_additional)
             {
-                if (this.additionalBuffDictionary.ContainsKey(_kind))
-                    this.additionalBuffDictionary[_kind] += _value;
+                if (additionalBuffDictionary.ContainsKey(_kind))
+                    additionalBuffDictionary[_kind] += _value;
                 else
-                    this.additionalBuffDictionary.Add(_kind, _value);
+                    additionalBuffDictionary.Add(_kind, _value);
             }
             else
             {
                 BattleLogIntreface mlegmhaocon = _battleLog;
                 UnitCtrl unitCtrl = _source;
-                UnitCtrl owner = this.Owner;
+                UnitCtrl owner = Owner;
                 int HLIKLPNIOKJ = (int)((_enable ? 1 : 2) * 10 + _kind);
                 long KGNFLOPBOMB = (long)_value;
                 UnitCtrl JELADBAMFKH = unitCtrl;
@@ -281,31 +281,31 @@ namespace Elements
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
-                        this.Atk = (int)(this.Atk + _value);
+                        Atk = (int)(Atk + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
-                        this.Def = (int)((int)this.Def + _value);
+                        Def = (int)((int)Def + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
-                        this.MagicStr = (int)(this.MagicStr + _value);
+                        MagicStr = (int)(MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
-                        this.MagicDef = (int)((int)this.MagicDef + _value);
+                        MagicDef = (int)((int)MagicDef + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
-                        this.Dodge = (int)((int)this.Dodge + _value);
+                        Dodge = (int)((int)Dodge + _value);
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL:
-                        this.PhysicalCritical = (int)((int)this.PhysicalCritical + _value);
+                        PhysicalCritical = (int)((int)PhysicalCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL:
-                        this.MagicCritical = (int)((int)this.MagicCritical + _value);
+                        MagicCritical = (int)((int)MagicCritical + _value);
                         break;
                     case UnitCtrl.BuffParamKind.LIFE_STEAL:
-                        this.LifeSteal = (int)((int)this.LifeSteal + _value);
+                        LifeSteal = (int)((int)LifeSteal + _value);
                         break;
                     case UnitCtrl.BuffParamKind.ACCURACY:
-                        this.Accuracy = (int)((int)this.Accuracy + _value);
+                        Accuracy = (int)((int)Accuracy + _value);
                         break;
                 }
             }
@@ -332,13 +332,13 @@ namespace Elements
 
         public void SetDamage(int _damage, UnitCtrl _source)
         {
-          if (this.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.PARTS_NO_DAMAGE))
+          if (Owner.IsAbnormalState(UnitCtrl.eAbnormalState.PARTS_NO_DAMAGE))
             return;
-          this.BreakPoint = (ObscuredInt) ((int) this.BreakPoint - _damage);
-          if ((int) this.BreakPoint < 0)
+          BreakPoint = BreakPoint - _damage;
+          if (BreakPoint < 0)
           {
-            this.BreakPoint = (ObscuredInt) 0;
-            this.BreakSource = _source;
+            BreakPoint = 0;
+            BreakSource = _source;
           }
           /*if (!((UnityEngine.Object) this.MultiTargetCursor != (UnityEngine.Object) null))
             return;
@@ -354,15 +354,15 @@ namespace Elements
             //  return;
             if (_enable)
             {
-              if (!this.Owner.BossPartsListForBattle.Exists((Predicate<PartsData>) (e => !e.IsBreak)))
-                this.Owner.OnBreakAll.Call();
+              if (!Owner.BossPartsListForBattle.Exists(e => !e.IsBreak))
+                Owner.OnBreakAll.Call();
               //ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_BREAK, _unitUiCtrl).transform.position = this.GetBottomTransformPosition() + this.GetFixedCenterPos();
               //this.MultiTargetCursor.RedUi.alpha = 0.0f;
               //this.MultiTargetCursor.Animator.Play("BattleMultiTargetsCursor_breaked");
               //ManagerSingleton<SoundManager>.Instance.PlaySeByOuterSource(this.MultiTargetCursor.SeSource, eSE.MULTI_TARGETS_BREAK);
               //this.createBreakEffect(0);
-              this.Owner.AppendCoroutine(this.updateChangeAttachment(this.ChangeAttachmentStartTime, true), ePauseType.SYSTEM, this.Owner);
-              if (this.AttachmentNamePairList.Count <= 0)
+              Owner.AppendCoroutine(updateChangeAttachment(ChangeAttachmentStartTime, true), ePauseType.SYSTEM, Owner);
+              if (AttachmentNamePairList.Count <= 0)
                 return;
               //this.MultiTargetCursor.gameObject.SetActive(false);
             }
@@ -370,9 +370,9 @@ namespace Elements
             {
               //ManagerSingleton<SoundManager>.Instance.PlaySeByOuterSource(this.MultiTargetCursor.SeSource, eSE.MULTI_TARGETS_REVIVAL);
               //this.MultiTargetCursor.Animator.Play("BattleMultiTargetsCursor_breakEnd");
-              this.Owner.AppendCoroutine(this.waitAndBreakPointReset(), ePauseType.SYSTEM);
+              Owner.AppendCoroutine(waitAndBreakPointReset(), ePauseType.SYSTEM);
               //this.createBreakEffect(1);
-              if (this.AttachmentNamePairList.Count <= 0)
+              if (AttachmentNamePairList.Count <= 0)
                 return;
               //this.MultiTargetCursor.gameObject.SetActive(true);
             }
@@ -400,10 +400,10 @@ namespace Elements
             while (true)
             {
                 _timer -= partsData.Owner.DeltaTimeForPause;
-                if ((double)_timer >= 0.0)
+                if (_timer >= 0.0)
                 {
                     if (partsData.IsBreak == _enable)
-                        yield return (object)null;
+                        yield return null;
                     else
                         break;
                 }
@@ -415,7 +415,7 @@ namespace Elements
             BattleSpineController currentSpineCtrl = partsData.Owner.GetCurrentSpineCtrl();
             if (_enable)
             {
-                foreach (BasePartsData.AttachmentNamePair attachmentNamePair in partsData.AttachmentNamePairList)
+                foreach (AttachmentNamePair attachmentNamePair in partsData.AttachmentNamePairList)
                 {
                     (currentSpineCtrl.skeleton.skin == null ? currentSpineCtrl.skeleton.data.defaultSkin : currentSpineCtrl.skeleton.skin).AddAttachment(attachmentNamePair.TargetIndex, attachmentNamePair.TargetAttachmentName, attachmentNamePair.AppliedAttachment);
                     currentSpineCtrl.skeleton.slots.Items[attachmentNamePair.TargetIndex].attachment = attachmentNamePair.AppliedAttachment;
@@ -423,7 +423,7 @@ namespace Elements
             }
             else
             {
-                foreach (BasePartsData.AttachmentNamePair attachmentNamePair in partsData.AttachmentNamePairList)
+                foreach (AttachmentNamePair attachmentNamePair in partsData.AttachmentNamePairList)
                 {
                     (currentSpineCtrl.skeleton.skin == null ? currentSpineCtrl.skeleton.data.defaultSkin : currentSpineCtrl.skeleton.skin).AddAttachment(attachmentNamePair.TargetIndex, attachmentNamePair.TargetAttachmentName, attachmentNamePair.TargetAttachment);
                     currentSpineCtrl.skeleton.slots.Items[attachmentNamePair.TargetIndex].attachment = attachmentNamePair.TargetAttachment;
@@ -434,7 +434,7 @@ namespace Elements
         public void FixAttachment(UnitCtrl _owner)
         {
             BattleSpineController currentSpineCtrl = _owner.GetCurrentSpineCtrl();
-            foreach (BasePartsData.AttachmentNamePair attachmentNamePair in this.AttachmentNamePairList)
+            foreach (AttachmentNamePair attachmentNamePair in AttachmentNamePairList)
             {
                 (currentSpineCtrl.skeleton.skin == null ? currentSpineCtrl.skeleton.data.defaultSkin : currentSpineCtrl.skeleton.skin).AddAttachment(attachmentNamePair.TargetIndex, attachmentNamePair.TargetAttachmentName, attachmentNamePair.TargetAttachment);
                 currentSpineCtrl.skeleton.slots.Items[attachmentNamePair.TargetIndex].attachment = attachmentNamePair.TargetAttachment;
@@ -453,10 +453,10 @@ namespace Elements
                 yield return (object)null;
             }*/
             RecoverTime = 1.12f;
-            while ((double)RecoverTime > 0.0)
+            while (RecoverTime > 0.0)
             {
                 RecoverTime -= partsData.battleManager.DeltaTime_60fps;
-                yield return (object)null;
+                yield return null;
             }
             RecoverTime = 1.12f;
             partsData.IsBreak = false;

@@ -1,5 +1,6 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -80,9 +81,9 @@ namespace PCRCaculator.Guild
             EnemyData newEnemyData = enemyData.Copy();
             try
             {
-                newEnemyData.baseData.Hp = long.Parse(inputField_HP.text, System.Globalization.NumberStyles.AllowExponent);
+                newEnemyData.baseData.Hp = long.Parse(inputField_HP.text, NumberStyles.AllowExponent);
             }
-            catch (System.FormatException e)
+            catch (FormatException e)
             {
                 MainManager.Instance.WindowConfigMessage("HP只能输入整数，请不要用科学计数法。", null);
                 return;
@@ -176,7 +177,7 @@ namespace PCRCaculator.Guild
                 enemyData = GuildManager.Instance.SettingData.changedEnemyDataDic[enemyId];
             }
             this.enemyData = enemyData;
-            this.unit_id = enemyData.unit_id;
+            unit_id = enemyData.unit_id;
             inputField_HP.text = "" + enemyData.baseData.Hp;
             inputField_lv.text = "" + enemyData.level;
             inputField_def.text = "" + enemyData.baseData.Def;
@@ -269,10 +270,6 @@ namespace PCRCaculator.Guild
                 GuildManager.Instance.SettingData.bossBodyWidthDic.TryGetValue(enemyData.unit_id, out float value))
             {
                 bossBodyWidth = value;
-            }
-            else
-            {
-                //bossBodyWidth = GuildManager.Instance.SettingData.BodyColliderWidth;
             }
         }
         private void GetBossSkillCastTime()

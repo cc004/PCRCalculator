@@ -10,10 +10,10 @@ namespace Spine.Unity.Modules
 		private static Transform parentSpaceHelper;
 
 		[Header("Hierarchy")]
-		[SpineBone("", "", true)]
+		[SpineBone]
 		public string startingBoneName = "";
 
-		[SpineBone("", "", true)]
+		[SpineBone]
 		public List<string> stopBoneNames = new List<string>();
 
 		[Header("Parameters")]
@@ -42,7 +42,7 @@ namespace Spine.Unity.Modules
 		[Tooltip("If your ragdoll seems unstable or uneffected by limits, try lowering this value.")]
 		public float massFalloffFactor = 0.4f;
 
-		[SkeletonRagdoll.LayerField]
+		[SkeletonRagdoll.LayerFieldAttribute]
 		[Tooltip("The layer assigned to all of the rigidbody parts.")]
 		public int colliderLayer;
 
@@ -134,7 +134,7 @@ namespace Spine.Unity.Modules
 				if (key == bone3)
 				{
 					ragdollRoot = new GameObject("RagdollRoot").transform;
-					ragdollRoot.SetParent(base.transform, worldPositionStays: false);
+					ragdollRoot.SetParent(this.transform, worldPositionStays: false);
 					if (key == skeleton.RootBone)
 					{
 						ragdollRoot.localPosition = new Vector3(key.WorldX, key.WorldY, 0f);
@@ -146,7 +146,7 @@ namespace Spine.Unity.Modules
 						ragdollRoot.localRotation = Quaternion.Euler(0f, 0f, GetPropagatedRotation(key.Parent));
 					}
 					transform = ragdollRoot;
-					rootOffset = value.position - base.transform.position;
+					rootOffset = value.position - this.transform.position;
 				}
 				else
 				{
@@ -188,7 +188,7 @@ namespace Spine.Unity.Modules
 					if (skeletonUtilityBone.mode == SkeletonUtilityBone.Mode.Override)
 					{
 						list2.Add(skeletonUtilityBone.gameObject.name);
-						Object.Destroy(skeletonUtilityBone.gameObject);
+						Destroy(skeletonUtilityBone.gameObject);
 					}
 				}
 				if (list2.Count > 0)
@@ -258,8 +258,8 @@ namespace Spine.Unity.Modules
 			{
 				return;
 			}
-			Vector3 vector = worldPosition - base.transform.position;
-			base.transform.position = worldPosition;
+			Vector3 vector = worldPosition - transform.position;
+			transform.position = worldPosition;
 			foreach (Transform value in boneTable.Values)
 			{
 				value.position -= vector;
@@ -273,9 +273,9 @@ namespace Spine.Unity.Modules
 			isActive = false;
 			foreach (Transform value in boneTable.Values)
 			{
-				Object.Destroy(value.gameObject);
+				Destroy(value.gameObject);
 			}
-			Object.Destroy(ragdollRoot.gameObject);
+			Destroy(ragdollRoot.gameObject);
 			boneTable.Clear();
 			targetSkeletonComponent.UpdateWorld -= UpdateSpineSkeleton;
 		}
@@ -301,7 +301,7 @@ namespace Spine.Unity.Modules
 			gameObject.layer = colliderLayer;
 			Transform transform = gameObject.transform;
 			boneTable.Add(b, transform);
-			transform.parent = base.transform;
+			transform.parent = this.transform;
 			transform.localPosition = new Vector3(b.WorldX, b.WorldY, 0f);
 			transform.localRotation = Quaternion.Euler(0f, 0f, b.WorldRotationX - b.shearX);
 			transform.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 0f);

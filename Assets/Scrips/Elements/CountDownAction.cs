@@ -4,10 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Elements
 {
@@ -23,7 +20,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.actionParameter = _skill.ActionParameters.Find((Predicate<ActionParameter>) (e => e.ActionId == this.ActionDetail1));
+      actionParameter = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1);
     }
 
     public override void ReadyAction(
@@ -32,7 +29,7 @@ namespace Elements
       Skill _skill)
     {
       base.ReadyAction(_source, _sourceActionController, _skill);
-      this.actionParameter.CancelByIfForAll = true;
+      actionParameter.CancelByIfForAll = true;
     }
 
     public override void ExecAction(

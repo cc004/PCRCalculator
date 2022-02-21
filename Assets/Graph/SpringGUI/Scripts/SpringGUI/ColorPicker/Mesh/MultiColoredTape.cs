@@ -27,7 +27,7 @@ namespace SpringGUI
             UIVertex topRight = GetUIVertex(new Vector2(halfX , halfY) , TopRight);
             UIVertex bottomLeft = GetUIVertex(new Vector2(-halfX , -halfY) , BottomLeft);
             UIVertex bottomRight = GetUIVertex(new Vector2(halfX , -halfY) , BottomRight);
-            vh.AddUIVertexQuad(new UIVertex[] { topLeft , topRight , bottomRight , bottomLeft });
+            vh.AddUIVertexQuad(new[] { topLeft , topRight , bottomRight , bottomLeft });
             if ( Outline ) DrawOutline(vh);
         }
         

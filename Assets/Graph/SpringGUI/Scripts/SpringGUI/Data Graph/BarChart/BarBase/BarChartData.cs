@@ -112,7 +112,7 @@ namespace SpringGUI
         {
             if (!barDic.ContainsKey(id))
             {
-                Debug.LogWarning(string.Format("The key{0} you want to replace is not exist in the dictionary{2}",id,barDic.ToString()));
+                Debug.LogWarning(string.Format("The key{0} you want to replace is not exist in the dictionary{2}",id,barDic));
                 return;
             }
             barDic[id] = bars;
@@ -122,7 +122,7 @@ namespace SpringGUI
         {
             if (!barDic.ContainsKey(id))
             {
-                Debug.LogWarning(string.Format("The key{0} you want to remove is not exist in the dictionary{2}",id,barDic.ToString()));
+                Debug.LogWarning(string.Format("The key{0} you want to remove is not exist in the dictionary{2}",id,barDic));
                 return;
             }
             barDic.Remove(id);

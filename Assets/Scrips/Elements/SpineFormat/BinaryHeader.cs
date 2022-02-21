@@ -36,22 +36,22 @@ namespace Elements.SpineFormat
       byte[] numArray1 = bytes;
       int index1 = num1;
       int num2 = index1 + 1;
-      this._tag1 = numArray1[index1];
+      _tag1 = numArray1[index1];
       byte[] numArray2 = bytes;
       int index2 = num2;
       int num3 = index2 + 1;
-      this._tag2 = numArray2[index2];
+      _tag2 = numArray2[index2];
       byte[] numArray3 = bytes;
       int index3 = num3;
       int num4 = index3 + 1;
-      this._tag3 = numArray3[index3];
+      _tag3 = numArray3[index3];
       byte[] numArray4 = bytes;
       int index4 = num4;
       int counter = index4 + 1;
-      this._tag4 = numArray4[index4];
-      this._majorVersion = this.ByteToInt(bytes, ref counter);
-      this._minerVersion = this.ByteToInt(bytes, ref counter);
-      this._bodyCount = this.ByteToInt(bytes, ref counter);
+      _tag4 = numArray4[index4];
+      _majorVersion = ByteToInt(bytes, ref counter);
+      _minerVersion = ByteToInt(bytes, ref counter);
+      _bodyCount = ByteToInt(bytes, ref counter);
     }
 
     private int ByteToInt(byte[] bytes, ref int counter)
@@ -63,45 +63,45 @@ namespace Elements.SpineFormat
 
     public void Init(int bodyCount)
     {
-      this.SetTag();
-      this.SetVersion();
-      this._bodyCount = bodyCount;
+      SetTag();
+      SetVersion();
+      _bodyCount = bodyCount;
     }
 
-    public bool CheckTag() => this._tag1 == (byte) 99 && this._tag2 == (byte) 121 && (this._tag3 == (byte) 115 && this._tag4 == (byte) 112);
+    public bool CheckTag() => _tag1 == 99 && _tag2 == 121 && (_tag3 == 115 && _tag4 == 112);
 
-    public bool CheckVersion() => this._majorVersion == 0 && this._minerVersion == 1;
+    public bool CheckVersion() => _majorVersion == 0 && _minerVersion == 1;
 
     public int majorVersion
     {
-      get => this._majorVersion;
-      set => this._majorVersion = value;
+      get => _majorVersion;
+      set => _majorVersion = value;
     }
 
     public int minerVersion
     {
-      get => this._minerVersion;
-      set => this._minerVersion = value;
+      get => _minerVersion;
+      set => _minerVersion = value;
     }
 
     public int bodyCount
     {
-      get => this._bodyCount;
-      set => this._bodyCount = value;
+      get => _bodyCount;
+      set => _bodyCount = value;
     }
 
     private void SetVersion()
     {
-      this._majorVersion = 0;
-      this._minerVersion = 1;
+      _majorVersion = 0;
+      _minerVersion = 1;
     }
 
     private void SetTag()
     {
-      this._tag1 = Convert.ToByte('c');
-      this._tag2 = Convert.ToByte('y');
-      this._tag3 = Convert.ToByte('s');
-      this._tag4 = Convert.ToByte('p');
+      _tag1 = Convert.ToByte('c');
+      _tag2 = Convert.ToByte('y');
+      _tag3 = Convert.ToByte('s');
+      _tag4 = Convert.ToByte('p');
     }
   }
 }

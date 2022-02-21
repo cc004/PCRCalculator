@@ -4,31 +4,30 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
+
 //using LitJson;
-using System.Collections.Generic;
 
 namespace Elements
 {
   public class UnitDataForView
   {
-    public ObscuredInt Id { get; private set; }
+    public int Id { get; private set; }
 
-    public ObscuredInt UnitLevel { get; private set; }
+    public int UnitLevel { get; private set; }
 
-    public ObscuredInt UnitRarity { get; private set; }
+    public int UnitRarity { get; private set; }
 
-    public ObscuredInt BattleRarity { get; private set; }
+    public int BattleRarity { get; private set; }
 
     public ePromotionLevel PromotionLevel { get; private set; }
 
-    public ObscuredInt Power { get; private set; }
+    public int Power { get; private set; }
 
     //public SkinData SkinData { get; private set; }
 
     //public List<EquipSlot> UniqueEquipSlot { get; private set; }
 
-    public void SetUnitLevel(int _unitLevel) => this.UnitLevel = (ObscuredInt) _unitLevel;
+    public void SetUnitLevel(int _unitLevel) => UnitLevel = _unitLevel;
 
     //public void SetSkinData(SkinData _skinData) => this.SkinData = _skinData;
 
@@ -36,12 +35,12 @@ namespace Elements
     /*
     private void initializeUnitDataForView()
     {
-      this.Id = (ObscuredInt) 0;
-      this.UnitLevel = (ObscuredInt) 0;
-      this.UnitRarity = (ObscuredInt) 0;
-      this.BattleRarity = (ObscuredInt) 0;
+      this.Id = (int) 0;
+      this.UnitLevel = (int) 0;
+      this.UnitRarity = (int) 0;
+      this.BattleRarity = (int) 0;
       this.PromotionLevel = ePromotionLevel.INVALID_VALUE;
-      this.Power = (ObscuredInt) 0;
+      this.Power = (int) 0;
       this.SkinData = (SkinData) null;
       this.UniqueEquipSlot = new List<EquipSlot>();
     }
@@ -58,12 +57,12 @@ namespace Elements
       SkinData _skinData,
       List<EquipSlot> _uniqueEquipSlot)
     {
-      this.Id = (ObscuredInt) _id;
-      this.UnitLevel = (ObscuredInt) _unitLevel;
-      this.UnitRarity = (ObscuredInt) _unitRarity;
-      this.BattleRarity = (ObscuredInt) _battleRarity;
+      this.Id = (int) _id;
+      this.UnitLevel = (int) _unitLevel;
+      this.UnitRarity = (int) _unitRarity;
+      this.BattleRarity = (int) _battleRarity;
       this.PromotionLevel = _promotionLevel;
-      this.Power = (ObscuredInt) _power;
+      this.Power = (int) _power;
       this.SkinData = _skinData;
       this.UniqueEquipSlot = _uniqueEquipSlot;
     }
@@ -78,17 +77,17 @@ namespace Elements
     {
       if (_json.Count == 0)
         return;
-      this.Id = (ObscuredInt) _json["id"].ToInt();
+      this.Id = (int) _json["id"].ToInt();
       if (_json.Keys.Contains("unit_level"))
-        this.UnitLevel = (ObscuredInt) _json["unit_level"].ToInt();
+        this.UnitLevel = (int) _json["unit_level"].ToInt();
       if (_json.Keys.Contains("unit_rarity"))
-        this.UnitRarity = (ObscuredInt) _json["unit_rarity"].ToInt();
+        this.UnitRarity = (int) _json["unit_rarity"].ToInt();
       if (_json.Keys.Contains("battle_rarity"))
-        this.BattleRarity = (ObscuredInt) _json["battle_rarity"].ToInt();
+        this.BattleRarity = (int) _json["battle_rarity"].ToInt();
       if (_json.Keys.Contains("promotion_level"))
         this.PromotionLevel = (ePromotionLevel) _json["promotion_level"].ToInt();
       if (_json.Keys.Contains("power"))
-        this.Power = (ObscuredInt) _json["power"].ToInt();
+        this.Power = (int) _json["power"].ToInt();
       if (_json.Keys.Contains("skin_data"))
       {
         JsonData _json1 = _json["skin_data"];

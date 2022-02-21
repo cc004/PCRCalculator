@@ -1,12 +1,12 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using System.IO;
-using Mono.Data.Sqlite;
 using System.Security.Cryptography;
 using System.Text;
-using System;
+using Mono.Data.Sqlite;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace PCRCaculator
 {
@@ -16,8 +16,8 @@ namespace PCRCaculator
         public static string DMMpath = "C:/Users/user/AppData/LocalLow/Cygames/PrincessConnectReDive/";
         //const string OUTpath = "F:/apk/DMMOut/"; 
         public static string OUTpath = "D:/PCRCalculator/PCRCalculator/PCRCalculator/Assets/StreamingAssets/AB/";
-        private static SHA1CryptoServiceProvider sha1 = (SHA1CryptoServiceProvider)null;
-        private static UTF8Encoding utf8 = (UTF8Encoding)null;
+        private static SHA1CryptoServiceProvider sha1 = null;
+        private static UTF8Encoding utf8 = null;
 
         static Dictionary<string, string> ABNameDic = new Dictionary<string, string>();
         static Dictionary<string, AssetBundle> AssetBundleDic = new Dictionary<string, AssetBundle>();
@@ -411,7 +411,7 @@ namespace PCRCaculator
             }
             return count;
         }
-        public static T GetAssetBundleByName<T>(string fullname, string fit = "") where T : UnityEngine.Object
+        public static T GetAssetBundleByName<T>(string fullname, string fit = "") where T : Object
         {
             AssetBundle asset = null;
             if (AssetBundleDic.ContainsKey(fullname))
@@ -437,7 +437,7 @@ namespace PCRCaculator
             }
             return result;
         }
-        public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "") where T : UnityEngine.Object
+        public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "") where T : Object
         {
             AssetBundle asset = null;
             if (AssetBundleDic.ContainsKey(fullname))
@@ -469,11 +469,9 @@ namespace PCRCaculator
                 string path = MainManager.Instance.PlayerSetting.dmmPath + "/a/" + ComputeSHA1(fullName);
                 return path;
             }
-            else
-            {
-                string path2 = "file:///" + Application.streamingAssetsPath + "/AB/" + fullName;
-                return path2;
-            }
+
+            string path2 = "file:///" + Application.streamingAssetsPath + "/AB/" + fullName;
+            return path2;
         }
         public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4}
         public static Sprite GetSprites(SpriteType type, int id)

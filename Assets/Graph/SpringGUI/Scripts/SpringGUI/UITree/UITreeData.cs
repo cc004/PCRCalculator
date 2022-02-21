@@ -16,7 +16,7 @@ namespace SpringGUI
         
         public UITreeData Parent;
         public List<UITreeData> ChildNodes;
-        public int Layer = 0;
+        public int Layer;
         public string Name = String.Empty; 
 
         public UITreeData( ) { }
@@ -44,17 +44,17 @@ namespace SpringGUI
 
         public void SetParent( UITreeData parent )
         {
-            if ( null != this.Parent )
-                this.Parent.RemoveChild(this);
-            this.Parent = parent;
-            this.Layer = parent.Layer + 1;
+            if ( null != Parent )
+                Parent.RemoveChild(this);
+            Parent = parent;
+            Layer = parent.Layer + 1;
             parent.ChildNodes.Add(this);
             ResetChildren(this);
         }
 
         public void AddChild( UITreeData child )
         {
-            AddChild(new UITreeData[] { child });
+            AddChild(new[] { child });
         }
 
         public void AddChild( IEnumerable<UITreeData> children )
@@ -65,7 +65,7 @@ namespace SpringGUI
 
         public void RemoveChild( UITreeData child )
         {
-            RemoveChild(new UITreeData[] { child });
+            RemoveChild(new[] { child });
         }
 
         public void RemoveChild( IEnumerable<UITreeData> children )

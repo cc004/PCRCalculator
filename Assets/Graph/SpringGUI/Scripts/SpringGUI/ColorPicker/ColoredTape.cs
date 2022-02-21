@@ -35,7 +35,7 @@ namespace SpringGUI
 
         [Header("Colored tape colors setting")]
         [SerializeField]
-        private List<Color> m_Colors = new List<Color>() { Color.red , Color.magenta };
+        private List<Color> m_Colors = new List<Color> { Color.red , Color.magenta };
         [HideInInspector]
         public Vector2 RectSize;
 
@@ -65,7 +65,7 @@ namespace SpringGUI
                 var second = GetUIVertex(topRightPos, startColor);
                 var third = GetUIVertex(bottomRightPos,endColor);
                 var four = GetUIVertex(bottomLeftPos, endColor);
-                vh.AddUIVertexQuad(new UIVertex[] { first , second , third , four });
+                vh.AddUIVertexQuad(new[] { first , second , third , four });
                 topLeftPos = bottomLeftPos;
                 topRightPos = bottomRightPos;
                 bottomLeftPos = topLeftPos - new Vector2(0 , offset);
@@ -88,7 +88,7 @@ namespace SpringGUI
                 var second = GetUIVertex(topRightPos , endColor);
                 var third = GetUIVertex(bottomRightPos , endColor);
                 var four = GetUIVertex(bottomLeftPos , startColor);
-                vh.AddUIVertexQuad(new UIVertex[] { first , second , third , four });
+                vh.AddUIVertexQuad(new[] { first , second , third , four });
                 topLeftPos = topRightPos;
                 bottomLeftPos = bottomRightPos;
                 topRightPos = topLeftPos + new Vector2(offset,0);
@@ -196,7 +196,7 @@ namespace SpringGUI
             var color1 = color0;
             var color2 = color0;
             var offset = 0.0f;
-            ArrayList array = new ArrayList() { red , green , blue };
+            ArrayList array = new ArrayList { red , green , blue };
             array.Sort();
 
             if (array[2].Equals(red))

@@ -13,23 +13,23 @@ namespace Elements
   public class AwakeUbNoneStopEffect : SkillEffectCtrl
   {
     [SerializeField]
-    private AwakeUbNoneStopEffect.eDisplayType displayType;
+    private eDisplayType displayType;
     [SerializeField]
     private float startHpPercentage;
 
     public override void SetTimeToDieByStartHp(float _hpPercent)
     {
-      if ((double) _hpPercent > (double) this.startHpPercentage)
+      if (_hpPercent > (double) startHpPercentage)
       {
-        if (this.displayType != AwakeUbNoneStopEffect.eDisplayType.DISPLAY_LOW)
+        if (displayType != eDisplayType.DISPLAY_LOW)
           return;
-        this.SetTimeToDie(true);
+        SetTimeToDie(true);
       }
       else
       {
-        if (this.displayType != AwakeUbNoneStopEffect.eDisplayType.DISPLAY_HIGH)
+        if (displayType != eDisplayType.DISPLAY_HIGH)
           return;
-        this.SetTimeToDie(true);
+        SetTimeToDie(true);
       }
     }
 

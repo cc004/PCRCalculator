@@ -18,20 +18,20 @@ namespace Elements.SpineFormat
 
     public int binaryFormat
     {
-      get => this._binaryFormat;
-      set => this._binaryFormat = value;
+      get => _binaryFormat;
+      set => _binaryFormat = value;
     }
 
     public long bufferPosStart
     {
-      get => this._bufferPosStart;
-      set => this._bufferPosStart = value;
+      get => _bufferPosStart;
+      set => _bufferPosStart = value;
     }
 
     public long bufferSize
     {
-      get => this._bufferSize;
-      set => this._bufferSize = value;
+      get => _bufferSize;
+      set => _bufferSize = value;
     }
   }
 }

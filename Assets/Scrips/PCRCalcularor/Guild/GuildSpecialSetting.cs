@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace PCRCaculator.Guild
 {
     public class GuildSpecialSetting : MonoBehaviour
@@ -44,9 +45,9 @@ namespace PCRCaculator.Guild
                 CancelButton();
                 RandomManager.Reflash();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                MainManager.Instance.WindowConfigMessage("错误：" + e.Message, null, null);
+                MainManager.Instance.WindowConfigMessage("错误：" + e.Message, null);
             }
         }
         public void OpenAndReflash(GuildRandomSpecialData specialData)

@@ -557,7 +557,7 @@ namespace Spine
 				else
 				{
 					float num37 = array2[num30 - 1];
-					num32 = (float)num30 + (num32 - num37) / (num36 - num37);
+					num32 = num30 + (num32 - num37) / (num36 - num37);
 				}
 				AddCurvePosition(num32 * 0.1f, num10, num11, num12, num13, num14, num15, num16, num17, items2, n, tangents || (m > 0 && num31 == 0f));
 			}

@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Elements;
+using Elements.Battle;
 using UnityEngine;
-using UnityEngine.UI;
-using System;
 using UnityEngine.SceneManagement;
-using PCRCaculator.Guild;
+using UnityEngine.UI;
 
 namespace PCRCaculator.Battle
 {
@@ -79,18 +80,18 @@ namespace PCRCaculator.Battle
         public float DamageRandomScale;
         public float DamageScale;
 
-        private long fpsCount = 0;
-        private float timeCount = 0;
-        private Elements.MyGameCtrl myGameCtrl=> Elements.MyGameCtrl.Instance;
-        private float guildTotalDamage = 0;
+        private long fpsCount;
+        private float timeCount;
+        private MyGameCtrl myGameCtrl=> MyGameCtrl.Instance;
+        private float guildTotalDamage;
         private Action _Update;
 
-        private float m_LastUpdateShowTime = 0f;    //上一次更新帧率的时间;
+        private float m_LastUpdateShowTime;    //上一次更新帧率的时间;
         private float m_UpdateShowDeltaTime = 0.05f;//更新帧率的时间间隔;
-        private int m_FrameUpdate = 0;//帧数;
-        private int m_FPS = 0;
+        private int m_FrameUpdate;//帧数;
+        private int m_FPS;
 
-        static string[] SPLIT = new string[] { "\n" };
+        static string[] SPLIT = { "\n" };
         private List<string> debugStrList = new List<string>();
         private Dictionary<Elements.eStateIconType, bool> showBuffDic;
         public float TimeCount { get => timeCount; set => timeCount = value; }
@@ -139,7 +140,7 @@ namespace PCRCaculator.Battle
         }
         private void _Update_1()
         {
-            frameText.text = Elements.BattleHeaderController.CurrentFrameCount + "";
+            frameText.text = BattleHeaderController.CurrentFrameCount + "";
         }
         private void _UpdateFPSCount()
         {
@@ -189,7 +190,7 @@ namespace PCRCaculator.Battle
         {
             if (myGameCtrl != null)
             {
-                fpsCount = Elements.BattleHeaderController.CurrentFrameCount;
+                fpsCount = BattleHeaderController.CurrentFrameCount;
             }
             string logtext = "(" + fpsCount + ")" + word + "\n";
             debugStrList.Add(logtext);
@@ -198,7 +199,7 @@ namespace PCRCaculator.Battle
             int overText = debugText.text.Length - maxTextLength;
             if (overText > 0)
             {
-                string[] messages = debugText.text.Split(SPLIT, System.StringSplitOptions.None);
+                string[] messages = debugText.text.Split(SPLIT, StringSplitOptions.None);
                 Stack<string> messageStack = new Stack<string>();
                 int lengthCount = 0;
                 for (int i = messages.Length - 1; i >= 0; i--)
@@ -241,14 +242,14 @@ namespace PCRCaculator.Battle
             }*/
             //Canvas.ForceUpdateCanvases();
         }
-        public void LogMessage(string word,eLogMessageType messageType,Elements.UnitCtrl unitCtrl)
+        public void LogMessage(string word,eLogMessageType messageType,UnitCtrl unitCtrl)
         {
             bool other = unitCtrl.IsOther;
             LogMessage(unitCtrl.UnitName + word, messageType, other);
         }
         public void ShowFullDebugWord()
         {
-            if (Elements.BattleHeaderController.Instance.GetIsPause())
+            if (BattleHeaderController.Instance.GetIsPause())
             {
                 GameObject a = Instantiate(DebugWindowPrefab);
                 a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
@@ -266,7 +267,7 @@ namespace PCRCaculator.Battle
             a.GetComponent<SkillNameImage>().SetName(skillName, transform);
 
         }
-        public void SetUI_2(Elements.MyGameCtrl gameCtrl)
+        public void SetUI_2(MyGameCtrl gameCtrl)
         {
             guildTotalDamageNumber.gameObject.SetActive(false);            
             for (int i = 0; i < PlayerUI.Count; i++)
@@ -312,7 +313,7 @@ namespace PCRCaculator.Battle
             }
             StartCoroutine(AutoSaveImage2());
         }
-        public void SetSummonUI(Elements.UnitCtrl summon)
+        public void SetSummonUI(UnitCtrl summon)
         {
             GameObject a = Instantiate(buffUIPrefab);
             CharacterBuffUIController b = a.GetComponent<CharacterBuffUIController>();
@@ -323,23 +324,23 @@ namespace PCRCaculator.Battle
 
         public void ExitButton()
         {
-            if ((Elements.Battle.BattleManager.Instance?.BossUnit?.Hp ?? 0) == 0)
+            if ((BattleManager.Instance?.BossUnit?.Hp ?? 0) == 0)
             {
                 ExitButton2();
             }
             else
             {
-                Elements.Battle.BattleManager.Instance.BossUnit.Hp = 0;
-                Elements.Battle.BattleManager.Instance.BossUnit.SetState(Elements.UnitCtrl.ActionState.DIE);
+                BattleManager.Instance.BossUnit.Hp = 0;
+                BattleManager.Instance.BossUnit.SetState(UnitCtrl.ActionState.DIE);
             }
         }
 
         public void ExitButton2()
         {
             bool isGuildBossBattle = false;
-            if (Elements.MyGameCtrl.Instance != null)
+            if (MyGameCtrl.Instance != null)
             {
-                isGuildBossBattle = Elements.MyGameCtrl.Instance.tempData.isGuildBattle;
+                isGuildBossBattle = MyGameCtrl.Instance.tempData.isGuildBattle;
             }
 
             Time.timeScale = 1;
@@ -356,14 +357,14 @@ namespace PCRCaculator.Battle
         public void PauseButton()
         {
             {
-                Elements.MyGameCtrl.Instance.PauseButton();
+                MyGameCtrl.Instance.PauseButton();
             }
         }
         public void CharacterUBTryingButton(int charidx)
         {
-            if (Elements.MyGameCtrl.Instance != null)
+            if (MyGameCtrl.Instance != null)
             {
-                if (Elements.MyGameCtrl.Instance.ForceAutoMode)
+                if (MyGameCtrl.Instance.ForceAutoMode)
                 {
                     MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
                     return;
@@ -372,7 +373,7 @@ namespace PCRCaculator.Battle
                 {
                     case 0:
                         UBButtonState[charidx] = 1;
-                        Elements.MyGameCtrl.Instance.TryingExecUB(charidx);
+                        MyGameCtrl.Instance.TryingExecUB(charidx);
                         StartCoroutine(UBCool(charidx));
                         break;
                     case 1:
@@ -386,7 +387,7 @@ namespace PCRCaculator.Battle
                         UBButtonState[charidx] = 0;
                         break;
                 }
-                Elements.MyGameCtrl.Instance.TryingExecUB(charidx);
+                MyGameCtrl.Instance.TryingExecUB(charidx);
             }
         }
         private IEnumerator UBCool(int idx)
@@ -399,7 +400,7 @@ namespace PCRCaculator.Battle
         {
             while (UBButtonState[idx] == 2)
             {
-                Elements.MyGameCtrl.Instance.TryingExecUB(idx);
+                MyGameCtrl.Instance.TryingExecUB(idx);
                 yield return null;
             }
         }
@@ -412,7 +413,7 @@ namespace PCRCaculator.Battle
         }
         public void OnAutoToggleSwitched()
         {
-            if (Elements.MyGameCtrl.Instance.ForceAutoMode)
+            if (MyGameCtrl.Instance.ForceAutoMode)
             {
                 MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
                 return;
@@ -441,7 +442,7 @@ namespace PCRCaculator.Battle
         public void SetTimeScale(float scale)
         {
             {
-                Elements.MyGameCtrl.Instance.SetBattleSpeed(scale);
+                MyGameCtrl.Instance.SetBattleSpeed(scale);
             }
         }
         public Sprite GetAbnormalIconSprite(eStateIconType stateIconType)
@@ -470,7 +471,7 @@ namespace PCRCaculator.Battle
             for (int i = 0; i < valuestr.Length; i++)
             {
                 //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
+                int num = valuestr[i] - 48;
                 numbers.Add(sprites[num]);
             }
             Sprite head = null;
@@ -504,7 +505,7 @@ namespace PCRCaculator.Battle
             for (int i = 0; i < valuestr.Length; i++)
             {
                 //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
+                int num = valuestr[i] - 48;
                 numbers.Add(sprites[num]);
             }
             SetPrefabNumber(pos + numberPosFix, numbers, null, scale);
@@ -522,7 +523,7 @@ namespace PCRCaculator.Battle
             for (int i = 0; i < valuestr.Length; i++)
             {
                 //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
+                int num = valuestr[i] - 48;
                 if (num >= 0 && num <= 9)
                 {
                     numbers.Add(sprites[num]);
@@ -532,7 +533,7 @@ namespace PCRCaculator.Battle
         }
         private float HeldRandom(float scale=0.1f)
         {
-            return Elements.Battle.BattleManager.HeldRandom(-100, 100) / 100.0f*scale;
+            return BattleManager.HeldRandom(-100, 100) / 100.0f*scale;
         }
         public void SetMissEffect(Vector3 pos0, float scale = 1)
         {
@@ -552,7 +553,7 @@ namespace PCRCaculator.Battle
             for (int i = 0; i < valuestr.Length; i++)
             {
                 //int num = (int)valuestr[i];
-                int num = (int)valuestr[i] - 48;
+                int num = valuestr[i] - 48;
                 numbers.Add(sprites[num]);
             }
 
@@ -570,12 +571,12 @@ namespace PCRCaculator.Battle
             a.GetComponent<DamageNumbers>().SetDamageNumber(numbers, head, scale * DamageScale);
 
         }
-        public void StartFieldEffect(Elements.ChangeParameterFieldData dataBase)
+        public void StartFieldEffect(ChangeParameterFieldData dataBase)
         {
             fieldActionUI.gameObject.SetActive(true);
-            Elements.eStateIconType type = Elements.UnitCtrl.BUFF_DEBUFF_ICON_DIC[dataBase.BuffParamKind].DebuffIcon;
+            Elements.eStateIconType type = UnitCtrl.BUFF_DEBUFF_ICON_DIC[dataBase.BuffParamKind].DebuffIcon;
             string des = "" + dataBase.Value;
-            fieldActionUI.Init(GetAbnormalIconSprite((eStateIconType)(int)type), type, dataBase.StayTime,des, (a) => fieldActionUI.gameObject.SetActive(false));
+            fieldActionUI.Init(GetAbnormalIconSprite((eStateIconType)(int)type), type, dataBase.StayTime,des, a => fieldActionUI.gameObject.SetActive(false));
         }
 
         public IEnumerator CaptureByUI(RectTransform UIRect,int extendValue=0)
@@ -643,7 +644,7 @@ namespace PCRCaculator.Battle
             png.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
             png.Apply();
             byte[] bytes = png.EncodeToPNG();
-            Texture2D.DestroyImmediate(png);
+            DestroyImmediate(png);
             png = null;
             RenderTexture.active = prev;
             return bytes;
@@ -655,7 +656,7 @@ namespace PCRCaculator.Battle
         }
         public void SetBUFFUIShowButton()
         {
-            if (Elements.BattleHeaderController.Instance.GetIsPause())
+            if (BattleHeaderController.Instance.GetIsPause())
             {
                 buffUISettingBack.SetActive(true);
                 buffUIScrollEX.ClearAll();
@@ -665,7 +666,7 @@ namespace PCRCaculator.Battle
                         a =>
                         {
                             bool isshow = ShowBuffDic.TryGetValue(stateIconType, out bool value) ? value : true;
-                            a.GetComponent<Elements.BUFFShowPrefab>().Init(stateIconType, isshow);
+                            a.GetComponent<BUFFShowPrefab>().Init(stateIconType, isshow);
                         });
                 }
                 buffUIScrollEX.AutoFit();
@@ -679,7 +680,7 @@ namespace PCRCaculator.Battle
         {
             foreach(GameObject a in buffUIScrollEX.Prefabs)
             {
-                var buff = a.GetComponent<Elements.BUFFShowPrefab>();
+                var buff = a.GetComponent<BUFFShowPrefab>();
                 if (buff != null)
                 {
                     if (ShowBuffDic.ContainsKey(buff.stateIconType))

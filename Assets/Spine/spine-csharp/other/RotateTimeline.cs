@@ -61,7 +61,7 @@ namespace Spine
 				case MixPose.Current:
 				{
 					float num = bone.data.rotation - bone.rotation;
-					num -= (float)((16384 - (int)(16384.499999999996 - (double)(num / 360f))) * 360);
+					num -= (16384 - (int)(16384.499999999996 - num / 360f)) * 360;
 					bone.rotation += num * alpha;
 					break;
 				}
@@ -76,7 +76,7 @@ namespace Spine
 					return;
 				}
 				float num2 = bone.data.rotation + array[array.Length + -1] - bone.rotation;
-				num2 -= (float)((16384 - (int)(16384.499999999996 - (double)(num2 / 360f))) * 360);
+				num2 -= (16384 - (int)(16384.499999999996 - num2 / 360f)) * 360;
 				bone.rotation += num2 * alpha;
 				return;
 			}
@@ -85,17 +85,17 @@ namespace Spine
 			float num5 = array[num3];
 			float curvePercent = GetCurvePercent((num3 >> 1) - 1, 1f - (time - num5) / (array[num3 + -2] - num5));
 			float num6 = array[num3 + 1] - num4;
-			num6 -= (float)((16384 - (int)(16384.499999999996 - (double)(num6 / 360f))) * 360);
+			num6 -= (16384 - (int)(16384.499999999996 - num6 / 360f)) * 360;
 			num6 = num4 + num6 * curvePercent;
 			if (pose == MixPose.Setup)
 			{
-				num6 -= (float)((16384 - (int)(16384.499999999996 - (double)(num6 / 360f))) * 360);
+				num6 -= (16384 - (int)(16384.499999999996 - num6 / 360f)) * 360;
 				bone.rotation = bone.data.rotation + num6 * alpha;
 			}
 			else
 			{
 				num6 = bone.data.rotation + num6 - bone.rotation;
-				num6 -= (float)((16384 - (int)(16384.499999999996 - (double)(num6 / 360f))) * 360);
+				num6 -= (16384 - (int)(16384.499999999996 - num6 / 360f)) * 360;
 				bone.rotation += num6 * alpha;
 			}
 		}

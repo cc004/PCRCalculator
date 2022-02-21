@@ -7,12 +7,11 @@
 ==========================================*/
 
 using System;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
-using Object = UnityEngine.Object;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SpringGUI
 {
@@ -48,14 +47,14 @@ namespace SpringGUI
         #region private && public members
         private DateTime m_selectDT = DateTime.Today;
         private readonly CalendarData m_calendarData = new CalendarData();
-        private Transform m_Transform = null;
+        private Transform m_Transform;
         [HideInInspector]
         public E_CalendarType CalendarType = E_CalendarType.Day;
         public E_DisplayType DisplayType = E_DisplayType.Chinese;
-        private Text _timeButtonText = null;
-        private GameObject _weeksGameObject = null;
-        private GameObject _daysGameObejct = null;
-        private GameObject _monthGameObject = null;
+        private Text _timeButtonText;
+        private GameObject _weeksGameObject;
+        private GameObject _daysGameObejct;
+        private GameObject _monthGameObject;
         private readonly List<DMY> _daysPool = new List<DMY>();
         private readonly List<DMY> _monthYearPool = new List<DMY>();
         #endregion
@@ -167,7 +166,7 @@ namespace SpringGUI
         }
         private GameObject prefabGenerator( GameObject prefab,Transform parent )
         {
-            GameObject go = Object.Instantiate(prefab);
+            GameObject go = Instantiate(prefab);
             go.transform.SetParent(parent);
             go.transform.localScale = Vector3.one;
             return go;
@@ -331,7 +330,7 @@ namespace SpringGUI
     public class DMY : UIBehaviour
     {
         public DateTime DateTime { get; set; }
-        private Text _text = null;
+        private Text _text;
         protected override void Awake( )
         {
             _text = transform.Find("Text").GetComponent<Text>();

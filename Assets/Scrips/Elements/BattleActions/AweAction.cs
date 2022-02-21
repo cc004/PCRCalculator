@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System.Collections.Generic;
-using UnityEngine;
+using Elements.Battle;
+using PCRCaculator.Guild;
 
 namespace Elements
 {
@@ -25,14 +25,14 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            double dodgeByLevelDiff = (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
+            double dodgeByLevelDiff = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
 
-            double num = (double) BattleManager.Random(0.0f, 1f, new PCRCaculator.Guild.RandomData(_source, _target.Owner, ActionId, 4, (float)dodgeByLevelDiff));
-      AweAction.AweData _aweData = new AweAction.AweData()
+            double num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 4, (float)dodgeByLevelDiff));
+      AweData _aweData = new AweData
       {
         LifeTime = _valueDictionary[eValueNumber.VALUE_3],
-        AweType = (AweAction.eAweType) this.ActionDetail1,
-        CountLimit = this.ActionDetail2 == 0 ? -1 : this.ActionDetail2,
+        AweType = (eAweType) ActionDetail1,
+        CountLimit = ActionDetail2 == 0 ? -1 : ActionDetail2,
         Value = _valueDictionary[eValueNumber.VALUE_1] / 100f
       };
       /*if (this.ActionEffectList.Count != 0)
@@ -49,12 +49,12 @@ namespace Elements
       //double dodgeByLevelDiff = (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
       if (num <= dodgeByLevelDiff)
       {
-        this.AppendIsAlreadyExeced(_target.Owner, _num);
+        AppendIsAlreadyExeced(_target.Owner, _num);
         _target.Owner.AddAweData(_aweData);
       }
       else
       {
-        ActionExecedData actionExecedData = this.AlreadyExecedData[_target.Owner][_num];
+        ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
         if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
           return;
         if (actionExecedData.TargetPartsNumber == 1)
@@ -67,8 +67,8 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
-      this.Value[eValueNumber.VALUE_3] = (float) ((double) this.MasterData.action_value_3 + (double) this.MasterData.action_value_4 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     public class AweData
@@ -76,7 +76,7 @@ namespace Elements
       public float Value;
       public float LifeTime;
       public int CountLimit = -1;
-      public AweAction.eAweType AweType = AweAction.eAweType.UB_AND_SKILL;
+      public eAweType AweType = eAweType.UB_AND_SKILL;
       public SkillEffectCtrl Effect;
     }
 

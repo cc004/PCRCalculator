@@ -18,7 +18,7 @@ namespace Elements
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
       if (_sourceActionController.Skill1IsChargeTime)
         return;
-      _sourceActionController.Skill1IsChargeTime = _skill.SkillId == _source.UnionBurstSkillId && (this.ActionType == eActionType.SEARCH_AREA_CHANGE && this.ActionDetail2 == 2);
+      _sourceActionController.Skill1IsChargeTime = _skill.SkillId == _source.UnionBurstSkillId && (ActionType == eActionType.SEARCH_AREA_CHANGE && ActionDetail2 == 2);
     }
 
     public override void ExecAction(
@@ -32,14 +32,14 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      _target.Owner.ChangeSearchArea(_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], this.ActionDetail2 == 2, _valueDictionary[eValueNumber.VALUE_4]);
+      _target.Owner.ChangeSearchArea(_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], ActionDetail2 == 2, _valueDictionary[eValueNumber.VALUE_4]);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
-      this.Value[eValueNumber.VALUE_4] = (float) ((double) this.MasterData.action_value_4 + (double) this.MasterData.action_value_5 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_4] = (float) (MasterData.action_value_4 + MasterData.action_value_5 * _level);
     }
 
     private enum eSearchAreaChangeType

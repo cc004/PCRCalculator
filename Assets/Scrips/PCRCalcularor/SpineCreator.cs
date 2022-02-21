@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Spine;
-using Spine.Unity;
+﻿using System;
 using System.IO;
-using System;
+using PCR_cysp2skel;
+using Spine.Unity;
+using UnityEngine;
 
 namespace PCRCaculator
 {
@@ -42,7 +40,7 @@ namespace PCRCaculator
                     texture.LoadImage(bytes);
 
                 }
-                Material tempMateral = new Material(this.spineMaterial);
+                Material tempMateral = new Material(spineMaterial);
                 tempMateral.mainTexture = texture;
                 tempMateral.mainTexture.name = skinID.ToString();
                 tempMateral.mainTextureScale = new Vector2(1, 1);
@@ -64,7 +62,7 @@ namespace PCRCaculator
                     if (p0 != null)
                         bytes_0 = ABExTool.GetAssetBundleByName<TextAsset>(p0, ".skel").bytes;
                     else
-                        bytes_0 = PCR_cysp2skel.MainTransClass.GetUnitSkelBytes(prefabID);
+                        bytes_0 = MainTransClass.GetUnitSkelBytes(prefabID);
                 }
                 else
                     bytes_0 = File.ReadAllBytes(path_skel);
@@ -78,9 +76,9 @@ namespace PCRCaculator
                 //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonData); // Spawn a new SkeletonAnimation GameObject.
                 return skeletonData;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                PCRCaculator.MainManager.Instance.WindowConfigMessage(
+                MainManager.Instance.WindowConfigMessage(
     "合成角色" + prefabID + "的动画时发生错误：" + e.Message + "\n可能原因：找不到" + ab_atlas + "/" + p, null);
 
             }

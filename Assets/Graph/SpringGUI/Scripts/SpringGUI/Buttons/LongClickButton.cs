@@ -19,7 +19,7 @@ namespace SpringGUI
         public class LongClickEvent : UnityEvent {}
 
         [SerializeField]
-        private LongClickEvent m_onLongClick = null;
+        private LongClickEvent m_onLongClick;
         public LongClickEvent onLongClick
         {
             get { return m_onLongClick; }

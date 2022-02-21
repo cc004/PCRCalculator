@@ -5,9 +5,7 @@
 * Description:$safeprojectname$
 ==========================================*/
 
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace SpringGUI
 {
@@ -17,7 +15,7 @@ namespace SpringGUI
         {
             List<Bars> bars = new List<Bars>();
             foreach (float bar in datas)
-                bars.Add(new Bars(new List<float>(){bar}));
+                bars.Add(new Bars(new List<float> {bar}));
             return bars;
         }
 

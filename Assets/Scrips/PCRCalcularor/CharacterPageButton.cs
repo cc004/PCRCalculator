@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Elements;
+using PCRCaculator.Battle;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using PCRCaculator.Battle;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
+using eStateIconType = Elements.eStateIconType;
 
 namespace PCRCaculator
 {
@@ -38,7 +37,7 @@ namespace PCRCaculator
         public SkillUI skillUI;
         public RectTransform ScreenShotTrans;
         
-        private Elements.UnitCtrl owner2;
+        private UnitCtrl owner2;
         private BattleUIManager uIManager;
         //private List<eStateIconType> currentBuffs = new List<eStateIconType>();
         private List<BattleBuffUI> battleBuffUIs = new List<BattleBuffUI>();
@@ -141,7 +140,7 @@ namespace PCRCaculator
                     levelText_B.gameObject.SetActive(true);
                     UnitRarityData rarityData = MainManager.Instance.UnitRarityDic[unitid];
                     //levelText_B.text = "lv:" + data.level;
-                    levelText_B.text = "" + Mathf.RoundToInt(rarityData.GetPowerValue(data, false, false));
+                    levelText_B.text = "" + Mathf.RoundToInt(rarityData.GetPowerValue(data));
                     if (showPosition)
                     {
                         PositionType k = rarityData.unitPositionType;
@@ -153,7 +152,7 @@ namespace PCRCaculator
 
             }
         }
-        public void SetButton(Elements.UnitCtrl unitCtrl)
+        public void SetButton(UnitCtrl unitCtrl)
         {
             if (buttonType != ButtonType.typeC&&buttonType!= ButtonType.typeD)
             {
@@ -166,7 +165,7 @@ namespace PCRCaculator
                 backImage.gameObject.SetActive(unitCtrl.UnitId <= 200000);
                 return;
             }
-            this.owner2 = unitCtrl;
+            owner2 = unitCtrl;
             uIManager = BattleUIManager.Instance;
             //owner2.OnChangeState += SetAbnormalIcons_2;
             //SetAbnormalIcons(owner, eStateIconType.NONE, false);
@@ -213,10 +212,10 @@ namespace PCRCaculator
             TPSlider.value = 0;
             stars.SetStarColor(grayColor);
         }
-        public void SetAbnormalIcons(Elements.UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???")
+        public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???")
         {
-            if(stateIconType_2 == Elements.eStateIconType.NONE) { return; }
-            if (BattleUIManager.Instance.ShowBuffDic.TryGetValue(Elements.eStateIconType.NONE, out bool value))
+            if(stateIconType_2 == eStateIconType.NONE) { return; }
+            if (BattleUIManager.Instance.ShowBuffDic.TryGetValue(eStateIconType.NONE, out bool value))
             {
                 if (value)
                     return;
@@ -232,16 +231,16 @@ namespace PCRCaculator
                 GameObject a = Instantiate(buffUIPrefab);
                 a.transform.SetParent(buffUIParent,false);
                 BattleBuffUI buffUI = a.GetComponent<BattleBuffUI>();
-                buffUI.Init(uIManager.GetAbnormalIconSprite((eStateIconType)(int)stateIconType_2),stateIconType_2,stayTime,describe,RemoveBuffIcon);
+                buffUI.Init(uIManager.GetAbnormalIconSprite((Battle.eStateIconType)(int)stateIconType_2),stateIconType_2,stayTime,describe,RemoveBuffIcon);
                 battleBuffUIs.Add(buffUI);
                 ReflashBattleBuffUIs();
             }
             else
             {
                 int idx = 0;
-                if (stateIconType_2 == Elements.eStateIconType.SLOW || stateIconType_2 == Elements.eStateIconType.HASTE)
+                if (stateIconType_2 == eStateIconType.SLOW || stateIconType_2 == eStateIconType.HASTE)
                 {
-                    idx = battleBuffUIs.FindIndex(a => a.stateIconType == Elements.eStateIconType.SLOW || a.stateIconType == Elements.eStateIconType.HASTE);
+                    idx = battleBuffUIs.FindIndex(a => a.stateIconType == eStateIconType.SLOW || a.stateIconType == eStateIconType.HASTE);
                 }
                 else
                 {

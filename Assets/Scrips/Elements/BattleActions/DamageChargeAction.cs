@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,38 +23,38 @@ namespace Elements
           UnitActionController _sourceActionController)
         {
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
-            switch (this.ActionDetail1)
+            switch (ActionDetail1)
             {
                 case 1:
                 case 3:
-                    _source.OnDamage += (UnitCtrl.OnDamageDelegate)((byAttack, damage, critical) =>
-                   {
-                       if (!byAttack || !_source.IsOnDamageCharge || this.ActionDetail2 == 0)
-                           return;
-                       this.targetAction.Value[eValueNumber.VALUE_1] += damage * this.Value[eValueNumber.VALUE_1];
-                   });
-                    if (this.ActionDetail2 == 0)
+                    _source.OnDamage += (byAttack, damage, critical) =>
+                    {
+                        if (!byAttack || !_source.IsOnDamageCharge || ActionDetail2 == 0)
+                            return;
+                        targetAction.Value[eValueNumber.VALUE_1] += damage * Value[eValueNumber.VALUE_1];
+                    };
+                    if (ActionDetail2 == 0)
                         break;
-                    this.targetAction = _skill.ActionParameters.Find((Predicate<ActionParameter>)(e => e.ActionId == this.ActionDetail2));
-                    this.defaultValue = this.targetAction.Value[eValueNumber.VALUE_1];
+                    targetAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2);
+                    this.defaultValue = targetAction.Value[eValueNumber.VALUE_1];
                     break;
                 case 2:
-                    ActionParameter actionParameter = _skill.ActionParameters.Find((Predicate<ActionParameter>)(x => x.ActionId == this.ActionDetail3));
-                    actionParameter.OnDamageHit += (ActionParameter.OnDamageHitDelegate)(damage =>
-                   {
-                       for (int index = 0; index < this.ActionChildrenIndexes.Count; ++index)
-                           _skill.ActionParameters[this.ActionChildrenIndexes[index]].Value[eValueNumber.VALUE_1] += damage * this.Value[eValueNumber.VALUE_1];
-                   });
-                    actionParameter.OnActionEnd += (ActionParameter.OnActionEndDelegate)(() =>
-                   {
-                       for (int index = 0; index < this.ActionChildrenIndexes.Count; ++index)
-                           _sourceActionController.ExecUnitActionWithDelay(_skill.ActionParameters[this.ActionChildrenIndexes[index]], _skill, false, false);
-                   });
-                    if (this.ActionDetail2 == 0)
+                    ActionParameter actionParameter = _skill.ActionParameters.Find(x => x.ActionId == ActionDetail3);
+                    actionParameter.OnDamageHit += damage =>
+                    {
+                        for (int index = 0; index < ActionChildrenIndexes.Count; ++index)
+                            _skill.ActionParameters[ActionChildrenIndexes[index]].Value[eValueNumber.VALUE_1] += damage * Value[eValueNumber.VALUE_1];
+                    };
+                    actionParameter.OnActionEnd += () =>
+                    {
+                        for (int index = 0; index < ActionChildrenIndexes.Count; ++index)
+                            _sourceActionController.ExecUnitActionWithDelay(_skill.ActionParameters[ActionChildrenIndexes[index]], _skill, false, false);
+                    };
+                    if (ActionDetail2 == 0)
                         break;
-                    ActionParameter toAction = _skill.ActionParameters.Find((Predicate<ActionParameter>)(e => e.ActionId == this.ActionDetail2));
+                    ActionParameter toAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2);
                     float defaultValue = toAction.Value[eValueNumber.VALUE_1];
-                    toAction.OnActionEnd += (ActionParameter.OnActionEndDelegate)(() => toAction.Value[eValueNumber.VALUE_1] = defaultValue);
+                    toAction.OnActionEnd += () => toAction.Value[eValueNumber.VALUE_1] = defaultValue;
                     break;
             }
         }
@@ -66,9 +65,9 @@ namespace Elements
           Skill _skill)
         {
             base.ReadyAction(_source, _sourceActionController, _skill);
-            if (this.targetAction == null)
+            if (targetAction == null)
                 return;
-            this.targetAction.Value[eValueNumber.VALUE_1] = this.defaultValue;
+            targetAction.Value[eValueNumber.VALUE_1] = defaultValue;
         }
 
         public override void ExecAction(
@@ -82,13 +81,13 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            switch (this.ActionDetail1)
+            switch (ActionDetail1)
             {
                 case 1:
                 case 3:
                     _source.IsOnDamageCharge = true;
                     _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false);
-                    _sourceActionController.AppendCoroutine(this.PlayMotionLoopForDamageCharge(_skill.AnimId, _skill, _source, _sourceActionController, _skill), ePauseType.SYSTEM, _source);
+                    _sourceActionController.AppendCoroutine(PlayMotionLoopForDamageCharge(_skill.AnimId, _skill, _source, _sourceActionController, _skill), ePauseType.SYSTEM, _source);
                     break;
             }
         }
@@ -119,14 +118,14 @@ namespace Elements
                         effect.ExecAppendCoroutine(_source);
                         skillEffectList.Add(effect);
                     }
-                    Action stopEffect = (Action)(() =>
-                   {
-                       for (int index = 0; index < skillEffectList.Count; ++index)
-                           skillEffectList[index].SetTimeToDie(true);
-                       for (int index = 0; index < _skill.LoopEffectObjs.Count; ++index)
-                           _skill.LoopEffectObjs[index].SetTimeToDie(true);
-                       _skill.LoopEffectObjs.Clear();
-                   });
+                    Action stopEffect = () =>
+                    {
+                        for (int index = 0; index < skillEffectList.Count; ++index)
+                            skillEffectList[index].SetTimeToDie(true);
+                        for (int index = 0; index < _skill.LoopEffectObjs.Count; ++index)
+                            _skill.LoopEffectObjs[index].SetTimeToDie(true);
+                        _skill.LoopEffectObjs.Clear();
+                    };
                     while (true)
                     {
                         timer += damageChargeAction.battleManager.DeltaTime_60fps;
@@ -134,8 +133,8 @@ namespace Elements
                         {
                             if ((long)_source.Hp > 0L)
                             {
-                                if ((double)timer <= (double)damageChargeAction.Value[eValueNumber.VALUE_3])
-                                    yield return (object)null;
+                                if (timer <= (double)damageChargeAction.Value[eValueNumber.VALUE_3])
+                                    yield return null;
                                 else
                                     goto label_14;
                             }
@@ -166,7 +165,7 @@ namespace Elements
                     _source.IsOnDamageCharge = false;
                     break;
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
 
@@ -185,14 +184,14 @@ namespace Elements
                     _source.SkillEndProcess();
                     break;
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
 
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
             var group = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
             if (ActionId>=300000000&& group.isSpecialBoss &&( group.specialBossID == 666666 ||group.specialBossID==666667))
             {

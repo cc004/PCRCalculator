@@ -4,8 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,10 +12,10 @@ namespace Elements
   public class SpineFireArm : FirearmCtrl
   {
     [SerializeField]
-    private SpineFireArm.eSortOrder sortOrder;
+    private eSortOrder sortOrder;
     private const int OFFSET = 1;
     [SerializeField]
-    private SpineFireArm.eSortOrderType sortOrderType = SpineFireArm.eSortOrderType.BACK_OF_FX;
+    private eSortOrderType sortOrderType = eSortOrderType.BACK_OF_FX;
     private const int DEFAULT_OFFSET = 200;
     public List<GameObject> WalkEffectPrefab;
     public List<GameObject> WalkEffectPrefabLeft;

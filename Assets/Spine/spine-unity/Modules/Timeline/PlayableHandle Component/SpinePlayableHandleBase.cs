@@ -28,15 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 //using UnityEngine.Playables;
 
 namespace Spine.Unity.Playables {
 
-	public delegate void SpineEventDelegate (Spine.Event e);
+	public delegate void SpineEventDelegate (Event e);
 
 	/// <summary>Base class for Spine Playable Handle components, commonly for integrating with UnityEngine Timeline.</summary>
 	public abstract class SpinePlayableHandleBase : MonoBehaviour {

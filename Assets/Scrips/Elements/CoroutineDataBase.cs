@@ -15,24 +15,24 @@ namespace Elements
 
     public void Destroy()
     {
-      for (int index = this.CoroutineList.Count - 1; index > 0; --index)
+      for (int index = CoroutineList.Count - 1; index > 0; --index)
       {
-        this.CoroutineList[index] = (IEnumerator) null;
-        this.CoroutineList.RemoveAt(index);
+        CoroutineList[index] = null;
+        CoroutineList.RemoveAt(index);
       }
-      this.CoroutineList.Clear();
+      CoroutineList.Clear();
     }
 
     public virtual void Update()
     {
-      if (this.CoroutineList.Count <= 0)
+      if (CoroutineList.Count <= 0)
         return;
-      for (int index = this.CoroutineList.Count - 1; index >= 0; --index)
+      for (int index = CoroutineList.Count - 1; index >= 0; --index)
       {
-        if (!this.CoroutineList[index].MoveNext())
+        if (!CoroutineList[index].MoveNext())
         {
-          this.CoroutineList[index] = (IEnumerator) null;
-          this.CoroutineList.RemoveAt(index);
+          CoroutineList[index] = null;
+          CoroutineList.RemoveAt(index);
         }
       }
     }

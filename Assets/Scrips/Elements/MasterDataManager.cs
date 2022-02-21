@@ -5,11 +5,9 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 //using Coneshell;
-using Cute;
-//using Sqlite3Plugin;
-using System;
+
 using System.Collections.Generic;
-using System.IO;
+//using Sqlite3Plugin;
 
 namespace Elements
 {
@@ -684,7 +682,7 @@ namespace Elements
     {
     }
     */
-    protected HashSet<string> GetKnownMasterGroups() => new HashSet<string>()
+    protected HashSet<string> GetKnownMasterGroups() => new HashSet<string>
     {
       "master_enemy",
       "master_etc",

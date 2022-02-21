@@ -7,14 +7,13 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 namespace SpringGUI
 {
     public class BarChartFactory : sgDataGraphBase , IBarChartFactory
     {
-        protected BarChartData Data = null;
-        protected BarChartSetting Setting = null;
+        protected BarChartData Data;
+        protected BarChartSetting Setting;
         protected Vector2 size = Vector2.zero;
         protected Vector2 origin = Vector2.zero;
 
@@ -22,8 +21,8 @@ namespace SpringGUI
         {
             BaseSetting = baseSetting;
             Setting = barChartSetting;
-            this.size = rect.size;
-            this.origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
+            size = rect.size;
+            origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
             Data = data;
             DrawMesh(vh,rect);
             return vh;
@@ -133,8 +132,8 @@ namespace SpringGUI
             Setting = setting;
             BaseSetting = baseSetting;
             Data = data;
-            this.size = rect.size;
-            this.origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
+            size = rect.size;
+            origin = new Vector2(-size.x / 2.0f , -size.y / 2.0f);
             // x axis text
             Vector2 leftStart = origin + new Vector2(Setting.BarSpacing/2.0f,0);
             foreach (var bars in Data.BarDic)

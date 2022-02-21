@@ -5,7 +5,7 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 //using Elements.Data;
-using System;
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,9 +13,9 @@ namespace Elements
 {
   public class BattleUtil
   {
-    public static float GetCriticalRate(float critical, int level, int targetLevel) => (float) ((double) critical * 0.0500000007450581 * ((double) level / (double) targetLevel) * 0.00999999977648258);
+    public static float GetCriticalRate(float critical, int level, int targetLevel) => (float) (critical * 0.0500000007450581 * (level / (double) targetLevel) * 0.00999999977648258);
 
-    public static float GetDodgeByLevelDiff(int level, int targetLevel) => (float) (1.0 - (double) Mathf.Max((float) (targetLevel - level), 0.0f) / 100.0);
+    public static float GetDodgeByLevelDiff(int level, int targetLevel) => (float) (1.0 - Mathf.Max(targetLevel - level, 0.0f) / 100.0);
 
     /*public static bool IsCheckSupportChara(eBattleCategory _battleCategory)
     {
@@ -55,52 +55,52 @@ namespace Elements
       return false;
     }*/
 
-    public static bool Approximately(float _a, float _b) => (double) Mathf.Abs(_b - _a) < (double) Mathf.Max(1E-05f * Mathf.Max(Mathf.Abs(_a), Mathf.Abs(_b)), Mathf.Epsilon * 8f);
+    public static bool Approximately(float _a, float _b) => Mathf.Abs(_b - _a) < (double) Mathf.Max(1E-05f * Mathf.Max(Mathf.Abs(_a), Mathf.Abs(_b)), Mathf.Epsilon * 8f);
 
     public static int FloatToInt(float _num)
     {
-      if ((double) _num >= 0.0)
+      if (_num >= 0.0)
       {
         int num = Mathf.CeilToInt(_num);
-        return BattleUtil.Approximately(_num, (float) num) ? num : (int) _num;
+        return Approximately(_num, num) ? num : (int) _num;
       }
       int num1 = Mathf.FloorToInt(_num);
-      return BattleUtil.Approximately(_num, (float) num1) ? num1 : (int) _num;
+      return Approximately(_num, num1) ? num1 : (int) _num;
     }
 
     public static int FloatToIntReverseTruncate(float _num)
     {
       int num = (int) _num;
-      if (BattleUtil.Approximately((float) num, _num))
+      if (Approximately(num, _num))
         return num;
-      return (double) _num <= 0.0 ? Mathf.FloorToInt(_num) : Mathf.CeilToInt(_num);
+      return _num <= 0.0 ? Mathf.FloorToInt(_num) : Mathf.CeilToInt(_num);
     }
 
     public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
     {
-        return _num.Select(x => FloatToIntReverseTruncate((float)x));
+        return _num.Select(x => FloatToIntReverseTruncate(x));
     }
     public static FloatWithEx FloatToInt(FloatWithEx _num)
     {
-        return _num.Select(x => FloatToInt((float)x));
+        return _num.Select(x => FloatToInt(x));
     }
     public static eUnitRespawnPos SearchRespawnPos(
       eUnitRespawnPos _basePos,
       List<UnitCtrl> _unitList)
     {
-      if (_unitList.FindIndex((Predicate<UnitCtrl>) (e => e.RespawnPos == _basePos)) == -1)
+      if (_unitList.FindIndex(e => e.RespawnPos == _basePos) == -1)
         return _basePos;
       int basePos = (int) _basePos;
       int index1 = 0;
       bool flag1 = _basePos == eUnitRespawnPos.MAIN_POS_1;
       int index2 = 0;
       bool flag2 = _basePos == eUnitRespawnPos.SUB_POS_5;
-      for (index1 = 1; index1 <= basePos && _unitList.FindIndex((Predicate<UnitCtrl>) (e => e.RespawnPos == (eUnitRespawnPos) (basePos - index1))) != -1; index1++)
+      for (index1 = 1; index1 <= basePos && _unitList.FindIndex(e => e.RespawnPos == (eUnitRespawnPos) (basePos - index1)) != -1; index1++)
       {
         if (index1 == basePos)
           flag1 = true;
       }
-      for (index2 = 1; index2 <= 9 - basePos && _unitList.FindIndex((Predicate<UnitCtrl>) (e => e.RespawnPos == (eUnitRespawnPos) (basePos + index2))) != -1; index2++)
+      for (index2 = 1; index2 <= 9 - basePos && _unitList.FindIndex(e => e.RespawnPos == (eUnitRespawnPos) (basePos + index2)) != -1; index2++)
       {
         if (index2 == 9 - basePos)
           flag2 = true;
@@ -125,10 +125,10 @@ namespace Elements
         {
           float searchArea1 = _searchAreaList[index2 - 1];
           float searchArea2 = _searchAreaList[index2];
-          int num2 = (double) searchArea1 > (double) searchArea2 ? 1 : 0;
+          int num2 = searchArea1 > (double) searchArea2 ? 1 : 0;
           bool flag = false;
           if (_isWithId)
-            flag = (double) searchArea1 == (double) searchArea2 && _unitList[_posList[index2 - 1]].UnitId > _unitList[_posList[index2]].UnitId;
+            flag = searchArea1 == (double) searchArea2 && _unitList[_posList[index2 - 1]].UnitId > _unitList[_posList[index2]].UnitId;
           int num3 = flag ? 1 : 0;
           if ((num2 | num3) != 0)
           {

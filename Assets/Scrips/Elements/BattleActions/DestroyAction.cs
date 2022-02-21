@@ -27,32 +27,32 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictinary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
-      switch ((DestroyAction.eDestroyType) this.ActionDetail1)
+      AppendIsAlreadyExeced(_target.Owner, _num);
+      switch ((eDestroyType) ActionDetail1)
       {
-        case DestroyAction.eDestroyType.NORMAL:
+        case eDestroyType.NORMAL:
           UnitCtrl owner = _target.Owner;
           DamageData _damageData = new DamageData();
           _damageData.Damage = (long) _target.Owner.Hp;
           _damageData.DamageType = DamageData.eDamageType.NONE;
           _damageData.Source = _source;
           _damageData.ActionType = eActionType.DESTROY;
-          int actionId = this.ActionId;
-          Action onDefeatEnemy = this.OnDefeatEnemy;
-          double energyChargeMultiple = (double) this.EnergyChargeMultiple;
+          int actionId = ActionId;
+          Action onDefeatEnemy = OnDefeatEnemy;
+          double energyChargeMultiple = EnergyChargeMultiple;
           owner.SetDamage(_damageData, false, actionId, _hasEffect: false, _onDefeat: onDefeatEnemy, _energyChargeMultiple: ((float) energyChargeMultiple));
           break;
-        case DestroyAction.eDestroyType.DELETE:
+        case eDestroyType.DELETE:
           _target.Owner.IdleOnly = true;
           _target.Owner.CurrentState = UnitCtrl.ActionState.IDLE;
-          this.battleManager.CallbackIdleOnlyDone(_target.Owner);
-          List<UnitCtrl> unitCtrlList = _target.Owner.IsOther ? this.battleManager.EnemyList : this.battleManager.UnitList;
+          battleManager.CallbackIdleOnlyDone(_target.Owner);
+          List<UnitCtrl> unitCtrlList = _target.Owner.IsOther ? battleManager.EnemyList : battleManager.UnitList;
           if (unitCtrlList.Contains(_target.Owner))
             unitCtrlList.Remove(_target.Owner);
           _target.Owner.IsDead = true;
           _target.Owner.CureAllAbnormalState();
-          this.battleManager.CallbackFadeOutDone(_target.Owner);
-          this.battleManager.CallbackDead(_target.Owner);
+          battleManager.CallbackFadeOutDone(_target.Owner);
+          battleManager.CallbackDead(_target.Owner);
           _target.Owner.gameObject.SetActive(false);
           _target.Owner.SetCurrentHpZero();
                     /*using (List<SkillEffectCtrl>.Enumerator enumerator = _target.Owner.RepeatEffectList.GetEnumerator())

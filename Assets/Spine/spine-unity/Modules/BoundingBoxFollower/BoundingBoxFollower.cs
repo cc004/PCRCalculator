@@ -11,7 +11,7 @@ namespace Spine.Unity
 
 		public SkeletonRenderer skeletonRenderer;
 
-		[SpineSlot("", "skeletonRenderer", true, true)]
+		[SpineSlot("", "skeletonRenderer", true)]
 		public string slotName;
 
 		public bool isTrigger;
@@ -84,7 +84,7 @@ namespace Spine.Unity
 				_ = DebugMessages;
 				return;
 			}
-			if (base.gameObject.activeInHierarchy)
+			if (gameObject.activeInHierarchy)
 			{
 				foreach (Skin skin in skeleton.Data.Skins)
 				{
@@ -97,7 +97,7 @@ namespace Spine.Unity
 			}
 			if (DebugMessages && colliderTable.Count == 0)
 			{
-				_ = base.gameObject.activeInHierarchy;
+				_ = gameObject.activeInHierarchy;
 			}
 		}
 
@@ -118,7 +118,7 @@ namespace Spine.Unity
 				}
 				if (boundingBoxAttachment != null && !colliderTable.ContainsKey(boundingBoxAttachment))
 				{
-					PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, base.gameObject, isTrigger);
+					PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
 					polygonCollider2D.enabled = false;
 					polygonCollider2D.hideFlags = HideFlags.NotEditable;
 					polygonCollider2D.isTrigger = IsTrigger;
@@ -166,7 +166,7 @@ namespace Spine.Unity
 					{
 						if (polygonCollider2D != null)
 						{
-							Object.Destroy(polygonCollider2D);
+							Destroy(polygonCollider2D);
 						}
 					}
 				}
@@ -177,7 +177,7 @@ namespace Spine.Unity
 					{
 						if (polygonCollider2D2 != null)
 						{
-							Object.DestroyImmediate(polygonCollider2D2);
+							DestroyImmediate(polygonCollider2D2);
 						}
 					}
 				}
@@ -189,7 +189,7 @@ namespace Spine.Unity
 				{
 					if (polygonCollider2D3 != null)
 					{
-						Object.Destroy(polygonCollider2D3);
+						Destroy(polygonCollider2D3);
 					}
 				}
 			}

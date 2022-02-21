@@ -4,13 +4,12 @@
 * Description: SpringGUI.ColoredTape example.
 ==========================================*/
 
-using UnityEngine;
 using SpringGUI;
+using UnityEngine;
 
 public class ColoredTapeExample : MonoBehaviour
 {
-    private Color[] Colors = new Color[]
-    {
+    private Color[] Colors = {
         UnityEngine.Color.red,
         UnityEngine.Color.magenta,
         UnityEngine.Color.blue,
@@ -20,8 +19,7 @@ public class ColoredTapeExample : MonoBehaviour
         UnityEngine.Color.red
     };
 
-    private Color[] Color = new Color[]
-    {
+    private Color[] Color = {
         UnityEngine.Color.red,
         UnityEngine.Color.green
     };

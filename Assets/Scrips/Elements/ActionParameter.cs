@@ -4,9 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Elements.Battle;
 using System;
 using System.Collections.Generic;
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -19,16 +19,16 @@ namespace Elements
     private static BattleEffectPoolInterface staticBattleEffectPool;
     private static BattleLogIntreface staticBattleLog;
     public eActionType ActionType;
-    public ActionParameter.OnActionEndDelegate OnActionEnd;
+    public OnActionEndDelegate OnActionEnd;
     public bool IsSearchAndSorted;
     public float EnergyChargeMultiple = 1f;
     //protected List<SkillEffectCtrl> changePatternCurrentSkillEffect = new List<SkillEffectCtrl>();
 
-    protected BattleManager battleManager => ActionParameter.staticBattleManager;
+    protected BattleManager battleManager => staticBattleManager;
 
-    protected BattleEffectPoolInterface battleEffectPool => ActionParameter.staticBattleEffectPool;
+    protected BattleEffectPoolInterface battleEffectPool => staticBattleEffectPool;
 
-    protected BattleLogIntreface battleLog => ActionParameter.staticBattleLog;
+    protected BattleLogIntreface battleLog => staticBattleLog;
 
     public eTargetAssignment TargetAssignment { get; set; }
 
@@ -70,7 +70,7 @@ namespace Elements
 
     public List<int> ActionChildrenIndexes { get; set; }
 
-    public ActionParameter.OnDamageHitDelegate OnDamageHit { get; set; }
+    public OnDamageHitDelegate OnDamageHit { get; set; }
 
     public List<NormalSkillEffect> ActionEffectList { get; set; }
 
@@ -120,9 +120,9 @@ namespace Elements
     public static void StaticRelease()
     {
       //ActionParameter.staticSingletonTree = (Yggdrasil<ActionParameter>) null;
-      ActionParameter.staticBattleManager = null;
-      ActionParameter.staticBattleEffectPool = (BattleEffectPoolInterface) null;
-      ActionParameter.staticBattleLog = (BattleLogIntreface) null;
+      staticBattleManager = null;
+      staticBattleEffectPool = null;
+      staticBattleLog = null;
     }
 
     public ActionParameter()
@@ -130,20 +130,20 @@ namespace Elements
             //if (ActionParameter.staticSingletonTree != null)
             //  return;
             //ActionParameter.staticSingletonTree = this.CreateSingletonTree<ActionParameter>();
-            ActionParameter.staticBattleManager = BattleManager.Instance;
-      ActionParameter.staticBattleEffectPool = staticBattleManager.battleEffectPool;
-      ActionParameter.staticBattleLog = staticBattleManager;
+            staticBattleManager = BattleManager.Instance;
+      staticBattleEffectPool = staticBattleManager.battleEffectPool;
+      staticBattleLog = staticBattleManager;
     }
 
     public virtual void Initialize()
     {
-      this.HitOnceDic = new Dictionary<BasePartsData, bool>();
-      this.HitOnceKeyList = new List<BasePartsData>();
-      this.AlreadyExecedData = new Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>>();
-      this.AlreadyExecedKeys = new Dictionary<UnitCtrl, List<int>>();
+      HitOnceDic = new Dictionary<BasePartsData, bool>();
+      HitOnceKeyList = new List<BasePartsData>();
+      AlreadyExecedData = new Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>>();
+      AlreadyExecedKeys = new Dictionary<UnitCtrl, List<int>>();
     }
 
-    public virtual void Initialize(UnitCtrl _ownerUnitCtrl) => this.Initialize();
+    public virtual void Initialize(UnitCtrl _ownerUnitCtrl) => Initialize();
 
     public virtual void ExecActionOnStart(
       Skill _skill,
@@ -197,18 +197,18 @@ namespace Elements
     public virtual void ReadyAction(
       UnitCtrl _source,
       UnitActionController _sourceActionController,
-      Skill _skill) => this.ResetHitData();
+      Skill _skill) => ResetHitData();
 
     public void ResetHitData()
     {
-      for (int index = 0; index < this.HitOnceKeyList.Count; ++index)
-        this.HitOnceDic[this.HitOnceKeyList[index]] = true;
-      Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>>.Enumerator enumerator = this.AlreadyExecedData.GetEnumerator();
+      for (int index = 0; index < HitOnceKeyList.Count; ++index)
+        HitOnceDic[HitOnceKeyList[index]] = true;
+      Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>>.Enumerator enumerator = AlreadyExecedData.GetEnumerator();
       while (enumerator.MoveNext())
       {
-        for (int index = 0; index < this.AlreadyExecedKeys[enumerator.Current.Key].Count; ++index)
+        for (int index = 0; index < AlreadyExecedKeys[enumerator.Current.Key].Count; ++index)
         {
-          ActionExecedData actionExecedData = this.AlreadyExecedData[enumerator.Current.Key][this.AlreadyExecedKeys[enumerator.Current.Key][index]];
+          ActionExecedData actionExecedData = AlreadyExecedData[enumerator.Current.Key][AlreadyExecedKeys[enumerator.Current.Key][index]];
           actionExecedData.AlreadyExeced = false;
           actionExecedData.ExecedPartsNumber = 0;
           actionExecedData.TargetPartsNumber = 0;
@@ -218,52 +218,52 @@ namespace Elements
 
     public AbnormalStateEffectPrefabData CreateAbnormalEffectData()
     {
-      AbnormalStateEffectPrefabData effectPrefabData = (AbnormalStateEffectPrefabData) null;
-      if (this.ActionEffectList.Count > 0)
-        effectPrefabData = new AbnormalStateEffectPrefabData()
+      AbnormalStateEffectPrefabData effectPrefabData = null;
+      if (ActionEffectList.Count > 0)
+        effectPrefabData = new AbnormalStateEffectPrefabData
         {
-          IsHead = this.ActionEffectList[0].TargetBone == eTargetBone.HEAD,
-          LeftEffectPrefab = this.ActionEffectList[0].PrefabLeft,
-          RightEffectPrefab = this.ActionEffectList[0].Prefab
+          IsHead = ActionEffectList[0].TargetBone == eTargetBone.HEAD,
+          LeftEffectPrefab = ActionEffectList[0].PrefabLeft,
+          RightEffectPrefab = ActionEffectList[0].Prefab
         };
       return effectPrefabData;
     }
 
-    public bool JudgeIsAlreadyExeced(UnitCtrl _target, int _num) => !this.AlreadyExecedData[_target][_num].AlreadyExeced;
+    public bool JudgeIsAlreadyExeced(UnitCtrl _target, int _num) => !AlreadyExecedData[_target][_num].AlreadyExeced;
 
     public void AppendTargetNum(UnitCtrl _target, int _num)
     {
-      if (!this.AlreadyExecedData.ContainsKey(_target))
+      if (!AlreadyExecedData.ContainsKey(_target))
       {
-        this.AlreadyExecedData.Add(_target, new Dictionary<int, ActionExecedData>()
+        AlreadyExecedData.Add(_target, new Dictionary<int, ActionExecedData>
         {
           {
             _num,
-            new ActionExecedData() { TargetPartsNumber = 1 }
+            new ActionExecedData { TargetPartsNumber = 1 }
           }
         });
-        this.AlreadyExecedKeys.Add(_target, new List<int>()
+        AlreadyExecedKeys.Add(_target, new List<int>
         {
           _num
         });
       }
-      else if (!this.AlreadyExecedData[_target].ContainsKey(_num))
+      else if (!AlreadyExecedData[_target].ContainsKey(_num))
       {
-        this.AlreadyExecedData[_target].Add(_num, new ActionExecedData()
+        AlreadyExecedData[_target].Add(_num, new ActionExecedData
         {
           TargetPartsNumber = 1
         });
-        this.AlreadyExecedKeys[_target].Add(_num);
+        AlreadyExecedKeys[_target].Add(_num);
       }
       else
-        ++this.AlreadyExecedData[_target][_num].TargetPartsNumber;
+        ++AlreadyExecedData[_target][_num].TargetPartsNumber;
     }
 
-    public void AppendIsAlreadyExeced(UnitCtrl _target, int _num) => this.AlreadyExecedData[_target][_num].AlreadyExeced = true;
+    public void AppendIsAlreadyExeced(UnitCtrl _target, int _num) => AlreadyExecedData[_target][_num].AlreadyExeced = true;
 
     public bool JudgeLastAndNotExeced(UnitCtrl _target, int _num)
     {
-      ActionExecedData actionExecedData = this.AlreadyExecedData[_target][_num];
+      ActionExecedData actionExecedData = AlreadyExecedData[_target][_num];
       ++actionExecedData.ExecedPartsNumber;
       return !actionExecedData.AlreadyExeced && actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
     }

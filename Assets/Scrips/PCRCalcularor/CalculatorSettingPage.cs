@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace PCRCaculator
 {
     public class CalculatorSettingPage : MonoBehaviour
@@ -10,8 +11,8 @@ namespace PCRCaculator
         public List<Toggle> toggles;
         public delegate void Config(int dropdownChoose, int toggleChoose);
         public Config config;
-        public System.Action cancel;
-        public void SetButton(Config config,System.Action action = null)
+        public Action cancel;
+        public void SetButton(Config config,Action action = null)
         {
             this.config = config;
             cancel = action;

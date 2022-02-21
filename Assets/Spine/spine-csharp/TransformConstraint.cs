@@ -343,7 +343,7 @@ namespace Spine
 				if (num != 0f)
 				{
 					float num6 = bone.arotation - num5 + data.offsetRotation;
-					num6 -= (float)((16384 - (int)(16384.499999999996 - (double)(num6 / 360f))) * 360);
+					num6 -= (16384 - (int)(16384.499999999996 - num6 / 360f)) * 360;
 					num5 += num6 * num;
 				}
 				float num7 = bone2.ax;
@@ -370,7 +370,7 @@ namespace Spine
 				if (num4 > 0f)
 				{
 					float num11 = bone.ashearY - ashearY + data.offsetShearY;
-					num11 -= (float)((16384 - (int)(16384.499999999996 - (double)(num11 / 360f))) * 360);
+					num11 -= (16384 - (int)(16384.499999999996 - num11 / 360f)) * 360;
 					bone2.shearY += num11 * num4;
 				}
 				bone2.UpdateWorldTransform(num7, num8, num5, num9, num10, bone2.ashearX, ashearY);

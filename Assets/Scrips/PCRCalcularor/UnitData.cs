@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System;
 using Elements;
-using UnityEngine;
 using Newtonsoft0.Json;
 using PCRCaculator.Battle;
+using PCRCaculator.Guild;
+using UnityEngine;
 using DirectionType = PCRCaculator.Battle.DirectionType;
 using eMoveTypes = PCRCaculator.Battle.eMoveTypes;
+using eStateIconType = Elements.eStateIconType;
 using eTargetAssignment = PCRCaculator.Battle.eTargetAssignment;
 
 /// <summary>
@@ -18,10 +19,10 @@ namespace PCRCaculator
     /// <summary>
     /// 角色基础面板数据，数据由数据库中的unit_rarity表以及其他类生成~
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class UnitRarityData : IComparer<UnitRarityData>, IComparable<UnitRarityData>
     {
-        public readonly int unitId = 0;
+        public readonly int unitId;
         public readonly string unitName;
         public readonly PositionType unitPositionType;
         private List<BaseData> raritydatas = new List<BaseData>();
@@ -207,7 +208,7 @@ namespace PCRCaculator
                 }
                 return d1;
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 MainManager.Instance.WindowConfigMessage("加载角色" + a.unitId + "时发生错误：" + e.Message, null);
                 return new BaseData();
@@ -331,14 +332,14 @@ namespace PCRCaculator
         }
         public int CompareTo(UnitRarityData other)
         {
-            return this.detailData.searchAreaWidth - other.detailData.searchAreaWidth;
+            return detailData.searchAreaWidth - other.detailData.searchAreaWidth;
 
         }
     }
     /// <summary>
     /// 玩家可以更改的角色数据，用于存档
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class UnitData
     {
         private int _unitId;
@@ -354,12 +355,12 @@ namespace PCRCaculator
         //public PositionType positionType = PositionType.frount;
         public int level = 1;
         public int rarity = 1;
-        public int love = 0;//好感度
+        public int love;//好感度
         public int rank = 1;
         public int[] equipLevel = new int[6] { -1, -1, -1, -1, -1, -1 };//装备等级，-1-未装备，0~5表示强化等级
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic;
-        public int uniqueEqLv = 0;//专武等级
+        public int uniqueEqLv;//专武等级
         private string name = "";
 
         public void SetDefaultLoveDict()
@@ -606,7 +607,7 @@ namespace PCRCaculator
     /// <summary>
     /// 角色的RANK数据，对应数据库中的unit_promotion_status表和unit_promotion表%
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class UnitRankData
     {
         public readonly List<int[]> rankEquipments = new List<int[]>();
@@ -642,7 +643,7 @@ namespace PCRCaculator
     /// <summary>
     /// 角色技能数据，对应数据库中的unit_skill_data表和unit_attack_pattern表?
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class UnitSkillData
     {
         public int UB;
@@ -762,18 +763,18 @@ namespace PCRCaculator
     /// <summary>
     /// 所有的技能数据，对应数据库中的skill_data表@
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class SkillData
     {
-        public readonly int skillid = 0;
+        public readonly int skillid;
         public readonly string name = "空技能";
-        public readonly int type = 0;
-        public readonly int areawidth = 0;
-        public readonly float casttime = 0;
+        public readonly int type;
+        public readonly int areawidth;
+        public readonly float casttime;
         public readonly int[] skillactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
         public readonly int[] dependactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
         public readonly string describes = "";
-        public readonly int icon = 0;
+        public readonly int icon;
         public static string[] num = new string[10] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩" };
         /// <summary>
         /// 不要用这个构造函数！
@@ -807,7 +808,7 @@ namespace PCRCaculator
         {
             string[] data0 = data.Split('@');
             skillid = int.Parse(data0[0]);
-            this.name = data0[1];
+            name = data0[1];
             type = int.Parse(data0[2]);
             areawidth = int.Parse(data0[3]);
             casttime = float.Parse(data0[4]);
@@ -857,7 +858,7 @@ namespace PCRCaculator
     /// <summary>
     /// 所有技能基础数据，对应数据库中的skill_action表#
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class SkillAction
     {
         public readonly int actionid;
@@ -1233,7 +1234,7 @@ namespace PCRCaculator
     /// <summary>
     /// 装备基础数据，对应数据库中的equipment_data 和 equipment_enhance_rate表,忽视部分鸡肋属性-
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class EquipmentData
     {
         public readonly int equipment_id;
@@ -1318,14 +1319,13 @@ namespace PCRCaculator
             {
                 return BaseData.CeilToInt(data + GetMaxLevel() * data_rate);
             }
-            else if (level > 0)
+
+            if (level > 0)
             {
                 return BaseData.CeilToInt(data + level * data_rate);
             }
-            else
-            {
-                return data;
-            }
+
+            return data;
         }
         public override string ToString()
         {
@@ -1338,7 +1338,7 @@ namespace PCRCaculator
     /// <summary>
     /// 角色羁绊类，对应数据库中story_detail和chara_story_status表$
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class UnitStoryData
     {
         static readonly int[] loveTrans = new int[13] { 0, 1, 1, 1, 2, 3, 3, 3, 4 ,4,4,4,4};
@@ -1390,7 +1390,7 @@ namespace PCRCaculator
             if (love < 0 || love > 12)
             {
                 string word = "羁绊值设置错误！";
-                MainManager.Instance.WindowConfigMessage("<color=#FF0000>" + word + "</color>", null, null);
+                MainManager.Instance.WindowConfigMessage("<color=#FF0000>" + word + "</color>", null);
                 love = love < 0 ? 0 : 8;
             }
             if(loveMax == 4)
@@ -1470,7 +1470,7 @@ namespace PCRCaculator
         {
             string[] data0 = data.Split('*');
             unitid = int.Parse(data0[0]);
-            this.name = data0[1];
+            name = data0[1];
             minrarity = int.Parse(data0[2]);
             motionType = int.Parse(data0[3]);
             seType = int.Parse(data0[4]);
@@ -1496,7 +1496,7 @@ namespace PCRCaculator
     /// <summary>
     /// 数据基类，+
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class BaseData
     {
         /*public float hp, atk, magic_str, def, magic_def, physical_critical,//0-5
@@ -1516,37 +1516,37 @@ namespace PCRCaculator
             }
         }
         [JsonIgnore]
-        public float Atk { get => (float)dataint[1] / 100.0f; set => dataint[1] = Mathf.RoundToInt((value * 100)); }
+        public float Atk { get => dataint[1] / 100.0f; set => dataint[1] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Magic_str { get => (float)dataint[2] / 100.0f; set => dataint[2] = Mathf.RoundToInt((value * 100)); }
+        public float Magic_str { get => dataint[2] / 100.0f; set => dataint[2] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Def { get => (float)dataint[3] / 100.0f; set => dataint[3] = Mathf.RoundToInt((value * 100)); }
+        public float Def { get => dataint[3] / 100.0f; set => dataint[3] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Magic_def { get => (float)dataint[4] / 100.0f; set => dataint[4] = Mathf.RoundToInt((value * 100)); }
+        public float Magic_def { get => dataint[4] / 100.0f; set => dataint[4] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Physical_critical { get => (float)dataint[5] / 100.0f; set => dataint[5] = Mathf.RoundToInt((value * 100)); }
+        public float Physical_critical { get => dataint[5] / 100.0f; set => dataint[5] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Magic_critical { get => (float)dataint[6] / 100.0f; set => dataint[6] = Mathf.RoundToInt((value * 100)); }
+        public float Magic_critical { get => dataint[6] / 100.0f; set => dataint[6] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Wave_hp_recovery { get => (float)dataint[7] / 100.0f; set => dataint[7] = Mathf.RoundToInt((value * 100)); }
+        public float Wave_hp_recovery { get => dataint[7] / 100.0f; set => dataint[7] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Wave_energy_recovery { get => (float)dataint[8] / 100.0f; set => dataint[8] = Mathf.RoundToInt((value * 100)); }
+        public float Wave_energy_recovery { get => dataint[8] / 100.0f; set => dataint[8] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Dodge { get => (float)dataint[9] / 100.0f; set => dataint[9] = Mathf.RoundToInt((value * 100)); }
+        public float Dodge { get => dataint[9] / 100.0f; set => dataint[9] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Physical_penetrate { get => (float)dataint[10] / 100.0f; set => dataint[10] = Mathf.RoundToInt((value * 100)); }
+        public float Physical_penetrate { get => dataint[10] / 100.0f; set => dataint[10] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Magic_penetrate { get => (float)dataint[11] / 100.0f; set => dataint[11] = Mathf.RoundToInt((value * 100)); }
+        public float Magic_penetrate { get => dataint[11] / 100.0f; set => dataint[11] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Life_steal { get => (float)dataint[12] / 100.0f; set => dataint[12] = Mathf.RoundToInt((value * 100)); }
+        public float Life_steal { get => dataint[12] / 100.0f; set => dataint[12] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Hp_recovery_rate { get => (float)dataint[13] / 100.0f; set => dataint[13] = Mathf.RoundToInt((value * 100)); }
+        public float Hp_recovery_rate { get => dataint[13] / 100.0f; set => dataint[13] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Energy_recovery_rate { get => (float)dataint[14] / 100.0f; set => dataint[14] = Mathf.RoundToInt((value * 100)); }
+        public float Energy_recovery_rate { get => dataint[14] / 100.0f; set => dataint[14] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Enerey_reduce_rate { get => (float)dataint[15] / 100.0f; set => dataint[15] = Mathf.RoundToInt((value * 100)); }
+        public float Enerey_reduce_rate { get => dataint[15] / 100.0f; set => dataint[15] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Accuracy { get => (float)dataint[16] / 100.0f; set => dataint[16] = Mathf.RoundToInt((value * 100)); }
+        public float Accuracy { get => dataint[16] / 100.0f; set => dataint[16] = Mathf.RoundToInt((value * 100)); }
         //public int[] Dataint { get => dataint; set => dataint = value; }
 
         //public int[] Dataint { get => dataint;private set => dataint = value; }
@@ -1595,7 +1595,7 @@ namespace PCRCaculator
         public float GetPowerValue(UnitData unit)// int[] skillLevel, int rarity,bool hasUneq)
         {
             int[] skillLevel = unit.skillLevel;
-            float pow = Mathf.RoundToInt((float)Hp) * 0.1f;
+            float pow = Mathf.RoundToInt(Hp) * 0.1f;
             pow += Mathf.RoundToInt(Atk) + Mathf.RoundToInt(Magic_str);
             pow += (Mathf.RoundToInt(Def) + Mathf.RoundToInt(Magic_def)) * 4.5f;
             pow += (Physical_critical + Magic_critical) * 0.5f;
@@ -1695,7 +1695,7 @@ namespace PCRCaculator
 
     }
 
-    [System.Serializable]
+    [Serializable]
     public class PlayerSetting
     {
         public int playerLevel;
@@ -1710,7 +1710,7 @@ namespace PCRCaculator
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
 
-        public Dictionary<Elements.eStateIconType, bool> ShowBuffDic = new Dictionary<Elements.eStateIconType, bool>();
+        public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
 
         public int GetMaxRank()
         {
@@ -1818,7 +1818,7 @@ namespace PCRCaculator
             return max;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class AllData
     {
         public List<string> equipmentDic;//装备类与装备id的对应字典
@@ -1855,12 +1855,12 @@ namespace PCRCaculator
             this.skillActionDescribe_cn = skillActionDescribe_cn;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class UnitPrefabData
     {
-        public Dictionary<string, List<Elements.FirearmCtrlData>> unitFirearmDatas;
+        public Dictionary<string, List<FirearmCtrlData>> unitFirearmDatas;
     }
-    [System.Serializable]
+    [Serializable]
     public class UnitSkillTimeData
     {
         public int unitId;
@@ -1878,7 +1878,7 @@ namespace PCRCaculator
         public Dictionary<int, float[]> actionExecTime_MainSkill2;
         public Dictionary<int, List<EffectData>> actionEffectDic;
     }
-    [System.Serializable]
+    [Serializable]
     public class EffectData
     {
         public float[] execTime;
@@ -1886,7 +1886,7 @@ namespace PCRCaculator
         public float hitDelay;
         public eMoveTypes moveType;
     }
-    [System.Serializable]
+    [Serializable]
     public class UnitAttackPattern
     {
         public int pattern_id;
@@ -1905,7 +1905,7 @@ namespace PCRCaculator
             this.atk_patterns = atk_patterns;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class UniqueEquipmentData
     {
         public int equipment_id;
@@ -1921,13 +1921,13 @@ namespace PCRCaculator
             return new BaseData();
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class GuildBattleData
     {
         public AddedPlayerData players;
         public EnemyData enemyData;
         public Dictionary<int, EnemyData> MPartsDataDic;
-        public Elements.MasterEnemyMParts.EnemyMParts mParts;
+        public MasterEnemyMParts.EnemyMParts mParts;
         public List<List<float>> UBExecTimeList = null;
         public bool isAutoMode = true;
         public bool forceAutoMode = false;
@@ -1940,7 +1940,7 @@ namespace PCRCaculator
         //public bool useFixedRandomSeed;
        // public int RandomSeed;
         //public Dictionary<int, UnitAttackPattern> changedATKPatternDic = new Dictionary<int, UnitAttackPattern>();
-        public Guild.GuildSettingData SettingData;
+        public GuildSettingData SettingData;
     }
 
 }

@@ -4,9 +4,9 @@
 * Description: pie graph example.
 ==========================================*/
 
-using UnityEngine;
 using System.Collections.Generic;
 using SpringGUI;
+using UnityEngine;
 
 public class PieGraphExample : MonoBehaviour
 {
@@ -15,13 +15,13 @@ public class PieGraphExample : MonoBehaviour
     private void Start()
     {
         // method 1:
-        PieGraph.Inject(new Pies(new List<PieData>()
-            {
+        PieGraph.Inject(new Pies(new List<PieData>
+        {
                 new PieData(26 ,Color.white)
             }));
 
         // method 2:
-        PieGraph.Inject(new List<PieData>()
+        PieGraph.Inject(new List<PieData>
         {
             new PieData(22,Color.magenta),
             new PieData(15 ,Color.red),
@@ -29,10 +29,10 @@ public class PieGraphExample : MonoBehaviour
 
         // method 3:
         PieGraph.Inject(
-            new List<float>() { 12 , 10 } ,
-            new List<Color>() { Color.blue , Color.black });
+            new List<float> { 12 , 10 } ,
+            new List<Color> { Color.blue , Color.black });
 
         // method 4:
-        PieGraph.Inject(new List<float>() { 8 , 7 });
+        PieGraph.Inject(new List<float> { 8 , 7 });
     }
 }

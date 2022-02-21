@@ -390,7 +390,7 @@ namespace Spine.Unity
 			{
 				Slot slot2 = items[i];
 				Attachment attachment = slot2.attachment;
-				float z = zSpacing * (float)i;
+				float z = zSpacing * i;
 				float[] array = tempVerts;
 				Color color2 = default(Color);
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
@@ -443,9 +443,9 @@ namespace Spine.Unity
 				if (pmaVertexColors)
 				{
 					color.a = (byte)(num * slot2.a * color2.a);
-					color.r = (byte)(r * slot2.r * color2.r * (float)(int)color.a);
-					color.g = (byte)(g * slot2.g * color2.g * (float)(int)color.a);
-					color.b = (byte)(b * slot2.b * color2.b * (float)(int)color.a);
+					color.r = (byte)(r * slot2.r * color2.r * color.a);
+					color.g = (byte)(g * slot2.g * color2.g * color.a);
+					color.b = (byte)(b * slot2.b * color2.b * color.a);
 					if (slot2.data.blendMode == BlendMode.Additive)
 					{
 						color.a = 0;
@@ -570,7 +570,7 @@ namespace Spine.Unity
 			clipper.ClipEnd();
 			meshBoundsMin = vector;
 			meshBoundsMax = vector2;
-			meshBoundsThickness = (float)instruction.endSlot * zSpacing;
+			meshBoundsThickness = instruction.endSlot * zSpacing;
 			int[] items6 = exposedList.Items;
 			int m = exposedList.Count;
 			for (int num14 = items6.Length; m < num14; m++)
@@ -679,7 +679,7 @@ namespace Spine.Unity
 				{
 					Slot slot2 = items4[l];
 					Attachment attachment2 = slot2.attachment;
-					float z = (float)l * settings.zSpacing;
+					float z = l * settings.zSpacing;
 					RegionAttachment regionAttachment = attachment2 as RegionAttachment;
 					if (regionAttachment != null)
 					{
@@ -707,9 +707,9 @@ namespace Spine.Unity
 						if (settings.pmaVertexColors)
 						{
 							color.a = (byte)(num3 * slot2.a * regionAttachment.a);
-							color.r = (byte)(r * slot2.r * regionAttachment.r * (float)(int)color.a);
-							color.g = (byte)(g * slot2.g * regionAttachment.g * (float)(int)color.a);
-							color.b = (byte)(b * slot2.b * regionAttachment.b * (float)(int)color.a);
+							color.r = (byte)(r * slot2.r * regionAttachment.r * color.a);
+							color.g = (byte)(g * slot2.g * regionAttachment.g * color.a);
+							color.b = (byte)(b * slot2.b * regionAttachment.b * color.a);
 							if (slot2.data.blendMode == BlendMode.Additive)
 							{
 								color.a = 0;
@@ -816,9 +816,9 @@ namespace Spine.Unity
 					if (settings.pmaVertexColors)
 					{
 						color.a = (byte)(num3 * slot2.a * meshAttachment2.a);
-						color.r = (byte)(r * slot2.r * meshAttachment2.r * (float)(int)color.a);
-						color.g = (byte)(g * slot2.g * meshAttachment2.g * (float)(int)color.a);
-						color.b = (byte)(b * slot2.b * meshAttachment2.b * (float)(int)color.a);
+						color.r = (byte)(r * slot2.r * meshAttachment2.r * color.a);
+						color.g = (byte)(g * slot2.g * meshAttachment2.g * color.a);
+						color.b = (byte)(b * slot2.b * meshAttachment2.b * color.a);
 						if (slot2.data.blendMode == BlendMode.Additive)
 						{
 							color.a = 0;
@@ -885,7 +885,7 @@ namespace Spine.Unity
 			}
 			meshBoundsMin = v;
 			meshBoundsMax = v2;
-			meshBoundsThickness = (float)num2 * settings.zSpacing;
+			meshBoundsThickness = num2 * settings.zSpacing;
 			if (!updateTriangles)
 			{
 				return;
@@ -1171,7 +1171,7 @@ namespace Spine.Unity
 			{
 				Vector2 vector2 = tempTanBuffer[i];
 				float num = Mathf.Sqrt(vector2.x * vector2.x + vector2.y * vector2.y);
-				if ((double)num > 1E-05)
+				if (num > 1E-05)
 				{
 					float num2 = 1f / num;
 					vector2.x *= num2;

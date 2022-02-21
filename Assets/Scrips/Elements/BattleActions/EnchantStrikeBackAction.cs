@@ -4,9 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Elements.Battle;
 using System.Collections.Generic;
+using Cute;
 using UnityEngine;
 
 namespace Elements
@@ -44,8 +43,8 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            this.AppendIsAlreadyExeced(_target.Owner, _num);
-            SkillEffectCtrl skillEffectCtrl1 = (SkillEffectCtrl)null;
+            AppendIsAlreadyExeced(_target.Owner, _num);
+            SkillEffectCtrl skillEffectCtrl1 = null;
             bool flag = true;
             //if (_target.Owner.StrikeBackDictionary.ContainsKey((EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2))
             //  flag = !_target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect.IsPlaying;
@@ -86,14 +85,14 @@ namespace Elements
               skillEffectCtrl1 = _target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect;
               effectController = skillEffectCtrl1 as CircleEffectController;
             }*/
-            StrikeBackDataSet strikeBackDataSet = (StrikeBackDataSet)null;
-            if (!_target.Owner.StrikeBackDictionary.TryGetValue((EnchantStrikeBackAction.eStrikeBackEffectType)this.ActionDetail2, out strikeBackDataSet))
+            StrikeBackDataSet strikeBackDataSet = null;
+            if (!_target.Owner.StrikeBackDictionary.TryGetValue((eStrikeBackEffectType)ActionDetail2, out strikeBackDataSet))
             {
-                strikeBackDataSet = new StrikeBackDataSet()
+                strikeBackDataSet = new StrikeBackDataSet
                 {
                     DataList = new List<StrikeBackData>()
                 };
-                _target.Owner.StrikeBackDictionary.Add((EnchantStrikeBackAction.eStrikeBackEffectType)this.ActionDetail2, strikeBackDataSet);
+                _target.Owner.StrikeBackDictionary.Add((eStrikeBackEffectType)ActionDetail2, strikeBackDataSet);
             }
             strikeBackDataSet.SkillEffect = skillEffectCtrl1;
             int count = 5;// effectController.Children.Count;
@@ -101,17 +100,17 @@ namespace Elements
             //effectController.AddEffect(number);
             for (int index = 0; index < number; ++index)
             {
-                StrikeBackData strikeBackData = new StrikeBackData()
+                StrikeBackData strikeBackData = new StrikeBackData
                 {
-                    StrikeBackType = (StrikeBackData.eStrikeBackType)this.ActionDetail1,
+                    StrikeBackType = (StrikeBackData.eStrikeBackType)ActionDetail1,
                     Damage = (int)_valueDictionary[eValueNumber.VALUE_1],
-                    EffectType = (EnchantStrikeBackAction.eStrikeBackEffectType)this.ActionDetail2,
-                    ActionEffectList = this.ActionEffectList,
+                    EffectType = (eStrikeBackEffectType)ActionDetail2,
+                    ActionEffectList = ActionEffectList,
                     Skill = _skill
                 };
                 strikeBackData.DataSet = strikeBackDataSet;
                 strikeBackDataSet.DataList.Add(strikeBackData);
-                _target.Owner.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(_target.Owner, eStateIconType.STRIKE_BACK, true);
+                _target.Owner.OnChangeState.Call(_target.Owner, eStateIconType.STRIKE_BACK, true);
                 _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.STRIKE_BACK, true, 90, "反击中");
 
             }
@@ -120,7 +119,7 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            this.Value[eValueNumber.VALUE_1] = (float)((double)this.MasterData.action_value_1 + (double)this.MasterData.action_value_2 * (double)_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
         }
 
         public enum eStrikeBackEffectType
@@ -130,13 +129,13 @@ namespace Elements
             OMEME_PLUS = 3,
         }
 
-        public class eStrikeBackEffectType_DictComparer : IEqualityComparer<EnchantStrikeBackAction.eStrikeBackEffectType>
+        public class eStrikeBackEffectType_DictComparer : IEqualityComparer<eStrikeBackEffectType>
         {
             public bool Equals(
-              EnchantStrikeBackAction.eStrikeBackEffectType _x,
-              EnchantStrikeBackAction.eStrikeBackEffectType _y) => _x == _y;
+              eStrikeBackEffectType _x,
+              eStrikeBackEffectType _y) => _x == _y;
 
-            public int GetHashCode(EnchantStrikeBackAction.eStrikeBackEffectType _obj) => (int)_obj;
+            public int GetHashCode(eStrikeBackEffectType _obj) => (int)_obj;
         }
     }
 }

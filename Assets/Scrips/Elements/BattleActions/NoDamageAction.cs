@@ -21,23 +21,23 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      this.AppendIsAlreadyExeced(_target.Owner, _num);
-      switch (this.ActionDetail1)
+      AppendIsAlreadyExeced(_target.Owner, _num);
+      switch (ActionDetail1)
       {
         case 1:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION, _valueDictionary[eValueNumber.VALUE_1], (ActionParameter) this, _skill);
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
           break;
         case 2:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DODGE, _valueDictionary[eValueNumber.VALUE_1], (ActionParameter) this, _skill);
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DODGE, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
           break;
         case 4:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.NO_ABNORMAL, _valueDictionary[eValueNumber.VALUE_1], (ActionParameter) this, _skill);
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.NO_ABNORMAL, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
           break;
         case 5:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.NO_DEBUF, _valueDictionary[eValueNumber.VALUE_1], (ActionParameter) this, _skill);
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.NO_DEBUF, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
           break;
         case 6:
-          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PARTS_NO_DAMAGE, _valueDictionary[eValueNumber.VALUE_1], (ActionParameter) this, _skill);
+          _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PARTS_NO_DAMAGE, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
           break;
       }
     }
@@ -45,7 +45,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
+      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
     }
 
     private enum eNoDamageType

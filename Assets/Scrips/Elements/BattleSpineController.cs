@@ -4,14 +4,16 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
+using System.Collections;
+using System.Diagnostics;
 using Cute;
 using Elements.Battle;
 using Spine;
 using Spine.Unity;
-using System;
-using System.Collections;
-using System.Diagnostics;
 using UnityEngine;
+using Animation = Spine.Animation;
+using Debug = UnityEngine.Debug;
 
 namespace Elements
 {
@@ -40,43 +42,41 @@ namespace Elements
 
         public bool IsConstantVelocity { get; set; }
 
-        private BattleManager battleManager => BattleSpineController.staticBattleManager;
+        private BattleManager battleManager => staticBattleManager;
 
         public bool IsIndependentBattleSync
         {
-            get => this.isIndependentBattleSync;
-            set => this.isIndependentBattleSync = value;
+            get => isIndependentBattleSync;
+            set => isIndependentBattleSync = value;
         }
 
         public bool IsColorStone
         {
-            get => this.isStone;
+            get => isStone;
             set
             {
-                this.isStone = value;
-                if (this.isStone)
-                    this.ChangeShader(eShader.VERTEX_COLOR_SEPARETE_GRAY_SCALE);
-                else { }
+                isStone = value;
+                if (isStone)
+                    ChangeShader(eShader.VERTEX_COLOR_SEPARETE_GRAY_SCALE);
                 //this.ChangeDefaultShader();
             }
         }
 
         public bool IsColorPauseAction
         {
-            get => this.isPauseAction;
+            get => isPauseAction;
             set
             {
-                this.isPauseAction = value;
-                if (this.isPauseAction)
-                    this.ChangeShader(eShader.VERTEX_COLOR_SEPARETE_GRAY_SCALE);
-                else { }
+                isPauseAction = value;
+                if (isPauseAction)
+                    ChangeShader(eShader.VERTEX_COLOR_SEPARETE_GRAY_SCALE);
                 //this.ChangeDefaultShader();
             }
         }
 
-        public bool HasSpecialSleepAnimatilon(int _motionPrefix) => this.IsAnimation(eSpineCharacterAnimeId.SLEEP, _motionPrefix, 0);
+        public bool HasSpecialSleepAnimatilon(int _motionPrefix) => IsAnimation(eSpineCharacterAnimeId.SLEEP, _motionPrefix, 0);
 
-        public bool CheckPlaySpecialSleepAnimeExceptRelease(int _motionPrefix) => this.HasSpecialSleepAnimatilon(_motionPrefix) && (this.AnimationName == this.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.SLEEP, _motionPrefix, 0) || this.AnimationName == this.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.SLEEP, _motionPrefix, 1));
+        public bool CheckPlaySpecialSleepAnimeExceptRelease(int _motionPrefix) => HasSpecialSleepAnimatilon(_motionPrefix) && (AnimationName == ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.SLEEP, _motionPrefix, 0) || AnimationName == ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.SLEEP, _motionPrefix, 1));
 
         public static void StaticRelease()
         {
@@ -92,7 +92,7 @@ namespace Elements
           Action<BattleSpineController> _callback = null,
           int _enemyColor = 0)
         {
-            UnityEngine.Debug.LogError("不要使用这个函数加载骨骼！");
+            Debug.LogError("不要使用这个函数加载骨骼！");
             /*int skinId = UnitUtility.GetSkinId(_spineType, _unitId, _rarity);
             SpineResourceLoader.Load(_spineType, skinId, skinId, _enemyColor, _transform, (Action<SpineResourceSet>) (_resourceSpineSet =>
             {
@@ -103,7 +103,7 @@ namespace Elements
         }
         public static BattleSpineController LoadNewSkeletonAnimationGameObject(SkeletonDataAsset skeletonDataAsset)
         {
-            return SkeletonAnimation.NewSpineGameObject<BattleSpineController>(skeletonDataAsset);
+            return NewSpineGameObject<BattleSpineController>(skeletonDataAsset);
         }
         public static BattleSpineController LoadAddedSkeletonAnimation(SkeletonDataAsset skeletonDataAsset,GameObject obj)
         {
@@ -150,8 +150,8 @@ namespace Elements
               BattleSpineController.staticBattleManager = (FMOLPKDBOPO) BattleSpineController.staticSingletonTree.Get<BattleManager>();
             }*/
             staticBattleManager = BattleManager.Instance;
-          this.battleManager.AddUnitSpineControllerList(this);
-          this.IsStopState = false;
+          battleManager.AddUnitSpineControllerList(this);
+          IsStopState = false;
         }
 
         /*public override void OnDestroy()
@@ -167,24 +167,24 @@ namespace Elements
 
         public void UpdateIndependentBattleSync()
         {
-            if (!this.IsIndependentBattleSync)
+            if (!IsIndependentBattleSync)
                 return;
-            this.RealUpdate();
+            RealUpdate();
         }
 
         public void LateUpdateIndependentBattleSync()
         {
-            if (!this.IsIndependentBattleSync)
+            if (!IsIndependentBattleSync)
                 return;
-            this.RealLateUpdate();
+            RealLateUpdate();
         }
 
         public void RealUpdate()
         {
-            if (!this.isActiveAndEnabled)
+            if (!isActiveAndEnabled)
                 return;
-            if (this.battleManager != null)
-                this.Update(this.IsConstantVelocity ? this.battleManager.DeltaTime_60fps / Time.timeScale : this.battleManager.DeltaTime_60fps);
+            if (battleManager != null)
+                Update(IsConstantVelocity ? battleManager.DeltaTime_60fps / Time.timeScale : battleManager.DeltaTime_60fps);
             else 
              base.Update();
         }
@@ -195,14 +195,14 @@ namespace Elements
 
         public void RealLateUpdate()
         {
-            if (!this.isActiveAndEnabled)
+            if (!isActiveAndEnabled)
                 return;
             base.LateUpdate();
         }
 
-        public void PlayAnime(eSpineCharacterAnimeId _animeId, bool _playLoop = true) => this.PlayAnime(this.ConvertAnimeIdToAnimeName(_animeId), _playLoop, 0.0f, false);
+        public void PlayAnime(eSpineCharacterAnimeId _animeId, bool _playLoop = true) => PlayAnime(ConvertAnimeIdToAnimeName(_animeId), _playLoop);
 
-        public void PlayAnime(eSpineCharacterAnimeId _animeId, int _index1, bool _playLoop = true) => this.PlayAnime(this.ConvertAnimeIdToAnimeName(_animeId, _index1), _playLoop, 0.0f, false);
+        public void PlayAnime(eSpineCharacterAnimeId _animeId, int _index1, bool _playLoop = true) => PlayAnime(ConvertAnimeIdToAnimeName(_animeId, _index1), _playLoop);
 
         public void PlayAnime(
           string _playAnimeName,
@@ -211,11 +211,11 @@ namespace Elements
           bool _ignoreBlackout = false)
         {
             base.PlayAnime(_playAnimeName, _playLoop);
-            this.IsPlayAnimeBattle = true;
-            float duration = this.state.Data.skeletonData.FindAnimation(_playAnimeName).Duration;
-            if (_playLoop || !((UnityEngine.Object)this.Owner == (UnityEngine.Object)null) && this.Owner.PlayingNoCutinMotion)
+            IsPlayAnimeBattle = true;
+            float duration = state.Data.skeletonData.FindAnimation(_playAnimeName).Duration;
+            if (_playLoop || !(Owner == null) && Owner.PlayingNoCutinMotion)
                 return;
-            this.setUpdateAnime(_startTime, duration, _ignoreBlackout);
+            setUpdateAnime(_startTime, duration, _ignoreBlackout);
         }
 
         public void RestartPlayAnimeCoroutine(
@@ -224,45 +224,45 @@ namespace Elements
           int _index,
           int _prefix)
         {
-            float duration = this.state.Data.skeletonData.FindAnimation(this.ConvertAnimeIdToAnimeName(_animeId, _index, _index3: _prefix)).Duration;
-            this.IsPlayAnimeBattle = true;
-            this.setUpdateAnime(_startTime, duration);
+            float duration = state.Data.skeletonData.FindAnimation(ConvertAnimeIdToAnimeName(_animeId, _index, _index3: _prefix)).Duration;
+            IsPlayAnimeBattle = true;
+            setUpdateAnime(_startTime, duration);
         }
 
-        public override void PlayAnime(string _playAnimeName, bool _playLoop = true) => this.PlayAnime(_playAnimeName, _playLoop, 0.0f, false);
+        public override void PlayAnime(string _playAnimeName, bool _playLoop = true) => PlayAnime(_playAnimeName, _playLoop);
 
-        public void PlayAnimeNoOverlap(eSpineCharacterAnimeId _animeId, int _index1, bool _playLoop = true) => this.PlayAnimeNoOverlap(this.ConvertAnimeIdToAnimeName(_animeId, _index1), _playLoop);
+        public void PlayAnimeNoOverlap(eSpineCharacterAnimeId _animeId, int _index1, bool _playLoop = true) => PlayAnimeNoOverlap(ConvertAnimeIdToAnimeName(_animeId, _index1), _playLoop);
 
         public void PlayAnimeNoOverlap(
           eSpineCharacterAnimeId _animeId,
           int _index1,
           int _ndex2,
           int _index3,
-          bool _playLoop = true) => this.PlayAnimeNoOverlap(this.ConvertAnimeIdToAnimeName(_animeId, _index1, _ndex2, _index3), _playLoop);
+          bool _playLoop = true) => PlayAnimeNoOverlap(ConvertAnimeIdToAnimeName(_animeId, _index1, _ndex2, _index3), _playLoop);
 
         public void SetAnimeEventDelegateForBattle(Action _callBack, int _motionPrefix = -1)
         {
-            Timeline timeline = this.state.Data.skeletonData.FindAnimation(this.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, _motionPrefix)).timelines.Find((Predicate<Timeline>)(e => e is EventTimeline));
-            this.stopStateEvent = _callBack;
+            Timeline timeline = state.Data.skeletonData.FindAnimation(ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, _motionPrefix)).timelines.Find(e => e is EventTimeline);
+            stopStateEvent = _callBack;
             if (timeline == null)
                 return;
-            this.StopStateTime = (timeline as EventTimeline).frames[0];
+            StopStateTime = (timeline as EventTimeline).frames[0];
         }
 
         public void SetDropTreasureBoxTime()
         {
-            Spine.Animation animation = this.state.Data.skeletonData.FindAnimation(this.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DIE));
+            Animation animation = state.Data.skeletonData.FindAnimation(ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DIE));
             if (animation == null)
             {
-                this.DropTreasureBoxTime = 0.2f;
+                DropTreasureBoxTime = 0.2f;
             }
             else
             {
-                Timeline timeline = animation.timelines.Find((Predicate<Timeline>)(e => e is EventTimeline));
+                Timeline timeline = animation.timelines.Find(e => e is EventTimeline);
                 if (timeline != null)
-                    this.DropTreasureBoxTime = (timeline as EventTimeline).frames[0];
+                    DropTreasureBoxTime = (timeline as EventTimeline).frames[0];
                 else
-                    this.DropTreasureBoxTime = 0.2f;
+                    DropTreasureBoxTime = 0.2f;
             }
         }
 
@@ -273,14 +273,14 @@ namespace Elements
           int _index3,
           bool _playLoop = true,
           float _startTime = 0.0f,
-          bool _ignoreBlackout = false) => this.PlayAnime(this.ConvertAnimeIdToAnimeName(_animeId, _index1, _index2, _index3), _playLoop, _startTime, _ignoreBlackout);
+          bool _ignoreBlackout = false) => PlayAnime(ConvertAnimeIdToAnimeName(_animeId, _index1, _index2, _index3), _playLoop, _startTime, _ignoreBlackout);
 
         private void setUpdateAnime(float _startTime, float _endTime, bool _ignoreBlackout = false)
         {
             if (_ignoreBlackout)
-                this.battleManager.AppendCoroutine(this.updateAnime(_startTime, _endTime, ++this.startedCoroutineId), ePauseType.IGNORE_BLACK_OUT, (UnitCtrl)null);
+                battleManager.AppendCoroutine(updateAnime(_startTime, _endTime, ++startedCoroutineId), ePauseType.IGNORE_BLACK_OUT);
             else
-                this.battleManager.AppendCoroutine(this.updateAnime(_startTime, _endTime, ++this.startedCoroutineId), ePauseType.SYSTEM, this.Owner);
+                battleManager.AppendCoroutine(updateAnime(_startTime, _endTime, ++startedCoroutineId), ePauseType.SYSTEM, Owner);
         }
 
         private IEnumerator updateAnime(float _startTime, float _endTime, int _thisId)
@@ -288,22 +288,22 @@ namespace Elements
             BattleSpineController battleSpineController = this;
             float deltaTime = battleSpineController.battleManager != null ? battleSpineController.battleManager.DeltaTime_60fps : 0.03333334f;
             float time = _startTime;
-            bool callDamageEvent = (UnityEngine.Object)battleSpineController.Owner != (UnityEngine.Object)null && battleSpineController.AnimationName == battleSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, battleSpineController.Owner.MotionPrefix);
+            bool callDamageEvent = battleSpineController.Owner != null && battleSpineController.AnimationName == battleSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, battleSpineController.Owner.MotionPrefix);
             while (battleSpineController.startedCoroutineId == _thisId)
             {
                 time += !battleSpineController.isPause ? deltaTime : 0.0f;
-                if (callDamageEvent && (double)time > (double)battleSpineController.StopStateTime)
+                if (callDamageEvent && time > (double)battleSpineController.StopStateTime)
                 {
                     battleSpineController.stopStateEvent.Call();
                     callDamageEvent = false;
                 }
-                if ((double)time > (double)_endTime || BattleUtil.Approximately(time, _endTime))
+                if (time > (double)_endTime || BattleUtil.Approximately(time, _endTime))
                 {
                     battleSpineController.IsPlayAnimeBattle = false;
                     battleSpineController.IsStopState = false;
                     break;
                 }
-                yield return (object)null;
+                yield return null;
             }
         }
     }

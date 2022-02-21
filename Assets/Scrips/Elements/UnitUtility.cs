@@ -4,14 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using CodeStage.AntiCheat.ObscuredTypes;
-using Cute;
 //using Cute.Cri;
 //using Elements.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace Elements
 {
@@ -31,9 +25,9 @@ namespace Elements
     public static eUnitBattlePos GetUnitPosType(float _searchAreaWidth)
     {
       //MasterPositionSetting.PositionSetting positionSetting = ManagerSingleton<MasterDataManager>.Instance.masterPositionSetting.Get(1);
-      if ((double) _searchAreaWidth <= (double) (int) 299)//positionSetting.front)
+      if (_searchAreaWidth <= (double) 299)//positionSetting.front)
         return eUnitBattlePos.FRONT;
-      return (double) _searchAreaWidth > (double) (int) 599//positionSetting.middle 
+      return _searchAreaWidth > (double) 599//positionSetting.middle 
                 ? eUnitBattlePos.BACK : eUnitBattlePos.MIDDLE;
     }
 
@@ -93,7 +87,7 @@ namespace Elements
     */
     public static int GetCharaId(int _unitId)
     {
-      _unitId = UnitUtility.GetUnitResourceId(_unitId);
+      _unitId = GetUnitResourceId(_unitId);
       return _unitId / 100;
     }
 
@@ -101,7 +95,7 @@ namespace Elements
 
     public static int GetClassId(int _unitId)
     {
-      _unitId = UnitUtility.GetUnitResourceId(_unitId);
+      _unitId = GetUnitResourceId(_unitId);
       return _unitId % 100;
     }
 /**
@@ -133,36 +127,36 @@ namespace Elements
     */
     public static bool IsUnitTypePersonOrSummonPerson(int _unitId)
     {
-      UnitDefine.UnitType unitType = UnitUtility.getUnitType(_unitId);
+      UnitDefine.UnitType unitType = getUnitType(_unitId);
       return unitType == UnitDefine.UnitType.PERSON || unitType == UnitDefine.UnitType.SUMMON_PERSON;
     }
 
-    public static bool IsUnitTypeSummonPersonOnly(int _unitId) => UnitUtility.getUnitType(_unitId) == UnitDefine.UnitType.SUMMON_PERSON;
+    public static bool IsUnitTypeSummonPersonOnly(int _unitId) => getUnitType(_unitId) == UnitDefine.UnitType.SUMMON_PERSON;
 
     public static bool IsMonsterUnit(int _unitId)
     {
-      _unitId = UnitUtility.GetUnitResourceId(_unitId);
-      return UnitUtility.getUnitType(_unitId) == UnitDefine.UnitType.MONSTER;
+      _unitId = GetUnitResourceId(_unitId);
+      return getUnitType(_unitId) == UnitDefine.UnitType.MONSTER;
     }
 
     public static bool JudgeIsBoss(int _unitId)
     {
-      _unitId = UnitUtility.GetUnitResourceId(_unitId);
-      return UnitUtility.getUnitType(_unitId) == UnitDefine.UnitType.BOSS;
+      _unitId = GetUnitResourceId(_unitId);
+      return getUnitType(_unitId) == UnitDefine.UnitType.BOSS;
     }
 
     public static bool JudgeIsSummon(int _unitId)
     {
-      _unitId = UnitUtility.GetUnitResourceId(_unitId);
-      UnitDefine.UnitType unitType = UnitUtility.getUnitType(_unitId);
+      _unitId = GetUnitResourceId(_unitId);
+      UnitDefine.UnitType unitType = getUnitType(_unitId);
       return unitType == UnitDefine.UnitType.SUMMON_PERSON || unitType == UnitDefine.UnitType.SUMMON_MONSTER;
     }
     
-    public static bool JudgeIsGuest(int _unitId) => UnitUtility.getUnitType(_unitId) == UnitDefine.UnitType.GUEST;
+    public static bool JudgeIsGuest(int _unitId) => getUnitType(_unitId) == UnitDefine.UnitType.GUEST;
 
     public static bool IsEnemyUnit(int _unitId)
     {
-      UnitDefine.UnitType unitType = UnitUtility.getUnitType(_unitId);
+      UnitDefine.UnitType unitType = getUnitType(_unitId);
       return _unitId >= 1000000 || unitType == UnitDefine.UnitType.MONSTER || unitType == UnitDefine.UnitType.BOSS;
     }
 
@@ -1961,7 +1955,7 @@ namespace Elements
       return eDialogTextColor;
     }
     */
-    public static int GetDefaultActionPatternId(int _id) => UnitUtility.GetUnitResourceId(_id) * 100 + 1;
+    public static int GetDefaultActionPatternId(int _id) => GetUnitResourceId(_id) * 100 + 1;
 /*
     public static int CalcUnitsTotalPower()
     {
@@ -3252,7 +3246,7 @@ namespace Elements
                 int _promotionLevel = (int) actionInfo.ActionValue.Value4 % 100;
                 if (_promotionLevel == 0)
                   _promotionLevel = (int) unitData.PromotionLevel;
-                ObscuredInt actionDetail2 = skillAction.action_detail_2;
+                int actionDetail2 = skillAction.action_detail_2;
                 summonSkillList.Add(new UnitUtility.SummonSkillData((int) skillLevel.SkillId, (int) skillLevel.SkillLevel, _rarity, _promotionLevel, (int) actionDetail2));
               }
             }
@@ -3635,7 +3629,7 @@ namespace Elements
     */
     public static int GetSkinId(int _unitId, int _rarity)
     {
-      if (!UnitUtility.IsUnitTypePersonOrSummonPerson(_unitId) || UnitUtility.IsUnitTypeSummonPersonOnly(_unitId) && _rarity == 0)
+      if (!IsUnitTypePersonOrSummonPerson(_unitId) || IsUnitTypeSummonPersonOnly(_unitId) && _rarity == 0)
         return _unitId;
       int num = _unitId;
       switch (_rarity)
@@ -3677,13 +3671,13 @@ namespace Elements
       return UnitUtility.GetSkinId(_unitId, setSkinNo);
     }*/
     
-    public static int SkinIdToUnitId(int _skinId) => _skinId / 100 * 100 + UnitUtility.SkinIdToClassId(_skinId);
+    public static int SkinIdToUnitId(int _skinId) => _skinId / 100 * 100 + SkinIdToClassId(_skinId);
 
     public static int SkinIdToRarity(int _skinId) => _skinId / 10 % 10;
 
     public static int SkinIdToSkinNo(int _skinId) => _skinId % 100 / 10;
 
-    public static bool IsSkinId(int _id) => (uint) UnitUtility.SkinIdToRarity(_id) > 0U;
+    public static bool IsSkinId(int _id) => (uint) SkinIdToRarity(_id) > 0U;
 
     public static int SkinIdToClassId(int _skinId) => _skinId % 10;
 /*

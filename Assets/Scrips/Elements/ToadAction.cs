@@ -4,11 +4,10 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Cute;
-using Spine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cute;
+using Spine;
 using UnityEngine;
 
 namespace Elements
@@ -112,15 +111,15 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       ToadAction toadAction = this;
-      while ((double) _toadData.Timer <= (double) _valueDictionary[eValueNumber.VALUE_1] || _target.Owner.CurrentState != UnitCtrl.ActionState.IDLE)
+      while (_toadData.Timer <= (double) _valueDictionary[eValueNumber.VALUE_1] || _target.Owner.CurrentState != UnitCtrl.ActionState.IDLE)
       {
         _toadData.Timer += _target.Owner.DeltaTimeForPause;
         if (_toadData.DisableByNextToad)
           yield break;
-        else if (_toadData.Enable && (!_target.Owner.IdleOnly || (long) _target.Owner.Hp <= 0L))
-          yield return (object) null;
+        if (_toadData.Enable && (!_target.Owner.IdleOnly || (long) _target.Owner.Hp <= 0L))
+            yield return null;
         else
-          break;
+            break;
       }
       if (!_toadData.DisableByNextToad)
       {
@@ -137,17 +136,15 @@ namespace Elements
         _toadData.Timer = 0.0f;
         _target.Owner.CancelByToad = true;
         _target.Owner.ToadRelease = true;
-        while ((double) _toadData.Timer < (double) _valueDictionary[eValueNumber.VALUE_3])
+        while (_toadData.Timer < (double) _valueDictionary[eValueNumber.VALUE_3])
         {
-          if (_toadData.DisableByNextToad)
+            if (_toadData.DisableByNextToad)
           {
             yield break;
           }
-          else
-          {
+
             _toadData.Timer += _target.Owner.DeltaTimeForPause;
-            yield return (object) null;
-          }
+            yield return null;
         }
         if (!_toadData.DisableByNextToad)
         {
@@ -158,16 +155,15 @@ namespace Elements
           //_target.Owner.PlayDieEffect();
           while (spineCtrl.IsPlayAnimeBattle)
           {
-            if (_toadData.DisableByNextToad)
+              if (_toadData.DisableByNextToad)
               yield break;
-            else
-              yield return (object) null;
+              yield return null;
           }
           if (!_toadData.DisableByNextToad)
           {
             _target.Owner.ToadRelease = false;
             _target.Owner.ToadDatas.Remove(_toadData);
-            _target.Owner.OnChangeState.Call<UnitCtrl, eStateIconType, bool>(_target.Owner, _toadData.StateIconType, false);
+            _target.Owner.OnChangeState.Call(_target.Owner, _toadData.StateIconType, false);
             _toadData.BattleSpineController.gameObject.SetActive(false);
             Color curColor = _toadData.BattleSpineController.CurColor;
             BattleSpineController currentSpineCtrl = _target.Owner.GetCurrentSpineCtrl();
@@ -209,6 +205,6 @@ namespace Elements
       }
     }
 
-    public override void SetLevel(float _level) => this.Value[eValueNumber.VALUE_1] = (float) ((double) this.MasterData.action_value_1 + (double) this.MasterData.action_value_2 * (double) _level);
+    public override void SetLevel(float _level) => Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
   }
 }

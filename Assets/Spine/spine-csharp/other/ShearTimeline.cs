@@ -10,8 +10,8 @@ namespace Spine
 
 		public override void Apply(Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixPose pose, MixDirection direction)
 		{
-			Bone bone = skeleton.bones.Items[base.BoneIndex];
-			float[] frames = base.frames;
+			Bone bone = skeleton.bones.Items[BoneIndex];
+			float[] frames = this.frames;
 			if (time < frames[0])
 			{
 				switch (pose)

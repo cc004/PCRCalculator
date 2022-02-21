@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
-using Spine;
+using Elements.Battle;
+using PCRCaculator;
+using PCRCaculator.Battle;
+using PCRCaculator.Guild;
 using Spine.Unity;
-using Newtonsoft0.Json;
+using UnityEngine;
 
 namespace Elements
 {
@@ -27,9 +29,9 @@ namespace Elements
         public List<UnitCtrl> enemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
 
-        private int finishCount = 0;
-        private PCRCaculator.MainManager mainManager;
-        private Battle.BattleManager staticBattleManager;
+        private int finishCount;
+        private MainManager mainManager;
+        private BattleManager staticBattleManager;
         private Dictionary<int, UnitCtrl> playerUnitCtrlDic = new Dictionary<int, UnitCtrl>();
         private Dictionary<int, UnitCtrl> enemyUnitCtrlDic = new Dictionary<int, UnitCtrl>();
 
@@ -48,12 +50,12 @@ namespace Elements
         }
         private void Start()
         {
-            staticBattleManager = Battle.BattleManager.Instance;
-            if(PCRCaculator.MainManager.Instance == null)
+            staticBattleManager = BattleManager.Instance;
+            if(MainManager.Instance == null)
             {
                 return;
             }
-            mainManager = PCRCaculator.MainManager.Instance;
+            mainManager = MainManager.Instance;
             IsAutoMode = mainManager.IsAutoMode;
             ForceAutoMode = mainManager.ForceAutoMode;
             tempData = new TempData();
@@ -75,17 +77,17 @@ namespace Elements
             else
             {
                 tempData.enemyList = mainManager.EnemyDataForBattle;
-                tempData.SettingData = PCRCaculator.Guild.GuildManager.StaticsettingData;
+                tempData.SettingData = GuildManager.StaticsettingData;
             }
             tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
-            Battle.BattleManager.Instance.Init(this);
+            BattleManager.Instance.Init(this);
             if (!IsAutoMode)
             {
-                Battle.BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
             }
             else
             {
-                Battle.BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
             }
     }
     private void LoadAllUnitCtrlData()
@@ -146,10 +148,10 @@ namespace Elements
         }
         public void SetUI()
         {
-            PCRCaculator.Battle.BattleUIManager.Instance.SetUI_2(this);
-            if (tempData.isGuildBattle && PCRCaculator.Guild.GuildCalculator.Instance != null)
+            BattleUIManager.Instance.SetUI_2(this);
+            if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
-                PCRCaculator.Guild.GuildCalculator.Instance.Initialize(playerUnitCtrl, enemyUnitCtrl[0]);
+                GuildCalculator.Instance.Initialize(playerUnitCtrl, enemyUnitCtrl[0]);
             }
 
             if (tempData.isGuildBattle)
@@ -159,7 +161,7 @@ namespace Elements
         }
         public static void SetSummonUI(UnitCtrl summon)
         {
-            PCRCaculator.Battle.BattleUIManager.Instance.SetSummonUI(summon);
+            BattleUIManager.Instance.SetSummonUI(summon);
         }
         public void PauseButton()
         {
@@ -167,11 +169,11 @@ namespace Elements
         }
         public void SetTimeCount(float LastTimeFloat)
         {
-            PCRCaculator.Battle.BattleUIManager.Instance.UpdateTimeCount(LastTimeFloat);
+            BattleUIManager.Instance.UpdateTimeCount(LastTimeFloat);
         }
         public void SetBattleSpeed(float speed)
         {
-            Battle.BattleSpeedInterface battleSpeed = Battle.BattleManager.Instance.battleTimeScale;
+            BattleSpeedInterface battleSpeed = BattleManager.Instance.battleTimeScale;
             if (speed == 1)
             {
                 battleSpeed.SpeedUpFlag = false;
@@ -189,11 +191,11 @@ namespace Elements
             dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
             if(dataAsset == null)
             {
-                dataAsset = PCRCaculator.SpineCreator.Instance.Createskeletondata(unitid, SPINE_SCALE, true);
+                dataAsset = SpineCreator.Instance.Createskeletondata(unitid, SPINE_SCALE, true);
             }
             if(dataAsset == null)
             {
-                PCRCaculator.MainManager.Instance.WindowConfigMessage("角色" + unitid + "的骨骼动画数据丢失！",null);
+                MainManager.Instance.WindowConfigMessage("角色" + unitid + "的骨骼动画数据丢失！",null);
                 return;
             }
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
@@ -218,7 +220,7 @@ namespace Elements
             
             unitCtrl.CenterBone = battleSpineController.skeleton.FindBone("Center");
             unitCtrl.StateBone = battleSpineController.skeleton.FindBone("State");
-            battleSpineController.SetAnimeEventDelegateForBattle(() => { battleSpineController.IsStopState = true; }, -1);
+            battleSpineController.SetAnimeEventDelegateForBattle(() => { battleSpineController.IsStopState = true; });
             //unitCtrl.transform.parent = unitParentTransform;
             unitCtrl.transform.ResetLocal();
             unitCtrl.transform.localPosition = new Vector3(-1400f, staticBattleManager.GetRespawnPos(respawnPos), 0);
@@ -226,7 +228,7 @@ namespace Elements
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
             unitCtrl.unitParameter = unitParameter;
-            unitCtrl.Initialize(unitParameter,unitData ,false, true, false);
+            unitCtrl.Initialize(unitParameter,unitData ,false, true);
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
             if (!IsAutoMode && isplayer)
@@ -284,10 +286,10 @@ namespace Elements
                 useSkillEffects = LoadSkillEffectPrefabs(unitid);
             }
             //GameObject b = Instantiate(battleUnitPrefab);
-            GameObject prefab = PCRCaculator.ABExTool.LoadUnitPrefab(unitid);
+            GameObject prefab = ABExTool.LoadUnitPrefab(unitid);
             GameObject b;
             if (prefab != null)
-                b = Instantiate(PCRCaculator.ABExTool.LoadUnitPrefab(unitid));
+                b = Instantiate(ABExTool.LoadUnitPrefab(unitid));
             else
             {
                 b = Instantiate(battleUnitPrefab);
@@ -336,17 +338,17 @@ namespace Elements
             finishAction?.Invoke();
 
         }
-        public UnitCtrl LoadSummonPrefabImmediately(Battle.SummonData summonData)
+        public UnitCtrl LoadSummonPrefabImmediately(SummonData summonData)
         {
             int unitid = summonData.SummonId;
             if (unitid >= 999999)
-                unitid = PCRCaculator.Guild.GuildManager.EnemyDataDic[unitid].unit_id;
-            var a = PCRCaculator.ABExTool.LoadUnitPrefab(unitid);
+                unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+            var a = ABExTool.LoadUnitPrefab(unitid);
             if (a == null)
             {
-                unitid = (int)(unitid / 100) * 100;
-                PCRCaculator.Guild.GuildManager.EnemyDataDic[summonData.SummonId].unit_id = unitid;
-                a = PCRCaculator.ABExTool.LoadUnitPrefab(unitid);
+                unitid = unitid / 100 * 100;
+                GuildManager.EnemyDataDic[summonData.SummonId].unit_id = unitid;
+                a = ABExTool.LoadUnitPrefab(unitid);
             }
             GameObject b = Instantiate(a);
             b.transform.SetParent(unitParent);
@@ -357,18 +359,18 @@ namespace Elements
             b.GetComponent<UnitActionController>().LoadActionControllerData(unitid);
             return unitCtrl;
         }
-        public static void CreateSummonSpine(Battle.SummonData summonData,UnitCtrl summonUnitCtrl, GameObject exitObj,
+        public static void CreateSummonSpine(SummonData summonData,UnitCtrl summonUnitCtrl, GameObject exitObj,
           Action<BattleSpineController> _callback = null)
         {
             int unitid = summonData.SummonId;
             if (unitid >= 999999)
-                unitid = PCRCaculator.Guild.GuildManager.EnemyDataDic[unitid].unit_id;
-            int prefabID = PCRCaculator.ABExTool.GetPrefabId(unitid);
+                unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+            int prefabID = ABExTool.GetPrefabId(unitid);
             SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
             if (dataAsset == null)
             {
-                dataAsset = PCRCaculator.SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true);
+                dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true);
             }
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadAddedSkeletonAnimation(dataAsset,exitObj);
@@ -379,7 +381,7 @@ namespace Elements
             battleSpineController.Create(resourceSet);
             SetSummonUI(summonUnitCtrl);
             _callback?.Invoke(battleSpineController);
-            PCRCaculator.Guild.GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);
+            GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);
 
         }
         public static void CreateModeChangeSpine(eSpineType _spineType,
@@ -393,12 +395,12 @@ namespace Elements
             SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             int unitid = _unitId;
             if (unitid >= 999999)
-                unitid = PCRCaculator.Guild.GuildManager.EnemyDataDic[unitid].unit_id;
-            int prefabID = PCRCaculator.ABExTool.GetPrefabId(unitid);
+                unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+            int prefabID = ABExTool.GetPrefabId(unitid);
             dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + _unitId + "_1/" + (_unitId+30) + "_1_SkeletonData");
             if (dataAsset == null)
             {
-                dataAsset = PCRCaculator.SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{_unitId + 30}_1.unity3d");
+                dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{_unitId + 30}_1.unity3d");
             }
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadNewSkeletonAnimationGameObject(dataAsset);
@@ -425,7 +427,7 @@ namespace Elements
             {
                 foreach (string name in neededPrefab)
                 {
-                    List<GameObject> ins = PCRCaculator.ABExTool.GetAllAssetBundleByName<GameObject>("all_" + name + ".unity3d", "prefab");
+                    List<GameObject> ins = ABExTool.GetAllAssetBundleByName<GameObject>("all_" + name + ".unity3d", "prefab");
                     if (ins != null || ins.Count == 0)
                     {
                         //GameObject a = Instantiate(ins);
@@ -437,7 +439,7 @@ namespace Elements
                         Debug.LogError(unitid + "的通用弹道数据丢失！");
                     }
                 }
-                GameObject ins2 = PCRCaculator.ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab");
+                GameObject ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab");
                 if (ins2 != null)
                 {
                     //GameObject b = Instantiate(ins2);
@@ -509,19 +511,19 @@ namespace Elements
         {
             if (tempData.isGuildBattle)
             {
-                PCRCaculator.Guild.GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
+                GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
             }
             if (!mainManager.AutoCalculatorData.isFinish)
             {
                 mainManager.AutoCalculatorData.resultDatas.Add(
-                  PCRCaculator.Guild.GuildCalculator.Instance.GetOnceResultData( mainManager.AutoCalculatorData.execedTime + 1));
+                  GuildCalculator.Instance.GetOnceResultData( mainManager.AutoCalculatorData.execedTime + 1));
                 StartCoroutine(BackToTitle());
             }
         }
         private IEnumerator BackToTitle()
         {
             yield return new WaitForSecondsRealtime(1.5f);
-            PCRCaculator.Battle.BattleUIManager.Instance.ExitButton2();
+            BattleUIManager.Instance.ExitButton2();
         }
 
     }
@@ -532,25 +534,25 @@ namespace Elements
     }
     public class TempData
     {
-        public List<List<Elements.UnitParameter>> AllUnitParameters;
+        public List<List<UnitParameter>> AllUnitParameters;
         public List<UnitParameter> PlayerParameters;
         public List<UnitParameter> EnemyParameters;
         public List<List<float>> UBExecTimeList;
         public int tryCount = 30;
-        public bool isGuildBattle = false;
-        public bool isGuildEnemyViolent = false;
+        public bool isGuildBattle;
+        public bool isGuildEnemyViolent;
         public List<PCRCaculator.UnitData> playerList;
         public List<PCRCaculator.UnitData> enemyList;
-        public PCRCaculator.EnemyData guildEnemy;
-        public Dictionary<int, PCRCaculator.EnemyData> MPartsDataDic;
-        public Elements.MasterEnemyMParts.EnemyMParts mParts;
+        public EnemyData guildEnemy;
+        public Dictionary<int, EnemyData> MPartsDataDic;
+        public MasterEnemyMParts.EnemyMParts mParts;
         //public bool UseFixedRandomSeed;
         //public int RandomSeed;
-        public PCRCaculator.Guild.GuildSettingData SettingData;
-        public Dictionary<int, PCRCaculator.BaseData> playerUnitBaseDataDic;
-        public PCRCaculator.Guild.GuildRandomData randomData;
+        public GuildSettingData SettingData;
+        public Dictionary<int, BaseData> playerUnitBaseDataDic;
+        public GuildRandomData randomData;
 
-        public void CreateAllUnitParameters(PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType useLogBarrier = PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.NoBarrier)
+        public void CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {
             AllUnitParameters = new List<List<UnitParameter>>();
             PlayerParameters = new List<UnitParameter>();
@@ -578,12 +580,12 @@ namespace Elements
         }
         public static UnitParameter CreateUnitParameter(PCRCaculator.UnitData unitData)
         {
-            PCRCaculator.UnitRarityData rarityData = PCRCaculator.MainManager.Instance.UnitRarityDic[unitData.unitId];
+            UnitRarityData rarityData = MainManager.Instance.UnitRarityDic[unitData.unitId];
             //int[] skillList = rarityData.GetSkillList(unitData);
             //int[] skillList = rarityData.GetFullSkillList();
-            PCRCaculator.UnitSkillData skillData = rarityData.skillData;
+            UnitSkillData skillData = rarityData.skillData;
             int[] skillLvEv = unitData.GetEvlotionSkillLv();
-            PCRCaculator.UnitDetailData detailData = rarityData.detailData;
+            UnitDetailData detailData = rarityData.detailData;
             return new UnitParameter(
                 new UnitData(unitData.unitId, new DateTime(), 1, unitData.rarity, unitData.rarity, unitData.level, 0, ePromotionLevel.Bronze,
                     new List<SkillLevelInfo> { new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0), new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0) },
@@ -594,7 +596,7 @@ namespace Elements
                     new List<SkillLevelInfo>(), 0),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(unitData.unitId, detailData.name, "?", unitData.unitId, 0, detailData.minrarity, detailData.motionType, detailData.seType,
-                450, detailData.searchAreaWidth, detailData.atkType, detailData.normalAtkCastTime, 0, 0, 0, 0, detailData.guildId, 0, "", 0, "", ""),
+                450, detailData.searchAreaWidth, detailData.atkType, detailData.normalAtkCastTime, 0, 0, 0, 0, detailData.guildId),
                 new MasterUnitSkillData.UnitSkillData(
                     unit_id: unitData.unitId,
                     union_burst: skillData.UB,
@@ -627,7 +629,7 @@ namespace Elements
 
                 ) ;
         }
-        public static UnitParameter CreateUnitParameter(PCRCaculator.EnemyData enemyData, PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType useLogBarrier)
+        public static UnitParameter CreateUnitParameter(EnemyData enemyData, GuildPlayerGroupData.LogBarrierType useLogBarrier)
         {
             List<SkillLevelInfo> mainSkillLevelInfo = new List<SkillLevelInfo>();
             for(int i = 0; i < enemyData.main_skill_lvs.Count; i++)
@@ -643,7 +645,7 @@ namespace Elements
                     enemyData.resist_status_id),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(enemyData.unit_id, enemyData.detailData.unit_name, "?", enemyData.detailData.unit_id, 0, 1, enemyData.detailData.motion_type, enemyData.detailData.se_type,
-                450, enemyData.detailData.search_area_width, enemyData.detailData.atk_type, enemyData.detailData.normal_atk_cast_time, 0, 0, 0, 0, 0, 0, "", 0, "", ""),
+                450, enemyData.detailData.search_area_width, enemyData.detailData.atk_type, enemyData.detailData.normal_atk_cast_time),
                 new MasterUnitSkillData.UnitSkillData(unit_id: enemyData.unit_id, union_burst: enemyData.skillData.UB,
                 main_skill_1: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[0],useLogBarrier),
                 main_skill_2: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[1], useLogBarrier),
@@ -657,16 +659,16 @@ namespace Elements
                 main_skill_10: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[9], useLogBarrier)
                 ),enemyData);
         }
-        private static int JudgeAndSetSkillByID(int skillid, PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType enableLogBarrier)
+        private static int JudgeAndSetSkillByID(int skillid, GuildPlayerGroupData.LogBarrierType enableLogBarrier)
         {
-            if (skillid == 0 || enableLogBarrier != PCRCaculator.Guild.GuildPlayerGroupData.LogBarrierType.NoBarrier)
+            if (skillid == 0 || enableLogBarrier != GuildPlayerGroupData.LogBarrierType.NoBarrier)
                 return skillid;
-            var skillData = PCRCaculator.MainManager.Instance.SkillDataDic[skillid];
+            var skillData = MainManager.Instance.SkillDataDic[skillid];
             foreach(int actionid in skillData.skillactions)
             {
                 if (actionid > 0)
                 {
-                    var actionData = PCRCaculator.MainManager.Instance.SkillActionDic[actionid];
+                    var actionData = MainManager.Instance.SkillActionDic[actionid];
                     if (actionData.type == 73)
                         return 0;
                 }
@@ -675,7 +677,7 @@ namespace Elements
         }
 
     }
-    [System.Serializable]
+    [Serializable]
     public class UnitCtrlData
     {
         public int unitid;

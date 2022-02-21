@@ -12,7 +12,7 @@ namespace Elements
   [Serializable]
   public class DamageData
   {
-    public DamageData.eDamageSoundType DamageSoundType { get; set; }
+    public eDamageSoundType DamageSoundType { get; set; }
 
     public BasePartsData Target { get; set; }
 
@@ -28,7 +28,7 @@ namespace Elements
 
     public float CriticalRate { get; set; }
 
-    public DamageData.eDamageType DamageType { get; set; }
+    public eDamageType DamageType { get; set; }
 
     public eDamageEffectType DamegeEffectType { get; set; }
 
@@ -65,11 +65,11 @@ namespace Elements
       SLIP,
     }
 
-    public class eDamageSoundType_DictComparer : IEqualityComparer<DamageData.eDamageSoundType>
+    public class eDamageSoundType_DictComparer : IEqualityComparer<eDamageSoundType>
     {
-      public bool Equals(DamageData.eDamageSoundType _x, DamageData.eDamageSoundType _y) => _x == _y;
+      public bool Equals(eDamageSoundType _x, eDamageSoundType _y) => _x == _y;
 
-      public int GetHashCode(DamageData.eDamageSoundType _obj) => (int) _obj;
+      public int GetHashCode(eDamageSoundType _obj) => (int) _obj;
     }
   }
 }

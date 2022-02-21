@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using Spine;
 using System;
 using System.Collections.Generic;
 
@@ -18,7 +17,7 @@ namespace Elements
     public const int EYE_ANIMATION_PLAY_TRACK = 0;
     public const int MOUTH_ANIMATION_PLAY_TRACK = 1;
     public const int INVALID_VALUE = -1;
-    private static Dictionary<eSpineBinaryAnimationId, eResourceId> spineBinaryAnimationDic = new Dictionary<eSpineBinaryAnimationId, eResourceId>()
+    private static Dictionary<eSpineBinaryAnimationId, eResourceId> spineBinaryAnimationDic = new Dictionary<eSpineBinaryAnimationId, eResourceId>
     {
       {
         eSpineBinaryAnimationId.COMMON_BATTLE,
@@ -143,7 +142,7 @@ namespace Elements
       eSpineSkinId.QUANTITY_HALF,
       eSpineSkinId.QUANTITY_MAX
     };
-    private static Dictionary<eSpineSkinId, string> spineSkinDic = new Dictionary<eSpineSkinId, string>()
+    private static Dictionary<eSpineSkinId, string> spineSkinDic = new Dictionary<eSpineSkinId, string>
     {
       {
         eSpineSkinId.ANGER,
@@ -259,13 +258,13 @@ namespace Elements
     }
 
     public static eResourceId GetResourceId(
-      eSpineBinaryAnimationId spineBinaryAnimationId) => SpineDefine.spineBinaryAnimationDic[spineBinaryAnimationId];
+      eSpineBinaryAnimationId spineBinaryAnimationId) => spineBinaryAnimationDic[spineBinaryAnimationId];
 
-    public static string GetSkinName(eSpineSkinId spineSkinId) => SpineDefine.spineSkinDic[spineSkinId];
+    public static string GetSkinName(eSpineSkinId spineSkinId) => spineSkinDic[spineSkinId];
 
     public static eSpineSkinId GetSkinId(string _spineSkin)
     {
-      foreach (KeyValuePair<eSpineSkinId, string> keyValuePair in SpineDefine.spineSkinDic)
+      foreach (KeyValuePair<eSpineSkinId, string> keyValuePair in spineSkinDic)
       {
         if (keyValuePair.Value == _spineSkin.ToLower())
           return keyValuePair.Key;
@@ -308,12 +307,12 @@ namespace Elements
         case eSpineCharacterAnimeId.DAMEGE:
         case eSpineCharacterAnimeId.GAME_START:
         case eSpineCharacterAnimeId.IDLE_RESULT:
-          return index1 == -1 ? (weaponId == 0 ? string.Format("{0:D6}_" + animeName, (object) unitId) : string.Format("{0:D2}_" + animeName, (object) weaponId)) : (weaponId == 0 ? string.Format("{0:D6}_{1:D1}_" + animeName, (object) unitId, (object) index1) : string.Format("{0:D2}_{1:D1}_" + animeName, (object) unitId, (object) index1));
+          return index1 == -1 ? (weaponId == 0 ? string.Format("{0:D6}_" + animeName, unitId) : string.Format("{0:D2}_" + animeName, weaponId)) : (weaponId == 0 ? string.Format("{0:D6}_{1:D1}_" + animeName, unitId, index1) : string.Format("{0:D2}_{1:D1}_" + animeName, unitId, index1));
         case eSpineCharacterAnimeId.IDLE_MULTI_TARGET:
         case eSpineCharacterAnimeId.DAMAGE_MULTI_TARGET:
-          return string.Format("{0:D6}_{2}{1:D1}", (object) unitId, (object) index2, (object) animeName);
+          return string.Format("{0:D6}_{2}{1:D1}", unitId, index2, animeName);
         case eSpineCharacterAnimeId.JOY_RESULT:
-          return index1 == -1 ? string.Format("{0:D6}_" + animeName, (object) unitId) : string.Format("{0:D6}_{1:D1}_" + animeName, (object) unitId, (object) index1);
+          return index1 == -1 ? string.Format("{0:D6}_" + animeName, unitId) : string.Format("{0:D6}_{1:D1}_" + animeName, unitId, index1);
         case eSpineCharacterAnimeId.SMILE:
         case eSpineCharacterAnimeId.RARITYUP_POSING:
         case eSpineCharacterAnimeId.MANA_IDLE:
@@ -337,9 +336,9 @@ namespace Elements
         case eSpineCharacterAnimeId.DEAR_IDOL:
         case eSpineCharacterAnimeId.DEAR_JUMP:
         case eSpineCharacterAnimeId.DEAR_SMILE:
-          return string.Format("{0:D6}_" + animeName, (object) (weaponId == 0 ? unitId : 0));
+          return string.Format("{0:D6}_" + animeName, weaponId == 0 ? unitId : 0);
         case eSpineCharacterAnimeId.SLEEP:
-          return string.Format("{0:D6}_{1}_{2:D1}", (object) unitId, (object) animeName, (object) index2);
+          return string.Format("{0:D6}_{1}_{2:D1}", unitId, animeName, index2);
         case eSpineCharacterAnimeId.EVENT_BANNER_MOTION:
         case eSpineCharacterAnimeId.EVENT_BANNER_MOTION_CIRCLE:
         case eSpineCharacterAnimeId.FKE_IDLE:
@@ -402,21 +401,21 @@ namespace Elements
         case eSpineCharacterAnimeId.AWAKE:
         case eSpineCharacterAnimeId.ATTACK_SKIPQUEST:
         case eSpineCharacterAnimeId.AWAKE_RESULT:
-          return weaponId == 0 ? string.Format("{0:D6}_" + animeName, (object) unitId) : string.Format("{0:D2}_" + animeName, (object) weaponId);
+          return weaponId == 0 ? string.Format("{0:D6}_" + animeName, unitId) : string.Format("{0:D2}_" + animeName, weaponId);
         case eSpineCharacterAnimeId.ATTACK:
           if (index3 != -1)
-            return string.Format("{0:D6}_{1:D1}_" + animeName, (object) unitId, (object) index3);
-          return weaponId == 0 ? string.Format("{0:D6}_" + animeName, (object) unitId) : string.Format("{0:D2}_" + animeName, (object) weaponId);
+            return string.Format("{0:D6}_{1:D1}_" + animeName, unitId, index3);
+          return weaponId == 0 ? string.Format("{0:D6}_" + animeName, unitId) : string.Format("{0:D2}_" + animeName, weaponId);
         case eSpineCharacterAnimeId.DIE:
         case eSpineCharacterAnimeId.DEFEAT:
         case eSpineCharacterAnimeId.DIE_LOOP:
           if (index1 != -1 && index2 != -1)
-            return string.Format("{0:D6}_{1:D1}_" + animeName + "_{2:D1}", (object) unitId, (object) index1, (object) index2);
+            return string.Format("{0:D6}_{1:D1}_" + animeName + "_{2:D1}", unitId, index1, index2);
           if (index1 != -1)
-            return string.Format("{0:D6}_" + animeName + "_{1:D1}", (object) unitId, (object) index1);
+            return string.Format("{0:D6}_" + animeName + "_{1:D1}", unitId, index1);
           if (index2 != -1)
-            return string.Format("{0:D6}_{1:D1}_" + animeName, (object) unitId, (object) index2);
-          return weaponId == 0 ? string.Format("{0:D6}_" + animeName, (object) unitId) : string.Format("{0:D2}_" + animeName, (object) weaponId);
+            return string.Format("{0:D6}_{1:D1}_" + animeName, unitId, index2);
+          return weaponId == 0 ? string.Format("{0:D6}_" + animeName, unitId) : string.Format("{0:D2}_" + animeName, weaponId);
         case eSpineCharacterAnimeId.SKILL:
         case eSpineCharacterAnimeId.SPECIAL_SKILL:
         case eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION:
@@ -424,25 +423,25 @@ namespace Elements
         case eSpineCharacterAnimeId.SUMMON:
           if (index3 == -1)
           {
-            string str = string.Format("{0:D6}_" + animeName + "{1:D1}", (object) unitId, (object) index1);
-            return index2 == -1 ? str : string.Format("{0}_{1:D1}", (object) str, (object) index2);
+            string str = string.Format("{0:D6}_" + animeName + "{1:D1}", unitId, index1);
+            return index2 == -1 ? str : string.Format("{0}_{1:D1}", str, index2);
           }
-          string str1 = string.Format("{0:D6}_{2:D1}_" + animeName + "{1:D1}", (object) unitId, (object) index1, (object) index3);
-          return index2 == -1 ? str1 : string.Format("{0}_{1:D1}", (object) str1, (object) index2);
+          string str1 = string.Format("{0:D6}_{2:D1}_" + animeName + "{1:D1}", unitId, index1, index3);
+          return index2 == -1 ? str1 : string.Format("{0}_{1:D1}", str1, index2);
         case eSpineCharacterAnimeId.PRINCESS_SKILL:
           if (index2 == -1)
-            return index3 == -1 ? string.Format("{0}_p_{1}_skill", (object) unitId, (object) index1) : string.Format("{0}_{1}_p_{2}_skill", (object) unitId, (object) index3, (object) index1);
+            return index3 == -1 ? string.Format("{0}_p_{1}_skill", unitId, index1) : string.Format("{0}_{1}_p_{2}_skill", unitId, index3, index1);
           if (index3 == -1)
-            return string.Format("{0}_p_{1}_skill_{2}", (object) unitId, (object) index1, (object) index2);
-          return string.Format("{0}_{1}_p_{2}_skill_{3}", (object) unitId, (object) index3, (object) index1, (object) index2);
+            return string.Format("{0}_p_{1}_skill_{2}", unitId, index1, index2);
+          return string.Format("{0}_{1}_p_{2}_skill_{3}", unitId, index3, index1, index2);
         case eSpineCharacterAnimeId.PRINCESS_SKILL_EVOLUTION:
           if (index2 == -1)
-            return index3 == -1 ? string.Format("{0}_p_{1}_skill_evolution", (object) unitId, (object) index1) : string.Format("{0}_{1}_p_{2}_skill_evolution", (object) unitId, (object) index3, (object) index1);
+            return index3 == -1 ? string.Format("{0}_p_{1}_skill_evolution", unitId, index1) : string.Format("{0}_{1}_p_{2}_skill_evolution", unitId, index3, index1);
           if (index3 == -1)
-            return string.Format("{0}_p_{1}_skill_evolution_{2}", (object) unitId, (object) index1, (object) index2);
-          return string.Format("{0}_{1}_p_{2}_skill_evolution_{3}", (object) unitId, (object) index3, (object) index1, (object) index2);
+            return string.Format("{0}_p_{1}_skill_evolution_{2}", unitId, index1, index2);
+          return string.Format("{0}_{1}_p_{2}_skill_evolution_{3}", unitId, index3, index1, index2);
         case eSpineCharacterAnimeId.COMBINE_JOY_RESULT:
-          return string.Format("{0:D6}" + animeName + "{1:D6}", (object) unitId, (object) index1);
+          return string.Format("{0:D6}" + animeName + "{1:D6}", unitId, index1);
         case eSpineCharacterAnimeId.STORY_EYE_IDLE:
         case eSpineCharacterAnimeId.STORY_EYE_BLINK:
         case eSpineCharacterAnimeId.STORY_EYE_OPEN:
@@ -470,7 +469,7 @@ namespace Elements
         case eSpineCharacterAnimeId.TREASURE_OUT_EFFECT04:
         case eSpineCharacterAnimeId.TREASURE_OUT_EFFECT05:
         case eSpineCharacterAnimeId.TREASURE_OUT_EFFECT06:
-          return string.Format("{0:D7}_{1}", (object) index1, (object) animeName);
+          return string.Format("{0:D7}_{1}", index1, animeName);
         default:
           return string.Empty;
       }

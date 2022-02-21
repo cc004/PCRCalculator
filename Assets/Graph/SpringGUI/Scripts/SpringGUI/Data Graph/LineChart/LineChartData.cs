@@ -14,7 +14,7 @@ namespace SpringGUI
 {
     public class VertexStream
     {
-        public IList<Vector2> vertexs = null;
+        public IList<Vector2> vertexs;
         public Color color;
 
         public VertexStream( IList<Vector2> vertexs , Color color0 )
@@ -48,7 +48,7 @@ namespace SpringGUI
         public Vector2 MeshCellSize { get { return new Vector2(MeshCellXSize , MeshCellYSize); } }
         
         [Header("LineChart Unit Setting")]
-        public Color[] LineColors = new Color[] { };
+        public Color[] LineColors = { };
         public bool IsShowUnit = false;
         public float XUnit = 1;
         public float YUnit = 10;

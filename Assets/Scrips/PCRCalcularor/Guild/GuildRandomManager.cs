@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using Elements;
 using UnityEngine;
 using UnityEngine.UI;
-using System.ComponentModel;
 
 namespace PCRCaculator.Guild
 {
@@ -200,7 +200,7 @@ namespace PCRCaculator.Guild
             }
             return des;
         }
-        public bool TryJudgeRandomSpecialSetting(Elements.UnitCtrl source,Elements.UnitCtrl target,Elements.Skill skill,Elements.eActionType actionType,int currrentFrame,out float randomResult)
+        public bool TryJudgeRandomSpecialSetting(UnitCtrl source,UnitCtrl target,Skill skill,eActionType actionType,int currrentFrame,out float randomResult)
         {
             randomResult = 0;
             bool result = false;
@@ -319,7 +319,7 @@ namespace PCRCaculator.Guild
             des += resuleType.GetDescription();
             return des;
         }
-        public bool TryJudgeRandomSpecialSetting(Elements.UnitCtrl source, Elements.UnitCtrl target, Elements.Skill skill, Elements.eActionType actionType, int currrentFrame, out float randomResult)
+        public bool TryJudgeRandomSpecialSetting(UnitCtrl source, UnitCtrl target, Skill skill, eActionType actionType, int currrentFrame, out float randomResult)
         {
             randomResult = 0;
             if(fixTimeExec)
@@ -377,31 +377,31 @@ namespace PCRCaculator.Guild
             switch (sourceSkillType)
             {
                 case skillType.ATK:
-                    if(actionType!= Elements.eActionType.ATTACK)
+                    if(actionType!= eActionType.ATTACK)
                     {
                         return false;
                     }
                     break;
                 case skillType.ChangeSpeed:
-                    if (actionType != Elements.eActionType.CHANGE_SPEED)
+                    if (actionType != eActionType.CHANGE_SPEED)
                     {
                         return false;
                     }
                     break;
                 case skillType.KNOCK:
-                    if (actionType != Elements.eActionType.KNOCK)
+                    if (actionType != eActionType.KNOCK)
                     {
                         return false;
                     }
                     break;
                 case skillType.SLIP_DAMAGE:
-                    if(actionType != Elements.eActionType.SLIP_DAMAGE)
+                    if(actionType != eActionType.SLIP_DAMAGE)
                     {
                         return false;
                     }
                     break;
                 case skillType.BLIND:
-                    if(actionType != Elements.eActionType.BLIND)
+                    if(actionType != eActionType.BLIND)
                     {
                         return false;
                     }

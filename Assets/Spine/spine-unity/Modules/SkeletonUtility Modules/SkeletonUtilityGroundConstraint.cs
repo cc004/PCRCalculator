@@ -42,12 +42,12 @@ namespace Spine.Unity.Modules
 		protected override void OnEnable()
 		{
 			base.OnEnable();
-			lastHitY = base.transform.position.y;
+			lastHitY = transform.position.y;
 		}
 
 		public override void DoUpdate()
 		{
-			rayOrigin = base.transform.position + new Vector3(castOffset, castDistance, 0f);
+			rayOrigin = transform.position + new Vector3(castOffset, castDistance, 0f);
 			hitY = float.MinValue;
 			if (use2D)
 			{
@@ -62,7 +62,7 @@ namespace Spine.Unity.Modules
 				}
 				else if (Application01.BNDCGKDLADN)
 				{
-					hitY = Mathf.MoveTowards(lastHitY, base.transform.position.y, adjustSpeed * Time.deltaTime);
+					hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
 				}
 			}
 			else
@@ -78,14 +78,14 @@ namespace Spine.Unity.Modules
 				}
 				else if (Application01.BNDCGKDLADN)
 				{
-					hitY = Mathf.MoveTowards(lastHitY, base.transform.position.y, adjustSpeed * Time.deltaTime);
+					hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
 				}
 			}
-			Vector3 position = base.transform.position;
+			Vector3 position = transform.position;
 			position.y = Mathf.Clamp(position.y, Mathf.Min(lastHitY, hitY), float.MaxValue);
-			base.transform.position = position;
-			utilBone.bone.X = base.transform.localPosition.x;
-			utilBone.bone.Y = base.transform.localPosition.y;
+			transform.position = position;
+			utilBone.bone.X = transform.localPosition.x;
+			utilBone.bone.Y = transform.localPosition.y;
 			lastHitY = hitY;
 		}
 

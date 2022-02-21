@@ -7,12 +7,12 @@
 ==========================================*/
 
 using System;
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SpringGUI
 {
@@ -59,12 +59,12 @@ namespace SpringGUI
         private const string RED = "Red";
         private const string GREEN = "Green";
         private const string BLUE = "Blue";
-        private readonly Color[] SEVENCOLOR = new Color[] { Color.red , Color.magenta , Color.blue , Color.cyan , Color.green , Color.yellow , Color.red , };
+        private readonly Color[] SEVENCOLOR = { Color.red , Color.magenta , Color.blue , Color.cyan , Color.green , Color.yellow , Color.red , };
         #endregion
 
         #region enum members
         //显示模式
-        public enum E_PaletteMode : int
+        public enum E_PaletteMode
         {
             Hue = 0,
             Saturation = 1,
@@ -75,7 +75,7 @@ namespace SpringGUI
         }
         private E_PaletteMode PaletteMode = E_PaletteMode.Hue;
         //色彩模式
-        public enum E_ColorMode : int
+        public enum E_ColorMode
         {
             RGB = 0,
             //色调（H），饱和度（S），明度（V）
@@ -83,7 +83,7 @@ namespace SpringGUI
         }
         private E_ColorMode ColorMode = E_ColorMode.RGB;
         //工作状态
-        internal enum E_WorkState : int
+        internal enum E_WorkState
         {
             Normal = 0 ,
             Sucker = 1 ,
@@ -113,70 +113,70 @@ namespace SpringGUI
         #endregion
 
         #region base field
-        private Transform m_transform = null;
-        private Transform m_suckScreen = null;
-        private Transform m_colorPalette = null;
+        private Transform m_transform;
+        private Transform m_suckScreen;
+        private Transform m_colorPalette;
         //private ColorPalette m_colorPaletteScript = null;
-        private Transform m_coloredPate = null;
+        private Transform m_coloredPate;
         #endregion
 
         #region MainColorTape && ColoredTape && Texts
         //Brightness && Saturation && Hue Text
-        private Text m_leftText = null;
-        private Text m_rightText = null;
-        private Text m_bottomText = null;
+        private Text m_leftText;
+        private Text m_rightText;
+        private Text m_bottomText;
         //Brightness && Saturation && Hue ColoredTape
-        private MainColorTape m_mainColorTape = null;
-        private ColoredTape m_firstLayerCT = null;
-        private ColoredTape m_secondLayerCT = null;
-        private MultiColoredTape m_multiCT = null;
+        private MainColorTape m_mainColorTape;
+        private ColoredTape m_firstLayerCT;
+        private ColoredTape m_secondLayerCT;
+        private MultiColoredTape m_multiCT;
 
-        private Slider m_verticalCTSlider = null;
-        private ColoredTape m_verticalFirstCT = null;
+        private Slider m_verticalCTSlider;
+        private ColoredTape m_verticalFirstCT;
         //private ColoredTape m_verticalSecondCT = null;
         #endregion
 
         #region sucker
-        private Texture2D m_texture = null;
-        private Image m_screenImage = null;
-        private ImageMesh m_imageMesh = null;
+        private Texture2D m_texture;
+        private Image m_screenImage;
+        private ImageMesh m_imageMesh;
         #endregion
 
         #region RGBAColorTape 
-        private Text m_rText = null;
-        private InputField m_rValue = null;
-        private Slider m_rSlider = null;
-        private ColoredTape m_rColoredTape = null;
+        private Text m_rText;
+        private InputField m_rValue;
+        private Slider m_rSlider;
+        private ColoredTape m_rColoredTape;
 
-        private Text m_gText = null;
-        private InputField m_gValue = null;
-        private Slider m_gSlider = null;
-        private ColoredTape m_gColoredTape = null;
+        private Text m_gText;
+        private InputField m_gValue;
+        private Slider m_gSlider;
+        private ColoredTape m_gColoredTape;
 
-        private Text m_bText = null;
-        private InputField m_bValue = null;
-        private Slider m_bSlider = null;
-        private ColoredTape m_bColoredTape = null;
+        private Text m_bText;
+        private InputField m_bValue;
+        private Slider m_bSlider;
+        private ColoredTape m_bColoredTape;
 
-        private Text m_aText = null;
-        private InputField m_aValue = null;
-        private Slider m_aSlider = null;
-        private ColoredTape m_aColoredTape = null;
+        private Text m_aText;
+        private InputField m_aValue;
+        private Slider m_aSlider;
+        private ColoredTape m_aColoredTape;
         #endregion
 
         #region Hex Color 
-        private InputField m_hexColor = null;
+        private InputField m_hexColor;
         #endregion
 
         #region Preset Color
-        private Transform m_presetParent = null;
-        private GameObject m_colorItemTamplate = null;
-        private Image m_presetAddButton = null;
+        private Transform m_presetParent;
+        private GameObject m_colorItemTamplate;
+        private Image m_presetAddButton;
         #endregion
 
         #region nonius
 
-        private Transform m_nonius = null;
+        private Transform m_nonius;
 
         #endregion
         #endregion
@@ -202,7 +202,7 @@ namespace SpringGUI
         #region UIBehaviour functions
         protected override void Start()
         {
-            m_transform = this.transform;
+            m_transform = transform;
             m_mainColorTape = m_transform.Find("MainColor").GetComponent<MainColorTape>();
 
             #region  RGBA ColoredTape RGBA组件获取与事件监听
@@ -322,7 +322,7 @@ namespace SpringGUI
                             Color = mixedTwoColoredTapeColor(m_nonius.localPosition);
                             break;
                         case E_PaletteMode.Saturation:
-                            m_secondLayerCT.SetColors(new Color[]
+                            m_secondLayerCT.SetColors(new[]
                             {
                                 new Color(0, 0, 0, 0) * (1 - value) + new Color(1, 1, 1, 1) * (value) ,
                                 new Color(0,0,0,1), 
@@ -330,7 +330,7 @@ namespace SpringGUI
                             Color = mixedTwoColoredTapeColor(m_nonius.localPosition);
                             break;
                         case E_PaletteMode.Brightness:
-                            m_secondLayerCT.SetColors(new Color[]
+                            m_secondLayerCT.SetColors(new[]
                             {
                                 new Color(1,1,1,0) * (1-value) + new Color(0,0,0,1) * (value),
                                 new Color(1,1,1,1) * (1-value)  + new Color(0,0,0,1) * (value)
@@ -346,7 +346,7 @@ namespace SpringGUI
                             redTR.r = 1 - value;
                             redBL.r = 1 - value;
                             redBR.r = 1 - value;
-                            m_multiCT.SetColors(new Color[] { redTL , redTR , redBL , redBR });
+                            m_multiCT.SetColors(new[] { redTL , redTR , redBL , redBR });
                             setRedSliderValue(1 - value);
                             var temp1 = m_multiCT.GetColor(m_nonius.localPosition);
                             Color = new Color(1 - value , temp1.g , temp1.b , Color.a);
@@ -360,7 +360,7 @@ namespace SpringGUI
                             greenTR.g = 1 - value;
                             greenBL.g = 1 - value;
                             greenBR.g = 1 - value;
-                            m_multiCT.SetColors(new Color[] { greenTL , greenTR , greenBL , greenBR });
+                            m_multiCT.SetColors(new[] { greenTL , greenTR , greenBL , greenBR });
                             setGreenSliderValue(1 - value);
                             var temp2 = m_multiCT.GetColor(m_nonius.localPosition);
                             Color = new Color(temp2.r , 1 - value , temp2.b , Color.a);
@@ -374,7 +374,7 @@ namespace SpringGUI
                             blueTR.b = 1 - value;
                             blueBL.b = 1 - value;
                             blueBR.b = 1 - value;
-                            m_multiCT.SetColors(new Color[] { blueTL , blueTR , blueBL , blueBR });
+                            m_multiCT.SetColors(new[] { blueTL , blueTR , blueBL , blueBR });
                             setBlueSliderValue(1 - value);
                             var temp3 = m_multiCT.GetColor(m_nonius.localPosition);
                             Color = new Color(temp3.r , temp3.g , 1 - value , Color.a);
@@ -425,7 +425,7 @@ namespace SpringGUI
                     var red1 = color0.r;
                     var green1 = color0.g;
                     var blue1 = color0.b;
-                    ArrayList array1 = new ArrayList() { red1 , green1 , blue1 };
+                    ArrayList array1 = new ArrayList { red1 , green1 , blue1 };
                     array1.Sort();
                     Color mainColor1;
                     if(array1[0].Equals(red1))
@@ -434,8 +434,8 @@ namespace SpringGUI
                         mainColor1 = new Color(red1,0,blue1,1);
                     else
                         mainColor1 = new Color(red1,green1,0,1);
-                    m_verticalFirstCT.SetColors(new Color[] { mainColor1 , Color.white });
-                    m_secondLayerCT.SetColors(new Color[]
+                    m_verticalFirstCT.SetColors(new[] { mainColor1 , Color.white });
+                    m_secondLayerCT.SetColors(new[]
                     {
                         new Color(0, 0, 0, 0) * (1 - (float)array1[0]) + new Color(1, 1, 1, 1) * ((float)array1[0]) ,
                         Color.black
@@ -449,7 +449,7 @@ namespace SpringGUI
                     var red2 = color0.r;
                     var green2 = color0.g;
                     var blue2 = color0.b;
-                    ArrayList array2 = new ArrayList() { red2 , green2 , blue2 };
+                    ArrayList array2 = new ArrayList { red2 , green2 , blue2 };
                     array2.Sort();
                     Color mainColor2;
                     if ( array2[0].Equals(red2) )
@@ -458,8 +458,8 @@ namespace SpringGUI
                         mainColor2 = new Color(red2 , 0 , blue2 , 1);
                     else
                         mainColor2 = new Color(red2 , green2 , 0 , 1);
-                    m_verticalFirstCT.SetColors(new Color[] { mainColor2 , Color.black });
-                    m_secondLayerCT.SetColors(new Color[] { new Color(1 , 1 , 1 , (float)array2[0]) , Color.white });
+                    m_verticalFirstCT.SetColors(new[] { mainColor2 , Color.black });
+                    m_secondLayerCT.SetColors(new[] { new Color(1 , 1 , 1 , (float)array2[0]) , Color.white });
                     setValueForVerticalSlider((float)array2[0]);
                     float y2 = ( 1 - (float)array2[0] ) * size.y - size.y / 2.0f;
                     result = new Vector2(x2 , y2);
@@ -485,7 +485,7 @@ namespace SpringGUI
         /// <param name="color"></param>
         private void changedFirstLayerColoredTape( Color color )
         {
-            m_firstLayerCT.SetColors(new Color[] { Color.white , color });
+            m_firstLayerCT.SetColors(new[] { Color.white , color });
         }
         
         /// <summary>
@@ -546,20 +546,20 @@ namespace SpringGUI
                     m_firstLayerCT.gameObject.SetActive(true);
                     m_secondLayerCT.gameObject.SetActive(true);
                     m_multiCT.gameObject.SetActive(false);
-                    m_firstLayerCT.SetColors(new Color[] { Color.white , Color.red });
-                    m_secondLayerCT.SetColors(new Color[] { new Color(0 , 0 , 0 , 0) , Color.black });
+                    m_firstLayerCT.SetColors(new[] { Color.white , Color.red });
+                    m_secondLayerCT.SetColors(new[] { new Color(0 , 0 , 0 , 0) , Color.black });
                     m_verticalFirstCT.SetColors(SEVENCOLOR);
                     m_leftText.text = BRIGHTNESS;
                     m_rightText.text = HUE;
                     m_bottomText.text = SATURATION;
-                    m_firstLayerCT.SetColors(new Color[] { Color.white , new Color(Color.r , Color.g , Color.b , 1) });
+                    m_firstLayerCT.SetColors(new[] { Color.white , new Color(Color.r , Color.g , Color.b , 1) });
                     Vector2 size = m_colorPalette.GetComponent<RectTransform>().sizeDelta;
                     m_nonius.localPosition = new Vector3(size.x / 2.0f , size.y / 2.0f);
                     break;
                 case E_PaletteMode.Saturation:
                     m_firstLayerCT.SetColors(SEVENCOLOR);
-                    m_secondLayerCT.SetColors(new Color[] { new Color(0 , 0 , 0 , 0) , Color.black });
-                    m_verticalFirstCT.SetColors(new Color[] { Color.red , Color.white });
+                    m_secondLayerCT.SetColors(new[] { new Color(0 , 0 , 0 , 0) , Color.black });
+                    m_verticalFirstCT.SetColors(new[] { Color.red , Color.white });
                     m_leftText.text = BRIGHTNESS;
                     m_rightText.text = SATURATION;
                     m_bottomText.text = HUE;
@@ -567,8 +567,8 @@ namespace SpringGUI
                     break;
                 case E_PaletteMode.Brightness:
                     m_firstLayerCT.SetColors(SEVENCOLOR);
-                    m_secondLayerCT.SetColors(new Color[] { new Color(1 , 1 , 1 , 0) , Color.white });
-                    m_verticalFirstCT.SetColors(new Color[] { Color.red , Color.black });
+                    m_secondLayerCT.SetColors(new[] { new Color(1 , 1 , 1 , 0) , Color.white });
+                    m_verticalFirstCT.SetColors(new[] { Color.red , Color.black });
                     m_leftText.text = SATURATION;
                     m_rightText.text = BRIGHTNESS;
                     m_bottomText.text = HUE;
@@ -578,8 +578,8 @@ namespace SpringGUI
                     m_firstLayerCT.gameObject.SetActive(false);
                     m_secondLayerCT.gameObject.SetActive(false);
                     m_multiCT.gameObject.SetActive(true);
-                    m_verticalFirstCT.SetColors(new Color[] { new Color(1 , Color.g , Color.b) , new Color(0 , Color.g , Color.b) });
-                    m_multiCT.SetColors(new Color[] { new Color(Color.r , 1 , 0) , new Color(Color.r , 1 , 1) , new Color(Color.r , 0 , 0) , new Color(Color.r , 0 , 1) , });
+                    m_verticalFirstCT.SetColors(new[] { new Color(1 , Color.g , Color.b) , new Color(0 , Color.g , Color.b) });
+                    m_multiCT.SetColors(new[] { new Color(Color.r , 1 , 0) , new Color(Color.r , 1 , 1) , new Color(Color.r , 0 , 0) , new Color(Color.r , 0 , 1) , });
                     m_leftText.text = GREEN;
                     m_bottomText.text = BLUE;
                     m_rightText.text = RED;
@@ -587,8 +587,8 @@ namespace SpringGUI
                     setValueForVerticalSlider(m_verticalFirstCT.GetScale(Color));
                     break;
                 case E_PaletteMode.Green:
-                    m_verticalFirstCT.SetColors(new Color[] { new Color(Color.r , 1 , Color.b) , new Color(Color.r , 0 , Color.b) });
-                    m_multiCT.SetColors(new Color[] { new Color(1 , Color.g , 0) , new Color(1 , Color.g , 1) , new Color(0 , Color.g , 0) , new Color(0 , Color.g , 1) , });
+                    m_verticalFirstCT.SetColors(new[] { new Color(Color.r , 1 , Color.b) , new Color(Color.r , 0 , Color.b) });
+                    m_multiCT.SetColors(new[] { new Color(1 , Color.g , 0) , new Color(1 , Color.g , 1) , new Color(0 , Color.g , 0) , new Color(0 , Color.g , 1) , });
                     m_leftText.text = RED;
                     m_bottomText.text = BLUE;
                     m_rightText.text = GREEN;
@@ -596,8 +596,8 @@ namespace SpringGUI
                     setValueForVerticalSlider(m_verticalFirstCT.GetScale(Color));
                     break;
                 case E_PaletteMode.Blue:
-                    m_verticalFirstCT.SetColors(new Color[] { new Color(Color.r , Color.g , 1) , new Color(Color.r , Color.g , 0) });
-                    m_multiCT.SetColors(new Color[] { new Color(0 , 1 , Color.b) , new Color(1 , 1 , Color.b) , new Color(0 , 0 , Color.b) , new Color(1 , 0 , Color.b) , });
+                    m_verticalFirstCT.SetColors(new[] { new Color(Color.r , Color.g , 1) , new Color(Color.r , Color.g , 0) });
+                    m_multiCT.SetColors(new[] { new Color(0 , 1 , Color.b) , new Color(1 , 1 , Color.b) , new Color(0 , 0 , Color.b) , new Color(1 , 0 , Color.b) , });
                     m_leftText.text = GREEN;
                     m_bottomText.text = RED;
                     m_rightText.text = BLUE;
@@ -635,18 +635,18 @@ namespace SpringGUI
                         maxValue = green;
                     if (maxValue.Equals(red))
                     {
-                        m_gColoredTape.SetColors(new Color[] { Color.white , Color.red });
-                        m_bColoredTape.SetColors(new Color[] { Color.black , Color.red });
+                        m_gColoredTape.SetColors(new[] { Color.white , Color.red });
+                        m_bColoredTape.SetColors(new[] { Color.black , Color.red });
                     }
                     else if (maxValue.Equals(green))
                     {
-                        m_gColoredTape.SetColors(new Color[] { Color.white , Color.green });
-                        m_bColoredTape.SetColors(new Color[] { Color.black , Color.green });
+                        m_gColoredTape.SetColors(new[] { Color.white , Color.green });
+                        m_bColoredTape.SetColors(new[] { Color.black , Color.green });
                     }
                     else
                     {
-                        m_gColoredTape.SetColors(new Color[] { Color.white , Color.blue });
-                        m_bColoredTape.SetColors(new Color[] { Color.black , Color.blue });
+                        m_gColoredTape.SetColors(new[] { Color.white , Color.blue });
+                        m_bColoredTape.SetColors(new[] { Color.black , Color.blue });
                     }
                     break;
             }
@@ -677,15 +677,15 @@ namespace SpringGUI
             //set red 
             var startColor = new Color(0 , green , blue , 1);
             var endColor = new Color(1 , green , blue , 1);
-            m_rColoredTape.SetColors(new Color[] { startColor , endColor });
+            m_rColoredTape.SetColors(new[] { startColor , endColor });
             //set green
             startColor = new Color(red , 0 , blue , 1);
             endColor = new Color(red , 1 , blue , 1);
-            m_gColoredTape.SetColors(new Color[] { startColor , endColor });
+            m_gColoredTape.SetColors(new[] { startColor , endColor });
             //set blue
             startColor = new Color(red , green , 0 , 1);
             endColor = new Color(red , green , 1 , 1);
-            m_bColoredTape.SetColors(new Color[] { startColor , endColor });
+            m_bColoredTape.SetColors(new[] { startColor , endColor });
         }
 
         /// <summary>
@@ -701,7 +701,7 @@ namespace SpringGUI
                 return;
             }
             setRedSliderValue(value / 255.0f);
-            Color = new Color((float)value / 255.0f , Color.g , Color.b , Color.a);
+            Color = new Color(value / 255.0f , Color.g , Color.b , Color.a);
             SetNoniusPositionByColor();
         }
         private void setRedInputFieldValue( float value )
@@ -1048,8 +1048,8 @@ namespace SpringGUI
             var yCount = m_imageMesh.YAxisCount;
             m_texture = new Texture2D(xCount , yCount , TextureFormat.RGB24 , false);
             yield return new WaitForEndOfFrame();
-            m_texture.ReadPixels(new Rect((int)Input.mousePosition.x - (int)( xCount / 2 ) ,
-                (int)Input.mousePosition.y - (int)( yCount / 2 ) , xCount , yCount) , 0 , 0);
+            m_texture.ReadPixels(new Rect((int)Input.mousePosition.x - xCount / 2 ,
+                (int)Input.mousePosition.y - yCount / 2 , xCount , yCount) , 0 , 0);
             m_texture.Apply();
             m_screenImage.sprite = Sprite.Create(m_texture , new Rect(0 , 0 , xCount , yCount) , Vector2.zero);
         }
@@ -1066,31 +1066,31 @@ namespace SpringGUI
                     Color = mixedTwoColoredTapeColor(noniusPos);
                     var main1 = m_firstLayerCT.GetColor(noniusPos);
                     m_mainColorTape.Color = Color;
-                    m_verticalFirstCT.SetColors(new Color[] { main1 , Color.white});
+                    m_verticalFirstCT.SetColors(new[] { main1 , Color.white});
                     break;
                 case E_PaletteMode.Brightness:
                     Color = mixedTwoColoredTapeColor(noniusPos);
                     var main2 = m_firstLayerCT.GetColor(noniusPos);
                     m_mainColorTape.Color = Color;
-                    m_verticalFirstCT.SetColors(new Color[] { main2 , Color.black });
+                    m_verticalFirstCT.SetColors(new[] { main2 , Color.black });
                     break;
                 case E_PaletteMode.Red:
                     var color11 = getMultiColoredTapeColor(noniusPos);
                     Color = new Color(color11.r , color11.g , color11.b , Color.a);
                     m_mainColorTape.Color = Color;
-                    m_verticalFirstCT.SetColors(new Color[] { new Color(1 , Color.g , Color.b , 1) , new Color(0 , Color.g , Color.b , 1) });
+                    m_verticalFirstCT.SetColors(new[] { new Color(1 , Color.g , Color.b , 1) , new Color(0 , Color.g , Color.b , 1) });
                     break;
                 case E_PaletteMode.Green:
                     var color22 = getMultiColoredTapeColor(noniusPos);
                     Color = new Color(color22.r , color22.g , color22.b , Color.a);
                     m_mainColorTape.Color = Color;
-                    m_verticalFirstCT.SetColors(new Color[] { new Color(Color.r , 1 , Color.b , 1) , new Color(Color.r , 0 , Color.b , 1) });
+                    m_verticalFirstCT.SetColors(new[] { new Color(Color.r , 1 , Color.b , 1) , new Color(Color.r , 0 , Color.b , 1) });
                     break;
                 case E_PaletteMode.Blue:
                     var color3 = getMultiColoredTapeColor(noniusPos);
                     Color = new Color(color3.r , color3.g , color3.b , Color.a);
                     m_mainColorTape.Color = Color;
-                    m_verticalFirstCT.SetColors(new Color[] { new Color(Color.r , Color.g , 1 , 1) , new Color(Color.r , Color.g , 0 , 1) });
+                    m_verticalFirstCT.SetColors(new[] { new Color(Color.r , Color.g , 1 , 1) , new Color(Color.r , Color.g , 0 , 1) });
                     break;
             }
         }
@@ -1134,7 +1134,7 @@ namespace SpringGUI
 
         private void AddPresetColor( )
         {
-            GameObject newPreset = GameObject.Instantiate(m_colorItemTamplate);
+            GameObject newPreset = Instantiate(m_colorItemTamplate);
             newPreset.SetActive(true);
             newPreset.GetComponent<Image>().color = Color;
             newPreset.transform.SetParent(m_presetParent);

@@ -1,10 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace PCRCaculator
 {
-    [System.Serializable]
+    [Serializable]
     public class QuestData
     {
         public int quest_id;
@@ -75,7 +74,7 @@ namespace PCRCaculator
             this.reward_image_5 = reward_image_5;
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class QuestRewardData
     {
         public int quest_id;
@@ -85,7 +84,7 @@ namespace PCRCaculator
         public List<int> rewardEquips = new List<int>();
         public List<int> odds = new List<int>();
     }
-    [System.Serializable]
+    [Serializable]
     public class WaveGroupData
     {
         public int id;
@@ -102,7 +101,7 @@ namespace PCRCaculator
             this.enemyDropDatas = enemyDropDatas;
         }
 
-        [System.Serializable]
+        [Serializable]
         public class EnemyDropData
         {
             public int enemy_id;
@@ -118,7 +117,7 @@ namespace PCRCaculator
             }
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class EnemyRewardData
     {
         public int drop_reward_id;
@@ -132,7 +131,7 @@ namespace PCRCaculator
             this.rewardDatas = rewardDatas;
         }
 
-        [System.Serializable]
+        [Serializable]
         public class RewardData
         {
             public int reward_type;
@@ -149,7 +148,7 @@ namespace PCRCaculator
             }
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class EquipmentCraft
     {
         public int equipment_id;
@@ -205,7 +204,7 @@ namespace PCRCaculator
 
         }
     }
-    [System.Serializable]
+    [Serializable]
     public class EquipmentGet
     {
         public int equipment_id;
@@ -224,7 +223,7 @@ namespace PCRCaculator
                 odds.Add(getWay.get_odds);
             }
         }
-        [System.Serializable]
+        [Serializable]
         public class GetWay
         {
             public int get_quest_id;

@@ -4,7 +4,6 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -19,7 +18,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      this.parts = (BasePartsData) _source.BossPartsListForBattle.Find((Predicate<PartsData>) (e => (double) e.Index == (double) this.Value[eValueNumber.VALUE_4]));
+      parts = _source.BossPartsListForBattle.Find(e => e.Index == (double) Value[eValueNumber.VALUE_4]);
     }
 
     public override void ExecAction(
@@ -35,22 +34,22 @@ namespace Elements
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       if (_num % 2 == 0)
       {
-        this.parts.PositionX += _valueDictionary[eValueNumber.VALUE_1];
-        this.parts.BodyWidthValue = 0.0f;
-        this.parts.Owner.PartsMotionPrefix = (int) _valueDictionary[eValueNumber.VALUE_5];
-        this.OnActionEnd = (ActionParameter.OnActionEndDelegate) (() =>
+        parts.PositionX += _valueDictionary[eValueNumber.VALUE_1];
+        parts.BodyWidthValue = 0.0f;
+        parts.Owner.PartsMotionPrefix = (int) _valueDictionary[eValueNumber.VALUE_5];
+        OnActionEnd = () =>
         {
-          this.parts.Owner.PartsMotionPrefix = 0;
-          this.parts.PositionX = this.parts.InitialPositionX;
-          this.OnActionEnd = (ActionParameter.OnActionEndDelegate) null;
-        });
+            parts.Owner.PartsMotionPrefix = 0;
+            parts.PositionX = parts.InitialPositionX;
+            OnActionEnd = null;
+        };
       }
       else
       {
-        this.parts.Owner.PartsMotionPrefix = 0;
-        this.parts.BodyWidthValue = 300f;
-        this.parts.PositionX = this.parts.InitialPositionX;
-        this.OnActionEnd = (ActionParameter.OnActionEndDelegate) null;
+        parts.Owner.PartsMotionPrefix = 0;
+        parts.BodyWidthValue = 300f;
+        parts.PositionX = parts.InitialPositionX;
+        OnActionEnd = null;
       }
     }
   }

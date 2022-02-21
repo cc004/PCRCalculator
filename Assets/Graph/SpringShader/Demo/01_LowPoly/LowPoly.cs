@@ -1,16 +1,16 @@
 ﻿
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class LowPoly : MonoBehaviour 
 {
-    private MeshFilter MeshFilter = null;
+    private MeshFilter MeshFilter;
     public int XCount = 5;
     public int YCount = 5;
 
     private void Awake()
     {
-        MeshFilter = this.GetComponent<MeshFilter>();
+        MeshFilter = GetComponent<MeshFilter>();
     }
 
     private void GenerateLowPoly()

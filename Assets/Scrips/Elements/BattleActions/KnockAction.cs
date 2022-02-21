@@ -28,46 +28,46 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            this.AppendIsAlreadyExeced(_target.Owner, _num);
-            switch (this.ActionDetail1)
+            AppendIsAlreadyExeced(_target.Owner, _num);
+            switch (ActionDetail1)
             {
                 case 1:
-                    _sourceActionController.AppendCoroutine(this.updateKnockUpDown(_target.Owner), ePauseType.IGNORE_BLACK_OUT);
-                    this.setTargetDamageNoOverrap(_target.Owner);
+                    _sourceActionController.AppendCoroutine(updateKnockUpDown(_target.Owner), ePauseType.IGNORE_BLACK_OUT);
+                    setTargetDamageNoOverrap(_target.Owner);
                     break;
                 case 3:
-                    _sourceActionController.AppendCoroutine(this.updateKnockback(_target.Owner, _source, new Func<UnitCtrl, UnitCtrl, float>(this.getKnockValue)), ePauseType.IGNORE_BLACK_OUT);
-                    this.setTargetDamageNoOverrap(_target.Owner);
+                    _sourceActionController.AppendCoroutine(updateKnockback(_target.Owner, _source, getKnockValue), ePauseType.IGNORE_BLACK_OUT);
+                    setTargetDamageNoOverrap(_target.Owner);
                     break;
                 case 4:
                 case 5:
-                    List<UnitCtrl> unitCtrlList = _source.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
-                    this.unitListForSort.Clear();
+                    List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
+                    unitListForSort.Clear();
                     for (int index1 = 0; index1 < unitCtrlList.Count; ++index1)
                     {
                         UnitCtrl unitCtrl = unitCtrlList[index1];
                         if (unitCtrl.IsPartsBoss)
                         {
                             for (int index2 = 0; index2 < unitCtrl.BossPartsListForBattle.Count; ++index2)
-                                this.unitListForSort.Add((BasePartsData)unitCtrl.BossPartsListForBattle[index2]);
+                                unitListForSort.Add(unitCtrl.BossPartsListForBattle[index2]);
                         }
                         else
-                            this.unitListForSort.Add(unitCtrl.GetFirstParts());
+                            unitListForSort.Add(unitCtrl.GetFirstParts());
                     }
                     _source.BaseX = _source.transform.position.x;
-                    this.unitListForSort.Sort(new Comparison<BasePartsData>(_source.CompareDistanceAsc));
-                    BasePartsData basePartsData = (double)this.unitListForSort.Count > (double)_valueDictionary[eValueNumber.VALUE_2] ? this.unitListForSort[(int)_valueDictionary[eValueNumber.VALUE_2]] : this.unitListForSort[this.unitListForSort.Count - 1];
-                    Vector3 _pos = new Vector3(((double)_source.transform.position.x - (double)basePartsData.GetPosition().x > 0.0 ? 1f : -1f) * _valueDictionary[eValueNumber.VALUE_1] + basePartsData.GetLocalPosition().x, _target.GetLocalPosition().y, _target.GetLocalPosition().z);
-                    if (this.ActionDetail1 == 5)
+                    unitListForSort.Sort(_source.CompareDistanceAsc);
+                    BasePartsData basePartsData = unitListForSort.Count > (double)_valueDictionary[eValueNumber.VALUE_2] ? unitListForSort[(int)_valueDictionary[eValueNumber.VALUE_2]] : unitListForSort[unitListForSort.Count - 1];
+                    Vector3 _pos = new Vector3((_source.transform.position.x - (double)basePartsData.GetPosition().x > 0.0 ? 1f : -1f) * _valueDictionary[eValueNumber.VALUE_1] + basePartsData.GetLocalPosition().x, _target.GetLocalPosition().y, _target.GetLocalPosition().z);
+                    if (ActionDetail1 == 5)
                     {
-                        _sourceActionController.AppendCoroutine(this.updateParaboricKnock(_pos, _target.Owner), ePauseType.SYSTEM, _source);
+                        _sourceActionController.AppendCoroutine(updateParaboricKnock(_pos, _target.Owner), ePauseType.SYSTEM, _source);
                         break;
                     }
                     _target.Owner.transform.localPosition = _pos;
                     break;
                 case 6:
-                    _sourceActionController.AppendCoroutine(this.updateKnockback(_target.Owner, _source, new Func<UnitCtrl, UnitCtrl, float>(this.getKnockValueLimited)), ePauseType.IGNORE_BLACK_OUT);
-                    this.setTargetDamageNoOverrap(_target.Owner);
+                    _sourceActionController.AppendCoroutine(updateKnockback(_target.Owner, _source, getKnockValueLimited), ePauseType.IGNORE_BLACK_OUT);
+                    setTargetDamageNoOverrap(_target.Owner);
                     break;
             }
         }
@@ -76,31 +76,31 @@ namespace Elements
         {
             if (_target.CurrentState == UnitCtrl.ActionState.DAMAGE)
                 return;
-            if (this.battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE && this.battleManager.BlackOutUnitList.Count != 0)
-                this.battleManager.BlackOutUnitList.Add(_target);
+            if (battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE && battleManager.BlackOutUnitList.Count != 0)
+                battleManager.BlackOutUnitList.Add(_target);
             _target.SetState(UnitCtrl.ActionState.DAMAGE);
         }
 
         private float getKnockValue(UnitCtrl _target, UnitCtrl _source)
         {
-            float a = (float)(((double)_target.transform.localPosition.x > (double)_source.transform.localPosition.x ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)this.Value[eValueNumber.VALUE_1]));
-            return (double)a <= 0.0 ? Mathf.Max(a, -BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x) : Mathf.Min(a, BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x);
+            float a = (float)((_target.transform.localPosition.x > (double)_source.transform.localPosition.x ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)Value[eValueNumber.VALUE_1]));
+            return a <= 0.0 ? Mathf.Max(a, -BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x) : Mathf.Min(a, BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x);
         }
 
         private float getKnockValueLimited(UnitCtrl _target, UnitCtrl _source)
         {
-            bool flag = (double)_target.transform.localPosition.x > (double)_source.transform.localPosition.x;
-            List<UnitCtrl> unitCtrlList = new List<UnitCtrl>(_target.IsOther ? (IEnumerable<UnitCtrl>)this.battleManager.EnemyList : (IEnumerable<UnitCtrl>)this.battleManager.UnitList);
+            bool flag = _target.transform.localPosition.x > (double)_source.transform.localPosition.x;
+            List<UnitCtrl> unitCtrlList = new List<UnitCtrl>(_target.IsOther ? battleManager.EnemyList : (IEnumerable<UnitCtrl>)battleManager.UnitList);
             UnitCtrl unitCtrl = _target;
             if (unitCtrlList.Count != 0)
             {
-                unitCtrlList.Sort((Comparison<UnitCtrl>)((a, b) => a.transform.position.x.CompareTo(b.transform.position.x)));
-                unitCtrl = (double)this.Value[eValueNumber.VALUE_1] > 0.0 != flag ? unitCtrlList[0] : unitCtrlList[unitCtrlList.Count - 1];
+                unitCtrlList.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+                unitCtrl = (double)Value[eValueNumber.VALUE_1] > 0.0 != flag ? unitCtrlList[0] : unitCtrlList[unitCtrlList.Count - 1];
             }
-            float a1 = (float)((flag ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)this.Value[eValueNumber.VALUE_1]));
-            float num1 = (float)((flag ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)this.Value[eValueNumber.VALUE_5]));
+            float a1 = (float)((flag ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)Value[eValueNumber.VALUE_1]));
+            float num1 = (float)((flag ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)Value[eValueNumber.VALUE_5]));
             float num2;
-            if ((double)a1 > 0.0)
+            if (a1 > 0.0)
             {
                 float b = Mathf.Max(0.0f, unitCtrl.transform.localPosition.x + num1 - _target.transform.localPosition.x);
                 num2 = Mathf.Min(a1, Mathf.Min(BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x, b));
@@ -131,8 +131,8 @@ namespace Elements
                 localPosition.x = start + knockValue * knockAction.KnockAnimationCurve.Evaluate(time / duration);
                 _target.transform.localPosition = localPosition;
                 time += knockAction.battleManager.DeltaTime_60fps;
-                if ((double)time <= (double)duration)
-                    yield return (object)null;
+                if (time <= (double)duration)
+                    yield return null;
                 else
                     break;
             }
@@ -151,28 +151,28 @@ namespace Elements
             float time = 0.0f;
             float duration = knockAction.Value[eValueNumber.VALUE_1] / knockAction.Value[eValueNumber.VALUE_3];
             ++_target.KnockBackEnableCount;
-            while ((double)duration > (double)time)
+            while (duration > (double)time)
             {
                 Vector3 localPosition = _target.transform.localPosition;
                 time += knockAction.battleManager.DeltaTime_60fps;
-                if ((double)time > (double)duration)
+                if (time > (double)duration)
                     time = duration;
                 localPosition.y = start + knockValue * knockAction.KnockAnimationCurve.Evaluate(time / duration);
                 _target.transform.localPosition = localPosition;
-                yield return (object)null;
+                yield return null;
             }
             duration = knockAction.Value[eValueNumber.VALUE_1] / knockAction.Value[eValueNumber.VALUE_4];
             start = _target.transform.localPosition.y;
             time = 0.0f;
-            while ((double)duration > (double)time)
+            while (duration > (double)time)
             {
                 Vector3 localPosition = _target.transform.localPosition;
                 time += knockAction.battleManager.DeltaTime_60fps;
-                if ((double)time > (double)duration)
+                if (time > (double)duration)
                     time = duration;
                 localPosition.y = start - knockValue * knockAction.KnockDownAnimationCurve.Evaluate(time / duration);
                 _target.transform.localPosition = localPosition;
-                yield return (object)null;
+                yield return null;
             }
             --_target.KnockBackEnableCount;
             if (!_target.IsUnableActionState())
@@ -189,12 +189,12 @@ namespace Elements
             float time = 0.0f;
             do
             {
-                yield return (object)null;
+                yield return null;
                 time += knockAction.battleManager.DeltaTime_60fps;
-                float y = (double)time >= (double)halfDuration ? easingDownY.GetCurVal(knockAction.battleManager.DeltaTime_60fps) : easingUpY.GetCurVal(knockAction.battleManager.DeltaTime_60fps);
+                float y = time >= (double)halfDuration ? easingDownY.GetCurVal(knockAction.battleManager.DeltaTime_60fps) : easingUpY.GetCurVal(knockAction.battleManager.DeltaTime_60fps);
                 _target.transform.localPosition = new Vector3(easingX.GetCurVal(knockAction.battleManager.DeltaTime_60fps), y);
             }
-            while ((double)time <= 0.5);
+            while (time <= 0.5);
         }
 
         private enum eKnockType

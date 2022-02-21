@@ -53,7 +53,7 @@ namespace Spine.Unity
 		public void Reset()
 		{
 			bone = null;
-			cachedTransform = base.transform;
+			cachedTransform = transform;
 			valid = skeletonUtility != null && skeletonUtility.skeletonRenderer != null && skeletonUtility.skeletonRenderer.valid;
 			if (valid)
 			{
@@ -66,7 +66,7 @@ namespace Spine.Unity
 
 		private void OnEnable()
 		{
-			skeletonUtility = base.transform.GetComponentInParent<SkeletonUtility>();
+			skeletonUtility = transform.GetComponentInParent<SkeletonUtility>();
 			if (!(skeletonUtility == null))
 			{
 				skeletonUtility.RegisterBone(this);
@@ -201,7 +201,7 @@ namespace Spine.Unity
 
 		public void AddBoundingBox(string skinName, string slotName, string attachmentName)
 		{
-			SkeletonUtility.AddBoundingBoxGameObject(bone.skeleton, skinName, slotName, attachmentName, base.transform);
+			SkeletonUtility.AddBoundingBoxGameObject(bone.skeleton, skinName, slotName, attachmentName, transform);
 		}
 	}
 }

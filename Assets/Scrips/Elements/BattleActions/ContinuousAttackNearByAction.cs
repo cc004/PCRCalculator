@@ -5,7 +5,6 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Elements
 {
@@ -17,7 +16,7 @@ namespace Elements
       UnitActionController _sourceActionController)
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
-      if (_sourceActionController.Skill1IsChargeTime || this.ActionDetail1 != 0)
+      if (_sourceActionController.Skill1IsChargeTime || ActionDetail1 != 0)
         return;
       _sourceActionController.Skill1IsChargeTime = _skill.SkillId == _source.UnionBurstSkillId;
     }
@@ -33,21 +32,21 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      ContinuousAttackNearByAction.eReleaseType actionDetail1 = (ContinuousAttackNearByAction.eReleaseType) this.ActionDetail1;
-      ContinuousAttackNearByAction.ContinuousAttackNearByData _data = new ContinuousAttackNearByAction.ContinuousAttackNearByData()
+      eReleaseType actionDetail1 = (eReleaseType) ActionDetail1;
+      ContinuousAttackNearByData _data = new ContinuousAttackNearByData
       {
         Enable = true,
         ReleaseType = actionDetail1,
-        AttackType = (AttackActionBase.eAttackType) this.ActionDetail2,
-        StateIconType = (eStateIconType) this.ActionDetail3,
+        AttackType = (AttackActionBase.eAttackType) ActionDetail2,
+        StateIconType = (eStateIconType) ActionDetail3,
         Size = _valueDictionary[eValueNumber.VALUE_1],
         BaseDamage = _valueDictionary[eValueNumber.VALUE_2],
         AttackEfficiency = _valueDictionary[eValueNumber.VALUE_4],
-        Timer = actionDetail1 == ContinuousAttackNearByAction.eReleaseType.TIMER ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
-        ReduceEnergy = actionDetail1 == ContinuousAttackNearByAction.eReleaseType.ENERGY ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
-        AbsorberValue = this.battleManager.KIHOGJBONDH,
+        Timer = actionDetail1 == eReleaseType.TIMER ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
+        ReduceEnergy = actionDetail1 == eReleaseType.ENERGY ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
+        AbsorberValue = battleManager.KIHOGJBONDH,
         Skill = _skill,
-        ActionId = this.ActionId
+        ActionId = ActionId
       };
       /*if (this.ActionEffectList.Count != 0)
       {
@@ -66,9 +65,9 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      this.Value[eValueNumber.VALUE_2] = (float) ((double) this.MasterData.action_value_2 + (double) this.MasterData.action_value_3 * (double) _level);
-      this.Value[eValueNumber.VALUE_4] = (float) ((double) this.MasterData.action_value_4 + (double) this.MasterData.action_value_5 * (double) _level);
-      this.Value[eValueNumber.VALUE_6] = (float) ((double) this.MasterData.action_value_6 + (double) this.MasterData.action_value_7 * (double) _level);
+      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_4] = (float) (MasterData.action_value_4 + MasterData.action_value_5 * _level);
+      Value[eValueNumber.VALUE_6] = (float) (MasterData.action_value_6 + MasterData.action_value_7 * _level);
     }
 
     public enum eReleaseType
@@ -83,7 +82,7 @@ namespace Elements
 
       public bool Enable { get; set; }
 
-      public ContinuousAttackNearByAction.eReleaseType ReleaseType { get; set; }
+      public eReleaseType ReleaseType { get; set; }
 
       public AttackActionBase.eAttackType AttackType { get; set; } = AttackActionBase.eAttackType.PHYSICAL;
 

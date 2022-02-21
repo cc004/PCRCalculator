@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using System.Threading.Tasks;
 using System.IO;
-using System;
+using System.Threading.Tasks;
+using Elements;
 using PCRCaculator.Guild;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace PCRCaculator
 {
@@ -23,7 +25,7 @@ namespace PCRCaculator
 
 
         private bool allDependsLoaded;
-        private Dictionary<int, Elements.UnitActionController> loadedUnits = new Dictionary<int, Elements.UnitActionController>();
+        private Dictionary<int, UnitActionController> loadedUnits = new Dictionary<int, UnitActionController>();
         private bool isCreating;
         private bool isInit;
         private void Awake()
@@ -52,7 +54,7 @@ namespace PCRCaculator
                 {
                     await Task.Run(() => SQL2Json.CreateAllSQLDataInPlayerMode_jp());
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     a.Close();
                     PlayerPrefs.SetInt("UsePlayerSQL", 0);
@@ -77,7 +79,7 @@ namespace PCRCaculator
                 {
                     await Task.Run(() => SQL2Json.CreateAllSQLDataInPlayerMode_cn());
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     a.Close();
                     PlayerPrefs.SetInt("UsePlayerSQL", 0);
@@ -128,7 +130,7 @@ namespace PCRCaculator
                         MainManager.Instance.WindowConfigMessage("unitid错误！", null);
                     }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message, null);
                 }
@@ -161,7 +163,7 @@ namespace PCRCaculator
                     MainManager.Instance.WindowConfigMessage("unitid错误！", null);
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message, null);
             }
@@ -182,7 +184,7 @@ namespace PCRCaculator
                 {
                     SaveFirearmData(unitid, false, false);
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
                     MainManager.Instance.WindowConfigMessage("生成" + unitid + "的弹道数据时发生错误：" + e.Message, null);
                 }
@@ -214,30 +216,28 @@ namespace PCRCaculator
             }
             allDependsLoaded = true;
         }
-        private Elements.UnitActionController LoadUnitPrefab(int unitid)
+        private UnitActionController LoadUnitPrefab(int unitid)
         {
             if (loadedUnits.TryGetValue(unitid, out var result))
             {
                 return result;
             }
-            else
+
+            var b = ABExTool.GetAllAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab");
+            foreach (var i in b)
             {
-                var b = ABExTool.GetAllAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab");
-                foreach (var i in b)
-                {
-                    if (i != null)
-                        Instantiate(i).SetActive(false);
-                }
-                GameObject a = ABExTool.GetAssetBundleByName<GameObject>("all_battleunitprefab_" + unitid + ".unity3d", "prefab");
-                var c = Instantiate(a);
-                var d = c.GetComponent<Elements.UnitActionController>();
-                loadedUnits.Add(unitid, d);
-                return d;
+                if (i != null)
+                    Instantiate(i).SetActive(false);
             }
+            GameObject a = ABExTool.GetAssetBundleByName<GameObject>("all_battleunitprefab_" + unitid + ".unity3d", "prefab");
+            var c = Instantiate(a);
+            var d = c.GetComponent<UnitActionController>();
+            loadedUnits.Add(unitid, d);
+            return d;
         }
         private void SaveFirearmData(int unitid, bool saveImmedately = true, bool showResult = true)
         {
-            Dictionary<string, List<Elements.FirearmCtrlData>> result = null;
+            Dictionary<string, List<FirearmCtrlData>> result = null;
             var unitactioncontroller = LoadUnitPrefab(unitid);
             if (unitid >= 200000)
             {
@@ -257,7 +257,7 @@ namespace PCRCaculator
         }
         public void ExitButton()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GuildScene");
+            SceneManager.LoadScene("GuildScene");
         }
         public void UpDateABFromDMM()
         {
@@ -275,7 +275,7 @@ namespace PCRCaculator
                 else
                     ABExTool.CopyByID(unitid, 1, MainManager.Instance.WindowMessage);
             }
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message, null);
             }
@@ -303,35 +303,35 @@ namespace PCRCaculator
     }
     public class AllUnitFirearmData
     {
-        public Dictionary<int, Dictionary<string, List<Elements.FirearmCtrlData>>> AllUnitFirearmDic = new Dictionary<int, Dictionary<string, List<Elements.FirearmCtrlData>>>();
-        public Dictionary<int, Dictionary<string, List<Elements.FirearmCtrlData>>> AllUnitFirearmDic_player = new Dictionary<int, Dictionary<string, List<Elements.FirearmCtrlData>>>();
+        public Dictionary<int, Dictionary<string, List<FirearmCtrlData>>> AllUnitFirearmDic = new Dictionary<int, Dictionary<string, List<FirearmCtrlData>>>();
+        public Dictionary<int, Dictionary<string, List<FirearmCtrlData>>> AllUnitFirearmDic_player = new Dictionary<int, Dictionary<string, List<FirearmCtrlData>>>();
         public Dictionary<int, UnitSkillEffectData> AllUnitSkillEffectDic = new Dictionary<int, UnitSkillEffectData>();
 
-        private bool isInited = false;
+        private bool isInited;
         public void Init()
         {
             if (isInited)
                 return;
             if (AllUnitFirearmDic == null)
-                AllUnitFirearmDic = new Dictionary<int, Dictionary<string, List<Elements.FirearmCtrlData>>>();
+                AllUnitFirearmDic = new Dictionary<int, Dictionary<string, List<FirearmCtrlData>>>();
             if (AllUnitFirearmDic_player == null)
-                AllUnitFirearmDic_player = new Dictionary<int, Dictionary<string, List<Elements.FirearmCtrlData>>>();
+                AllUnitFirearmDic_player = new Dictionary<int, Dictionary<string, List<FirearmCtrlData>>>();
             if (AllUnitSkillEffectDic == null)
                 AllUnitSkillEffectDic = new Dictionary<int, UnitSkillEffectData>();
             isInited = true;
         }
-        public Dictionary<string, List<Elements.FirearmCtrlData>> GetData(int unitid,bool forcePlayer=false)
+        public Dictionary<string, List<FirearmCtrlData>> GetData(int unitid,bool forcePlayer=false)
         {
             Init();
             if (AllUnitFirearmDic_player.TryGetValue(unitid, out var data))
                 return data;
             if (forcePlayer)
-                return new Dictionary<string, List<Elements.FirearmCtrlData>>();
+                return new Dictionary<string, List<FirearmCtrlData>>();
             if (AllUnitFirearmDic.TryGetValue(unitid, out var value))
                 return value;
-            return new Dictionary<string, List<Elements.FirearmCtrlData>>();
+            return new Dictionary<string, List<FirearmCtrlData>>();
         }
-        public void SetData(int unitid, Dictionary<string, List<Elements.FirearmCtrlData>> value,UnitSkillEffectData effectData,bool toPlayer = false)
+        public void SetData(int unitid, Dictionary<string, List<FirearmCtrlData>> value,UnitSkillEffectData effectData,bool toPlayer = false)
         {
             Init();
             if (toPlayer)
@@ -380,8 +380,8 @@ namespace PCRCaculator
     }
     public class UnitSkillEffectData
     {
-        public int unitid = 0;
-        public bool hasFirearmSkill = false;
+        public int unitid;
+        public bool hasFirearmSkill;
         public List<string> requireFsxkList = new List<string>();
     }
 }
