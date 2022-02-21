@@ -265,9 +265,14 @@ namespace Elements
         public class CritPoint
         {
             public eCritPointPriority priority;
-            public int frame;
+            public readonly int frame;
             public string description;
             public string description2;
+
+            public CritPoint()
+            {
+                frame = BattleHeaderController.CurrentFrameCount;
+            }
 
             public string ToString(int frame)
             {
@@ -275,9 +280,9 @@ namespace Elements
                     return description2;
                 if (frame <= this.frame + 2)
                     return $"极限押{description2}({frame - this.frame})";
-                else if (frame <= this.frame + 5)
+                if (frame <= this.frame + 5)
                     return $"速押{description2}({frame - this.frame})";
-                else if (frame <= this.frame + 8)
+                if (frame <= this.frame + 8)
                     return $"慢押{description2}({frame - this.frame})";
                 return $"{description}后{frame - this.frame}帧";
             }
@@ -285,6 +290,8 @@ namespace Elements
 
         private static CritPoint globalCritPoint;
         public CritPoint critPoint;
+        public bool lastCanReleaseSkill = false;
+
         public CritPoint lastCritPoint
         {
             get => critPoint;
@@ -294,7 +301,7 @@ namespace Elements
                     critPoint = value;
                 if (IsSummonOrPhantom) return;
                 globalCritPoint = value;
-                globalCritPoint.description = this.UnitNameEx + globalCritPoint.description;
+                globalCritPoint.description = UnitNameEx + globalCritPoint.description;
             }
         }
         public string GetCurrentOp()

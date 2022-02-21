@@ -2803,16 +2803,6 @@ this.updateCurColor();
             MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
             uIManager.LogMessage("TP变更为：" + energy + $"-{Energy.Probability(x => x >= 1000f):P0}", PCRCaculator.Battle.eLogMessageType.CHANGE_TP, this);
-            if (this.Energy >= UnitDefine.MAX_ENERGY)
-            {
-                critPoint = new CritPoint()
-                {
-                    description = "TP满",
-                    description2 = "连点",
-                    frame = BattleHeaderController.CurrentFrameCount,
-                    priority = eCritPointPriority.FullEnergy
-                };
-            }
         }
 
         public void IndicateSkillName(string _skillName) 
@@ -6045,12 +6035,24 @@ this.updateCurColor();
             var prob = Hp.Probability(x => x <= 0f);
             var hp2 = Hp;
             if (!this.IsBoss)
-                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+            {
+                if (Hp > 0)
+                    PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => hp2.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
+                    });
+                else
                 {
-                    unit = UnitNameEx,
-                    predict = hash => hp2.Emulate(hash) <= 0f,
-                    description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
-                });
+                    PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => hp2.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})没被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
+                    });
+                }
+            }
             else
                 PCRCaculator.Guild.GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
 
@@ -7402,8 +7404,7 @@ this.updateCurColor();
             {
                 description = $"{UnitNameEx}释放ub",
                 description2 = $"{UnitNameEx}ub后",
-                frame = BattleHeaderController.CurrentFrameCount,
-                priority = eCritPointPriority.ExecAction
+                priority = eCritPointPriority.StartSkill
             };
         }
 

@@ -160,7 +160,6 @@ namespace PCRCaculator.Guild
                         {
                             description = "IDLE",
                             description2 = "AUTO",
-                            frame = frameCount,
                             priority = UnitCtrl.eCritPointPriority.ExecAction
                         };
                     }

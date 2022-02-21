@@ -773,10 +773,6 @@ namespace Elements
             skillExecData.UnitName = Owner.UnitName;
             if (skillId == Owner.UnionBurstSkillId)
             {
-                if (Owner.UnitId > 199999)
-                {
-
-                }
                 skillExecData.energy = Owner.lastEnergyBeforeUB;
                 var e = Owner.lastEnergyBeforeUB;
                 PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
@@ -789,6 +785,13 @@ namespace Elements
             else
             {
                 skillExecData.energy = Owner.Energy;
+                var e = Owner.Energy;
+                PCRCaculator.Guild.GuildCalculator.Instance.dmglist.Add(new PCRCaculator.Guild.ProbEvent
+                {
+                    unit = Owner.UnitNameEx,
+                    predict = hash => e.Emulate(hash) >= 1000f,
+                    description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB提前开出"
+                });
             }
             Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
@@ -797,7 +800,6 @@ namespace Elements
             {
                 description = $"{skill.SkillName}唱名",
                 description2 = $"{skill.SkillName}唱名",
-                frame = BattleHeaderController.CurrentFrameCount,
                 priority = UnitCtrl.eCritPointPriority.StartSkill,
             };
             return true;
@@ -1337,12 +1339,12 @@ namespace Elements
             }
             actionExecData.result = isResisted ? PCRCaculator.Guild.UnitActionExecData.ActionState.MISS : PCRCaculator.Guild.UnitActionExecData.ActionState.NORMAL;
             Owner.MyOnExecAction?.Invoke(Owner.UnitId, skill.SkillId, actionExecData);
+            var a = skill.ActionParameters.Count(ap => ap.ActionType == action.ActionType);
+            var b = skill.ActionParameters.Where(ap => ap.ActionType == action.ActionType).TakeWhile(ap => ap != action).Count();
             Owner.lastCritPoint = new UnitCtrl.CritPoint()
             {
-                description = $"{skill.SkillName}的{action.ActionType.GetDescription()}执行",
-                description2 = skill.SkillId == Owner.UnionBurstSkillId ? "连点" : 
-                    (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
-                frame = BattleHeaderController.CurrentFrameCount,
+                description = $"{skill.SkillName}的{(a == 1 ? "" : $"第{b}个")}{action.ActionType.GetDescription()}执行",
+                description2 = (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
                 priority = UnitCtrl.eCritPointPriority.ExecAction
             };
             //change end

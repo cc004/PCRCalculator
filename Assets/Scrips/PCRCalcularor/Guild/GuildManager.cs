@@ -120,7 +120,6 @@ namespace PCRCaculator.Guild
             Load();
             //LoadAddedPlayerData();
             ReflashOnStart();
-            FixGuildEnemyErrors();
             if (MainManager.Instance.AutoCalculatorData.isCalculating && !MainManager.Instance.AutoCalculatorData.isConfig)
             {
                 OpenAutoCalculatePage();
@@ -621,29 +620,6 @@ namespace PCRCaculator.Guild
             {
                 staticsettingData = new GuildSettingData(true);
             }
-        }
-        private void FixGuildEnemyErrors()
-        {
-            foreach (UnitAttackPattern unitAttackPattern in MainManager.Instance.AllUnitAttackPatternDic.Values)
-            {
-                if (unitAttackPattern.unit_id == 302000)
-                {
-                    unitAttackPattern.atk_patterns = new int[20] { 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                }
-                if (unitAttackPattern.unit_id == 301101)
-                {
-                    unitAttackPattern.atk_patterns = new int[20] { 1, 1, 1001, 1, 1001, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                }
-                if (unitAttackPattern.unit_id == 303900)
-                {
-                    unitAttackPattern.atk_patterns = new int[20] { 1, 1001, 1001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                }
-            }
-            //EnemyDataDic[401010504].skillData.MainSkills[1]=(3011013);
-           // EnemyDataDic[401011504].skillData.MainSkills[1]=(3011013);
-
-
-
         }
         public void SaveDataToJson()
         {

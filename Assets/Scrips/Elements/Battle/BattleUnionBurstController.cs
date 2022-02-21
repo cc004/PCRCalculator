@@ -22,6 +22,17 @@ namespace Elements.Battle
         UnitCtrl unitCtrl = this.battleManager.GetUnitCtrl(DNGOJHOHHMF);
         if (unitCtrl.UnionBurstSkillId != 0)
           unitCtrl.UpdateSkillTarget();
+        if (unitCtrl.JudgeSkillReadyAndIsMyTurn() && !unitCtrl.lastCanReleaseSkill)
+        {
+            unitCtrl.critPoint = new UnitCtrl.CritPoint()
+            {
+                description = "连点",
+                description2 = "连点",
+                priority = UnitCtrl.eCritPointPriority.FullEnergy
+            };
+        }
+        unitCtrl.lastCanReleaseSkill = unitCtrl.JudgeSkillReadyAndIsMyTurn();
+
         if (unitCtrl.IsAutoOrUbExecTrying() && unitCtrl.JudgeSkillReadyAndIsMyTurn())
         {
           unitCtrl.SetDirectionAuto();
