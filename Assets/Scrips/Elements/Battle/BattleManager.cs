@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cute;
 using PCRCaculator;
 using PCRCaculator.Guild;
@@ -3626,6 +3627,27 @@ namespace Elements.Battle
             //}
             yield return null;
             gameCtrl.SetUI();
+
+
+            try
+            {
+                var sh = GuildManager.Instance.SettingData.start_hp.Split(',').Select(float.Parse).ToArray();
+                var st = GuildManager.Instance.SettingData.start_tp.Split(',').Select(float.Parse).ToArray();
+                foreach (var unitCtrl in battleManager.UnitList)
+                {
+                    var idx = unitCtrl.posIdx;
+                    unitCtrl.Hp = unitCtrl.MaxHp * sh[idx];
+                    unitCtrl.unitUI.SetHP(sh[idx]);
+                    unitCtrl.energy = UnitDefine.MAX_ENERGY * st[idx];
+                    unitCtrl.unitUI.SetTP(st[idx]);
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+
+
             battleManager.GameState = eBattleGameState.PLAY;
 
         }

@@ -371,7 +371,7 @@ namespace PCRCaculator
             List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unitId];
             foreach (var unit in effectUnitList)
             {
-                playLoveDic.Add(unit, 0);
+                playLoveDic.Add(unit, MainManager.Instance.unitDataDic.TryGetValue(unit, out var val) ? val.love : 0);
             }
         }
 

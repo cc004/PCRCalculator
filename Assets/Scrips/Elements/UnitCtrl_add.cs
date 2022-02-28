@@ -13,7 +13,7 @@ namespace Elements
 {
     public partial class UnitCtrl
     {
-        private CharacterPageButton unitUI;
+        internal CharacterPageButton unitUI;
         private CharacterBuffUIController unitBuffUI;
         private BattleUIManager uIManager;
         public PCRCaculator.UnitData unitData;

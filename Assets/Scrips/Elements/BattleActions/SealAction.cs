@@ -55,7 +55,7 @@ namespace Elements
       if (seal.GetCurrentCount() == 0 && (double) _valueDictionary[eValueNumber.VALUE_4] > 0.0)
       {
         _target.Owner.OnChangeState.Call(_target.Owner, eStateIconType, true);
-                _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType, true, 90, "NaN");
+                _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType, true, _valueDictionary[eValueNumber.VALUE_3], eStateIconType.ToString());
 
                 /*if (this.ActionEffectList.Count != 0)
                 {

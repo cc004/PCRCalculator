@@ -1292,7 +1292,7 @@ namespace Elements
             }
         }
 
-        private FloatWithEx energy { get; set; }
+        internal FloatWithEx energy { get; set; }
 
         public bool HasSkillTarget => skillTargetList.Count > 0;
 
@@ -3006,14 +3006,16 @@ this.updateCurColor();
           float _effectTime,
           ActionParameter _action,
           Skill _skill,
-          float _value = 0.0f,
-          float _value2 = 0.0f,
+          FloatWithEx _value = default,
+          FloatWithEx _value2 = default,
           bool _reduceEnergy = false,
           bool _isDamageRelease = false,
           float _reduceEnergyRate = 1f)
         {
             if (battleManager.GameState != eBattleGameState.PLAY)
                 return;
+            _value = _value ?? 0f;
+            _value2 = _value2 ?? 0f;
             AbnormalStateEffectPrefabData abnormalEffectData = _action?.CreateAbnormalEffectData();
             if (_action != null && _action.AbnormalStateFieldAction != null)
                 _action.AbnormalStateFieldAction.TargetAbnormalState = _abnormalState;
@@ -3100,6 +3102,7 @@ this.updateCurColor();
                     if (IsAbnormalState(abnormalStateCategory))
                         return;
                     stateCategoryData.CurrentAbnormalState = _abnormalState;
+                    if (barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = _value;
                     IEnumerator _cr = UpdateAbnormalState(_abnormalState, abnormalEffectData);
                     if (!_cr.MoveNext())
                         return;
@@ -3107,6 +3110,16 @@ this.updateCurColor();
                 }
             }
         }
+
+        private readonly Dictionary<eAbnormalState, FloatWithEx> barriers = new Dictionary<eAbnormalState, FloatWithEx>()
+        {
+            [eAbnormalState.DRAIN_ATK] = 0f,
+            [eAbnormalState.DRAIN_MGC] = 0f,
+            [eAbnormalState.DRAIN_BOTH] = 0f,
+            [eAbnormalState.GUARD_ATK] = 0f,
+            [eAbnormalState.GUARD_MGC] = 0f,
+            [eAbnormalState.GUARD_BOTH] = 0f,
+        };
 
         private void switchAbnormalState(
           eAbnormalState abnormalState,
@@ -3216,6 +3229,7 @@ this.updateCurColor();
           bool _enable,
           bool _reduceEnergy = false,
           bool _switch = false,
+          bool nobreak = false,
             bool _switch_On = false)
         {
             eAbnormalStateCategory abnormalStateCategory = GetAbnormalStateCategory(_abnormalState);
@@ -3226,6 +3240,7 @@ this.updateCurColor();
                 abnormalStateCategoryDataDictionary[abnormalStateCategory].Time = 0.0f;
                 abnormalStateCategoryDataDictionary[abnormalStateCategory].Duration = 0.0f;
                 abnormalStateCategoryDataDictionary[abnormalStateCategory].EnergyChargeMultiple = 1f;
+                if (!nobreak && barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = 0f;
             }
             abnormalStateCategoryDataDictionary[abnormalStateCategory].enable = _enable;
             m_abnormalState[_abnormalState] = _enable;
@@ -3632,7 +3647,7 @@ this.updateCurColor();
             }
         }
 
-        public static float GetHealDownValue(UnitCtrl _source) => !_source.IsAbnormalState(eAbnormalState.HEAL_DOWN) ? 1f : _source.abnormalStateCategoryDataDictionary[eAbnormalStateCategory.HEAL_DOWN].MainValue;
+        public static float GetHealDownValue(UnitCtrl _source) => !_source.IsAbnormalState(eAbnormalState.HEAL_DOWN) ? 1f : (float)_source.abnormalStateCategoryDataDictionary[eAbnormalStateCategory.HEAL_DOWN].MainValue;
 
 
         private IEnumerator UpdateTpRegeneration(int _regeneId)
@@ -6079,14 +6094,15 @@ this.updateCurColor();
             return num6.Floor();
         }
 
-        private void execBarrier(DamageData _damageData, ref FloatWithEx _fDamage, ref int _overRecoverValue)
+        private void execBarrier(DamageData _damageData, ref FloatWithEx __fDamage, ref int _overRecoverValue)
         {
+            FloatWithEx _fDamage = __fDamage;
             if (IsAbnormalState(eAbnormalState.GUARD_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 var num = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num > 0.0)
                 {
-                    EnableAbnormalState(eAbnormalState.GUARD_ATK, false);
+                    EnableAbnormalState(eAbnormalState.GUARD_ATK, false, nobreak: true);
                     _fDamage = num;
                 }
                 else
@@ -6100,7 +6116,7 @@ this.updateCurColor();
                 var num = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
                 if ((double)num > 0.0)
                 {
-                    EnableAbnormalState(eAbnormalState.GUARD_MGC, false);
+                    EnableAbnormalState(eAbnormalState.GUARD_MGC, false, nobreak: true);
                     _fDamage = num;
                 }
                 else
@@ -6109,12 +6125,52 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                 }
             }
+            if (IsAbnormalState(eAbnormalState.GUARD_BOTH) && _damageData.ActionType != eActionType.DESTROY)
+            {
+                var num = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
+                if ((double)num > 0.0)
+                {
+                    EnableAbnormalState(eAbnormalState.GUARD_BOTH, false, nobreak: true);
+                    _fDamage = num;
+                }
+                else
+                {
+                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
+                    _fDamage = 0.0f;
+                }
+            }
+
+            // override the guard exec
+            _fDamage = __fDamage;
+            if (!barriers[eAbnormalState.GUARD_ATK].StrictlyEquals(0f) &&
+                _damageData.DamageType == DamageData.eDamageType.ATK)
+            {
+                var val = _fDamage;
+                _fDamage = (val - barriers[eAbnormalState.GUARD_ATK]).Max(0f);
+                barriers[eAbnormalState.GUARD_ATK] = (barriers[eAbnormalState.GUARD_ATK] - BattleUtil.FloatToInt(val)).Max(0f);
+            }
+            if (!barriers[eAbnormalState.GUARD_MGC].StrictlyEquals(0f) &&
+                _damageData.DamageType == DamageData.eDamageType.MGC)
+            {
+                var val = _fDamage;
+                _fDamage = (val - barriers[eAbnormalState.GUARD_MGC]).Max(0f);
+                barriers[eAbnormalState.GUARD_MGC] = (barriers[eAbnormalState.GUARD_MGC] - BattleUtil.FloatToInt(val)).Max(0f);
+            }
+            if (!barriers[eAbnormalState.GUARD_BOTH].StrictlyEquals(0f) &&
+                _damageData.ActionType != eActionType.DESTROY)
+            {
+                var val = _fDamage;
+                _fDamage = (val - barriers[eAbnormalState.GUARD_BOTH]).Max(0f);
+                barriers[eAbnormalState.GUARD_BOTH] = (barriers[eAbnormalState.GUARD_BOTH] - BattleUtil.FloatToInt(val)).Max(0f);
+            }
+
+
             if (IsAbnormalState(eAbnormalState.DRAIN_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num1 > 0.0)
                 {
-                    _overRecoverValue += (int)setRecoveryAndGetOverRecovery(BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
+                    _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)(float)BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
                 }
@@ -6131,7 +6187,7 @@ this.updateCurColor();
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
                 if ((double)num1 > 0.0)
                 {
-                    _overRecoverValue += (int)setRecoveryAndGetOverRecovery(BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
+                    _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)(float)BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_MGC, false);
                     _fDamage = num1;
                 }
@@ -6143,35 +6199,31 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                 }
             }
-            if (IsAbnormalState(eAbnormalState.GUARD_BOTH) && _damageData.ActionType != eActionType.DESTROY)
+            if (IsAbnormalState(eAbnormalState.DRAIN_BOTH) && _damageData.ActionType != eActionType.DESTROY)
             {
-                var num = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
-                if ((double)num > 0.0)
+                var num3 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH]
+                    .MainValue;
+                if ((double) num3 > 0.0)
                 {
-                    EnableAbnormalState(eAbnormalState.GUARD_BOTH, false);
-                    _fDamage = num;
+                    _overRecoverValue += (int) (float)setRecoveryAndGetOverRecovery((int)(float)
+                        BattleUtil.FloatToInt(
+                            abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH]
+                                .MainValue), this, _damageData.Target,
+                        _damageData.DamageType == DamageData.eDamageType.MGC,
+                        abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
+                    EnableAbnormalState(eAbnormalState.DRAIN_BOTH, false);
+                    _fDamage = num3;
                 }
                 else
                 {
-                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
+                    int num1 = (int) BattleUtil.FloatToInt(_fDamage);
+                    _overRecoverValue += (int) setRecoveryAndGetOverRecovery(num1, this, _damageData.Target,
+                        _damageData.DamageType == DamageData.eDamageType.MGC,
+                        abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
+                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -=
+                        num1;
                     _fDamage = 0.0f;
                 }
-            }
-            if (!IsAbnormalState(eAbnormalState.DRAIN_BOTH) || _damageData.ActionType == eActionType.DESTROY)
-                return;
-            var num3 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue;
-            if ((double)num3 > 0.0)
-            {
-                _overRecoverValue += (int)setRecoveryAndGetOverRecovery(BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
-                EnableAbnormalState(eAbnormalState.DRAIN_BOTH, false);
-                _fDamage = num3;
-            }
-            else
-            {
-                int num1 = (int)BattleUtil.FloatToInt(_fDamage);
-                _overRecoverValue += (int)setRecoveryAndGetOverRecovery(num1, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
-                abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= num1;
-                _fDamage = 0.0f;
             }
         }
 
@@ -9193,7 +9245,7 @@ this.updateCurColor();
             NONE = 0,
             [Description("物伤减免")]
             GUARD_ATK = 1,
-            TOP = 1,
+            //TOP = 1,
             [Description("法伤减免")]
             GUARD_MGC = 2,
             [Description("物伤吸收")]

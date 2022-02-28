@@ -1876,7 +1876,7 @@ namespace Elements
                 case PriorityPattern.HP_DEC:
                 case PriorityPattern.HP_ASC_NEAR:
                 case PriorityPattern.HP_DEC_NEAR:
-                    selector = parts => $"{parts.Owner.UnitName}({parts.Owner.Hp / parts.Owner.MaxHp:P2})";
+                    selector = parts => $"{parts.Owner.UnitName}({(float)parts.Owner.Hp / parts.Owner.MaxHp:P2})";
                     break;
                 case PriorityPattern.ENERGY_ASC:
                 case PriorityPattern.ENERGY_DEC:

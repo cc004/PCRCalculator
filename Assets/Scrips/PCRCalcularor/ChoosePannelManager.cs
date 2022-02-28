@@ -374,28 +374,12 @@ namespace PCRCaculator
                     {
                         unitname = name0;
                     }
-                    if (playerData.playrCharacters[selectedCharacterId_setting].playLoveDic != null)
-                    {
-                        EXsettingSliders[i].SetSliderPrefab(
-                            unitname, 
-                            playerData.playrCharacters[selectedCharacterId_setting].playLoveDic[effectUnitList[i]], 
-                            unitRarityData.GetMaxLoveLevel(), 
-                            0, 
-                            null);
-                    }
-                    else
-                    {
-                        if(MainManager.Instance.JudgeWeatherShowThisUnit(effectUnitList[i]))
-                            EXsettingSliders[i].SetSliderPrefab(
-                                unitname, 
-                                playerData.playrCharacters[selectedCharacterId_setting].love,
-                            unitRarityData.GetMaxLoveLevel(),
-                                0, 
-                                null);
-                        else
-                            EXsettingSliders[i].SetSliderPrefab(unitname, 0, 8, 0, null);
-
-                    }
+                    EXsettingSliders[i].SetSliderPrefab(
+                        unitname,
+                        playerData.playrCharacters[selectedCharacterId_setting].playLoveDic[effectUnitList[i]],
+                        unitRarityData.GetMaxLoveLevel(),
+                        0,
+                        null);
                 }
                 else
                 {

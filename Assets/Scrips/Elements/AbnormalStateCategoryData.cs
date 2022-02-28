@@ -12,7 +12,7 @@ namespace Elements
   {
     public UnitCtrl.eAbnormalState CurrentAbnormalState;
     public bool enable;
-    public float MainValue;
+    public FloatWithEx MainValue;
     public const float SLIP_DAMAGE_INTERVAL_TIME = 1f;
     public float Time;
     public float Duration;

@@ -1083,7 +1083,7 @@ namespace PCRCaculator
             while (reader.Read())
             {
                 int enemy_id = reader.GetInt32(reader.GetOrdinal("enemy_id"));
-                if (enemy_id >= 401010101 && enemy_id <= 501010501)
+                //if (enemy_id >= 400000000 && enemy_id <= 599999999)
                 {
                     EnemyData enemyData = new EnemyData();
                     enemyData.enemy_id = enemy_id;
@@ -1121,7 +1121,7 @@ namespace PCRCaculator
             while (reader.Read())
             {
                 int enemy_id = reader.GetInt32(reader.GetOrdinal("enemy_id"));
-                if (enemy_id >= 401021505 && enemy_id <= 499999999)
+                //if (enemy_id >= 400000000 && enemy_id <= 599999999)
                 {
                     int id_1 = reader.GetInt32(reader.GetOrdinal("child_enemy_parameter_1"));
                     int id_2 = reader.GetInt32(reader.GetOrdinal("child_enemy_parameter_2"));

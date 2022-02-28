@@ -147,7 +147,7 @@ namespace Elements
         public FloatWithEx Log() => Select(Mathf.Log);
         public FloatWithEx Max(float f) => Select(x => Mathf.Max(x, f));
         public FloatWithEx Min(float f) => Select(x => Mathf.Min(x, f));
-        public override string ToString() => pure ? ((int)(float)this).ToString() : $"{(int)(float)this}[{(int)Expect}]";
+        public override string ToString() => pure ? ((float)this).ToString() : $"{(int)(float)this}[{(int)Expect}]";
         public FloatWithEx Floor() => Select(Mathf.Floor);
         public int CompareTo(FloatWithEx other) => ((float)this).CompareTo(other);
         public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y);
@@ -165,6 +165,11 @@ namespace Elements
         public override bool Equals(object obj)
         {
             return obj is FloatWithEx other && Equals(other);
+        }
+
+        public bool StrictlyEquals(float x)
+        {
+            return root == null && value == x;
         }
 
         public override int GetHashCode()

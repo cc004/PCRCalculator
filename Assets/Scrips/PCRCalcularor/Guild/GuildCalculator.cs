@@ -519,7 +519,7 @@ namespace PCRCaculator.Guild
                 UBTimes.Add(ubline);
             }
             return UBTimes;*/
-            return PlayerIds.Append(bossId).SelectMany((id, i) => allUnitStateChangeDic[id]
+            return PlayerIds.Take(5).Append(bossId).SelectMany((id, i) => allUnitStateChangeDic[id]
                     .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
                     .Select(s => (state: s, pos: i)))
                 .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.id)

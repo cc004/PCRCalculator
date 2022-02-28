@@ -209,6 +209,8 @@ namespace PCRCaculator.Guild
             }
             else
             {
+                specialInput.text = "401042401";
+                /*
                 show_text.text = show_str[dropdowns_ChooseBoss[3].value];
                 switch (dropdowns_ChooseBoss[3].value)
                 {
@@ -230,14 +232,14 @@ namespace PCRCaculator.Guild
                         break;
                     case 2:
                         break;
-                }
+                }*/
             }
             specialEnemyid = enemyid_0;
             specialInputValue = 100;
         }
         public void OnInputFinished()
         {
-            if(!isGuildBoss && dropdowns_ChooseBoss[3].value == 2)
+            if(!isGuildBoss)
             {
                 int bossid = int.Parse(specialInput.text, NumberStyles.Any);
                 if(enemyDataDic.TryGetValue(bossid,out var data))
@@ -253,10 +255,6 @@ namespace PCRCaculator.Guild
                     specialEnemyid = 0;
                 }
                 specialInputValue = 0;
-            }
-            else if (!isGuildBoss)
-            {
-                specialInputValue = int.Parse(specialInput.text, NumberStyles.Any);
             }
         }
         public void FinishChooseBossButton()
@@ -280,10 +278,10 @@ namespace PCRCaculator.Guild
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
 
             var group = SettingData.GetCurrentPlayerGroup();
-            group.selectedEnemyID = enemyId;
-            group.isSpecialBoss = !isGuildBoss;
-            group.specialBossID = specialEnemyid;
-            group.specialInputValue = specialInputValue;
+            group.selectedEnemyID = isGuildBoss ? enemyId : specialEnemyid;
+            group.isSpecialBoss = false;//!isGuildBoss;
+            //group.specialBossID = specialEnemyid;
+            //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
             SaveDataToJson();
             Reflash();
@@ -561,9 +559,11 @@ namespace PCRCaculator.Guild
             //SettingInputs[2].text = SettingData.BossAbnormalMultValue + "";
             //SettingInputs[3].text = SettingData.BossAbnormalAddValue + "";
             RandomManager.Reflash();
-           // SettingToggles[7].isOn = SettingData.usePhysics;
+            // SettingToggles[7].isOn = SettingData.usePhysics;
             //SettingToggles[8].isOn = SettingData.useSkillEffects;
             //SettingInputs[4].text = SettingData.skillEffeckFix + "";
+            SettingInputs[1].text = SettingData.start_hp;
+            SettingInputs[2].text = SettingData.start_tp;
             SettingInputs[5].text = SettingData.limitTime.ToString();
             SettingInputs[6].text = SettingData.author;
             SettingInputs[7].text = SettingData.format;
@@ -604,6 +604,8 @@ namespace PCRCaculator.Guild
             //SettingData.usePhysics = SettingToggles[7].isOn;
             //SettingData.useSkillEffects = SettingToggles[8].isOn;
             //SettingData.skillEffeckFix = float.Parse(SettingInputs[4].text);
+            SettingData.start_hp = SettingInputs[1].text;
+            SettingData.start_tp = SettingInputs[2].text;
             SettingData.limitTime = int.Parse(SettingInputs[5].text);
             SettingData.author = SettingInputs[6].text;
             SettingData.format = SettingInputs[7].text;
@@ -963,6 +965,7 @@ namespace PCRCaculator.Guild
         public int currentGuildEnemyNum;
         public int currentTurn;*/
 
+        public string start_hp, start_tp;
         public List<GuildPlayerGroupData> guildPlayerGroupDatas;
 
         public Dictionary<int, UnitAttackPattern> changedEnemyAttackPatternDic = new Dictionary<int, UnitAttackPattern>();
