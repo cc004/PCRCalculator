@@ -812,7 +812,7 @@ namespace Elements
           bool _considerBodyWidth = true)
         {
             searchTargetUnit(_action, _basePosition, _skill, _considerBodyWidth);
-            sortTargetListByTargetPattern(_action, Owner.BottomTransform, _action.Value[eValueNumber.VALUE_1], _quiet);
+            sortTargetListByTargetPattern(_action, Owner.BottomTransform, _action.Value[eValueNumber.VALUE_1], _quiet, _skill);
             bool flag = false;
             for (int index = 0; index < _action.TargetList.Count - _action.TargetNth; ++index)
             {
@@ -1866,9 +1866,9 @@ namespace Elements
           ActionParameter _actionParameter,
           Transform _baseTransform,
           float _value,
-          bool _quiet)
+          bool _quiet,
+          Skill skill)
         {
-            var skill = skillDictionary[Owner.CurrentSkillId];
             Func<BasePartsData, string> selector;
             switch (_actionParameter.TargetSort)
             {

@@ -6094,9 +6094,9 @@ this.updateCurColor();
             return num6.Floor();
         }
 
-        private void execBarrier(DamageData _damageData, ref FloatWithEx __fDamage, ref int _overRecoverValue)
+        private void execBarrier(DamageData _damageData, ref FloatWithEx _fDamage, ref int _overRecoverValue)
         {
-            FloatWithEx _fDamage = __fDamage;
+            //FloatWithEx _fDamage = __fDamage;
             if (IsAbnormalState(eAbnormalState.GUARD_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 var num = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
@@ -6104,11 +6104,23 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_ATK, false, nobreak: true);
                     _fDamage = num;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
+                    });
                 }
                 else
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
+                    });
                 }
             }
             if (IsAbnormalState(eAbnormalState.GUARD_MGC) && _damageData.DamageType == DamageData.eDamageType.MGC)
@@ -6118,11 +6130,23 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_MGC, false, nobreak: true);
                     _fDamage = num;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
+                    });
                 }
                 else
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
+                    });
                 }
             }
             if (IsAbnormalState(eAbnormalState.GUARD_BOTH) && _damageData.ActionType != eActionType.DESTROY)
@@ -6132,14 +6156,27 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_BOTH, false, nobreak: true);
                     _fDamage = num;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
+                    });
                 }
                 else
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
+                    });
                 }
             }
 
+            /*
             // override the guard exec
             _fDamage = __fDamage;
             if (!barriers[eAbnormalState.GUARD_ATK].StrictlyEquals(0f) &&
@@ -6163,8 +6200,8 @@ this.updateCurColor();
                 _fDamage = (val - barriers[eAbnormalState.GUARD_BOTH]).Max(0f);
                 barriers[eAbnormalState.GUARD_BOTH] = (barriers[eAbnormalState.GUARD_BOTH] - BattleUtil.FloatToInt(val)).Max(0f);
             }
-
-
+            
+            */
             if (IsAbnormalState(eAbnormalState.DRAIN_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
@@ -6173,6 +6210,12 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)(float)BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num1.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
+                    });
                 }
                 else
                 {
@@ -6180,6 +6223,12 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)num2;
                     _fDamage = 0.0f;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num1.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
+                    });
                 }
             }
             if (IsAbnormalState(eAbnormalState.DRAIN_MGC) && _damageData.DamageType == DamageData.eDamageType.MGC)
@@ -6190,6 +6239,12 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)(float)BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_MGC, false);
                     _fDamage = num1;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num1.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
+                    });
                 }
                 else
                 {
@@ -6197,6 +6252,12 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= num2;
                     _fDamage = 0.0f;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num1.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
+                    });
                 }
             }
             if (IsAbnormalState(eAbnormalState.DRAIN_BOTH) && _damageData.ActionType != eActionType.DESTROY)
@@ -6213,6 +6274,12 @@ this.updateCurColor();
                         abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_BOTH, false);
                     _fDamage = num3;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num3.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
+                    });
                 }
                 else
                 {
@@ -6223,6 +6290,12 @@ this.updateCurColor();
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -=
                         num1;
                     _fDamage = 0.0f;
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => num3.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
+                    });
                 }
             }
         }
