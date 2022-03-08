@@ -244,6 +244,11 @@ namespace PCRCaculator.Battle
         }
         public void LogMessage(string word,eLogMessageType messageType,UnitCtrl unitCtrl)
         {
+            if (unitCtrl == null)
+            {
+                LogMessage(word, messageType, false);
+                return;
+            }
             bool other = unitCtrl.IsOther;
             LogMessage(unitCtrl.UnitName + word, messageType, other);
         }

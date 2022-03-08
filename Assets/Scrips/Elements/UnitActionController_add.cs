@@ -764,7 +764,7 @@ namespace Elements
                         firearmCtrl.data = _skillEffect.Prefab.GetComponent<FirearmCtrl>().GetPrefabData();
                         SetPrefabDataBySkillid(_skill.SkillId, firearmCtrl.data);
                     }
-                    catch (MissingReferenceException e)
+                    catch (Exception e)
                     {
                         firearmCtrl.data = GetPrefabDataBySkillid(_skill.SkillId);
                     }

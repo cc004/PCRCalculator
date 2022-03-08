@@ -18,6 +18,12 @@ namespace PCRCaculator.Guild
         {
             Destroy(gameObject);
         }
+
+        public void OnPointerClick()
+        {
+
+        }
+
         public void Setdetails(UnitSkillExecData data)
         {
             detailTexts[0].text = data.skillName;

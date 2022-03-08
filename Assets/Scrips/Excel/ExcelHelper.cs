@@ -503,6 +503,8 @@ namespace ExcelHelper
                 int[] backColotInt_1 = new int[3] { 253, 233, 217 };
                 int[] backColotInt_2 = new int[3] { 250, 191, 143 };
                 int[] lineColor = new int[3] { 151, 71, 6 };
+                worksheet0.Cells[0, 0].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
+                    .GetDescription();
                 worksheet0.Cells[1, 2, 2, 9].Merge = true;
                 worksheet0.MySetValue(1, 2, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
                 worksheet0.MySetValue(3, 2,

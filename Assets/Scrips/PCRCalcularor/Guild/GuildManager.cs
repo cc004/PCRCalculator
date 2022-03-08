@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using Elements;
 using Newtonsoft0.Json;
@@ -1136,8 +1137,11 @@ namespace PCRCaculator.Guild
 
         public enum LogBarrierType
         {
+            [Description("无盾")]
             NoBarrier = 0,
+            [Description("无盾有tp")]
             TpOnly = 1,
+            [Description("有盾")]
             FullBarrier = 2
         }
 
