@@ -1764,6 +1764,23 @@ this.updateCurColor();
 
             if (additional != null) baseData += additional;
 
+
+            //this.Def = this.StartDef = (int)Mathf.RoundToInt(baseData.Def);
+            //this.Atk = this.StartAtk = (int)Mathf.RoundToInt(baseData.Atk);
+            //this.MagicStr = this.StartMagicStr = (int)Mathf.RoundToInt(baseData.Magic_str);
+            //this.MagicDef = this.StartMagicDef = (int)Mathf.RoundToInt(baseData.Magic_def);
+            StartDef = Mathf.RoundToInt(baseData.Def);
+            StartAtk = Mathf.RoundToInt(baseData.Atk);
+            StartMagicStr = Mathf.RoundToInt(baseData.Magic_str);
+            StartMagicDef = Mathf.RoundToInt(baseData.Magic_def);
+
+            baseData += baseDataEX;
+
+            Def = Mathf.RoundToInt(baseData.Def);
+            Atk = Mathf.RoundToInt(baseData.Atk);
+            MagicStr = Mathf.RoundToInt(baseData.Magic_str);
+            MagicDef = Mathf.RoundToInt(baseData.Magic_def);
+
             if (UnitId >= 300000 && UnitId <= 399999)
             {
                 var data = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
@@ -1783,20 +1800,6 @@ this.updateCurColor();
             }
             else
                 Hp = (long)(MaxHp = StartMaxHP = (long)baseData.Hp);
-
-
-            //this.Def = this.StartDef = (int)Mathf.RoundToInt(baseData.Def);
-            //this.Atk = this.StartAtk = (int)Mathf.RoundToInt(baseData.Atk);
-            //this.MagicStr = this.StartMagicStr = (int)Mathf.RoundToInt(baseData.Magic_str);
-            //this.MagicDef = this.StartMagicDef = (int)Mathf.RoundToInt(baseData.Magic_def);
-            StartDef = Mathf.RoundToInt(baseData.Def);
-            StartAtk = Mathf.RoundToInt(baseData.Atk);
-            StartMagicStr = Mathf.RoundToInt(baseData.Magic_str);
-            StartMagicDef = Mathf.RoundToInt(baseData.Magic_def);
-            Def = (int)(StartDef + baseDataEX.Def);
-            Atk = StartAtk + baseDataEX.Atk;
-            MagicStr = StartMagicStr + baseDataEX.Magic_str;
-            MagicDef = (int)(StartMagicDef + baseDataEX.Magic_def);
 
             if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
             {
@@ -5409,7 +5412,13 @@ this.updateCurColor();
                 return;
             int pokeaebgpib = battleManager.CurrentWave;
             int index = 0;
-            foreach (KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV in addPassiveValue(addPassiveValue(IsOther ? battleManager.PassiveDic_4[pokeaebgpib] : battleManager.PassiveDic_3[pokeaebgpib], IsOther ? battleManager.PassiveDic_2[index] : battleManager.PassiveDic_1[index]), OwnerPassiveAction))
+            foreach (KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV in addPassiveValue(
+                         addPassiveValue(
+                             IsOther
+                                 ? battleManager.PassiveDic_4[pokeaebgpib]
+                                 : battleManager.PassiveDic_3[pokeaebgpib],
+                             IsOther ? battleManager.PassiveDic_2[index] : battleManager.PassiveDic_1[index]),
+                         OwnerPassiveAction))
             {
                 switch (_passiveActionKV.Key)
                 {

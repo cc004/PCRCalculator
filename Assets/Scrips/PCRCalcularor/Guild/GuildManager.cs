@@ -157,10 +157,12 @@ namespace PCRCaculator.Guild
             UnitData unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
             characterDetailButton.SetButton(unitData);
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
-            characterDetailTexts[0].text = "" + baseData.Hp;
+            var baseDataEX = MainManager.Instance.UnitRarityDic[unitData.unitId].GetEXSkillValue(unitData);//,MyGameCtrl.Instance.tempData.isGuildBattle);
+            characterDetailTexts[0].text = "" + baseData.Hp + (baseDataEX.Hp == 0 ? string.Empty : $"<color=#FF80C0>+{baseDataEX.Hp}</color>");
             for (int i = 1; i < baseData.dataint.Length; i++)
             {
-                characterDetailTexts[i].text = "" + baseData.dataint[i] / 100.0f;
+                //处理一下四舍五入的问题
+                characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100 - baseData.dataint[i] / 100}</color>");
             }
             execTimeButtonAction = () => { GuildExecTimeSettingButton(unitData); };
         }
@@ -476,6 +478,8 @@ namespace PCRCaculator.Guild
                     UnitUBTimes[i].SetUBTimes(new List<float>());
                 }
             }
+
+            if (data.UBExecTimeData.Count < 6) data.UBExecTimeData.Add(new List<float>());
             UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             AutoModeToggle.isOn = data.useAutoMode;
 
@@ -1043,10 +1047,26 @@ namespace PCRCaculator.Guild
         }
         public AddedPlayerData GetCurrentPlayerData()
         {
+            while (currentPlayerGroupNum >= guildPlayerGroupDatas.Count)
+            {
+                GuildPlayerGroupData data = new GuildPlayerGroupData();
+                data.Init();
+                guildPlayerGroupDatas.Add(data);
+            }
+
+            if (currentPlayerGroupNum < 0) currentPlayerGroupNum = 0;
             return guildPlayerGroupDatas[currentPlayerGroupNum].playerData;
         }
         public GuildPlayerGroupData GetCurrentPlayerGroup()
         {
+            while (currentPlayerGroupNum >= guildPlayerGroupDatas.Count)
+            {
+                GuildPlayerGroupData data = new GuildPlayerGroupData();
+                data.Init();
+                guildPlayerGroupDatas.Add(data);
+            }
+
+            if (currentPlayerGroupNum < 0) currentPlayerGroupNum = 0;
             return guildPlayerGroupDatas[currentPlayerGroupNum];
         }
         public void SetCurrentPlayerData(AddedPlayerData playerData)

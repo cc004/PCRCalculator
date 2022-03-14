@@ -4,6 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Elements;
@@ -503,7 +504,7 @@ namespace ExcelHelper
                 int[] backColotInt_1 = new int[3] { 253, 233, 217 };
                 int[] backColotInt_2 = new int[3] { 250, 191, 143 };
                 int[] lineColor = new int[3] { 151, 71, 6 };
-                worksheet0.Cells[0, 0].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
+                worksheet0.Cells[1, 1].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
                     .GetDescription();
                 worksheet0.Cells[1, 2, 2, 9].Merge = true;
                 worksheet0.MySetValue(1, 2, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
@@ -526,7 +527,7 @@ namespace ExcelHelper
                     count++;
                 }
                 worksheet0.Cells[3, 8, 8, 9].Merge = true;
-                worksheet0.InsertImage(TimelineData.charImages[5], 2, 7, false,2,6);
+                worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 7, false,2,6);
                 worksheet0.MySetValue(9, 1, "帧数");
                 worksheet0.MySetValue(9, 2, "秒数", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(9, 3, "角色", blod: true, backColor: backColotInt_2);

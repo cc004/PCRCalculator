@@ -523,9 +523,11 @@ namespace PCRCaculator
                 {
                     unitRankdic.Add(id, new List<int[]>());
                 }
-                if (unitRankdic[id].Count < rank)
-                {
-                    int[] equipl_solt = new int[6] {
+
+                while (unitRankdic[id].Count < rank)
+                    unitRankdic[id].Add(null);
+
+                int[] equipl_solt = new int[6] {
                     reader.GetInt32(reader.GetOrdinal("equip_slot_1")),
                     reader.GetInt32(reader.GetOrdinal("equip_slot_2")),
                     reader.GetInt32(reader.GetOrdinal("equip_slot_3")),
@@ -533,12 +535,7 @@ namespace PCRCaculator
                     reader.GetInt32(reader.GetOrdinal("equip_slot_5")),
                     reader.GetInt32(reader.GetOrdinal("equip_slot_6"))
                 };
-                    unitRankdic[id].Add(equipl_solt);
-                }
-                else
-                {
-                    Debug.LogError("加载" + id + " 的RANK装备数据时出错！");
-                }
+                unitRankdic[id][rank - 1] = equipl_solt;
             }
             reader = sql.ReadFullTable("unit_rarity");
             while (reader.Read())

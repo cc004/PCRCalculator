@@ -595,7 +595,7 @@ namespace PCRCaculator.Guild
             string fileName = CurrentBossText.text + "-";
             for (int i = 0; i < 5; i++)
             {
-                if (playerIds.Count >= i)
+                if (playerIds.Count > i)
                 {
                     int player = playerIds[i];
                     fileName += MainManager.Instance.GetUnitNickName(player);
