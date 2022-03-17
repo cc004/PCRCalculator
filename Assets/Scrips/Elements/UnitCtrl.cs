@@ -1508,7 +1508,8 @@ this.updateCurColor();
           bool _isOther,
           bool _isFirstWave,
           bool _isGaugeAlwaysVisible = false,
-          BaseData additional = null)
+          BaseData additional = null,
+          BaseData exOverride = null)
         {
             //this.soundManager = ManagerSingleton<SoundManager>.Instance;
             /*if (UnitCtrl.staticSingletonTree == null)
@@ -1762,6 +1763,8 @@ this.updateCurColor();
                 baseData = _data.EnemyData.baseData;
             }
 
+            baseDataEX = exOverride ?? baseDataEX;
+
             if (additional != null) baseData += additional;
 
 
@@ -1773,6 +1776,8 @@ this.updateCurColor();
             StartAtk = Mathf.RoundToInt(baseData.Atk);
             StartMagicStr = Mathf.RoundToInt(baseData.Magic_str);
             StartMagicDef = Mathf.RoundToInt(baseData.Magic_def);
+
+            var baseHp = (long)baseData.Hp;
 
             baseData += baseDataEX;
 
@@ -1833,7 +1838,7 @@ this.updateCurColor();
             if (_data.EnemyData != null && _data.EnemyData.virtual_hp != 0)
                 skillStackValDmg = 1000f / _data.EnemyData.virtual_hp;
             else
-                skillStackValDmg = 1000f / MaxHp;
+                skillStackValDmg = 1000f / baseHp;
 
             switch (UnitUtility.GetUnitPosType((int)_data.MasterData.SearchAreaWidth))
             {

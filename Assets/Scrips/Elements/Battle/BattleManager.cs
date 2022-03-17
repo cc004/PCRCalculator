@@ -4473,10 +4473,12 @@ namespace Elements.Battle
                 }
 
 
-                unitCtrl.Initialize(parameter,unitData_my, flag, true, false, additional);
+                unitCtrl.Initialize(parameter,unitData_my, flag, true, false, additional,
+                    MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my));
+
                 if (_summonData.ConsiderEquipmentAndBonus)
                 {
-                    unitCtrl.ApplyPassiveSkillValue(true);
+                    //unitCtrl.ApplyPassiveSkillValue(true);
                 }
                 if (flag)
                 {
