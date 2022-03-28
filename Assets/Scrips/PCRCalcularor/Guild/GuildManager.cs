@@ -572,6 +572,8 @@ namespace PCRCaculator.Guild
             SettingInputs[5].text = SettingData.limitTime.ToString();
             SettingInputs[6].text = SettingData.author;
             SettingInputs[7].text = SettingData.format;
+            SettingInputs[9].text = SettingData.n1.ToString();
+            SettingInputs[10].text = SettingData.n2.ToString();
         }
         public void ReflashCalcUI()
         {
@@ -614,6 +616,8 @@ namespace PCRCaculator.Guild
             SettingData.limitTime = int.Parse(SettingInputs[5].text);
             SettingData.author = SettingInputs[6].text;
             SettingData.format = SettingInputs[7].text;
+            SettingData.n1 = int.Parse(SettingInputs[9].text);
+            SettingData.n2 = int.Parse(SettingInputs[10].text);
             SaveDataToJson();
         }
         private static void LoadAddedPlayerData()
@@ -971,6 +975,7 @@ namespace PCRCaculator.Guild
         public int currentTurn;*/
 
         public string start_hp, start_tp;
+        public int n1 = 1000, n2 = 10000;
         public List<GuildPlayerGroupData> guildPlayerGroupDatas;
 
         public Dictionary<int, UnitAttackPattern> changedEnemyAttackPatternDic = new Dictionary<int, UnitAttackPattern>();

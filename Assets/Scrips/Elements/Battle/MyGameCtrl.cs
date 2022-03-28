@@ -441,6 +441,10 @@ namespace Elements
                     }
                 }
                 GameObject ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab");
+                if (ins2 == null && unitid > 200000)
+                {
+                    ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + (unitid / 100 * 100 + 99) + ".unity3d", "prefab");
+                }
                 if (ins2 != null)
                 {
                     //GameObject b = Instantiate(ins2);

@@ -322,11 +322,12 @@ namespace PCRCaculator.Guild
         public bool TryJudgeRandomSpecialSetting(UnitCtrl source, UnitCtrl target, Skill skill, eActionType actionType, int currrentFrame, out float randomResult)
         {
             randomResult = 0;
-            if(fixTimeExec)
-            if (currrentFrame < startFream || currrentFrame > endFream)
+            if(fixTimeExec && (currrentFrame < startFream || currrentFrame > endFream))
             {
                 return false;
             }
+
+            if (source == null) return false;
             if (fixCountExec)
             {
                 if (source.MySkillExecDic.TryGetValue(skill.SkillId, out int count))

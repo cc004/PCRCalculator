@@ -104,16 +104,12 @@ namespace Elements
         }
 
         public float Expect => avg;
-        public float Expected
+        public float Expected(int N)
         {
-            get
-            {
-                const int N = 1000;
-                double s = 0;
-                for (int i = 0; i < N; ++i)
-                    s += Emulate(rand.Next());
-                return (float)(s / N);
-            }
+            double s = 0;
+            for (int i = 0; i < N; ++i)
+                s += Emulate(rand.Next());
+            return (float)(s / N);
         }
         public float Stddev
         {

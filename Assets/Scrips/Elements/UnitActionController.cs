@@ -786,12 +786,13 @@ namespace Elements
             {
                 skillExecData.energy = Owner.Energy;
                 var e = Owner.Energy;
-                GuildCalculator.Instance.dmglist.Add(new ProbEvent
-                {
-                    unit = Owner.UnitNameEx,
-                    predict = hash => e.Emulate(hash) >= 1000f,
-                    description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB提前开出"
-                });
+                if (Owner.IsBoss)
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = Owner.UnitNameEx,
+                        predict = hash => e.Emulate(hash) >= 1000f,
+                        description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB提前开出"
+                    });
             }
             Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);

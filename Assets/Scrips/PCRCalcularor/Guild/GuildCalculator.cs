@@ -256,7 +256,7 @@ namespace PCRCaculator.Guild
             {
                 damage = damage,
                 id = id,
-                source = source.UnitId
+                source = source?.UnitId ?? unitid
             };
             allUnitHPDic[unitid].Add(valueData);
             skillGroupPrefabDic[unitid].ReflashHPChat(allUnitHPDic[unitid]);
@@ -413,8 +413,10 @@ namespace PCRCaculator.Guild
                 backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
                 ReflashTotalDamage(true, 0, false, 0, 0);
             }
+
+            var n = GuildManager.StaticsettingData.n1;
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{(int)totalDamageExcept.Expect}({(int)totalDamageExcept.Expected})±{(int)totalDamageExcept.Stddev}</color>]";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{(int)totalDamageExcept.Expect}({totalDamageExcept.Expected(n)})±{(int)totalDamageExcept.Stddev}</color>]";
             if (backTime > 0)
             {
                 detail = $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f, 1000):P0}";
@@ -735,7 +737,6 @@ namespace PCRCaculator.Guild
                     return;
                 }
                 var fileName = ofn.file.Replace("\\", "/");
-                const int N = 10000;
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
                 const string totaldie = "总乱轴";
@@ -763,7 +764,7 @@ namespace PCRCaculator.Guild
                     var lastHp = bossValues.Last(f => (GuildManager.Instance.SettingData.limitTime - f.frame / 60 >= -val)).value;
                     action = hash => lastHp.Emulate(hash) <= 0;
                 }
-                for (int i = 0; i < N; ++i)
+                for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
                     var hash = rnd.Next();
                     foreach (var evt in dmglist)
@@ -799,10 +800,10 @@ namespace PCRCaculator.Guild
                 {
                     foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                     {
-                        sw.WriteLine($"{name}-{(float)dname[name] / N:P1}");
+                        sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}");
                         if (!dskill.ContainsKey(name)) continue;
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
-                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / N:P1}");
+                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}");
                     }
                 }
                 MainManager.Instance.WindowMessage("成功！");
