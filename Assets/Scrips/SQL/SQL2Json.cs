@@ -787,6 +787,52 @@ namespace PCRCaculator
                     (float)reader.GetDouble(reader.GetOrdinal(names[16]))
 
                     );
+            if (baseData.Hp > long.MaxValue)
+            {
+                baseData.Hp = long.MaxValue;
+            }
+            return baseData;
+        }
+        private BaseData GetBaseDataFromReader2(SqliteDataReader reader, bool isGrowth = false)
+        {
+            string[] names = new string[17]
+            {
+            "hp","atk","magic_str","def","magic_def","physical_critical","magic_critical",
+            "wave_hp_recovery","wave_energy_recovery","dodge","physical_penetrate",
+            "magic_penetrate","life_steal","hp_recovery_rate","energy_recovery_rate",
+            "energy_reduce_rate","accuracy"
+            };
+            if (isGrowth)
+            {
+                for (int i = 0; i < 17; i++)
+                {
+                    names[i] += "_growth";
+                }
+            }
+            BaseData baseData = new BaseData(
+                    float.Parse(reader.GetString(reader.GetOrdinal(names[0]))),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[1])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[2])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[3])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[4])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[5])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[6])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[7])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[8])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[9])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[10])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[11])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[12])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[13])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[14])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[15])),
+                    (float)reader.GetDouble(reader.GetOrdinal(names[16]))
+
+                    );
+            if (baseData.Hp > long.MaxValue)
+            {
+                baseData.Hp = long.MaxValue;
+            }
             return baseData;
         }
         private void SaveDics2Json()
@@ -1076,6 +1122,7 @@ namespace PCRCaculator
                 }
             }
             enemyDataDic.Clear();
+
             reader = sql.ReadFullTable("enemy_parameter");
             while (reader.Read())
             {
@@ -1100,9 +1147,17 @@ namespace PCRCaculator
                         enemyData.ex_skill_lvs.Add(reader.GetInt32(reader.GetOrdinal("ex_skill_lv_" + i)));
                     }
                     enemyData.resist_status_id = reader.GetInt32(reader.GetOrdinal("resist_status_id"));
-                    enemyData.unique_equipment_flag_1 = reader.GetInt32(reader.GetOrdinal("unique_equipment_flag_1"));
-                    enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
-                    enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
+                    try
+                    {
+                        enemyData.unique_equipment_flag_1 =
+                            reader.GetInt32(reader.GetOrdinal("unique_equipment_flag_1"));
+                        enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
+                        enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
+                    }
+                    catch
+                    {
+
+                    }
                     if (detailDic.ContainsKey(enemyData.unit_id))
                         enemyData.detailData = detailDic[enemyData.unit_id];
                     else
@@ -1114,6 +1169,54 @@ namespace PCRCaculator
                     enemyDataDic.Add(enemy_id, enemyData);
                 }
             }
+
+            reader = sql.ReadFullTable("sekai_enemy_parameter");
+            while (reader.Read())
+            {
+                int enemy_id = reader.GetInt32(reader.GetOrdinal("sekai_enemy_id"));
+                //if (enemy_id >= 400000000 && enemy_id <= 599999999)
+                {
+                    EnemyData enemyData = new EnemyData();
+                    enemyData.enemy_id = enemy_id;
+                    enemyData.unit_id = reader.GetInt32(reader.GetOrdinal("unit_id"));
+                    enemyData.name = reader.GetString(reader.GetOrdinal("name"));
+                    enemyData.level = reader.GetInt32(reader.GetOrdinal("level"));
+                    enemyData.rarity = reader.GetInt32(reader.GetOrdinal("rarity"));
+                    enemyData.promotion_level = reader.GetInt32(reader.GetOrdinal("promotion_level"));
+                    enemyData.baseData = GetBaseDataFromReader2(reader);
+                    enemyData.union_burst_level = reader.GetInt32(reader.GetOrdinal("union_burst_level"));
+                    for (int i = 1; i < 11; i++)
+                    {
+                        enemyData.main_skill_lvs.Add(reader.GetInt32(reader.GetOrdinal("main_skill_lv_" + i)));
+                    }
+                    for (int i = 1; i < 6; i++)
+                    {
+                        enemyData.ex_skill_lvs.Add(reader.GetInt32(reader.GetOrdinal("ex_skill_lv_" + i)));
+                    }
+                    enemyData.resist_status_id = reader.GetInt32(reader.GetOrdinal("resist_status_id"));
+                    try
+                    {
+                        enemyData.unique_equipment_flag_1 =
+                            reader.GetInt32(reader.GetOrdinal("unique_equipment_flag_1"));
+                        enemyData.break_durability = reader.GetInt32(reader.GetOrdinal("break_durability"));
+                        enemyData.virtual_hp = reader.GetInt32(reader.GetOrdinal("virtual_hp"));
+                    }
+                    catch
+                    {
+
+                    }
+                    if (detailDic.ContainsKey(enemyData.unit_id))
+                        enemyData.detailData = detailDic[enemyData.unit_id];
+                    else
+                        Debug.Log("角色" + enemyData.unit_id + "的详细数据丢失！");
+                    if (skillDic.ContainsKey(enemyData.unit_id))
+                        enemyData.skillData = skillDic[enemyData.unit_id];
+                    else
+                        Debug.Log("角色" + enemyData.unit_id + "的技能数据丢失！");
+                    enemyDataDic.Add(enemy_id, enemyData);
+                }
+            }
+
             reader = sql.ReadFullTable("enemy_m_parts");
             while (reader.Read())
             {

@@ -184,20 +184,33 @@ namespace Elements
                     _addValue[_evalue] = (float)countUnitNumCompareX(_targetList2, parts, false) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 default:
-                    if ((double)_valueDictionary[eValueNumber.VALUE_1] > 200.0)
+                    if (_valueDictionary[eValueNumber.VALUE_1] > 200f)
                     {
-                        eStateIconType key = (double)_valueDictionary[eValueNumber.VALUE_1] <= 2000.0 ? (eStateIconType)((double)_valueDictionary[eValueNumber.VALUE_1] % 200.0) : (eStateIconType)((double)_valueDictionary[eValueNumber.VALUE_1] % 2000.0);
-                        SealData sealData = null;
-                        if (!_target.Owner.SealDictionary.TryGetValue(key, out sealData))
-                            break;
-                        _addValue[_evalue] = (float)sealData.GetCurrentCount() * _valueDictionary[eValueNumber.VALUE_2];
-                        break;
+                        eStateIconType eStateIconType = eStateIconType.INVALID_VALUE;
+                        eStateIconType = ((!(_valueDictionary[eValueNumber.VALUE_1] > 2000f)) ? ((eStateIconType)(_valueDictionary[eValueNumber.VALUE_1] % 200f)) : ((eStateIconType)(_valueDictionary[eValueNumber.VALUE_1] % 2000f)));
+                        SealData value = null;
+                        if (_target.Owner.SealDictionary.TryGetValue(eStateIconType, out value))
+                        {
+                            _addValue[_evalue] = (float)value.GetCurrentCount() * _valueDictionary[eValueNumber.VALUE_2];
+                        }
                     }
-                    if ((double)_valueDictionary[eValueNumber.VALUE_1] <= 100.0)
-                        break;
-                    StrikeBackDataSet strikeBackDataSet = null;
-                    if (!_target.Owner.StrikeBackDictionary.TryGetValue((EnchantStrikeBackAction.eStrikeBackEffectType)((int)_valueDictionary[eValueNumber.VALUE_1] - 100), out strikeBackDataSet))
-                        break;
+                    else if (_valueDictionary[eValueNumber.VALUE_1] > 100f)
+                    {
+                        StrikeBackDataSet value2 = null;
+                        if (_target.Owner.StrikeBackDictionary.TryGetValue((EnchantStrikeBackAction.eStrikeBackEffectType)((int)_valueDictionary[eValueNumber.VALUE_1] - 100), out value2))
+                        {
+                            _addValue[_evalue] = (float)value2.DataList.Count * _valueDictionary[eValueNumber.VALUE_2];
+                        }
+                    }
+                    else if (_valueDictionary[eValueNumber.VALUE_1] >= 20f)
+                    {
+                        int key = (int)_valueDictionary[eValueNumber.VALUE_1] % 10;
+                        if (_source.SkillExecCountDictionary.TryGetValue(key, out var value3))
+                        {
+                            _addValue[_evalue] = (float)value3 * _valueDictionary[eValueNumber.VALUE_2];
+                        }
+                    }
+
                     break;
             }
         }

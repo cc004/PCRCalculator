@@ -7501,14 +7501,6 @@ this.updateCurColor();
             {
                 //Debug.LogError("UB特效鸽了！");
                 princessFormProcessor.StartPrincessFormSkill(unitActionController.GetPrincessFormMovieData(UnionBurstSkillId));
-                switch (UnitId)
-                {
-                    case 180501:
-                        float addtime = 4 * battleManager.DeltaTime_60fps;                        
-                        //addtime = addtime / this.abnormalStateCategoryDataDictionary[UnitCtrl.eAbnormalStateCategory.SPEED].MainValue;
-                        m_fCastTimer += addtime;
-                        break;
-                }
             }
             else if (unitActionController.StartAction(UnionBurstSkillId))
                 AppendCoroutine(updateSkill1(), ePauseType.SYSTEM, this);
@@ -9598,5 +9590,83 @@ this.updateCurColor();
 
             public int GetHashCode(eReduceEnergyType _obj) => (int)_obj;
         }
+
+
+        private static int compareHigherAtkOrMagicStrDec(BasePartsData _a, BasePartsData _b)
+        {
+            if (_a == null)
+            {
+                if (_b != null)
+                {
+                    return -1;
+                }
+                return 0;
+            }
+            if (_b != null)
+            {
+                return Math.Max(_b.GetAtkZero(), _b.GetMagicStrZero()).CompareTo(Math.Max(_a.GetAtkZero(), _a.GetMagicStrZero()));
+            }
+            return -1;
+        }
+
+        private static int compareHigherAtkOrMagicaStrAsc(BasePartsData _a, BasePartsData _b)
+        {
+            if (_a == null)
+            {
+                if (_b != null)
+                {
+                    return -1;
+                }
+                return 0;
+            }
+            if (_b != null)
+            {
+                return Math.Max(_a.GetAtkZero(), _a.GetMagicStrZero()).CompareTo(Math.Max(_b.GetAtkZero(), _b.GetMagicStrZero()));
+            }
+            return 1;
+        }
+
+        public int CompareHigherAtkOrMagicStrDecSameNear(BasePartsData _a, BasePartsData _b)
+        {
+            if (_a == null)
+            {
+                if (_b != null)
+                {
+                    return -1;
+                }
+                return 0;
+            }
+            if (_b == null)
+            {
+                return -1;
+            }
+            if (Math.Max(_a.GetAtkZero(), _a.GetMagicStrZero()) == Math.Max(_b.GetAtkZero(), _b.GetMagicStrZero()))
+            {
+                return CompareDistanceAsc(_a, _b);
+            }
+            return compareHigherAtkOrMagicStrDec(_a, _b);
+        }
+
+        public int CompareHigherAtkOrMagicStrAscSameNear(BasePartsData _a, BasePartsData _b)
+        {
+            if (_a == null)
+            {
+                if (_b != null)
+                {
+                    return -1;
+                }
+                return 0;
+            }
+            if (_b == null)
+            {
+                return 1;
+            }
+            if (Math.Max(_a.GetAtkZero(), _a.GetMagicStrZero()) == Math.Max(_b.GetAtkZero(), _b.GetMagicStrZero()))
+            {
+                return CompareDistanceAsc(_a, _b);
+            }
+            return compareHigherAtkOrMagicaStrAsc(_a, _b);
+        }
+
     }
 }

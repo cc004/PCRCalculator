@@ -355,7 +355,8 @@ namespace Elements
             b.transform.SetParent(unitParent);
             b.name = unitid + "(clone)";
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
-            unitCtrl.UnitName = mainManager.GetUnitNickName(unitid);
+            unitCtrl.UnitName = mainManager.GetUnitNickName(unitid) + "[召唤物]";
+            unitCtrl.UnitName = ("<color=#C080FF>") + unitCtrl.UnitName + "</color>";
             unitCtrl.UnitNameEx = unitCtrl.UnitName;
             b.GetComponent<UnitActionController>().LoadActionControllerData(unitid);
             return unitCtrl;

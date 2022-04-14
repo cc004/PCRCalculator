@@ -12,6 +12,7 @@ using Cute;
 using PCRCaculator;
 using PCRCaculator.Guild;
 using UnityEngine;
+using UnityEngine.Video;
 using Random = UnityEngine.Random;
 //using Elements.Data;
 //using Elements.Uek;
@@ -140,6 +141,11 @@ namespace Elements.Battle
         private bool isValid = true;
         //private StoryBattleData storyBattleDataPrefab;
         private GameObject focusObject;
+
+        public GameObject princessFormMoviePlayer;
+
+        public VideoPlayer PrincessFormMoviePlayer => princessFormMoviePlayer.GetComponent<VideoPlayer>();
+
         //private CustomUIButton focusButton;
         //private List<EventDelegate> cacheEventDelegate;
 
@@ -4464,22 +4470,10 @@ namespace Elements.Battle
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
-
-                BaseData additional = null;
-
-                if (_summonData.ConsiderEquipmentAndBonus)
-                {
-                    additional = MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData);
-                }
-
-
-                unitCtrl.Initialize(parameter,unitData_my, flag, true, false, additional,
-                    MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my));
-
-                if (_summonData.ConsiderEquipmentAndBonus)
-                {
-                    //unitCtrl.ApplyPassiveSkillValue(true);
-                }
+                unitCtrl.Initialize(parameter,unitData_my, flag, true, false,
+                    _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
+                    _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my) : null);
+                
                 if (flag)
                 {
                     unitCtrl.OnDieForZeroHp = (Action<UnitCtrl>)Delegate.Combine(unitCtrl.OnDieForZeroHp, new Action<UnitCtrl>(_this.onDieEnemy));

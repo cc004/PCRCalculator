@@ -714,8 +714,8 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("无效的存档！" , null);
                 return;
             }
-            if (guildTimelineData.playerGroupData.UBExecTimeData.Count == 5)
-                guildTimelineData.playerGroupData.UBExecTimeData.Add(new List<float>());
+            if (guildTimelineData.UBExecTime.Count == 5)
+                guildTimelineData.UBExecTime.Add(new List<float>());
             int currentNum = SettingData.currentPlayerGroupNum;
             //int guild_currentNum = guildTimelineData.currentSettingData.currentPlayerGroupNum;
             //SettingData.addedPlayerDatas[currentNum] = guildTimelineData.currentSettingData.addedPlayerDatas[guild_currentNum];
@@ -726,6 +726,7 @@ namespace PCRCaculator.Guild
             timeLine.RandomSeed = guildTimelineData.currentRandomSeed;
             SettingData.SetCurrentRandomData(timeLine);
             SettingData.SetCurrentPlayerGroup(guildTimelineData.playerGroupData);
+            SettingData.GetCurrentPlayerGroup().UBExecTimeData = guildTimelineData.UBExecTime;
             Reflash();
             SaveDataToJson();
         }

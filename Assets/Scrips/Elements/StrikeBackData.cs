@@ -72,6 +72,8 @@ namespace Elements
           _source.SetRecovery(_recovery, UnitCtrl.eInhibitHealType.PHYSICS, _source);
           break;
       }
+
+      _callback();
       /*switch (this.EffectType)
       {
         case EnchantStrikeBackAction.eStrikeBackEffectType.TOY:

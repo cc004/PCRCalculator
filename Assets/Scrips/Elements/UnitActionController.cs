@@ -1899,6 +1899,10 @@ namespace Elements
                 case PriorityPattern.MAGIC_STR_DEC_NEAR:
                     selector = parts => $"{parts.Owner.UnitName}({parts.GetMagicStrZero()})";
                     break;
+                case PriorityPattern.PHYSICS_OR_MAGIC_HIGH_ATTACK_DEC:
+                case PriorityPattern.PHYSICS_OR_MAGIC_HIGH_ATTACK_ASC:
+                    selector = parts => $"{parts.Owner.UnitName}({parts.GetAtkZero()}|{parts.GetMagicStrZero()})";
+                    break;
                 default:
                     selector = parts => $"{parts.Owner.UnitName}";
                     break;
@@ -2074,6 +2078,14 @@ namespace Elements
                 case PriorityPattern.HP_VALUE_ASC_NEAR_FORWARD:
                     Owner.BaseX = _baseTransform.position.x;
                     sortTargetPosition(targetList, true, Owner.CompareLifeValueAscSameLeft, Owner.CompareLifeValueAscSameRight);
+                    break;
+                case PriorityPattern.PHYSICS_OR_MAGIC_HIGH_ATTACK_DEC:
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareHigherAtkOrMagicStrDecSameNear);
+                    break;
+                case PriorityPattern.PHYSICS_OR_MAGIC_HIGH_ATTACK_ASC:
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareHigherAtkOrMagicStrAscSameNear);
                     break;
                 default:
                     targetList.Sort(Owner.CompareDistanceAsc);
