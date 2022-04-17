@@ -697,6 +697,9 @@ namespace Elements
             BattleSpineController currentSpineCtrl = Owner.GetCurrentSpineCtrl();
             if (skill.ForcePlayNoTarget)
                 flag1 = false;
+            // fix that boss silense it self causing attack action not working
+            if (flag1 || this.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && !this.Owner.AttackWhenSilence && !Owner.IsBoss)
+            if (flag1 || this.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && !this.Owner.AttackWhenSilence)
             if (flag1 || Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && !Owner.AttackWhenSilence)
             {
                 if (Owner.IsBoss && !Owner.IsConfusionOrConvert() && (!skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix)))
