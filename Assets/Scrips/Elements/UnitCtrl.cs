@@ -9667,6 +9667,13 @@ this.updateCurColor();
             }
             return compareHigherAtkOrMagicaStrAsc(_a, _b);
         }
+        public void DispelAbnormalState(eAbnormalState _abnormalState)
+        {
+            if (IsAbnormalState(_abnormalState))
+            {
+                EnableAbnormalState(_abnormalState, _enable: false);
+            }
+        }
 
     }
 }

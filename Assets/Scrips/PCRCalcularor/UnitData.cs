@@ -288,10 +288,24 @@ namespace PCRCaculator
             }
             return b;
         }
-        public BaseData GetEXSkillValue(UnitData a,bool jjc_otherside = false)
+        public BaseData GetEXSkillValue(UnitData a, bool jjc_otherside = false)
         {
             BaseData b = new BaseData();
             int[] exSkillActionList = MainManager.Instance.SkillDataDic[skillData.GetSkillList(a)[3]].skillactions;
+            foreach (int exActionId in exSkillActionList)
+            {
+                if (exActionId > 1000)
+                {
+                    b += MainManager.Instance.SkillActionDic[exActionId].GetEXSkillApplyedValue(a.skillLevel[3]);
+                }
+            }
+            return b;
+
+        }
+        public BaseData GetEXSkillValueNoEv(UnitData a, bool jjc_otherside = false)
+        {
+            BaseData b = new BaseData();
+            int[] exSkillActionList = MainManager.Instance.SkillDataDic[skillData.EXskill].skillactions;
             foreach (int exActionId in exSkillActionList)
             {
                 if (exActionId > 1000)

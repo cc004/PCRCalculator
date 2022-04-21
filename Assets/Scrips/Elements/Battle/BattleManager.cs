@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cute;
+
 using PCRCaculator;
 using PCRCaculator.Guild;
 using UnityEngine;
@@ -4472,7 +4473,7 @@ namespace Elements.Battle
 
                 unitCtrl.Initialize(parameter,unitData_my, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
-                    _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my) : null);
+                    _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my) : null);
                 
                 if (flag)
                 {

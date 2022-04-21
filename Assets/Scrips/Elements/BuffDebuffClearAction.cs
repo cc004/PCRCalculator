@@ -43,18 +43,64 @@ namespace Elements
           _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_ATTACK);
       }
       else
-      {
-        AppendIsAlreadyExeced(_target.Owner, _num);
-        switch ((eDetail1Type) ActionDetail1)
-        {
-          case eDetail1Type.BUFF:
-            _target.Owner.DespeleBuffDebuff(true, CreateAbnormalEffectData());
-            break;
-          case eDetail1Type.DEBUFF:
-            _target.Owner.DespeleBuffDebuff(false, CreateAbnormalEffectData());
-            break;
-        }
-      }
+			{
+				AppendIsAlreadyExeced(_target.Owner, _num);
+				switch (base.ActionDetail1)
+				{
+					case 1:
+						_target.Owner.DespeleBuffDebuff(_isBuff: true, CreateAbnormalEffectData());
+						break;
+					case 2:
+						_target.Owner.DespeleBuffDebuff(_isBuff: false, CreateAbnormalEffectData());
+						break;
+					case 10:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_BOTH);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC);
+						break;
+					case 11:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK);
+						break;
+					case 12:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC);
+						break;
+					case 13:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK);
+						break;
+					case 14:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC);
+						break;
+					case 15:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH);
+						break;
+					case 16:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_BOTH);
+						break;
+					case 17:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK);
+						break;
+					case 18:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC);
+						break;
+					case 19:
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH);
+						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_BOTH);
+						break;
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+						break;
+				}
+			}
     }
 
     public override void SetLevel(float _level)
