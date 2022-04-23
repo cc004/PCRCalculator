@@ -2151,11 +2151,12 @@ this.updateCurColor();
                     break;
                 default:
                     m_fCastTimer = battleManager.CurrentWave != 0 ? 0.3f : 2.5f;
+                    /*
                     //XX: force make up for part boss additional 1 frame
                     if (battleManager.BossUnit.IsPartsBoss)
                     {
                         m_fCastTimer += battleManager.DeltaTime_60fps;
-                    }
+                    }*/
                     break;
             }
         }
