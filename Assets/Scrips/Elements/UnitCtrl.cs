@@ -6071,6 +6071,10 @@ this.updateCurColor();
 
             des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
                 + $"-{prob:P0}";
+            if (_damageData.Target.Owner.IsPartsBoss)
+            {
+                des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
+            }
             MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des, _damageData.Source);
             uIManager.LogMessage(des,eLogMessageType.GET_DAMAGE, this);
             createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
@@ -6103,8 +6107,8 @@ this.updateCurColor();
                         SetState(ActionState.DIE);
                 }
             }
-            string describe = "对目标造成<color=#FF0000>" + num6 + (_critical? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
-                                + $"-{prob:P0}";
+            string describe =
+                $"对目标{(_damageData.Target.Owner.IsPartsBoss ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}-{prob:P0}";
             callBack?.Invoke(describe);
             return num6.Floor();
         }
