@@ -132,7 +132,7 @@ namespace PCRCaculator.Battle
                 Vector3 tansFix = new Vector3(partsData.PositionX / 540.0f,0, 0 );
                 a.transform.SetParent(owner2.gameObject.transform, false);
                 a.transform.position = owner2.gameObject.transform.position+ tansFix;
-                a.transform.position = new Vector3(a.transform.position.x, poszFix, a.transform.position.z);
+                a.transform.position = new Vector3(a.transform.position.x, poszFix, transform.position.z);
                 a.GetComponent<PartsdataUI>().Init(partsData);
             }
         }

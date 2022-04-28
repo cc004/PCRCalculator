@@ -18,7 +18,7 @@ namespace Elements
     {
         private UnitCtrl owner;
         private UnitActionController unitActionController;
-        private VideoPlayer movieManager;
+        //private VideoPlayer movieManager;
         private BattleManager battleManager;
         private BattleSpeedInterface battleTimeScale;
         private eMovieType currentMovieType = eMovieType.PRINCESS_FORM_SKILL_NORMAL;
@@ -33,7 +33,7 @@ namespace Elements
           BattleManager _battleManager,
           BattleSpeedInterface _battleTimeScale)
         {
-            this.movieManager = _battleManager.PrincessFormMoviePlayer;
+            //this.movieManager = _battleManager.PrincessFormMoviePlayer;
             //this.movieManager = ManagerSingleton<MovieManager>.Instance;
             battleManager = _battleManager;
             owner = _unitCtrl;
@@ -104,7 +104,6 @@ namespace Elements
             bool flag = !forceNormalSD && owner.IsShadow;
             currentMovieType = !battleTimeScale.IsSpeedQuadruple ? (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW : eMovieType.PRINCESS_FORM_SKILL_NORMAL) : (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW_4X : eMovieType.PRINCESS_FORM_SKILL_NORMAL_4X);
             int unionBurstSkillId = owner.UnionBurstSkillId;
-            float num = 0.75f;
             //ViewManager instance1 = ManagerSingleton<ViewManager>.Instance;
             //SoundManager instance2 = ManagerSingleton<SoundManager>.Instance;
             //if (_movieIndex != 1)
@@ -132,14 +131,14 @@ namespace Elements
           //  PABCCELMCAJ.IKMGFNGHDPJ = 30;
           _callback.Call();
             };
-
+            /*
             this.movieManager.source = VideoSource.Url;
             this.movieManager.url = $"file://{Application.streamingAssetsPath}/Movies/p_skill_normal_{unionBurstSkillId}_{_movieIndex}.mp4";
             this.movieManager.prepareCompleted += _ =>
             {
                 this.movieManager.Play();
                 this.movieManager.playbackSpeed = this.battleTimeScale.SpeedUpFlag ? this.battleTimeScale.SpeedUpRate : 1f;
-            };
+            };*/
 
             if (movieData.UseFade)
             {
@@ -152,7 +151,7 @@ namespace Elements
                 battleManager.StartCoroutine(waitMovieEndFrame(action, unionBurstSkillId, currentMovieType, _movieIndex));
             }
 
-            this.movieManager.Prepare();
+            //this.movieManager.Prepare();
             //if (!this.battleTimeScale.IsSpeedQuadruple)
             //  this.movieManager.SetPlaySpeed(this.currentMovieType, (long) unionBurstSkillId, this.battleTimeScale.SpeedUpFlag ? this.battleTimeScale.SpeedUpRate : 1f, (long) _movieIndex);
             currentMovieId = unionBurstSkillId;
@@ -167,6 +166,21 @@ namespace Elements
         {
             // MovieManager movieManager = ManagerSingleton<MovieManager>.Instance;
             float oneFrame = 0.03333334f;
+            
+            eSpineCharacterAnimeId _animeId = unitActionController.GetSkillMotionType((int)_movieId) == SkillMotionType.EVOLUTION ? eSpineCharacterAnimeId.PRINCESS_SKILL_EVOLUTION : eSpineCharacterAnimeId.PRINCESS_SKILL;
+            BattleSpineController currentSpineCtrl = owner.GetCurrentSpineCtrl();
+            if (currentSpineCtrl.IsAnimation(_animeId, _movieIndex, _index3: owner.MotionPrefix))
+                owner.PlayAnime(_animeId, _movieIndex, _index3: owner.MotionPrefix, _isLoop: false);
+            else
+                owner.PlayAnime(eSpineCharacterAnimeId.IDLE, owner.MotionPrefix);
+            currentSpineCtrl.RealUpdate();
+            currentSpineCtrl.RealLateUpdate();
+            if (_movieIndex == 1)
+                battleManager.CAOHLDNADPB = false;
+            if (_callback == null)
+                yield break;
+            _callback.Call();
+            /*
             while (!movieManager.isPlaying)
             {
                 yield return null;
@@ -200,7 +214,7 @@ namespace Elements
             }
             yield break;
         label_13:
-            _callback.Call();
+            _callback.Call();*/
         }
 
         public void Prepare()

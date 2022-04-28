@@ -65,7 +65,7 @@ namespace PCRCaculator
             }
             if (a.uniqueEqLv > 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out var value3))
             {
-                result += value3.CalcUniqueValue(a.uniqueEqLv);
+                result += BaseData.CeilToInt(value3.CalcUniqueValue(a.uniqueEqLv));
             }
 
             return result;
@@ -203,7 +203,7 @@ namespace PCRCaculator
                 {
                     if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out UniqueEquipmentData equipmentData))
                     {
-                        d1 += equipmentData.CalcUniqueValue(a.uniqueEqLv);
+                        d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv));
                     }
                 }
                 return d1;
