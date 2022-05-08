@@ -506,6 +506,7 @@ namespace ExcelHelper
                 int[] lineColor = new int[3] { 151, 71, 6 };
                 worksheet0.Cells[1, 1].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
                     .GetDescription();
+                worksheet0.Cells[2, 1].Value = "v" + Application.version;
                 worksheet0.Cells[1, 2, 2, 9].Merge = true;
                 worksheet0.MySetValue(1, 2, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
                 worksheet0.MySetValue(3, 2,

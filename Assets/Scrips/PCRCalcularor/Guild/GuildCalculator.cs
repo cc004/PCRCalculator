@@ -24,6 +24,7 @@ namespace PCRCaculator.Guild
         public string unit;
         public string description;
         public Func<int, bool> predict;
+        public bool enabled = true;
     }
     public class GuildCalculator : MonoBehaviour
     {
@@ -415,8 +416,9 @@ namespace PCRCaculator.Guild
             }
 
             var n = GuildManager.StaticsettingData.n1;
+            expectedDamage = (int)totalDamageExcept.Expected(n);
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{(int)totalDamageExcept.Expect}({totalDamageExcept.Expected(n)})±{(int)totalDamageExcept.Stddev}</color>]";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{expectedDamage}±{(int)totalDamageExcept.Stddev}</color>]";
             if (backTime > 0)
             {
                 detail = $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f, 1000):P0}";
@@ -424,8 +426,10 @@ namespace PCRCaculator.Guild
             }
             else detail = string.Empty;
             totalDamageText.text = damageStr;
-            basedmg.text = totalDamageExcept.Expect.ToString();
+            basedmg.text = totalDamageCriEX.ToString();
         }
+
+        public int expectedDamage;
         public string detail;
         private void ResizePrefabs(bool change)
         {
@@ -479,7 +483,7 @@ namespace PCRCaculator.Guild
                     allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
                 {
                     UBExecTime = CreateUBExecTimeData(),
-                    exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expect / 10000),
+                    exceptDamage = Mathf.RoundToInt(expectedDamage / 10000),
                     backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
                     charImages = BattleUIManager.Instance.GetCharactersImage(),
                     //string fileName = CreateExcelName();
@@ -603,7 +607,7 @@ namespace PCRCaculator.Guild
                     fileName += MainManager.Instance.GetUnitNickName(player);
                 }
             }
-            fileName += "-" + Mathf.RoundToInt(totalDamage / 10000) + "(" + (totalDamageCriEX / 10000) + ")w";
+            fileName += "-" + Mathf.RoundToInt(expectedDamage / 10000) + "w";
             return fileName;
         }
         public void ReplaceUBTime()
@@ -764,10 +768,12 @@ namespace PCRCaculator.Guild
                     var lastHp = bossValues.Last(f => (GuildManager.Instance.SettingData.limitTime - f.frame / 60 >= -val)).value;
                     action = hash => lastHp.Emulate(hash) <= 0;
                 }
+
+                var dmglist2 = dmglist.Where(d => d.enabled).ToArray();
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
                     var hash = rnd.Next();
-                    foreach (var evt in dmglist)
+                    foreach (var evt in dmglist2)
                     {
                         if (evt.predict(hash))
                         {
@@ -860,7 +866,7 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
             {
                 UBExecTime = CreateUBExecTimeData(),
-                exceptDamage = Mathf.RoundToInt(totalDamageExcept.Expect / 10000),
+                exceptDamage = Mathf.RoundToInt(expectedDamage / 10000),
                 backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
                 charImages = BattleUIManager.Instance.GetCharactersImage(),
                 //string fileName = CreateExcelName();

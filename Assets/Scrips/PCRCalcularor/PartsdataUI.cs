@@ -33,10 +33,16 @@ namespace PCRCaculator.Battle
                 {
                     hpHeadText.text = $"{partsData.BreakPoint}({partsData.BreakPoint / (float)partsData.MaxBreakPoint:P2})";
                 }
-                hpDetauil.text = $"{partsData.GetDefZero()}-{partsData.GetMagicDefZero()}";
+                hpDetauil.text = $"{partsData.GetDefZero()}/{partsData.GetMagicDefZero()}";
                 //transform.position = partsData.GetBottomTransformPosition() + new Vector3(0.0f, partsData.PositionY, 0.0f);
                 if (partsData.Owner != null)
-                    posText.text = "" + Mathf.RoundToInt(partsData.Owner.transform.localPosition.x + partsData.PositionX);
+                {
+                    var owner2 = partsData.Owner;
+                    var mid = partsData.GetPosition().x / owner2.transform.lossyScale.x;
+                    var r = mid + partsData.GetBodyWidth()/ 2;
+                    var l = mid - partsData.GetBodyWidth() / 2;
+                    posText.text = $"{Mathf.RoundToInt(l)}/{mid}/{Mathf.RoundToInt(r)}";
+                }
                 else
                     posText.text = "???";
                 yield return null;

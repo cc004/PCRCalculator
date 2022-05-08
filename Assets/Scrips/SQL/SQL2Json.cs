@@ -389,15 +389,15 @@ namespace PCRCaculator
                 reader.GetInt32(reader.GetOrdinal("action_detail_3")),
 
                 };
-                float[] va = new float[7]
+                double[] va = new double[7]
                 {
-                reader.GetFloat(reader.GetOrdinal("action_value_1")),
-                reader.GetFloat(reader.GetOrdinal("action_value_2")),
-                reader.GetFloat(reader.GetOrdinal("action_value_3")),
-                reader.GetFloat(reader.GetOrdinal("action_value_4")),
-                reader.GetFloat(reader.GetOrdinal("action_value_5")),
-                reader.GetFloat(reader.GetOrdinal("action_value_6")),
-                reader.GetFloat(reader.GetOrdinal("action_value_7"))
+                reader.GetDouble(reader.GetOrdinal("action_value_1")),
+                reader.GetDouble(reader.GetOrdinal("action_value_2")),
+                reader.GetDouble(reader.GetOrdinal("action_value_3")),
+                reader.GetDouble(reader.GetOrdinal("action_value_4")),
+                reader.GetDouble(reader.GetOrdinal("action_value_5")),
+                reader.GetDouble(reader.GetOrdinal("action_value_6")),
+                reader.GetDouble(reader.GetOrdinal("action_value_7"))
                 };
                 SkillAction skillAction = new SkillAction(
                     actionid,

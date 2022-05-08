@@ -879,7 +879,7 @@ namespace PCRCaculator
         public readonly int classid;//1或2，一般为1，只有yls为2
         public readonly int type;//18到92
         public readonly int[] details;//长度为3
-        public readonly float[] values;//长度为7
+        public readonly double[] values;//长度为7
         public readonly int target_assigment;//对方-1，己方-2，所有-3，未知-0 OTHER_SIDE=1,OWNER_SIDE=2,ALL=3 eTargetAssignment
         public readonly int target_area;//FRONT=1,FRONT_AND_BACK=2,ALL=3  DirectionType
         public readonly int target_range;//-1到4320以及9999
@@ -921,7 +921,7 @@ namespace PCRCaculator
         /// <param name="t6"></param>
         /// <param name="des"></param>
         /// <param name="lvdes"></param>
-        public SkillAction(int acid, int id, int ty, int[] de, float[] val, int t1, int t2, int t3, int t4, int t5, int t6, string des, string lvdes)
+        public SkillAction(int acid, int id, int ty, int[] de, double[] val, int t1, int t2, int t3, int t4, int t5, int t6, string des, string lvdes)
         {
             actionid = acid;
             classid = id;
@@ -944,7 +944,7 @@ namespace PCRCaculator
             classid = int.Parse(data[0]);
             type = int.Parse(data[1]);
             details = JsonConvert.DeserializeObject<int[]>(data[2]);
-            values = JsonConvert.DeserializeObject<float[]>(data[3]);
+            values = JsonConvert.DeserializeObject<double[]>(data[3]);
             target_assigment = int.Parse(data[4]);
             target_area = int.Parse(data[5]);
             target_range = int.Parse(data[6]);
@@ -1006,7 +1006,7 @@ namespace PCRCaculator
                     }
                     else
                     {
-                        string des_2 = values[0] > 0 ? ("击退目标，击退距离："  + values[0]):( "拉近目标，拉近距离：" + Mathf.Abs(values[0]));
+                        string des_2 = values[0] > 0 ? ("击退目标，击退距离："  + values[0]):( "拉近目标，拉近距离：" + Math.Abs(values[0]));
                         detailstr = description + "<color=#002DFF>(" + des_2 + ",速度：" + values[2] +"，并打断对方技能";
                     }
                     detailstr += "，目标：" + GetTargetDescription();
@@ -1095,7 +1095,7 @@ namespace PCRCaculator
                     "<color=#002DFF>(召唤物等级：" + skilllevel;
                     break;
                 case 16://(CHARGE_ENERGY)TP回复/流失
-                    detailstr = string.Format(description, values[0] + Mathf.CeilToInt(values[1] * skilllevel)) +
+                    detailstr = string.Format(description, values[0] + (int)Math.Ceiling(values[1] * skilllevel)) +
                     "<color=#002DFF>(" + values[0] + "+" + values[1] + "✕技能等级(向上取整)";
                     break;
                 case 17://(TRIGER)触发特殊技能(比如中二自爆)
@@ -1213,16 +1213,16 @@ namespace PCRCaculator
                     b.Hp +=(long)(values[1] + values[2] * skilllevel);
                     break;
                 case 2:
-                    b.Atk += values[1] + values[2] * skilllevel;
+                    b.Atk += (float)(values[1] + values[2] * skilllevel);
                     break;
                 case 3:
-                    b.Def += values[1] + values[2] * skilllevel;
+                    b.Def += (float)(values[1] + values[2] * skilllevel);
                     break;
                 case 4:
-                    b.Magic_str += values[1] + values[2] * skilllevel;
+                    b.Magic_str += (float)(values[1] + values[2] * skilllevel);
                     break;
                 case 5:
-                    b.Magic_def += values[1] + values[2] * skilllevel;
+                    b.Magic_def += (float)(values[1] + values[2] * skilllevel);
                     break;
                 default:
                     Debug.LogError("未设置类型为:" + details[0] + "的被动技能应用！");

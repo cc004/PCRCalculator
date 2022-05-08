@@ -755,7 +755,7 @@ namespace PCRCaculator
 
         public string GetDetail()
         {
-            string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害：" + exceptDamage + "\n随机种子：" + randomSeed;
+            string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害（触盾偏高）：" + exceptDamage + "\n随机种子：" + randomSeed;
             if (warnings.Count > 0)
             {
                 for(int i=0;i<3;i++)

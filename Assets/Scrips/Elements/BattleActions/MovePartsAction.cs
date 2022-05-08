@@ -35,7 +35,7 @@ namespace Elements
       if (_num % 2 == 0)
       {
         parts.PositionX += _valueDictionary[eValueNumber.VALUE_1];
-        parts.BodyWidthValue = 0.0f;
+        //parts.BodyWidthValue = 0.0f;
         parts.Owner.PartsMotionPrefix = (int) _valueDictionary[eValueNumber.VALUE_5];
         OnActionEnd = () =>
         {
@@ -47,7 +47,7 @@ namespace Elements
       else
       {
         parts.Owner.PartsMotionPrefix = 0;
-        parts.BodyWidthValue = 300f;
+        //parts.BodyWidthValue = 300f;
         parts.PositionX = parts.InitialPositionX;
         OnActionEnd = null;
       }

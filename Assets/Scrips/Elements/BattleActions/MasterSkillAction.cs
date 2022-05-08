@@ -198,7 +198,7 @@ namespace Elements
             public string description => _description;
 
             public string level_up_disp => _level_up_disp;
-
+            /*
             public SkillAction(
               int action_id = 0,
               int class_id = 0,
@@ -243,7 +243,7 @@ namespace Elements
                 _target_count = target_count;
                 _description = description;
                 _level_up_disp = level_up_disp;
-            }
+            }*/
             public SkillAction(PCRCaculator.SkillAction data)
             {
                 _action_id = data.actionid;

@@ -1671,7 +1671,10 @@ this.updateCurColor();
                     partsData2.SetBattleManager(this.battleManager);
                     this.BossPartsListForBattle.Add(partsData2);*/
                     PartsData bossParts = BossPartsList[index];
+                    // BossPartsList是序列化值，BossPartsListForBattle是运行时值
+                    // 这里没有对InitialPositionX进行初始化（与原值不同）
                     bossParts.Owner = this;
+                    bossParts.InitialPositionX = bossParts.PositionX;
                     bossParts.Initialize(_enemyMParts);
                     bossParts.SetBattleManager(battleManager);
                     BossPartsListForBattle.Add(bossParts);

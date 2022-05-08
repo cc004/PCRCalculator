@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using Elements.Battle;
+using PCRCaculator.Guild;
 using UnityEngine;
 
 namespace Elements
@@ -170,6 +171,11 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
       Action<string> callBack = null)
     {
+        if (relatedEvent != null)
+        {
+            relatedEvent.enabled = true;
+            relatedEvent = null;
+        }
             ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             //add scripts
             string describe = "技能描述鸽了！";
@@ -271,5 +277,7 @@ namespace Elements
     public delegate void OnDamageHitDelegate(float damage);
 
     public delegate void OnActionEndDelegate();
+
+    public ProbEvent relatedEvent;
   }
 }

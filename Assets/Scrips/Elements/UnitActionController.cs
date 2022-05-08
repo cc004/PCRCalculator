@@ -1946,7 +1946,7 @@ namespace Elements
                 var nth = _actionParameter.TargetNth;
                 var tgt = targetList[Math.Min(lst.Count - 1, nth)];
                 var tgth = tgt.GetHashCode();
-                GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                var evt = new ProbEvent
                 {
                     unit = Owner.UnitNameEx,
                     predict = hash =>
@@ -1957,8 +1957,12 @@ namespace Elements
                         UnitCtrl.quickSortImpl(lst2, 0, lst2.Count - 1, instance);
                         return lst2[Math.Min(lst2.Count - 1, nth)].hash != tgth;
                     },
-                    description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的{(Owner.CurrentSkillId == 1 ? "普攻" : $"{skillDictionary[Owner.CurrentSkillId].SkillName}技能({Owner.CurrentSkillId})")}打歪(原定目标: {tgt.Owner.UnitNameEx})"
-                });
+                    enabled = false,
+                    description =
+                        $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的{(Owner.CurrentSkillId == 1 ? "普攻" : $"{skillDictionary[Owner.CurrentSkillId].SkillName}技能({Owner.CurrentSkillId})")}打歪(原定目标: {tgt.Owner.UnitNameEx})"
+                };
+                _actionParameter.relatedEvent = evt;
+                GuildCalculator.Instance.dmglist.Add(evt);
             }
 
             switch (_actionParameter.TargetSort)
