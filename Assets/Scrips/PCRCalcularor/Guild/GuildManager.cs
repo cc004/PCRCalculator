@@ -922,7 +922,7 @@ namespace PCRCaculator.Guild
         }
         public void StartAutoCalculateByButton(int time)
         {
-            if (time <= 1 || time >= 20)
+            if (time <= 1)
             {
                 MainManager.Instance.WindowConfigMessage("输入错误！", null);
                 return;

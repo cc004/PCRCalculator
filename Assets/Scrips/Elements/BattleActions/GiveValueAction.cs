@@ -164,10 +164,10 @@ namespace Elements
                     _addValue[_evalue] = _skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 7:
-                    _addValue[_evalue] = (float)(int)_target.Owner.Atk * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.Atk) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 8:
-                    _addValue[_evalue] = (float)(int)_target.Owner.MagicStr * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.MagicStr) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 9:
                     _addValue[_evalue] = (float)(int)_target.Owner.Def * _valueDictionary[eValueNumber.VALUE_2];

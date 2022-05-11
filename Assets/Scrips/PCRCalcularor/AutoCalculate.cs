@@ -35,7 +35,7 @@ namespace PCRCaculator
             }
             else
             {
-                MainManager.Instance.WindowInputMessage("输入计算次数（2到20）", StartNew_0);
+                MainManager.Instance.WindowInputMessage("输入计算次数（2到2147483647）", StartNew_0);
             }
 
         }

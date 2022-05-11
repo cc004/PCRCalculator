@@ -3114,7 +3114,7 @@ this.updateCurColor();
                     if (IsAbnormalState(abnormalStateCategory))
                         return;
                     stateCategoryData.CurrentAbnormalState = _abnormalState;
-                    if (barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = _value;
+                    //if (barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = _value;
                     IEnumerator _cr = UpdateAbnormalState(_abnormalState, abnormalEffectData);
                     if (!_cr.MoveNext())
                         return;
@@ -3122,7 +3122,7 @@ this.updateCurColor();
                 }
             }
         }
-
+        /*
         private readonly Dictionary<eAbnormalState, FloatWithEx> barriers = new Dictionary<eAbnormalState, FloatWithEx>()
         {
             [eAbnormalState.DRAIN_ATK] = 0f,
@@ -3131,7 +3131,7 @@ this.updateCurColor();
             [eAbnormalState.GUARD_ATK] = 0f,
             [eAbnormalState.GUARD_MGC] = 0f,
             [eAbnormalState.GUARD_BOTH] = 0f,
-        };
+        };*/
 
         private void switchAbnormalState(
           eAbnormalState abnormalState,
@@ -3252,7 +3252,7 @@ this.updateCurColor();
                 abnormalStateCategoryDataDictionary[abnormalStateCategory].Time = 0.0f;
                 abnormalStateCategoryDataDictionary[abnormalStateCategory].Duration = 0.0f;
                 abnormalStateCategoryDataDictionary[abnormalStateCategory].EnergyChargeMultiple = 1f;
-                if (!nobreak && barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = 0f;
+                //if (!nobreak && barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = 0f;
             }
             abnormalStateCategoryDataDictionary[abnormalStateCategory].enable = _enable;
             m_abnormalState[_abnormalState] = _enable;
@@ -6135,7 +6135,7 @@ this.updateCurColor();
                 }
                 else
                 {
-                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
+                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
@@ -6161,7 +6161,7 @@ this.updateCurColor();
                 }
                 else
                 {
-                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
+                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
@@ -6187,7 +6187,7 @@ this.updateCurColor();
                 }
                 else
                 {
-                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= (float)BattleUtil.FloatToInt(_fDamage);
+                    abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
