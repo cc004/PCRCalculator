@@ -137,7 +137,8 @@ namespace Elements.Battle
                 }
                 if (HKDBJHAIOMB == eFieldExecType.REPEAT)
                 {
-                    intervalCount += BattleManager.DeltaTime_60fps;
+                    if (BattleManager.GetBlackOutUnitLength() == 0)
+                        intervalCount += BattleManager.DeltaTime_60fps;
                     if (intervalCount > 1.0)
                     {
                         intervalCount = 0.0f;
