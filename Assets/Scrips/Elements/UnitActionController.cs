@@ -1328,7 +1328,8 @@ namespace Elements
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
-                
+
+                action.PreExecAction();
                 action.ExecAction(Owner, target, num, this, skill, starttime, dictionary, 
                     _valueDictionary,a=> 
                 { 

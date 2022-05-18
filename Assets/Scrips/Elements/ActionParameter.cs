@@ -160,6 +160,14 @@ namespace Elements
     {
     }
 
+    public void PreExecAction()
+    {
+        if (relatedEvent != null)
+        {
+            relatedEvent.enabled = true;
+            relatedEvent = null;
+        }
+    }
     public virtual void ExecAction(
       UnitCtrl _source,
       BasePartsData _target,
@@ -171,11 +179,6 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
       Action<string> callBack = null)
     {
-        if (relatedEvent != null)
-        {
-            relatedEvent.enabled = true;
-            relatedEvent = null;
-        }
             ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             //add scripts
             string describe = "技能描述鸽了！";
