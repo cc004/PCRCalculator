@@ -152,11 +152,18 @@ namespace PCRCaculator
                 {
                     a.rank = 1 + rankData.datas.Count;
                 }
+
+                BaseData result = new BaseData();
+
                 BaseData d1 = raritydatas[a.rarity - 1] + (a.level + a.rank) * ratitydatas_rate[a.rarity - 1];//计算等级与星级、rank
                 if (a.rank >= 2)
                 {
                     d1 += rankData.datas[a.rank - 2];
                 }
+
+                result += BaseData.Round(d1);
+
+                d1 = new BaseData();
                 if (unitId < 200000)
                 {
                     for (int i = 0; i < 6; i++)//计算装备属性
@@ -172,6 +179,18 @@ namespace PCRCaculator
                         }
                     }
                 }
+                //计算专武加成
+                if (a.uniqueEqLv > 0 && unitId <= 200000)
+                {
+                    if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out UniqueEquipmentData equipmentData))
+                    {
+                        d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv));
+                    }
+                }
+
+                result += BaseData.Round(d1);
+                d1 = new BaseData();
+
                 //计算羁绊加成
                 if (a.love >= 0 && unitId <= 200000)
                 {
@@ -198,15 +217,9 @@ namespace PCRCaculator
                         }
                     }
                 }
-                //计算专武加成
-                if (a.uniqueEqLv > 0 && unitId <= 200000)
-                {
-                    if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out UniqueEquipmentData equipmentData))
-                    {
-                        d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv));
-                    }
-                }
-                return d1;
+
+                result += BaseData.Round(d1);
+                return result;
             }
             catch(Exception e)
             {
@@ -1670,9 +1683,27 @@ namespace PCRCaculator
         }
         public static BaseData CeilToInt(BaseData a)
         {
-            for(int i = 1; i < a.dataint.Length; i++)
+            for (int i = 1; i < a.dataint.Length; i++)
             {
                 a.dataint[i] = 100 * Mathf.CeilToInt(a.dataint[i] / 100.0f);
+            }
+            return a;
+        }
+        private static int round(float _f)
+        {
+            int num = 0;
+            if (_f - (float)(int)_f >= 0.5f || Mathf.Approximately((float)(int)_f + 0.5f, _f))
+            {
+                return (int)_f + 1;
+            }
+            return (int)_f;
+        }
+
+        public static BaseData Round(BaseData a)
+        {
+            for (int i = 1; i < a.dataint.Length; i++)
+            {
+                a.dataint[i] = 100 * round(a.dataint[i] / 100.0f);
             }
             return a;
         }
