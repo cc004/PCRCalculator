@@ -186,7 +186,7 @@ namespace Elements.Battle
 
         public List<int> NOMJJDDCBAN { get; private set; }
 
-        public int JJCJONPDGIM { get; private set; }
+        public int FrameCount { get; private set; }
 
         public eBattleGameState GameState { get; private set; }
 
@@ -474,7 +474,7 @@ namespace Elements.Battle
                 UnitCtrl unitCtrl = MyGameCtrl.Instance.playerUnitCtrl[index1];
                 if (!(unitCtrl == null))
                 {
-                    while (JJCJONPDGIM < unitCtrl.CutInFrameSet.ServerCutInFrame)
+                    while (FrameCount < unitCtrl.CutInFrameSet.ServerCutInFrame)
                         updateFrameWithSkip(unitCtrl);
                 }
             }
@@ -525,7 +525,7 @@ namespace Elements.Battle
                         break;
                 }
                 while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps);
-                while (JJCJONPDGIM < PPNHIMOOKDD && !IsFramePause)
+                while (FrameCount < PPNHIMOOKDD && !IsFramePause)
                 {
                     updateFrame();
                     if (IsPlayingPrincessMovie)
@@ -577,7 +577,7 @@ namespace Elements.Battle
                     BattleHeaderController.Instance.SetRestTime(BattleLeftTime);
                     GamePause(true);
                     if (PPNHIMOOKDD > 0)
-                        PPNHIMOOKDD = JJCJONPDGIM;
+                        PPNHIMOOKDD = FrameCount;
                     //BattleHeaderController.Instance.gameObject.SetActive(false);
                     //this.UnitUiCtrl.HidePopUp();
                     GameState = eBattleGameState.WAIT_WAVE_END;
@@ -588,7 +588,7 @@ namespace Elements.Battle
                     return;
                 }
             }
-            ++JJCJONPDGIM;
+            ++FrameCount;
             if (BattleLeftTime <= 0.0 && battleResult != eBattleResult.WIN)
                 return;
             //this.UnitUiCtrl._Update(_canUpdateTime);
@@ -610,7 +610,7 @@ namespace Elements.Battle
                     effectUpdateList.RemoveAt(index2);
             }
             //if (this.JJCJONPDGIM != 0 && this.UnitUiCtrl.UnitCtrls != null && (this.EnemyList != null && !this.callStartCutIn()))
-            if (JJCJONPDGIM != 0 && (EnemyList != null && !callStartCutIn()))
+            if (FrameCount != 0 && (EnemyList != null && !callStartCutIn()))
                 CoroutineManager._Update();
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
@@ -1270,7 +1270,7 @@ namespace Elements.Battle
                 UnitCtrl unitCtrl = UnitList[index];
                 if (!(unitCtrl == null))
                 {
-                    if (JJCJONPDGIM == unitCtrl.CutInFrameSet.CutInFrame)
+                    if (FrameCount == unitCtrl.CutInFrameSet.CutInFrame)
                     {
                         if (!unitCtrl.IsSkillReady)
                         {
@@ -1282,7 +1282,7 @@ namespace Elements.Battle
                         unitCtrl.StartCutIn();
                         return true;
                     }
-                    if (JJCJONPDGIM == unitCtrl.CutInFrameSet.ServerCutInFrame + 1)
+                    if (FrameCount == unitCtrl.CutInFrameSet.ServerCutInFrame + 1)
                     {
                         onSyncEnd(unitCtrl);
                         if (unitCtrl.ConsumeEnergy() == eConsumeResult.FAILED || GameState != eBattleGameState.PLAY)
@@ -1311,7 +1311,7 @@ namespace Elements.Battle
                 UnitCtrl enemy = EnemyList[index];
                 if (!(enemy == null))
                 {
-                    if (JJCJONPDGIM == enemy.CutInFrameSet.CutInFrame)
+                    if (FrameCount == enemy.CutInFrameSet.CutInFrame)
                     {
                         if (!enemy.IsSkillReady)
                         {
@@ -1323,7 +1323,7 @@ namespace Elements.Battle
                         enemy.StartCutIn();
                         return true;
                     }
-                    if (JJCJONPDGIM == enemy.CutInFrameSet.CutInFrame + 1)
+                    if (FrameCount == enemy.CutInFrameSet.CutInFrame + 1)
                     {
                         onSyncEnd(enemy);
                         LJFFAACGDMF = false;
@@ -1573,7 +1573,7 @@ namespace Elements.Battle
 
         public UnitCtrl FindEnemyForResourceId(int id) => EnemyList.Find(a => a.UnitId == id);
 
-        public void RestFrameCount() => JJCJONPDGIM = 0;
+        public void RestFrameCount() => FrameCount = 0;
 
         public void IncrementNoneVoiceAttackCount() => ++noneVoiceCount;
 
@@ -3115,7 +3115,7 @@ namespace Elements.Battle
             PBCLBKCKHAI = new List<long>();
             BlackoutUnitTargetList = new List<UnitCtrl>();
             BlackOutUnitList = new List<UnitCtrl>();
-            JJCJONPDGIM = 0;
+            FrameCount = 0;
             AMLOLHFMOPP = false;
             DAIFDPFABCM = new Dictionary<string, GameObject>();
             FieldDataDictionary = new Dictionary<int, List<AbnormalStateDataBase>>();

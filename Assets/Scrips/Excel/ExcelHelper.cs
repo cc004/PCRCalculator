@@ -6,6 +6,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using Elements;
 using ExcelDataReader;
@@ -346,11 +347,108 @@ namespace ExcelHelper
                     MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n请自行前往查看！", null);
                 }
 
+                // Script Export
 
-
+                if (File.Exists("patch_asm_export"))
+                    File.WriteAllText(filePath + ".asm", CreateAsmString());
             }
             
         }
+
+        private static (string, Func<UnitData, object>)[] conditions =
+        {
+            ("st", c => c.rarity),
+            ("rk", c => c.rank),
+            ("e1", c => int.TryParse(c.equipLevel[0].ToString(), out var val) ? val : -1),
+            ("e2", c => int.TryParse(c.equipLevel[1].ToString(), out var val) ? val : -1),
+            ("e3", c => int.TryParse(c.equipLevel[2].ToString(), out var val) ? val : -1),
+            ("e4", c => int.TryParse(c.equipLevel[3].ToString(), out var val) ? val : -1),
+            ("e5", c => int.TryParse(c.equipLevel[4].ToString(), out var val) ? val : -1),
+            ("e6", c => int.TryParse(c.equipLevel[5].ToString(), out var val) ? val : -1),
+            ("s1", c => c.skillLevel[0]),
+            ("s2", c => c.skillLevel[1]),
+            ("ub", c => c.skillLevel[2]),
+            ("ex", c => c.skillLevel[3]),
+            ("lv", c => c.level)
+        };
+
+        private static string UnitDetail(UnitData info)
+        {
+            var lstring = string.Join(",", new[]
+            {
+                info.skillLevel[0], info.skillLevel[1], info.skillLevel[2], info.skillLevel[3]
+            });
+            string unitsLove = JsonConvert.SerializeObject(info.playLoveDic);
+            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|000|{unitsLove}";
+        }
+
+        private static string ToTime(long time, int limit)
+        {
+            return $"{time / 3600}:{(time / 60 % 60):D2}:{(time % 60):D2} ({limit - time:D4}";
+        }
+
+        private static string CreateAsmString()
+        {
+            int seed = TimelineData.currentRandomSeed;
+            var units = TimelineData.playerGroupData.playerData.playrCharacters;
+            var cdict = units.ToDictionary(u => u.unitId, u => new { name = u.GetNicName(), unit = u });
+            var enemy = "boss";
+            var msg = new StringBuilder();
+            var src = new StringBuilder();
+
+            const string header = "log seed\n";
+            src.AppendLine(header);
+
+            foreach (var pair in cdict)
+            {
+                var cond = string.Join(" ", conditions.Select(t => $"{t.Item1}={t.Item2(pair.Value.unit)}"));
+
+                src.AppendLine($"//require {pair.Key}:{cond}");
+            }
+
+            src.AppendLine($"//require {TimelineData.playerGroupData.selectedEnemyID}:");
+
+            foreach (var tuple in cdict)
+            {
+                src.AppendLine($"mov {tuple.Value.unit.unitId},{tuple.Value.name}");
+            }
+
+            //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
+            //msg.AppendLine($"对\"{enemy}\"（{seed}:{enemy}-{PCRBattle.Instance.enemyUnitid}）造成{damage}伤害：");
+            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
+            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyID}");
+            msg.AppendLine("帧轴：");
+
+            var skippingFrame = 0;
+            cdict.Add(TimelineData.playerGroupData.selectedEnemyID, new { name = string.Empty, unit = (UnitData)null });
+
+            var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
+
+            foreach (var (unit, data) in TimelineData.allUnitStateChangeDic.SelectMany(pair =>
+                             pair.Value.Select(dat => (pair.Key, dat)))
+                         .Where(t => t.dat.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                         .OrderBy(t => t.dat.realFrameCount))
+            {
+                var frame = data.currentFrameCount;
+                var unit_id = unit;
+                if (unit_id <= 200000)
+                {
+                    var name = cdict[unit].name;
+                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
+                    src.AppendLine($"wait {data.realFrameCount}; press {name},5; // lframe {data.currentFrameCount}");
+                }
+                else
+                {
+                    src.AppendLine($"//bossub");
+                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
+                }
+            }
+
+            src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"//{m}")));
+
+            return src.ToString();
+        }
+
         private static void CreateUnitExecTimeExcel(FileInfo newFile)
         {
             using (ExcelPackage package = new ExcelPackage(newFile))

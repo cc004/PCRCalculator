@@ -173,6 +173,7 @@ namespace PCRCaculator.Guild
                             changStateFrom = allUnitLastStateDic[unitid].changStateTo,
                             changStateTo = actionState,
                             currentFrameCount = frameCount,
+                            realFrameCount = BattleManager.Instance.FrameCount,
                             operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null
                         });
                     //skillGroupPrefabDic[unitid].AddButtons(allUnitLastStateDic[unitid].currentFrameCount, frameCount, (int)actionState);
@@ -719,6 +720,13 @@ namespace PCRCaculator.Guild
         public readonly List<ProbEvent> dmglist = new List<ProbEvent>();
         public readonly List<(int frame, FloatWithEx value)> bossValues = new List<(int frame, FloatWithEx value)>();
 
+        private static bool CanKill(long maxhp, params float[] dmgs)
+        {
+            Array.Sort(dmgs);
+            var remaining = maxhp - dmgs.Skip(1).Sum();
+            return  dmgs[0] >= 30 / 7f * remaining;
+        }
+
         public void SaveDieProb()
         {
             try
@@ -744,8 +752,15 @@ namespace PCRCaculator.Guild
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
                 const string totaldie = "总乱轴";
+
+                const string mb1 = "1+满补";
+                const string mb2 = "2+满补";
+                const string d1 = "1刀";
+                const string d2 = "2刀";
+
                 var dname = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
+                var dmg = new List<float>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
                     dname.Add(name, 0);
                 dname.Add(dmginfo, 0);
@@ -773,6 +788,7 @@ namespace PCRCaculator.Guild
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
                     var hash = rnd.Next();
+                    dmg.Add(totalDamageExcept.Emulate(hash));
                     foreach (var evt in dmglist2)
                     {
                         if (evt.predict(hash))
@@ -800,6 +816,28 @@ namespace PCRCaculator.Guild
                     foreach ((string name, string source) in sskill) ++dskill[name][source];
                     sname.Clear();
                     sskill.Clear();
+                }
+
+                var maxhp = boss.MaxHp;
+                dname.Add(mb1, 0); dname.Add(mb2, 0); dname.Add(d2, 0); dname.Add(d1, 0);
+                for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
+                {
+                    var a = dmg[i];
+                    var b = dmg[(i + 1) % GuildManager.StaticsettingData.n2];
+                    var c = dmg[(i + 2) % GuildManager.StaticsettingData.n2];
+                    if (CanKill(maxhp, a, b, c))
+                    {
+                        ++dname[mb2];
+                        if (a + b > maxhp)
+                        {
+                            ++dname[d2];
+                            if (CanKill(maxhp, a, b))
+                            {
+                                ++dname[mb1];
+                                if (a > maxhp) ++dname[d1];
+                            }
+                        }
+                    }
                 }
                 if (File.Exists(fileName)) File.Delete(fileName);
                 using (var sw = new StreamWriter(File.OpenWrite(fileName)))
@@ -1035,7 +1073,7 @@ namespace PCRCaculator.Guild
     public struct UnitStateChangeData
     {
         public int id;
-        public int currentFrameCount;
+        public int currentFrameCount, realFrameCount;
         public UnitCtrl.ActionState changStateFrom;
         public UnitCtrl.ActionState changStateTo;
         public string describe;
@@ -1045,6 +1083,7 @@ namespace PCRCaculator.Guild
         public UnitStateChangeData(int currentFrameCount, UnitCtrl.ActionState changStateFrom, UnitCtrl.ActionState changStateTo, string describe = "")
         {
             this.currentFrameCount = currentFrameCount;
+            this.realFrameCount = 0;
             this.changStateFrom = changStateFrom;
             this.changStateTo = changStateTo;
             this.describe = describe;

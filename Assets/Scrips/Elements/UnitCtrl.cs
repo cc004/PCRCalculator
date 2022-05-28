@@ -9063,7 +9063,7 @@ this.updateCurColor();
                 PlayAnime(eSpineCharacterAnimeId.RUN);
                 SupportSkillEnd = false;
                 SetLeftDirection(false);
-                CutInFrameSet.CutInFrame = battleManager.JJCJONPDGIM + 1;
+                CutInFrameSet.CutInFrame = battleManager.FrameCount + 1;
                 CutInFrameSet.ServerCutInFrame = -2;
                 CutInFrameSet.SupportSkillUsed = true;
             }
