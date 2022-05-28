@@ -12,17 +12,53 @@ namespace Elements
   public static class UnitUtility
   {
     private const int DEFAULT_RARITY_MAX = 5;
-    /*private static MasterEquipmentData.EquipmentData unknownEquipmentData = (MasterEquipmentData.EquipmentData) null;
-    private static readonly SoundManager.eVoiceType[] charaDetailVoiceTypes = new SoundManager.eVoiceType[3]
-    {
-      SoundManager.eVoiceType.GACHA,
-      SoundManager.eVoiceType.DETAIL,
-      SoundManager.eVoiceType.MYPAGE
-    };*/
+        /*private static MasterEquipmentData.EquipmentData unknownEquipmentData = (MasterEquipmentData.EquipmentData) null;
+        private static readonly SoundManager.eVoiceType[] charaDetailVoiceTypes = new SoundManager.eVoiceType[3]
+        {
+          SoundManager.eVoiceType.GACHA,
+          SoundManager.eVoiceType.DETAIL,
+          SoundManager.eVoiceType.MYPAGE
+        };*/
+        public static int GetSkinIdFromRarity(int _rarity)
+        {
+            int result = 1;
+            switch (_rarity)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    result = 1;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    result = 3;
+                    break;
+                case 6:
+                    result = 6;
+                    break;
+            }
+            return result;
+        }
+        //public static UserChara SearchCharaParamByUnitId(int _unitId) => Singleton<UserData>.Instance == null ? (UserChara) null : Singleton<UserData>.Instance.SearchCharaParam(UnitUtility.GetCharaId(_unitId));
+        public static int GetSkinId(eSpineType _spineType, int _unitId, int _rarity, int _unitIdForParameter = 0, UnitDefine.eSkinType _skin = UnitDefine.eSkinType.Sd, bool _isOther = false)
+        {
+            if (_rarity == -2)
+            {
+                _unitIdForParameter = ((_unitIdForParameter == 0) ? _unitId : _unitIdForParameter);
+            }
+            if (ResourceDefineSpine.IsSkinIdSpineType(_spineType))
+            {
+                return GetSkinId(_unitId, _rarity);
+            }
+            if (_spineType == eSpineType.SD_SHADOW && _rarity == 6)
+            {
+                return GetSkinIdFromRarity(_rarity);
+            }
+            return _unitId;
+        }
 
-    //public static UserChara SearchCharaParamByUnitId(int _unitId) => Singleton<UserData>.Instance == null ? (UserChara) null : Singleton<UserData>.Instance.SearchCharaParam(UnitUtility.GetCharaId(_unitId));
-
-    public static eUnitBattlePos GetUnitPosType(float _searchAreaWidth)
+        public static eUnitBattlePos GetUnitPosType(float _searchAreaWidth)
     {
       //MasterPositionSetting.PositionSetting positionSetting = ManagerSingleton<MasterDataManager>.Instance.masterPositionSetting.Get(1);
       if (_searchAreaWidth <= (double) 299)//positionSetting.front)

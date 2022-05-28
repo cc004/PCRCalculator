@@ -188,12 +188,12 @@ namespace Elements
         private void CreateUnitSpine(PCRCaculator.UnitData data,int idx, bool isplayer,eUnitRespawnPos respawnPos, Action callBack)
         {
             int unitid = data.unitId;
-            SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
-            dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
-            if(dataAsset == null)
-            {
-                dataAsset = SpineCreator.Instance.Createskeletondata(unitid, SPINE_SCALE, true);
-            }
+            //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+            //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
+            //if(dataAsset == null)
+            //{
+                var dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */), SPINE_SCALE, true);
+            //}
             if(dataAsset == null)
             {
                 MainManager.Instance.WindowConfigMessage("角色" + unitid + "的骨骼动画数据丢失！",null);
@@ -368,12 +368,12 @@ namespace Elements
             if (unitid >= 999999)
                 unitid = GuildManager.EnemyDataDic[unitid].unit_id;
             int prefabID = ABExTool.GetPrefabId(unitid);
-            SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
-            dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
-            if (dataAsset == null)
-            {
-                dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true);
-            }
+            //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+            //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
+            //if (dataAsset == null)
+            //{
+                var dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(prefabID, summonData.ConsiderEquipmentAndBonus ? 3 : 0), SPINE_SCALE, true);
+            //}
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadAddedSkeletonAnimation(dataAsset,exitObj);
             battleSpineController.Initialize(false);
@@ -392,18 +392,21 @@ namespace Elements
           Transform _transform,
           Action<BattleSpineController> _callback = null)
         {
+            int skinId = UnitUtility.GetSkinId(_spineType, _unitId, _rarity);
+            int num = 0;
+
             //GameObject a = Instantiate(Instance.emptyObject);
             //a.transform.SetParent(_transform, false);
-            SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
+            //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             int unitid = _unitId;
             if (unitid >= 999999)
                 unitid = GuildManager.EnemyDataDic[unitid].unit_id;
             int prefabID = ABExTool.GetPrefabId(unitid);
-            dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + _unitId + "_1/" + (_unitId+30) + "_1_SkeletonData");
-            if (dataAsset == null)
-            {
-                dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{_unitId + 30}_1.unity3d");
-            }
+            //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + _unitId + "_1/" + (_unitId+30) + "_1_SkeletonData");
+            //if (dataAsset == null)
+            //{
+            var dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{skinId}_1.unity3d");
+            //}
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadNewSkeletonAnimationGameObject(dataAsset);
             battleSpineController.Initialize(false);

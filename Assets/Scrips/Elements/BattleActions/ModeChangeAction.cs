@@ -29,7 +29,7 @@ namespace Elements
                    _obj.SetAnimeEventDelegateForBattle((Action)(() => _obj.IsStopState = true), 1);
                    _source.UnitSpineCtrlModeChange = _obj;
                }));*/
-                MyGameCtrl.CreateModeChangeSpine(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, _source.SkinRarity, _source.transform.TargetTransform, _obj =>
+                MyGameCtrl.CreateModeChangeSpine(_source.IsShadow ? eSpineType.SD_SHADOW_MODE_CHANGE : eSpineType.SD_MODE_CHANGE, _source.SoundUnitId, 5 /* force use 3x skin */, _source.transform.TargetTransform, _obj =>
                 {
                     _obj.gameObject.SetActive(false);
                     _obj.transform.localScale = new Vector3(_source.Scale, _source.Scale, 1f);

@@ -23,7 +23,7 @@ namespace Spine.Unity
 				{
 					return;
 				}
-				if (material2.mainTexture.name == fileNameWithoutExtension)
+				if (material2.mainTexture.name == fileNameWithoutExtension || material2.mainTexture.name == "force_override")
 				{
 					material = material2;
 					break;

@@ -66,22 +66,38 @@ namespace Spine.Unity
 			}
 			return skeletonDataAsset;
 		}
-		public static SkeletonDataAsset CreateRuntimeInstance(byte[] skeletonDataBytes, string name, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f)
-		{
-			SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
-			skeletonDataAsset.Clear();
-			skeletonDataAsset.skeletonJSON = new TextAsset("default");
-			skeletonDataAsset.skeletonJSON.name = name;
-			skeletonDataAsset.useOwnBytes = true;
-			skeletonDataAsset.skelBytes = skeletonDataBytes;
-			skeletonDataAsset.atlasAssets = new[] { atlasAsset };
-			skeletonDataAsset.scale = scale;
+        public static SkeletonDataAsset CreateRuntimeInstance(byte[] skeletonDataBytes, string name, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f)
+        {
+            SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
+            skeletonDataAsset.Clear();
+            skeletonDataAsset.skeletonJSON = new TextAsset("default");
+            skeletonDataAsset.skeletonJSON.name = name;
+            skeletonDataAsset.useOwnBytes = true;
+            skeletonDataAsset.skelBytes = skeletonDataBytes;
+            skeletonDataAsset.atlasAssets = new[] { atlasAsset };
+            skeletonDataAsset.scale = scale;
 
-			if (initialize)
-				skeletonDataAsset.GetSkeletonData(true);
+            if (initialize)
+                skeletonDataAsset.GetSkeletonData(true);
 
-			return skeletonDataAsset;
+            return skeletonDataAsset;
 		}
+        public static SkeletonDataAsset CreateRuntimeInstance(SkeletonData skeletonData, string name, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f)
+        {
+            SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
+            skeletonDataAsset.Clear();
+            skeletonDataAsset.skeletonJSON = new TextAsset("default");
+            skeletonDataAsset.skeletonJSON.name = name;
+            skeletonDataAsset.useOwnBytes = true;
+            //skeletonDataAsset.skeletonData = skeletonData;
+            skeletonDataAsset.atlasAssets = new[] { atlasAsset };
+            skeletonDataAsset.scale = scale;
+
+            skeletonDataAsset.InitializeWithData(skeletonData);
+                //skeletonDataAsset.GetSkeletonData(true);
+
+            return skeletonDataAsset;
+        }
 		public void Clear()
 		{
 			skeletonData = null;
