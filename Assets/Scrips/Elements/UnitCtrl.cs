@@ -5982,6 +5982,7 @@ this.updateCurColor();
             if ((long)Hp == 0L && (IsTough || ExecKnightGuard()) && (long)Hp == 0L)
                 Hp = 1L;
             Hp = Hp.Min(MaxHp);
+            _hp = Hp.ZeroCapForHp();
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
             //    this.playDamageVoice();
             /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
@@ -7134,7 +7135,7 @@ this.updateCurColor();
         public void SetState(ActionState _state, int _nextSkillId = 0, int _skillId = 0, bool _quiet = false)
         {
             string des = _state == ActionState.SKILL ? (unitActionController.skillDictionary.TryGetValue(_skillId,out var value)?value.SkillName:"UnknownSkill") : "";
-
+            uIManager?.LogMessage($"切换到{_state}状态", eLogMessageType.OTHER, this);
             MyOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount,des, this);
             /*switch (UnitId)
             {

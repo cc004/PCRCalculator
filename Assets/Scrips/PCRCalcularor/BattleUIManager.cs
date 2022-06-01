@@ -24,7 +24,8 @@ namespace PCRCaculator.Battle
         CHANGE_TP = 20,
         BUFF_DEBUFF = 30,
         MISS_DAMAGE_BY_NO_DAMAGE = 40,
-        WARNING = 50
+        WARNING = 50,
+        OTHER = 999,
 
     }
     public class BattleUIManager : MonoBehaviour

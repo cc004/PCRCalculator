@@ -7,10 +7,20 @@ namespace Elements
     public class FloatWithEx : IComparable<FloatWithEx>, IEquatable<FloatWithEx>
     {
         private bool pure => min == max;
-        private float value, avg, min, max;
-        private Func<int, float> root;
+        private readonly float value, avg, min, max;
+        private readonly Func<int, float> root;
         private int hash;
         private float cache;
+
+        public FloatWithEx(float value = 0f, float avg = 0f, float min = 0f, float max = 0f,
+            Func<int, float> root = null)
+        {
+            this.value = value;
+            this.avg = avg;
+            this.min = min;
+            this.max = max;
+            this.root = root;
+        }
 
         public float Emulate(int hash)
         {
@@ -30,14 +40,8 @@ namespace Elements
             p = Mathf.Clamp(p, 0f, 1f);
             if (p == 0f) return 0f;
             if (p == 1f) return 1f;
-            var result = new FloatWithEx
-            {
-                value = val ? 1 : 0,
-                avg = p,
-                root = _ => rand.NextDouble() < p ? 1 : 0,
-                min = 0,
-                max = 1
-            };
+            var result = new FloatWithEx(val ? 1 : 0, p, root: _ => rand.NextDouble() < p ? 1 : 0, min: 0,
+                max: 1);
             return result;
         }
 
@@ -46,13 +50,8 @@ namespace Elements
         {
             if (pure) return selector(value);
             float a = selector(min), b = selector(max);
-            return new FloatWithEx
-            {
-                value = selector(value),
-                avg = selector(avg),
-                root = hash => selector(Emulate(hash)),
-                min = Mathf.Min(a, b), max = Mathf.Max(a, b)
-            };
+            return new FloatWithEx(selector(value), selector(avg), root: hash => selector(Emulate(hash)),
+                min: Mathf.Min(a, b), max: Mathf.Max(a, b));
         }
 
         private static FloatWithEx Default = 0f;
@@ -75,32 +74,15 @@ namespace Elements
             {
                 if (b.pure)
                     return op(a.value, b.value);
-                return new FloatWithEx
-                {
-                    value = op(vala, b.value),
-                    avg = op(vala, b.avg),
-                    root = hash => op(vala, b.Emulate(hash)),
-                    min = Mathf.Min(xs), max = Mathf.Max(xs)
-                };
+                return new FloatWithEx(op(vala, b.value), op(vala, b.avg),
+                    root: hash => op(vala, b.Emulate(hash)), min: Mathf.Min(xs), max: Mathf.Max(xs));
             }
 
             if (b.pure)
-                return new FloatWithEx
-                {
-                    value = op(a.value, valb),
-                    avg = op(a.avg, valb),
-                    root = hash => op(a.Emulate(hash), valb),
-                    min = Mathf.Min(xs),
-                    max = Mathf.Max(xs)
-                };
-            return new FloatWithEx
-            {
-                value = op(a.value, b.value),
-                avg = op(a.avg, b.avg),
-                root = hash => op(a.Emulate(hash), b.Emulate(hash)),
-                min = Mathf.Min(xs),
-                max = Mathf.Max(xs)
-            };
+                return new FloatWithEx(op(a.value, valb), op(a.avg, valb),
+                    root: hash => op(a.Emulate(hash), valb), min: Mathf.Min(xs), max: Mathf.Max(xs));
+            return new FloatWithEx(op(a.value, b.value), op(a.avg, b.avg),
+                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: Mathf.Min(xs), max: Mathf.Max(xs));
         }
 
         public float Expect => avg;
@@ -135,11 +117,8 @@ namespace Elements
         }
 
         public static implicit operator float(FloatWithEx self) => self.value;
-        public static implicit operator FloatWithEx(float x) => new FloatWithEx
-        { 
-            value = x, avg = x, min = x, max = x,
-            root = null
-        };
+        public static implicit operator FloatWithEx(float x) =>
+            new FloatWithEx(x, x, x, x, null);
         public FloatWithEx Log() => Select(Mathf.Log);
         public FloatWithEx Max(float f) => Select(x => Mathf.Max(x, f));
         public FloatWithEx Min(float f) => Select(x => Mathf.Min(x, f));
@@ -171,6 +150,11 @@ namespace Elements
         public override int GetHashCode()
         {
             return value.GetHashCode();
+        }
+
+        public FloatWithEx ZeroCapForHp()
+        {
+            return new FloatWithEx(value >= 0f ? value : 0f, avg, min, max, root);
         }
     }
 }
