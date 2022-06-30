@@ -9318,7 +9318,7 @@ this.updateCurColor();
             GAME_START = 7,
         }
 
-        public delegate void OnDamageDelegate(bool byAttack, float damage, bool critical);
+        public delegate void OnDamageDelegate(bool byAttack, FloatWithEx damage, bool critical);
 
         public delegate void OnDeadDelegate(UnitCtrl owner);
 

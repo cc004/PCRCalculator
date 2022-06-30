@@ -565,7 +565,7 @@ namespace PCRCaculator.Battle
 
             guildTotalDamageNumber.SetDamageNumber(null, numbers, sprite_total_physical, 2);
         }
-        public void ReflashGuildEnemyTotalDamage2(bool byAttack,float value,bool critical)
+        public void ReflashGuildEnemyTotalDamage2(bool byAttack, FloatWithEx value,bool critical)
         {
             ReflashGuildEnemyTotalDamage(value);
         }

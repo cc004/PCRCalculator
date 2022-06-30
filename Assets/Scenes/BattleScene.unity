@@ -3535,6 +3535,7 @@ MonoBehaviour:
   - {r: 1, g: 0.8197811, b: 0.7028302, a: 1}
   UBTimeEditorPrefab: {fileID: 6093979742115304221, guid: 6eecc2b2a36d5de4ba21fe45a8bed183,
     type: 3}
+  expectedDamage: 0
   detail: 
 --- !u!4 &338011304
 Transform:
@@ -14704,7 +14705,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 396023724}
   m_Direction: 2
   m_MinValue: 0
-  m_MaxValue: 5
+  m_MaxValue: 7
   m_WholeNumbers: 1
   m_Value: 3
   m_OnValueChanged:

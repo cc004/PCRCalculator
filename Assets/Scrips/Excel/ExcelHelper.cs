@@ -449,6 +449,57 @@ namespace ExcelHelper
             return src.ToString();
         }
 
+        private static string CreatePyString()
+        {
+            var units = TimelineData.playerGroupData.playerData.playrCharacters;
+            var cdict = units.ToDictionary(u => u.unitId, u => new { name = u.GetNicName(), unit = u });
+            var enemy = "boss";
+            var msg = new StringBuilder();
+            var src = new StringBuilder();
+            
+            src.AppendLine("from autotimeline import *\nimport sys\nsys.path.append('.')\n");
+
+            foreach (var tuple in cdict)
+            {
+                src.AppendLine($"print(\"calibrate for {tuple.Value.name}\");\nautopcr.calibrate(\"{tuple.Value.name}\")");
+            }
+
+            src.AppendLine("autopcr.setOffset(2, 0); # offset calibration");
+
+            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
+            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyID}");
+            msg.AppendLine("帧轴：");
+
+            var skippingFrame = 0;
+            cdict.Add(TimelineData.playerGroupData.selectedEnemyID, new { name = string.Empty, unit = (UnitData)null });
+
+            var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
+
+            foreach (var (unit, data) in TimelineData.allUnitStateChangeDic.SelectMany(pair =>
+                             pair.Value.Select(dat => (pair.Key, dat)))
+                         .Where(t => t.dat.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                         .OrderBy(t => t.dat.realFrameCount))
+            {
+                var frame = data.currentFrameCount;
+                var unit_id = unit;
+                if (unit_id <= 200000)
+                {
+                    var name = cdict[unit].name;
+                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
+                    src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); autopcr.multipress(\"{name}\", 5) # lframe {data.currentFrameCount}");
+                }
+                else
+                {
+                    src.AppendLine("# bossub");
+                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
+                }
+            }
+
+            src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"# {m}")));
+
+            return src.ToString();
+        }
+
         private static void CreateUnitExecTimeExcel(FileInfo newFile)
         {
             using (ExcelPackage package = new ExcelPackage(newFile))
@@ -639,6 +690,43 @@ namespace ExcelHelper
 
                 List<UBDetail> UBList = TimelineData.uBDetails;
                 UBList.Sort((a, b) => a.UBTime - b.UBTime);
+                var dmglist = GuildCalculator.Instance.dmglist
+                    .Where(p => p.enabled).ToArray();
+
+                var dmgcnt = new Dictionary<ProbEvent, int>();
+                var rnd = new System.Random();
+
+                for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
+                {
+                    var hash = rnd.Next();
+
+                    foreach (var evt in dmglist)
+                    {
+                        if (evt.predict(hash))
+                        {
+                            if (!dmgcnt.ContainsKey(evt)) dmgcnt[evt] = 0;
+                            ++dmgcnt[evt];
+                            break;
+                        }
+                    }
+                }
+
+                var curline = 0;
+                foreach (var (time, content) in dmgcnt
+                             .OrderBy(p => p.Key.frame)
+                             .Select(p => (p.Key.frame, new string[]
+                             {
+                                 p.Key.frame.ToString(),
+                                 $"{p.Value / (float) GuildManager.StaticsettingData.n2:P2}",
+                                 p.Key.unit,
+                                 p.Key.description
+                             })))
+                {
+                    while (curline < UBList.Count && UBList[curline].UBTime > time) ++curline;
+                    foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
+                        worksheet0.MySetValue(10 + curline, 11 + i, cont);
+                }
+
                 foreach(var a in UBList)
                 {
                     worksheet0.MySetValue(currentLineNum, 1, a.UBTime);

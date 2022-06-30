@@ -57,6 +57,21 @@ namespace PCR_cysp2skel
                 var CHAR_BASE = ABExTool.GetAssetBundleByName<TextAsset>(char_base);
                 var BATTLE = ABExTool.GetAssetBundleByName<TextAsset>(spine_battle);
                 var COMMON_BATTLE =  ABExTool.GetAssetBundleByName<TextAsset>(common_battle);
+
+                if (CHAR_BASE == null)
+                {
+                    MainManager.Instance.WindowConfigMessage(
+                        "合成角色" + unitId + "的动画时发生错误：找不到" + char_base, null);
+                    return null;
+                }
+
+                if (BATTLE == null)
+                {
+                    MainManager.Instance.WindowConfigMessage(
+                        "合成角色" + unitId + "的动画时发生错误：找不到" + spine_battle, null);
+                    return null;
+                }
+
                 var binary = new SkeletonBinary(new AtlasAttachmentLoader(atlas.GetAtlas()));
                 var data = binary.ReadSkeletonDevisionCyspSkeleton(new SimpleMemoryStream(CHAR_BASE.bytes));
                 binary.ReadSkeletonDevisionCyspAnimation(new SimpleMemoryStream(BATTLE.bytes), data);
@@ -66,10 +81,10 @@ namespace PCR_cysp2skel
             }
             catch(Exception e)
             {
-                MainManager.Instance.WindowConfigMessage(
-                    "合成角色" + unitId + "的动画时发生错误：" + e.Message + "\n可能原因：找不到" + char_base + "/" + spine_battle, null);
+                    MainManager.Instance.WindowConfigMessage(
+                        "合成角色" + unitId + "的动画时发生错误:" + e, null);
+                    return null;
             }
-            return null;
         }
         /*public void TranslateEnimy(int unitid)
         {

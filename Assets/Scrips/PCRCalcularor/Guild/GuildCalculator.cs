@@ -22,6 +22,7 @@ namespace PCRCaculator.Guild
     public class ProbEvent
     {
         public string unit;
+        public int frame = BattleHeaderController.CurrentFrameCount;
         public string description;
         public Func<int, bool> predict;
         public bool enabled = true;
@@ -1259,6 +1260,7 @@ namespace PCRCaculator.Guild
         public List<ValueChangeData> bossMgcDefChangeDic = new List<ValueChangeData>();
         //[JsonIgnore]
         public List<List<float>> UBExecTime = new List<List<float>>();
+        [JsonIgnore]
         public List<RandomData> AllRandomList = new List<RandomData>();
         public int exceptDamage;
         public int backDamage;

@@ -89,11 +89,11 @@ namespace PCRCaculator
             try
             {
                 //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
-                dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
-                if (dataAsset == null)
-                {
-                    dataAsset = SpineCreator.Instance.Createskeletondata(unitid, 0.01f, true);
-                }
+                //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
+                //if (dataAsset == null)
+                //{
+                    var dataAsset = SpineCreator.Instance.Createskeletondata(unitid, 0.01f, true);
+                //}
                 if (dataAsset == null)
                 {
                     MainManager.Instance.WindowConfigMessage("角色" + unitid + "的战斗小人丢失！", null);

@@ -14,7 +14,7 @@ namespace Elements
     public class DamageChargeAction : ActionParameter
     {
         private const int LOOP_MOTION_NUMBER = 1;
-        private float defaultValue;
+        private FloatWithEx defaultValue;
         private ActionParameter targetAction;
 
         public override void ExecActionOnStart(
