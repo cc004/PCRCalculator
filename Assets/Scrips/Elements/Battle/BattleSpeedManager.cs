@@ -46,14 +46,14 @@ namespace Elements.Battle
             get => speedUpRate;
             set
             {
-                if (value >= 0.124f && value<=20.1f)
-                {
+                //if (value >= 0.124f && value<=20.1f)
+                //{
                     speedUpRate = value;
-                }
-                else
-                {
-                    speedUpRate = 1;
-                }
+                //}
+                //else
+                //{
+                //    speedUpRate = 1;
+                //}
             }
         }
 

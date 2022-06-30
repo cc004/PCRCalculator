@@ -173,8 +173,18 @@ namespace Elements
                 owner.PlayAnime(_animeId, _movieIndex, _index3: owner.MotionPrefix, _isLoop: false);
             else
                 owner.PlayAnime(eSpineCharacterAnimeId.IDLE, owner.MotionPrefix);
-            currentSpineCtrl.RealUpdate();
-            currentSpineCtrl.RealLateUpdate();
+
+            for (int i = 0; i < 120;)
+            {
+                for (int j = 0; j < battleManager.battleTimeScale.SpeedUpRate; ++j)
+                {
+                    currentSpineCtrl.RealUpdate();
+                    currentSpineCtrl.RealLateUpdate();
+                    ++i;
+                }
+                yield return null;
+            }
+
             if (_movieIndex == 1)
                 battleManager.CAOHLDNADPB = false;
             if (_callback == null)

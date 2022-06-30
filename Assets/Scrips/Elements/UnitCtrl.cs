@@ -5979,10 +5979,10 @@ this.updateCurColor();
                 _onDamageHit((float)num6);
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (long)1L;
-            if ((long)Hp == 0L && (IsTough || ExecKnightGuard()) && (long)Hp == 0L)
-                Hp = 1L;
             Hp = Hp.Min(MaxHp);
             _hp = Hp.ZeroCapForHp();
+            if ((long)Hp == 0L && (IsTough || ExecKnightGuard()) && (long)Hp == 0L)
+                Hp = 1L;
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
             //    this.playDamageVoice();
             /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
