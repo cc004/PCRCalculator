@@ -325,7 +325,23 @@ namespace PCRCaculator
                 data.uniqueEqLv = (int)detailSliders_setting[14].value;
             }
             ReflashSettingPage();
+
+            if (data.rank < 2) data.skillLevel[1] = 0;
+            if (data.rank < 4) data.skillLevel[2] = 0;
+            if (data.rank < 7)
+            {
+                data.skillLevel[3] = 0;
+                data.uniqueEqLv = 0;
+            }
             ReflashSettingValues();
+
+            if (data.rank < 2) detailSliders_setting[4].maxValue = 0;
+            if (data.rank < 4) detailSliders_setting[5].maxValue = 0;
+            if (data.rank < 7)
+            {
+                detailSliders_setting[6].maxValue = 0;
+                detailSliders_setting[14].maxValue = 0;
+            }
         }
         public void AddButton_setting(int buttonid)
         {

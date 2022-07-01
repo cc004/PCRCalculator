@@ -455,8 +455,16 @@ namespace Elements.Battle
             ACGNCFFDNON();
         }*/
 
+        private bool spacePressed = false;
+
         private void Update()
         {
+            if (Input.GetKey(KeyCode.Space))
+            {
+                if (!spacePressed) BattleHeaderController.Instance.OnClickPauseButton();
+                spacePressed = true;
+            }
+            else spacePressed = false;
             isUpdateFrameExecuted = false;
             //int index1 = 0;
             /*for (int length = this.UnitUiCtrl.UnitCtrls.Length; index1 < length; ++index1)

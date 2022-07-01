@@ -365,9 +365,9 @@ namespace ExcelHelper
             ("e4", c => int.TryParse(c.equipLevel[3].ToString(), out var val) ? val : -1),
             ("e5", c => int.TryParse(c.equipLevel[4].ToString(), out var val) ? val : -1),
             ("e6", c => int.TryParse(c.equipLevel[5].ToString(), out var val) ? val : -1),
-            ("s1", c => c.skillLevel[0]),
-            ("s2", c => c.skillLevel[1]),
-            ("ub", c => c.skillLevel[2]),
+            ("ub", c => c.skillLevel[0]),
+            ("s1", c => c.skillLevel[1]),
+            ("s2", c => c.skillLevel[2]),
             ("ex", c => c.skillLevel[3]),
             ("lv", c => c.level)
         };

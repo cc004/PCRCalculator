@@ -8,7 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-
+using System.Diagnostics;
 using Cute;
 using Elements.Battle;
 using PCRCaculator;
@@ -18,6 +18,7 @@ using Spine;
 using Spine.Unity;
 using UnityEngine;
 using Attachment = Spine.Attachment;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 //using Cute.Cri.Movie;
 //using Elements.Data;
@@ -6075,7 +6076,7 @@ this.updateCurColor();
 
             des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
                 + $"-{prob:P0}";
-            if (_damageData.Target.Owner.IsPartsBoss)
+            if (_damageData.Target?.Owner?.IsPartsBoss ?? false)
             {
                 des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
             }
@@ -6111,8 +6112,10 @@ this.updateCurColor();
                         SetState(ActionState.DIE);
                 }
             }
+
             string describe =
-                $"对目标{(_damageData.Target.Owner.IsPartsBoss ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}-{prob:P0}";
+                $"对目标{((_damageData.Target?.Owner?.IsPartsBoss ?? false) ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}-{prob:P0}";
+
             callBack?.Invoke(describe);
             return num6.Floor();
         }
@@ -9301,6 +9304,11 @@ this.updateCurColor();
             if (battleManager.ubmanager.IsUbExec(battleManager.UnitList.IndexOf(this)))
                 return true;
             //return this.battleManager.UnitUiCtrl.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;
+
+            var index = MyGameCtrl.Instance.playerUnitCtrl.IndexOf(this);
+            if (index >= 0 && Input.GetKey(KeyCode.Alpha5 - index)) return true;
+
+
             return MyGameCtrl.Instance.IsAutoMode && CurrentState == ActionState.IDLE;
         }
 

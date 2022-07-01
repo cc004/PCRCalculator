@@ -598,10 +598,13 @@ namespace Elements
             return new UnitParameter(
                 new UnitData(unitData.unitId, new DateTime(), 1, unitData.rarity, unitData.rarity, unitData.level, 0, ePromotionLevel.Bronze,
                     new List<SkillLevelInfo> { new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0), new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0) },
-                    new List<SkillLevelInfo> { new SkillLevelInfo(skillData.skill_1, unitData.skillLevel[1], 0), new SkillLevelInfo(skillData.skill_2, unitData.skillLevel[2], 0) ,
-                        new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0), new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0)
+                    new List<SkillLevelInfo> { 
+                        new SkillLevelInfo(skillData.skill_1, unitData.rank < 2 ? 0 : unitData.skillLevel[1], 0), 
+                        new SkillLevelInfo(skillData.skill_2, unitData.rank < 4 ? 0 : unitData.skillLevel[2], 0) ,
+                        new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0), 
+                        new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0)
                     },
-                                        new List<SkillLevelInfo> { new SkillLevelInfo(skillData.EXskill, unitData.skillLevel[3], 0) },
+                    new List<SkillLevelInfo> { new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0) },
                     new List<SkillLevelInfo>(), 0),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(unitData.unitId, detailData.name, "?", unitData.unitId, 0, detailData.minrarity, detailData.motionType, detailData.seType,
