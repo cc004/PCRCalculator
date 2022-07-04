@@ -722,9 +722,10 @@ namespace ExcelHelper
                                  p.Key.description
                              })))
                 {
-                    while (curline < UBList.Count && UBList[curline].UBTime > time) ++curline;
+                    while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
                     foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                        worksheet0.MySetValue(10 + curline, 11 + i, cont);
+                        worksheet0.MySetValue(10 + curline, 11 + i, cont, centre:false);
+                    ++curline;
                 }
 
                 foreach(var a in UBList)

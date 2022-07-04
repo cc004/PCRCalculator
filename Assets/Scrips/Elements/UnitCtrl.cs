@@ -8082,6 +8082,10 @@ this.updateCurColor();
                 {
                     if (ActionsTargetOnMe.Count > 0 || FirearmCtrlsOnMe.Count > 0 || KnockBackEnableCount > 0)
                     {
+                        if (time == 0)
+                        {
+                            uIManager?.LogMessage($"由于被技能{string.Join("\n", ActionsTargetOnMe)}、{FirearmCtrlsOnMe.Count}个弹射物与{KnockBackEnableCount}个击退效果锁定，不会立即死亡", eLogMessageType.OTHER, this);
+                        }
                         time += battleManager.DeltaTime_60fps;
                         if (time > 10.0)
                         {
@@ -8497,7 +8501,7 @@ this.updateCurColor();
                         }
                         else
                         {
-                            if ((unitCtrl.battleManager.ActionStartTimeCounter <= 0.0 || unitCtrl.IsOther ? (!unitCtrl.ToadRelease ? 1 : 0) : 0) != 0)
+                            if ((unitCtrl.battleManager.ActionStartTimeCounter <= 0f || unitCtrl.IsOther ? (!unitCtrl.ToadRelease ? 1 : 0) : 0) != 0)
                             {
                                 unitCtrl.m_fCastTimer = unitCtrl.m_fCastTimer - unitCtrl.DeltaTimeForPause;
                                 if (unitCtrl.m_fCastTimer < 0.1 && unitCtrl.UnitNameEx.Contains("凯"))
@@ -8510,7 +8514,7 @@ this.updateCurColor();
                                 yield return null;
                             else if (unitCtrl.ToadRelease)
                                 yield return null;
-                            else if ((float)unitCtrl.m_fCastTimer <= 0.0 && unitCtrl.attackPatternDictionary != null)
+                            else if ((float)unitCtrl.m_fCastTimer <= 0f && unitCtrl.attackPatternDictionary != null)
                             {
                                 unitCtrl.updateAttackTargetImpl();
                                 if (unitCtrl.judgeStateIsWalk())

@@ -3146,7 +3146,7 @@ namespace Elements.Battle
             BattleLogEnable = true;// !TutorialManager.IsStartTutorial && this.battleProcessor.GetBattleLogEnable(this.BattleLogEnable);
             FameRate = 60;// this.battleProcessor.GetFrameRate();
             IsDefenceReplayMode = false;// this.battleProcessor.GetIsDefenceReplayMode();
-            DeltaTime_60fps = 0.01666667f;
+            DeltaTime_60fps = 1 / 60f;
             UnitCtrl.DamageFlashFrame = 8;
             UnitCtrl.FlashDelayFrame = 0;
             CoroutineManager = gameObject.AddComponent<CoroutineManager>();

@@ -359,6 +359,8 @@ namespace PCRCaculator
         }
         public int CompareTo(UnitRarityData other)
         {
+            if (detailData.searchAreaWidth == other.detailData.searchAreaWidth)
+                return detailData.unitid - other.detailData.unitid;
             return detailData.searchAreaWidth - other.detailData.searchAreaWidth;
 
         }
