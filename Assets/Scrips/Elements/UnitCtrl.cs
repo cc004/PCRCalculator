@@ -3311,6 +3311,7 @@ this.updateCurColor();
                 case eAbnormalState.STUN:
                 case eAbnormalState.DETAIN:
                 case eAbnormalState.FAINT:
+                case eAbnormalState.NPC_STUN:
                     if (_enable)
                     {
                         if (CurrentState != ActionState.DAMAGE)
@@ -3323,11 +3324,14 @@ this.updateCurColor();
                     {
                         //XX: temporary fix for damage spine resuming
                         //this.specialSleepStatus = UnitCtrl.eSpecialSleepStatus.INVALID;
-                        //BattleSpineController currentSpineCtrl = this.GetCurrentSpineCtrl();
-                        //currentSpineCtrl.IsPlayAnimeBattle = false;
-                        //currentSpineCtrl.IsStopState = false;
+                        BattleSpineController currentSpineCtrl3 = GetCurrentSpineCtrl();
+                        if (currentSpineCtrl3.AnimationName == currentSpineCtrl3.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE))
+                        {
+                            currentSpineCtrl3.IsPlayAnimeBattle = false;
+                            currentSpineCtrl3.IsStopState = false;
+                        }
                         setMotionResume();
-                        //this.isContinueIdleForPauseAction = false;
+                        this.isContinueIdleForPauseAction = false;
                     }
                     break;
                 case eAbnormalState.CONVERT:
@@ -6084,7 +6088,7 @@ this.updateCurColor();
             uIManager.LogMessage(des,eLogMessageType.GET_DAMAGE, this);
             createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
             if (OnDamage != null)
-                OnDamage(_byAttack, (float)num6, _critical);
+                OnDamage(_byAttack, num6, _critical);
             MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
             MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, (float)num6, _critical);
@@ -8635,6 +8639,7 @@ this.updateCurColor();
                         TrackEntry current2 = currentSpineCtrl.state.GetCurrent(0);
                         current2.lastTime = battleManager.DeltaTime_60fps;
                         current2.time = battleManager.DeltaTime_60fps;
+                        current2.animationLast = battleManager.DeltaTime_60fps;
                         //current2.animationLast = this.battleManager.DeltaTime_60fps;
                         //current2.animationStart = this.battleManager.DeltaTime_60fps;
 

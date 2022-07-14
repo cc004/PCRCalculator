@@ -15,7 +15,7 @@ namespace Elements
 
         public int EffectId { get; set; }
 
-        public float Value { get; set; }
+        public FloatWithEx Value { get; set; }
 
         public int ActionId { get; set; }
 
@@ -45,26 +45,24 @@ namespace Elements
             {
                 if (TargetList[index].Owner.CurrentState != UnitCtrl.ActionState.DIE)
                 {
-                    DamageData damageData = new DamageData
+                    DamageData damageData = new DamageData();
+                    damageData.Target = TargetList[index];
+                    damageData.Damage = BattleUtil.FloatToInt(Value);
+                    damageData.DamageType = DamageType;
+                    damageData.Source = PPOJKIDHGNJ;
+                    damageData.ActionType = eActionType.ATTACK_FIELD;
+                    damageData.ExecAbsorber = _damage =>
                     {
-                        Target = TargetList[index],
-                        Damage = (long)BattleUtil.FloatToInt(Value),
-                        DamageType = DamageType,
-                        Source = PPOJKIDHGNJ,
-                        ActionType = eActionType.ATTACK_FIELD,
-                        ExecAbsorber = _damage =>
+                        if (_damage > AbsorberValue)
                         {
-                            if (_damage > AbsorberValue)
-                            {
-                                int num = _damage - AbsorberValue;
-                                BattleManager.SubstructEnemyPoint(AbsorberValue);
-                                AbsorberValue = 0;
-                                return num;
-                            }
-                            AbsorberValue -= _damage;
-                            BattleManager.SubstructEnemyPoint(_damage);
-                            return 0;
+                            int num = _damage - AbsorberValue;
+                            BattleManager.SubstructEnemyPoint(AbsorberValue);
+                            AbsorberValue = 0;
+                            return num;
                         }
+                        AbsorberValue -= _damage;
+                        BattleManager.SubstructEnemyPoint(_damage);
+                        return 0;
                     };
                     UnitCtrl owner = TargetList[index].Owner;
                     DamageData _damageData = damageData;

@@ -43,16 +43,16 @@ namespace Elements
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             DamageData.eDamageType eDamageType;
-            float num;
+            FloatWithEx num;
             if (ActionDetail1 % 2 == 0)
             {
                 eDamageType = DamageData.eDamageType.MGC;
-                num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : (float)(int)_source.MagicStrZero);
+                num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : _source.MagicStrZero);
             }
             else
             {
                 eDamageType = DamageData.eDamageType.ATK;
-                num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : (float)(int)_source.AtkZero);
+                num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : _source.AtkZero);
             }
             GameObject gameObject1 = null;
             GameObject gameObject2 = null;
