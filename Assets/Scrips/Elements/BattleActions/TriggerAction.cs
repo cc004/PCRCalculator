@@ -211,8 +211,34 @@ namespace Elements
                     parts.BreakEffectList = _skill.SkillEffects;
                     _source.OnUpdateWhenIdle += _limitTime =>
                     {
-                        if (parts.BreakPoint != 0 || parts.IsBreak || (judgeSilenceOrToad(_source) || battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) || BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        var point = parts.BreakPoint;
+                        if (parts.BreakPoint != 0 || parts.IsBreak ||
+                            (judgeSilenceOrToad(_source) || battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) ||
+                            BattleManager.Random(0.0f, 1f,
+                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) >
+                            (double) Value[eValueNumber.VALUE_1] / 100.0)
+                        {
+                            if (parts.IsBreak ||
+                                (judgeSilenceOrToad(_source) ||
+                                 battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE))
+                                return;
+
+                            GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                            {
+                                unit = _source.UnitNameEx,
+                                predict = hash => point.Emulate(hash) <= 0f,
+                                description = $"({BattleHeaderController.CurrentFrameCount}){_source.UnitNameEx}的第{parts.Index}个部位提前break",
+                                isProb = true
+                            });
                             return;
+                        }
+                        GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                        {
+                            unit = _source.UnitNameEx,
+                            predict = hash => point.Emulate(hash) > 0f,
+                            description = $"({BattleHeaderController.CurrentFrameCount}){_source.UnitNameEx}的第{parts.Index}个部位未break",
+                            isProb = true
+                        });
                         _source.AppendBreakLog(parts.BreakSource);
                         parts.IsBreak = true;
                         parts.OnBreak.Call();

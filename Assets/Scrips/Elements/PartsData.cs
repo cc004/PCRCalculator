@@ -77,7 +77,7 @@ namespace Elements
 
         public int StartLifeSteal { get; private set; }
 
-        public int BreakPoint { get; set; }
+        public FloatWithEx BreakPoint { get; set; }
 
         public float BreakTime { get; set; }
 
@@ -330,16 +330,17 @@ namespace Elements
             }
         }*/
 
-        public void SetDamage(int _damage, UnitCtrl _source)
+        public void SetDamage(FloatWithEx _damage, UnitCtrl _source)
         {
           if (Owner.IsAbnormalState(UnitCtrl.eAbnormalState.PARTS_NO_DAMAGE))
             return;
           BreakPoint = BreakPoint - _damage;
           if (BreakPoint < 0)
           {
-            BreakPoint = 0;
             BreakSource = _source;
           }
+
+          BreakPoint = BreakPoint.ZeroCapForHp();
           /*if (!((UnityEngine.Object) this.MultiTargetCursor != (UnityEngine.Object) null))
             return;
           if ((int) this.BreakPoint == 0 && this.IsBreak)

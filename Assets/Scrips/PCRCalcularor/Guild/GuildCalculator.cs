@@ -26,6 +26,7 @@ namespace PCRCaculator.Guild
         public string description;
         public Func<int, bool> predict;
         public bool enabled = true;
+        public bool isProb = false;
     }
     public class GuildCalculator : MonoBehaviour
     {
@@ -752,7 +753,8 @@ namespace PCRCaculator.Guild
                 var fileName = ofn.file.Replace("\\", "/");
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
-                const string totaldie = "总乱轴";
+                const string totaldie = "总乱轴（上限）";
+                const string totaldie2 = "总乱轴（下限，不计入穿盾、break）";
 
                 const string mb1 = "1+满补";
                 const string mb2 = "2+满补";
@@ -760,19 +762,25 @@ namespace PCRCaculator.Guild
                 const string d2 = "2刀";
 
                 var dname = new Dictionary<string, int>();
+                var dname2 = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
                 var dmg = new List<float>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
+                {
+                    dname2.Add(name, 0);
                     dname.Add(name, 0);
+                }
                 dname.Add(dmginfo, 0);
                 dname.Add(dmginfo2, 0);
                 dname.Add(totaldie, 0);
+                dname.Add(totaldie2, 0);
                 foreach (var skill in dmglist.Select(n => (n.unit, n.description)).Distinct())
                 {
                     if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());
                     dskill[skill.unit].Add(skill.description, 0);
                 }
                 var sname = new HashSet<string>();
+                var sname2 = new HashSet<string>();
                 var sskill = new HashSet<(string, string)>();
                 var rnd = new System.Random();
                 var val = float.Parse(basedmg.text);
@@ -788,6 +796,7 @@ namespace PCRCaculator.Guild
                 var dmglist2 = dmglist.Where(d => d.enabled).ToArray();
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
+                    var flag = false;
                     var hash = rnd.Next();
                     dmg.Add(totalDamageExcept.Emulate(hash));
                     foreach (var evt in dmglist2)
@@ -796,6 +805,11 @@ namespace PCRCaculator.Guild
                         {
                             if (!sname.Contains(evt.unit))
                             {
+                                if (!evt.isProb)
+                                {
+                                    flag = true;
+                                    sname2.Add(evt.unit);
+                                }
                                 sname.Add(evt.unit);
                                 sskill.Add((evt.unit, evt.description));
                             }
@@ -805,6 +819,7 @@ namespace PCRCaculator.Guild
                     if (sname.Count > 0)
                     {
                         ++dname[totaldie];
+                        if (flag) ++dname[totaldie2];
                         if (action(hash)) ++dname[dmginfo];
                     }
                     else if (action(hash))
@@ -814,8 +829,10 @@ namespace PCRCaculator.Guild
                     }
 
                     foreach (var name in sname) ++dname[name];
+                    foreach (var name in sname2) ++dname2[name];
                     foreach ((string name, string source) in sskill) ++dskill[name][source];
                     sname.Clear();
+                    sname2.Clear();
                     sskill.Clear();
                 }
 
@@ -845,7 +862,10 @@ namespace PCRCaculator.Guild
                 {
                     foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                     {
-                        sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}");
+                        var real = dname2.ContainsKey(name)
+                            ? $"({(float) dname2[name] / GuildManager.StaticsettingData.n2:P1})"
+                            : string.Empty;
+                        sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
                         if (!dskill.ContainsKey(name)) continue;
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
                             sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}");

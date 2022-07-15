@@ -5553,7 +5553,10 @@ this.updateCurColor();
             return partsData1;
         }
 
-        public void AppendBreakLog(UnitCtrl _source) => battleLog.AppendBattleLog(eBattleLogType.BREAK, 0, 0L, 0L, 0, 0, JELADBAMFKH: _source, LIMEKPEENOB: this);
+        public void AppendBreakLog(UnitCtrl _source)
+        {
+            battleLog.AppendBattleLog(eBattleLogType.BREAK, 0, 0L, 0L, 0, 0, JELADBAMFKH: _source, LIMEKPEENOB: this);
+        }
 
         /*public void SetCountinuousPartsData(Dictionary<int, ContinuousPartsData> _data)
         {
@@ -5637,12 +5640,12 @@ this.updateCurColor();
             {
                 if (!_damageData.IsSlipDamage)
                 {
-                    (_damageData.Target as PartsData).SetDamage((int)num1, _damageData.Source);
+                    (_damageData.Target as PartsData).SetDamage(num1, _damageData.Source);
                 }
                 else
                 {
                     for (int index = 0; index < BossPartsListForBattle.Count; ++index)
-                        BossPartsListForBattle[index].SetDamage((int)num1, _damageData.Source);
+                        BossPartsListForBattle[index].SetDamage(num1, _damageData.Source);
                 }
             }
             //if (this.MultiBossPartsData != null)
@@ -6136,6 +6139,7 @@ this.updateCurColor();
                     _fDamage = num;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
@@ -6147,6 +6151,7 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
@@ -6162,6 +6167,7 @@ this.updateCurColor();
                     _fDamage = num;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
@@ -6173,6 +6179,7 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
@@ -6188,6 +6195,7 @@ this.updateCurColor();
                     _fDamage = num;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
@@ -6199,6 +6207,7 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
@@ -6242,6 +6251,7 @@ this.updateCurColor();
                     _fDamage = num1;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
@@ -6255,6 +6265,7 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
@@ -6271,6 +6282,7 @@ this.updateCurColor();
                     _fDamage = num1;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
@@ -6284,6 +6296,7 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
@@ -6306,6 +6319,7 @@ this.updateCurColor();
                     _fDamage = num3;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num3.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
@@ -6322,6 +6336,7 @@ this.updateCurColor();
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
+                        isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num3.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
