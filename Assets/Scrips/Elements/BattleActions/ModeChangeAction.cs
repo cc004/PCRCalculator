@@ -122,7 +122,7 @@ namespace Elements
                                 goto label_7;
                             case eModeChangeType.ENERGY:
                                 _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = true;
-                                _source.SetEnergy(_source.Energy - _source.DeltaTimeForPause * _value, eSetEnergyType.BY_MODE_CHANGE);
+                                _source.SetEnergy((float)_source.Energy - _source.DeltaTimeForPause * _value, eSetEnergyType.BY_MODE_CHANGE);
                                 if ((double)_source.Energy == 0.0)
                                     endFlag = true;
                                 if (_source.ToadDatas.Count <= 0)
