@@ -151,7 +151,7 @@ namespace PCRCaculator
 
         public void OpenProperty()
         {
-            GuildManager.Instance.ActivateCharacterDetailPage(Vector3.right * 320);
+            GuildManager.Instance.ActivateCharacterDetailPage(new Vector3(260, 0, 0), 0.6f);
             GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
         }
 

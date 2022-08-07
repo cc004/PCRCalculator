@@ -149,14 +149,16 @@ namespace PCRCaculator.Guild
             ChoosePannelManager.Instance.CallChooseBack(3);
         }
 
-        public void ActivateCharacterDetailPage(Vector3 pos)
+        public void ActivateCharacterDetailPage(Vector3 pos, float scale)
         {
             characterDetailPage.SetActive(true);
             characterDetailPageChild.transform.localPosition = pos;
+            characterDetailPageChild.transform.localScale = Vector3.one * scale;
         }
 
         public void RefreshCharacterDetailPage(int idx)
         {
+            if (idx >= SettingData.GetCurrentPlayerData().playrCharacters.Count) return;
             UnitData unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
             characterDetailButton.SetButton(unitData);
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
@@ -177,7 +179,7 @@ namespace PCRCaculator.Guild
                 return;
             }
 
-            ActivateCharacterDetailPage(Vector3.zero);
+            ActivateCharacterDetailPage(Vector3.zero, 1f);
             RefreshCharacterDetailPage(idx);
         }
         public void EditCharacterdetail()
