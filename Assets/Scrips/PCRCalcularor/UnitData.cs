@@ -205,13 +205,13 @@ namespace PCRCaculator
                             if (!jjc_otherside)
                             {
                                 d1 += MainManager.Instance.UnitStoryDic[id0].GetLoveValues(
-                                    usedic_save ? MainManager.Instance.unitDataDic_save[id0].love :
-                                    MainManager.Instance.unitDataDic[id0].love);
+                                    usedic_save ? MainManager.Instance.unitDataDic_save[id0].love2 :
+                                    MainManager.Instance.unitDataDic[id0].love2);
                             }
                             else
                             {
 
-                                d1 += MainManager.Instance.UnitStoryDic[id0].GetLoveValues(a.love);
+                                d1 += MainManager.Instance.UnitStoryDic[id0].GetLoveValues(a.love2);
 
                             }
                         }
@@ -384,13 +384,14 @@ namespace PCRCaculator
         //public PositionType positionType = PositionType.frount;
         public int level = 1;
         public int rarity = 1;
-        public int love;//好感度
+        public int love => 114514;//好感度
         public int rank = 1;
         public int[] equipLevel = new int[6] { -1, -1, -1, -1, -1, -1 };//装备等级，-1-未装备，0~5表示强化等级
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic;
         public int uniqueEqLv;//专武等级
         private string name = "";
+        public int love2 => playLoveDic.TryGetValue(unitId, out var val) ? val : 114514;
 
         public void SetDefaultLoveDict()
         {
@@ -400,7 +401,7 @@ namespace PCRCaculator
             List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unitId];
             foreach (var unit in effectUnitList)
             {
-                playLoveDic.Add(unit, MainManager.Instance.unitDataDic.TryGetValue(unit, out var val) ? val.love : 0);
+                playLoveDic.Add(unit, 0);
             }
         }
 
@@ -446,7 +447,7 @@ namespace PCRCaculator
             unitId = id;
             level = lv;
             rarity = ra;
-            love = lov;
+            //love = lov;
             this.rank = rank;
             equipLevel = eqlv;
             skillLevel = sklv;
@@ -472,7 +473,7 @@ namespace PCRCaculator
                 skillLevel[1] = playerLevel;
                 skillLevel[2] = playerLevel;
                 skillLevel[3] = playerLevel;
-                love = GetMaxRarity() == 6 ? 12 : 8;
+                //love = GetMaxRarity() == 6 ? 12 : 8;
                 rarity = GetMaxRarity();
                 rank = playerSetting.GetMaxRank();
                 for (int i = 0; i < 6; i++)
@@ -490,7 +491,8 @@ namespace PCRCaculator
                         equipLevel[i] = -1;
                     }
                 }
-                uniqueEqLv = playerSetting.maxUniqueEqLv;
+
+                uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
             }
             else
             {

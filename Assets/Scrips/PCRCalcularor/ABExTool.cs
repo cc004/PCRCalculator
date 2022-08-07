@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Mono.Data.Sqlite;
+using PCRApi;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -411,6 +412,22 @@ namespace PCRCaculator
             }
             return count;
         }
+
+        private static AssetManager mgr = new AssetManager();
+        static ABExTool()
+        {
+            try
+            {
+                mgr.Initialize("10028300");
+            }
+            catch (Exception e)
+            {
+                mgr = null;
+                Debug.LogError(e);
+            }
+        }
+
+
         public static T GetAssetBundleByName<T>(string fullname, string fit = "") where T : Object
         {
             AssetBundle asset = null;
@@ -420,7 +437,12 @@ namespace PCRCaculator
             }
             else
             {
-
+                var path = Application.streamingAssetsPath + "/AB/" + fullname;
+                if (!File.Exists(path) && mgr != null)
+                {
+                    var bytes = mgr.ResolveFile("a/" + fullname);
+                    if (bytes != null) File.WriteAllBytes(path, bytes);
+                }
                 WWW www = new WWW(GetABPath(fullname));
                 asset = www.assetBundle;
                 AssetBundleDic.Add(fullname, asset);

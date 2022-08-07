@@ -405,7 +405,7 @@ namespace Elements
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + _unitId + "_1/" + (_unitId+30) + "_1_SkeletonData");
             //if (dataAsset == null)
             //{
-            var dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{skinId}_1.unity3d");
+            var dataAsset = SpineCreator.Instance.Createskeletondata(prefabID, SPINE_SCALE, true, $"spine_sdmodechange_{skinId}_1.unity3d", $"{skinId}_1");
             //}
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadNewSkeletonAnimationGameObject(dataAsset);

@@ -16,7 +16,7 @@ namespace PCRCaculator
             Instance = this;
         }
 
-        public SkeletonDataAsset Createskeletondata(int skinID, float scale = 0.5f, bool useAB = false, string p0 = null)
+        public SkeletonDataAsset Createskeletondata(int skinID, float scale = 0.5f, bool useAB = false, string p0 = null, string skinName = null)
         {
             //int skinID = prefabID >= 200000 ? prefabID : prefabID + 30;
             Texture2D texture = new Texture2D(0, 0);
@@ -27,7 +27,7 @@ namespace PCRCaculator
             {
                 //if (useAB)
                 //{
-                    texture = ABExTool.GetAssetBundleByName<Texture2D>(p, "png");
+                    texture = ABExTool.GetAssetBundleByName<Texture2D>(p, (skinName ?? $"{skinID}") + ".png");
                 //}
                 //else
                 //{
@@ -49,7 +49,7 @@ namespace PCRCaculator
                 TextAsset atlas;
                 //if (useAB)
                 //{
-                    atlas = ABExTool.GetAssetBundleByName<TextAsset>(ab_atlas, "txt");
+                    atlas = ABExTool.GetAssetBundleByName<TextAsset>(ab_atlas, (skinName ?? $"{skinID}") + ".atlas.txt");
                 //}
                 //else
                 //    atlas = new TextAsset(File.ReadAllText(path_atlas));

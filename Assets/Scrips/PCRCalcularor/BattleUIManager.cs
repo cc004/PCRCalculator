@@ -328,6 +328,13 @@ namespace PCRCaculator.Battle
             b.SetBuffUI(rularSprites[0], summon,true);
         }
 
+        public void StepButton()
+        {
+            if (!BattleHeaderController.Instance.IsPaused) return;
+            BattleManager.Instance.stepping = true;
+            PauseButton();
+        }
+
         public void ExitButton()
         {
             if ((BattleManager.Instance?.BossUnit?.Hp ?? 0) == 0)
@@ -385,7 +392,7 @@ namespace PCRCaculator.Battle
                     case 1:
                         UBButtonState[charidx] = 2;
                         PlayerUI[charidx].ShowContinousPress(true);
-                        StartCoroutine(UBTrying(charidx));
+                        BattleManager.Instance.AppendCoroutine(UBTrying(charidx), ePauseType.SYSTEM);
                         break;
                     case 2:
                     default:

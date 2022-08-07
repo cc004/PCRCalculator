@@ -1052,7 +1052,6 @@ false
                 battleManager.GamePause(false);
                 //this.battleManager.ResumeAbnormalEffect();
                 IsPaused = false;
-
             }
             /*EHPLBCOOOPK tempData = Singleton<EHPLBCOOOPK>.Instance;
             DialogManager dialogManager = ManagerSingleton<DialogManager>.Instance;

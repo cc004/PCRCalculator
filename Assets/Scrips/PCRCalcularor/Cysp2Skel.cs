@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using Elements;
+using PCRApi;
 using PCRCaculator;
 using Spine;
 using Spine.Unity;
@@ -46,6 +47,7 @@ namespace PCR_cysp2skel
         //static string[] additionAnimations = new string[6] { "DEAR", "NO_WEAPON", "POSING", "RACE", "RUN_JUMP", "SMILE" };
         //int[] enemyIDs = new int[] { 302600, 302601 };
         //int[] summonIDs = new int[] { 403101, 404201, 407701, 408401, 408402, 408403 };
+
         public static SkeletonData GetUnitSkelBytes(int unitId, AtlasAsset atlas)
         {
             var unitType = MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var d) ? d.detailData.motionType : 0;
@@ -60,16 +62,12 @@ namespace PCR_cysp2skel
 
                 if (CHAR_BASE == null)
                 {
-                    MainManager.Instance.WindowConfigMessage(
-                        "合成角色" + unitId + "的动画时发生错误：找不到" + char_base, null);
-                    return null;
+                    throw new Exception("找不到" + char_base);
                 }
 
                 if (BATTLE == null)
                 {
-                    MainManager.Instance.WindowConfigMessage(
-                        "合成角色" + unitId + "的动画时发生错误：找不到" + spine_battle, null);
-                    return null;
+                    throw new Exception("找不到" + spine_battle);
                 }
 
                 var binary = new SkeletonBinary(new AtlasAttachmentLoader(atlas.GetAtlas()));
@@ -82,7 +80,7 @@ namespace PCR_cysp2skel
             catch(Exception e)
             {
                     MainManager.Instance.WindowConfigMessage(
-                        "合成角色" + unitId + "的动画时发生错误:" + e, null);
+                        "合成角色" + unitId + "的动画时发生错误:" + e.Message, null);
                     return null;
             }
         }

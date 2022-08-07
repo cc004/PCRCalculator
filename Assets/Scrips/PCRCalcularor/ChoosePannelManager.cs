@@ -96,6 +96,7 @@ namespace PCRCaculator
                         selectedCharId.Add(player.playrCharacters[i].unitId);
                     }
                 }
+                this.OpenProperty();
             }
             else if (PlayerPrefs.HasKey("selectedCharId"))
             {
@@ -147,6 +148,13 @@ namespace PCRCaculator
                 }
             }
         }
+
+        public void OpenProperty()
+        {
+            GuildManager.Instance.ActivateCharacterDetailPage(Vector3.right * 320);
+            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
+        }
+
         public void CancalButton()
         {
             baseBack.SetActive(false);
@@ -159,6 +167,7 @@ namespace PCRCaculator
         }
         public void NextButton(AddedPlayerData playerData0 = null)
         {
+            this.OpenProperty();
             if (selectedCharId.Count == 0)
             {
                 MainManager.Instance.WindowMessage("请选择至少一个角色！");
@@ -251,6 +260,13 @@ namespace PCRCaculator
             {
                 GuildManager.Instance.FinishEditCharacterdetail();
             }
+
+            foreach (var c in playerData.playrCharacters)
+            {
+                if (MainManager.Instance.unitDataDic.ContainsKey(c.unitId))
+                    MainManager.Instance.unitDataDic[c.unitId] = c;
+                MainManager.Instance.SaveUnitData();
+            }
         }
         public void OnToggleSwitched(bool k, int unitid)
         {
@@ -308,7 +324,7 @@ namespace PCRCaculator
             UnitData data = new UnitData(selectedCharId[selectedCharacterId_setting]);
             data.level = (int)detailSliders_setting[0].value;
             data.rarity = (int)detailSliders_setting[1].value;
-            data.love = (int)detailSliders_setting[2].value;
+            //data.love = (int)detailSliders_setting[2].value;
             for (int i = 3; i < 7; i++)
             {
                 data.skillLevel[i - 3] = (int)detailSliders_setting[i].value;
@@ -342,6 +358,7 @@ namespace PCRCaculator
                 detailSliders_setting[6].maxValue = 0;
                 detailSliders_setting[14].maxValue = 0;
             }
+            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
         }
         public void AddButton_setting(int buttonid)
         {
@@ -518,9 +535,9 @@ namespace PCRCaculator
             detailTexts_setting[1].text = data.rarity + "";
             detailSliders_setting[1].maxValue = data.GetMaxRarity();
             detailSliders_setting[1].value = data.rarity;
-            detailTexts_setting[2].text = data.love + "";
-            detailSliders_setting[2].maxValue = data.GetMaxRarity() == 6 ? 12 : 8;
-            detailSliders_setting[2].value = data.love;
+            //detailTexts_setting[2].text = data.love + "";
+            //detailSliders_setting[2].maxValue = data.GetMaxRarity() == 6 ? 12 : 8;
+            //detailSliders_setting[2].value = data.love;
             for (int i = 3; i < 7; i++)
             {
                 detailTexts_setting[i].text = data.skillLevel[i - 3] + "";

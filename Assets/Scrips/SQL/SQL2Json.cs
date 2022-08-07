@@ -640,13 +640,13 @@ namespace PCRCaculator
                     unitAtkPatterndic[unitid][0][1],
                     unitAtkPatterndic[unitid][1]);
                 unitSkillData.skill_3 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_4 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_5 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_6 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_7 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_8 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_9 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
-                unitSkillData.skill_10 = reader.GetInt32(reader.GetOrdinal("main_skill_3"));
+                unitSkillData.skill_4 = reader.GetInt32(reader.GetOrdinal("main_skill_4"));
+                unitSkillData.skill_5 = reader.GetInt32(reader.GetOrdinal("main_skill_5"));
+                unitSkillData.skill_6 = reader.GetInt32(reader.GetOrdinal("main_skill_6"));
+                unitSkillData.skill_7 = reader.GetInt32(reader.GetOrdinal("main_skill_7"));
+                unitSkillData.skill_8 = reader.GetInt32(reader.GetOrdinal("main_skill_8"));
+                unitSkillData.skill_9 = reader.GetInt32(reader.GetOrdinal("main_skill_9"));
+                unitSkillData.skill_10 = reader.GetInt32(reader.GetOrdinal("main_skill_10"));
                 unitSkillData.EXskill_2 = reader.GetInt32(reader.GetOrdinal("ex_skill_2"));
                 unitSkillData.EXskill_ev2 = reader.GetInt32(reader.GetOrdinal("ex_skill_evolution_2"));
                 unitSkillData.EXskill_3 = reader.GetInt32(reader.GetOrdinal("ex_skill_3"));
@@ -1097,14 +1097,14 @@ namespace PCRCaculator
                                 skill.action.TryGetValue(sk.skillactions[1], out var ac2) && ac2.type == 73)
                             {
                                 //remove current log barrier
-                                skill_id = 0;
+                                //skill_id = 0;
                             }
                         }
 
                         skillData.MainSkills.Add(skill_id);
                     }
 
-
+                    /*
                     var id = skillData.MainSkills.FindIndex(sk => sk == 0);
                     if (skill.action.FirstOrDefault(pair => pair.Value.type == 73 && pair.Key / 1000 == unit_id).Key !=
                         0)
@@ -1113,7 +1113,7 @@ namespace PCRCaculator
                     }
                     if (id >= 0)
                         skillData.MainSkills[id] =
-                            skill.action.FirstOrDefault(pair => pair.Value.type == 73 && pair.Key / 1000 == unit_id).Key / 100;
+                            skill.action.FirstOrDefault(pair => pair.Value.type == 73 && pair.Key / 1000 == unit_id).Key / 100;*/
                     if (patternDic.ContainsKey(unit_id))
                         skillData.enemyAttackPatterns = patternDic[unit_id];
                     else

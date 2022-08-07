@@ -465,6 +465,7 @@ namespace Elements.Battle
                 spacePressed = true;
             }
             else spacePressed = false;
+
             isUpdateFrameExecuted = false;
             //int index1 = 0;
             /*for (int length = this.UnitUiCtrl.UnitCtrls.Length; index1 < length; ++index1)
@@ -548,15 +549,13 @@ namespace Elements.Battle
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());
             }
+
         }
+
+        public bool stepping = false;
 
         private void updateFrame()
         {
-            if (GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
-            {
-                GuildManager.Instance.stoptime = -1;
-                MyGameCtrl.Instance.PauseButton();
-            }
             bool _canUpdateTime = !isPauseTimeLimit && BlackOutUnitList.Count == 0;
             //BattleHeaderController instance = BattleHeaderController..Instance;
 
@@ -624,6 +623,17 @@ namespace Elements.Battle
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
             battleUnionBurstController.TryExecUnionBurst();
             isUpdateFrameExecuted = true;
+
+            if (GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
+            {
+                GuildManager.Instance.stoptime = -1;
+                MyGameCtrl.Instance.PauseButton();
+            }
+            else if (stepping)
+            {
+                MyGameCtrl.Instance.PauseButton();
+                stepping = false;
+            }
         }
 
         private bool callStartCutIn() => GameState == eBattleGameState.PLAY && (updateMainUnit() || updateEnemyUnit());

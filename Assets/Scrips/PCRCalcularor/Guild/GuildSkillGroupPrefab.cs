@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Elements;
 using SpringGUI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -66,6 +67,16 @@ namespace PCRCaculator.Guild
         }
         public void AddAbnormalStateButtons(UnitAbnormalStateChangeData changeData,Action action = null)
         {
+            if (!MainManager.Instance.PlayerSetting.ShowBuffDic[
+                    changeData.CurrentAbnormalState == UnitCtrl.eAbnormalState.NONE
+                        ? UnitCtrl.BUFF_DEBUFF_ICON_DIC.TryGetValue(changeData.BUFF_Type, out var val)
+                            ? changeData.isBuff
+                                ? val.BuffIcon
+                                : val.DebuffIcon
+                            : eStateIconType.NONE
+                        : UnitCtrl.ABNORMAL_CONST_DATA.TryGetValue(changeData.CurrentAbnormalState, out var val2)
+                            ? val2.IconType
+                            : eStateIconType.NONE]) return;
             int i = 0;
             bool flag1 = false;
             bool flag2 = changeData.endFrameCount == 5500;
@@ -208,7 +219,7 @@ namespace PCRCaculator.Guild
         {
             if (data.isBuff)
             {
-                return buffColors[data.BUFF_Type % buffColors.Count];
+                return buffColors[(int)data.BUFF_Type % buffColors.Count];
             }
 
             return abnormalStateColors[(int)data.CurrentAbnormalState % abnormalStateColors.Count];

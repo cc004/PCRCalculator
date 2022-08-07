@@ -26,6 +26,7 @@ namespace PCRCaculator.Guild
         public List<Text> timeLineTexts;
 
         public GameObject characterDetailPage;
+        public GameObject characterDetailPageChild;
         public CharacterPageButton characterDetailButton;
         public Action execTimeButtonAction;
         public List<Text> characterDetailTexts;
@@ -147,13 +148,15 @@ namespace PCRCaculator.Guild
         {
             ChoosePannelManager.Instance.CallChooseBack(3);
         }
-        public void ShowCharacterDetailPage(int idx)
+
+        public void ActivateCharacterDetailPage(Vector3 pos)
         {
-            if(idx>= SettingData.GetCurrentPlayerData().playrCharacters.Count)
-            {
-                return;
-            }
             characterDetailPage.SetActive(true);
+            characterDetailPageChild.transform.localPosition = pos;
+        }
+
+        public void RefreshCharacterDetailPage(int idx)
+        {
             UnitData unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
             characterDetailButton.SetButton(unitData);
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
@@ -165,6 +168,17 @@ namespace PCRCaculator.Guild
                 characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100 - baseData.dataint[i] / 100}</color>");
             }
             execTimeButtonAction = () => { GuildExecTimeSettingButton(unitData); };
+        }
+
+        public void ShowCharacterDetailPage(int idx)
+        {
+            if(idx>= SettingData.GetCurrentPlayerData().playrCharacters.Count)
+            {
+                return;
+            }
+
+            ActivateCharacterDetailPage(Vector3.zero);
+            RefreshCharacterDetailPage(idx);
         }
         public void EditCharacterdetail()
         {
@@ -795,7 +809,7 @@ namespace PCRCaculator.Guild
         }
         public void PlayerDatasNextButton()
         {
-            if (currentPage >= 20)
+            if (currentPage >= int.MaxValue)
             {
                 MainManager.Instance.WindowConfigMessage("已达上限！", null);
             }

@@ -209,10 +209,11 @@ namespace PCRCaculator.Guild
             UnitAbnormalStateChangeData changeData;
             if (abnormalData.isBuff)
             {
-                if (abnormalData.BUFF_Type == 14)
+                /*
+                if (abnormalData.BUFF_Type)
                 {
                     return;
-                }
+                }*/
 
                 changeData = allUnitAbnormalStateDic[unitid].Find(a =>
                 {
@@ -754,7 +755,7 @@ namespace PCRCaculator.Guild
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
                 const string totaldie = "总乱轴（上限）";
-                const string totaldie2 = "总乱轴（下限，不计入穿盾、break）";
+                //const string totaldie2 = "总乱轴（下限，不计入穿盾、break）";
 
                 const string mb1 = "1+满补";
                 const string mb2 = "2+满补";
@@ -773,7 +774,7 @@ namespace PCRCaculator.Guild
                 dname.Add(dmginfo, 0);
                 dname.Add(dmginfo2, 0);
                 dname.Add(totaldie, 0);
-                dname.Add(totaldie2, 0);
+                //dname.Add(totaldie2, 0);
                 foreach (var skill in dmglist.Select(n => (n.unit, n.description)).Distinct())
                 {
                     if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());
@@ -819,7 +820,7 @@ namespace PCRCaculator.Guild
                     if (sname.Count > 0)
                     {
                         ++dname[totaldie];
-                        if (flag) ++dname[totaldie2];
+                        //if (flag) ++dname[totaldie2];
                         if (action(hash)) ++dname[dmginfo];
                     }
                     else if (action(hash))
@@ -1141,7 +1142,7 @@ namespace PCRCaculator.Guild
         //public Skill Skill;
         //public UnitCtrl Source;
         public bool isBuff;
-        public int BUFF_Type;
+        public UnitCtrl.BuffParamKind BUFF_Type;
         public string GetDescription()
         {
             if (isBuff)

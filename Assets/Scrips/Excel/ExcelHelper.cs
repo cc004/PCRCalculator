@@ -797,7 +797,7 @@ namespace ExcelHelper
                     worksheet1.Cells[lineNum, 2].Value = unitData.GetUnitName();
                     worksheet1.Cells[lineNum, 3].Value = unitData.level;
                     worksheet1.Cells[lineNum, 4].Value = unitData.rarity;
-                    worksheet1.Cells[lineNum, 5].Value = unitData.love;
+                    worksheet1.Cells[lineNum, 5].Value = unitData.playLoveDic[unitData.unitId];//unitData.love;
                     worksheet1.Cells[lineNum, 6].Value = unitData.rank;
                     for(int i = 0; i < unitData.equipLevel.Length; i++)
                     {

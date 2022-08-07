@@ -4462,7 +4462,7 @@ this.updateCurColor();
             //stateChangeData.SkillName = data.Skill.SkillName;
             //stateChangeData.SourceName = data.Source.UnitName;
             stateChangeData.isBuff = true;
-            stateChangeData.BUFF_Type = (int)_kind;
+            stateChangeData.BUFF_Type = _kind;
             MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
             MyOnChangeAbnormalState?.Invoke(this, IDAFJHFJKOL, _enable,buffTime,des);
             ///finish add
