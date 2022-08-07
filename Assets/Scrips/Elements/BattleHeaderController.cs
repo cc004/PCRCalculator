@@ -1040,6 +1040,8 @@ false
         }
         public void OnClickPauseButton()
         {
+            //XX: experimental
+            BattleManager.deltaTimeAccumulated = 0;
             if (BattleManager.GetIsPlayCutin())// || this.IsPaused)
                 return;
             if (!IsPaused)

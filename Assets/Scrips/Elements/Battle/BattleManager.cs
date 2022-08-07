@@ -65,7 +65,7 @@ namespace Elements.Battle
         private BlurOptimized playCameraBlurOptimized;
         private ViewBattle viewBattle;*/
         //private BattleEffectManager battleEffectManager;
-        private float deltaTimeAccumulated;
+        public float deltaTimeAccumulated;
         private float cutinSkipTimeAccumulated;
         private bool isToPauseOnFrameEnd;
         private bool isToResumeOnFrameEnd;
