@@ -450,7 +450,7 @@ namespace Elements
             //float time = 1.12f;
             /*while ((double)time > 0.0)
             {
-                time -= partsData.battleManager.DeltaTime_60fps;
+                time -= partsData.battleManager.DeltaTime_60fps;.0
                 yield return (object)null;
             }*/
             RecoverTime = 1.12f;

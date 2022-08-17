@@ -641,6 +641,8 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
+
+            var currentFrame = BattleHeaderController.CurrentFrameCount;
             return new OnceResultData
             {
                 id = id,
@@ -648,6 +650,7 @@ namespace PCRCaculator.Guild
                 criticalEX = totalDamageCriEX,
                 currentDamage = totalDamage,
                 randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,
+                backTime = currentFrame < 5400 ? (Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20) : 0,
                 warnings = errorList
             };
         }

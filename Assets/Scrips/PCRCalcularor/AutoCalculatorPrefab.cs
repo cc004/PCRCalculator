@@ -11,7 +11,8 @@ namespace PCRCaculator
         public void Init(OnceResultData data)
         {
             resultData = data;
-            text.text = "第" + data.id + "次" + (data.warnings.Count>0? "   <color=#FF0000>" + data.currentDamage+"</color>":"   "+data.currentDamage);
+            text.text = "第" + data.id + "次" + (data.warnings.Count>0? "   <color=#FF0000>" + data.currentDamage+"</color>":"   "+data.currentDamage)
+                 + (resultData.backTime == 0 ? string.Empty : $"返{resultData.backTime}s");
         }
         public void DetailButton()
         {            

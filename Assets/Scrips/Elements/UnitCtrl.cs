@@ -5989,6 +5989,30 @@ this.updateCurColor();
             //    this.Hp = (long)1L;
             Hp = Hp.Min(MaxHp);
             _hp = Hp.ZeroCapForHp();
+            var hp2 = Hp;
+
+            if (!IsBoss)
+            {
+                if (Hp > 0)
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => hp2.Emulate(hash) <= 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
+                    });
+                else
+                {
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = UnitNameEx,
+                        predict = hash => hp2.Emulate(hash) > 0f,
+                        description = $"({BattleHeaderController.CurrentFrameCount})没被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
+                    });
+                }
+            }
+            else
+                GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
+
             if ((long)Hp == 0L && (IsTough || ExecKnightGuard()) && (long)Hp == 0L)
                 Hp = 1L;
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
@@ -6058,28 +6082,6 @@ this.updateCurColor();
             this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
             string des;
             var prob = Hp.Probability(x => x <= 0f);
-            var hp2 = Hp;
-            if (!IsBoss)
-            {
-                if (Hp > 0)
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
-                    {
-                        unit = UnitNameEx,
-                        predict = hash => hp2.Emulate(hash) <= 0f,
-                        description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
-                    });
-                else
-                {
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
-                    {
-                        unit = UnitNameEx,
-                        predict = hash => hp2.Emulate(hash) > 0f,
-                        description = $"({BattleHeaderController.CurrentFrameCount})没被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
-                    });
-                }
-            }
-            else
-                GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
 
             des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
                 + $"-{prob:P0}";

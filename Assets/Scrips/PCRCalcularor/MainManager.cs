@@ -750,12 +750,14 @@ namespace PCRCaculator
         public long currentDamage;
         public long criticalEX;
         public long exceptDamage;
+        public int backTime;
 
         public List<string> warnings = new List<string>();
 
         public string GetDetail()
         {
             string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害（触盾偏高）：" + exceptDamage + "\n随机种子：" + randomSeed;
+            if (backTime > 0) result += $"返\n{backTime}s";
             if (warnings.Count > 0)
             {
                 for(int i=0;i<3;i++)
