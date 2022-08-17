@@ -9320,6 +9320,7 @@ this.updateCurColor();
 
         public bool JudgeSkillReadyAndIsMyTurn() => isMyTurn() && IsSkillReady;
 
+        public bool pressing = false;
         public bool IsAutoOrUbExecTrying()
         {
             //if (this.IsUbExecTrying && (!this.battleManager.UnitUiCtrl.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())
@@ -9327,13 +9328,13 @@ this.updateCurColor();
                 battleManager.SetOnlyAutoClearFlag(false);
             if (IsUbExecTrying)
                 return true;
+            if (pressing) return true;
             if (battleManager.ubmanager.IsUbExec(battleManager.UnitList.IndexOf(this)))
                 return true;
             //return this.battleManager.UnitUiCtrl.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;
 
             var index = MyGameCtrl.Instance.playerUnitCtrl.IndexOf(this);
             if (index >= 0 && Input.GetKey(KeyCode.Alpha5 - index)) return true;
-
 
             return MyGameCtrl.Instance.IsAutoMode && CurrentState == ActionState.IDLE;
         }

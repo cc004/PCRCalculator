@@ -382,6 +382,7 @@ namespace PCRCaculator.Battle
                     MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
                     return;
                 }
+                MyGameCtrl.Instance.playerUnitCtrl[charidx].pressing = false;
                 switch (UBButtonState[charidx])
                 {
                     case 0:
@@ -391,10 +392,9 @@ namespace PCRCaculator.Battle
                         break;
                     case 1:
                         UBButtonState[charidx] = 2;
+                        MyGameCtrl.Instance.playerUnitCtrl[charidx].pressing = true;
                         PlayerUI[charidx].ShowContinousPress(true);
-                        BattleManager.Instance.AppendCoroutine(UBTrying(charidx), ePauseType.SYSTEM);
                         break;
-                    case 2:
                     default:
                         PlayerUI[charidx].ShowContinousPress(false);
                         UBButtonState[charidx] = 0;
@@ -409,14 +409,7 @@ namespace PCRCaculator.Battle
             if (UBButtonState[idx] == 1)
                 UBButtonState[idx] = 0;
         }
-        private IEnumerator UBTrying(int idx)
-        {
-            while (UBButtonState[idx] == 2)
-            {
-                MyGameCtrl.Instance.TryingExecUB(idx);
-                yield return null;
-            }
-        }
+
         private void HideContinoueText()
         {
             foreach(var a in PlayerUI)
