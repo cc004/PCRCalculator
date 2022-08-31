@@ -44,19 +44,21 @@ namespace PCRCaculator
         private Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();
         private Dictionary<int, GuildEnemyData> guildEnemyDataList = new Dictionary<int, GuildEnemyData>();
 
-        private SQLiteHelper sql => CnConnection;
+        private static SQLiteHelper staticConnection;
+
+        private SQLiteHelper sql => staticConnection;
         public int loadCharacterMax = 500000;//最多加载到的角色序号
         private static bool editor;
         const string conn = "redive_jp.db";
         const string conn_cn = "redive_cn.db";
-
+        private static readonly SQL2Json Instance = new SQL2Json();
 
 #if UNITY_EDITOR
         [MenuItem("PCRTools/db2json")]
 #endif 
         public static (Dictionary<int, SkillAction>, Dictionary<int, SkillData>) Db2json()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load();
             a.SaveDics2Json();
             //a.SaveUnitAttackPatternDic2Json();
@@ -85,7 +87,7 @@ namespace PCRCaculator
             string path = Application.dataPath + "/MyText3.txt";
             FileStream fs = new FileStream(path, FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load();
 
             for (int i = 0; i < 10; i++)
@@ -123,7 +125,7 @@ namespace PCRCaculator
 
         public static void CreateCraftjson()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_2();
             a.CalcDics();
             a.SaveDics2Json_2();
@@ -135,7 +137,7 @@ namespace PCRCaculator
 
         public static void CreateEnemyJson()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_3();
             a.SaveDics2Json_3();
         }
@@ -146,7 +148,7 @@ namespace PCRCaculator
 
         public static void CreateEnemyJson2((Dictionary<int, SkillAction>, Dictionary<int, SkillData>) skill)
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_3(true, skill);
             a.SaveDics2Json_3();
         }
@@ -157,7 +159,7 @@ namespace PCRCaculator
 
         public static void CreateAttackPatternJson()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_4();
             a.SaveUnitAttackPatternDic2Json();
         }
@@ -168,7 +170,7 @@ namespace PCRCaculator
 
         public static void CreateAttackPatternJson2()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_4(true);
             a.SaveUnitAttackPatternDic2Json();
         }
@@ -179,7 +181,7 @@ namespace PCRCaculator
 
         public static void CreateUniqueEquipmentJson()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_5();
             a.SaveUniqueEquipmentDataDic2Json();
         }
@@ -191,7 +193,7 @@ namespace PCRCaculator
 
         public static void CreateResistDataDic()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_6();
             a.SaveResistDataDic();
 
@@ -203,7 +205,7 @@ namespace PCRCaculator
 
         public static void CreateClanBattleData()
         {
-            SQL2Json a = new SQL2Json();
+            SQL2Json a = Instance;
             a.Load_7();
             a.SaveClanBattleData();
 
@@ -220,8 +222,18 @@ namespace PCRCaculator
         }
         public static void CreateAllSQLDataInPlayerMode_cn()
         {
-            _cnconn = null;
+            staticConnection = JpConnection;
+
             var skill = Db2json(); 
+
+            CreateEnemyJson2(skill);
+            CreateAttackPatternJson2();
+            CreateUniqueEquipmentJson();
+            CreateClanBattleData();
+
+            staticConnection = CnConnection;
+
+            skill = Db2json();
 
             CreateEnemyJson2(skill);
             CreateAttackPatternJson2();
@@ -279,8 +291,8 @@ namespace PCRCaculator
             sql.CloseConnection();
 
         }
-        private static SQLiteHelper _cnconn;
-        //private static SQLiteHelper JpConnection => _jpconn = _jpconn ?? new SQLiteHelper(conn);
+        private static SQLiteHelper _jpconn, _cnconn;
+        private static SQLiteHelper JpConnection => _jpconn = _jpconn ?? new SQLiteHelper(conn);
         private static SQLiteHelper CnConnection => _cnconn = _cnconn ?? new SQLiteHelper(conn_cn, true);
         private void LoadEquipmentData()
         {
@@ -318,7 +330,7 @@ namespace PCRCaculator
                         reader.GetInt32(reader.GetOrdinal("craft_flg")),
 
                         GetBaseDataFromReader(reader), dic[id]);
-                    equipmentDic.Add(id, equipmentData);
+                    equipmentDic[id] = equipmentData;
                 }
             }
         }
@@ -609,9 +621,8 @@ namespace PCRCaculator
                 {
                     unitAtkPatterndic.Add(unitid, dlist);
                 }
-                if (!unitAttackPatternDic.ContainsKey(patternid))
 
-                    unitAttackPatternDic.Add(patternid, new UnitAttackPattern(patternid, unitid, s2e[0], s2e[1], loops));
+                unitAttackPatternDic[patternid] = new UnitAttackPattern(patternid, unitid, s2e[0], s2e[1], loops);
 
             }
 
@@ -677,7 +688,7 @@ namespace PCRCaculator
                     if (!unitRarityRatedic.ContainsKey(id)) { unitRarityRatedic.Add(id, new List<BaseData>()); }
                     UnitRarityData unitRarityData = new UnitRarityData(id, unitRaritydic[id],
                         unitRarityRatedic[id], unitRankData, unitDetaildic[id], unitSkilldic[id]);
-                    unitRarityDic.Add(id, unitRarityData);
+                    unitRarityDic[id] = unitRarityData;
 
                 }
             }
@@ -712,8 +723,7 @@ namespace PCRCaculator
                 List<int[]> dlist = new List<int[]>();
                 dlist.Add(s2e);
                 dlist.Add(loops);
-                if (!unitAttackPatternDic.ContainsKey(patternid))
-                    unitAttackPatternDic.Add(patternid, new UnitAttackPattern(patternid, unitid, s2e[0], s2e[1], loops));
+                unitAttackPatternDic[patternid] = new UnitAttackPattern(patternid, unitid, s2e[0], s2e[1], loops);
 
             }
 
@@ -726,7 +736,7 @@ namespace PCRCaculator
             {
                 int id = reader.GetInt32(reader.GetOrdinal("unit_id"));
                 string name = reader.GetString(reader.GetOrdinal("unit_name"));
-                unitName_cn.Add(id, name);
+                unitName_cn[id] = name;
             }
 
             reader = sql.ReadFullTable("skill_data");
@@ -737,7 +747,7 @@ namespace PCRCaculator
                 string name = reader.GetString(reader.GetOrdinal("name"));
                 string describe = reader.GetString(reader.GetOrdinal("description"));
                 string[] data = new string[2] { name, describe };
-                skillNameAndDescribe_cn.Add(id, data);
+                skillNameAndDescribe_cn[id] = data;
             }
 
             reader = sql.ReadFullTable("skill_action");
@@ -746,7 +756,7 @@ namespace PCRCaculator
             {
                 int id = reader.GetInt32(reader.GetOrdinal("action_id"));
                 string describe = reader.GetString(reader.GetOrdinal("description"));
-                skillActionDescribe_cn.Add(id, describe);
+                skillActionDescribe_cn[id] = describe;
             }
 
 
@@ -910,7 +920,7 @@ namespace PCRCaculator
                     reader.GetInt32(reader.GetOrdinal("reward_image_4")),
                     reader.GetInt32(reader.GetOrdinal("reward_image_5"))
                     );
-                questDataDic.Add(id, questData);
+                questDataDic[id] = questData;
             }
 
         }
@@ -935,7 +945,7 @@ namespace PCRCaculator
                     reader.GetInt32(reader.GetOrdinal("odds")),
                     dropDatas
                     );
-                waveGroupDataDic.Add(wave_id, groupData);
+                waveGroupDataDic[wave_id] = groupData;
             }
 
         }
@@ -963,7 +973,7 @@ namespace PCRCaculator
                     reader.GetInt32(reader.GetOrdinal("drop_count")),
                     dropDatas
                     );
-                enemyRewardDataDic.Add(id, rewardData);
+                enemyRewardDataDic[id] = rewardData;
             }
 
 
@@ -995,7 +1005,7 @@ namespace PCRCaculator
                     reader.GetInt32(reader.GetOrdinal("crafted_cost")),
                     a, b
                     );
-                equipmentCraftDic.Add(id,equipmentCraft);
+                equipmentCraftDic[id] = equipmentCraft;
             }
         }
         private void LoadEXPCost()
@@ -1166,7 +1176,7 @@ namespace PCRCaculator
                         enemyData.skillData = skillDic[enemyData.unit_id];
                     else
                         Debug.Log("角色" + enemyData.unit_id + "的技能数据丢失！");
-                    enemyDataDic.Add(enemy_id, enemyData);
+                    enemyDataDic[enemy_id] = enemyData;
                 }
             }
 
@@ -1213,7 +1223,7 @@ namespace PCRCaculator
                         enemyData.skillData = skillDic[enemyData.unit_id];
                     else
                         Debug.Log("角色" + enemyData.unit_id + "的技能数据丢失！");
-                    enemyDataDic.Add(enemy_id, enemyData);
+                    enemyDataDic[enemy_id] = enemyData;
                 }
             }
 
@@ -1229,7 +1239,7 @@ namespace PCRCaculator
                     int id_4 = reader.GetInt32(reader.GetOrdinal("child_enemy_parameter_4"));
                     int id_5 = reader.GetInt32(reader.GetOrdinal("child_enemy_parameter_5"));
                     var data = new MasterEnemyMParts.EnemyMParts(enemy_id, id_1, id_2, id_3, id_4, id_5);
-                    enemyMPartsDic.Add(enemy_id, data);
+                    enemyMPartsDic[enemy_id] = data;
                 }
             }
         }
@@ -1242,7 +1252,7 @@ namespace PCRCaculator
                 unique.equipment_id = reader.GetInt32(reader.GetOrdinal("equipment_id"));
                 unique.baseValue = GetBaseDataFromReader(reader);
                 int unitid = (unique.equipment_id-130001)*10+100001;
-                uniqueEquipmentDataDic.Add(unitid, unique);
+                uniqueEquipmentDataDic[unitid] = unique;
             }
             reader = sql.ReadFullTable("unique_equipment_enhance_rate");
             while (reader.Read())
@@ -1265,7 +1275,8 @@ namespace PCRCaculator
                 {
                     ailments[i - 1] = reader.GetInt32(reader.GetOrdinal("ailment_" + i)); ;
                 }
-                resistDataDic.Add(id, ailments);
+
+                resistDataDic[id] = ailments;
             }
         }
         private void LoadClanBattleData()
@@ -1295,10 +1306,12 @@ namespace PCRCaculator
                     reader.GetInt32(reader.GetOrdinal("wave_group_id_5"))
                 }));
             }
-            guildEnemyDataList = lst.GroupBy(d => d.group).ToDictionary(g => g.Key, g => new GuildEnemyData
+            var guildEnemyDataList0 = lst.GroupBy(d => d.group).ToDictionary(g => g.Key, g => new GuildEnemyData
             {
                 enemyIds = g.OrderBy(d => d.id).Select(d => d.Item3.Select(wave => waveGroupDic[wave]).ToArray()).ToArray()
             });
+            foreach (var pair in guildEnemyDataList0)
+                guildEnemyDataList[pair.Key] = pair.Value;
         }
         private void SaveDics2Json_3()
         {
@@ -1468,7 +1481,8 @@ namespace PCRCaculator
                             equipment.getWays_h.Add(new EquipmentGet.GetWay(questData.quest_id, questData.area_id, odd));
                         }
                     }
-                    questRewardDic.Add(questRewardData.quest_id, questRewardData);
+
+                    questRewardDic[questRewardData.quest_id] = questRewardData;
                 }
             }
 

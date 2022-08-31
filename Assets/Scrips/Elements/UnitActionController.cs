@@ -281,8 +281,16 @@ namespace Elements
                         {
                             SkillData data = MainManager.Instance.SkillDataDic[key];
                             MasterSkillData.SkillData _skillParameter = new MasterSkillData.SkillData(data);
-                            setSkillParameter(_skill, _skillParameter);
-                            _skill.SetLevel(Owner.SkillLevels[key]);
+                            try
+                            {
+                                setSkillParameter(_skill, _skillParameter);
+                                _skill.SetLevel(Owner.SkillLevels[key]);
+                            }
+                            catch
+                            {
+                                MainManager.Instance.WindowMessage($"技能: {_skill.SkillName}含有超前动作，已被重置为普攻");
+                                Owner.SkillLevels[key] = 0;
+                            }
                         }
                         continue;
                 }

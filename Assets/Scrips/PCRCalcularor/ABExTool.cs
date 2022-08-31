@@ -418,7 +418,7 @@ namespace PCRCaculator
         {
             try
             {
-                mgr.Initialize("10028300");
+                mgr.Initialize("10041200");
             }
             catch (Exception e)
             {
@@ -440,6 +440,7 @@ namespace PCRCaculator
                 var path = Application.streamingAssetsPath + "/AB/" + fullname;
                 if (!File.Exists(path) && mgr != null)
                 {
+                    MainManager.Instance.WindowMessage($"正在尝试下载丢失的文件...{path}");
                     var bytes = mgr.ResolveFile("a/" + fullname);
                     if (bytes != null) File.WriteAllBytes(path, bytes);
                 }

@@ -11,6 +11,8 @@ using Mono.Data.Sqlite;
 using Newtonsoft0.Json;
 using UnityEngine.Diagnostics;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using PCRCaculator;
 
 namespace PCRApi
 {
@@ -55,7 +57,7 @@ namespace PCRApi
 
         public static List<Content> FromUrl(string urlroot, string url, string @class)
         {
-            UnityEngine.Debug.LogError($"downloading from {urlroot}{url}");
+            UnityEngine.Debug.Log($"downloading from {urlroot}{url}");
             var lines = client.GetStringAsync($"{urlroot}{url}").Result.Split('\n')
                 .Where(l => !string.IsNullOrEmpty(l)).ToArray();
             var res = new Content[lines.Length];
@@ -161,7 +163,7 @@ namespace PCRApi
                 foreach (var pair in registries)
                     pair.Value.children = pair.Value.children.Select(c => registries[c.url]).ToList();
 
-                UnityEngine.Debug.LogError($"manifest version {ver} loaded from cache");
+                UnityEngine.Debug.Log($"manifest version {ver} loaded from cache");
             }
             catch (Exception e)
             {
@@ -182,12 +184,15 @@ namespace PCRApi
                 CalcHash();
                 ManifestVer = new Random().Next().ToString();
             }
+            
         }
         
         public byte[] ResolveFile(string path)
         {
             if (registries.TryGetValue(path, out var content))
+            {
                 return content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}");
+            }
             return null;
         }
         

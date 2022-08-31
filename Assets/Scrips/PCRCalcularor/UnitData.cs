@@ -1965,6 +1965,7 @@ namespace PCRCaculator
         {
             if (level > 0)
             {
+                if (enhanceValue == null) return baseValue;
                 return baseValue + enhanceValue * (level - 1);
             }
             return new BaseData();
