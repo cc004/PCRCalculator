@@ -349,7 +349,7 @@ namespace ExcelHelper
 
                 // Script Export
 
-                if (File.Exists("patch_asm_export"))
+                if (File.Exists("patch_asm_exportaabbabab"))
                     File.WriteAllText(filePath + ".asm", CreateAsmString());
             }
             
