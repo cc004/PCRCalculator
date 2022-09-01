@@ -67,6 +67,8 @@ namespace PCRCaculator.Guild
         }
         public void AddAbnormalStateButtons(UnitAbnormalStateChangeData changeData,Action action = null)
         {
+            if (MainManager.Instance.PlayerSetting.ShowBuffDic.TryGetValue(eStateIconType.NONE, out var value) && value)
+                return;
             if (MainManager.Instance.PlayerSetting.ShowBuffDic.TryGetValue(
                     changeData.CurrentAbnormalState == UnitCtrl.eAbnormalState.NONE
                         ? UnitCtrl.BUFF_DEBUFF_ICON_DIC.TryGetValue(changeData.BUFF_Type, out var val)

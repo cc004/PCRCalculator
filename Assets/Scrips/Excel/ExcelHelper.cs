@@ -379,7 +379,7 @@ namespace ExcelHelper
                 info.skillLevel[0], info.skillLevel[1], info.skillLevel[2], info.skillLevel[3]
             });
             string unitsLove = JsonConvert.SerializeObject(info.playLoveDic);
-            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|000|{unitsLove}";
+            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|000|{unitsLove}";
         }
 
         private static string ToTime(long time, int limit)

@@ -307,7 +307,7 @@ namespace PCRCaculator
             while (reader.Read())
             {
                 int id = reader.GetInt32(reader.GetOrdinal("equipment_id"));
-                if (!equipmentDic.ContainsKey(id))
+                //if (!equipmentDic.ContainsKey(id))
                 {
                     //if (id >= 113000) { break; }//超过113000为装备碎片，不需要这些数据
                     if (!dic.ContainsKey(id))
@@ -371,8 +371,7 @@ namespace PCRCaculator
             foreach (int id in add_vals.Keys)
             {
                 UnitStoryData unitStory = new UnitStoryData(id, add_vals[id].Count + 1, ef_id[id], add_vals[id]);
-                if (!unitStoryDic.ContainsKey(id))
-                    unitStoryDic.Add(id, unitStory);
+                unitStoryDic[id] = unitStory;
                 if (!unitStoryEffectDic.ContainsKey(id))
                 {
                     unitStoryEffectDic.Add(id, new List<int>());
@@ -678,7 +677,7 @@ namespace PCRCaculator
             }
             foreach (int id in unitRankdic.Keys)
             {
-                if (id <= 500000 && !unitRarityDic.ContainsKey(id))//只加载到指定角色
+                if (id <= 500000)//只加载到指定角色
                 {
                     if (!dic.ContainsKey(id)) { dic.Add(id, new List<BaseData>()); }
                     UnitRankData unitRankData = new UnitRankData(unitRankdic[id], dic[id]);

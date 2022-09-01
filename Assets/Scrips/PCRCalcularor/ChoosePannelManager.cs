@@ -351,14 +351,6 @@ namespace PCRCaculator
             }
             ReflashSettingValues();
 
-            if (data.rank < 2) detailSliders_setting[4].maxValue = 0;
-            if (data.rank < 4) detailSliders_setting[5].maxValue = 0;
-            if (data.rank < 7)
-            {
-                detailSliders_setting[6].maxValue = 0;
-                detailSliders_setting[14].maxValue = 0;
-            }
-            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
         }
         public void AddButton_setting(int buttonid)
         {
@@ -433,6 +425,7 @@ namespace PCRCaculator
                 }
             }
             playerData.playrCharacters[selectedCharacterId_setting].playLoveDic = loveDic;
+            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
         }
 
         private void TurnAllToggles(bool k)
@@ -581,6 +574,15 @@ namespace PCRCaculator
             totalPointText_setting.text = (int)to + "";
             playerData.totalpoint = (int)to;
             isinstating = false;
+
+            if (data.rank < 2) detailSliders_setting[4].maxValue = 0;
+            if (data.rank < 4) detailSliders_setting[5].maxValue = 0;
+            if (data.rank < 7)
+            {
+                detailSliders_setting[6].maxValue = 0;
+                detailSliders_setting[14].maxValue = 0;
+            }
+            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
         }
     }
 }

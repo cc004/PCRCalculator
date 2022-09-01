@@ -388,10 +388,10 @@ namespace PCRCaculator
         public int rank = 1;
         public int[] equipLevel = new int[6] { -1, -1, -1, -1, -1, -1 };//装备等级，-1-未装备，0~5表示强化等级
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
-        public Dictionary<int, int> playLoveDic;
+        public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
         private string name = "";
-        public int love2 => playLoveDic.TryGetValue(unitId, out var val) ? val : 114514;
+        public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
 
         public void SetDefaultLoveDict()
         {
