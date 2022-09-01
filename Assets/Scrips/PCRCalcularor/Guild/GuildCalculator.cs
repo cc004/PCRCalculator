@@ -264,13 +264,15 @@ namespace PCRCaculator.Guild
                 source = source?.UnitId ?? unitid
             };
             allUnitHPDic[unitid].Add(valueData);
-            skillGroupPrefabDic[unitid].ReflashHPChat(allUnitHPDic[unitid]);
+            if (!GuildManager.StaticsettingData.calcSpineAnimation)
+                skillGroupPrefabDic[unitid].ReflashHPChat(allUnitHPDic[unitid]);
         }
         public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
             allUnitTPDic[unitid].Add(new ValueChangeData(frame * deltaXforChat, currentTP, 0, describe));
-            skillGroupPrefabDic[unitid].ReflashTPChat(allUnitTPDic[unitid]);
+            if (!GuildManager.StaticsettingData.calcSpineAnimation)
+                skillGroupPrefabDic[unitid].ReflashTPChat(allUnitTPDic[unitid]);
         }
         public void AppendStartSkill(int unitid, UnitSkillExecData unitSkillExecData)
         {
@@ -406,6 +408,13 @@ namespace PCRCaculator.Guild
             };
             action(MyGameCtrl.Instance.playerUnitCtrl);
             action(MyGameCtrl.Instance.enemyUnitCtrl);
+            
+            foreach (var pair in skillGroupPrefabDic)
+            {
+                pair.Value.ReflashHPChat(allUnitHPDic[pair.Key]);
+                pair.Value.ReflashTPChat(allUnitTPDic[pair.Key]);
+            }
+
             AppendChangeBaseValue(bossId, 1, boss.Def, 5400, "时间耗尽");
             AppendChangeBaseValue(bossId, 2, boss.MagicDef, 5400, "时间耗尽");
             skillScrollRect.horizontalNormalizedPosition = 1;

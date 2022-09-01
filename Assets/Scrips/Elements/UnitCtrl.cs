@@ -1084,7 +1084,7 @@ namespace Elements
 
         public bool IsOnDamageCharge { get; set; }
 
-        public int Index { get; set; }
+        public int Index = -2;
 
         public int IdentifyNum { get; set; }
 
@@ -9361,11 +9361,12 @@ this.updateCurColor();
             if (IsUbExecTrying)
                 return true;
             if (pressing) return true;
-            if (battleManager.ubmanager.IsUbExec(battleManager.UnitList.IndexOf(this)))
+            if (Index == -2) Index = battleManager.UnitList.IndexOf(this);
+            if (battleManager.ubmanager.IsUbExec(Index))
                 return true;
             //return this.battleManager.UnitUiCtrl.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;
             
-            if (Index >= 0 && Input.GetKey(KeyCode.Alpha5 - Index)) return true;
+            if (Index >= 0 && Index <= 4 && Input.GetKey(KeyCode.Alpha5 - Index)) return true;
 
             return MyGameCtrl.Instance.IsAutoMode && CurrentState == ActionState.IDLE;
         }

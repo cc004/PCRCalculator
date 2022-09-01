@@ -154,13 +154,13 @@ namespace PCRCaculator.Guild
         public void ReflashHPChat(List<ValueChangeData> hpList)
         {
             if(hpList!=null)
-            hpValueList = GuildCalculator.CreateLineChatData(hpList);
+                hpValueList = GuildCalculator.CreateLineChatData(hpList);
             ReflashLineChat();
         }
         public void ReflashTPChat(List<ValueChangeData> tpList)
         {
             if(tpList!=null)
-            tpValueList = GuildCalculator.CreateLineChatData(tpList);
+                tpValueList = GuildCalculator.CreateLineChatData(tpList);
             ReflashLineChat();
         }
         private void ReflashLineChat()

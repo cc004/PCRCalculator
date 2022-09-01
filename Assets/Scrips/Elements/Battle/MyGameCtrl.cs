@@ -518,15 +518,15 @@ namespace Elements
         }*/
         public void OnBattleFinished(int result)//1-lose,2-timeover
         {
-            if (tempData.isGuildBattle)
-            {
-                GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
-            }
             if (!mainManager.AutoCalculatorData.isFinish)
             {
                 mainManager.AutoCalculatorData.resultDatas.Add(
                   GuildCalculator.Instance.GetOnceResultData( mainManager.AutoCalculatorData.execedTime + 1));
                 StartCoroutine(BackToTitle());
+            }
+            else if (tempData.isGuildBattle)
+            {
+                GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
             }
         }
         private IEnumerator BackToTitle()
