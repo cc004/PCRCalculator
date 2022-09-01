@@ -625,7 +625,7 @@ namespace PCRCaculator.Battle
         {
             yield return null;
             yield return null;
-            foreach (var unitctrl in myGameCtrl.playerUnitCtrl)
+            foreach (var unitctrl in myGameCtrl.playerUnitCtrl.ToArray())
             {
                 screenshootBt.SetButton(unitctrl);
                 yield return null;

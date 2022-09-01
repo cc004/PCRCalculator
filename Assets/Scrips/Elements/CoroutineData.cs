@@ -14,7 +14,8 @@ namespace Elements
     private List<UnitCtrl> blackOutUnitList;
     private List<UnitCtrl> coroutineDataRemoveKeyList = new List<UnitCtrl>();
 
-    private List<UnitCtrl> keyList { get; set; }
+    private List<UnitCtrl> keyList, keyListOther;
+    private HashSet<UnitCtrl> set = new HashSet<UnitCtrl>();
 
     public void Init(List<UnitCtrl> _blackOutUnitList) => blackOutUnitList = _blackOutUnitList;
 
@@ -37,10 +38,29 @@ namespace Elements
         if (keyList == null)
         {
           keyList = new List<UnitCtrl>(CoroutineDataDictionary.Keys);
+          keyListOther = new List<UnitCtrl>();
         }
         else
         {
-          foreach (UnitCtrl key in CoroutineDataDictionary.Keys)
+            set.Clear();
+            foreach (var key in keyList)
+            {
+                set.Add(key);
+                if (CoroutineDataDictionary.ContainsKey(key))
+                    keyListOther.Add(key);
+            }
+            
+            foreach (UnitCtrl key in CoroutineDataDictionary.Keys)
+            {
+                if (!set.Contains(key))
+                    keyListOther.Add(key);
+            } 
+            keyList.Clear();
+            var t = keyList;
+            keyList = keyListOther;
+            keyListOther = t;
+            /*
+           foreach (UnitCtrl key in CoroutineDataDictionary.Keys)
           {
             if (!keyList.Contains(key))
               keyList.Add(key);
@@ -49,7 +69,7 @@ namespace Elements
           {
             if (!CoroutineDataDictionary.ContainsKey(keyList[index]))
               keyList.RemoveAt(index);
-          }
+          }*/
         }
         for (int index = 0; index < keyList.Count; ++index)
         {

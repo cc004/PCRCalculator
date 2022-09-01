@@ -1731,7 +1731,7 @@ namespace Elements
           Skill skill,
           bool _considerBodyWidth)
         {
-            float x = transform.parent.lossyScale.x;
+            float x = Owner.lossyx;
             actionParameter.TargetList.Clear();
             bool isOther = Owner.IsOther;
             List<UnitCtrl> unitCtrlList1 = !Owner.IsConfusionOrConvert() ? (isOther ? battleManager.UnitList : battleManager.EnemyList) : (!isOther ? battleManager.UnitList : battleManager.EnemyList);

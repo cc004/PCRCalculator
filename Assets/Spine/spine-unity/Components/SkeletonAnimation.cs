@@ -129,29 +129,53 @@ namespace Spine.Unity
 			Update(Time.deltaTime);
 		}
 
-		public void Update(float deltaTime)
+        private bool vistualUpdateQueued;
+        private bool lateUpdateQueued;
+
+		public void VisualUpdate()
+        {
+            if (valid && vistualUpdateQueued)
+			{
+				state.Apply(skeleton);
+                if (_UpdateLocal != null)
+                {
+                    _UpdateLocal(this);
+                }
+                skeleton.UpdateWorldTransform();
+                if (_UpdateWorld != null)
+                {
+                    _UpdateWorld(this);
+                    skeleton.UpdateWorldTransform();
+                }
+                if (_UpdateComplete != null)
+                {
+                    _UpdateComplete(this);
+                }
+
+                vistualUpdateQueued = false;
+            }
+
+            if (valid && lateUpdateQueued)
+            {
+                base.LateUpdate();
+                lateUpdateQueued = false;
+			}
+        }
+
+        public override void LateUpdate()
+        {
+            lateUpdateQueued = true;
+        }
+
+        public void Update(float deltaTime)
 		{
 			if (valid)
 			{
 				deltaTime *= timeScale;
 				skeleton.Update(deltaTime);
 				state.Update(deltaTime);
-				state.Apply(skeleton);
-				if (_UpdateLocal != null)
-				{
-					_UpdateLocal(this);
-				}
-				skeleton.UpdateWorldTransform();
-				if (_UpdateWorld != null)
-				{
-					_UpdateWorld(this);
-					skeleton.UpdateWorldTransform();
-				}
-				if (_UpdateComplete != null)
-				{
-					_UpdateComplete(this);
-				}
-			}
+                vistualUpdateQueued = true;
+            }
 		}
 	}
 }

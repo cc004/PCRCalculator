@@ -241,7 +241,6 @@ namespace Spine.Unity
 				}
 			}
 		}
-
 		public virtual void LateUpdate()
 		{
 			if (!valid)

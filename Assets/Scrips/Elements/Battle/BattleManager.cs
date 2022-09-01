@@ -545,17 +545,20 @@ namespace Elements.Battle
                 else if (!isToPauseOnFrameEnd && isToResumeOnFrameEnd)
                     GamePause(false);
                 if (isUpdateFrameExecuted)
-                    return;
+                    goto eof;
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());
             }
 
+            eof:
+            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.VisualUpdate());
         }
 
         public bool stepping = false;
 
         private void updateFrame()
         {
+            if (battleFinished) return;
             bool _canUpdateTime = !isPauseTimeLimit && BlackOutUnitList.Count == 0;
             //BattleHeaderController instance = BattleHeaderController..Instance;
 
@@ -2006,8 +2009,10 @@ namespace Elements.Battle
 
         //public void RevivalAtFinishBattle() => this.StartCoroutine(this.RecreateDeadUnits((System.Action)(() => this.CallbackRequestFinishBattle()), this.battleResult));
 
+        private bool battleFinished;
         private void finishBattle(eBattleResult JJHEBNEEHPB)
         {
+            battleFinished = true;
             /*if (BattleHeaderController.Instance.IsPaused && this.dialogManager.IsUse(eDialogId.BATTLE_MENU))
                 this.dialogManager.ForceCloseOne(eDialogId.BATTLE_MENU);*/
             MyGameCtrl.Instance.OnBattleFinished((int)JJHEBNEEHPB);
@@ -3363,6 +3368,7 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
+            battleFinished = false;
             GuildCalculator.Instance.dmglist.Clear();
             GuildCalculator.Instance.bossValues.Clear();
             BattleManager battleManager = this;

@@ -1503,6 +1503,9 @@ this.updateCurColor();
             //this.OnChangeStateNum += (System.Action<UnitCtrl, eStateIconType, int>)((_unit, _iconType, _num) => this.lifeGauge.SetIconNum(_iconType, _num));
         }
 
+        public FixedTransform transformCache;
+        public Transform parentCache;
+        public float lossyx;
         public void Initialize(
           UnitParameter _data,
           PCRCaculator.UnitData unitData_my,
@@ -1512,7 +1515,10 @@ this.updateCurColor();
           BaseData additional = null,
           BaseData exOverride = null)
         {
-            //this.soundManager = ManagerSingleton<SoundManager>.Instance;
+            transformCache = transform;
+            parentCache = transformCache.TargetTransform.parent;
+            lossyx = transformCache.parent.lossyScale.x;
+                //this.soundManager = ManagerSingleton<SoundManager>.Instance;
             /*if (UnitCtrl.staticSingletonTree == null)
             {
                 UnitCtrl.staticSingletonTree = this.CreateSingletonTree<UnitCtrl>();
@@ -1523,7 +1529,7 @@ this.updateCurColor();
                 UnitCtrl.staticBattleTimeScale = (BattleSpeedInterface)this.singletonTree.Get<BattleSpeedManager>();
                 UnitCtrl.FunctionalComparer<BasePartsData>.CreateInstance();
             }*/
-            
+
                 staticBattleManager = BattleManager.Instance;
                 staticBattleLog = battleManager;
                 staticBattleTimeScale = battleManager.battleTimeScale;
@@ -2315,12 +2321,15 @@ this.updateCurColor();
             }
         }
 
+        public Vector3 positionCached => parentCache.TransformPoint(transformCache.localPosition);
+
         private bool judgeFrontAreaTarget(UnitCtrl _target, float _distance)
         {
             if (_target.IsPartsBoss)
                 return judgeFrontAreaTargetForBossParts(_target, _distance);
-            float x = transform.parent.lossyScale.x;
-            float _a = (float)(_target.transform.position.x / (double)x - transform.position.x / (double)x);
+            float x = lossyx;
+            float _a = (float)(_target.positionCached.x / (double)x -
+                               positionCached.x / (double)x);
             float num = _target.BodyWidth + BodyWidth;
             float _b1 = (float)((IsLeftDir ? -(double)_distance : 0.0) - num * 0.5);
             float _b2 = (float)((IsLeftDir ? 0.0 : _distance) + num * 0.5);
@@ -2372,6 +2381,30 @@ this.updateCurColor();
                         break;
                 }
             }
+
+            TargetEnemyList.Clear();
+            targetPlayerList.Clear();
+
+            List<UnitCtrl> list1, list2;
+
+            if (IsOther)
+            {
+                list1 = TargetEnemyList;
+                list2 = targetPlayerList;
+            }
+            else
+            {
+                list1 = targetPlayerList;
+                list2 = TargetEnemyList;
+            }
+
+            foreach (var ctrl in battleManager.UnitList)
+                if (judgeFrontAreaTarget(ctrl, _distance))
+                    list1.Add(ctrl);
+            foreach (var ctrl in battleManager.EnemyList)
+                if (judgeFrontAreaTarget(ctrl, _distance))
+                    list2.Add(ctrl);
+            /*
             for (int index = 0; index < unitCtrlList1.Count; ++index)
             {
                 UnitCtrl _target = unitCtrlList1[index];
@@ -2409,7 +2442,7 @@ this.updateCurColor();
                 UnitCtrl targetPlayer = targetPlayerList[index];
                 if (!unitCtrlList2.Contains(targetPlayer))
                     targetPlayerList.Remove(targetPlayer);
-            }
+            }*/
         }
 
         public void _Update()
@@ -2734,7 +2767,7 @@ this.updateCurColor();
             //controller.state.GetCurrent(0).animationLast = _startTime;
             //controller.state.GetCurrent(0).animationStart = _startTime;
 
-            controller.state.Apply(controller.skeleton);
+            //controller.state.Apply(controller.skeleton);
             if (_quiet)
                 return;
             //this.playSeWithMotion(controller, _animeId, _index1, _index2, _index3, _isLoop, _startTime);
@@ -2818,7 +2851,7 @@ this.updateCurColor();
             Energy = energy;
             MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
-            uIManager.LogMessage("TP变更为：" + energy + $"-{Energy.Probability(x => x >= 1000f):P0}", eLogMessageType.CHANGE_TP, this);
+            uIManager.LogMessage("TP变更为：" + energy, eLogMessageType.CHANGE_TP, this);
         }
 
         public void IndicateSkillName(string _skillName) 
@@ -6081,10 +6114,9 @@ this.updateCurColor();
             /*
             this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
             string des;
-            var prob = Hp.Probability(x => x <= 0f);
+            //var prob = Hp.Probability(x => x <= 0f);
 
-            des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")
-                + $"-{prob:P0}";
+            des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
             if (_damageData.Target?.Owner?.IsPartsBoss ?? false)
             {
                 des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
@@ -6123,7 +6155,7 @@ this.updateCurColor();
             }
 
             string describe =
-                $"对目标{((_damageData.Target?.Owner?.IsPartsBoss ?? false) ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}-{prob:P0}";
+                $"对目标{((_damageData.Target?.Owner?.IsPartsBoss ?? false) ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}";
 
             callBack?.Invoke(describe);
             return num6.Floor();
@@ -6621,7 +6653,7 @@ this.updateCurColor();
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
             var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZero + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
-            action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点-{Energy.Probability(x => x >= 1000f):P0}");
+            action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点");
             SetEnergy(Energy + num, _setEnergyType, _source);
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_hasNumberEffect)
@@ -8688,7 +8720,7 @@ this.updateCurColor();
                     current2.time = 0.0f;
                     //current2.animationLast = 0;
                     //current2.animationStart = 0;
-                    currentSpineCtrl.state.Apply(currentSpineCtrl.skeleton);
+                    //currentSpineCtrl.state.Apply(currentSpineCtrl.skeleton);
                 }
             }
             else
@@ -9332,9 +9364,8 @@ this.updateCurColor();
             if (battleManager.ubmanager.IsUbExec(battleManager.UnitList.IndexOf(this)))
                 return true;
             //return this.battleManager.UnitUiCtrl.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;
-
-            var index = MyGameCtrl.Instance.playerUnitCtrl.IndexOf(this);
-            if (index >= 0 && Input.GetKey(KeyCode.Alpha5 - index)) return true;
+            
+            if (Index >= 0 && Input.GetKey(KeyCode.Alpha5 - Index)) return true;
 
             return MyGameCtrl.Instance.IsAutoMode && CurrentState == ActionState.IDLE;
         }

@@ -14787,9 +14787,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 396023724}
   m_Direction: 2
   m_MinValue: 0
-  m_MaxValue: 8
+  m_MaxValue: 10
   m_WholeNumbers: 1
-  m_Value: 3
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -16491,6 +16491,7 @@ MonoBehaviour:
   energyStackRatioDamagedFront: 0.5
   energyStackRatioDamagedMiddle: 0.5
   energyStackRationDamageBack: 0.5
+  deltaTimeAccumulated: 0
   BossUnit: {fileID: 0}
   IsPlayCutin: 0
   BattleStartPos: 560
@@ -18682,6 +18683,7 @@ MonoBehaviour:
   energyStackRatioDamagedFront: 0.5
   energyStackRatioDamagedMiddle: 0.5
   energyStackRationDamageBack: 0.5
+  deltaTimeAccumulated: 0
   BossUnit: {fileID: 0}
   IsPlayCutin: 0
   BattleStartPos: 560
