@@ -94,7 +94,6 @@ namespace PCRCaculator.Battle
 
         static string[] SPLIT = { "\n" };
         private List<string> debugStrList = new List<string>();
-        private Dictionary<Elements.eStateIconType, bool> showBuffDic;
         public float TimeCount { get => timeCount; set => timeCount = value; }
         public List<string> DebugStrList { get => debugStrList;}
 
@@ -102,16 +101,7 @@ namespace PCRCaculator.Battle
 
         private List<byte[]> imageSaved = new List<byte[]>();
 
-        public Dictionary<Elements.eStateIconType,bool> ShowBuffDic { 
-            get
-            {
-                if (showBuffDic == null)
-                {
-                    showBuffDic = MainManager.Instance.PlayerSetting.ShowBuffDic;
-                }
-                return showBuffDic;
-            }
-        }
+        public Dictionary<Elements.eStateIconType, bool> ShowBuffDic => MainManager.Instance.PlayerSetting.ShowBuffDic;
 
         private void Awake()
         {

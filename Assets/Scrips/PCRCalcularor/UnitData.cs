@@ -22,15 +22,15 @@ namespace PCRCaculator
     [Serializable]
     public class UnitRarityData : IComparer<UnitRarityData>, IComparable<UnitRarityData>
     {
-        public readonly int unitId;
-        public readonly string unitName;
-        public readonly PositionType unitPositionType;
-        private List<BaseData> raritydatas = new List<BaseData>();
-        private List<BaseData> ratitydatas_rate = new List<BaseData>();
+        public int unitId;
+        public string unitName;
+        public PositionType unitPositionType;
+        public List<BaseData> raritydatas = new List<BaseData>();
+        public List<BaseData> ratitydatas_rate = new List<BaseData>();
         public int unit_material_id { get => (unitId - 100001) / 100 + 31000; }//这个材质id暂时没用
-        private UnitRankData rankData;
-        public readonly UnitDetailData detailData;
-        public readonly UnitSkillData skillData;
+        public UnitRankData rankData;
+        public UnitDetailData detailData;
+        public UnitSkillData skillData;
 
         public BaseData GetBonusData(UnitData a)
         {
@@ -94,6 +94,7 @@ namespace PCRCaculator
                 unitPositionType = PositionType.backword;
             }
         }
+        /*
         public UnitRarityData(string data)
         {
             string[] data0 = data.Split('~');
@@ -127,7 +128,7 @@ namespace PCRCaculator
             {
                 unitPositionType = PositionType.backword;
             }
-        }
+        }*/
         /// <summary>
         /// 获取角色的详细数据（随等级等改变的数据）
         /// </summary>
@@ -304,7 +305,9 @@ namespace PCRCaculator
         public BaseData GetEXSkillValue(UnitData a, bool jjc_otherside = false)
         {
             BaseData b = new BaseData();
-            int[] exSkillActionList = MainManager.Instance.SkillDataDic[skillData.GetSkillList(a)[3]].skillactions;
+            var exskill = skillData.GetSkillList(a)[3];
+            if (exskill == 0) return b;
+            int[] exSkillActionList = MainManager.Instance.SkillDataDic[exskill].skillactions;
             foreach (int exActionId in exSkillActionList)
             {
                 if (exActionId > 1000)
@@ -390,7 +393,7 @@ namespace PCRCaculator
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
-        private string name = "";
+        public string name = "";
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
 
         public void SetDefaultLoveDict()
@@ -641,8 +644,8 @@ namespace PCRCaculator
     [Serializable]
     public class UnitRankData
     {
-        public readonly List<int[]> rankEquipments = new List<int[]>();
-        public readonly List<BaseData> datas = new List<BaseData>();
+        public List<int[]> rankEquipments = new List<int[]>();
+        public List<BaseData> datas = new List<BaseData>();
 
         public UnitRankData() { }
         public UnitRankData(List<int[]> eq, List<BaseData> datas)
@@ -797,15 +800,15 @@ namespace PCRCaculator
     [Serializable]
     public class SkillData
     {
-        public readonly int skillid;
-        public readonly string name = "空技能";
-        public readonly int type;
-        public readonly int areawidth;
-        public readonly float casttime;
-        public readonly int[] skillactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
-        public readonly int[] dependactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
-        public readonly string describes = "";
-        public readonly int icon;
+        public int skillid;
+        public string name = "空技能";
+        public int type;
+        public int areawidth;
+        public float casttime;
+        public int[] skillactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
+        public int[] dependactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
+        public string describes = "";
+        public int icon;
         public static string[] num = new string[10] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩" };
         /// <summary>
         /// 不要用这个构造函数！
@@ -892,19 +895,19 @@ namespace PCRCaculator
     [Serializable]
     public class SkillAction
     {
-        public readonly int actionid;
-        public readonly int classid;//1或2，一般为1，只有yls为2
-        public readonly int type;//18到92
-        public readonly int[] details;//长度为3
-        public readonly double[] values;//长度为7
-        public readonly int target_assigment;//对方-1，己方-2，所有-3，未知-0 OTHER_SIDE=1,OWNER_SIDE=2,ALL=3 eTargetAssignment
-        public readonly int target_area;//FRONT=1,FRONT_AND_BACK=2,ALL=3  DirectionType
-        public readonly int target_range;//-1到4320以及9999
-        public readonly int target_type;//排序优先度（枚举PirorityPattern)
-        public readonly int target_number;//目标优先顺序，0-第一，1-第二……
-        public readonly int target_count;//目标数量
-        public readonly string description = "";//小技能描述
-        public readonly string levelupdes = "";//小技能升级描述
+        public int actionid;
+        public int classid;//1或2，一般为1，只有yls为2
+        public int type;//18到92
+        public int[] details;//长度为3
+        public double[] values;//长度为7
+        public int target_assigment;//对方-1，己方-2，所有-3，未知-0 OTHER_SIDE=1,OWNER_SIDE=2,ALL=3 eTargetAssignment
+        public int target_area;//FRONT=1,FRONT_AND_BACK=2,ALL=3  DirectionType
+        public int target_range;//-1到4320以及9999
+        public int target_type;//排序优先度（枚举PirorityPattern)
+        public int target_number;//目标优先顺序，0-第一，1-第二……
+        public int target_count;//目标数量
+        public string description = "";//小技能描述
+        public string levelupdes = "";//小技能升级描述
         public static string[] skillTypeName = new string[94]
             {"?","ATTACK","MOVE","KNOCK","HEAL","CURE","BARRIER","REFLEXIVE","CHANGE_SPEED","SLIP_DAMAGE",//10
         "BUFF_DEBUFF","CHARM","BLIND","SILENCE","MODE_CHANGE","SUMMON","CHARGE_ENERGY","TRIGER","DAMAGE_CHANGE","CHARGE","DECOY",//20
@@ -1268,16 +1271,16 @@ namespace PCRCaculator
     [Serializable]
     public class EquipmentData
     {
-        public readonly int equipment_id;
-        public readonly string equipment_name;
-        public readonly int promotion_level;
-        public readonly string description;
-        public readonly bool craftFlg;
-        public readonly int equipmentEnhancePoint;
-        public readonly int salePrice;
-        public readonly int requireLevel;
-        private readonly BaseData data;
-        private readonly BaseData data_rate;
+        public int equipment_id;
+        public string equipment_name;
+        public int promotion_level;
+        public string description;
+        public bool craftFlg;
+        public int equipmentEnhancePoint;
+        public int salePrice;
+        public int requireLevel;
+        public BaseData data;
+        public BaseData data_rate;
         public static EquipmentData EMPTYDATA { get => GetEmptyData(); }
         public EquipmentData() { }
         public EquipmentData(int id, string name, int prolevel, BaseData data, BaseData data_rate)
@@ -1372,11 +1375,11 @@ namespace PCRCaculator
     [Serializable]
     public class UnitStoryData
     {
-        static readonly int[] loveTrans = new int[13] { 0, 1, 1, 1, 2, 3, 3, 3, 4 ,4,4,4,4};
-        public readonly int unitid;
-        public readonly int loveMax;
-        public readonly List<int> effectCharacters;//受影响的角色id列表
-        private List<List<int[]>> addValues;//增加的属性，【属性序号，属性值】
+        static int[] loveTrans = new int[13] { 0, 1, 1, 1, 2, 3, 3, 3, 4 ,4,4,4,4};
+        public int unitid;
+        public int loveMax;
+        public List<int> effectCharacters;//受影响的角色id列表
+        public List<List<int[]>> addValues;//增加的属性，【属性序号，属性值】
         /// <summary>
         /// 不要使用这个构造函数
         /// </summary>
@@ -1428,10 +1431,10 @@ namespace PCRCaculator
             {
                 love = loveTrans[love];
             }
-            int k = Mathf.Min(love - 2,addValues.Count-1);
+            //int k = Mathf.Min(love - 2,addValues.Count-1);
             BaseData bt = new BaseData();
             //string message = "";
-            while (k >= 0)
+            for (int k = 1; k < love; ++k)
             {
                 //message += "第" +k + "轮：";
                 foreach (int[] values in addValues[k])
@@ -1468,7 +1471,6 @@ namespace PCRCaculator
                             Debug.LogError("未定义该属性！"); break;
                     }
                 }
-                k--;
             }
             //Debug.Log(message + "共" + bt.magic_def + "&" + bt.def + "&" + bt.dodge);
             return bt;
@@ -1484,15 +1486,15 @@ namespace PCRCaculator
     /// </summary>
     public class UnitDetailData
     {
-        public readonly int unitid;
-        public readonly string name;
-        public readonly int minrarity;//初始星级
-        public readonly int motionType;//武器动作类型
-        public readonly int seType;//武器类型
-        public readonly int searchAreaWidth;//普攻距离
-        public readonly int atkType;//攻击方式
-        public readonly float normalAtkCastTime;//普攻间隔
-        public readonly int guildId;
+        public int unitid;
+        public string name;
+        public int minrarity;//初始星级
+        public int motionType;//武器动作类型
+        public int seType;//武器类型
+        public int searchAreaWidth;//普攻距离
+        public int atkType;//攻击方式
+        public float normalAtkCastTime;//普攻间隔
+        public int guildId;
         /// <summary>
         /// 不要用这个构造函数！
         /// </summary>
@@ -1870,18 +1872,18 @@ namespace PCRCaculator
     [Serializable]
     public class AllData
     {
-        public List<string> equipmentDic;//装备类与装备id的对应字典
-        public List<string> unitRarityDic;//角色基础数据与角色id的对应字典 
-        public List<string> unitStoryDic;//角色羁绊奖励列表
+        public Dictionary<int, EquipmentData> equipmentDic;//装备类与装备id的对应字典
+        public Dictionary<int, UnitRarityData> unitRarityDic;//角色基础数据与角色id的对应字典 
+        public Dictionary<int, UnitStoryData> unitStoryDic;//角色羁绊奖励列表
         public Dictionary<int, List<int>> unitStoryEffectDic;//角色的马甲列表
-        public List<string> skillDataDic;//所有的技能列表
-        public List<string> skillActionDic;//所有小技能列表
+        public Dictionary<int, SkillData> skillDataDic;//所有的技能列表
+        public Dictionary<int, SkillAction> skillActionDic;//所有小技能列表
         public Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
         public Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
         public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
 
         public AllData() { }
-
+        /*
         public AllData(List<string> equipmentDic,
             List<string> unitRarityDic,
             List<string> unitStoryDic,
@@ -1902,7 +1904,7 @@ namespace PCRCaculator
             this.unitName_cn = unitName_cn;
             this.skillNameAndDescribe_cn = skillNameAndDescribe_cn;
             this.skillActionDescribe_cn = skillActionDescribe_cn;
-        }
+        }*/
     }
     [Serializable]
     public class UnitPrefabData

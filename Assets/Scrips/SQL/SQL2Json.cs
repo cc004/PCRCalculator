@@ -846,6 +846,7 @@ namespace PCRCaculator
         }
         private void SaveDics2Json()
         {
+            /*
             List<string> dic1 = new List<string>();
             foreach (int a in equipmentDic.Keys)
             {
@@ -871,7 +872,20 @@ namespace PCRCaculator
             {
                 dic6.Add(skillActionDic[f].ToString());
             }
-            AllData alldata = new AllData(dic1, dic2, dic3, unitStoryEffectDic, dic5, dic6, unitName_cn, skillNameAndDescribe_cn, skillActionDescribe_cn);
+            */
+            AllData alldata = new AllData
+            {
+                equipmentDic = equipmentDic,
+                skillActionDescribe_cn = skillActionDescribe_cn,
+                skillActionDic = skillActionDic,
+                skillDataDic = skillDataDic,
+                skillNameAndDescribe_cn = skillNameAndDescribe_cn,
+                unitStoryDic = unitStoryDic,
+                unitName_cn = unitName_cn,
+                unitRarityDic = unitRarityDic,
+                unitStoryEffectDic = unitStoryEffectDic,
+            };
+            //dic1, dic2, dic3, unitStoryEffectDic, dic5, dic6, unitName_cn, skillNameAndDescribe_cn, skillActionDescribe_cn);
             //string filePath = Application.dataPath + "/Txts/AllData.txt";
             string filePath = GetSaveDataPath() + "/AllData.json";
 

@@ -218,7 +218,34 @@ namespace ExcelHelper
                             }
                         }
                     } while (excelReader.NextResult());*/
-                    var result = excelReader.AsDataSet();
+                    do
+                    {
+                        if (excelReader.Name == "savePage") break;
+                    } while (excelReader.NextResult());
+
+                    excelReader.Read();
+                    excelReader.Read();
+                    string dataStr = excelReader.GetString(0);
+
+
+                    if (dataStr != null && dataStr != "")
+                    {
+                        try
+                        {
+                            string jsonStr = MainManager.DecryptDES(dataStr);
+                            guildTimelineData = JsonConvert.DeserializeObject<GuildTimelineData>(jsonStr);
+                            return true;
+                        }
+                        catch (Exception e)
+                        {
+                            MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message + "\n请手动输入存档数据！", failedAction);
+                        }
+                    }
+                    else
+                    {
+                        MainManager.Instance.WindowConfigMessage("没有数据！\n请手动输入存档数据！", failedAction);
+                    }
+                    /*
                     if (result != null)
                     {
                         DataTable dataTable = result.Tables["savePage"];
@@ -227,23 +254,6 @@ namespace ExcelHelper
                             int i = dataTable.Rows.Count;
                             int j = dataTable.Columns.Count;
                             string dataStr = dataTable.Rows[1][0].ToString();
-                            if (dataStr != null && dataStr != "")
-                            {
-                                try
-                                {
-                                    string jsonStr = MainManager.DecryptDES(dataStr);
-                                    guildTimelineData = JsonConvert.DeserializeObject<GuildTimelineData>(jsonStr);
-                                    return true;
-                                }
-                                catch (Exception e)
-                                {
-                                    MainManager.Instance.WindowConfigMessage("发生错误：" + e.Message + "\n请手动输入存档数据！", failedAction);
-                                }
-                            }
-                            else
-                            {
-                                MainManager.Instance.WindowConfigMessage("没有数据！\n请手动输入存档数据！", failedAction);
-                            }
                         }
                         else
                         {
@@ -253,7 +263,7 @@ namespace ExcelHelper
                     else
                     {
                         MainManager.Instance.WindowConfigMessage("文件读取失败！\n请手动输入存档数据！", failedAction);
-                    }
+                    }*/
                 }
             }
             else

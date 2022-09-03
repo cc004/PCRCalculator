@@ -434,7 +434,7 @@ namespace PCRCaculator.Guild
                 $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>]";
             if (backTime > 0)
             {
-                detail = $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f, 1000):P0}";
+                detail = $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
                 damageStr += detail;
             }
             else detail = string.Empty;

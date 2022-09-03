@@ -152,46 +152,15 @@ namespace PCRCaculator
             if (jsonStr != "")
             {
                 AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
-                foreach (string a in allData.equipmentDic)
-                {
-                    EquipmentData equipmentData = new EquipmentData(a);
-                    equipmentDic.Add(equipmentData.equipment_id, equipmentData);
-                }
-                equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-                Debugtext.text += "\n成功加载" + EquipmentDic.Count + "个装备数据！";
-
-                foreach (string a in allData.unitRarityDic)
-                {
-                    UnitRarityData unitRarityData = new UnitRarityData(a);
-                    unitRarityDic.Add(unitRarityData.unitId, unitRarityData);
-                }
-                Debugtext.text += "\n成功加载" + UnitRarityDic.Count + "个角色数据！";
-
-                foreach (string a in allData.unitStoryDic)
-                {
-                    UnitStoryData unitStoryData = new UnitStoryData(a);
-                    unitStoryDic.Add(unitStoryData.unitid, unitStoryData);
-                }
+                equipmentDic = allData.equipmentDic;
+                unitRarityDic = allData.unitRarityDic;
                 unitStoryEffectDic = allData.unitStoryEffectDic;
-                foreach (string a in allData.skillDataDic)
-                {
-                    SkillData skillData = new SkillData(a);
-                    skillDataDic.Add(skillData.skillid, skillData);
-                }
-                skillDataDic.Add(0, new SkillData());
-                Debugtext.text += "\n成功加载" + SkillDataDic.Count + "个技能数据！";
-
-                foreach (string a in allData.skillActionDic)
-                {
-                    SkillAction skillAction = new SkillAction(a);
-                    skillActionDic.Add(skillAction.actionid, skillAction);
-                }
+                unitStoryDic = allData.unitStoryDic;
+                equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                skillDataDic = allData.skillDataDic;
+                skillActionDic = allData.skillActionDic;
                 unitName_cn = allData.unitName_cn;
-                Debugtext.text += "\n成功加载" + unitName_cn.Count + "个角色数据(中文)！";
-
                 skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
-                Debugtext.text += "\n成功加载" + skillNameAndDescribe_cn.Count + "个技能数据(中文)！";
-
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
             LoadUnitData();

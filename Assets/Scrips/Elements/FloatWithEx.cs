@@ -1,4 +1,5 @@
 ﻿using System;
+using PCRCaculator.Guild;
 using UnityEngine;
 using Random = System.Random;
 
@@ -97,7 +98,7 @@ namespace Elements
         {
             get
             {
-                const int N = 1000;
+                var N = GuildManager.StaticsettingData.n1;
                 double s = 0, s2 = 0;
                 for (int i = 0; i < N; ++i)
                 {
@@ -108,8 +109,9 @@ namespace Elements
                 return (float)Math.Sqrt((s2 - s * s / N) / N);
             }
         }
-        public float Probability(Func<float, bool> predict, int N = 100)
+        public float Probability(Func<float, bool> predict)
         {
+            var N = GuildManager.StaticsettingData.n1;
             int s = 0;
             for (int i = 0; i < N; ++i)
                 if (predict(Emulate(rand.Next()))) ++s;

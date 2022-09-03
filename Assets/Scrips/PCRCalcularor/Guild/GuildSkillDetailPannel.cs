@@ -30,7 +30,7 @@ namespace PCRCaculator.Guild
             detailTexts[1].text = data.UnitName;
             detailTexts[2].text = data.skillState.GetDescription();
             detailTexts[3].text = data.startTime + "~" + data.endTime;
-            detailTexts[4].text = data.energy == 0f ? "无" : $"{data.energy}-{data.energy.Probability(x => x >= 1000f):P0}";
+            detailTexts[4].text = data.energy == 0f ? "无" : $"{data.energy}";
             for(int i = 0; i < data.actionExecDatas.Count; i++)
             {
                 AddActionDetails(data.actionExecDatas[i], i);
