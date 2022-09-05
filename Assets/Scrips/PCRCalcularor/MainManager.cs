@@ -50,6 +50,8 @@ namespace PCRCaculator
         private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
         private Dictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic = new Dictionary<int, UniqueEquipmentData>();//角色专武字典
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
+        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf = new Elements.MasterUnitSkillDataRf();//未来可期
+        private List<int> enemy_ignore_skill_rf = new List<int>();//未来可期
 
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
@@ -104,10 +106,13 @@ namespace PCRCaculator
         public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
         //public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
         public AllUnitFirearmData FirearmData { get => firearmData;}
+        public List<int> Enemy_ignore_skill_rf { get => enemy_ignore_skill_rf;}
+        public Elements.MasterUnitSkillDataRf MasterUnitSkillDataRf { get => masterUnitSkillDataRf;}
 
         public readonly List<int> showUnitIDs = new List<int>();
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
+        public int MaxTPUpValue => playerSetting.maxTPUpValue;
         private void Awake()
         {
             if (Instance == null)

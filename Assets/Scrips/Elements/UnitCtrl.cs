@@ -101,6 +101,9 @@ namespace Elements
         private UnitActionController unitActionController;
         //private int hitEffectSortOffset;
         //private float sortOffsetResetTimer = 0.6f;
+        //private IAutoLogic[] mainUnionBurstAutoLogics;
+
+        //private IAutoLogic[] subUnionBurstAutoLogics;
         //private PrefabWithTime.eEffectDifficulty effectDifficulty;
         //private static Yggdrasil<UnitCtrl> staticSingletonTree = (Yggdrasil<UnitCtrl>)null;
         private static BattleLogIntreface staticBattleLog;
@@ -128,418 +131,560 @@ namespace Elements
         private static BattleManager staticBattleManager;
         private Dictionary<eAbnormalState, bool> m_abnormalState = new Dictionary<eAbnormalState, bool>(new eAbnormalState_DictComparer());
         private Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData> abnormalStateCategoryDataDictionary = new Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData>(new eAbnormalStateCategory_DictComparer());
+        private int overlapAbnormalStateCount;
+        private Dictionary<eAbnormalState, List<int>> overlapAbnormalStateIndexList = new Dictionary<eAbnormalState, List<int>>
+        {
+            {
+                eAbnormalState.SLOW_OVERLAP,
+                new List<int>()
+            },
+            {
+                eAbnormalState.HASTE_OVERLAP,
+                new List<int>()
+            }
+        };
+        private Dictionary<int, AbnormalStateCategoryData> overlapAbnormalStateData = new Dictionary<int, AbnormalStateCategoryData>();
+
         private Dictionary<GameObject, int> statusEffectOrderDictionary = new Dictionary<GameObject, int>();
         public static readonly Dictionary<eAbnormalState, AbnormalConstData> ABNORMAL_CONST_DATA = new Dictionary<eAbnormalState, AbnormalConstData>(new eAbnormalState_DictComparer())
-    {
-      {
-        eAbnormalState.GUARD_ATK,
-        new AbnormalConstData
         {
-          IconType = eStateIconType.PHYSICS_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.GUARD_MGC,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.MAGIC_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.DRAIN_ATK,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.PHYSICS_DRAIN_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.DRAIN_MGC,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.MAGIC_DRAIN_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.GUARD_BOTH,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.BOTH_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.DRAIN_BOTH,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.BOTH_DRAIN_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.HASTE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.HASTE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.POISON,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.SLIP_DAMAGE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.BURN,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.BURN,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.CURSE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CURSE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.SLOW,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.SLOW,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.PARALYSIS,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.PARALISYS,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.FREEZE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.FREEZE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.CONVERT,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CONVERT,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.PHYSICS_DARK,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.PHYSICS_DARK,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.MAGIC_DARK,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.MAGIC_DARK,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.SILENCE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.SILENCE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.CHAINED,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CHAINED,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.SLEEP,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.SLEEP,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.STUN,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.STUN,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.DETAIN,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.DETAIN,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.NO_EFFECT_SLIP_DAMAGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.SLIP_DAMAGE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.NO_DAMAGE_MOTION,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.NO_DAMAGE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.NO_ABNORMAL,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.DEBUF_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.NO_DEBUF,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.DEBUF_BARRIAR,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.PARTS_NO_DAMAGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.NONE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.ACCUMULATIVE_DAMAGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.NONE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.DECOY,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.DECOY,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.MIFUYU,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.NONE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.STONE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.STONE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.REGENERATION,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.REGENERATION,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.PHYSICS_DODGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.PHYSICS_DODGE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.CONFUSION,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CONFUSION,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.VENOM,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.VENOM,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.COUNT_BLIND,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.COUNT_BLIND,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.INHIBIT_HEAL,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.INHIBIT_HEAL,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.FEAR,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.FEAR,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.TP_REGENERATION,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.TP_REGENERATION,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.HEX,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.HEX,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.FAINT,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.FAINT,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.COMPENSATION,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.COMPENSATION,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.CUT_ATK_DAMAGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CUT_ATK_DAMAGE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.CUT_MGC_DAMAGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CUT_MGC_DAMAGE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.CUT_ALL_DAMAGE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.CUT_ALL_DAMAGE,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.LOG_ATK_BARRIR,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.LOG_ATK_BARRIER,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.LOG_MGC_BARRIR,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.LOG_MGC_BARRIER,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.LOG_ALL_BARRIR,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.LOG_ALL_BARRIER,
-          IsBuff = true
-        }
-      },
-      {
-        eAbnormalState.PAUSE_ACTION,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.PAUSE_ACTION,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.UB_SILENCE,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.UB_SILENCE,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.HEAL_DOWN,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.HEAL_DOWN,
-          IsBuff = false
-        }
-      },
-      {
-        eAbnormalState.NPC_STUN,
-        new AbnormalConstData
-        {
-          IconType = eStateIconType.NPC_STUN,
-          IsBuff = false
-        }
-      }
-    };
+            {
+                eAbnormalState.GUARD_ATK,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PHYSICS_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.GUARD_MGC,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.MAGIC_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.DRAIN_ATK,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PHYSICS_DRAIN_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.DRAIN_MGC,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.MAGIC_DRAIN_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.GUARD_BOTH,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.BOTH_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.DRAIN_BOTH,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.BOTH_DRAIN_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.HASTE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.HASTE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.POISON,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SLIP_DAMAGE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.POISON2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SLIP_DAMAGE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.BURN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.BURN,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CURSE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CURSE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CURSE2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CURSE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.SLOW,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SLOW,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.PARALYSIS,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PARALISYS,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.FREEZE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.FREEZE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CONVERT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CONVERT,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.PHYSICS_DARK,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PHYSICS_DARK,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.MAGIC_DARK,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.MAGIC_DARK,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.SILENCE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SILENCE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CHAINED,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CHAINED,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.SLEEP,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SLEEP,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.STUN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.STUN,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.STUN2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.STUN,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.DETAIN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DETAIN,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.NO_EFFECT_SLIP_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SLIP_DAMAGE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.NO_DAMAGE_MOTION,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NO_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.NO_DAMAGE_MOTION2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NO_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.NO_ABNORMAL,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DEBUF_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.NO_DEBUF,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DEBUF_BARRIAR,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.PARTS_NO_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.ACCUMULATIVE_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.DECOY,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DECOY,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.MIFUYU,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.STONE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.STONE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.REGENERATION,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.REGENERATION,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.REGENERATION2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.REGENERATION,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.PHYSICS_DODGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PHYSICS_DODGE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.CONFUSION,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CONFUSION,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CONFUSION2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CONFUSION,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.VENOM,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.VENOM,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.COUNT_BLIND,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.COUNT_BLIND,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.INHIBIT_HEAL,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.INHIBIT_HEAL,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.FEAR,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.FEAR,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.TP_REGENERATION,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.TP_REGENERATION,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.TP_REGENERATION2,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.TP_REGENERATION,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.HEX,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.HEX,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.FAINT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.FAINT,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.COMPENSATION,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.COMPENSATION,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CUT_ATK_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CUT_ATK_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.CUT_MGC_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CUT_MGC_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.CUT_ALL_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CUT_ALL_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.LOG_ATK_BARRIR,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.LOG_ATK_BARRIER,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.LOG_MGC_BARRIR,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.LOG_MGC_BARRIER,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.LOG_ALL_BARRIR,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.LOG_ALL_BARRIER,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.PAUSE_ACTION,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PAUSE_ACTION,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.UB_SILENCE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.UB_SILENCE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.HEAL_DOWN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.HEAL_DOWN,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.NPC_STUN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NPC_STUN,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.DECREASE_HEAL,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DECREASE_HEAL,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.POISON_BY_BEHAVIOUR,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.POISON_BY_BEHAVIOUR,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.CRYSTALIZE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CRYSTALIZE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.DAMAGE_LIMIT_ATK,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DAMAGE_LIMIT,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.DAMAGE_LIMIT_MGC,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DAMAGE_LIMIT,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.DAMAGE_LIMIT_ALL,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.DAMAGE_LIMIT,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.SLOW_OVERLAP,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.HASTE_OVERLAP,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = true
+                }
+            },
+            {
+                eAbnormalState.SPY,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.SPY,
+                    IsBuff = true
+                }
+            }
+        };
         private Dictionary<eAbnormalStateCategory, int> slipDamageIdDictionary = new Dictionary<eAbnormalStateCategory, int>
         {
       {
@@ -567,10 +712,27 @@ namespace Elements
         0
       },
       {
-        eAbnormalStateCategory.COMPENSATION,
-        0
-      }
+                eAbnormalStateCategory.COMPENSATION,
+                0
+            },
+            {
+                eAbnormalStateCategory.POISON2,
+                0
+            },
+            {
+                eAbnormalStateCategory.CURSE2,
+                0
+            }
     };
+
+        public Dictionary<eAbnormalState, Action<bool>> damageByBehaviourDictionary = new Dictionary<eAbnormalState, Action<bool>>();
+
+        private Dictionary<eAbnormalState, int> abnormalStateToCurrentId = new Dictionary<eAbnormalState, int>();
+
+        private bool isDamageReleaseSpecialSleepAnimForUnionBurst;
+
+        private bool isPlayDamageAnimForAbnormal;
+
         private static readonly Color WEAK_COLOR = new Color(0.5411f, 0.6274f, 0.996f);
         private const float RUNOUT_COEFFICIENT = 1.5f;
         private const float RESULT_POSITION_COEFFICIENT_X = 1.5f;
@@ -580,126 +742,188 @@ namespace Elements
         private const int CHARACTER_OFFSET_Y = -165;
         private float scaleValue;
         private const float RESULT_UNIT_SCALE = 0.875f;
+        private float scaleForGuest = 1f;
+
+        private int maxHpDebufCounter;
+
         public static readonly Dictionary<BuffParamKind, BuffDebuffConstData> BUFF_DEBUFF_ICON_DIC = new Dictionary<BuffParamKind, BuffDebuffConstData>(new BuffParamKind_DictComparer())
-    {
-      {
-        BuffParamKind.NUM,
-        new BuffDebuffConstData
         {
-          BuffIcon = eStateIconType.NONE,
-          DebuffIcon = eStateIconType.NONE
-        }
-      },
-      {
-        BuffParamKind.ATK,
-        new BuffDebuffConstData
+            {
+                BuffParamKind.NUM,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.NONE
+                }
+            },
+            {
+                BuffParamKind.ATK,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_PHYSICAL_ATK,
+                    DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_ATK
+                }
+            },
+            {
+                BuffParamKind.DEF,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_PHYSICAL_DEF,
+                    DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_DEF
+                }
+            },
+            {
+                BuffParamKind.MAGIC_STR,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_MAGIC_ATK,
+                    DebuffIcon = eStateIconType.DEBUFF_MAGIC_ATK
+                }
+            },
+            {
+                BuffParamKind.MAGIC_DEF,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_MAGIC_DEF,
+                    DebuffIcon = eStateIconType.DEBUFF_MAGIC_DEF
+                }
+            },
+            {
+                BuffParamKind.DODGE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_DODGE,
+                    DebuffIcon = eStateIconType.DEBUFF_DODGE
+                }
+            },
+            {
+                BuffParamKind.PHYSICAL_CRITICAL,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_CRITICAL,
+                    DebuffIcon = eStateIconType.DEBUFF_CRITICAL
+                }
+            },
+            {
+                BuffParamKind.MAGIC_CRITICAL,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_CRITICAL,
+                    DebuffIcon = eStateIconType.DEBUFF_CRITICAL
+                }
+            },
+            {
+                BuffParamKind.ENERGY_RECOVER_RATE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_ENERGY_RECOVERY,
+                    DebuffIcon = eStateIconType.DEBUFF_ENERGY_RECOVERY
+                }
+            },
+            {
+                BuffParamKind.LIFE_STEAL,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_LIFE_STEAL,
+                    DebuffIcon = eStateIconType.DEBUFF_LIFE_STEAL
+                }
+            },
+            {
+                BuffParamKind.MOVE_SPEED,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.DEBUFF_MOVE_SPEED
+                }
+            },
+            {
+                BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_PHYSICAL_CRITICAL_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_CRITICAL_DAMAGE
+                }
+            },
+            {
+                BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_MAGIC_CRITICAL_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_MAGIC_CRITICAL_DAMAGE
+                }
+            },
+            {
+                BuffParamKind.ACCURACY,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_ACCURACY,
+                    DebuffIcon = eStateIconType.DEBUFF_ACCURACY
+                }
+            },
+            {
+                BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_RECEIVE_CRITICAL_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_RECEIVE_CRITICAL_DAMAGE
+                }
+            },
+            {
+                BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.DEBUFF_RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT
+                }
+            },
+            {
+                BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.DEBUFF_RECEIVE_PHYSICAL_DAMAGE_PERCENT
+                }
+            },
+            {
+                BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.DEBUFF_RECEIVE_MAGIC_DAMAGE_PERCENT
+                }
+            },
+            {
+                BuffParamKind.MAX_HP,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.DEBUFF_MAX_HP
+                }
+            }
+        };
+
+        public static readonly Dictionary<BuffParamKind, eStateIconType> ADDITIONAL_BUFF_ICON_DIC = new Dictionary<BuffParamKind, eStateIconType>
         {
-          BuffIcon = eStateIconType.BUFF_PHYSICAL_ATK,
-          DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_ATK
-        }
-      },
-      {
-        BuffParamKind.DEF,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_PHYSICAL_DEF,
-          DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_DEF
-        }
-      },
-      {
-        BuffParamKind.MAGIC_STR,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_MAGIC_ATK,
-          DebuffIcon = eStateIconType.DEBUFF_MAGIC_ATK
-        }
-      },
-      {
-        BuffParamKind.MAGIC_DEF,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_MAGIC_DEF,
-          DebuffIcon = eStateIconType.DEBUFF_MAGIC_DEF
-        }
-      },
-      {
-        BuffParamKind.DODGE,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_DODGE,
-          DebuffIcon = eStateIconType.DEBUFF_DODGE
-        }
-      },
-      {
-        BuffParamKind.PHYSICAL_CRITICAL,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_CRITICAL,
-          DebuffIcon = eStateIconType.DEBUFF_CRITICAL
-        }
-      },
-      {
-        BuffParamKind.MAGIC_CRITICAL,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_CRITICAL,
-          DebuffIcon = eStateIconType.DEBUFF_CRITICAL
-        }
-      },
-      {
-        BuffParamKind.ENERGY_RECOVER_RATE,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_ENERGY_RECOVERY,
-          DebuffIcon = eStateIconType.DEBUFF_ENERGY_RECOVERY
-        }
-      },
-      {
-        BuffParamKind.LIFE_STEAL,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_LIFE_STEAL,
-          DebuffIcon = eStateIconType.DEBUFF_LIFE_STEAL
-        }
-      },
-      {
-        BuffParamKind.MOVE_SPEED,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.NONE,
-          DebuffIcon = eStateIconType.DEBUFF_MOVE_SPEED
-        }
-      },
-      {
-        BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_PHYSICAL_CRITICAL_DAMAGE,
-          DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_CRITICAL_DAMAGE
-        }
-      },
-      {
-        BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_MAGIC_CRITICAL_DAMAGE,
-          DebuffIcon = eStateIconType.DEBUFF_MAGIC_CRITICAL_DAMAGE
-        }
-      },
-      {
-        BuffParamKind.ACCURACY,
-        new BuffDebuffConstData
-        {
-          BuffIcon = eStateIconType.BUFF_ACCURACY,
-          DebuffIcon = eStateIconType.DEBUFF_ACCURACY
-        }
-      }
-    };
+            {
+                BuffParamKind.NUM,
+                eStateIconType.NONE
+            },
+            {
+                BuffParamKind.DEF,
+                eStateIconType.ADDITIONAL_BUFF_PHYSICAL_DEF
+            },
+            {
+                BuffParamKind.MAGIC_DEF,
+                eStateIconType.ADDITIONAL_BUFF_MAGIC_DEF
+            }
+        };
         private List<int> buffDebuffSkilIds = new List<int>();
         public const float PREFAB_CREATE_OFFSET_TIME = 1f;
         private const float PERCENTAGE_DIGIT = 100f;
         public List<PartsData> BossPartsList = new List<PartsData>();
         public bool UseTargetCursorOver;
+        public bool OneRemainingDisableEffect;
+        public float OverCursorSize = 1f;
         private const float COMBO_DAMAGE_INTERVAL = 0.45f;
         private const float COMBO_EFFECT_OFFSET_ADDITION = 0.1f;
         private const int WEIGHT_SIGNIFICANT_DIGITS = 100;
@@ -830,6 +1054,11 @@ namespace Elements
         private const float VOICE_RATE_OFFSET_ATTACK = 0.0f;
         private static readonly string CUT_IN_CUE_NAME = "se_cutin_{0}";
         private const float ENEGY_REDUCE_RATE_BASE = 100f;*/
+        private bool setStateCalled;
+
+        private bool isNotPartsBossReady;
+
+        
         public bool IsUbExecTrying;
         public Dictionary<eReduceEnergyType, bool> IsReduceEnergyDictionary = new Dictionary<eReduceEnergyType, bool>(new eReduceEnergyType_DictComparer())
     {
@@ -852,12 +1081,25 @@ namespace Elements
     };
 
         public Bone StateBone { get; set; }
-
+        public Bone StateBoneModeChange
+        {
+            get;
+            set;
+        }
         public Bone CenterBone { get; set; }
-
+        public Bone CenterBoneModeChange
+        {
+            get;
+            set;
+        }
         public List<SkillEffectCtrl> RepeatEffectList { get; private set; }
 
         public List<SkillEffectCtrl> AuraEffectList { get; private set; }
+        public Dictionary<int, List<(SkillEffectCtrl effect, string boneName)>> DamagedHpEffectDictionary
+        {
+            get;
+            set;
+        } = new Dictionary<int, List<(SkillEffectCtrl, string)>>();
 
         public float BodyWidth { get; set; }
 
@@ -879,8 +1121,31 @@ namespace Elements
 
         public bool MainSkill1Evolved { get; set; }
 
-        public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? battleManager.DeltaTime_60fps : 0.0f;
+        //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? battleManager.DeltaTime_60fps : 0.0f;
 
+        public float DeltaTimeForPause
+        {
+            get
+            {
+                if (PlayingNoCutinMotion)
+                {
+                    return battleManager.DeltaTime_60fps;
+                }
+                if (battleManager == null)
+                {
+                    return 0f;
+                }
+                if (battleManager.IsPausingEffectSkippedInThisFrame)
+                {
+                    return 0f;
+                }
+                if (!m_bPause)
+                {
+                    return battleManager.DeltaTime_60fps;
+                }
+                return 0f;
+            }
+        }
         //public CriAtomSource VoiceSource { get; private set; }
 
         //public CriAtomSource SeSource { get; private set; }
@@ -910,13 +1175,29 @@ namespace Elements
         public UnitParameter UnitParameter { get; set; }
 
         public bool IsOther { get; set; }
+        public bool IsBonusEnemy
+        {
+            get;
+            set;
+        }
+        public bool IsPlayerUnit => !IsOther;// == battleManager.BJKKBMOLHDH;
 
         public bool JoyFlag { get; set; }
 
         public SummonAction.eSummonType SummonType { get; set; }
 
         public bool IsSummonOrPhantom => SummonType == SummonAction.eSummonType.SUMMON || SummonType == SummonAction.eSummonType.PHANTOM;
+        public bool IsGuest
+        {
+            get;
+            set;
+        }
 
+        public bool IsGuestFadeout
+        {
+            get;
+            set;
+        }
         public bool IsDivision => SummonType == SummonAction.eSummonType.DIVISION;
 
         public bool IsDivisionSourceForDamage { get; set; }
@@ -1079,10 +1360,40 @@ namespace Elements
         public Action<bool> OnDamageForSpecialSleepRelease { get; set; }
 
         public Dictionary<int, Action<bool>> OnDamageListForChangeSpeedDisableByAttack { get; set; }
-
+        public Dictionary<int, Action<bool>> OnDamageListForSpyDisableByAttack
+        {
+            get;
+            set;
+        } = new Dictionary<int, Action<bool>>();
+        public Dictionary<int, Action<float>> OnRecoverListForChangeSpeedDisableByMaxHp
+        {
+            get;
+            set;
+        } = new Dictionary<int, Action<float>>();
+        public Dictionary<eAbnormalState, Func<bool>> IsReleaseSlipDamageDic
+        {
+            get;
+            set;
+        } = new Dictionary<eAbnormalState, Func<bool>>();
+        public OnDamageDelegate OnHpChangeForDamagedHP
+        {
+            get;
+            set;
+        }
         public Action OnDamageForUIShake { set; get; }
 
         public bool IsOnDamageCharge { get; set; }
+        public Dictionary<int, float> PartsBreakTimeDictionary
+        {
+            get;
+            set;
+        } = new Dictionary<int, float>();
+        public List<(long triggerHp, bool isActionDone, int actionId, Skill skill)> DamagedTriggerHpAndActionDoneList
+        {
+            get;
+            set;
+        } = new List<(long, bool, int, Skill)>();
+
 
         public int Index = -2;
 
@@ -1091,7 +1402,11 @@ namespace Elements
         public int UnitId { get; protected set; }
 
         public int CharacterUnitId { get; protected set; }
-
+        public int OriginalUnitId
+        {
+            get;
+            private set;
+        }
         public int SDSkin { get; private set; }
 
         public int IconSkin { get; private set; }
@@ -1117,7 +1432,11 @@ namespace Elements
         private Dictionary<int, List<int>> attackPatternDictionary { get; set; }
 
         private Dictionary<int, List<int>> attackPatternLoopDictionary { get; set; }
-
+        private List<int> levelFixedSpSkillIdList
+        {
+            get;
+            set;
+        } = new List<int>();
         public long StartMaxHP { get; private set; }
 
         public int StartAtk { get; protected set; }
@@ -1159,6 +1478,29 @@ namespace Elements
         public int StartPhysicalCriticalDamageRate { get; private set; }
 
         public int StartMagicCriticalDamageRate { get; private set; }
+        public int StartReceiveCriticalDamageRate
+        {
+            get;
+            private set;
+        }
+
+        public int StartPhysicalAndMagicReceiveDamagePercent
+        {
+            get;
+            set;
+        }
+
+        public int StartPhysicalReceiveDamagePercent
+        {
+            get;
+            set;
+        }
+
+        public int StartMagicReceiveDamagePercent
+        {
+            get;
+            set;
+        }
 
         public int Level { get; protected set; }
 
@@ -1231,7 +1573,35 @@ namespace Elements
         public int PhysicalCriticalDamageRate { get; set; }
 
         public int MagicCriticalDamageRate { get; set; }
+        public int ReceiveCriticalDamageRate
+        {
+            get;
+            set;
+        }
 
+        public int AdditionalPhysicalAndMagicReceiveDamagePercent
+        {
+            get;
+            set;
+        }
+
+        public int AdditionalPhysicalReceiveDamagePercent
+        {
+            get;
+            set;
+        }
+
+        public int AdditionalMagicReceiveDamagePercent
+        {
+            get;
+            set;
+        }
+
+        public long MaxHpAfterPassive
+        {
+            get;
+            set;
+        }
         public FloatWithEx AtkZero => (Atk.Max(0f) + getAdditionalBuffDictionary(BuffParamKind.ATK));
 
         public FloatWithEx MagicStrZero => (MagicStr.Max(0f) + getAdditionalBuffDictionary(BuffParamKind.MAGIC_STR));
@@ -1252,8 +1622,14 @@ namespace Elements
 
         public int WaveEnergyRecoveryZero => Mathf.Max(0, WaveEnergyRecovery);
 
-        public int EnergyRecoveryRateZero => (int)Mathf.Max(0, (int)EnergyRecoveryRate + getAdditionalBuffDictionary(BuffParamKind.ENERGY_RECOVER_RATE));
-
+        public int EnergyRecoveryRateZero
+        {
+            get
+            {
+                int num = (int)Mathf.Max(0, (int)EnergyRecoveryRate + getAdditionalBuffDictionary(BuffParamKind.ENERGY_RECOVER_RATE));
+                return (MainManager.Instance.MaxTPUpValue <= 0) ? num : Mathf.Min(num, MainManager.Instance.MaxTPUpValue);
+            }
+        }
         public int LifeStealZero => (int)(Mathf.Max(0, LifeSteal) + getAdditionalBuffDictionary(BuffParamKind.LIFE_STEAL));
 
         public int PhysicalPenetrateZero => Mathf.Max(0, PhysicalPenetrate);
@@ -1269,6 +1645,12 @@ namespace Elements
         public int PhysicalCriticalDamageRateOrMin => (int)(Mathf.Max(50, PhysicalCriticalDamageRate) + getAdditionalBuffDictionary(BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE));
 
         public int MagicCriticalDamageRateOrMin => (int)(Mathf.Max(50, MagicCriticalDamageRate) + getAdditionalBuffDictionary(BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE));
+
+        public int ReceiveCriticalDamageRateOrMin =>(int)(Mathf.Max(50, ReceiveCriticalDamageRate) + (float)getAdditionalBuffDictionary(BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE));
+
+        public float PhysicalReceiveDamagePercentOrMin => Mathf.Max(0f, (float)((int)AdditionalPhysicalReceiveDamagePercent + (int)AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
+
+        public float MagicReceiveDamagePercentOrMin => Mathf.Max(0f, (float)((int)AdditionalMagicReceiveDamagePercent + (int)AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
 
         public float StartHpPercent { get; private set; }
 
@@ -1300,6 +1682,7 @@ namespace Elements
         public float EnegryAmount => Energy / 1000f;
 
         public float LifeAmount => (long)Hp / (float)(long)MaxHp;
+        public float MaxLifeAmount => (float)(long)MaxHp / (float)MaxHpAfterPassive;
 
         public Transform BottomTransform
         {
@@ -2871,8 +3254,23 @@ this.updateCurColor();
         private bool isContinueIdleForPauseAction { get; set; }
 
         public eSpecialSleepStatus specialSleepStatus { get; set; } = eSpecialSleepStatus.INVALID;
-
+        private bool isSpecialSleepStatus
+        {
+            get
+            {
+                if (specialSleepStatus != 0 && specialSleepStatus != eSpecialSleepStatus.WAIT_START_END)
+                {
+                    return specialSleepStatus == eSpecialSleepStatus.LOOP;
+                }
+                return true;
+            }
+        }
         private bool isAbnormalEffectEnable { get; set; } = true;
+        public bool IsCharaAuraEnable
+        {
+            get;
+            set;
+        } = true;
 
         public bool AbnormalIconVisible { get; set; }
 
@@ -4704,7 +5102,20 @@ this.updateCurColor();
         public static int CompareMagicStrDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.GetMagicStrZeroEx.Emulate(hash).CompareTo(a.GetMagicStrZeroEx.Emulate(hash)) : -1);
 
 
-
+        public int CompareEnergyDecNearForward(BasePartsData _a, BasePartsData _b)
+        {
+            if (BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy))
+            {
+                bool flag = _a.GetPosition().x <= GetFirstParts().GetPosition().x == IsLeftDir;
+                bool flag2 = _b.GetPosition().x <= GetFirstParts().GetPosition().x == IsLeftDir;
+                if (flag == flag2)
+                {
+                    return CompareDistanceAsc(_a, _b);
+                }
+                return flag2.CompareTo(flag);
+            }
+            return CompareEnergyDec(_a, _b);
+        }
         public int CompareAtkAscNear(BasePartsData _a, BasePartsData _b) => _a.GetAtkZero() == _b.GetAtkZero() ? CompareDistanceAsc(_a, _b) : CompareAtkAsc(_a, _b);
 
         public int CompareAtkDecNear(BasePartsData _a, BasePartsData _b) => _a.GetAtkZero() == _b.GetAtkZero() ? CompareDistanceAsc(_a, _b) : CompareAtkDec(_a, _b);
@@ -4744,7 +5155,11 @@ this.updateCurColor();
         public Action OnActionByCritical { get; set; }
 
         public Action OnActionByDamageOnce { get; set; }
-
+        public Dictionary<eStateIconType, Action> ChargeEnergyByReceiveDamageDictionary
+        {
+            get;
+            set;
+        } = new Dictionary<eStateIconType, Action>();
         private List<AweAction.AweData> aweDatas { get; set; } = new List<AweAction.AweData>();
 
         private IEnumerator aweCoroutine { get; set; }
@@ -4812,13 +5227,29 @@ this.updateCurColor();
         0
       },
       {
-        BuffParamKind.ACCURACY,
-        0
-      },
-      {
-        BuffParamKind.MAX_HP,
-        0
-      }
+                BuffParamKind.ACCURACY,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.MAX_HP,
+                0
+            }
     };
 
 
@@ -5291,6 +5722,85 @@ this.updateCurColor();
             return num2;
         }
 
+        private Dictionary<BuffParamKind, int> buffCounterDictionary
+        {
+            get;
+            set;
+        } = new Dictionary<BuffParamKind, int>
+        {
+            {
+                BuffParamKind.ATK,
+                0
+            },
+            {
+                BuffParamKind.DEF,
+                0
+            },
+            {
+                BuffParamKind.MAGIC_STR,
+                0
+            },
+            {
+                BuffParamKind.MAGIC_DEF,
+                0
+            },
+            {
+                BuffParamKind.DODGE,
+                0
+            },
+            {
+                BuffParamKind.PHYSICAL_CRITICAL,
+                0
+            },
+            {
+                BuffParamKind.MAGIC_CRITICAL,
+                0
+            },
+            {
+                BuffParamKind.ENERGY_RECOVER_RATE,
+                0
+            },
+            {
+                BuffParamKind.LIFE_STEAL,
+                0
+            },
+            {
+                BuffParamKind.MOVE_SPEED,
+                0
+            },
+            {
+                BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE,
+                0
+            },
+            {
+                BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE,
+                0
+            },
+            {
+                BuffParamKind.ACCURACY,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.MAX_HP,
+                0
+            }
+        };
 
 
         public Dictionary<eParamType, PassiveActionValue> OwnerPassiveAction { get; private set; }
@@ -5620,7 +6130,11 @@ this.updateCurColor();
             _data.BreakTime = 0.0f;
             _data.SetBreak(false, null);
         }
-
+        public PartsData MultiBossPartsData
+        {
+            get;
+            set;
+        }
         private UnitCtrl KillBonusTarget { get; set; }
 
         public Action<float> OnLifeAmmountChange { get; set; }
@@ -7151,13 +7665,27 @@ this.updateCurColor();
                 return;
             this.StartCoroutine(this.FadeoutVoice((System.Action)(() => this.VoiceSource.Stop())));
         }*/
-
+        private bool isRevivaling
+        {
+            get
+            {
+                if ((long)Hp <= 0)
+                {
+                    return OnDeadForRevival != null;
+                }
+                return false;
+            }
+        }
         private Dictionary<int, float> castTimeDictionary { get; set; }
 
         public bool UnionBurstAnimeEndForIfAction { get; set; }
 
         public int UnionBurstSkillId { get; set; }
-
+        public bool IsSubUnionBurstMode
+        {
+            get;
+            set;
+        }
         public bool IsStartVoicePlay { get; set; }
 
         public bool ModeChangeEnd { get; set; }
@@ -7171,7 +7699,11 @@ this.updateCurColor();
         public Action<float> OnUpdateWhenIdle { get; set; }
 
         public Action OnBreakAll { get; set; }
-
+        public bool OnBreakAllCallWhenGameStartDone
+        {
+            get;
+            set;
+        }
         private int damageCoroutineId { get; set; }
 
         private int walkCoroutineId { get; set; }
@@ -9085,12 +9617,32 @@ this.updateCurColor();
         }
 
         //public void PlayDieEffect() => this.AppendCoroutine(this.CreatePrefabWithTime(this.dieEffects, _ignorePause: true), ePauseType.IGNORE_BLACK_OUT);
+        public bool ModeChangeUnableStateBarrier
+        {
+            get;
+            set;
+        }
 
+        public bool MultiTargetByTime
+        {
+            get;
+            set;
+        }
+
+        public int SpecialIdleMotionId
+        {
+            get;
+            set;
+        }
         public int ThanksTargetUnitId { get; set; }
         public bool UbIsDisableByChangePattern { get; set; }
-
+        public float UnionBurstCoolDownTime
+        {
+            get;
+            set;
+        }
         public int AnnihilationId { get; set; }
-
+        
         public int UbCounter { get; set; }
 
         public bool IsCutInSkip { get; set; }
@@ -9357,7 +9909,8 @@ this.updateCurColor();
         {
             //if (this.IsUbExecTrying && (!this.battleManager.UnitUiCtrl.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())
             if (IsUbExecTrying && (!MyGameCtrl.Instance.IsAutoMode || CurrentState != ActionState.IDLE) && JudgeSkillReadyAndIsMyTurn())
-                battleManager.SetOnlyAutoClearFlag(false);
+                //battleManager.SetOnlyAutoClearFlag(false);
+                battleManager.DisableAutoClear();
             if (IsUbExecTrying)
                 return true;
             if (pressing) return true;
@@ -9501,7 +10054,23 @@ this.updateCurColor();
             HEAL_DOWN = 50, // 0x00000032
             [Description("击晕NPC")]
             NPC_STUN = 51, // 0x00000033
-            NUM = 52, // 0x00000034
+            DECREASE_HEAL = 52,
+            POISON_BY_BEHAVIOUR = 53,
+            CRYSTALIZE = 54,
+            DAMAGE_LIMIT_ATK = 55,
+            DAMAGE_LIMIT_MGC = 56,
+            DAMAGE_LIMIT_ALL = 57,
+            STUN2 = 58,
+            POISON2 = 59,
+            CURSE2 = 60,
+            CONFUSION2 = 61,
+            NO_DAMAGE_MOTION2 = 62,
+            REGENERATION2 = 0x3F,
+            TP_REGENERATION2 = 0x40,
+            SLOW_OVERLAP = 65,
+            HASTE_OVERLAP = 66,
+            SPY = 67,
+            NUM = 68,
 
 
         }
@@ -9516,7 +10085,6 @@ this.updateCurColor();
         public enum eAbnormalStateCategory
         {
             NONE = 0,
-            TOP = 0,
             DAMAGE_RESISTANCE_MGK = 1,
             DAMAGE_RESISTANCE_ATK = 2,
             DAMAGE_RESISTANCE_BOTH = 3,
@@ -9526,48 +10094,63 @@ this.updateCurColor();
             SPEED = 7,
             FREEZE = 8,
             PARALYSIS = 9,
-            STUN = 10, // 0x0000000A
-            DETAIN = 11, // 0x0000000B
-            CONVERT = 12, // 0x0000000C
-            SILENCE = 13, // 0x0000000D
-            PHYSICAL_DARK = 14, // 0x0000000E
-            MAGIC_DARK = 15, // 0x0000000F
-            MIFUYU = 16, // 0x00000010
-            DECOY = 17, // 0x00000011
-            NO_DAMAGE = 18, // 0x00000012
-            NO_ABNORMAL = 19, // 0x00000013
-            NO_DEBUF = 20, // 0x00000014
-            SLEEP = 21, // 0x00000015
-            CHAINED = 22, // 0x00000016
-            ACCUMULATIVE_DAMAGE = 23, // 0x00000017
-            NO_EFFECT_SLIP_DAMAGE = 24, // 0x00000018
-            STONE = 25, // 0x00000019
-            REGENERATION = 26, // 0x0000001A
-            PHYSICS_DODGE = 27, // 0x0000001B
-            CONFUSION = 28, // 0x0000001C
-            VENOM = 29, // 0x0000001D
-            COUNT_BLIND = 30, // 0x0000001E
-            INHIBIT_HEAL = 31, // 0x0000001F
-            FEAR = 32, // 0x00000020
-            TP_REGENERATION = 33, // 0x00000021
-            HEX = 34, // 0x00000022
-            FAINT = 35, // 0x00000023
-            PARTS_NO_DAMAGE = 36, // 0x00000024
-            COMPENSATION = 37, // 0x00000025
-            CUT_ATK_DAMAGE = 38, // 0x00000026
-            CUT_MGC_DAMAGE = 39, // 0x00000027
-            CUT_ALL_DAMAGE = 40, // 0x00000028
-            LOG_ATK_BARRIR = 41, // 0x00000029
-            LOG_MGC_BARRIR = 42, // 0x0000002A
-            LOG_ALL_BARRIR = 43, // 0x0000002B
-            PAUSE_ACTION = 44, // 0x0000002C
-            UB_SILENCE = 45, // 0x0000002D
-            HEAL_DOWN = 46, // 0x0000002E
-            END = 47, // 0x0000002F
-            NPC_STUN = 47, // 0x0000002F
-            NUM = 48, // 0x00000030
+            STUN = 10,
+            DETAIN = 11,
+            CONVERT = 12,
+            SILENCE = 13,
+            PHYSICAL_DARK = 14,
+            MAGIC_DARK = 0xF,
+            MIFUYU = 0x10,
+            DECOY = 17,
+            NO_DAMAGE = 18,
+            NO_ABNORMAL = 19,
+            NO_DEBUF = 20,
+            SLEEP = 21,
+            CHAINED = 22,
+            ACCUMULATIVE_DAMAGE = 23,
+            NO_EFFECT_SLIP_DAMAGE = 24,
+            STONE = 25,
+            REGENERATION = 26,
+            PHYSICS_DODGE = 27,
+            CONFUSION = 28,
+            VENOM = 29,
+            COUNT_BLIND = 30,
+            INHIBIT_HEAL = 0x1F,
+            FEAR = 0x20,
+            TP_REGENERATION = 33,
+            HEX = 34,
+            FAINT = 35,
+            PARTS_NO_DAMAGE = 36,
+            COMPENSATION = 37,
+            CUT_ATK_DAMAGE = 38,
+            CUT_MGC_DAMAGE = 39,
+            CUT_ALL_DAMAGE = 40,
+            LOG_ATK_BARRIR = 41,
+            LOG_MGC_BARRIR = 42,
+            LOG_ALL_BARRIR = 43,
+            PAUSE_ACTION = 44,
+            UB_SILENCE = 45,
+            HEAL_DOWN = 46,
+            NPC_STUN = 47,
+            DECREASE_HEAL = 48,
+            POISON_BY_BEHAVIOUR = 49,
+            CRYSTALIZE = 50,
+            DAMAGE_LIMIT_ALL = 51,
+            DAMAGE_LIMIT_MGC = 52,
+            DAMAGE_LIMIT_ATK = 53,
+            STUN2 = 54,
+            POISON2 = 55,
+            CURSE2 = 56,
+            CONFUSION2 = 57,
+            NO_DAMAGE2 = 58,
+            REGENERATION2 = 59,
+            TP_REGENERATION2 = 60,
+            SPEED_OVERLAP = 61,
+            SPY = 62,
+            NUM = 0x3F,
+            TOP = 0,
+            END = 62
         }
-
         public class eAbnormalStateCategory_DictComparer : IEqualityComparer<eAbnormalStateCategory>
         {
             public bool Equals(eAbnormalStateCategory _x, eAbnormalStateCategory _y) => _x == _y;
@@ -9612,6 +10195,14 @@ this.updateCurColor();
             MAGIC_CRITICAL_DAMAGE_RATE = 12, // 0x0000000C
             [Description("命中")]
             ACCURACY = 13, // 0x0000000D
+            [Description("降暴")]
+            RECEIVE_CRITICAL_DAMAGE_RATE = 14,
+            [Description("降暴伤")]
+            RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT = 0xF,
+            [Description("降物暴伤")]
+            RECEIVE_PHYSICAL_DAMAGE_PERCENT = 0x10,
+            [Description("降魔暴伤")]
+            RECEIVE_MAGIC_DAMAGE_PERCENT = 17,
             MAX_HP = 100, // 0x00000064
             NONE = 101, // 0x00000065
             NUM = 101, // 0x00000065

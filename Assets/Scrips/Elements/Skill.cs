@@ -55,6 +55,7 @@ namespace Elements
         public float CutInMovieFadeStartTime = 1.9f;
         public float CutInMovieFadeDurationTime = 0.1f;
         public float CutInSkipTime;
+        public bool ForceCutinOff;
         [NonSerialized]
         [JsonIgnore]
         public int Level;
@@ -69,6 +70,8 @@ namespace Elements
         public bool PauseStopState;
         public List<int> BranchIds = new List<int>();
         [JsonIgnore]
+        public List<Skill> OverrideSkillList = new List<Skill>();
+        [JsonIgnore]
         public List<ActionParameter> ActionParameters
         {
             get => actionParameters;
@@ -76,6 +79,12 @@ namespace Elements
         }
         [JsonIgnore]
         public float CastTime { get; set; }
+        [JsonIgnore]
+        public float UnionBurstCoolDownTime
+        {
+            get;
+            set;
+        }
         [JsonIgnore]
         public int SkillNum { get; set; }
         [JsonIgnore]
@@ -120,6 +129,11 @@ namespace Elements
         public bool IsLifeStealEnabled { get; set; } = true;
         [JsonIgnore]
         public int AbsorberValue { get; set; }
+        public int BonusId
+        {
+            get;
+            set;
+        }
         public void SetLevel(int _level)
         {
             Level = _level;

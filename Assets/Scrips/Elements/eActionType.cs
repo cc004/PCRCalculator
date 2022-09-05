@@ -29,6 +29,7 @@ namespace Elements
         SLIP_DAMAGE = 9,
         [Description("BUFF/DEBUFF")]
         BUFF_DEBUFF = 10,
+        [Description("魅惑")]
         CHARM = 11,
         [Description("致盲")]
         BLIND = 12,
@@ -107,11 +108,24 @@ namespace Elements
         HEAL_DOWN = 76,
         PASSIVE_SEAL = 77,
         PASSIVE_DAMAGE_UP = 78,
+
+        DAMAGE_BY_ATTACK = 79,
+        DAMAGE_LIMIT = 80,
+        SPECIAL_IDLE = 81,
+        CHANGE_RESIST_ID = 82,
+        CHANGE_SPEED_OVERLAP = 83,
+
+
+
         [Description("被动技能")]
         PASSIVE = 90,//被动
         PASSIVE_INTERMITTENT = 91,//忽略，没有角色有这个技能
         CHANGE_ENERGY_RECOVERY_RATIO_BY_DAMAGE = 92, // 0x0000005C
         IGNORE_DECOY = 93, // 0x0000005D
+        EFFECT = 94,
+        SPY = 95,
+        CHARGE_ENERGY_FIELD = 96,
+        CHARGE_ENERGY_BY_DAMAGE = 97
 
     }
 

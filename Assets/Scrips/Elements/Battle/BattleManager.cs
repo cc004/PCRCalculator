@@ -87,6 +87,10 @@ namespace Elements.Battle
         //private TowerTempData towerTempData;
         //private SpaceBattleTempData spaceBattleTempData;
         //private ReplayTempData replayTempData;
+        private bool isSkipCoroutineRunning;
+
+        private float startRemainTime;
+
         private bool isPauseTimeLimit;
         public bool IsPlayCutin;
         public float BattleStartPos = 560f;
@@ -94,8 +98,10 @@ namespace Elements.Battle
         private int lastVoiceId;
         public float LatestSkillVoiceTime = -0.5f;
         public const float SKILL_VOICE_MIN_DELAY = 0.5f;
-        [NonSerialized]
-        public bool OnlyAutoClearFlag;
+        private eBattleClearType clearType;
+        public bool IsPausingEffectSkippedInThisFrame;
+        //[NonSerialized]
+        //public bool OnlyAutoClearFlag;
         public float ActionStartTimeCounter;
         private int currentWaveOffset;
         /*private ViewManager viewManager = ManagerSingleton<ViewManager>.Instance;
@@ -117,6 +123,13 @@ namespace Elements.Battle
         private UITexture skillExeScreenTexture;*/
         private float startalpha;
         private const float TOTAL_DELAY = 0.06f;
+        /*private bool startBonusAppearCalled;
+
+        private List<OMNGIBGDMFJ> bonusEnemy;
+
+        private Dictionary<PBAIJIBJPCO, List<CNBALNPBPGF>> bonusDictionary;
+
+        private bool isDefeatBonusOnly;*/
         private const float BOSS_TIME_UP_UNIT_FADEOUT_TIME = 0.5f;
         private const float PERCENT_DIGIT = 100f;
         public const int MILI_DIGID = 1000;
@@ -141,6 +154,7 @@ namespace Elements.Battle
         //private ISingletonNodeForInstanceEditing battleManagerNode;
         private bool isValid = true;
         //private StoryBattleData storyBattleDataPrefab;
+        private bool forcePauseNoDialogUpdate;
         private GameObject focusObject;
 
         public GameObject princessFormMoviePlayer;
@@ -310,9 +324,9 @@ namespace Elements.Battle
 
         public float GGCJPDLOAKI { get; set; }
 
-        public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
+        //public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
 
-        public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
+        //public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
 
         public bool LOGNEDLPEIJ { get; set; }
 
@@ -339,7 +353,10 @@ namespace Elements.Battle
                 return this.FELHBMBCMPD || this.ANHHNJFCMDB || this.BattleCategory == eBattleCategory.FRIEND;
             }
         }*/
-
+        public void DisableAutoClear()
+        {
+            clearType = eBattleClearType.MANUAL;
+        }
         public void GamePauseOnFrameEnd()
         {
             isToPauseOnFrameEnd = true;
@@ -625,6 +642,7 @@ namespace Elements.Battle
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
             battleUnionBurstController.TryExecUnionBurst();
+            IsPausingEffectSkippedInThisFrame = false;
             isUpdateFrameExecuted = true;
 
             if (GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)

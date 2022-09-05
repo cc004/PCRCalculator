@@ -671,7 +671,14 @@ namespace PCRCaculator
 
                 unitSkillData.SPskill_1_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_1"));
                 unitSkillData.SPskill_2_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_2"));
-
+                try
+                {
+                    unitSkillData.SPUB = reader.GetInt32(reader.GetOrdinal("sp_union_burst"));
+                }
+                catch
+                {
+                    Debug.LogError("DB过旧！");
+                }
 
                 unitSkilldic.Add(unitid, unitSkillData);
             }

@@ -637,7 +637,8 @@ namespace Elements
                 union_burst_evolution: skillData.UB_ev,
                 main_skill_evolution_1: skillData.skill_1_ev,
                 main_skill_evolution_2: skillData.skill_2_ev,
-                ex_skill_evolution_1: skillData.EXskill_ev)
+                ex_skill_evolution_1: skillData.EXskill_ev,
+                sp_union_burst:skillData.SPUB)
 
                 ) ;
         }

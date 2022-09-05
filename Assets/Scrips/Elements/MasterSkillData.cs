@@ -100,6 +100,7 @@ namespace Elements
             protected int _skill_type;
             protected int _skill_area_width;
             protected double _skill_cast_time;
+            protected double _boss_ub_cool_time;
             protected int _action_1;
             protected int _action_2;
             protected int _action_3;
@@ -177,7 +178,7 @@ namespace Elements
             public int skill_area_width => _skill_area_width;
 
             public double skill_cast_time => _skill_cast_time;
-
+            public double boss_ub_cool_time => _boss_ub_cool_time;
             public int action_1 => _action_1;
 
             public int action_2 => _action_2;

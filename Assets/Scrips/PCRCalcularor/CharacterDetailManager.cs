@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Elements;
 using Spine.Unity;
 using TMPro;
 using UnityEngine;
@@ -92,7 +93,7 @@ namespace PCRCaculator
                 //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
                 //if (dataAsset == null)
                 //{
-                    var dataAsset = SpineCreator.Instance.Createskeletondata(unitid, 0.01f, true);
+                     dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */), 0.01f, true);
                 //}
                 if (dataAsset == null)
                 {

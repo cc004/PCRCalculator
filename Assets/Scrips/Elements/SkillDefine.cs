@@ -10,14 +10,14 @@ using UnityEngine;
 
 namespace Elements
 {
-  public static class SkillDefine
-  {
-    public const int FREE_SKILL_SLOT_NUM = 3;
-    public const int ACTION_VALUE4_RARITY_ID = 100;
-    public const int UPGRADE_SKILL_NUM = 10;
-    private const float NO_DISPLAY = 0.0f;
-    private const float NO_VALUE_DISPLAY = -1f;
-    public static readonly Dictionary<eActionType, Func<List<float>, List<float>, bool, float>> SkillActionDictionary = new Dictionary<eActionType, Func<List<float>, List<float>, bool, float>>
+    public static class SkillDefine
+    {
+        public const int FREE_SKILL_SLOT_NUM = 3;
+        public const int ACTION_VALUE4_RARITY_ID = 100;
+        public const int UPGRADE_SKILL_NUM = 10;
+        private const float NO_DISPLAY = 0.0f;
+        private const float NO_VALUE_DISPLAY = -1f;
+        public static readonly Dictionary<eActionType, Func<List<float>, List<float>, bool, float>> SkillActionDictionary = new Dictionary<eActionType, Func<List<float>, List<float>, bool, float>>
     {
       {
         eActionType.ATTACK,
@@ -594,6 +594,22 @@ namespace Elements
         eActionType.PASSIVE_DAMAGE_UP,
         typeof (PassiveDamageUpAction)
       },
+      /*{
+        eActionType.DAMAGE_BY_ATTACK,
+        typeof(DamageByBehaviourAction)
+            },
+            {
+                eActionType.SPECIAL_IDLE,
+                typeof(SpecialIdleAction)
+            },
+            {
+                eActionType.CHANGE_RESIST_ID,
+                typeof(ChangeResistIdAction)
+            },
+            {
+                eActionType.DAMAGE_LIMIT,
+                typeof(DamageLimitAction)
+            },*/
       {
         eActionType.PASSIVE,
         typeof (ActionParameter)
@@ -605,8 +621,28 @@ namespace Elements
       {
         eActionType.IGNORE_DECOY,
         typeof (IgnoreDecoyAction)
-      }
-    };
+      },
+            /*{
+                eActionType.CHANGE_SPEED_OVERLAP,
+                typeof(ChangeSpeedOverlapAction)
+            },
+            {
+                eActionType.EFFECT,
+                typeof(EffectAction)
+            },
+            {
+                eActionType.SPY,
+                typeof(SpyAction)
+            },
+            {
+                eActionType.CHARGE_ENERGY_FIELD,
+                typeof(ChargeEnergyFieldAction)
+            },
+            {
+                eActionType.CHARGE_ENERGY_BY_DAMAGE,
+                typeof(ChargeEnergyByDamage)
+            }*/
+        };
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()
         {
           {
@@ -752,172 +788,172 @@ namespace Elements
       List<float> _subParameters,
       bool _isLevelUp) => 0.0f;
 
-    private static float calcSkillLevelParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isLevelUp) => !_isLevelUp ? -1f : _parameters[0];
+        private static float calcSkillLevelParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isLevelUp) => !_isLevelUp ? -1f : _parameters[0];
 
-    private static float calcAttackBaseParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isLevelUp)
-    {
-      float parameter1 = _parameters[0];
-      double parameter2 = _parameters[1];
-      float parameter3 = _parameters[2];
-      float parameter4 = _parameters[3];
-      float parameter5 = _parameters[4];
-      float subParameter1 = _subParameters[0];
-      float subParameter2 = _subParameters[1];
-      float subParameter3 = _subParameters[2];
-      double num = parameter3 * (double) parameter1;
-      return Mathf.Floor((float) (parameter2 + num + (subParameter1 == 1.0 || subParameter1 == 3.0 ? subParameter2 : (double) subParameter3) * (parameter4 + parameter5 * (double) parameter1)));
+        private static float calcAttackBaseParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isLevelUp)
+        {
+            float parameter1 = _parameters[0];
+            double parameter2 = _parameters[1];
+            float parameter3 = _parameters[2];
+            float parameter4 = _parameters[3];
+            float parameter5 = _parameters[4];
+            float subParameter1 = _subParameters[0];
+            float subParameter2 = _subParameters[1];
+            float subParameter3 = _subParameters[2];
+            double num = parameter3 * (double)parameter1;
+            return Mathf.Floor((float)(parameter2 + num + (subParameter1 == 1.0 || subParameter1 == 3.0 ? subParameter2 : (double)subParameter3) * (parameter4 + parameter5 * (double)parameter1)));
+        }
+
+        private static float calcHealBaseParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isLevelUp)
+        {
+            float parameter1 = _parameters[0];
+            double parameter2 = _parameters[1];
+            double parameter3 = _parameters[2];
+            float parameter4 = _parameters[3];
+            float parameter5 = _parameters[4];
+            float parameter6 = _parameters[5];
+            float subParameter1 = _subParameters[0];
+            float subParameter2 = _subParameters[1];
+            float subParameter3 = _subParameters[2];
+            double num = parameter4 * (double)parameter1;
+            return Mathf.Floor((float)(parameter3 + num + (subParameter1 == 1.0 ? subParameter2 : (double)subParameter3) * (parameter5 + parameter6 * (double)parameter1)));
+        }
+
+        private static float calcKnightGuardParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isLevelUp)
+        {
+            float parameter1 = _parameters[0];
+            double parameter2 = _parameters[1];
+            float parameter3 = _parameters[2];
+            float parameter4 = _parameters[3];
+            float parameter5 = _parameters[4];
+            float parameter6 = _parameters[5];
+            double subParameter1 = _subParameters[0];
+            float subParameter2 = _subParameters[1];
+            float subParameter3 = _subParameters[2];
+            float num = (int)parameter2 == 1 ? subParameter2 : subParameter3;
+            return (int)(parameter3 + parameter4 * (double)parameter1 + (parameter5 + parameter6 * (double)parameter1) * num);
+        }
+
+        private static float calcHealFieldBaseParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _levelUp)
+        {
+            float parameter1 = _parameters[0];
+            double parameter2 = _parameters[1];
+            float parameter3 = _parameters[2];
+            float parameter4 = _parameters[3];
+            float parameter5 = _parameters[4];
+            double parameter6 = _parameters[5];
+            float subParameter1 = _subParameters[0];
+            float subParameter2 = _subParameters[1];
+            float subParameter3 = _subParameters[2];
+            bool flag = subParameter1 == 2.0 || subParameter1 == 4.0;
+            double num = parameter3 * (double)parameter1;
+            return Mathf.Floor((float)(parameter2 + num + (flag ? subParameter3 : (double)subParameter2) * (parameter4 + parameter5 * (double)parameter1)));
+        }
+
+        private static float calcValueFirstBaseParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _levelUp)
+        {
+            float parameter = _parameters[0];
+            return Mathf.Ceil(_parameters[1] + _parameters[2] * parameter);
+        }
+
+        private static float calcValueFirstBaseParam2(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _levelUp)
+        {
+            float parameter = _parameters[0];
+            return BattleUtil.FloatToIntReverseTruncate(_parameters[1] + _parameters[2] * parameter);
+        }
+
+        private static float calcValueFirstBaseParamNoCeil(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _levelUp)
+        {
+            float parameter = _parameters[0];
+            return _parameters[1] + _parameters[2] * parameter;
+        }
+
+        private static float calcValueFirstBaseParamRound(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _levelUp)
+        {
+            float parameter = _parameters[0];
+            return Mathf.RoundToInt(_parameters[1] + _parameters[2] * parameter);
+        }
+
+        private static float calcValueSecondParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isSkillLevelUp)
+        {
+            float parameter = _parameters[0];
+            return Mathf.Ceil(_parameters[2] + _parameters[3] * parameter);
+        }
+
+        private static float calcValueSecondParam2(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isSkillLevelUp)
+        {
+            float parameter = _parameters[0];
+            return BattleUtil.FloatToIntReverseTruncate(_parameters[2] + _parameters[3] * parameter);
+        }
+
+        private static float calcChargeParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isLevelUp)
+        {
+            float parameter = _parameters[0];
+            return Mathf.Floor(_parameters[1] + _parameters[2] * parameter);
+        }
+
+        private static float calcRegeneParam(
+          List<float> _parameters,
+          List<float> _subParameters,
+          bool _isLevelUp)
+        {
+            float parameter1 = _parameters[0];
+            float parameter2 = _parameters[1];
+            float parameter3 = _parameters[2];
+            float parameter4 = _parameters[3];
+            float parameter5 = _parameters[4];
+            float subParameter1 = _subParameters[0];
+            float subParameter2 = _subParameters[1];
+            float subParameter3 = _subParameters[2];
+            return _subParameters[3] != 1.0 ? 0.0f : Mathf.Floor((float)(parameter2 + parameter3 * (double)parameter1 + (parameter4 + parameter5 * (double)parameter1) * (subParameter1 == 1.0 ? subParameter2 : (double)subParameter3)));
+        }
+
+        public static bool IsEvolutionSkill(int _skillId) => _skillId / 10 % 10 == 1;
+
+        public enum eBarrierType
+        {
+            PHYSIC_INVALID = 1,
+            MAGIC_INVALID = 2,
+            PHYSIC_ABSORB = 3,
+            MAGIC_ABSORB = 4,
+            PHYSIC_AND_MAGIC_INVALID = 5,
+            PHYSIC_AND_MAGIC_ABSORB = 6,
+        }
     }
-
-    private static float calcHealBaseParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isLevelUp)
-    {
-      float parameter1 = _parameters[0];
-      double parameter2 = _parameters[1];
-      double parameter3 = _parameters[2];
-      float parameter4 = _parameters[3];
-      float parameter5 = _parameters[4];
-      float parameter6 = _parameters[5];
-      float subParameter1 = _subParameters[0];
-      float subParameter2 = _subParameters[1];
-      float subParameter3 = _subParameters[2];
-      double num = parameter4 * (double) parameter1;
-      return Mathf.Floor((float) (parameter3 + num + (subParameter1 == 1.0 ? subParameter2 : (double) subParameter3) * (parameter5 + parameter6 * (double) parameter1)));
-    }
-
-    private static float calcKnightGuardParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isLevelUp)
-    {
-      float parameter1 = _parameters[0];
-      double parameter2 = _parameters[1];
-      float parameter3 = _parameters[2];
-      float parameter4 = _parameters[3];
-      float parameter5 = _parameters[4];
-      float parameter6 = _parameters[5];
-      double subParameter1 = _subParameters[0];
-      float subParameter2 = _subParameters[1];
-      float subParameter3 = _subParameters[2];
-      float num = (int) parameter2 == 1 ? subParameter2 : subParameter3;
-      return (int) (parameter3 + parameter4 * (double) parameter1 + (parameter5 + parameter6 * (double) parameter1) * num);
-    }
-
-    private static float calcHealFieldBaseParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _levelUp)
-    {
-      float parameter1 = _parameters[0];
-      double parameter2 = _parameters[1];
-      float parameter3 = _parameters[2];
-      float parameter4 = _parameters[3];
-      float parameter5 = _parameters[4];
-      double parameter6 = _parameters[5];
-      float subParameter1 = _subParameters[0];
-      float subParameter2 = _subParameters[1];
-      float subParameter3 = _subParameters[2];
-      bool flag = subParameter1 == 2.0 || subParameter1 == 4.0;
-      double num = parameter3 * (double) parameter1;
-      return Mathf.Floor((float) (parameter2 + num + (flag ? subParameter3 : (double) subParameter2) * (parameter4 + parameter5 * (double) parameter1)));
-    }
-
-    private static float calcValueFirstBaseParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _levelUp)
-    {
-      float parameter = _parameters[0];
-      return Mathf.Ceil(_parameters[1] + _parameters[2] * parameter);
-    }
-
-    private static float calcValueFirstBaseParam2(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _levelUp)
-    {
-      float parameter = _parameters[0];
-      return BattleUtil.FloatToIntReverseTruncate(_parameters[1] + _parameters[2] * parameter);
-    }
-
-    private static float calcValueFirstBaseParamNoCeil(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _levelUp)
-    {
-      float parameter = _parameters[0];
-      return _parameters[1] + _parameters[2] * parameter;
-    }
-
-    private static float calcValueFirstBaseParamRound(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _levelUp)
-    {
-      float parameter = _parameters[0];
-      return Mathf.RoundToInt(_parameters[1] + _parameters[2] * parameter);
-    }
-
-    private static float calcValueSecondParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isSkillLevelUp)
-    {
-      float parameter = _parameters[0];
-      return Mathf.Ceil(_parameters[2] + _parameters[3] * parameter);
-    }
-
-    private static float calcValueSecondParam2(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isSkillLevelUp)
-    {
-      float parameter = _parameters[0];
-      return BattleUtil.FloatToIntReverseTruncate(_parameters[2] + _parameters[3] * parameter);
-    }
-
-    private static float calcChargeParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isLevelUp)
-    {
-      float parameter = _parameters[0];
-      return Mathf.Floor(_parameters[1] + _parameters[2] * parameter);
-    }
-
-    private static float calcRegeneParam(
-      List<float> _parameters,
-      List<float> _subParameters,
-      bool _isLevelUp)
-    {
-      float parameter1 = _parameters[0];
-      float parameter2 = _parameters[1];
-      float parameter3 = _parameters[2];
-      float parameter4 = _parameters[3];
-      float parameter5 = _parameters[4];
-      float subParameter1 = _subParameters[0];
-      float subParameter2 = _subParameters[1];
-      float subParameter3 = _subParameters[2];
-      return _subParameters[3] != 1.0 ? 0.0f : Mathf.Floor((float) (parameter2 + parameter3 * (double) parameter1 + (parameter4 + parameter5 * (double) parameter1) * (subParameter1 == 1.0 ? subParameter2 : (double) subParameter3)));
-    }
-
-    public static bool IsEvolutionSkill(int _skillId) => _skillId / 10 % 10 == 1;
-
-    public enum eBarrierType
-    {
-      PHYSIC_INVALID = 1,
-      MAGIC_INVALID = 2,
-      PHYSIC_ABSORB = 3,
-      MAGIC_ABSORB = 4,
-      PHYSIC_AND_MAGIC_INVALID = 5,
-      PHYSIC_AND_MAGIC_ABSORB = 6,
-    }
-  }
 }

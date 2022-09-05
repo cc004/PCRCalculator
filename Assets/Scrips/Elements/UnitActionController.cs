@@ -30,6 +30,7 @@ namespace Elements
         public List<Skill> SpecialSkillEvolutionList;
         public List<Skill> UnionBurstEvolutionList;
         public List<Skill> MainSkillEvolutionList;
+        public List<Skill> SubUnionBurstList;
         public Skill Annihilation;
         //private static Yggdrasil<UnitActionController> staticSingletonTree;
         private static BattleManagerForActionController staticBattleManager;
@@ -42,9 +43,6 @@ namespace Elements
         private const int LOOP_MOTION_NUMBER = 1;
         private const int FIRST_TARGET_INDEX = 0;
 
-        public bool GetIsSkillPrincessForm(int _skillId) => skillDictionary[_skillId].IsPrincessForm;
-
-        public List<PrincessSkillMovieData> GetPrincessFormMovieData(int _skillId) => skillDictionary[_skillId].PrincessSkillMovieDataList;
 
         public UnitCtrl Owner { get; set; }
 
@@ -55,7 +53,11 @@ namespace Elements
         public bool DisableUBByModeChange { set; get; }
 
         public bool ModeChanging { get; set; }
-
+        public bool StopModeChangeEndEffectCalled
+        {
+            get;
+            set;
+        }
         public bool MoveEnd { get; set; }
 
         public Dictionary<int, Skill> skillDictionary { get; private set; }
@@ -68,19 +70,22 @@ namespace Elements
 
         private BattleManagerForActionController battleManager => staticBattleManager;
 
-        //private BMIOELFOCPE battleCameraEffect => UnitActionController.staticBattleCameraEffect;
+        //private BMIOELFOCPE battleCameraEffect => UnitstaticBattleCameraEffect;
 
         private BattleEffectPoolInterface battleEffectPool => staticBattleEffectPool;
 
-        //private JFJNEHKINFI battleTimeScale => UnitActionController.staticBattleTimeScale;
+        //private JFJNEHKINFI battleTimeScale => UnitstaticBattleTimeScale;
+        public bool GetIsSkillPrincessForm(int _skillId) => skillDictionary[_skillId].IsPrincessForm;
+
+        public List<PrincessSkillMovieData> GetPrincessFormMovieData(int _skillId) => skillDictionary[_skillId].PrincessSkillMovieDataList;
 
         public static void StaticRelease()
         {
-            //UnitActionController.staticSingletonTree = (Yggdrasil<UnitActionController>) null;
+            //UnitstaticSingletonTree = (Yggdrasil<UnitActionController>) null;
             staticBattleManager = null;
-            //UnitActionController.staticBattleCameraEffect = (BMIOELFOCPE) null;
+            //UnitstaticBattleCameraEffect = (BMIOELFOCPE) null;
             staticBattleEffectPool = null;
-            //UnitActionController.staticBattleTimeScale = (JFJNEHKINFI) null;
+            //UnitstaticBattleTimeScale = (JFJNEHKINFI) null;
         }
 
         private void OnDestroy()
@@ -101,13 +106,13 @@ namespace Elements
           bool _initializeAttackOnly = false,
           UnitCtrl _seOwner = null)
         {
-            /*if (UnitActionController.staticSingletonTree == null)
+            /*if (UnitstaticSingletonTree == null)
             {
-              UnitActionController.staticSingletonTree = this.CreateSingletonTree<UnitActionController>();
-              UnitActionController.staticBattleManager = (GHPNJFDPICH) UnitActionController.staticSingletonTree.Get<BattleManager>();
-              UnitActionController.staticBattleCameraEffect = (BMIOELFOCPE) UnitActionController.staticSingletonTree.Get<CMMLKFHCEPD>();
-              UnitActionController.staticBattleEffectPool = (BattleEffectPoolInterface) UnitActionController.staticSingletonTree.Get<BattleEffectPool>();
-              UnitActionController.staticBattleTimeScale = (JFJNEHKINFI) UnitActionController.staticSingletonTree.Get<BattleSpeedManager>();
+              UnitstaticSingletonTree = this.CreateSingletonTree<UnitActionController>();
+              UnitstaticBattleManager = (GHPNJFDPICH) UnitstaticSingletonTree.Get<BattleManager>();
+              UnitstaticBattleCameraEffect = (BMIOELFOCPE) UnitstaticSingletonTree.Get<CMMLKFHCEPD>();
+              UnitstaticBattleEffectPool = (BattleEffectPoolInterface) UnitstaticSingletonTree.Get<BattleEffectPool>();
+              UnitstaticBattleTimeScale = (JFJNEHKINFI) UnitstaticSingletonTree.Get<BattleSpeedManager>();
             }*/
 
             staticBattleManager = BattleManager.Instance;
@@ -267,6 +272,18 @@ namespace Elements
                 else
                     break;
             }
+            List<int> subUnionBurstIds = skillData.SubUnionBurstIds;
+            for (int num3 = 0; num3 < subUnionBurstIds.Count; num3++)
+            {
+                int num4 = subUnionBurstIds[num3];
+                if (num4 == 0)
+                {
+                    break;
+                }
+                SubUnionBurstList[num3].SkillNum = num3;
+                skillDictionary.Add(num4, SubUnionBurstList[num3]);
+            }
+            Dictionary<int, int> dictionary = new Dictionary<int, int>();
             foreach (KeyValuePair<int, Skill> skill in skillDictionary)
             {
                 Skill _skill = skill.Value;
@@ -277,14 +294,33 @@ namespace Elements
                     case 1:
                         continue;
                     default:
-                        if (Owner.SkillLevels[key] != 0)
+                        int lv = Owner.SkillLevels[key];
+                        if (lv != 0)
                         {
                             SkillData data = MainManager.Instance.SkillDataDic[key];
                             MasterSkillData.SkillData _skillParameter = new MasterSkillData.SkillData(data);
                             try
                             {
                                 setSkillParameter(_skill, _skillParameter);
-                                _skill.SetLevel(Owner.SkillLevels[key]);
+                                _skill.SetLevel(lv);
+                                List<MasterUnitSkillDataRf.UnitSkillDataRf> list = MainManager.Instance.MasterUnitSkillDataRf.GetListWithSkillId(key).OrderBy((Func<MasterUnitSkillDataRf.UnitSkillDataRf, int>)((MasterUnitSkillDataRf.UnitSkillDataRf e) => e.min_lv)).ToList();
+                                for (int num6 = 0; num6 < list.Count; num6++)
+                                {
+                                    MasterUnitSkillDataRf.UnitSkillDataRf unitSkillDataRf = list[num6];
+                                    if (lv < (int)unitSkillDataRf.min_lv)
+                                    {
+                                        if (num6 != 0)
+                                        {
+                                            dictionary.Add(_skill.SkillId, num6 - 1);
+                                        }
+                                        break;
+                                    }
+                                    if (list.Count == num6 + 1)
+                                    {
+                                        dictionary.Add(_skill.SkillId, num6);
+                                    }
+                                }
+
                             }
                             catch
                             {
@@ -295,6 +331,13 @@ namespace Elements
                         continue;
                 }
             }
+            if (MainManager.Instance.Enemy_ignore_skill_rf.Contains(Owner.UnitId))//ManagerSingleton<MasterDataManager>.Instance.masterEnemyIgnoreSkillRf.Get(Owner.UnitId) == null)
+            {
+                foreach (KeyValuePair<int, int> item2 in dictionary)
+                {
+                    skillDictionary[item2.Key] = skillDictionary[item2.Key].OverrideSkillList[item2.Value];
+                }
+            }
             if (UnionBurstList.Count != 0)
                 setCutInSkipTimeForPrincessForm(skillData.UnionBurstIds[0]);
             if (UnionBurstEvolutionList.Count == 0)
@@ -302,7 +345,7 @@ namespace Elements
             setCutInSkipTimeForPrincessForm(skillData.UnionBurstEvolutionIds[0]);
         }
 
-        private void setSkillParameter(Skill _skill, MasterSkillData.SkillData _skillParameter)
+        private void setSkillParameter(Skill _skill, MasterSkillData.SkillData _skillParameter,int _parentSkillId = -1)
         {
             Dictionary<eActionType, int> actionCounter = new Dictionary<eActionType, int>(new eActionType_DictComparer());
             _skill.ActionParameters = new List<ActionParameter>();
@@ -315,7 +358,14 @@ namespace Elements
                 //  responceVoiceType = eUbResponceVoiceType.APPLOUD;
                 //this.Owner.UbResponceVoiceType = responceVoiceType;
             }
-            _skill.SkillId = _skillParameter.SkillId;
+            if (_parentSkillId != -1)
+            {
+                _skill.SkillId = _parentSkillId;
+            }
+            else
+            {
+                _skill.SkillId = _skillParameter.SkillId;
+            }
             _skill.skillAreaWidth = _skillParameter.skill_area_width == 0 ? Owner.SearchAreaSize : _skillParameter.skill_area_width;
             for (int index = 0; index < _skillParameter.ActionDataList.Count; ++index)
             {
@@ -323,6 +373,7 @@ namespace Elements
                 createActionValue(_skillParameter, actionData, _skill, actionCounter);
             }
             _skill.CastTime = (float)(double)_skillParameter.skill_cast_time;
+            _skill.UnionBurstCoolDownTime = (float)(double)_skillParameter.boss_ub_cool_time;
             _skill.SkillName = _skillParameter.Name;
             //add scripts
             if (MainManager.Instance.SkillNameAndDescribe_cn.TryGetValue(_skill.SkillId, out string[] names))
@@ -367,6 +418,20 @@ namespace Elements
                     this.Timer((System.Action)(() => right.gameObject.SetActive(false)));
                 }
             }*/
+            List<MasterUnitSkillDataRf.UnitSkillDataRf> listWithSkillId = MainManager.Instance.MasterUnitSkillDataRf.GetListWithSkillId(_skillParameter.SkillId);
+
+            for (int j = 0; j < _skill.OverrideSkillList.Count; j++)
+            {
+                if (listWithSkillId.Count > j)
+                {
+                    _skill.OverrideSkillList[j].SkillNum = _skill.SkillNum;
+                    SkillData data = MainManager.Instance.SkillDataDic[listWithSkillId[j].rf_skill_id];
+                    MasterSkillData.SkillData temp0 = new MasterSkillData.SkillData(data);
+
+                    setSkillParameter(_skill.OverrideSkillList[j], temp0, _skillParameter.SkillId);
+                    _skill.OverrideSkillList[j].SetLevel(Owner.SkillLevels[_skillParameter.SkillId]);
+                }
+            }
         }
 
         private void dependActionSolve(Skill skill)
@@ -585,6 +650,10 @@ namespace Elements
                 return false;
             }
             Skill skill = skillDictionary[skillId];
+            if (skill.UnionBurstCoolDownTime > 0f)
+            {
+                Owner.UnionBurstCoolDownTime = skill.UnionBurstCoolDownTime;
+            }
             skill.DefeatEnemyCount = 0;
             skill.DefeatByThisSkill = false;
             skill.AlreadyAddAttackSelfSeal = false;
@@ -863,14 +932,15 @@ namespace Elements
                 }
                 else if (battleManager.DecoyEnemy != null)
                     basePartsData = battleManager.DecoyEnemy.GetFirstParts(_basePos: Owner.transform.position.x);
-                if (basePartsData != null && !basePartsData.Owner.IsDead)
+                //2022/09/05改
+                if (basePartsData != null && !basePartsData.Owner.IsDead && !basePartsData.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY) && isInActionTargetArea(_skill, _action, _basePosition, _considerBodyWidth, basePartsData))
                 {
                     //if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 2.0 + (double)this.Owner.BodyWidth / 2.0)
-                    if (Mathf.Abs(basePartsData.GetLocalPosition().x - transform.localPosition.x) <= _action.TargetWidth + basePartsData.GetBodyWidth() / 2.0 + Owner.BodyWidth / 2.0)
-                    {
+                    //if (Mathf.Abs(basePartsData.GetLocalPosition().x - transform.localPosition.x) <= _action.TargetWidth + basePartsData.GetBodyWidth() / 2.0 + Owner.BodyWidth / 2.0)
+                    //{
                         _action.TargetList.Clear();
                         _action.TargetList.Add(basePartsData);
-                    }
+                    //}
                 }
             }
             _action.IsSearchAndSorted = true;
@@ -889,16 +959,16 @@ namespace Elements
           int _skillId,
           Action _callback)
         {
-            UnitActionController actionController = this;
-            //actionController.battleTimeScale.StopSlowEffect();
-            Skill skill = actionController.skillDictionary[_skillId];
-            BattleSpineController unitSpineController = actionController.Owner.GetCurrentSpineCtrl();
+            //UnitActionController actionController = this;
+            //battleTimeScale.StopSlowEffect();
+            Skill skill = skillDictionary[_skillId];
+            BattleSpineController unitSpineController = Owner.GetCurrentSpineCtrl();
             TrackEntry entry = unitSpineController.state.GetCurrent(0);
             float deltaTimeAccumulated = 0.0f;
             //BattleHeaderController battleHeaderController = SingletonMonoBehaviour<BattleHeaderController>.Instance;
-            actionController.battleManager.SetSkillExeScreenActive(_unit, Color.black);
-            actionController.Owner.SetSortOrderFront();
-            actionController.AddBlackoutTarget(_skillId);
+            battleManager.SetSkillExeScreenActive(_unit, Color.black);
+            Owner.SetSortOrderFront();
+            AddBlackoutTarget(_skillId);
             if (skill.IsPrincessForm)
             {
                 yield return null;
@@ -906,91 +976,91 @@ namespace Elements
             }
             else
             {
-                actionController.Owner.PlayAnime(skill.AnimId, skill.SkillNum, _index3: actionController.Owner.MotionPrefix, _isLoop: false);
+                Owner.PlayAnime(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix, _isLoop: false);
                 for (int index = 0; index < skill.SkillEffects.Count; ++index)
                 {
                     NormalSkillEffect skillEffect = skill.SkillEffects[index];
                     if (skillEffect.TargetMotionIndex == 0)
                     {
                         skill.Cancel = false;
-                        //actionController.StartCoroutine(actionController.updateCoroutineWithOutCutIn(actionController.createNormalPrefabWithDelay(skillEffect, skill, _skipCutIn: true)));
+                        //StartCoroutine(updateCoroutineWithOutCutIn(createNormalPrefabWithDelay(skillEffect, skill, _skipCutIn: true)));
                     }
                 }
                 //if (skill.ZoomEffect.Enable)
-                //  actionController.battleCameraEffect.StartZoomEffect(skill.ZoomEffect, actionController.Owner, 0.0f, true, false, false);
-                if (skill.SkillId == actionController.Owner.UnionBurstSkillId)
-                    actionController.Owner.StartChangeSortOrder(skill.ChangeSortDatas, 0.0f);
-                while (!actionController.battleManager.CoroutineManager.VisualPause)
+                //  battleCameraEffect.StartZoomEffect(skill.ZoomEffect, Owner, 0.0f, true, false, false);
+                if (skill.SkillId == Owner.UnionBurstSkillId)
+                    Owner.StartChangeSortOrder(skill.ChangeSortDatas, 0.0f);
+                while (!battleManager.CoroutineManager.VisualPause)
                     yield return null;
-                actionController.Timer(() => battleManager.SetSkillExeScreenActive(_unit, skill.BlackoutColor));
-                actionController.Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
-                actionController.Owner.IsCutInSkip = true;
+                this.Timer(() => battleManager.SetSkillExeScreenActive(_unit, skill.BlackoutColor));
+                Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
+                Owner.IsCutInSkip = true;
                 entry = unitSpineController.state.GetCurrent(0);
                 while (true)
                 {
                     if (!BattleHeaderController.Instance.IsPaused)
                         deltaTimeAccumulated += Time.deltaTime;
-                    for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= actionController.battleManager.DeltaTime_60fps)
+                    for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= battleManager.DeltaTime_60fps)
                     {
-                        if (!actionController.battleManager.BlackoutUnitTargetList.Contains(actionController.Owner))
+                        if (!battleManager.BlackoutUnitTargetList.Contains(Owner))
                         {
                             unitSpineController.RealUpdate();
                             unitSpineController.RealLateUpdate();
                         }
-                        actionController.battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealUpdate());
-                        actionController.battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealLateUpdate());
-                        actionController.Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealUpdate());
-                        actionController.Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealLateUpdate());
+                        battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealUpdate());
+                        battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealLateUpdate());
+                        Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealUpdate());
+                        Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealLateUpdate());
                     }
                     if (entry.TrackTime < (double)skill.CutInSkipTime)//TrackTime为修改过的
                         yield return null;
                     else
                         break;
                 }
-                actionController.Owner.EffectSpineControllerList.Clear();
+                Owner.EffectSpineControllerList.Clear();
                 _callback.Call();
             }
         }
 
         public IEnumerator StartAnnihilationSkillAnimation(int _annihilationId)
         {
-            UnitActionController actionController = this;
-            actionController.Owner.Pause = false;
-            //actionController.battleTimeScale.StopSlowEffect();
-            Skill annihilation = actionController.Annihilation;
-            BattleSpineController unitSpineController = actionController.Owner.GetCurrentSpineCtrl();
+            //UnitActionController actionController = this;
+            Owner.Pause = false;
+            //battleTimeScale.StopSlowEffect();
+            Skill annihilation = Annihilation;
+            BattleSpineController unitSpineController = Owner.GetCurrentSpineCtrl();
             //BattleHeaderController instance = SingletonMonoBehaviour<BattleHeaderController>.Instance;
-            unitSpineController.AnimationName = unitSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.ANNIHILATION, _index3: actionController.Owner.MotionPrefix);
+            unitSpineController.AnimationName = unitSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.ANNIHILATION, _index3: Owner.MotionPrefix);
             for (int index = 0; index < annihilation.SkillEffects.Count; ++index)
             {
                 NormalSkillEffect skillEffect = annihilation.SkillEffects[index];
                 if (skillEffect.TargetMotionIndex == 0)
                 {
                     annihilation.Cancel = false;
-                    //actionController.StartCoroutine(actionController.updateCoroutineWithOutCutIn(actionController.createNormalPrefabWithDelay(skillEffect, annihilation)));
+                    //StartCoroutine(updateCoroutineWithOutCutIn(createNormalPrefabWithDelay(skillEffect, annihilation)));
                 }
             }
-            //actionController.battleCameraEffect.ClearShake();
+            //battleCameraEffect.ClearShake();
             /*if (annihilation.ZoomEffect.Enable)
             {
-              ++actionController.Owner.UbCounter;
-              actionController.battleCameraEffect.StartZoomEffect(annihilation.ZoomEffect, actionController.Owner, 0.0f, true, true);
+              ++Owner.UbCounter;
+              battleCameraEffect.StartZoomEffect(annihilation.ZoomEffect, Owner, 0.0f, true, true);
             }*/
             //foreach (ShakeEffect shakeEffect in annihilation.ShakeEffects)
-            //  actionController.Owner.StartCoroutine(actionController.updateCoroutineWithOutCutIn(actionController.StartShakeWithDelay(shakeEffect, annihilation)));
+            //  Owner.StartCoroutine(updateCoroutineWithOutCutIn(StartShakeWithDelay(shakeEffect, annihilation)));
             //if (annihilation.SlowEffect.Enable)
-            //actionController.battleTimeScale.StartSlowEffect(annihilation.SlowEffect, actionController.Owner, 0.0f, true);
+            //battleTimeScale.StartSlowEffect(annihilation.SlowEffect, Owner, 0.0f, true);
             if (annihilation.BlackOutTime > 0.0)
             {
-                actionController.battleManager.SetForegroundEnable(false);
-                actionController.StartCoroutine(actionController.updateCoroutineWithOutCutIn(actionController.foregroundActiveWithDelay(annihilation.BlackOutTime)));
+                battleManager.SetForegroundEnable(false);
+                StartCoroutine(updateCoroutineWithOutCutIn(foregroundActiveWithDelay(annihilation.BlackOutTime)));
             }
-            actionController.Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
-            while (_annihilationId == actionController.Owner.AnnihilationId)
+            Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
+            while (_annihilationId == Owner.AnnihilationId)
             {
-                for (float num = 0.0f + Time.deltaTime; num > 0.0; num -= actionController.battleManager.DeltaTime_60fps)
+                for (float num = 0.0f + Time.deltaTime; num > 0.0; num -= battleManager.DeltaTime_60fps)
                 {
-                    //actionController.battleCameraEffect.UpdateShake();
+                    //battleCameraEffect.UpdateShake();
                     if (!unitSpineController.IsPlayAnime)
                     {
                         unitSpineController.AnimationName = unitSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE);
@@ -1167,7 +1237,9 @@ namespace Elements
             if (_action == null|| _action.TargetList == null)
                 return;
             if (_action.TargetList.Count == 0)
-                _action.OnInitWhenNoTarget.Call();
+            {
+                initWhenNoTarget(_action, _skill);
+            }
             if (_action.ActionType == eActionType.CONTINUOUS_ATTACK)
             {
                 //if (this.Owner.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum, 1))
@@ -1184,7 +1256,9 @@ namespace Elements
         public void ExecUnitActionNoDelay(ActionParameter _action, Skill _skill)
         {
             if (_action.TargetList.Count == 0)
-                _action.OnInitWhenNoTarget.Call();
+            {
+                initWhenNoTarget(_action, _skill);
+            }
             for (int index = 0; index < _action.TargetList.Count && (index < _action.TargetNum || _action.TargetNum == 0 || index == 0); ++index)
             {
                 BasePartsData target = _action.TargetList[index];
@@ -1398,12 +1472,49 @@ namespace Elements
             int index = 0;
             for (int count = action.ActionChildrenIndexes.Count; index < count; ++index)
             {
-                int actionChildrenIndex = action.ActionChildrenIndexes[index];
-                if ((skill.ActionParameters[actionChildrenIndex].ActionType != eActionType.MODE_CHANGE || skill.ActionParameters[actionChildrenIndex].ActionDetail1 != 3) && (!enabledChildAction.ContainsKey(skill.ActionParameters[actionChildrenIndex].ActionId) || enabledChildAction[skill.ActionParameters[actionChildrenIndex].ActionId]) && (action.ActionType != eActionType.ATTACK || num == action.ExecTime.Length - 1))
-                    AppendCoroutine(ExecActionWithDelayAndTarget(skill.ActionParameters[actionChildrenIndex], skill, target, starttime), ePauseType.SYSTEM, skill.BlackOutTime > 0.0 ? Owner : null);
+                //int actionChildrenIndex = action.ActionChildrenIndexes[index];
+                //if ((skill.ActionParameters[actionChildrenIndex].ActionType != eActionType.MODE_CHANGE || skill.ActionParameters[actionChildrenIndex].ActionDetail1 != 3) && (!enabledChildAction.ContainsKey(skill.ActionParameters[actionChildrenIndex].ActionId) || enabledChildAction[skill.ActionParameters[actionChildrenIndex].ActionId]) && (action.ActionType != eActionType.ATTACK || num == action.ExecTime.Length - 1))
+                //    AppendCoroutine(ExecActionWithDelayAndTarget(skill.ActionParameters[actionChildrenIndex], skill, target, starttime), ePauseType.SYSTEM, skill.BlackOutTime > 0.0 ? Owner : null);
+                ActionParameter actionParameter = skill.ActionParameters[action.ActionChildrenIndexes[index]];
+                if ((actionParameter.ActionType == eActionType.MODE_CHANGE && actionParameter.ActionDetail1 == 3) || (enabledChildAction.ContainsKey(actionParameter.ActionId) && !enabledChildAction[actionParameter.ActionId]) || (action.ActionType == eActionType.ATTACK && num != action.ExecTime.Length - 1))
+                {
+                    continue;
+                }
+                if (actionParameter.TargetSort != PriorityPattern.PARENT_TARGET_PARTS)
+                {
+                    AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+                }
+                else
+                {
+                    if (!target.Owner.IsPartsBoss || actionParameter.ExecedMultiBossList.Contains(target.Owner))
+                    {
+                        continue;
+                    }
+                    foreach (PartsData item in target.Owner.BossPartsListForBattle)
+                    {
+                        if (item.GetTargetable())
+                        {
+                            AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, item, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+                        }
+                    }
+                    actionParameter.ExecedMultiBossList.Add(target.Owner);
+                }
             }
         }
-
+        private void initWhenNoTarget(ActionParameter _action, Skill _skill)
+        {
+            _action.OnInitWhenNoTarget.Call();
+            Queue<int> queue = new Queue<int>(_action.ActionChildrenIndexes);
+            while (queue.Count > 0)
+            {
+                ActionParameter actionParameter = _skill.ActionParameters[queue.Dequeue()];
+                actionParameter.OnInitWhenNoTarget.Call();
+                for (int i = 0; i < actionParameter.ActionChildrenIndexes.Count; i++)
+                {
+                    queue.Enqueue(actionParameter.ActionChildrenIndexes[i]);
+                }
+            }
+        }
         private IEnumerator createNormalPrefabWithDelay(
           NormalSkillEffect _skilleffect,
           Skill _skill,
@@ -1595,7 +1706,7 @@ namespace Elements
           int execTimeIndex = 0,
           bool _modeChangeEndEffect = false)
         {
-          if (_skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM && !(_skillEffect.FireAction is AttackAction) && (!(_skillEffect.FireAction is RatioDamageAction) && !(_skillEffect.FireAction is UpperLimitAttackAction)) && (!(_skillEffect.FireAction is HealAction) && _skillEffect.AppendAndJudgeAlreadyExeced(_firearmEndTarget.Owner)) || (_skillEffect.TargetBranchId != 0 && _skillEffect.TargetBranchId != _skill.EffectBranchId || _skillEffect.TargetMotionIndex == 1 && _skill.LoopEffectAlreadyDone))
+          if (_skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM && !(_skillEffect.FireAction is AttackAction) && (!(_skillEffect.FireAction is RatioDamageAction) && !(_skillEffect.FireAction is UpperLimitAttackAction)) && (!(_skillEffect.FireAction is HealAction) && _skillEffect.AppendAndJudgeAlreadyExeced(_firearmEndTarget.Owner)) || (_skillEffect.TargetBranchId != 0 && _skillEffect.TargetBranchId != _skill.EffectBranchId || _skillEffect.TargetMotionIndex == 1 && _skill.LoopEffectAlreadyDone) || (_modeChangeEndEffect && StopModeChangeEndEffectCalled))
             return;
           GameObject prefab1 = null;
           SkillEffectCtrl prefab2 = createPrefab(_skillEffect, _skill, _target, ref prefab1);
@@ -1732,11 +1843,27 @@ namespace Elements
           bool _considerBodyWidth)
         {
             float x = Owner.lossyx;
+            //float x = transform.parent.lossyScale.x;
+
             actionParameter.TargetList.Clear();
             bool isOther = Owner.IsOther;
             List<UnitCtrl> unitCtrlList1 = !Owner.IsConfusionOrConvert() ? (isOther ? battleManager.UnitList : battleManager.EnemyList) : (!isOther ? battleManager.UnitList : battleManager.EnemyList);
             List<UnitCtrl> unitCtrlList2 = isOther ? battleManager.EnemyList : battleManager.UnitList;
-            List<UnitCtrl> unitCtrlList3 = actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE ? unitCtrlList1 : unitCtrlList2;
+            List<UnitCtrl> unitCtrlList3 = null;
+            switch (actionParameter.TargetAssignment)
+            {
+                case eTargetAssignment.OTHER_SIDE:
+                    unitCtrlList3 = unitCtrlList1;
+                    break;
+                case eTargetAssignment.OLD_OWNER_SIDE:
+                case eTargetAssignment.OWNER_SITE:
+                    unitCtrlList3 = unitCtrlList2;
+                    break;
+                case eTargetAssignment.ALL:
+                    unitCtrlList3 = new List<UnitCtrl>(battleManager.EnemyList);
+                    unitCtrlList3.AddRange(battleManager.UnitList);
+                    break;
+            }
             switch (actionParameter.TargetSort)
             {
                 case PriorityPattern.SUMMON:
@@ -1837,7 +1964,18 @@ namespace Elements
                 actionParameter.TargetList.Add(basePartsData1);
             }
         }
-
+        private bool isInActionTargetArea(Skill _skill, ActionParameter _action, Vector3 _basePosition, bool _considerBodyWidth, BasePartsData _checkUnitCtrl)
+        {
+            int attackSide = GetAttackSide(_action.Direction, Owner);
+            float num = _action.TargetWidth;
+            if (num <= 0f)
+            {
+                num = ((_skill.SkillId == 1) ? Owner.SearchAreaSize : _skill.skillAreaWidth);
+            }
+            float start = ((attackSide != 1) ? (0f - num) : 0f);
+            float end = ((attackSide != -1) ? num : 0f);
+            return judgeIsInTargetArea(_action, _basePosition, _considerBodyWidth, transform.parent.lossyScale.x, start, end, _checkUnitCtrl);
+        }
         private bool judgeIsInTargetArea(
           ActionParameter _actionParameter,
           Vector3 _basePosition,
@@ -1847,30 +1985,53 @@ namespace Elements
           float _end,
           BasePartsData _unitCtrl)
         {
+            /* if (!_unitCtrl.GetTargetable())
+                 return false;
+             float _a = (float)(_unitCtrl.GetPosition().x / (double)_parentLossyScale - _basePosition.x / (double)_parentLossyScale);
+             float bodyWidth = _unitCtrl.GetBodyWidth();
+             if (_considerBodyWidth)            
+                 bodyWidth += Owner.BodyWidth;
+
+             float _b1 = _start - bodyWidth * 0.5f;
+             float _b2 = _end + bodyWidth * 0.5f;
+             return _a >= (double)_b1 && _a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2)) || _actionParameter.Direction == DirectionType.ALL;
+         */
             if (!_unitCtrl.GetTargetable())
-                return false;
-            float _a = (float)(_unitCtrl.GetPosition().x / (double)_parentLossyScale - _basePosition.x / (double)_parentLossyScale);
-            float bodyWidth = _unitCtrl.GetBodyWidth();
-            if (_considerBodyWidth)            
-                bodyWidth += Owner.BodyWidth;
-            //add 
-            /*if (_considerBodyWidth)
             {
-                bodyWidth += Mathf.Min(this.Owner.BodyWidth,bodyWidth);
-
-            }*/
-
-            //end
-            float _b1 = _start - bodyWidth * 0.5f;
-            float _b2 = _end + bodyWidth * 0.5f;
-            return _a >= (double)_b1 && _a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2)) || _actionParameter.Direction == DirectionType.ALL;
+                return false;
+            }
+            float num = _unitCtrl.GetPosition().x / _parentLossyScale - _basePosition.x / _parentLossyScale;
+            float num2 = _unitCtrl.GetBodyWidth();
+            if (_considerBodyWidth)
+            {
+                num2 += Owner.BodyWidth;
+            }
+            float num3 = _start - num2 * 0.5f;
+            float num4 = _end + num2 * 0.5f;
+            if ((!(num >= num3) || !(num <= num4)) && !BattleUtil.Approximately(num, num3) && !BattleUtil.Approximately(num, num4))
+            {
+                return _actionParameter.Direction == DirectionType.ALL;
+            }
+            return true;
         }
 
-        private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
+        /*private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
         {
             if (_unitCtrl.IsStealth || _unitCtrl.IsPhantom && _actionParameter.TargetSort != PriorityPattern.OWN_SUMMON_RANDOM || (_unitCtrl.IsDead || (long)_unitCtrl.Hp <= 0L) && !_unitCtrl.HasUnDeadTime)
                 return false;
             return _actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl;
+        }*/
+        private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
+        {
+            if (!_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
+            {
+                if (_actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE && _actionParameter.TargetNum == 1)
+                {
+                    return !_unitCtrl.IsAbnormalState(UnitCtrl.eAbnormalState.SPY);
+                }
+                return true;
+            }
+            return false;
         }
 
         public static int GetAttackSide(DirectionType _direction, UnitCtrl _owner) => _direction != DirectionType.FRONT ? 0 : (!_owner.IsLeftDir ? 1 : -1);
@@ -1896,7 +2057,7 @@ namespace Elements
                 case PriorityPattern.ENERGY_REDUCING:
                 case PriorityPattern.ENERGY_ASC_NEAR:
                 case PriorityPattern.ENERGY_DEC_NEAR:
-                case PriorityPattern.ENERGY_DEC_NEAR_MAX:
+                case PriorityPattern.ENERGY_DEC_NEAR_MAX_FORWARD:
                     selector = parts => $"{parts.Owner.UnitName}({(float)parts.Owner.Energy / UnitDefine.MAX_ENERGY:P2})";
                     break;
                 case PriorityPattern.ATK_ASC:
@@ -2058,10 +2219,13 @@ namespace Elements
                     Owner.BaseX = _baseTransform.position.x;
                     targetList.Sort(Owner.CompareLifeDecNear);
                     break;
-                case PriorityPattern.ENERGY_DEC_NEAR:
-                case PriorityPattern.ENERGY_DEC_NEAR_MAX:
+                case PriorityPattern.ENERGY_DEC_NEAR:                
                     Owner.BaseX = _baseTransform.position.x;
                     targetList.Sort(Owner.CompareEnergyDecNear);
+                    break;
+                case PriorityPattern.ENERGY_DEC_NEAR_MAX_FORWARD:
+                    Owner.BaseX = _baseTransform.position.x;
+                    targetList.Sort(Owner.CompareEnergyDecNearForward);
                     break;
                 case PriorityPattern.ENERGY_ASC_NEAR:
                     Owner.BaseX = _baseTransform.position.x;
@@ -2234,10 +2398,20 @@ namespace Elements
 
         public bool HasNextAnime(int skillId)
         {
+            //Skill skill = skillDictionary[skillId];
+            //if (skill.IsPrincessForm)
+            //    return true;
+            //return (skill.AnimId == eSpineCharacterAnimeId.SKILL || skill.AnimId == eSpineCharacterAnimeId.SKILL_EVOLUTION || skill.AnimId == eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION) && Owner.GetCurrentSpineCtrl().IsAnimation(skill.AnimId, skill.SkillNum, 1);
             Skill skill = skillDictionary[skillId];
             if (skill.IsPrincessForm)
+            {
                 return true;
-            return (skill.AnimId == eSpineCharacterAnimeId.SKILL || skill.AnimId == eSpineCharacterAnimeId.SKILL_EVOLUTION || skill.AnimId == eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION) && Owner.GetCurrentSpineCtrl().IsAnimation(skill.AnimId, skill.SkillNum, 1);
+            }
+            if (skill.AnimId == eSpineCharacterAnimeId.SKILL || skill.AnimId == eSpineCharacterAnimeId.SKILL_EVOLUTION || skill.AnimId == eSpineCharacterAnimeId.SPECIAL_SKILL_EVOLUTION || skill.AnimId == eSpineCharacterAnimeId.SUB_UNION_BURST)
+            {
+                return Owner.GetCurrentSpineCtrl().IsAnimation(skill.AnimId, skill.SkillNum, 1);
+            }
+            return false;
         }
 
         public bool IsLoopMotionPlaying(int _skillId)
@@ -2249,9 +2423,15 @@ namespace Elements
         public SkillMotionType GetSkillMotionType(int _skillId) => skillDictionary[_skillId].SkillMotionType;
 
         public int GetSkillNum(int _skillId) => skillDictionary[_skillId].SkillNum;
-
+        public eSpineCharacterAnimeId GetAnimeId(int _skillId)
+        {
+            return skillDictionary[_skillId].AnimId;
+        }
         public bool IsModeChange(int _skillId) => skillDictionary[_skillId].IsModeChange;
-
+        public void SetBonusId(int _skillId, int _bonusId)
+        {
+            skillDictionary[_skillId].BonusId = _bonusId;
+        }
         public void ExecActionOnStart()
         {
             foreach (KeyValuePair<int, Skill> skill in skillDictionary)
@@ -2319,7 +2499,10 @@ namespace Elements
             CancelAction(_skillId);
             return true;
         }
-
+        public bool GetForceCutinOff(int _skillId)
+        {
+            return skillDictionary[_skillId].ForceCutinOff;
+        }
         private enum eRefrexiveType
         {
             REFLEXIVE_NORMAL = 1,
