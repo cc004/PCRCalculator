@@ -113,6 +113,7 @@ namespace PCRCaculator
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
         public int MaxTPUpValue => playerSetting.maxTPUpValue;
+        
         private void Awake()
         {
             if (Instance == null)
@@ -650,6 +651,14 @@ namespace PCRCaculator
             sw.Write(saveJsonStr);
             sw.Close();
             Debug.Log("成功！");
+        }
+        /// <summary>
+        ///闪避时加TP的比率
+        /// </summary>
+        /// <returns></returns>
+        internal float GetDodgeTPRecoveryRatio()
+        {
+            return 0;
         }
     }
     public class UnitData_other

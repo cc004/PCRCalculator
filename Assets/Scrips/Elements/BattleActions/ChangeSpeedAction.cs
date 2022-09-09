@@ -14,53 +14,66 @@ namespace Elements
 {
     public class ChangeSpeedAction : ActionParameter
     {
-        private static readonly Dictionary<eChangeSpeedType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eChangeSpeedType, UnitCtrl.eAbnormalState>(new eChangeSpeedType_DictComparer())
-    {
-      {
-        eChangeSpeedType.SLOW,
-        UnitCtrl.eAbnormalState.SLOW
-      },
-      {
-        eChangeSpeedType.HASTE,
-        UnitCtrl.eAbnormalState.HASTE
-      },
-      {
-        eChangeSpeedType.PARALYSIS,
-        UnitCtrl.eAbnormalState.PARALYSIS
-      },
-      {
-        eChangeSpeedType.FREEZE,
-        UnitCtrl.eAbnormalState.FREEZE
-      },
-      {
-        eChangeSpeedType.CHAINED,
-        UnitCtrl.eAbnormalState.CHAINED
-      },
-      {
-        eChangeSpeedType.SLEEP,
-        UnitCtrl.eAbnormalState.SLEEP
-      },
-      {
-        eChangeSpeedType.STUN,
-        UnitCtrl.eAbnormalState.STUN
-      },
-      {
-        eChangeSpeedType.STONE,
-        UnitCtrl.eAbnormalState.STONE
-      },
-      {
-        eChangeSpeedType.DETAIN,
-        UnitCtrl.eAbnormalState.DETAIN
-      },
-      {
-        eChangeSpeedType.FAINT,
-        UnitCtrl.eAbnormalState.FAINT
-      },
-      {
-        eChangeSpeedType.PAUSE_ACTION,
-        UnitCtrl.eAbnormalState.PAUSE_ACTION
-      }
-    };
+        public static readonly Dictionary<eChangeSpeedType, UnitCtrl.eAbnormalState> AbnormalStateDic = new Dictionary<eChangeSpeedType, UnitCtrl.eAbnormalState>(new eChangeSpeedType_DictComparer())
+        {
+            {
+                eChangeSpeedType.SLOW,
+                UnitCtrl.eAbnormalState.SLOW
+            },
+            {
+                eChangeSpeedType.HASTE,
+                UnitCtrl.eAbnormalState.HASTE
+            },
+            {
+                eChangeSpeedType.PARALYSIS,
+                UnitCtrl.eAbnormalState.PARALYSIS
+            },
+            {
+                eChangeSpeedType.FREEZE,
+                UnitCtrl.eAbnormalState.FREEZE
+            },
+            {
+                eChangeSpeedType.CHAINED,
+                UnitCtrl.eAbnormalState.CHAINED
+            },
+            {
+                eChangeSpeedType.SLEEP,
+                UnitCtrl.eAbnormalState.SLEEP
+            },
+            {
+                eChangeSpeedType.STUN,
+                UnitCtrl.eAbnormalState.STUN
+            },
+            {
+                eChangeSpeedType.STONE,
+                UnitCtrl.eAbnormalState.STONE
+            },
+            {
+                eChangeSpeedType.DETAIN,
+                UnitCtrl.eAbnormalState.DETAIN
+            },
+            {
+                eChangeSpeedType.FAINT,
+                UnitCtrl.eAbnormalState.FAINT
+            },
+            {
+                eChangeSpeedType.PAUSE_ACTION,
+                UnitCtrl.eAbnormalState.PAUSE_ACTION
+            },
+            {
+                eChangeSpeedType.NPC_STUN,
+                UnitCtrl.eAbnormalState.NPC_STUN
+            },
+            {
+                eChangeSpeedType.CRYSTALIZE,
+                UnitCtrl.eAbnormalState.CRYSTALIZE
+            },
+            {
+                eChangeSpeedType.STUN2,
+                UnitCtrl.eAbnormalState.STUN2
+            }
+        };
+
 
         public override void ExecActionOnStart(
           Skill _skill,
@@ -79,6 +92,13 @@ namespace Elements
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+            eChangeSpeedType actionDetail = (eChangeSpeedType)base.ActionDetail1;
+            if ((uint)(actionDetail - 3) <= 10u && _target.Owner.ModeChangeUnableStateBarrier)
+            {
+                action($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
+                return;
+            }
+
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
             float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 6, (float)pp));
             //start add
@@ -89,8 +109,8 @@ namespace Elements
             if (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || TargetAssignment == eTargetAssignment.OWNER_SITE)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
-                UnitCtrl.eAbnormalState abnormalState = abnormalStateDic[(eChangeSpeedType)ActionDetail1];
-                if (abnormalState == UnitCtrl.eAbnormalState.HASTE)
+                UnitCtrl.eAbnormalState abnormalState = AbnormalStateDic[(eChangeSpeedType)ActionDetail1];
+                /*if (abnormalState == UnitCtrl.eAbnormalState.HASTE)
                 {
                     UnitCtrl owner = _target.Owner;
                     Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
@@ -98,6 +118,17 @@ namespace Elements
                     int skillId = _skill.SkillId;
                     UnitCtrl _source1 = _source;
                     owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.5f, skillId, _source1, true, eEffectType.COMMON, true, false);
+                }*/
+                float num2 = _valueDictionary[eValueNumber.VALUE_1];
+                if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(num2 + _target.Owner.CalcAbnormalStateSpeed(), 1f))
+                {
+                    _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
+                    {
+                        {
+                            _target,
+                            0
+                        }
+                    }, 0.5f, _skill.SkillId, _source, _despelable: true, eEffectType.COMMON, _isBuff: true, _additional: false, _isShowIcon: false);
                 }
                 MyGameCtrl myGameCtrl = MyGameCtrl.Instance;
                 if(myGameCtrl.tempData.isGuildBattle)// && _target.Owner.IsBoss)
@@ -108,10 +139,12 @@ namespace Elements
                         //_valueDictionary[eValueNumber.VALUE_3] += myGameCtrl.tempData.SettingData.BossAbnormalAddValue;
                     }
                 }
-                _target.Owner.SetAbnormalState(_source, abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (ActionDetail2 == 1));
+                //_target.Owner.SetAbnormalState(_source, abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (ActionDetail2 == 1));
+                _target.Owner.SetAbnormalState(_source, abnormalState, (base.AbnormalStateFieldAction == null) ?(float) _valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, num2, 0f, _reduceEnergy: false, base.ActionDetail2 == 1, 1f, _valueDictionary[eValueNumber.VALUE_5] == 0f);
+
                 string describe = ((eChangeSpeedType)ActionDetail1).GetDescription() + ",值" + _valueDictionary[eValueNumber.VALUE_1] + ",持续时间：" + _valueDictionary[eValueNumber.VALUE_3] + "秒";
-                
-                if (ActionDetail2 != 1 || _target.Owner.OnDamageListForChangeSpeedDisableByAttack.ContainsKey(ActionId))
+
+                /*if (ActionDetail2 != 1 || _target.Owner.OnDamageListForChangeSpeedDisableByAttack.ContainsKey(ActionId))
                 {
                     action(describe);
                     return;
@@ -124,8 +157,43 @@ namespace Elements
                     if (!byAttack || !_target.Owner.IsAbnormalState(abnormalState))
                         return;
                     _target.Owner.DisableAbnormalStateById(abnormalState, ActionId, true);
-                });
+                });*/
+                switch (base.ActionDetail2)
+                {
+                    case 1:
+                        if (_target.Owner.OnDamageListForChangeSpeedDisableByAttack.ContainsKey(base.ActionId))
+                        {
+                            break;
+                        }
+                        _target.Owner.OnDamageListForChangeSpeedDisableByAttack.Add(base.ActionId, delegate (bool byAttack)
+                        {
+                            if (byAttack && _target.Owner.IsAbnormalState(abnormalState))
+                            {
+                                _target.Owner.DisableAbnormalStateById(abnormalState, base.ActionId, _isReleasedByDamage: true);
+                            }
+                        });
+                        describe += ",受到伤害后取消";
+                        break;
+                    case 2:
+                        {
+                            float value6 = _valueDictionary[eValueNumber.VALUE_6] / 100f;
+                            if (_target.Owner.OnRecoverListForChangeSpeedDisableByMaxHp.ContainsKey(base.ActionId))
+                            {
+                                break;
+                            }
+                            _target.Owner.OnRecoverListForChangeSpeedDisableByMaxHp.Add(base.ActionId, delegate (float _hpAmount)
+                            {
+                                if (BattleUtil.LessThanOrApproximately(value6, _hpAmount) && _target.Owner.IsAbnormalState(abnormalState))
+                                {
+                                    _target.Owner.DisableAbnormalStateById(abnormalState, base.ActionId, _isReleasedByDamage: false);
+                                }
+                            });
+                            describe += ",回血后取消";
 
+                            break;
+                        }
+                }
+                action(describe);
             }
             else
             {
@@ -133,7 +201,8 @@ namespace Elements
                 if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)
                     return;
                 if (actionExecedData.TargetPartsNumber == 1)
-                    _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_CHANGE_SPEED, _parts: _target);
+                    _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_CHANGE_SPEED, eDamageEffectType.NORMAL, _target);
+                //_target.Owner.SetMissAtk(_source, eMissLogType.DODGE_CHANGE_SPEED, _parts: _target);
                 else
                     _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_CHANGE_SPEED);
                 action("MISS");
@@ -171,12 +240,19 @@ namespace Elements
             FAINT = 10, // 0x0000000A
             [Description("暂停")]
             PAUSE_ACTION = 11, // 0x0000000B
+            [Description("打晕NPC")]
+            NPC_STUN,
+            [Description("结晶")]
+            CRYSTALIZE,
+            [Description("击晕2")]
+            STUN2
         }
 
-        private enum eCancelTriggerType
+        public enum eCancelTriggerType
         {
             NONE,
             DAMAGED,
+            MAX_HP
         }
 
         public class eChangeSpeedType_DictComparer : IEqualityComparer<eChangeSpeedType>

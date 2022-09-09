@@ -161,8 +161,9 @@ namespace Elements
       protected int _OnlyDispOwned;
       protected string _StartTime;
       protected string _EndTime;
+            protected int _OriginalUnitId;
 
-      public int VisualChangeFlag { get; private set; }
+            public int VisualChangeFlag { get; private set; }
 
       /*public UnitData(MasterUnitEnemyData.UnitEnemyData unitEnemyData)
       {
@@ -226,8 +227,8 @@ namespace Elements
       public string StartTime => _StartTime;
 
       public string EndTime => _EndTime;
-
-      public UnitData(
+            public int OriginalUnitId => _OriginalUnitId;
+            public UnitData(
         int UnitId = 0,
         string UnitName = "",
         string Kana = "",
@@ -249,7 +250,8 @@ namespace Elements
         string Comment = "",
         int OnlyDispOwned = 0,
         string StartTime = "",
-        string EndTime = "")
+        string EndTime = "",
+        int originalUnitID = 0)
       {
         _UnitId = UnitId;
         _UnitName = UnitName;
@@ -273,6 +275,7 @@ namespace Elements
         _OnlyDispOwned = OnlyDispOwned;
         _StartTime = StartTime;
         _EndTime = EndTime;
+                _OriginalUnitId = originalUnitID;
       }
     }
   }

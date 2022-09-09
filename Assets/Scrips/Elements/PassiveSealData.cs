@@ -25,8 +25,12 @@ namespace Elements
     public PassiveSealAction.eSealTarget SealTarget { get; set; }
 
     public int SealNumLimit { get; set; }
-
-    public IEnumerator Update()
+        public int SealNum
+        {
+            get;
+            set;
+        }
+        public IEnumerator Update()
     {
       while (true)
       {

@@ -40,7 +40,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary, System.Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       AppendIsAlreadyExeced(_target.Owner, _num);
@@ -49,7 +49,8 @@ namespace Elements
                 return;
             }
       _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eDamageCutType) ActionDetail1], _valueDictionary[eValueNumber.VALUE_3], this, _skill, _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5]);
-    }
+            action($"对数盾");
+        }
 
     public override void SetLevel(float _level)
     {

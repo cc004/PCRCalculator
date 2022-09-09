@@ -56,8 +56,15 @@ namespace Elements
     }*/
 
     public static bool Approximately(float _a, float _b) => Mathf.Abs(_b - _a) < (double) Mathf.Max(1E-05f * Mathf.Max(Mathf.Abs(_a), Mathf.Abs(_b)), Mathf.Epsilon * 8f);
-
-    public static int FloatToInt(float _num)
+        public static bool LessThanOrApproximately(float _lhs, float _rhs)
+        {
+            if (!(_lhs < _rhs))
+            {
+                return Approximately(_lhs, _rhs);
+            }
+            return true;
+        }
+        public static int FloatToInt(float _num)
     {
       if (_num >= 0.0)
       {
@@ -75,8 +82,11 @@ namespace Elements
         return num;
       return _num <= 0.0 ? Mathf.FloorToInt(_num) : Mathf.CeilToInt(_num);
     }
-
-    public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
+        public static float FloatToPerMille(float _value)
+        {
+            return (float)FloatToInt(_value * 1000f) / 1000f;
+        }
+        public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
     {
         return _num.Select(x => FloatToIntReverseTruncate(x));
     }

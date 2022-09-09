@@ -31,6 +31,7 @@ namespace Elements
       Dictionary<int, bool> _enabledChildAction,
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
+            throw new Exception($"这个类鸽了！");
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       _sourceActionController.AppendCoroutine(updateContinuousAttack(_target, _skill, _source, _sourceActionController, ActionDetail2 == 0 ? null : _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2)), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
     }

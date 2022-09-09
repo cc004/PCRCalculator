@@ -451,10 +451,6 @@ namespace Elements
         typeof (AttackFieldAction)
       },
       {
-        eActionType.ABNORMAL_STATE_FIELD,
-        typeof (AbnormalStateFieldAction)
-      },
-      {
         eActionType.HEAL_FIELD,
         typeof (HealFieldAction)
       },
@@ -462,6 +458,10 @@ namespace Elements
         eActionType.CHANGE_PARAMETER_FIELD,
         typeof (ChangeParameterFieldAction)
       },
+      {
+                eActionType.ABNORMAL_STATE_FIELD,
+                typeof(AbnormalStateFieldAction)
+            },
       {
         eActionType.UB_CHANGE_TIME,
         typeof (UbChangeSpeedAction)
@@ -507,6 +507,10 @@ namespace Elements
         typeof (DivisionAction)
       },
       {
+        eActionType.CHANGE_BODY_WIDTH,
+        typeof (ChangeBodyWidthAction)
+      },
+      {
         eActionType.IF_EXISTS_FIELD_FOR_ALL,
         typeof (IfExistsFieldForAllAction)
       },
@@ -514,10 +518,7 @@ namespace Elements
         eActionType.STEALTH,
         typeof (StealthAction)
       },
-      {
-        eActionType.COUNT_DOWN,
-        typeof (CountDownAction)
-      },
+      
       {
         eActionType.MOVE_PARTS,
         typeof (MovePartsAction)
@@ -527,8 +528,8 @@ namespace Elements
         typeof (CountBlindAction)
       },
       {
-        eActionType.CHANGE_BODY_WIDTH,
-        typeof (ChangeBodyWidthAction)
+        eActionType.COUNT_DOWN,
+        typeof (CountDownAction)
       },
       {
         eActionType.STOP_FIELD,
@@ -594,7 +595,7 @@ namespace Elements
         eActionType.PASSIVE_DAMAGE_UP,
         typeof (PassiveDamageUpAction)
       },
-      /*{
+      {
         eActionType.DAMAGE_BY_ATTACK,
         typeof(DamageByBehaviourAction)
             },
@@ -609,8 +610,8 @@ namespace Elements
             {
                 eActionType.DAMAGE_LIMIT,
                 typeof(DamageLimitAction)
-            },*/
-      {
+            },
+            {
         eActionType.PASSIVE,
         typeof (ActionParameter)
       },
@@ -622,7 +623,7 @@ namespace Elements
         eActionType.IGNORE_DECOY,
         typeof (IgnoreDecoyAction)
       },
-            /*{
+            {
                 eActionType.CHANGE_SPEED_OVERLAP,
                 typeof(ChangeSpeedOverlapAction)
             },
@@ -641,7 +642,7 @@ namespace Elements
             {
                 eActionType.CHARGE_ENERGY_BY_DAMAGE,
                 typeof(ChargeEnergyByDamage)
-            }*/
+            }
         };
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()
         {

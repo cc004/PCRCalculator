@@ -19,8 +19,9 @@ namespace Elements
     public List<AbnormalStateEffectGameObject> Effects = new List<AbnormalStateEffectGameObject>();
     public int ActionId;
     public float EnergyChargeMultiple = 1f;
+        public bool ShowsIcon = true;
 
-    public float SubValue { get; set; }
+        public float SubValue { get; set; }
 
     public float EnergyReduceRate { get; set; }
 

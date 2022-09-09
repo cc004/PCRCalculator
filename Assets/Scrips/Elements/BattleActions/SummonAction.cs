@@ -36,7 +36,8 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      System.Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       eUnitRespawnPos _basePos = (eUnitRespawnPos) Mathf.Min(9, Mathf.Max(0, (int) (_source.RespawnPos + (int) _valueDictionary[eValueNumber.VALUE_2])));
@@ -78,6 +79,7 @@ namespace Elements
         if (battleManager.UnitList.Contains(summonUnit1))
           battleManager.UnitList.Remove(summonUnit1);
       }
+            action($"召唤{unitCtrl.UnitNameEx}{ActionDetail2}");
       if (_source.SummonTargetAttachmentName.IsNullOrEmpty() || appliedAttachment != null)
         return;
       int index1 = _source.UnitSpineCtrl.skeleton.slots.FindIndex(e => e.data.Name == _source.SummonTargetAttachmentName);

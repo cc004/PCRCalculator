@@ -10,18 +10,26 @@ namespace Elements
 {
   public class ChangeBodyWidthAction : ActionParameter
   {
-    public override void ExecAction(
-      UnitCtrl _source,
-      BasePartsData _target,
-      int _num,
-      UnitActionController _sourceActionController,
-      Skill _skill,
-      float _starttime,
-      Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.BodyWidth = _valueDictionary[eValueNumber.VALUE_1];
+		private enum eTargetType
+		{
+			SINGLE,
+			PARTS
+		}
 
-    public override void SetLevel(float _level)
-    {
-    }
-  }
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		{
+			switch (base.ActionDetail1)
+			{
+				case 1:
+					_target.Owner.BossPartsListForBattle.Find((PartsData e) => e.Index == base.ActionDetail2).BodyWidthValue = _valueDictionary[eValueNumber.VALUE_1];
+					break;
+				case 0:
+					_target.Owner.BodyWidth = _valueDictionary[eValueNumber.VALUE_1];
+					break;
+			}
+		}
+		public override void SetLevel(float _level)
+		{
+		}
+	}
 }

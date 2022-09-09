@@ -17,13 +17,26 @@ namespace Elements
     {
         private const int TOUGH_VALUE = 99;
         private const int NO_MOTION_VALUE = 1;
-
+        public override void ExecActionOnWaveStart(Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController)
+        {
+            base.ExecActionOnWaveStart(_skill, _source, _sourceActionController);
+            PartsData partsData = _source.BossPartsListForBattle.Find((PartsData e) => e.Index == _skill.ParameterTarget);
+            eTriggerType actionDetail = (eTriggerType)base.ActionDetail1;
+            if (actionDetail == eTriggerType.BREAK)
+            {
+                _source.PartsBreakTimeDictionary.Add(partsData.Index, base.Value[eValueNumber.VALUE_3]);
+            }
+        }
         public override void ExecActionOnStart(
           Skill _skill,
           UnitCtrl _source,
           UnitActionController _sourceActionController)
         {
             PartsData parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
+            if (_source.MultiBossPartsData != null)
+            {
+                parts = _source.MultiBossPartsData;
+            }
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
             UnitCtrl target = _source;
             if (ActionDetail2 != 0)
@@ -272,6 +285,129 @@ namespace Elements
                             _sourceActionController.StartAction(_skill.SkillId);
                     };
                     break;
+                case 12:
+                    {
+                        UnitCtrl unitCtrl8 = target;
+                        unitCtrl8.OnDamage = (UnitCtrl.OnDamageDelegate)Delegate.Combine(unitCtrl8.OnDamage, (UnitCtrl.OnDamageDelegate)delegate
+                        {
+                            if (!_source.IsDead && !_source.IdleOnly && !judgeSilenceOrToad(_source) && BattleManager.Random(0f, 1f,
+                            new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+
+                            {
+                            if (base.Value[eValueNumber.VALUE_4] != 1f)
+                                {
+                                    _source.CancelByAwake = true;
+                                    _source.CurrentTriggerSkillId = _skill.SkillId;
+                                    _source.SetState(UnitCtrl.ActionState.SKILL, 0, _skill.SkillId);
+                                }
+                                else
+                                {
+                                    _sourceActionController.StartAction(_skill.SkillId);
+                                }
+                            }
+                        });
+                        break;
+
+                    }
+                case 13:
+                    {
+                        long num = (long)_source.Hp - (long)base.Value[eValueNumber.VALUE_3];
+                        /*List<PrefabWithTime> list2 = new List<PrefabWithTime>();
+                        foreach (NormalSkillEffect actionEffect in base.ActionEffectList)
+                        {
+                            PrefabWithTime item = new PrefabWithTime
+                            {
+                                Prefab = actionEffect.Prefab,
+                                PrefabLeft = actionEffect.PrefabLeft,
+                                Time = actionEffect.ExecTime[0],
+                                TargetBoneName = actionEffect.TargetBoneName,
+                                IsTrackRotation = actionEffect.TrackRotation
+                            };
+                            list2.Add(item);
+                        }
+                        if (list2.Count > 0)
+                        {
+                            _source.AppendCoroutine(_source.CreatePrefabWithTime(list2, _isIdle: false, -1, _isAura: true, _isShieldEffect: false, _ignorePause: false, base.ActionId), ePauseType.NO_DIALOG);
+                        }*/
+                        if (num > 0)
+                        {
+                            _source.DamagedTriggerHpAndActionDoneList.Add((num, false, base.ActionId, _skill));
+                            _source.DamagedTriggerHpAndActionDoneList.Sort(((long triggerHp, bool isActionDone, int actionId, Skill skill) a, (long triggerHp, bool isActionDone, int actionId, Skill skill) b) => b.triggerHp.CompareTo(a.triggerHp));
+                        }
+                        if (_source.DamagedTriggerHpAndActionDoneList.Count != 1)
+                        {
+                            break;
+                        }
+                        bool actionDoing = false;
+                        target.OnHpChangeForDamagedHP = delegate
+                        {
+                            float num5 = BattleManager.Random(0f, 1f,new RandomData(_source,target,ActionId,17, base.Value[eValueNumber.VALUE_1] / 100f, 0));
+                            if (!judgeSilenceOrToad(_source) && !_source.IsUnableActionState() && !_source.IsDead && !(num5 > base.Value[eValueNumber.VALUE_1] / 100f))
+                            {
+                                int iForAction = default(int);
+                                long triggerHp = default(long);
+                                int actionId = default(int);
+                                Skill skill = default(Skill);
+                                for (int i = 0; i < _source.DamagedTriggerHpAndActionDoneList.Count; i++)
+                                {
+                                    iForAction = i;
+                                    bool flag2;
+                                    (triggerHp, flag2, actionId, skill) = _source.DamagedTriggerHpAndActionDoneList[i];
+                                    if (!flag2)
+                                    {
+                                        if ((long)_source.Hp <= triggerHp && !actionDoing)
+                                        {
+                                            actionDoing = true;
+                                            _source.DamagedTriggerHpAndActionDoneList[iForAction] = (triggerHp, true, actionId, skill);
+                                            Action<bool> action2 = delegate (bool _waitUbTurn)
+                                            {
+                                                actionDoing = false;
+                                                if (judgeSilenceOrToad(_source) || _source.IsUnableActionState())
+                                                {
+                                                    _source.DamagedTriggerHpAndActionDoneList[iForAction] = (triggerHp, false, actionId, skill);
+                                                }
+                                                else
+                                                {
+                                                    //_source.DeleteDamagedHpAuraEffect(actionId);
+                                                    if (skill.BlackOutTime > 0f && _waitUbTurn)
+                                                    {
+                                                        base.battleManager.OCAMDIOPEFP = true;
+                                                    }
+                                                    _source.SkillUseCount[skill.SkillId]++;
+                                                    _source.CancelByAwake = true;
+                                                    _source.CurrentTriggerSkillId = skill.SkillId;
+                                                    if (skill.BlackOutTime > 0f)
+                                                    {
+                                                        //_sourceActionController.StopSlowEffect();
+                                                        //base.battleManager.SetSkillEffectSortOrderBack();
+                                                        //base.battleManager.GamePause(true, false);
+                                                        //base.battleManager.SetSkillExeScreen(_source, skill.BlackOutTime, skill.BlackoutColor, skill.BlackoutEndWithMotion);
+                                                        _source.SetSortOrderFront();
+                                                    }
+                                                    _source.SetState(UnitCtrl.ActionState.SKILL, 0, skill.SkillId);
+                                                }
+                                            };
+                                            if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
+                                            {
+                                                _source.AppendCoroutine(waitStateIdle(action2, _source), ePauseType.SYSTEM, _source);
+                                            }
+                                            else if (base.battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE)
+                                            {
+                                                action2.Call(JEOCPILJNAD: false);
+                                            }
+                                            else
+                                            {
+                                                _source.AppendCoroutine(waitChargeSkillTurnNone(action2, _source), ePauseType.SYSTEM, _source);
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        };
+                        break;
+                    }
+
             }
         }
 
@@ -307,8 +443,11 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            if (ActionDetail1 != 8)
+            eTriggerType actionDetail = (eTriggerType)base.ActionDetail1;
+            if (actionDetail != eTriggerType.STEALTH_FREE)
+            {
                 return;
+            }
             _source.IdleOnly = true;
             _source.CurrentState = UnitCtrl.ActionState.IDLE;
             battleManager.CallbackIdleOnlyDone(_source);
@@ -346,6 +485,8 @@ namespace Elements
             BREAK = 9,
             SLIP_DAMAGE = 10, // 0x0000000A
             ALL_BREAK = 11, // 0x0000000B
+            DAMAGED_2,
+            DAMAGED_HP
         }
     }
 }

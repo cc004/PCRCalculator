@@ -21,9 +21,11 @@ namespace Elements
     {
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
       actionParameter = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1);
-    }
+            actionParameter.IsAlwaysChargeEnegry = true;
 
-    public override void ReadyAction(
+        }
+
+        public override void ReadyAction(
       UnitCtrl _source,
       UnitActionController _sourceActionController,
       Skill _skill)
@@ -43,22 +45,23 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      /*for (int index = 0; index < this.ActionEffectList.Count; ++index)
-      {
-        NormalSkillEffect actionEffect = this.ActionEffectList[index];
-        SkillEffectCtrl effect = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? actionEffect.PrefabLeft : actionEffect.Prefab);
-        effect.transform.parent = ExceptNGUIRoot.Transform;
-        effect.SortTarget = _target.Owner;
-        effect.InitializeSort();
-        effect.SetPossitionAppearanceType(actionEffect, _target, _target.Owner, _skill);
-        effect.ExecAppendCoroutine();
-        if (effect is CountDownEffectCtrl)
-        {
-          CountDownEffectCtrl _countDownEffect = effect as CountDownEffectCtrl;
-          _countDownEffect.SetDamageText((int) _valueDictionary[eValueNumber.VALUE_1]);
-          _target.Owner.AppendCoroutine(this.updateCountDown(_valueDictionary[eValueNumber.VALUE_1], _countDownEffect, _target.Owner, _skill, _sourceActionController, _source), ePauseType.SYSTEM);
-        }
-      }*/
+            /*for (int index = 0; index < this.ActionEffectList.Count; ++index)
+            {
+              NormalSkillEffect actionEffect = this.ActionEffectList[index];
+              SkillEffectCtrl effect = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? actionEffect.PrefabLeft : actionEffect.Prefab);
+              effect.transform.parent = ExceptNGUIRoot.Transform;
+              effect.SortTarget = _target.Owner;
+              effect.InitializeSort();
+              effect.SetPossitionAppearanceType(actionEffect, _target, _target.Owner, _skill);
+              effect.ExecAppendCoroutine();
+              if (effect is CountDownEffectCtrl)
+              {
+                CountDownEffectCtrl _countDownEffect = effect as CountDownEffectCtrl;
+                _countDownEffect.SetDamageText((int) _valueDictionary[eValueNumber.VALUE_1]);
+                _target.Owner.AppendCoroutine(this.updateCountDown(_valueDictionary[eValueNumber.VALUE_1], _countDownEffect, _target.Owner, _skill, _sourceActionController, _source), ePauseType.SYSTEM);
+              }
+            }*/
+            throw new System.Exception("这个技能鸽了！");
     }
 
     /*private IEnumerator updateCountDown(

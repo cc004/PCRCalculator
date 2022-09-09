@@ -232,10 +232,10 @@ namespace Elements
             unitCtrl.Initialize(unitParameter,unitData ,false, true);
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
-            if (!IsAutoMode && isplayer)
-            {
+            //if (!IsAutoMode && isplayer)
+            //{
                 //unitCtrl.SetUBExecTime(tempData.UBExecTimeList[idx], tempData.tryCount);
-            }
+            //}
 
         }
         private IEnumerator LoadCharacterPrefab(PCRCaculator.UnitData data,int idx,bool isplayer,Action finishAction )

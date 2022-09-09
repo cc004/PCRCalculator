@@ -605,9 +605,12 @@ namespace PCRCaculator.Battle
         [Description("42")]
         DEBUFF_MAGIC_CRITICAL_DAMAGE = 70,
         COMPENSATION = 71, 
-        KNIGHT_GUARD = 72, 
+        KNIGHT_GUARD = 72,
+        [Description("43")]
         CUT_ATK_DAMAGE = 73,
+        [Description("43")]
         CUT_MGC_DAMAGE = 74,
+        [Description("43")]
         CUT_ALL_DAMAGE = 75, 
         CHIERU = 76, 
         REI = 77,

@@ -19,5 +19,6 @@ namespace Elements
     DODGE_BY_NO_DAMAGE_MOTION = 7,
     MISS_HP0_RECOVER = 8,
     DODGE_KNOCK = 9,
-  }
+        DODGE_DAMAGE_BY_BEHAVIOUR = 10,
+    }
 }

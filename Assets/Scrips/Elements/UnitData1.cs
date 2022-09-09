@@ -46,7 +46,7 @@ namespace Elements
         public StatusParamShort BonusParam { get; private set; }
 
         public int ResistStatusId { get; private set; }
-
+        public int ResistVariationId { get; private set; }
         public int Power { get; private set; }
 
         //public SkinData SkinData { get; private set; }

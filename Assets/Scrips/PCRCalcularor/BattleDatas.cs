@@ -70,9 +70,10 @@ namespace PCRCaculator.Battle
     public static class StaticAilmentData
     {
         public static readonly AilmentData[] ailmentDatas;
+        public static readonly Dictionary<int, ResistVariationData> resistVariationDataDic;
         static StaticAilmentData()
         {
-            ailmentDatas = new AilmentData[32]{
+            ailmentDatas = new AilmentData[40]{
                 new AilmentData(1,8,1,"减速"),
                 new AilmentData(2,8,2,"加速"),
                 new AilmentData(3,8,3,"麻痹"),
@@ -106,6 +107,18 @@ namespace PCRCaculator.Battle
                 new AilmentData(31,76,-1,"HP回复减少"),
                 new AilmentData(32,78,-1,"弱体伤害上升"),
 
+                new AilmentData(33,79,-1,"行動時毒ダメージ"),
+                new AilmentData(34,8,14,"スタン（別枠）"),
+                new AilmentData(35,9,7,"毒（別枠）"),
+                new AilmentData(36,9,8,"呪い（別枠）"),
+                new AilmentData(37,11,2,"混乱（別枠）"),
+                new AilmentData(38,8,13,"結晶化"),
+                new AilmentData(39,83,1,"スロウ(加算可能)"),
+                new AilmentData(40,83,2,"ヘイスト(加算可能)"),                
+            };
+            resistVariationDataDic = new Dictionary<int, ResistVariationData>
+            {
+
             };
         }
     }
@@ -127,6 +140,8 @@ namespace PCRCaculator.Battle
     }
     public class ResistData
     {
+        public const int AILMENT_LENGTH = 50;
+
         public readonly int resist_ststus_id;
         public readonly int[] ailments;
         static Dictionary<int, int[]> resistDataDic;
@@ -138,11 +153,8 @@ namespace PCRCaculator.Battle
         public ResistData()
         {
             resist_ststus_id = 0;
-            ailments = new int[32]
-            {
-                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,0,0
-            };
+            ailments = new int[AILMENT_LENGTH];
+            
 
         }
         public ResistData(int id,int[] ails)
@@ -155,7 +167,7 @@ namespace PCRCaculator.Battle
             resist_ststus_id = cent;
             if(!resistDataDic.TryGetValue(cent,out ailments))
             {
-                ailments = new int[32];
+                ailments = new int[AILMENT_LENGTH];
             }
             /*switch (cent)
             {
@@ -244,5 +256,44 @@ namespace PCRCaculator.Battle
         }
 
     }
-    
+    public class ResistVariationData
+    {
+
+        public int resist_variation_id;// => _resist_variation_id;
+
+        public int value_1;// => _value_1;
+
+        public int value_2;// => _value_2;
+
+        public int value_3;// => _value_3;
+
+        public int value_4;// => _value_4;
+
+        public int[] DebuffDecrement
+        {
+            get;
+            set;
+        }
+
+        public ResistVariationData(int resist_variation_id = 0, int value_1 = 0, int value_2 = 0, int value_3 = 0, int value_4 = 0)
+        {
+            this.resist_variation_id = resist_variation_id;
+            this.value_1 = value_1;
+            this.value_2 = value_2;
+            this.value_3 = value_3;
+            this.value_4 = value_4;
+            SetUp();
+        }
+
+        public void SetUp()
+        {
+            DebuffDecrement = new int[4];
+            DebuffDecrement[0] = value_1;
+            DebuffDecrement[1] = value_2;
+            DebuffDecrement[2] = value_3;
+            DebuffDecrement[3] = value_4;
+        }
+    }
+
+
 }

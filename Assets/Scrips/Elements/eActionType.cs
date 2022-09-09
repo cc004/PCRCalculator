@@ -100,7 +100,7 @@ namespace Elements
         LOOP_MOTION_REPEAT = 63, //忽略
         TOAD = 69, //忽略，这个属性就一个怪有，判定代码却到处都有，贼烦
         FORCE_HP_CHANGE = 70,//忽略，没有角色有这个技能
-        KNGHT_GUARD = 71,//ペコリーヌ（プリンセス）专属 
+        KNGHT_GUARD = 71,//战续
         DAMAGE_CUT = 72, //忽略，没有角色有这个技能
         LOG_BARRIER = 73, //忽略，工会战boss专属的对数盾
         GIVE_VALUE_AS_DIVIDE = 74,//忽略，没有角色有这个技能

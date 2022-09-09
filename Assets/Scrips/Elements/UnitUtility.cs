@@ -134,34 +134,46 @@ namespace Elements
       _unitId = GetUnitResourceId(_unitId);
       return _unitId % 100;
     }
-/**
-    public static UnitDefine.eUnitClassId GetMaxClassId(int _unitId) => UnitUtility.GetMaxClassIdFromCharaId(UnitUtility.GetCharaId(_unitId));
+        public static int GetOriginalUnitId(int _unitId)
+        {
+            if (!IsConversionUnit(_unitId))
+            {
+                return _unitId;
+            }
+            throw new System.Exception("咕咕咕！");
+        }
+        public static bool IsConversionUnit(int _unitId)
+        {
+            return _unitId / 10000 == 17;
+        }
+        /**
+            public static UnitDefine.eUnitClassId GetMaxClassId(int _unitId) => UnitUtility.GetMaxClassIdFromCharaId(UnitUtility.GetCharaId(_unitId));
 
-    public static UnitDefine.eUnitClassId GetMaxClassIdFromCharaId(int _charaId)
-    {
-      int _jobId = 1;
-      UserData instance = Singleton<UserData>.Instance;
-      while (instance.IsMyUnit(UnitUtility.GetUnitId(_charaId, _jobId)))
-        ++_jobId;
-      return (UnitDefine.eUnitClassId) (_jobId - 1);
-    }*/
+            public static UnitDefine.eUnitClassId GetMaxClassIdFromCharaId(int _charaId)
+            {
+              int _jobId = 1;
+              UserData instance = Singleton<UserData>.Instance;
+              while (instance.IsMyUnit(UnitUtility.GetUnitId(_charaId, _jobId)))
+                ++_jobId;
+              return (UnitDefine.eUnitClassId) (_jobId - 1);
+            }*/
 
-    //public static int GetSummonResourceId(int _unitId) => (int) ManagerSingleton<MasterDataManager>.Instance.masterUnitData[UnitUtility.GetUnitResourceId(_unitId)].PrefabId;
-/*
-    public static bool IsPersonUnit(int _unitId)
-    {
-      _unitId = UnitUtility.GetUnitResourceId(_unitId);
-      UnitDefine.UnitType unitType = UnitUtility.getUnitType(_unitId);
-      return unitType == UnitDefine.UnitType.PERSON || unitType == UnitDefine.UnitType.GUEST;
-    }
+        //public static int GetSummonResourceId(int _unitId) => (int) ManagerSingleton<MasterDataManager>.Instance.masterUnitData[UnitUtility.GetUnitResourceId(_unitId)].PrefabId;
+        /*
+            public static bool IsPersonUnit(int _unitId)
+            {
+              _unitId = UnitUtility.GetUnitResourceId(_unitId);
+              UnitDefine.UnitType unitType = UnitUtility.getUnitType(_unitId);
+              return unitType == UnitDefine.UnitType.PERSON || unitType == UnitDefine.UnitType.GUEST;
+            }
 
-    public static bool IsPlayableUnit(int _unitId)
-    {
-      MasterUnitData.UnitData unitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData.Get(_unitId);
-      return unitData != null && UnitUtility.IsPersonUnit(_unitId) && (!UnitUtility.JudgeIsGuest(_unitId) && (int) unitData.Rarity > 0) && (uint) (int) unitData.CutIn1 > 0U;
-    }
-    */
-    public static bool IsUnitTypePersonOrSummonPerson(int _unitId)
+            public static bool IsPlayableUnit(int _unitId)
+            {
+              MasterUnitData.UnitData unitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData.Get(_unitId);
+              return unitData != null && UnitUtility.IsPersonUnit(_unitId) && (!UnitUtility.JudgeIsGuest(_unitId) && (int) unitData.Rarity > 0) && (uint) (int) unitData.CutIn1 > 0U;
+            }
+            */
+        public static bool IsUnitTypePersonOrSummonPerson(int _unitId)
     {
       UnitDefine.UnitType unitType = getUnitType(_unitId);
       return unitType == UnitDefine.UnitType.PERSON || unitType == UnitDefine.UnitType.SUMMON_PERSON;

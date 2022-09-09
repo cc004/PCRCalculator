@@ -13,5 +13,10 @@ namespace Elements
     public float CriticalRate { get; set; }
 
     public FloatWithEx ExpectedDamage;
-  }
+        public FloatWithEx ExpectedDamageNotCritical
+        {
+            get;
+            set;
+        }
+    }
 }

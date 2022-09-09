@@ -28,7 +28,8 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      System.Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       AppendIsAlreadyExeced(_target.Owner, _num);
@@ -89,6 +90,7 @@ namespace Elements
           dataDictionary[_source].Add(ActionId, _attackSealData);
         _sourceActionController.AppendCoroutine(updateAttackSealData(_attackSealData, _source, () => dataDictionary[_source].Remove(ActionId)), ePauseType.SYSTEM, _source);
       }
+            action("标记");
     }
 
     private IEnumerator updateAttackSealData(

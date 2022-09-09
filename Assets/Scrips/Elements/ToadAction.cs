@@ -102,6 +102,7 @@ namespace Elements
               _target.Owner.SetLeftDirection(_target.Owner.IsLeftDir);
             }));
             _target.Owner.CancelByToad = true;*/
+            throw new System.Exception("这个技能鸽了！");
         }
 
         private IEnumerator updateToad(

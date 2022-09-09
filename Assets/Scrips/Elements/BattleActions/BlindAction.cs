@@ -13,7 +13,22 @@ namespace Elements
     public class BlindAction : ActionParameter
     {
         private const float PERCENTAGE_TO_RATE = 0.01f;
-
+        private enum eBlindType
+        {
+            PHYSICAL,
+            MAGIC
+        }
+        private Dictionary<eBlindType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eBlindType, UnitCtrl.eAbnormalState>
+        {
+            {
+                eBlindType.PHYSICAL,
+                UnitCtrl.eAbnormalState.PHYSICS_DARK
+            },
+            {
+                eBlindType.MAGIC,
+                UnitCtrl.eAbnormalState.MAGIC_DARK
+            }
+        };
         public override void ExecActionOnStart(
           Skill _skill,
           UnitCtrl _source,
@@ -27,7 +42,8 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -40,7 +56,9 @@ namespace Elements
             if (randomNum <=judgeNum)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, ActionDetail1);
+                _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eBlindType)base.ActionDetail2], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, base.ActionDetail1);
+                action("致盲");
+                //_target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, ActionDetail1);
             }
             else
             {
@@ -51,6 +69,7 @@ namespace Elements
                     _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_DARK, _parts: _target);
                 else
                     _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_DARK);
+                action("MISS");
             }
         }
 
