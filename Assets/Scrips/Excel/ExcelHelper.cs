@@ -1307,9 +1307,10 @@ namespace ExcelHelper
 
         public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit, int widthCount,int hightCount)
         {
-            using (var image = Image.FromStream(new MemoryStream(imageBytes)))
+            using (var image = (new MemoryStream(imageBytes)))
             {
-                var picture = worksheet.Drawings.AddPicture(rowNum+"0"+columnNum, image);
+                var picture = worksheet.Drawings.AddPicture(rowNum+"0"+columnNum, image
+                    , ePictureType.Png);
                 /*int adjustImageWidthInPix = cellColumnWidthInPix;
                 int adjustImageHeightInPix = cellRowHeightInPix;
                 if (autofit)
@@ -1324,6 +1325,8 @@ namespace ExcelHelper
                 int rowOffsetPixels = (int)((cellRowHeightInPix - adjustImageHeightInPix) / 2.0);
                 picture.SetSize(adjustImageWidthInPix, adjustImageHeightInPix);
                 picture.SetPosition(rowNum - 1, rowOffsetPixels, columnNum - 1, columnOffsetPixels);*/
+
+                picture.ChangeCellAnchor(eEditAs.TwoCell);
                 picture.From.Column = columnNum;
                 picture.From.Row = rowNum;
                 picture.To.Column = columnNum + widthCount;
