@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft0.Json;
+using Newtonsoft.Json;
 using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;

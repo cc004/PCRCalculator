@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
-using Newtonsoft0.Json;
+using Newtonsoft.Json;
 using PCRCaculator.Calc;
 using TMPro;
 using UnityEngine;

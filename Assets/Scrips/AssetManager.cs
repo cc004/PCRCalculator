@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mono.Data.Sqlite;
-using Newtonsoft0.Json;
+using Newtonsoft.Json;
 using UnityEngine.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Elements;
-using Newtonsoft0.Json;
+using Newtonsoft.Json;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using UnityEngine;
