@@ -393,7 +393,8 @@ namespace PCRCaculator
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
-        public string name = "";
+        [JsonIgnore]
+        public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
 
         public void SetDefaultLoveDict()
@@ -582,16 +583,20 @@ namespace PCRCaculator
             }
             return equipList;
         }
+
         public string GetUnitName()
         {
-            if (name != null && name!= "") { return name; }
+            if (!string.IsNullOrEmpty(name)) { return name; }
+            return name = MainManager.Instance.GetUnitNickName(unitId);
+        }
+
+        public string GetUnitNameInternal()
+        {
             if (MainManager.Instance.UnitName_cn.TryGetValue(unitId, out string name0))
             {
-                name = name0;
+                return name0;
             }
-            else
-                name = MainManager.Instance.UnitRarityDic[unitId].unitName;
-            return name;
+            return MainManager.Instance.UnitRarityDic[unitId].unitName;
         }
         public string GetNicName()
         {

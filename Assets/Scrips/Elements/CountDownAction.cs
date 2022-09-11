@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Elements
@@ -43,7 +44,11 @@ namespace Elements
       Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      /*for (int index = 0; index < this.ActionEffectList.Count; ++index)
+      _target.Owner.AppendCoroutine(
+          this.updateCountDown(_valueDictionary[eValueNumber.VALUE_1], null, _target.Owner, _skill,
+              _sourceActionController, _source), ePauseType.SYSTEM);
+      /*
+      for (int index = 0; index < this.ActionEffectList.Count; ++index)
       {
         NormalSkillEffect actionEffect = this.ActionEffectList[index];
         SkillEffectCtrl effect = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? actionEffect.PrefabLeft : actionEffect.Prefab);
@@ -56,14 +61,13 @@ namespace Elements
         {
           CountDownEffectCtrl _countDownEffect = effect as CountDownEffectCtrl;
           _countDownEffect.SetDamageText((int) _valueDictionary[eValueNumber.VALUE_1]);
-          _target.Owner.AppendCoroutine(this.updateCountDown(_valueDictionary[eValueNumber.VALUE_1], _countDownEffect, _target.Owner, _skill, _sourceActionController, _source), ePauseType.SYSTEM);
-        }
+                  }
       }*/
     }
 
-    /*private IEnumerator updateCountDown(
+    private IEnumerator updateCountDown(
       float _duration,
-      CountDownEffectCtrl _countDownEffect,
+      object countDownEffect,
       UnitCtrl _target,
       Skill _skill,
       UnitActionController _sourceUnitActionController,
@@ -75,17 +79,17 @@ namespace Elements
       {
         if (_target.IsDead)
         {
-          _countDownEffect.SetTimeToDie(true);
+          //_countDownEffect.SetTimeToDie(true);
           yield break;
         }
         else
         {
           timer -= countDownAction.battleManager.DeltaTime_60fps;
-          _countDownEffect.SetDamageText((int) timer);
-          yield return (object) null;
+          //_countDownEffect.SetDamageText((int) timer);
+          yield return null;
         }
       }
-      _countDownEffect.SetTimeToDie(true);
+      //_countDownEffect.SetTimeToDie(true);
       countDownAction.actionParameter.CancelByIfForAll = false;
       for (int index = countDownAction.actionParameter.TargetList.Count - 1; index >= 0; --index)
       {
@@ -94,15 +98,15 @@ namespace Elements
           countDownAction.actionParameter.TargetList.RemoveAt(index);
       }
       _sourceUnitActionController.ExecUnitActionWithDelay(countDownAction.actionParameter, _skill, false, false, true);
-      for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
+      /*for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
       {
         if (_skill.ShakeEffects[index].TargetMotion == 2)
           _sourceUnitActionController.AppendCoroutine(_sourceUnitActionController.StartShakeWithDelay(_skill.ShakeEffects[index], _skill), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-      }
-      for (int index = 0; index < _countDownEffect.CountEndEffectData.Count; ++index)
-        _target.AppendCoroutine(countDownAction.createEndEffect(_countDownEffect.CountEndEffectData[index], _target, _source), ePauseType.SYSTEM);
+      }*/
+      //for (int index = 0; index < _countDownEffect.CountEndEffectData.Count; ++index)
+      //  _target.AppendCoroutine(countDownAction.createEndEffect(_countDownEffect.CountEndEffectData[index], _target, _source), ePauseType.SYSTEM);
     }
-    */
+    
     /*private IEnumerator createEndEffect(
       CountEndEffectData _endEffect,
       UnitCtrl _target,

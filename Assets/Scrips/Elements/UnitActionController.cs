@@ -288,7 +288,7 @@ namespace Elements
                             }
                             catch
                             {
-                                MainManager.Instance.WindowMessage($"技能: {_skill.SkillName}含有超前动作，已被重置为普攻");
+                                MainManager.Instance.WindowMessage($"技能: {_skill.SkillName}({_skill.SkillId})含有超前动作，已被重置为普攻");
                                 Owner.SkillLevels[key] = 0;
                             }
                         }

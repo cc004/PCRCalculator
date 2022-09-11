@@ -327,7 +327,7 @@ namespace Elements
                 {
                     unitCtrl.UnitName = rarityData.unitName;
                 }*/
-                unitCtrl.UnitName = data.GetUnitName();
+                unitCtrl.UnitName = MainManager.Instance.GetUnitNickName(data.unitId);
             }
             unitCtrl.UnitNameEx = unitCtrl.UnitName;
             unitCtrl.UnitName = (isplayer ? "<color=#FF0000>" : "<color=#0024FF>") + unitCtrl.UnitName + "</color>";

@@ -53,6 +53,8 @@ namespace PCRCaculator
 
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
+        private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
+
 
         private CharacterManager characterManager;
         private AdventureManager battleManager;
@@ -185,6 +187,7 @@ namespace PCRCaculator
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
+            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
             if (!string.IsNullOrEmpty(firearmStr))
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
@@ -420,8 +423,10 @@ namespace PCRCaculator
                 return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
                 return unitNickNameDic[unitid];
+            if (unitNickNameDic2.ContainsKey(unitid))
+                return unitNickNameDic2[unitid];
             if (unitDataDic.ContainsKey(unitid))
-                return unitDataDic[unitid].GetUnitName();
+                return unitDataDic[unitid].GetUnitNameInternal();
             return "???";
         }
         private void CreateShowUnitIDS()
