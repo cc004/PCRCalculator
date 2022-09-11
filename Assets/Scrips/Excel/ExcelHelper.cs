@@ -16,8 +16,8 @@ using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Style;
 using PCRCaculator;
 using PCRCaculator.Guild;
-using UnityEditor;
 using UnityEngine;
+using Application = UnityEngine.Application;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 using FontStyle = System.Drawing.FontStyle;
@@ -43,13 +43,13 @@ namespace ExcelHelper
 #if UNITY_EDITOR
     public class OutPutExcelEditor
     {
-        [MenuItem("PCRTools/生成Excel")]
+        [UnityEditor.MenuItem("PCRTools/生成Excel")]
         public static void OutPutExcel()
         {
             ExcelHelper.LoadDic();
             ExcelHelper.SaveExcel(1);
         }
-        [MenuItem("PCRTools/从Excel生成别名json")]
+        [UnityEditor.MenuItem("PCRTools/从Excel生成别名json")]
         public static void CreateNicName()
         {
             ExcelHelper.ReadExcelNicName();
@@ -111,7 +111,7 @@ namespace ExcelHelper
                 failedAction?.Invoke();
                 return false;
             }
-
+            
             OpenFileName ofn = new OpenFileName();
 
             ofn.structSize = Marshal.SizeOf(ofn);
@@ -1341,6 +1341,7 @@ namespace ExcelHelper
             }
 
         }
+        /*
         /// <summary>
         /// 获取自适应调整后的图片尺寸
         /// </summary>
@@ -1348,6 +1349,7 @@ namespace ExcelHelper
         /// <param name="cellColumnWidthInPix"></param>
         /// <param name="cellRowHeightInPix"></param>
         /// <returns>item1:调整后的图片宽度; item2:调整后的图片高度</returns>
+        /// 
         private static Tuple<int, int> GetAdjustImageSize(Image image, int cellColumnWidthInPix, int cellRowHeightInPix)
         {
             int imageWidthInPix = image.Width;
@@ -1370,7 +1372,7 @@ namespace ExcelHelper
                 adjustImageHeightInPix = (int)(imageHeightInPix * ratio);
             }
             return new Tuple<int, int>(adjustImageWidthInPix, adjustImageHeightInPix);
-        }
+        }*/
         /// <summary>
         /// 获取单元格的宽度(像素)
         /// </summary>
