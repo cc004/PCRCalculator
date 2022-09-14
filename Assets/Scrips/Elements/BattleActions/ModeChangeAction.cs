@@ -454,6 +454,7 @@ namespace Elements
             }
             _source.IsSubUnionBurstMode = false;
             _source.UnitSpineCtrlModeChange.gameObject.SetActive(value: false);
+            _source.UnitSpineCtrl.gameObject.SetActive(true);
             //_source.UnitSpineCtrl.IsAlphaZero = false;
             //_source.UnitSpineCtrl.SetCurColor(_source.UnitSpineCtrlModeChange.CurColor);
             if (_source.IsFront)
