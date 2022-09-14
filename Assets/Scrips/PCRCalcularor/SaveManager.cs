@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace PCRCaculator
 {
@@ -9,7 +10,18 @@ namespace PCRCaculator
     {
         private static Dictionary<string, string> objDict;
 
-        private static string path => MainManager.GetSaveDataPath() + "/../../存档.json";
+        private static string path
+        {
+            get
+            {
+#if PLATFORM_ANDROID
+                return Application.persistentDataPath + "/存档.json";
+#else
+                return MainManager.GetSaveDataPath() + "/../../存档.json";
+#endif
+            }
+        }
+
         private static void LoadAll()
         {
             try

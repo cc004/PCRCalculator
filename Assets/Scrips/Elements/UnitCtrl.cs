@@ -1952,7 +1952,7 @@ this.updateCurColor();
             WeaponSeType = (SystemIdDefine.eWeaponSeType)(int)_data.MasterData.SeType;
             WeaponMotionType = (SystemIdDefine.eWeaponMotionType)(int)_data.MasterData.MotionType;
             UnitId = _data.UniqueData.Id;
-            OriginalUnitId = UnitUtility.GetOriginalUnitId(UnitId);
+            //OriginalUnitId = UnitUtility.GetOriginalUnitId(UnitId);
             CharacterUnitId = _data.MasterData.UnitId;
             SoundUnitId = _data.MasterData.PrefabId;
             //MasterEnemyEnableVoice.EnemyEnableVoice enemyEnableVoice = ManagerSingleton<MasterDataManager>.Instance.masterEnemyEnableVoice.Get(this.CharacterUnitId);

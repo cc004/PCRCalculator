@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using Mono.Data.Sqlite;
 using PCRApi;
 using UnityEditor;
@@ -414,11 +415,13 @@ namespace PCRCaculator
         }
 
         private static AssetManager mgr = new AssetManager();
+        private static AssetManager mgrold = new AssetManager();
         static ABExTool()
         {
             try
             {
                 mgr.Initialize("10041200");
+                mgrold.Initialize("10028300");
             }
             catch (Exception e)
             {
@@ -427,27 +430,41 @@ namespace PCRCaculator
             }
         }
 
-
-        public static T GetAssetBundleByName<T>(string fullname, string fit = "") where T : Object
+        private static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
         {
-            AssetBundle asset = null;
-            if (AssetBundleDic.ContainsKey(fullname))
+            if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
+
+            //internal packed
+            var path = Application.streamingAssetsPath + "/AB/" + fullname;
+#if PLATFORM_ANDROID
+            var www = new WWW(path);
+            while (!www.isDone) { Thread.Sleep(0); }
+            path = Application.persistentDataPath + "/AB/" + fullname;
+#else
+            var www = new WWW(path);
+            path = Application.streamingAssetsPath + "/.ABExt/" + fullname;
+#endif
+            var asset = www.getAssetBundle();
+            if (asset == null)
             {
-                asset = AssetBundleDic[fullname];
-            }
-            else
-            {
-                var path = Application.streamingAssetsPath + "/AB/" + fullname;
-                if (!File.Exists(path) && mgr != null)
+                if (!File.Exists(path))
                 {
-                    MainManager.Instance.WindowMessage($"正在尝试下载丢失的文件...{path}");
-                    var bytes = mgr.ResolveFile("a/" + fullname);
+                    var bytes = (useOldManifest ? mgrold : mgr).ResolveFile("a/" + fullname);
                     if (bytes != null) File.WriteAllBytes(path, bytes);
                 }
-                WWW www = new WWW(GetABPath(fullname));
-                asset = www.assetBundle;
-                AssetBundleDic.Add(fullname, asset);
+                www = new WWW("file://" + path);
+                while (!www.isDone) { Thread.Sleep(0); }
+                asset = www.getAssetBundle();
             }
+
+            AssetBundleDic.Add(fullname, asset);
+
+            return asset;
+        }
+
+        public static T GetAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
+        {
+            var asset = TryGetAssetBundleByName(fullname, useOldManifest);
             T result = default;
             if (asset != null)
             {
@@ -460,20 +477,9 @@ namespace PCRCaculator
             }
             return result;
         }
-        public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "") where T : Object
+        public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
-            AssetBundle asset = null;
-            if (AssetBundleDic.ContainsKey(fullname))
-            {
-                asset = AssetBundleDic[fullname];
-            }
-            else
-            {
-
-                WWW www = new WWW(GetABPath(fullname));
-                asset = www.assetBundle;
-                AssetBundleDic.Add(fullname, asset);
-            }
+            var asset = TryGetAssetBundleByName(fullname, useOldManifest);
             List<T> result = new List<T>();
             if (asset != null)
             {
@@ -484,17 +490,6 @@ namespace PCRCaculator
                 }
             }
             return result;
-        }
-        static string GetABPath(string fullName)
-        {
-            if (MainManager.Instance.PlayerSetting.useDMMpath)
-            {
-                string path = MainManager.Instance.PlayerSetting.dmmPath + "/a/" + ComputeSHA1(fullName);
-                return path;
-            }
-
-            string path2 = "file:///" + Application.streamingAssetsPath + "/AB/" + fullName;
-            return path2;
         }
         public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4}
         public static Sprite GetSprites(SpriteType type, int id)
@@ -540,7 +535,7 @@ namespace PCRCaculator
         {
             //if (unitid >= 200000 && unitid <= 299999)
             //    unitid = (int)(unitid / 100) * 100;
-            GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab");
+            GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab", unitid > 200000);
             /*if(a==null)
             {
                 unitid = (int)(unitid / 100) * 100;

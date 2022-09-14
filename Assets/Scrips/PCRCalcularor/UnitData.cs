@@ -399,7 +399,7 @@ namespace PCRCaculator
 
         public void SetDefaultLoveDict()
         {
-            if (playLoveDic != null) return;
+            if (playLoveDic != null && playLoveDic.ContainsKey(unitId)) return;
             playLoveDic = new Dictionary<int, int>();
             if (!MainManager.Instance.UnitStoryEffectDic.ContainsKey(unitId)) return;
             List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unitId];

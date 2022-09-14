@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -8,10 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
-using UnityEngine.Diagnostics;
+using UnityEngine;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using PCRCaculator;
+using Random = System.Random;
 
 namespace PCRApi
 {
@@ -138,13 +138,24 @@ namespace PCRApi
 
         public string Ver { get; private set; }
 
+        private static string Platform
+        {
+            get
+            {
+#if PLATFORM_ANDROID
+                return "Android";
+#else
+                return "Windows";
+#endif
+            }
+        }
         public void AddRoot(string @class, string ver, string rootpath)
         {
             new Content
             {
                 url = rootpath,
                 type = "every",
-                children = Content.FromUrl($"{manifest}{ver}/Jpn/{@class}/Windows/", rootpath, @class)
+                children = Content.FromUrl($"{manifest}{ver}/Jpn/{@class}/{Platform}/", rootpath, @class)
             }.RegisterTo(this);
 
         }
@@ -153,9 +164,14 @@ namespace PCRApi
             Ver = ver;
             registries.Clear();
 
+#if PLATFORM_ANDROID
+            var file = UnityEngine.Application.persistentDataPath + $"/AB/manifest_{ver}.json";
+#else
+            var file = $"manifest_{ver}.json";
+#endif
             try
             {
-                registries = JsonConvert.DeserializeObject<Dictionary<string, Content>>(File.ReadAllText($"manifest_{ver}.json"));
+                registries = JsonConvert.DeserializeObject<Dictionary<string, Content>>(File.ReadAllText(file));
 
                 /* setup children */
 
@@ -175,7 +191,7 @@ namespace PCRApi
                 if (sound_ver != null)
                     AddRoot("Sound", sound_ver, "manifest/sound2manifest");
 
-                File.WriteAllText($"manifest_{ver}.json", JsonConvert.SerializeObject(registries));
+                File.WriteAllText(file, JsonConvert.SerializeObject(registries));
             }
 
             if (patch)
@@ -190,6 +206,7 @@ namespace PCRApi
         {
             if (registries.TryGetValue(path, out var content))
             {
+                Debug.Log($"resolving file {path}");
                 return content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}");
             }
             return null;

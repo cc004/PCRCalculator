@@ -475,14 +475,11 @@ namespace PCRCaculator.Guild
         }
         public void SaveFileToExcel()
         {
-            if (Application.platform == RuntimePlatform.Android)
-            {
-                MainManager.Instance.WindowConfigMessage("手机端导出可能失败，建议使用电脑端导出！\n如要尝试请按确定继续", CallExcelHelper);
-            }
-            else
-            {
-                CallExcelHelper();
-            }
+#if PLATFORM_ANDROID
+            MainManager.Instance.WindowConfigMessage("手机端导出可能失败，建议使用电脑端导出！\n如要尝试请按确定继续", CallExcelHelper);
+#else
+            CallExcelHelper();
+#endif
         }
 
         private void CallExcelHelper()
@@ -513,6 +510,7 @@ namespace PCRCaculator.Guild
             catch (System.Exception a)
 #endif
             {
+                Debug.LogError(a.ToString());
                 MainManager.Instance.WindowConfigMessage("发生错误：" + a.Message, null);
             }
 
@@ -746,6 +744,9 @@ namespace PCRCaculator.Guild
         {
             try
             {
+#if PLATFORM_ANDROID
+                var fileName = CreateExcelName().Replace("\\", "/") + ".txt";
+#else
                 var ofn = new OpenFileName();
                 ofn.structSize = Marshal.SizeOf(ofn);
                 ofn.filter = "Text Files(*.txt)\0*.txt\0";
@@ -764,6 +765,7 @@ namespace PCRCaculator.Guild
                     return;
                 }
                 var fileName = ofn.file.Replace("\\", "/");
+#endif
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
                 const string totaldie = "总乱轴（上限）";

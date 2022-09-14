@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 using PCRCaculator.Calc;
 using TMPro;
@@ -132,10 +133,12 @@ namespace PCRCaculator
         {
             try
             {
-                if (Application.platform == RuntimePlatform.Android)
-                {
-                    CopyDataInAndraid();
-                }
+#if PLATFORM_ANDROID
+                var dir = Application.persistentDataPath + "/AB";
+#else
+                var dir = Application.streamingAssetsPath + "/.ABExt";
+#endif
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 Load();
                 CreateShowUnitIDS();
             }
@@ -547,7 +550,14 @@ namespace PCRCaculator
         public string LoadJsonDatas(string path,bool forceStreaming = true)
         {
             string filePath = GetSaveDataPath() + "/" + path + ".json";
+#if PLATFORM_ANDROID
+            var reader = new WWW(filePath);
+            while (!reader.isDone) {Thread.Sleep(0);}
+
+            return reader.text;
+#else
             return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+#endif
         }
         public static Sprite LoadSourceSprite(string relativePath)
         {
@@ -637,8 +647,6 @@ namespace PCRCaculator
         }
         public static string GetSaveDataPath()
         {
-            if (Application.platform == RuntimePlatform.Android)
-                return Application.persistentDataPath;
             return Application.streamingAssetsPath;
         }
         [ContextMenu("生成排刀器用unitdetail文件")]

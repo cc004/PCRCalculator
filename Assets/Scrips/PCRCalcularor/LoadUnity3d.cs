@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using Elements;
 using Spine.Unity;
 using UnityEngine;
-
+#if bullshit
 namespace PCRCaculator.Battle
 {
-
+    /*
 
     public class LoadUnity3d : MonoBehaviour
     {      // Use this for initialization 
@@ -375,5 +375,6 @@ namespace PCRCaculator.Battle
                 yield return AddBundleRefrence(bundleName, dependBundleName);
             }
         }*/
-    }
+    }*/
 }
+#endif

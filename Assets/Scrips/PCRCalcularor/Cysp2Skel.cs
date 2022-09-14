@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using Elements;
 using PCRApi;
@@ -54,11 +53,12 @@ namespace PCR_cysp2skel
             string char_base = $"spine_{(unitType == 0 ? unitId : 0):D6}_chara_base.cysp.unity3d";
             string common_battle = $"spine_{(unitType == 0 ? unitId: unitType):D2}_common_battle.cysp.unity3d";
             string spine_battle = $"spine_{unitId:D6}_battle.cysp.unity3d";
+            var useold = unitId > 200000;
             try
             {
-                var CHAR_BASE = ABExTool.GetAssetBundleByName<TextAsset>(char_base);
-                var BATTLE = ABExTool.GetAssetBundleByName<TextAsset>(spine_battle);
-                var COMMON_BATTLE =  ABExTool.GetAssetBundleByName<TextAsset>(common_battle);
+                var CHAR_BASE = ABExTool.GetAssetBundleByName<TextAsset>(char_base, useOldManifest: useold);
+                var BATTLE = ABExTool.GetAssetBundleByName<TextAsset>(spine_battle, useOldManifest: useold);
+                var COMMON_BATTLE =  ABExTool.GetAssetBundleByName<TextAsset>(common_battle, useOldManifest: useold);
 
                 if (CHAR_BASE == null)
                 {

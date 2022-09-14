@@ -244,13 +244,14 @@ namespace Elements
             int unitid = data.unitId;
             WWW www = new WWW("file:///" + Application.dataPath + "/AB/all_battleunitprefab_" + unitid + ".unity3d");
             yield return www;
-            foreach (string path_0 in www.assetBundle.GetAllAssetNames())
+            var ab = www.getAssetBundle();
+            foreach (string path_0 in ab.GetAllAssetNames())
             {
                 //try
                 //{
                     if (path_0.Contains(".prefab"))
                     {
-                        GameObject b = Instantiate(www.assetBundle.LoadAsset<GameObject>(path_0));
+                        GameObject b = Instantiate(ab.LoadAsset<GameObject>(path_0));
                         //GameObject b = www.assetBundle.LoadAsset<GameObject>(path_0);
 
                         //b.SetActive(false);
@@ -274,7 +275,7 @@ namespace Elements
                 //    Debug.LogError("load " + path_0 + " failed beacuse " + e.Message);
                 //}
             }
-            www.assetBundle.Unload(false);
+            ab.Unload(false);
             finishAction?.Invoke();
 
         }
@@ -444,10 +445,10 @@ namespace Elements
                         Debug.LogError(unitid + "的通用弹道数据丢失！");
                     }
                 }
-                GameObject ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab");
+                GameObject ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + unitid + ".unity3d", "prefab", unitid > 200000);
                 if (ins2 == null && unitid > 200000)
                 {
-                    ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + (unitid / 100 * 100 + 99) + ".unity3d", "prefab");
+                    ins2 = ABExTool.GetAssetBundleByName<GameObject>("all_battleunit_" + (unitid / 100 * 100 + 99) + ".unity3d", "prefab", true);
                 }
                 if (ins2 != null)
                 {

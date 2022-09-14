@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,9 +17,6 @@ using PCRCaculator.Guild;
 using UnityEngine;
 using Application = UnityEngine.Application;
 using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
-using FontStyle = System.Drawing.FontStyle;
-using Graphics = System.Drawing.Graphics;
 using UnitData = PCRCaculator.UnitData;
 
 namespace ExcelHelper
@@ -105,13 +100,11 @@ namespace ExcelHelper
 
         public static bool ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,SystemWindowMessage.configDelegate failedAction = null)
         {
-            if(Application.platform == RuntimePlatform.Android)
-            {
-                guildTimelineData = new GuildTimelineData();
-                failedAction?.Invoke();
-                return false;
-            }
-            
+#if PLATFORM_ANDROID
+            guildTimelineData = new GuildTimelineData();
+            failedAction?.Invoke();
+            return false;
+#else
             OpenFileName ofn = new OpenFileName();
 
             ofn.structSize = Marshal.SizeOf(ofn);
@@ -272,7 +265,7 @@ namespace ExcelHelper
             }
             guildTimelineData = new GuildTimelineData();
             return false;
-
+#endif
         }
 
 
@@ -280,9 +273,12 @@ namespace ExcelHelper
         {
             bool isSuccess = true;
             string filePath = "";
-            if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
-            {
-                OpenFileName ofn = new OpenFileName();
+#if PLATFORM_ANDROID
+
+            string name = (defaultName == "" ? "ExportTimeLine" : defaultName);
+            filePath = Application.persistentDataPath + "/" + name + ".xlsx";
+#else
+            OpenFileName ofn = new OpenFileName();
 
                 ofn.structSize = Marshal.SizeOf(ofn);
 
@@ -321,48 +317,40 @@ namespace ExcelHelper
                 isSuccess = DllTest.GetSaveFileName(ofn);
                 filePath = ofn.file.Replace("\\", "/");
 
-            }
-            else if(Application.platform == RuntimePlatform.Android)
-            {
-                string name = (defaultName == "" ? "ExportTimeLine" : defaultName);
-                filePath = Application.persistentDataPath + "/" + name + ".xlsx";
-            }
+#endif
             //打开windows框
-            if (isSuccess)
+            //TODO
+
+            //把文件路径格式替换一下
+            //ofn.file = ofn.file.Replace("\\", "/");
+            //Debug.Log(ofn.file);
+
+            FileInfo newFile = new FileInfo(filePath);
+            if (newFile.Exists)
             {
-                //TODO
+                newFile.Delete(); // ensures we create a new workbook
+                newFile = new FileInfo(filePath);
+            }
 
-                //把文件路径格式替换一下
-                //ofn.file = ofn.file.Replace("\\", "/");
-                //Debug.Log(ofn.file);
+            switch (type)
+            {
+                case 1:
+                    CreateUnitExecTimeExcel(newFile);
+                    break;
+                case 2:
+                    CreateGuildTimeLineExcel(newFile);
+                    break;
 
-                FileInfo newFile = new FileInfo(filePath);
-                if (newFile.Exists)
-                {
-                    newFile.Delete();  // ensures we create a new workbook
-                    newFile = new FileInfo(filePath);
-                }
-                switch (type)
-                {
-                    case 1:
-                        CreateUnitExecTimeExcel(newFile);
-                        break;
-                    case 2:
-                        CreateGuildTimeLineExcel(newFile);
-                        break;
-
-                }
-                if (Application.platform == RuntimePlatform.Android)
-                {
-                    MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n请自行前往查看！", null);
-                }
+            }
+            
+#if PLATFORM_ANDROID
+                MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n请自行前往查看！", null);
+#endif
 
                 // Script Export
 
                 if (File.Exists("patch_asm_exportaabbabab"))
-                    File.WriteAllText(filePath + ".asm", CreateAsmString());
-            }
-            
+                File.WriteAllText(filePath + ".asm", CreateAsmString());
         }
 
         private static (string, Func<UnitData, object>)[] conditions =
@@ -1307,6 +1295,9 @@ namespace ExcelHelper
 
         public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit, int widthCount,int hightCount)
         {
+#if PLATFORM_ANDROID
+            return null;
+#else
             using (var image = (new MemoryStream(imageBytes)))
             {
                 var picture = worksheet.Drawings.AddPicture(rowNum+"0"+columnNum, image
@@ -1339,7 +1330,7 @@ namespace ExcelHelper
 
                 return picture;
             }
-
+#endif
         }
         /*
         /// <summary>
@@ -1373,47 +1364,6 @@ namespace ExcelHelper
             }
             return new Tuple<int, int>(adjustImageWidthInPix, adjustImageHeightInPix);
         }*/
-        /// <summary>
-        /// 获取单元格的宽度(像素)
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <returns></returns>
-        private static int GetWidthInPixels(ExcelRange cell)
-        {
-            double columnWidth = cell.Worksheet.Column(cell.Start.Column).Width;
-            Font font = new Font(cell.Style.Font.Name, cell.Style.Font.Size, FontStyle.Regular);
-            double pxBaseline = Math.Round(MeasureString("1234567890", font) / 10);
-            return (int)(columnWidth * pxBaseline);
-        }
-        /// <summary>
-        /// 获取单元格的高度(像素)
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <returns></returns>
-        private static int GetHeightInPixels(ExcelRange cell)
-        {
-            double rowHeight = cell.Worksheet.Row(cell.Start.Row).Height;
-            return (int)rowHeight;
-            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                float dpiY = graphics.DpiY;
-                return (int)(rowHeight * (1.0 / DEFAULT_DPI) * dpiY);
-            }
-        }
-        /// <summary>
-        /// MeasureString
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="font"></param>
-        /// <returns></returns>
-        private static float MeasureString(string s, Font font)
-        {
-            using (var g = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                g.TextRenderingHint = TextRenderingHint.AntiAlias;
-                return g.MeasureString(s, font, int.MaxValue, StringFormat.GenericTypographic).Width;
-            }
-        }
     }
     public struct TimeLineDataA
     {
