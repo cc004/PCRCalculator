@@ -4,6 +4,7 @@ using System.Linq;
 using Elements;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
+using PCRCaculator.Battle;
 using PCRCaculator.Calc;
 using PCRCaculator.Guild;
 using UnityEditor;
@@ -671,7 +672,14 @@ namespace PCRCaculator
 
                 unitSkillData.SPskill_1_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_1"));
                 unitSkillData.SPskill_2_ev = reader.GetInt32(reader.GetOrdinal("sp_skill_evolution_2"));
-
+                try
+                {
+                    unitSkillData.SPUB = reader.GetInt32(reader.GetOrdinal("sp_union_burst"));
+                }
+                catch
+                {
+                    Debug.LogError("DB过旧！");
+                }
 
                 unitSkilldic.Add(unitid, unitSkillData);
             }
@@ -1278,13 +1286,14 @@ namespace PCRCaculator
         }
         private void LoadResistDada()
         {
+            staticConnection = JpConnection;
             resistDataDic.Clear();
             SqliteDataReader reader = sql.ReadFullTable("resist_data");
             while (reader.Read())
             {
                 int id = reader.GetInt32(reader.GetOrdinal("resist_status_id"));
-                int[] ailments = new int[32];
-                for(int i = 1; i < 33; i++)
+                int[] ailments = new int[ResistData.AILMENT_LENGTH];
+                for(int i = 1; i <= ResistData.AILMENT_LENGTH; i++)
                 {
                     ailments[i - 1] = reader.GetInt32(reader.GetOrdinal("ailment_" + i)); ;
                 }

@@ -25,10 +25,18 @@ namespace Elements
     public FloatWithEx Damage { get; set; }
 
     public UnitCtrl Source { get; set; }
-
-    public float CriticalRate { get; set; }
-
-    public eDamageType DamageType { get; set; }
+        public UnitCtrl StrikeBackSource
+        {
+            get;
+            set;
+        }
+        public float CriticalRate { get; set; }
+        public float CriticalRateForLogBarrier
+        {
+            get;
+            set;
+        }
+        public eDamageType DamageType { get; set; }
 
     public eDamageEffectType DamegeEffectType { get; set; }
 
@@ -41,8 +49,12 @@ namespace Elements
     public bool IsDivisionDamage { get; set; }
 
     public int LifeSteal { get; set; }
-
-    public bool IsSlipDamage { get; set; }
+        public Func<float, float> LimitDamageFunc
+        {
+            get;
+            set;
+        }
+        public bool IsSlipDamage { get; set; }
 
     public float CriticalDamageRate { get; set; }
 
@@ -51,8 +63,12 @@ namespace Elements
     public float DamegeNumScale { get; set; } = 1f;
 
     public Func<int, int> ExecAbsorber { get; set; }
-
-    public enum eDamageType
+        public bool IsAlwaysChargeEnegry
+        {
+            get;
+            set;
+        }
+        public enum eDamageType
     {
       ATK = 1,
       MGC = 2,

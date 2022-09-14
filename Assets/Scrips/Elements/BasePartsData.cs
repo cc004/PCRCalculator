@@ -21,13 +21,24 @@ namespace Elements
         public float PositionX;
         public float PositionY;
         public List<AttachmentNamePair> AttachmentNamePairList = new List<AttachmentNamePair>();
+        public bool DisableStartBreakEffect;
         public float ChangeAttachmentStartTime;
         public float ChangeAttachmentEndTime;
         public float BodyWidthValue;
         public int Index;
         public int EnemyId = 100000001;
+        public float BreakEffectTime;
+        public float BreakEffectOffsetY;
+        public float BreakEffectSize = 1f;
         private float lastHealEffectTime;
         private const int ALL_DETAIL_VALUE = -1;
+        private int currentAbnormalResistId;
+
+        private int currentDebuffResistId;
+
+        private Dictionary<int, Dictionary<eActionType, Dictionary<int, int>>> abnormalResistIdDictionary = new Dictionary<int, Dictionary<eActionType, Dictionary<int, int>>>();
+
+        private Dictionary<int, Dictionary<UnitCtrl.BuffParamKind, int>> debuffResistIdDictionary = new Dictionary<int, Dictionary<UnitCtrl.BuffParamKind, int>>();
 
         public List<NormalSkillEffect> BreakEffectList { get; set; }
 
@@ -44,6 +55,33 @@ namespace Elements
         public bool PassiveUbIsMagic { get; set; }
 
         public bool IsBlackoutTarget { get; set; }
+        public int StartAbnormalResistId
+        {
+            get;
+            private set;
+        }
+
+        public int StartDebuffResistId
+        {
+            get;
+            private set;
+        }
+
+        public int AbnormalResistIdSetCount
+        {
+            get;
+            private set;
+        }
+
+        public int DebuffResistIdSetCount
+        {
+            get;
+            private set;
+        }
+
+        private Dictionary<eActionType, Dictionary<int, int>> abnormalResistStatusDictionary => abnormalResistIdDictionary[currentAbnormalResistId];
+
+        private Dictionary<UnitCtrl.BuffParamKind, int> debuffResistStatusDictionary => debuffResistIdDictionary[currentDebuffResistId];
 
         public void SetBattleManager(BattleManager _battleManager) => battleManager = _battleManager;
 
@@ -108,9 +146,10 @@ namespace Elements
           eDamageEffectType _damageEffectType,
           float _scale)
         {
-            if (Owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
-                return;
-            Owner.SetMissAtk(_source, _missLogType, _damageEffectType, _scale: _scale);
+            if (!Owner.IsNoDamageMotion())
+            {
+                Owner.SetMissAtk(_source, _missLogType, _damageEffectType, null, _scale);
+            }
         }
 
         /*public void ShowHitEffect(
@@ -179,6 +218,7 @@ namespace Elements
             }
             else
             {
+                UnitCtrl owner = Owner;
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
@@ -236,6 +276,26 @@ namespace Elements
                         UnitCtrl owner13 = Owner;
                         owner13.Accuracy = (int)((int)owner13.Accuracy + _value);
                         break;
+                    case UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE:
+                        {
+                            owner.ReceiveCriticalDamageRate = (int)(owner.ReceiveCriticalDamageRate - _value);
+                            break;
+                        }
+                    case UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT:
+                        {
+                            owner.AdditionalPhysicalAndMagicReceiveDamagePercent = (int)(owner.AdditionalPhysicalAndMagicReceiveDamagePercent - _value);
+                            break;
+                        }
+                    case UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT:
+                        {
+                            owner.AdditionalPhysicalReceiveDamagePercent = (int)(owner.AdditionalPhysicalReceiveDamagePercent - _value);
+                            break;
+                        }
+                    case UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT:
+                        {
+                            owner.AdditionalMagicReceiveDamagePercent = (int)(owner.AdditionalMagicReceiveDamagePercent - _value);
+                            break;
+                        }
                     case UnitCtrl.BuffParamKind.MAX_HP:
                         if (Owner.MaxHp + (long)_value > 0L)
                         {
@@ -244,7 +304,15 @@ namespace Elements
                             if (Owner.MaxHp >= (long)Owner.Hp)
                                 break;
                             Owner.SetCurrentHp(Owner.MaxHp);
-                            break;
+                            if (!_enable)
+                            {
+                                break;
+                            }
+                            float jEOCPILJNAD = (float)(long)Owner.Hp / (float)(long)Owner.MaxHp;
+                            foreach (KeyValuePair<int, Action<float>> item in Owner.OnRecoverListForChangeSpeedDisableByMaxHp)
+                            {
+                                item.Value?.Invoke(jEOCPILJNAD);
+                            }
                         }
                         if ((long)Owner.Hp <= 0L)
                             break;
@@ -287,27 +355,78 @@ namespace Elements
 
         public virtual bool GetTargetable() => true;
 
-        public Dictionary<eActionType, Dictionary<int, int>> ResistStatusDictionary { get; set; }
-
-        public void InitializeResistStatus(int resistId)
+        public void SetAbnormalResistId(int _resistId, bool _isInit)
         {
-            /* this.ResistStatusDictionary = new Dictionary<eActionType, Dictionary<int, int>>((IEqualityComparer<eActionType>)new eActionType_DictComparer());
+            if (!abnormalResistIdDictionary.ContainsKey(_resistId))
+            {
+                createResistStatus(_resistId);
+            }
+            currentAbnormalResistId = _resistId;
+            if (_isInit)
+            {
+                StartAbnormalResistId = _resistId;
+            }
+            AbnormalResistIdSetCount++;
+        }
 
-             MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
-             this.ResistStatusDictionary = new Dictionary<eActionType, Dictionary<int, int>>((IEqualityComparer<eActionType>) new eActionType_DictComparer());
-             if (resistId == 0)
-               return;
-             MasterResistData.ResistData resistData = instance.masterResistData.Get(resistId);
-             for (int index = 0; index < resistData.Ailments.Length; ++index)
-             {
-               MasterAilmentData.AilmentData ailmentData = instance.masterAilmentData.Get(index + 1);
-               if (ailmentData == null)
-                 break;
-               eActionType ailmentAction = (eActionType) (int) ailmentData.ailment_action;
-               if (!this.ResistStatusDictionary.ContainsKey(ailmentAction))
-                 this.ResistStatusDictionary.Add(ailmentAction, new Dictionary<int, int>());
-               this.ResistStatusDictionary[ailmentAction][(int) ailmentData.ailment_detail_1] = resistData.Ailments[index];
-             }*/
+        public void SetDebuffResistId(int _resistId, bool _isInit)
+        {
+            if (!debuffResistIdDictionary.ContainsKey(_resistId))
+            {
+                createDebuffStatus(_resistId);
+            }
+            currentDebuffResistId = _resistId;
+            if (_isInit)
+            {
+                StartDebuffResistId = _resistId;
+            }
+            DebuffResistIdSetCount++;
+        }
+        private void createResistStatus(int _resistId)
+        {
+            abnormalResistIdDictionary.AddIfNoContains(_resistId, new Dictionary<eActionType, Dictionary<int, int>>());
+            if (_resistId == 0)
+            {
+                return;
+            }
+            Dictionary<eActionType, Dictionary<int, int>> resistDic = new Dictionary<eActionType, Dictionary<int, int>>();
+            ResistData unitResistdata = new ResistData(_resistId);
+            for (int i = 0; i < StaticAilmentData.ailmentDatas.Length; i++)
+            {
+                AilmentData ailment = StaticAilmentData.ailmentDatas[i];
+                if (ailment == null)
+                    break;
+                if (!resistDic.ContainsKey((eActionType)ailment.ailment_action))
+                {
+                    resistDic.Add((eActionType)ailment.ailment_action, new Dictionary<int, int>());
+                }
+                resistDic[(eActionType)ailment.ailment_action].Add(ailment.ailment_detail1, unitResistdata.ailments[i]);
+                eActionType key = (eActionType)(int)ailment.ailment_action;
+                if (!abnormalResistIdDictionary[_resistId].ContainsKey(key))
+                {
+                    abnormalResistIdDictionary[_resistId].Add(key, new Dictionary<int, int>());
+                }
+                abnormalResistIdDictionary[_resistId][key][ailment.ailment_detail1] = unitResistdata.ailments[i];
+            }
+            
+        }
+        private void createDebuffStatus(int _resistId)
+        {
+            debuffResistIdDictionary.AddIfNoContains(_resistId, new Dictionary<UnitCtrl.BuffParamKind, int>());
+            if (_resistId != 0)
+            {
+                ResistVariationData resistVariationData = StaticAilmentData.resistVariationDataDic[_resistId];
+                for (int i = 0; i < 4; i++)
+                {
+                    debuffResistIdDictionary[_resistId][(UnitCtrl.BuffParamKind)(i + 1)] = resistVariationData.DebuffDecrement[i];
+                }
+            }
+        }
+        //public Dictionary<eActionType, Dictionary<int, int>> ResistStatusDictionary { get; set; }
+
+        /*public void InitializeResistStatus(int resistId)
+        {
+            
             Dictionary<eActionType, Dictionary<int, int>> resistDic = new Dictionary<eActionType, Dictionary<int, int>>();
             ResistData unitResistdata = new ResistData(resistId);
             for (int i = 0; i < StaticAilmentData.ailmentDatas.Length; i++)
@@ -321,7 +440,7 @@ namespace Elements
             }
             ResistStatusDictionary = resistDic;
 
-        }
+        }*/
 
         public bool ResistStatus(
       eActionType _actionType,
@@ -331,13 +450,15 @@ namespace Elements
       bool _targetOneParts,
       BasePartsData _target)
         {
-            if (!ResistStatusDictionary.ContainsKey(_actionType))
+            if (!abnormalResistStatusDictionary.ContainsKey(_actionType))
+            {
                 return false;
-            Dictionary<int, int> resistStatus = ResistStatusDictionary[_actionType];
-            if (resistStatus.ContainsKey(-1))
+            }
+            Dictionary<int, int> dictionary = abnormalResistStatusDictionary[_actionType];
+            if (dictionary.ContainsKey(-1))
                 _detail1 = -1;
-            if (!resistStatus.ContainsKey(_detail1) || BattleManager.Random(0.0f, 1f, 
-                    new RandomData(_source,_target.Owner, (int)_actionType, 9, resistStatus[_detail1] / 100.0f)) >= resistStatus[_detail1] / 100.0)
+            if (!dictionary.ContainsKey(_detail1) || BattleManager.Random(0.0f, 1f, 
+                    new RandomData(_source,_target.Owner, (int)_actionType, 9, dictionary[_detail1] / 100.0f)) >= dictionary[_detail1] / 100.0)
                 return false;
             if (_last)
             {
@@ -348,7 +469,11 @@ namespace Elements
             }
             return true;
         }
-
+        public int GetDebuffResistPercent(UnitCtrl.BuffParamKind _buffParamKind)
+        {
+            debuffResistStatusDictionary.TryGetValue(_buffParamKind, out var value);
+            return value;
+        }
         [Serializable]
         public class AttachmentNamePair
         {

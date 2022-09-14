@@ -26,57 +26,79 @@ namespace Elements
         private int currentSealId { get; set; }
 
         private List<int> enableSealIdList { get; set; }
-
-        public void RemoveSeal(int _count)
+        private Dictionary<int, IEnumerator> updateDataDic
         {
-            if (enableSealIdList == null)
-                return;
-            _count = Mathf.Min(_count, enableSealIdList.Count);
-            for (int index = 0; index < _count; ++index)
-                enableSealIdList.RemoveAt(0);
-        }
+            get;
+            set;
+        } = new Dictionary<int, IEnumerator>();
 
-        public void AddSeal(float _limitTime, UnitCtrl _target, eStateIconType _iconType, int _count)
-        {
-            RemoveSeal(Mathf.Max(0, GetCurrentCount() + _count - Max));
-            for (int index = 0; index < _count; ++index)
-                addSealImpl(_limitTime, _target, _iconType);
-        }
+		public void RemoveSeal(int _count, bool _isPassiveSeal)
+		{
+			if (enableSealIdList == null)
+			{
+				return;
+			}
+			_count = Mathf.Min(_count, enableSealIdList.Count);
+			for (int i = 0; i < _count; i++)
+			{
+				int key = enableSealIdList[0];
+				enableSealIdList.RemoveAt(0);
+				if (_isPassiveSeal && updateDataDic.ContainsKey(key))
+				{
+					updateDataDic[key].MoveNext();
+					updateDataDic.Remove(key);
+				}
+			}
+		}
 
-        private void addSealImpl(float _limitTime, UnitCtrl _target, eStateIconType _iconType)
-        {
-            if (currentSealId == 0)
-                enableSealIdList = new List<int>();
-            enableSealIdList.Add(currentSealId);
-            ++Count;
-            if (DisplayCount)
-                _target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
-            _target.AppendCoroutine(updateData(_limitTime, _target, _iconType, currentSealId), ePauseType.SYSTEM);
-            ++currentSealId;
-        }
+		public void AddSeal(float _limitTime, UnitCtrl _target, eStateIconType _iconType, int _count)
+		{
+			RemoveSeal(Mathf.Max(0, GetCurrentCount() + _count - Max), _isPassiveSeal: false);
+			for (int i = 0; i < _count; i++)
+			{
+				addSealImpl(_limitTime, _target, _iconType);
+			}
+		}
 
-        private IEnumerator updateData(
-          float _limitTime,
-          UnitCtrl _target,
-          eStateIconType _iconType,
-          int _sealId)
-        {
-            while (_limitTime > 0.0 && !_target.IdleOnly && (!_target.IsDead && enableSealIdList.Contains(_sealId)))
-            {
-                _limitTime -= _target.DeltaTimeForPause;
-                yield return null;
-            }
-            enableSealIdList.Remove(_sealId);
-            Count--;
-            if (DisplayCount)
-                _target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
-            if (Count == 0 && GetCurrentCount() == 0)
-            {
-                //if ((Object) this.Effect != (Object) null)
-                //  this.Effect.SetTimeToDie(true);
-                _target.OnChangeState.Call(_target, _iconType, false);
-                _target.MyOnChangeAbnormalState?.Invoke(_target, _iconType, false, 0, "NaN");
-            }
-        }
-    }
+		private void addSealImpl(float _limitTime, UnitCtrl _target, eStateIconType _iconType)
+		{
+			if (currentSealId == 0)
+			{
+				enableSealIdList = new List<int>();
+			}
+			enableSealIdList.Add(currentSealId);
+			Count++;
+			if (DisplayCount)
+			{
+				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
+			}
+			IEnumerator enumerator = updateData(_limitTime, _target, _iconType, currentSealId);
+			updateDataDic.Add(currentSealId, enumerator);
+			_target.AppendCoroutine(enumerator, ePauseType.SYSTEM);
+			currentSealId++;
+		}
+
+		private IEnumerator updateData(float _limitTime, UnitCtrl _target, eStateIconType _iconType, int _sealId)
+		{
+			while (_limitTime > 0f && !_target.IdleOnly && !_target.IsDead && enableSealIdList.Contains(_sealId))
+			{
+				_limitTime -= _target.DeltaTimeForPause;
+				yield return null;
+			}
+			enableSealIdList.Remove(_sealId);
+			Count--;
+			if (DisplayCount)
+			{
+				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
+			}
+			if (Count == 0 && GetCurrentCount() == 0)
+			{
+				if (Effect != null)
+				{
+					Effect.SetTimeToDie(value: true);
+				}
+				_target.OnChangeState.Call(_target, _iconType, ADIFIOLCOPN: false);
+			}
+		}
+	}
 }

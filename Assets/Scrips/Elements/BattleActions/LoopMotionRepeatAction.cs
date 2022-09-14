@@ -54,7 +54,8 @@ namespace Elements
       UnitActionController _sourceActionController,
       Skill _skill)
     {
-      base.ReadyAction(_source, _sourceActionController, _skill);
+            totalDamage = 0.0f;
+            base.ReadyAction(_source, _sourceActionController, _skill);
       if (repeatAction != null)
         repeatAction.CancelByIfForAll = true;
       if (failAction != null)

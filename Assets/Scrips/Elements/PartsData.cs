@@ -144,7 +144,9 @@ namespace Elements
             Dodge = StartDodge = (int)data.baseData.Dodge;
             LifeSteal = StartLifeSteal = (int)data.baseData.Life_steal;
             HpRecoveryRate = (int)data.baseData.Hp_recovery_rate;
-            InitializeResistStatus(data.resist_status_id);
+            SetAbnormalResistId(data.resist_status_id, _isInit: true);
+            SetDebuffResistId(data.resist_variation_id, _isInit: true);
+            EnemyId = unit_id;
             /*if (Singleton<EHPLBCOOOPK>.Instance.PHDACAOAOMA.CLCOKFOINCL == eBattleCategory.CLAN_BATTLE)
             {
               ClanBattleTopInfo clanBattleTopInfo = Singleton<ClanBattleTempData>.Instance.ClanBattleTopInfo;
@@ -307,6 +309,11 @@ namespace Elements
                     case UnitCtrl.BuffParamKind.ACCURACY:
                         Accuracy = (int)((int)Accuracy + _value);
                         break;
+                    case UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE:
+                    case UnitCtrl.BuffParamKind.MOVE_SPEED:
+                    case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE:
+                    case UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE:
+                        break;
                 }
             }
         }
@@ -355,14 +362,26 @@ namespace Elements
             //  return;
             if (_enable)
             {
-              if (!Owner.BossPartsListForBattle.Exists(e => !e.IsBreak))
-                Owner.OnBreakAll.Call();
-              //ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_BREAK, _unitUiCtrl).transform.position = this.GetBottomTransformPosition() + this.GetFixedCenterPos();
-              //this.MultiTargetCursor.RedUi.alpha = 0.0f;
-              //this.MultiTargetCursor.Animator.Play("BattleMultiTargetsCursor_breaked");
-              //ManagerSingleton<SoundManager>.Instance.PlaySeByOuterSource(this.MultiTargetCursor.SeSource, eSE.MULTI_TARGETS_BREAK);
-              //this.createBreakEffect(0);
-              Owner.AppendCoroutine(updateChangeAttachment(ChangeAttachmentStartTime, true), ePauseType.SYSTEM, Owner);
+                //if (!Owner.BossPartsListForBattle.Exists(e => !e.IsBreak))
+                //  Owner.OnBreakAll.Call();
+
+                if (!base.Owner.BossPartsListForBattle.Exists((PartsData e) => !e.IsBreak))
+                {
+                    if (base.Owner.IsBoss && !base.Owner.GameStartDone)
+                    {
+                        base.Owner.OnBreakAllCallWhenGameStartDone = true;
+                    }
+                    else
+                    {
+                        base.Owner.OnBreakAll.Call();
+                    }
+                }
+                //ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_BREAK, _unitUiCtrl).transform.position = this.GetBottomTransformPosition() + this.GetFixedCenterPos();
+                //this.MultiTargetCursor.RedUi.alpha = 0.0f;
+                //this.MultiTargetCursor.Animator.Play("BattleMultiTargetsCursor_breaked");
+                //ManagerSingleton<SoundManager>.Instance.PlaySeByOuterSource(this.MultiTargetCursor.SeSource, eSE.MULTI_TARGETS_BREAK);
+                //this.createBreakEffect(0);
+                Owner.AppendCoroutine(updateChangeAttachment(ChangeAttachmentStartTime, true), ePauseType.SYSTEM, Owner);
               if (AttachmentNamePairList.Count <= 0)
                 return;
               //this.MultiTargetCursor.gameObject.SetActive(false);
@@ -373,8 +392,8 @@ namespace Elements
               //this.MultiTargetCursor.Animator.Play("BattleMultiTargetsCursor_breakEnd");
               Owner.AppendCoroutine(waitAndBreakPointReset(), ePauseType.SYSTEM);
               //this.createBreakEffect(1);
-              if (AttachmentNamePairList.Count <= 0)
-                return;
+              //if (AttachmentNamePairList.Count <= 0)
+              //  return;
               //this.MultiTargetCursor.gameObject.SetActive(true);
             }
         }

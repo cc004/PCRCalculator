@@ -4,6 +4,8 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using UnityEngine;
+
 namespace Elements
 {
   public class AccumulativeDamageData
@@ -17,5 +19,15 @@ namespace Elements
     public int DamagedCount { get; set; }
 
     public int CountLimit { get; set; }
-  }
+		public FloatWithEx CalcAdditionalDamage(int _count, FloatWithEx _baseDamage)
+		{
+			int num = Mathf.Min(_count, CountLimit);
+			return AccumulativeDamageType switch
+			{
+				eAccumulativeDamageType.FIXED => (FloatWithEx)((float)num * FixedValue),
+				eAccumulativeDamageType.PERCENTAGE => (FloatWithEx)((float)(_baseDamage * num) * PercentageValue / 100f),
+				_ => 0,
+			};
+		}
+	}
 }

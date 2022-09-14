@@ -15,7 +15,7 @@ namespace Elements
                 new RandomData(_source, _target.Owner, ActionId, 11, (float)pp)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
-                Dictionary<BasePartsData, FloatWithEx> dictionary1 = new Dictionary<BasePartsData, FloatWithEx> {
+                /*Dictionary<BasePartsData, FloatWithEx> dictionary1 = new Dictionary<BasePartsData, FloatWithEx> {
                     { 
                         _target,
                         0f
@@ -23,6 +23,16 @@ namespace Elements
                 };
                 _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary1, 0.5f, _skill.SkillId, _source, true, eEffectType.COMMON, false, false);
                 _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.HEAL_DOWN, (AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 9999f, this, _skill, Mathf.Max(_valueDictionary[eValueNumber.VALUE_1], 0f));
+            */
+                _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
+                {
+                    {
+                        _target,
+                        0
+                    }
+                }, 0.5f, _skill.SkillId, _source, _despelable: true, eEffectType.COMMON, _isBuff: false, _additional: false, _isShowIcon: false);
+                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.HEAL_DOWN, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 9999f, this, _skill, Mathf.Max(_valueDictionary[eValueNumber.VALUE_1], 0f));
+                return;
             }
             else
             {

@@ -8,7 +8,8 @@ namespace Elements
 {
   public enum eTargetAssignment
   {
-    OTHER_SIDE = 1,
+        OLD_OWNER_SIDE = 0,
+        OTHER_SIDE = 1,
     OWNER_SITE = 2,
     ALL = 3,
   }

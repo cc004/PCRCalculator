@@ -44,6 +44,7 @@ namespace Elements
           _energy = (float) ((double) _target.Owner.Energy * (double) _valueDictionary[eValueNumber.VALUE_1] / 100.0) - _target.Owner.Energy;
           break;
       }
+
       _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1, _source, _effectType: EffectType,action:action);
     }
 

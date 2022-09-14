@@ -120,7 +120,7 @@ namespace Elements
         }
 
 
-        protected DamageData createDamageData(
+        /*protected DamageData createDamageData(
           UnitCtrl _source,
           BasePartsData _target,
           int _num,
@@ -148,21 +148,22 @@ namespace Elements
                 level = parts.GetLevel();
             }
             var num3 = BattleUtil.FloatToInt(_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]);
-            var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]) * ActionExecTimeList[_num].Weight / ActionWeightSum);
-            if (_target.Owner.AccumulativeDamageDataDictionary.ContainsKey(_source))
-            {
-                AccumulativeDamageData accumulativeDamageData = _target.Owner.AccumulativeDamageDataDictionary[_source];
-                switch (accumulativeDamageData.AccumulativeDamageType)
-                {
-                    case eAccumulativeDamageType.FIXED:
-                        num4 = num4 + (float)(int)(accumulativeDamageData.DamagedCount * (double)accumulativeDamageData.FixedValue);
-                        break;
-                    case eAccumulativeDamageType.PERCENTAGE:
-                        num4 = num4 + (float)(int)((double)(num4 * (float)accumulativeDamageData.DamagedCount) * accumulativeDamageData.PercentageValue / 100.0);
-                        break;
-                }
-                accumulativeDamageData.DamagedCount = Mathf.Min(accumulativeDamageData.DamagedCount + 1, accumulativeDamageData.CountLimit);
-            }
+             var num4 = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + num1 * _valueDictionary[eValueNumber.VALUE_3]) * ActionExecTimeList[_num].Weight / ActionWeightSum);
+             if (_target.Owner.AccumulativeDamageDataDictionary.ContainsKey(_source))
+             {
+                 AccumulativeDamageData accumulativeDamageData = _target.Owner.AccumulativeDamageDataDictionary[_source];
+                 switch (accumulativeDamageData.AccumulativeDamageType)
+                 {
+                     case eAccumulativeDamageType.FIXED:
+                         num4 = num4 + (float)(int)(accumulativeDamageData.DamagedCount * (double)accumulativeDamageData.FixedValue);
+                         break;
+                     case eAccumulativeDamageType.PERCENTAGE:
+                         num4 = num4 + (float)(int)((double)(num4 * (float)accumulativeDamageData.DamagedCount) * accumulativeDamageData.PercentageValue / 100.0);
+                         break;
+                 }
+                 accumulativeDamageData.DamagedCount = Mathf.Min(accumulativeDamageData.DamagedCount + 1, accumulativeDamageData.CountLimit);
+             }           
+
             float num5 = getCriticalDamageRate(_valueDictionary) * (flag ? _source.PhysicalCriticalDamageRateOrMin / 100f : (int)_source.MagicCriticalDamageRateOrMin / 100f);
             return new DamageData
             {
@@ -179,6 +180,133 @@ namespace Elements
                 CriticalDamageRate = num5,
                 ActionType = _actionType
             };
+        }*/
+        protected DamageData createDamageData(
+          UnitCtrl _source,
+          BasePartsData _target,
+          int _num,
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          eAttackType _actionDetail1,
+          bool _isCritical,
+          Skill _skill,
+          eActionType _actionType,
+          bool _isPhysicalForTarget)
+        {
+            bool flag = judgeIsPhysical(_actionDetail1);
+            FloatWithEx num = 0;
+            int num2 = 0;
+            int num3 = 0;
+            if (!_source.IsPartsBoss)
+            {
+                num = (flag ? _source.AtkZero : _source.MagicStrZero);
+                num2 = (flag ? _source.PhysicalCriticalZero : _source.MagicCriticalZero);
+                num3 = _source.Level;
+            }
+            else
+            {
+                num = (flag ? parts.GetAtkZero() : parts.GetMagicStrZero());
+                num2 = (flag ? parts.GetPhysicalCriticalZero() : parts.GetMagicCriticalZero());
+                num3 = parts.GetLevel();
+            }
+            FloatWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
+            FloatWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
+            float num6 = 0f;
+            num6 = ((!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f));
+            num4 = BattleUtil.FloatToInt((float)num4 * num6);
+            num5 = BattleUtil.FloatToInt((float)num5 * num6);
+            if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
+            {
+                value.DamagedCount++;
+            }
+            float criticalDamageRate = getCriticalDamageRate(_valueDictionary);
+            float num7 = (flag ? ((float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f) : ((float)(int)_source.MagicCriticalDamageRateOrMin / 100f));
+            float num8 = (float)(int)_target.Owner.ReceiveCriticalDamageRateOrMin / 100f;
+            criticalDamageRate *= Mathf.Max(0.5f, num7 * num8);
+            DamageData damageData = new DamageData
+            {
+                TotalDamageForLogBarrier = num4,
+                Damage = num5,
+                Target = _target,
+                Source = _source,
+                DamageType = (_isPhysicalForTarget ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC),
+                CriticalRate = (_isCritical ? 1f : BattleUtil.GetCriticalRate(num2, num3, _target.GetLevel())),
+                CriticalRateForLogBarrier = BattleUtil.GetCriticalRate(num2, num3, _target.GetLevel()),
+                DamegeEffectType = base.ActionExecTimeList[_num].DamageNumType,
+                DamegeNumScale = base.ActionExecTimeList[_num].DamageNumScale,
+                DefPenetrate = (_isPhysicalForTarget ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero),
+                LifeSteal = (_source.IsPartsBoss ? parts.GetLifeStealZero() : ((int)_source.LifeStealZero)),
+                CriticalDamageRate = criticalDamageRate,
+                ActionType = _actionType,
+                IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
+            };
+            if (_isPhysicalForTarget)
+            {
+                if (base.LimitDamageDictionaryAtk.ContainsKey(_target))
+                {
+                    damageData.LimitDamageFunc = delegate (float _damage)
+                    {
+                        long num10 = base.LimitDamageDictionaryAtk[_target];
+                        if (num10 == 0L)
+                        {
+                            return 0f;
+                        }
+                        if (num10 > 0 && (float)num10 < _damage)
+                        {
+                            base.LimitDamageDictionaryAtk[_target] = 0L;
+                            return num10;
+                        }
+                        base.LimitDamageDictionaryAtk[_target] -= (long)_damage;
+                        return _damage;
+                    };
+                }
+            }
+            else if (base.LimitDamageDictionaryMgc.ContainsKey(_target))
+            {
+                damageData.LimitDamageFunc = delegate (float _damage)
+                {
+                    long num9 = base.LimitDamageDictionaryMgc[_target];
+                    if (num9 == 0L)
+                    {
+                        return 0f;
+                    }
+                    if (num9 > 0 && (float)num9 < _damage)
+                    {
+                        base.LimitDamageDictionaryMgc[_target] = 0L;
+                        return num9;
+                    }
+                    base.LimitDamageDictionaryMgc[_target] -= (long)_damage;
+                    return _damage;
+                };
+            }
+            return damageData;
+        }
+        private FloatWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, FloatWithEx _atk)
+        {
+            float num = _valueDictionary[eValueNumber.VALUE_1] + (float)_atk * _valueDictionary[eValueNumber.VALUE_3];
+            num *= _target.Owner.GetDebuffDamageUpValue();
+            if (!_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
+            {
+                return BattleUtil.FloatToInt(num);
+            }
+            int num2 = value.DamagedCount - _num;
+            FloatWithEx num3 = 0;
+            for (int i = 0; i < base.ActionExecTimeList.Count; i++)
+            {
+                FloatWithEx num4 = BattleUtil.FloatToInt(num * base.ActionExecTimeList[i].Weight / base.ActionWeightSum);
+                num4 += value.CalcAdditionalDamage(num2 + i, num4);
+                num3 += num4;
+            }
+            return num3;
+        }
+
+        private FloatWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, FloatWithEx _atk)
+        {
+            FloatWithEx num = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + (float)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+            if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
+            {
+                num += value.CalcAdditionalDamage(value.DamagedCount, num);
+            }
+            return num;
         }
 
         protected virtual float getCriticalDamageRate(Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => 1f;

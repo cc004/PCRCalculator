@@ -22,7 +22,8 @@ namespace Elements
     public eActionType ActionType;
     public OnActionEndDelegate OnActionEnd;
     public bool IsSearchAndSorted;
-    public float EnergyChargeMultiple = 1f;
+        public bool IsAlwaysChargeEnegry;
+        public float EnergyChargeMultiple = 1f;
     //protected List<SkillEffectCtrl> changePatternCurrentSkillEffect = new List<SkillEffectCtrl>();
 
     protected BattleManager battleManager => staticBattleManager;
@@ -102,8 +103,26 @@ namespace Elements
     public List<BasePartsData> HitOnceKeyList { get; set; }
 
     public Dictionary<BasePartsData, List<CriticalData>> CriticalDataDictionary { get; set; } = new Dictionary<BasePartsData, List<CriticalData>>();
+        public Dictionary<eStateIconType, List<UnitCtrl>> UsedChargeEnergyByReceiveDamage
+        {
+            get;
+            set;
+        } = new Dictionary<eStateIconType, List<UnitCtrl>>();
 
-    public Dictionary<BasePartsData, FloatWithEx> TotalDamageDictionary { get; set; } = new Dictionary<BasePartsData, FloatWithEx>();
+
+        public Dictionary<BasePartsData, long> LimitDamageDictionaryAtk
+        {
+            get;
+            set;
+        } = new Dictionary<BasePartsData, long>();
+
+
+        public Dictionary<BasePartsData, long> LimitDamageDictionaryMgc
+        {
+            get;
+            set;
+        } = new Dictionary<BasePartsData, long>();
+        public Dictionary<BasePartsData, FloatWithEx> TotalDamageDictionary { get; set; } = new Dictionary<BasePartsData, FloatWithEx>();
 
     //FIXME: no expectation for multiple or divide value for the expression is not linear
     public Dictionary<eValueNumber, FloatWithEx> AdditionalValue { get; set; }
@@ -117,8 +136,13 @@ namespace Elements
     public eEffectType EffectType { get; set; }
 
     public bool IgnoreDecoy { get; set; }
+        public List<UnitCtrl> ExecedMultiBossList
+        {
+            get;
+            set;
+        } = new List<UnitCtrl>();
 
-    public static void StaticRelease()
+        public static void StaticRelease()
     {
       //ActionParameter.staticSingletonTree = (Yggdrasil<ActionParameter>) null;
       staticBattleManager = null;
@@ -206,7 +230,11 @@ namespace Elements
     public virtual void ReadyAction(
       UnitCtrl _source,
       UnitActionController _sourceActionController,
-      Skill _skill) => ResetHitData();
+      Skill _skill)
+        {
+            ExecedMultiBossList.Clear();
+            ResetHitData();
+        }
 
     public void ResetHitData()
     {
@@ -239,8 +267,11 @@ namespace Elements
     }
 
     public bool JudgeIsAlreadyExeced(UnitCtrl _target, int _num) => !AlreadyExecedData[_target][_num].AlreadyExeced;
-
-    public void AppendTargetNum(UnitCtrl _target, int _num)
+        public bool IsAppendTargetNum(UnitCtrl _target)
+        {
+            return AlreadyExecedData.ContainsKey(_target);
+        }
+        public void AppendTargetNum(UnitCtrl _target, int _num)
     {
       if (!AlreadyExecedData.ContainsKey(_target))
       {

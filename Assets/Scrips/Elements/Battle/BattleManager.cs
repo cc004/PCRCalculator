@@ -87,6 +87,10 @@ namespace Elements.Battle
         //private TowerTempData towerTempData;
         //private SpaceBattleTempData spaceBattleTempData;
         //private ReplayTempData replayTempData;
+        private bool isSkipCoroutineRunning;
+
+        private float startRemainTime;
+
         private bool isPauseTimeLimit;
         public bool IsPlayCutin;
         public float BattleStartPos = 560f;
@@ -94,8 +98,10 @@ namespace Elements.Battle
         private int lastVoiceId;
         public float LatestSkillVoiceTime = -0.5f;
         public const float SKILL_VOICE_MIN_DELAY = 0.5f;
-        [NonSerialized]
-        public bool OnlyAutoClearFlag;
+        private eBattleClearType clearType;
+        public bool IsPausingEffectSkippedInThisFrame;
+        //[NonSerialized]
+        //public bool OnlyAutoClearFlag;
         public float ActionStartTimeCounter;
         private int currentWaveOffset;
         /*private ViewManager viewManager = ManagerSingleton<ViewManager>.Instance;
@@ -117,6 +123,13 @@ namespace Elements.Battle
         private UITexture skillExeScreenTexture;*/
         private float startalpha;
         private const float TOTAL_DELAY = 0.06f;
+        /*private bool startBonusAppearCalled;
+
+        private List<OMNGIBGDMFJ> bonusEnemy;
+
+        private Dictionary<PBAIJIBJPCO, List<CNBALNPBPGF>> bonusDictionary;
+
+        private bool isDefeatBonusOnly;*/
         private const float BOSS_TIME_UP_UNIT_FADEOUT_TIME = 0.5f;
         private const float PERCENT_DIGIT = 100f;
         public const int MILI_DIGID = 1000;
@@ -141,6 +154,7 @@ namespace Elements.Battle
         //private ISingletonNodeForInstanceEditing battleManagerNode;
         private bool isValid = true;
         //private StoryBattleData storyBattleDataPrefab;
+        private bool forcePauseNoDialogUpdate;
         private GameObject focusObject;
 
         public GameObject princessFormMoviePlayer;
@@ -310,10 +324,14 @@ namespace Elements.Battle
 
         public float GGCJPDLOAKI { get; set; }
 
-        public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
+        //public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
 
-        public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
-
+        //public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
+        public int KAOHIMNBPOK//多目标初始化相关
+        {
+            get;
+            set;
+        }
         public bool LOGNEDLPEIJ { get; set; }
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
@@ -339,7 +357,10 @@ namespace Elements.Battle
                 return this.FELHBMBCMPD || this.ANHHNJFCMDB || this.BattleCategory == eBattleCategory.FRIEND;
             }
         }*/
-
+        public void DisableAutoClear()
+        {
+            clearType = eBattleClearType.MANUAL;
+        }
         public void GamePauseOnFrameEnd()
         {
             isToPauseOnFrameEnd = true;
@@ -625,6 +646,7 @@ namespace Elements.Battle
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
             battleUnionBurstController.TryExecUnionBurst();
+            IsPausingEffectSkippedInThisFrame = false;
             isUpdateFrameExecuted = true;
 
             if (GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
@@ -1696,7 +1718,13 @@ namespace Elements.Battle
                 }
             }
         }
-
+        public void StopScaleChange()
+        {
+            foreach (UnitCtrl blackoutUnitTarget in BlackoutUnitTargetList)
+            {
+                blackoutUnitTarget.StopScaleChange();
+            }
+        }
         public void SetForegroundEnable(bool GABGIKMFNFG) { }// => this.foregroundPanel.SetActive(GABGIKMFNFG);
 
         public float GetRespawnPos(eUnitRespawnPos OKDOFGMKNOJ) => BossUnit != null ? BattleDefine.RESPAWN_POS[OKDOFGMKNOJ] + BossUnit.AllUnitCenter : BattleDefine.RESPAWN_POS[OKDOFGMKNOJ];
@@ -1740,9 +1768,22 @@ namespace Elements.Battle
         public bool OCAMDIOPEFP { get; set; }
 
         private int FGBCOBGHGKE { get; set; }
+        public UnitCtrl HBDACBKGHIK
+        {
+            get;
+            set;
+        }
 
         public void OnBlackOutEnd(UnitCtrl FNHGFDNICFG, bool ADJGECMDGDK = false)
         {
+            if (FNHGFDNICFG == HBDACBKGHIK)
+            {
+                foreach (KeyValuePair<UnitCtrl.eAbnormalState, Action<bool>> item in FNHGFDNICFG.damageByBehaviourDictionary)
+                {
+                    item.Value.Call(JEOCPILJNAD: true);
+                }
+                HBDACBKGHIK = null;
+            }
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             //this.showTotalDamage();
             Action<List<UnitCtrl>> action = list =>
@@ -1832,6 +1873,33 @@ namespace Elements.Battle
             FGBCOBGHGKE = ++FNHGFDNICFG.UbUsedCount;
             //this.skillExeScreen.gameObject.SetActive(true);
         }
+        /*public void StartBackgroundSpineAnimation(int DKLJDFCFCGH, float MLKPJFOGDGL)
+        {
+            if (IJDEOGJGADM != null)
+            {
+                string text = "battle_foreground_ub_" + DKLJDFCFCGH;
+                if (IJDEOGJGADM.IsAnimation(text))
+                {
+                    IJDEOGJGADM.Depth = 22400;
+                    IJDEOGJGADM.PlayAnime(text, _playLoop: false, 0f, _ignoreBlackout: true);
+                    TrackEntry current = IJDEOGJGADM.state.GetCurrent(0);
+                    current.lastTime = MLKPJFOGDGL;
+                    current.time = MLKPJFOGDGL;
+                }
+            }
+            if (MHBAMILFOMA != null)
+            {
+                string text2 = "battle_middleground_ub_" + DKLJDFCFCGH;
+                if (MHBAMILFOMA.IsAnimation(text2))
+                {
+                    MHBAMILFOMA.Depth = 12180;
+                    MHBAMILFOMA.PlayAnime(text2, _playLoop: false, 0f, _ignoreBlackout: true);
+                    TrackEntry current2 = MHBAMILFOMA.state.GetCurrent(0);
+                    current2.lastTime = MLKPJFOGDGL;
+                    current2.time = MLKPJFOGDGL;
+                }
+            }
+        }*/
 
         private IEnumerator updateBlackoutUnit(UnitCtrl FNHGFDNICFG, bool AJMFAOIFPKA)
         {
@@ -3126,6 +3194,8 @@ namespace Elements.Battle
             // if (Singleton<UserData>.Instance.InitSettingParameter.BattleLogType != null)
             //     this.BattleLogEnable = this.battleLog.GetLogEnable(Singleton<UserData>.Instance.InitSettingParameter.BattleLogType);
             //this.BattleCategory = this.tempData.PHDACAOAOMA.CLCOKFOINCL;
+            FEDKJAIEDGI = MainManager.Instance.GetDodgeTPRecoveryRatio();
+
             BattleCategory = eBattleCategory.ARENA;//设定战斗系统为JJC
                                                         //this.battleProcessor = this.createBattleProcessor(PPNELKAAIKP);
                                                         //this.battleEffectPool.BACHGMADMKC = this.battleProcessor.GetForceNormalSD();
@@ -3161,7 +3231,7 @@ namespace Elements.Battle
             BattleLogEnable = true;// !TutorialManager.IsStartTutorial && this.battleProcessor.GetBattleLogEnable(this.BattleLogEnable);
             FameRate = 60;// this.battleProcessor.GetFrameRate();
             IsDefenceReplayMode = false;// this.battleProcessor.GetIsDefenceReplayMode();
-            DeltaTime_60fps = 1 / 60f;
+            DeltaTime_60fps = 1 / 60f;//0.0166666675f;
             UnitCtrl.DamageFlashFrame = 8;
             UnitCtrl.FlashDelayFrame = 0;
             CoroutineManager = gameObject.AddComponent<CoroutineManager>();
@@ -4469,6 +4539,7 @@ namespace Elements.Battle
                 //{
                 //    _obj = sa
                 //};
+                unitCtrl.CurrentState = UnitCtrl.ActionState.SUMMON;
                 unitCtrl.UnitSpineCtrl = sa;
                 sa.Owner = unitCtrl;
                 //sa.LoadAnimationIDImmediately(eSpineBinaryAnimationId.COMMON_BATTLE);
@@ -4498,7 +4569,8 @@ namespace Elements.Battle
                 unitCtrl.Initialize(parameter,unitData_my, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my) : null);
-                
+                unitCtrl.MaxHpAfterPassive = unitCtrl.MaxHp;
+
                 if (flag)
                 {
                     unitCtrl.OnDieForZeroHp = (Action<UnitCtrl>)Delegate.Combine(unitCtrl.OnDieForZeroHp, new Action<UnitCtrl>(_this.onDieEnemy));
@@ -4707,8 +4779,11 @@ namespace Elements.Battle
             RUNNING,
             STOP_PULSE,
         }
-
-
-
+        public float FEDKJAIEDGI
+        {
+            get;
+            private set;
+        }
+        public float FNHFJLAENPF => DeltaTime_60fps;
     }
 }

@@ -719,6 +719,8 @@ namespace PCRCaculator
         public int SPskill_1_ev;
         public int SPskill_2_ev;
 
+        public int SPUB;
+
 
         public int loopStart;
         public int loopEnd;
@@ -1765,6 +1767,7 @@ namespace PCRCaculator
         public bool useDMMpath = false;
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
+        public int maxTPUpValue = -1;
 
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
 

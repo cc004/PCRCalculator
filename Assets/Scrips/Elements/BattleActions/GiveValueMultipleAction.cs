@@ -8,21 +8,30 @@ using System.Collections.Generic;
 
 namespace Elements
 {
-  public class GiveValueMultipleAction : GiveValueAction
-  {
-    protected override void setValue(
-        Dictionary<eValueNumber, FloatWithEx> _value,
-      ActionParameter _action)
+    public class GiveValueMultipleAction : GiveValueAction
     {
-      base.setValue(_value, _action);
-      _action.MultipleValue = _value;
-    }
+        protected override void setValue(
+            Dictionary<eValueNumber, FloatWithEx> _value,
+          ActionParameter _action)
+        {
+            base.setValue(_value, _action);
+            _action.MultipleValue = _value;
+        }
 
-    public override void SetLevel(float _level)
-    {
-      base.SetLevel(_level);
-      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+        public override void SetLevel(float _level)
+        {
+            base.SetLevel(_level);
+            Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
+        }
+        /*protected override float calcDamageValue(UnitCtrl _source, Dictionary<eValueNumber, float> _valueDictionary)
+        {
+            return (float)((long)_source.MaxHp - (long)_source.Hp) / (float)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+        }
+
+        protected override float calcHpValue(UnitCtrl _source, Dictionary<eValueNumber, float> _valueDictionary)
+        {
+            return (float)(long)_source.Hp / (float)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+        }*/
+
     }
-        
-  }
 }

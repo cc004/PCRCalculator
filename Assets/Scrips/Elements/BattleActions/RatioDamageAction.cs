@@ -68,6 +68,9 @@ namespace Elements
                 case eTargetParameter.CURRENT_HP:
                     num = BattleUtil.FloatToInt((targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
+                case eTargetParameter.START_MAX_HP:
+                    num = BattleUtil.FloatToInt((float)(long)_target.Owner.StartMaxHP * _valueDictionary[eValueNumber.VALUE_1] / 100f * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+                    break;
             }
             DamageData damageData = new DamageData
             {
@@ -80,7 +83,8 @@ namespace Elements
                 DamegeNumScale = ActionExecTimeList[_num].DamageNumScale,
                 IgnoreDef = true,
                 LifeSteal = _source.IsPartsBoss ? parts.GetLifeStealZero() : (int)_source.LifeStealZero,
-                ActionType = eActionType.RATIO_DAMAGE
+                ActionType = eActionType.RATIO_DAMAGE,
+                IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
             };
             UnitCtrl owner = _target.Owner;
             DamageData _damageData = damageData;
@@ -111,6 +115,8 @@ namespace Elements
             MAX_HP = 1,
             [Description("当前HP")]
             CURRENT_HP = 2,
+            [Description("开局最大HP")]
+            START_MAX_HP
         }
     }
 }

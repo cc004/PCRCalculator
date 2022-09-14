@@ -219,42 +219,50 @@ namespace PCRCaculator.Guild
             //bossImage_ChooseBoss.sprite = bossSprites[dropdowns_ChooseBoss[0].value];
             int enemyid_0 = 0;
             string Path;
-            if (isGuildBoss)
+            try
             {
-                enemyid_0 = guildEnemyDatas[dropdowns_ChooseBoss[2].value + 1024].enemyIds[0][dropdowns_ChooseBoss[0].value];
-                //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
-                //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
-            }
-            else
-            {
-                specialInput.text = "401042401";
-                /*
-                show_text.text = show_str[dropdowns_ChooseBoss[3].value];
-                switch (dropdowns_ChooseBoss[3].value)
+                if (isGuildBoss)
                 {
-                    case 0://木桩1
-                        enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
-                        specialInput.text = "100";
-                        //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
-                        //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                        bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
+                    enemyid_0 = guildEnemyDatas[dropdowns_ChooseBoss[2].value + 1024].enemyIds[0][dropdowns_ChooseBoss[0].value];
+                    //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
+                    //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
+                    bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
+                }
+                else
+                {
+                    specialInput.text = "401042401";
+                    /*
+                    show_text.text = show_str[dropdowns_ChooseBoss[3].value];
+                    switch (dropdowns_ChooseBoss[3].value)
+                    {
+                        case 0://木桩1
+                            enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
+                            specialInput.text = "100";
+                            //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
+                            //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
+                            bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
 
-                        break;
-                    case 1://木桩2
-                        enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
-                        specialInput.text = "100";
-                        //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
-                        //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                        bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
+                            break;
+                        case 1://木桩2
+                            enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
+                            specialInput.text = "100";
+                            //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
+                            //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
+                            bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
 
-                        break;
-                    case 2:
-                        break;
-                }*/
+                            break;
+                        case 2:
+                            break;
+                    }*/
+                }
+
+                specialEnemyid = enemyid_0;
+                specialInputValue = 100;
             }
-            specialEnemyid = enemyid_0;
-            specialInputValue = 100;
+            catch(KeyNotFoundException _)
+            {
+                MainManager.Instance.WindowConfigMessage($"会战{dropdowns_ChooseBoss[2].value + 1024}的配置缺失！", null);
+            }
         }
         public void OnInputFinished()
         {

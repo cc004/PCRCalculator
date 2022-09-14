@@ -27,6 +27,7 @@ namespace Elements
         public Dictionary<UnitCtrl, int> AlreadyExecedTargetCount { get; set; }
 
         protected override int getClearedIndex(UnitCtrl _unit) => !IsBuff ? _unit.ClearedDebuffFieldIndex : _unit.ClearedBuffFieldIndex;
+        public bool ShowsIcon = true;
 
         public override void StartField()
         {
@@ -64,7 +65,7 @@ namespace Elements
             }
             else
                 dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
-            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, false, null, IsBuff, false, 90);
+            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, _enable: false, null, IsBuff, _additional: false, ShowsIcon);
         }
 
         public override void OnEnter(BasePartsData _parts)
@@ -87,8 +88,8 @@ namespace Elements
             }
             else
                 dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
-            owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.0f, 0, null, true, Elements.eEffectType.COMMON, IsBuff, false);
-            owner.EnableBuffParam(BuffParamKind, dictionary, true, null, IsBuff, false, 90);
+            owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, BuffParamKind, dictionary, 0f, 0, null, _despelable: true, Elements.eEffectType.COMMON, IsBuff, _additional: false, _isShowIcon: false);
+            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, null, IsBuff, _additional: false, ShowsIcon);
         }
 
         public enum eValueType

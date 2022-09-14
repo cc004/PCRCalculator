@@ -1,10 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Elements.PassiveSealAction
-// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: EE4A7FA8-7E00-4124-8344-C695120E3AA4
-// Assembly location: C:\Users\user\Desktop\Assembly-CSharp.dll
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Elements
 {
@@ -37,7 +31,9 @@ namespace Elements
         TargetStateIcon = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2],
         SealDuration = _valueDictionary[eValueNumber.VALUE_3],
         LifeTime = _valueDictionary[eValueNumber.VALUE_5],
-        SealNumLimit = (int) _valueDictionary[eValueNumber.VALUE_1]
+        SealNumLimit = (int) _valueDictionary[eValueNumber.VALUE_1],
+                        SealNum = (int)_valueDictionary[eValueNumber.VALUE_7]
+
       };
       AppendIsAlreadyExeced(_target.Owner, _num);
       _source.AppendCoroutine(_data.Update(), ePauseType.SYSTEM);
@@ -54,9 +50,11 @@ namespace Elements
     public enum ePassiveTiming
     {
       BUFF = 1,
-    }
+            DAMAGED
 
-    public enum eSealTarget
+        }
+
+        public enum eSealTarget
     {
       SOURCE,
     }

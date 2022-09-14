@@ -42,9 +42,21 @@ namespace Elements
       {
         eSlipDamageType.COMPENSATION,
         UnitCtrl.eAbnormalState.COMPENSATION
-      }
+      },
+            {
+                eSlipDamageType.POISON2,
+                UnitCtrl.eAbnormalState.POISON2
+            },
+            {
+                eSlipDamageType.CURSE2,
+                UnitCtrl.eAbnormalState.CURSE2
+            }
     };
-
+        private enum eCancelTriggerType
+        {
+            NONE = 0,
+            MAX_HP = 2
+        }
         public override void ExecActionOnStart(
           Skill _skill,
           UnitCtrl _source,
@@ -69,11 +81,28 @@ namespace Elements
             {
                 num = 1-fix;
             }
+            bool flag = false;
+            UnitCtrl targetOwner = _target.Owner;
+            eCancelTriggerType actionDetail = (eCancelTriggerType)base.ActionDetail2;
+            if (actionDetail == eCancelTriggerType.MAX_HP)
+            {
+                flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (float)(long)targetOwner.Hp / (float)(long)targetOwner.MaxHp);
+            }
             //end add
-            if (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (!flag && num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)ActionDetail1], AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
+                //_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)ActionDetail1], AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
+                UnitCtrl.eAbnormalState eAbnormalState = abnormalStateDic[(eSlipDamageType)base.ActionDetail1];
+                targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = null;
+                actionDetail = (eCancelTriggerType)base.ActionDetail2;
+                if (actionDetail == eCancelTriggerType.MAX_HP)
+                {
+                    targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (float)(long)targetOwner.Hp / (float)(long)targetOwner.MaxHp);
+                }
+                targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _valueDictionary[eValueNumber.VALUE_6] == 0f);
+
+
                 callback?.Invoke("DOT伤害，参数1：" + (int)_valueDictionary[eValueNumber.VALUE_1] + "，参数2：" + (int)_valueDictionary[eValueNumber.VALUE_5]);
             }
             else
@@ -85,7 +114,7 @@ namespace Elements
                     _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_SLIP_DAMAGE, _parts: _target);
                 else
                     _target.Owner.SetMissAtk(_source, eMissLogType.DODGE_SLIP_DAMAGE);
-                callback?.Invoke("MISS！");
+                callback?.Invoke($"MISS！{(flag?$"目标血量高于{_valueDictionary[eValueNumber.VALUE_7] / 100f}":"")}");
             }
         }
 
@@ -106,6 +135,8 @@ namespace Elements
             VENOM,
             HEX,
             COMPENSATION,
+            POISON2,
+            CURSE2
         }
 
         private class eSlipDamageType_DictComparer : IEqualityComparer<eSlipDamageType>

@@ -78,7 +78,8 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             switch (ActionDetail1)
@@ -90,6 +91,7 @@ namespace Elements
                     _sourceActionController.AppendCoroutine(PlayMotionLoopForDamageCharge(_skill.AnimId, _skill, _source, _sourceActionController, _skill), ePauseType.SYSTEM, _source);
                     break;
             }
+            action($"伤害充能,持续{Value[eValueNumber.VALUE_3]}秒");
         }
 
         private IEnumerator PlayMotionLoopForDamageCharge(
@@ -193,11 +195,11 @@ namespace Elements
             base.SetLevel(_level);
             Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
             var group = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
-            if (ActionId>=300000000&& group.isSpecialBoss &&( group.specialBossID == 666666 ||group.specialBossID==666667))
+            /*if (ActionId>=300000000&& group.isSpecialBoss &&( group.specialBossID == 666666 ||group.specialBossID==666667))
             {
                 Value[eValueNumber.VALUE_1] = 0f;
                 Value[eValueNumber.VALUE_3] = 82.5f;
-            }
+            }*/
 
         }
 

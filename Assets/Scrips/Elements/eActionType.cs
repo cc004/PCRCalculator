@@ -29,6 +29,7 @@ namespace Elements
         SLIP_DAMAGE = 9,
         [Description("BUFF/DEBUFF")]
         BUFF_DEBUFF = 10,
+        [Description("魅惑")]
         CHARM = 11,
         [Description("致盲")]
         BLIND = 12,
@@ -99,7 +100,7 @@ namespace Elements
         LOOP_MOTION_REPEAT = 63, //忽略
         TOAD = 69, //忽略，这个属性就一个怪有，判定代码却到处都有，贼烦
         FORCE_HP_CHANGE = 70,//忽略，没有角色有这个技能
-        KNGHT_GUARD = 71,//ペコリーヌ（プリンセス）专属 
+        KNGHT_GUARD = 71,//战续
         DAMAGE_CUT = 72, //忽略，没有角色有这个技能
         LOG_BARRIER = 73, //忽略，工会战boss专属的对数盾
         GIVE_VALUE_AS_DIVIDE = 74,//忽略，没有角色有这个技能
@@ -107,11 +108,24 @@ namespace Elements
         HEAL_DOWN = 76,
         PASSIVE_SEAL = 77,
         PASSIVE_DAMAGE_UP = 78,
+
+        DAMAGE_BY_ATTACK = 79,
+        DAMAGE_LIMIT = 80,
+        SPECIAL_IDLE = 81,
+        CHANGE_RESIST_ID = 82,
+        CHANGE_SPEED_OVERLAP = 83,
+
+
+
         [Description("被动技能")]
         PASSIVE = 90,//被动
         PASSIVE_INTERMITTENT = 91,//忽略，没有角色有这个技能
         CHANGE_ENERGY_RECOVERY_RATIO_BY_DAMAGE = 92, // 0x0000005C
         IGNORE_DECOY = 93, // 0x0000005D
+        EFFECT = 94,
+        SPY = 95,
+        CHARGE_ENERGY_FIELD = 96,
+        CHARGE_ENERGY_BY_DAMAGE = 97
 
     }
 

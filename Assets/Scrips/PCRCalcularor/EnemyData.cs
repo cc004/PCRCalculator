@@ -18,6 +18,7 @@ namespace PCRCaculator
         public List<int> main_skill_lvs = new List<int>();//从0开始，长度10
         public List<int> ex_skill_lvs = new List<int>();//从0开始，长度5
         public int resist_status_id;
+        public int resist_variation_id;
         public int unique_equipment_flag_1;
         public int break_durability;
         public int virtual_hp;

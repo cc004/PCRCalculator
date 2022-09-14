@@ -1,31 +1,37 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Elements.eIfType
-// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
-// Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
-
-namespace Elements
+﻿namespace Elements
 {
-  public enum eIfType
-  {
-    STOP = 100, // 0x00000064
-    BLIND = 200, // 0x000000C8
-    CONVERT = 300, // 0x0000012C
-    DECOY = 400, // 0x00000190
-    BURN = 500, // 0x000001F4
-    CURSE = 501, // 0x000001F5
-    POISON = 502, // 0x000001F6
-    VENOM = 503, // 0x000001F7
-    POISON_OR_VENOM = 512, // 0x00000200
-    SLIP_DAMAGE = 599, // 0x00000257
-    SEAL = 600, // 0x00000258
-    ALONE = 700, // 0x000002BC
-    BREAK = 710, // 0x000002C6
-    UNIT_ID = 720, // 0x000002D0
-    TARGET_HP = 900, // 0x00000384
-    DEFEAT = 1000, // 0x000003E8
-    CRITICAL = 1001, // 0x000003E9
-    SKILL_COUNT = 1200, // 0x000004B0
-    ATK_TYPE = 1300, // 0x00000514
-  }
+	public enum eIfType
+	{
+		STOP = 100,
+		HASTE = 101,
+		SLOW = 102,
+		PHYSICS_BLIND = 200,
+		CONVERT = 300,
+		DECOY = 400,
+		BURN = 500,
+		CURSE = 501,
+		POISON = 502,
+		VENOM = 503,
+		HEX = 504,
+		CURSE_OR_HEX = 0x1FF,
+		POISON_OR_VENOM = 0x200,
+		SLIP_DAMAGE = 599,
+		SEAL = 600,
+		ALONE = 700,
+		BREAK = 710,
+		UNIT_ID = 720,
+		SEAL_COUNT = 721,
+		TARGET_HP = 900,
+		DEFEAT = 1000,
+		CRITICAL = 1001,
+		SKILL_COUNT = 1200,
+		ATK_TYPE = 1300,
+		TOAD = 1400,
+		CROWD_CONTROL = 1500,
+		ABNORMAL_STATE = 1600,
+		BUFF_DEBUFF = 1700,
+		MULTI_BOSS = 1800,
+		BARRIER = 1900,
+		SEAL_THREE_DIGIT = 6000
+	}
 }
