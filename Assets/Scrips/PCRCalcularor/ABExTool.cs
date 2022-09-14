@@ -442,7 +442,7 @@ namespace PCRCaculator
             path = Application.persistentDataPath + "/AB/" + fullname;
 #else
             var www = new WWW(path);
-            path = Application.streamingAssetsPath + "/.ABExt/" + fullname;
+            path = Application.streamingAssetsPath + "/../.ABExt/" + fullname;
 #endif
             var asset = www.getAssetBundle();
             if (asset == null)
