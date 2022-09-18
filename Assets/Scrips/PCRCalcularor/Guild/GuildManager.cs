@@ -598,6 +598,7 @@ namespace PCRCaculator.Guild
             SettingInputs[7].text = SettingData.format;
             SettingInputs[9].text = SettingData.n1.ToString();
             SettingInputs[10].text = SettingData.n2.ToString();
+            SettingInputs[11].text = SettingData.dispFields;
         }
         public void ReflashCalcUI()
         {
@@ -642,6 +643,8 @@ namespace PCRCaculator.Guild
             SettingData.format = SettingInputs[7].text;
             SettingData.n1 = int.Parse(SettingInputs[9].text);
             SettingData.n2 = int.Parse(SettingInputs[10].text);
+            SettingData.dispFields = SettingInputs[11].text;
+            UnitCtrl.infoGetter = null;
             SaveDataToJson();
         }
         private static void LoadAddedPlayerData()
@@ -1035,6 +1038,7 @@ namespace PCRCaculator.Guild
         public int limitTime = 90;
         //public bool[] unlockGuilds = new bool[12] { false, false, false, true, true, true, true, false, false, false, false, false };
         public string author = "", format = "m:ss";
+        public string dispFields = "Left/Mid/Right";
         public GuildSettingData() { }
         public GuildSettingData(bool createNew)
         {

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Cute;
 using Elements.Battle;
 using PCRCaculator;
@@ -11290,6 +11291,24 @@ this.updateCurColor();
         public bool JudgeSkillReadyAndIsMyTurn() => isMyTurn() && IsSkillReady;
 
         public bool pressing = false;
+        public static Func<UnitCtrl, string> infoGetter;
+
+        public void RebuildInfoGetter()
+        {
+            var infos = GuildManager.StaticsettingData.dispFields.Split('/');
+            var propinfos = infos.Select(name => typeof(UnitCtrl).GetProperty(name)?.GetMethod).ToArray();
+            var empty = new object[0];
+            infoGetter = o => string.Join("/", propinfos.Select(p => p.Invoke(o, empty).ToString()));
+        }
+
+        public float Mid => transformCache.position.x / lossyx;
+        public float Right => Mid + BodyWidth / 2;
+        public float Left => Mid - BodyWidth / 2;
+        public string GetInfo()
+        {
+            if (infoGetter == null) RebuildInfoGetter();
+            return infoGetter(this);
+        }
         public bool IsAutoOrUbExecTrying()
         {
             //if (this.IsUbExecTrying && (!this.battleManager.UnitUiCtrl.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())

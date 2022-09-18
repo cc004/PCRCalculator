@@ -111,10 +111,7 @@ namespace PCRCaculator.Battle
             {
                 try
                 {
-                    var mid = owner2.transform.position.x / owner2.transform.lossyScale.x;
-                    var r = mid + owner2.BodyWidth / 2;
-                    var l = mid - owner2.BodyWidth / 2;
-                    posText.text = $"{Mathf.RoundToInt(l)}/{mid}/{Mathf.RoundToInt(r)}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / UnitDefine.MAX_ENERGY:P2}";
+                    posText.text = $"{owner2.GetInfo()}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / UnitDefine.MAX_ENERGY:P2}";
                 }
                 catch
                 {
