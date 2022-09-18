@@ -126,7 +126,7 @@ namespace Elements
                         criticalData.ExpectedDamage *= 1f + FloatWithEx.Binomial(damageData.CriticalRate, false) * (2f * damageData.CriticalDamageRate - 1);
                     }
 
-                    criticalData.ExpectedDamage = criticalData.ExpectedDamage.Floor();
+                    criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage);
                     if (!damageData.IgnoreDef)
                     {
                         switch (damageData.DamageType)
@@ -134,15 +134,15 @@ namespace Elements
                             case DamageData.eDamageType.ATK:
                                 var defZero = (float)damageData.Target.GetDefZero();
                                 var num3 = Mathf.Max(0.0f, defZero - damageData.DefPenetrate);
-                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f)));
-                                criticalData.ExpectedDamageNotCritical = criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f));
+                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f))).Floor();
+                                criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
 
                                 break;
                             case DamageData.eDamageType.MGC:
                                 float magicDefZero = damageData.Target.GetMagicDefZero();
                                 float num4 = Mathf.Max(0.0f, magicDefZero - damageData.DefPenetrate);
-                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f)));
-                                criticalData.ExpectedDamageNotCritical = criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f));
+                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
+                                criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
 
                                 break;
                         }
@@ -155,8 +155,8 @@ namespace Elements
                 TotalDamageDictionary.Add(_target, num1);
             }
             damageData.IsLogBarrierCritical = CriticalDataDictionary[_target][_num].IsCritical;
-            damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage.Floor();
-            damageData.TotalDamageForLogBarrier = TotalDamageDictionary[_target].Floor();
+            damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage;
+            damageData.TotalDamageForLogBarrier = TotalDamageDictionary[_target];
             if (flag)
             {
                 _target.Owner.RecoverDodgeTP(damageData.DamageType, (int)damageData.Damage, damageData.ActionType, (int)base.CriticalDataDictionary[_target][_num].ExpectedDamageNotCritical, (int)damageData.TotalDamageForLogBarrier, damageData.Source, damageData.IgnoreDef, damageData.Target, damageData.DefPenetrate, null, _skill, EnergyChargeMultiple);

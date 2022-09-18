@@ -1237,7 +1237,7 @@ namespace PCRCaculator
             switch (details[0])
             {
                 case 1:
-                    b.Hp +=(long)(values[1] + values[2] * skilllevel);
+                    b.Hp += (float)(values[1] + values[2] * skilllevel);
                     break;
                 case 2:
                     b.Atk += (float)(values[1] + values[2] * skilllevel);
@@ -1714,7 +1714,7 @@ namespace PCRCaculator
 
         public static BaseData Round(BaseData a)
         {
-            for (int i = 1; i < a.dataint.Length; i++)
+            for (int i = 0; i < a.dataint.Length; i++)
             {
                 a.dataint[i] = 100 * round(a.dataint[i] / 100.0f);
             }

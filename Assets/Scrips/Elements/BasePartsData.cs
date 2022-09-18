@@ -11,6 +11,7 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using Spine;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 using Attachment = Spine.Attachment;
 
 namespace Elements
@@ -442,6 +443,20 @@ namespace Elements
 
         }*/
 
+        public float GetResistProb(eActionType _actionType, int _detail1)
+        {
+
+            if (!abnormalResistStatusDictionary.ContainsKey(_actionType))
+            {
+                return 0;
+            }
+            Dictionary<int, int> dictionary = abnormalResistStatusDictionary[_actionType];
+            if (dictionary.ContainsKey(-1))
+                _detail1 = -1;
+            if (dictionary.ContainsKey(_detail1))
+                return dictionary[_detail1] / 100f;
+            return 0;
+        }
         public bool ResistStatus(
       eActionType _actionType,
       int _detail1,

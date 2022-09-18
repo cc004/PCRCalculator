@@ -248,7 +248,6 @@ namespace PCRCaculator
             result = unitactioncontroller.GetFirearmDatas();
             var unitSkilldata = unitactioncontroller.CreateUnitSkillEffectData();
             unitSkilldata.unitid = unitid;
-            unitSkilldata.hasFirearmSkill = result.Count > 0;
             MainManager.Instance.FirearmData.SetData(unitid, result,unitSkilldata);
             if(saveImmedately)
             MainManager.Instance.SaveAllUnitFriearmData();
@@ -365,15 +364,12 @@ namespace PCRCaculator
         }
         public bool GetAddLoadPrefabNames(int unitid,List<string> results)
         {
-            if(AllUnitSkillEffectDic.TryGetValue(unitid,out var data) && data.hasFirearmSkill)
+            if(AllUnitSkillEffectDic.TryGetValue(unitid,out var data))
             {
-                if (data.hasFirearmSkill)
-                {
-                    foreach (string name in data.requireFsxkList)
-                        if (!results.Contains(name))
-                            results.Add(name);
-                    return true;
-                }
+                foreach (string name in data.requireFsxkList)
+                    if (!results.Contains(name))
+                        results.Add(name);
+                return true;
             }
             return false;
         }
@@ -381,7 +377,6 @@ namespace PCRCaculator
     public class UnitSkillEffectData
     {
         public int unitid;
-        public bool hasFirearmSkill;
         public List<string> requireFsxkList = new List<string>();
     }
 }

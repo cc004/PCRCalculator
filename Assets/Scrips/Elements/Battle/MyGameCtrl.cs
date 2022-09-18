@@ -340,6 +340,8 @@ namespace Elements
             finishAction?.Invoke();
 
         }
+
+        private static Dictionary<int, int> unitCount = new Dictionary<int, int>();
         public UnitCtrl LoadSummonPrefabImmediately(SummonData summonData)
         {
             int unitid = summonData.SummonId;
@@ -356,10 +358,19 @@ namespace Elements
             b.transform.SetParent(unitParent);
             b.name = unitid + "(clone)";
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
-            unitCtrl.UnitName = mainManager.GetUnitNickName(unitid) + "[召唤物]";
+            unitCount.TryGetValue(unitid, out var val);
+            unitCount[unitid] = val + 1;
+            unitCtrl.UnitName = mainManager.GetUnitNickName(unitid) + $"[召唤物{val+1}]";
             unitCtrl.UnitName = ("<color=#C080FF>") + unitCtrl.UnitName + "</color>";
             unitCtrl.UnitNameEx = unitCtrl.UnitName;
-            b.GetComponent<UnitActionController>().LoadActionControllerData(unitid);
+            var actionController = b.GetComponent<UnitActionController>();
+            actionController.LoadActionControllerData(unitid);
+            bool useSkillEffects = false;
+            if (!ignoreEffects)
+            {
+                useSkillEffects = LoadSkillEffectPrefabs(unitid);
+            }
+            actionController.UseSkillEffect = useSkillEffects;
             return unitCtrl;
         }
         public static void CreateSummonSpine(SummonData summonData,UnitCtrl summonUnitCtrl, GameObject exitObj,
@@ -373,7 +384,7 @@ namespace Elements
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
             //if (dataAsset == null)
             //{
-                var dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(prefabID, summonData.ConsiderEquipmentAndBonus ? 3 : 0), SPINE_SCALE, true);
+            var dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(prefabID, summonData.ConsiderEquipmentAndBonus ? 3 : 0), SPINE_SCALE, true);
             //}
             //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(dataAsset); // Spawn a new SkeletonAnimation GameObject.
             BattleSpineController battleSpineController = BattleSpineController.LoadAddedSkeletonAnimation(dataAsset,exitObj);

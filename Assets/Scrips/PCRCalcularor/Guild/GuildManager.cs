@@ -1137,21 +1137,7 @@ namespace PCRCaculator.Guild
         {
             string des = "";
             var data = GetCurrentPlayerGroup();
-            switch (data.currentTurn)
-            {
-                case 1:
-                    des += "A";
-                    break;
-                case 2:
-                    des += "B";
-                    break;
-                case 3:
-                    des += "C";
-                    break;
-                case 4:
-                    des += "D";
-                    break;
-            }
+            des += (char)('A' + data.currentTurn - 1);
             if (data.currentGuildEnemyNum == 4 && data.isViolent)
                 des += "6";
             else

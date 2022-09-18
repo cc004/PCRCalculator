@@ -2204,7 +2204,7 @@ this.updateCurColor();
             StartMagicStr = Mathf.RoundToInt(baseData.Magic_str);
             StartMagicDef = Mathf.RoundToInt(baseData.Magic_def);
 
-            var baseHp = (long)baseData.Hp;
+            var baseHp = Mathf.RoundToInt(baseData.Hp);
 
             baseData += baseDataEX;
 
@@ -5772,8 +5772,6 @@ this.updateCurColor();
                 des += value;
                 MainValue = value;
             }
-
-            MainValue = MainValue.Floor();
             ///added script
             UnitAbnormalStateChangeData stateChangeData = new UnitAbnormalStateChangeData();
             //stateChangeData.AbsorberValue = data.AbsorberValue;
@@ -7264,7 +7262,7 @@ this.updateCurColor();
                     lifeSteal += _skill.LifeSteal;
                 if (lifeSteal > 0)
                 {
-                    var num2 = num1.Floor() * (float)lifeSteal / (float)(lifeSteal + Level + 100);
+                    var num2 = num1 * (float)lifeSteal / (float)(lifeSteal + Level + 100);
                     if (num2 != 0)
                     {   //_damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
                         _damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
@@ -7605,7 +7603,7 @@ this.updateCurColor();
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
-                Hp = (Hp - (num6.Floor() - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
+                Hp = (Hp - (num6 - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
             }
                 if (_onDamageHit != null & flag2)
                 _onDamageHit((float)num6);
@@ -7712,6 +7710,9 @@ this.updateCurColor();
             {
                 des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
             }
+
+            des += $",剩余HP: {Hp}";
+
             MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des, _damageData.Source);
             uIManager.LogMessage(des,eLogMessageType.GET_DAMAGE, this);
             createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
@@ -7772,7 +7773,7 @@ this.updateCurColor();
                 $"对目标{((_damageData.Target?.Owner?.IsPartsBoss ?? false) ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}";
 
             callBack?.Invoke(describe);
-            return num6.Floor();
+            return num6;
         }
         private bool IsDamageIgnore(bool _energyAdd)
         {

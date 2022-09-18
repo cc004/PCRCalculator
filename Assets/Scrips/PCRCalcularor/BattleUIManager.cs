@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Elements;
 using Elements.Battle;
 using UnityEngine;
@@ -177,6 +178,7 @@ namespace PCRCaculator.Battle
             }
         }
 
+        private static StreamWriter sw = new StreamWriter(File.OpenWrite("logmessage.txt")){AutoFlush = true};
         public void LogMessage(string word, eLogMessageType logMessageType, bool isOther)
         {
             if (myGameCtrl != null)
@@ -185,6 +187,7 @@ namespace PCRCaculator.Battle
             }
             string logtext = "(" + fpsCount + ")" + word + "\n";
             debugStrList.Add(logtext);
+            sw.WriteLine(logtext);
             Text debugText = debugText1;//= isOther ? debugText2 : debugText1;
             ScrollRect scrollRect = scrollRect1;//isOther ? scrollRect2 : scrollRect1;
             int overText = debugText.text.Length - maxTextLength;

@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Cute;
 
@@ -887,16 +888,14 @@ namespace Elements.Battle
         }
 
         //public static int Random(int Min, int Max) => Min == Max ? Min : UnityEngine.Random.Range(Min, Max);
-        public static int Random(int Min, int Max, RandomData data) 
+        public static int Random(int Min, int Max, RandomData data)
         {
+            int result = UnityRandom.Range(Min, Max);
             if (Min == Max)
                 return Min;
-            if (data.type == 1 && MainManager.Instance.PlayerSetting.ignoreLogBarrierCritical)
-                return Min;
-            int result = UnityEngine.Random.Range(Min, Max);
             data.randomResult = result;
             OnCallRandom?.Invoke(data);
-            return result; 
+            return result;
         }
 
         public static int HeldRandom(int Min, int Max)
@@ -3466,6 +3465,7 @@ namespace Elements.Battle
             if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
+                UnityRandom.InitState(tempData.randomData.RandomSeed);
                 gameCtrl.CurrentSeedForSave = tempData.randomData.RandomSeed;
             }
             else

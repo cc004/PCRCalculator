@@ -24,7 +24,7 @@ namespace Elements
     }
 
     public virtual void Update()
-    {
+    { 
       if (CoroutineList.Count <= 0)
         return;
       for (int index = CoroutineList.Count - 1; index >= 0; --index)
