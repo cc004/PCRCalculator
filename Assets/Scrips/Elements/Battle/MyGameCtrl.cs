@@ -81,6 +81,7 @@ namespace Elements
                 tempData.SettingData = GuildManager.StaticsettingData;
             }
             tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
+            unitCount.Clear();
             BattleManager.Instance.Init(this);
             if (!IsAutoMode)
             {
@@ -341,7 +342,7 @@ namespace Elements
 
         }
 
-        private static Dictionary<int, int> unitCount = new Dictionary<int, int>();
+        private Dictionary<int, int> unitCount = new Dictionary<int, int>();
         public UnitCtrl LoadSummonPrefabImmediately(SummonData summonData)
         {
             int unitid = summonData.SummonId;
