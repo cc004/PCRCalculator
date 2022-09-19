@@ -3471,6 +3471,7 @@ namespace Elements.Battle
             else
             {
                 UnityEngine.Random.InitState(seed);
+                UnityRandom.InitState(seed);
                 gameCtrl.CurrentSeedForSave = seed;
             }
             battleManager.ActionStartTimeCounter = 0;

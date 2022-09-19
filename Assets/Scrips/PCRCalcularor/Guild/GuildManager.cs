@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using Elements;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -110,6 +111,9 @@ namespace PCRCaculator.Guild
         private void Awake()
         {
             Instance = this;
+
+            System.IO.File.WriteAllText("fieldnames.txt",
+                string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
             LoadAddedPlayerData();
         }
         private void Start()
