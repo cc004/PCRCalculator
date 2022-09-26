@@ -26,6 +26,8 @@ namespace PCRCaculator
         public GameObject SystemInputPrefab;//弹窗输入面板
         public GameObject LoadingPagePrefab;//加载面板
         public GameObject LoadingPagePrefab_2;//加载面板2
+        public GameObject WaitingPrefab;//等待面板
+        
         //public TextAsset db;
         //public TextAsset unitTimeTxt;
         //public TextAsset unitPrefabData;
@@ -559,6 +561,13 @@ namespace PCRCaculator
             return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
 #endif
         }
+
+        public WaitUI OpenWaitUI()
+        {
+            GameObject p = Instantiate(WaitingPrefab, GameObject.Find("Canvas")?.transform);
+            return p.GetComponent<WaitUI>();
+        }
+
         public static Sprite LoadSourceSprite(string relativePath)
         {
             if (Instance.spriteCacheDic.ContainsKey(relativePath))

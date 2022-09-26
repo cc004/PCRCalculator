@@ -159,11 +159,16 @@ namespace PCRCaculator.Guild
             characterDetailPageChild.transform.localPosition = pos;
             characterDetailPageChild.transform.localScale = Vector3.one * scale;
         }
-
-        public void RefreshCharacterDetailPage(int idx)
+        public void HideCharacterDetailPage()
         {
-            if (idx >= SettingData.GetCurrentPlayerData().playrCharacters.Count) return;
-            UnitData unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
+            characterDetailPage.SetActive(false);
+        }
+        public void RefreshCharacterDetailPage(int idx,UnitData unitData=null)
+        {
+            if (unitData == null && idx >= SettingData.GetCurrentPlayerData().playrCharacters.Count) 
+                return;
+            if (unitData == null)
+                unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
             characterDetailButton.SetButton(unitData);
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
             var baseDataEX = MainManager.Instance.UnitRarityDic[unitData.unitId].GetEXSkillValue(unitData);//,MyGameCtrl.Instance.tempData.isGuildBattle);

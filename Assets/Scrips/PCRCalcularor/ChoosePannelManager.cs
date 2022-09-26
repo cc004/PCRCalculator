@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using PCRCaculator.Guild;
 using TMPro;
 using UnityEngine;
@@ -61,6 +62,11 @@ namespace PCRCaculator
         /// <param name="playerData">敌人队伍/会战要更改的队伍，为空则不显示</param>
         public void CallChooseBack(int type, AddedPlayerData player = null)
         {
+            StartCoroutine(CallChooseBack_0(type, player));
+        }
+        private IEnumerator CallChooseBack_0(int type, AddedPlayerData player = null)
+        {
+            var waitUI = MainManager.Instance.OpenWaitUI();
             this.type = type;
             baseBack.SetActive(true);
             chooseBack_A.SetActive(true);
@@ -86,12 +92,12 @@ namespace PCRCaculator
                 }
             }
             //selectedCharId.Clear();
-            if(type == 4)
+            if (type == 4)
             {
                 selectedCharId.Clear();
-                for(int i = 0; i < 5; i++)
+                for (int i = 0; i < 5; i++)
                 {
-                    if(i< player.playrCharacters.Count)
+                    if (i < player.playrCharacters.Count)
                     {
                         selectedCharId.Add(player.playrCharacters[i].unitId);
                     }
@@ -117,7 +123,7 @@ namespace PCRCaculator
                     selectedCharId.Clear();
                 }
             }
-            ReflashBasePage(0);
+            yield return ReflashBasePage(0);
             switchToggles[0].isOn = true;
             ReflashSelectedButtons();
             if (type == 1)
@@ -128,12 +134,13 @@ namespace PCRCaculator
             {
                 nextButtonText.text = "下一步";
             }
-            if(type == 4)
+            if (type == 4)
             {
                 playerData = player;
                 playerDataForGuild = player;
                 NextButton(player);
             }
+            waitUI.Close();
         }
         public void OnToggleSwitched(bool k)
         {
@@ -143,7 +150,7 @@ namespace PCRCaculator
                 {
                     if (switchToggles[i].isOn)
                     {
-                        ReflashBasePage(i);
+                        StartCoroutine(ReflashBasePage(i));
                     }
                 }
             }
@@ -154,12 +161,16 @@ namespace PCRCaculator
             GuildManager.Instance.ActivateCharacterDetailPage(new Vector3(260, 0, 0), 0.6f);
             GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
         }
-
+        public void CloseProperty()
+        {
+            GuildManager.Instance.HideCharacterDetailPage();
+        }
         public void CancalButton()
         {
             baseBack.SetActive(false);
             chooseBack_A.SetActive(false);
             settingBack.SetActive(false);
+            CloseProperty();
         }
         public void NextButton()
         {
@@ -244,6 +255,7 @@ namespace PCRCaculator
         {
             chooseBack_A.SetActive(true);
             settingBack.SetActive(false);
+            CloseProperty();
         }
         public void FinishEditButton_setting()
         {
@@ -424,8 +436,9 @@ namespace PCRCaculator
                     loveDic.Add(effectUnitList[i], EXsettingSliders[i].GetValue());
                 }
             }
-            playerData.playrCharacters[selectedCharacterId_setting].playLoveDic = loveDic;
-            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
+            var unitdata = playerData.playrCharacters[selectedCharacterId_setting];
+            unitdata.playLoveDic = loveDic;
+            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting, unitdata);
         }
 
         private void TurnAllToggles(bool k)
@@ -439,7 +452,7 @@ namespace PCRCaculator
                 }
             }
         }
-        private void ReflashBasePage(int type)
+        private IEnumerator ReflashBasePage(int type)
         {
             PositionType positionType = PositionType.frount;
             switch (type)
@@ -479,7 +492,8 @@ namespace PCRCaculator
                         togglePerferbs.Add(id0, b.GetComponent<Toggle>());
                         count++;
                         //showUnitIDs.Add(id);
-
+                        if (count % 3 == 0)
+                            yield return null;
                     }
                 }
             }
@@ -582,7 +596,7 @@ namespace PCRCaculator
                 detailSliders_setting[6].maxValue = 0;
                 detailSliders_setting[14].maxValue = 0;
             }
-            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
+            GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting,data);
         }
     }
 }

@@ -56,6 +56,8 @@ MonoBehaviour:
     type: 3}
   LoadingPagePrefab_2: {fileID: 5997757917144725720, guid: 660aea92ec05f294a945d606e610d6c8,
     type: 3}
+  WaitingPrefab: {fileID: 578561025915406311, guid: 8d27b2002051df047b5938ce3aadf40b,
+    type: 3}
   stayPage: 0
   UseNewBattleSystem: 1
   showSummonIDs: 
