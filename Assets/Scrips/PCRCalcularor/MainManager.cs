@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
+using OfficeOpenXml;
 using PCRCaculator.Calc;
 using TMPro;
 using UnityEngine;
@@ -139,6 +140,7 @@ namespace PCRCaculator
                 var dir = Application.streamingAssetsPath + "/../.ABExt";
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 Load();
                 CreateShowUnitIDS();
             }

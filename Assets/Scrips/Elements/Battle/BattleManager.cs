@@ -147,7 +147,7 @@ namespace Elements.Battle
         private UIPanel foregroundPanel;*/
         //private MLDKPCCPIOC battleProcessor;
         //private GJNIHENNINA battleLog;
-        //private CMMLKFHCEPD battleCameraEffect;
+        public BattleCameraEffect battleCameraEffect;
         public BattleEffectPool battleEffectPool;
         public BattleSpeedManager battleTimeScale;
         //private Yggdrasil<BattleManager> singletonTree;
@@ -635,7 +635,7 @@ namespace Elements.Battle
                         EnemyList[index2]._Update();
                     break;
             }
-            //this.battleCameraEffect.UpdateShake();
+            this.battleCameraEffect.UpdateShake();
             for (int index2 = effectUpdateList.Count - 1; index2 >= 0; --index2)
             {
                 if (!effectUpdateList[index2]._Update())
@@ -890,9 +890,9 @@ namespace Elements.Battle
         //public static int Random(int Min, int Max) => Min == Max ? Min : UnityEngine.Random.Range(Min, Max);
         public static int Random(int Min, int Max, RandomData data)
         {
-            int result = UnityRandom.Range(Min, Max);
-            if (Min == Max)
-                return Min;
+            if (Max == Min) return Min;
+            int result = UnityEngine.Random.Range(Min, Max);
+            //System.IO.File.AppendAllText("D:\\rnd.log", $"({BattleHeaderController.CurrentFrameCount})rnd is {result}, stack:\n{new StackTrace()}\n");
             data.randomResult = result;
             OnCallRandom?.Invoke(data);
             return result;
@@ -3177,6 +3177,7 @@ namespace Elements.Battle
             battleUnionBurstController = new BattleUnionBurstController(this);
             //this.battleCameraEffect = new CMMLKFHCEPD((OKKJGOIAIFK)this, this.playCamera, this.motionBlur, this.playCameraBlurOptimized);
             battleEffectPool = new BattleEffectPool();
+            battleCameraEffect = new BattleCameraEffect(this);
             battleTimeScale = new BattleSpeedManager(this);
             NOMJJDDCBAN = new List<int>();
             // this.battleManagerNode.AddInstance((object)this);

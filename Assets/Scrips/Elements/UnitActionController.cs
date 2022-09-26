@@ -34,6 +34,8 @@ namespace Elements
         public Skill Annihilation;
         //private static Yggdrasil<UnitActionController> staticSingletonTree;
         private static BattleManagerForActionController staticBattleManager;
+
+        private IBattleCameraEffectForUnitActionController battleCameraEffect;
         //private static BMIOELFOCPE staticBattleCameraEffect;
         private static BattleEffectPoolInterface staticBattleEffectPool;
         //private static JFJNEHKINFI staticBattleTimeScale;
@@ -117,7 +119,7 @@ namespace Elements
 
             staticBattleManager = BattleManager.Instance;
             staticBattleEffectPool = BattleManager.Instance.battleEffectPool;
-
+            battleCameraEffect = BattleManager.Instance.battleCameraEffect;
             Owner = _owner;
             transform = _owner.transform;
             //MyGameCtrl.ResetSkillEffects(this);
@@ -788,11 +790,11 @@ namespace Elements
             }
             if (!flag3)
                 Owner.IndicateSkillName(skill.SkillName);
-            /*for (int index = 0; index < skill.ShakeEffects.Count; ++index)
+            for (int index = 0; index < skill.ShakeEffects.Count; ++index)
             {
               if (skill.ShakeEffects[index].TargetMotion == 0)
                 this.AppendCoroutine(this.StartShakeWithDelay(skill.ShakeEffects[index], skill, true), ePauseType.VISUAL, (double) skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-            }*/
+            }
             //this.startBlurEffects(skill, true);
             if (skill.AnimId != eSpineCharacterAnimeId.NONE && !skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, _index3: Owner.MotionPrefix))
             {
@@ -1040,14 +1042,14 @@ namespace Elements
                     //StartCoroutine(updateCoroutineWithOutCutIn(createNormalPrefabWithDelay(skillEffect, annihilation)));
                 }
             }
-            //battleCameraEffect.ClearShake();
+            battleCameraEffect.ClearShake();
             /*if (annihilation.ZoomEffect.Enable)
             {
               ++Owner.UbCounter;
               battleCameraEffect.StartZoomEffect(annihilation.ZoomEffect, Owner, 0.0f, true, true);
             }*/
-            //foreach (ShakeEffect shakeEffect in annihilation.ShakeEffects)
-            //  Owner.StartCoroutine(updateCoroutineWithOutCutIn(StartShakeWithDelay(shakeEffect, annihilation)));
+            foreach (ShakeEffect shakeEffect in annihilation.ShakeEffects)
+              Owner.StartCoroutine(updateCoroutineWithOutCutIn(StartShakeWithDelay(shakeEffect, annihilation)));
             //if (annihilation.SlowEffect.Enable)
             //battleTimeScale.StartSlowEffect(annihilation.SlowEffect, Owner, 0.0f, true);
             if (annihilation.BlackOutTime > 0.0)
@@ -1060,7 +1062,7 @@ namespace Elements
             {
                 for (float num = 0.0f + Time.deltaTime; num > 0.0; num -= battleManager.DeltaTime_60fps)
                 {
-                    //battleCameraEffect.UpdateShake();
+                    battleCameraEffect.UpdateShake();
                     if (!unitSpineController.IsPlayAnime)
                     {
                         unitSpineController.AnimationName = unitSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE);
@@ -1731,12 +1733,11 @@ namespace Elements
                 _actions.Add(_skillEffect.FireAction);
               firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), Owner, _skillEffect.Height, _skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, transform.position + (Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
               firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? fctrl =>
-              {
-                  /*for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
+              { for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
                 {
                   if (fctrl.ShakeEffects[index1].TargetMotion == 0)
                     this.AppendCoroutine(this.StartShakeWithDelay(fctrl.ShakeEffects[index1], fctrl.Skill), ePauseType.VISUAL, (double) fctrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-                }*/
+                }
                   if (_skillEffect.FireActionId != -1)
                       AppendCoroutine(ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _firearmEndTarget, 0.0f), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
                   int index3 = 0;
@@ -1824,11 +1825,11 @@ namespace Elements
         {
           if (firearmCtrl == null || firearmCtrl.FireTarget == null || firearmCtrl.Skill == null)
             return;
-          /*for (int index = 0; index < firearmCtrl.ShakeEffects.Count; ++index)
+          for (int index = 0; index < firearmCtrl.ShakeEffects.Count; ++index)
           {
             if (firearmCtrl.ShakeEffects[index].TargetMotion == 0)
               this.AppendCoroutine(this.StartShakeWithDelay(firearmCtrl.ShakeEffects[index], firearmCtrl.Skill), ePauseType.VISUAL, (double) firearmCtrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-          }*/
+          }
           int index1 = 0;
           for (int count = firearmCtrl.EndActions.Count; index1 < count; ++index1)
             ExecUnitActionWithDelay(firearmCtrl.EndActions[index1], firearmCtrl.Skill, false, true);
@@ -2334,7 +2335,7 @@ namespace Elements
             skill.Cancel = true;
         }
 
-        /*public IEnumerator StartShakeWithDelay(
+        public IEnumerator StartShakeWithDelay(
           ShakeEffect _shake,
           Skill _skill,
           bool _first = false)
@@ -2359,7 +2360,7 @@ namespace Elements
     label_6:
             this.battleCameraEffect.StartShake(_shake, _skill, this.Owner);
           }
-        }*/
+        }
 
         /*private void startBlurEffects(Skill _skill, bool _first = false)
         {

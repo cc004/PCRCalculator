@@ -159,11 +159,11 @@ namespace Elements
                     _source.PlayAnime(animeId, skill.SkillNum, 2, _isLoop: false);
                     _sourceActionController.AppendCoroutine(damageChargeAction.waitMotinEnd(_source, _skill, _sourceActionController), ePauseType.SYSTEM, _source);
                     _sourceActionController.CreateNormalPrefabWithTargetMotion(skill, 2, false);
-                    /*for (int index = 0; index < skill.ShakeEffects.Count; ++index)
+                    for (int index = 0; index < skill.ShakeEffects.Count; ++index)
                     {
                       if (skill.ShakeEffects[index].TargetMotion == 2)
                         _sourceActionController.AppendCoroutine(_sourceActionController.StartShakeWithDelay(skill.ShakeEffects[index], skill, true), ePauseType.VISUAL, _source);
-                    }*/
+                    }
                     _source.IsOnDamageCharge = false;
                     break;
                 }

@@ -57,23 +57,24 @@ namespace Elements
         private const float PERCENT_DIGIT = 100f;
         public Dictionary<int, int> SkillUseCount = new Dictionary<int, int>();
         public int CurrentRotateCoroutineId;
-        /*[SerializeField]
+        [SerializeField]
         private List<ShakeEffect> gameStartShakes;
+        /*
         [SerializeField]
         private List<PrefabWithTime> gameStartEffects;
         [SerializeField]
         private List<PrefabWithTime> dieEffects;
         [SerializeField]
-        private List<ShakeEffect> dieShakes;
-        [SerializeField]
         private List<PrefabWithTime> damageEffects;
-        [SerializeField]
-        private List<ShakeEffect> damageShakes;
         public List<PrefabWithTime> SummonEffects;
         [SerializeField]
         private List<PrefabWithTime> idleEffects;
         [SerializeField]
         private List<PrefabWithTime> auraEffects;*/
+        [SerializeField]
+        private List<ShakeEffect> dieShakes;
+        [SerializeField]
+        private List<ShakeEffect> damageShakes;
         [SerializeField]
         public float ShowTitleDelay = 0.5f;
         [SerializeField]
@@ -1791,8 +1792,8 @@ this.updateCurColor();
             this.CutInFrameSet = (CutInFrameData)null;
             this.SkillUseCount = (Dictionary<int, int>)null;
             this.OnIsFrontFalse = (System.Action)null;
-            /*this.gameStartShakes = (List<ShakeEffect>)null;
-            this.gameStartEffects = (List<PrefabWithTime>)null;
+            this.gameStartShakes = (List<ShakeEffect>)null;
+            /*this.gameStartEffects = (List<PrefabWithTime>)null;
             this.dieEffects = (List<PrefabWithTime>)null;
             this.dieShakes = (List<ShakeEffect>)null;
             this.damageEffects = (List<PrefabWithTime>)null;
@@ -7353,7 +7354,8 @@ this.updateCurColor();
             }
             return (long)num1;
         }
-        
+
+        private static readonly WaitForSeconds LARGE_NUM_SHOW_TIME = new WaitForSeconds(0.2f);
         public FloatWithEx SetDamageImpl(
           DamageData _damageData,
           bool _byAttack,
@@ -7640,6 +7642,49 @@ this.updateCurColor();
                 Hp = 1L;
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
             //    this.playDamageVoice();
+
+            if (this.IsBoss)
+            {
+                bool flag3 = false;
+                if (_skill != null)
+                {
+                    List<UnitCtrl> unitList = battleManager.UnitList;
+                    for (int i = 0; i < unitList.Count; i++)
+                    {
+                        if (unitList[i].UnionBurstSkillId == _skill.SkillId)
+                        {
+                            flag3 = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (flag3)
+                {
+                    static IEnumerator moveParticle()
+                    {
+                        //float rand = UnityEngine.Random.Range(-2f, 2f);
+                        yield return null;
+                    }
+
+                    IEnumerator playLargeUBEffect()
+                    {
+                        yield return LARGE_NUM_SHOW_TIME;
+                        StartCoroutine(moveParticle());
+                    }
+
+                    switch (_damageData.DamegeEffectType)
+                    {
+                        case eDamageEffectType.NORMAL:
+                            break;
+                        case eDamageEffectType.COMBO:
+                            break;
+                        case eDamageEffectType.LARGE:
+                            StartCoroutine(playLargeUBEffect());
+                            break;
+                    }
+                }
+            }
             /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
             {
                 float NormalizedHP = (float)(long)this.Hp / (float)(long)this.MaxHp;
@@ -7670,8 +7715,8 @@ this.updateCurColor();
                     }
                     else
                         _damage = (int)(this.accumulateDamage + num6);
-                    //if (flag3)
-                   //     SingletonMonoBehaviour<BattleHeaderController>.Instance.BossTotalDamage.SetDamageUB(_damage, _damageData.DamegeEffectType, this);
+                    if (flag3)
+                        SingletonMonoBehaviour<BattleHeaderController>.Instance.BossTotalDamage.SetDamageUB(_damage, _damageData.DamegeEffectType, this);
                     //else
                     //    SingletonMonoBehaviour<BattleHeaderController>.Instance.BossTotalDamage.SetDamageNormal(_damage);
                     if (this.IsBoss)
@@ -9124,10 +9169,10 @@ this.updateCurColor();
         {
             //MyOnChangeState?.Invoke(UnitId, CurrentState, BattleHeaderController.CurrentFrameCount);
             UnitCtrl unitCtrl = this;
-            float time = 0.0f;
-            //bool[] shakeStarted = new bool[unitCtrl.gameStartShakes.Count];
+            float time = 0.0f; 
+            bool[] shakeStarted = new bool[unitCtrl.gameStartShakes.Count];
             //if (unitCtrl.battleManager.GetPurpose() == eHatsuneSpecialPurpose.SHIELD || unitCtrl.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && unitCtrl.battleManager.FICLPNJNOEP < unitCtrl.battleManager.GetPurposeCount())
-            // unitCtrl.AppendCoroutine(unitCtrl.CreatePrefabWithTime(unitCtrl.gameStartEffects, _isShieldEffect: true), ePauseType.SYSTEM);
+            //unitCtrl.AppendCoroutine(unitCtrl.CreatePrefabWithTime(unitCtrl.gameStartEffects, _isShieldEffect: true), ePauseType.SYSTEM);
             while (true)
             {
                 unitCtrl.GetCurrentSpineCtrl().Pause();
@@ -9147,14 +9192,14 @@ this.updateCurColor();
             while (true)
             {
                 time += unitCtrl.DeltaTimeForPause;
-                /*for (int index = 0; index < unitCtrl.gameStartShakes.Count; ++index)
+                for (int index = 0; index < unitCtrl.gameStartShakes.Count; ++index)
                 {
                     if (!shakeStarted[index] && (double)unitCtrl.gameStartShakes[index].StartTime < (double)time)
                     {
-                        unitCtrl.battleCameraEffect.StartShake(unitCtrl.gameStartShakes[index], (Skill)null, unitCtrl);
+                        unitCtrl.battleManager.battleCameraEffect.StartShake(unitCtrl.gameStartShakes[index], (Skill)null, unitCtrl);
                         shakeStarted[index] = true;
                     }
-                }*/
+                }
                 if (!unitCtrl.IsDead)
                 {
                     if (unitCtrl.GetCurrentSpineCtrl().IsPlayAnimeBattle && !unitCtrl.CancelByAwake)
@@ -9739,9 +9784,9 @@ this.updateCurColor();
                         PlayAnime(eSpineCharacterAnimeId.DIE, _index2: MotionPrefix, _isLoop: false);
                     //if (this.dieEffects.Count > 0 && !this.IsDivisionSourceForDie)
                     //    this.AppendCoroutine(this.CreatePrefabWithTime(this.dieEffects, _ignorePause: true), ePauseType.IGNORE_BLACK_OUT);
-                    //int index1 = 0;
-                    //for (int count = this.dieShakes.Count; index1 < count; ++index1)
-                    //    this.AppendCoroutine(this.startShakeWithDelay(this.dieShakes[index1], true), ePauseType.IGNORE_BLACK_OUT);
+                    int index1 = 0;
+                    for (int count = this.dieShakes.Count; index1 < count; ++index1)
+                        this.AppendCoroutine(this.startShakeWithDelay(this.dieShakes[index1], true), ePauseType.IGNORE_BLACK_OUT);
                     if (OnDieForZeroHp != null && OnDeadForRevival == null)
                         OnDieForZeroHp(this);
                     //this.playRetireVoice();
@@ -9867,9 +9912,9 @@ this.updateCurColor();
                     }
                     //if (this.damageEffects.Count > 0)
                     //    this.AppendCoroutine(this.CreatePrefabWithTime(this.damageEffects), ePauseType.SYSTEM);
-                    //int index = 0;
-                    //for (int count = this.damageShakes.Count; index < count; ++index)
-                    //    this.AppendCoroutine(this.startShakeWithDelay(this.damageShakes[index]), ePauseType.SYSTEM);
+                    int index = 0;
+                    for (int count = this.damageShakes.Count; index < count; ++index)
+                        this.AppendCoroutine(this.startShakeWithDelay(this.damageShakes[index]), ePauseType.SYSTEM);
                     //if (!_quiet)
                      //   this.playDamageVoice();
                     PlayAnime(eSpineCharacterAnimeId.DAMEGE, MotionPrefix, _isLoop: false, _ignoreBlackout: true);
@@ -10887,7 +10932,7 @@ this.updateCurColor();
             this.runSmokeEffect = effect;
         }*/
 
-        /*private IEnumerator startShakeWithDelay(ShakeEffect shake, bool _ignorePause = false)
+        private IEnumerator startShakeWithDelay(ShakeEffect shake, bool _ignorePause = false)
         {
             UnitCtrl GEDLBPMPOKB = this;
             float time = 0.0f;
@@ -10899,8 +10944,8 @@ this.updateCurColor();
                 else
                     break;
             }
-            GEDLBPMPOKB.battleCameraEffect.StartShake(shake, (Skill)null, GEDLBPMPOKB);
-        }*/
+            battleManager.battleCameraEffect.StartShake(shake, (Skill)null, GEDLBPMPOKB);
+        }
 
         public bool IsCancelActionState(bool _isSkill1, int _skillId = -1)
         {

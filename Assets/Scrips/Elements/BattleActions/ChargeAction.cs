@@ -110,11 +110,11 @@ label_14:
       _sourceUnitActionController.ExecUnitActionWithDelay(_action, _skill, false, false);
       _source.PlayAnime(_animeId, _skill.SkillNum, 2, _isLoop: false);
       _sourceUnitActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);
-      //for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
-      //{
-      //  if (_skill.ShakeEffects[index].TargetMotion == 2)
-      //    _sourceUnitActionController.AppendCoroutine(_sourceUnitActionController.StartShakeWithDelay(_skill.ShakeEffects[index], _skill), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-      //}
+      for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
+      {
+        if (_skill.ShakeEffects[index].TargetMotion == 2)
+          _sourceUnitActionController.AppendCoroutine(_sourceUnitActionController.StartShakeWithDelay(_skill.ShakeEffects[index], _skill), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+      }
     }
 
     public override void SetLevel(float _level)

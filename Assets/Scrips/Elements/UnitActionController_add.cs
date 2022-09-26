@@ -774,11 +774,11 @@ namespace Elements
                     firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), Owner, _skillEffect.Height, _skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, transform.position + (Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
                     firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? fctrl =>
                     {
-                        /*for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
+                        for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
                         {
                           if (fctrl.ShakeEffects[index1].TargetMotion == 0)
                             this.AppendCoroutine(this.StartShakeWithDelay(fctrl.ShakeEffects[index1], fctrl.Skill), ePauseType.VISUAL, (double) fctrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-                        }*/
+                        }
                         if (_skillEffect.FireActionId != -1)
                             AppendCoroutine(ExecActionWithDelayAndTarget(_skillEffect.FireAction, _skill, _firearmEndTarget, 0.0f), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? Owner : null);
                         int index3 = 0;
@@ -870,11 +870,11 @@ namespace Elements
             if (firearmCtrl == null || firearmCtrl.FireTarget == null || firearmCtrl.Skill == null)
                 return;
             //Debug.Log("触发技能");
-            /*for (int index = 0; index < firearmCtrl.ShakeEffects.Count; ++index)
+            for (int index = 0; index < firearmCtrl.ShakeEffects.Count; ++index)
             {
               if (firearmCtrl.ShakeEffects[index].TargetMotion == 0)
                 this.AppendCoroutine(this.StartShakeWithDelay(firearmCtrl.ShakeEffects[index], firearmCtrl.Skill), ePauseType.VISUAL, (double) firearmCtrl.Skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl) null);
-            }*/
+            }
             int index1 = 0;
             for (int count = firearmCtrl.EndActions.Count; index1 < count; ++index1)
                 ExecUnitActionWithDelay(firearmCtrl.EndActions[index1], firearmCtrl.Skill, false, true);

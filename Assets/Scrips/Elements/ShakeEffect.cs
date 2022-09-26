@@ -17,13 +17,13 @@ namespace Elements
     public float StartTime;
     public float Duration;
     public int TargetMotion;
-    public float StartAmplitude;
-    public float EndAmplitude;
-    public float StartFrequency;
-    public float EndFrequency;
-    public float Rotation;
-    public CustomEasing EasingFrequency;
-    public CustomEasing EasingAmplitude;
+    //public float StartAmplitude;
+    //public float EndAmplitude;
+    //public float StartFrequency;
+    //public float EndFrequency;
+    //public float Rotation;
+    //public CustomEasing EasingFrequency;
+    //public CustomEasing EasingAmplitude;
     [NonSerialized]
     private Skill skill;
     private UnitCtrl owner;
@@ -32,9 +32,9 @@ namespace Elements
 
     private int numberOfShake { get; set; }
 
-    public float CurrentAmplutude { get; set; }
+    //public float CurrentAmplutude { get; set; }
 
-    public Vector3 CurrentShakePos { get; set; }
+    //public Vector3 CurrentShakePos { get; set; }
 
     public bool ShakeLoopEnd { get; set; }
 
@@ -44,10 +44,10 @@ namespace Elements
       this.owner = owner;
       timer = 0.0f;
       numberOfShake = 0;
-      CurrentAmplutude = StartAmplitude;
-      CurrentShakePos = Vector3.zero;
-      EasingFrequency = new CustomEasing(CustomEasing.eType.outQuad, StartFrequency, EndFrequency, Duration);
-      EasingAmplitude = new CustomEasing(CustomEasing.eType.outQuad, StartAmplitude, EndAmplitude, Duration);
+      //CurrentAmplutude = StartAmplitude;
+      //CurrentShakePos = Vector3.zero;
+      //EasingFrequency = new CustomEasing(CustomEasing.eType.outQuad, StartFrequency, EndFrequency, Duration);
+      //EasingAmplitude = new CustomEasing(CustomEasing.eType.outQuad, StartAmplitude, EndAmplitude, Duration);
     }
 
     public bool GetOwnerPause() => owner != null && owner.Pause;
@@ -65,13 +65,14 @@ namespace Elements
         return false;
       timer += deltaTime;
       int numberOfShake1 = numberOfShake;
-      float curVal = EasingFrequency.GetCurVal(deltaTime);
-      CurrentAmplutude = EasingAmplitude.GetCurVal(deltaTime);
-      numberOfShake = (int) (curVal * 2.0 * 3.14159274101257 * timer / 3.14159274101257 / 2.0);
+      //float curVal = EasingFrequency.GetCurVal(deltaTime);
+      //CurrentAmplutude = EasingAmplitude.GetCurVal(deltaTime);
+      //numberOfShake = (int) (curVal * 2.0 * 3.14159274101257 * timer / 3.14159274101257 / 2.0);
       int numberOfShake2 = numberOfShake;
       if (numberOfShake1 != numberOfShake2 && ShakeType == ShakeType.RANDOM)
-        Rotation = Random.Range(0.0f, 360f);
-      CurrentShakePos = new Vector3(CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Cos((float) (Rotation / 180.0 * 3.14159274101257)), CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Sin((float) (Rotation / 180.0 * 3.14159274101257)), 0.0f);
+        //Rotation = Random.Range(0.0f, 360f);
+        Random.Range(0.0f, 360f);
+            //CurrentShakePos = new Vector3(CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Cos((float) (Rotation / 180.0 * 3.14159274101257)), CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Sin((float) (Rotation / 180.0 * 3.14159274101257)), 0.0f);
       if (timer <= (double) Duration)
         return false;
       ResetStart(null, null);

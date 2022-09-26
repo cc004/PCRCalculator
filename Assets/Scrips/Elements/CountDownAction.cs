@@ -101,11 +101,11 @@ namespace Elements
           countDownAction.actionParameter.TargetList.RemoveAt(index);
       }
       _sourceUnitActionController.ExecUnitActionWithDelay(countDownAction.actionParameter, _skill, false, false, true);
-      /*for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
+      for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
       {
         if (_skill.ShakeEffects[index].TargetMotion == 2)
           _sourceUnitActionController.AppendCoroutine(_sourceUnitActionController.StartShakeWithDelay(_skill.ShakeEffects[index], _skill), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-      }*/
+      }
       //for (int index = 0; index < _countDownEffect.CountEndEffectData.Count; ++index)
       //  _target.AppendCoroutine(countDownAction.createEndEffect(_countDownEffect.CountEndEffectData[index], _target, _source), ePauseType.SYSTEM);
     }

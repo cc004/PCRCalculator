@@ -130,11 +130,11 @@ namespace Elements
             _skill.LoopEffectObjs[index].SetTimeToDie(true);
           _skill.LoopEffectObjs.Clear();
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 3, false);
-          /*foreach (ShakeEffect shakeEffect in _skill.ShakeEffects)
+          foreach (ShakeEffect shakeEffect in _skill.ShakeEffects)
           {
             if (shakeEffect.TargetMotion == 3)
               _sourceActionController.AppendCoroutine(_sourceActionController.StartShakeWithDelay(shakeEffect, _skill, true), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-          }*/
+          }
           if (motionRepeatAction.failAction != null)
           {
             motionRepeatAction.failAction.ReadyAction(_source, _sourceActionController, _skill);
@@ -150,11 +150,11 @@ namespace Elements
         if (timer < 0.0)
         {
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);
-          /*foreach (ShakeEffect shakeEffect in _skill.ShakeEffects)
+          foreach (ShakeEffect shakeEffect in _skill.ShakeEffects)
           {
             if (shakeEffect.TargetMotion == 2)
               _sourceActionController.AppendCoroutine(_sourceActionController.StartShakeWithDelay(shakeEffect, _skill, true), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-          }*/
+          }
           if (motionRepeatAction.successAction != null)
           {
             motionRepeatAction.successAction.ReadyAction(_source, _sourceActionController, _skill);

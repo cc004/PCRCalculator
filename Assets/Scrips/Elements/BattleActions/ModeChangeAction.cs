@@ -316,11 +316,11 @@ namespace Elements
                 int _targetmotion = 1;
                 _source.ModeChangeEndEffectList.Clear();
                 _sourceUnitActionController.CreateNormalPrefabWithTargetMotion(_skill, _targetmotion, false, _modechangeEndEffect: true);
-                /*for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
+                for (int index = 0; index < _skill.ShakeEffects.Count; ++index)
                 {
                   if (_skill.ShakeEffects[index].TargetMotion == _targetmotion)
                     _sourceUnitActionController.AppendCoroutine(_sourceUnitActionController.StartShakeWithDelay(_skill.ShakeEffects[index], _skill), ePauseType.VISUAL, (double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-                }*/
+                }
             }
         }
 
