@@ -104,16 +104,26 @@ namespace PCRCaculator.Guild
                 }
                 return enemyDataDic;
             }
+            set
+            {
+                enemyDataDic = value;
+            }
         }
-        public Dictionary<int, MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic;}
+        public Dictionary<int, MasterEnemyMParts.EnemyMParts> EnemyMPartsDic
+        {
+            get => enemyMPartsDic; set
+            {
+                enemyMPartsDic = value;
+            }
+        }
         public bool isGuildBoss { get => toggles_ChooseType[0].isOn; }
 
         private void Awake()
         {
             Instance = this;
 
-            System.IO.File.WriteAllText("fieldnames.txt",
-                string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
+            //System.IO.File.WriteAllText("fieldnames.txt",
+            //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
             LoadAddedPlayerData();
         }
         private void Start()
@@ -122,8 +132,10 @@ namespace PCRCaculator.Guild
         }
         private IEnumerator StartAfterWait()
         {
+            while (!MainManager.Instance.LoadFinished)
+                yield return null;
             yield return null;
-            Load();
+            //Load();
             //LoadAddedPlayerData();
             ReflashOnStart();
             if (MainManager.Instance.AutoCalculatorData.isCalculating && !MainManager.Instance.AutoCalculatorData.isConfig)
@@ -139,14 +151,22 @@ namespace PCRCaculator.Guild
             //TextAsset enemyDataDicTxt = Resources.Load<TextAsset>("Datas/EnemyDataDic");
             //string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
             //enemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
-            string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
-            if (!string.IsNullOrEmpty(guildenemyDatasStr))
+            /*try
             {
-                guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, GuildEnemyData>>(guildenemyDatasStr);
+                guildEnemyDatas = 
             }
-            string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
-            enemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, MasterEnemyMParts.EnemyMParts>>(enemyMParts);
-            CreateSpecialEnemyData();
+            catch(Exception ex)
+            {
+                Debug.LogError($"读取会战怪物数据出错！{ex}");
+                string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
+                if (!string.IsNullOrEmpty(guildenemyDatasStr))
+                {
+                    guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, GuildEnemyData>>(guildenemyDatasStr);
+                }
+            }*/
+            //string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
+            //enemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, MasterEnemyMParts.EnemyMParts>>(enemyMParts);
+            //CreateSpecialEnemyData();
         }
         public void SelectCharacterButton()
         {
@@ -225,6 +245,8 @@ namespace PCRCaculator.Guild
         }
         public void OnChooseBossDropDownChanged()
         {
+            if (!MainManager.Instance.LoadFinished)
+                return;
             //bossImage_ChooseBoss.sprite = bossSprites[dropdowns_ChooseBoss[0].value];
             int enemyid_0 = 0;
             string Path;
@@ -235,7 +257,7 @@ namespace PCRCaculator.Guild
                     enemyid_0 = guildEnemyDatas[dropdowns_ChooseBoss[2].value + 1024].enemyIds[0][dropdowns_ChooseBoss[0].value];
                     //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                    bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
+                    bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
                 }
                 else
                 {
@@ -268,9 +290,9 @@ namespace PCRCaculator.Guild
                 specialEnemyid = enemyid_0;
                 specialInputValue = 100;
             }
-            catch(KeyNotFoundException _)
+            catch(Exception _)
             {
-                MainManager.Instance.WindowConfigMessage($"会战{dropdowns_ChooseBoss[2].value + 1024}的配置缺失！", null);
+                MainManager.Instance.WindowConfigMessage($"会战{dropdowns_ChooseBoss[2]?.value + 1024}的配置缺失！", null);
             }
         }
         public void OnInputFinished()
@@ -278,7 +300,7 @@ namespace PCRCaculator.Guild
             if(!isGuildBoss)
             {
                 int bossid = int.Parse(specialInput.text, NumberStyles.Any);
-                if(enemyDataDic.TryGetValue(bossid,out var data))
+                if(EnemyDataDic.TryGetValue(bossid,out var data))
                 {
                     //string Path = "GuildEnemy/icon_unit_" + data.unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
@@ -421,7 +443,7 @@ namespace PCRCaculator.Guild
         }
         private EnemyData GetEnemyDataByID(int enemy_id)
         {
-            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : enemyDataDic[enemy_id];
+            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
         {
@@ -525,8 +547,8 @@ namespace PCRCaculator.Guild
                 data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12, data.currentGuildEnemyNum, data.currentTurn);
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
-            bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[selectedBossEnemyid].unit_id);
-            bossDetailTexts[0].text = group.isSpecialBoss ? "自定义": enemyDataDic[selectedBossEnemyid].name;
+            bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyid].unit_id);
+            bossDetailTexts[0].text = group.isSpecialBoss ? "自定义": EnemyDataDic[selectedBossEnemyid].name;
             string str = "";
             if (group.isSpecialBoss)
             {

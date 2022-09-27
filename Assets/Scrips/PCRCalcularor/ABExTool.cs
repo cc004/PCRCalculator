@@ -25,9 +25,9 @@ namespace PCRCaculator
         static Dictionary<string, AssetBundle> AssetBundleDic = new Dictionary<string, AssetBundle>();
         static Dictionary<string, Sprite> spriteDic = new Dictionary<string, Sprite>();
 
-#if UNITY_EDITOR
+/*#if UNITY_EDITOR
         [MenuItem("PCRTools/DMM/从DMM客户端导出所有角色的.unity3d资源")]
-#endif
+#endif*/
         public static void Db2json()
         {
             //CreateNameDic();
@@ -54,7 +54,7 @@ namespace PCRCaculator
             CopyByID(180401, 0);
             CopyByID(180501, 0);
             CopyByID(109801, 0);*/
-            string conn = "redive_jp.db";
+            /*string conn = "redive_jp.db";
             SQLiteHelper sql = new SQLiteHelper(conn);
             SqliteDataReader reader = sql.ReadFullTable("unit_data");
 
@@ -64,10 +64,11 @@ namespace PCRCaculator
                 if (id <= 189999)
                     CopyByID(109801, 0);
             }
-            sql.CloseConnection();
+            sql.CloseConnection();*/
 
 
         }
+        /*
 #if UNITY_EDITOR
         [MenuItem("PCRTools/DMM/从DMM客户端导出会战BOSS数据")]
 #endif
@@ -80,14 +81,9 @@ namespace PCRCaculator
             CopyByID(207001, 1);
 
             //return;
-            /*for (int i = 300000; i < 309900; i += 100)
-            {
-                for (int j = 0; j < 6; j++)
-                {
-                    CopyByID(i + j, 1);
-                }
-            }*/
+            
         }
+
 #if UNITY_EDITOR
 
         [MenuItem("PCRTools/DMM/从DMM客户端导出图标")]
@@ -181,7 +177,7 @@ namespace PCRCaculator
         }
         //[MenuItem("PCRTools/DMM/导出通用弹道数据")]
 
-
+        */
 
         public static void CopyByID(int unitid, int type,Action<string> callBack=null)
         {
@@ -358,7 +354,7 @@ namespace PCRCaculator
 #endif
         }
 
-        static void CreateNameDic()
+        /*static void CreateNameDic()
         {
             ABNameDic.Clear();
             string conn = "manifest.db";
@@ -373,7 +369,7 @@ namespace PCRCaculator
             }
             sql.CloseConnection();
 
-        }
+        }*/
         public static string ComputeSHA1(string fileName)
         {
             if (sha1 == null)

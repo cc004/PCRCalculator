@@ -48,8 +48,8 @@ namespace Elements
         private void Awake()
         {
             Instance = this;
-            System.IO.File.WriteAllText("fieldnames.txt",
-                string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
+            //System.IO.File.WriteAllText("fieldnames.txt",
+            //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
         private void Start()
         {

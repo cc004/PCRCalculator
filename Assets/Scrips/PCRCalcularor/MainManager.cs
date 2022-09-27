@@ -6,8 +6,10 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PCRCaculator.Calc;
+using PCRCaculator.SQL;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -118,6 +120,7 @@ namespace PCRCaculator
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
         public int MaxTPUpValue => playerSetting.maxTPUpValue;
+        public bool LoadFinished { get; private set; }
         private void Awake()
         {
             if (Instance == null)
@@ -141,12 +144,12 @@ namespace PCRCaculator
                 var dir = Application.streamingAssetsPath + "/../.ABExt";
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                Load();
-                CreateShowUnitIDS();
+                StartCoroutine(Load());
             }
             catch (Exception e)
             {
                 Debugtext.text += e.Message;
+                Debug.LogError(e.Message);
             }
 
             //CharacterManager = CharacterManager.Instance;
@@ -155,53 +158,108 @@ namespace PCRCaculator
 
         public Dictionary<int, float[]> execTimePatch;
 
-        private void Load()
+        private IEnumerator Load()
+        {
+            LoadFinished = false;
+            var wait = OpenWaitUI();
+            LoadPlayerSettings();
+            //Thread thread = new Thread(() => LoadAsync());
+            //await Task.Run(LoadAsync);
+            yield return LoadAsync();
+            Debugtext.text += "\n数据加载完毕！";
+            CreateShowUnitIDS();
+            wait.Close();
+        }
+        private IEnumerator LoadAsync()
         {
             execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
             string jsonStr = LoadJsonDatas("Datas/AllData");
+            yield return null;
             if (jsonStr != "")
             {
                 AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
-                equipmentDic = allData.equipmentDic;
+                //equipmentDic = allData.equipmentDic;
                 unitRarityDic = allData.unitRarityDic;
                 unitStoryEffectDic = allData.unitStoryEffectDic;
                 unitStoryDic = allData.unitStoryDic;
-                equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                //equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
                 skillDataDic = allData.skillDataDic;
                 skillActionDic = allData.skillActionDic;
                 unitName_cn = allData.unitName_cn;
                 skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
+            yield return null;
+            Guild.GuildManager gm = Guild.GuildManager.Instance;
+
+            SQLiteTool dbTool = SQLiteTool.OpenDB();
+
+            equipmentDic = dbTool.GetEquipmentData();
+            equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+
+
+            allUnitAttackPatternDic = dbTool.GetUnitAttackPatternDic();
+
+            gm.guildEnemyDatas = dbTool.GetGuildEnemyData();
+
+            gm.EnemyMPartsDic = dbTool.GetMPartsData();
+
+            //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
+            Guild.GuildManager.EnemyDataDic = new Dictionary<int, EnemyData>();
+            yield return dbTool.GetEnemyDataDic(Guild.GuildManager.EnemyDataDic);
+
+            dbTool.CloseDB();
+
+            /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
+            allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
+
+            string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
+            if (!string.IsNullOrEmpty(guildenemyDatasStr))
+            {
+                gm.guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, Guild.GuildEnemyData>>(guildenemyDatasStr);
+            }
+            string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
+            gm.EnemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>>(enemyMParts);
+
+            string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
+            //Guild.GuildManager.EnemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
+
+            Debug.LogError($"读取DB失败！{ex.Message}");*/
+
+            yield return null;
             LoadUnitData();
-            LoadPlayerSettings();
+            //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
             //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
             //allUnitFirearmDatas = allUnitPrefabData.allUnitFirearmDatas;
             //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
-
+            yield return null;
             string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
-            Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
+            //Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
             //string attackPatternStr = Resources.Load<TextAsset>("Datas/UnitAtttackPatternDic").text;
-            string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
-            allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
+            //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
+            //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
+            yield return null;
             string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
+            yield return null;
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
             unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
+            yield return null;
             if (!string.IsNullOrEmpty(firearmStr))
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
-            Debugtext.text += "\n数据加载完毕！";
+
+            LoadFinished = true;
         }
         private void LoadUnitData()
         {
