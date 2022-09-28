@@ -13,10 +13,12 @@ namespace PCRCaculator.SQL
     public class SQLiteTool
     {
         public static string DatabaseName = "redive_jp.db";
-        public static SQLiteTool OpenDB()
+        public static string DatabaseName_cn = "redive_cn.db";
+
+        public static SQLiteTool OpenDB(bool cn = false)
         {
 #if UNITY_EDITOR
-            var dbPath = string.Format(@"Assets/StreamingAssets/{0}", DatabaseName);
+            var dbPath = string.Format(@"Assets/StreamingAssets/{0}", cn ? DatabaseName_cn : DatabaseName);
 #else
         // check if file exists in Application.persistentDataPath
         var filepath = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
@@ -81,13 +83,13 @@ namespace PCRCaculator.SQL
 
             db = new SQLiteConnection(path, readOnly ? SQLiteOpenFlags.ReadOnly : SQLiteOpenFlags.ReadWrite);
         }
-        public List<T> GetDatas<T>(Func<T, bool>? func = null) where T : new()
+        public List<T> GetDatas<T>(Func<T, bool> func = null) where T : new()
         {
             
             List<T> list = new List<T>(func == null ? db.Table<T>() : db.Table<T>().Where<T>(func));
             return list;
         }
-        public Dictionary<int, T> GetDatasDic<T>(Func<T, int> func, Func<T, bool>? select = null) where T : new()
+        public Dictionary<int, T> GetDatasDic<T>(Func<T, int> func, Func<T, bool> select = null) where T : new()
         {
             Dictionary<int, T> dict = new Dictionary<int, T>();
             var list = GetDatas<T>(select);
@@ -95,7 +97,23 @@ namespace PCRCaculator.SQL
                 dict[func(item)] = item;
             return dict;
         }
-        
+        public Dictionary<int,List<T>> GetDatasDicList<T>(Func<T, int> func, Func<T, bool> select = null) where T : new()
+        {
+            Dictionary<int, List<T>> dic = new Dictionary<int, List<T>>();
+            var list = GetDatas<T>(select);
+            foreach(var dd in list)
+            {
+                if (dic.TryGetValue(func(dd), out var list1))
+                {
+                    list1.Add(dd);
+                }
+                else
+                    dic[func(dd)] = new List<T> { dd };
+            }
+            return dic;
+        }
+
+
         public int UpdateDB(List<object> list)
         {
             return db.UpdateAll(list);

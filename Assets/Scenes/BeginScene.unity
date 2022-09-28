@@ -5381,8 +5381,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 825212226}
         m_TargetAssemblyTypeName: PCRCaculator.CharacterManager, Assembly-CSharp
-        m_MethodName: OnToggleSwitched
-        m_Mode: 6
+        m_MethodName: OnToggleSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -35431,7 +35431,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2048174546}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -40322,14 +40322,12 @@ VideoPlayer:
   m_DataSource: 0
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 0
-  m_TargetAudioSources:
-  - {fileID: 0}
-  m_DirectAudioVolumes:
-  - 1
+  m_TargetAudioSources: []
+  m_DirectAudioVolumes: []
   m_Url: 
-  m_EnabledAudioTracks: 01
-  m_DirectAudioMutes: 00
-  m_ControlledAudioTrackCount: 1
+  m_EnabledAudioTracks: 
+  m_DirectAudioMutes: 
+  m_ControlledAudioTrackCount: 0
   m_PlayOnAwake: 1
   m_SkipOnDrop: 1
   m_Looping: 1
@@ -50991,7 +50989,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 846574224}
   toggleTransition: 1
   graphic: {fileID: 53275844}
@@ -51001,8 +50999,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 825212226}
         m_TargetAssemblyTypeName: PCRCaculator.CharacterManager, Assembly-CSharp
-        m_MethodName: OnToggleSwitched
-        m_Mode: 6
+        m_MethodName: OnToggleSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -55098,8 +55096,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 825212226}
         m_TargetAssemblyTypeName: PCRCaculator.CharacterManager, Assembly-CSharp
-        m_MethodName: OnToggleSwitched
-        m_Mode: 6
+        m_MethodName: OnToggleSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -58186,8 +58184,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 825212226}
         m_TargetAssemblyTypeName: PCRCaculator.CharacterManager, Assembly-CSharp
-        m_MethodName: OnToggleSwitched
-        m_Mode: 6
+        m_MethodName: OnToggleSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -65125,6 +65123,10 @@ MonoBehaviour:
   allowRarity6Toggle: {fileID: 1811066305}
   showAllUnitToggle: {fileID: 1952657900}
   SettingBack: {fileID: 1818183832}
+  TPMaxText: {fileID: 0}
+  RBLevelText: {fileID: 0}
+  RBValueText: {fileID: 0}
+  RBTPValueText: {fileID: 0}
 --- !u!1 &1992364002
 GameObject:
   m_ObjectHideFlags: 0
@@ -69860,8 +69862,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 825212226}
         m_TargetAssemblyTypeName: PCRCaculator.CharacterManager, Assembly-CSharp
-        m_MethodName: OnToggleSwitched
-        m_Mode: 6
+        m_MethodName: OnToggleSelected
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

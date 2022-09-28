@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PCRCaculator.Calc;
+using PCRCaculator.Guild;
 using PCRCaculator.SQL;
 using TMPro;
 using UnityEngine;
@@ -61,7 +62,8 @@ namespace PCRCaculator
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
         private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
-
+        private Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
+        private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic;
 
         private CharacterManager characterManager;
         private AdventureManager battleManager;
@@ -120,7 +122,13 @@ namespace PCRCaculator
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
         public int MaxTPUpValue => playerSetting.maxTPUpValue;
+        public int RBRank => playerSetting.RBRank_max;
+        public int RBValue => playerSetting.RBValue1;
+        public int RBTpValue => playerSetting.RBTpValue;
         public bool LoadFinished { get; private set; }
+        public Dictionary<int, GuildEnemyData> GuildEnemyDatas { get => guildEnemyDatas;}
+        public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic;}
+
         private void Awake()
         {
             if (Instance == null)
@@ -175,43 +183,66 @@ namespace PCRCaculator
             execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
-            string jsonStr = LoadJsonDatas("Datas/AllData");
+            /*string jsonStr = LoadJsonDatas("Datas/AllData");
             yield return null;
             if (jsonStr != "")
             {
                 AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
                 //equipmentDic = allData.equipmentDic;
-                unitRarityDic = allData.unitRarityDic;
-                unitStoryEffectDic = allData.unitStoryEffectDic;
-                unitStoryDic = allData.unitStoryDic;
+                //unitRarityDic = allData.unitRarityDic;
+                //unitStoryEffectDic = allData.unitStoryEffectDic;
+                //unitStoryDic = allData.unitStoryDic;
                 //equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-                skillDataDic = allData.skillDataDic;
-                skillActionDic = allData.skillActionDic;
+                //skillDataDic = allData.skillDataDic;
+                //skillActionDic = allData.skillActionDic;
                 unitName_cn = allData.unitName_cn;
                 skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
-            yield return null;
-            Guild.GuildManager gm = Guild.GuildManager.Instance;
+            yield return null;*/
 
             SQLiteTool dbTool = SQLiteTool.OpenDB();
 
             equipmentDic = dbTool.GetEquipmentData();
             equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+            yield return null;
+            unitRarityDic = new Dictionary<int, UnitRarityData>();
+            yield return dbTool.GetUnitRarityData(unitRarityDic);
+            unitStoryDic = new Dictionary<int, UnitStoryData>();
+            unitStoryEffectDic = new Dictionary<int, List<int>>();
+            dbTool.GetUnitStoryData(unitStoryDic, unitStoryEffectDic);
+            yield return null;
 
+            skillDataDic = dbTool.GetSkillDataDic();
+            yield return null;
+            skillActionDic = dbTool.GetSkillActionDic();
+            yield return null;
 
             allUnitAttackPatternDic = dbTool.GetUnitAttackPatternDic();
+            yield return null;
 
-            gm.guildEnemyDatas = dbTool.GetGuildEnemyData();
+            guildEnemyDatas = dbTool.GetGuildEnemyData();
+            yield return null;
 
-            gm.EnemyMPartsDic = dbTool.GetMPartsData();
+            enemyMPartsDic = dbTool.GetMPartsData();
+            yield return null;
 
             //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
             Guild.GuildManager.EnemyDataDic = new Dictionary<int, EnemyData>();
             yield return dbTool.GetEnemyDataDic(Guild.GuildManager.EnemyDataDic);
 
+            uniqueEquipmentDataDic = dbTool.GetUEQData();
+
             dbTool.CloseDB();
 
+            dbTool = SQLiteTool.OpenDB(true);
+            unitName_cn = dbTool.GetUnitName_cn();
+            yield return null;
+            skillNameAndDescribe_cn = dbTool.GetSkillName_cn();
+            yield return null;
+            skillActionDescribe_cn = dbTool.GetSkillActionDes_cn();
+            yield return null;
+            dbTool.CloseDB();
             /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
 
@@ -247,9 +278,9 @@ namespace PCRCaculator
             //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
             yield return null;
-            string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
-            uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
-            yield return null;
+            //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
+            //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
+            //yield return null;
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);

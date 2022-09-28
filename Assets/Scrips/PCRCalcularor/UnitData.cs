@@ -218,11 +218,32 @@ namespace PCRCaculator
                         }
                     }
                 }
+                //计算RANK奖励
+                int RBRank = MainManager.Instance.RBRank;
+                if(a.rank == RBRank || a.rank == RBRank - 1)
+                {
+                    BaseData rbAdd = new BaseData();
+                    if (result.Atk > result.Magic_str)
+                    {
+                        rbAdd.Atk = MainManager.Instance.RBValue;
+                    }
+                    else
+                    {
+                        rbAdd.Magic_str = MainManager.Instance.RBValue;
+                    }
+                    rbAdd.Energy_recovery_rate = MainManager.Instance.RBTpValue;
+                    result += rbAdd;
+                }
+
 
                 result += BaseData.Round(d1);
                 return result;
             }
+#if UNITY_EDITOR
+            catch(NotImplementedException e)
+#else
             catch(Exception e)
+#endif
             {
                 MainManager.Instance.WindowConfigMessage("加载角色" + a.unitId + "时发生错误：" + e.Message, null);
                 return new BaseData();
@@ -1345,6 +1366,8 @@ namespace PCRCaculator
                 case 4:
                 case 5:
                 case 6:
+                case 7:
+                case 8:
                     return 5;
                 default: return 0;
             }
@@ -1443,8 +1466,10 @@ namespace PCRCaculator
             //string message = "";
             for (int k = 1; k < love; ++k)
             {
+                if (k >= addValues.Count+1)
+                    break;
                 //message += "第" +k + "轮：";
-                foreach (int[] values in addValues[k])
+                foreach (int[] values in addValues[k-1])
                 {
                     //message += "属性：" + values[0] + "+" + values[1]+",";
                     int val = values[1];
@@ -1756,10 +1781,10 @@ namespace PCRCaculator
     [Serializable]
     public class PlayerSetting
     {
-        public int playerLevel;
-        public int playerProcess;
+        public int playerLevel = 240;
+        public int playerProcess = 55;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 110;
+        public int maxUniqueEqLv = 240;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
@@ -1767,7 +1792,11 @@ namespace PCRCaculator
         public bool useDMMpath = false;
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
-        public int maxTPUpValue = -1;
+
+        public int maxTPUpValue = 250;//TP上限
+        public int RBRank_max = 24;//RB的最高rank
+        public int RBValue1 = 1400;//RB奖励值
+        public int RBTpValue = 10;//RB奖励TP值
 
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
 

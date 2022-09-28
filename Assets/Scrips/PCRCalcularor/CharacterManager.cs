@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,6 +23,8 @@ namespace PCRCaculator
 
         private List<GameObject> buttons = new List<GameObject>();
 
+        private bool isUpdated = false;
+        private bool isIniting = false;
         private void Awake()
         {
             Instance = this;
@@ -42,7 +45,7 @@ namespace PCRCaculator
             {
                 baseBack.SetActive(true);
                 detailBack.SetActive(false);
-                ReflashBasePage(0);
+                StartCoroutine(ReflashBasePage(0));
             }
             else if (i == 2)
             {
@@ -50,8 +53,34 @@ namespace PCRCaculator
                 detailBack.SetActive(true);
             }
         }
-        private void ReflashBasePage(int type)
+        /// <summary>
+        /// UI按钮调用
+        /// </summary>
+        /// <param name="type"></param>
+        public void OnToggleSelected()
         {
+            if (isUpdated||isIniting)
+                return;
+            isUpdated = true;
+            for(int i = 0; i < toggles.Count; i++)
+            {
+                if (toggles[i].isOn)
+                {
+                    StartCoroutine(ReflashBasePage(i));
+                    break;
+                }
+            }
+            StartCoroutine(WaitUpdated());
+        }
+        private IEnumerator WaitUpdated()
+        {
+            yield return null;
+            yield return null;
+            isUpdated = false;
+        }
+        private IEnumerator ReflashBasePage(int type)
+        {
+            isIniting = true;
             PositionType positionType = PositionType.frount;
             switch (type)
             {
@@ -83,12 +112,14 @@ namespace PCRCaculator
                         b.GetComponent<CharacterPageButton>().SetButton(id0);
                         buttons.Add(b);
                         count++;
-                        showUnitIDs.Add(id);                        
+                        showUnitIDs.Add(id);
+                        if (count % 5 == 0)
+                            yield return null;
                     }
                 }
             }
             parent.GetComponent<RectTransform>().sizeDelta = range * Mathf.CeilToInt(count/3.0f);
-
+            isIniting = false;
         }
         public void DetailButton(int id)
         {

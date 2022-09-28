@@ -16,6 +16,169 @@ namespace PCRCaculator.SQL
     {
         private static Dictionary<int,unit_skill_data> unit_Skill_DatasDic;
         private static Dictionary<int,List<unit_attack_pattern>> unit_Attack_PatternsDic;
+        public static IEnumerator GetUnitRarityData(this SQLiteTool data, Dictionary<int, UnitRarityData> dic)
+        {
+            //Dictionary<int, UnitRarityData> dic = new Dictionary<int, UnitRarityData>();
+            Dictionary<int, List<unit_rarity>> rarityDic = data.GetDatasDicList<unit_rarity>(a => a.unit_id,a=>a.unit_id<=499999);
+            yield return null;
+            if (unit_Skill_DatasDic == null)
+                unit_Skill_DatasDic = data.GetDatasDic<unit_skill_data>(a => a.unit_id);
+            if (unit_Attack_PatternsDic == null)            
+                unit_Attack_PatternsDic = data.GetDatasDicList<unit_attack_pattern>(a => a.unit_id);
+            yield return null;
+            Dictionary<int, List<unit_promotion>> equipDic = data.GetDatasDicList<unit_promotion>(a => a.unit_id);
+            yield return null;
+            Dictionary<int, List<unit_promotion_status>> rankStateDic = data.GetDatasDicList<unit_promotion_status>(a => a.unit_id);
+            yield return null;
+            Dictionary<int, unit_data> unitDic = data.GetDatasDic<unit_data>(a => a.unit_id);
+            yield return null;
+            int idx = 0;
+            foreach(var pair in rarityDic)
+            {
+                List<int[]> eq = new List<int[]>();
+                List<BaseData> datas1 = new List<BaseData>();
+                try
+                {
+                    foreach (var t2 in equipDic[pair.Key])
+                        eq.Add(t2.GetEquips());
+                    foreach (var t3 in rankStateDic[pair.Key])
+                        datas1.Add(t3.GetBaseData());
+                }
+                catch(KeyNotFoundException ex)
+                {
+                    Debug.LogError($"{pair.Key}的RANK数据丢失！");
+                }
+                UnitRankData rankData = new UnitRankData(eq, datas1);
+                UnitDetailData detailData;
+                try
+                {
+                    unit_data t4 = unitDic[pair.Key];
+                    detailData = new UnitDetailData(t4.unit_id,
+                        t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,
+                        t4.search_area_width, t4.atk_type, t4.normal_atk_cast_time, t4.guild_id);
+                }
+                catch(KeyNotFoundException ex)
+                {
+                    Debug.LogError($"{pair.Key}的DETAIL数据丢失！");
+                    detailData = new UnitDetailData();
+                }
+                UnitSkillData skillData = new UnitSkillData();
+                unit_skill_data sk = unit_Skill_DatasDic[pair.Key];
+                skillData.UB = sk.union_burst;
+                skillData.UB_ev = sk.union_burst_evolution;
+                skillData.skill_1 = sk.main_skill_1;
+                skillData.skill_1_ev = sk.main_skill_evolution_1;
+                skillData.skill_2 = sk.main_skill_2;
+                skillData.skill_2_ev = sk.main_skill_evolution_2;
+                skillData.skill_3 = sk.main_skill_3;
+                skillData.skill_4 = sk.main_skill_4;
+                skillData.skill_5 = sk.main_skill_5;
+                skillData.skill_6 = sk.main_skill_6;
+                skillData.skill_7 = sk.main_skill_7;
+                skillData.skill_8 = sk.main_skill_8;
+                skillData.skill_9 = sk.main_skill_9;
+                skillData.skill_10 = sk.main_skill_10;
+                skillData.EXskill = sk.ex_skill_1;
+                skillData.EXskill_ev = sk.ex_skill_evolution_1;
+                skillData.EXskill_2 = sk.ex_skill_2;
+                skillData.EXskill_ev2 = sk.ex_skill_evolution_2;
+                skillData.EXskill_3 = sk.ex_skill_3;
+                skillData.EXskill_ev3 = sk.ex_skill_evolution_3;
+                skillData.EXskill_4 = sk.ex_skill_4;
+                skillData.EXskill_ev4 = sk.ex_skill_evolution_4;
+                skillData.EXskill_5 = sk.ex_skill_5;
+                skillData.EXskill_ev5 = sk.ex_skill_evolution_5;
+                skillData.SPskill_1 = sk.sp_skill_1;
+                skillData.SPskill_1_ev = sk.sp_skill_evolution_1;
+                skillData.SPskill_2 = sk.sp_skill_2;
+                skillData.SPskill_2_ev = sk.sp_skill_evolution_2;
+                skillData.SPskill_3 = sk.sp_skill_3;
+                skillData.SPskill_4 = sk.sp_skill_4;
+                skillData.SPskill_5 = sk.sp_skill_5;
+                skillData.SPUB = sk.sp_union_burst;
+                unit_attack_pattern pattern = unit_Attack_PatternsDic[pair.Key][0];
+                skillData.loopStart = pattern.loop_start;
+                skillData.loopEnd = pattern.loop_end;
+                skillData.atkPatterns = pattern.GetAllPatterns().ToArray();
+                List<BaseData> d1 = new List<BaseData>();
+                List<BaseData> d2 = new List<BaseData>();
+                foreach(var t6 in pair.Value)
+                {
+                    d1.Add(t6.GetBaseData());
+                    d2.Add(t6.GetBaseDataGrowth());
+                }
+                UnitRarityData rarityData = new UnitRarityData(pair.Key, d1, d2, rankData, detailData, skillData);
+                dic.Add(pair.Key, rarityData);
+                if (idx % 10 == 0)
+                    yield return null;
+                idx++;
+            }
+
+        }
+        public static void GetUnitStoryData(this SQLiteTool data, Dictionary<int, UnitStoryData> unitStoryDic, Dictionary<int, List<int>> unitStoryEffectDic)
+        {
+            Dictionary<int, List<List<int[]>>> add_vals = new Dictionary<int, List<List<int[]>>>();
+            Dictionary<int, List<int>> ef_id = new Dictionary<int, List<int>>();
+            var list = data.GetDatas<chara_story_status>();
+
+            foreach(var dd in list)
+            {
+                int storyid = dd.story_id;
+                int unitid = Mathf.FloorToInt(storyid / 1000) * 100 + 1;
+                if (!add_vals.ContainsKey(unitid))
+                {
+                    add_vals.Add(unitid, new List<List<int[]>>());
+                    ef_id[unitid] = dd.GetCharIdList();                   
+                }
+                List<int[]> li = dd.GetStatesValueList();
+                add_vals[unitid].Add(li);
+            }
+            foreach (int id in add_vals.Keys)
+            {
+                UnitStoryData unitStory = new UnitStoryData(id, add_vals[id].Count + 1, ef_id[id], add_vals[id]);
+                unitStoryDic[id] = unitStory;
+                if (!unitStoryEffectDic.ContainsKey(id))
+                {
+                    unitStoryEffectDic.Add(id, new List<int>());
+                }
+                foreach (int efid in unitStory.effectCharacters)
+                {
+                    if (!unitStoryEffectDic[id].Contains(efid))
+                    {
+                        unitStoryEffectDic[id].Add(efid);
+                    }
+
+                }
+            }
+        }
+        
+        public static Dictionary<int, SkillData> GetSkillDataDic(this SQLiteTool data)
+        {
+            Dictionary<int, SkillData> dic = new Dictionary<int, SkillData>(); 
+            var list = data.GetDatas<skill_data>();
+            foreach(var dd in list)
+            {
+                SkillData sk = new SkillData(dd.skill_id, dd.name, dd.skill_type,
+                    dd.skill_area_width, dd.skill_cast_time, dd.GetAllActionIDs().ToArray(),
+                    dd.GetAllDependActionIDs().ToArray(), dd.description, dd.icon_type);
+                dic.Add(sk.skillid, sk);
+            }
+            return dic;
+        }
+        public static Dictionary<int, SkillAction> GetSkillActionDic(this SQLiteTool data)
+        {
+            Dictionary<int, SkillAction> dic = new Dictionary<int, SkillAction>();
+            var list = data.GetDatas<skill_action>();
+            foreach (var dd in list)
+            {
+                SkillAction action = new SkillAction(dd.action_id, dd.class_id,
+                    dd.action_type, dd.GetDE(), dd.GetValues(), dd.target_assignment,
+                    dd.target_area, dd.target_range, dd.target_type, dd.target_number, dd.target_count,
+                    dd.description, dd.level_up_disp);
+                dic.Add(action.actionid, action);
+            }
+            return dic;
+        }
         public static Dictionary<int, UnitAttackPattern> GetUnitAttackPatternDic(this SQLiteTool data)
         {
             Dictionary<int, UnitAttackPattern> dic = new Dictionary<int, UnitAttackPattern>();
@@ -86,8 +249,8 @@ namespace PCRCaculator.SQL
                 unit_Skill_DatasDic = data.GetDatasDic<unit_skill_data>(a=>a.unit_id);
             if (unit_Attack_PatternsDic == null)
             {
-                unit_Attack_PatternsDic = new Dictionary<int, List<unit_attack_pattern>>();
-                var  unit_Attack_Patterns = data.GetDatas<unit_attack_pattern>();
+                unit_Attack_PatternsDic = data.GetDatasDicList<unit_attack_pattern>(a => a.unit_id);
+                /*var  unit_Attack_Patterns = data.GetDatas<unit_attack_pattern>();
                 foreach(var pa in unit_Attack_Patterns)
                 {
                     if (unit_Attack_PatternsDic.TryGetValue(pa.unit_id, out var list1))
@@ -96,7 +259,7 @@ namespace PCRCaculator.SQL
                     }
                     else
                         unit_Attack_PatternsDic[pa.unit_id] = new List<unit_attack_pattern> { pa };
-                }
+                }*/
             }
             int idx = 0;
             foreach(var dd in list)
@@ -180,6 +343,58 @@ namespace PCRCaculator.SQL
                 equipment.data = dd.GetBaseData();
                 equipment.data_rate = dic2.ContainsKey(dd.equipment_id) ? dic2[dd.equipment_id].GetBaseData() : new BaseData();
                 dic.Add(dd.equipment_id, equipment);
+            }
+            return dic;
+        }
+        public static Dictionary<int, UniqueEquipmentData> GetUEQData(this SQLiteTool data)
+        {
+            Dictionary<int, UniqueEquipmentData> dic = new Dictionary<int, UniqueEquipmentData>();
+            var list = data.GetDatas<unique_equipment_data>();
+            foreach(var dd in list)
+            {
+                UniqueEquipmentData unique = new UniqueEquipmentData();
+                unique.equipment_id = dd.equipment_id;
+                unique.baseValue = dd.GetBaseData();
+                int unitid = (unique.equipment_id - 130001) * 10 + 100001;
+                dic[unitid] = unique;
+            }
+            var list2 = data.GetDatas<unique_equipment_enhance_rate>();
+            foreach(var dd in list2)
+            {
+                int equipment_id = dd.equipment_id;
+                int unitid = (equipment_id - 130001) * 10 + 100001;
+                dic[unitid].enhanceValue = dd.GetBaseData();
+            }
+            return dic;
+        }
+
+        public static Dictionary<int, string> GetUnitName_cn(this SQLiteTool data)
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            var list = data.GetDatas<unit_data>();
+            foreach(var dd in list)
+            {
+                dic.Add(dd.unit_id, dd.unit_name);
+            }
+            return dic;
+        }
+        public static Dictionary<int, string[]> GetSkillName_cn(this SQLiteTool data)
+        {
+            Dictionary<int, string[]> dic = new Dictionary<int, string[]>();
+            var list = data.GetDatas<skill_data>();
+            foreach (var dd in list)
+            {
+                dic.Add(dd.skill_id, new string[2] { dd.name,dd.description});
+            }
+            return dic;
+        }
+        public static Dictionary<int, string> GetSkillActionDes_cn(this SQLiteTool data)
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            var list = data.GetDatas<skill_action>();
+            foreach (var dd in list)
+            {
+                dic.Add(dd.action_id, dd.description);
             }
             return dic;
         }
@@ -426,17 +641,21 @@ namespace PCRCaculator.SQL
         public int icon_type { get; set; }
         public List<int> GetAllActionIDs()
         {
-            List<int> ids = new List<int>();
-            PropertyInfo[] pArray = typeof(skill_data).GetProperties();
-            foreach (var p in pArray)
+            List<int> ids = new List<int>
             {
-                if (p.PropertyType == typeof(int) && p.Name.Contains("action_"))
-                {
-                    int value = (int)(p.GetValue(this) ?? 0);
-                    if (value > 0)
-                        ids.Add(value);
-                }
-            }
+                action_1,action_2,action_3,action_4,
+                action_5,action_6,action_7
+            };           
+
+            return ids;
+        }
+        public List<int> GetAllDependActionIDs()
+        {
+            List<int> ids = new List<int>
+            {
+                depend_action_1,depend_action_2,depend_action_3,depend_action_4,
+                depend_action_5,depend_action_6,depend_action_7
+            };
 
             return ids;
         }
@@ -466,6 +685,20 @@ namespace PCRCaculator.SQL
         public string description { get; set; }
         public string level_up_disp { get; set; }
 
+        public int[] GetDE() => new int[3] { action_detail_1, action_detail_2, action_detail_3 };
+        public double[] GetValues()
+        {
+            return new double[7]
+            {
+                action_value_1,
+                action_value_2,
+                action_value_3,
+                action_value_4,
+                action_value_5,
+                action_value_6,
+                action_value_7
+            };
+        }
     }
     public class equipment_data
     {
@@ -540,5 +773,278 @@ namespace PCRCaculator.SQL
             energy_recovery_rate, energy_reduce_rate, accuracy);
         }
     }
+    public class unit_rarity
+    {
+        [PrimaryKey]
+        public int unit_id { get; set; }
+        [PrimaryKey]
+        public int rarity { get; set; }
+        public float hp { get; set; }
+        public float atk { get; set; }
+        public float magic_str { get; set; }
+        public float def { get; set; }
+        public float magic_def { get; set; }
+        public float physical_critical { get; set; }
+        public float magic_critical { get; set; }
+        public float wave_hp_recovery { get; set; }
+        public float wave_energy_recovery { get; set; }
+        public float dodge { get; set; }
+        public float physical_penetrate { get; set; }
+        public float magic_penetrate { get; set; }
+        public float life_steal { get; set; }
+        public float hp_recovery_rate { get; set; }
+        public float energy_recovery_rate { get; set; }
+        public float energy_reduce_rate { get; set; }
+        public float accuracy { get; set; }
+        public float hp_growth { get; set; }
+        public float atk_growth { get; set; }
+        public float magic_str_growth { get; set; }
+        public float def_growth { get; set; }
+        public float magic_def_growth { get; set; }
+        public float physical_critical_growth { get; set; }
+        public float magic_critical_growth { get; set; }
+        public float wave_hp_recovery_growth { get; set; }
+        public float wave_energy_recovery_growth { get; set; }
+        public float dodge_growth { get; set; }
+        public float physical_penetrate_growth { get; set; }
+        public float magic_penetrate_growth { get; set; }
+        public float life_steal_growth { get; set; }
+        public float hp_recovery_rate_growth { get; set; }
+        public float energy_recovery_rate_growth { get; set; }
+        public float energy_reduce_rate_growth { get; set; }
+        public float accuracy_growth { get; set; }
+        public int unit_material_id { get; set; }
+        public int consume_num { get; set; }
+        public int consume_gold { get; set; }
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
+            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
+            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
+            energy_recovery_rate, energy_reduce_rate, accuracy);
+        }
+        public BaseData GetBaseDataGrowth()
+        {
+            return new BaseData(hp_growth, atk_growth, magic_str_growth, def_growth, magic_def_growth, physical_critical_growth,//0-5
+            magic_critical_growth, wave_hp_recovery_growth, wave_energy_recovery_growth, dodge_growth,//6-9
+            physical_penetrate_growth, magic_penetrate_growth, life_steal_growth, hp_recovery_rate_growth,//10-13
+            energy_recovery_rate_growth, energy_reduce_rate_growth, accuracy_growth);
+        }
+    }
+    public class unit_promotion
+    {
+        [PrimaryKey]
+        public int unit_id { get; set; }
+        [PrimaryKey]
+        public int promotion_level { get; set; }
+        public int equip_slot_1 { get; set; }
+        public int equip_slot_2 { get; set; }
+        public int equip_slot_3 { get; set; }
+        public int equip_slot_4 { get; set; }
+        public int equip_slot_5 { get; set; }
+        public int equip_slot_6 { get; set; }
+
+        public int[] GetEquips()
+        {
+            return new int[6]
+            {
+                equip_slot_1 , equip_slot_2 , equip_slot_3,
+                equip_slot_4,equip_slot_5,equip_slot_6
+            };
+        }
+
+    }
+    public class unit_promotion_status
+    {
+        [PrimaryKey]
+        public int unit_id { get; set; }
+        [PrimaryKey]
+        public int promotion_level { get; set; }
+        public float hp { get; set; }
+        public float atk { get; set; }
+        public float magic_str { get; set; }
+        public float def { get; set; }
+        public float magic_def { get; set; }
+        public float physical_critical { get; set; }
+        public float magic_critical { get; set; }
+        public float wave_hp_recovery { get; set; }
+        public float wave_energy_recovery { get; set; }
+        public float dodge { get; set; }
+        public float physical_penetrate { get; set; }
+        public float magic_penetrate { get; set; }
+        public float life_steal { get; set; }
+        public float hp_recovery_rate { get; set; }
+        public float energy_recovery_rate { get; set; }
+        public float energy_reduce_rate { get; set; }
+        public float accuracy { get; set; }
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
+            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
+            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
+            energy_recovery_rate, energy_reduce_rate, accuracy);
+        }
+
+    }
+    public class unit_data
+    {
+        [PrimaryKey]
+        public int unit_id { get; set; }
+        public string unit_name { get; set; }
+        public string kana { get; set; }
+        public int prefab_id { get; set; }
+        public int prefab_id_battle { get; set; }
+        public int is_limited { get; set; }
+        public int rarity { get; set; }
+        public int motion_type { get; set; }
+        public int se_type { get; set; }
+        public int move_speed { get; set; }
+        public int search_area_width { get; set; }
+        public int atk_type { get; set; }
+        public float normal_atk_cast_time { get; set; }
+        public int cutin_1 { get; set; }
+        public int cutin_2 { get; set; }
+        public int cutin1_star6 { get; set; }
+        public int cutin2_star6 { get; set; }
+        public int guild_id { get; set; }
+        public int exskill_display { get; set; }
+        public string comment { get; set; }
+        public int only_disp_owned { get; set; }
+        public string start_time { get; set; }
+        public string end_time { get; set; }
+        public int original_unit_id { get; set; }
+       
+
+
+    }
+    public class chara_story_status
+    {
+        [PrimaryKey]
+        public int story_id { get; set; }
+        public string unlock_story_name { get; set; }
+        public int status_type_1 { get; set; }
+        public int status_rate_1 { get; set; }
+        public int status_type_2 { get; set; }
+        public int status_rate_2 { get; set; }
+        public int status_type_3 { get; set; }
+        public int status_rate_3 { get; set; }
+        public int status_type_4 { get; set; }
+        public int status_rate_4 { get; set; }
+        public int status_type_5 { get; set; }
+        public int status_rate_5 { get; set; }
+        public int chara_id_1 { get; set; }
+        public int chara_id_2 { get; set; }
+        public int chara_id_3 { get; set; }
+        public int chara_id_4 { get; set; }
+        public int chara_id_5 { get; set; }
+        public int chara_id_6 { get; set; }
+        public int chara_id_7 { get; set; }
+        public int chara_id_8 { get; set; }
+        public int chara_id_9 { get; set; }
+        public int chara_id_10 { get; set; }
+
+        public List<int[]> GetStatesValueList()
+        {
+            return new List<int[]>
+            {
+                new int[2]{ status_type_1 , status_rate_1 },
+                new int[2]{ status_type_2 , status_rate_2 },
+                new int[2]{ status_type_3 , status_rate_3 },
+                new int[2]{ status_type_4 , status_rate_4 },
+                new int[2]{ status_type_5 , status_rate_5 }
+            };
+        }
+        public List<int> GetCharIdList()
+        {
+            List<int> ids = new List<int>();
+            PropertyInfo[] pArray = typeof(chara_story_status).GetProperties();
+            foreach (var p in pArray)
+            {
+                if (p.PropertyType == typeof(int) && p.Name.Contains("chara_id_"))
+                {
+                    int value = (int)(p.GetValue(this) ?? 0);
+                    if (value > 0)
+                    {
+                        int unitid = value * 100 + 1;
+                        ids.Add(unitid);
+
+                    }
+                }
+            }
+
+            return ids;
+        }
+    }
+    public class unique_equipment_data
+    {
+        [PrimaryKey]
+        public int equipment_id { get; set; }
+        public string equipment_name { get; set; }
+        public string description { get; set; }
+        public int promotion_level { get; set; }
+        public int craft_flg { get; set; }
+        public int equipment_enhance_point { get; set; }
+        public int sale_price { get; set; }
+        public int require_level { get; set; }
+        public float hp { get; set; }
+        public float atk { get; set; }
+        public float magic_str { get; set; }
+        public float def { get; set; }
+        public float magic_def { get; set; }
+        public float physical_critical { get; set; }
+        public float magic_critical { get; set; }
+        public float wave_hp_recovery { get; set; }
+        public float wave_energy_recovery { get; set; }
+        public float dodge { get; set; }
+        public float physical_penetrate { get; set; }
+        public float magic_penetrate { get; set; }
+        public float life_steal { get; set; }
+        public float hp_recovery_rate { get; set; }
+        public float energy_recovery_rate { get; set; }
+        public float energy_reduce_rate { get; set; }
+        public float accuracy { get; set; }
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
+            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
+            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
+            energy_recovery_rate, energy_reduce_rate, accuracy);
+        }
+
+    }
+    public class unique_equipment_enhance_rate
+    {
+        [PrimaryKey]
+        public int equipment_id { get; set; }
+        public string equipment_name { get; set; }
+        public string description { get; set; }
+        public int promotion_level { get; set; }
+        public float hp { get; set; }
+        public float atk { get; set; }
+        public float magic_str { get; set; }
+        public float def { get; set; }
+        public float magic_def { get; set; }
+        public float physical_critical { get; set; }
+        public float magic_critical { get; set; }
+        public float wave_hp_recovery { get; set; }
+        public float wave_energy_recovery { get; set; }
+        public float dodge { get; set; }
+        public float physical_penetrate { get; set; }
+        public float magic_penetrate { get; set; }
+        public float life_steal { get; set; }
+        public float hp_recovery_rate { get; set; }
+        public float energy_recovery_rate { get; set; }
+        public float energy_reduce_rate { get; set; }
+        public float accuracy { get; set; }
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
+            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
+            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
+            energy_recovery_rate, energy_reduce_rate, accuracy);
+        }
+
+    }
+
 }
 

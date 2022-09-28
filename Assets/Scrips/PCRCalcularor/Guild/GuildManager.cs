@@ -59,8 +59,8 @@ namespace PCRCaculator.Guild
         //public List<Sprite> bossSprites;
         //public List<string> bossNames;
         //public List<int> enemy_ids;
-        public Dictionary<int, GuildEnemyData> guildEnemyDatas;
-        public List<int> specialEnemyDatas;
+        public Dictionary<int, GuildEnemyData> guildEnemyDatas => MainManager.Instance.GuildEnemyDatas;
+        //public List<int> specialEnemyDatas;
 
         //public GuildExecTimeSetting GuildExecTimeSetting;
         public GuildRandomManager RandomManager;
@@ -70,7 +70,7 @@ namespace PCRCaculator.Guild
 
         //private List<AddedPlayerData> addedPlayerDatas;
         private static Dictionary<int, EnemyData> enemyDataDic;
-        private Dictionary<int, MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, MasterEnemyMParts.EnemyMParts>();
+        //private Dictionary<int, MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, MasterEnemyMParts.EnemyMParts>();
         public GuildSettingData SettingData => StaticsettingData;
 
         private static GuildSettingData staticsettingData;
@@ -97,11 +97,11 @@ namespace PCRCaculator.Guild
         {
             get
             {
-                if (enemyDataDic == null)
+                /*if (enemyDataDic == null)
                 {
                     string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
                     enemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
-                }
+                }*/
                 return enemyDataDic;
             }
             set
@@ -111,10 +111,7 @@ namespace PCRCaculator.Guild
         }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> EnemyMPartsDic
         {
-            get => enemyMPartsDic; set
-            {
-                enemyMPartsDic = value;
-            }
+            get => MainManager.Instance.EnemyMPartsDic;
         }
         public bool isGuildBoss { get => toggles_ChooseType[0].isOn; }
 
@@ -409,7 +406,7 @@ namespace PCRCaculator.Guild
             GuildBattleData battleData = new GuildBattleData();
             battleData.players = SettingData.GetCurrentPlayerData();
             battleData.enemyData = enemyData;
-            if(enemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+            if(EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
             {
                 battleData.mParts = value;
                 battleData.MPartsDataDic = new Dictionary<int, EnemyData>();
@@ -753,6 +750,11 @@ namespace PCRCaculator.Guild
         }
         public void LoadDataFromExcel()
         {
+            if(Application.platform == RuntimePlatform.Android)
+            {
+                AndroidTool.OpenAndroidFileBrower();
+                return;
+            }
             //MainManager.Instance.WindowConfigMessage("在做了", null, null);
             if (ExcelHelper.ExcelHelper.ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,()=> { LoadDataFromexcel_failed(); }))
             {
@@ -1008,6 +1010,38 @@ namespace PCRCaculator.Guild
             }
 
             RandomManager.RandomData.UseFixedRandomSeed = seed;
+        }
+
+        public void UpdateButton()
+        {
+            MainManager.Instance.WindowConfigMessage($"该功能暂时不可用！", null);
+            return;
+#if PLATFORM_ANDROID
+            try
+            {
+                string path = Application.persistentDataPath + "/PCRCalculator6.08.apk";
+                if (System.IO.File.Exists(path))
+                {
+                    AndroidTool.UpdateTotalAPK(path);
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.LogError($"{ex.Message}\n{ex.StackTrace}");
+                MainManager.Instance.WindowConfigMessage($"更新失败！{ex.Message}", null);
+            }
+#else
+            MainManager.Instance.WindowConfigMessage($"请手动下载新版本", null);
+
+#endif
+        }
+        //由java调用
+        public void ImportExcelFileByAndroidNative(string filePath)
+        {
+            if (ExcelHelper.ExcelHelper.ReadExcelTimeLineData(out GuildTimelineData guildTimelineData, () => { LoadDataFromexcel_failed(); },filePath))
+            {
+                MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); });
+            }
         }
 
         public static void SaveSettingData(GuildSettingData settingData)

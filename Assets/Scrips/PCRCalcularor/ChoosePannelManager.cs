@@ -489,7 +489,7 @@ namespace PCRCaculator
                         }
                         b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
                         b.GetComponent<CharacterPageButton>().SetButton(id);
-                        togglePerferbs.Add(id0, b.GetComponent<Toggle>());
+                        togglePerferbs[id0] = b.GetComponent<Toggle>();
                         count++;
                         //showUnitIDs.Add(id);
                         if (count % 3 == 0)

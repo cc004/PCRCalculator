@@ -872,21 +872,39 @@ namespace PCRCaculator.Guild
                         }
                     }
                 }
-                if (File.Exists(fileName)) File.Delete(fileName);
-                using (var sw = new StreamWriter(File.OpenWrite(fileName)))
+                if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.WindowsEditor)
                 {
+                    string str = "";
                     foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                     {
                         var real = dname2.ContainsKey(name)
-                            ? $"({(float) dname2[name] / GuildManager.StaticsettingData.n2:P1})"
+                            ? $"({(float)dname2[name] / GuildManager.StaticsettingData.n2:P1})"
                             : string.Empty;
-                        sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
+                        str += $"   {name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real + "\n";
                         if (!dskill.ContainsKey(name)) continue;
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
-                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}");
+                            str += $"   \t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}" + "\n";
                     }
+                    BaseBackManager.Instance.ShowText(str);
                 }
-                MainManager.Instance.WindowMessage("成功！");
+                else
+                {
+                    if (File.Exists(fileName)) File.Delete(fileName);
+                    using (var sw = new StreamWriter(File.OpenWrite(fileName)))
+                    {
+                        foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
+                        {
+                            var real = dname2.ContainsKey(name)
+                                ? $"({(float)dname2[name] / GuildManager.StaticsettingData.n2:P1})"
+                                : string.Empty;
+                            sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
+                            if (!dskill.ContainsKey(name)) continue;
+                            foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
+                                sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}");
+                        }
+                    }
+                    MainManager.Instance.WindowMessage("成功！");
+                }
             }
             catch (Exception e)
             {
@@ -896,6 +914,11 @@ namespace PCRCaculator.Guild
 
         public void SaveFileToTemplate()
         {
+            if(Application.platform == RuntimePlatform.Android)
+            {
+                MainManager.Instance.WindowConfigMessage("Android端暂时不支持！",null);
+                return;
+            }
             try
             {
                 SaveFileToTemplateInternal();
