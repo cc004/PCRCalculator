@@ -104,8 +104,10 @@ namespace Elements
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
                 {
                     CriticalData criticalData = new CriticalData();
+                    var data = new RandomData(_source, _target.Owner, ActionId, 1, damageData.CriticalRate,
+                        damageData.CriticalDamageRate);
                     double num2 = BattleManager.Random(0.0f, 1f,
-                        new RandomData(_source, _target.Owner, ActionId, 1, damageData.CriticalRate, damageData.CriticalDamageRate));
+                        data);
 
 
                     if (MyGameCtrl.Instance.tempData.isGuildBattle && (MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_player && _target.Owner.IsOther || MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_enemy && !_target.Owner.IsOther))
@@ -121,15 +123,22 @@ namespace Elements
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
                     double criticalRate = damageData.CriticalRate;
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
-                    if ((num2 <= criticalRate && damageData.CriticalDamageRate != 0.0 && damageData.CriticalRateForLogBarrier != 0f) || _valueDictionary[eValueNumber.VALUE_5] == (float)(index + 1))
+                    if (_valueDictionary[eValueNumber.VALUE_5] == (float) (index + 1))
                     {
+                        criticalData.critVar = 1f;
                         criticalData.IsCritical = true;
-                        criticalData.ExpectedDamage *= 1f + FloatWithEx.Binomial(damageData.CriticalRate, true) * (2f * damageData.CriticalDamageRate - 1);
+                    }
+                    else if (damageData.CriticalDamageRate != 0.0 && damageData.CriticalRateForLogBarrier != 0f)
+                    {
+                        if (num2 <= criticalRate)
+                            criticalData.IsCritical = true;
+                        criticalData.critVar = FloatWithEx.Binomial(damageData.CriticalRate, criticalData.IsCritical,
+                            $"rnd:{data.id}:{(int) (criticalRate * 1000)}");
                     }
                     else
-                    {
-                        criticalData.ExpectedDamage *= 1f + FloatWithEx.Binomial(damageData.CriticalRate, false) * (2f * damageData.CriticalDamageRate - 1);
-                    }
+                        criticalData.critVar = 0f;
+
+                    criticalData.ExpectedDamage *= 1f + criticalData.critVar * (2f * damageData.CriticalDamageRate - 1);
 
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage);
                     if (!damageData.IgnoreDef)
@@ -140,14 +149,14 @@ namespace Elements
                                 var defZero = (float)damageData.Target.GetDefZero();
                                 var num3 = Mathf.Max(0.0f, defZero - damageData.DefPenetrate);
                                 criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f))).Floor();
-                                criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
+                                //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
 
                                 break;
                             case DamageData.eDamageType.MGC:
                                 float magicDefZero = damageData.Target.GetMagicDefZero();
                                 float num4 = Mathf.Max(0.0f, magicDefZero - damageData.DefPenetrate);
                                 criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
-                                criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
+                                //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
 
                                 break;
                         }
@@ -159,6 +168,7 @@ namespace Elements
                 CriticalDataDictionary.Add(_target, criticalDataList);
                 TotalDamageDictionary.Add(_target, num1);
             }
+            damageData.critVar = CriticalDataDictionary[_target][_num].critVar;
             damageData.IsLogBarrierCritical = CriticalDataDictionary[_target][_num].IsCritical;
             damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage;
             damageData.TotalDamageForLogBarrier = TotalDamageDictionary[_target];

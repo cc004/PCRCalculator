@@ -7,9 +7,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Cute;
 using Elements.Battle;
 using PCRCaculator.Guild;
+using UnityEngine;
 
 namespace Elements
 {
@@ -224,6 +226,11 @@ namespace Elements
                     parts.BreakEffectList = _skill.SkillEffects;
                     _source.OnUpdateWhenIdle += _limitTime =>
                     {
+                        if (BattleHeaderController.CurrentFrameCount == 1827 && parts.Index == 3)
+                        {
+                            File.WriteAllText("d:\\exp.txt", parts.BreakPoint.ToExpression(114514));
+                            Debug.LogError($"id={parts.Index},point={parts.BreakPoint}");
+                        }
                         var point = parts.BreakPoint;
                         if (parts.BreakPoint != 0 || parts.IsBreak ||
                             (judgeSilenceOrToad(_source) || battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) ||
@@ -240,6 +247,7 @@ namespace Elements
                             {
                                 unit = _source.UnitNameEx,
                                 predict = hash => point.Emulate(hash) <= 0f,
+                                exp = hash => $"{point.ToExpression(hash)} <= 0",
                                 description = $"({BattleHeaderController.CurrentFrameCount}){_source.UnitNameEx}的第{parts.Index}个部位提前break",
                                 isProb = true
                             });
@@ -249,6 +257,7 @@ namespace Elements
                         {
                             unit = _source.UnitNameEx,
                             predict = hash => point.Emulate(hash) > 0f,
+                            exp = hash => $"{point.ToExpression(hash)} > 0",
                             description = $"({BattleHeaderController.CurrentFrameCount}){_source.UnitNameEx}的第{parts.Index}个部位未break",
                             isProb = true
                         });

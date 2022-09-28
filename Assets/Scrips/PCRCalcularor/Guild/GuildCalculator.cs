@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using Elements;
 using Elements.Battle;
 using ExcelDataReader;
@@ -25,6 +26,7 @@ namespace PCRCaculator.Guild
         public int frame = BattleHeaderController.CurrentFrameCount;
         public string description;
         public Func<int, bool> predict;
+        public Func<int, string> exp;
         public bool enabled = true;
         public bool isProb = false;
     }
@@ -338,7 +340,6 @@ namespace PCRCaculator.Guild
         }
         public void AppendCallRandom(RandomData data)
         {
-            data.id = AllRandomDataList.Count;
             data.frame = BattleHeaderController.CurrentFrameCount;
             data.currentSeed = Random.seed;
             AllRandomDataList.Add(data);
@@ -780,6 +781,7 @@ namespace PCRCaculator.Guild
                 var dname2 = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
                 var dmg = new List<float>();
+                var probs = new Dictionary<string, ProbEvent>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
                 {
                     dname2.Add(name, 0);
@@ -794,6 +796,7 @@ namespace PCRCaculator.Guild
                     if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());
                     dskill[skill.unit].Add(skill.description, 0);
                 }
+                
                 var sname = new HashSet<string>();
                 var sname2 = new HashSet<string>();
                 var sskill = new HashSet<(string, string)>();
@@ -827,6 +830,7 @@ namespace PCRCaculator.Guild
                                 }
                                 sname.Add(evt.unit);
                                 sskill.Add((evt.unit, evt.description));
+                                probs[evt.description] = evt;
                             }
                         }
                     }
@@ -883,7 +887,21 @@ namespace PCRCaculator.Guild
                         sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
                         if (!dskill.ContainsKey(name)) continue;
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
-                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}");
+                        {
+                            var prob = probs[pair.Key];
+                            var sb = new StringBuilder();
+                            var exp = string.Empty;
+                            if (prob.exp != null && ExcelHelper.ExcelHelper.AsmExportEnabled)
+                            {
+                                exp = prob.exp(rnd.Next());
+                            }
+                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}{exp}");
+                        }
+                    }
+
+                    if (ExcelHelper.ExcelHelper.AsmExportEnabled)
+                    {
+                        sw.WriteLine(totalDamageExcept.ToExpression(rnd.Next()));
                     }
                 }
                 MainManager.Instance.WindowMessage("成功！");

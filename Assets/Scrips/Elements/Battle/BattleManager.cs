@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Cute;
 
@@ -15,6 +16,7 @@ using PCRCaculator;
 using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.Video;
+using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
 //using Elements.Data;
 //using Elements.Uek;
@@ -25,6 +27,7 @@ namespace Elements.Battle
 {
     public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController, BattleLogIntreface
     {
+        public static int randomCounter;
         public AutoubManager ubmanager = new AutoubManager();
         public static BattleManager Instance;
         public const int POST_RESULT_TYPE_LOSE = 0;
@@ -892,8 +895,9 @@ namespace Elements.Battle
         {
             if (Max == Min) return Min;
             int result = UnityEngine.Random.Range(Min, Max);
-            //System.IO.File.AppendAllText("D:\\rnd.log", $"({BattleHeaderController.CurrentFrameCount})rnd is {result}, stack:\n{new StackTrace()}\n");
+            System.IO.File.AppendAllText("D:\\rnd.log", $"({BattleHeaderController.CurrentFrameCount})rnd is {result}, stack:\n{new StackTrace()}\n");
             data.randomResult = result;
+            data.id = randomCounter++;
             OnCallRandom?.Invoke(data);
             return result;
         }
@@ -3475,6 +3479,71 @@ namespace Elements.Battle
                 UnityRandom.InitState(seed);
                 gameCtrl.CurrentSeedForSave = seed;
             }
+
+            /*
+            // start calc exp
+
+            var x = (uint)gameCtrl.CurrentSeedForSave;
+            var y = 1812433253 * x + 1;
+            var z = 1812433253 * y + 1;
+            var w = 1812433253 * z + 1;
+            var rlist = new List<int>();
+
+            var splits = File.ReadAllText("exp.txt").Split('|');
+            var n = splits.Length;
+            var value = new float[n];
+            for (var i = 0; i < n; ++i)
+            {
+                var exp = splits[i].Split(',');
+                if (exp[0] == "pure") value[i] = float.Parse(exp[1]);
+                else if (exp[0] == "add") value[i] = value[int.Parse(exp[1])] + value[int.Parse(exp[2])];
+                else if (exp[0] == "sub") value[i] = value[int.Parse(exp[1])] - value[int.Parse(exp[2])];
+                else if (exp[0] == "mul") value[i] = value[int.Parse(exp[1])] * value[int.Parse(exp[2])];
+                else if (exp[0] == "div") value[i] = value[int.Parse(exp[1])] / value[int.Parse(exp[2])];
+                else if (exp[0] == "floor") value[i] = Mathf.FloorToInt(value[int.Parse(exp[1])]);
+                else if (exp[0] == "ceil") value[i] = Mathf.CeilToInt(value[int.Parse(exp[1])]);
+                else if (exp[0] == "max")
+                {
+                    var a = float.Parse(exp[1]);
+                    var b = value[int.Parse(exp[2])];
+                    value[i] = Mathf.Max(a, b);
+                }
+                else if (exp[0] == "min")
+                {
+                    var a = float.Parse(exp[1]);
+                    var b = value[int.Parse(exp[2])];
+                    value[i] = Mathf.Min(a, b);
+                }
+                else if (exp[0] == "barrier")
+                {
+                    var main = float.Parse(exp[1]);
+                    var sub = float.Parse(exp[2]);
+                    var total = value[int.Parse(exp[3])];
+                    if (total > sub)
+                        value[i] = (Mathf.Log(((total - sub) / main + 1.0f)) * main + sub);
+                    else value[i] = total;
+                }
+                else if (exp[0] == "rnd")
+                {
+                    var id = int.Parse(exp[1]);
+                    var bound = int.Parse(exp[2]);
+                    while (rlist.Count <= id)
+                    {
+                        uint t = x, s = w;
+                        x = y;
+                        y = z;
+                        z = w;
+                        t ^= t << 11;
+                        t ^= t >> 8;
+                        w = t ^ s ^ (s >> 19);
+                        rlist.Add((int)(w % 1000));
+                    }
+                    value[i] = rlist[id] <= bound ? 1 : 0;
+                }
+                else throw new NotImplementedException();
+            }
+            UnityEngine.Debug.LogError($"exp value = {(int)value[n - 1]}");*/
+            randomCounter = 0;
             battleManager.ActionStartTimeCounter = 0;
             // battleManager.battleProcessor.GetActionStartTime();
                                                      //battleManager.StoryStartTime = battleManager.battleProcessor.GetStoryStartTime();

@@ -123,8 +123,7 @@ namespace Elements
             set;
         } = new Dictionary<BasePartsData, long>();
         public Dictionary<BasePartsData, FloatWithEx> TotalDamageDictionary { get; set; } = new Dictionary<BasePartsData, FloatWithEx>();
-
-    //FIXME: no expectation for multiple or divide value for the expression is not linear
+        
     public Dictionary<eValueNumber, FloatWithEx> AdditionalValue { get; set; }
 
     public Dictionary<eValueNumber, FloatWithEx> MultipleValue { get; set; }

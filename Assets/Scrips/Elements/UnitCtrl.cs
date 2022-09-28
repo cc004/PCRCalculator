@@ -7216,8 +7216,9 @@ this.updateCurColor();
           Action<string> callBack = null)
         {
             bool _critical = false;
+            var data = new RandomData(_damageData.Source, this, _actionId, 0, _damageData.CriticalRate);
             double random = BattleManager.Random(0.0f, 1f, 
-                new RandomData(_damageData.Source,this, _actionId, 0, _damageData.CriticalRate));
+                data);
             if (MyGameCtrl.Instance.tempData.isGuildBattle &&(MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_player && IsOther || MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_enemy && !IsOther))
                 random = 1;
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.ForceCritical_player && IsOther)
@@ -7242,6 +7243,13 @@ this.updateCurColor();
             }
             
             if (flag) _critical = _damageData.IsLogBarrierCritical;
+            else if (_damageData.CriticalDamageRate != 0.0)
+            {
+                _damageData.critVar = FloatWithEx.Binomial(_damageData.CriticalRate, _critical,
+                    $"rnd:{data.id}:{(int) (_damageData.CriticalRate * 1000)}");
+            }
+            else _damageData.critVar = 0f;
+
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate);
             if (_damageData.Target is PartsData)
             {
@@ -7392,7 +7400,7 @@ this.updateCurColor();
             }
             var a = _damageData.Damage;
             float num1 = 2f * _damageData.CriticalDamageRate;
-            a *= (1 + (num1 - 1) * FloatWithEx.Binomial(Mathf.Clamp(_damageData.CriticalRate, 0f, 1f), _critical));
+            a *= (1 + (num1 - 1) * _damageData.critVar);
             if (debuffDamageUpDataList.Count > 0)
                 a *= GetDebuffDamageUpValue();
             bool flag1 = false;
@@ -7427,7 +7435,7 @@ this.updateCurColor();
             {
                 if (total > sub)
                     return (Mathf.Log(((total - sub) / main + 1.0f)) * main + sub) / total;
-                return 1f;
+                return 1;
             }
 
             if (_damageData.ActionType == eActionType.ATTACK)
@@ -7437,21 +7445,21 @@ this.updateCurColor();
                     float abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                     float abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                     a *= _damageData.TotalDamageForLogBarrier.Select(x =>
-                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue));
+                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                 }
                 else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
                 {
                     float abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                     float abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                     a *= _damageData.TotalDamageForLogBarrier.Select(x =>
-                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue));
+                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                 }
                 if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
                 {
                     float abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                     float abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                     a *= _damageData.TotalDamageForLogBarrier.Select(x =>
-                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue));
+                        execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                 }
             }
             Tuple<StrikeBackData, List<StrikeBackData>> tuple = searchStrikeBack(_damageData);
@@ -7623,6 +7631,7 @@ this.updateCurColor();
                     {
                         unit = UnitNameEx,
                         predict = hash => hp2.Emulate(hash) <= 0f,
+                        exp = hash => $"{hp2.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
                     });
                 else
@@ -7631,6 +7640,7 @@ this.updateCurColor();
                     {
                         unit = UnitNameEx,
                         predict = hash => hp2.Emulate(hash) > 0f,
+                        exp = hash => $"{hp2.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})没被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
                     });
                 }
@@ -7889,6 +7899,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) <= 0f,
+                        exp = hash => $"{num.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
                 }
@@ -7901,6 +7912,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) > 0f,
+                        exp = hash => $"{num.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
                 }
@@ -7917,6 +7929,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) <= 0f,
+                        exp = hash => $"{num.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
                 }
@@ -7929,6 +7942,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) > 0f,
+                        exp = hash => $"{num.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
                 }
@@ -7946,6 +7960,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) <= 0f,
+                        exp = hash => $"{num1.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
                 }
@@ -7960,6 +7975,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) > 0f,
+                        exp = hash => $"{num1.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
                 }
@@ -7977,6 +7993,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) <= 0f,
+                        exp = hash => $"{num1.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
                 }
@@ -7991,6 +8008,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num1.Emulate(hash) > 0f,
+                        exp = hash => $"{num1.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
                 }
@@ -8007,6 +8025,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) <= 0f,
+                        exp = hash => $"{num.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
                 }
@@ -8019,6 +8038,7 @@ this.updateCurColor();
                         isProb = true,
                         unit = UnitNameEx,
                         predict = hash => num.Emulate(hash) > 0f,
+                        exp = hash => $"{num.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
                 }

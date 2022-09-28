@@ -268,7 +268,7 @@ namespace ExcelHelper
 #endif
         }
 
-
+        public static bool AsmExportEnabled => File.Exists("patch_asm_exportaabbabab");
         public static void SaveExcel(int type,string defaultName = "")
         {
             bool isSuccess = true;
@@ -349,7 +349,7 @@ namespace ExcelHelper
 
                 // Script Export
 
-                if (File.Exists("patch_asm_exportaabbabab"))
+                if (AsmExportEnabled)
                 File.WriteAllText(filePath + ".asm", CreateAsmString());
         }
 

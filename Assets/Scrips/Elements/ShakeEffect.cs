@@ -19,10 +19,10 @@ namespace Elements
     public int TargetMotion;
     //public float StartAmplitude;
     //public float EndAmplitude;
-    //public float StartFrequency;
-    //public float EndFrequency;
+    public float StartFrequency;
+    public float EndFrequency;
     //public float Rotation;
-    //public CustomEasing EasingFrequency;
+    public CustomEasing EasingFrequency;
     //public CustomEasing EasingAmplitude;
     [NonSerialized]
     private Skill skill;
@@ -46,7 +46,7 @@ namespace Elements
       numberOfShake = 0;
       //CurrentAmplutude = StartAmplitude;
       //CurrentShakePos = Vector3.zero;
-      //EasingFrequency = new CustomEasing(CustomEasing.eType.outQuad, StartFrequency, EndFrequency, Duration);
+      EasingFrequency = new CustomEasing(CustomEasing.eType.outQuad, StartFrequency, EndFrequency, Duration);
       //EasingAmplitude = new CustomEasing(CustomEasing.eType.outQuad, StartAmplitude, EndAmplitude, Duration);
     }
 
@@ -65,14 +65,17 @@ namespace Elements
         return false;
       timer += deltaTime;
       int numberOfShake1 = numberOfShake;
-      //float curVal = EasingFrequency.GetCurVal(deltaTime);
+      float curVal = EasingFrequency.GetCurVal(deltaTime);
       //CurrentAmplutude = EasingAmplitude.GetCurVal(deltaTime);
-      //numberOfShake = (int) (curVal * 2.0 * 3.14159274101257 * timer / 3.14159274101257 / 2.0);
+      numberOfShake = (int) (curVal * 2.0 * 3.14159274101257 * timer / 3.14159274101257 / 2.0);
       int numberOfShake2 = numberOfShake;
       if (numberOfShake1 != numberOfShake2 && ShakeType == ShakeType.RANDOM)
-        //Rotation = Random.Range(0.0f, 360f);
-        Random.Range(0.0f, 360f);
-            //CurrentShakePos = new Vector3(CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Cos((float) (Rotation / 180.0 * 3.14159274101257)), CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Sin((float) (Rotation / 180.0 * 3.14159274101257)), 0.0f);
+          //Rotation = Random.Range(0.0f, 360f);
+      {
+          Random.Range(0.0f, 360f);
+          ++Battle.BattleManager.randomCounter;
+      }
+      //CurrentShakePos = new Vector3(CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Cos((float) (Rotation / 180.0 * 3.14159274101257)), CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Sin((float) (Rotation / 180.0 * 3.14159274101257)), 0.0f);
       if (timer <= (double) Duration)
         return false;
       ResetStart(null, null);

@@ -861,6 +861,7 @@ namespace Elements
                 {
                     unit = Owner.UnitNameEx,
                     predict = hash => e.Emulate(hash) < 1000f,
+                    exp = hash => $"{e.ToExpression(hash)} < 1000",
                     description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB没开出"
                 });
             }
@@ -868,13 +869,15 @@ namespace Elements
             {
                 skillExecData.energy = Owner.Energy;
                 var e = Owner.Energy;
+                /*
                 if (Owner.IsBoss)
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
                         unit = Owner.UnitNameEx,
                         predict = hash => e.Emulate(hash) >= 1000f,
+                        suffix = " >= 1000",
                         description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB提前开出"
-                    });
+                    });*/
             }
             Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
@@ -2112,7 +2115,8 @@ namespace Elements
                 hash = part.GetHashCode()
             }).ToList();
 
-            void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare)
+            void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare,
+                Func<BasePartsDataEx, FloatWithEx> getter)
             {
                 if (_actionParameter.TargetNum != 1) return;
                 var nth = _actionParameter.TargetNth;
@@ -2129,6 +2133,7 @@ namespace Elements
                         UnitCtrl.quickSortImpl(lst2, 0, lst2.Count - 1, instance);
                         return lst2[Math.Min(lst2.Count - 1, nth)].hash != tgth;
                     },
+                    exp = hash => $"\n qsort = {nth}:\n{string.Join("\n", lst.Select(u => getter(u).ToExpression(hash)))}",
                     enabled = false,
                     description =
                         $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的{(Owner.CurrentSkillId == 1 ? "普攻" : $"{skillDictionary[Owner.CurrentSkillId].SkillName}技能({Owner.CurrentSkillId})")}打歪(原定目标: {tgt.Owner.UnitNameEx})"
@@ -2165,11 +2170,11 @@ namespace Elements
                     break;
                 case PriorityPattern.HP_ASC:
                     QuickSort(targetList, UnitCtrl.CompareLifeAsc);
-                    AddProbEvent(UnitCtrl.CompareLifeAsc);
+                    AddProbEvent(UnitCtrl.CompareLifeAsc, u => u.Hp / u.MaxHp);
                     break;
                 case PriorityPattern.HP_DEC:
                     QuickSort(targetList, UnitCtrl.CompareLifeDec);
-                    AddProbEvent(UnitCtrl.CompareLifeDec);
+                    AddProbEvent(UnitCtrl.CompareLifeDec, u => u.Hp / u.MaxHp);
                     break;
                 case PriorityPattern.OWNER:
                     targetList.Clear();
@@ -2186,28 +2191,28 @@ namespace Elements
                     break;
                 case PriorityPattern.ENERGY_DEC:
                     QuickSort(targetList, UnitCtrl.CompareEnergyDec);
-                    AddProbEvent(UnitCtrl.CompareEnergyDec);
+                    AddProbEvent(UnitCtrl.CompareEnergyDec, u => u.Energy);
                     break;
                 case PriorityPattern.ENERGY_ASC:
                 case PriorityPattern.ENERGY_REDUCING:
                     QuickSort(targetList, UnitCtrl.CompareEnergyAsc);
-                    AddProbEvent(UnitCtrl.CompareEnergyAsc);
+                    AddProbEvent(UnitCtrl.CompareEnergyAsc, u => u.Energy);
                     break;
                 case PriorityPattern.ATK_DEC:
                     QuickSort(targetList, UnitCtrl.CompareAtkDec);
-                    AddProbEvent(UnitCtrl.CompareAtkDec);
+                    AddProbEvent(UnitCtrl.CompareAtkDec, u => u.GetAtkZeroEx);
                     break;
                 case PriorityPattern.ATK_ASC:
                     QuickSort(targetList, UnitCtrl.CompareAtkAsc);
-                    AddProbEvent(UnitCtrl.CompareAtkAsc);
+                    AddProbEvent(UnitCtrl.CompareAtkAsc, u => u.GetAtkZeroEx);
                     break;
                 case PriorityPattern.MAGIC_STR_DEC:
                     QuickSort(targetList, UnitCtrl.CompareMagicStrDec);
-                    AddProbEvent(UnitCtrl.CompareMagicStrDec);
+                    AddProbEvent(UnitCtrl.CompareMagicStrDec, u => u.GetMagicStrZeroEx);
                     break;
                 case PriorityPattern.MAGIC_STR_ASC:
                     QuickSort(targetList, UnitCtrl.CompareMagicStrAsc);
-                    AddProbEvent(UnitCtrl.CompareMagicStrAsc);
+                    AddProbEvent(UnitCtrl.CompareMagicStrAsc, u => u.GetMagicStrZeroEx);
                     break;
                 case PriorityPattern.BOSS:
                     Owner.BaseX = _baseTransform.position.x;

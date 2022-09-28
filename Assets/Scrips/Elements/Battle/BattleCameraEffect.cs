@@ -27,6 +27,10 @@ namespace Elements.Battle
 
         public void StartShake(ShakeEffect shake, Skill skill, UnitCtrl unit)
         {
+            if (shake.ShakeType == ShakeType.RANDOM)
+            {
+                Debug.LogError($"{skill?.SkillName}:{unit?.UnitName} shake random");
+            }
             currentShake.Add(shake);
             shake.ResetStart(skill, unit);
         }

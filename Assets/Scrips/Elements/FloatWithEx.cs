@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
 using Random = System.Random;
@@ -12,8 +13,10 @@ namespace Elements
         private readonly Func<int, float> root;
         private int hash;
         private float cache;
+        private string select, op, rnd;
+        private FloatWithEx op1, op2;
 
-        public FloatWithEx(float value = 0f, float avg = 0f, float min = 0f, float max = 0f,
+        private FloatWithEx(float value = 0f, float avg = 0f, float min = 0f, float max = 0f,
             Func<int, float> root = null)
         {
             this.value = value;
@@ -36,29 +39,35 @@ namespace Elements
         
         private static Random rand = new Random();
 
-        public static FloatWithEx Binomial(float p, bool val)
+        public static FloatWithEx Binomial(float p, bool val, string rnd)
         {
             p = Mathf.Clamp(p, 0f, 1f);
             if (p == 0f) return 0f;
             if (p == 1f) return 1f;
             var result = new FloatWithEx(val ? 1 : 0, p, root: _ => rand.NextDouble() < p ? 1 : 0, min: 0,
-                max: 1);
+                max: 1)
+            {
+                rnd = rnd
+            };
             return result;
         }
 
 
-        public FloatWithEx Select(Func<float, float> selector)
+        public FloatWithEx Select(Func<float, float> selector, string select)
         {
             if (pure) return selector(value);
             float a = selector(min), b = selector(max);
             return new FloatWithEx(selector(value), selector(avg), root: hash => selector(Emulate(hash)),
-                min: Mathf.Min(a, b), max: Mathf.Max(a, b));
+                min: Mathf.Min(a, b), max: Mathf.Max(a, b))
+            {
+                select = select, op1 = this
+            };
         }
 
         private static FloatWithEx Default = 0f;
 
         private static FloatWithEx Op(FloatWithEx a, FloatWithEx b,
-            Func<float, float, float> op)
+            Func<float, float, float> op, string ops)
         {
             a = a ?? Default;
             b = b ?? Default;
@@ -76,14 +85,27 @@ namespace Elements
                 if (b.pure)
                     return op(a.value, b.value);
                 return new FloatWithEx(op(vala, b.value), op(vala, b.avg),
-                    root: hash => op(vala, b.Emulate(hash)), min: Mathf.Min(xs), max: Mathf.Max(xs));
+                    root: hash => op(vala, b.Emulate(hash)), min: Mathf.Min(xs), max: Mathf.Max(xs))
+                {
+                    op = ops, op1 = vala, op2 = b
+                };
             }
 
             if (b.pure)
                 return new FloatWithEx(op(a.value, valb), op(a.avg, valb),
-                    root: hash => op(a.Emulate(hash), valb), min: Mathf.Min(xs), max: Mathf.Max(xs));
+                    root: hash => op(a.Emulate(hash), valb), min: Mathf.Min(xs), max: Mathf.Max(xs))
+                {
+                    op = ops,
+                    op1 = a,
+                    op2 = valb
+                }; ;
             return new FloatWithEx(op(a.value, b.value), op(a.avg, b.avg),
-                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: Mathf.Min(xs), max: Mathf.Max(xs));
+                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: Mathf.Min(xs), max: Mathf.Max(xs))
+            {
+                op = ops,
+                op1 = a,
+                op2 = b
+            }; ;
         }
 
         public float Expect => avg;
@@ -121,16 +143,31 @@ namespace Elements
         public static implicit operator float(FloatWithEx self) => self.value;
         public static implicit operator FloatWithEx(float x) =>
             new FloatWithEx(x, x, x, x, null);
-        public FloatWithEx Log() => Select(Mathf.Log);
-        public FloatWithEx Max(float f) => Select(x => Mathf.Max(x, f));
-        public FloatWithEx Min(float f) => Select(x => Mathf.Min(x, f));
+        public FloatWithEx Max(float f)
+        {
+            if (min > f) return this;
+            return Select(x => Mathf.Max(x, f), $"max:{f}");
+        }
+
+        public FloatWithEx Min(float f)
+        {
+            if (max < f) return this;
+            return Select(x => Mathf.Min(x, f), $"min:{f}");
+        }
+
         public override string ToString() => pure ? ((float)this).ToString() : $"{(int)(float)this}[{(int)Expect}]";
-        public FloatWithEx Floor() => Select(Mathf.Floor);
+        public FloatWithEx Floor() => Select(Mathf.Floor, "floor");
         public int CompareTo(FloatWithEx other) => ((float)this).CompareTo(other);
-        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y);
-        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y);
-        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x * y);
-        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x / y);
+        public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y, "add");
+        public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y, "sub");
+        public static FloatWithEx operator *(FloatWithEx a, FloatWithEx b)
+        {
+            if (b.StrictlyEquals(1f)) return a;
+            if (a.StrictlyEquals(1f)) return b;
+            return Op(a, b, (x, y) => x * y, "mul");
+        }
+
+        public static FloatWithEx operator /(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x / y, "div");
 
         public static bool operator ==(FloatWithEx a, FloatWithEx b) => a.Equals(b);
         public static bool operator !=(FloatWithEx a, FloatWithEx b) => !a.Equals(b);
@@ -146,7 +183,7 @@ namespace Elements
 
         public bool StrictlyEquals(float x)
         {
-            return root == null && value == x;
+            return pure && value == x;
         }
 
         public override int GetHashCode()
@@ -156,7 +193,46 @@ namespace Elements
 
         public FloatWithEx ZeroCapForHp()
         {
-            return new FloatWithEx(value >= 0f ? value : 0f, avg, min, max, root);
+            return new FloatWithEx(value >= 0f ? value : 0f, avg, min, max, root)
+            {
+                op = op, op1 = op1, op2 = op2, rnd = rnd, select = select, id = id
+            };
+        }
+        
+        private int id;
+
+        public string ToExpression(int hash)
+        {
+            var sb = new StringBuilder();
+            ToExpression(sb, hash);
+            sb.Remove(sb.Length - 1, 1);
+            return sb.ToString();
+        }
+
+        private int ToExpression(StringBuilder sb, int hash, int num = 0)
+        {
+            if (this.hash == hash) return num;
+            this.hash = hash;
+            if (pure)
+            {
+                sb.AppendFormat("pure:{0}|", value);
+            }
+            else if (select != null)
+            {
+                num = op1.ToExpression(sb, hash, num);
+                sb.AppendFormat("{0}:{1}|", select, op1.id);
+            }
+            else if (op != null)
+            {
+                num = op1.ToExpression(sb, hash, num);
+                num = op2.ToExpression(sb, hash, num);
+                sb.AppendFormat("{0}:{1}:{2}|", op, op1.id, op2.id);
+            }
+            else if (rnd != null)
+                sb.AppendFormat("{0}|", rnd);
+            else throw new NotImplementedException();
+            id = num++;
+            return num;
         }
     }
 }

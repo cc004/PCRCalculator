@@ -8,6 +8,7 @@ namespace Elements
 {
   public class CriticalData
   {
+      public FloatWithEx critVar { get; set; }
     public bool IsCritical { get; set; }
 
     public float CriticalRate { get; set; }

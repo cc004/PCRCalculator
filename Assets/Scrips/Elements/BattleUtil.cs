@@ -88,11 +88,11 @@ namespace Elements
         }
         public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
     {
-        return _num.Select(x => FloatToIntReverseTruncate(x));
+        return _num.Select(x => FloatToIntReverseTruncate(x), "ceil");
     }
     public static FloatWithEx FloatToInt(FloatWithEx _num)
     {
-        return _num.Select(x => FloatToInt(x));
+        return _num.Select(x => FloatToInt(x), "ceil");
     }
     public static eUnitRespawnPos SearchRespawnPos(
       eUnitRespawnPos _basePos,

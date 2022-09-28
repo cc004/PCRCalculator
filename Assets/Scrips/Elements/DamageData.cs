@@ -13,7 +13,7 @@ namespace Elements
   public class DamageData
   {
     public eDamageSoundType DamageSoundType { get; set; }
-
+    public FloatWithEx critVar;
     public BasePartsData Target { get; set; }
 
     public FloatWithEx TotalDamageForLogBarrier { get; set; }
