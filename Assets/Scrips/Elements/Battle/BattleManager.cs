@@ -895,7 +895,7 @@ namespace Elements.Battle
         {
             if (Max == Min) return Min;
             int result = UnityEngine.Random.Range(Min, Max);
-            System.IO.File.AppendAllText("D:\\rnd.log", $"({BattleHeaderController.CurrentFrameCount})rnd is {result}, stack:\n{new StackTrace()}\n");
+            //System.IO.File.AppendAllText("D:\\rnd.log", $"({BattleHeaderController.CurrentFrameCount})rnd is {result}, stack:\n{new StackTrace()}\n");
             data.randomResult = result;
             data.id = randomCounter++;
             OnCallRandom?.Invoke(data);

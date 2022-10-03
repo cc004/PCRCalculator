@@ -414,9 +414,9 @@ namespace PCRCaculator
         private static AssetManager mgrold = new AssetManager();
         private const string KEY_VER_ID = "VER_ID";
         private const string KEY_VER_ID_OLD = "VER_ID_OLD";
-        public static int GetVer(bool old,int defaultVal = 10041400)
+        public static int GetVer(bool old,int? defaultVal = null)
         {
-            return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID, defaultVal);
+            return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID, defaultVal ?? (old ? 10028300 : 10041400));
         }
         static ABExTool()
         {
