@@ -412,12 +412,23 @@ namespace PCRCaculator
 
         private static AssetManager mgr = new AssetManager();
         private static AssetManager mgrold = new AssetManager();
+        private const string KEY_VER_ID = "VER_ID";
+        private const string KEY_VER_ID_OLD = "VER_ID_OLD";
+        public static int GetVer(bool old,int defaultVal = 10041400)
+        {
+            return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID, defaultVal);
+        }
         static ABExTool()
         {
             try
             {
-                mgr.Initialize("10041200");
-                mgrold.Initialize("10028300");
+                int verid = GetVer(false);
+                int verid_old = GetVer(true);
+                mgr.Initialize(verid.ToString());
+                if (verid == verid_old)
+                    mgrold = mgr;
+                else
+                    mgrold.Initialize(verid_old.ToString());
             }
             catch (Exception e)
             {
@@ -544,6 +555,25 @@ namespace PCRCaculator
             if (unitid == 207001)
                 return 207000;
             return unitid;
+        }
+
+        public static void FreeDeleteAndReset(int ver, int verold)
+        {
+            PlayerPrefs.SetInt(KEY_VER_ID, ver);
+            PlayerPrefs.SetInt(KEY_VER_ID_OLD, verold);
+            PlayerPrefs.Save();
+            AssetBundleDic.Clear();
+            spriteDic.Clear();
+            AssetBundle.UnloadAllAssetBundles(true);
+            string path = Application.streamingAssetsPath + "/../.ABExt";
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                path = Application.persistentDataPath + "/AB";
+            }
+
+            Directory.Delete(path);
+            Directory.CreateDirectory(path);
+
         }
     }
 }

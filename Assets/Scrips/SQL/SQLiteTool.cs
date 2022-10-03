@@ -15,7 +15,7 @@ namespace PCRCaculator.SQL
         public static string DatabaseName = "redive_jp.db";
         public static string DatabaseName_cn = "redive_cn.db";
 
-        public static SQLiteTool OpenDB(bool cn = false)
+        public static string GetDBPath(bool cn = false)
         {
 #if UNITY_EDITOR
             var dbPath = string.Format(@"Assets/StreamingAssets/{0}", cn ? DatabaseName_cn : DatabaseName);
@@ -64,9 +64,14 @@ namespace PCRCaculator.SQL
 
         var dbPath = filepath;
 #endif
+            return dbPath;
+        }
+        public static SQLiteTool OpenDB(bool cn = false)
+        {
+
             //_connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
             //Debug.Log("Final PATH: " + dbPath);
-            SQLiteTool temp = new SQLiteTool(dbPath, true);
+            SQLiteTool temp = new SQLiteTool(GetDBPath(cn), true);
             return temp;
         }   
 

@@ -235,7 +235,7 @@ namespace PCRCaculator.SQL
             var list = data.GetDatas<enemy_m_parts>();
             foreach(var dd in list)
             {
-                dic.Add(dd.enemy_id, new MasterEnemyMParts.EnemyMParts(dd.child_enemy_parameter_1, dd.child_enemy_parameter_2, dd.child_enemy_parameter_3, dd.child_enemy_parameter_4, dd.child_enemy_parameter_5));
+                dic.Add(dd.enemy_id, new MasterEnemyMParts.EnemyMParts(dd.enemy_id,dd.child_enemy_parameter_1, dd.child_enemy_parameter_2, dd.child_enemy_parameter_3, dd.child_enemy_parameter_4, dd.child_enemy_parameter_5));
             }
             return dic;
         }
@@ -403,7 +403,7 @@ namespace PCRCaculator.SQL
     {
         [PrimaryKey]
         public int enemy_id { get; set; }
-
+        public string name { get; set; }
         public int child_enemy_parameter_1 { get; set; }
         public int child_enemy_parameter_2 { get; set; }
         public int child_enemy_parameter_3 { get; set; }

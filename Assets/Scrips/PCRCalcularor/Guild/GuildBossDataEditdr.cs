@@ -275,7 +275,7 @@ namespace PCRCaculator.Guild
         private void GetBossSkillCastTime()
         {
             bossMainSkillIDs = enemyData.skillData.MainSkills;
-            bossSkillCastTime = new float[10];
+            bossSkillCastTime = new float[bossMainSkillIDs.Count];
             for (int i = 0; i < bossMainSkillIDs.Count; i++)
             {
                 if (bossMainSkillIDs[i] > 0)

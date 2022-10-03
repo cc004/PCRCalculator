@@ -400,7 +400,8 @@ namespace PCRCaculator
         public void OpenEXSettingPannel()
         {
             EXsettingPannel.SetActive(true);
-            List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[playerData.playrCharacters[selectedCharacterId_setting].unitId];
+            UnitData unit = playerData.playrCharacters[selectedCharacterId_setting];
+            List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unit.unitId];
             for(int i = 0; i < EXsettingSliders.Count; i++)
             {
                 if (i < effectUnitList.Count)
@@ -411,9 +412,10 @@ namespace PCRCaculator
                     {
                         unitname = name0;
                     }
+                    int value = unit.playLoveDic.TryGetValue(effectUnitList[i], out var val) ? val : 0;
                     EXsettingSliders[i].SetSliderPrefab(
                         unitname,
-                        playerData.playrCharacters[selectedCharacterId_setting].playLoveDic[effectUnitList[i]],
+                        value,
                         unitRarityData.GetMaxLoveLevel(),
                         0,
                         null);

@@ -64,6 +64,7 @@ namespace PCRCaculator.Guild
 
         //public GuildExecTimeSetting GuildExecTimeSetting;
         public GuildRandomManager RandomManager;
+        public Update.UpdateManager updateManager;
         public GameObject guildDataInportPannel;
 
         public GameObject autoCalculatePagePrefab;
@@ -240,6 +241,29 @@ namespace PCRCaculator.Guild
             Reflash();
             SaveDataToJson();
         }
+        private void CreateMonthDropDown()
+        {
+            Dropdown dp = dropdowns_ChooseBoss[2];
+            List<string> list = new List<string>();
+            foreach(var key in guildEnemyDatas.Keys)
+            {
+                if (key >= 1036)
+                {
+                    string str = $"{guildMonthNames[(key - 1000 + 11) % 12]}({key})";
+                    list.Add(str);
+                }
+            }
+            dp.ClearOptions();
+            dp.AddOptions(list);
+        }
+        private int GetClanBattleID()
+        {
+            return dropdowns_ChooseBoss[2].value + 1024;
+        }
+        private void SetChooseBossDropDown(int clanBattleID)
+        {
+            dropdowns_ChooseBoss[2].value  = clanBattleID - 1024;
+        }
         public void OnChooseBossDropDownChanged()
         {
             if (!MainManager.Instance.LoadFinished)
@@ -251,7 +275,7 @@ namespace PCRCaculator.Guild
             {
                 if (isGuildBoss)
                 {
-                    enemyid_0 = guildEnemyDatas[dropdowns_ChooseBoss[2].value + 1024].enemyIds[0][dropdowns_ChooseBoss[0].value];
+                    enemyid_0 = guildEnemyDatas[GetClanBattleID()].enemyIds[0][dropdowns_ChooseBoss[0].value];
                     //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
                     bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
@@ -289,7 +313,7 @@ namespace PCRCaculator.Guild
             }
             catch(Exception _)
             {
-                MainManager.Instance.WindowConfigMessage($"会战{dropdowns_ChooseBoss[2]?.value + 1024}的配置缺失！", null);
+                MainManager.Instance.WindowConfigMessage($"会战{GetClanBattleID()}的配置缺失！", null);
             }
         }
         public void OnInputFinished()
@@ -317,14 +341,16 @@ namespace PCRCaculator.Guild
             int enemyId = 0;
             if (isGuildBoss)
             {
-                int month = dropdowns_ChooseBoss[2].value;
-                SettingData.GetCurrentPlayerGroup().currentGuildMonth = 1000 + month;
-                bossDetailTexts[3].text = guildMonthNames[(month + 11) % 12];
-                int num = dropdowns_ChooseBoss[0].value; ;
+                //int month = dropdowns_ChooseBoss[2].value;
+                int clanBattleID = GetClanBattleID();
+                int month = clanBattleID - 1000;
+                SettingData.GetCurrentPlayerGroup().currentGuildMonth = GetClanBattleID();
+                bossDetailTexts[3].text = $"{guildMonthNames[(month + 11) % 12]}\n<size=10>({GetClanBattleID()})</size>";
+                int num = dropdowns_ChooseBoss[0].value; 
                 SettingData.GetCurrentPlayerGroup().currentGuildEnemyNum = num;
                 int turn = dropdowns_ChooseBoss[1].value + 1; 
                 SettingData.GetCurrentPlayerGroup().currentTurn = turn;
-                enemyId = GetGuildBossID(month, num, turn);
+                enemyId = GetGuildBossID(clanBattleID, num, turn);
             }
             else
             {
@@ -341,10 +367,10 @@ namespace PCRCaculator.Guild
             SaveDataToJson();
             Reflash();
         }
-        public int GetGuildBossID(int month, int num, int turn)
+        public int GetGuildBossID(int clanBattleID, int num, int turn)
         {
             int enemyId = 0;
-            enemyId = guildEnemyDatas[month + 1024].enemyIds[turn][num];
+            enemyId = guildEnemyDatas[clanBattleID].enemyIds[turn][num];
             /*
             switch (turn)
             {
@@ -457,8 +483,11 @@ namespace PCRCaculator.Guild
                 currentPage = 1;
             }
             ReflashCharacterGroupToggle();
+            CreateMonthDropDown();
+
             var data = SettingData.GetCurrentPlayerGroup();
-            dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
+            SetChooseBossDropDown(data.currentGuildMonth);
+            //dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
             dropdowns_ChooseBoss[1].value = data.currentTurn - 1;
             dropdowns_ChooseBoss[4].value = (int)data.useLogBarrierNew;
@@ -541,7 +570,7 @@ namespace PCRCaculator.Guild
             var group = SettingData.GetCurrentPlayerGroup();
 
             if (selectedBossEnemyid == 0)
-                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12, data.currentGuildEnemyNum, data.currentTurn);
+                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth >= 1000 ? data.currentGuildMonth : 1048, data.currentGuildEnemyNum, data.currentTurn);
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
             bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyid].unit_id);
@@ -593,7 +622,8 @@ namespace PCRCaculator.Guild
                 group.playerSetingHP = 0;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
-            bossDetailTexts[3].text = guildMonthNames[(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 + 11 : data.currentGuildMonth) % 12];
+            bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 + 11 : data.currentGuildMonth) % 12]}" +
+                $"\n<size=10>({data.currentGuildMonth})</size>";
             //group.useLogBarrier = toggles_ChooseBoss[3].isOn;
         }
         private void ReflashCalcSettings_start()
@@ -1014,7 +1044,7 @@ namespace PCRCaculator.Guild
 
         public void UpdateButton()
         {
-            MainManager.Instance.WindowConfigMessage($"该功能暂时不可用！", null);
+            MainManager.Instance.WindowConfigMessage($"是否立即检查更新？", updateManager.StartCheck);
             return;
 #if PLATFORM_ANDROID
             try
