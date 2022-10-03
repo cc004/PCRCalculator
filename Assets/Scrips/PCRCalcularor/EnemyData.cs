@@ -57,9 +57,9 @@ namespace PCRCaculator
     {
         public int UB;
         public List<int> MainSkills = new List<int>();
-        public List<EnemyAttackPattern> enemyAttackPatterns = new List<EnemyAttackPattern>();
+        public List<UnitAttackPattern> enemyAttackPatterns = new List<UnitAttackPattern>();
     }
-    [Serializable]
+    /*[Serializable]
     public class EnemyAttackPattern
     {
         public int pattern_id;
@@ -67,6 +67,7 @@ namespace PCRCaculator
         public int loopStart;
         public int loopEnd;
         public int[] atkPatterns;//长度为20
-    }
+
+    }*/
 
 }

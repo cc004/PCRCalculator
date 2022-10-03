@@ -9389,6 +9389,12 @@ MonoBehaviour:
   allowRarity6Toggle: {fileID: 0}
   showAllUnitToggle: {fileID: 0}
   SettingBack: {fileID: 0}
+  TPMaxText: {fileID: 0}
+  RBLevelText: {fileID: 0}
+  RBValueText: {fileID: 0}
+  RBTPValueText: {fileID: 0}
+  ShowTextPrefab: {fileID: 4228948815256344673, guid: 2839c3f51c3106e42beadce5a1fd810b,
+    type: 3}
 --- !u!1 &1206986711
 GameObject:
   m_ObjectHideFlags: 0
@@ -11279,7 +11285,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1815058483}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.16261904
+  m_Size: 0.16261905
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11887,7 +11893,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1754030685}
   m_HandleRect: {fileID: 1754030684}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -16496,6 +16502,7 @@ MonoBehaviour:
   IsPlayCutin: 0
   BattleStartPos: 560
   LatestSkillVoiceTime: -0.5
+  IsPausingEffectSkippedInThisFrame: 0
   ActionStartTimeCounter: 0
   princessFormMoviePlayer: {fileID: 0}
   stepping: 0
@@ -18688,6 +18695,7 @@ MonoBehaviour:
   IsPlayCutin: 0
   BattleStartPos: 560
   LatestSkillVoiceTime: -0.5
+  IsPausingEffectSkippedInThisFrame: 0
   ActionStartTimeCounter: 0
   princessFormMoviePlayer: {fileID: 1992102222}
   stepping: 0

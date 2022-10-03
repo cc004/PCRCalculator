@@ -1664,7 +1664,7 @@
         </member>
         <member name="T:ExcelDataReader.Log.LogManager">
             <summary>
-            2.0 version of LogExtensions, not as awesome as Extension methods
+            2.0 version of LogExtensions, not as awesome aE methods
             </summary>
         </member>
         <member name="M:ExcelDataReader.Log.LogManager.Log``1(``0)">

@@ -159,16 +159,21 @@ namespace PCRApi
             }.RegisterTo(this);
 
         }
+        private string GetManifestJson()
+        {
+#if PLATFORM_ANDROID
+            var file = UnityEngine.Application.persistentDataPath + $"/AB/manifest_{ver}.json";
+#else
+            var file = $"manifest_{Ver}.json";
+#endif
+            return file;
+        }
         public void Initialize(string ver, string movie_ver = null, string sound_ver = null, bool patch=true)
         {
             Ver = ver;
             registries.Clear();
 
-#if PLATFORM_ANDROID
-            var file = UnityEngine.Application.persistentDataPath + $"/AB/manifest_{ver}.json";
-#else
-            var file = $"manifest_{ver}.json";
-#endif
+            var file = GetManifestJson();
             try
             {
                 registries = JsonConvert.DeserializeObject<Dictionary<string, Content>>(File.ReadAllText(file));
@@ -221,6 +226,14 @@ namespace PCRApi
                     if (hashes.ContainsKey(pair.Value.MD5)) continue;
                     hashes.Add(pair.Value.MD5, pair.Value);
                 }
+        }
+        public void DeleteCache()
+        {
+            var file = GetManifestJson();
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
         }
     }
 }

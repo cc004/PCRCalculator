@@ -97,13 +97,10 @@ namespace ExcelHelper
                 }
             }
         }
-
-        public static bool ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,SystemWindowMessage.configDelegate failedAction = null)
+        private static string GetExcelPath()
         {
 #if PLATFORM_ANDROID
-            guildTimelineData = new GuildTimelineData();
-            failedAction?.Invoke();
-            return false;
+            return AndroidTool.GetExcelPath();
 #else
             OpenFileName ofn = new OpenFileName();
 
@@ -180,10 +177,23 @@ namespace ExcelHelper
                 //Debug.Log(ofn.file);
                 //FileInfo info = new FileInfo(Application.dataPath + "/temp.xlsx");
                 //FileInfo info = new FileInfo(ofn.file);
+                return ofn.file;
+            }
+            return null;
+#endif
+        }
+        public static bool ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,SystemWindowMessage.configDelegate failedAction = null,string path0=null)
+        {
+            string path = string.IsNullOrEmpty(path0) ? GetExcelPath() : path0;
+
+            //打开windows框
+            if (!string.IsNullOrEmpty(path))
+            {
+                
                 FileStream stream = null;
                 try
                 {
-                     stream = File.Open(ofn.file,FileMode.Open, FileAccess.Read,FileShare.Read);
+                     stream = File.Open(path,FileMode.Open, FileAccess.Read,FileShare.Read);
 
                 }
                 catch (IOException e)
@@ -265,7 +275,6 @@ namespace ExcelHelper
             }
             guildTimelineData = new GuildTimelineData();
             return false;
-#endif
         }
 
         public static bool AsmExportEnabled => File.Exists("patch_asm_exportaabbabab");
@@ -344,11 +353,13 @@ namespace ExcelHelper
             }
             
 #if PLATFORM_ANDROID
-                MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n请自行前往查看！", null);
+                MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n是否打开？",()=> AndroidTool.ShowExcelFile(filePath));
 #endif
 
-                // Script Export
+            // Script Export
 
+            //if (File.Exists("patch_asm_exportaabbabab"))
+            //    File.WriteAllText(filePath + ".asm", CreateAsmString());
                 if (AsmExportEnabled)
                 File.WriteAllText(filePath + ".asm", CreateAsmString());
         }

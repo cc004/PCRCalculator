@@ -19,6 +19,12 @@ namespace PCRCaculator
         public Toggle allowRarity6Toggle;
         public Toggle showAllUnitToggle;
         public GameObject SettingBack;
+
+        public InputField TPMaxText;
+        public InputField RBLevelText;
+        public InputField RBValueText;
+        public InputField RBTPValueText;
+        public GameObject ShowTextPrefab;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
         private bool isLoading;
@@ -43,6 +49,13 @@ namespace PCRCaculator
             allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
             if(showAllUnitToggle!=null)
             showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
+
+            TPMaxText.text = PlayerSetting.maxTPUpValue.ToString();
+            RBLevelText.text = PlayerSetting.RBRank_max.ToString();
+            RBValueText.text = PlayerSetting.RBValue1.ToString();
+            RBTPValueText.text = PlayerSetting.RBTpValue.ToString();
+
+
             isLoading = false;
         }
         /// <summary>
@@ -73,6 +86,12 @@ namespace PCRCaculator
             PlayerSetting.allowRarity6 = allowRarity6Toggle.isOn;
             if(showAllUnitToggle!=null)
             PlayerSetting.showAllUnits = showAllUnitToggle.isOn;
+
+            PlayerSetting.maxTPUpValue = int.Parse(TPMaxText.text, System.Globalization.NumberStyles.Any);
+            PlayerSetting.RBRank_max = int.Parse(RBLevelText.text, System.Globalization.NumberStyles.Any);
+            PlayerSetting.RBValue1 = int.Parse(RBValueText.text, System.Globalization.NumberStyles.Any);
+            PlayerSetting.RBTpValue = int.Parse(RBTPValueText.text, System.Globalization.NumberStyles.Any);
+
             MainManager.Instance.SavePlayerSetting();
             MainManager.Instance.WindowMessage("保存成功！");
         }
@@ -114,6 +133,11 @@ namespace PCRCaculator
                     MainManager.Instance.CalculatorButton();
                     break;
             }
+        }
+        public void ShowText(string str)
+        {
+            GameObject a = Instantiate(ShowTextPrefab, latestUIback.transform, false);
+            a.GetComponent<ShowTextUI>().Set(str);
         }
     }
 }

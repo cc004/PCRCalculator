@@ -40,7 +40,7 @@ namespace PCRCaculator
                 input_DMMPath.text = MainManager.Instance.PlayerSetting.dmmPath;
             isInit = false;
         }
-
+        /*
         public async void UpdateSQLData_async()
         {
             var a = MainManager.Instance.WindowAsyncMessage("正在导入数据，请耐心等待...");
@@ -91,7 +91,7 @@ namespace PCRCaculator
             PlayerPrefs.SetInt("UsePlayerSQL", 1);
             MainManager.Instance.WindowConfigMessage("成功！", null);
         }
-
+        */
         public void DeleteSQLData()
         {
             PlayerPrefs.SetInt("UsePlayerSQL", 0);

@@ -221,7 +221,7 @@ namespace PCRCaculator.Battle
             if (logMessageType == eLogMessageType.ERROR)
             {
 #if UNITY_EDITOR
-                Debug.LogError(fpsCount + "-" + word);
+                Debug.Log(fpsCount + "-" + word);
 #endif
                 /*if (BattleManager.Instance.ShowErrorMessage)
                 {

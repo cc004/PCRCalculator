@@ -745,9 +745,9 @@ namespace PCRCaculator.Guild
         {
             try
             {
-#if PLATFORM_ANDROID
-                var fileName = CreateExcelName().Replace("\\", "/") + ".txt";
-#else
+        #if PLATFORM_ANDROID
+                        var fileName = CreateExcelName().Replace("\\", "/") + ".txt";
+        #else
                 var ofn = new OpenFileName();
                 ofn.structSize = Marshal.SizeOf(ofn);
                 ofn.filter = "Text Files(*.txt)\0*.txt\0";
@@ -766,7 +766,7 @@ namespace PCRCaculator.Guild
                     return;
                 }
                 var fileName = ofn.file.Replace("\\", "/");
-#endif
+        #endif
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
                 const string totaldie = "总乱轴（上限）";
@@ -796,7 +796,7 @@ namespace PCRCaculator.Guild
                     if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());
                     dskill[skill.unit].Add(skill.description, 0);
                 }
-                
+
                 var sname = new HashSet<string>();
                 var sname2 = new HashSet<string>();
                 var sskill = new HashSet<(string, string)>();
@@ -876,35 +876,53 @@ namespace PCRCaculator.Guild
                         }
                     }
                 }
-                if (File.Exists(fileName)) File.Delete(fileName);
-                using (var sw = new StreamWriter(File.OpenWrite(fileName)))
+                if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.WindowsEditor)
                 {
+                    string str = "";
                     foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                     {
                         var real = dname2.ContainsKey(name)
-                            ? $"({(float) dname2[name] / GuildManager.StaticsettingData.n2:P1})"
+                            ? $"({(float)dname2[name] / GuildManager.StaticsettingData.n2:P1})"
                             : string.Empty;
-                        sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
+                        str += $"   {name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real + "\n";
                         if (!dskill.ContainsKey(name)) continue;
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
+                            str += $"   \t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}" + "\n";
+                    }
+                    BaseBackManager.Instance.ShowText(str);
+                }
+                else
+                {
+                    if (File.Exists(fileName)) File.Delete(fileName);
+                    using (var sw = new StreamWriter(File.OpenWrite(fileName)))
+                    {
+                        foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                         {
-                            var prob = probs[pair.Key];
-                            var sb = new StringBuilder();
-                            var exp = string.Empty;
-                            if (prob.exp != null && ExcelHelper.ExcelHelper.AsmExportEnabled)
+                            var real = dname2.ContainsKey(name)
+                                    ? $"({(float)dname2[name] / GuildManager.StaticsettingData.n2:P1})"
+                                : string.Empty;
+                            sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
+                            if (!dskill.ContainsKey(name)) continue;
+                            foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
                             {
-                                exp = prob.exp(rnd.Next());
+                                var prob = probs[pair.Key];
+                                var sb = new StringBuilder();
+                                var exp = string.Empty;
+                                if (prob.exp != null && ExcelHelper.ExcelHelper.AsmExportEnabled)
+                                {
+                                    exp = prob.exp(rnd.Next());
+                                }
+                                sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}{exp}");
                             }
-                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}{exp}");
+                        }
+
+                        if (ExcelHelper.ExcelHelper.AsmExportEnabled)
+                        {
+                            sw.WriteLine(totalDamageExcept.ToExpression(rnd.Next()));
                         }
                     }
-
-                    if (ExcelHelper.ExcelHelper.AsmExportEnabled)
-                    {
-                        sw.WriteLine(totalDamageExcept.ToExpression(rnd.Next()));
-                    }
+                    MainManager.Instance.WindowMessage("成功！");
                 }
-                MainManager.Instance.WindowMessage("成功！");
             }
             catch (Exception e)
             {
@@ -914,6 +932,11 @@ namespace PCRCaculator.Guild
 
         public void SaveFileToTemplate()
         {
+            if(Application.platform == RuntimePlatform.Android)
+            {
+                MainManager.Instance.WindowConfigMessage("Android端暂时不支持！",null);
+                return;
+            }
             try
             {
                 SaveFileToTemplateInternal();

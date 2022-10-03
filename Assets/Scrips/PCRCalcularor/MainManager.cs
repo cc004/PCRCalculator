@@ -6,9 +6,13 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using PCRCaculator.Calc;
+using PCRCaculator.Guild;
+using PCRCaculator.SQL;
+using PCRCalcularor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,6 +31,7 @@ namespace PCRCaculator
         public GameObject SystemInputPrefab;//弹窗输入面板
         public GameObject LoadingPagePrefab;//加载面板
         public GameObject LoadingPagePrefab_2;//加载面板2
+        public GameObject WaitingPrefab;//等待面板
         //public TextAsset db;
         //public TextAsset unitTimeTxt;
         //public TextAsset unitPrefabData;
@@ -58,6 +63,8 @@ namespace PCRCaculator
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
         private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
+        private Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
+        private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic;
 
 
         private CharacterManager characterManager;
@@ -117,6 +124,12 @@ namespace PCRCaculator
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
         public int MaxTPUpValue => playerSetting.maxTPUpValue;
+        public int RBRank => playerSetting.RBRank_max;
+        public int RBValue => playerSetting.RBValue1;
+        public int RBTpValue => playerSetting.RBTpValue;
+        public bool LoadFinished { get; private set; }
+        public Dictionary<int, GuildEnemyData> GuildEnemyDatas { get => guildEnemyDatas;}
+        public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic;}
         private void Awake()
         {
             if (Instance == null)
@@ -141,12 +154,13 @@ namespace PCRCaculator
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                Load();
+                StartCoroutine(Load());
                 CreateShowUnitIDS();
             }
             catch (Exception e)
             {
                 Debugtext.text += e.Message;
+                Debug.LogError(e.Message);
             }
 
             //CharacterManager = CharacterManager.Instance;
@@ -155,53 +169,166 @@ namespace PCRCaculator
 
         public Dictionary<int, float[]> execTimePatch;
 
-        private void Load()
+        private IEnumerator Load()
+        {
+            LoadFinished = false;
+            var wait = OpenWaitUI();
+            LoadPlayerSettings();
+            //Thread thread = new Thread(() => LoadAsync());
+            //await Task.Run(LoadAsync);
+            yield return LoadAsync();
+            Debugtext.text += "\n数据加载完毕！";
+            CreateShowUnitIDS();
+            wait.Close();
+        }
+        private IEnumerator LoadAsync()
         {
             execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
-            string jsonStr = LoadJsonDatas("Datas/AllData");
+            /*string jsonStr = LoadJsonDatas("Datas/AllData");
+            yield return null;
             if (jsonStr != "")
             {
                 AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
-                equipmentDic = allData.equipmentDic;
-                unitRarityDic = allData.unitRarityDic;
-                unitStoryEffectDic = allData.unitStoryEffectDic;
-                unitStoryDic = allData.unitStoryDic;
-                equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-                skillDataDic = allData.skillDataDic;
-                skillActionDic = allData.skillActionDic;
+                //equipmentDic = allData.equipmentDic;
+                //unitRarityDic = allData.unitRarityDic;
+                //unitStoryEffectDic = allData.unitStoryEffectDic;
+                //unitStoryDic = allData.unitStoryDic;
+                //equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                //skillDataDic = allData.skillDataDic;
+                //skillActionDic = allData.skillActionDic;
                 unitName_cn = allData.unitName_cn;
                 skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
+            yield return null;*/
+
+            SQLiteTool dbTool = SQLiteTool.OpenDB();
+
+            equipmentDic = dbTool.GetEquipmentData();
+            equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+            yield return null;
+            unitRarityDic = new Dictionary<int, UnitRarityData>();
+            yield return dbTool.GetUnitRarityData(unitRarityDic);
+            unitStoryDic = new Dictionary<int, UnitStoryData>();
+            unitStoryEffectDic = new Dictionary<int, List<int>>();
+            dbTool.GetUnitStoryData(unitStoryDic, unitStoryEffectDic);
+            yield return null;
+
+            skillDataDic = dbTool.GetSkillDataDic();
+            yield return null;
+            skillActionDic = dbTool.GetSkillActionDic();
+            yield return null;
+
+            allUnitAttackPatternDic = dbTool.GetUnitAttackPatternDic();
+            yield return null;
+
+            guildEnemyDatas = dbTool.GetGuildEnemyData();
+            yield return null;
+
+            enemyMPartsDic = dbTool.GetMPartsData();
+            yield return null;
+
+            //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
+            Guild.GuildManager.EnemyDataDic = new Dictionary<int, EnemyData>();
+            yield return dbTool.GetEnemyDataDic(Guild.GuildManager.EnemyDataDic);
+
+            uniqueEquipmentDataDic = dbTool.GetUEQData();
+
+            dbTool.CloseDB();
+
+            dbTool = SQLiteTool.OpenDB(true);
+            unitName_cn = dbTool.GetUnitName_cn();
+            yield return null;
+            skillNameAndDescribe_cn = dbTool.GetSkillName_cn();
+            yield return null;
+            skillActionDescribe_cn = dbTool.GetSkillActionDes_cn();
+            yield return null;
+
+#if true
+            SQLData.ClearCache();
+            Extensions.OverrideWith(equipmentDic, dbTool.GetEquipmentData());
+            yield return null;
+            var unitRarityDic2 = new Dictionary<int, UnitRarityData>();
+            yield return dbTool.GetUnitRarityData(unitRarityDic2);
+            Extensions.OverrideWith(unitRarityDic, unitRarityDic2);
+            var unitStoryDic2 = new Dictionary<int, UnitStoryData>();
+            var unitStoryEffectDic2 = new Dictionary<int, List<int>>();
+            dbTool.GetUnitStoryData(unitStoryDic2, unitStoryEffectDic2);
+            Extensions.OverrideWith(unitStoryDic, unitStoryDic2);
+            Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2);
+            yield return null;
+            
+            Extensions.OverrideWith(skillDataDic, dbTool.GetSkillDataDic());
+            yield return null;
+            Extensions.OverrideWith(skillActionDic, dbTool.GetSkillActionDic());
+            yield return null;
+            Extensions.OverrideWith(allUnitAttackPatternDic, dbTool.GetUnitAttackPatternDic());
+            yield return null;
+            Extensions.OverrideWith(guildEnemyDatas, dbTool.GetGuildEnemyData());
+            yield return null;
+            Extensions.OverrideWith(enemyMPartsDic, dbTool.GetMPartsData());
+            yield return null;
+
+            //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
+            var EnemyDataDic = new Dictionary<int, EnemyData>();
+            yield return dbTool.GetEnemyDataDic(Guild.GuildManager.EnemyDataDic);
+            Extensions.OverrideWith(Guild.GuildManager.EnemyDataDic, EnemyDataDic);
+            yield return null;
+            Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool.GetUEQData());
+#endif
+
+            dbTool.CloseDB();
+
+            /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
+            allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
+
+            string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
+            if (!string.IsNullOrEmpty(guildenemyDatasStr))
+            {
+                gm.guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, Guild.GuildEnemyData>>(guildenemyDatasStr);
+            }
+            string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
+            gm.EnemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>>(enemyMParts);
+
+            string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
+            //Guild.GuildManager.EnemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
+
+            Debug.LogError($"读取DB失败！{ex.Message}");*/
+
+            yield return null;
             LoadUnitData();
-            LoadPlayerSettings();
+            //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
             //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
             //allUnitFirearmDatas = allUnitPrefabData.allUnitFirearmDatas;
             //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
-
+            yield return null;
             string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
-            Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
+            //Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
             //string attackPatternStr = Resources.Load<TextAsset>("Datas/UnitAtttackPatternDic").text;
-            string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
-            allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
+            //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
+            //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
-            string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
-            uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
+            yield return null;
+            //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
+            //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
+            //yield return null;
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
             unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
+            yield return null;
             if (!string.IsNullOrEmpty(firearmStr))
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
-            Debugtext.text += "\n数据加载完毕！";
+
+            LoadFinished = true;
         }
         private void LoadUnitData()
         {
@@ -560,6 +687,12 @@ namespace PCRCaculator
 #else
             return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
 #endif
+        }
+
+        public WaitUI OpenWaitUI()
+        {
+            GameObject p = Instantiate(WaitingPrefab, GameObject.Find("Canvas")?.transform);
+            return p.GetComponent<WaitUI>();
         }
         public static Sprite LoadSourceSprite(string relativePath)
         {
