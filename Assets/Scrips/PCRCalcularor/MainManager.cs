@@ -273,7 +273,7 @@ namespace PCRCaculator
 
             //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
             var EnemyDataDic = new Dictionary<int, EnemyData>();
-            yield return dbTool.GetEnemyDataDic(Guild.GuildManager.EnemyDataDic);
+            yield return dbTool.GetEnemyDataDic(EnemyDataDic);
             Extensions.OverrideWith(Guild.GuildManager.EnemyDataDic, EnemyDataDic);
             yield return null;
             Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool.GetUEQData());

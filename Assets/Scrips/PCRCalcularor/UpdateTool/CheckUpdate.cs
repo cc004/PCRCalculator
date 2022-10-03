@@ -254,6 +254,12 @@ namespace PCRCaculator.Update
                 {
                     File.WriteAllBytes(updateFileFullName, web.downloadHandler.data);
                 }
+                else
+                {
+                    Log.Error($"ÏÂÔØÎÄ¼þÊ§°Ü£¡");
+                    StateCode = 500;
+                    yield break;
+                }
                 if (checkHash)
                 {
                     var fileHash = CalcMd5(File.ReadAllBytes(updateFileFullName));

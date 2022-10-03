@@ -247,7 +247,7 @@ namespace PCRCaculator.Guild
             List<string> list = new List<string>();
             foreach(var key in guildEnemyDatas.Keys)
             {
-                if (key >= 1036)
+                if (key >= 1024)
                 {
                     string str = $"{guildMonthNames[(key - 1000 + 11) % 12]}({key})";
                     list.Add(str);
@@ -568,9 +568,11 @@ namespace PCRCaculator.Guild
             timeLineTexts[1].text = data.timeLineData.GetDescribe();
 
             var group = SettingData.GetCurrentPlayerGroup();
+            if (data.currentGuildMonth < 1000) data.currentGuildMonth += 1024;
+            if (data.currentGuildMonth < 1024) data.currentGuildMonth += 24;
 
             if (selectedBossEnemyid == 0)
-                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth >= 1000 ? data.currentGuildMonth : 1048, data.currentGuildEnemyNum, data.currentTurn);
+                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth, data.currentGuildEnemyNum, data.currentTurn);
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
             bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyid].unit_id);
@@ -622,7 +624,7 @@ namespace PCRCaculator.Guild
                 group.playerSetingHP = 0;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
-            bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 + 11 : data.currentGuildMonth) % 12]}" +
+            bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" +
                 $"\n<size=10>({data.currentGuildMonth})</size>";
             //group.useLogBarrier = toggles_ChooseBoss[3].isOn;
         }

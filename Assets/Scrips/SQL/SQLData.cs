@@ -627,7 +627,7 @@ namespace PCRCaculator.SQL
         public string name { get; set; }
         public int skill_type { get; set; }
         public int skill_area_width { get; set; }
-        public int skill_cast_time { get; set; }
+        public float skill_cast_time { get; set; }
         public int boss_ub_cool_time { get; set; }
         public int action_1 { get; set; }
         public int action_2 { get; set; }
