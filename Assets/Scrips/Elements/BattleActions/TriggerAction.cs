@@ -226,11 +226,6 @@ namespace Elements
                     parts.BreakEffectList = _skill.SkillEffects;
                     _source.OnUpdateWhenIdle += _limitTime =>
                     {
-                        if (BattleHeaderController.CurrentFrameCount == 1827 && parts.Index == 3)
-                        {
-                            File.WriteAllText("d:\\exp.txt", parts.BreakPoint.ToExpression(114514));
-                            Debug.LogError($"id={parts.Index},point={parts.BreakPoint}");
-                        }
                         var point = parts.BreakPoint;
                         if (parts.BreakPoint != 0 || parts.IsBreak ||
                             (judgeSilenceOrToad(_source) || battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) ||
