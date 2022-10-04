@@ -39080,7 +39080,7 @@ MonoBehaviour:
   text: {fileID: 373239394}
   button: {fileID: 970938776}
   buttonText: {fileID: 1387466426}
-  GameVersion: 17
+  GameVersion: 18
   AssetVer: 10041400
   AssetVerOld: 10041400
 --- !u!114 &1397829692
@@ -40342,6 +40342,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4044618195180921840, guid: 75c6d1fd3037a4d4d82523de05e618fe,
+        type: 3}
+      propertyPath: useJapanData
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4044618195180921842, guid: 75c6d1fd3037a4d4d82523de05e618fe,
         type: 3}
       propertyPath: m_Name

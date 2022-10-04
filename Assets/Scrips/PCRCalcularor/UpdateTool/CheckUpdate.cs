@@ -14,11 +14,12 @@ namespace PCRCaculator.Update
 {
     public static class CheckUpdate
     {
-#if true //这里应该加个define
-        public const string Owner = @"cc004";
-#else
-        public const string Owner = @"acygen";
-#endif
+        /*#if true //这里应该加个define
+                public const string Owner = @"cc004";
+        #else
+                public const string Owner = @"acygen";
+        #endif*/
+        public static string Owner => MainManager.Instance.useJapanData ? @"acygen" : @"cc004";
         public const string Repo = @"PCRCalculator";
         public const string Salt = "abcd1234";
 
@@ -83,6 +84,10 @@ namespace PCRCaculator.Update
                 if(nowToolVer < HashData.Version)
                 {
                     Log.SetLog($"当前版本{nowToolVer}不是最新版，建议使用最新版。");
+                }
+                else
+                {
+                    Log.SetLog($"当前版本{nowToolVer}是最新版。");
                 }
                 int ver = ABExTool.GetVer(false);
                 int verold = ABExTool.GetVer(true);

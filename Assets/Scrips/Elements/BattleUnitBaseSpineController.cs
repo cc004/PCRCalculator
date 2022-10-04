@@ -29,7 +29,7 @@ namespace Elements
             skinId = _resourceSpineSet.SkinId;
             spineType = _resourceSpineSet.SpineResourceInfo.spineType;
             //this.MotionType = !ManagerSingleton<MasterDataManager>.Instance.masterUnitData.ContainsKey(_resourceSpineSet.UnitId) ? 0 : (int) ManagerSingleton<MasterDataManager>.Instance.masterUnitData[_resourceSpineSet.UnitId].MotionType;
-            MotionType = MainManager.Instance.UnitRarityDic.TryGetValue(UnitId, out UnitRarityData t) ? t.detailData.motionType : 0;
+            MotionType = MainManager.Instance.GetMotionType(UnitId, skinId);
             float animationScale = _resourceSpineSet.SpineResourceInfo.animationScale;
             //if ((Object)_resourceSpineSet.Animation != (Object)null)
             //_resourceSpineSet.Skelton.CreateSkeltonCysp(_resourceSpineSet.Animation, animationScale, false);

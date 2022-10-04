@@ -40,6 +40,7 @@ namespace PCRCaculator
         //public int loadCharacterMax;//最多加载到的角色序号
         public int levelMax { get => playerSetting.playerLevel; }
         public bool UseNewBattleSystem = true;
+        public bool useJapanData;
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
         private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
@@ -246,39 +247,40 @@ namespace PCRCaculator
             skillActionDescribe_cn = dbTool.GetSkillActionDes_cn();
             yield return null;
 
-#if true
-            SQLData.ClearCache();
-            Extensions.OverrideWith(equipmentDic, dbTool.GetEquipmentData());
-            yield return null;
-            var unitRarityDic2 = new Dictionary<int, UnitRarityData>();
-            yield return dbTool.GetUnitRarityData(unitRarityDic2);
-            Extensions.OverrideWith(unitRarityDic, unitRarityDic2);
-            var unitStoryDic2 = new Dictionary<int, UnitStoryData>();
-            var unitStoryEffectDic2 = new Dictionary<int, List<int>>();
-            dbTool.GetUnitStoryData(unitStoryDic2, unitStoryEffectDic2);
-            Extensions.OverrideWith(unitStoryDic, unitStoryDic2);
-            Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2);
-            yield return null;
-            
-            Extensions.OverrideWith(skillDataDic, dbTool.GetSkillDataDic());
-            yield return null;
-            Extensions.OverrideWith(skillActionDic, dbTool.GetSkillActionDic());
-            yield return null;
-            Extensions.OverrideWith(allUnitAttackPatternDic, dbTool.GetUnitAttackPatternDic());
-            yield return null;
-            Extensions.OverrideWith(guildEnemyDatas, dbTool.GetGuildEnemyData());
-            yield return null;
-            Extensions.OverrideWith(enemyMPartsDic, dbTool.GetMPartsData());
-            yield return null;
+            if (!useJapanData)
+            {
+                SQLData.ClearCache();
+                Extensions.OverrideWith(equipmentDic, dbTool.GetEquipmentData());
+                yield return null;
+                var unitRarityDic2 = new Dictionary<int, UnitRarityData>();
+                yield return dbTool.GetUnitRarityData(unitRarityDic2);
+                Extensions.OverrideWith(unitRarityDic, unitRarityDic2);
+                var unitStoryDic2 = new Dictionary<int, UnitStoryData>();
+                var unitStoryEffectDic2 = new Dictionary<int, List<int>>();
+                dbTool.GetUnitStoryData(unitStoryDic2, unitStoryEffectDic2);
+                Extensions.OverrideWith(unitStoryDic, unitStoryDic2);
+                Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2);
+                yield return null;
 
-            //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
-            var EnemyDataDic = new Dictionary<int, EnemyData>();
-            yield return dbTool.GetEnemyDataDic(EnemyDataDic);
-            Extensions.OverrideWith(Guild.GuildManager.EnemyDataDic, EnemyDataDic);
-            yield return null;
-            Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool.GetUEQData());
-#endif
+                Extensions.OverrideWith(skillDataDic, dbTool.GetSkillDataDic());
+                yield return null;
+                Extensions.OverrideWith(skillActionDic, dbTool.GetSkillActionDic());
+                yield return null;
+                Extensions.OverrideWith(allUnitAttackPatternDic, dbTool.GetUnitAttackPatternDic());
+                yield return null;
+                Extensions.OverrideWith(guildEnemyDatas, dbTool.GetGuildEnemyData());
+                yield return null;
+                Extensions.OverrideWith(enemyMPartsDic, dbTool.GetMPartsData());
+                yield return null;
 
+                //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
+                var EnemyDataDic = new Dictionary<int, EnemyData>();
+                yield return dbTool.GetEnemyDataDic(EnemyDataDic);
+                Extensions.OverrideWith(Guild.GuildManager.EnemyDataDic, EnemyDataDic);
+                yield return null;
+                Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool.GetUEQData());
+
+            }
             dbTool.CloseDB();
 
             /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
@@ -806,6 +808,12 @@ namespace PCRCaculator
         internal float GetDodgeTPRecoveryRatio()
         {
             return 0;
+        }
+        public int GetMotionType(int unitid,int skinid)
+        {
+            if (skinid == 170161 || unitid == 170101 && useJapanData)
+                return 34;
+            return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
         }
     }
     public class UnitData_other
