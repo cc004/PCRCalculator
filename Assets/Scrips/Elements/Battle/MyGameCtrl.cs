@@ -197,12 +197,12 @@ namespace Elements
             //{
             int skinID = UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */);
             int unitid2 = unitid;
-            if (mainManager.useJapanData && unitid == 105701 && data.rarity == 6)
+            if (unitid == 105701 && data.rarity == 6)
             {
                 skinID = 170161;
                 unitid2 = 170101;
             }
-                var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true);
+            var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true);
             //}
             if(dataAsset == null)
             {

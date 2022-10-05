@@ -453,7 +453,7 @@ namespace PCRCaculator
             path = Application.streamingAssetsPath + "/../.ABExt/" + fullname;
 #endif
             var asset = www.getAssetBundle();
-            if (asset == null)
+            if (asset == null || MainManager.Instance.useJapanData)
             {
                 if (!File.Exists(path))
                 {
