@@ -416,7 +416,7 @@ namespace PCRCaculator
         private const string KEY_VER_ID_OLD = "VER_ID_OLD";
         public static int GetVer(bool old,int? defaultVal = null)
         {
-            return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID, defaultVal ?? (old ? 10028300 : 10041400));
+            return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID, defaultVal ?? (old ? (MainManager.Instance?.useJapanData ?? false ? 10041400 : 10028300) : 10041400));
         }
         static ABExTool()
         {
@@ -554,6 +554,8 @@ namespace PCRCaculator
         {
             if (unitid == 207001)
                 return 207000;
+            if (unitid == 105701)
+                return 170101;
             return unitid;
         }
 
@@ -571,7 +573,7 @@ namespace PCRCaculator
                 path = Application.persistentDataPath + "/AB";
             }
 
-            Directory.Delete(path);
+            Directory.Delete(path,true);
             Directory.CreateDirectory(path);
 
         }

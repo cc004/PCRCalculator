@@ -49,7 +49,8 @@ namespace PCR_cysp2skel
 
         public static SkeletonData GetUnitSkelBytes(int unitId, AtlasAsset atlas)
         {
-            var unitType = MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var d) ? d.detailData.motionType : 0;
+            //var unitType = MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var d) ? d.detailData.motionType : 0;
+            var unitType = MainManager.Instance.GetMotionType(unitId, unitId);
             string char_base = $"spine_{(unitType == 0 ? unitId : 0):D6}_chara_base.cysp.unity3d";
             string common_battle = $"spine_{(unitType == 0 ? unitId: unitType):D2}_common_battle.cysp.unity3d";
             string spine_battle = $"spine_{unitId:D6}_battle.cysp.unity3d";
