@@ -2159,6 +2159,15 @@ this.updateCurColor();
             //action(_data.SkillData.SpSkillEvolutionIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true);
             SetSkill(_data.SkillData.SpSkillIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
             SetSkill(_data.SkillData.SpSkillEvolutionIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
+            List<SkillLevelInfo> skillLevelInfoList2 = new List<SkillLevelInfo>();
+            for (int index = 0; index < _data.SkillData.SubUnionBurstIds.Count; ++index)
+            {
+                SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
+                skillLevelInfo.SetSkillId(_data.SkillData.SubUnionBurstIds[index]);
+                skillLevelInfo.SetSkillLevel(Level);
+                skillLevelInfoList2.Add(skillLevelInfo);
+            }
+            SetSkill(_data.SkillData.SubUnionBurstIds, skillLevelInfoList2, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
             MainSkillIdList = _data.SkillData.MainSkillIds;
             SpecialSkillIdList = _data.SkillData.SpSkillIds;
             SpecialSkillEvolutionIdList = _data.SkillData.SpSkillEvolutionIds;
@@ -11669,11 +11678,11 @@ this.updateCurColor();
             ACCURACY = 13, // 0x0000000D
             [Description("降暴")]
             RECEIVE_CRITICAL_DAMAGE_RATE = 14,
-            [Description("降暴伤")]
+            [Description("受到暴伤提升")]
             RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT = 0xF,
-            [Description("降物暴伤")]
+            [Description("受到物暴伤提升")]
             RECEIVE_PHYSICAL_DAMAGE_PERCENT = 0x10,
-            [Description("降魔暴伤")]
+            [Description("受到魔暴伤提升")]
             RECEIVE_MAGIC_DAMAGE_PERCENT = 17,
             MAX_HP = 100, // 0x00000064
             NONE = 101, // 0x00000065

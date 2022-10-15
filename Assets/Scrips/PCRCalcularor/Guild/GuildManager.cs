@@ -54,6 +54,7 @@ namespace PCRCaculator.Guild
 
         public List<Text> calSettingTexts;
         public Slider calSlider;
+        public GameObject bossDetailPrefab;
 
 
         //public List<Sprite> bossSprites;
@@ -814,6 +815,11 @@ namespace PCRCaculator.Guild
             //SettingData.ubExecTimeDataDic[currentNum] = guildTimelineData.currentSettingData.ubExecTimeDataDic[guild_currentNum];
             //SettingData.useAutoModeDic[currentNum] = guildTimelineData.currentSettingData.useAutoModeDic[guild_currentNum];
             var timeLine = guildTimelineData.playerGroupData.timeLineData;
+            if(timeLine == null)
+            {
+                guildTimelineData.playerGroupData.timeLineData = new GuildRandomData();
+                timeLine = guildTimelineData.playerGroupData.timeLineData;
+            }
             timeLine.UseFixedRandomSeed = true;
             timeLine.RandomSeed = guildTimelineData.currentRandomSeed;
             SettingData.SetCurrentRandomData(timeLine);
@@ -1075,6 +1081,62 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); });
             }
         }
+
+        //显示BOSS详细数据
+        public void BossImageButton()
+        {
+            string detailstr = "    请选择BOSS!";
+            EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
+            if (enemyData != null)
+            {
+                detailstr = $"  {enemyData.detailData.unit_name}({selectedBossEnemyid})/({enemyData.detailData.unit_id})\n";
+                detailstr += $" HP：{enemyData.baseData.Hp}\n";
+                detailstr += $" ATK：{enemyData.baseData.Atk}\n";
+                detailstr += $" MGSTR：{enemyData.baseData.Magic_str}\n";
+                detailstr += $" DEF：{enemyData.baseData.Def}\n";
+                detailstr += $" MDEF：{enemyData.baseData.Magic_def}\n";
+                int idx = 1;
+                foreach (var pattern in enemyData.skillData.enemyAttackPatterns)
+                {
+                    string begin = "";
+                    string loop = "";
+                    for (int i = 0; i < pattern.loop_start - 1; i++)
+                    {
+                        begin += CharacterDetailManager.SkillInt2Str(pattern.atk_patterns[i]) + "-";
+                    }
+                    for (int i = pattern.loop_start - 1; i < pattern.loop_end; i++)
+                    {
+                        loop += CharacterDetailManager.SkillInt2Str(pattern.atk_patterns[i]) + "-";
+                    }
+                    detailstr += $" 攻击模式{idx++}:\n 起手：{begin}\n 循环：{loop}\n";
+                }
+                //int skID = enemyData.skillData.UB;
+                //int skLV = enemyData.union_burst_level;
+                Action<int, int,string> action = (skID, skLV,str) =>
+                 {
+                     detailstr += $" {str}:\n {skID}({skLV})\n";
+                     SkillData sk = MainManager.Instance.SkillDataDic[skID];
+                     detailstr += $" {sk.GetSkillDetailsEnemy(skLV, Math.Max(enemyData.baseData.Atk, enemyData.baseData.Magic_str))}\n";
+                 };
+                action(enemyData.skillData.UB, enemyData.union_burst_level,"UB");
+                for(int i = 0; i < enemyData.main_skill_lvs.Count; i++)
+                {
+                    int skID = enemyData.skillData.MainSkills[i];
+                    int skLV = enemyData.main_skill_lvs[i];
+                    if(skID>0 && skLV > 0)
+                    {
+                        action(skID, skLV,$"技能{i+1}");
+                    }
+                }
+
+            }
+
+
+            GameObject a = Instantiate(bossDetailPrefab, BaseBackManager.Instance.latestUIback.transform);
+            a.GetComponent<ShowTextUI>().Set(detailstr);
+        }
+
+
 
         public static void SaveSettingData(GuildSettingData settingData)
         {

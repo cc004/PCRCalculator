@@ -187,8 +187,8 @@ namespace PCRApi
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"asset manager load cache failed for manifest version {ver}");
-                UnityEngine.Debug.LogError(e);
+                UnityEngine.Debug.Log($"asset manager load cache failed for manifest version {ver}");
+                UnityEngine.Debug.Log(e);
 
                 AddRoot("AssetBundles", ver, "manifest/manifest_assetmanifest");
                 if (movie_ver != null)

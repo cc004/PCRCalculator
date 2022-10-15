@@ -412,6 +412,7 @@ namespace PCRCaculator
                     {
                         unitname = name0;
                     }
+                    unit.SetDefaultLoveDict();
                     int value = unit.playLoveDic.TryGetValue(effectUnitList[i], out var val) ? val : 0;
                     EXsettingSliders[i].SetSliderPrefab(
                         unitname,

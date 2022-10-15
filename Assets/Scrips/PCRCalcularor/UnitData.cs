@@ -903,6 +903,34 @@ namespace PCRCaculator
             }
             return detail;
         }
+        /// <summary>
+        /// 获取技能描述文字
+        /// </summary>
+        /// <param name="lv">技能等级</param>
+        /// <returns>描述字符串</returns>
+        public string GetSkillDetailsEnemy(int lv, float atk)
+        {
+            string detail = "释放时间：" + casttime + "s\n";
+            int i = 0;
+            foreach (int action in skillactions)
+            {
+                if (action != 0)
+                {
+                    string acdetail = MainManager.Instance.SkillActionDic[action].GetDetail(lv, atk);
+                    if (dependactions[i] > 0)
+                    {
+                        List<int> list = new List<int>(skillactions);
+                        acdetail = $"依赖{num[list.FindIndex(a=>a==dependactions[i])]}" + acdetail;
+                    }
+                    if (acdetail != "")
+                    {
+                        detail += num[i] + acdetail + "\n";
+                        i++;
+                    }
+                }
+            }
+            return detail;
+        }
         public override string ToString()
         {
             string[] da = new string[9]
@@ -1234,7 +1262,7 @@ namespace PCRCaculator
                     break;
                 default:
                     detailstr = description +
-                    "<color=#002DFF>(未知技能片段[" + skillTypeName[type] + "]";
+                    "<color=#002DFF>(未知技能片段[" + type + "]";
                     break;
 
             }

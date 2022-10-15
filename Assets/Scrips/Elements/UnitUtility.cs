@@ -2004,1700 +2004,1704 @@ namespace Elements
     }
     */
     public static int GetDefaultActionPatternId(int _id) => GetUnitResourceId(_id) * 100 + 1;
-/*
-    public static int CalcUnitsTotalPower()
-    {
-      int num = 0;
-      foreach (UnitParameter unitParameter in Singleton<UserData>.Instance.UnitParameterDictionary.Values)
-      {
-        if (unitParameter.UniqueData != null)
-          num += (int) unitParameter.UniqueData.Power;
-        else if (unitParameter.UniqueDataForView != null)
-          num += (int) unitParameter.UniqueDataForView.Power;
-      }
-      return num;
-    }
+        /*
+            public static int CalcUnitsTotalPower()
+            {
+              int num = 0;
+              foreach (UnitParameter unitParameter in Singleton<UserData>.Instance.UnitParameterDictionary.Values)
+              {
+                if (unitParameter.UniqueData != null)
+                  num += (int) unitParameter.UniqueData.Power;
+                else if (unitParameter.UniqueDataForView != null)
+                  num += (int) unitParameter.UniqueDataForView.Power;
+              }
+              return num;
+            }
 
-    public static int CalcUnitsTotalPower(List<UnitParameter> _unitParameters)
-    {
-      int num = 0;
-      for (int index = 0; index < _unitParameters.Count; ++index)
-      {
-        UnitParameter unitParameter = _unitParameters[index];
-        if (unitParameter.UniqueData != null)
-          num += (int) unitParameter.UniqueData.Power;
-        else if (unitParameter.UniqueDataForView != null)
-          num += (int) unitParameter.UniqueDataForView.Power;
-      }
-      return num;
-    }
+            public static int CalcUnitsTotalPower(List<UnitParameter> _unitParameters)
+            {
+              int num = 0;
+              for (int index = 0; index < _unitParameters.Count; ++index)
+              {
+                UnitParameter unitParameter = _unitParameters[index];
+                if (unitParameter.UniqueData != null)
+                  num += (int) unitParameter.UniqueData.Power;
+                else if (unitParameter.UniqueDataForView != null)
+                  num += (int) unitParameter.UniqueDataForView.Power;
+              }
+              return num;
+            }
 
-    public static int ConversionClass1UnitId(int _baseUnitId)
-    {
-      int _unitId = _baseUnitId;
-      int _jobId = 1;
-      if (UnitUtility.GetClassId(_unitId) > _jobId)
-        _unitId = UnitUtility.GetUnitId(UnitUtility.GetCharaId(_unitId), _jobId);
-      return _unitId;
-    }
+            public static int ConversionClass1UnitId(int _baseUnitId)
+            {
+              int _unitId = _baseUnitId;
+              int _jobId = 1;
+              if (UnitUtility.GetClassId(_unitId) > _jobId)
+                _unitId = UnitUtility.GetUnitId(UnitUtility.GetCharaId(_unitId), _jobId);
+              return _unitId;
+            }
 
-    public static void RemoveSupportUnitFromParty(ePartyType _partyType)
-    {
-      int[] partyUnitIdArray = Singleton<UserData>.Instance.FindPartyUnitIdArray(_partyType);
-      int[] _partyUnitIdArray = new int[5];
-      int index1 = 0;
-      for (int index2 = 0; index2 < partyUnitIdArray.Length; ++index2)
-      {
-        if (partyUnitIdArray[index2] != 1)
-        {
-          _partyUnitIdArray[index1] = partyUnitIdArray[index2];
-          ++index1;
-        }
-      }
-      Singleton<UserData>.Instance.SetPartyUnitIdArray(_partyType, _partyUnitIdArray);
-      ApiManager instance = ManagerSingleton<ApiManager>.Instance;
-      if (_partyType == ePartyType.CLAN_BATTLE)
-        return;
-      instance.AddDeckUpdatePostParam((int) _partyType, _partyUnitIdArray[0], _partyUnitIdArray[1], _partyUnitIdArray[2], _partyUnitIdArray[3], _partyUnitIdArray[4]);
-      instance.Exec((System.Action) (() => {}));
-    }
+            public static void RemoveSupportUnitFromParty(ePartyType _partyType)
+            {
+              int[] partyUnitIdArray = Singleton<UserData>.Instance.FindPartyUnitIdArray(_partyType);
+              int[] _partyUnitIdArray = new int[5];
+              int index1 = 0;
+              for (int index2 = 0; index2 < partyUnitIdArray.Length; ++index2)
+              {
+                if (partyUnitIdArray[index2] != 1)
+                {
+                  _partyUnitIdArray[index1] = partyUnitIdArray[index2];
+                  ++index1;
+                }
+              }
+              Singleton<UserData>.Instance.SetPartyUnitIdArray(_partyType, _partyUnitIdArray);
+              ApiManager instance = ManagerSingleton<ApiManager>.Instance;
+              if (_partyType == ePartyType.CLAN_BATTLE)
+                return;
+              instance.AddDeckUpdatePostParam((int) _partyType, _partyUnitIdArray[0], _partyUnitIdArray[1], _partyUnitIdArray[2], _partyUnitIdArray[3], _partyUnitIdArray[4]);
+              instance.Exec((System.Action) (() => {}));
+            }
 
-    public static void RemoveSupportUnitFromParty(ePartyType[] _partyTypeArray)
-    {
-      ApiManager instance = ManagerSingleton<ApiManager>.Instance;
-      List<DeckListData> postDeckList = new List<DeckListData>();
-      UserData userData = Singleton<UserData>.Instance;
-      System.Action<ePartyType, int[]> action = (System.Action<ePartyType, int[]>) ((_partyType, _unitIdArray) =>
-      {
-        DeckListData deckListData = new DeckListData();
-        deckListData.SetDeckNumber((int) _partyType);
-        deckListData.SetUnitList(_unitIdArray);
-        postDeckList.Add(deckListData);
-        userData.SetPartyUnitIdArray(_partyType, _unitIdArray);
-      });
-      for (int index1 = 0; index1 < _partyTypeArray.Length; ++index1)
-      {
-        ePartyType partyType = _partyTypeArray[index1];
-        int[] partyUnitIdArray = Singleton<UserData>.Instance.FindPartyUnitIdArray(partyType);
-        int[] numArray = new int[5];
-        int index2 = 0;
-        for (int index3 = 0; index3 < partyUnitIdArray.Length; ++index3)
-        {
-          if (partyUnitIdArray[index3] != 1)
-          {
-            numArray[index2] = partyUnitIdArray[index3];
-            ++index2;
-          }
-        }
-        action(partyType, numArray);
-      }
-      instance.AddDeckUpdateListPostParam(postDeckList);
-      instance.Exec((System.Action) (() => {}));
-    }
+            public static void RemoveSupportUnitFromParty(ePartyType[] _partyTypeArray)
+            {
+              ApiManager instance = ManagerSingleton<ApiManager>.Instance;
+              List<DeckListData> postDeckList = new List<DeckListData>();
+              UserData userData = Singleton<UserData>.Instance;
+              System.Action<ePartyType, int[]> action = (System.Action<ePartyType, int[]>) ((_partyType, _unitIdArray) =>
+              {
+                DeckListData deckListData = new DeckListData();
+                deckListData.SetDeckNumber((int) _partyType);
+                deckListData.SetUnitList(_unitIdArray);
+                postDeckList.Add(deckListData);
+                userData.SetPartyUnitIdArray(_partyType, _unitIdArray);
+              });
+              for (int index1 = 0; index1 < _partyTypeArray.Length; ++index1)
+              {
+                ePartyType partyType = _partyTypeArray[index1];
+                int[] partyUnitIdArray = Singleton<UserData>.Instance.FindPartyUnitIdArray(partyType);
+                int[] numArray = new int[5];
+                int index2 = 0;
+                for (int index3 = 0; index3 < partyUnitIdArray.Length; ++index3)
+                {
+                  if (partyUnitIdArray[index3] != 1)
+                  {
+                    numArray[index2] = partyUnitIdArray[index3];
+                    ++index2;
+                  }
+                }
+                action(partyType, numArray);
+              }
+              instance.AddDeckUpdateListPostParam(postDeckList);
+              instance.Exec((System.Action) (() => {}));
+            }
 
-    public static InterfaceEquipmentData GetEquipmentDataIncludedUnknownData(
-      int _equipmentId)
-    {
-      if (_equipmentId != 999999)
-        return ItemUtil.GetEquipmentData(_equipmentId);
-      if (UnitUtility.unknownEquipmentData == null)
-        UnitUtility.unknownEquipmentData = new MasterEquipmentData.EquipmentData(999999, eTextId.UNKNOWN_EQUIPMENT_NAME.Name());
-      return (InterfaceEquipmentData) UnitUtility.unknownEquipmentData;
-    }
+            public static InterfaceEquipmentData GetEquipmentDataIncludedUnknownData(
+              int _equipmentId)
+            {
+              if (_equipmentId != 999999)
+                return ItemUtil.GetEquipmentData(_equipmentId);
+              if (UnitUtility.unknownEquipmentData == null)
+                UnitUtility.unknownEquipmentData = new MasterEquipmentData.EquipmentData(999999, eTextId.UNKNOWN_EQUIPMENT_NAME.Name());
+              return (InterfaceEquipmentData) UnitUtility.unknownEquipmentData;
+            }
 
-    public static string GetSortTypeParameterValueString(
-      UnitParameter _unitParameter,
-      UnitSort.eSortType _sortType)
-    {
-      int unitId = (int) _unitParameter.MasterData.UnitId;
-      UnitData uniqueData = _unitParameter.UniqueData;
-      UnitParam unitParam = uniqueData.UnitParam;
-      switch (_sortType)
-      {
-        case UnitSort.eSortType.LV:
-          return _unitParameter.UniqueData.UnitLevel.ToString();
-        case UnitSort.eSortType.POWER:
-          return uniqueData.Power.ToString();
-        case UnitSort.eSortType.HP:
-          return uniqueData.TotalHp.ToString();
-        case UnitSort.eSortType.ATK:
-          return uniqueData.TotalAtk.ToString();
-        case UnitSort.eSortType.MAGIC_ATK:
-          return uniqueData.TotalMagicAtk.ToString();
-        case UnitSort.eSortType.DEF:
-          return uniqueData.TotalDef.ToString();
-        case UnitSort.eSortType.MAGIC_DEF:
-          return uniqueData.TotalMagicDef.ToString();
-        case UnitSort.eSortType.RARITY:
-          return ((int) uniqueData.PromotionLevel).ToString();
-        case UnitSort.eSortType.JAPANESE_SYLLABARY:
-          return (string) _unitParameter.MasterData.UnitName;
-        case UnitSort.eSortType.AFFECTION_RANK:
-          return ((int) Singleton<UserData>.Instance.CharaParameterDictionary[UnitUtility.GetCharaId(unitId)].LoveLevel).ToString();
-        default:
-          return "";
-      }
-    }
+            public static string GetSortTypeParameterValueString(
+              UnitParameter _unitParameter,
+              UnitSort.eSortType _sortType)
+            {
+              int unitId = (int) _unitParameter.MasterData.UnitId;
+              UnitData uniqueData = _unitParameter.UniqueData;
+              UnitParam unitParam = uniqueData.UnitParam;
+              switch (_sortType)
+              {
+                case UnitSort.eSortType.LV:
+                  return _unitParameter.UniqueData.UnitLevel.ToString();
+                case UnitSort.eSortType.POWER:
+                  return uniqueData.Power.ToString();
+                case UnitSort.eSortType.HP:
+                  return uniqueData.TotalHp.ToString();
+                case UnitSort.eSortType.ATK:
+                  return uniqueData.TotalAtk.ToString();
+                case UnitSort.eSortType.MAGIC_ATK:
+                  return uniqueData.TotalMagicAtk.ToString();
+                case UnitSort.eSortType.DEF:
+                  return uniqueData.TotalDef.ToString();
+                case UnitSort.eSortType.MAGIC_DEF:
+                  return uniqueData.TotalMagicDef.ToString();
+                case UnitSort.eSortType.RARITY:
+                  return ((int) uniqueData.PromotionLevel).ToString();
+                case UnitSort.eSortType.JAPANESE_SYLLABARY:
+                  return (string) _unitParameter.MasterData.UnitName;
+                case UnitSort.eSortType.AFFECTION_RANK:
+                  return ((int) Singleton<UserData>.Instance.CharaParameterDictionary[UnitUtility.GetCharaId(unitId)].LoveLevel).ToString();
+                default:
+                  return "";
+              }
+            }
 
-    public static bool IsEnoughEnhanceUseGold()
-    {
-      int totalGold = Singleton<UserData>.Instance.TotalGold;
-      if (totalGold < 120)
-        return false;
-      MasterItemData masterItemData = ManagerSingleton<MasterDataManager>.Instance.masterItemData;
-      MasterEquipmentData masterEquipmentData = ManagerSingleton<MasterDataManager>.Instance.masterEquipmentData;
-      foreach (UserItemParameter upStrengthenItem in Singleton<UserData>.Instance.ListUpStrengthenItems())
-      {
-        int itemId = (int) upStrengthenItem.ItemId;
-        MasterItemData.ItemData itemData = masterItemData.Get(itemId);
-        if ((int) itemData.Type == 3 && (int) upStrengthenItem.ItemCount > 0)
-        {
-          int num = (int) itemData.Value;
-          if (num > 0 && totalGold >= num * 120)
-            return true;
-        }
-      }
-      foreach (KeyValuePair<int, int> keyValuePair in Singleton<UserData>.Instance.ListUpPossession(eInventoryType.Equip))
-      {
-        if (keyValuePair.Value > 0)
-        {
-          MasterEquipmentData.EquipmentData equipmentData = masterEquipmentData.Get(keyValuePair.Key);
-          if (equipmentData != null)
-          {
-            int enhancementPoint = (int) equipmentData.EnhancementPoint;
-            if (enhancementPoint > 0 && totalGold >= enhancementPoint * 120)
+            public static bool IsEnoughEnhanceUseGold()
+            {
+              int totalGold = Singleton<UserData>.Instance.TotalGold;
+              if (totalGold < 120)
+                return false;
+              MasterItemData masterItemData = ManagerSingleton<MasterDataManager>.Instance.masterItemData;
+              MasterEquipmentData masterEquipmentData = ManagerSingleton<MasterDataManager>.Instance.masterEquipmentData;
+              foreach (UserItemParameter upStrengthenItem in Singleton<UserData>.Instance.ListUpStrengthenItems())
+              {
+                int itemId = (int) upStrengthenItem.ItemId;
+                MasterItemData.ItemData itemData = masterItemData.Get(itemId);
+                if ((int) itemData.Type == 3 && (int) upStrengthenItem.ItemCount > 0)
+                {
+                  int num = (int) itemData.Value;
+                  if (num > 0 && totalGold >= num * 120)
+                    return true;
+                }
+              }
+              foreach (KeyValuePair<int, int> keyValuePair in Singleton<UserData>.Instance.ListUpPossession(eInventoryType.Equip))
+              {
+                if (keyValuePair.Value > 0)
+                {
+                  MasterEquipmentData.EquipmentData equipmentData = masterEquipmentData.Get(keyValuePair.Key);
+                  if (equipmentData != null)
+                  {
+                    int enhancementPoint = (int) equipmentData.EnhancementPoint;
+                    if (enhancementPoint > 0 && totalGold >= enhancementPoint * 120)
+                      return true;
+                  }
+                }
+              }
+              return false;
+            }
+
+            public static bool IsEnoughUniqueEnhanceUseGold(int _slotIndex, int _nowPoint)
+            {
+              List<UserItemParameter> userItemParameterList = Singleton<UserData>.Instance.ListUpStrengthenItems();
+              MasterItemData masterItemData = ManagerSingleton<MasterDataManager>.Instance.masterItemData;
+              MasterEquipmentData masterEquipmentData = ManagerSingleton<MasterDataManager>.Instance.masterEquipmentData;
+              int _minPoint = 0;
+              int num1 = 0;
+              for (int index = 0; index < userItemParameterList.Count; ++index)
+              {
+                if ((int) userItemParameterList[index].ItemCount > 0)
+                {
+                  int itemId = (int) userItemParameterList[index].ItemId;
+                  MasterItemData.ItemData itemData = masterItemData.Get(itemId);
+                  if ((int) itemData.Type == 3)
+                  {
+                    if ((int) itemData.Value > 0)
+                    {
+                      int num2 = (int) itemData.Value;
+                      if (_minPoint == 0)
+                        _minPoint = num2;
+                      else if (_minPoint > num2)
+                        _minPoint = num2;
+                    }
+                    if (_minPoint == 1)
+                      break;
+                  }
+                }
+              }
+              if (_minPoint == 1)
+                return UnitUtility.checkUniqueEnhanceCost(_slotIndex, _nowPoint, _minPoint);
+              num1 = 0;
+              foreach (KeyValuePair<int, int> keyValuePair in Singleton<UserData>.Instance.ListUpPossession(eInventoryType.Equip))
+              {
+                if (keyValuePair.Value > 0)
+                {
+                  MasterEquipmentData.EquipmentData equipmentData = masterEquipmentData.Get(keyValuePair.Key);
+                  if (equipmentData != null)
+                  {
+                    int enhancementPoint = (int) equipmentData.EnhancementPoint;
+                    if (enhancementPoint > 0)
+                    {
+                      int num2 = enhancementPoint;
+                      if (_minPoint == 0)
+                        _minPoint = num2;
+                      else if (_minPoint > num2)
+                        _minPoint = num2;
+                    }
+                    if (_minPoint == 1)
+                      break;
+                  }
+                }
+              }
+              return _minPoint != 0 && UnitUtility.checkUniqueEnhanceCost(_slotIndex, _nowPoint, _minPoint);
+            }
+
+            private static bool checkUniqueEnhanceCost(int _slotIndex, int _nowPoint, int _minPoint) => Singleton<UserData>.Instance.TotalGold >= ManagerSingleton<MasterDataManager>.Instance.masterUniqueEquipmentEnhanceData.RequireCost(_slotIndex, _nowPoint, _minPoint);
+
+            public static bool IsPromotionPossible(Dictionary<int, int> _needEquipItems)
+            {
+              MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
+              Dictionary<int, int> dictionary = new Dictionary<int, int>();
+              foreach (KeyValuePair<int, int> needEquipItem in _needEquipItems)
+              {
+                int num1 = Singleton<UserData>.Instance.SearchPossession(eInventoryType.Equip, needEquipItem.Key);
+                if (num1 < needEquipItem.Value)
+                {
+                  int num2 = needEquipItem.Value - num1;
+                  MasterEquipmentCraft.EquipmentCraft equipmentCraft = instance.masterEquipmentCraft.Get(needEquipItem.Key);
+                  if (equipmentCraft == null)
+                    return false;
+                  int conditionEquipmentCount = equipmentCraft.GetConditionEquipmentCount();
+                  if (conditionEquipmentCount <= 0)
+                    return false;
+                  for (int _index = 0; _index < conditionEquipmentCount; ++_index)
+                  {
+                    int conditionEquipmentId = equipmentCraft.GetConditionEquipmentId(_index);
+                    int conditionConsumeNum = equipmentCraft.GetConditionConsumeNum(_index);
+                    if (dictionary.ContainsKey(conditionEquipmentId))
+                      dictionary[conditionEquipmentId] += conditionConsumeNum * num2;
+                    else
+                      dictionary.Add(conditionEquipmentId, conditionConsumeNum * num2);
+                  }
+                }
+              }
+              foreach (KeyValuePair<int, int> keyValuePair in dictionary)
+              {
+                if (Singleton<UserData>.Instance.SearchPossession(eInventoryType.Equip, keyValuePair.Key) < keyValuePair.Value)
+                  return false;
+              }
               return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    public static bool IsEnoughUniqueEnhanceUseGold(int _slotIndex, int _nowPoint)
-    {
-      List<UserItemParameter> userItemParameterList = Singleton<UserData>.Instance.ListUpStrengthenItems();
-      MasterItemData masterItemData = ManagerSingleton<MasterDataManager>.Instance.masterItemData;
-      MasterEquipmentData masterEquipmentData = ManagerSingleton<MasterDataManager>.Instance.masterEquipmentData;
-      int _minPoint = 0;
-      int num1 = 0;
-      for (int index = 0; index < userItemParameterList.Count; ++index)
-      {
-        if ((int) userItemParameterList[index].ItemCount > 0)
-        {
-          int itemId = (int) userItemParameterList[index].ItemId;
-          MasterItemData.ItemData itemData = masterItemData.Get(itemId);
-          if ((int) itemData.Type == 3)
-          {
-            if ((int) itemData.Value > 0)
-            {
-              int num2 = (int) itemData.Value;
-              if (_minPoint == 0)
-                _minPoint = num2;
-              else if (_minPoint > num2)
-                _minPoint = num2;
             }
-            if (_minPoint == 1)
-              break;
-          }
-        }
-      }
-      if (_minPoint == 1)
-        return UnitUtility.checkUniqueEnhanceCost(_slotIndex, _nowPoint, _minPoint);
-      num1 = 0;
-      foreach (KeyValuePair<int, int> keyValuePair in Singleton<UserData>.Instance.ListUpPossession(eInventoryType.Equip))
-      {
-        if (keyValuePair.Value > 0)
-        {
-          MasterEquipmentData.EquipmentData equipmentData = masterEquipmentData.Get(keyValuePair.Key);
-          if (equipmentData != null)
-          {
-            int enhancementPoint = (int) equipmentData.EnhancementPoint;
-            if (enhancementPoint > 0)
+
+            public static void UpdateUnitNotification(
+              UnitDefine.UnitNotificationType _type = UnitDefine.UnitNotificationType.ALL,
+              int _unitId = 0,
+              int _calcLocalGold = -1,
+              bool _isUpdateEquip = false,
+              int _levelOffset = 0)
             {
-              int num2 = enhancementPoint;
-              if (_minPoint == 0)
-                _minPoint = num2;
-              else if (_minPoint > num2)
-                _minPoint = num2;
-            }
-            if (_minPoint == 1)
-              break;
-          }
-        }
-      }
-      return _minPoint != 0 && UnitUtility.checkUniqueEnhanceCost(_slotIndex, _nowPoint, _minPoint);
-    }
-
-    private static bool checkUniqueEnhanceCost(int _slotIndex, int _nowPoint, int _minPoint) => Singleton<UserData>.Instance.TotalGold >= ManagerSingleton<MasterDataManager>.Instance.masterUniqueEquipmentEnhanceData.RequireCost(_slotIndex, _nowPoint, _minPoint);
-
-    public static bool IsPromotionPossible(Dictionary<int, int> _needEquipItems)
-    {
-      MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
-      Dictionary<int, int> dictionary = new Dictionary<int, int>();
-      foreach (KeyValuePair<int, int> needEquipItem in _needEquipItems)
-      {
-        int num1 = Singleton<UserData>.Instance.SearchPossession(eInventoryType.Equip, needEquipItem.Key);
-        if (num1 < needEquipItem.Value)
-        {
-          int num2 = needEquipItem.Value - num1;
-          MasterEquipmentCraft.EquipmentCraft equipmentCraft = instance.masterEquipmentCraft.Get(needEquipItem.Key);
-          if (equipmentCraft == null)
-            return false;
-          int conditionEquipmentCount = equipmentCraft.GetConditionEquipmentCount();
-          if (conditionEquipmentCount <= 0)
-            return false;
-          for (int _index = 0; _index < conditionEquipmentCount; ++_index)
-          {
-            int conditionEquipmentId = equipmentCraft.GetConditionEquipmentId(_index);
-            int conditionConsumeNum = equipmentCraft.GetConditionConsumeNum(_index);
-            if (dictionary.ContainsKey(conditionEquipmentId))
-              dictionary[conditionEquipmentId] += conditionConsumeNum * num2;
-            else
-              dictionary.Add(conditionEquipmentId, conditionConsumeNum * num2);
-          }
-        }
-      }
-      foreach (KeyValuePair<int, int> keyValuePair in dictionary)
-      {
-        if (Singleton<UserData>.Instance.SearchPossession(eInventoryType.Equip, keyValuePair.Key) < keyValuePair.Value)
-          return false;
-      }
-      return true;
-    }
-
-    public static void UpdateUnitNotification(
-      UnitDefine.UnitNotificationType _type = UnitDefine.UnitNotificationType.ALL,
-      int _unitId = 0,
-      int _calcLocalGold = -1,
-      bool _isUpdateEquip = false,
-      int _levelOffset = 0)
-    {
-      if (!ManagerSingleton<MasterDataManager>.Instance.IsSetupFinished || TutorialManager.IsStartTutorial)
-        return;
-      bool _isEnhanceRelease = ManagerSingleton<MasterDataManager>.Instance.masterContentReleaseData.CheckReleaseContents(eSystemId.UNIT_EQUIP_ENHANCE);
-      switch (_type)
-      {
-        case UnitDefine.UnitNotificationType.ALL:
-          UnitUtility.updateUnitEquipNotificationInfo(_isUpdateEquip, _isEnhanceRelease);
-          UnitUtility.updateUnitRarityNotificationInfo();
-          UnitUtility.updateUnlockUnitNotificationInfo();
-          UnitUtility.updateSkillEnhanceNotification();
-          UnitUtility.updateLevelUpNotification();
-          break;
-        case UnitDefine.UnitNotificationType.EQUIP:
-          UnitUtility.updateUnitEquipNotificationInfo(_isUpdateEquip, _isEnhanceRelease);
-          break;
-        case UnitDefine.UnitNotificationType.SPECIFIC_EQUIP:
-          UnitUtility.updateSpecificUnitEquipNotificationInfo(_isUpdateEquip, _unitId, _isEnhanceRelease);
-          break;
-        case UnitDefine.UnitNotificationType.SKILL:
-          UnitUtility.updateSkillEnhanceNotification();
-          break;
-        case UnitDefine.UnitNotificationType.SKILL_TARGET_UNIT:
-          UnitUtility.updateSkillEnhanceLocalNotification(_unitId, _calcLocalGold, _levelOffset);
-          break;
-        case UnitDefine.UnitNotificationType.LEVEL_UP:
-          UnitUtility.updateLevelUpNotification(_unitId);
-          UnitUtility.updateUniqueEquipNotificationInfo(_isUpdateEquip, _unitId, _isEnhanceRelease);
-          break;
-        case UnitDefine.UnitNotificationType.HIGH_RARITY:
-          UnitUtility.updateHighRarityEquipNotificationInfo(_isUpdateEquip, _unitId);
-          break;
-      }
-    }
-
-    private static void updateUnitEquipNotificationInfo(bool _isUpdateEquip, bool _isEnhanceRelease)
-    {
-      foreach (KeyValuePair<int, UnitParameter> unitParameter in Singleton<UserData>.Instance.UnitParameterDictionary)
-      {
-        UnitUtility.setUnitEquipNotificationInfo(_isUpdateEquip, unitParameter.Value, _isEnhanceRelease);
-        UnitUtility.setUnitUniqueEquipNotificationInfo(false, unitParameter.Value, _isEnhanceRelease);
-        UnitUtility.setUnitHighRarityEquipNotificationInfo(false, unitParameter.Value);
-      }
-    }
-
-    private static void updateSpecificUnitEquipNotificationInfo(
-      bool _isUpdateEquip,
-      int _unitId,
-      bool _isEnhanceRelease)
-    {
-      UnitParameter _unitParam = (UnitParameter) null;
-      if (!Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out _unitParam))
-        return;
-      UnitUtility.setUnitEquipNotificationInfo(_isUpdateEquip, _unitParam, _isEnhanceRelease);
-      UnitUtility.setUnitUniqueEquipNotificationInfo(false, _unitParam, _isEnhanceRelease);
-    }
-
-    private static void updateUniqueEquipNotificationInfo(
-      bool _isUpdateEquip,
-      int _unitId,
-      bool _isEnhanceRelease,
-      int _temporaryAddLv = 0)
-    {
-      UnitParameter _unitParam = (UnitParameter) null;
-      if (!Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out _unitParam))
-        return;
-      UnitUtility.setUnitUniqueEquipNotificationInfo(_isUpdateEquip, _unitParam, _isEnhanceRelease, _temporaryAddLv);
-    }
-
-    private static void updateHighRarityEquipNotificationInfo(bool _isUpdateEquip, int _unitId)
-    {
-      UnitParameter _unitParam = (UnitParameter) null;
-      if (!Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out _unitParam))
-        return;
-      UnitUtility.setUnitHighRarityEquipNotificationInfo(_isUpdateEquip, _unitParam);
-    }
-
-    private static void setUnitEquipNotificationInfo(
-      bool _isUpdateEquip,
-      UnitParameter _unitParam,
-      bool _isEnhanceRelease)
-    {
-      int id1 = (int) _unitParam.UniqueData.Id;
-      Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
-      bool flag = true;
-      if (_isUpdateEquip)
-        UnitUtility.UpdateUnitEquipmentSlot(id1);
-      UnitNotificationInfo notificationInfo;
-      if (!unitNotification.TryGetValue(id1, out notificationInfo))
-      {
-        notificationInfo = new UnitNotificationInfo(id1, _level: ((int) _unitParam.UniqueData.UnitLevel));
-        unitNotification.Add(id1, notificationInfo);
-      }
-      else
-        notificationInfo.IsNoticeUnlock = false;
-      List<EquipSlot> equipSlot = _unitParam.UniqueData.EquipSlot;
-      Dictionary<int, int> _needEquipItems = new Dictionary<int, int>();
-      for (int index = 0; index < equipSlot.Count; ++index)
-      {
-        int id2 = (int) equipSlot[index].Id;
-        UnitDefine.UnitEquipmentStatus status = (UnitDefine.UnitEquipmentStatus) (int) equipSlot[index].Status;
-        if (status == UnitDefine.UnitEquipmentStatus.NO_POSSESION || status == UnitDefine.UnitEquipmentStatus.LV_SHORTAGE || (status == UnitDefine.UnitEquipmentStatus.NO_POSSESION_CANNOT_CRAFT || status == UnitDefine.UnitEquipmentStatus.UNKNOWN))
-        {
-          flag = false;
-          notificationInfo.SlotList[index].SetEquip(false);
-          notificationInfo.SlotList[index].SetEnhance(false);
-          notificationInfo.SlotList[index].SetCraftCost(-1);
-        }
-        else
-        {
-          switch (status)
-          {
-            case UnitDefine.UnitEquipmentStatus.CAN_EQUIP:
-            case UnitDefine.UnitEquipmentStatus.CAN_CRAFT:
-            case UnitDefine.UnitEquipmentStatus.CAN_EQUIP_LV_SHORTAGE:
-            case UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE:
-              notificationInfo.SlotList[index].SetEquip(true);
-              notificationInfo.SlotList[index].SetEnhance(false);
-              if (_needEquipItems.ContainsKey(id2))
-                _needEquipItems[id2]++;
-              else
-                _needEquipItems.Add(id2, 1);
-              if (status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT || status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE)
+              if (!ManagerSingleton<MasterDataManager>.Instance.IsSetupFinished || TutorialManager.IsStartTutorial)
+                return;
+              bool _isEnhanceRelease = ManagerSingleton<MasterDataManager>.Instance.masterContentReleaseData.CheckReleaseContents(eSystemId.UNIT_EQUIP_ENHANCE);
+              switch (_type)
               {
-                notificationInfo.SlotList[index].SetCraftCost(UnitUtility.CalcNeededCraftCost(id2));
-                continue;
-              }
-              notificationInfo.SlotList[index].SetCraftCost(-1);
-              continue;
-            case UnitDefine.UnitEquipmentStatus.EQUIPPED:
-              notificationInfo.SlotList[index].SetEquip(false);
-              if (_isEnhanceRelease)
-                notificationInfo.SlotList[index].SetEnhance(UnitUtility.settingUnitEquipEnhanceStatus(equipSlot[index]));
-              else
-                notificationInfo.SlotList[index].SetEnhance(false);
-              notificationInfo.SlotList[index].SetCraftCost(-1);
-              continue;
-            default:
-              flag = false;
-              continue;
-          }
-        }
-      }
-      if ((ePromotionLevel) UnitUtility.GetUnitMaxRank(id1) <= _unitParam.UniqueData.PromotionLevel)
-        flag = false;
-      else if (flag)
-        flag = UnitUtility.IsPromotionPossible(_needEquipItems);
-      notificationInfo.IsNoticePromotion = flag;
-      unitNotification[id1] = notificationInfo;
-    }
-
-    private static void setUnitUniqueEquipNotificationInfo(
-      bool _isUpdateEquip,
-      UnitParameter _unitParam,
-      bool _isEnhanceRelease,
-      int _temporaryAddLv = 0)
-    {
-      int id1 = (int) _unitParam.UniqueData.Id;
-      Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
-      if (_isUpdateEquip)
-        UnitUtility.UpdateUnitEquipmentSlot(id1);
-      UnitNotificationInfo notificationInfo;
-      if (!unitNotification.TryGetValue(id1, out notificationInfo))
-      {
-        notificationInfo = new UnitNotificationInfo(id1, _level: ((int) _unitParam.UniqueData.UnitLevel));
-        unitNotification.Add(id1, notificationInfo);
-      }
-      else
-      {
-        notificationInfo.IsNoticeUnlock = false;
-        notificationInfo.CheckAndCreateUniqueSlot(id1);
-      }
-      if (UnitUtility.GetUniqueEquipSlotNum(id1) == 0)
-        return;
-      List<EquipSlot> uniqueEquipSlot = _unitParam.UniqueData.UniqueEquipSlot;
-      Dictionary<int, int> dictionary = new Dictionary<int, int>();
-      for (int index = 0; index < uniqueEquipSlot.Count; ++index)
-      {
-        int id2 = (int) uniqueEquipSlot[index].Id;
-        UnitDefine.UnitEquipmentStatus status = (UnitDefine.UnitEquipmentStatus) (int) uniqueEquipSlot[index].Status;
-        switch (status)
-        {
-          case UnitDefine.UnitEquipmentStatus.NO_POSSESION:
-          case UnitDefine.UnitEquipmentStatus.NO_POSSESION_CANNOT_CRAFT:
-          case UnitDefine.UnitEquipmentStatus.LV_SHORTAGE:
-          case UnitDefine.UnitEquipmentStatus.UNKNOWN:
-          case UnitDefine.UnitEquipmentStatus.RANK_SHORTAGE:
-            notificationInfo.UniqueSlotList[index].SetEquip(false);
-            notificationInfo.UniqueSlotList[index].SetEnhance(false);
-            notificationInfo.UniqueSlotList[index].SetCraftCost(-1);
-            notificationInfo.UniqueSlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-            break;
-          case UnitDefine.UnitEquipmentStatus.CAN_EQUIP:
-          case UnitDefine.UnitEquipmentStatus.CAN_CRAFT:
-          case UnitDefine.UnitEquipmentStatus.CAN_EQUIP_LV_SHORTAGE:
-          case UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE:
-            notificationInfo.UniqueSlotList[index].SetEquip(true);
-            notificationInfo.UniqueSlotList[index].SetEnhance(false);
-            if (dictionary.ContainsKey(id2))
-              dictionary[id2]++;
-            else
-              dictionary.Add(id2, 1);
-            if (status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT || status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE)
-            {
-              notificationInfo.UniqueSlotList[index].SetCraftCost(UnitUtility.CalcNeededCraftCost(id2));
-              break;
-            }
-            notificationInfo.UniqueSlotList[index].SetCraftCost(-1);
-            break;
-          case UnitDefine.UnitEquipmentStatus.EQUIPPED:
-            if (_isEnhanceRelease)
-            {
-              notificationInfo.UniqueSlotList[index] = UnitUtility.settingUnitUniqueEquipEnhanceStatus(uniqueEquipSlot[index], index, (int) _unitParam.UniqueData.UnitLevel + _temporaryAddLv);
-              break;
-            }
-            notificationInfo.UniqueSlotList[index].SetEquip(false);
-            notificationInfo.UniqueSlotList[index].SetEnhance(false);
-            notificationInfo.UniqueSlotList[index].SetCraftCost(-1);
-            notificationInfo.UniqueSlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-            break;
-        }
-      }
-      unitNotification[id1] = notificationInfo;
-    }
-
-    private static void setUnitHighRarityEquipNotificationInfo(
-      bool _isUpdateEquip,
-      UnitParameter _unitParam)
-    {
-      int id = (int) _unitParam.UniqueData.Id;
-      if (!UnitUtility.IsUnlockRaritySix(id))
-        return;
-      UserData instance = Singleton<UserData>.Instance;
-      Dictionary<int, UnitNotificationInfo> unitNotification = instance.UnitNotification;
-      if (_isUpdateEquip)
-        UnitUtility.UpdateUnitEquipmentSlot(id);
-      UnitNotificationInfo notificationInfo;
-      if (!unitNotification.TryGetValue(id, out notificationInfo))
-      {
-        notificationInfo = new UnitNotificationInfo(id, _level: ((int) _unitParam.UniqueData.UnitLevel));
-        unitNotification.Add(id, notificationInfo);
-      }
-      else
-        notificationInfo.IsNoticeUnlock = false;
-      List<EquipSlot> uniqueEquipSlot = _unitParam.UniqueData.UniqueEquipSlot;
-      bool flag1 = uniqueEquipSlot.Count > 0;
-      if (flag1)
-        flag1 = (bool) uniqueEquipSlot[0].IsSlot;
-      bool flag2 = true;
-      MasterUnlockRarity6 masterUnlockRarity6 = ManagerSingleton<MasterDataManager>.Instance.masterUnlockRarity6;
-      for (int index = 0; index < 3; ++index)
-      {
-        switch ((UnitDefine.UnitEquipmentStatus) UnitUtility.GetUnlockRarityStatus(_unitParam.UniqueData.UnlockRarity6Item, index + 1))
-        {
-          case UnitDefine.UnitEquipmentStatus.NO_POSSESION:
-          case UnitDefine.UnitEquipmentStatus.NO_POSSESION_CANNOT_CRAFT:
-            notificationInfo.HighRaritySlotList[index].SetEquip(false);
-            notificationInfo.HighRaritySlotList[index].SetEnhance(false);
-            notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
-            notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-            flag2 = false;
-            break;
-          case UnitDefine.UnitEquipmentStatus.CAN_EQUIP:
-            int unlockRarityLevel1 = UnitUtility.GetUnlockRarityLevel(_unitParam.UniqueData.UnlockRarity6Item, index + 1);
-            int consumeGold1 = (int) masterUnlockRarity6.Get(id, (byte) (index + 1), (byte) (unlockRarityLevel1 + 1)).consume_gold;
-            bool flag3 = instance.TotalGold >= consumeGold1 & flag1;
-            notificationInfo.HighRaritySlotList[index].SetEquip(flag3);
-            notificationInfo.HighRaritySlotList[index].SetEnhance(false);
-            notificationInfo.HighRaritySlotList[index].SetCraftCost(flag3 ? consumeGold1 : -1);
-            notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-            flag2 = false;
-            break;
-          case UnitDefine.UnitEquipmentStatus.EQUIPPED:
-            notificationInfo.HighRaritySlotList[index].SetEquip(false);
-            int unlockRarityLevel2 = UnitUtility.GetUnlockRarityLevel(_unitParam.UniqueData.UnlockRarity6Item, index + 1);
-            if (unlockRarityLevel2 >= masterUnlockRarity6.GetListWithUnitIdAndSlotIdOrderByUnlockLevelAsc(id, (byte) (index + 1)).Count)
-            {
-              notificationInfo.HighRaritySlotList[index].SetEnhance(false);
-              notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
-              notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.MAX);
-              break;
-            }
-            if (UnitUtility.isEnoughHighRarityItemNum(id, index + 1, unlockRarityLevel2 + 1))
-            {
-              int consumeGold2 = (int) masterUnlockRarity6.Get(id, (byte) (index + 1), (byte) (unlockRarityLevel2 + 1)).consume_gold;
-              bool flag4 = instance.TotalGold >= consumeGold2;
-              notificationInfo.HighRaritySlotList[index].SetEnhance(flag4);
-              notificationInfo.HighRaritySlotList[index].SetCraftCost(flag4 ? consumeGold2 : -1);
-              notificationInfo.HighRaritySlotList[index].SetOverLimit(flag4 ? UnitDefine.UniqueEquipOverLimitStatus.POSSIBLE : UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-              flag2 = false;
-              break;
-            }
-            notificationInfo.HighRaritySlotList[index].SetEnhance(false);
-            notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
-            notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-            flag2 = false;
-            break;
-          case UnitDefine.UnitEquipmentStatus.STAR_SHORTAGE:
-            notificationInfo.HighRaritySlotList[index].SetEquip(false);
-            notificationInfo.HighRaritySlotList[index].SetEnhance(false);
-            notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
-            notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-            flag2 = false;
-            break;
-        }
-      }
-      if ((int) _unitParam.UniqueData.UnitRarity == 5)
-      {
-        UnitData uniqueData = instance.UnitParameterDictionary[id].UniqueData;
-        notificationInfo.IsNoticeHighRarityEvolution = (int) uniqueData.UnlockRarity6Item.QuestClear > 0;
-      }
-      else if ((int) _unitParam.UniqueData.UnitRarity == 6)
-      {
-        flag2 = false;
-        notificationInfo.IsNoticeHighRarityEvolution = false;
-      }
-      notificationInfo.IsNoticeHighRarityQuest = flag2;
-      unitNotification[id] = notificationInfo;
-    }
-
-    private static bool isEnoughHighRarityItemNum(int _unitId, int _slotId, int _checkItemLevel)
-    {
-      MasterUnlockRarity6.UnlockRarity6 unlockRarity6 = ManagerSingleton<MasterDataManager>.Instance.masterUnlockRarity6.Get(_unitId, (byte) _slotId, (byte) _checkItemLevel);
-      return Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, (int) unlockRarity6.material_id) >= (int) unlockRarity6.material_count;
-    }
-
-    private static bool settingUnitEquipEnhanceStatus(EquipSlot _equipSlot)
-    {
-      InterfaceEquipmentData includedUnknownData = UnitUtility.GetEquipmentDataIncludedUnknownData((int) _equipSlot.Id);
-      int count = ManagerSingleton<MasterDataManager>.Instance.masterEquipmentEnhanceData[includedUnknownData.Promotion - 1].Count;
-      return includedUnknownData.Promotion > 1 && (int) _equipSlot.EnhancementLevel < count;
-    }
-
-    private static NoticeEquipStatus settingUnitUniqueEquipEnhanceStatus(
-      EquipSlot _equipSlot,
-      int _slotIndex,
-      int _unitLevel)
-    {
-      NoticeEquipStatus noticeEquipStatus = new NoticeEquipStatus(_isUnique: true);
-      MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
-      MasterUniqueEquipmentEnhanceData equipmentEnhanceData = instance.masterUniqueEquipmentEnhanceData;
-      MasterUniqueEquipmentRankup uniqueEquipmentRankup1 = instance.masterUniqueEquipmentRankup;
-      if ((int) _equipSlot.EnhancementLevel >= equipmentEnhanceData.LevelMax(_slotIndex))
-      {
-        noticeEquipStatus.SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.MAX);
-        return noticeEquipStatus;
-      }
-      int num = equipmentEnhanceData.LimitLevel(_slotIndex, (int) _equipSlot.Rank);
-      if ((int) _equipSlot.EnhancementLevel < num)
-        noticeEquipStatus.SetEnhance(UnitUtility.IsEnoughUniqueEnhanceUseGold(_slotIndex, (int) _equipSlot.EnhancementPt));
-      int maxEquipRank = uniqueEquipmentRankup1.GetMaxEquipRank((int) _equipSlot.Id);
-      MasterUniqueEquipmentRankup.UniqueEquipmentRankup uniqueEquipmentRankup2 = uniqueEquipmentRankup1.Get((int) _equipSlot.Id, (int) _equipSlot.Rank);
-      if ((int) _equipSlot.Rank > maxEquipRank)
-      {
-        noticeEquipStatus.SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.MAX);
-        return noticeEquipStatus;
-      }
-      if (_unitLevel < (int) uniqueEquipmentRankup2.UnitLevel || UnitUtility.CreateUniqueEquipmentRankupPostData((int) _equipSlot.Id, (int) _equipSlot.Rank) == null)
-        return noticeEquipStatus;
-      noticeEquipStatus.SetOverLimit(Singleton<UserData>.Instance.TotalGold >= uniqueEquipmentRankup2.GetCraftCost ? UnitDefine.UniqueEquipOverLimitStatus.POSSIBLE : UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
-      return noticeEquipStatus;
-    }
-
-    private static void updateUnitRarityNotificationInfo()
-    {
-      Dictionary<int, UnitParameter> parameterDictionary = Singleton<UserData>.Instance.UnitParameterDictionary;
-      Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
-      foreach (KeyValuePair<int, UnitParameter> keyValuePair in parameterDictionary)
-      {
-        int key = keyValuePair.Key;
-        UnitNotificationInfo notificationInfo;
-        if (!unitNotification.TryGetValue(key, out notificationInfo))
-        {
-          notificationInfo = new UnitNotificationInfo(key, _level: ((int) keyValuePair.Value.UniqueData.UnitLevel));
-          unitNotification.Add(key, notificationInfo);
-        }
-        else
-          notificationInfo.IsNoticeUnlock = false;
-        List<MasterUnitRarity.UnitRarity> unitRarityList = ManagerSingleton<MasterDataManager>.Instance.masterUnitRarity[key];
-        if (((int) keyValuePair.Value.UniqueData.UnitRarity >= 5 ? 1 : 0) == 0)
-        {
-          MasterUnitRarity.UnitRarity unitRarity = unitRarityList[(int) keyValuePair.Value.UniqueData.UnitRarity];
-          notificationInfo.IsNoticeEvolution = Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, (int) unitRarity.unit_material_id) >= (int) unitRarity.consume_num & Singleton<UserData>.Instance.TotalGold >= (int) unitRarity.consume_gold;
-        }
-        else
-          notificationInfo.IsNoticeEvolution = false;
-        unitNotification[key] = notificationInfo;
-      }
-    }
-
-    private static void updateUnlockUnitNotificationInfo()
-    {
-      MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
-      Dictionary<int, MasterUnlockUnitCondition.UnlockUnitCondition> dictionary = instance.masterUnlockUnitCondition.dictionary;
-      Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
-      foreach (KeyValuePair<int, MasterUnlockUnitCondition.UnlockUnitCondition> keyValuePair in dictionary)
-      {
-        int key = keyValuePair.Key;
-        if ((int) instance.masterUnitData[key].OnlyDispOwned <= 0 && !Singleton<UserData>.Instance.IsMyUnit(key))
-        {
-          UnitNotificationInfo notificationInfo;
-          if (!unitNotification.TryGetValue(key, out notificationInfo))
-          {
-            notificationInfo = new UnitNotificationInfo(key);
-            unitNotification.Add(key, notificationInfo);
-          }
-          MasterUnlockUnitCondition.UnlockUnitCondition unlockUnitCondition = instance.masterUnlockUnitCondition[key];
-          bool flag1 = false;
-          bool flag2 = false;
-          if (unlockUnitCondition.ConsumeMaterialNum != 0)
-          {
-            int materialId = unlockUnitCondition.MaterialId;
-            flag1 = unlockUnitCondition.ConsumeMaterialNum > Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, materialId) || flag1;
-          }
-          for (int index = 0; index < unlockUnitCondition.Equip.Count; ++index)
-          {
-            MasterUnlockUnitCondition.UnlockUnitCondition.Pair pair = unlockUnitCondition.Equip[index];
-            flag1 = pair.Num > Singleton<UserData>.Instance.SearchPossession(eInventoryType.Equip, pair.Id) || flag1;
-          }
-          for (int index = 0; index < unlockUnitCondition.Item.Count; ++index)
-          {
-            MasterUnlockUnitCondition.UnlockUnitCondition.Pair pair = unlockUnitCondition.Item[index];
-            flag1 = pair.Num > Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, pair.Id) || flag1;
-          }
-          int consumeGold = unlockUnitCondition.ConsumeGold;
-          if (consumeGold > 0)
-          {
-            int totalGold = Singleton<UserData>.Instance.TotalGold;
-            flag2 = consumeGold >= totalGold || flag2;
-          }
-          notificationInfo.IsNoticeUnlock = !flag1 && !flag2 && !UnitUtility.IsLimitedUnit(key);
-          unitNotification[key] = notificationInfo;
-        }
-      }
-    }
-
-    private static void updateLevelUpNotification()
-    {
-      foreach (KeyValuePair<int, UnitParameter> unitParameter in Singleton<UserData>.Instance.UnitParameterDictionary)
-        UnitUtility.updateLevelUpNotification(unitParameter.Key);
-    }
-
-    public static void UpdateLevelUpNotification(
-      int _unitId,
-      Dictionary<int, UserItemParameter> _usedItem = null)
-    {
-      if (!ManagerSingleton<MasterDataManager>.Instance.IsSetupFinished || TutorialManager.IsStartTutorial)
-        return;
-      UnitUtility.updateLevelUpNotification(_unitId, _usedItem);
-    }
-
-    private static void updateLevelUpNotification(
-      int _unitId,
-      Dictionary<int, UserItemParameter> _usedItem = null)
-    {
-      UserData instance = Singleton<UserData>.Instance;
-      Dictionary<int, UnitParameter> parameterDictionary = instance.UnitParameterDictionary;
-      Dictionary<int, UnitNotificationInfo> unitNotification = instance.UnitNotification;
-      MasterItemData masterItemData = ManagerSingleton<MasterDataManager>.Instance.masterItemData;
-      MasterExperienceUnit masterExperienceUnit = ManagerSingleton<MasterDataManager>.Instance.masterExperienceUnit;
-      UnitParameter unitParameter = (UnitParameter) null;
-      int key = _unitId;
-      ref UnitParameter local = ref unitParameter;
-      if (!parameterDictionary.TryGetValue(key, out local))
-        return;
-      UnitData uniqueData = unitParameter.UniqueData;
-      UnitNotificationInfo notificationInfo;
-      if (!unitNotification.TryGetValue((int) uniqueData.Id, out notificationInfo))
-      {
-        notificationInfo = new UnitNotificationInfo((int) uniqueData.Id, _level: ((int) uniqueData.UnitLevel));
-        unitNotification.Add((int) uniqueData.Id, notificationInfo);
-      }
-      int num1 = (int) uniqueData.UnitLevel;
-      int num2 = 0;
-      if (_usedItem != null)
-      {
-        foreach (KeyValuePair<int, UserItemParameter> keyValuePair in _usedItem)
-          num2 += (int) masterItemData.Get((int) keyValuePair.Value.ItemId).Value * (int) keyValuePair.Value.ItemCount;
-      }
-      int num3 = (int) uniqueData.UnitExp + num2;
-      for (int _level = (int) uniqueData.UnitLevel + 1; _level <= (int) instance.UserInfo.TeamLevel && masterExperienceUnit[_level].total_exp <= num3; ++_level)
-        num1 = _level;
-      if (_usedItem != null)
-        UnitUtility.updateTemporaryLvUniqueEquipNotification(_unitId, num1 - (int) uniqueData.UnitLevel);
-      if (num1 >= (int) instance.UserInfo.TeamLevel)
-      {
-        notificationInfo.IsNoticeLevelUp = false;
-        unitNotification[(int) uniqueData.Id] = notificationInfo;
-      }
-      else
-      {
-        int num4 = UnitUtility.calcStrengthItemExp() - num2;
-        if (masterExperienceUnit[num1 + 1].total_exp <= num3 + num4)
-        {
-          notificationInfo.IsNoticeLevelUp = true;
-          unitNotification[(int) uniqueData.Id] = notificationInfo;
-        }
-        else
-        {
-          notificationInfo.IsNoticeLevelUp = false;
-          unitNotification[(int) uniqueData.Id] = notificationInfo;
-        }
-      }
-    }
-
-    private static void updateTemporaryLvUniqueEquipNotification(int _unitId, int _temporaryAddLv = 0)
-    {
-      bool _isEnhanceRelease = ManagerSingleton<MasterDataManager>.Instance.masterContentReleaseData.CheckReleaseContents(eSystemId.UNIT_EQUIP_ENHANCE);
-      UnitUtility.updateUniqueEquipNotificationInfo(false, _unitId, _isEnhanceRelease, _temporaryAddLv);
-    }
-
-    private static void updateSkillNoticeInfo(
-      List<SkillLevelInfo> _list,
-      Dictionary<int, SkillNoticeInfo> _dic,
-      UnitParameter _value,
-      int _gold = -1,
-      int _levelOffset = 0)
-    {
-      for (int index = 0; index < _list.Count; ++index)
-      {
-        if (_dic.ContainsKey((int) _list[index].SkillId))
-        {
-          SkillNoticeInfo skillNoticeInfo = _dic[(int) _list[index].SkillId];
-          skillNoticeInfo.SkillLevel = (int) _list[index].SkillLevel;
-          skillNoticeInfo.IsEnhance = UnitUtility.IsSkillEnhancePossible(_list[index], _value, _gold, _levelOffset);
-          _dic[(int) _list[index].SkillId] = skillNoticeInfo;
-        }
-        else
-          _dic.Add((int) _list[index].SkillId, new SkillNoticeInfo((int) _list[index].SkillLevel, UnitUtility.IsSkillEnhancePossible(_list[index], _value, _gold, _levelOffset)));
-      }
-    }
-
-    private static void updateSkillEnhanceNotification()
-    {
-      Dictionary<int, UnitParameter> parameterDictionary = Singleton<UserData>.Instance.UnitParameterDictionary;
-      Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
-      UserData instance = Singleton<UserData>.Instance;
-      bool flag = ManagerSingleton<MasterDataManager>.Instance.masterContentReleaseData.CheckReleaseContents(eSystemId.UNIT_SKILL_LVUP);
-      foreach (KeyValuePair<int, UnitParameter> keyValuePair in parameterDictionary)
-      {
-        int key = keyValuePair.Key;
-        UnitNotificationInfo notificationInfo;
-        if (!unitNotification.TryGetValue(key, out notificationInfo))
-        {
-          notificationInfo = new UnitNotificationInfo(key, _level: ((int) keyValuePair.Value.UniqueData.UnitLevel));
-          unitNotification.Add(key, notificationInfo);
-        }
-        else
-          notificationInfo.IsNoticeUnlock = false;
-        if (!flag)
-        {
-          if (notificationInfo.SkillInfo.Count > 0)
-            notificationInfo.SkillInfo.Clear();
-        }
-        else
-        {
-          UnitUtility.updateSkillNoticeInfo(keyValuePair.Value.UniqueData.UnionBurst, notificationInfo.SkillInfo, keyValuePair.Value);
-          UnitUtility.updateSkillNoticeInfo(keyValuePair.Value.UniqueData.MainSkill, notificationInfo.SkillInfo, keyValuePair.Value);
-          UnitUtility.updateSkillNoticeInfo(keyValuePair.Value.UniqueData.ExSkill, notificationInfo.SkillInfo, keyValuePair.Value);
-        }
-        unitNotification[key] = notificationInfo;
-      }
-    }
-
-    public static void CheckSkillNoticeInfo(UnitData _uniqueData)
-    {
-      Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
-      if (!unitNotification.ContainsKey((int) _uniqueData.Id))
-        return;
-      bool isUpdate = false;
-      UnitNotificationInfo noticeInfo = unitNotification[(int) _uniqueData.Id];
-      System.Action<List<SkillLevelInfo>> action = (System.Action<List<SkillLevelInfo>>) (_list =>
-      {
-        for (int index = 0; index < _list.Count; ++index)
-        {
-          if (noticeInfo.SkillInfo.ContainsKey((int) _list[index].SkillId))
-            isUpdate = true;
-        }
-      });
-      action(_uniqueData.UnionBurst);
-      action(_uniqueData.MainSkill);
-      action(_uniqueData.ExSkill);
-      if (!isUpdate)
-        return;
-      unitNotification[(int) _uniqueData.Id].SkillInfo.Clear();
-      UnitUtility.updateSkillEnhanceNotification();
-    }
-
-    private static bool IsSkillEnhancePossible(
-      SkillLevelInfo _skillInfo,
-      UnitParameter _unit,
-      int _calcLocalGold = -1,
-      int _levelOffset = 0)
-    {
-      UserData instance = Singleton<UserData>.Instance;
-      if ((int) _skillInfo.SkillLevel >= (int) _unit.UniqueData.UnitLevel + _levelOffset)
-        return false;
-      int num = _calcLocalGold == -1 ? Singleton<UserData>.Instance.TotalGold : _calcLocalGold;
-      return (int) ManagerSingleton<MasterDataManager>.Instance.masterSkillCost.Get((int) _skillInfo.SkillLevel + 1).cost <= num;
-    }
-
-    private static void updateSkillEnhanceLocalNotification(
-      int _unitId,
-      int _calcLocalGold,
-      int _levelOffset = 0)
-    {
-      UnitNotificationInfo notificationInfo;
-      UnitParameter unitParameter;
-      if (!Singleton<UserData>.Instance.UnitNotification.TryGetValue(_unitId, out notificationInfo) || !Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out unitParameter))
-        return;
-      UnitUtility.updateSkillNoticeInfo(unitParameter.UniqueData.UnionBurst, notificationInfo.SkillInfo, unitParameter, _calcLocalGold, _levelOffset);
-      UnitUtility.updateSkillNoticeInfo(unitParameter.UniqueData.MainSkill, notificationInfo.SkillInfo, unitParameter, _calcLocalGold, _levelOffset);
-      UnitUtility.updateSkillNoticeInfo(unitParameter.UniqueData.ExSkill, notificationInfo.SkillInfo, unitParameter, _calcLocalGold, _levelOffset);
-    }
-
-    public static UnitParameter CreateUnitParameterFromEnemyParameter(
-      int _enemyParameterId)
-    {
-      UnitData _unitData = new UnitData();
-      _unitData.SetId(_enemyParameterId);
-      UnitParameter unitParameter = new UnitParameter(_unitData);
-      MasterEnemyParameter.EnemyParameter fromAllKind = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter.GetFromAllKind(_enemyParameterId);
-      _unitData.SetUnitLevel((int) fromAllKind.level);
-      StatusParam _baseParam = new StatusParam();
-      _unitData.SetUnitRarity((int) fromAllKind.rarity);
-      _unitData.SetPromotionLevel((ePromotionLevel) (int) fromAllKind.promotion_level);
-      _baseParam.SetHp((long) (int) fromAllKind.hp);
-      _baseParam.SetAtk((int) fromAllKind.atk);
-      _baseParam.SetDef((int) fromAllKind.def);
-      _baseParam.SetMagicStr((int) fromAllKind.magic_str);
-      _baseParam.SetMagicDef((int) fromAllKind.magic_def);
-      _baseParam.SetPhysicalCritical((int) fromAllKind.physical_critical);
-      _baseParam.SetMagicCritical((int) fromAllKind.magic_critical);
-      _baseParam.SetDodge((int) fromAllKind.dodge);
-      _baseParam.SetLifeSteal((int) fromAllKind.life_steal);
-      _baseParam.SetWaveHpRecovery((int) fromAllKind.wave_hp_recovery);
-      _baseParam.SetWaveEnergyRecovery((int) fromAllKind.wave_energy_recovery);
-      _baseParam.SetPhysicalPenetrate((int) fromAllKind.physical_penetrate);
-      _baseParam.SetMagicPenetrate((int) fromAllKind.magic_penetrate);
-      _baseParam.SetEnergyRecoveryRate((int) fromAllKind.energy_recovery_rate);
-      _baseParam.SetHpRecoveryRate((int) fromAllKind.hp_recovery_rate);
-      _baseParam.SetEnergyReduceRate((int) fromAllKind.energy_reduce_rate);
-      _baseParam.SetAccuracy((int) fromAllKind.accuracy);
-      _unitData.SetResistStatusId((int) fromAllKind.resist_status_id);
-      _unitData.SetMainSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.MainSkillIds, UnitUtility.getMainSkillLevels(fromAllKind), unitParameter.SkillData.MainSkillEvolutionIds, UnitUtility.getMainSkillIsEvolved(fromAllKind)));
-      _unitData.SetExSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.ExSkillIds, UnitUtility.getExSkillLevels(fromAllKind), (List<int>) null, (List<bool>) null));
-      _unitData.SetUnionBurst(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.UnionBurstIds, UnitUtility.getUnionBurstLevels(fromAllKind), unitParameter.SkillData.UnionBurstEvolutionIds, UnitUtility.getUnionBurstIsEvolved(fromAllKind)));
-      StatusParam _equipParam = new StatusParam();
-      UnitParam _unitParam = new UnitParam();
-      _unitParam.SetBaseParam(_baseParam);
-      _unitParam.SetEquipParam(_equipParam);
-      _unitData.SetUnitParam(_unitParam);
-      int _power = UnitUtility.calcOverallEnemy(_baseParam, _unitData);
-      _unitData.SetPower(_power);
-      return unitParameter;
-    }
-
-    public static UnitParameter CreateUnitParameterFromEnemyParameterForSekai(
-      int _enemyParameterId)
-    {
-      UnitData _unitData = new UnitData();
-      _unitData.SetId(_enemyParameterId);
-      MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter = ManagerSingleton<MasterDataManager>.Instance.masterSekaiEnemyParameter.Get(_enemyParameterId);
-      UnitParameter unitParameter = new UnitParameter(_unitData);
-      _unitData.SetUnitLevel((int) _enemyParameter.level);
-      StatusParam _baseParam = new StatusParam();
-      _baseParam.SetHp(long.Parse((string) _enemyParameter.hp));
-      _baseParam.SetAtk((int) _enemyParameter.atk);
-      _baseParam.SetDef((int) _enemyParameter.def);
-      _baseParam.SetMagicStr((int) _enemyParameter.magic_str);
-      _baseParam.SetMagicDef((int) _enemyParameter.magic_def);
-      _baseParam.SetPhysicalCritical((int) _enemyParameter.physical_critical);
-      _baseParam.SetMagicCritical((int) _enemyParameter.magic_critical);
-      _baseParam.SetDodge((int) _enemyParameter.dodge);
-      _baseParam.SetLifeSteal((int) _enemyParameter.life_steal);
-      _baseParam.SetWaveHpRecovery((int) _enemyParameter.wave_hp_recovery);
-      _baseParam.SetWaveEnergyRecovery((int) _enemyParameter.wave_energy_recovery);
-      _baseParam.SetPhysicalPenetrate((int) _enemyParameter.physical_penetrate);
-      _baseParam.SetMagicPenetrate((int) _enemyParameter.magic_penetrate);
-      _baseParam.SetEnergyRecoveryRate((int) _enemyParameter.energy_recovery_rate);
-      _baseParam.SetHpRecoveryRate((int) _enemyParameter.hp_recovery_rate);
-      _baseParam.SetEnergyReduceRate((int) _enemyParameter.energy_reduce_rate);
-      _baseParam.SetAccuracy((int) _enemyParameter.accuracy);
-      _unitData.SetResistStatusId((int) _enemyParameter.resist_status_id);
-      _unitData.SetMainSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.MainSkillIds, UnitUtility.getMainSkillLevels(_enemyParameter), unitParameter.SkillData.MainSkillEvolutionIds, UnitUtility.getMainSkillIsEvolved((MasterEnemyParameter.EnemyParameter) _enemyParameter)));
-      _unitData.SetExSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.ExSkillIds, UnitUtility.getExSkillLevels(_enemyParameter), (List<int>) null, (List<bool>) null));
-      _unitData.SetUnionBurst(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.UnionBurstIds, UnitUtility.getUnionBurstLevels(_enemyParameter), unitParameter.SkillData.UnionBurstEvolutionIds, UnitUtility.getUnionBurstIsEvolved((MasterEnemyParameter.EnemyParameter) _enemyParameter)));
-      StatusParam _equipParam = new StatusParam();
-      UnitParam _unitParam = new UnitParam();
-      _unitParam.SetBaseParam(_baseParam);
-      _unitParam.SetEquipParam(_equipParam);
-      _unitData.SetUnitParam(_unitParam);
-      int _power = UnitUtility.calcOverallEnemy(_baseParam, _unitData);
-      _unitData.SetPower(_power);
-      return unitParameter;
-    }
-
-    private static List<int> getMainSkillLevels(
-      MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<int>()
-    {
-      (int) _enemyParameter.main_skill_lv_1,
-      (int) _enemyParameter.main_skill_lv_2,
-      (int) _enemyParameter.main_skill_lv_3,
-      (int) _enemyParameter.main_skill_lv_4,
-      (int) _enemyParameter.main_skill_lv_5,
-      (int) _enemyParameter.main_skill_lv_6,
-      (int) _enemyParameter.main_skill_lv_7,
-      (int) _enemyParameter.main_skill_lv_8,
-      (int) _enemyParameter.main_skill_lv_9,
-      (int) _enemyParameter.main_skill_lv_10
-    };
-
-    private static List<bool> getMainSkillIsEvolved(
-      MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<bool>()
-    {
-      (int) _enemyParameter.unique_equipment_flag_1 == 1
-    };
-
-    private static List<int> getMainSkillLevels(
-      MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter) => new List<int>()
-    {
-      (int) _enemyParameter.main_skill_lv_1,
-      (int) _enemyParameter.main_skill_lv_2,
-      (int) _enemyParameter.main_skill_lv_3,
-      (int) _enemyParameter.main_skill_lv_4,
-      (int) _enemyParameter.main_skill_lv_5,
-      (int) _enemyParameter.main_skill_lv_6,
-      (int) _enemyParameter.main_skill_lv_7,
-      (int) _enemyParameter.main_skill_lv_8,
-      (int) _enemyParameter.main_skill_lv_9,
-      (int) _enemyParameter.main_skill_lv_10
-    };
-
-    private static List<int> getExSkillLevels(
-      MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<int>()
-    {
-      (int) _enemyParameter.ex_skill_lv_1,
-      (int) _enemyParameter.ex_skill_lv_2,
-      (int) _enemyParameter.ex_skill_lv_3,
-      (int) _enemyParameter.ex_skill_lv_4,
-      (int) _enemyParameter.ex_skill_lv_5
-    };
-
-    private static List<int> getExSkillLevels(
-      MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter) => new List<int>()
-    {
-      (int) _enemyParameter.ex_skill_lv_1,
-      (int) _enemyParameter.ex_skill_lv_2,
-      (int) _enemyParameter.ex_skill_lv_3,
-      (int) _enemyParameter.ex_skill_lv_4,
-      (int) _enemyParameter.ex_skill_lv_5
-    };
-
-    private static List<int> getUnionBurstLevels(
-      MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<int>()
-    {
-      (int) _enemyParameter.union_burst_level
-    };
-
-    private static List<int> getUnionBurstLevels(
-      MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter) => new List<int>()
-    {
-      (int) _enemyParameter.union_burst_level
-    };
-
-    private static List<bool> getUnionBurstIsEvolved(
-      MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<bool>()
-    {
-      (int) _enemyParameter.rarity == 6
-    };
-
-    private static List<SkillLevelInfo> createSkillLevelFromEnemyParameter(
-      List<int> _mainSkills,
-      List<int> _levels,
-      List<int> _plusSkills,
-      List<bool> _plusSkillFlags)
-    {
-      List<SkillLevelInfo> skillLevelInfoList = new List<SkillLevelInfo>();
-      int index = 0;
-      for (int count = _mainSkills.Count; index < count; ++index)
-      {
-        int _skillId = _mainSkills[index];
-        if (_skillId != 0)
-        {
-          if (_plusSkillFlags != null && _plusSkillFlags.Count > index && _plusSkillFlags[index])
-            _skillId = _plusSkills[index];
-          SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
-          skillLevelInfo.SetSkillId(_skillId);
-          skillLevelInfo.SetSkillLevel(_levels[index]);
-          skillLevelInfoList.Add(skillLevelInfo);
-        }
-      }
-      return skillLevelInfoList;
-    }
-
-    public static void CalcParamAndSkill(
-      UnitData _unitData,
-      UnitUtility.SummonSkillData _summonSkillData = null,
-      bool _isPowerLocal = false,
-      bool _useBattleRarity = true)
-    {
-      if ((UnityEngine.Object) ManagerSingleton<MasterDataManager>.Instance == (UnityEngine.Object) null || Singleton<UserData>.Instance == null || Singleton<UserData>.Instance.UnitParameterDictionary == null)
-        return;
-      int id = (int) _unitData.Id;
-      int _level = (int) _unitData.UnitLevel;
-      int _rarity = (int) _unitData.UnitRarity;
-      if (_useBattleRarity)
-        _rarity = _unitData.GetCurrentRarity();
-      int promotionLevel = (int) _unitData.PromotionLevel;
-      if (UnitUtility.IsQuestMonsterUnit((int) _unitData.Id))
-      {
-        UnitUtility.GetUnitResourceId((int) _unitData.Id);
-        MasterEnemyParameter.EnemyParameter fromAllKind = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter.GetFromAllKind((int) _unitData.Id);
-        StatusParam _baseParam = new StatusParam();
-        _baseParam.SetHp((long) (int) fromAllKind.hp);
-        _baseParam.SetAtk((int) fromAllKind.atk);
-        _baseParam.SetDef((int) fromAllKind.def);
-        _baseParam.SetMagicStr((int) fromAllKind.magic_str);
-        _baseParam.SetMagicDef((int) fromAllKind.magic_def);
-        _baseParam.SetPhysicalCritical((int) fromAllKind.physical_critical);
-        _baseParam.SetMagicCritical((int) fromAllKind.magic_critical);
-        _baseParam.SetDodge((int) fromAllKind.dodge);
-        _baseParam.SetLifeSteal((int) fromAllKind.life_steal);
-        _baseParam.SetWaveHpRecovery((int) fromAllKind.wave_hp_recovery);
-        _baseParam.SetWaveEnergyRecovery((int) fromAllKind.wave_energy_recovery);
-        _baseParam.SetPhysicalPenetrate((int) fromAllKind.physical_penetrate);
-        _baseParam.SetMagicPenetrate((int) fromAllKind.magic_penetrate);
-        _baseParam.SetEnergyRecoveryRate((int) fromAllKind.energy_recovery_rate);
-        _baseParam.SetHpRecoveryRate((int) fromAllKind.hp_recovery_rate);
-        _baseParam.SetEnergyReduceRate((int) fromAllKind.energy_reduce_rate);
-        _baseParam.SetAccuracy((int) fromAllKind.accuracy);
-        _unitData.SetResistStatusId((int) fromAllKind.resist_status_id);
-        StatusParam _equipParam = new StatusParam();
-        UnitParam _unitParam = new UnitParam();
-        _unitParam.SetBaseParam(_baseParam);
-        _unitParam.SetEquipParam(_equipParam);
-        _unitData.SetUnitParam(_unitParam);
-        if (!_isPowerLocal)
-          return;
-        int _power = UnitUtility.calcOverallEnemy(_baseParam, _unitData);
-        _unitData.SetPower(_power);
-      }
-      else
-      {
-        if (_summonSkillData != null)
-        {
-          _level = _summonSkillData.SkillLevel;
-          _rarity = _summonSkillData.Rarity;
-          promotionLevel = _summonSkillData.PromotionLevel;
-        }
-        StatusParam _baseParam = new StatusParam();
-        _baseParam.SetHp((long) UnitUtility.CalcUnitBaseParameter(eParamType.HP, id, _level, _rarity, promotionLevel));
-        _baseParam.SetAtk(UnitUtility.CalcUnitBaseParameter(eParamType.ATK, id, _level, _rarity, promotionLevel));
-        _baseParam.SetDef(UnitUtility.CalcUnitBaseParameter(eParamType.DEF, id, _level, _rarity, promotionLevel));
-        _baseParam.SetMagicStr(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_ATK, id, _level, _rarity, promotionLevel));
-        _baseParam.SetMagicDef(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_DEF, id, _level, _rarity, promotionLevel));
-        _baseParam.SetPhysicalCritical(UnitUtility.CalcUnitBaseParameter(eParamType.PHYSICAL_CRITICAL, id, _level, _rarity, promotionLevel));
-        _baseParam.SetMagicCritical(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_CRITICAL, id, _level, _rarity, promotionLevel));
-        _baseParam.SetDodge(UnitUtility.CalcUnitBaseParameter(eParamType.DODGE, id, _level, _rarity, promotionLevel));
-        _baseParam.SetLifeSteal(UnitUtility.CalcUnitBaseParameter(eParamType.LIFE_STEAL, id, _level, _rarity, promotionLevel));
-        _baseParam.SetWaveHpRecovery(UnitUtility.CalcUnitBaseParameter(eParamType.WAVE_HP_RECOVERY, id, _level, _rarity, promotionLevel));
-        _baseParam.SetWaveEnergyRecovery(UnitUtility.CalcUnitBaseParameter(eParamType.WAVE_ENERGY_RECOVERY, id, _level, _rarity, promotionLevel));
-        _baseParam.SetPhysicalPenetrate(UnitUtility.CalcUnitBaseParameter(eParamType.PHYSICAL_PENETRATE, id, _level, _rarity, promotionLevel));
-        _baseParam.SetMagicPenetrate(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_PENETRATE, id, _level, _rarity, promotionLevel));
-        _baseParam.SetEnergyRecoveryRate(UnitUtility.CalcUnitBaseParameter(eParamType.ENERGY_RECOVERY_RATE, id, _level, _rarity, promotionLevel));
-        _baseParam.SetHpRecoveryRate(UnitUtility.CalcUnitBaseParameter(eParamType.HP_RECOVERY_RATE, id, _level, _rarity, promotionLevel));
-        _baseParam.SetEnergyReduceRate(UnitUtility.CalcUnitBaseParameter(eParamType.ENERGY_REDUCE_RATE, id, _level, _rarity, promotionLevel));
-        _baseParam.SetAccuracy(UnitUtility.CalcUnitBaseParameter(eParamType.ACCURACY, id, _level, _rarity, promotionLevel));
-        StatusParam _equipParam = new StatusParam();
-        List<EquipSlot> equipSlot = _unitData.EquipSlot;
-        List<EquipSlot> uniqueEquipSlot = _unitData.UniqueEquipSlot;
-        _equipParam.SetHp((long) UnitUtility.CalcEquipParameter(eParamType.HP, equipSlot, uniqueEquipSlot));
-        _equipParam.SetAtk(UnitUtility.CalcEquipParameter(eParamType.ATK, equipSlot, uniqueEquipSlot));
-        _equipParam.SetDef(UnitUtility.CalcEquipParameter(eParamType.DEF, equipSlot, uniqueEquipSlot));
-        _equipParam.SetMagicStr(UnitUtility.CalcEquipParameter(eParamType.MAGIC_ATK, equipSlot, uniqueEquipSlot));
-        _equipParam.SetMagicDef(UnitUtility.CalcEquipParameter(eParamType.MAGIC_DEF, equipSlot, uniqueEquipSlot));
-        _equipParam.SetPhysicalCritical(UnitUtility.CalcEquipParameter(eParamType.PHYSICAL_CRITICAL, equipSlot, uniqueEquipSlot));
-        _equipParam.SetMagicCritical(UnitUtility.CalcEquipParameter(eParamType.MAGIC_CRITICAL, equipSlot, uniqueEquipSlot));
-        _equipParam.SetDodge(UnitUtility.CalcEquipParameter(eParamType.DODGE, equipSlot, uniqueEquipSlot));
-        _equipParam.SetLifeSteal(UnitUtility.CalcEquipParameter(eParamType.LIFE_STEAL, equipSlot, uniqueEquipSlot));
-        _equipParam.SetWaveHpRecovery(UnitUtility.CalcEquipParameter(eParamType.WAVE_HP_RECOVERY, equipSlot, uniqueEquipSlot));
-        _equipParam.SetWaveEnergyRecovery(UnitUtility.CalcEquipParameter(eParamType.WAVE_ENERGY_RECOVERY, equipSlot, uniqueEquipSlot));
-        _equipParam.SetPhysicalPenetrate(UnitUtility.CalcEquipParameter(eParamType.PHYSICAL_PENETRATE, equipSlot, uniqueEquipSlot));
-        _equipParam.SetMagicPenetrate(UnitUtility.CalcEquipParameter(eParamType.MAGIC_PENETRATE, equipSlot, uniqueEquipSlot));
-        _equipParam.SetEnergyRecoveryRate(UnitUtility.CalcEquipParameter(eParamType.ENERGY_RECOVERY_RATE, equipSlot, uniqueEquipSlot));
-        _equipParam.SetHpRecoveryRate(UnitUtility.CalcEquipParameter(eParamType.HP_RECOVERY_RATE, equipSlot, uniqueEquipSlot));
-        _equipParam.SetEnergyReduceRate(UnitUtility.CalcEquipParameter(eParamType.ENERGY_REDUCE_RATE, equipSlot, uniqueEquipSlot));
-        _equipParam.SetAccuracy(UnitUtility.CalcEquipParameter(eParamType.ACCURACY, equipSlot, uniqueEquipSlot));
-        if (_unitData.ExSkill.Count > 0 && (int) _unitData.ExSkill[0].SkillLevel > 0)
-        {
-          MasterUnitSkillData.UnitSkillData unitSkillData = ManagerSingleton<MasterDataManager>.Instance.masterUnitSkillData.Get((int) _unitData.Id);
-          int _skillId = _unitData.GetCurrentRarity() >= 5 ? unitSkillData.ExSkillEvolutionIds[0] : unitSkillData.ExSkillIds[0];
-          _unitData.ExSkill[0].SetSkillId(_skillId);
-        }
-        UnitParam _unitParam = new UnitParam();
-        _unitParam.SetBaseParam(_baseParam);
-        _unitParam.SetEquipParam(_equipParam);
-        _unitData.SetUnitParam(_unitParam);
-        if (!_isPowerLocal)
-          return;
-        int _power = UnitUtility.CalcOverall(id, _level, _rarity, promotionLevel, _unitData);
-        _unitData.SetPower(_power);
-      }
-    }
-
-    public static UnitParameter CreateSummonUnitParameter(
-      UnitParameter _owner,
-      int _id,
-      int _level,
-      bool _considerEquipment,
-      bool _mainSkill1Evolved)
-    {
-      UnitData _unitData = new UnitData();
-      _unitData.SetId(_id);
-      _unitData.SetUnitLevel(_level);
-      UnitParameter _target = new UnitParameter(_unitData);
-      UnitUtility.SummonSkillData _summonSkillData = UnitUtility.searchSummonSkill(_owner).FindAll((Predicate<UnitUtility.SummonSkillData>) (_it => _it.SummonTargetUnitId == _id))[0];
-      bool _exSkillEvolved = _owner.UniqueData.GetCurrentRarity() >= 5;
-      UnitUtility.calcurateSkillLevelInfo(_target, _summonSkillData.PromotionLevel, _level, _considerEquipment, _mainSkill1Evolved, _exSkillEvolved);
-      UnitUtility.CalcParamAndSkill(_target.UniqueData, _summonSkillData, true);
-      if (_considerEquipment)
-      {
-        _target.UniqueData.SetBonusParam(_owner.UniqueData.BonusParam);
-        _target.UniqueData.UnitParam.SetEquipParam(_owner.UniqueData.UnitParam.EquipParam);
-      }
-      return _target;
-    }
-
-    public static void calcurateSkillLevelInfo(
-      UnitParameter _target,
-      int _promotionLevel,
-      int _level,
-      bool _considerExSkill,
-      bool _mainSkill1Evolved,
-      bool _exSkillEvolved)
-    {
-      List<SkillLevelInfo> skillLevel1 = UnitUtility.createSkillLevel(_target.SkillData.MainSkillIds, _promotionLevel, _level, true, _mainSkill1Evolved, _target.SkillData.MainSkillEvolutionIds);
-      _target.UniqueData.SetMainSkill(skillLevel1);
-      List<SkillLevelInfo> skillLevel2 = UnitUtility.createSkillLevel(_target.SkillData.UnionBurstIds, _promotionLevel, _level);
-      _target.UniqueData.SetUnionBurst(skillLevel2);
-      if (!_considerExSkill)
-        return;
-      int key = 301;
-      MasterUnlockSkillData.UnlockSkillData unlockSkillData = (MasterUnlockSkillData.UnlockSkillData) null;
-      if (!ManagerSingleton<MasterDataManager>.Instance.masterUnlockSkillData.dictionary.TryGetValue(key, out unlockSkillData) || (int) unlockSkillData.promotion_level > _promotionLevel)
-        return;
-      List<int> _mainSkills;
-      if (!_exSkillEvolved)
-      {
-        _mainSkills = _target.SkillData.ExSkillIds;
-      }
-      else
-      {
-        _mainSkills = new List<int>();
-        _mainSkills.Add((int) _target.SkillData.ex_skill_evolution_1);
-      }
-      List<SkillLevelInfo> skillLevel3 = UnitUtility.createSkillLevel(_mainSkills, _promotionLevel, _level);
-      _target.UniqueData.SetExSkill(skillLevel3);
-    }
-
-    private static List<SkillLevelInfo> createSkillLevel(
-      List<int> _mainSkills,
-      int _promotionLevel,
-      int _level,
-      bool _isMainSkill = false,
-      bool _mainSkill1Evolved = false,
-      List<int> _mainSkillEvolvedIds = null)
-    {
-      List<SkillLevelInfo> skillLevelInfoList = new List<SkillLevelInfo>();
-      int index = 0;
-      for (int count = _mainSkills.Count; index < count; ++index)
-      {
-        int _skillId = _mainSkills[index];
-        if (_isMainSkill & _mainSkill1Evolved && index == 0)
-          _skillId = _mainSkillEvolvedIds[index] == 0 ? _skillId : _mainSkillEvolvedIds[0];
-        if (_skillId != 0)
-        {
-          SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
-          skillLevelInfo.SetSkillId(_skillId);
-          if (_isMainSkill)
-          {
-            int key = 201 + index;
-            MasterUnlockSkillData.UnlockSkillData unlockSkillData = (MasterUnlockSkillData.UnlockSkillData) null;
-            if (ManagerSingleton<MasterDataManager>.Instance.masterUnlockSkillData.dictionary.TryGetValue(key, out unlockSkillData))
-            {
-              int promotionLevel = (int) unlockSkillData.promotion_level;
-              skillLevelInfo.SetSkillLevel(_promotionLevel >= promotionLevel ? _level : 0);
-            }
-          }
-          else
-            skillLevelInfo.SetSkillLevel(_level);
-          skillLevelInfoList.Add(skillLevelInfo);
-        }
-      }
-      return skillLevelInfoList;
-    }
-
-    private static List<UnitUtility.SummonSkillData> searchSummonSkill(
-      UnitParameter _unitParameter)
-    {
-      UnitData unitData = _unitParameter.UniqueData;
-      MasterDataManager masterDatamanager = ManagerSingleton<MasterDataManager>.Instance;
-      List<UnitUtility.SummonSkillData> summonSkillList = new List<UnitUtility.SummonSkillData>();
-      System.Action<List<SkillLevelInfo>> action = (System.Action<List<SkillLevelInfo>>) (_skillLevelList =>
-      {
-        for (int index1 = 0; index1 < _skillLevelList.Count; ++index1)
-        {
-          SkillLevelInfo skillLevel = _skillLevelList[index1];
-          if ((int) skillLevel.SkillId != 0)
-          {
-            SkillData skillData = SkillUtility.GetSkillData((int) skillLevel.SkillId, (int) skillLevel.SkillLevel);
-            for (int index2 = 0; index2 < skillData.ActionInfoList.Count; ++index2)
-            {
-              ActionData actionInfo = skillData.ActionInfoList[index2];
-              MasterSkillAction.SkillAction skillAction = masterDatamanager.masterSkillAction.Get(actionInfo.ActionId);
-              if ((byte) skillAction.action_type == (byte) 15)
-              {
-                int _rarity = (int) actionInfo.ActionValue.Value4 / 100;
-                if (_rarity == 0)
-                  _rarity = unitData.GetCurrentRarity();
-                int _promotionLevel = (int) actionInfo.ActionValue.Value4 % 100;
-                if (_promotionLevel == 0)
-                  _promotionLevel = (int) unitData.PromotionLevel;
-                int actionDetail2 = skillAction.action_detail_2;
-                summonSkillList.Add(new UnitUtility.SummonSkillData((int) skillLevel.SkillId, (int) skillLevel.SkillLevel, _rarity, _promotionLevel, (int) actionDetail2));
+                case UnitDefine.UnitNotificationType.ALL:
+                  UnitUtility.updateUnitEquipNotificationInfo(_isUpdateEquip, _isEnhanceRelease);
+                  UnitUtility.updateUnitRarityNotificationInfo();
+                  UnitUtility.updateUnlockUnitNotificationInfo();
+                  UnitUtility.updateSkillEnhanceNotification();
+                  UnitUtility.updateLevelUpNotification();
+                  break;
+                case UnitDefine.UnitNotificationType.EQUIP:
+                  UnitUtility.updateUnitEquipNotificationInfo(_isUpdateEquip, _isEnhanceRelease);
+                  break;
+                case UnitDefine.UnitNotificationType.SPECIFIC_EQUIP:
+                  UnitUtility.updateSpecificUnitEquipNotificationInfo(_isUpdateEquip, _unitId, _isEnhanceRelease);
+                  break;
+                case UnitDefine.UnitNotificationType.SKILL:
+                  UnitUtility.updateSkillEnhanceNotification();
+                  break;
+                case UnitDefine.UnitNotificationType.SKILL_TARGET_UNIT:
+                  UnitUtility.updateSkillEnhanceLocalNotification(_unitId, _calcLocalGold, _levelOffset);
+                  break;
+                case UnitDefine.UnitNotificationType.LEVEL_UP:
+                  UnitUtility.updateLevelUpNotification(_unitId);
+                  UnitUtility.updateUniqueEquipNotificationInfo(_isUpdateEquip, _unitId, _isEnhanceRelease);
+                  break;
+                case UnitDefine.UnitNotificationType.HIGH_RARITY:
+                  UnitUtility.updateHighRarityEquipNotificationInfo(_isUpdateEquip, _unitId);
+                  break;
               }
             }
-          }
-        }
-      });
-      action(unitData.UnionBurst);
-      action(unitData.MainSkill);
-      action(unitData.ExSkill);
-      List<SkillLevelInfo> skillLevelInfoList = new List<SkillLevelInfo>();
-      for (int index = 0; index < _unitParameter.SkillData.SpSkillIds.Count; ++index)
-      {
-        SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
-        skillLevelInfo.SetSkillId(_unitParameter.SkillData.SpSkillIds[index]);
-        skillLevelInfoList.Add(skillLevelInfo);
-      }
-      action(skillLevelInfoList);
-      action(unitData.FreeSkill);
-      return summonSkillList;
-    }
 
-    public static void SortPartyByPosition(List<UnitDataForView> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<UnitDataForView>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.Id), masterUnitData.Get((int) _b.Id))));
-    }
+            private static void updateUnitEquipNotificationInfo(bool _isUpdateEquip, bool _isEnhanceRelease)
+            {
+              foreach (KeyValuePair<int, UnitParameter> unitParameter in Singleton<UserData>.Instance.UnitParameterDictionary)
+              {
+                UnitUtility.setUnitEquipNotificationInfo(_isUpdateEquip, unitParameter.Value, _isEnhanceRelease);
+                UnitUtility.setUnitUniqueEquipNotificationInfo(false, unitParameter.Value, _isEnhanceRelease);
+                UnitUtility.setUnitHighRarityEquipNotificationInfo(false, unitParameter.Value);
+              }
+            }
 
-    public static void SortPartyByPosition(List<ChangeRarityUnit> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<ChangeRarityUnit>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get(_a.unit_id), masterUnitData.Get(_b.unit_id))));
-    }
+            private static void updateSpecificUnitEquipNotificationInfo(
+              bool _isUpdateEquip,
+              int _unitId,
+              bool _isEnhanceRelease)
+            {
+              UnitParameter _unitParam = (UnitParameter) null;
+              if (!Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out _unitParam))
+                return;
+              UnitUtility.setUnitEquipNotificationInfo(_isUpdateEquip, _unitParam, _isEnhanceRelease);
+              UnitUtility.setUnitUniqueEquipNotificationInfo(false, _unitParam, _isEnhanceRelease);
+            }
 
-    public static void SortPartyByPosition(List<UnitData> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<UnitData>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.Id), masterUnitData.Get((int) _b.Id))));
-    }
+            private static void updateUniqueEquipNotificationInfo(
+              bool _isUpdateEquip,
+              int _unitId,
+              bool _isEnhanceRelease,
+              int _temporaryAddLv = 0)
+            {
+              UnitParameter _unitParam = (UnitParameter) null;
+              if (!Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out _unitParam))
+                return;
+              UnitUtility.setUnitUniqueEquipNotificationInfo(_isUpdateEquip, _unitParam, _isEnhanceRelease, _temporaryAddLv);
+            }
 
-    public static void SortPartyByPosition(List<ReplayUnitDataForView> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<ReplayUnitDataForView>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.Id), masterUnitData.Get((int) _b.Id))));
-    }
+            private static void updateHighRarityEquipNotificationInfo(bool _isUpdateEquip, int _unitId)
+            {
+              UnitParameter _unitParam = (UnitParameter) null;
+              if (!Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out _unitParam))
+                return;
+              UnitUtility.setUnitHighRarityEquipNotificationInfo(_isUpdateEquip, _unitParam);
+            }
 
-    public static void SortPartyByPosition(List<int> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<int>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get(_a), masterUnitData.Get(_b))));
-    }
+            private static void setUnitEquipNotificationInfo(
+              bool _isUpdateEquip,
+              UnitParameter _unitParam,
+              bool _isEnhanceRelease)
+            {
+              int id1 = (int) _unitParam.UniqueData.Id;
+              Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
+              bool flag = true;
+              if (_isUpdateEquip)
+                UnitUtility.UpdateUnitEquipmentSlot(id1);
+              UnitNotificationInfo notificationInfo;
+              if (!unitNotification.TryGetValue(id1, out notificationInfo))
+              {
+                notificationInfo = new UnitNotificationInfo(id1, _level: ((int) _unitParam.UniqueData.UnitLevel));
+                unitNotification.Add(id1, notificationInfo);
+              }
+              else
+                notificationInfo.IsNoticeUnlock = false;
+              List<EquipSlot> equipSlot = _unitParam.UniqueData.EquipSlot;
+              Dictionary<int, int> _needEquipItems = new Dictionary<int, int>();
+              for (int index = 0; index < equipSlot.Count; ++index)
+              {
+                int id2 = (int) equipSlot[index].Id;
+                UnitDefine.UnitEquipmentStatus status = (UnitDefine.UnitEquipmentStatus) (int) equipSlot[index].Status;
+                if (status == UnitDefine.UnitEquipmentStatus.NO_POSSESION || status == UnitDefine.UnitEquipmentStatus.LV_SHORTAGE || (status == UnitDefine.UnitEquipmentStatus.NO_POSSESION_CANNOT_CRAFT || status == UnitDefine.UnitEquipmentStatus.UNKNOWN))
+                {
+                  flag = false;
+                  notificationInfo.SlotList[index].SetEquip(false);
+                  notificationInfo.SlotList[index].SetEnhance(false);
+                  notificationInfo.SlotList[index].SetCraftCost(-1);
+                }
+                else
+                {
+                  switch (status)
+                  {
+                    case UnitDefine.UnitEquipmentStatus.CAN_EQUIP:
+                    case UnitDefine.UnitEquipmentStatus.CAN_CRAFT:
+                    case UnitDefine.UnitEquipmentStatus.CAN_EQUIP_LV_SHORTAGE:
+                    case UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE:
+                      notificationInfo.SlotList[index].SetEquip(true);
+                      notificationInfo.SlotList[index].SetEnhance(false);
+                      if (_needEquipItems.ContainsKey(id2))
+                        _needEquipItems[id2]++;
+                      else
+                        _needEquipItems.Add(id2, 1);
+                      if (status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT || status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE)
+                      {
+                        notificationInfo.SlotList[index].SetCraftCost(UnitUtility.CalcNeededCraftCost(id2));
+                        continue;
+                      }
+                      notificationInfo.SlotList[index].SetCraftCost(-1);
+                      continue;
+                    case UnitDefine.UnitEquipmentStatus.EQUIPPED:
+                      notificationInfo.SlotList[index].SetEquip(false);
+                      if (_isEnhanceRelease)
+                        notificationInfo.SlotList[index].SetEnhance(UnitUtility.settingUnitEquipEnhanceStatus(equipSlot[index]));
+                      else
+                        notificationInfo.SlotList[index].SetEnhance(false);
+                      notificationInfo.SlotList[index].SetCraftCost(-1);
+                      continue;
+                    default:
+                      flag = false;
+                      continue;
+                  }
+                }
+              }
+              if ((ePromotionLevel) UnitUtility.GetUnitMaxRank(id1) <= _unitParam.UniqueData.PromotionLevel)
+                flag = false;
+              else if (flag)
+                flag = UnitUtility.IsPromotionPossible(_needEquipItems);
+              notificationInfo.IsNoticePromotion = flag;
+              unitNotification[id1] = notificationInfo;
+            }
 
-    public static void SortPartyByPosition(List<UnitParameter> _partyList) => _partyList?.Sort((Comparison<UnitParameter>) ((_a, _b) => UnitUtility.compareUnitOrder(_a.MasterData, _b.MasterData)));
+            private static void setUnitUniqueEquipNotificationInfo(
+              bool _isUpdateEquip,
+              UnitParameter _unitParam,
+              bool _isEnhanceRelease,
+              int _temporaryAddLv = 0)
+            {
+              int id1 = (int) _unitParam.UniqueData.Id;
+              Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
+              if (_isUpdateEquip)
+                UnitUtility.UpdateUnitEquipmentSlot(id1);
+              UnitNotificationInfo notificationInfo;
+              if (!unitNotification.TryGetValue(id1, out notificationInfo))
+              {
+                notificationInfo = new UnitNotificationInfo(id1, _level: ((int) _unitParam.UniqueData.UnitLevel));
+                unitNotification.Add(id1, notificationInfo);
+              }
+              else
+              {
+                notificationInfo.IsNoticeUnlock = false;
+                notificationInfo.CheckAndCreateUniqueSlot(id1);
+              }
+              if (UnitUtility.GetUniqueEquipSlotNum(id1) == 0)
+                return;
+              List<EquipSlot> uniqueEquipSlot = _unitParam.UniqueData.UniqueEquipSlot;
+              Dictionary<int, int> dictionary = new Dictionary<int, int>();
+              for (int index = 0; index < uniqueEquipSlot.Count; ++index)
+              {
+                int id2 = (int) uniqueEquipSlot[index].Id;
+                UnitDefine.UnitEquipmentStatus status = (UnitDefine.UnitEquipmentStatus) (int) uniqueEquipSlot[index].Status;
+                switch (status)
+                {
+                  case UnitDefine.UnitEquipmentStatus.NO_POSSESION:
+                  case UnitDefine.UnitEquipmentStatus.NO_POSSESION_CANNOT_CRAFT:
+                  case UnitDefine.UnitEquipmentStatus.LV_SHORTAGE:
+                  case UnitDefine.UnitEquipmentStatus.UNKNOWN:
+                  case UnitDefine.UnitEquipmentStatus.RANK_SHORTAGE:
+                    notificationInfo.UniqueSlotList[index].SetEquip(false);
+                    notificationInfo.UniqueSlotList[index].SetEnhance(false);
+                    notificationInfo.UniqueSlotList[index].SetCraftCost(-1);
+                    notificationInfo.UniqueSlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                    break;
+                  case UnitDefine.UnitEquipmentStatus.CAN_EQUIP:
+                  case UnitDefine.UnitEquipmentStatus.CAN_CRAFT:
+                  case UnitDefine.UnitEquipmentStatus.CAN_EQUIP_LV_SHORTAGE:
+                  case UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE:
+                    notificationInfo.UniqueSlotList[index].SetEquip(true);
+                    notificationInfo.UniqueSlotList[index].SetEnhance(false);
+                    if (dictionary.ContainsKey(id2))
+                      dictionary[id2]++;
+                    else
+                      dictionary.Add(id2, 1);
+                    if (status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT || status == UnitDefine.UnitEquipmentStatus.CAN_CRAFT_LV_SHORTAGE)
+                    {
+                      notificationInfo.UniqueSlotList[index].SetCraftCost(UnitUtility.CalcNeededCraftCost(id2));
+                      break;
+                    }
+                    notificationInfo.UniqueSlotList[index].SetCraftCost(-1);
+                    break;
+                  case UnitDefine.UnitEquipmentStatus.EQUIPPED:
+                    if (_isEnhanceRelease)
+                    {
+                      notificationInfo.UniqueSlotList[index] = UnitUtility.settingUnitUniqueEquipEnhanceStatus(uniqueEquipSlot[index], index, (int) _unitParam.UniqueData.UnitLevel + _temporaryAddLv);
+                      break;
+                    }
+                    notificationInfo.UniqueSlotList[index].SetEquip(false);
+                    notificationInfo.UniqueSlotList[index].SetEnhance(false);
+                    notificationInfo.UniqueSlotList[index].SetCraftCost(-1);
+                    notificationInfo.UniqueSlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                    break;
+                }
+              }
+              unitNotification[id1] = notificationInfo;
+            }
 
-    public static void SortPartyByPosition(List<DungeonUnit> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<DungeonUnit>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.UnitId), masterUnitData.Get((int) _b.UnitId))));
-    }
+            private static void setUnitHighRarityEquipNotificationInfo(
+              bool _isUpdateEquip,
+              UnitParameter _unitParam)
+            {
+              int id = (int) _unitParam.UniqueData.Id;
+              if (!UnitUtility.IsUnlockRaritySix(id))
+                return;
+              UserData instance = Singleton<UserData>.Instance;
+              Dictionary<int, UnitNotificationInfo> unitNotification = instance.UnitNotification;
+              if (_isUpdateEquip)
+                UnitUtility.UpdateUnitEquipmentSlot(id);
+              UnitNotificationInfo notificationInfo;
+              if (!unitNotification.TryGetValue(id, out notificationInfo))
+              {
+                notificationInfo = new UnitNotificationInfo(id, _level: ((int) _unitParam.UniqueData.UnitLevel));
+                unitNotification.Add(id, notificationInfo);
+              }
+              else
+                notificationInfo.IsNoticeUnlock = false;
+              List<EquipSlot> uniqueEquipSlot = _unitParam.UniqueData.UniqueEquipSlot;
+              bool flag1 = uniqueEquipSlot.Count > 0;
+              if (flag1)
+                flag1 = (bool) uniqueEquipSlot[0].IsSlot;
+              bool flag2 = true;
+              MasterUnlockRarity6 masterUnlockRarity6 = ManagerSingleton<MasterDataManager>.Instance.masterUnlockRarity6;
+              for (int index = 0; index < 3; ++index)
+              {
+                switch ((UnitDefine.UnitEquipmentStatus) UnitUtility.GetUnlockRarityStatus(_unitParam.UniqueData.UnlockRarity6Item, index + 1))
+                {
+                  case UnitDefine.UnitEquipmentStatus.NO_POSSESION:
+                  case UnitDefine.UnitEquipmentStatus.NO_POSSESION_CANNOT_CRAFT:
+                    notificationInfo.HighRaritySlotList[index].SetEquip(false);
+                    notificationInfo.HighRaritySlotList[index].SetEnhance(false);
+                    notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
+                    notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                    flag2 = false;
+                    break;
+                  case UnitDefine.UnitEquipmentStatus.CAN_EQUIP:
+                    int unlockRarityLevel1 = UnitUtility.GetUnlockRarityLevel(_unitParam.UniqueData.UnlockRarity6Item, index + 1);
+                    int consumeGold1 = (int) masterUnlockRarity6.Get(id, (byte) (index + 1), (byte) (unlockRarityLevel1 + 1)).consume_gold;
+                    bool flag3 = instance.TotalGold >= consumeGold1 & flag1;
+                    notificationInfo.HighRaritySlotList[index].SetEquip(flag3);
+                    notificationInfo.HighRaritySlotList[index].SetEnhance(false);
+                    notificationInfo.HighRaritySlotList[index].SetCraftCost(flag3 ? consumeGold1 : -1);
+                    notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                    flag2 = false;
+                    break;
+                  case UnitDefine.UnitEquipmentStatus.EQUIPPED:
+                    notificationInfo.HighRaritySlotList[index].SetEquip(false);
+                    int unlockRarityLevel2 = UnitUtility.GetUnlockRarityLevel(_unitParam.UniqueData.UnlockRarity6Item, index + 1);
+                    if (unlockRarityLevel2 >= masterUnlockRarity6.GetListWithUnitIdAndSlotIdOrderByUnlockLevelAsc(id, (byte) (index + 1)).Count)
+                    {
+                      notificationInfo.HighRaritySlotList[index].SetEnhance(false);
+                      notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
+                      notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.MAX);
+                      break;
+                    }
+                    if (UnitUtility.isEnoughHighRarityItemNum(id, index + 1, unlockRarityLevel2 + 1))
+                    {
+                      int consumeGold2 = (int) masterUnlockRarity6.Get(id, (byte) (index + 1), (byte) (unlockRarityLevel2 + 1)).consume_gold;
+                      bool flag4 = instance.TotalGold >= consumeGold2;
+                      notificationInfo.HighRaritySlotList[index].SetEnhance(flag4);
+                      notificationInfo.HighRaritySlotList[index].SetCraftCost(flag4 ? consumeGold2 : -1);
+                      notificationInfo.HighRaritySlotList[index].SetOverLimit(flag4 ? UnitDefine.UniqueEquipOverLimitStatus.POSSIBLE : UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                      flag2 = false;
+                      break;
+                    }
+                    notificationInfo.HighRaritySlotList[index].SetEnhance(false);
+                    notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
+                    notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                    flag2 = false;
+                    break;
+                  case UnitDefine.UnitEquipmentStatus.STAR_SHORTAGE:
+                    notificationInfo.HighRaritySlotList[index].SetEquip(false);
+                    notificationInfo.HighRaritySlotList[index].SetEnhance(false);
+                    notificationInfo.HighRaritySlotList[index].SetCraftCost(-1);
+                    notificationInfo.HighRaritySlotList[index].SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+                    flag2 = false;
+                    break;
+                }
+              }
+              if ((int) _unitParam.UniqueData.UnitRarity == 5)
+              {
+                UnitData uniqueData = instance.UnitParameterDictionary[id].UniqueData;
+                notificationInfo.IsNoticeHighRarityEvolution = (int) uniqueData.UnlockRarity6Item.QuestClear > 0;
+              }
+              else if ((int) _unitParam.UniqueData.UnitRarity == 6)
+              {
+                flag2 = false;
+                notificationInfo.IsNoticeHighRarityEvolution = false;
+              }
+              notificationInfo.IsNoticeHighRarityQuest = flag2;
+              unitNotification[id] = notificationInfo;
+            }
 
-    public static void SortPartyByPosition(List<TowerUnit> _partyList)
-    {
-      if (_partyList == null)
-        return;
-      MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-      _partyList.Sort((Comparison<TowerUnit>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.UnitId), masterUnitData.Get((int) _b.UnitId))));
-    }
+            private static bool isEnoughHighRarityItemNum(int _unitId, int _slotId, int _checkItemLevel)
+            {
+              MasterUnlockRarity6.UnlockRarity6 unlockRarity6 = ManagerSingleton<MasterDataManager>.Instance.masterUnlockRarity6.Get(_unitId, (byte) _slotId, (byte) _checkItemLevel);
+              return Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, (int) unlockRarity6.material_id) >= (int) unlockRarity6.material_count;
+            }
 
-    public static void SortPartyByPosition(List<ClanChatUnitData> _partyList, bool _isEnemy)
-    {
-      if (_partyList == null)
-        return;
-      if (_isEnemy)
-      {
-        MasterEnemyParameter masterEnemyParameter = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter;
-        MasterUnitEnemyData masterUnitEnemyData = ManagerSingleton<MasterDataManager>.Instance.masterUnitEnemyData;
-        _partyList.Sort((Comparison<ClanChatUnitData>) ((_a, _b) => UnitUtility.compareUnitEnemyOrder(masterUnitEnemyData.Get((int) masterEnemyParameter.GetFromAllKind(_a.id).unit_id), masterUnitEnemyData.Get((int) masterEnemyParameter.GetFromAllKind(_b.id).unit_id))));
-      }
-      else
-      {
-        MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
-        _partyList.Sort((Comparison<ClanChatUnitData>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get(_a.id), masterUnitData.Get(_b.id))));
-      }
-    }
+            private static bool settingUnitEquipEnhanceStatus(EquipSlot _equipSlot)
+            {
+              InterfaceEquipmentData includedUnknownData = UnitUtility.GetEquipmentDataIncludedUnknownData((int) _equipSlot.Id);
+              int count = ManagerSingleton<MasterDataManager>.Instance.masterEquipmentEnhanceData[includedUnknownData.Promotion - 1].Count;
+              return includedUnknownData.Promotion > 1 && (int) _equipSlot.EnhancementLevel < count;
+            }
 
-    public static ClanChatUnitData[] SortPartyByPosition(
-      ClanChatUnitData[] _partyArray,
-      bool _isEnemy)
-    {
-      List<ClanChatUnitData> list = ((IEnumerable<ClanChatUnitData>) _partyArray).ToList<ClanChatUnitData>();
-      UnitUtility.SortPartyByPosition(list, _isEnemy);
-      return list.ToArray();
-    }
+            private static NoticeEquipStatus settingUnitUniqueEquipEnhanceStatus(
+              EquipSlot _equipSlot,
+              int _slotIndex,
+              int _unitLevel)
+            {
+              NoticeEquipStatus noticeEquipStatus = new NoticeEquipStatus(_isUnique: true);
+              MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
+              MasterUniqueEquipmentEnhanceData equipmentEnhanceData = instance.masterUniqueEquipmentEnhanceData;
+              MasterUniqueEquipmentRankup uniqueEquipmentRankup1 = instance.masterUniqueEquipmentRankup;
+              if ((int) _equipSlot.EnhancementLevel >= equipmentEnhanceData.LevelMax(_slotIndex))
+              {
+                noticeEquipStatus.SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.MAX);
+                return noticeEquipStatus;
+              }
+              int num = equipmentEnhanceData.LimitLevel(_slotIndex, (int) _equipSlot.Rank);
+              if ((int) _equipSlot.EnhancementLevel < num)
+                noticeEquipStatus.SetEnhance(UnitUtility.IsEnoughUniqueEnhanceUseGold(_slotIndex, (int) _equipSlot.EnhancementPt));
+              int maxEquipRank = uniqueEquipmentRankup1.GetMaxEquipRank((int) _equipSlot.Id);
+              MasterUniqueEquipmentRankup.UniqueEquipmentRankup uniqueEquipmentRankup2 = uniqueEquipmentRankup1.Get((int) _equipSlot.Id, (int) _equipSlot.Rank);
+              if ((int) _equipSlot.Rank > maxEquipRank)
+              {
+                noticeEquipStatus.SetOverLimit(UnitDefine.UniqueEquipOverLimitStatus.MAX);
+                return noticeEquipStatus;
+              }
+              if (_unitLevel < (int) uniqueEquipmentRankup2.UnitLevel || UnitUtility.CreateUniqueEquipmentRankupPostData((int) _equipSlot.Id, (int) _equipSlot.Rank) == null)
+                return noticeEquipStatus;
+              noticeEquipStatus.SetOverLimit(Singleton<UserData>.Instance.TotalGold >= uniqueEquipmentRankup2.GetCraftCost ? UnitDefine.UniqueEquipOverLimitStatus.POSSIBLE : UnitDefine.UniqueEquipOverLimitStatus.IMPOSSIBLE);
+              return noticeEquipStatus;
+            }
 
-    public static ClanChatUnitData[] SortPartyEnemyTowerOrder(
-      ClanChatUnitData[] _partyList,
-      bool _isEx,
-      int _questId)
-    {
-      if (_partyList == null)
-        return (ClanChatUnitData[]) null;
-      MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
-      MasterUnitEnemyData masterUnitEnemyData = instance.masterUnitEnemyData;
-      int wave_group_id = (int) (_isEx ? instance.masterTowerExQuestData.Get(_questId).wave_group_id : instance.masterTowerQuestData.Get(_questId).wave_group_id);
-      MasterTowerWaveGroupData.TowerWaveGroupData towerWaveGroupData = instance.masterTowerWaveGroupData.Get(wave_group_id);
-      List<int> enemyIdList = new List<int>();
-      if ((int) towerWaveGroupData.enemy_id_1 > 0)
-        enemyIdList.Add((int) towerWaveGroupData.enemy_id_1);
-      if ((int) towerWaveGroupData.enemy_id_2 > 0)
-        enemyIdList.Add((int) towerWaveGroupData.enemy_id_2);
-      if ((int) towerWaveGroupData.enemy_id_3 > 0)
-        enemyIdList.Add((int) towerWaveGroupData.enemy_id_3);
-      if ((int) towerWaveGroupData.enemy_id_4 > 0)
-        enemyIdList.Add((int) towerWaveGroupData.enemy_id_4);
-      if ((int) towerWaveGroupData.enemy_id_5 > 0)
-        enemyIdList.Add((int) towerWaveGroupData.enemy_id_5);
-      List<ClanChatUnitData> list = ((IEnumerable<ClanChatUnitData>) _partyList).ToList<ClanChatUnitData>();
-      List<ClanChatUnitData> clanChatUnitDataList = new List<ClanChatUnitData>();
-      for (int i = 0; i < enemyIdList.Count; i++)
-      {
-        int index = list.FindIndex((Predicate<ClanChatUnitData>) (dt => dt.id == enemyIdList[i]));
-        if (index >= 0)
+            private static void updateUnitRarityNotificationInfo()
+            {
+              Dictionary<int, UnitParameter> parameterDictionary = Singleton<UserData>.Instance.UnitParameterDictionary;
+              Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
+              foreach (KeyValuePair<int, UnitParameter> keyValuePair in parameterDictionary)
+              {
+                int key = keyValuePair.Key;
+                UnitNotificationInfo notificationInfo;
+                if (!unitNotification.TryGetValue(key, out notificationInfo))
+                {
+                  notificationInfo = new UnitNotificationInfo(key, _level: ((int) keyValuePair.Value.UniqueData.UnitLevel));
+                  unitNotification.Add(key, notificationInfo);
+                }
+                else
+                  notificationInfo.IsNoticeUnlock = false;
+                List<MasterUnitRarity.UnitRarity> unitRarityList = ManagerSingleton<MasterDataManager>.Instance.masterUnitRarity[key];
+                if (((int) keyValuePair.Value.UniqueData.UnitRarity >= 5 ? 1 : 0) == 0)
+                {
+                  MasterUnitRarity.UnitRarity unitRarity = unitRarityList[(int) keyValuePair.Value.UniqueData.UnitRarity];
+                  notificationInfo.IsNoticeEvolution = Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, (int) unitRarity.unit_material_id) >= (int) unitRarity.consume_num & Singleton<UserData>.Instance.TotalGold >= (int) unitRarity.consume_gold;
+                }
+                else
+                  notificationInfo.IsNoticeEvolution = false;
+                unitNotification[key] = notificationInfo;
+              }
+            }
+
+            private static void updateUnlockUnitNotificationInfo()
+            {
+              MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
+              Dictionary<int, MasterUnlockUnitCondition.UnlockUnitCondition> dictionary = instance.masterUnlockUnitCondition.dictionary;
+              Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
+              foreach (KeyValuePair<int, MasterUnlockUnitCondition.UnlockUnitCondition> keyValuePair in dictionary)
+              {
+                int key = keyValuePair.Key;
+                if ((int) instance.masterUnitData[key].OnlyDispOwned <= 0 && !Singleton<UserData>.Instance.IsMyUnit(key))
+                {
+                  UnitNotificationInfo notificationInfo;
+                  if (!unitNotification.TryGetValue(key, out notificationInfo))
+                  {
+                    notificationInfo = new UnitNotificationInfo(key);
+                    unitNotification.Add(key, notificationInfo);
+                  }
+                  MasterUnlockUnitCondition.UnlockUnitCondition unlockUnitCondition = instance.masterUnlockUnitCondition[key];
+                  bool flag1 = false;
+                  bool flag2 = false;
+                  if (unlockUnitCondition.ConsumeMaterialNum != 0)
+                  {
+                    int materialId = unlockUnitCondition.MaterialId;
+                    flag1 = unlockUnitCondition.ConsumeMaterialNum > Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, materialId) || flag1;
+                  }
+                  for (int index = 0; index < unlockUnitCondition.Equip.Count; ++index)
+                  {
+                    MasterUnlockUnitCondition.UnlockUnitCondition.Pair pair = unlockUnitCondition.Equip[index];
+                    flag1 = pair.Num > Singleton<UserData>.Instance.SearchPossession(eInventoryType.Equip, pair.Id) || flag1;
+                  }
+                  for (int index = 0; index < unlockUnitCondition.Item.Count; ++index)
+                  {
+                    MasterUnlockUnitCondition.UnlockUnitCondition.Pair pair = unlockUnitCondition.Item[index];
+                    flag1 = pair.Num > Singleton<UserData>.Instance.SearchPossession(eInventoryType.Item, pair.Id) || flag1;
+                  }
+                  int consumeGold = unlockUnitCondition.ConsumeGold;
+                  if (consumeGold > 0)
+                  {
+                    int totalGold = Singleton<UserData>.Instance.TotalGold;
+                    flag2 = consumeGold >= totalGold || flag2;
+                  }
+                  notificationInfo.IsNoticeUnlock = !flag1 && !flag2 && !UnitUtility.IsLimitedUnit(key);
+                  unitNotification[key] = notificationInfo;
+                }
+              }
+            }
+
+            private static void updateLevelUpNotification()
+            {
+              foreach (KeyValuePair<int, UnitParameter> unitParameter in Singleton<UserData>.Instance.UnitParameterDictionary)
+                UnitUtility.updateLevelUpNotification(unitParameter.Key);
+            }
+
+            public static void UpdateLevelUpNotification(
+              int _unitId,
+              Dictionary<int, UserItemParameter> _usedItem = null)
+            {
+              if (!ManagerSingleton<MasterDataManager>.Instance.IsSetupFinished || TutorialManager.IsStartTutorial)
+                return;
+              UnitUtility.updateLevelUpNotification(_unitId, _usedItem);
+            }
+
+            private static void updateLevelUpNotification(
+              int _unitId,
+              Dictionary<int, UserItemParameter> _usedItem = null)
+            {
+              UserData instance = Singleton<UserData>.Instance;
+              Dictionary<int, UnitParameter> parameterDictionary = instance.UnitParameterDictionary;
+              Dictionary<int, UnitNotificationInfo> unitNotification = instance.UnitNotification;
+              MasterItemData masterItemData = ManagerSingleton<MasterDataManager>.Instance.masterItemData;
+              MasterExperienceUnit masterExperienceUnit = ManagerSingleton<MasterDataManager>.Instance.masterExperienceUnit;
+              UnitParameter unitParameter = (UnitParameter) null;
+              int key = _unitId;
+              ref UnitParameter local = ref unitParameter;
+              if (!parameterDictionary.TryGetValue(key, out local))
+                return;
+              UnitData uniqueData = unitParameter.UniqueData;
+              UnitNotificationInfo notificationInfo;
+              if (!unitNotification.TryGetValue((int) uniqueData.Id, out notificationInfo))
+              {
+                notificationInfo = new UnitNotificationInfo((int) uniqueData.Id, _level: ((int) uniqueData.UnitLevel));
+                unitNotification.Add((int) uniqueData.Id, notificationInfo);
+              }
+              int num1 = (int) uniqueData.UnitLevel;
+              int num2 = 0;
+              if (_usedItem != null)
+              {
+                foreach (KeyValuePair<int, UserItemParameter> keyValuePair in _usedItem)
+                  num2 += (int) masterItemData.Get((int) keyValuePair.Value.ItemId).Value * (int) keyValuePair.Value.ItemCount;
+              }
+              int num3 = (int) uniqueData.UnitExp + num2;
+              for (int _level = (int) uniqueData.UnitLevel + 1; _level <= (int) instance.UserInfo.TeamLevel && masterExperienceUnit[_level].total_exp <= num3; ++_level)
+                num1 = _level;
+              if (_usedItem != null)
+                UnitUtility.updateTemporaryLvUniqueEquipNotification(_unitId, num1 - (int) uniqueData.UnitLevel);
+              if (num1 >= (int) instance.UserInfo.TeamLevel)
+              {
+                notificationInfo.IsNoticeLevelUp = false;
+                unitNotification[(int) uniqueData.Id] = notificationInfo;
+              }
+              else
+              {
+                int num4 = UnitUtility.calcStrengthItemExp() - num2;
+                if (masterExperienceUnit[num1 + 1].total_exp <= num3 + num4)
+                {
+                  notificationInfo.IsNoticeLevelUp = true;
+                  unitNotification[(int) uniqueData.Id] = notificationInfo;
+                }
+                else
+                {
+                  notificationInfo.IsNoticeLevelUp = false;
+                  unitNotification[(int) uniqueData.Id] = notificationInfo;
+                }
+              }
+            }
+
+            private static void updateTemporaryLvUniqueEquipNotification(int _unitId, int _temporaryAddLv = 0)
+            {
+              bool _isEnhanceRelease = ManagerSingleton<MasterDataManager>.Instance.masterContentReleaseData.CheckReleaseContents(eSystemId.UNIT_EQUIP_ENHANCE);
+              UnitUtility.updateUniqueEquipNotificationInfo(false, _unitId, _isEnhanceRelease, _temporaryAddLv);
+            }
+
+            private static void updateSkillNoticeInfo(
+              List<SkillLevelInfo> _list,
+              Dictionary<int, SkillNoticeInfo> _dic,
+              UnitParameter _value,
+              int _gold = -1,
+              int _levelOffset = 0)
+            {
+              for (int index = 0; index < _list.Count; ++index)
+              {
+                if (_dic.ContainsKey((int) _list[index].SkillId))
+                {
+                  SkillNoticeInfo skillNoticeInfo = _dic[(int) _list[index].SkillId];
+                  skillNoticeInfo.SkillLevel = (int) _list[index].SkillLevel;
+                  skillNoticeInfo.IsEnhance = UnitUtility.IsSkillEnhancePossible(_list[index], _value, _gold, _levelOffset);
+                  _dic[(int) _list[index].SkillId] = skillNoticeInfo;
+                }
+                else
+                  _dic.Add((int) _list[index].SkillId, new SkillNoticeInfo((int) _list[index].SkillLevel, UnitUtility.IsSkillEnhancePossible(_list[index], _value, _gold, _levelOffset)));
+              }
+            }
+
+            private static void updateSkillEnhanceNotification()
+            {
+              Dictionary<int, UnitParameter> parameterDictionary = Singleton<UserData>.Instance.UnitParameterDictionary;
+              Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
+              UserData instance = Singleton<UserData>.Instance;
+              bool flag = ManagerSingleton<MasterDataManager>.Instance.masterContentReleaseData.CheckReleaseContents(eSystemId.UNIT_SKILL_LVUP);
+              foreach (KeyValuePair<int, UnitParameter> keyValuePair in parameterDictionary)
+              {
+                int key = keyValuePair.Key;
+                UnitNotificationInfo notificationInfo;
+                if (!unitNotification.TryGetValue(key, out notificationInfo))
+                {
+                  notificationInfo = new UnitNotificationInfo(key, _level: ((int) keyValuePair.Value.UniqueData.UnitLevel));
+                  unitNotification.Add(key, notificationInfo);
+                }
+                else
+                  notificationInfo.IsNoticeUnlock = false;
+                if (!flag)
+                {
+                  if (notificationInfo.SkillInfo.Count > 0)
+                    notificationInfo.SkillInfo.Clear();
+                }
+                else
+                {
+                  UnitUtility.updateSkillNoticeInfo(keyValuePair.Value.UniqueData.UnionBurst, notificationInfo.SkillInfo, keyValuePair.Value);
+                  UnitUtility.updateSkillNoticeInfo(keyValuePair.Value.UniqueData.MainSkill, notificationInfo.SkillInfo, keyValuePair.Value);
+                  UnitUtility.updateSkillNoticeInfo(keyValuePair.Value.UniqueData.ExSkill, notificationInfo.SkillInfo, keyValuePair.Value);
+                }
+                unitNotification[key] = notificationInfo;
+              }
+            }
+
+            public static void CheckSkillNoticeInfo(UnitData _uniqueData)
+            {
+              Dictionary<int, UnitNotificationInfo> unitNotification = Singleton<UserData>.Instance.UnitNotification;
+              if (!unitNotification.ContainsKey((int) _uniqueData.Id))
+                return;
+              bool isUpdate = false;
+              UnitNotificationInfo noticeInfo = unitNotification[(int) _uniqueData.Id];
+              System.Action<List<SkillLevelInfo>> action = (System.Action<List<SkillLevelInfo>>) (_list =>
+              {
+                for (int index = 0; index < _list.Count; ++index)
+                {
+                  if (noticeInfo.SkillInfo.ContainsKey((int) _list[index].SkillId))
+                    isUpdate = true;
+                }
+              });
+              action(_uniqueData.UnionBurst);
+              action(_uniqueData.MainSkill);
+              action(_uniqueData.ExSkill);
+              if (!isUpdate)
+                return;
+              unitNotification[(int) _uniqueData.Id].SkillInfo.Clear();
+              UnitUtility.updateSkillEnhanceNotification();
+            }
+
+            private static bool IsSkillEnhancePossible(
+              SkillLevelInfo _skillInfo,
+              UnitParameter _unit,
+              int _calcLocalGold = -1,
+              int _levelOffset = 0)
+            {
+              UserData instance = Singleton<UserData>.Instance;
+              if ((int) _skillInfo.SkillLevel >= (int) _unit.UniqueData.UnitLevel + _levelOffset)
+                return false;
+              int num = _calcLocalGold == -1 ? Singleton<UserData>.Instance.TotalGold : _calcLocalGold;
+              return (int) ManagerSingleton<MasterDataManager>.Instance.masterSkillCost.Get((int) _skillInfo.SkillLevel + 1).cost <= num;
+            }
+
+            private static void updateSkillEnhanceLocalNotification(
+              int _unitId,
+              int _calcLocalGold,
+              int _levelOffset = 0)
+            {
+              UnitNotificationInfo notificationInfo;
+              UnitParameter unitParameter;
+              if (!Singleton<UserData>.Instance.UnitNotification.TryGetValue(_unitId, out notificationInfo) || !Singleton<UserData>.Instance.UnitParameterDictionary.TryGetValue(_unitId, out unitParameter))
+                return;
+              UnitUtility.updateSkillNoticeInfo(unitParameter.UniqueData.UnionBurst, notificationInfo.SkillInfo, unitParameter, _calcLocalGold, _levelOffset);
+              UnitUtility.updateSkillNoticeInfo(unitParameter.UniqueData.MainSkill, notificationInfo.SkillInfo, unitParameter, _calcLocalGold, _levelOffset);
+              UnitUtility.updateSkillNoticeInfo(unitParameter.UniqueData.ExSkill, notificationInfo.SkillInfo, unitParameter, _calcLocalGold, _levelOffset);
+            }
+
+            public static UnitParameter CreateUnitParameterFromEnemyParameter(
+              int _enemyParameterId)
+            {
+              UnitData _unitData = new UnitData();
+              _unitData.SetId(_enemyParameterId);
+              UnitParameter unitParameter = new UnitParameter(_unitData);
+              MasterEnemyParameter.EnemyParameter fromAllKind = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter.GetFromAllKind(_enemyParameterId);
+              _unitData.SetUnitLevel((int) fromAllKind.level);
+              StatusParam _baseParam = new StatusParam();
+              _unitData.SetUnitRarity((int) fromAllKind.rarity);
+              _unitData.SetPromotionLevel((ePromotionLevel) (int) fromAllKind.promotion_level);
+              _baseParam.SetHp((long) (int) fromAllKind.hp);
+              _baseParam.SetAtk((int) fromAllKind.atk);
+              _baseParam.SetDef((int) fromAllKind.def);
+              _baseParam.SetMagicStr((int) fromAllKind.magic_str);
+              _baseParam.SetMagicDef((int) fromAllKind.magic_def);
+              _baseParam.SetPhysicalCritical((int) fromAllKind.physical_critical);
+              _baseParam.SetMagicCritical((int) fromAllKind.magic_critical);
+              _baseParam.SetDodge((int) fromAllKind.dodge);
+              _baseParam.SetLifeSteal((int) fromAllKind.life_steal);
+              _baseParam.SetWaveHpRecovery((int) fromAllKind.wave_hp_recovery);
+              _baseParam.SetWaveEnergyRecovery((int) fromAllKind.wave_energy_recovery);
+              _baseParam.SetPhysicalPenetrate((int) fromAllKind.physical_penetrate);
+              _baseParam.SetMagicPenetrate((int) fromAllKind.magic_penetrate);
+              _baseParam.SetEnergyRecoveryRate((int) fromAllKind.energy_recovery_rate);
+              _baseParam.SetHpRecoveryRate((int) fromAllKind.hp_recovery_rate);
+              _baseParam.SetEnergyReduceRate((int) fromAllKind.energy_reduce_rate);
+              _baseParam.SetAccuracy((int) fromAllKind.accuracy);
+              _unitData.SetResistStatusId((int) fromAllKind.resist_status_id);
+              _unitData.SetMainSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.MainSkillIds, UnitUtility.getMainSkillLevels(fromAllKind), unitParameter.SkillData.MainSkillEvolutionIds, UnitUtility.getMainSkillIsEvolved(fromAllKind)));
+              _unitData.SetExSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.ExSkillIds, UnitUtility.getExSkillLevels(fromAllKind), (List<int>) null, (List<bool>) null));
+              _unitData.SetUnionBurst(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.UnionBurstIds, UnitUtility.getUnionBurstLevels(fromAllKind), unitParameter.SkillData.UnionBurstEvolutionIds, UnitUtility.getUnionBurstIsEvolved(fromAllKind)));
+              StatusParam _equipParam = new StatusParam();
+              UnitParam _unitParam = new UnitParam();
+              _unitParam.SetBaseParam(_baseParam);
+              _unitParam.SetEquipParam(_equipParam);
+              _unitData.SetUnitParam(_unitParam);
+              int _power = UnitUtility.calcOverallEnemy(_baseParam, _unitData);
+              _unitData.SetPower(_power);
+              return unitParameter;
+            }
+
+            public static UnitParameter CreateUnitParameterFromEnemyParameterForSekai(
+              int _enemyParameterId)
+            {
+              UnitData _unitData = new UnitData();
+              _unitData.SetId(_enemyParameterId);
+              MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter = ManagerSingleton<MasterDataManager>.Instance.masterSekaiEnemyParameter.Get(_enemyParameterId);
+              UnitParameter unitParameter = new UnitParameter(_unitData);
+              _unitData.SetUnitLevel((int) _enemyParameter.level);
+              StatusParam _baseParam = new StatusParam();
+              _baseParam.SetHp(long.Parse((string) _enemyParameter.hp));
+              _baseParam.SetAtk((int) _enemyParameter.atk);
+              _baseParam.SetDef((int) _enemyParameter.def);
+              _baseParam.SetMagicStr((int) _enemyParameter.magic_str);
+              _baseParam.SetMagicDef((int) _enemyParameter.magic_def);
+              _baseParam.SetPhysicalCritical((int) _enemyParameter.physical_critical);
+              _baseParam.SetMagicCritical((int) _enemyParameter.magic_critical);
+              _baseParam.SetDodge((int) _enemyParameter.dodge);
+              _baseParam.SetLifeSteal((int) _enemyParameter.life_steal);
+              _baseParam.SetWaveHpRecovery((int) _enemyParameter.wave_hp_recovery);
+              _baseParam.SetWaveEnergyRecovery((int) _enemyParameter.wave_energy_recovery);
+              _baseParam.SetPhysicalPenetrate((int) _enemyParameter.physical_penetrate);
+              _baseParam.SetMagicPenetrate((int) _enemyParameter.magic_penetrate);
+              _baseParam.SetEnergyRecoveryRate((int) _enemyParameter.energy_recovery_rate);
+              _baseParam.SetHpRecoveryRate((int) _enemyParameter.hp_recovery_rate);
+              _baseParam.SetEnergyReduceRate((int) _enemyParameter.energy_reduce_rate);
+              _baseParam.SetAccuracy((int) _enemyParameter.accuracy);
+              _unitData.SetResistStatusId((int) _enemyParameter.resist_status_id);
+              _unitData.SetMainSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.MainSkillIds, UnitUtility.getMainSkillLevels(_enemyParameter), unitParameter.SkillData.MainSkillEvolutionIds, UnitUtility.getMainSkillIsEvolved((MasterEnemyParameter.EnemyParameter) _enemyParameter)));
+              _unitData.SetExSkill(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.ExSkillIds, UnitUtility.getExSkillLevels(_enemyParameter), (List<int>) null, (List<bool>) null));
+              _unitData.SetUnionBurst(UnitUtility.createSkillLevelFromEnemyParameter(unitParameter.SkillData.UnionBurstIds, UnitUtility.getUnionBurstLevels(_enemyParameter), unitParameter.SkillData.UnionBurstEvolutionIds, UnitUtility.getUnionBurstIsEvolved((MasterEnemyParameter.EnemyParameter) _enemyParameter)));
+              StatusParam _equipParam = new StatusParam();
+              UnitParam _unitParam = new UnitParam();
+              _unitParam.SetBaseParam(_baseParam);
+              _unitParam.SetEquipParam(_equipParam);
+              _unitData.SetUnitParam(_unitParam);
+              int _power = UnitUtility.calcOverallEnemy(_baseParam, _unitData);
+              _unitData.SetPower(_power);
+              return unitParameter;
+            }
+
+            private static List<int> getMainSkillLevels(
+              MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<int>()
+            {
+              (int) _enemyParameter.main_skill_lv_1,
+              (int) _enemyParameter.main_skill_lv_2,
+              (int) _enemyParameter.main_skill_lv_3,
+              (int) _enemyParameter.main_skill_lv_4,
+              (int) _enemyParameter.main_skill_lv_5,
+              (int) _enemyParameter.main_skill_lv_6,
+              (int) _enemyParameter.main_skill_lv_7,
+              (int) _enemyParameter.main_skill_lv_8,
+              (int) _enemyParameter.main_skill_lv_9,
+              (int) _enemyParameter.main_skill_lv_10
+            };
+
+            private static List<bool> getMainSkillIsEvolved(
+              MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<bool>()
+            {
+              (int) _enemyParameter.unique_equipment_flag_1 == 1
+            };
+
+            private static List<int> getMainSkillLevels(
+              MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter) => new List<int>()
+            {
+              (int) _enemyParameter.main_skill_lv_1,
+              (int) _enemyParameter.main_skill_lv_2,
+              (int) _enemyParameter.main_skill_lv_3,
+              (int) _enemyParameter.main_skill_lv_4,
+              (int) _enemyParameter.main_skill_lv_5,
+              (int) _enemyParameter.main_skill_lv_6,
+              (int) _enemyParameter.main_skill_lv_7,
+              (int) _enemyParameter.main_skill_lv_8,
+              (int) _enemyParameter.main_skill_lv_9,
+              (int) _enemyParameter.main_skill_lv_10
+            };
+
+            private static List<int> getExSkillLevels(
+              MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<int>()
+            {
+              (int) _enemyParameter.ex_skill_lv_1,
+              (int) _enemyParameter.ex_skill_lv_2,
+              (int) _enemyParameter.ex_skill_lv_3,
+              (int) _enemyParameter.ex_skill_lv_4,
+              (int) _enemyParameter.ex_skill_lv_5
+            };
+
+            private static List<int> getExSkillLevels(
+              MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter) => new List<int>()
+            {
+              (int) _enemyParameter.ex_skill_lv_1,
+              (int) _enemyParameter.ex_skill_lv_2,
+              (int) _enemyParameter.ex_skill_lv_3,
+              (int) _enemyParameter.ex_skill_lv_4,
+              (int) _enemyParameter.ex_skill_lv_5
+            };
+
+            private static List<int> getUnionBurstLevels(
+              MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<int>()
+            {
+              (int) _enemyParameter.union_burst_level
+            };
+
+            private static List<int> getUnionBurstLevels(
+              MasterSekaiEnemyParameter.SekaiEnemyParameter _enemyParameter) => new List<int>()
+            {
+              (int) _enemyParameter.union_burst_level
+            };
+
+            private static List<bool> getUnionBurstIsEvolved(
+              MasterEnemyParameter.EnemyParameter _enemyParameter) => new List<bool>()
+            {
+              (int) _enemyParameter.rarity == 6
+            };
+
+            private static List<SkillLevelInfo> createSkillLevelFromEnemyParameter(
+              List<int> _mainSkills,
+              List<int> _levels,
+              List<int> _plusSkills,
+              List<bool> _plusSkillFlags)
+            {
+              List<SkillLevelInfo> skillLevelInfoList = new List<SkillLevelInfo>();
+              int index = 0;
+              for (int count = _mainSkills.Count; index < count; ++index)
+              {
+                int _skillId = _mainSkills[index];
+                if (_skillId != 0)
+                {
+                  if (_plusSkillFlags != null && _plusSkillFlags.Count > index && _plusSkillFlags[index])
+                    _skillId = _plusSkills[index];
+                  SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
+                  skillLevelInfo.SetSkillId(_skillId);
+                  skillLevelInfo.SetSkillLevel(_levels[index]);
+                  skillLevelInfoList.Add(skillLevelInfo);
+                }
+              }
+              return skillLevelInfoList;
+            }
+
+            public static void CalcParamAndSkill(
+              UnitData _unitData,
+              UnitUtility.SummonSkillData _summonSkillData = null,
+              bool _isPowerLocal = false,
+              bool _useBattleRarity = true)
+            {
+              if ((UnityEngine.Object) ManagerSingleton<MasterDataManager>.Instance == (UnityEngine.Object) null || Singleton<UserData>.Instance == null || Singleton<UserData>.Instance.UnitParameterDictionary == null)
+                return;
+              int id = (int) _unitData.Id;
+              int _level = (int) _unitData.UnitLevel;
+              int _rarity = (int) _unitData.UnitRarity;
+              if (_useBattleRarity)
+                _rarity = _unitData.GetCurrentRarity();
+              int promotionLevel = (int) _unitData.PromotionLevel;
+              if (UnitUtility.IsQuestMonsterUnit((int) _unitData.Id))
+              {
+                UnitUtility.GetUnitResourceId((int) _unitData.Id);
+                MasterEnemyParameter.EnemyParameter fromAllKind = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter.GetFromAllKind((int) _unitData.Id);
+                StatusParam _baseParam = new StatusParam();
+                _baseParam.SetHp((long) (int) fromAllKind.hp);
+                _baseParam.SetAtk((int) fromAllKind.atk);
+                _baseParam.SetDef((int) fromAllKind.def);
+                _baseParam.SetMagicStr((int) fromAllKind.magic_str);
+                _baseParam.SetMagicDef((int) fromAllKind.magic_def);
+                _baseParam.SetPhysicalCritical((int) fromAllKind.physical_critical);
+                _baseParam.SetMagicCritical((int) fromAllKind.magic_critical);
+                _baseParam.SetDodge((int) fromAllKind.dodge);
+                _baseParam.SetLifeSteal((int) fromAllKind.life_steal);
+                _baseParam.SetWaveHpRecovery((int) fromAllKind.wave_hp_recovery);
+                _baseParam.SetWaveEnergyRecovery((int) fromAllKind.wave_energy_recovery);
+                _baseParam.SetPhysicalPenetrate((int) fromAllKind.physical_penetrate);
+                _baseParam.SetMagicPenetrate((int) fromAllKind.magic_penetrate);
+                _baseParam.SetEnergyRecoveryRate((int) fromAllKind.energy_recovery_rate);
+                _baseParam.SetHpRecoveryRate((int) fromAllKind.hp_recovery_rate);
+                _baseParam.SetEnergyReduceRate((int) fromAllKind.energy_reduce_rate);
+                _baseParam.SetAccuracy((int) fromAllKind.accuracy);
+                _unitData.SetResistStatusId((int) fromAllKind.resist_status_id);
+                StatusParam _equipParam = new StatusParam();
+                UnitParam _unitParam = new UnitParam();
+                _unitParam.SetBaseParam(_baseParam);
+                _unitParam.SetEquipParam(_equipParam);
+                _unitData.SetUnitParam(_unitParam);
+                if (!_isPowerLocal)
+                  return;
+                int _power = UnitUtility.calcOverallEnemy(_baseParam, _unitData);
+                _unitData.SetPower(_power);
+              }
+              else
+              {
+                if (_summonSkillData != null)
+                {
+                  _level = _summonSkillData.SkillLevel;
+                  _rarity = _summonSkillData.Rarity;
+                  promotionLevel = _summonSkillData.PromotionLevel;
+                }
+                StatusParam _baseParam = new StatusParam();
+                _baseParam.SetHp((long) UnitUtility.CalcUnitBaseParameter(eParamType.HP, id, _level, _rarity, promotionLevel));
+                _baseParam.SetAtk(UnitUtility.CalcUnitBaseParameter(eParamType.ATK, id, _level, _rarity, promotionLevel));
+                _baseParam.SetDef(UnitUtility.CalcUnitBaseParameter(eParamType.DEF, id, _level, _rarity, promotionLevel));
+                _baseParam.SetMagicStr(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_ATK, id, _level, _rarity, promotionLevel));
+                _baseParam.SetMagicDef(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_DEF, id, _level, _rarity, promotionLevel));
+                _baseParam.SetPhysicalCritical(UnitUtility.CalcUnitBaseParameter(eParamType.PHYSICAL_CRITICAL, id, _level, _rarity, promotionLevel));
+                _baseParam.SetMagicCritical(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_CRITICAL, id, _level, _rarity, promotionLevel));
+                _baseParam.SetDodge(UnitUtility.CalcUnitBaseParameter(eParamType.DODGE, id, _level, _rarity, promotionLevel));
+                _baseParam.SetLifeSteal(UnitUtility.CalcUnitBaseParameter(eParamType.LIFE_STEAL, id, _level, _rarity, promotionLevel));
+                _baseParam.SetWaveHpRecovery(UnitUtility.CalcUnitBaseParameter(eParamType.WAVE_HP_RECOVERY, id, _level, _rarity, promotionLevel));
+                _baseParam.SetWaveEnergyRecovery(UnitUtility.CalcUnitBaseParameter(eParamType.WAVE_ENERGY_RECOVERY, id, _level, _rarity, promotionLevel));
+                _baseParam.SetPhysicalPenetrate(UnitUtility.CalcUnitBaseParameter(eParamType.PHYSICAL_PENETRATE, id, _level, _rarity, promotionLevel));
+                _baseParam.SetMagicPenetrate(UnitUtility.CalcUnitBaseParameter(eParamType.MAGIC_PENETRATE, id, _level, _rarity, promotionLevel));
+                _baseParam.SetEnergyRecoveryRate(UnitUtility.CalcUnitBaseParameter(eParamType.ENERGY_RECOVERY_RATE, id, _level, _rarity, promotionLevel));
+                _baseParam.SetHpRecoveryRate(UnitUtility.CalcUnitBaseParameter(eParamType.HP_RECOVERY_RATE, id, _level, _rarity, promotionLevel));
+                _baseParam.SetEnergyReduceRate(UnitUtility.CalcUnitBaseParameter(eParamType.ENERGY_REDUCE_RATE, id, _level, _rarity, promotionLevel));
+                _baseParam.SetAccuracy(UnitUtility.CalcUnitBaseParameter(eParamType.ACCURACY, id, _level, _rarity, promotionLevel));
+                StatusParam _equipParam = new StatusParam();
+                List<EquipSlot> equipSlot = _unitData.EquipSlot;
+                List<EquipSlot> uniqueEquipSlot = _unitData.UniqueEquipSlot;
+                _equipParam.SetHp((long) UnitUtility.CalcEquipParameter(eParamType.HP, equipSlot, uniqueEquipSlot));
+                _equipParam.SetAtk(UnitUtility.CalcEquipParameter(eParamType.ATK, equipSlot, uniqueEquipSlot));
+                _equipParam.SetDef(UnitUtility.CalcEquipParameter(eParamType.DEF, equipSlot, uniqueEquipSlot));
+                _equipParam.SetMagicStr(UnitUtility.CalcEquipParameter(eParamType.MAGIC_ATK, equipSlot, uniqueEquipSlot));
+                _equipParam.SetMagicDef(UnitUtility.CalcEquipParameter(eParamType.MAGIC_DEF, equipSlot, uniqueEquipSlot));
+                _equipParam.SetPhysicalCritical(UnitUtility.CalcEquipParameter(eParamType.PHYSICAL_CRITICAL, equipSlot, uniqueEquipSlot));
+                _equipParam.SetMagicCritical(UnitUtility.CalcEquipParameter(eParamType.MAGIC_CRITICAL, equipSlot, uniqueEquipSlot));
+                _equipParam.SetDodge(UnitUtility.CalcEquipParameter(eParamType.DODGE, equipSlot, uniqueEquipSlot));
+                _equipParam.SetLifeSteal(UnitUtility.CalcEquipParameter(eParamType.LIFE_STEAL, equipSlot, uniqueEquipSlot));
+                _equipParam.SetWaveHpRecovery(UnitUtility.CalcEquipParameter(eParamType.WAVE_HP_RECOVERY, equipSlot, uniqueEquipSlot));
+                _equipParam.SetWaveEnergyRecovery(UnitUtility.CalcEquipParameter(eParamType.WAVE_ENERGY_RECOVERY, equipSlot, uniqueEquipSlot));
+                _equipParam.SetPhysicalPenetrate(UnitUtility.CalcEquipParameter(eParamType.PHYSICAL_PENETRATE, equipSlot, uniqueEquipSlot));
+                _equipParam.SetMagicPenetrate(UnitUtility.CalcEquipParameter(eParamType.MAGIC_PENETRATE, equipSlot, uniqueEquipSlot));
+                _equipParam.SetEnergyRecoveryRate(UnitUtility.CalcEquipParameter(eParamType.ENERGY_RECOVERY_RATE, equipSlot, uniqueEquipSlot));
+                _equipParam.SetHpRecoveryRate(UnitUtility.CalcEquipParameter(eParamType.HP_RECOVERY_RATE, equipSlot, uniqueEquipSlot));
+                _equipParam.SetEnergyReduceRate(UnitUtility.CalcEquipParameter(eParamType.ENERGY_REDUCE_RATE, equipSlot, uniqueEquipSlot));
+                _equipParam.SetAccuracy(UnitUtility.CalcEquipParameter(eParamType.ACCURACY, equipSlot, uniqueEquipSlot));
+                if (_unitData.ExSkill.Count > 0 && (int) _unitData.ExSkill[0].SkillLevel > 0)
+                {
+                  MasterUnitSkillData.UnitSkillData unitSkillData = ManagerSingleton<MasterDataManager>.Instance.masterUnitSkillData.Get((int) _unitData.Id);
+                  int _skillId = _unitData.GetCurrentRarity() >= 5 ? unitSkillData.ExSkillEvolutionIds[0] : unitSkillData.ExSkillIds[0];
+                  _unitData.ExSkill[0].SetSkillId(_skillId);
+                }
+                UnitParam _unitParam = new UnitParam();
+                _unitParam.SetBaseParam(_baseParam);
+                _unitParam.SetEquipParam(_equipParam);
+                _unitData.SetUnitParam(_unitParam);
+                if (!_isPowerLocal)
+                  return;
+                int _power = UnitUtility.CalcOverall(id, _level, _rarity, promotionLevel, _unitData);
+                _unitData.SetPower(_power);
+              }
+            }
+
+            public static UnitParameter CreateSummonUnitParameter(
+              UnitParameter _owner,
+              int _id,
+              int _level,
+              bool _considerEquipment,
+              bool _mainSkill1Evolved)
+            {
+              UnitData _unitData = new UnitData();
+              _unitData.SetId(_id);
+              _unitData.SetUnitLevel(_level);
+              UnitParameter _target = new UnitParameter(_unitData);
+              UnitUtility.SummonSkillData _summonSkillData = UnitUtility.searchSummonSkill(_owner).FindAll((Predicate<UnitUtility.SummonSkillData>) (_it => _it.SummonTargetUnitId == _id))[0];
+              bool _exSkillEvolved = _owner.UniqueData.GetCurrentRarity() >= 5;
+              UnitUtility.calcurateSkillLevelInfo(_target, _summonSkillData.PromotionLevel, _level, _considerEquipment, _mainSkill1Evolved, _exSkillEvolved);
+              UnitUtility.CalcParamAndSkill(_target.UniqueData, _summonSkillData, true);
+              if (_considerEquipment)
+              {
+                _target.UniqueData.SetBonusParam(_owner.UniqueData.BonusParam);
+                _target.UniqueData.UnitParam.SetEquipParam(_owner.UniqueData.UnitParam.EquipParam);
+              }
+              return _target;
+            }
+
+            public static void calcurateSkillLevelInfo(
+              UnitParameter _target,
+              int _promotionLevel,
+              int _level,
+              bool _considerExSkill,
+              bool _mainSkill1Evolved,
+              bool _exSkillEvolved)
+            {
+              List<SkillLevelInfo> skillLevel1 = UnitUtility.createSkillLevel(_target.SkillData.MainSkillIds, _promotionLevel, _level, true, _mainSkill1Evolved, _target.SkillData.MainSkillEvolutionIds);
+              _target.UniqueData.SetMainSkill(skillLevel1);
+              List<SkillLevelInfo> skillLevel2 = UnitUtility.createSkillLevel(_target.SkillData.UnionBurstIds, _promotionLevel, _level);
+              _target.UniqueData.SetUnionBurst(skillLevel2);
+              if (!_considerExSkill)
+                return;
+              int key = 301;
+              MasterUnlockSkillData.UnlockSkillData unlockSkillData = (MasterUnlockSkillData.UnlockSkillData) null;
+              if (!ManagerSingleton<MasterDataManager>.Instance.masterUnlockSkillData.dictionary.TryGetValue(key, out unlockSkillData) || (int) unlockSkillData.promotion_level > _promotionLevel)
+                return;
+              List<int> _mainSkills;
+              if (!_exSkillEvolved)
+              {
+                _mainSkills = _target.SkillData.ExSkillIds;
+              }
+              else
+              {
+                _mainSkills = new List<int>();
+                _mainSkills.Add((int) _target.SkillData.ex_skill_evolution_1);
+              }
+              List<SkillLevelInfo> skillLevel3 = UnitUtility.createSkillLevel(_mainSkills, _promotionLevel, _level);
+              _target.UniqueData.SetExSkill(skillLevel3);
+            }
+
+            private static List<SkillLevelInfo> createSkillLevel(
+              List<int> _mainSkills,
+              int _promotionLevel,
+              int _level,
+              bool _isMainSkill = false,
+              bool _mainSkill1Evolved = false,
+              List<int> _mainSkillEvolvedIds = null)
+            {
+              List<SkillLevelInfo> skillLevelInfoList = new List<SkillLevelInfo>();
+              int index = 0;
+              for (int count = _mainSkills.Count; index < count; ++index)
+              {
+                int _skillId = _mainSkills[index];
+                if (_isMainSkill & _mainSkill1Evolved && index == 0)
+                  _skillId = _mainSkillEvolvedIds[index] == 0 ? _skillId : _mainSkillEvolvedIds[0];
+                if (_skillId != 0)
+                {
+                  SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
+                  skillLevelInfo.SetSkillId(_skillId);
+                  if (_isMainSkill)
+                  {
+                    int key = 201 + index;
+                    MasterUnlockSkillData.UnlockSkillData unlockSkillData = (MasterUnlockSkillData.UnlockSkillData) null;
+                    if (ManagerSingleton<MasterDataManager>.Instance.masterUnlockSkillData.dictionary.TryGetValue(key, out unlockSkillData))
+                    {
+                      int promotionLevel = (int) unlockSkillData.promotion_level;
+                      skillLevelInfo.SetSkillLevel(_promotionLevel >= promotionLevel ? _level : 0);
+                    }
+                  }
+                  else
+                    skillLevelInfo.SetSkillLevel(_level);
+                  skillLevelInfoList.Add(skillLevelInfo);
+                }
+              }
+              return skillLevelInfoList;
+            }
+
+            private static List<UnitUtility.SummonSkillData> searchSummonSkill(
+              UnitParameter _unitParameter)
+            {
+              UnitData unitData = _unitParameter.UniqueData;
+              MasterDataManager masterDatamanager = ManagerSingleton<MasterDataManager>.Instance;
+              List<UnitUtility.SummonSkillData> summonSkillList = new List<UnitUtility.SummonSkillData>();
+              System.Action<List<SkillLevelInfo>> action = (System.Action<List<SkillLevelInfo>>) (_skillLevelList =>
+              {
+                for (int index1 = 0; index1 < _skillLevelList.Count; ++index1)
+                {
+                  SkillLevelInfo skillLevel = _skillLevelList[index1];
+                  if ((int) skillLevel.SkillId != 0)
+                  {
+                    SkillData skillData = SkillUtility.GetSkillData((int) skillLevel.SkillId, (int) skillLevel.SkillLevel);
+                    for (int index2 = 0; index2 < skillData.ActionInfoList.Count; ++index2)
+                    {
+                      ActionData actionInfo = skillData.ActionInfoList[index2];
+                      MasterSkillAction.SkillAction skillAction = masterDatamanager.masterSkillAction.Get(actionInfo.ActionId);
+                      if ((byte) skillAction.action_type == (byte) 15)
+                      {
+                        int _rarity = (int) actionInfo.ActionValue.Value4 / 100;
+                        if (_rarity == 0)
+                          _rarity = unitData.GetCurrentRarity();
+                        int _promotionLevel = (int) actionInfo.ActionValue.Value4 % 100;
+                        if (_promotionLevel == 0)
+                          _promotionLevel = (int) unitData.PromotionLevel;
+                        int actionDetail2 = skillAction.action_detail_2;
+                        summonSkillList.Add(new UnitUtility.SummonSkillData((int) skillLevel.SkillId, (int) skillLevel.SkillLevel, _rarity, _promotionLevel, (int) actionDetail2));
+                      }
+                    }
+                  }
+                }
+              });
+              action(unitData.UnionBurst);
+              action(unitData.MainSkill);
+              action(unitData.ExSkill);
+              List<SkillLevelInfo> skillLevelInfoList = new List<SkillLevelInfo>();
+              for (int index = 0; index < _unitParameter.SkillData.SpSkillIds.Count; ++index)
+              {
+                SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
+                skillLevelInfo.SetSkillId(_unitParameter.SkillData.SpSkillIds[index]);
+                skillLevelInfoList.Add(skillLevelInfo);
+              }
+              action(skillLevelInfoList);
+              action(unitData.FreeSkill);
+              return summonSkillList;
+            }
+
+            public static void SortPartyByPosition(List<UnitDataForView> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<UnitDataForView>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.Id), masterUnitData.Get((int) _b.Id))));
+            }
+
+            public static void SortPartyByPosition(List<ChangeRarityUnit> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<ChangeRarityUnit>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get(_a.unit_id), masterUnitData.Get(_b.unit_id))));
+            }
+
+            public static void SortPartyByPosition(List<UnitData> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<UnitData>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.Id), masterUnitData.Get((int) _b.Id))));
+            }
+
+            public static void SortPartyByPosition(List<ReplayUnitDataForView> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<ReplayUnitDataForView>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.Id), masterUnitData.Get((int) _b.Id))));
+            }
+
+            public static void SortPartyByPosition(List<int> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<int>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get(_a), masterUnitData.Get(_b))));
+            }
+
+            public static void SortPartyByPosition(List<UnitParameter> _partyList) => _partyList?.Sort((Comparison<UnitParameter>) ((_a, _b) => UnitUtility.compareUnitOrder(_a.MasterData, _b.MasterData)));
+
+            public static void SortPartyByPosition(List<DungeonUnit> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<DungeonUnit>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.UnitId), masterUnitData.Get((int) _b.UnitId))));
+            }
+
+            public static void SortPartyByPosition(List<TowerUnit> _partyList)
+            {
+              if (_partyList == null)
+                return;
+              MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+              _partyList.Sort((Comparison<TowerUnit>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get((int) _a.UnitId), masterUnitData.Get((int) _b.UnitId))));
+            }
+
+            public static void SortPartyByPosition(List<ClanChatUnitData> _partyList, bool _isEnemy)
+            {
+              if (_partyList == null)
+                return;
+              if (_isEnemy)
+              {
+                MasterEnemyParameter masterEnemyParameter = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter;
+                MasterUnitEnemyData masterUnitEnemyData = ManagerSingleton<MasterDataManager>.Instance.masterUnitEnemyData;
+                _partyList.Sort((Comparison<ClanChatUnitData>) ((_a, _b) => UnitUtility.compareUnitEnemyOrder(masterUnitEnemyData.Get((int) masterEnemyParameter.GetFromAllKind(_a.id).unit_id), masterUnitEnemyData.Get((int) masterEnemyParameter.GetFromAllKind(_b.id).unit_id))));
+              }
+              else
+              {
+                MasterUnitData masterUnitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData;
+                _partyList.Sort((Comparison<ClanChatUnitData>) ((_a, _b) => UnitUtility.compareUnitOrder(masterUnitData.Get(_a.id), masterUnitData.Get(_b.id))));
+              }
+            }
+
+            public static ClanChatUnitData[] SortPartyByPosition(
+              ClanChatUnitData[] _partyArray,
+              bool _isEnemy)
+            {
+              List<ClanChatUnitData> list = ((IEnumerable<ClanChatUnitData>) _partyArray).ToList<ClanChatUnitData>();
+              UnitUtility.SortPartyByPosition(list, _isEnemy);
+              return list.ToArray();
+            }
+
+            public static ClanChatUnitData[] SortPartyEnemyTowerOrder(
+              ClanChatUnitData[] _partyList,
+              bool _isEx,
+              int _questId)
+            {
+              if (_partyList == null)
+                return (ClanChatUnitData[]) null;
+              MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
+              MasterUnitEnemyData masterUnitEnemyData = instance.masterUnitEnemyData;
+              int wave_group_id = (int) (_isEx ? instance.masterTowerExQuestData.Get(_questId).wave_group_id : instance.masterTowerQuestData.Get(_questId).wave_group_id);
+              MasterTowerWaveGroupData.TowerWaveGroupData towerWaveGroupData = instance.masterTowerWaveGroupData.Get(wave_group_id);
+              List<int> enemyIdList = new List<int>();
+              if ((int) towerWaveGroupData.enemy_id_1 > 0)
+                enemyIdList.Add((int) towerWaveGroupData.enemy_id_1);
+              if ((int) towerWaveGroupData.enemy_id_2 > 0)
+                enemyIdList.Add((int) towerWaveGroupData.enemy_id_2);
+              if ((int) towerWaveGroupData.enemy_id_3 > 0)
+                enemyIdList.Add((int) towerWaveGroupData.enemy_id_3);
+              if ((int) towerWaveGroupData.enemy_id_4 > 0)
+                enemyIdList.Add((int) towerWaveGroupData.enemy_id_4);
+              if ((int) towerWaveGroupData.enemy_id_5 > 0)
+                enemyIdList.Add((int) towerWaveGroupData.enemy_id_5);
+              List<ClanChatUnitData> list = ((IEnumerable<ClanChatUnitData>) _partyList).ToList<ClanChatUnitData>();
+              List<ClanChatUnitData> clanChatUnitDataList = new List<ClanChatUnitData>();
+              for (int i = 0; i < enemyIdList.Count; i++)
+              {
+                int index = list.FindIndex((Predicate<ClanChatUnitData>) (dt => dt.id == enemyIdList[i]));
+                if (index >= 0)
+                {
+                  clanChatUnitDataList.Add(list[index]);
+                  list.RemoveAt(index);
+                }
+              }
+              return clanChatUnitDataList.ToArray();
+            }
+
+            public static int CalcTotalPower(List<UnitDataForView> _unitParamList)
+            {
+              int num = 0;
+              for (int index = 0; index < _unitParamList.Count; ++index)
+                num += (int) _unitParamList[index].Power;
+              return num;
+            }
+
+            private static int calcOverallEnemy(StatusParam _baseParam, UnitData _unitData)
+            {
+              MasterUnitStatusCoefficient masterUnitStatusValue = ManagerSingleton<MasterDataManager>.Instance.masterUnitStatusCoefficient;
+              int skillLevelSum = 0;
+              _unitData.UnionBurst.ForEach((System.Action<SkillLevelInfo>) (_it => skillLevelSum += (int) _it.SkillLevel));
+              _unitData.MainSkill.ForEach((System.Action<SkillLevelInfo>) (_it => skillLevelSum += (int) _it.SkillLevel));
+              _unitData.ExSkill.ForEach((System.Action<SkillLevelInfo>) (_it =>
+              {
+                skillLevelSum += (int) _it.SkillLevel;
+                if ((int) _it.SkillLevel <= 0 || (int) _unitData.UnitRarity < 5)
+                  return;
+                skillLevelSum += masterUnitStatusValue.GetExSkillEvolutionCoefficient();
+              }));
+              _unitData.FreeSkill.ForEach((System.Action<SkillLevelInfo>) (_it => skillLevelSum += (int) _it.SkillLevel));
+              return UnitUtility.round(Mathf.Pow((float) (0.0 + (double) (long) _baseParam.Hp * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.HP) + (double) (int) _baseParam.Atk * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ATK) + (double) (int) _baseParam.Def * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.DEF) + (double) (int) _baseParam.MagicStr * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_ATK) + (double) (int) _baseParam.MagicDef * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_DEF) + (double) (int) _baseParam.PhysicalCritical * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.PHYSICAL_CRITICAL) + (double) (int) _baseParam.MagicCritical * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_CRITICAL) + (double) (int) _baseParam.Dodge * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.DODGE) + (double) (int) _baseParam.Accuracy * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ACCURACY) + (double) (int) _baseParam.LifeSteal * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.LIFE_STEAL) + (double) (int) _baseParam.WaveHpRecovery * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.WAVE_HP_RECOVERY) + (double) (int) _baseParam.WaveEnergyRecovery * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.WAVE_ENERGY_RECOVERY) + (double) (int) _baseParam.PhysicalPenetrate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.PHYSICAL_PENETRATE) + (double) (int) _baseParam.MagicPenetrate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_PENETRATE) + (double) (int) _baseParam.EnergyRecoveryRate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ENERGY_RECOVERY_RATE) + (double) (int) _baseParam.HpRecoveryRate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.HP) + (double) (int) _baseParam.EnergyReduceRate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ENERGY_REDUCE_RATE) + (double) skillLevelSum * (double) masterUnitStatusValue.GetSkillLevelCoefficient()), masterUnitStatusValue.GetOverallCoefficient()));
+            }
+
+            public static void OpenDialogCharacterDetail(
+              int _id,
+              bool _trialStoryView = false,
+              System.Action _onBeforePlayVoice = null)
+            {
+              MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
+              MasterUnitPromotion.UnitPromotion maxUnitPromotion = instance.masterUnitPromotion.GetMaxUnitPromotion(_id);
+              int levelMax = instance.masterExperienceUnit.LevelMax;
+              int promotionLevel = (int) maxUnitPromotion.promotion_level;
+              MasterUnitData.UnitData unitData = instance.masterUnitData.Get(_id);
+              UnitData _unitData = new UnitData();
+              _unitData.SetId(_id);
+              _unitData.SetUnitLevel(levelMax);
+              _unitData.SetUnitRarity((int) unitData.Rarity);
+              _unitData.SetPromotionLevel((ePromotionLevel) promotionLevel);
+              ManagerSingleton<DialogManager>.Instance.OpenDialogCharacterDetail(_unitData, _trialStoryView, _onBeforePlayVoice);
+            }
+
+            private static NIBGCIIGOMC playCharaDetailVoice(
+              int _unitId,
+              int _rarity,
+              ref int _playIndex)
+            {
+              int skinId = UnitUtility.GetSkinId(_unitId, _rarity);
+              SoundManager.eVoiceType charaDetailVoiceType = UnitUtility.charaDetailVoiceTypes[_playIndex];
+              _playIndex = _playIndex + 1 < UnitUtility.charaDetailVoiceTypes.Length ? _playIndex + 1 : 0;
+              SoundManager instance = ManagerSingleton<SoundManager>.Instance;
+              instance.StopVoice();
+              return instance.PlayVoice(skinId, charaDetailVoiceType, 1);
+            }
+
+            public static void PlayCharaDetailVoiceWithCheckDataExist(
+              int _unitId,
+              int _rarity,
+              int _playIndex,
+              System.Action<NIBGCIIGOMC, int> _audioPlayback)
+            {
+              int playIndex = _playIndex;
+              if (QualityManager.GetVoiceDataAvailable())
+              {
+                if (DownloadUtil.isCharaCmnVoiceDataDownloaded(_unitId))
+                {
+                  NIBGCIIGOMC JEOCPILJNAD = UnitUtility.playCharaDetailVoice(_unitId, _rarity, ref playIndex);
+                  _audioPlayback.Call<NIBGCIIGOMC, int>(JEOCPILJNAD, playIndex);
+                }
+                else
+                  ManagerSingleton<DialogManager>.Instance.OpenConfirm(eTextId.VOICE_DOWNLOAD.Name(), eTextId.VOICEDATA_DOWNLOAD.Name(), true, (System.Action) (() => ManagerSingleton<ViewManager>.Instance.StartCoroutine(DownloadUtil.DownloadCharaCmnVoice(new int[1]
+                  {
+                    _unitId
+                  }, (System.Action<bool>) (_downloadOccurred => _audioPlayback.Call<NIBGCIIGOMC, int>(UnitUtility.playCharaDetailVoice(_unitId, _rarity, ref playIndex), playIndex))))));
+              }
+              else
+              {
+                ManagerSingleton<DialogManager>.Instance.OpenConfirm(ParamDialogCommonText.eDialogSize.Small, eTextId.SETTING_CONFIRM.Name(), eTextId.VOICE_DOWNLOAD_SETTING_IS_OFF.Name(), eTextId.CLOSE.Name(), eTextId.TO_SETTING.Name(), (System.Action) null, (System.Action) (() => ManagerSingleton<DialogManager>.Instance.OpenSystemSettingDialog()));
+                _audioPlayback.Call<NIBGCIIGOMC, int>(NIBGCIIGOMC.Error(IEGILGIGDDK.Voice), _playIndex);
+              }
+            }
+
+            public static bool IsBirthDayVoiceEnable(int _unitId, int _rarity, bool _isStrict = false)
+            {
+              if (!_isStrict)
+              {
+                List<MasterUnitComments.UnitComments> orderByVoiceIdAsc = ManagerSingleton<MasterDataManager>.Instance.masterUnitComments.GetListWithUnitIdAndUseTypeOrderByVoiceIdAsc(_unitId, (byte) 2);
+                return orderByVoiceIdAsc != null && orderByVoiceIdAsc.Count > 0;
+              }
+              int unit_id = _unitId;
+              if (_rarity >= 3)
+                unit_id = UnitUtility.GetSkinId(_unitId, _rarity);
+              List<MasterUnitComments.UnitComments> orderByVoiceIdAsc1 = ManagerSingleton<MasterDataManager>.Instance.masterUnitComments.GetListWithUnitIdAndUseTypeOrderByVoiceIdAsc(unit_id, (byte) 2);
+              return orderByVoiceIdAsc1 != null && orderByVoiceIdAsc1.Count > 0;
+            }
+
+            private static string playCharaBirthDayVoice(int _unitId, int _rarity, int _playIndex)
+            {
+              SoundManager.VoiceCueParam voiceCueParam = SoundManager.GetVoiceCueParam(SoundManager.eVoiceType.BIRTH_DAY);
+              int skinId = UnitUtility.GetSkinId(_unitId, _rarity);
+              string _cueSheet = string.Format(voiceCueParam.CueSheetNameFormat, (object) skinId);
+              List<MasterUnitComments.UnitComments> orderByVoiceIdAsc = ManagerSingleton<MasterDataManager>.Instance.masterUnitComments.GetListWithUnitIdAndUseTypeOrderByVoiceIdAsc(_unitId, (byte) 2);
+              if (orderByVoiceIdAsc == null || orderByVoiceIdAsc.Count == 0)
+                return string.Empty;
+              int voiceId = (int) (byte) orderByVoiceIdAsc[_playIndex % orderByVoiceIdAsc.Count].voice_id;
+              string _cueName = string.Format(voiceCueParam.CueNameFormat, (object) skinId, (object) voiceId);
+              SoundManager instance = ManagerSingleton<SoundManager>.Instance;
+              instance.StopVoice();
+              instance.PlayVoice(_cueSheet, _cueName);
+              return _cueSheet;
+            }
+
+            private static string playCharaBirthDayVoiceWithRarityCheck(
+              int _unitId,
+              int _rarity,
+              int _playIndex)
+            {
+              if (UnitUtility.IsBirthDayVoiceEnable(_unitId, _rarity, true))
+                return UnitUtility.playCharaBirthDayVoice(_unitId, _rarity, _playIndex);
+              switch (_rarity)
+              {
+                case 1:
+                case 2:
+                  return string.Empty;
+                case 3:
+                case 4:
+                case 5:
+                  return UnitUtility.playCharaBirthDayVoiceWithRarityCheck(_unitId, 1, _playIndex);
+                case 6:
+                  return UnitUtility.playCharaBirthDayVoiceWithRarityCheck(_unitId, 3, _playIndex);
+                default:
+                  return string.Empty;
+              }
+            }
+
+            public static string PlayCharaBirthDayVoiceWithCheckDataExist(
+              int _unitId,
+              int _rarity,
+              int _playIndex)
+            {
+              if (QualityManager.GetVoiceDataAvailable())
+              {
+                if (UnitUtility.IsBirthDayVoiceEnable(_unitId, _rarity))
+                  return UnitUtility.playCharaBirthDayVoiceWithRarityCheck(_unitId, _rarity, _playIndex);
+              }
+              else
+                ManagerSingleton<DialogManager>.Instance.OpenConfirm(ParamDialogCommonText.eDialogSize.Small, eTextId.SETTING_CONFIRM.Name(), eTextId.VOICE_DOWNLOAD_SETTING_IS_OFF.Name(), eTextId.CLOSE.Name(), eTextId.TO_SETTING.Name(), (System.Action) null, (System.Action) (() => ManagerSingleton<DialogManager>.Instance.OpenSystemSettingDialog()));
+              return string.Empty;
+            }
+
+            public static void GotoCharacterAlbum(int _unitId)
+            {
+              Singleton<EHPLBCOOOPK>.Instance.DGLHJHFMGJD = _unitId;
+              ManagerSingleton<ViewManager>.Instance.ChangeView(eViewId.CHARACTER_ALBUM);
+            }
+
+            public static void GotoMemoryAlbum(int _unitId)
+            {
+              EHPLBCOOOPK instance1 = Singleton<EHPLBCOOOPK>.Instance;
+              MasterDataManager instance2 = ManagerSingleton<MasterDataManager>.Instance;
+              instance1.BJBGGDPJAHB = ViewMemoryList.eMemoryTabType.CHARACTER_STORY;
+              instance1.GBMPJLBLDEA = UnitUtility.GetCharaId(_unitId);
+              string strA = ((string) instance2.masterUnitData.Get(_unitId).Kana).Substring(0, 1);
+              for (int index = 0; index < UnitDefine.PEOPLEBOOK_SET_FILTER_TYPE_LIST.Length; ++index)
+              {
+                string strB1 = UnitDefine.PEOPLEBOOK_SET_FILTER_TYPE_LIST[index, 0].Name();
+                string strB2 = UnitDefine.PEOPLEBOOK_SET_FILTER_TYPE_LIST[index, 1].Name();
+                int num1 = string.Compare(strA, strB1, StringComparison.CurrentCulture);
+                int num2 = string.Compare(strA, strB2, StringComparison.CurrentCulture);
+                if (num1 >= 0 && num2 < 0)
+                {
+                  instance1.NNFPFKBEKHJ = UnitDefine.CHARASTORY_SORT_TYPE_LIST[index];
+                  break;
+                }
+              }
+              ManagerSingleton<ViewManager>.Instance.ChangeView(eViewId.MENU_ALBUM_STILL_AND_MOVIE);
+            }
+
+            private static int compareUnitOrder(
+              MasterUnitData.UnitData _aUnitData,
+              MasterUnitData.UnitData _bUnitData)
+            {
+              int searchAreaWidth1 = (int) _aUnitData.SearchAreaWidth;
+              int searchAreaWidth2 = (int) _bUnitData.SearchAreaWidth;
+              return searchAreaWidth1 == searchAreaWidth2 ? (int) _aUnitData.UnitId - (int) _bUnitData.UnitId : searchAreaWidth1 - searchAreaWidth2;
+            }
+
+            private static int compareUnitEnemyOrder(
+              MasterUnitEnemyData.UnitEnemyData _aUnitData,
+              MasterUnitEnemyData.UnitEnemyData _bUnitData)
+            {
+              int searchAreaWidth1 = (int) _aUnitData.search_area_width;
+              int searchAreaWidth2 = (int) _bUnitData.search_area_width;
+              return searchAreaWidth1 == searchAreaWidth2 ? (int) _aUnitData.unit_id - (int) _bUnitData.unit_id : searchAreaWidth1 - searchAreaWidth2;
+            }
+
+            public static Material LoadUnitProfileThumbnailMaterial(
+              int _unitId,
+              int _rarity,
+              eResourceId _mask = eResourceId.UNIT_PROFILE_ALPHA) => ManagerSingleton<ResourceManager>.Instance.LoadThumbUnitProfileImmediately(UnitUtility.GetSkinId(_unitId, _rarity), _mask);
+
+            public static Texture LoadUnitProfileThumbnailTexture(int _unitId, int _rarity) => ManagerSingleton<ResourceManager>.Instance.LoadResourceImmediately(eResourceId.UNIT_PROFILE_TEXTURE, (long) UnitUtility.GetSkinId(_unitId, _rarity)) as Texture;
+
+            private static int GetNextSkinId(int _rarity, int _practical)
+            {
+              UnitDefine.eUnitRarity eUnitRarity = (UnitDefine.eUnitRarity) _rarity;
+              switch (_rarity)
+              {
+                case 1:
+                case 2:
+                  eUnitRarity = UnitDefine.eUnitRarity.RARITY_3;
+                  break;
+                case 3:
+                case 4:
+                case 5:
+                  eUnitRarity = _practical < 6 ? UnitDefine.eUnitRarity.RARITY_1 : UnitDefine.eUnitRarity.RARITY_6;
+                  break;
+                case 6:
+                  eUnitRarity = UnitDefine.eUnitRarity.RARITY_1;
+                  break;
+              }
+              return (int) eUnitRarity;
+            }
+
+            public static int SwitchUnitProfileThumbnail(
+              UITexture _thumbnail,
+              int _unitId,
+              int _rarity,
+              int _practicalRarity,
+              eResourceId _mask = eResourceId.UNIT_PROFILE_ALPHA)
+            {
+              if ((UnityEngine.Object) _thumbnail == (UnityEngine.Object) null)
+                return _rarity;
+              int nextSkinId = UnitUtility.GetNextSkinId(_rarity, _practicalRarity);
+              _thumbnail.material = UnitUtility.LoadUnitProfileThumbnailMaterial(_unitId, nextSkinId, _mask);
+              return nextSkinId;
+            }
+            */
+        public static int GetSkinId(int _unitId, int _rarity)
         {
-          clanChatUnitDataList.Add(list[index]);
-          list.RemoveAt(index);
+            if (_unitId == 418101)
+                return 418131;
+            if (_unitId >= 403101 && _unitId <= 403109)
+                return _unitId + 30;
+            if (!IsUnitTypePersonOrSummonPerson(_unitId) || IsUnitTypeSummonPersonOnly(_unitId) && _rarity == 0)
+                return _unitId;
+            int num = _unitId;
+            switch (_rarity)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    num = _unitId + 10;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    num = _unitId + 30;
+                    break;
+                case 6:
+                    num = _unitId + 60;
+                    break;
+            }
+            return num;
         }
-      }
-      return clanChatUnitDataList.ToArray();
-    }
-
-    public static int CalcTotalPower(List<UnitDataForView> _unitParamList)
-    {
-      int num = 0;
-      for (int index = 0; index < _unitParamList.Count; ++index)
-        num += (int) _unitParamList[index].Power;
-      return num;
-    }
-
-    private static int calcOverallEnemy(StatusParam _baseParam, UnitData _unitData)
-    {
-      MasterUnitStatusCoefficient masterUnitStatusValue = ManagerSingleton<MasterDataManager>.Instance.masterUnitStatusCoefficient;
-      int skillLevelSum = 0;
-      _unitData.UnionBurst.ForEach((System.Action<SkillLevelInfo>) (_it => skillLevelSum += (int) _it.SkillLevel));
-      _unitData.MainSkill.ForEach((System.Action<SkillLevelInfo>) (_it => skillLevelSum += (int) _it.SkillLevel));
-      _unitData.ExSkill.ForEach((System.Action<SkillLevelInfo>) (_it =>
-      {
-        skillLevelSum += (int) _it.SkillLevel;
-        if ((int) _it.SkillLevel <= 0 || (int) _unitData.UnitRarity < 5)
-          return;
-        skillLevelSum += masterUnitStatusValue.GetExSkillEvolutionCoefficient();
-      }));
-      _unitData.FreeSkill.ForEach((System.Action<SkillLevelInfo>) (_it => skillLevelSum += (int) _it.SkillLevel));
-      return UnitUtility.round(Mathf.Pow((float) (0.0 + (double) (long) _baseParam.Hp * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.HP) + (double) (int) _baseParam.Atk * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ATK) + (double) (int) _baseParam.Def * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.DEF) + (double) (int) _baseParam.MagicStr * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_ATK) + (double) (int) _baseParam.MagicDef * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_DEF) + (double) (int) _baseParam.PhysicalCritical * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.PHYSICAL_CRITICAL) + (double) (int) _baseParam.MagicCritical * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_CRITICAL) + (double) (int) _baseParam.Dodge * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.DODGE) + (double) (int) _baseParam.Accuracy * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ACCURACY) + (double) (int) _baseParam.LifeSteal * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.LIFE_STEAL) + (double) (int) _baseParam.WaveHpRecovery * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.WAVE_HP_RECOVERY) + (double) (int) _baseParam.WaveEnergyRecovery * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.WAVE_ENERGY_RECOVERY) + (double) (int) _baseParam.PhysicalPenetrate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.PHYSICAL_PENETRATE) + (double) (int) _baseParam.MagicPenetrate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.MAGIC_PENETRATE) + (double) (int) _baseParam.EnergyRecoveryRate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ENERGY_RECOVERY_RATE) + (double) (int) _baseParam.HpRecoveryRate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.HP) + (double) (int) _baseParam.EnergyReduceRate * (double) masterUnitStatusValue.GetParameterCoefficient(eParamType.ENERGY_REDUCE_RATE) + (double) skillLevelSum * (double) masterUnitStatusValue.GetSkillLevelCoefficient()), masterUnitStatusValue.GetOverallCoefficient()));
-    }
-
-    public static void OpenDialogCharacterDetail(
-      int _id,
-      bool _trialStoryView = false,
-      System.Action _onBeforePlayVoice = null)
-    {
-      MasterDataManager instance = ManagerSingleton<MasterDataManager>.Instance;
-      MasterUnitPromotion.UnitPromotion maxUnitPromotion = instance.masterUnitPromotion.GetMaxUnitPromotion(_id);
-      int levelMax = instance.masterExperienceUnit.LevelMax;
-      int promotionLevel = (int) maxUnitPromotion.promotion_level;
-      MasterUnitData.UnitData unitData = instance.masterUnitData.Get(_id);
-      UnitData _unitData = new UnitData();
-      _unitData.SetId(_id);
-      _unitData.SetUnitLevel(levelMax);
-      _unitData.SetUnitRarity((int) unitData.Rarity);
-      _unitData.SetPromotionLevel((ePromotionLevel) promotionLevel);
-      ManagerSingleton<DialogManager>.Instance.OpenDialogCharacterDetail(_unitData, _trialStoryView, _onBeforePlayVoice);
-    }
-
-    private static NIBGCIIGOMC playCharaDetailVoice(
-      int _unitId,
-      int _rarity,
-      ref int _playIndex)
-    {
-      int skinId = UnitUtility.GetSkinId(_unitId, _rarity);
-      SoundManager.eVoiceType charaDetailVoiceType = UnitUtility.charaDetailVoiceTypes[_playIndex];
-      _playIndex = _playIndex + 1 < UnitUtility.charaDetailVoiceTypes.Length ? _playIndex + 1 : 0;
-      SoundManager instance = ManagerSingleton<SoundManager>.Instance;
-      instance.StopVoice();
-      return instance.PlayVoice(skinId, charaDetailVoiceType, 1);
-    }
-
-    public static void PlayCharaDetailVoiceWithCheckDataExist(
-      int _unitId,
-      int _rarity,
-      int _playIndex,
-      System.Action<NIBGCIIGOMC, int> _audioPlayback)
-    {
-      int playIndex = _playIndex;
-      if (QualityManager.GetVoiceDataAvailable())
-      {
-        if (DownloadUtil.isCharaCmnVoiceDataDownloaded(_unitId))
-        {
-          NIBGCIIGOMC JEOCPILJNAD = UnitUtility.playCharaDetailVoice(_unitId, _rarity, ref playIndex);
-          _audioPlayback.Call<NIBGCIIGOMC, int>(JEOCPILJNAD, playIndex);
-        }
-        else
-          ManagerSingleton<DialogManager>.Instance.OpenConfirm(eTextId.VOICE_DOWNLOAD.Name(), eTextId.VOICEDATA_DOWNLOAD.Name(), true, (System.Action) (() => ManagerSingleton<ViewManager>.Instance.StartCoroutine(DownloadUtil.DownloadCharaCmnVoice(new int[1]
-          {
-            _unitId
-          }, (System.Action<bool>) (_downloadOccurred => _audioPlayback.Call<NIBGCIIGOMC, int>(UnitUtility.playCharaDetailVoice(_unitId, _rarity, ref playIndex), playIndex))))));
-      }
-      else
-      {
-        ManagerSingleton<DialogManager>.Instance.OpenConfirm(ParamDialogCommonText.eDialogSize.Small, eTextId.SETTING_CONFIRM.Name(), eTextId.VOICE_DOWNLOAD_SETTING_IS_OFF.Name(), eTextId.CLOSE.Name(), eTextId.TO_SETTING.Name(), (System.Action) null, (System.Action) (() => ManagerSingleton<DialogManager>.Instance.OpenSystemSettingDialog()));
-        _audioPlayback.Call<NIBGCIIGOMC, int>(NIBGCIIGOMC.Error(IEGILGIGDDK.Voice), _playIndex);
-      }
-    }
-
-    public static bool IsBirthDayVoiceEnable(int _unitId, int _rarity, bool _isStrict = false)
-    {
-      if (!_isStrict)
-      {
-        List<MasterUnitComments.UnitComments> orderByVoiceIdAsc = ManagerSingleton<MasterDataManager>.Instance.masterUnitComments.GetListWithUnitIdAndUseTypeOrderByVoiceIdAsc(_unitId, (byte) 2);
-        return orderByVoiceIdAsc != null && orderByVoiceIdAsc.Count > 0;
-      }
-      int unit_id = _unitId;
-      if (_rarity >= 3)
-        unit_id = UnitUtility.GetSkinId(_unitId, _rarity);
-      List<MasterUnitComments.UnitComments> orderByVoiceIdAsc1 = ManagerSingleton<MasterDataManager>.Instance.masterUnitComments.GetListWithUnitIdAndUseTypeOrderByVoiceIdAsc(unit_id, (byte) 2);
-      return orderByVoiceIdAsc1 != null && orderByVoiceIdAsc1.Count > 0;
-    }
-
-    private static string playCharaBirthDayVoice(int _unitId, int _rarity, int _playIndex)
-    {
-      SoundManager.VoiceCueParam voiceCueParam = SoundManager.GetVoiceCueParam(SoundManager.eVoiceType.BIRTH_DAY);
-      int skinId = UnitUtility.GetSkinId(_unitId, _rarity);
-      string _cueSheet = string.Format(voiceCueParam.CueSheetNameFormat, (object) skinId);
-      List<MasterUnitComments.UnitComments> orderByVoiceIdAsc = ManagerSingleton<MasterDataManager>.Instance.masterUnitComments.GetListWithUnitIdAndUseTypeOrderByVoiceIdAsc(_unitId, (byte) 2);
-      if (orderByVoiceIdAsc == null || orderByVoiceIdAsc.Count == 0)
-        return string.Empty;
-      int voiceId = (int) (byte) orderByVoiceIdAsc[_playIndex % orderByVoiceIdAsc.Count].voice_id;
-      string _cueName = string.Format(voiceCueParam.CueNameFormat, (object) skinId, (object) voiceId);
-      SoundManager instance = ManagerSingleton<SoundManager>.Instance;
-      instance.StopVoice();
-      instance.PlayVoice(_cueSheet, _cueName);
-      return _cueSheet;
-    }
-
-    private static string playCharaBirthDayVoiceWithRarityCheck(
-      int _unitId,
-      int _rarity,
-      int _playIndex)
-    {
-      if (UnitUtility.IsBirthDayVoiceEnable(_unitId, _rarity, true))
-        return UnitUtility.playCharaBirthDayVoice(_unitId, _rarity, _playIndex);
-      switch (_rarity)
-      {
-        case 1:
-        case 2:
-          return string.Empty;
-        case 3:
-        case 4:
-        case 5:
-          return UnitUtility.playCharaBirthDayVoiceWithRarityCheck(_unitId, 1, _playIndex);
-        case 6:
-          return UnitUtility.playCharaBirthDayVoiceWithRarityCheck(_unitId, 3, _playIndex);
-        default:
-          return string.Empty;
-      }
-    }
-
-    public static string PlayCharaBirthDayVoiceWithCheckDataExist(
-      int _unitId,
-      int _rarity,
-      int _playIndex)
-    {
-      if (QualityManager.GetVoiceDataAvailable())
-      {
-        if (UnitUtility.IsBirthDayVoiceEnable(_unitId, _rarity))
-          return UnitUtility.playCharaBirthDayVoiceWithRarityCheck(_unitId, _rarity, _playIndex);
-      }
-      else
-        ManagerSingleton<DialogManager>.Instance.OpenConfirm(ParamDialogCommonText.eDialogSize.Small, eTextId.SETTING_CONFIRM.Name(), eTextId.VOICE_DOWNLOAD_SETTING_IS_OFF.Name(), eTextId.CLOSE.Name(), eTextId.TO_SETTING.Name(), (System.Action) null, (System.Action) (() => ManagerSingleton<DialogManager>.Instance.OpenSystemSettingDialog()));
-      return string.Empty;
-    }
-
-    public static void GotoCharacterAlbum(int _unitId)
-    {
-      Singleton<EHPLBCOOOPK>.Instance.DGLHJHFMGJD = _unitId;
-      ManagerSingleton<ViewManager>.Instance.ChangeView(eViewId.CHARACTER_ALBUM);
-    }
-
-    public static void GotoMemoryAlbum(int _unitId)
-    {
-      EHPLBCOOOPK instance1 = Singleton<EHPLBCOOOPK>.Instance;
-      MasterDataManager instance2 = ManagerSingleton<MasterDataManager>.Instance;
-      instance1.BJBGGDPJAHB = ViewMemoryList.eMemoryTabType.CHARACTER_STORY;
-      instance1.GBMPJLBLDEA = UnitUtility.GetCharaId(_unitId);
-      string strA = ((string) instance2.masterUnitData.Get(_unitId).Kana).Substring(0, 1);
-      for (int index = 0; index < UnitDefine.PEOPLEBOOK_SET_FILTER_TYPE_LIST.Length; ++index)
-      {
-        string strB1 = UnitDefine.PEOPLEBOOK_SET_FILTER_TYPE_LIST[index, 0].Name();
-        string strB2 = UnitDefine.PEOPLEBOOK_SET_FILTER_TYPE_LIST[index, 1].Name();
-        int num1 = string.Compare(strA, strB1, StringComparison.CurrentCulture);
-        int num2 = string.Compare(strA, strB2, StringComparison.CurrentCulture);
-        if (num1 >= 0 && num2 < 0)
-        {
-          instance1.NNFPFKBEKHJ = UnitDefine.CHARASTORY_SORT_TYPE_LIST[index];
-          break;
-        }
-      }
-      ManagerSingleton<ViewManager>.Instance.ChangeView(eViewId.MENU_ALBUM_STILL_AND_MOVIE);
-    }
-
-    private static int compareUnitOrder(
-      MasterUnitData.UnitData _aUnitData,
-      MasterUnitData.UnitData _bUnitData)
-    {
-      int searchAreaWidth1 = (int) _aUnitData.SearchAreaWidth;
-      int searchAreaWidth2 = (int) _bUnitData.SearchAreaWidth;
-      return searchAreaWidth1 == searchAreaWidth2 ? (int) _aUnitData.UnitId - (int) _bUnitData.UnitId : searchAreaWidth1 - searchAreaWidth2;
-    }
-
-    private static int compareUnitEnemyOrder(
-      MasterUnitEnemyData.UnitEnemyData _aUnitData,
-      MasterUnitEnemyData.UnitEnemyData _bUnitData)
-    {
-      int searchAreaWidth1 = (int) _aUnitData.search_area_width;
-      int searchAreaWidth2 = (int) _bUnitData.search_area_width;
-      return searchAreaWidth1 == searchAreaWidth2 ? (int) _aUnitData.unit_id - (int) _bUnitData.unit_id : searchAreaWidth1 - searchAreaWidth2;
-    }
-
-    public static Material LoadUnitProfileThumbnailMaterial(
-      int _unitId,
-      int _rarity,
-      eResourceId _mask = eResourceId.UNIT_PROFILE_ALPHA) => ManagerSingleton<ResourceManager>.Instance.LoadThumbUnitProfileImmediately(UnitUtility.GetSkinId(_unitId, _rarity), _mask);
-
-    public static Texture LoadUnitProfileThumbnailTexture(int _unitId, int _rarity) => ManagerSingleton<ResourceManager>.Instance.LoadResourceImmediately(eResourceId.UNIT_PROFILE_TEXTURE, (long) UnitUtility.GetSkinId(_unitId, _rarity)) as Texture;
-
-    private static int GetNextSkinId(int _rarity, int _practical)
-    {
-      UnitDefine.eUnitRarity eUnitRarity = (UnitDefine.eUnitRarity) _rarity;
-      switch (_rarity)
-      {
-        case 1:
-        case 2:
-          eUnitRarity = UnitDefine.eUnitRarity.RARITY_3;
-          break;
-        case 3:
-        case 4:
-        case 5:
-          eUnitRarity = _practical < 6 ? UnitDefine.eUnitRarity.RARITY_1 : UnitDefine.eUnitRarity.RARITY_6;
-          break;
-        case 6:
-          eUnitRarity = UnitDefine.eUnitRarity.RARITY_1;
-          break;
-      }
-      return (int) eUnitRarity;
-    }
-
-    public static int SwitchUnitProfileThumbnail(
-      UITexture _thumbnail,
-      int _unitId,
-      int _rarity,
-      int _practicalRarity,
-      eResourceId _mask = eResourceId.UNIT_PROFILE_ALPHA)
-    {
-      if ((UnityEngine.Object) _thumbnail == (UnityEngine.Object) null)
-        return _rarity;
-      int nextSkinId = UnitUtility.GetNextSkinId(_rarity, _practicalRarity);
-      _thumbnail.material = UnitUtility.LoadUnitProfileThumbnailMaterial(_unitId, nextSkinId, _mask);
-      return nextSkinId;
-    }
-    */
-    public static int GetSkinId(int _unitId, int _rarity)
-    {
-      if (!IsUnitTypePersonOrSummonPerson(_unitId) || IsUnitTypeSummonPersonOnly(_unitId) && _rarity == 0)
-        return _unitId;
-      int num = _unitId;
-      switch (_rarity)
-      {
-        case 0:
-        case 1:
-        case 2:
-          num = _unitId + 10;
-          break;
-        case 3:
-        case 4:
-        case 5:
-          num = _unitId + 30;
-          break;
-        case 6:
-          num = _unitId + 60;
-          break;
-      }
-      return num;
-    }
     /*
     public static int GetSkinId(
       eSpineType _spineType,

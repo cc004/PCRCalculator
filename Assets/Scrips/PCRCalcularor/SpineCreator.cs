@@ -72,10 +72,13 @@ namespace PCRCaculator
                 //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonData); // Spawn a new SkeletonAnimation GameObject.
                 return skeletonData;
             }
+#if UNITY_EDITOR
+            catch (NotImplementedException e)
+#else
             catch (Exception e)
+#endif
             {
-                MainManager.Instance.WindowConfigMessage(
-    "合成角色" + skinID + "的动画时发生错误：" + e.Message + "\n可能原因：找不到" + ab_atlas + "/" + p, null);
+                MainManager.Instance.WindowConfigMessage("合成角色" + skinID + "的动画时发生错误：" + e.Message + "\n可能原因：找不到" + ab_atlas + "/" + p, null);
 
             }
             return null;

@@ -93,8 +93,8 @@ namespace Elements
             {
                 BattleManager.Instance.ubmanager.SetUbExec(null, 0);
             }
-    }
-    private void LoadAllUnitCtrlData()
+        }
+        private void LoadAllUnitCtrlData()
         {
         }
         public void Initialize()//由GameManager的init调用，生成己方战斗小人
