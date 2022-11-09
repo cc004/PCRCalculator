@@ -207,7 +207,6 @@ namespace PCRCaculator.Guild
         }
         public void AppendChangeAbnormalState(int unitid, UnitAbnormalStateChangeData abnormalData, int frameCount)
         {
-
             UnitAbnormalStateChangeData changeData;
             if (abnormalData.isBuff)
             {

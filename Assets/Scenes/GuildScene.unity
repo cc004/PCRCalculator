@@ -40633,7 +40633,7 @@ PrefabInstance:
     - target: {fileID: 4044618195180921840, guid: 75c6d1fd3037a4d4d82523de05e618fe,
         type: 3}
       propertyPath: useJapanData
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4044618195180921840, guid: 75c6d1fd3037a4d4d82523de05e618fe,
         type: 3}

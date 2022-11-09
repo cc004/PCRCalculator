@@ -60,6 +60,9 @@ MonoBehaviour:
     type: 3}
   stayPage: 0
   UseNewBattleSystem: 1
+  useJapanData: 0
+  useVerification: 0
+  loginTool: {fileID: 0}
   showSummonIDs: 
 --- !u!114 &8479292379845382890
 MonoBehaviour:

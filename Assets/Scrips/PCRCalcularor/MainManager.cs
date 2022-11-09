@@ -286,6 +286,9 @@ namespace PCRCaculator
                 yield return null;
                 Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool.GetUEQData());
 
+                unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
+                unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
+
             }
             dbTool.CloseDB();
 

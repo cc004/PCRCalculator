@@ -417,7 +417,7 @@ namespace PCRCaculator
         public static int GetVer(bool old,int? defaultVal = null)
         {
             return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID,
-                defaultVal ?? (old || !(MainManager.Instance?.useJapanData ?? false) ? 10028300 : 10041900));
+                defaultVal ?? (old && !(MainManager.Instance?.useJapanData ?? false) ? 10028300 : 10041900));
         }
         static ABExTool()
         {

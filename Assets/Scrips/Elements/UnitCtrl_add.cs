@@ -91,39 +91,25 @@ namespace Elements
             BossPartsList = data.BossPartsList;
             UseTargetCursorOver = data.UseTargetCursorOver;
         }
-        private void CallBackAbnormalStateChanged(AbnormalStateCategoryData data,bool waitForFrame = false)
+        
+        private void CallBackAbnormalStateChanged(AbnormalStateCategoryData data)
         {
-            Action action = () =>
-            {
-                UnitAbnormalStateChangeData stateChangeData = new UnitAbnormalStateChangeData();
-                stateChangeData.AbsorberValue = data.AbsorberValue;
-                stateChangeData.ActionId = data.ActionId;
-                stateChangeData.CurrentAbnormalState = data.CurrentAbnormalState;
-                stateChangeData.Duration = data.Duration;
-                stateChangeData.enable = data.enable;
-                stateChangeData.EnergyReduceRate = data.EnergyReduceRate;
-                stateChangeData.IsDamageRelease = data.IsDamageRelease;
-                stateChangeData.IsEnergyReduceMode = data.IsEnergyReduceMode;
-                stateChangeData.IsReleasedByDamage = data.IsReleasedByDamage;
-                stateChangeData.MainValue = data.MainValue;
-                stateChangeData.SubValue = data.SubValue;
-                stateChangeData.SkillName = data.Skill.SkillName;
-                stateChangeData.SourceName = data.Source.UnitName;
-                int currentFrame = BattleHeaderController.CurrentFrameCount;
-                if (waitForFrame)
-                    currentFrame--;
-                MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData,currentFrame);
-            };
-            if (waitForFrame)
-                AppendCoroutine(WaitForFrame(action), ePauseType.SYSTEM,this);
-            else
-                action();
+            UnitAbnormalStateChangeData stateChangeData = new UnitAbnormalStateChangeData();
+            stateChangeData.AbsorberValue = data.AbsorberValue;
+            stateChangeData.ActionId = data.ActionId;
+            stateChangeData.CurrentAbnormalState = data.CurrentAbnormalState;
+            stateChangeData.Duration = data.Duration;
+            stateChangeData.enable = data.enable;
+            stateChangeData.EnergyReduceRate = data.EnergyReduceRate;
+            stateChangeData.IsDamageRelease = data.IsDamageRelease;
+            stateChangeData.IsEnergyReduceMode = data.IsEnergyReduceMode;
+            stateChangeData.IsReleasedByDamage = data.IsReleasedByDamage;
+            stateChangeData.MainValue = data.MainValue;
+            stateChangeData.SubValue = data.SubValue;
+            stateChangeData.SkillName = data.Skill.SkillName;
+            stateChangeData.SourceName = data.Source.UnitName;
         }
-        private IEnumerator WaitForFrame(Action action)
-        {
-            yield return null;
-            action?.Invoke();
-        }
+        
         /// <summary>
         /// 从skillid判断是不是UB、技能12、atk
         /// </summary>

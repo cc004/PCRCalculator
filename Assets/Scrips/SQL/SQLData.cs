@@ -76,7 +76,7 @@ namespace PCRCaculator.SQL
                 }
                 UnitSkillData skillData = new UnitSkillData();
                 unit_skill_data sk = unit_Skill_DatasDic[pair.Key];
-                if(pair.Key == 105701)
+                if(pair.Key == 105701 && MainManager.Instance.useJapanData)
                 {
                     sk = unit_Skill_DatasDic[170101];
                 }

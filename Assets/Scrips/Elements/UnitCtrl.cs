@@ -4582,7 +4582,7 @@ this.updateCurColor();
             OnChangeState.Call(this, iDAFJHFJKOL, _enable);
             MyOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[_abnormalState].IconType,
                 _enable, abnormalStateCategoryDataDictionary[abnormalStateCategory].Duration, describe);
-                //CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory],_switch_On);
+            CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory]);
             if (_enable || _switch)
                 return;
             battleManager.RestartAbnormalStateField(this, _abnormalState);
@@ -7623,14 +7623,14 @@ this.updateCurColor();
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
-                Hp = (Hp - (num6 - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
+                _hp = (Hp - (num6 - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
             }
-                if (_onDamageHit != null & flag2)
+            if (_onDamageHit != null & flag2)
                 _onDamageHit((float)num6);
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (long)1L;
-            Hp = Hp.Min(MaxHp);
-            _hp = Hp.ZeroCapForHp();
+            _hp = Hp.Min(MaxHp);
+            _hp = _hp.ZeroCapForHp();
             var hp2 = Hp;
 
             if (!IsBoss)
@@ -7657,8 +7657,10 @@ this.updateCurColor();
             else
                 GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
 
-            if ((long)Hp == 0L && (IsTough || ExecKnightGuard()) && (long)Hp == 0L)
-                Hp = 1L;
+            if ((long)Hp == 0L && (IsTough || ExecKnightGuard()))
+                _hp = 1L;
+
+            Hp = Hp; // refresh hp val
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
             //    this.playDamageVoice();
 
