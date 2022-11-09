@@ -284,6 +284,7 @@ namespace Elements
                 }
                 SubUnionBurstList[num3].SkillNum = num3;
                 skillDictionary.Add(num4, SubUnionBurstList[num3]);
+                Owner.SkillLevels[num4] = Owner.Level;
             }
             Dictionary<int, int> dictionary = new Dictionary<int, int>();
             foreach (KeyValuePair<int, Skill> skill in skillDictionary)

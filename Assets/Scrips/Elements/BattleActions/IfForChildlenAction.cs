@@ -143,15 +143,18 @@ namespace Elements
                         eStateIconType eStateIconType = eStateIconType.INVALID_VALUE;
                         eStateIconType = (eStateIconType)((base.ActionDetail1 <= 6000) ? (base.ActionDetail1 - 600) : (base.ActionDetail1 - 6000));
                         flag = _target.Owner.SealDictionary.ContainsKey(eStateIconType) && ((_valueDictinary[eValueNumber.VALUE_3] != 0f) ? ((float)_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() >= _valueDictinary[eValueNumber.VALUE_3]) : (_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() > 0));
+                        break;
                     }
                     else if (base.ActionDetail1 >= 1600)
                     {
                         flag = isAbnormalState((eIfAbnormalState)(base.ActionDetail1 % 100), _target);
+                        break;
                     }
                     else if (base.ActionDetail1 > 1500)
                     {
                         UnitCtrl.eAbnormalState abnormalState = ChangeSpeedAction.AbnormalStateDic[(ChangeSpeedAction.eChangeSpeedType)(base.ActionDetail1 % 100)];
                         flag = _target.Owner.IsAbnormalState(abnormalState);
+                        break;
                     }
                     if (ActionDetail1 > 900)
                     {

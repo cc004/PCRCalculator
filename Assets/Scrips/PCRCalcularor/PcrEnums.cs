@@ -592,7 +592,7 @@ namespace PCRCaculator.Battle
         CHRISTINA = 61,
         [Description("44")]
         TP_REGENERATION = 62,
-        SAGITTARIUS = 63, 
+        CHEATING_STAR = 63, 
         TONAKAI = 64, 
         HEX = 65, 
         FAINT = 66,
@@ -633,7 +633,40 @@ namespace PCRCaculator.Battle
         [Description("40")]
         AKINO_CHRISTMAS = 92, // 0x0000005C
         NPC_STUN = 93, // 0x0000005D
-        NUM = 94, // 0x0000005E
+        BUFF_RECEIVE_CRITICAL_DAMAGE = 94,
+        [Description("51")]
+        DEBUFF_RECEIVE_CRITICAL_DAMAGE = 95,
+        DECREASE_HEAL = 96,
+        SHEFI = 97,
+        SCHOOL_FESTIVAL_YUNI = 98,
+        SCHOOL_FESTIVAL_CHLOE = 99,
+        POISON_BY_BEHAVIOUR = 100,
+        ADDITIONAL_BUFF_PHYSICAL_DEF = 101,
+        CRYSTALIZE = 102,
+        DAMAGE_LIMIT = 103,
+        ADDITIONAL_BUFF_MAGIC_DEF = 104,
+        MAGIC_CHARACTER_OF_WISDOM = 105,
+        MAGIC_CHARACTER_OF_POWER = 106,
+        [Description("50")]
+        DETECT_WEAKNESS = 107,
+        [Description("53")]
+        DEBUFF_RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT = 108,
+        [Description("51")]
+        DEBUFF_RECEIVE_PHYSICAL_DAMAGE_PERCENT = 109,
+        [Description("52")]
+        DEBUFF_RECEIVE_MAGIC_DAMAGE_PERCENT = 110,
+        SAGITTARIUS = 111,
+        SWORD_SEAL = 112,
+        PHANTOMCORE_WEDGE = 113,
+        SPY = 114,
+        HAPPY_MOMENT = 115,
+        SEA_GOD_PROTECTION = 116,
+        BLUE_MAGIC_SEAL = 117,
+        SHEEP = 118,
+        TWILIGHT_GUARD = 119,
+        PSYCHIC_POWER = 120,
+        CELESTIAL_BODIES = 121,
+        NUM = 122
     }
     public enum eSummonType { NONE = 0, SUMMON = 1, PHANTOM = 2, DIVISION = 1001 }
     public enum eTargetAssignment 

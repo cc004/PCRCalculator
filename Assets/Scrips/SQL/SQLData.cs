@@ -22,6 +22,12 @@ namespace PCRCaculator.SQL
 
         private static Dictionary<int,unit_skill_data> unit_Skill_DatasDic;
         private static Dictionary<int,List<unit_attack_pattern>> unit_Attack_PatternsDic;
+        /// <summary>
+        /// 获取数据，姬塔数据默认六星覆盖
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public static IEnumerator GetUnitRarityData(this SQLiteTool data, Dictionary<int, UnitRarityData> dic)
         {
             //Dictionary<int, UnitRarityData> dic = new Dictionary<int, UnitRarityData>();
@@ -70,6 +76,10 @@ namespace PCRCaculator.SQL
                 }
                 UnitSkillData skillData = new UnitSkillData();
                 unit_skill_data sk = unit_Skill_DatasDic[pair.Key];
+                if(pair.Key == 105701)
+                {
+                    sk = unit_Skill_DatasDic[170101];
+                }
                 skillData.UB = sk.union_burst;
                 skillData.UB_ev = sk.union_burst_evolution;
                 skillData.skill_1 = sk.main_skill_1;

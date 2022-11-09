@@ -198,7 +198,8 @@ namespace PCRCaculator
         {
             if (allDependsLoaded)
                 return;
-            string folderFullName = Application.streamingAssetsPath + "/AB";
+            //string folderFullName = Application.streamingAssetsPath + "/AB";
+            string folderFullName = Application.streamingAssetsPath + "/../.ABExt";
             List<string> vs = new List<string>();
             DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
             foreach (FileInfo NextFile in TheFolder.GetFiles())
@@ -239,11 +240,11 @@ namespace PCRCaculator
         {
             Dictionary<string, List<FirearmCtrlData>> result = null;
             var unitactioncontroller = LoadUnitPrefab(unitid);
-            if (unitid >= 200000)
+            /*if (unitid >= 200000)
             {
                 int otherID = Mathf.FloorToInt(unitid / 100) * 100 + 99;
                 var otherPrefab = ABExTool.GetAllAssetBundleByName<GameObject>("all_battleunit_" + otherID + ".unity3d", "prefab");
-            }
+            }*/
 
             result = unitactioncontroller.GetFirearmDatas();
             var unitSkilldata = unitactioncontroller.CreateUnitSkillEffectData();

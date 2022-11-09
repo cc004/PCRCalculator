@@ -41,6 +41,8 @@ namespace PCRCaculator
         public int levelMax { get => playerSetting.playerLevel; }
         public bool UseNewBattleSystem = true;
         public bool useJapanData;
+        public bool useVerification;
+        public LoginTool loginTool;
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
         private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
@@ -148,6 +150,10 @@ namespace PCRCaculator
         {
             try
             {
+                if (useVerification)
+                {
+                    loginTool?.gameObject.SetActive(true);
+                }
 #if PLATFORM_ANDROID
                 var dir = Application.persistentDataPath + "/AB";
 #else

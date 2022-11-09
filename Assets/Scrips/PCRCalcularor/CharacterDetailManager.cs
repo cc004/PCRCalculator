@@ -271,11 +271,17 @@ namespace PCRCaculator
             skillDetailTexts_2[0].text = begin.Substring(0, begin.Length - 1);
             skillDetailTexts_2[1].text = loop.Substring(0, loop.Length - 1);
         }
-        private static string SkillInt2Str(int skillid)
+        public static string SkillInt2Str(int skillid)
         {
-            if (skillid == 1) { return "普攻"; }
+            if (skillid == 1 || skillid == 0) { return "普攻"; }
             if (skillid == 1001) { return "<color=#0422FF>技能1</color>"; }
             if (skillid == 1002) { return "<color=#6604FF>技能2</color>"; }
+            if (skillid >= 1000 && skillid <= 1999)
+            {
+                int skillid2 = skillid % 1000;
+                return $"技能{skillid2}";
+
+            }
             return "ERROR!";
         }
         /// <summary>
