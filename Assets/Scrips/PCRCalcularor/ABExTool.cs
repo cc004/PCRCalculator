@@ -477,7 +477,9 @@ namespace PCRCaculator
 
         private static Dictionary<(Type, string, string, bool), object>
             GetAssetBundleByNameCache = new Dictionary<(Type, string, string, bool), object>();
-        
+
+        public static string persistentDataPath;
+
         public static T GetAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
             var key = (typeof(T), fullname, fit, useOldManifest);

@@ -162,7 +162,7 @@ namespace PCRApi
         private string GetManifestJson()
         {
 #if PLATFORM_ANDROID
-            var file = UnityEngine.Application.persistentDataPath + $"/AB/manifest_{Ver}.json";
+            var file = ABExTool.persistentDataPath + $"/AB/manifest_{Ver}.json";
 #else
             var file = $"manifest_{Ver}.json";
 #endif

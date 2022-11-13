@@ -573,7 +573,7 @@ namespace PCRCaculator.SQL
             foreach (var dd in list)
             {
                 int storyid = dd.story_id;
-                int unitid = Mathf.FloorToInt(storyid / 1000) * 100 + 1;
+                int unitid = storyid / 1000 * 100 + 1;
                 if (!add_vals.ContainsKey(unitid))
                 {
                     add_vals.Add(unitid, new List<List<int[]>>());

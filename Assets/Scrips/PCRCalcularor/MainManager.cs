@@ -210,6 +210,7 @@ namespace PCRCaculator
             */
 
             var tasks = new List<Task>();
+            ABExTool.persistentDataPath = Application.persistentDataPath;
             tasks.Add(ABExTool.StaticInitialize());
             var dbTool = SQLData.OpenDB();
             var dbTool2 = SQLData.OpenDB(true);

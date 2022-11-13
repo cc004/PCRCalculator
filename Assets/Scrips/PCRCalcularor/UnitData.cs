@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Elements;
+using ExcelDataReader.Log;
 using Newtonsoft.Json;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
@@ -199,6 +200,10 @@ namespace PCRCaculator
                     {
                         if (a.playLoveDic != null && a.playLoveDic.TryGetValue(id0, out int loveLevel))
                         {
+                            if (!MainManager.Instance.UnitStoryDic.ContainsKey(id0))
+                            {
+                                Debug.LogError($"{id0}: key not found");
+                            }
                             d1 += MainManager.Instance.UnitStoryDic[id0].GetLoveValues(loveLevel);
                         }
                         else if (MainManager.Instance.JudgeWeatherShowThisUnit(id0) && MainManager.Instance.unitDataDic.ContainsKey(id0))
@@ -245,7 +250,8 @@ namespace PCRCaculator
             catch(Exception e)
 #endif
             {
-                MainManager.Instance.WindowConfigMessage("加载角色" + a.unitId + "时发生错误：" + e.Message, null);
+                Debug.LogError("加载角色" + a.unitId + "时发生错误：" + e);
+                //MainManager.Instance.WindowConfigMessage("加载角色" + a.unitId + "时发生错误：" + e.Message, null);
                 return new BaseData();
             }
         }

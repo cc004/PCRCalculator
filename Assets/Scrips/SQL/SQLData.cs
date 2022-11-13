@@ -968,12 +968,12 @@ namespace PCRCaculator.SQL
         }
         public List<int> GetCharIdList()
         {
-            return new List<int>()
+            return new int[]
             {
                 chara_id_1, chara_id_2, chara_id_3, chara_id_4, chara_id_5, chara_id_6, chara_id_7, chara_id_8,
                 chara_id_9,
                 chara_id_10
-            };
+            }.Where(x => x != 0).Select(x => 100 * x + 1).ToList();
             /*
         List<int> ids = new List<int>();
         PropertyInfo[] pArray = typeof(chara_story_status).GetProperties();
