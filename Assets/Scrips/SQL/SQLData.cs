@@ -12,7 +12,8 @@ using Elements;
 
 namespace PCRCaculator.SQL
 {
-    public static class SQLData
+    /*
+    public static class SQLData2
     {
         public static void ClearCache()
         {
@@ -28,23 +29,22 @@ namespace PCRCaculator.SQL
         /// <param name="data"></param>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public static IEnumerator GetUnitRarityData(this SQLiteTool data, Dictionary<int, UnitRarityData> dic)
+        public static void GetUnitRarityData(this SQLiteTool data, Dictionary<int, UnitRarityData> dic)
         {
             //Dictionary<int, UnitRarityData> dic = new Dictionary<int, UnitRarityData>();
             Dictionary<int, List<unit_rarity>> rarityDic = data.GetDatasDicList<unit_rarity>(a => a.unit_id,a=>a.unit_id<=499999);
-            yield return null;
+            
             if (unit_Skill_DatasDic == null)
                 unit_Skill_DatasDic = data.GetDatasDic<unit_skill_data>(a => a.unit_id);
             if (unit_Attack_PatternsDic == null)            
                 unit_Attack_PatternsDic = data.GetDatasDicList<unit_attack_pattern>(a => a.unit_id);
-            yield return null;
+            
             Dictionary<int, List<unit_promotion>> equipDic = data.GetDatasDicList<unit_promotion>(a => a.unit_id);
-            yield return null;
+            
             Dictionary<int, List<unit_promotion_status>> rankStateDic = data.GetDatasDicList<unit_promotion_status>(a => a.unit_id);
-            yield return null;
+            
             Dictionary<int, unit_data> unitDic = data.GetDatasDic<unit_data>(a => a.unit_id);
-            yield return null;
-            int idx = 0;
+            
             foreach(var pair in rarityDic)
             {
                 List<int[]> eq = new List<int[]>();
@@ -125,9 +125,6 @@ namespace PCRCaculator.SQL
                 }
                 UnitRarityData rarityData = new UnitRarityData(pair.Key, d1, d2, rankData, detailData, skillData);
                 dic.Add(pair.Key, rarityData);
-                if (idx % 10 == 0)
-                    yield return null;
-                idx++;
             }
 
         }
@@ -255,11 +252,11 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-        public static IEnumerator GetEnemyDataDic(this SQLiteTool data, Dictionary<int, EnemyData> dic)
+        public static void GetEnemyDataDic(this SQLiteTool data, Dictionary<int, EnemyData> dic)
         {
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
             Dictionary<int, unit_enemy_data> dic1 = data.GetDatasDic<unit_enemy_data>(a => a.unit_id);
-            yield return null;
+            
             var list = data.GetDatas<enemy_parameter>(a=>a.enemy_id >= 400000000 && a.enemy_id <= 500000000);
             if (unit_Skill_DatasDic == null)
                 unit_Skill_DatasDic = data.GetDatasDic<unit_skill_data>(a=>a.unit_id);
@@ -275,7 +272,7 @@ namespace PCRCaculator.SQL
                     }
                     else
                         unit_Attack_PatternsDic[pa.unit_id] = new List<unit_attack_pattern> { pa };
-                }*/
+                }
             }
             int idx = 0;
             foreach(var dd in list)
@@ -335,8 +332,7 @@ namespace PCRCaculator.SQL
 
                 dic.Add(e.enemy_id, e);
                 idx++;
-                if (idx % 50 == 0)
-                    yield return null;
+                    
             }
             //return dic;
         }
@@ -414,7 +410,7 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-    }
+    }*/
     public class enemy_m_parts
     {
         [PrimaryKey]
@@ -972,23 +968,30 @@ namespace PCRCaculator.SQL
         }
         public List<int> GetCharIdList()
         {
-            List<int> ids = new List<int>();
-            PropertyInfo[] pArray = typeof(chara_story_status).GetProperties();
-            foreach (var p in pArray)
+            return new List<int>()
             {
-                if (p.PropertyType == typeof(int) && p.Name.Contains("chara_id_"))
+                chara_id_1, chara_id_2, chara_id_3, chara_id_4, chara_id_5, chara_id_6, chara_id_7, chara_id_8,
+                chara_id_9,
+                chara_id_10
+            };
+            /*
+        List<int> ids = new List<int>();
+        PropertyInfo[] pArray = typeof(chara_story_status).GetProperties();
+        foreach (var p in pArray)
+        {
+            if (p.PropertyType == typeof(int) && p.Name.Contains("chara_id_"))
+            {
+                int value = (int)(p.GetValue(this) ?? 0);
+                if (value > 0)
                 {
-                    int value = (int)(p.GetValue(this) ?? 0);
-                    if (value > 0)
-                    {
-                        int unitid = value * 100 + 1;
-                        ids.Add(unitid);
+                    int unitid = value * 100 + 1;
+                    ids.Add(unitid);
 
-                    }
                 }
             }
+        }
 
-            return ids;
+        return ids;*/
         }
     }
     public class unique_equipment_data

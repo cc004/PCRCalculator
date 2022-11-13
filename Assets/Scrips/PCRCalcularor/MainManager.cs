@@ -161,13 +161,13 @@ namespace PCRCaculator
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                StartCoroutine(Load());
+                Load();
                 CreateShowUnitIDS();
             }
             catch (Exception e)
             {
                 Debugtext.text += e.Message;
-                Debug.LogError(e.Message);
+                Debug.LogError(e.ToString());
             }
 
             //CharacterManager = CharacterManager.Instance;
@@ -176,25 +176,23 @@ namespace PCRCaculator
 
         public Dictionary<int, float[]> execTimePatch;
 
-        private IEnumerator Load()
+        private void Load()
         {
             LoadFinished = false;
             var wait = OpenWaitUI();
             LoadPlayerSettings();
             //Thread thread = new Thread(() => LoadAsync());
             //await Task.Run(LoadAsync);
-            yield return LoadAsync();
-            Debugtext.text += "\n数据加载完毕！";
-            CreateShowUnitIDS();
-            wait.Close();
+            LoadAsync(wait);
         }
-        private IEnumerator LoadAsync()
+
+        private void LoadAsync(WaitUI wait)
         {
             execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
             /*string jsonStr = LoadJsonDatas("Datas/AllData");
-            yield return null;
+            
             if (jsonStr != "")
             {
                 AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
@@ -209,88 +207,57 @@ namespace PCRCaculator
                 skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
-            yield return null;*/
+            */
 
-            SQLiteTool dbTool = SQLiteTool.OpenDB();
+            var tasks = new List<Task>();
+            tasks.Add(ABExTool.StaticInitialize());
+            var dbTool = SQLData.OpenDB();
+            var dbTool2 = SQLData.OpenDB(true);
+            tasks.Add(
+                Task.WhenAll(dbTool.ParallelGetAll(), dbTool2.ParallelGetAll())
+                    .ContinueWith(_ =>
+                    {
+                        dbTool.CloseDB();
+                        dbTool2.CloseDB();
 
-            equipmentDic = dbTool.GetEquipmentData();
-            equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-            yield return null;
-            unitRarityDic = new Dictionary<int, UnitRarityData>();
-            yield return dbTool.GetUnitRarityData(unitRarityDic);
-            unitStoryDic = new Dictionary<int, UnitStoryData>();
-            unitStoryEffectDic = new Dictionary<int, List<int>>();
-            dbTool.GetUnitStoryData(unitStoryDic, unitStoryEffectDic);
-            yield return null;
+                        equipmentDic = dbTool.Dic8;
+                        equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                        unitRarityDic = dbTool.Dic1;
+                        (unitStoryDic, unitStoryEffectDic) = dbTool.Pair;
+                        skillDataDic = dbTool.Dic3;
+                        skillActionDic = dbTool.Dic4;
+                        allUnitAttackPatternDic = dbTool.Dic5;
+                        guildEnemyDatas = dbTool.Dic6;
+                        enemyMPartsDic = dbTool.Dic7;
+                        //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
+                        Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
+                        uniqueEquipmentDataDic = dbTool.Dic9;
 
-            skillDataDic = dbTool.GetSkillDataDic();
-            yield return null;
-            skillActionDic = dbTool.GetSkillActionDic();
-            yield return null;
 
-            allUnitAttackPatternDic = dbTool.GetUnitAttackPatternDic();
-            yield return null;
+                        var (unitStoryDic2, unitStoryEffectDic2) = dbTool2.Pair;
+                        unitName_cn = dbTool2.Dic10;
+                        skillNameAndDescribe_cn = dbTool2.Dic11;
+                        skillActionDescribe_cn = dbTool2.Dic12;
 
-            guildEnemyDatas = dbTool.GetGuildEnemyData();
-            yield return null;
-
-            enemyMPartsDic = dbTool.GetMPartsData();
-            yield return null;
-
-            //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
-            Guild.GuildManager.EnemyDataDic = new Dictionary<int, EnemyData>();
-            yield return dbTool.GetEnemyDataDic(Guild.GuildManager.EnemyDataDic);
-
-            uniqueEquipmentDataDic = dbTool.GetUEQData();
-
-            dbTool.CloseDB();
-
-            dbTool = SQLiteTool.OpenDB(true);
-            unitName_cn = dbTool.GetUnitName_cn();
-            yield return null;
-            skillNameAndDescribe_cn = dbTool.GetSkillName_cn();
-            yield return null;
-            skillActionDescribe_cn = dbTool.GetSkillActionDes_cn();
-            yield return null;
-
-            if (!useJapanData)
-            {
-                SQLData.ClearCache();
-                Extensions.OverrideWith(equipmentDic, dbTool.GetEquipmentData());
-                yield return null;
-                var unitRarityDic2 = new Dictionary<int, UnitRarityData>();
-                yield return dbTool.GetUnitRarityData(unitRarityDic2);
-                Extensions.OverrideWith(unitRarityDic, unitRarityDic2);
-                var unitStoryDic2 = new Dictionary<int, UnitStoryData>();
-                var unitStoryEffectDic2 = new Dictionary<int, List<int>>();
-                dbTool.GetUnitStoryData(unitStoryDic2, unitStoryEffectDic2);
-                Extensions.OverrideWith(unitStoryDic, unitStoryDic2);
-                Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2);
-                yield return null;
-
-                Extensions.OverrideWith(skillDataDic, dbTool.GetSkillDataDic());
-                yield return null;
-                Extensions.OverrideWith(skillActionDic, dbTool.GetSkillActionDic());
-                yield return null;
-                Extensions.OverrideWith(allUnitAttackPatternDic, dbTool.GetUnitAttackPatternDic());
-                yield return null;
-                Extensions.OverrideWith(guildEnemyDatas, dbTool.GetGuildEnemyData());
-                yield return null;
-                Extensions.OverrideWith(enemyMPartsDic, dbTool.GetMPartsData());
-                yield return null;
-
-                //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
-                var EnemyDataDic = new Dictionary<int, EnemyData>();
-                yield return dbTool.GetEnemyDataDic(EnemyDataDic);
-                Extensions.OverrideWith(Guild.GuildManager.EnemyDataDic, EnemyDataDic);
-                yield return null;
-                Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool.GetUEQData());
-
-                unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
-                unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
-
-            }
-            dbTool.CloseDB();
+                        if (!useJapanData)
+                        {
+                            Task.WhenAll(
+                                Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
+                                Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
+                                Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
+                                Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
+                                Task.Run(() => Extensions.OverrideWith(skillDataDic, dbTool2.Dic3)),
+                                Task.Run(() => Extensions.OverrideWith(skillActionDic, dbTool2.Dic4)),
+                                Task.Run(() => Extensions.OverrideWith(allUnitAttackPatternDic, dbTool2.Dic5)),
+                                Task.Run(() => Extensions.OverrideWith(guildEnemyDatas, dbTool2.Dic6)),
+                                Task.Run(() => Extensions.OverrideWith(enemyMPartsDic, dbTool2.Dic7)),
+                                Task.Run(() => Extensions.OverrideWith(GuildManager.EnemyDataDic, dbTool2.Dic2)),
+                                Task.Run(() => Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool2.Dic9))
+                            ).Wait();
+                            unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
+                            unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
+                        }
+                    }));
 
             /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
@@ -308,7 +275,7 @@ namespace PCRCaculator
 
             Debug.LogError($"读取DB失败！{ex.Message}");*/
 
-            yield return null;
+            
             LoadUnitData();
             //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
@@ -317,7 +284,7 @@ namespace PCRCaculator
             //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
-            yield return null;
+            
             string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
@@ -326,20 +293,25 @@ namespace PCRCaculator
             //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
-            yield return null;
+            
             //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
-            //yield return null;
+            //
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
             unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
-            yield return null;
+            
             if (!string.IsNullOrEmpty(firearmStr))
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
 
+            Task.WhenAll(tasks).Wait();
+
             LoadFinished = true;
+            Debugtext.text += "\n数据加载完毕！";
+            CreateShowUnitIDS();
+            wait.Close();
         }
         private void LoadUnitData()
         {

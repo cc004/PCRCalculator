@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Mono.Data.Sqlite;
 using PCRApi;
 using UnityEditor;
@@ -419,22 +420,26 @@ namespace PCRCaculator
             return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID,
                 defaultVal ?? (old && !(MainManager.Instance?.useJapanData ?? false) ? 10028300 : 10041900));
         }
-        static ABExTool()
+
+        public static Task StaticInitialize()
         {
-            try
+            int verid = GetVer(false);
+            int verid_old = GetVer(true);
+
+            if (verid == verid_old)
             {
-                int verid = GetVer(false);
-                int verid_old = GetVer(true);
-                mgr.Initialize(verid.ToString());
-                if (verid == verid_old)
+                return Task.Run(() =>
+                {
+                    mgr.Initialize(verid.ToString());
                     mgrold = mgr;
-                else
-                    mgrold.Initialize(verid_old.ToString());
+                });
             }
-            catch (Exception e)
+            else
             {
-                mgr = null;
-                Debug.LogError(e);
+                return Task.WhenAll(
+                    Task.Run(() => mgr.Initialize(verid.ToString())),
+                    Task.Run(() => mgrold.Initialize(verid_old.ToString()))
+                );
             }
         }
 
@@ -470,8 +475,14 @@ namespace PCRCaculator
             return asset;
         }
 
+        private static Dictionary<(Type, string, string, bool), object>
+            GetAssetBundleByNameCache = new Dictionary<(Type, string, string, bool), object>();
+        
         public static T GetAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
+            var key = (typeof(T), fullname, fit, useOldManifest);
+            if (GetAssetBundleByNameCache.TryGetValue(key, out var val))
+                return (T)val;
             var asset = TryGetAssetBundleByName(fullname, useOldManifest);
             T result = default;
             if (asset != null)
@@ -483,6 +494,7 @@ namespace PCRCaculator
                     if (result != null) break;
                 }
             }
+            GetAssetBundleByNameCache.Add(key, result);
             return result;
         }
         public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object

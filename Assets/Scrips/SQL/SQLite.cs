@@ -153,7 +153,8 @@ namespace SQLite4Unity3d
 		// - To prepend deadlock, application may lock a database file explicity by either way:
 		//   - RunInTransaction(Action) locks the database during the transaction (for insert/update)
 		//   - RunInDatabaseLock(Action) similarly locks the database but no transaction (for query)
-		private static Dictionary<string, object> syncObjects = new Dictionary<string, object>();
+		// FUCKING TERRIBLE SHARED DICT CRASHES WHEN CONNECTION IS ESTABLISHED CONCURRENTLY
+		//private static Dictionary<string, object> syncObjects = new Dictionary<string, object>();
 
 		#region debug tracing
 
@@ -219,7 +220,7 @@ namespace SQLite4Unity3d
 				throw new ArgumentException ("Must be specified", "databasePath");
 
 			DatabasePath = databasePath;
-			mayCreateSyncObject(databasePath);
+			//mayCreateSyncObject(databasePath);
 
 #if NETFX_CORE
 			SQLite3.SetDirectory(/*temp directory type*/2, Windows.Storage.ApplicationData.Current.TemporaryFolder.Path);
@@ -255,19 +256,19 @@ namespace SQLite4Unity3d
 				ti.Name = "magic";
 			}
 		}
-
+		/*
 		void mayCreateSyncObject(string databasePath)
 		{
 			if (!syncObjects.ContainsKey(databasePath)) {
 				syncObjects[databasePath] = new object();
 			}
-		}
+		}*/
 
 		/// <summary>
 		/// Gets the synchronous object, to be lock the database file for updating.
 		/// </summary>
 		/// <value>The sync object.</value>
-		public object SyncObject { get { return syncObjects[DatabasePath];} }
+		//public object SyncObject { get { return syncObjects[DatabasePath];} }
 
 		public void EnableLoadExtension(int onoff)
 		{
@@ -1098,11 +1099,11 @@ namespace SQLite4Unity3d
 		public void RunInTransaction (Action action)
 		{
 			try {
-				lock (syncObjects[DatabasePath]) {
+				//lock (syncObjects[DatabasePath]) {
 					var savePoint = SaveTransactionPoint ();
 					action ();
 					Release (savePoint);
-				}
+				//}
 			} catch (Exception) {
 				Rollback ();
 				throw;
@@ -1117,9 +1118,9 @@ namespace SQLite4Unity3d
 		/// </param>
 		public void RunInDatabaseLock (Action action)
 		{
-			lock (syncObjects[DatabasePath]) {
+			//lock (syncObjects[DatabasePath]) {
 				action ();
-			}
+			//}
 		}
 
 		/// <summary>
@@ -2073,11 +2074,11 @@ namespace SQLite4Unity3d
 			}
 			
 			var r = SQLite3.Result.OK;
-			lock (_conn.SyncObject) {
+			//lock (_conn.SyncObject) {
 				var stmt = Prepare ();
 				r = SQLite3.Step (stmt);
 				Finalize(stmt);
-			}
+			//}
 			if (r == SQLite3.Result.Done) {
 				int rowsAffected = SQLite3.Changes (_conn.Handle);
 				return rowsAffected;
@@ -2132,7 +2133,7 @@ namespace SQLite4Unity3d
 				_conn.InvokeTrace ("Executing Query: " + this);
 			}
 
-			lock (_conn.SyncObject) {
+			//lock (_conn.SyncObject) {
 				var stmt = Prepare ();
 				try {
 					var cols = new TableMapping.Column[SQLite3.ColumnCount (stmt)];
@@ -2157,7 +2158,7 @@ namespace SQLite4Unity3d
 				} finally {
 					SQLite3.Finalize(stmt);
 				}
-			}
+			//}
 		}
 
 		public T ExecuteScalar<T> ()
@@ -2168,7 +2169,7 @@ namespace SQLite4Unity3d
 			
 			T val = default(T);
 			
-			lock (_conn.SyncObject) {
+			//lock (_conn.SyncObject) {
 				var stmt = Prepare();
 
 				try {
@@ -2186,7 +2187,7 @@ namespace SQLite4Unity3d
 				} finally {
 					Finalize (stmt);
 				}
-			}
+			//}
 			
 			return val;
 		}
