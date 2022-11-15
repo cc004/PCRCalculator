@@ -214,6 +214,7 @@ namespace PCRCaculator
         }
         public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???")
         {
+            if (stayTime == 0) stayTime = unitCtrl.fieldTime;
             if(stateIconType_2 == eStateIconType.NONE) { return; }
             if (BattleUIManager.Instance.ShowBuffDic.TryGetValue(eStateIconType.NONE, out bool value))
             {

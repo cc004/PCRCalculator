@@ -277,7 +277,6 @@ namespace PCRCaculator
             Debug.LogError($"读取DB失败！{ex.Message}");*/
 
             
-            LoadUnitData();
             //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
             //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
@@ -308,12 +307,14 @@ namespace PCRCaculator
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
 
             Task.WhenAll(tasks).Wait();
+            LoadUnitData();
 
             LoadFinished = true;
             Debugtext.text += "\n数据加载完毕！";
             CreateShowUnitIDS();
             wait.Close();
         }
+
         private void LoadUnitData()
         {
             try

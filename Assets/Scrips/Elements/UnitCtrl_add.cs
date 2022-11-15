@@ -108,6 +108,7 @@ namespace Elements
             stateChangeData.SubValue = data.SubValue;
             stateChangeData.SkillName = data.Skill.SkillName;
             stateChangeData.SourceName = data.Source.UnitName;
+            MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
         }
         
         /// <summary>

@@ -97,6 +97,8 @@ namespace Elements
         public bool IsForceLeftDir;
         public static int DamageFlashFrame = 0;
         public static int FlashDelayFrame = 0;
+
+        public float fieldTime;
         //private LifeGaugeController lifeGauge;
         private Transform bottomTransform;
         private bool m_bPause;
@@ -7630,7 +7632,6 @@ this.updateCurColor();
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (long)1L;
             _hp = Hp.Min(MaxHp);
-            _hp = _hp.ZeroCapForHp();
             var hp2 = Hp;
 
             if (!IsBoss)
@@ -7657,10 +7658,23 @@ this.updateCurColor();
             else
                 GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
 
-            if ((long)Hp == 0L && (IsTough || ExecKnightGuard()))
-                _hp = 1L;
-
-            Hp = Hp; // refresh hp val
+            if (Hp < 0)
+            {
+                if (IsTough || ExecKnightGuard())
+                {
+                    Hp = 1;
+                }
+                else
+                {
+                    Hp = _hp;
+                    _hp = _hp.ZeroCapForHp();
+                }
+            }
+            else
+            {
+                Hp = Hp;
+            }
+            
             //if (num7 != 0 && (double)(long)this.Hp < (double)(long)this.MaxHp * 0.200000002980232)
             //    this.playDamageVoice();
 

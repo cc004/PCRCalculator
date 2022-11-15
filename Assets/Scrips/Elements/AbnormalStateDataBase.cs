@@ -109,11 +109,13 @@ namespace Elements.Battle
 
         protected virtual int getClearedIndex(UnitCtrl FNHGFDNICFG) => 0;
 
+        protected float remaining;
         public IEnumerator Update()
         {
             float time = 0.0f;
             float intervalCount = 0.0f;
             isPlaying = true;
+            remaining = StayTime;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域开始");
             while (true)
             {
@@ -148,6 +150,7 @@ namespace Elements.Battle
                 if (BattleManager.GetBlackOutUnitLength() == 0)
                 {
                     time += BattleManager.DeltaTime_60fps;
+                    remaining = StayTime - time;
                 }
                 //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域加时"+);
                 eBattleGameState mmbmbjnnacg = BattleManager.GameState;
