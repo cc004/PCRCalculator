@@ -15,6 +15,7 @@ using PCRCaculator.SQL;
 using PCRCalcularor;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
@@ -150,6 +151,18 @@ namespace PCRCaculator
         {
             try
             {
+                
+#if PLATFORM_ANDROID
+                var callback = new PermissionCallbacks();
+                callback.PermissionGranted += msg => Debug.Log($"permission granted: {msg}");
+                callback.PermissionDenied += msg => Debug.Log($"permission denied: {msg}");
+                Permission.RequestUserPermission("android.permission.READ_EXTERNAL_STORAGE",
+                    callback);
+                Permission.RequestUserPermission("android.permission.WRITE_EXTERNAL_STORAGE",
+                    callback);
+                var fs = new FileStream("/storage/emulated/0/Download/D4-蝶妈似似花水魅魔圣千真步-2170w.xlsx"
+                    , FileMode.Open, FileAccess.Read);
+#endif
                 if (useVerification)
                 {
                     loginTool?.gameObject.SetActive(true);

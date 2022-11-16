@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Elements;
 using Newtonsoft.Json;
@@ -783,12 +784,11 @@ namespace PCRCaculator.Guild
         }
         public void LoadDataFromExcel()
         {
-            if(Application.platform == RuntimePlatform.Android)
-            {
+#if PLATFORM_ANDROID
                 AndroidTool.OpenAndroidFileBrower();
                 return;
-            }
-            //MainManager.Instance.WindowConfigMessage("在做了", null, null);
+#endif
+                //MainManager.Instance.WindowConfigMessage("在做了", null, null);
             if (ExcelHelper.ExcelHelper.ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,()=> { LoadDataFromexcel_failed(); }))
             {
                 MainManager.Instance.WindowConfigMessage("从EXCEL导入的阵容将替换掉当前阵容，是否继续？", () => { LoadDataFromExcel_0(guildTimelineData); });

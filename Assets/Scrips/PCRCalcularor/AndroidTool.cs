@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
+using Application = UnityEngine.Application;
 
 namespace PCRCaculator
 {
@@ -23,9 +24,35 @@ namespace PCRCaculator
             int s = jo.Call<int>("Sub", 3, 2);
             Debug.Log($"测试数据{s}(1)");
         }
+
         public static void OpenAndroidFileBrower()
         {
-            
+            int ver;
+            using (var version = new AndroidJavaClass("android.os.Build$VERSION"))
+                ver = version.GetStatic<int>("SDK_INT");
+
+            Debug.Log($"using sdk version = {ver}");
+
+            if (ver >= 30)
+            {
+                MainManager.Instance.WindowConfigMessage(
+                    "你现在使用android11及以上的版本，不支持内部存储的读取，" +
+                    "请将excel文件放入/sdcard/Android/data/com.PCRFans.PCRGuildCalculator/files" +
+                    "下，否则将会出错或者闪退",
+                    OpenAndroidFileBrowerInternal);
+            }
+            else OpenAndroidFileBrowerInternal();
+        }
+
+        private static void OpenAndroidFileBrowerInternal()
+        {
+            MainManager.Instance.WindowConfigMessage(
+                "手机选取文件时，请使用文件管理进行文件选取，如果在\"下载内容\"中选取文件将会闪退",
+                OpenAndroidFileBrowerInternal2);
+        }
+
+        private static void OpenAndroidFileBrowerInternal2()
+        {
             try
             {
                 AndroidJavaObject jc = new AndroidJavaObject($"{libName}.GetFilePath");
