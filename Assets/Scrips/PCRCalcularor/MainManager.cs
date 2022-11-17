@@ -151,7 +151,7 @@ namespace PCRCaculator
         {
             try
             {
-                
+                /*
 #if PLATFORM_ANDROID
                 var callback = new PermissionCallbacks();
                 callback.PermissionGranted += msg => Debug.Log($"permission granted: {msg}");
@@ -162,7 +162,7 @@ namespace PCRCaculator
                     callback);
                 var fs = new FileStream("/storage/emulated/0/Download/D4-蝶妈似似花水魅魔圣千真步-2170w.xlsx"
                     , FileMode.Open, FileAccess.Read);
-#endif
+#endif*/
                 if (useVerification)
                 {
                     loginTool?.gameObject.SetActive(true);
