@@ -178,13 +178,10 @@ namespace Elements
             // f = f.Select(x => Mathf.CeilToInt(Mathf.Abs(x)));
             //if (_isDebuf)
             //    f *= -1f;
-            int num2 = Mathf.CeilToInt(Mathf.Abs(f));
+            var num2 = f.Abs().Ceil();
             if (_isDebuf)
             {
-                num2 = BattleUtil.FloatToInt((float)num2 * (1f - (float)_target.GetDebuffResistPercent(_targetChangeParamKind) / 100f));
-            }
-            if (_isDebuf)
-            {
+                num2 = (num2 * (1f - (float)_target.GetDebuffResistPercent(_targetChangeParamKind) / 100f)).Floor();
                 num2 *= -1;
             }
             return num2;

@@ -157,6 +157,8 @@ namespace Elements
 
         public override string ToString() => pure ? ((float)this).ToString() : $"{(int)(float)this}[{(int)Expect}]";
         public FloatWithEx Floor() => Select(Mathf.Floor, "floor");
+        public FloatWithEx Ceil() => Select(Mathf.Ceil, "ceil");
+        public FloatWithEx Abs() => Select(Mathf.Abs, "abs");
         public int CompareTo(FloatWithEx other) => ((float)this).CompareTo(other);
         public static FloatWithEx operator +(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x + y, "add");
         public static FloatWithEx operator -(FloatWithEx a, FloatWithEx b) => Op(a, b, (x, y) => x - y, "sub");
