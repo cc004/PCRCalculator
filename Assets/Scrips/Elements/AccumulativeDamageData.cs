@@ -24,8 +24,8 @@ namespace Elements
 			int num = Mathf.Min(_count, CountLimit);
 			return AccumulativeDamageType switch
 			{
-				eAccumulativeDamageType.FIXED => (FloatWithEx)((float)num * FixedValue),
-				eAccumulativeDamageType.PERCENTAGE => (FloatWithEx)((float)(_baseDamage * num) * PercentageValue / 100f),
+				eAccumulativeDamageType.FIXED => (num * FixedValue),
+				eAccumulativeDamageType.PERCENTAGE => ((_baseDamage * num) * PercentageValue / 100f),
 				_ => 0,
 			};
 		}

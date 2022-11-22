@@ -212,8 +212,8 @@ namespace Elements
             FloatWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
             float num6 = 0f;
             num6 = ((!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f));
-            num4 = BattleUtil.FloatToInt((float)num4 * num6);
-            num5 = BattleUtil.FloatToInt((float)num5 * num6);
+            num4 = BattleUtil.FloatToInt(num4 * num6);
+            num5 = BattleUtil.FloatToInt(num5 * num6);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 value.DamagedCount++;
@@ -282,7 +282,7 @@ namespace Elements
         }
         private FloatWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, FloatWithEx _atk)
         {
-            float num = _valueDictionary[eValueNumber.VALUE_1] + (float)_atk * _valueDictionary[eValueNumber.VALUE_3];
+            var num = _valueDictionary[eValueNumber.VALUE_1] + _atk * _valueDictionary[eValueNumber.VALUE_3];
             num *= _target.Owner.GetDebuffDamageUpValue();
             if (!_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
@@ -301,7 +301,7 @@ namespace Elements
 
         private FloatWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, FloatWithEx _atk)
         {
-            FloatWithEx num = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + (float)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+            FloatWithEx num = BattleUtil.FloatToInt((_valueDictionary[eValueNumber.VALUE_1] + _atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 num += value.CalcAdditionalDamage(value.DamagedCount, num);

@@ -32,10 +32,10 @@ namespace Elements
           Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
           Action<string> action = null)
         {
-            if (BattleHeaderController.CurrentFrameCount == 4846 && _source.UnitId == 107101)
+            /*if (BattleHeaderController.CurrentFrameCount == 4846 && _source.UnitId == 107101)
             {
                 Debugger.Break();
-            }
+            }*/
             _target.IncrementUbAttackHitCount();
             eAttackType actionDetail1 = (eAttackType)ActionDetail1;
             if (_num == 0)
