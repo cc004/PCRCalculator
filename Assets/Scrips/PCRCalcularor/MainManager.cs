@@ -657,7 +657,7 @@ namespace PCRCaculator
             a.GetComponent<RectTransform>().offsetMax = new Vector2(5, 5);
             a.GetComponent<RectTransform>().offsetMin = new Vector2(-5, -5);
 
-            yield return new WaitForSeconds(1.5f);
+            //yield return new WaitForSeconds(1.5f);
             var async = SceneManager.LoadSceneAsync("BattleScene");
             async.allowSceneActivation = true;
             while (!async.isDone)
