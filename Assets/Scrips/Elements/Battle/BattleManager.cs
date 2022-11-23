@@ -284,11 +284,9 @@ namespace Elements.Battle
 
         public bool isPrincessFormSkill { get; set; }
 
-        public List<UnitCtrl> BlackoutUnitTargetList { get; private set; }
+        public HashSet<UnitCtrl> BlackoutUnitTargetList { get; private set; }
 
         public int GetBlackoutUnitTargetLength() => BlackoutUnitTargetList.Count;
-
-        public UnitCtrl GetBlackoutUnitTarget(int DNGOJHOHHMF) => BlackoutUnitTargetList[DNGOJHOHHMF];
 
         public Dictionary<string, GameObject> DAIFDPFABCM { get; private set; }
 
@@ -1789,17 +1787,10 @@ namespace Elements.Battle
             }
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             //this.showTotalDamage();
-            Action<List<UnitCtrl>> action = list =>
+            Action<IEnumerable<UnitCtrl>> action = list =>
             {
-                for (int index = 0; index < list.Count; ++index)
+                foreach (var unitCtrl in list)
                 {
-                    // ISSUE: object of a compiler-generated type is created
-                    // ISSUE: variable of a compiler-generated type
-                    //BattleManager.JILFAOKEEHI jilfaokeehi = new BattleManager.JILFAOKEEHI()
-                    //{
-                    //  4__this = this,
-                    UnitCtrl unitCtrl = list[index];
-                    //};
                     // ISSUE: reference to a compiler-generated field
                     unitCtrl.CutInFrameSet.CutInFrame = -1;
                     // ISSUE: reference to a compiler-generated method
@@ -3210,7 +3201,7 @@ namespace Elements.Battle
             EnemyList = new List<UnitCtrl>();
             LPBCBINDJLJ = new List<UnitCtrl>();
             PBCLBKCKHAI = new List<long>();
-            BlackoutUnitTargetList = new List<UnitCtrl>();
+            BlackoutUnitTargetList = new HashSet<UnitCtrl>();
             BlackOutUnitList = new List<UnitCtrl>();
             FrameCount = 0;
             AMLOLHFMOPP = false;

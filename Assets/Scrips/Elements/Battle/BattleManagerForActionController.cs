@@ -30,7 +30,7 @@ namespace Elements.Battle
 
     CoroutineManager CoroutineManager { get; }
 
-    List<UnitCtrl> BlackoutUnitTargetList { get; }
+    HashSet<UnitCtrl> BlackoutUnitTargetList { get; }
 
     float DeltaTime_60fps { get; }
 

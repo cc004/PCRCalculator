@@ -839,8 +839,8 @@ namespace Elements
                 }
 
             }
-            for (int index = 0; index < battleManager.BlackoutUnitTargetList.Count; ++index)
-                battleManager.BlackoutUnitTargetList[index].DisableSortOrderFrontOnBlackoutTarget = false;
+            foreach (var unit in battleManager.BlackoutUnitTargetList)
+                unit.DisableSortOrderFrontOnBlackoutTarget = false;
             if(UseSkillEffect && effectFlag)
                 CreateNormalPrefabWithTargetMotion2(skill, 0, true);
             //if (skill.ZoomEffect.Enable)
