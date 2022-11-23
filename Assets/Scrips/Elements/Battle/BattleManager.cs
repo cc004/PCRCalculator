@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Assets.Scrips;
 using Cute;
 
 using PCRCaculator;
@@ -27,6 +28,7 @@ namespace Elements.Battle
 {
     public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController, BattleLogIntreface
     {
+        public ScriptManager scriptMgr;
         public static int randomCounter;
         public AutoubManager ubmanager = new AutoubManager();
         public static BattleManager Instance;
@@ -624,6 +626,7 @@ namespace Elements.Battle
             ++FrameCount;
             if (BattleLeftTime <= 0.0 && battleResult != eBattleResult.WIN)
                 return;
+            scriptMgr?.Update();
             //this.UnitUiCtrl._Update(_canUpdateTime);
             switch (GameState)
             {
@@ -3813,6 +3816,11 @@ namespace Elements.Battle
 
             battleManager.GameState = eBattleGameState.PLAY;
 
+            if (ExcelHelper.ExcelHelper.AsmExportEnabled)
+            {
+                scriptMgr = new ScriptManager(this);
+                scriptMgr.ParseScript();
+            }
         }
 
         public List<UnitCtrl> GetMyUnitList() => (BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? UnitList : EnemyList;

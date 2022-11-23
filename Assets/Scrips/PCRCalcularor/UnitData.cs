@@ -401,6 +401,7 @@ namespace PCRCaculator
     [Serializable]
     public class UnitData
     {
+        public int enemyid;
         private int _unitId;
         public int unitId
         {

@@ -313,7 +313,7 @@ namespace Elements
             //gameObject.name = "rotate_center";
             // ISSUE: reference to a compiler-generated field
             unitCtrl.RotateCenter = b.transform;
-
+            unitCtrl.enemyId = data.enemyid;
             if (isplayer)
             {
                 playerUnitCtrl.Add(unitCtrl);

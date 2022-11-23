@@ -277,7 +277,8 @@ namespace ExcelHelper
             return false;
         }
 
-        public static bool AsmExportEnabled => File.Exists("patch_asm_exportaabbabab");
+        public static bool AsmExportEnabled => 
+            Application.isEditor || File.Exists("patch_asm_exportaabbabab");
         public static void SaveExcel(int type,string defaultName = "")
         {
             bool isSuccess = true;

@@ -279,6 +279,7 @@ namespace Elements
         private static CritPoint globalCritPoint;
         public CritPoint critPoint;
         public bool lastCanReleaseSkill = false;
+        public int enemyId;
 
         public CritPoint lastCritPoint
         {

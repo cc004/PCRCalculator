@@ -11224,6 +11224,7 @@ this.updateCurColor();
         public void StartCutIn()
         {
             battleManager.ubmanager.UbExecCallback(battleManager.UnitList.IndexOf(this));
+            battleManager.scriptMgr.UbExecCallback(UnitId);
             ++UbCounter;
             //this.battleCameraEffect.DAHAALGOJNA = Vector3.zero;
             for (int index = 0; index < battleManager.UnitList.Count; ++index)
@@ -11422,6 +11423,8 @@ this.updateCurColor();
                 return true;
             if (pressing) return true;
             if (Index == -2) Index = battleManager.UnitList.IndexOf(this);
+            if (battleManager.scriptMgr?.IsPressed(UnitId) ?? false)
+                return true;
             if (battleManager.ubmanager.IsUbExec(Index))
                 return true;
             //return this.battleManager.UnitUiCtrl.IsAutoMode && this.CurrentState == UnitCtrl.ActionState.IDLE;
