@@ -113,7 +113,7 @@ namespace PCRCaculator
                         buttons.Add(b);
                         count++;
                         showUnitIDs.Add(id);
-                        if (count % 5 == 0)
+                        if (count % 20 == 0)
                             yield return null;
                     }
                 }

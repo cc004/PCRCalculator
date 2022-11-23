@@ -1911,7 +1911,7 @@ this.updateCurColor();
           BaseData exOverride = null)
         {
             transformCache = transform;
-            parentCache = transformCache.TargetTransform.parent;
+            m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;
             lossyx = transformCache.parent.lossyScale.x;
                 //this.soundManager = ManagerSingleton<SoundManager>.Instance;
             /*if (UnitCtrl.staticSingletonTree == null)
@@ -2758,26 +2758,39 @@ this.updateCurColor();
         {
             skillTargetList.Clear();
             List<UnitCtrl> unitCtrlList = IsOther ? battleManager.UnitList : battleManager.EnemyList;
-            for (int index = 0; index < unitCtrlList.Count; ++index)
+            var distance = SkillAreaWidthList[UnionBurstSkillId];
+            foreach (var unit in unitCtrlList)
             {
-                if (judgeFrontAreaTarget(unitCtrlList[index], SkillAreaWidthList[UnionBurstSkillId]))
-                    skillTargetList.Add(unitCtrlList[index]);
+                if (judgeFrontAreaTarget(unit, distance))
+                    skillTargetList.Add(unit);
             }
         }
 
         public Vector3 positionCached => parentCache.TransformPoint(transformCache.localPosition);
+        public float m00;
 
+        /* hotspot */
         private bool judgeFrontAreaTarget(UnitCtrl _target, float _distance)
         {
             if (_target.IsPartsBoss)
                 return judgeFrontAreaTargetForBossParts(_target, _distance);
-            float x = lossyx;
-            float _a = (float)(_target.positionCached.x / (double)x -
-                               positionCached.x / (double)x);
-            float num = _target.BodyWidth + BodyWidth;
-            float _b1 = (float)((IsLeftDir ? -(double)_distance : 0.0) - num * 0.5);
-            float _b2 = (float)((IsLeftDir ? 0.0 : _distance) + num * 0.5);
-            return (_a >= (double)_b1 && _a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2))) && (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth);
+            double x = lossyx;
+            float _a = (float)((_target.transformCache.positionX - transformCache.positionX) / FixedTransform.DIGID * m00 / x);
+            var num = (_target.BodyWidth + BodyWidth) * 0.5;
+            if (IsLeftDir)
+            {
+                var _b1 = (float)(-_distance - num);
+                var _b2 = (float)(num);
+                return (_a >= _b1 && _a <= _b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2))) &&
+                    (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth);
+            }
+            else
+            {
+                var _b1 = (float)(- num);
+                var _b2 = (float)( _distance + num);
+                return (_a >= _b1 && _a <= _b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2))) &&
+                    (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth);
+            }
         }
 
         private bool judgeFrontAreaTargetForBossParts(UnitCtrl _target, float _distance)

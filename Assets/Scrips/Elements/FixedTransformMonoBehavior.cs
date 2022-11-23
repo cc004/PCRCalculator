@@ -39,9 +39,9 @@ namespace Elements
 
         public class FixedTransform
         {
-            private const float DIGID = 100f;
+            public const float DIGID = 100f;
             private const float SCALE = 1;//60f;
-            private int positionX;
+            public int positionX;
             private int positionY;
             public Transform TargetTransform;
 
