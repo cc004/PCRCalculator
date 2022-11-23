@@ -216,21 +216,16 @@ namespace Elements.Battle
             }
             else
             {
-                if (owner.IsStealth || getClearedIndex(owner) >= fieldIndex || owner.IsDead)
+                if (!(owner.IsSummonOrPhantom && owner.IdleOnly))
                 {
-                }
-                else
-                {
-                    if (!(owner.IsSummonOrPhantom && owner.IdleOnly))
+                    if (owner.IsStealth || getClearedIndex(owner) >= fieldIndex || owner.IsDead) return;
+                    var posx = target.GetLocalPositionX();
+                    bool flag = ((((posx <= (CenterX + Size)) &&
+                        (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
+                        );
+                    if (flag)
                     {
-                        var posx = target.GetLocalPositionX();
-                        bool flag = ((((posx <= (CenterX + Size)) &&
-                            (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
-                            );
-                        if (flag)
-                        {
-                            OnEnter(target);
-                        }
+                        OnEnter(target);
                     }
                 }
             }
