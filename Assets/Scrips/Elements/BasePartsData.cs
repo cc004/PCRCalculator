@@ -90,6 +90,8 @@ namespace Elements
 
         public virtual Vector3 GetLocalPosition() => Owner.transform.localPosition;
 
+        public virtual float GetLocalPositionX() => Owner.transform.positionX / FixedTransformMonoBehavior.FixedTransform.DIGID;
+
         public virtual float GetBodyWidth() => Owner.BodyWidth;
 
         //public virtual Vector3 GetBottomTransformPosition() => (UnityEngine.Object)this.Owner == (UnityEngine.Object)null ? Vector3.zero : this.Owner.BottomTransform.position;

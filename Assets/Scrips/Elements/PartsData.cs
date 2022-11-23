@@ -192,6 +192,7 @@ namespace Elements
         public override Vector3 GetPosition() => Owner.transform.position + new Vector3(PositionX / 540f, 0.0f);
 
         public override Vector3 GetLocalPosition() => Owner.transform.localPosition + new Vector3(PositionX, 0.0f, 0.0f);
+        public override float GetLocalPositionX() => Owner.transform.positionX / FixedTransformMonoBehavior.FixedTransform.DIGID + PositionX;
 
         public override float GetBodyWidth() => BodyWidthValue;
 

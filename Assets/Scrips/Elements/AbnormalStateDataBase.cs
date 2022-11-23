@@ -203,11 +203,14 @@ namespace Elements.Battle
                 }
                 else
                 {
-                    var posx = target.GetLocalPosition().x;
-                    bool flag = ((((posx <= (CenterX + Size)) &&
-                        (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
-                        ) && (!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly));
-                    if (!flag) OnExit(target);
+                    if ((!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly)))
+                    {
+                        var posx = target.GetLocalPositionX();
+                        bool flag = ((((posx <= (CenterX + Size)) &&
+                            (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
+                            );
+                        if (!flag) OnExit(target);
+                    }
                 }
             }
             else
@@ -217,13 +220,16 @@ namespace Elements.Battle
                 }
                 else
                 {
-                    var posx = target.GetLocalPosition().x;
-                    bool flag = ((((posx <= (CenterX + Size)) &&
-                        (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
-                        ) && (!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly));
-                    if (flag)
+                    if (!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly))
                     {
-                        OnEnter(target);
+                        var posx = target.GetLocalPosition().x;
+                        bool flag = ((((posx <= (CenterX + Size)) &&
+                            (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
+                            );
+                        if (flag)
+                        {
+                            OnEnter(target);
+                        }
                     }
                 }
             }
