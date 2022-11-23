@@ -35,6 +35,7 @@ namespace Elements.Battle
         public eFieldTargetType LCHLGLAFJED { get; set; }
 
         public List<BasePartsData> TargetList { get; set; }
+        public HashSet<BasePartsData> TargetSet { get; set; }
 
         public List<UnitCtrl> ALFDJACNNCL { get; set; }
 
@@ -73,9 +74,17 @@ namespace Elements.Battle
             //AbnormalStateDataBase.staticBattleEffectPool = (BattleEffectPoolInterface) AbnormalStateDataBase.staticSingletonTree.Get<BattleEffectPool>();
         }
 
-        public virtual void OnEnter(BasePartsData GEDLBPMPOKB) => TargetList.Add(GEDLBPMPOKB);
+        public virtual void OnEnter(BasePartsData GEDLBPMPOKB)
+        {
+            TargetList.Add(GEDLBPMPOKB);
+            TargetSet.Add(GEDLBPMPOKB);
+        }
 
-        public virtual void OnExit(BasePartsData GEDLBPMPOKB) => TargetList.Remove(GEDLBPMPOKB);
+        public virtual void OnExit(BasePartsData GEDLBPMPOKB)
+        {
+            TargetList.Remove(GEDLBPMPOKB);
+            TargetSet.Remove(GEDLBPMPOKB);
+        }
 
         public virtual void OnRepeat()
         {
@@ -125,16 +134,15 @@ namespace Elements.Battle
                 for (int count = ALFDJACNNCL.Count; index1 < count; ++index1)
                 {
                     // ISSUE: reference to a compiler-generated method
-                    Action<BasePartsData> action = Updateb__83_0;
                     UnitCtrl unitCtrl = ALFDJACNNCL[index1];
                     if (!unitCtrl.IsPartsBoss)
                     {
-                        action(unitCtrl.GetFirstParts());
+                        Updateb__83_0(unitCtrl.GetFirstParts());
                     }
                     else
                     {
                         for (int index2 = 0; index2 < unitCtrl.BossPartsListForBattle.Count; ++index2)
-                            action(unitCtrl.BossPartsListForBattle[index2]);
+                            Updateb__83_0(unitCtrl.BossPartsListForBattle[index2]);
                     }
                 }
                 if (HKDBJHAIOMB == eFieldExecType.REPEAT)
@@ -187,30 +195,66 @@ namespace Elements.Battle
         }
         private void Updateb__83_0(BasePartsData target)
         {
+            if (TargetSet.Contains(target))
+            {
+                if (target.Owner.IsStealth || getClearedIndex(target.Owner) >= fieldIndex || target.Owner.IsDead)
+                {
+                    OnExit(target);
+                }
+                else
+                {
+                    var posx = target.GetLocalPosition().x;
+                    bool flag = ((((posx <= (CenterX + Size)) &&
+                        (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
+                        ) && (!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly));
+                    if (!flag) OnExit(target);
+                }
+            }
+            else
+            {
+                if (target.Owner.IsStealth || getClearedIndex(target.Owner) >= fieldIndex || target.Owner.IsDead)
+                {
+                }
+                else
+                {
+                    var posx = target.GetLocalPosition().x;
+                    bool flag = ((((posx <= (CenterX + Size)) &&
+                        (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
+                        ) && (!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly));
+                    if (flag)
+                    {
+                        OnEnter(target);
+                    }
+                }
+            }
+            /*
+            var contains = TargetSet.Contains(target);
             if (target.Owner.IsStealth)
             {
-                if (TargetList.Contains(target))
+                if (contains)
                 {
                     OnExit(target);
                 }
             }
             else if (getClearedIndex(target.Owner) >= fieldIndex)
             {
-                if (TargetList.Contains(target))
+                if (contains)
                 {
                     OnExit(target);
                 }
             }
             else if (target.Owner.IsDead)
             {
-                if (TargetList.Contains(target))
+                if (contains)
                 {
                     OnExit(target);
                 }
             }
             else
             {
-                bool flag = (((target.GetLocalPosition().x <= (CenterX + Size)) && (target.GetLocalPosition().x >= (CenterX - Size))) || BattleUtil.Approximately(target.GetLocalPosition().x, CenterX + Size)) || BattleUtil.Approximately(target.GetLocalPosition().x, CenterX - Size);
+                var posx = target.GetLocalPosition().x;
+                bool flag = (((posx <= (CenterX + Size)) &&
+                    (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size);
                 if (target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly)
                 {
                     flag = false;
@@ -223,7 +267,7 @@ namespace Elements.Battle
                 {
                     OnExit(target);
                 }
-            }
+            }*/
         }
 
         /*private IEnumerator createPrefabWithTime(

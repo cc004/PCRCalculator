@@ -45,6 +45,7 @@ namespace Elements
       healFieldData.ValueType = (HealFieldData.eValueType) ActionDetail2;
       healFieldData.EffectType = (HealFieldData.eEffectType) ActionDetail3;
       healFieldData.TargetList = new List<BasePartsData>();
+            healFieldData.TargetSet = new HashSet<BasePartsData>();
       healFieldData.Value = num;
       healFieldData.PPOJKIDHGNJ = _source;
       healFieldData.IsMagic = ActionDetail1 % 2 == 0;

@@ -62,7 +62,8 @@ namespace Elements
       abnormalStateFieldData.Size = _valueDictionary[eValueNumber.VALUE_3];
       abnormalStateFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
       abnormalStateFieldData.TargetList = new List<BasePartsData>();
-      abnormalStateFieldData.PPOJKIDHGNJ = _source;
+            abnormalStateFieldData.TargetSet = new HashSet<BasePartsData>();
+            abnormalStateFieldData.PPOJKIDHGNJ = _source;
       abnormalStateFieldData.HGMNJJBLJIO = gameObject1;
       abnormalStateFieldData.LALMMFAOJDP = gameObject2;
       abnormalStateFieldData.TargetAction = targetAction;

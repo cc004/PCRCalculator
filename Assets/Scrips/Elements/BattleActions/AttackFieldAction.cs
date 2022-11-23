@@ -71,6 +71,7 @@ namespace Elements
             attackFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
             attackFieldData.EffectId = ActionDetail2;
             attackFieldData.TargetList = new List<BasePartsData>();
+            attackFieldData.TargetSet = new HashSet<BasePartsData>();
             attackFieldData.Value = num;
             attackFieldData.DamageType = eDamageType;
             attackFieldData.ActionId = ActionId;

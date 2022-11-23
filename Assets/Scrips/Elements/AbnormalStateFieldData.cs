@@ -51,14 +51,18 @@ namespace Elements
         return;
       TargetAction.ResetHitData();
       if (!_unit.IsPartsBoss)
-      {
-        TargetList.Remove(_unit.GetFirstParts());
-      }
+            {
+                TargetList.Remove(_unit.GetFirstParts());
+                TargetSet.Remove(_unit.GetFirstParts());
+            }
       else
       {
-        for (int index = 0; index < _unit.BossPartsListForBattle.Count; ++index)
-          TargetList.Remove(_unit.BossPartsListForBattle[index]);
-      }
+                for (int index = 0; index < _unit.BossPartsListForBattle.Count; ++index)
+                {
+                    TargetList.Remove(_unit.BossPartsListForBattle[index]);
+                    TargetSet.Remove(_unit.BossPartsListForBattle[index]);
+                }
+            }
     }
   }
 }

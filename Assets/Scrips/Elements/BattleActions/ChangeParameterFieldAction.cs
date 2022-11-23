@@ -57,6 +57,7 @@ namespace Elements
             parameterFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
             parameterFieldData.EffectType = (ChangeParameterFieldData.eEffectType)ActionDetail3;
             parameterFieldData.TargetList = new List<BasePartsData>();
+            parameterFieldData.TargetSet = new HashSet<BasePartsData>();
             parameterFieldData.Value = intReverseTruncate;
             parameterFieldData.BuffParamKind = changeParamKind;
             parameterFieldData.ValueType = (BuffDebuffAction.eChangeParameterType)ActionDetail2;

@@ -102,6 +102,7 @@ namespace Elements
 				EGEPDDJBILL = ((_skill.BlackOutTime > 0f) ? _source : null),
 				FieldEffectType = (ChargeEnergyFieldData.eFieldEffectType)base.ActionDetail3,
 				TargetList = new List<BasePartsData>(),
+				TargetSet = new HashSet<BasePartsData>(),
 				Value = num,
 				PPOJKIDHGNJ = _source,
 				PMHDBOJMEAD = _skill,
