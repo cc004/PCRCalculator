@@ -1192,7 +1192,7 @@ namespace Elements
 
         public SummonAction.eSummonType SummonType { get; set; }
 
-        public bool IsSummonOrPhantom => SummonType == SummonAction.eSummonType.SUMMON || SummonType == SummonAction.eSummonType.PHANTOM;
+        public bool IsSummonOrPhantom;
         public bool IsGuest
         {
             get;

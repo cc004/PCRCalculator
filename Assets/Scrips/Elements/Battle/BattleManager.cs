@@ -260,7 +260,7 @@ namespace Elements.Battle
 
         public bool GetIsPlayCutin() => IsPlayCutin;
 
-        public List<long> PBCLBKCKHAI { get; private set; }
+        public HashSet<long> PBCLBKCKHAI { get; private set; }
 
         public eBattleResult battleResult { get; private set; }
 
@@ -3045,7 +3045,7 @@ namespace Elements.Battle
             yield break;
         label_4:
             PEGOKDOFFIL = true;
-            CallbackActionEnd(PBCLBKCKHAI.Count == 0 ? 0L : PBCLBKCKHAI[0]);
+            CallbackActionEnd(PBCLBKCKHAI.Count == 0 ? 0L : PBCLBKCKHAI.First());
             NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
         }
 
@@ -3200,7 +3200,7 @@ namespace Elements.Battle
             UnitList = new List<UnitCtrl>();
             EnemyList = new List<UnitCtrl>();
             LPBCBINDJLJ = new List<UnitCtrl>();
-            PBCLBKCKHAI = new List<long>();
+            PBCLBKCKHAI = new HashSet<long>();
             BlackoutUnitTargetList = new HashSet<UnitCtrl>();
             BlackOutUnitList = new List<UnitCtrl>();
             FrameCount = 0;
@@ -4644,6 +4644,7 @@ namespace Elements.Battle
                 }
                 unitCtrl.ExecActionOnStartAndDetermineInstanceID();
                 unitCtrl.SummonType = _summonData.SummonType;
+                unitCtrl.IsSummonOrPhantom = unitCtrl.SummonType == SummonAction.eSummonType.SUMMON || unitCtrl.SummonType == SummonAction.eSummonType.PHANTOM;
                 unitCtrl.SetLeftDirection(_summonData.Owner.IsLeftDir);
                 int skillNum = _summonData.Skill.SkillNum;
                 //if (this.unitCtrl.SummonEffects.Count > 0)

@@ -1013,10 +1013,16 @@ namespace Elements
                             unitSpineController.RealUpdate();
                             unitSpineController.RealLateUpdate();
                         }
-                        battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealUpdate());
-                        battleManager.BlackoutUnitTargetList.ForEach(_it => _it.GetCurrentSpineCtrl().RealLateUpdate());
-                        Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealUpdate());
-                        Owner.EffectSpineControllerList.ForEach(_fx => _fx.RealLateUpdate());
+                        foreach (var unit in battleManager.BlackoutUnitTargetList)
+                        {
+                            var spine = unit.GetCurrentSpineCtrl();
+                            spine.RealUpdate(); spine.RealLateUpdate();
+                        }
+                        foreach (var ctrl in Owner.EffectSpineControllerList)
+                        {
+                            ctrl.RealUpdate();
+                            ctrl.RealLateUpdate();
+                        }
                     }
                     if (entry.TrackTime < (double)skill.CutInSkipTime)//TrackTime为修改过的
                         yield return null;

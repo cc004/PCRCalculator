@@ -195,15 +195,16 @@ namespace Elements.Battle
         }
         private void Updateb__83_0(BasePartsData target)
         {
+            var owner = target.Owner;
             if (TargetSet.Contains(target))
             {
-                if (target.Owner.IsStealth || getClearedIndex(target.Owner) >= fieldIndex || target.Owner.IsDead)
+                if (owner.IsStealth || getClearedIndex(owner) >= fieldIndex || owner.IsDead)
                 {
                     OnExit(target);
                 }
                 else
                 {
-                    if ((!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly)))
+                    if ((!(owner.IsSummonOrPhantom && owner.IdleOnly)))
                     {
                         var posx = target.GetLocalPositionX();
                         bool flag = ((((posx <= (CenterX + Size)) &&
@@ -215,14 +216,14 @@ namespace Elements.Battle
             }
             else
             {
-                if (target.Owner.IsStealth || getClearedIndex(target.Owner) >= fieldIndex || target.Owner.IsDead)
+                if (owner.IsStealth || getClearedIndex(owner) >= fieldIndex || owner.IsDead)
                 {
                 }
                 else
                 {
-                    if (!(target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly))
+                    if (!(owner.IsSummonOrPhantom && owner.IdleOnly))
                     {
-                        var posx = target.GetLocalPosition().x;
+                        var posx = target.GetLocalPositionX();
                         bool flag = ((((posx <= (CenterX + Size)) &&
                             (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
                             );
@@ -235,21 +236,21 @@ namespace Elements.Battle
             }
             /*
             var contains = TargetSet.Contains(target);
-            if (target.Owner.IsStealth)
+            if (owner.IsStealth)
             {
                 if (contains)
                 {
                     OnExit(target);
                 }
             }
-            else if (getClearedIndex(target.Owner) >= fieldIndex)
+            else if (getClearedIndex(owner) >= fieldIndex)
             {
                 if (contains)
                 {
                     OnExit(target);
                 }
             }
-            else if (target.Owner.IsDead)
+            else if (owner.IsDead)
             {
                 if (contains)
                 {
@@ -261,7 +262,7 @@ namespace Elements.Battle
                 var posx = target.GetLocalPosition().x;
                 bool flag = (((posx <= (CenterX + Size)) &&
                     (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size);
-                if (target.Owner.IsSummonOrPhantom && target.Owner.IdleOnly)
+                if (owner.IsSummonOrPhantom && owner.IdleOnly)
                 {
                     flag = false;
                 }
