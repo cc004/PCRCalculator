@@ -261,6 +261,8 @@ namespace PCRCaculator.SQL
                         eq.Add(t2.GetEquips());
                     foreach (var t3 in rankStateDic[pair.Key])
                         datas1.Add(t3.GetBaseData());
+                    eq.RemoveAt(eq.Count - 1);
+                    datas1.RemoveAt(datas1.Count - 1);
                 }
                 catch (KeyNotFoundException ex)
                 {

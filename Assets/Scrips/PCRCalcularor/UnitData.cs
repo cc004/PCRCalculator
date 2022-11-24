@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Elements;
 using ExcelDataReader.Log;
 using Newtonsoft.Json;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
+using PCRCalcularor;
 using UnityEngine;
 using DirectionType = PCRCaculator.Battle.DirectionType;
 using eMoveTypes = PCRCaculator.Battle.eMoveTypes;
@@ -21,7 +23,7 @@ namespace PCRCaculator
     /// 角色基础面板数据，数据由数据库中的unit_rarity表以及其他类生成~
     /// </summary>
     [Serializable]
-    public class UnitRarityData : IComparer<UnitRarityData>, IComparable<UnitRarityData>
+    public class UnitRarityData : IComparer<UnitRarityData>, IComparable<UnitRarityData>, IOverride<UnitRarityData>
     {
         public int unitId;
         public string unitName;
@@ -358,6 +360,20 @@ namespace PCRCaculator
             }
             return b;
 
+        }
+
+        public void OverrideWith(UnitRarityData other)
+        {
+            unitName = other.unitName;
+            detailData = other.detailData;
+            skillData = other.skillData;
+            for (int i = 0; i < other.rankData.datas.Count; ++i)
+            {
+                var d = other.rankData.datas[i];
+                var r = other.rankData.rankEquipments[i];
+                if (r.Max() != 999999) rankData.rankEquipments[i] = r;
+                rankData.datas[i] = d;
+            }
         }
 
         public override string ToString()

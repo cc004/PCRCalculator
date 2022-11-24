@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PCRCalcularor
 {
+    public interface IOverride<T>
+    {
+        void OverrideWith(T other);
+    }
+
     internal class Extensions
     {
         public static void OverrideWith<TKey, TValue>(Dictionary<TKey, TValue> self,
@@ -13,7 +19,19 @@ namespace PCRCalcularor
         {
             foreach (var pair in other)
             {
-                self[pair.Key] = pair.Value;
+                if (self.TryGetValue(pair.Key, out var val))
+                {
+                    if (val is IOverride<TValue> val2)
+                    {
+                        val2.OverrideWith(pair.Value);
+                    }
+                    else
+                    {
+                        self[pair.Key] = pair.Value;
+                    }
+                }
+                else
+                    self.Add(pair.Key, pair.Value);
             }
         }
     }
