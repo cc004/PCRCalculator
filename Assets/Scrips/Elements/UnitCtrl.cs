@@ -11224,7 +11224,7 @@ this.updateCurColor();
         public void StartCutIn()
         {
             battleManager.ubmanager.UbExecCallback(battleManager.UnitList.IndexOf(this));
-            battleManager.scriptMgr.UbExecCallback(UnitId);
+            battleManager.scriptMgr?.UbExecCallback(UnitId);
             ++UbCounter;
             //this.battleCameraEffect.DAHAALGOJNA = Vector3.zero;
             for (int index = 0; index < battleManager.UnitList.Count; ++index)

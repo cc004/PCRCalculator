@@ -569,7 +569,7 @@ namespace PCRCaculator
         {
             if (unitid == 207001)
                 return 207000;
-            if (unitid == 105701)
+            if (unitid == 105701 && MainManager.Instance.useJapanData)
                 return 170101;
             return unitid;
         }
