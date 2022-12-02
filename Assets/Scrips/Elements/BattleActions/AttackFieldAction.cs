@@ -82,6 +82,7 @@ namespace Elements
             attackFieldData.EnergyChargeMultiple = EnergyChargeMultiple;
             attackFieldData.AbsorberValue = battleManager.KIHOGJBONDH;
             attackFieldData.onExec = action;
+            attackFieldData.Cache();
             action?.Invoke("领域中心：" + attackFieldData.CenterX + "范围：" + attackFieldData.Size + "\n");
             battleManager.ExecField(attackFieldData, ActionId);
         }

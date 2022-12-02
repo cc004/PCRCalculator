@@ -66,6 +66,7 @@ namespace Elements
             parameterFieldData.LALMMFAOJDP = gameObject2;
             parameterFieldData.IsBuff = ActionDetail1 % 10 != 1;
             parameterFieldData.AlreadyExecedTargetCount = new Dictionary<UnitCtrl, int>();
+            parameterFieldData.Cache();
             battleManager.ExecField(parameterFieldData, ActionId);
             action?.Invoke("释放领域，起点：" + parameterFieldData.CenterX + "范围：" + parameterFieldData.Size + "持续时间：" + parameterFieldData.StayTime);
         }

@@ -70,6 +70,7 @@ namespace Elements
       abnormalStateFieldData.SourceActionController = _sourceActionController;
       abnormalStateFieldData.LCHLGLAFJED = _source.IsOther ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
       abnormalStateFieldData.PMHDBOJMEAD = _skill;
+      abnormalStateFieldData.Cache();
             //add scripts
             string describe = "展开中心为" + abnormalStateFieldData.CenterX +"，大小为" + abnormalStateFieldData.Size + "的领域";
             action(describe);

@@ -49,6 +49,7 @@ namespace Elements
       healFieldData.Value = num;
       healFieldData.PPOJKIDHGNJ = _source;
       healFieldData.IsMagic = ActionDetail1 % 2 == 0;
+      healFieldData.Cache();
       battleManager.ExecField(healFieldData, ActionId);
     }
 

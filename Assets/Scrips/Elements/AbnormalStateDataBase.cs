@@ -32,6 +32,14 @@ namespace Elements.Battle
 
         public float Size { get; set; }
 
+        public float Left, Right;
+
+        public void Cache()
+        {
+            Left = CenterX - Size;
+            Right = CenterX + Size;
+        }
+
         public eFieldTargetType LCHLGLAFJED { get; set; }
 
         public List<BasePartsData> TargetList { get; set; }
@@ -198,35 +206,26 @@ namespace Elements.Battle
             var owner = target.Owner;
             if (TargetSet.Contains(target))
             {
-                if (owner.IsStealth || getClearedIndex(owner) >= fieldIndex || owner.IsDead)
-                {
-                    OnExit(target);
-                }
+                if (owner.IsSummonOrPhantom && owner.IdleOnly || owner.IsStealth ||
+                    getClearedIndex(owner) >= fieldIndex || owner.IsDead) OnExit(target);
                 else
                 {
-                    if ((!(owner.IsSummonOrPhantom && owner.IdleOnly)))
-                    {
-                        var posx = target.GetLocalPositionX();
-                        bool flag = ((((posx <= (CenterX + Size)) &&
-                            (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
-                            );
-                        if (!flag) OnExit(target);
-                    }
+                    var posx = target.GetLocalPositionX();
+                    if (!(posx <= Right &&
+                          posx >= Left || BattleUtil.Approximately(posx, Right) ||
+                          BattleUtil.Approximately(posx, Left))) OnExit(target);
                 }
             }
             else
             {
-                if (!(owner.IsSummonOrPhantom && owner.IdleOnly))
+                if (owner.IsSummonOrPhantom && owner.IdleOnly || owner.IsStealth ||
+                    getClearedIndex(owner) >= fieldIndex || owner.IsDead) return;
+                var posx = target.GetLocalPositionX();
+                if (posx <= Right &&
+                    posx >= Left || BattleUtil.Approximately(posx, Right) ||
+                    BattleUtil.Approximately(posx, Left))
                 {
-                    if (owner.IsStealth || getClearedIndex(owner) >= fieldIndex || owner.IsDead) return;
-                    var posx = target.GetLocalPositionX();
-                    bool flag = ((((posx <= (CenterX + Size)) &&
-                        (posx >= (CenterX - Size))) || BattleUtil.Approximately(posx, CenterX + Size)) || BattleUtil.Approximately(posx, CenterX - Size)
-                        );
-                    if (flag)
-                    {
-                        OnEnter(target);
-                    }
+                    OnEnter(target);
                 }
             }
             /*

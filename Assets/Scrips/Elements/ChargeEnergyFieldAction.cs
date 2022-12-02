@@ -109,7 +109,8 @@ namespace Elements
 				HGMNJJBLJIO = uniqueEffectPrefab,
 				LALMMFAOJDP = uniqueEffectPrefabLeft
 			};
-			base.battleManager.ExecField(pFDAEFDOBIP, base.ActionId);
+			pFDAEFDOBIP.Cache();
+            base.battleManager.ExecField(pFDAEFDOBIP, base.ActionId);
 		}
 
 		public override void SetLevel(float _level)
