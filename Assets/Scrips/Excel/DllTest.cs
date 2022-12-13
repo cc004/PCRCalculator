@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFB;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -34,45 +35,15 @@ public struct OpenFileName
 
 
 
-
+/*
 public class DllTest
 {
-    private static T YieldRun<T, TArg>(Func<TArg, T> action, TArg arg)
+    public static bool GetOpenFileName([In, Out]ref OpenFileName ofn)
     {
-        var sema = new Semaphore(0, 1);
-        T result = default;
-        new Thread(() =>
-        {
-            result = action(arg);
-            sema.Release();
-        }).Start();
-        sema.WaitOne();
-        return result;
     }
+    
+    public static bool GetSaveFileName([In, Out] ref OpenFileName ofn)
+    {
 
-    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi)]
-    public static extern bool GetOpenFileName([In, Out]ref OpenFileName ofn);
-    public static bool GetOpenFileName1([In, Out]ref OpenFileName ofn)
-    {
-        var (result, ofn2) = YieldRun<(bool, OpenFileName), OpenFileName>(ofn =>
-        {
-            var r = GetOpenFileName(ref ofn);
-            return (r, ofn);
-        }, ofn);
-        ofn = ofn2;
-        return result;
     }
-
-    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi)]
-    public static extern bool GetSaveFileName([In, Out] ref OpenFileName ofn);
-    public static bool GetSaveFileName1([In, Out] ref OpenFileName ofn)
-    {
-        var (result, ofn2) = YieldRun<(bool, OpenFileName), OpenFileName>(ofn =>
-        {
-            var r = GetSaveFileName(ref ofn);
-            return (r, ofn);
-        }, ofn);
-        ofn = ofn2;
-        return result;
-    }
-}
+}*/

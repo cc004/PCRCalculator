@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using Elements;
@@ -14,6 +15,7 @@ using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Style;
 using PCRCaculator;
 using PCRCaculator.Guild;
+using SFB;
 using UnityEngine;
 using Application = UnityEngine.Application;
 using Color = System.Drawing.Color;
@@ -47,7 +49,7 @@ namespace ExcelHelper
         [UnityEditor.MenuItem("PCRTools/从Excel生成别名json")]
         public static void CreateNicName()
         {
-            ExcelHelper.ReadExcelNicName();
+           // ExcelHelper.ReadExcelNicName();
         }
 
     }
@@ -102,84 +104,15 @@ namespace ExcelHelper
 #if PLATFORM_ANDROID
             return AndroidTool.GetExcelPath();
 #else
-            OpenFileName ofn = new OpenFileName();
-
-            ofn.structSize = Marshal.SizeOf(ofn);
-
-            //ofn.filter = "All Files\0*.*\0\0";
-            //ofn.filter = "Image Files(*.jpg;*.png)\0*.jpg;*.png\0";
-            //ofn.filter = "Txt Files(*.txt)\0*.txt\0";
-
-            //ofn.filter = "Word Files(*.docx)\0*.docx\0";
-            //ofn.filter = "Word Files(*.doc)\0*.doc\0";
-            //ofn.filter = "Word Files(*.doc:*.docx)\0*.doc:*.docx\0";
-
-            //ofn.filter = "Excel Files(*.xls)\0*.xls\0";
-            ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";  //指定打开格式
-                                                           //ofn.filter = "Excel Files(*.xls:*.xlsx)\0*.xls:*.xlsx\0";
-                                                           //ofn.filter = "Excel Files(*.xlsx:*.xls)\0*.xlsx:*.xls\0";
-
-            ofn.file = new string(new char[256]);
-
-            ofn.maxFile = ofn.file.Length;
-
-            ofn.fileTitle = new string(new char[64]);
-
-            ofn.maxFileTitle = ofn.fileTitle.Length;
-
-            //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
-
-            ofn.title = "打开Excel";
-
-            ofn.defExt = "xlsx";
-
-            //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-
-
-            //打开windows框
-            if (DllTest.GetOpenFileName(ref ofn))
+            var str = StandaloneFileBrowser.OpenFilePanel(
+                "打开Excel", string.Empty, "*.xlsx", false);
+            if (str.Length > 0)
             {
-                //TODO
-
-                //把文件路径格式替换一下
-                ofn.file = ofn.file.Replace("\\", "/");
-
-                //string url = ofn.file;
-                //WWW www = new WWW(url);
-
-                ////写到临时文件
-                //while (!www.isDone)
-                //{
-                //    if (File.Exists(Application.dataPath + "/temp.xlsx"))
-                //    {
-                //        File.Delete(Application.dataPath + "/temp.xlsx");
-                //    }
-
-                //    byte[] fileBytes = www.bytes;
-
-                //    FileStream fs = new FileStream(Application.dataPath + "/temp.xlsx", FileMode.Create);
-                //    fs.Write(fileBytes, 0, fileBytes.Length);
-                //    fs.Flush();
-                //    //每次读取文件后都要记得关闭文件
-                //    fs.Close();
-                //}
-                //FileStream stream = File.Open(ofn.file, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-                // CreateOpenXmlReader用于读取Excel2007版本及以上的文件
-
-                //IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-
-                //DataSet result = ExcelReaderFactory.CreateOpenXmlReader(stream).AsDataSet();
-
-                //excelReader.Close();
-
-                //Debug.Log(ofn.file);
-                //FileInfo info = new FileInfo(Application.dataPath + "/temp.xlsx");
-                //FileInfo info = new FileInfo(ofn.file);
-                return ofn.file;
+                var file = str[0];
+                file = file.Replace("\\", "/");
+                return file;
             }
-            return null;
+            throw new Exception("用户取消操作");
 #endif
         }
         public static bool ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,SystemWindowMessage.configDelegate failedAction = null,string path0=null)
@@ -288,44 +221,16 @@ namespace ExcelHelper
             string name = (defaultName == "" ? "ExportTimeLine" : defaultName);
             filePath = Application.persistentDataPath + "/" + name + ".xlsx";
 #else
-            OpenFileName ofn = new OpenFileName();
 
-                ofn.structSize = Marshal.SizeOf(ofn);
 
-                //ofn.filter = "All Files\0*.*\0\0";
-                //ofn.filter = "Image Files(*.jpg;*.png)\0*.jpg;*.png\0";
-                //ofn.filter = "Txt Files(*.txt)\0*.txt\0";
-
-                //ofn.filter = "Word Files(*.docx)\0*.docx\0";
-                //ofn.filter = "Word Files(*.doc)\0*.doc\0";
-                //ofn.filter = "Word Files(*.doc:*.docx)\0*.doc:*.docx\0";
-
-                //ofn.filter = "Excel Files(*.xls)\0*.xls\0";
-                ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";  //指定打开格式
-                                                               //ofn.filter = "Excel Files(*.xls:*.xlsx)\0*.xls:*.xlsx\0";
-                                                               //ofn.filter = "Excel Files(*.xlsx:*.xls)\0*.xlsx:*.xls\0";
-
-                ofn.file = new string(new char[256]);
-
-                ofn.maxFile = ofn.file.Length;
-
-                ofn.fileTitle = new string(new char[64]);
-
-                ofn.maxFileTitle = ofn.fileTitle.Length;
-
-                //ofn.fileTitle = "B1狼狗智克yls200w";
-
-                //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
-
-                ofn.title = "选择保存路径";
-
-                ofn.defExt = "xlsx";
-                ofn.file = defaultName;
-                //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-                ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-
-                isSuccess = DllTest.GetSaveFileName(ref ofn);
-                filePath = ofn.file.Replace("\\", "/");
+            var ststrr = StandaloneFileBrowser.SaveFilePanel(
+                "保存Excel", string.Empty, filePath, "*.xlsx");
+            if (!string.IsNullOrEmpty(ststrr))
+            {
+                filePath = ststrr;
+                filePath = filePath.Replace("\\", "/");
+            }
+            else return;
 
 #endif
             //打开windows框
@@ -1217,6 +1122,7 @@ namespace ExcelHelper
             }
 
         }
+/*
         public static void ReadExcelNicName()
         {
             OpenFileName ofn = new OpenFileName();
@@ -1261,7 +1167,7 @@ namespace ExcelHelper
                 Debug.Log("成功！" + filePath);
 
             }
-        }
+        }*/
         public static void MySetValue(this ExcelWorksheet worksheet,int posx,int posy,object value,
             int size=11,bool centre = true,bool blod = false,int[] fontColor=null,int[] backColor=null)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using SFB;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -315,50 +316,17 @@ namespace PCRCaculator.Calc
 
         }
         private string ReadInputJson()
-        {            
+        {
 
-            OpenFileName ofn = new OpenFileName();
-
-            ofn.structSize = Marshal.SizeOf(ofn);
-
-            //ofn.filter = "All Files\0*.*\0\0";
-            //ofn.filter = "Image Files(*.jpg;*.png)\0*.jpg;*.png\0";
-            //ofn.filter = "Txt Files(*.txt)\0*.txt\0";
-
-            //ofn.filter = "Word Files(*.docx)\0*.docx\0";
-            //ofn.filter = "Word Files(*.doc)\0*.doc\0";
-            //ofn.filter = "Word Files(*.doc:*.docx)\0*.doc:*.docx\0";
-
-            //ofn.filter = "Excel Files(*.xls)\0*.xls\0";
-            ofn.filter = "Txt Files(*.txt)\0*.txt\0"; //指定打开格式
-                                                      //ofn.filter = "Excel Files(*.xls:*.xlsx)\0*.xls:*.xlsx\0";
-                                                      //ofn.filter = "Excel Files(*.xlsx:*.xls)\0*.xlsx:*.xls\0";
-
-            ofn.file = new string(new char[256]);
-
-            ofn.maxFile = ofn.file.Length;
-
-            ofn.fileTitle = new string(new char[64]);
-
-            ofn.maxFileTitle = ofn.fileTitle.Length;
-
-            //ofn.initialDir = UnityEngine.Application.dataPath;//默认路径
-
-            ofn.title = "打开TXT";
-
-            //ofn.defExt = "txt";
-
-            //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-
-
-            //打开windows框
-            if (DllTest.GetOpenFileName(ref ofn))
+            var str = StandaloneFileBrowser.OpenFilePanel(
+                "打开Excel", string.Empty, "*.txt", false);
+            if (str.Length > 0)
             {
-                ofn.file = ofn.file.Replace("\\", "/");                
+                var file = str[0];
+                file = file.Replace("\\", "/");
                 try
                 {
-                    string txtfile = File.ReadAllText(ofn.file);
+                    string txtfile = File.ReadAllText(file);
                     return txtfile;
                 }
                 catch (IOException e)
@@ -366,9 +334,7 @@ namespace PCRCaculator.Calc
                     MainManager.Instance.WindowConfigMessage("读取错误，请保证文件没有被其他程序占用！", null);
                     return null;
                 }
-                //IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
             }
-
             MainManager.Instance.WindowConfigMessage("文件读取失败！", null);
             return null;
 

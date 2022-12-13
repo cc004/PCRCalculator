@@ -13,6 +13,7 @@ using ExcelHelper;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using PCRCaculator.Battle;
+using SFB;
 using UnityEngine;
 using UnityEngine.UI;
 using BattleDefine = Elements.BattleDefine;
@@ -744,28 +745,19 @@ namespace PCRCaculator.Guild
         {
             try
             {
-        #if PLATFORM_ANDROID
-                        var fileName = CreateExcelName().Replace("\\", "/") + ".txt";
-        #else
-                var ofn = new OpenFileName();
-                ofn.structSize = Marshal.SizeOf(ofn);
-                ofn.filter = "Text Files(*.txt)\0*.txt\0";
-                ofn.file = new string(new char[256]);
-                ofn.maxFile = ofn.file.Length;
-                ofn.fileTitle = new string(new char[64]);
-                ofn.maxFileTitle = ofn.fileTitle.Length;
-                ofn.title = "选择保存路径";
-                ofn.defExt = "txt";
-                ofn.file = CreateExcelName();
-                //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-                ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
-
-                if (!DllTest.GetSaveFileName(ref ofn))
+                var fileName = CreateExcelName().Replace("\\", "/") + ".txt";
+#if PLATFORM_ANDROID
+#else
+                var ststrr = StandaloneFileBrowser.SaveFilePanel(
+                    "保存Excel", string.Empty, fileName, "*.xlsx");
+                if (!string.IsNullOrEmpty(ststrr))
                 {
-                    return;
+                    fileName = ststrr;
+                    fileName = fileName.Replace("\\", "/");
                 }
-                var fileName = ofn.file.Replace("\\", "/");
-        #endif
+                else return;
+                
+#endif
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
                 const string totaldie = "总乱轴（上限）";
@@ -900,13 +892,12 @@ namespace PCRCaculator.Guild
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
                         {
                             var prob = probs[pair.Key];
-                            var sb = new StringBuilder();
                             var exp = string.Empty;
                             if (prob.exp != null && ExcelHelper.ExcelHelper.AsmExportEnabled)
                             {
                                 exp = prob.exp(rnd.Next());
                             }
-                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}(seed={seedset[pair.Key]})\n{exp}");
+                            sw.WriteLine("\t{0}-{1:P1}(seed={2})\n{3}", pair.Key, (float) pair.Value / GuildManager.StaticsettingData.n2, seedset[pair.Key], exp);
                         }
                     }
 
@@ -916,7 +907,7 @@ namespace PCRCaculator.Guild
                     }
                 }
 #if PLATFORM_ANDROID
-                    BaseBackManager.Instance.ShowText(str);
+                    BaseBackManager.Instance.ShowText(Encoding.UTF8.GetString(stream.ToArray()));
 #else
                 MainManager.Instance.WindowMessage("成功！");
 #endif
@@ -950,13 +941,18 @@ namespace PCRCaculator.Guild
         private const float hparam2 = 1.3125f;
         public void SaveFileToTemplateInternal()
         {
-
-            OpenFileName ofn = new OpenFileName();
-
-            ofn.file = MainManager.GetSaveDataPath() + "/Templates/模板4 星美版2.xlsx";
+            var str2 = StandaloneFileBrowser.OpenFilePanel(
+                "打开Excel", MainManager.GetSaveDataPath(), "*.xlsx", false);
+            string file = null;
+            if (str2.Length > 0)
+            {
+                file = str2[0];
+                file = file.Replace("\\", "/");
+            }
+            
             templateSettings.Clear();
             using (IExcelDataReader reader =
-                   ExcelReaderFactory.CreateReader(File.Open(ofn.file, FileMode.Open)))
+                   ExcelReaderFactory.CreateReader(File.Open(file, FileMode.Open)))
             {
                 DataSet ds = reader.AsDataSet();
                 DataTable wsh = ds.Tables["设置"];
@@ -974,7 +970,7 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
-            ExcelPackage src = new ExcelPackage(new FileInfo(ofn.file));
+            ExcelPackage src = new ExcelPackage(new FileInfo(file));
 
             GuildTimelineData timelineData = new GuildTimelineData(MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup(), MyGameCtrl.Instance.CurrentSeedForSave, allUnitStateChangeDic,
                 allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
@@ -990,26 +986,17 @@ namespace PCRCaculator.Guild
             };
 
             string fileName = CreateExcelName();
-            ofn = new OpenFileName();
-            ofn.structSize = Marshal.SizeOf(ofn);
-            ofn.filter = "Excel Files(*.xlsx)\0*.xlsx\0";
-            ofn.file = new string(new char[256]);
-            ofn.maxFile = ofn.file.Length;
-            ofn.fileTitle = new string(new char[64]);
-            ofn.maxFileTitle = ofn.fileTitle.Length;
-            ofn.title = "选择保存路径";
-            ofn.defExt = "xlsx";
-            ofn.file = fileName;
-            //注意 一下项目不一定要全选 但是0x00000008项不要缺少
-            ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
 
-            if (!DllTest.GetSaveFileName(ref ofn))
+
+            var ststrr = StandaloneFileBrowser.SaveFilePanel(
+                "保存Excel", string.Empty, fileName, "*.xlsx");
+            if (!string.IsNullOrEmpty(ststrr))
             {
-                return;
+                fileName = ststrr;
+                fileName = fileName.Replace("\\", "/");
             }
-
-            fileName = ofn.file.Replace("\\", "/");
-
+            else return;
+            
             if (File.Exists(fileName))
             {
                 File.Delete(fileName);

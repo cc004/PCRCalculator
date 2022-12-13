@@ -34,10 +34,10 @@ namespace PCRCaculator.SQL
 
 #if UNITY_ANDROID 
             var loadDb2 = new WWW("jar:file://" + Application.dataPath + "!/assets/" + DatabaseName);  // this is the path to your StreamingAssets in android
-            while (!loadDb.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
+            while (!loadDb2.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
             // then save to Application.persistentDataPath
             var loadDb = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
-            File.WriteAllBytes(loadDb, loadDb.bytes);
+            File.WriteAllBytes(loadDb, loadDb2.bytes);
 #elif UNITY_IOS
                  var loadDb = Application.dataPath + "/Raw/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
                 // then save to Application.persistentDataPath
