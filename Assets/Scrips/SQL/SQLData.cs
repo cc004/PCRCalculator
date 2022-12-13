@@ -491,7 +491,10 @@ namespace PCRCaculator.SQL
             return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
             magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
             physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
-            energy_recovery_rate, energy_reduce_rate, accuracy);
+            energy_recovery_rate, energy_reduce_rate, accuracy)
+            {
+                realhp = hp
+            };
         }
     }
     public class unit_enemy_data
@@ -505,7 +508,7 @@ namespace PCRCaculator.SQL
         public int move_speed { get; set; }
         public int search_area_width { get; set; }
         public int atk_type { get; set; }
-        public float normal_atk_cast_time { get; set; }
+        public double normal_atk_cast_time { get; set; }
         public int cutin { get; set; }
         public int cutin_star6 { get; set; }
         public int visual_change_flag { get; set; }
@@ -633,7 +636,7 @@ namespace PCRCaculator.SQL
         public string name { get; set; }
         public int skill_type { get; set; }
         public int skill_area_width { get; set; }
-        public float skill_cast_time { get; set; }
+        public double skill_cast_time { get; set; }
         public int boss_ub_cool_time { get; set; }
         public int action_1 { get; set; }
         public int action_2 { get; set; }
@@ -681,13 +684,13 @@ namespace PCRCaculator.SQL
         public int action_detail_1 { get; set; }
         public int action_detail_2 { get; set; }
         public int action_detail_3 { get; set; }
-        public float action_value_1 { get; set; }
-        public float action_value_2 { get; set; }
-        public float action_value_3 { get; set; }
-        public float action_value_4 { get; set; }
-        public float action_value_5 { get; set; }
-        public float action_value_6 { get; set; }
-        public float action_value_7 { get; set; }
+        public double action_value_1 { get; set; }
+        public double action_value_2 { get; set; }
+        public double action_value_3 { get; set; }
+        public double action_value_4 { get; set; }
+        public double action_value_5 { get; set; }
+        public double action_value_6 { get; set; }
+        public double action_value_7 { get; set; }
         public int target_assignment { get; set; }
         public int target_area { get; set; }
         public int target_range { get; set; }
@@ -723,24 +726,24 @@ namespace PCRCaculator.SQL
         public int equipment_enhance_point { get; set; }
         public int sale_price { get; set; }
         public int require_level { get; set; }
-        public float hp { get; set; }
-        public float atk { get; set; }
-        public float magic_str { get; set; }
-        public float def { get; set; }
-        public float magic_def { get; set; }
-        public float physical_critical { get; set; }
-        public float magic_critical { get; set; }
-        public float wave_hp_recovery { get; set; }
-        public float wave_energy_recovery { get; set; }
-        public float dodge { get; set; }
-        public float physical_penetrate { get; set; }
-        public float magic_penetrate { get; set; }
-        public float life_steal { get; set; }
-        public float hp_recovery_rate { get; set; }
-        public float energy_recovery_rate { get; set; }
-        public float energy_reduce_rate { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
         public int enable_donation { get; set; }
-        public float accuracy { get; set; }
+        public double accuracy { get; set; }
 
         public int display_item { get; set; }
         public int item_type { get; set; }
@@ -760,23 +763,23 @@ namespace PCRCaculator.SQL
         public string equipment_name { get; set; }
         public string description { get; set; }
         public int promotion_level { get; set; }
-        public float hp { get; set; }
-        public float atk { get; set; }
-        public float magic_str { get; set; }
-        public float def { get; set; }
-        public float magic_def { get; set; }
-        public float physical_critical { get; set; }
-        public float magic_critical { get; set; }
-        public float wave_hp_recovery { get; set; }
-        public float wave_energy_recovery { get; set; }
-        public float dodge { get; set; }
-        public float physical_penetrate { get; set; }
-        public float magic_penetrate { get; set; }
-        public float life_steal { get; set; }
-        public float hp_recovery_rate { get; set; }
-        public float energy_recovery_rate { get; set; }
-        public float energy_reduce_rate { get; set; }
-        public float accuracy { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
+        public double accuracy { get; set; }
         public BaseData GetBaseData()
         {
             return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
@@ -791,40 +794,40 @@ namespace PCRCaculator.SQL
         public int unit_id { get; set; }
         [PrimaryKey]
         public int rarity { get; set; }
-        public float hp { get; set; }
-        public float atk { get; set; }
-        public float magic_str { get; set; }
-        public float def { get; set; }
-        public float magic_def { get; set; }
-        public float physical_critical { get; set; }
-        public float magic_critical { get; set; }
-        public float wave_hp_recovery { get; set; }
-        public float wave_energy_recovery { get; set; }
-        public float dodge { get; set; }
-        public float physical_penetrate { get; set; }
-        public float magic_penetrate { get; set; }
-        public float life_steal { get; set; }
-        public float hp_recovery_rate { get; set; }
-        public float energy_recovery_rate { get; set; }
-        public float energy_reduce_rate { get; set; }
-        public float accuracy { get; set; }
-        public float hp_growth { get; set; }
-        public float atk_growth { get; set; }
-        public float magic_str_growth { get; set; }
-        public float def_growth { get; set; }
-        public float magic_def_growth { get; set; }
-        public float physical_critical_growth { get; set; }
-        public float magic_critical_growth { get; set; }
-        public float wave_hp_recovery_growth { get; set; }
-        public float wave_energy_recovery_growth { get; set; }
-        public float dodge_growth { get; set; }
-        public float physical_penetrate_growth { get; set; }
-        public float magic_penetrate_growth { get; set; }
-        public float life_steal_growth { get; set; }
-        public float hp_recovery_rate_growth { get; set; }
-        public float energy_recovery_rate_growth { get; set; }
-        public float energy_reduce_rate_growth { get; set; }
-        public float accuracy_growth { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
+        public double accuracy { get; set; }
+        public double hp_growth { get; set; }
+        public double atk_growth { get; set; }
+        public double magic_str_growth { get; set; }
+        public double def_growth { get; set; }
+        public double magic_def_growth { get; set; }
+        public double physical_critical_growth { get; set; }
+        public double magic_critical_growth { get; set; }
+        public double wave_hp_recovery_growth { get; set; }
+        public double wave_energy_recovery_growth { get; set; }
+        public double dodge_growth { get; set; }
+        public double physical_penetrate_growth { get; set; }
+        public double magic_penetrate_growth { get; set; }
+        public double life_steal_growth { get; set; }
+        public double hp_recovery_rate_growth { get; set; }
+        public double energy_recovery_rate_growth { get; set; }
+        public double energy_reduce_rate_growth { get; set; }
+        public double accuracy_growth { get; set; }
         public int unit_material_id { get; set; }
         public int consume_num { get; set; }
         public int consume_gold { get; set; }
@@ -872,23 +875,23 @@ namespace PCRCaculator.SQL
         public int unit_id { get; set; }
         [PrimaryKey]
         public int promotion_level { get; set; }
-        public float hp { get; set; }
-        public float atk { get; set; }
-        public float magic_str { get; set; }
-        public float def { get; set; }
-        public float magic_def { get; set; }
-        public float physical_critical { get; set; }
-        public float magic_critical { get; set; }
-        public float wave_hp_recovery { get; set; }
-        public float wave_energy_recovery { get; set; }
-        public float dodge { get; set; }
-        public float physical_penetrate { get; set; }
-        public float magic_penetrate { get; set; }
-        public float life_steal { get; set; }
-        public float hp_recovery_rate { get; set; }
-        public float energy_recovery_rate { get; set; }
-        public float energy_reduce_rate { get; set; }
-        public float accuracy { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
+        public double accuracy { get; set; }
         public BaseData GetBaseData()
         {
             return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
@@ -913,7 +916,7 @@ namespace PCRCaculator.SQL
         public int move_speed { get; set; }
         public int search_area_width { get; set; }
         public int atk_type { get; set; }
-        public float normal_atk_cast_time { get; set; }
+        public double normal_atk_cast_time { get; set; }
         public int cutin_1 { get; set; }
         public int cutin_2 { get; set; }
         public int cutin1_star6 { get; set; }
@@ -1005,23 +1008,23 @@ namespace PCRCaculator.SQL
         public int equipment_enhance_point { get; set; }
         public int sale_price { get; set; }
         public int require_level { get; set; }
-        public float hp { get; set; }
-        public float atk { get; set; }
-        public float magic_str { get; set; }
-        public float def { get; set; }
-        public float magic_def { get; set; }
-        public float physical_critical { get; set; }
-        public float magic_critical { get; set; }
-        public float wave_hp_recovery { get; set; }
-        public float wave_energy_recovery { get; set; }
-        public float dodge { get; set; }
-        public float physical_penetrate { get; set; }
-        public float magic_penetrate { get; set; }
-        public float life_steal { get; set; }
-        public float hp_recovery_rate { get; set; }
-        public float energy_recovery_rate { get; set; }
-        public float energy_reduce_rate { get; set; }
-        public float accuracy { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
+        public double accuracy { get; set; }
         public BaseData GetBaseData()
         {
             return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
@@ -1038,23 +1041,23 @@ namespace PCRCaculator.SQL
         public string equipment_name { get; set; }
         public string description { get; set; }
         public int promotion_level { get; set; }
-        public float hp { get; set; }
-        public float atk { get; set; }
-        public float magic_str { get; set; }
-        public float def { get; set; }
-        public float magic_def { get; set; }
-        public float physical_critical { get; set; }
-        public float magic_critical { get; set; }
-        public float wave_hp_recovery { get; set; }
-        public float wave_energy_recovery { get; set; }
-        public float dodge { get; set; }
-        public float physical_penetrate { get; set; }
-        public float magic_penetrate { get; set; }
-        public float life_steal { get; set; }
-        public float hp_recovery_rate { get; set; }
-        public float energy_recovery_rate { get; set; }
-        public float energy_reduce_rate { get; set; }
-        public float accuracy { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
+        public double accuracy { get; set; }
         public BaseData GetBaseData()
         {
             return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5

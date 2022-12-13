@@ -1,33 +1,34 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 
-public class OpenFileName
+public struct OpenFileName
 {
-    public int structSize = 0;
-    public IntPtr dlgOwner = IntPtr.Zero;
-    public IntPtr instance = IntPtr.Zero;
-    public String filter = null;
-    public String customFilter = null;
-    public int maxCustFilter = 0;
-    public int filterIndex = 0;
-    public String file = null;
-    public int maxFile = 0;
-    public String fileTitle = null;
-    public int maxFileTitle = 0;
-    public String initialDir = null;
-    public String title = null;
-    public int flags = 0;
-    public short fileOffset = 0;
-    public short fileExtension = 0;
-    public String defExt = null;
-    public IntPtr custData = IntPtr.Zero;
-    public IntPtr hook = IntPtr.Zero;
-    public String templateName = null;
-    public IntPtr reservedPtr = IntPtr.Zero;
-    public int reservedInt = 0;
-    public int flagsEx = 0;
+    public int structSize;
+    public IntPtr dlgOwner;
+    public IntPtr instance;
+    public String filter;
+    public String customFilter;
+    public int maxCustFilter;
+    public int filterInde;
+    public String file;
+    public int maxFile;
+    public String fileTitle;
+    public int maxFileTitle;
+    public String initialDir;
+    public String title;
+    public int flags;
+    public short fileOffset;
+    public short fileExtension;
+    public String defExt;
+    public IntPtr custData;
+    public IntPtr hook;
+    public String templateName;
+    public IntPtr reservedPtr;
+    public int reservedInt;
+    public int flagsEx;
 
 }
 
@@ -36,17 +37,42 @@ public class OpenFileName
 
 public class DllTest
 {
-    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto)]
-    public static extern bool GetOpenFileName([In, Out] OpenFileName ofn);
-    public static bool GetOpenFileName1([In, Out] OpenFileName ofn)
+    private static T YieldRun<T, TArg>(Func<TArg, T> action, TArg arg)
     {
-        return GetOpenFileName(ofn);
+        var sema = new Semaphore(0, 1);
+        T result = default;
+        new Thread(() =>
+        {
+            result = action(arg);
+            sema.Release();
+        }).Start();
+        sema.WaitOne();
+        return result;
     }
 
-    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto)]
-    public static extern bool GetSaveFileName([In, Out] OpenFileName ofn);
-    public static bool GetSaveFileName1([In, Out] OpenFileName ofn)
+    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool GetOpenFileName([In, Out]ref OpenFileName ofn);
+    public static bool GetOpenFileName1([In, Out]ref OpenFileName ofn)
     {
-        return GetSaveFileName(ofn);
+        var (result, ofn2) = YieldRun<(bool, OpenFileName), OpenFileName>(ofn =>
+        {
+            var r = GetOpenFileName(ref ofn);
+            return (r, ofn);
+        }, ofn);
+        ofn = ofn2;
+        return result;
+    }
+
+    [DllImport("Comdlg32.dll", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool GetSaveFileName([In, Out] ref OpenFileName ofn);
+    public static bool GetSaveFileName1([In, Out] ref OpenFileName ofn)
+    {
+        var (result, ofn2) = YieldRun<(bool, OpenFileName), OpenFileName>(ofn =>
+        {
+            var r = GetSaveFileName(ref ofn);
+            return (r, ofn);
+        }, ofn);
+        ofn = ofn2;
+        return result;
     }
 }

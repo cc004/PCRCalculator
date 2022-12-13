@@ -50,7 +50,7 @@ namespace PCRCaculator
         public int move_speed;
         public int search_area_width;
         public int atk_type;
-        public float normal_atk_cast_time;
+        public double normal_atk_cast_time;
         public int cutin;
         public int visual_change_flag;
         public string comment;

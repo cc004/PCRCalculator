@@ -133,7 +133,7 @@ namespace Elements
                         if (num2 <= criticalRate)
                             criticalData.IsCritical = true;
                         criticalData.critVar = FloatWithEx.Binomial(damageData.CriticalRate, criticalData.IsCritical,
-                            $"rnd:{data.id}:{(int) (criticalRate * 1000)}");
+                            $"rnd:{data.id}:{(int) (criticalRate * 1000)}", data.id);
                     }
                     else
                         criticalData.critVar = 0f;

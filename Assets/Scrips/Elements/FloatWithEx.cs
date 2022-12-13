@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
@@ -36,15 +37,28 @@ namespace Elements
             }
             return cache;
         }
-        
-        private static Random rand = new Random();
 
-        public static FloatWithEx Binomial(float p, bool val, string rnd)
+        private static Random rndd = new Random();
+        private static UnityRandom rand = new UnityRandom();
+        private static List<int> cachedSeed = new List<int>();
+        public static void SetState(int seed)
+        {
+            rand.InitState(seed);
+            cachedSeed.Clear();
+        }
+
+        private static int GetRandN(int n)
+        {
+            while (cachedSeed.Count <= n) cachedSeed.Add(rand.Range(0, 1000));
+            return cachedSeed[n];
+        }
+        public static FloatWithEx Binomial(float p, bool val, string rnd, int order)
         {
             p = Mathf.Clamp(p, 0f, 1f);
             if (p == 0f) return 0f;
             if (p == 1f) return 1f;
-            var result = new FloatWithEx(val ? 1 : 0, p, root: _ => rand.NextDouble() < p ? 1 : 0, min: 0,
+            var p0 = (int) (p * 1000);
+            var result = new FloatWithEx(val ? 1 : 0, p, root: _ => GetRandN(order) < p0 ? 1 : 0, min: 0,
                 max: 1)
             {
                 rnd = rnd
@@ -113,7 +127,10 @@ namespace Elements
         {
             double s = 0;
             for (int i = 0; i < N; ++i)
-                s += Emulate(rand.Next());
+            {
+                SetState(rndd.Next());
+                s += Emulate(rndd.Next());
+            }
             return (float)(s / N);
         }
         public float Stddev
@@ -124,11 +141,12 @@ namespace Elements
                 double s = 0, s2 = 0;
                 for (int i = 0; i < N; ++i)
                 {
-                    var x = Emulate(rand.Next());
+                    SetState(rndd.Next());
+                    double x = Emulate(rndd.Next());
                     s += x;
                     s2 += x * x;
                 }
-                return (float)Math.Sqrt((s2 - s * s / N) / N);
+                return (float)Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
             }
         }
         public float Probability(Func<float, bool> predict)
@@ -136,7 +154,10 @@ namespace Elements
             var N = GuildManager.StaticsettingData.n1;
             int s = 0;
             for (int i = 0; i < N; ++i)
-                if (predict(Emulate(rand.Next()))) ++s;
+            {
+                SetState(rndd.Next());
+                if (predict(Emulate(rndd.Next()))) ++s;
+            }
             return (float)s / N;
         }
 

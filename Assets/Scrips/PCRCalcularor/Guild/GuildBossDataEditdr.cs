@@ -81,7 +81,7 @@ namespace PCRCaculator.Guild
             EnemyData newEnemyData = enemyData.Copy();
             try
             {
-                newEnemyData.baseData.Hp = long.Parse(inputField_HP.text, NumberStyles.AllowExponent);
+                newEnemyData.baseData.realhp = int.Parse(inputField_HP.text, NumberStyles.AllowExponent);
             }
             catch (FormatException e)
             {
@@ -178,7 +178,7 @@ namespace PCRCaculator.Guild
             }
             this.enemyData = enemyData;
             unit_id = enemyData.unit_id;
-            inputField_HP.text = "" + (long)enemyData.baseData.Hp;
+            inputField_HP.text = "" + enemyData.baseData.RealHp;
             inputField_lv.text = "" + enemyData.level;
             inputField_def.text = "" + Mathf.RoundToInt(enemyData.baseData.Def);
             inputField_def_mg.text = "" + Mathf.RoundToInt(enemyData.baseData.Magic_def);
@@ -286,7 +286,7 @@ namespace PCRCaculator.Guild
                     }
                     else
                     {
-                        bossSkillCastTime[i] = MainManager.Instance.SkillDataDic[bossMainSkillIDs[i]].casttime;
+                        bossSkillCastTime[i] = (float)MainManager.Instance.SkillDataDic[bossMainSkillIDs[i]].casttime;
                     }
                 }
                 else

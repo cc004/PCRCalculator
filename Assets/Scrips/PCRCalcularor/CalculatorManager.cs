@@ -353,7 +353,7 @@ namespace PCRCaculator.Calc
 
 
             //打开windows框
-            if (DllTest.GetOpenFileName(ofn))
+            if (DllTest.GetOpenFileName(ref ofn))
             {
                 ofn.file = ofn.file.Replace("\\", "/");                
                 try

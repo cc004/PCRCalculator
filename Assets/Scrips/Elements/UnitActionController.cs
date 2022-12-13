@@ -1023,7 +1023,7 @@ namespace Elements
                 _callback.Call();
             }
         }
-
+        /*
         public IEnumerator StartAnnihilationSkillAnimation(int _annihilationId)
         {
             //UnitActionController actionController = this;
@@ -1043,11 +1043,11 @@ namespace Elements
                 }
             }
             battleCameraEffect.ClearShake();
-            /*if (annihilation.ZoomEffect.Enable)
+            if (annihilation.ZoomEffect.Enable)
             {
               ++Owner.UbCounter;
               battleCameraEffect.StartZoomEffect(annihilation.ZoomEffect, Owner, 0.0f, true, true);
-            }*/
+            }
             foreach (ShakeEffect shakeEffect in annihilation.ShakeEffects)
               Owner.StartCoroutine(updateCoroutineWithOutCutIn(StartShakeWithDelay(shakeEffect, annihilation)));
             //if (annihilation.SlowEffect.Enable)
@@ -1071,7 +1071,7 @@ namespace Elements
                 }
                 yield return null;
             }
-        }
+        }*/
 
         private IEnumerator foregroundActiveWithDelay(float _time)
         {

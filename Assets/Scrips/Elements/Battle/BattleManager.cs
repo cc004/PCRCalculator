@@ -3464,13 +3464,13 @@ namespace Elements.Battle
             if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
-                UnityRandom.InitState(tempData.randomData.RandomSeed);
+                //UnityRandom.InitState(tempData.randomData.RandomSeed);
                 gameCtrl.CurrentSeedForSave = tempData.randomData.RandomSeed;
             }
             else
             {
                 UnityEngine.Random.InitState(seed);
-                UnityRandom.InitState(seed);
+                //UnityRandom.InitState(seed);
                 gameCtrl.CurrentSeedForSave = seed;
             }
 

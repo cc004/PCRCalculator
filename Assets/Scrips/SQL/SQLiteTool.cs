@@ -23,22 +23,21 @@ namespace PCRCaculator.SQL
         {
             var DatabaseName = cn ? DatabaseName_cn : SQLiteTool.DatabaseName;
 #if UNITY_EDITOR
-            var dbPath = string.Format(@"Assets/StreamingAssets/{0}", DatabaseName);
+            var loadDb = string.Format(@"Assets/StreamingAssets/{0}", DatabaseName);
 #else
         // check if file exists in Application.persistentDataPath
         //var filepath = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
-
-        if (true)
-        {
+        
             Debug.Log("Database not in Persistent path");
             // if it doesn't ->
             // open StreamingAssets directory and load the db ->
 
 #if UNITY_ANDROID 
-            var loadDb = new WWW("jar:file://" + Application.dataPath + "!/assets/" + DatabaseName);  // this is the path to your StreamingAssets in android
+            var loadDb2 = new WWW("jar:file://" + Application.dataPath + "!/assets/" + DatabaseName);  // this is the path to your StreamingAssets in android
             while (!loadDb.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
             // then save to Application.persistentDataPath
-            //File.WriteAllBytes(filepath, loadDb.bytes);
+            var loadDb = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
+            File.WriteAllBytes(loadDb, loadDb.bytes);
 #elif UNITY_IOS
                  var loadDb = Application.dataPath + "/Raw/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
                 // then save to Application.persistentDataPath
@@ -65,11 +64,10 @@ namespace PCRCaculator.SQL
 #endif
 
             Debug.Log("Database written");
-        }
 
-        var dbPath = filepath;
+        //var dbPath = filepath;
 #endif
-            return dbPath;
+            return loadDb;
         }
 
         
@@ -275,7 +273,7 @@ namespace PCRCaculator.SQL
                     unit_data t4 = unitDic[pair.Key];
                     detailData = new UnitDetailData(t4.unit_id,
                         t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,
-                        t4.search_area_width, t4.atk_type, t4.normal_atk_cast_time, t4.guild_id);
+                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id);
                 }
                 catch (KeyNotFoundException ex)
                 {
@@ -344,7 +342,7 @@ namespace PCRCaculator.SQL
             foreach (var dd in list)
             {
                 SkillData sk = new SkillData(dd.skill_id, dd.name, dd.skill_type,
-                    dd.skill_area_width, dd.skill_cast_time, dd.GetAllActionIDs().ToArray(),
+                    dd.skill_area_width, (float)dd.skill_cast_time, dd.GetAllActionIDs().ToArray(),
                     dd.GetAllDependActionIDs().ToArray(), dd.description, dd.icon_type);
                 dic.Add(sk.skillid, sk);
             }

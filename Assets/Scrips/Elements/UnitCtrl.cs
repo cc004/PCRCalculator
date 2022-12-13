@@ -1665,12 +1665,14 @@ namespace Elements
         //private SoundManager soundManager { get; set; }
 
         private BattleManager battleManager => staticBattleManager;
+        public bool energyjudged = false;
 
         public FloatWithEx Energy
         {
             get => energy;
             private set
             {
+                energyjudged = false;
                 energy = value.Min(UnitDefine.MAX_ENERGY).Max(0f);
                 if (unitUI != null)
                     unitUI.SetTP((float)energy / UnitDefine.MAX_ENERGY);
@@ -2231,20 +2233,20 @@ this.updateCurColor();
                 var data = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
                 if (MyGameCtrl.Instance.tempData.isGuildEnemyViolent)
                 {
-                    MaxHp = StartMaxHP = (long)baseData.Hp;
+                    MaxHp = StartMaxHP = (long)baseData.RealHp;
                     Hp = MaxHp / 2 - 1;
                 }
                 else if (MyGameCtrl.Instance.tempData.isGuildBattle && data.usePlayerSettingHP && data.playerSetingHP > 0)
                 {
-                    MaxHp = StartMaxHP = (long)baseData.Hp;
+                    MaxHp = StartMaxHP = (long)baseData.RealHp;
                     Hp = data.playerSetingHP;
                 }
                 else
-                    Hp = (long)(MaxHp = StartMaxHP = (long)baseData.Hp);
+                    Hp = (long)(MaxHp = StartMaxHP = (long)baseData.RealHp);
                 useLogBarrier = data.useLogBarrierNew;
             }
             else
-                Hp = (long)(MaxHp = StartMaxHP = (long)baseData.Hp);
+                Hp = (long)(MaxHp = StartMaxHP = (long)baseData.RealHp);
 
             /*if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
             {
@@ -7270,7 +7272,7 @@ this.updateCurColor();
             else if (_damageData.CriticalDamageRate != 0.0)
             {
                 _damageData.critVar = FloatWithEx.Binomial(_damageData.CriticalRate, _critical,
-                    $"rnd:{data.id}:{(int) (_damageData.CriticalRate * 1000)}");
+                    $"rnd:{data.id}:{(int) (_damageData.CriticalRate * 1000)}", data.id);
             }
             else _damageData.critVar = 0f;
 
@@ -11338,7 +11340,7 @@ this.updateCurColor();
             _callback.Call();
         }*/
 
-        public void StartAnnihilation() => StartCoroutine(unitActionController.StartAnnihilationSkillAnimation(++AnnihilationId));
+        //public void StartAnnihilation() => StartCoroutine(unitActionController.StartAnnihilationSkillAnimation(++AnnihilationId));
 
         public bool IsSkillReady
         {

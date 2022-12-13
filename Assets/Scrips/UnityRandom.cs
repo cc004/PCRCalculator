@@ -1,11 +1,13 @@
 ﻿public class UnityRandom
 {
+    public static UnityRandom Instance = new UnityRandom();
+
     public struct State
     {
         public uint x, y, z, w;
     }
-    public static State state;
-    public static void InitState(int seed)
+    public State state;
+    public void InitState(int seed)
     {
         state.x = (uint)seed;
         state.y = (uint)(1812433253 * state.x + 1);
@@ -13,12 +15,12 @@
         state.w = (uint)(1812433253 * state.z + 1);
     }
 
-    public static int Range(int min, int max)
+    public int Range(int min, int max)
     {
         return min + (int)(Random() % (max - min));
     }
 
-    public static uint Random()
+    public uint Random()
     {
         uint t = state.x, s = state.w;
         state.x = state.y;

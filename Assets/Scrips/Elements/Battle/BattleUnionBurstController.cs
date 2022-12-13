@@ -91,6 +91,19 @@ namespace Elements.Battle
                 }
                 if ((enemyCtrl.IsSummonOrPhantom && (enemyCtrl.SummonSource == null || (long)enemyCtrl.SummonSource.Hp <= 0)) || !enemyCtrl.JudgeSkillReadyAndIsMyTurn() || enemyCtrl.CurrentState != 0)
                 {
+                    if (!enemyCtrl.energyjudged && enemyCtrl.JudgeSkillReadyAndIsMyTurnExceptEnergy() && enemyCtrl.CurrentState == UnitCtrl.ActionState.IDLE)
+                    {
+                        enemyCtrl.energyjudged = true;
+                        var e = enemyCtrl.Energy;
+
+                        GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                        {
+                            unit = enemyCtrl.UnitNameEx,
+                            predict = hash => e.Emulate(hash) >= 1000f,
+                            exp = hash => $"{e.ToExpression(hash)} >= 1000",
+                            description = $"({BattleHeaderController.CurrentFrameCount}){enemyCtrl.UnitNameEx}的UB提前开出"
+                        });
+                    }
                     continue;
                 }
                 enemyCtrl.SetDirectionAuto();
@@ -106,18 +119,6 @@ namespace Elements.Battle
                     //}
                     enemyCtrl.StartCutIn();
                     break;
-                }
-                else if (enemyCtrl.JudgeSkillReadyAndIsMyTurnExceptEnergy() && enemyCtrl.CurrentState == UnitCtrl.ActionState.IDLE)
-                {
-                    var e = enemyCtrl.Energy;
-
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
-                    {
-                        unit = enemyCtrl.UnitNameEx,
-                        predict = hash => e.Emulate(hash) >= 1000f,
-                        exp = hash => $"{e.ToExpression(hash)} >= 1000",
-                        description = $"({BattleHeaderController.CurrentFrameCount}){enemyCtrl.UnitNameEx}的UB提前开出"
-                    });
                 }
             }
         }

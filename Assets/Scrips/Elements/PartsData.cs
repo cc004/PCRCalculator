@@ -172,7 +172,7 @@ namespace Elements
             MagicCritical = StartMagicCritical = (int)data.baseData.Magic_critical;
             Accuracy = (int)data.baseData.Accuracy;
             Level = data.level;
-            BreakPoint = MaxBreakPoint = (int)data.baseData.Hp;
+            BreakPoint = MaxBreakPoint = (int)data.baseData.RealHp;
             //}
         }
 

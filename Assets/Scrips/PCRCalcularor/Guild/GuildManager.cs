@@ -192,7 +192,7 @@ namespace PCRCaculator.Guild
             characterDetailButton.SetButton(unitData);
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
             var baseDataEX = MainManager.Instance.UnitRarityDic[unitData.unitId].GetEXSkillValue(unitData);//,MyGameCtrl.Instance.tempData.isGuildBattle);
-            characterDetailTexts[0].text = "" + baseData.Hp + (baseDataEX.Hp == 0 ? string.Empty : $"<color=#FF80C0>+{baseDataEX.Hp}</color>");
+            characterDetailTexts[0].text = "" + baseData.RealHp + (baseDataEX.RealHp == 0 ? string.Empty : $"<color=#FF80C0>+{baseDataEX.RealHp}</color>");
             for (int i = 1; i < baseData.dataint.Length; i++)
             {
                 //处理一下四舍五入的问题
@@ -1090,7 +1090,7 @@ namespace PCRCaculator.Guild
             if (enemyData != null)
             {
                 detailstr = $"  {enemyData.detailData.unit_name}({selectedBossEnemyid})/({enemyData.detailData.unit_id})\n";
-                detailstr += $" HP：{enemyData.baseData.Hp}\n";
+                detailstr += $" HP：{enemyData.baseData.RealHp}\n";
                 detailstr += $" ATK：{enemyData.baseData.Atk}\n";
                 detailstr += $" MGSTR：{enemyData.baseData.Magic_str}\n";
                 detailstr += $" DEF：{enemyData.baseData.Def}\n";

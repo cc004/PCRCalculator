@@ -540,7 +540,7 @@ namespace PCRCaculator.Guild
                     .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
                     .Select(s => (state: s, pos: i)))
                 .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.id)
-                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.01f)))
+                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.001f)))
                 .GroupBy(s => s.t.pos).Select(g =>
                     (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
                 .Aggregate(new List<List<float>>
@@ -571,7 +571,7 @@ namespace PCRCaculator.Guild
                         UBDetail detail = new UBDetail
                         {
                             unitData = unitData,
-                            sorting = tm.id,
+                            sorting = tm.realFrameCount,
                             UBTime = tm.currentFrameCount,
                             description = tm.operation ?? string.Empty
                         };
@@ -599,7 +599,7 @@ namespace PCRCaculator.Guild
                     UBDetail detail = new UBDetail
                     {
                         isBossUB = true,
-                        sorting = data.id,
+                        sorting = data.realFrameCount,
                         UBTime = data.currentFrameCount
                     };
                     uBDetails.Add(detail);
@@ -760,7 +760,7 @@ namespace PCRCaculator.Guild
                 //注意 一下项目不一定要全选 但是0x00000008项不要缺少
                 ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
 
-                if (!DllTest.GetSaveFileName(ofn))
+                if (!DllTest.GetSaveFileName(ref ofn))
                 {
                     return;
                 }
@@ -779,6 +779,7 @@ namespace PCRCaculator.Guild
                 var dname = new Dictionary<string, int>();
                 var dname2 = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
+                var seedset = new Dictionary<string, int>();
                 var dmg = new List<float>();
                 var probs = new Dictionary<string, ProbEvent>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
@@ -813,6 +814,8 @@ namespace PCRCaculator.Guild
                 var dmglist2 = dmglist.Where(d => d.enabled).ToArray();
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
+                    var seed = rnd.Next();
+                    FloatWithEx.SetState(seed);
                     var flag = false;
                     var hash = rnd.Next();
                     dmg.Add(totalDamageExcept.Emulate(hash));
@@ -848,7 +851,11 @@ namespace PCRCaculator.Guild
 
                     foreach (var name in sname) ++dname[name];
                     foreach (var name in sname2) ++dname2[name];
-                    foreach ((string name, string source) in sskill) ++dskill[name][source];
+                    foreach ((string name, string source) in sskill)
+                    {
+                        ++dskill[name][source];
+                        seedset[source] = seed;
+                    }
                     sname.Clear();
                     sname2.Clear();
                     sskill.Clear();
@@ -875,57 +882,50 @@ namespace PCRCaculator.Guild
                         }
                     }
                 }
-                if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.WindowsEditor)
+#if PLATFORM_ANDROID
+                var stream = new MemoryStream();
+#else
+                if (File.Exists(fileName)) File.Delete(fileName);
+                var stream = File.OpenWrite(fileName);
+#endif
+                using (var sw = new StreamWriter(stream))
                 {
-                    string str = "";
                     foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                     {
                         var real = dname2.ContainsKey(name)
                             ? $"({(float)dname2[name] / GuildManager.StaticsettingData.n2:P1})"
                             : string.Empty;
-                        str += $"   {name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real + "\n";
+                        sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
                         if (!dskill.ContainsKey(name)) continue;
                         foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
-                            str += $"   \t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}" + "\n";
-                    }
-                    BaseBackManager.Instance.ShowText(str);
-                }
-                else
-                {
-                    if (File.Exists(fileName)) File.Delete(fileName);
-                    using (var sw = new StreamWriter(File.OpenWrite(fileName)))
-                    {
-                        foreach (var name in dname.OrderByDescending(p => p.Value).Select(p => p.Key))
                         {
-                            var real = dname2.ContainsKey(name)
-                                    ? $"({(float)dname2[name] / GuildManager.StaticsettingData.n2:P1})"
-                                : string.Empty;
-                            sw.WriteLine($"{name}-{(float)dname[name] / GuildManager.StaticsettingData.n2:P1}" + real);
-                            if (!dskill.ContainsKey(name)) continue;
-                            foreach (var pair in dskill[name].OrderByDescending(p => p.Value).Where(p => p.Value > 0))
+                            var prob = probs[pair.Key];
+                            var sb = new StringBuilder();
+                            var exp = string.Empty;
+                            if (prob.exp != null && ExcelHelper.ExcelHelper.AsmExportEnabled)
                             {
-                                var prob = probs[pair.Key];
-                                var sb = new StringBuilder();
-                                var exp = string.Empty;
-                                if (prob.exp != null && ExcelHelper.ExcelHelper.AsmExportEnabled)
-                                {
-                                    exp = prob.exp(rnd.Next());
-                                }
-                                sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}{exp}");
+                                exp = prob.exp(rnd.Next());
                             }
-                        }
-
-                        if (ExcelHelper.ExcelHelper.AsmExportEnabled)
-                        {
-                            sw.WriteLine(totalDamageExcept.ToExpression(rnd.Next()));
+                            sw.WriteLine($"\t{pair.Key}-{(float)pair.Value / GuildManager.StaticsettingData.n2:P1}(seed={seedset[pair.Key]})\n{exp}");
                         }
                     }
-                    MainManager.Instance.WindowMessage("成功！");
+
+                    if (ExcelHelper.ExcelHelper.AsmExportEnabled)
+                    {
+                        sw.WriteLine(totalDamageExcept.ToExpression(rnd.Next()));
+                    }
                 }
+#if PLATFORM_ANDROID
+                    BaseBackManager.Instance.ShowText(str);
+#else
+                MainManager.Instance.WindowMessage("成功！");
+#endif
+                stream.Dispose();
             }
             catch (Exception e)
             {
                 MainManager.Instance.WindowMessage(e.ToString());
+                throw;
             }
         }
 
@@ -1003,7 +1003,7 @@ namespace PCRCaculator.Guild
             //注意 一下项目不一定要全选 但是0x00000008项不要缺少
             ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
 
-            if (!DllTest.GetSaveFileName(ofn))
+            if (!DllTest.GetSaveFileName(ref ofn))
             {
                 return;
             }

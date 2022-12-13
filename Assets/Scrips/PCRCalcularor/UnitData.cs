@@ -1620,8 +1620,11 @@ namespace PCRCaculator
             physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
             energy_recovery_rate, enerey_reduce_rate, accuracy;//14-16*/
         public long[] dataint;//数据为*100后的整数，计算升级数据等时用整数计算避免浮点数误差累积。(用decimal不就好了）
+        public int realhp = 0;
         [JsonIgnore]
-        public float Hp 
+        public int RealHp => realhp == 0 ? Mathf.RoundToInt(Hp) : realhp;
+        [JsonIgnore]
+        public float Hp
         { 
             get => dataint[0]/100.0f; 
             set{
@@ -1671,16 +1674,16 @@ namespace PCRCaculator
         {
             dataint = new long[17] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         }
-        public BaseData(float a, float b, float c, float d, float e, float f,
-            float g, float h, float i, float j,
-            float k, float l, float m, float n,
-            float o, float p, float q)
+        public BaseData(double a, double b, double c, double d, double e, double f,
+            double g, double h, double i, double j,
+            double k, double l, double m, double n,
+            double o, double p, double q)
         {
             dataint = new long[17] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            Hp = a; Atk = b; Magic_str = c; Def = d; Magic_def = e; Physical_critical = f;
-            Magic_critical = g; Wave_hp_recovery = h; Wave_energy_recovery = i; Dodge = j;
-            Physical_penetrate = k; Magic_penetrate = l; Life_steal = m; Hp_recovery_rate = n;
-            Energy_recovery_rate = o; Enerey_reduce_rate = p; Accuracy = q;
+            Hp = (float)a; Atk = (float)b; Magic_str = (float)c; Def = (float)d; Magic_def = (float)e; Physical_critical = (float)f;
+            Magic_critical = (float)g; Wave_hp_recovery = (float)h; Wave_energy_recovery = (float)i; Dodge = (float)j;
+            Physical_penetrate = (float)k; Magic_penetrate = (float)l; Life_steal = (float)m; Hp_recovery_rate = (float)n;
+            Energy_recovery_rate = (float)o; Enerey_reduce_rate = (float)p; Accuracy = (float)q;
         }
         /*public BaseData(int[] data)
         {

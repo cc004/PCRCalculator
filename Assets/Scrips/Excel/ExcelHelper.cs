@@ -138,7 +138,7 @@ namespace ExcelHelper
 
 
             //打开windows框
-            if (DllTest.GetOpenFileName(ofn))
+            if (DllTest.GetOpenFileName(ref ofn))
             {
                 //TODO
 
@@ -324,7 +324,7 @@ namespace ExcelHelper
                 //注意 一下项目不一定要全选 但是0x00000008项不要缺少
                 ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
 
-                isSuccess = DllTest.GetSaveFileName(ofn);
+                isSuccess = DllTest.GetSaveFileName(ref ofn);
                 filePath = ofn.file.Replace("\\", "/");
 
 #endif
@@ -699,7 +699,7 @@ namespace ExcelHelper
                 int currentLineNum = 10;
 
                 List<UBDetail> UBList = TimelineData.uBDetails;
-                UBList.Sort((a, b) => a.UBTime - b.UBTime);
+                //UBList.Sort((a, b) => a.UBTime - b.UBTime);
                 var dmglist = GuildCalculator.Instance.dmglist
                     .Where(p => p.enabled).ToArray();
 
@@ -1231,7 +1231,7 @@ namespace ExcelHelper
             ofn.defExt = "xlsx";
             ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR
             //打开windows框
-            if (DllTest.GetOpenFileName(ofn))
+            if (DllTest.GetOpenFileName(ref ofn))
             {
                 ofn.file = ofn.file.Replace("\\", "/");
                 FileInfo info = new FileInfo(ofn.file);
