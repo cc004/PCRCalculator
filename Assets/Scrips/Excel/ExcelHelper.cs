@@ -105,7 +105,7 @@ namespace ExcelHelper
             return AndroidTool.GetExcelPath();
 #else
             var str = StandaloneFileBrowser.OpenFilePanel(
-                "打开Excel", string.Empty, "*.xlsx", false);
+                "打开Excel", string.Empty, "xlsx", false);
             if (str.Length > 0)
             {
                 var file = str[0];
@@ -224,7 +224,7 @@ namespace ExcelHelper
 
 
             var ststrr = StandaloneFileBrowser.SaveFilePanel(
-                "保存Excel", string.Empty, filePath, "*.xlsx");
+                "保存Excel", string.Empty, filePath, "xlsx");
             if (!string.IsNullOrEmpty(ststrr))
             {
                 filePath = ststrr;

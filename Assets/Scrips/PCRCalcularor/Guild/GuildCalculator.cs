@@ -749,7 +749,7 @@ namespace PCRCaculator.Guild
 #if PLATFORM_ANDROID
 #else
                 var ststrr = StandaloneFileBrowser.SaveFilePanel(
-                    "保存Excel", string.Empty, fileName, "*.xlsx");
+                    "保存Excel", string.Empty, fileName, "txt");
                 if (!string.IsNullOrEmpty(ststrr))
                 {
                     fileName = ststrr;
@@ -942,7 +942,7 @@ namespace PCRCaculator.Guild
         public void SaveFileToTemplateInternal()
         {
             var str2 = StandaloneFileBrowser.OpenFilePanel(
-                "打开Excel", MainManager.GetSaveDataPath(), "*.xlsx", false);
+                "打开Excel", MainManager.GetSaveDataPath(), "xlsx", false);
             string file = null;
             if (str2.Length > 0)
             {
@@ -989,7 +989,7 @@ namespace PCRCaculator.Guild
 
 
             var ststrr = StandaloneFileBrowser.SaveFilePanel(
-                "保存Excel", string.Empty, fileName, "*.xlsx");
+                "保存Excel", string.Empty, fileName, "xlsx");
             if (!string.IsNullOrEmpty(ststrr))
             {
                 fileName = ststrr;

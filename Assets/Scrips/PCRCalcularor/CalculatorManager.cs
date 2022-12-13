@@ -319,7 +319,7 @@ namespace PCRCaculator.Calc
         {
 
             var str = StandaloneFileBrowser.OpenFilePanel(
-                "打开Excel", string.Empty, "*.txt", false);
+                "打开Excel", string.Empty, "txt", false);
             if (str.Length > 0)
             {
                 var file = str[0];
