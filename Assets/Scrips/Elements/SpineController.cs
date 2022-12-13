@@ -94,6 +94,7 @@ namespace Elements
             //this.spineManager = ManagerSingleton<SpineManager>.Instance;
             IsPlayAnime = false;
             AnimeName = "";
+            EntryCallBack();
             //this.ChangeSkeletonDataAsset(_createSkeletonDataAsset);
             //this.colorShader.Init(this.GetComponent<Renderer>());
             //this.defaultShader = _createSkeletonDataAsset.atlasAssets[0].materials[0].shader;

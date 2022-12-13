@@ -10648,93 +10648,81 @@ this.updateCurColor();
         
         private IEnumerator updateDamageWhenIdle(bool _damageMotionWhenUnionBurst)
         {
-            UnitCtrl unitCtrl = this;
-            bool blackoutUnitContained = unitCtrl.battleManager.BlackoutUnitTargetList.Contains(unitCtrl);
+            bool blackoutUnitContained = battleManager.BlackoutUnitTargetList.Contains(this);
             BattleSpineController currentSpineCtrl;
             while (true)
             {
-                currentSpineCtrl = unitCtrl.GetCurrentSpineCtrl();
-                if (!blackoutUnitContained || unitCtrl.battleManager.BlackoutUnitTargetList.Contains(unitCtrl) || (long)unitCtrl.Hp == 0L)
+                currentSpineCtrl = GetCurrentSpineCtrl();
+                if (blackoutUnitContained && !battleManager.BlackoutUnitTargetList.Contains(this) && (long)Hp != 0L)
                 {
-                    if (unitCtrl.CurrentState == ActionState.IDLE || unitCtrl.battleManager.BlackoutUnitTargetList.Contains(unitCtrl))
+                    resumeSpineWithTime();
+                    if (isContinueIdleForPauseAction)
                     {
-                        if (!(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.JOY_LONG, unitCtrl.MotionPrefix)))
+                        currentSpineCtrl.IsStopState = true;
+                        currentSpineCtrl.Resume();
+                        currentSpineCtrl.PlayAnime(eSpineCharacterAnimeId.IDLE, MotionPrefix);
+                        currentSpineCtrl.Pause();
+                    }
+                    else if (isResumeSpecialSleepAnime())
+                    {
+                        currentSpineCtrl.PlayAnime(eSpineCharacterAnimeId.SLEEP, MotionPrefix, 1, 0);
+                        currentSpineCtrl.Resume();
+                        specialSleepStatus = eSpecialSleepStatus.LOOP;
+                    }
+                    else if (currentSpineCtrl.HasSpecialSleepAnimatilon(MotionPrefix) && IsAbnormalState(eAbnormalState.STONE) && IsAbnormalState(eAbnormalState.SLEEP))
+                    {
+                        isPlayDamageAnimForAbnormal = false;
+                        currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, MotionPrefix);
+                        TrackEntry current = currentSpineCtrl.state.GetCurrent(0);
+                        if (current != null)
                         {
-                            if (unitCtrl.CurrentState != ActionState.IDLE || currentSpineCtrl.IsPlayAnime)
-                            {
-                                if (!(!currentSpineCtrl.IsPlayAnime & _damageMotionWhenUnionBurst) || (long)unitCtrl.Hp == 0L || !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, unitCtrl.MotionPrefix)))
-                                    yield return null;
-                                else
-                                    goto label_21;
-                            }
-                            else
-                                goto label_16;
+                            current.lastTime = currentSpineCtrl.StopStateTime;
+                            current.time = currentSpineCtrl.StopStateTime;
                         }
-                        else
-                            goto label_5;
+                        currentSpineCtrl.state.TimeScale = 0f;
+                        currentSpineCtrl.IsStopState = resumeIsStopState;
+                    }
+                    isIdleDamage = false;
+                    yield break;
+                }
+                if (CurrentState != 0 && !battleManager.BlackoutUnitTargetList.Contains(this))
+                {
+                    isIdleDamage = false;
+                    yield break;
+                }
+                if (currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.JOY_LONG, MotionPrefix))
+                {
+                    yield break;
+                }
+                if (CurrentState == ActionState.IDLE && !currentSpineCtrl.IsPlayAnime)
+                {
+                    currentSpineCtrl.loop = true;
+                    if (IsPartsBoss && PartsMotionPrefix != 0)
+                    {
+                        currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE_MULTI_TARGET, -1, PartsMotionPrefix);
                     }
                     else
-                        goto label_13;
+                    {
+                        currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, MotionPrefix);
+                    }
+                    isIdleDamage = false;
+                    yield break;
                 }
-                else
-                    break;
-            }
-            unitCtrl.resumeSpineWithTime();
-            if (unitCtrl.isContinueIdleForPauseAction)
-            {
-                currentSpineCtrl.IsStopState = true;
-                currentSpineCtrl.Resume();
-                currentSpineCtrl.PlayAnime(eSpineCharacterAnimeId.IDLE, unitCtrl.MotionPrefix);
-                currentSpineCtrl.Pause();
-            }
-            /*else if (!unitCtrl.IsAbnormalState(eAbnormalState.STONE) && (unitCtrl.specialSleepStatus == eSpecialSleepStatus.START || unitCtrl.specialSleepStatus == eSpecialSleepStatus.WAIT_START_END || unitCtrl.specialSleepStatus == eSpecialSleepStatus.LOOP) && unitCtrl.GetCurrentSpineCtrl().HasSpecialSleepAnimatilon(unitCtrl.MotionPrefix))
-            {
-                currentSpineCtrl.PlayAnime(eSpineCharacterAnimeId.SLEEP, unitCtrl.MotionPrefix, 1, 0);
-                currentSpineCtrl.Resume();
-                unitCtrl.specialSleepStatus = eSpecialSleepStatus.LOOP;
-            }*/
-            else if (isResumeSpecialSleepAnime())
-            {
-                currentSpineCtrl.PlayAnime(eSpineCharacterAnimeId.SLEEP, MotionPrefix, 1, 0);
-                currentSpineCtrl.Resume();
-                specialSleepStatus = eSpecialSleepStatus.LOOP;
-            }
-            else if (unitCtrl.GetCurrentSpineCtrl().HasSpecialSleepAnimatilon(unitCtrl.MotionPrefix) && unitCtrl.IsAbnormalState(eAbnormalState.STONE) && unitCtrl.IsAbnormalState(eAbnormalState.SLEEP))
-            {
-                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, unitCtrl.MotionPrefix);
-                TrackEntry current = currentSpineCtrl.state.GetCurrent(0);
-                if (current != null)
+                if (!currentSpineCtrl.IsPlayAnime && _damageMotionWhenUnionBurst && (long)Hp != 0L && currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, MotionPrefix))
                 {
-                    current.lastTime = currentSpineCtrl.StopStateTime;
-                    current.time = currentSpineCtrl.StopStateTime;
-                    //current.animationLast = currentSpineCtrl.StopStateTime;
-                    //current.animationStart = currentSpineCtrl.StopStateTime;
-
+                    break;
                 }
-                currentSpineCtrl.state.TimeScale = 0.0f;
-                currentSpineCtrl.IsStopState = unitCtrl.resumeIsStopState;
+                yield return null;
             }
-            unitCtrl.isIdleDamage = false;
-            yield break;
-        label_13:
-            unitCtrl.isIdleDamage = false;
-            yield break;
-        label_5:
-            yield break;
-        label_16:
             currentSpineCtrl.loop = true;
-            if (unitCtrl.IsPartsBoss && unitCtrl.PartsMotionPrefix != 0)
-                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE_MULTI_TARGET, _index2: unitCtrl.PartsMotionPrefix);
+            if (IsPartsBoss && PartsMotionPrefix != 0)
+            {
+                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE_MULTI_TARGET, -1, PartsMotionPrefix);
+            }
             else
-                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, unitCtrl.MotionPrefix);
-            unitCtrl.isIdleDamage = false;
-            yield break;
-        label_21:
-            currentSpineCtrl.loop = true;
-            if (unitCtrl.IsPartsBoss && unitCtrl.PartsMotionPrefix != 0)
-                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE_MULTI_TARGET, _index2: unitCtrl.PartsMotionPrefix);
-            else
-                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, unitCtrl.MotionPrefix);
+            {
+                currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, MotionPrefix);
+            }
         }
 
         /*private void resumeSpineWithTime()
@@ -11392,7 +11380,48 @@ this.updateCurColor();
             }
         }
 
+        public bool IsSkillReadyExceptEnergy
+        {
+            get
+            {
+                if ((battleManager.BattleCategory == eBattleCategory.DUNGEON ||
+                     battleManager.BattleCategory == eBattleCategory.TOWER ||
+                     (battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL ||
+                      battleManager.BattleCategory == eBattleCategory.TOWER_EX) ||
+                     (battleManager.BattleCategory == eBattleCategory.TOWER_REPLAY ||
+                      battleManager.BattleCategory == eBattleCategory.TOWER_EX_REPLAY ||
+                      battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER)
+                        ? 1
+                        : (battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY ? 1 : 0)) != 0 &&
+                    !StandByDone || battleManager.IsSpecialBattle &&
+                    battleManager.ActionStartTimeCounter > 0.0 ||
+                    (battleManager.LOGNEDLPEIJ || skillTargetList.Count == 0 || (battleManager.GameState != eBattleGameState.PLAY || !battleManager.GetAdvPlayed())) || ModeChangeEnd)
+                    return false;
+                /*switch (this.battleManager.GetPurpose())
+                {
+                    case eHatsuneSpecialPurpose.SHIELD:
+                    case eHatsuneSpecialPurpose.ABSORBER:
+                        if (this.IdleOnly)
+                            return false;
+                        break;
+                }*/
+                return ToadDatas.Count <= 0 && !IsAbnormalState(eAbnormalState.UB_SILENCE) &&
+                       !UbIsDisableByChangePattern &&
+                       ((CurrentState != ActionState.SKILL_1 ||
+                         unitActionController.Skill1IsChargeTime) &&
+                        (!IsUnableActionState() && CurrentState != ActionState.DAMAGE)) &&
+                       (UnionBurstSkillId != 0 && !IsAbnormalState(eAbnormalState.SILENCE) &&
+                        (!IsDead && CurrentState != ActionState.DIE) &&
+                        (!IsConfusionOrConvert() && (long)Hp > 0L &&
+                         (!isAwakeMotion && !unitActionController.DisableUBByModeChange))) &&
+                       ((double)1000.0 >= 1000.0 && SkillLevels[UnionBurstSkillId] != 0 &&
+                        !GetIsReduceEnergy()) && battleManager.LAMHAIODABF == 0;
+                //return this.ToadDatas.Count <= 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.UB_SILENCE) && (this.CurrentState != UnitCtrl.ActionState.SKILL_1 || this.unitActionController.Skill1IsChargeTime) && (!this.IsUnableActionState() && this.CurrentState != UnitCtrl.ActionState.DAMAGE && (this.UnionBurstSkillId != 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE))) && (!this.IsDead && this.CurrentState != UnitCtrl.ActionState.DIE && (!this.IsConfusionOrConvert() && (long)this.Hp > 0L) && (!this.isAwakeMotion && !this.unitActionController.DisableUBByModeChange && ((double)this.Energy >= 1000.0 && this.SkillLevels[this.UnionBurstSkillId] != 0))) && !this.GetIsReduceEnergy() && this.battleManager.LAMHAIODABF == 0;
+            }
+        }
+
         public bool JudgeSkillReadyAndIsMyTurn() => isMyTurn() && IsSkillReady;
+        public bool JudgeSkillReadyAndIsMyTurnExceptEnergy() => isMyTurn() && IsSkillReadyExceptEnergy;
 
         public bool pressing = false;
         public static Func<UnitCtrl, string> infoGetter;

@@ -4,6 +4,9 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using PCRCaculator.Guild;
+using static UnityEngine.UI.GridLayoutGroup;
+
 namespace Elements.Battle
 {
     public class BattleUnionBurstController
@@ -103,6 +106,18 @@ namespace Elements.Battle
                     //}
                     enemyCtrl.StartCutIn();
                     break;
+                }
+                else if (enemyCtrl.JudgeSkillReadyAndIsMyTurnExceptEnergy() && enemyCtrl.CurrentState == UnitCtrl.ActionState.IDLE)
+                {
+                    var e = enemyCtrl.Energy;
+
+                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    {
+                        unit = enemyCtrl.UnitNameEx,
+                        predict = hash => e.Emulate(hash) >= 1000f,
+                        exp = hash => $"{e.ToExpression(hash)} >= 1000",
+                        description = $"({BattleHeaderController.CurrentFrameCount}){enemyCtrl.UnitNameEx}的UB提前开出"
+                    });
                 }
             }
         }
