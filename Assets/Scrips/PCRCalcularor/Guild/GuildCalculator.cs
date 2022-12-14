@@ -745,7 +745,7 @@ namespace PCRCaculator.Guild
         {
             try
             {
-                var fileName = CreateExcelName().Replace("\\", "/") + ".txt";
+                var fileName = CreateExcelName();
 #if PLATFORM_ANDROID
 #else
                 var ststrr = StandaloneFileBrowser.SaveFilePanel(
@@ -942,7 +942,8 @@ namespace PCRCaculator.Guild
         public void SaveFileToTemplateInternal()
         {
             var str2 = StandaloneFileBrowser.OpenFilePanel(
-                "打开Excel", MainManager.GetSaveDataPath(), "xlsx", false);
+                "打开Excel", Path.Combine(MainManager.GetSaveDataPath(), "Templates"),
+                "xlsx", false);
             string file = null;
             if (str2.Length > 0)
             {

@@ -224,7 +224,7 @@ namespace ExcelHelper
 
 
             var ststrr = StandaloneFileBrowser.SaveFilePanel(
-                "保存Excel", string.Empty, filePath, "xlsx");
+                "保存Excel", string.Empty, defaultName, "xlsx");
             if (!string.IsNullOrEmpty(ststrr))
             {
                 filePath = ststrr;
