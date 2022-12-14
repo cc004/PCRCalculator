@@ -92,7 +92,7 @@ namespace Elements
     }
     public static FloatWithEx FloatToInt(FloatWithEx _num)
     {
-        return _num.Select(x => FloatToInt(x), "ceil");
+        return _num.Select(x => FloatToInt(x), "floor");
     }
     public static eUnitRespawnPos SearchRespawnPos(
       eUnitRespawnPos _basePos,
