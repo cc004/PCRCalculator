@@ -229,7 +229,7 @@ namespace Elements
                 Target = _target,
                 Source = _source,
                 DamageType = (_isPhysicalForTarget ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC),
-                CriticalRate = (_isCritical ? 1f : BattleUtil.GetCriticalRate(num2, num3, _target.GetLevel())),
+                CriticalRate = BattleUtil.GetCriticalRate(num2, num3, _target.GetLevel()),
                 CriticalRateForLogBarrier = BattleUtil.GetCriticalRate(num2, num3, _target.GetLevel()),
                 DamegeEffectType = base.ActionExecTimeList[_num].DamageNumType,
                 DamegeNumScale = base.ActionExecTimeList[_num].DamageNumScale,

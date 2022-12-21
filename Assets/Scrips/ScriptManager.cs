@@ -376,7 +376,7 @@ namespace Assets.Scrips
                         var b = arg[1];
                         result = pc =>
                         {
-                            if (unitlist.TryGetValue((int) a(), out var val))
+                            if (unitlist.TryGetValue((int)Parse(a()), out var val))
                                 variables[b] = val.energy;
                             return (pc + 1, true);
                         };

@@ -103,8 +103,14 @@ namespace Elements
                 List<CriticalData> criticalDataList = new List<CriticalData>();
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
                 {
+                    float criticalRate = damageData.CriticalRate;
+                    if ((double) _valueDictionary[eValueNumber.VALUE_5] == index + 1)
+                    {
+                        criticalRate = 1f;
+                    }
+
                     CriticalData criticalData = new CriticalData();
-                    var data = new RandomData(_source, _target.Owner, ActionId, 1, damageData.CriticalRate,
+                    var data = new RandomData(_source, _target.Owner, ActionId, 1, criticalRate,
                         damageData.CriticalDamageRate);
                     double num2 = BattleManager.Random(0.0f, 1f,
                         data);
@@ -121,7 +127,7 @@ namespace Elements
                     }
 
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
-                    double criticalRate = damageData.CriticalRate;
+
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
                     if (_valueDictionary[eValueNumber.VALUE_5] == (float) (index + 1))
                     {
@@ -132,7 +138,7 @@ namespace Elements
                     {
                         if (num2 <= criticalRate)
                             criticalData.IsCritical = true;
-                        criticalData.critVar = FloatWithEx.Binomial(damageData.CriticalRate, criticalData.IsCritical,
+                        criticalData.critVar = FloatWithEx.Binomial(criticalRate, criticalData.IsCritical,
                             $"rnd:{data.id}:{(int) (criticalRate * 1000)}", data.id);
                     }
                     else
@@ -168,6 +174,9 @@ namespace Elements
                 CriticalDataDictionary.Add(_target, criticalDataList);
                 TotalDamageDictionary.Add(_target, num1);
             }
+
+            if (_isCritical) damageData.CriticalRate = 1f;
+            
             damageData.critVar = CriticalDataDictionary[_target][_num].critVar;
             damageData.IsLogBarrierCritical = CriticalDataDictionary[_target][_num].IsCritical;
             damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage;

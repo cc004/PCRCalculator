@@ -9,6 +9,7 @@ judging .\test.asm.0
 unit 100301 not exists
 unit 107101 not exists
 unit 102801 not exists
+unit 106801 not exists
 unit 110701 not exists
 unit 401311401 not exists
 judging .\test.asm.1
@@ -20,17 +21,22 @@ unit 108401 not exists
 unit 401311401 not exists
 judging .\test.asm.2
 unit 106101 not exists
+unit 110401 not exists
 unit 107101 not exists
+unit 103401 not exists
+unit 106801 not exists
 unit 401311402 not exists
 judging .\test.asm.3
 unit 106101 not exists
-assumption st=4 for 110401 failed
+unit 110401 not exists
 unit 107101 not exists
-assumption rk>14 for 103401 failed
+unit 103401 not exists
+unit 106801 not exists
 unit 401311402 not exists
 judging .\test.asm.4
 unit 107101 not exists
 unit 102801 not exists
+unit 106801 not exists
 unit 110701 not exists
 unit 110001 not exists
 unit 401311403 not exists
