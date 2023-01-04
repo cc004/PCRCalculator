@@ -632,8 +632,8 @@ namespace Elements
                 actionParameter.ExecTime[index4] = parameterOnPrefabDetail.ExecTime[index4].Time;
             }
 
-            if (MainManager.Instance.execTimePatch.TryGetValue(actionParam.action_id, out var time))
-                actionParameter.ExecTime = time;
+//            if (MainManager.Instance.execTimePatch.TryGetValue(actionParam.action_id, out var time))
+//                actionParameter.ExecTime = time;
 
             actionParameter.DepenedActionId = actionParam.DependActionId;
             actionParameter.ActionId = actionParam.action_id;

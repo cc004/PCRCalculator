@@ -201,7 +201,7 @@ namespace PCRCaculator
 
         private void LoadAsync(WaitUI wait)
         {
-            execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
+ //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
             /*string jsonStr = LoadJsonDatas("Datas/AllData");

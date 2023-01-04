@@ -1960,6 +1960,7 @@ namespace PCRCaculator
             return max;
         }
     }
+    /*
     [Serializable]
     public class AllData
     {
@@ -1973,7 +1974,7 @@ namespace PCRCaculator
         public Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
         public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
 
-        public AllData() { }
+        public AllData() { }*/
         /*
         public AllData(List<string> equipmentDic,
             List<string> unitRarityDic,
@@ -1996,7 +1997,7 @@ namespace PCRCaculator
             this.skillNameAndDescribe_cn = skillNameAndDescribe_cn;
             this.skillActionDescribe_cn = skillActionDescribe_cn;
         }*/
-    }
+    //}
     [Serializable]
     public class UnitPrefabData
     {
