@@ -610,9 +610,13 @@ namespace ExcelHelper
 
                 var dmgcnt = new Dictionary<ProbEvent, int>();
                 var rnd = new System.Random();
+                var seedDict = new Dictionary<ProbEvent, int>();
 
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
+                    var seed = rnd.Next();
+                    FloatWithEx.SetState(seed);
+
                     var hash = rnd.Next();
 
                     foreach (var evt in dmglist)
@@ -621,6 +625,7 @@ namespace ExcelHelper
                         {
                             if (!dmgcnt.ContainsKey(evt)) dmgcnt[evt] = 0;
                             ++dmgcnt[evt];
+                            seedDict[evt] = seed;
                             break;
                         }
                     }
@@ -634,7 +639,8 @@ namespace ExcelHelper
                                  p.Key.frame.ToString(),
                                  $"{p.Value / (float) GuildManager.StaticsettingData.n2:P2}",
                                  p.Key.unit,
-                                 p.Key.description
+                                 p.Key.description,
+                                 $"seed={seedDict[p.Key]}"
                              })))
                 {
                     while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
