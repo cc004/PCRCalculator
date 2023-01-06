@@ -2780,13 +2780,14 @@ this.updateCurColor();
             double x = lossyx;
             float _a = (float)((_target.transformCache.positionX - transformCache.positionX) / FixedTransform.DIGID * m00 / x);
             var num = (_target.BodyWidth + BodyWidth) * 0.5;
+            /*
             if (this.UnitId == 209000 && _target.UnitId == 180501)
             {
                 File.AppendAllText(@"D:\rnd.log", $"[{BattleHeaderController.CurrentFrameCount}] " +
                                                   $"target={_target.transformCache.positionX / FixedTransform.DIGID * m00 / x}, " +
                                                   $"source={transformCache.positionX / FixedTransform.DIGID * m00 / x}, " +
                                                   $"distance={_a}\n");
-            }
+            }*/
             if (IsLeftDir)
             {
                 var _b1 = (float)(-_distance - num);
