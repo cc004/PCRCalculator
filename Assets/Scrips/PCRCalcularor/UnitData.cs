@@ -1575,6 +1575,7 @@ namespace PCRCaculator
         public int motionType;//武器动作类型
         public int seType;//武器类型
         public int searchAreaWidth;//普攻距离
+        public int moveSpeed; // 移速 有的角色移速是0！
         public int atkType;//攻击方式
         public float normalAtkCastTime;//普攻间隔
         public int guildId;

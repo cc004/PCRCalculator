@@ -273,7 +273,10 @@ namespace PCRCaculator.SQL
                     unit_data t4 = unitDic[pair.Key];
                     detailData = new UnitDetailData(t4.unit_id,
                         t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,
-                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id);
+                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id)
+                    { 
+                        moveSpeed = t4.move_speed
+                    };
                 }
                 catch (KeyNotFoundException ex)
                 {
