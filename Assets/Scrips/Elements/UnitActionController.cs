@@ -1338,56 +1338,18 @@ namespace Elements
           int num,
           float starttime)
         {
-            Dictionary<eValueNumber, FloatWithEx> additionalValue = action.AdditionalValue;
-            Dictionary<eValueNumber, FloatWithEx> multipleValue = action.MultipleValue;
-            Dictionary<eValueNumber, FloatWithEx> divideValue = action.DivideValue;
             Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
-            Func<ActionParameter, eValueNumber, FloatWithEx> func = (_action, _type) =>
+
+            if ((object) action.oppositeActionProb != null)
             {
-                FloatWithEx num1 = 0.0f;
-                if (additionalValue != null && additionalValue.ContainsKey(_type))
-                    num1 = additionalValue[_type];
-                FloatWithEx num2 = 1f;
-                if (multipleValue != null && multipleValue.ContainsKey(_type))
-                    num2 = multipleValue[_type];
-                FloatWithEx num3 = 1f;
-                if (divideValue != null && divideValue.ContainsKey(_type) && (double)divideValue[_type] != 0.0)
-                    num3 = divideValue[_type];
-                FloatWithEx num4 = 0.0f;
-                _action.Value.TryGetValue(_type, out num4);
-                return (num1 + num4) * num2 / num3;
-            };
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer())
-      {
-        {
-          eValueNumber.VALUE_1,
-          func(action, eValueNumber.VALUE_1)
-        },
-        {
-          eValueNumber.VALUE_2,
-          func(action, eValueNumber.VALUE_2)
-        },
-        {
-          eValueNumber.VALUE_3,
-          func(action, eValueNumber.VALUE_3)
-        },
-        {
-          eValueNumber.VALUE_4,
-          func(action, eValueNumber.VALUE_4)
-        },
-        {
-          eValueNumber.VALUE_5,
-          func(action, eValueNumber.VALUE_5)
-        },
-        {
-          eValueNumber.VALUE_6,
-          func(action, eValueNumber.VALUE_6)
-        },
-        {
-          eValueNumber.VALUE_7,
-          func(action, eValueNumber.VALUE_7)
-        }
-      };
+                if (action.oppositeAction == null)
+                    action.oppositeValue.Clear();
+                else
+                    action.oppositeValue = action.oppositeAction.PrepareActionValue();
+            }
+            
+            var _valueDictionary = action.PrepareActionValue();
+            
             bool _last = action.JudgeLastAndNotExeced(target.Owner, num);
             bool _targetOneParts = action.AlreadyExecedData[target.Owner][num].TargetPartsNumber == 1;
             /*if (!target.ResistStatus(action.ActionType, action.ActionDetail1, this.Owner, _last, _targetOneParts, target) && action.JudgeIsAlreadyExeced(target.Owner, num))

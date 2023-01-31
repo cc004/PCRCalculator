@@ -666,8 +666,8 @@ namespace Assets.Scrips
                                         var sub = float.Parse(exp[2]);
                                         var total = value[int.Parse(exp[3])];
                                         if (total > sub)
-                                            value[i] = (Mathf.Log(((total - sub) / main + 1.0f)) * main + sub);
-                                        else value[i] = total;
+                                            value[i] = (Mathf.Log(((total - sub) / main + 1.0f)) * main + sub) / total;
+                                        else value[i] = 1;
                                         break;
                                     }
                                     case "rnd":

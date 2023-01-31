@@ -89,8 +89,8 @@ namespace Elements
             eDecideTargetAtkType actionDetail2 = (eDecideTargetAtkType)base.ActionDetail2;
             if (actionDetail2 == eDecideTargetAtkType.TARGET_LOWER_DEF_TYPE)
             {
-                int defZero = _target.GetDefZero();
-                int magicDefZero = _target.GetMagicDefZero();
+                var defZero = _target.GetDefZero();
+                var magicDefZero = _target.GetMagicDefZero();
                 if (defZero != magicDefZero)
                 {
                     isPhysicalForTarget = defZero < magicDefZero;
@@ -152,15 +152,15 @@ namespace Elements
                         switch (damageData.DamageType)
                         {
                             case DamageData.eDamageType.ATK:
-                                var defZero = (float)damageData.Target.GetDefZero();
-                                var num3 = Mathf.Max(0.0f, defZero - damageData.DefPenetrate);
+                                var defZero = damageData.Target.GetDefZero();
+                                var num3 = (defZero - damageData.DefPenetrate).Max(0);
                                 criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f))).Floor();
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
 
                                 break;
                             case DamageData.eDamageType.MGC:
-                                float magicDefZero = damageData.Target.GetMagicDefZero();
-                                float num4 = Mathf.Max(0.0f, magicDefZero - damageData.DefPenetrate);
+                                var magicDefZero = damageData.Target.GetMagicDefZero();
+                                var num4 = (magicDefZero - damageData.DefPenetrate).Max(0);
                                 criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
 

@@ -139,9 +139,9 @@ namespace Elements
 
         public virtual float GetDodgeRate(int _accuracy) => Owner.GetDodgeRate(_accuracy);
 
-        public virtual int GetDefZero() => Owner.DefZero;
+        public virtual FloatWithEx GetDefZero() => Owner.DefZero;
 
-        public virtual int GetMagicDefZero() => Owner.MagicDefZero;
+        public virtual FloatWithEx GetMagicDefZero() => Owner.MagicDefZero;
 
         public virtual void SetMissAtk(
           UnitCtrl _source,
@@ -230,7 +230,7 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         UnitCtrl owner3 = Owner;
-                        owner3.Def = (int)((int)owner3.Def + _value);
+                        owner3.Def = (owner3.Def.Floor() + _value).Floor();
                         string des = (_source==null?"???":_source.UnitName) + "的技能" + (_enable?"开始":"结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
                         break;
@@ -240,7 +240,7 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         UnitCtrl owner5 = Owner;
-                        owner5.MagicDef = (int)((int)owner5.MagicDef + _value);
+                        owner5.MagicDef = (owner5.MagicDef.Floor() + _value).Floor();
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;

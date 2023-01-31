@@ -45,9 +45,9 @@ namespace Elements
 
         public FloatWithEx MagicStr { get; protected set; }
 
-        public int Def { get; protected set; }
+        public FloatWithEx Def { get; protected set; }
 
-        public int MagicDef { get; protected set; }
+        public FloatWithEx MagicDef { get; protected set; }
 
         public int Dodge { get; protected set; }
 
@@ -200,9 +200,9 @@ namespace Elements
 
         public override Vector3 GetColliderSize() => new Vector3(BodyWidthValue / 540f, 0.0f, 0.0f);
 
-        public override int GetDefZero() => Mathf.Max(0, Def) + getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+        public override FloatWithEx GetDefZero() => Def.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
 
-        public override int GetMagicDefZero() => Mathf.Max(0, MagicDef) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
+        public override FloatWithEx GetMagicDefZero() => MagicDef.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
 
         private int getDodgeZero() => Mathf.Max(0, Dodge) + getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
 

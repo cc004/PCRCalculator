@@ -198,7 +198,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = (float)(int)_target.Owner.DefZero * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.DefZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 10:
@@ -209,7 +209,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = (float)(int)_target.Owner.MagicDefZero * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.MagicDefZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 11:

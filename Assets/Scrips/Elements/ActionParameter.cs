@@ -14,7 +14,14 @@ namespace Elements
 {
   public class ActionParameter : ISingletonField
   {
-        public string sortinfo;
+    public ActionParameter oppositeAction;
+    /// <summary>
+    /// 1 when the if for all action turns to the other action
+    /// null means no other action
+    /// should always 'is null or is {.value = 0}' when execAction called
+    /// </summary>
+    public FloatWithEx oppositeActionProb;
+    public string sortinfo;
     //private static Yggdrasil<ActionParameter> staticSingletonTree;
     private static BattleManager staticBattleManager;
     private static BattleEffectPoolInterface staticBattleEffectPool;
@@ -312,5 +319,66 @@ namespace Elements
     public delegate void OnActionEndDelegate();
 
     public ProbEvent relatedEvent;
+    
+    public Dictionary<eValueNumber, FloatWithEx> oppositeValue = new Dictionary<eValueNumber, FloatWithEx>();
+    
+    public Dictionary<eValueNumber, FloatWithEx> PrepareActionValue()
+    {
+      
+      Dictionary<eValueNumber, FloatWithEx> additionalValue = AdditionalValue;
+      Dictionary<eValueNumber, FloatWithEx> multipleValue = MultipleValue;
+      Dictionary<eValueNumber, FloatWithEx> divideValue = DivideValue;
+      Func<ActionParameter, eValueNumber, FloatWithEx> func = (_action, _type) =>
+      {
+        FloatWithEx num1 = 0.0f;
+        if (additionalValue != null && additionalValue.ContainsKey(_type))
+          num1 = additionalValue[_type];
+        FloatWithEx num2 = 1f;
+        if (multipleValue != null && multipleValue.ContainsKey(_type))
+          num2 = multipleValue[_type];
+        FloatWithEx num3 = 1f;
+        if (divideValue != null && divideValue.ContainsKey(_type) && (double)divideValue[_type] != 0.0)
+          num3 = divideValue[_type];
+        FloatWithEx num4 = 0.0f;
+        _action.Value.TryGetValue(_type, out num4);
+        if ((object)oppositeActionProb == null)
+          return (num1 + num4) * num2 / num3;
+        var result = (num1 + num4) * num2 / num3;
+        var opp = oppositeValue.TryGetValue(_type, out var val) ? val : 0;
+        return result * (1 - oppositeActionProb) + opp * oppositeActionProb;
+      };
+      Dictionary<eValueNumber, FloatWithEx> _valueDictionary = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer())
+      {
+        {
+          eValueNumber.VALUE_1,
+          func(this, eValueNumber.VALUE_1)
+        },
+        {
+          eValueNumber.VALUE_2,
+          func(this, eValueNumber.VALUE_2)
+        },
+        {
+          eValueNumber.VALUE_3,
+          func(this, eValueNumber.VALUE_3)
+        },
+        {
+          eValueNumber.VALUE_4,
+          func(this, eValueNumber.VALUE_4)
+        },
+        {
+          eValueNumber.VALUE_5,
+          func(this, eValueNumber.VALUE_5)
+        },
+        {
+          eValueNumber.VALUE_6,
+          func(this, eValueNumber.VALUE_6)
+        },
+        {
+          eValueNumber.VALUE_7,
+          func(this, eValueNumber.VALUE_7)
+        }
+      };
+      return _valueDictionary;
+    }
   }
 }

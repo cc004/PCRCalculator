@@ -1528,8 +1528,8 @@ namespace Elements
         public FloatWithEx Atk { get; set; }
 
         public FloatWithEx MagicStr { get; set; }
-        private int def;
-        public int Def 
+        private FloatWithEx def;
+        public FloatWithEx Def 
         {
             get { return def; }
             set
@@ -1538,8 +1538,8 @@ namespace Elements
                 def = value;
             }
         }
-        private int magicDef;
-        public int MagicDef 
+        private FloatWithEx magicDef;
+        public FloatWithEx MagicDef 
         {
             get { return magicDef; }
             set
@@ -1613,9 +1613,9 @@ namespace Elements
 
         public FloatWithEx MagicStrZero => (MagicStr.Max(0f) + getAdditionalBuffDictionary(BuffParamKind.MAGIC_STR));
 
-        public int DefZero => (int)(Mathf.Max(0, Def) + getAdditionalBuffDictionary(BuffParamKind.DEF));
+        public FloatWithEx DefZero => (Def.Max(0) + getAdditionalBuffDictionary(BuffParamKind.DEF)).Floor();
 
-        public int MagicDefZero => (int)(Mathf.Max(0, MagicDef) + getAdditionalBuffDictionary(BuffParamKind.MAGIC_DEF));
+        public FloatWithEx MagicDefZero => (MagicDef.Max(0) + getAdditionalBuffDictionary(BuffParamKind.MAGIC_DEF)).Floor();
 
         public int DodgeZero => (int)(Mathf.Max(0, Dodge) + getAdditionalBuffDictionary(BuffParamKind.DODGE));
 
@@ -6957,16 +6957,16 @@ this.updateCurColor();
                         }
                         continue;
                     case eParamType.ATK:
-                        Atk = calculatePassiveSkillValue((float)(int)StartAtk, _passiveActionKV);
+                        Atk = calculatePassiveSkillValue((float)(int)StartAtk, _passiveActionKV).Floor();
                         continue;
                     case eParamType.DEF:
-                        Def = (int)calculatePassiveSkillValue((float)(int)StartDef, _passiveActionKV);
+                        Def = calculatePassiveSkillValue((float)(int)StartDef, _passiveActionKV).Floor();
                         continue;
                     case eParamType.MAGIC_ATK:
-                        MagicStr = calculatePassiveSkillValue((float)(int)StartMagicStr, _passiveActionKV);
+                        MagicStr = calculatePassiveSkillValue((float)(int)StartMagicStr, _passiveActionKV).Floor();
                         continue;
                     case eParamType.MAGIC_DEF:
-                        MagicDef = (int)calculatePassiveSkillValue((float)(int)StartMagicDef, _passiveActionKV);
+                        MagicDef = calculatePassiveSkillValue((float)(int)StartMagicDef, _passiveActionKV).Floor();
                         continue;
                     case eParamType.PHYSICAL_CRITICAL:
                         PhysicalCritical = (int)calculatePassiveSkillValue((float)(int)StartPhysicalCritical, _passiveActionKV);
@@ -7509,14 +7509,14 @@ this.updateCurColor();
                 switch (_damageData.DamageType)
                 {
                     case DamageData.eDamageType.ATK:
-                        float defZero = _damageData.Target.GetDefZero();
-                        float num3 = Mathf.Max(0.0f, defZero - _damageData.DefPenetrate);
-                        a *= (float)(1.0 - num3 / (defZero + 100.0));
+                        var defZero = _damageData.Target.GetDefZero();
+                        var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                        a *= (1.0f - num3 / (defZero + 100.0f));
                         break;
                     case DamageData.eDamageType.MGC:
-                        float magicDefZero = _damageData.Target.GetMagicDefZero();
-                        float num4 = Mathf.Max(0.0f, magicDefZero - _damageData.DefPenetrate);
-                        a *= (float)(1.0 - num4 / (magicDefZero + 100.0));
+                        var magicDefZero = _damageData.Target.GetMagicDefZero();
+                        var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                        a *= (1.0f - num4 / (magicDefZero + 100.0f));
                         break;
                 }
             }

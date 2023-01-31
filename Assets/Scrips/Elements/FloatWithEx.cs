@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
@@ -249,6 +250,7 @@ namespace Elements
             {
                 num = op1.ToExpression(sb, hash, num);
                 num = op2.ToExpression(sb, hash, num);
+                if (num == 3657) Debugger.Break();
                 sb.AppendFormat("{0}:{1}:{2}|", op, op1.id, op2.id);
             }
             else if (rnd != null)

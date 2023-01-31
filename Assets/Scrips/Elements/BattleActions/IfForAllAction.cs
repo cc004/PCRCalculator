@@ -89,6 +89,7 @@ namespace Elements
             bool flag = false;
             if (ActionDetail1 == 1000)
                 return;
+            FloatWithEx prob = null;
             switch ((eIfType)ActionDetail1)
             {
                 case eIfType.STOP:
@@ -218,6 +219,9 @@ namespace Elements
                     if (ActionDetail1 > 900)
                     {
                         flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
+                        var now = _target.Owner.Hp / _target.Owner.MaxHp;
+                        var bound = ActionDetail1 % 100 / 100.0;
+                        prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
                         break;
                     }
                     if (ActionDetail1 > 700)
@@ -232,6 +236,41 @@ namespace Elements
                     }*/
                     break;
             }
+
+            if ((object)prob != null)
+            {
+                ActionParameter positiveAction = null, negativeAction = null;
+                if (ActionDetail2 != 0)
+                    positiveAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2);
+                if (ActionDetail3 != 0)
+                    negativeAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail3);
+                
+                // we only deal with actions with same types here, for we can't virtually execute an action
+                if (positiveAction == null || negativeAction == null ||
+                    positiveAction.ActionType == negativeAction.ActionType &&
+                    positiveAction.ActionChildrenIndexes.Count == 0 && negativeAction.ActionChildrenIndexes.Count == 0)
+                {
+                    if (positiveAction != null)
+                    {
+                        positiveAction.oppositeAction = negativeAction;
+                        positiveAction.oppositeActionProb = 1 - prob; // assert (float)prob == 1
+                    }
+                    if (negativeAction != null)
+                    {
+                        negativeAction.oppositeAction = positiveAction;
+                        negativeAction.oppositeActionProb = prob; // assert (float)prob == 0
+                    }
+                    
+                    // for now, whether we cancel the positive action or the negative action should've have
+                    // the same effect, so we can execute the non-null action to ensure our calculation is correct.
+                    
+                    // when the only action is cancelled
+                    if ((flag ? ActionDetail2 : ActionDetail3) == 0)
+                        // revert the branch
+                        flag ^= true;
+                }
+            }
+            
             if (!flag)
             {
                 _skill.EffectBranchId = (int)Value[eValueNumber.VALUE_2];
@@ -245,6 +284,7 @@ namespace Elements
                     cancelAction(_skill.ActionParameters.Find(e => e.ActionId == ActionDetail3), _skill);
             }
             _sourceActionController.AppendCoroutine(_sourceActionController.UpdateBranchMotion(this, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
+
         }
         private bool isAbnormalState(eIfAbnormalState _abnormalState, BasePartsData _target)
         {
