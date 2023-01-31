@@ -482,7 +482,7 @@ namespace PCRCaculator.Guild
             currentPage = Mathf.FloorToInt(SettingData.currentPlayerGroupNum / 5.0f) + 1;
             if (currentPage < 1 || currentPage > 20)
             {
-                currentPage = 1;
+                //currentPage = 1;
             }
             ReflashCharacterGroupToggle();
             CreateMonthDropDown();
