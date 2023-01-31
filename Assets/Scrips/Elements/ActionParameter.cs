@@ -103,6 +103,9 @@ namespace Elements
 
     public Dictionary<BasePartsData, bool> HitOnceDic { get; set; }
 
+    public Dictionary<BasePartsData, ProbEvent> HitOnceProbDic { get; set; } =
+      new Dictionary<BasePartsData, ProbEvent>();
+
     public Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>> AlreadyExecedData { get; set; }
 
     public Dictionary<UnitCtrl, List<int>> AlreadyExecedKeys { get; set; }
@@ -195,6 +198,7 @@ namespace Elements
         if (relatedEvent != null)
         {
             relatedEvent.enabled = true;
+            relatedEvent = null;
             relatedEvent = null;
         }
     }

@@ -186,8 +186,11 @@ namespace Elements
                 _target.Owner.RecoverDodgeTP(damageData.DamageType, (int)damageData.Damage, damageData.ActionType, (int)base.CriticalDataDictionary[_target][_num].ExpectedDamageNotCritical, (int)damageData.TotalDamageForLogBarrier, damageData.Source, damageData.IgnoreDef, damageData.Target, damageData.DefPenetrate, null, _skill, EnergyChargeMultiple);
                 return;
             }
+
+            _target.Owner.lastBarrier = null;
             if (_target.Owner.SetDamage(damageData, true, ActionId, OnDamageHit, _skill: _skill, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple, callBack: action) != 0L)
                 HitOnceDic[_target] = true;
+            HitOnceProbDic[_target] = _target.Owner.lastBarrier;
             //if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK)
             //    return;
             //_target.ShowHitEffect(_source.ToadDatas.Count > 0 ? _skill.WeaponType : _source.WeaponSeType, _skill, _source.IsLeftDir);

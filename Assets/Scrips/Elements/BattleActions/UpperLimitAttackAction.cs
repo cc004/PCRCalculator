@@ -71,10 +71,12 @@ namespace Elements
                     return (int)(_criticalRate * (double)Mathf.Min(_damage, (int)_valueDictionary[eValueNumber.VALUE_7]) * num);
                 }, _energyChargeMultiple: EnergyChargeMultiple) != 0L)
                 HitOnceDic[_target] = true;*/
+            _target.Owner.lastBarrier = null;
             if (_target.Owner.SetDamage(damageData, _byAttack: true, base.ActionId, base.OnDamageHit, _hasEffect: true, _skill, _energyAdd: true, base.OnDefeatEnemy, _noMotion: false, base.ActionExecTimeList[_num].Weight, base.ActionWeightSum, upperLimitFunc, EnergyChargeMultiple, base.UsedChargeEnergyByReceiveDamage) != 0L)
             {
                 base.HitOnceDic[_target] = true;
             }
+            HitOnceProbDic[_target] = _target.Owner.lastBarrier;
 
             //if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK)
             //    return;

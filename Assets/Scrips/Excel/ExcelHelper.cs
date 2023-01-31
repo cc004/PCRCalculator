@@ -99,7 +99,7 @@ namespace ExcelHelper
                 }
             }
         }
-        private static string GetExcelPath()
+        public static string GetExcelPath()
         {
 #if PLATFORM_ANDROID
             return AndroidTool.GetExcelPath();

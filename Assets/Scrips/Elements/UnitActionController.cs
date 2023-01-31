@@ -1409,6 +1409,15 @@ namespace Elements
             {
                 if (num != action.ExecTime.Length - 1)
                     return;
+
+                if (action.ActionChildrenIndexes.Count > 0 &&
+                    action.HitOnceProbDic.TryGetValue(target, out var val) && val != null)
+                {
+                    var children = string.Join(",",
+                        action.ActionChildrenIndexes.Select(id => skill.ActionParameters[id]));
+                    val.description += $"(可能影响到技能{children}的执行，原定{(action.HitOnceDic[target] ? "执行" : "未执行")})";
+                }
+                
                 if (action.HitOnceDic[target])
                 {
                     ExecChildrenAction(action, skill, target, num, starttime, dictionary);

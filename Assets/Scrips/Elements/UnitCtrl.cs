@@ -7932,7 +7932,7 @@ this.updateCurColor();
             return null;
         }
 
-
+        public ProbEvent lastBarrier;
         private void execBarrier(DamageData _damageData, ref FloatWithEx _fDamage, ref int _overRecoverValue)
         {
             //FloatWithEx _fDamage = __fDamage;
@@ -7943,7 +7943,7 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_ATK, false);
                     _fDamage = num;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -7956,7 +7956,7 @@ this.updateCurColor();
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -7973,7 +7973,7 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_MGC, false);
                     _fDamage = num;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -7986,7 +7986,7 @@ this.updateCurColor();
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8004,7 +8004,7 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)(float)BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8019,7 +8019,7 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source);
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)num2;
                     _fDamage = 0.0f;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8037,7 +8037,7 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery((int)(float)BattleUtil.FloatToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_MGC, false);
                     _fDamage = num1;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8052,7 +8052,7 @@ this.updateCurColor();
                     _overRecoverValue += (int)setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source);
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= num2;
                     _fDamage = 0.0f;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8069,7 +8069,7 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_BOTH, false);
                     _fDamage = num;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8082,7 +8082,7 @@ this.updateCurColor();
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= BattleUtil.FloatToInt(_fDamage);
                     _fDamage = 0.0f;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8133,7 +8133,7 @@ this.updateCurColor();
                         abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source);
                     EnableAbnormalState(eAbnormalState.DRAIN_BOTH, false);
                     _fDamage = num3;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
@@ -8150,7 +8150,7 @@ this.updateCurColor();
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -=
                         num1;
                     _fDamage = 0.0f;
-                    GuildCalculator.Instance.dmglist.Add(new ProbEvent
+                    GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
                         unit = UnitNameEx,
