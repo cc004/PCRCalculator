@@ -2172,7 +2172,7 @@ this.updateCurColor();
                 skillLevelInfo.SetSkillLevel(Level);
                 skillLevelInfoList2.Add(skillLevelInfo);
             }
-            SetSkill(_data.SkillData.SubUnionBurstIds, skillLevelInfoList2, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
+            SetSkill(_data.SkillData.SubUnionBurstIds, skillLevelInfoList2, eSpineCharacterAnimeId.SUB_UNION_BURST, true, _data);
             MainSkillIdList = _data.SkillData.MainSkillIds;
             SpecialSkillIdList = _data.SkillData.SpSkillIds;
             SpecialSkillEvolutionIdList = _data.SkillData.SpSkillEvolutionIds;
@@ -3102,7 +3102,7 @@ this.updateCurColor();
 
         public void ChangeAttackPattern(int _attackPatternId, int _spSkillLevel, float _limitTime = -1f)
         {
-            Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] attack pattern changed to {_attackPatternId}");
+            // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] attack pattern changed to {_attackPatternId}");
             int currentActionPatternId = this.currentActionPatternId;
             this.currentActionPatternId = _attackPatternId;
             attackPatternIndex = 0;
@@ -3133,7 +3133,7 @@ this.updateCurColor();
 
         public void ChangeChargeSkill(int skillNum, float limitTime)
         {
-            Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] union burst changed to {skillNum}");
+            // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] union burst changed to {skillNum}");
             isAwakeMotion = true;
             int unionBurstSkillId = UnionBurstSkillId;
             UnionBurstSkillId = skillNum;
@@ -3149,9 +3149,10 @@ this.updateCurColor();
                 time += DeltaTimeForPause;
                 if (time > (double) limitTime)
                 {
-                    Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] union burst changed to {UnionBurstSkillId}");
+                    // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] union burst changed to {UnionBurstSkillId}");
                     UnionBurstSkillId = oldChargeSkillNum;
-                    yield break;
+                    // NOTE: there is a critical bug here, if the update change skill is called, the union burst will be forced
+                    // to the old charge skill
                 }
                 yield return null;
             }

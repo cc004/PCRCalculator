@@ -17,5 +17,9 @@ namespace Elements
     OMP,
     UEK,
     NYX,
+    // Token: 0x0400893D RID: 35133
+    RACE_ENEMY,
+    // Token: 0x0400893E RID: 35134
+    BLB_DRAMA
   }
 }

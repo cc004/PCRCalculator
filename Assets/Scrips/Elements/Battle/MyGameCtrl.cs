@@ -190,19 +190,28 @@ namespace Elements
         }
         private void CreateUnitSpine(PCRCaculator.UnitData data,int idx, bool isplayer,eUnitRespawnPos respawnPos, Action callBack)
         {
-            int unitid = data.unitId;
+            int prefab = mainManager.UnitRarityDic.TryGetValue(data.unitId, out var val) ? val.detailData.prefabIdBattle : 0;
+            var unitid = data.unitId;
             //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
             //if(dataAsset == null)
             //{
             int skinID = UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */);
-            int unitid2 = unitid;
+            int unitid2 = unitid, prefabOverride = -1;
+            string skin = null, p0 = null;
+            
             if (unitid == 105701 && data.rarity == 6)
             {
                 skinID = 170161;
                 unitid2 = 170101;
             }
-            var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true);
+
+            if (prefab != 0)
+            {
+                prefabOverride = UnitUtility.GetSkinId(prefab, 3);
+            }
+            
+            var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true, prefabOverride: prefabOverride);
             //}
             if(dataAsset == null)
             {

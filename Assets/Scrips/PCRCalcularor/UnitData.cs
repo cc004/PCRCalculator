@@ -1569,7 +1569,8 @@ namespace PCRCaculator
     /// </summary>
     public class UnitDetailData
     {
-        public int unitid;
+        public int unitid; 
+        public int prefabIdBattle;
         public string name;
         public int minrarity;//初始星级
         public int motionType;//武器动作类型

@@ -264,7 +264,7 @@ namespace PCRCaculator.SQL
                 }
                 catch (KeyNotFoundException ex)
                 {
-                    Debug.LogError($"{pair.Key}µƒRANK ˝æ›∂™ ß£°");
+                    Debug.LogError($"{pair.Key}ÁöÑRANKÊï∞ÊçÆ‰∏¢Â§±ÔºÅ");
                 }
                 UnitRankData rankData = new UnitRankData(eq, datas1);
                 UnitDetailData detailData;
@@ -275,12 +275,13 @@ namespace PCRCaculator.SQL
                         t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,
                         t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id)
                     { 
-                        moveSpeed = t4.move_speed
+                        moveSpeed = t4.move_speed,
+                        prefabIdBattle = t4.prefab_id_battle
                     };
                 }
                 catch (KeyNotFoundException ex)
                 {
-                    Debug.LogError($"{pair.Key}µƒDETAIL ˝æ›∂™ ß£°");
+                    Debug.LogError($"{pair.Key}ÁöÑDETAILÊï∞ÊçÆ‰∏¢Â§±ÔºÅ");
                     detailData = new UnitDetailData();
                 }
                 UnitSkillData skillData = new UnitSkillData();

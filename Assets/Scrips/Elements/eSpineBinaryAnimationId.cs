@@ -38,6 +38,9 @@ namespace Elements
     UEK,
     NYX,
     PKB,
-    MAX,
+    // Token: 0x04008A64 RID: 35428
+    BLB_DRAMA,
+    // Token: 0x04008A65 RID: 35429
+    MAX
   }
 }
