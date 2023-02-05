@@ -1750,6 +1750,9 @@ namespace PCRCaculator
             {
                 data.dataint[i] = a.dataint[i] + b.dataint[i];
             }
+
+            if (a.realhp != 0 || b.realhp != 0)
+                data.realhp = a.RealHp + b.RealHp;
             return data;
         }
         public static BaseData operator -(BaseData a, BaseData b)

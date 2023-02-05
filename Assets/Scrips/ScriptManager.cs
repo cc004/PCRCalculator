@@ -239,6 +239,130 @@ namespace Assets.Scrips
                         };
                         break;
                     }
+                    case "jeq":
+                    {
+                        var next = labels[arg[0]];
+                        var a = argv[1];
+                        var b = argv[2];
+                        result = pc =>
+                        {
+                            if (a() == b())
+                            {
+                                logger.WriteLine($"jumping to {next}.");
+                                return (next, true);
+                            }
+
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "jne":
+                    {
+                        var next = labels[arg[0]];
+                        var a = argv[1];
+                        var b = argv[2];
+                        result = pc =>
+                        {
+                            if (a() != b())
+                            {
+                                logger.WriteLine($"jumping to {next}.");
+                                return (next, true);
+                            }
+
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "jgt":
+                    {
+                        var next = labels[arg[0]];
+                        var a = argv[1];
+                        var b = argv[2];
+                        result = pc =>
+                        {
+                            if (a() > b())
+                            {
+                                logger.WriteLine($"jumping to {next}.");
+                                return (next, true);
+                            }
+
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "jge":
+                    {
+                        var next = labels[arg[0]];
+                        var a = argv[1];
+                        var b = argv[2];
+                        result = pc =>
+                        {
+                            if (a() >= b())
+                            {
+                                logger.WriteLine($"jumping to {next}.");
+                                return (next, true);
+                            }
+
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "jlt":
+                    {
+                        var next = labels[arg[0]];
+                        var a = argv[1];
+                        var b = argv[2];
+                        result = pc =>
+                        {
+                            if (a() < b())
+                            {
+                                logger.WriteLine($"jumping to {next}.");
+                                return (next, true);
+                            }
+
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "jle":
+                    {
+                        var next = labels[arg[0]];
+                        var a = argv[1];
+                        var b = argv[2];
+                        result = pc =>
+                        {
+                            if (a() <= b())
+                            {
+                                logger.WriteLine($"jumping to {next}.");
+                                return (next, true);
+                            }
+
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "max":
+                    {
+                        var res = arg[0];
+                        var argvs = argv.Skip(1).ToArray();
+                        result = pc =>
+                        {
+                            variables[res] = argvs.Max(a => a());
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
+                    case "min":
+                    {
+                        var res = arg[0];
+                        var argvs = argv.Skip(1).ToArray();
+                        result = pc =>
+                        {
+                            variables[res] = argvs.Min(a => a());
+                            return (pc + 1, true);
+                        };
+                        break;
+                    }
                     case "mov":
                     {
                         var a = argv[0];
@@ -687,6 +811,13 @@ namespace Assets.Scrips
                                         }
 
                                         value[i] = rlist[id] <= bound ? 1 : 0;
+                                        break;
+                                    }
+                                    case "lt":
+                                    {
+                                        var a = float.Parse(exp[1]);
+                                        var b = value[int.Parse(exp[2])];
+                                        value[i] = b < a ? 1 : 0;
                                         break;
                                     }
                                     default:
