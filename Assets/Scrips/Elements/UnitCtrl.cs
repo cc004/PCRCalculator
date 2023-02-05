@@ -3102,6 +3102,7 @@ this.updateCurColor();
 
         public void ChangeAttackPattern(int _attackPatternId, int _spSkillLevel, float _limitTime = -1f)
         {
+            Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] attack pattern changed to {_attackPatternId}");
             int currentActionPatternId = this.currentActionPatternId;
             this.currentActionPatternId = _attackPatternId;
             attackPatternIndex = 0;
@@ -3132,10 +3133,12 @@ this.updateCurColor();
 
         public void ChangeChargeSkill(int skillNum, float limitTime)
         {
+            Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] union burst changed to {skillNum}");
             isAwakeMotion = true;
             int unionBurstSkillId = UnionBurstSkillId;
             UnionBurstSkillId = skillNum;
-            AppendCoroutine(updateChangeSkillNum(unionBurstSkillId, limitTime), ePauseType.SYSTEM, this);
+            if (limitTime > 0f)
+                AppendCoroutine(updateChangeSkillNum(unionBurstSkillId, limitTime), ePauseType.SYSTEM, this);
         }
 
         private IEnumerator updateChangeSkillNum(int oldChargeSkillNum, float limitTime)
@@ -3144,8 +3147,12 @@ this.updateCurColor();
             while (true)
             {
                 time += DeltaTimeForPause;
-                if (time > (double)limitTime)
+                if (time > (double) limitTime)
+                {
+                    Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] union burst changed to {UnionBurstSkillId}");
                     UnionBurstSkillId = oldChargeSkillNum;
+                    yield break;
+                }
                 yield return null;
             }
         }
