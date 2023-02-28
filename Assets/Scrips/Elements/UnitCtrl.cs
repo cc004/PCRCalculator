@@ -2192,9 +2192,10 @@ this.updateCurColor();
             //UnitData uniqueData = _data.UniqueData;
             BaseData baseData = new BaseData();
             BaseData baseDataEX = new BaseData();
-            if (MyGameCtrl.Instance.tempData.guildEnemy?.unit_id == unitData_my.unitId)
+            var enemy = MyGameCtrl.Instance.tempData.guildEnemy.FirstOrDefault(e => e.unit_id == this.UnitId);
+            if (enemy != null)
             {
-                baseData = MyGameCtrl.Instance.tempData.guildEnemy.baseData;
+                baseData = enemy.baseData;
             }
             else if (MainManager.Instance.unitDataDic.ContainsKey(UnitId))/* if (UnitId <= 200000 || UnitId >= 400000) */
             {

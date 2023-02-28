@@ -904,6 +904,12 @@ namespace PCRCaculator.Guild
                     if (ExcelHelper.ExcelHelper.AsmExportEnabled)
                     {
                         sw.WriteLine(totalDamageExcept.ToExpression(rnd.Next()));
+
+                        if (BattleManager.Instance.scriptMgr != null)
+                        {
+                            foreach (var data in BattleManager.Instance.scriptMgr.additionalData)
+                                sw.WriteLine($"{data.comment}: {data.data?.ToExpression(rnd.Next())}");
+                        }
                     }
                 }
 #if PLATFORM_ANDROID
@@ -1023,7 +1029,7 @@ namespace PCRCaculator.Guild
             }
             if (templateSettings["BOSS名称坐标"] != null)
             {
-                sheet.Cells[templateSettings["BOSS名称坐标"]].Value = MyGameCtrl.Instance.tempData.guildEnemy.detailData.unit_name;
+                sheet.Cells[templateSettings["BOSS名称坐标"]].Value = MyGameCtrl.Instance.tempData.guildEnemy[0].detailData.unit_name;
             }
             
             if (templateSettings["BOSS头像"] != null)

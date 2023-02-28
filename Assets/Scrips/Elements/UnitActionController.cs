@@ -2101,7 +2101,7 @@ namespace Elements
                         UnitCtrl.quickSortImpl(lst2, 0, lst2.Count - 1, instance);
                         return lst2[Math.Min(lst2.Count - 1, nth)].hash != tgth;
                     },
-                    exp = hash => $"\n qsort = {nth}:\n{string.Join("\n", lst.Select(u => getter(u).ToExpression(hash)))}",
+                    exp = hash => $"\n qsort = {tgt.Owner.UnitNameEx}:\n{string.Join("\n", lst.Select(u => getter(u).ToExpression(hash)).Prepend($"{tgt.Owner.UnitNameEx}:"))}",
                     enabled = false,
                     description =
                         $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的{(Owner.CurrentSkillId == 1 ? "普攻" : $"{skillDictionary[Owner.CurrentSkillId].SkillName}技能({Owner.CurrentSkillId})")}打歪(原定目标: {tgt.Owner.UnitNameEx})"

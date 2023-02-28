@@ -68,7 +68,7 @@ namespace Elements
                 tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
                 tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
                 tempData.mParts = mainManager.GuildBattleData.mParts;
-                tempData.enemyList = new List<PCRCaculator.UnitData> { tempData.guildEnemy.CreateUnitData() };
+                tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
                 tempData.isGuildBattle = true;
                 tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
@@ -120,8 +120,11 @@ namespace Elements
             int idx = 0;
             if (tempData.isGuildBattle)
             {
-                var unitData = tempData.guildEnemy.CreateUnitData();
-                LoadCharacter(unitData, idx, false, action);
+                foreach (var enemy in tempData.guildEnemy)
+                {
+                    var unitData = enemy.CreateUnitData();
+                    LoadCharacter(unitData, idx, false, action);
+                }
             }
             else
             {
@@ -335,7 +338,8 @@ namespace Elements
             }
             if (tempData.isGuildBattle && !isplayer)
             {
-                unitCtrl.UnitName = tempData.guildEnemy.name;
+                unitCtrl.UnitName = tempData.guildEnemy.FirstOrDefault(e => e.unit_id == unitCtrl.UnitId)?.name ??
+                                    "BOSS";
             }
             else
             {
@@ -583,7 +587,7 @@ namespace Elements
         public bool isGuildEnemyViolent;
         public List<PCRCaculator.UnitData> playerList;
         public List<PCRCaculator.UnitData> enemyList;
-        public EnemyData guildEnemy;
+        public List<EnemyData> guildEnemy;
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         //public bool UseFixedRandomSeed;
@@ -612,8 +616,11 @@ namespace Elements
             }
             else
             {
-                UnitParameter parameter = CreateUnitParameter(guildEnemy,useLogBarrier);
-                EnemyParameters.Add(parameter);
+                foreach (var enemy in guildEnemy)
+                {
+                    UnitParameter parameter = CreateUnitParameter(enemy,useLogBarrier);
+                    EnemyParameters.Add(parameter);
+                }
             }
             AllUnitParameters.Add(PlayerParameters);
             AllUnitParameters.Add(EnemyParameters);

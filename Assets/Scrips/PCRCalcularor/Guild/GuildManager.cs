@@ -88,12 +88,12 @@ namespace PCRCaculator.Guild
                 return staticsettingData;
             }
         }
-        private int selectedBossEnemyid => SettingData.GetCurrentPlayerGroup().selectedEnemyID;
+        private int[] selectedBossEnemyids => SettingData.GetCurrentPlayerGroup().selectedEnemyIDs;
         private bool isEditongUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
         private int currentPage;
         private bool isInit;
-        private int specialEnemyid;
+        private int[] specialEnemyid;
         private int specialInputValue;
 
         public static Dictionary<int, EnemyData> EnemyDataDic
@@ -310,7 +310,7 @@ namespace PCRCaculator.Guild
                     }*/
                 }
 
-                specialEnemyid = enemyid_0;
+                specialEnemyid = new[] {enemyid_0};
                 specialInputValue = 100;
             }
             catch(Exception _)
@@ -322,8 +322,9 @@ namespace PCRCaculator.Guild
         {
             if(!isGuildBoss)
             {
-                int bossid = int.Parse(specialInput.text, NumberStyles.Any);
-                if(EnemyDataDic.TryGetValue(bossid,out var data))
+                var bossid = specialInput.text.Split(',').Select(x => int.Parse(x, NumberStyles.Any)).ToArray();
+                EnemyData data = null;
+                if (bossid.Reverse().All(x => EnemyDataDic.TryGetValue(x, out data)))
                 {
                     //string Path = "GuildEnemy/icon_unit_" + data.unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
@@ -333,14 +334,14 @@ namespace PCRCaculator.Guild
                 else
                 {
                     MainManager.Instance.WindowConfigMessage("bossID无效！", null);
-                    specialEnemyid = 0;
+                    specialEnemyid = new[] {0};
                 }
                 specialInputValue = 0;
             }
         }
         public void FinishChooseBossButton()
         {
-            int enemyId = 0;
+            int[] enemyId = new int[] {0};
             if (isGuildBoss)
             {
                 //int month = dropdowns_ChooseBoss[2].value;
@@ -352,7 +353,7 @@ namespace PCRCaculator.Guild
                 SettingData.GetCurrentPlayerGroup().currentGuildEnemyNum = num;
                 int turn = dropdowns_ChooseBoss[1].value + 1; 
                 SettingData.GetCurrentPlayerGroup().currentTurn = turn;
-                enemyId = GetGuildBossID(clanBattleID, num, turn);
+                enemyId = new [] {GetGuildBossID(clanBattleID, num, turn)};
             }
             else
             {
@@ -361,7 +362,7 @@ namespace PCRCaculator.Guild
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
 
             var group = SettingData.GetCurrentPlayerGroup();
-            group.selectedEnemyID = isGuildBoss ? enemyId : specialEnemyid;
+            group.selectedEnemyIDs = isGuildBoss ? enemyId : specialEnemyid;
             group.isSpecialBoss = false;//!isGuildBoss;
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
@@ -430,27 +431,31 @@ namespace PCRCaculator.Guild
             }*/
             stoptime = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             SaveDataToJson();
-            EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
             GuildBattleData battleData = new GuildBattleData();
             battleData.players = SettingData.GetCurrentPlayerData();
-            battleData.enemyData = enemyData;
-            if(EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+            battleData.enemyData = new List<EnemyData>();
+            foreach (var selectedBossEnemyid in selectedBossEnemyids)
             {
-                battleData.mParts = value;
-                battleData.MPartsDataDic = new Dictionary<int, EnemyData>();
-                Action<int> action = a =>
+                EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
+                if(EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
                 {
-                    if (a != 0)
+                    battleData.mParts = value;
+                    battleData.MPartsDataDic = new Dictionary<int, EnemyData>();
+                    Action<int> action = a =>
                     {
-                        battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));                        
-                    }
-                };
-                action(value.child_enemy_parameter_1);
-                action(value.child_enemy_parameter_2);
-                action(value.child_enemy_parameter_3);
-                action(value.child_enemy_parameter_4);
-                action(value.child_enemy_parameter_5);
+                        if (a != 0)
+                        {
+                            battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));                        
+                        }
+                    };
+                    action(value.child_enemy_parameter_1);
+                    action(value.child_enemy_parameter_2);
+                    action(value.child_enemy_parameter_3);
+                    action(value.child_enemy_parameter_4);
+                    action(value.child_enemy_parameter_5);
 
+                }
+                battleData.enemyData.Add(enemyData);
             }
             battleData.UBExecTimeList = SettingData.GetCurrentPlayerGroup().UBExecTimeData;
             battleData.isAutoMode = AutoModeToggle.isOn;
@@ -573,12 +578,13 @@ namespace PCRCaculator.Guild
             if (data.currentGuildMonth < 1000) data.currentGuildMonth += 1024;
             if (data.currentGuildMonth < 1024) data.currentGuildMonth += 24;
 
-            if (selectedBossEnemyid == 0)
-                data.selectedEnemyID = GetGuildBossID(data.currentGuildMonth, data.currentGuildEnemyNum, data.currentTurn);
+            if (selectedBossEnemyids == null || selectedBossEnemyids.Length == 0 || selectedBossEnemyids[0] == 0)
+                data.selectedEnemyIDs = new []
+                    {GetGuildBossID(data.currentGuildMonth, data.currentGuildEnemyNum, data.currentTurn)};
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
-            bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyid].unit_id);
-            bossDetailTexts[0].text = group.isSpecialBoss ? "自定义": EnemyDataDic[selectedBossEnemyid].name;
+            bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
+            bossDetailTexts[0].text = group.isSpecialBoss ? "自定义": EnemyDataDic[selectedBossEnemyids[0]].name;
             string str = "";
             if (group.isSpecialBoss)
             {
@@ -770,7 +776,7 @@ namespace PCRCaculator.Guild
         }
         public void GuildBossDataEditButton()
         {
-            BossDataEditdr.SetData(selectedBossEnemyid);
+            BossDataEditdr.SetData(selectedBossEnemyids[0]);
         }
         public void GuildExecTimeSettingButton(UnitData unitData)
         {
@@ -1086,10 +1092,10 @@ namespace PCRCaculator.Guild
         public void BossImageButton()
         {
             string detailstr = "    请选择BOSS!";
-            EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
+            EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyids[0]);
             if (enemyData != null)
             {
-                detailstr = $"  {enemyData.detailData.unit_name}({selectedBossEnemyid})/({enemyData.detailData.unit_id})\n";
+                detailstr = $"  {enemyData.detailData.unit_name}({selectedBossEnemyids[0]})/({enemyData.detailData.unit_id})\n";
                 detailstr += $" HP：{enemyData.baseData.RealHp}\n";
                 detailstr += $" ATK：{enemyData.baseData.Atk}\n";
                 detailstr += $" MGSTR：{enemyData.baseData.Magic_str}\n";
@@ -1328,7 +1334,7 @@ namespace PCRCaculator.Guild
         public int currentGuildMonth=9;
         public int currentGuildEnemyNum=1;
         public int currentTurn=1;
-        public int selectedEnemyID;
+        public int[] selectedEnemyIDs;
         public bool isViolent;
         public bool usePlayerSettingHP;
         public int playerSetingHP;

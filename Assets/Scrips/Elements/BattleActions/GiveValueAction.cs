@@ -172,29 +172,29 @@ namespace Elements
                     //_addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.Atk) * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
-                        _addValue[_evalue] = (float)parameterParts.GetAtkZero() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = parameterParts.GetAtkZero() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     else
                     {
-                        _addValue[_evalue] = (float)(int)_target.Owner.AtkZero * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.AtkZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 8:
                     //_addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.MagicStr) * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
-                        _addValue[_evalue] = (float)parameterParts.GetMagicStrZero() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = parameterParts.GetMagicStrZero() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     else
                     {
-                        _addValue[_evalue] = (float)(int)_target.Owner.MagicStrZero * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.MagicStrZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 9:
                     //_addValue[_evalue] = (float)(int)_target.Owner.Def * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
-                        _addValue[_evalue] = (float)parameterParts.GetDefZero() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = parameterParts.GetDefZero() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     else
                     {
@@ -205,7 +205,7 @@ namespace Elements
                     //_addValue[_evalue] = (float)(int)_target.Owner.MagicDef * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
-                        _addValue[_evalue] = (float)parameterParts.GetMagicDefZero() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = parameterParts.GetMagicDefZero() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     else
                     {

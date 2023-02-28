@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-
+/*
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 
 public struct OpenFileName
@@ -32,7 +32,7 @@ public struct OpenFileName
     public int flagsEx;
 
 }
-
+*/
 
 
 /*

@@ -14,6 +14,15 @@ namespace Assets.Scrips
 {
     public class ScriptManager
     {
+        public class AdditionalData
+        {
+            public string comment;
+            public FloatWithEx data;
+            public Func<FloatWithEx> getter;
+            public Func<bool> condition;
+        }
+        
+        public List<AdditionalData> additionalData = new List<AdditionalData>();
         private BattleManager mgr;
         private Func<int, (int, bool)>[] compiled;
         private Dictionary<string, double> variables = new Dictionary<string, double>();
@@ -40,6 +49,31 @@ namespace Assets.Scrips
         }
         public void ParseScript()
         {
+            additionalData.Clear();
+            if (File.Exists("additional.txt"))
+            {
+                foreach (var data in File.ReadAllLines("additional.txt"))
+                {
+                    var s = data.Split(' ');
+                    var frame = int.Parse(s[0]);
+                    var unit = Parse(int.Parse(s[1]));
+                    var prop = s[2];
+                    var comment = s[3];
+                    additionalData.Add(new AdditionalData
+                    {
+                        comment = comment,
+                        condition = () => BattleHeaderController.CurrentFrameCount == frame,
+                        getter = prop switch
+                        {
+                            "tp" => () => mgr.UnitList.Concat(mgr.EnemyList)
+                                .Single(u => u.UnitId == unit).energy,
+                            "hp" => () => mgr.UnitList.Concat(mgr.EnemyList)
+                                .Single(u => u.UnitId == unit).Hp,
+                            _ => () => 0
+                        }
+                    });
+                }
+            }
             variables.Clear();
             pressing.Clear();
             press.Clear();
@@ -182,9 +216,9 @@ namespace Assets.Scrips
                 if (l.EndsWith(":"))
                 {
                     var name = l.Substring(0, l.Length - 1);
-                    logger.WriteLine($"registering label: {name} to {ii}");
+                    // logger.WriteLine($"registering label: {name} to {ii}");
                     labels.Add(name, ii);
-                    compiled[ii - 1] = pc => (pc, true);
+                    compiled[ii - 1] = pc => (pc + 1, true);
                 }
             }
 
@@ -821,7 +855,8 @@ namespace Assets.Scrips
                                         break;
                                     }
                                     default:
-                                        logger.WriteLine($"eval: unrecognized operator: {exp[0]}");
+                                        if (!string.IsNullOrEmpty(exp[0]))
+                                            logger.WriteLine($"eval: unrecognized operator: {exp[0]}");
                                         break;
                                 }
                             }
@@ -848,7 +883,7 @@ namespace Assets.Scrips
             }
 
         }
-
+        
         public void Update()
         {
             unitlist.Clear();
@@ -860,6 +895,8 @@ namespace Assets.Scrips
             variables["cur_lframe"] = BattleHeaderController.CurrentFrameCount;
             var n = pc.Count;
             var removing = new List<int>();
+            foreach (var data in additionalData.Where(data => data.condition()))
+                data.data = data.getter();
             for (var i = 0; i < n; ++i)
             {
                 try

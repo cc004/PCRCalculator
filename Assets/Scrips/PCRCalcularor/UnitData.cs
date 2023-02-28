@@ -2074,7 +2074,7 @@ namespace PCRCaculator
     public class GuildBattleData
     {
         public AddedPlayerData players;
-        public EnemyData enemyData;
+        public List<EnemyData> enemyData;
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         public List<List<float>> UBExecTimeList = null;

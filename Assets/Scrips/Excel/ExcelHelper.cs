@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Elements;
 using ExcelDataReader;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Style;
@@ -105,7 +106,11 @@ namespace ExcelHelper
             return AndroidTool.GetExcelPath();
 #else
             var str = StandaloneFileBrowser.OpenFilePanel(
-                "打开Excel", string.Empty, "xlsx", false);
+                "打开Excel", string.Empty, new ExtensionFilter[]
+                {
+                    new ExtensionFilter("", "xlsx"),
+                    new ExtensionFilter("", "json"),
+                }, false);
             if (str.Length > 0)
             {
                 var file = str[0];
@@ -115,6 +120,106 @@ namespace ExcelHelper
             throw new Exception("用户取消操作");
 #endif
         }
+        
+        private static bool ReadJsonTimeLineData(string path, out GuildTimelineData guildTimelineData, SystemWindowMessage.configDelegate failedAction)
+        {
+            try
+            {
+                var json = JToken.Parse(File.ReadAllText(path))["data"];
+                var turn = (int) json["battle_log"]["data"]["lap_num"];
+                var ids = Enumerable.Range(1, 5).Select(i => (int)json["battle_log"][$"unit_id_{i}"])
+                    .OrderBy(t => MainManager.Instance.UnitRarityDic[t].detailData.searchAreaWidth)
+                    .ThenBy(t => t).Append((int)json["battle_log"][$"unit_id_{6}"]).ToArray();
+                var idinv = ids.Select((t, i) => (t, i)).ToDictionary(k => k.t, k => k.i);
+                double frame = 0;
+                var lovedict = json["battle_log"]["data"]["related_love"]
+                    .ToObject<List<Dictionary<int, int>>>().Select(d => d.Single()).Select(p => (p.Key, p.Value))
+                    .Concat(json["battle_log"]["data"]["units"].Values().Select(u => ((int) u["unit_id"], (int) u["love"])))
+                    .Distinct().ToDictionary(u => u.Item1, u => u.Item2);
+                guildTimelineData = new GuildTimelineData
+                {
+                    currentRandomSeed = (int)json["battle_log"]["seed"],
+                    playerGroupData = new GuildPlayerGroupData
+                    {
+                        playerData = new AddedPlayerData
+                        {
+                            playrCharacters = json["battle_log"]["data"]["units"].Values().Select(t =>
+                            {
+                                var unit = new UnitData(id: (int) t["unit_id"])
+                                {
+                                    equipLevel = new int[]
+                                    {
+                                        (int) t["equip1"],
+                                        (int) t["equip2"],
+                                        (int) t["equip3"],
+                                        (int) t["equip4"],
+                                        (int) t["equip5"],
+                                        (int) t["equip6"],
+                                    },
+                                    level = (int) t["level"],
+                                    skillLevel = new int[]
+                                    {
+                                        (int) t["ub"],
+                                        (int) t["main1"],
+                                        (int) t["main2"],
+                                        (int) t["ex"],
+                                    },
+                                    rarity = (int) t["battle_rarity"] == 0
+                                        ? (int) t["rarity"]
+                                        : (int) t["battle_rarity"],
+                                    rank = (int) t["rank"],
+                                    uniqueEqLv = (int) t["unique"]
+                                };
+                                foreach (var key in unit.playLoveDic.Keys.ToArray())
+                                {
+                                    unit.playLoveDic[key] = lovedict.TryGetValue(key, out var val) ? val : 0;
+                                }
+
+                                return unit;
+                            }).OrderBy(t => idinv[t.unitId]).ToList()
+                        },
+                        currentGuildMonth = (int) json["battle_log"]["data"]["clan_battle_id"],
+                        currentGuildEnemyNum = (int) json["battle_log"]["data"]["order_num"] - 1,
+                        currentTurn = (turn > 3 ? 1 : 0) + (turn > 10 ? 1 : 0) + (turn > 35 ? 1 : 0) +
+                                      (turn > 45 ? 1 : 0) +
+                                      1,
+                    },
+                    UBExecTime = json["timeline"].Select(j => new
+                            {unit = idinv[(int) j["unit_id"]], frame = (int) j["press"]})
+                        .Select(t =>
+                        {
+                            if ((int) frame == t.frame)
+                            {
+                                frame += 0.01;
+                                return (unit: t.unit, frame: frame);
+                            }
+                            else
+                            {
+                                frame = t.frame;
+                                return (unit: t.unit, frame: t.frame);
+                            }
+                        })
+                        .Aggregate(
+                            new List<List<float>>()
+                            {
+                                new List<float>(), new List<float>(), new List<float>(), new List<float>(),
+                                new List<float>(), new List<float>(),
+                            }, (seed, t) =>
+                            {
+                                seed[t.unit].Add((float) t.frame);
+                                return seed;
+                            })
+                };
+                return true;
+            }
+            catch (Exception e)
+            {
+                MainManager.Instance.WindowConfigMessage(e.ToString(), null);
+                guildTimelineData = null;
+                return false;
+            }
+        }
+        
         public static bool ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,SystemWindowMessage.configDelegate failedAction = null,string path0=null)
         {
             string path = string.IsNullOrEmpty(path0) ? GetExcelPath() : path0;
@@ -122,6 +227,10 @@ namespace ExcelHelper
             //打开windows框
             if (!string.IsNullOrEmpty(path))
             {
+                if (path.EndsWith(".json"))
+                {
+                    return ReadJsonTimeLineData(path, out guildTimelineData, failedAction);
+                }
                 
                 FileStream stream = null;
                 try
@@ -321,7 +430,7 @@ namespace ExcelHelper
                 src.AppendLine($"//require {pair.Key}:{cond}");
             }
 
-            src.AppendLine($"//require {TimelineData.playerGroupData.selectedEnemyID}:");
+            src.AppendLine($"//require {TimelineData.playerGroupData.selectedEnemyIDs[0]}:");
 
             foreach (var tuple in cdict)
             {
@@ -331,11 +440,11 @@ namespace ExcelHelper
             //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
             //msg.AppendLine($"对\"{enemy}\"（{seed}:{enemy}-{PCRBattle.Instance.enemyUnitid}）造成{damage}伤害：");
             msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
-            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyID}");
+            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
             msg.AppendLine("帧轴：");
 
             var skippingFrame = 0;
-            cdict.Add(TimelineData.playerGroupData.selectedEnemyID, new { name = string.Empty, unit = (UnitData)null });
+            cdict.Add(TimelineData.playerGroupData.selectedEnemyIDs[0], new { name = string.Empty, unit = (UnitData)null });
 
             var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
 
@@ -382,11 +491,11 @@ namespace ExcelHelper
             src.AppendLine("autopcr.setOffset(2, 0); # offset calibration");
 
             msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
-            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyID}");
+            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
             msg.AppendLine("帧轴：");
 
             var skippingFrame = 0;
-            cdict.Add(TimelineData.playerGroupData.selectedEnemyID, new { name = string.Empty, unit = (UnitData)null });
+            cdict.Add(TimelineData.playerGroupData.selectedEnemyIDs[0], new { name = string.Empty, unit = (UnitData)null });
 
             var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
 
@@ -744,7 +853,7 @@ namespace ExcelHelper
                 worksheet1.Cells[lineNum,1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet1.Cells[lineNum,1].Value = "BOSS详情";
                 lineNum++;
-                EnemyData enemyData = MyGameCtrl.Instance.tempData.guildEnemy;
+                EnemyData enemyData = MyGameCtrl.Instance.tempData.guildEnemy[0];
                 worksheet1.Cells[lineNum, 1].Value = enemyData.unit_id;
                 worksheet1.Cells[lineNum, 2].Value = enemyData.detailData.unit_name;
                 string str = "";
