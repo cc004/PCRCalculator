@@ -310,7 +310,7 @@ namespace PCRCaculator
             //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
             //
-            string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
+            string nickNameDic = LoadJsonDatas("Datas/nickname");
             //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
             unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
