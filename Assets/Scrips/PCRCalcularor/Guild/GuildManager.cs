@@ -366,7 +366,7 @@ namespace PCRCaculator.Guild
             group.isSpecialBoss = false;//!isGuildBoss;
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
-            group.useLogBarrierNew = (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
+            group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
             SaveDataToJson();
             Reflash();
         }
