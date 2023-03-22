@@ -268,8 +268,8 @@ namespace PCRCaculator
                                 Task.Run(() => Extensions.OverrideWith(GuildManager.EnemyDataDic, dbTool2.Dic2)),
                                 Task.Run(() => Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool2.Dic9))
                             ).Wait();
-                            unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
-                            unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
+                            // unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
+                            // unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
                     }));
 
