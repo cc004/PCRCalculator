@@ -626,7 +626,6 @@ namespace Elements.Battle
             ++FrameCount;
             if (BattleLeftTime <= 0.0 && battleResult != eBattleResult.WIN)
                 return;
-            scriptMgr?.Update();
             //this.UnitUiCtrl._Update(_canUpdateTime);
             switch (GameState)
             {
@@ -650,6 +649,7 @@ namespace Elements.Battle
                 CoroutineManager._Update();
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
+            scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
             isUpdateFrameExecuted = true;
