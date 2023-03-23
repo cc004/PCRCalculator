@@ -264,7 +264,8 @@ namespace Elements
 
             public string ToString(int frame)
             {
-                if (priority == eCritPointPriority.FullEnergy && frame - this.frame <= 1)
+                if ((priority == eCritPointPriority.FullEnergy || 
+                     priority == eCritPointPriority.ExecAction && description2 == "AUTO") && frame - this.frame <= 1)
                     return description2;
                 if (frame <= this.frame + 2)
                     return $"极限押{description2}({frame - this.frame})";

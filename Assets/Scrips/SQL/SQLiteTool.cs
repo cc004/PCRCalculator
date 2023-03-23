@@ -264,7 +264,8 @@ namespace PCRCaculator.SQL
                 }
                 catch (KeyNotFoundException ex)
                 {
-                    Debug.LogError($"{pair.Key}的RANK数据丢失！");
+                    Debug.LogWarning($"{pair.Key}的RANK数据丢失！");
+                    continue;
                 }
                 UnitRankData rankData = new UnitRankData(eq, datas1);
                 UnitDetailData detailData;
@@ -281,14 +282,22 @@ namespace PCRCaculator.SQL
                 }
                 catch (KeyNotFoundException ex)
                 {
-                    Debug.LogError($"{pair.Key}的DETAIL数据丢失！");
+                    Debug.LogWarning($"{pair.Key}的DETAIL数据丢失！");
                     detailData = new UnitDetailData();
+                    continue;
                 }
                 UnitSkillData skillData = new UnitSkillData();
                 unit_skill_data sk = unitSkillDataDic[pair.Key];
-                if (pair.Key == 105701 && MainManager.Instance.useJapanData)
+                if (pair.Key == 105701)
                 {
-                    sk = unitSkillDataDic[170101];
+                    if (MainManager.Instance.useJapanData)
+                    {
+                        sk = unitSkillDataDic[170101];
+                    }
+                    else
+                    {
+                        sk = unitSkillDataDic.TryGetValue(170301, out var val) ? val : unitSkillDataDic[170101];
+                    }
                 }
                 skillData.UB = sk.union_burst;
                 skillData.UB_ev = sk.union_burst_evolution;

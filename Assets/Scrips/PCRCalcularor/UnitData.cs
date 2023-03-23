@@ -370,9 +370,13 @@ namespace PCRCaculator
             for (int i = 0; i < other.rankData.datas.Count; ++i)
             {
                 var d = other.rankData.datas[i];
+                rankData.datas[i] = d;
+            }
+
+            for (int i = 0; i < other.rankData.rankEquipments.Count; ++i)
+            {
                 var r = other.rankData.rankEquipments[i];
                 if (r.Max() != 999999) rankData.rankEquipments[i] = r;
-                rankData.datas[i] = d;
             }
         }
 
