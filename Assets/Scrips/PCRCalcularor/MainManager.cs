@@ -268,8 +268,8 @@ namespace PCRCaculator
                                 Task.Run(() => Extensions.OverrideWith(GuildManager.EnemyDataDic, dbTool2.Dic2)),
                                 Task.Run(() => Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool2.Dic9))
                             ).Wait();
-                            unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
-                            unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
+                            // unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
+                            // unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
                     }));
 
@@ -310,10 +310,9 @@ namespace PCRCaculator
             //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
             //
-            string nickNameDic = LoadJsonDatas("Datas/nickname");
-            //string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
+            string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
-            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
+            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nicknames"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
             
             if (!string.IsNullOrEmpty(firearmStr))

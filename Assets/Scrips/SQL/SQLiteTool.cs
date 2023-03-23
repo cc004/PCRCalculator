@@ -294,10 +294,6 @@ namespace PCRCaculator.SQL
                     {
                         sk = unitSkillDataDic[170101];
                     }
-                    else
-                    {
-                        sk = unitSkillDataDic.TryGetValue(170301, out var val) ? val : unitSkillDataDic[170101];
-                    }
                 }
                 skillData.UB = sk.union_burst;
                 skillData.UB_ev = sk.union_burst_evolution;
