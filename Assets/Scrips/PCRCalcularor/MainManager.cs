@@ -170,7 +170,7 @@ namespace PCRCaculator
 #if PLATFORM_ANDROID
                 var dir = Application.persistentDataPath + "/AB";
 #else
-                var dir = Application.streamingAssetsPath + "/../.ABExt";
+                var dir = Application.streamingAssetsPath + "/../.ABExt2";
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

@@ -417,8 +417,13 @@ namespace PCRCaculator
         private const string KEY_VER_ID_OLD = "VER_ID_OLD";
         public static int GetVer(bool old,int? defaultVal = null)
         {
+            if (!(MainManager.Instance?.useJapanData ?? false))
+            {
+                return defaultVal ?? (old ? 10038900 : 10046200);
+            }
+
             return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID,
-                defaultVal ?? (old && !(MainManager.Instance?.useJapanData ?? false) ? 10038900 : 10046200));
+                defaultVal ?? (10046200));
         }
 
         public static Task StaticInitialize()
@@ -455,7 +460,7 @@ namespace PCRCaculator
             path = Application.persistentDataPath + "/AB/" + fullname;
 #else
             var www = new WWW(path);
-            path = Application.streamingAssetsPath + "/../.ABExt/" + fullname;
+            path = Application.streamingAssetsPath + "/../.ABExt2/" + fullname;
 #endif
             var asset = www.getAssetBundle();
             if (asset == null || MainManager.Instance.useJapanData)
@@ -582,7 +587,7 @@ namespace PCRCaculator
             AssetBundleDic.Clear();
             spriteDic.Clear();
             AssetBundle.UnloadAllAssetBundles(true);
-            string path = Application.streamingAssetsPath + "/../.ABExt";
+            string path = Application.streamingAssetsPath + "/../.ABExt2";
             if (Application.platform == RuntimePlatform.Android)
             {
                 path = Application.persistentDataPath + "/AB";
