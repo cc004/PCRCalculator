@@ -312,7 +312,7 @@ namespace PCRCaculator
             //
             string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
-            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nicknames"));
+            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
             
             if (!string.IsNullOrEmpty(firearmStr))
