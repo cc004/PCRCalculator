@@ -8,6 +8,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using Elements;
+using Elements.Battle;
 using ExcelDataReader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -668,8 +669,111 @@ namespace ExcelHelper
                 package.Save();
             }
         }
+
+        private static (int lframe, int frame, string comment)[] ParseSetStatus()
+        {
+            const int N = 5;
+            var statusChanging = new List<(int frame, int lframe, BattleManager.eSetStatus old, BattleManager.eSetStatus @new)>[N];
+            var status = new BattleManager.eSetStatus[N];
+            var result = new List<(int lframe, int frame, string comment)>();
+
+
+            for (var i = 0; i < N; ++i)
+            {
+                statusChanging[i] = new List<(int, int, BattleManager.eSetStatus, BattleManager.eSetStatus)>();
+                /*
+                {
+                    (-1, -1, BattleManager.eSetStatus.MUST_NOT, BattleManager.eSetStatus.MUST_NOT)
+                };*/
+                status[i] = BattleManager.eSetStatus.MUST_NOT;
+            }
+
+            var frame = 0;
+            
+            foreach (var (lframe, t) in BattleManager.Instance.setStatus)
+            {
+                for (var i = 0; i < N; ++i)
+                {
+                    if (status[i] != t[i])
+                    {
+                        statusChanging[i].Add((frame, lframe, status[i], t[i]));
+                        status[i] = t[i];
+                    }
+                }
+
+                ++frame;
+            }
+
+            var pos = new int[N];
+            var statusChanging2 = new List<(int, BattleManager.eSetStatus[])>();
+
+            for (var i = 0; i < N; ++i)
+            {
+                status[i] = BattleManager.eSetStatus.MUST_NOT;
+                pos[i] = 0;
+            }
+
+            for (;;)
+            {
+                int minFrame = 9999, minPos = -1;
+                for (var i = 0; i < N; ++i)
+                {
+                    if (pos[i] >= statusChanging[i].Count) continue;
+                    
+                    var t = statusChanging[i][pos[i]];
+                    if (minFrame <= t.frame) continue;
+                    
+                    minFrame = statusChanging[i][pos[i]].frame;
+                    minPos = i;
+                }
+
+                if (minPos == -1) break;
+                var mint = statusChanging[minPos][pos[minPos]++];
+
+                if (mint.@new == BattleManager.eSetStatus.MAY || mint.@new == status[minPos])
+                    continue;
+                
+                var newStatus = new BattleManager.eSetStatus[N];
+
+                for (var i = 0; i < N; ++i)
+                {
+                    newStatus[i] = status[i];
+
+                    if (i == minPos)
+                    {
+                        newStatus[i] = mint.@new;
+                        continue;
+                    }
+
+                    if (pos[i] >= statusChanging[i].Count) continue;
+                    
+                    var t = statusChanging[i][pos[i]];
+                    if (t.old == BattleManager.eSetStatus.MAY)
+                        newStatus[i] = t.@new;
+                    else
+                        newStatus[i] = t.old;
+                }
+                
+                if (!newStatus.SequenceEqual(status))
+                {
+                    result.Add((mint.lframe, mint.frame,
+                            string.Concat(newStatus.Select(x => x switch
+                            {
+                                BattleManager.eSetStatus.MUST_NOT => 'x',
+                                BattleManager.eSetStatus.MUST => 'o',
+                                _ => throw new InvalidOperationException()
+                            }))));
+                    status = newStatus;
+                }
+            }
+
+            return result.ToArray();
+        }
+        
         private static void CreateGuildTimeLineExcel(FileInfo newFile)
         {
+            var setData = ParseSetStatus();
+            
             using (ExcelPackage package = new ExcelPackage(newFile))
             {
                 AddedPlayerData playerDatas = TimelineData.playerGroupData.playerData;
@@ -740,24 +844,44 @@ namespace ExcelHelper
                     }
                 }
 
-                var curline = 0;
-                foreach (var (time, content) in dmgcnt
-                             .OrderBy(p => p.Key.frame)
-                             .Select(p => (p.Key.frame, new string[]
-                             {
-                                 p.Key.frame.ToString(),
-                                 $"{p.Value / (float) GuildManager.StaticsettingData.n2:P2}",
-                                 p.Key.unit,
-                                 p.Key.description,
-                                 $"seed={seedDict[p.Key]}"
-                             })))
                 {
-                    while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
-                    foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                        worksheet0.MySetValue(10 + curline, 11 + i, cont, centre:false);
-                    ++curline;
+                    var curline = 0;
+                    foreach (var (time, content) in dmgcnt
+                                 .OrderBy(p => p.Key.frame)
+                                 .Select(p => (p.Key.frame, new string[]
+                                 {
+                                     p.Key.frame.ToString(),
+                                     $"{p.Value / (float) GuildManager.StaticsettingData.n2:P2}",
+                                     p.Key.unit,
+                                     p.Key.description,
+                                     $"seed={seedDict[p.Key]}"
+                                 })))
+                    {
+                        while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
+                        foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
+                            worksheet0.MySetValue(10 + curline, 13 + i, cont, centre:false);
+                        ++curline;
+                    }
+
                 }
 
+                {
+                    var curline = 0;
+                    foreach (var (lframe, content) in setData
+                                 .OrderBy(p => p.frame)
+                                 .Select(p => (p.lframe, new string[]
+                                 {
+                                     p.lframe.ToString(),
+                                     p.comment
+                                 })))
+                    {
+                        while (curline < UBList.Count && UBList[curline].UBTime < lframe) ++curline;
+                        foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
+                            worksheet0.MySetValue(10 + curline, 11 + i, cont, centre:false);
+                        ++curline;
+                    }
+
+                }
                 foreach(var a in UBList)
                 {
                     worksheet0.MySetValue(currentLineNum, 1, a.UBTime);
@@ -890,6 +1014,7 @@ namespace ExcelHelper
                     worksheet1.Cells[lineNum, 1 + i].Value = playerDatas.playrCharacters[i].GetUnitName();
                 }
                 lineNum++;
+                
                 bool flag = true;
                 int count0 = 0;
                 List<List<float>> UBexecTimeList = TimelineData.UBExecTime;

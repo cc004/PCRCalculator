@@ -39,6 +39,16 @@ namespace Elements.Battle
         private const float ZOOM_SCALE = 1.45f;
         private const float RANDOM_DIGID = 1000f;
         private const float POINT_WAIT_TIME = 3f;
+
+        public enum eSetStatus
+        {
+            MUST_NOT,
+            MAY,
+            MUST,
+        }
+
+        public List<(int, eSetStatus[])> setStatus = new List<(int, eSetStatus[])>();
+        
         /*[SerializeField]
         private UITexture stageBgTex;
         [SerializeField]
@@ -3436,6 +3446,7 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
+            setStatus.Clear();
             battleFinished = false;
             GuildCalculator.Instance.dmglist.Clear();
             GuildCalculator.Instance.bossValues.Clear();

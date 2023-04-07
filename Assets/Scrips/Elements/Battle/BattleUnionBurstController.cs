@@ -20,12 +20,20 @@ namespace Elements.Battle
             if (battleManager.GetIsPlayCutin() || battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
                 return;
             bool flag = false;
+
+            for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
+            {
+                var unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
+                unitCtrl.skillReleased = false;
+            }
+
             for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
             {
                 UnitCtrl unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
                 if (unitCtrl.UnionBurstSkillId != 0)
                     unitCtrl.UpdateSkillTarget();
-                if (unitCtrl.JudgeSkillReadyAndIsMyTurn() && !unitCtrl.lastCanReleaseSkill)
+                var ready = unitCtrl.JudgeSkillReadyAndIsMyTurn();
+                if (ready && !unitCtrl.lastCanReleaseSkill)
                 {
                     unitCtrl.critPoint = new UnitCtrl.CritPoint
                     {
@@ -34,14 +42,15 @@ namespace Elements.Battle
                         priority = UnitCtrl.eCritPointPriority.FullEnergy
                     };
                 }
-                unitCtrl.lastCanReleaseSkill = unitCtrl.JudgeSkillReadyAndIsMyTurn();
+                unitCtrl.lastCanReleaseSkill = ready;
 
-                if (unitCtrl.IsAutoOrUbExecTrying() && unitCtrl.JudgeSkillReadyAndIsMyTurn())
+                if (unitCtrl.IsAutoOrUbExecTrying() && ready)
                 {
                     unitCtrl.SetDirectionAuto();
                     unitCtrl.UpdateSkillTarget();
                     if (unitCtrl.IsAutoOrUbExecTrying() && unitCtrl.JudgeSkillReadyAndIsMyTurn())
                     {
+                        unitCtrl.skillReleased = true;
                         battleManager.ChargeSkillTurn = eChargeSkillTurn.PLAYER;
 
                         battleManager.HBDACBKGHIK = unitCtrl;
@@ -54,8 +63,27 @@ namespace Elements.Battle
                     }
                 }
             }
+
+            var setStatus = new BattleManager.eSetStatus[5];
+
+            for (int i = 0; i < 5; ++i) setStatus[i] = BattleManager.eSetStatus.MAY;
+            
             for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
-                battleManager.GetUnitCtrl(DNGOJHOHHMF).IsUbExecTrying = false;
+            {
+                var unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
+                unitCtrl.IsUbExecTrying = false;
+                if (unitCtrl.lastCanReleaseSkill)
+                {
+                    setStatus[unitCtrl.Index] = unitCtrl.skillReleased ? BattleManager.eSetStatus.MUST : BattleManager.eSetStatus.MUST_NOT;
+                }
+                else
+                {
+                    setStatus[unitCtrl.Index] = BattleManager.eSetStatus.MAY;
+                }
+            }
+            
+            battleManager.setStatus.Add((BattleHeaderController.CurrentFrameCount, setStatus));
+            
             if (flag)
                 return;
             TryExecEnemyUnionBurst();
