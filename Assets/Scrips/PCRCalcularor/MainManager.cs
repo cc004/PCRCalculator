@@ -191,6 +191,7 @@ namespace PCRCaculator
 
         private void Load()
         {
+            Application.runInBackground = true;
             LoadFinished = false;
             var wait = OpenWaitUI();
             LoadPlayerSettings();

@@ -757,7 +757,7 @@ namespace ExcelHelper
                 if (!newStatus.SequenceEqual(status))
                 {
                     result.Add((mint.lframe, mint.frame,
-                            string.Concat(newStatus.Select(x => x switch
+                            string.Concat(newStatus.Reverse().Select(x => x switch
                             {
                                 BattleManager.eSetStatus.MUST_NOT => 'x',
                                 BattleManager.eSetStatus.MUST => 'o',

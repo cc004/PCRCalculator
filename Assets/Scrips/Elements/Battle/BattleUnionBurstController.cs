@@ -72,14 +72,15 @@ namespace Elements.Battle
             {
                 var unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
                 unitCtrl.IsUbExecTrying = false;
-                if (unitCtrl.lastCanReleaseSkill)
-                {
-                    setStatus[unitCtrl.Index] = unitCtrl.skillReleased ? BattleManager.eSetStatus.MUST : BattleManager.eSetStatus.MUST_NOT;
-                }
-                else
-                {
-                    setStatus[unitCtrl.Index] = BattleManager.eSetStatus.MAY;
-                }
+                if (unitCtrl.Index < 5 && unitCtrl.Index >= 0)
+                    if (unitCtrl.lastCanReleaseSkill)
+                    {
+                        setStatus[unitCtrl.Index] = unitCtrl.skillReleased ? BattleManager.eSetStatus.MUST : BattleManager.eSetStatus.MUST_NOT;
+                    }
+                    else
+                    {
+                        setStatus[unitCtrl.Index] = BattleManager.eSetStatus.MAY;
+                    }
             }
             
             battleManager.setStatus.Add((BattleHeaderController.CurrentFrameCount, setStatus));
