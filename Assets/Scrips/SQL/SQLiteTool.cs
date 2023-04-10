@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using SQLite4Unity3d;
 using System;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Elements;
+using Mono.Data.Sqlite;
 using PCRCaculator.Guild;
+using SQLite3 = SQLite4Unity3d.SQLite3;
 #if !UNITY_EDITOR
 using System.IO;
 #endif
@@ -73,6 +77,32 @@ namespace PCRCaculator.SQL
         
         protected SQLiteTool(string path, bool readOnly)
         {
+            var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
+            if (File.Exists(patchFile))
+            {
+                var dbPath = Path.GetTempFileName();
+                File.Copy(path, dbPath, true);
+
+                string connectingPath = "Data Source=" + dbPath;
+                //MainManager.Instance.debugtext.text += connectingPath;
+                //构造数据库连接
+                using var dbConnection = new SqliteConnection(connectingPath);
+                //打开数据库
+                dbConnection.Open();
+                var trans = dbConnection.BeginTransaction();
+                var num = UnsafeNativeMethods.sqlite3_exec((dbConnection._sql as Mono.Data.Sqlite.SQLite3)!._sql, 
+                    SqliteConvert.ToUTF8(File.ReadAllText(patchFile)), 
+                    IntPtr.Zero, IntPtr.Zero, out var intPtr);
+                var flag = num != 0;
+                if (flag)
+                {
+                    string onljihpignl = (intPtr == IntPtr.Zero) ? "" : Marshal.PtrToStringAnsi(intPtr);
+                    throw new Exception(onljihpignl);
+                }
+                trans.Commit();
+
+                path = dbPath;
+            }
             ConnectDB(path, readOnly);
         }
 

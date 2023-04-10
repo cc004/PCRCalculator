@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Mono.Data.Sqlite;
@@ -448,6 +450,14 @@ namespace PCRCaculator
             }
         }
 
+        public static IEnumerable<(AssetManager mgr, Content content)> CacheAllFiles(Regex regex, bool useOld)
+        {
+            var m = (useOld ? mgrold : mgr);
+            foreach (var pair in m.registries)
+                if (regex.IsMatch(pair.Key))
+                    yield return (m, pair.Value);
+        }
+
         private static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
         {
             if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
@@ -460,6 +470,7 @@ namespace PCRCaculator
             path = Application.persistentDataPath + "/AB/" + fullname;
 #else
             var www = new WWW(path);
+            while (!www.isDone) { Thread.Sleep(0); }
             path = Application.streamingAssetsPath + "/../.ABExt2/" + fullname;
 #endif
             var asset = www.getAssetBundle();
