@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Elements;
@@ -77,9 +78,17 @@ namespace PCRCaculator.SQL
         
         protected SQLiteTool(string path, bool readOnly)
         {
-            var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
-            if (File.Exists(patchFile))
+            try
             {
+#if UNITY_ANDROID
+                var loadsql = new WWW("jar:file://" + Application.dataPath + "!/assets/" + "dbdiff.sql");  // this is the path to your StreamingAssets in android
+                while (!loadsql.isDone) { }
+                var sql = Encoding.UTF8.GetString(loadsql.bytes);
+#else
+                var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
+                var sql = File.ReadAllText(patchFile);
+#endif
+                
                 var dbPath = Path.GetTempFileName();
                 File.Copy(path, dbPath, true);
 
@@ -90,8 +99,8 @@ namespace PCRCaculator.SQL
                 //打开数据库
                 dbConnection.Open();
                 var trans = dbConnection.BeginTransaction();
-                var num = UnsafeNativeMethods.sqlite3_exec((dbConnection._sql as Mono.Data.Sqlite.SQLite3)!._sql, 
-                    SqliteConvert.ToUTF8(File.ReadAllText(patchFile)), 
+                var num = UnsafeNativeMethods.sqlite3_exec((dbConnection._sql as Mono.Data.Sqlite.SQLite3)!._sql,
+                    SqliteConvert.ToUTF8(sql),
                     IntPtr.Zero, IntPtr.Zero, out var intPtr);
                 var flag = num != 0;
                 if (flag)
@@ -99,10 +108,16 @@ namespace PCRCaculator.SQL
                     string onljihpignl = (intPtr == IntPtr.Zero) ? "" : Marshal.PtrToStringAnsi(intPtr);
                     throw new Exception(onljihpignl);
                 }
+
                 trans.Commit();
 
                 path = dbPath;
             }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"error occured while trying to patch database: {e}");
+            }
+            
             ConnectDB(path, readOnly);
         }
 
