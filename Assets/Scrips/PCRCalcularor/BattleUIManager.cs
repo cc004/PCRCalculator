@@ -185,7 +185,7 @@ namespace PCRCaculator.Battle
             {
                 fpsCount = BattleHeaderController.CurrentFrameCount;
             }
-            string logtext = "(" + fpsCount + ")" + word + "\n";
+            string logtext = $"({fpsCount}/{BattleManager.Instance.FrameCount}){word}\n";
             debugStrList.Add(logtext);
             //sw.WriteLine(logtext);
             Text debugText = debugText1;//= isOther ? debugText2 : debugText1;

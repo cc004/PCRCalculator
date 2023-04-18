@@ -761,11 +761,14 @@ namespace Elements
                     FirearmCtrl2 firearmCtrl = prefab2 as FirearmCtrl2;
                     try
                     {
-                        firearmCtrl.data = _skillEffect.Prefab.GetComponent<FirearmCtrl>().GetPrefabData();
+                        firearmCtrl.data = (Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss ? _skillEffect.PrefabLeft : _skillEffect.Prefab)
+                            .GetComponent<FirearmCtrl>().GetPrefabData();
+                        firearmCtrl.position += firearmCtrl.data.initialPosition;
                         SetPrefabDataBySkillid(_skill.SkillId, firearmCtrl.data);
                     }
                     catch (Exception e)
                     {
+                        MainManager.Instance.WindowMessage("警告：弹道加载失败，使用旧版弹道可能会导致偏差");
                         firearmCtrl.data = GetPrefabDataBySkillid(_skill.SkillId);
                     }
                     List<ActionParameter> _actions = new List<ActionParameter>();

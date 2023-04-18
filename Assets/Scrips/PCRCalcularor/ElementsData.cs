@@ -8,6 +8,7 @@ namespace Elements
     [Serializable]
     public class FirearmCtrlData
     {
+        public Vector3 initialPosition;
         public float HitDelay = 0.5f;
         public float MoveRate = 1;
         public float duration;

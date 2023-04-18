@@ -309,7 +309,10 @@ namespace Elements
         }
         public FirearmCtrlData GetPrefabData()
         {
-            return new FirearmCtrlData(HitDelay, MoveRate, duration,(PCRCaculator.Battle.eMoveTypes)(int)MoveType, startRotate, endRotate, ColliderBox);
+            return new FirearmCtrlData(HitDelay, MoveRate, duration,(PCRCaculator.Battle.eMoveTypes)(int)MoveType, startRotate, endRotate, ColliderBox)
+            {
+                initialPosition = this.transform.position
+            };
         }
 
         public void SetDatas(FirearmCtrlData data)
