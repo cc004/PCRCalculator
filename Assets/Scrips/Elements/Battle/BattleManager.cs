@@ -655,7 +655,7 @@ namespace Elements.Battle
                     effectUpdateList.RemoveAt(index2);
             }
             //if (this.JJCJONPDGIM != 0 && this.UnitUiCtrl.UnitCtrls != null && (this.EnemyList != null && !this.callStartCutIn()))
-            if (FrameCount != 0 && (EnemyList != null && !callStartCutIn()))
+            if (FrameCount != 0 && (EnemyList != null && !callStartCutIn() && !IsPausingEffectSkippedInThisFrame))
                 CoroutineManager._Update();
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());

@@ -9069,10 +9069,12 @@ this.updateCurColor();
 
             }*/
             setStateCalled = true;
-            /*if (!MultiTargetByTime && GameStartDone && IsPartsBoss && !MultiTargetDone)
+            if (!MultiTargetByTime && GameStartDone && IsPartsBoss && !multiTargetDone)
             {
-                PlayAndSetUpMultiTarget(_isFirst: true);
+                // PlayAndSetUpMultiTarget(_isFirst: true);
+                battleManager.IsPausingEffectSkippedInThisFrame = true;
             }
+            /*
             if (IsBoss && GameStartDone)
             {
                 battleManager.StartBonusEffect();
@@ -11464,6 +11466,7 @@ this.updateCurColor();
         }
         public bool IsAutoOrUbExecTrying()
         {
+            // Debug.Log($"frame = {battleManager.FrameCount} unit = {this.UnitId}, recast = {this.m_fCastTimer}");
             //if (this.IsUbExecTrying && (!this.battleManager.UnitUiCtrl.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())
             if (IsUbExecTrying && (!MyGameCtrl.Instance.IsAutoMode || CurrentState != ActionState.IDLE) && JudgeSkillReadyAndIsMyTurn())
                 //battleManager.SetOnlyAutoClearFlag(false);
