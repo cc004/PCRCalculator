@@ -7661,7 +7661,7 @@ this.updateCurColor();
                 _hp = (Hp - (num6 - (float)(_overRecoverValue < 0 ? 0 : _overRecoverValue)));
             }
             if (_onDamageHit != null & flag2)
-                _onDamageHit((float)num6);
+                _onDamageHit(num6);
             //if ((long)this.Hp == 0L && this.battleManager.BattleCategory == eBattleCategory.GLOBAL_RAID && (SekaiUtility.IsBossDead() && this.IsBoss))
             //    this.Hp = (long)1L;
             _hp = Hp.Min(MaxHp);

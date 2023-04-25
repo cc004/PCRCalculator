@@ -318,7 +318,7 @@ namespace Elements
       return !actionExecedData.AlreadyExeced && actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
     }
 
-    public delegate void OnDamageHitDelegate(float damage);
+    public delegate void OnDamageHitDelegate(FloatWithEx damage);
 
     public delegate void OnActionEndDelegate();
 
