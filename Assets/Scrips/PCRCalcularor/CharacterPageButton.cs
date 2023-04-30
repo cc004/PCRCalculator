@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Elements;
 using PCRCaculator.Battle;
 using TMPro;
@@ -22,6 +23,7 @@ namespace PCRCaculator
         public TextMeshProUGUI levelText_B;
         public Image characterImage;
         public List<Sprite> backgrounds;//0-4
+        public static List<Sprite> backgrounds1;
         public Image characterPositionImage_B;
         public List<Sprite> positionSprites_B;//0-2
         public Image backImage;
@@ -41,7 +43,21 @@ namespace PCRCaculator
         private BattleUIManager uIManager;
         //private List<eStateIconType> currentBuffs = new List<eStateIconType>();
         private List<BattleBuffUI> battleBuffUIs = new List<BattleBuffUI>();
-        
+
+        public void Awake()
+        {
+            backgrounds1 = new List<Sprite>();
+            var sprites = Resources.LoadAll<Sprite>("AtlasCommon_3")
+                .ToDictionary(x => x.name, x => x);
+            backgrounds1.Add(sprites["common_unit_frame_blue"]);
+            backgrounds1.Add(sprites["common_unit_frame_bronze"]);
+            backgrounds1.Add(sprites["common_unit_frame_silver"]);
+            backgrounds1.Add(sprites["common_unit_frame_gold"]);
+            backgrounds1.Add(sprites["common_unit_frame_purple"]);
+            backgrounds1.Add(sprites["common_unit_frame_red"]);
+            backgrounds1.Add(sprites["common_unit_frame_orange"]);
+            backgrounds1.Add(sprites["common_unit_frame_green"]);
+        }
 
         /// <summary>
         /// 设置组件
@@ -64,7 +80,7 @@ namespace PCRCaculator
                         characterPositionImage_B.gameObject.SetActive(false);
                     }
                 }
-                backImage.sprite = backgrounds[0];
+                backImage.sprite = backgrounds1[0];
                 characterImage.sprite = sprite;
                 if(unitid/100000!=4)
                 return;
@@ -124,11 +140,23 @@ namespace PCRCaculator
             {
                 backtype = 4;
             }
-            else
+            else if (data.rank <= 20)
             {
                 backtype = 5;
             }
-            backImage.sprite = backgrounds[backtype < backgrounds.Count ? backtype : (backgrounds.Count - 1)];
+            else if (data.rank <= 23)
+            {
+                backtype = 6;
+            }
+            else if (data.rank <= 27)
+            {
+                backtype = 7;
+            }
+            else
+            {
+                backtype = 8;
+            }
+            backImage.sprite = backgrounds1[backtype < backgrounds1.Count ? backtype : (backgrounds1.Count - 1)];
             if (buttonType == ButtonType.typeA)
             {
                 levelText.text = "等级" + data.level;

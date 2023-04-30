@@ -664,7 +664,7 @@ namespace PCRCaculator.Battle
                     buffUIScrollEX.CreatePrefab(
                         a =>
                         {
-                            bool isshow = ShowBuffDic.TryGetValue(stateIconType, out bool value) ? value : true;
+                            bool isshow = ShowBuffDic.TryGetValue(stateIconType, out bool value) ? value : false;
                             a.GetComponent<BUFFShowPrefab>().Init(stateIconType, isshow);
                         });
                 }

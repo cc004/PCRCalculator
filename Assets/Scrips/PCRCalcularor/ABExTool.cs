@@ -428,10 +428,16 @@ namespace PCRCaculator
                 defaultVal ?? (10046200));
         }
 
-        public static Task StaticInitialize()
+        public static Task StaticInitialize(Tuple<int?, int?> verOverride = default)
         {
             int verid = GetVer(false);
             int verid_old = GetVer(true);
+
+            if (verOverride != null)
+            {
+                verid = verOverride.Item1 ?? verid;
+                verid_old = verOverride.Item2 ?? verid_old;
+            }
 
             if (verid == verid_old)
             {

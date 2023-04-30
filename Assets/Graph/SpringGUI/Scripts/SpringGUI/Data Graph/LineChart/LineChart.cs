@@ -54,6 +54,7 @@ namespace SpringGUI
             if ( LineChartBasis.Lines.Count.Equals(0) )
                 return;
             var rect = GetPixelAdjustedRect();
+            rect = new Rect(rect.x - rect.width / 2, rect.y - rect.height / 2, rect.width * 2, rect.height * 2);
             LineChartCreator.DrawLineChart(vh, rect,LineChartBasis);
         }
 

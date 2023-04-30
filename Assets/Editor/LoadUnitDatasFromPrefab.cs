@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -20,6 +21,31 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
     Dictionary<string, GameObject> allUnitSkillPrefabs = new Dictionary<string, GameObject>();
 
     private AssetBundle AB;
+
+    [MenuItem("PCRTools/下载旧版Boss数据")]
+    public static void DownloadAllFilesOld()
+    {
+        var regexes = new (string, bool)[]
+        {
+            (@"a/all_battleunitprefab_30260.\.unity3d", false),
+        };
+
+        ABExTool.StaticInitialize(new Tuple<int?, int?>(10028800, 10028800)).Wait();
+        var client = new HttpClient();
+        
+        foreach (var (reg, useNew) in regexes)
+        {
+            foreach (var (mgr, content) in ABExTool.CacheAllFiles(new Regex(reg), !useNew))
+            {
+                var filePath = Application.streamingAssetsPath + "/AB/" + content.url.Split('/').Last();
+                if (File.Exists(filePath)) continue;
+                Debug.Log($"resolving: {content.url}");
+                var resp = mgr.ResolveFile(content.url);
+                File.WriteAllBytes(filePath,
+                    resp);
+            }
+        }
+    }
 
     [MenuItem("PCRTools/下载全部数据")]
     public static void DownloadAllFiles()

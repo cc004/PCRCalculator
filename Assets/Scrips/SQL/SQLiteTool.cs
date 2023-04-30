@@ -115,7 +115,7 @@ namespace PCRCaculator.SQL
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"error occured while trying to patch database: {e}");
+                Debug.LogError($"error occured while trying to patch database: {e}");
             }
             
             ConnectDB(path, readOnly);

@@ -227,10 +227,14 @@ namespace Elements
 
         public string ToExpression(int hash)
         {
+#if UNITY_EDITOR
             var sb = new StringBuilder();
             ToExpression(sb, hash);
             sb.Remove(sb.Length - 1, 1);
             return sb.ToString();
+#else
+            return string.Empty;
+#endif
         }
 
         private int ToExpression(StringBuilder sb, int hash, int num = 0)
