@@ -34,7 +34,7 @@ namespace PCRCaculator.Guild
     public class GuildCalculator : MonoBehaviour
     {
         public static GuildCalculator Instance;
-        public const float deltaXforChat = 1 / 5400.0f;
+        // public const float deltaXforChat = 1 / 5400.0f;
         public Dictionary<int, List<UnitStateChangeData>> allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
         public Dictionary<int, List<UnitAbnormalStateChangeData>> allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
         public Dictionary<int, List<ValueChangeData>> allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();
@@ -196,7 +196,7 @@ namespace PCRCaculator.Guild
                     }
                     skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action);
 
-                    skillScrollRect.horizontalNormalizedPosition = frameCount * deltaXforChat;
+                    skillScrollRect.horizontalNormalizedPosition = frameCount;
                     allUnitLastStateDic[unitid] = new UnitStateChangeData(frameCount,
                         allUnitLastStateDic[unitid].changStateTo, actionState, describe);
                 }
@@ -259,7 +259,7 @@ namespace PCRCaculator.Guild
         public void AppendChangeHP(int unitid, float currentHP, int hp, int damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
-            ValueChangeData valueData = new ValueChangeData(frame * deltaXforChat, currentHP, hp, describe)
+            ValueChangeData valueData = new ValueChangeData(frame, currentHP, hp, describe)
             {
                 damage = damage,
                 id = id,
@@ -272,7 +272,7 @@ namespace PCRCaculator.Guild
         public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
-            allUnitTPDic[unitid].Add(new ValueChangeData(frame * deltaXforChat, currentTP, 0, describe));
+            allUnitTPDic[unitid].Add(new ValueChangeData(frame, currentTP, 0, describe));
             if (!GuildManager.StaticsettingData.calcSpineAnimation)
                 skillGroupPrefabDic[unitid].ReflashTPChat(allUnitTPDic[unitid]);
         }
@@ -315,8 +315,8 @@ namespace PCRCaculator.Guild
 
             if (unitid == bossId)
             {
-                playerUnitDamageDic[sourceUnitid].Add(new ValueChangeData(currentFrame / 5400.0f, damage));
-                playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame / 5400.0f, damage));
+                playerUnitDamageDic[sourceUnitid].Add(new ValueChangeData(currentFrame, damage));
+                playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame, damage));
             }
         }
         public void AppendChangeBaseValue(int unitid, int valueType, float value, int currentFrame, string describe)
@@ -330,10 +330,10 @@ namespace PCRCaculator.Guild
                 switch (valueType)
                 {
                     case 1:
-                        bossDefChangeDic.Add(new ValueChangeData(currentFrame * deltaXforChat, value, 0, describe));
+                        bossDefChangeDic.Add(new ValueChangeData(currentFrame, value, 0, describe));
                         break;
                     case 2:
-                        bossMgcDefChangeDic.Add(new ValueChangeData(currentFrame * deltaXforChat, value, 0, describe));
+                        bossMgcDefChangeDic.Add(new ValueChangeData(currentFrame, value, 0, describe));
                         break;
                 }
             }
@@ -664,6 +664,7 @@ namespace PCRCaculator.Guild
         }
         public static List<ValueChangeData> CreateLineChatData(List<ValueChangeData> data, float deltaXforChat = 1 / 5400.0f)
         {
+            return data;/*
             List<ValueChangeData> newData = new List<ValueChangeData>();
             if (data.Count >= 1)
             {
@@ -682,7 +683,7 @@ namespace PCRCaculator.Guild
                 }
                 newData.Add(data[i]);
             }
-            return newData;
+            return newData;*/
         }
         public static List<ValueChangeData> CreateTotalChatData(List<ValueChangeData> data)
         {
@@ -697,6 +698,7 @@ namespace PCRCaculator.Guild
         }
         public static List<ValueChangeData> CreateLineChatData2(List<ValueChangeData> data, float deltaX = 1 / 1080.0f, float deltaXforChat = 1 / 5400.0f)
         {
+            return data;/*
             List<ValueChangeData> newData = new List<ValueChangeData>();
             if (data.Count >= 1)
             {
@@ -706,20 +708,21 @@ namespace PCRCaculator.Guild
             {
                 if (data[i].xValue > data[i - 1].xValue + deltaXforChat)
                 {
-                    newData.Add(new ValueChangeData(data[i].xValue - deltaXforChat, data[i - 1].yValue));
+                    newData.Add(new ValueChangeData(data[i].xValue - 1, data[i - 1].yValue));
                 }
-
-                if (i == data.Count - 1 || (data[i].xValue < data[i + 1].xValue + deltaX + deltaXforChat))
+                
+                if (i == data.Count - 1 || (data[i].xValue < data[i + 1].xValue + 3 + 1))
                 {
-                    newData.Add(new ValueChangeData(data[i].xValue + deltaX, data[i].yValue));
-                    newData.Add(new ValueChangeData(data[i].xValue + deltaX + deltaXforChat, 0));
+                    newData.Add(new ValueChangeData(data[i].xValue + 3, data[i].yValue));
+                    newData.Add(new ValueChangeData(data[i].xValue + 3 + 1, 0));
                 }
                 newData.Add(data[i]);
             }
-            return newData;
+            return newData;*/
         }
         public static List<ValueChangeData> NormalizeLineChatData(List<ValueChangeData> data, float Max)
         {
+            return data;
             List<ValueChangeData> data0 = new List<ValueChangeData>();
             foreach (ValueChangeData value in data)
             {
@@ -1208,9 +1211,15 @@ namespace PCRCaculator.Guild
         }
     }
 
-    public class ValueChangeData
+    public interface IValue
     {
-        public float xValue { get; set; }
+        public int xValue { get; }
+        public float yValue { get; }
+    }
+
+    public class ValueChangeData : IValue
+    {
+        public int xValue { get; set; }
         public float yValue { get; set; }
         public int hp;
         public int damage;
@@ -1218,13 +1227,13 @@ namespace PCRCaculator.Guild
         public int id;
         public int source;
         public ValueChangeData() { }
-        public ValueChangeData(float x, float y)
+        public ValueChangeData(int x, float y)
         {
             xValue = x;
             yValue = y;
         }
 
-        public ValueChangeData(float x, float y, int hp, string describe)
+        public ValueChangeData(int x, float y, int hp, string describe)
         {
             xValue = x;
             yValue = y;

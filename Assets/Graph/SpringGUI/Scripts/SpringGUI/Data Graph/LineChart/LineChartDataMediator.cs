@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using PCRCaculator.Guild;
 using UnityEngine;
 
 namespace SpringGUI
@@ -20,28 +21,21 @@ namespace SpringGUI
         /// <typeparam name="T"></typeparam>
         /// <param name="vertexs"></param>
         /// <returns></returns>
-        public IList<Vector2> Inject<T>( IList<T> vertexs )
+        public IList<Vector2> Inject<T>( IList<T> vertexs ) where T : IValue
         {
             IList<Vector2> result = new List<Vector2>();
             Type type = typeof(T);
             PropertyInfo[] PropertyInfo = type.GetProperties();
             foreach ( T vertex in vertexs )
             {
-                float x = 0.0f;
-                float y = 0.0f;
-                foreach ( PropertyInfo info in PropertyInfo )
-                {
-                    if ( info.Name.Equals("xValue") )
-                        x = (float)info.GetValue(vertex , null);
-                    if ( info.Name.Equals("yValue") )
-                        y = (float)info.GetValue(vertex , null);
-                }
+                float x = vertex.xValue;
+                float y = vertex.yValue;
                 result.Add(new Vector2(x , y));
             }
             return result;
         }
 
-        public IList<Vector2>[] Inject<T>( IList<T>[] vertexs )
+        public IList<Vector2>[] Inject<T>( IList<T>[] vertexs ) where T : IValue
         {
             IList<Vector2>[] result = new IList<Vector2>[vertexs.Length];
             for (int i = 0; i < vertexs.Length; i++)

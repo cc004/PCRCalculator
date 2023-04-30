@@ -6,13 +6,15 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using PCRCaculator.Guild;
 using SpringGUI;
 using UnityEngine;
 
 public class LineChartGraphExample : MonoBehaviour
 {
-    public class TestData
+    public class TestData : IValue
     {
+        int IValue.xValue => (int) xValue;
         public float xValue { get; set; }
         public float yValue { get; set; }
 

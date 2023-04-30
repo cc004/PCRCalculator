@@ -1,21 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Elements;
-using SpringGUI;
 using UnityEngine;
 using UnityEngine.UI;
+using XCharts.Runtime;
 
 namespace PCRCaculator.Guild
 {
     public class GuildChatPannel : MonoBehaviour
     {
-        public LineChart lineChart;
+        // public LineChart lineChart;
         public List<Toggle> GuildTypeToggles;
         public List<Toggle> GuildUnitToggles;
         public List<Text> GuildUnitTexts;
-        public GameObject posPrefab;
-        public Transform PosXParent;
-        public Transform PosYParent;
+
+        public LineChart chart;
+
+        // public GameObject posPrefab;
+        // public Transform PosXParent;
+        // public Transform PosYParent;
 
         private List<List<ValueChangeData>> AllUnitDamageDates = new List<List<ValueChangeData>>();
         private List<float> DamageMax = new List<float>();
@@ -52,7 +56,8 @@ namespace PCRCaculator.Guild
             bossMagicDefMax = BossMagicDefData.Max(a => a.yValue);
             Reflash();
         }
-        public void Reflash()
+
+        private void Reflash()
         {
             for(int i=0;i<GuildTypeToggles.Count;i++)
             {
@@ -63,98 +68,71 @@ namespace PCRCaculator.Guild
                 }
             }
         }
-        public void SwitchChatType(int TypeId)
+
+        private void DrawData(List<ValueChangeData>[] data, LineType type)
+        {
+            var xpos = 
+                data.Length > 1 ? 
+                    Enumerable.Range(0, data.SelectMany(x => x).Max(x => x.xValue)).ToArray() :
+                    data[0].Select(x => x.xValue).Distinct().ToArray();
+
+            var nowx = new int[data.Length];
+
+            chart.RemoveData();
+
+            foreach (var t in data)
+            {
+                var serie = chart.AddSerie<Line>();
+                if (data.Length == 1) serie.lineType = type;
+            }
+
+            foreach (var x in xpos)
+            {
+                chart.AddXAxisData(x.ToString());
+                for (var i = 0; i < data.Length; ++i)
+                {
+                    while (nowx[i] + 1 < data[i].Count && data[i][nowx[i] + 1].xValue <= x)
+                        ++nowx[i];
+                    var t = data[i][nowx[i]];   
+                    chart.AddData(i, x, t.yValue, $"[{t.xValue}] {t.describe}");
+                }
+            }
+        }
+
+        private void SwitchChatType(int TypeId)
         {
             SetUnitToggles(TypeId);
-            bool[] showChat = new bool[6] { false, false, false, false, false, false };
+            var data = Enumerable.Range(0, 6).Select(_ => new List<ValueChangeData>()).ToArray();
             float TotalMax = 1;
+            LineType type = LineType.StepEnd;
             switch (TypeId)
             {
                 case 1:
-                    for(int i = 0; i < 6; i++)
-                    {
-                        if(GuildUnitToggles[i].interactable && GuildUnitToggles[i].isOn)
-                        {
-                            showChat[i] = true;
-                            if (TotalMax < DamageMax[i])
-                            {
-                                TotalMax = DamageMax[i];
-                            }
-                        }
-                    }
-                    bool k1 = true;
                     for (int i = 0; i < 6; i++)
-                    {
-                        if (showChat[i])
-                        {
-                            List<ValueChangeData> data1 = GuildCalculator.NormalizeLineChatData(AllUnitDamageDates[i], TotalMax);
-                            lineChart.Replace(i, data1);
-                            if (k1)
-                            {
-                                SetPos(data1, TotalMax);
-                                k1 = false;
-                            }
-                        }
-                        else
-                        {
-                            lineChart.Replace(i, emptyList);
-                        }
-                    }
+                        if (GuildUnitToggles[i].interactable && GuildUnitToggles[i].isOn)
+                            data[i] = GuildCalculator.NormalizeLineChatData(AllUnitDamageDates[i], TotalMax);
+                    type = LineType.Normal;
                     break;
                 case 2:
                     for (int i = 0; i < 6; i++)
-                    {
                         if (GuildUnitToggles[i].interactable && GuildUnitToggles[i].isOn)
-                        {
-                            showChat[i] = true;
-                            if (TotalMax < AllUnitTotalDamageDates[i][AllUnitTotalDamageDates[i].Count - 1].yValue)
-                            {
-                                TotalMax = AllUnitTotalDamageDates[i][AllUnitTotalDamageDates[i].Count - 1].yValue;
-                            }
-                        }
-                    }
-                    bool k2 = true;
-                    for (int i = 0; i < 6; i++)
-                    {
-                        if (showChat[i])
-                        {
-                            List<ValueChangeData> data2 = GuildCalculator.NormalizeLineChatData(AllUnitTotalDamageDates[i], TotalMax);
-                            lineChart.Replace(i, data2);
-                            if (k2)
-                            {
-                                SetPos(data2, TotalMax);
-                                k2 = false;
-                            }
-                        }
-                        else
-                        {
-                            lineChart.Replace(i, emptyList);
-                        }
-                    }
+                            data[i] = GuildCalculator.NormalizeLineChatData(AllUnitTotalDamageDates[i], TotalMax);
+
                     break;
                 case 3:
-                    List<ValueChangeData> data3 = GuildCalculator.NormalizeLineChatData(BossDefData, bossDefMax);
-                    lineChart.Replace(0, data3);
-                    SetPos(data3, bossDefMax);
-                    for (int i = 1; i < 6; i++)
-                    {
-                        lineChart.Replace(i, emptyList);
-                    }
+                    data[0] = GuildCalculator.NormalizeLineChatData(BossDefData, bossDefMax);
                     break;
                 case 4:
-                    List<ValueChangeData> data4 = GuildCalculator.NormalizeLineChatData(BossMagicDefData, bossMagicDefMax);
-                    lineChart.Replace(0, data4);
-                    SetPos(data4, bossMagicDefMax);
-                    for (int i = 1; i < 6; i++)
-                    {
-                        lineChart.Replace(i, emptyList);
-                    }
+                    data[0] = GuildCalculator.NormalizeLineChatData(BossMagicDefData, bossMagicDefMax);
                     break;
 
             }
 
+            DrawData(data.Where(x => x != null && x.Count > 0).ToArray(),
+                type);
         }
-        public void SetUnitToggles(int TypeId)
+
+        private void SetUnitToggles(int TypeId)
         {
             switch (TypeId)
             {
@@ -203,6 +181,7 @@ namespace PCRCaculator.Guild
                 Destroy(b);
             }
             lineChatYPrefabList.Clear();
+            /*
             for (int i = 0; i < data.Count; i++)
             {
                 if (Mathf.Abs(data[i].xValue - changeDataOld.xValue) >= deltaX && Mathf.Abs(data[i].yValue - changeDataOld.yValue) >= deltaY)
@@ -223,16 +202,17 @@ namespace PCRCaculator.Guild
 
                     changeDataOld = data[i];
                 }
-            }
+            }*/
 
         }
         private void SetLineChat()
         {
+            /*
             for(int i = 0; i < 6; i++)
             {
                 lineChart.Inject(emptyList);
             }
-            lineChart.ShowUnit();
+            lineChart.ShowUnit();*/
         }
 
     }

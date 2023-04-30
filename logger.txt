@@ -1,5 +1,5 @@
 judging .\C4-蝶妈似似花公主U1圣千真步-1642w.asm.0
-assumption st=3 for 180501 failed
+unit 180501 not exists
 unit 107001 not exists
 unit 180201 not exists
 unit 108401 not exists
@@ -8,19 +8,20 @@ unit 401312304 not exists
 judging .\result.asm.0
 unit 110301 not exists
 unit 107001 not exists
-unit 112001 not exists
+assumption st=3 for 112001 failed
 unit 115701 not exists
-unit 111401 not exists
+assumption st=5 for 111401 failed
 unit 401402503 not exists
 judging .\test.asm.0
 unit 100301 not exists
-assumption rk=19 for 107101 failed
+unit 107101 not exists
 unit 102801 not exists
+unit 106801 not exists
 unit 110701 not exists
 unit 401311401 not exists
 judging .\test.asm.1
 unit 110301 not exists
-unit 112001 not exists
+assumption st=3 for 112001 failed
 unit 101401 not exists
 unit 108801 not exists
 unit 108401 not exists
@@ -28,31 +29,33 @@ unit 401311401 not exists
 judging .\test.asm.2
 unit 106101 not exists
 unit 110401 not exists
-assumption rk=19 for 107101 failed
-unit 103401 not exists
-assumption rk=19 for 106801 failed
+unit 107101 not exists
+unit 106801 not exists
 unit 401311402 not exists
 judging .\test.asm.3
 unit 106101 not exists
 unit 110401 not exists
-assumption rk=19 for 107101 failed
-unit 103401 not exists
+unit 107101 not exists
+assumption rk>14 for 103401 failed
+unit 106801 not exists
 unit 401311402 not exists
 judging .\test.asm.4
+unit 107101 not exists
 unit 102801 not exists
+unit 106801 not exists
 unit 110701 not exists
 unit 110001 not exists
 unit 401311403 not exists
 judging .\test.asm.5
 unit 110301 not exists
-unit 112001 not exists
+assumption rk=18 for 112001 failed
 unit 101401 not exists
 unit 108801 not exists
 unit 100801 not exists
 unit 401311403 not exists
 judging .\test.asm.6
 unit 110301 not exists
-unit 112001 not exists
+assumption rk=18 for 112001 failed
 unit 101401 not exists
 unit 108801 not exists
 unit 100801 not exists
@@ -74,7 +77,7 @@ unit 401311404 not exists
 judging .\test.asm.9
 unit 105901 not exists
 unit 107001 not exists
-unit 112001 not exists
+assumption rk=19 for 112001 failed
 unit 101001 not exists
 unit 111101 not exists
 unit 401311405 not exists

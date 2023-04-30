@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -116,7 +117,7 @@ namespace SpringGUI
 
         #region data interfaces
 
-        public void Inject<T>( IList<T> vertexs )
+        public void Inject<T>( IList<T> vertexs ) where T :IValue
         {
             if( null == m_dataMediator)
                 m_dataMediator = new LineChartDataMediator();
@@ -154,7 +155,7 @@ namespace SpringGUI
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <param name="vertexs"></param>
-        public void Replace<T>( int id , IList<T> vertexs )
+        public void Replace<T>( int id , IList<T> vertexs ) where T : IValue
         {
             Replace(new[] { id } , new[] { vertexs });
         }
@@ -164,7 +165,7 @@ namespace SpringGUI
         /// <typeparam name="T"></typeparam>
         /// <param name="ids"></param>
         /// <param name="vertexs"></param>
-        public void Replace<T>( int[] ids , IList<T>[] vertexs )
+        public void Replace<T>( int[] ids , IList<T>[] vertexs ) where T : IValue
         {
             LineChartBasis.ReplaceLines(ids , m_dataMediator.Inject(vertexs));
             OnEnable();
@@ -176,7 +177,7 @@ namespace SpringGUI
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <param name="vertexs"></param>
-        public void InjectVertexStream<T>( int id , IList<T> vertexs )
+        public void InjectVertexStream<T>( int id , IList<T> vertexs ) where T : IValue
         {
             IList<Vector2> vertex = m_dataMediator.Inject(vertexs);
             StartCoroutine(StreamInject(id , vertex));
@@ -187,7 +188,7 @@ namespace SpringGUI
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <param name="vertexs"></param>
-        public void InjectVertexStream<T>(int[] ids , IList<T>[] vertexs )
+        public void InjectVertexStream<T>(int[] ids , IList<T>[] vertexs ) where T : IValue
         {
             for (int i = 0; i < ids.Length; i++)
                 InjectVertexStream(ids[i] , vertexs[i]);
