@@ -238,6 +238,7 @@ namespace PCRCaculator.Battle
         }
         public void LogMessage(string word,eLogMessageType messageType,UnitCtrl unitCtrl)
         {
+            if (BattleManager.Instance.skipping) return;
             if (unitCtrl == null)
             {
                 LogMessage(word, messageType, false);
@@ -295,7 +296,7 @@ namespace PCRCaculator.Battle
                     b.SetBuffUI(rularSprites[i + 5], gameCtrl.enemyUnitCtrl[i]);
                     if (gameCtrl.tempData.isGuildBattle)
                     {
-                        gameCtrl.enemyUnitCtrl[i].OnDamage += ReflashGuildEnemyTotalDamage2;
+                        gameCtrl.enemyUnitCtrl[i].OnDamage += RefreshGuildEnemyTotalDamage2;
                         guildTotalDamageNumber.gameObject.SetActive(true);
                     }
                 }
@@ -326,6 +327,11 @@ namespace PCRCaculator.Battle
             if (!BattleHeaderController.Instance.IsPaused) return;
             BattleManager.Instance.stepping = true;
             PauseButton();
+        }
+
+        public void SkipButton()
+        {
+            BattleManager.Instance.skipping = true;
         }
 
         public void ExitButton()
@@ -542,7 +548,7 @@ namespace PCRCaculator.Battle
             a.transform.position = pos;
             a.GetComponent<DamageNumbers>().SetMiss(scale*DamageScale);
         }
-        public void ReflashGuildEnemyTotalDamage(float value)
+        public void RefreshGuildEnemyTotalDamage(float value)
         {
             guildTotalDamage += value;
             int valueint = (int)guildTotalDamage;
@@ -558,9 +564,9 @@ namespace PCRCaculator.Battle
 
             guildTotalDamageNumber.SetDamageNumber(null, numbers, sprite_total_physical, 2);
         }
-        public void ReflashGuildEnemyTotalDamage2(bool byAttack, FloatWithEx value,bool critical)
+        public void RefreshGuildEnemyTotalDamage2(bool byAttack, FloatWithEx value,bool critical)
         {
-            ReflashGuildEnemyTotalDamage(value);
+            RefreshGuildEnemyTotalDamage(value);
         }
         private void SetPrefabNumber(Vector3 pos, List<Sprite> numbers, Sprite head = null, float scale = 1)
         {

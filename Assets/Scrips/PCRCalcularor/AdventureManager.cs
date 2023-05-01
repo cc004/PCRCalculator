@@ -38,7 +38,7 @@ namespace PCRCaculator
                 case 2:
                     backGround.SetActive(false);
                     JJCback.SetActive(true);
-                    JJCback.GetComponent<JJCManager>().Reflash();
+                    JJCback.GetComponent<JJCManager>().Refresh();
                     break;
                 case 3:
                     MainManager.Instance.WindowConfigMessage("是否切换到会战计算器？", SwitchScene);

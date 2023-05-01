@@ -262,7 +262,7 @@ namespace PCRCaculator
                 BattleBuffUI buffUI = a.GetComponent<BattleBuffUI>();
                 buffUI.Init(uIManager.GetAbnormalIconSprite((Battle.eStateIconType)(int)stateIconType_2),stateIconType_2,stayTime,describe,RemoveBuffIcon);
                 battleBuffUIs.Add(buffUI);
-                ReflashBattleBuffUIs();
+                RefreshBattleBuffUIs();
             }
             else
             {
@@ -281,11 +281,11 @@ namespace PCRCaculator
                 {
                     Destroy(battleBuffUIs[idx].gameObject);
                     battleBuffUIs.RemoveAt(idx);
-                    ReflashBattleBuffUIs();
+                    RefreshBattleBuffUIs();
                 }
             }
         }
-        public void ReflashBattleBuffUIs()
+        public void RefreshBattleBuffUIs()
         {
             for(int i = 0; i < battleBuffUIs.Count; i++)
             {
@@ -298,7 +298,7 @@ namespace PCRCaculator
             {
                 Destroy(obj.gameObject);
                 battleBuffUIs.Remove(obj);
-                ReflashBattleBuffUIs();
+                RefreshBattleBuffUIs();
             }
         }
         public void ShowContinousPress(bool show)
@@ -321,7 +321,7 @@ namespace PCRCaculator
             Debug.LogError("改方法已经过时！");
             if (stateIconType == eStateIconType.NONE)
             {
-                Reflash();
+                Refresh();
                 return;
             }
             if (currentBuffs.Contains(stateIconType))
@@ -332,14 +332,14 @@ namespace PCRCaculator
             {
                 currentBuffs.Add(stateIconType);
             }
-            Reflash();
+            Refresh();
         }*/
         /*public void SetAbnormalIcons_2(Elements.UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable)
         {
             eStateIconType stateIconType = (eStateIconType)(int)stateIconType_2;
             if (stateIconType == eStateIconType.NONE)
             {
-                Reflash();
+                Refresh();
                 return;
             }
             if (currentBuffs.Contains(stateIconType))
@@ -350,9 +350,9 @@ namespace PCRCaculator
             {
                 currentBuffs.Add(stateIconType);
             }
-            Reflash();
+            Refresh();
         }*/
-        /*private void Reflash()
+        /*private void Refresh()
         {
             for (int i = 0; i < 4; i++)
             {

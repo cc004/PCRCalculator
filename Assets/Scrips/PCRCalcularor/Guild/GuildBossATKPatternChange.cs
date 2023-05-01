@@ -18,12 +18,12 @@ namespace PCRCaculator.Guild
         {
             attackPattern = unitAttackPattern;
             callBackAction = callBack;
-            Reflash();
+            Refresh();
         }
         public void ResetButton()
         {
             attackPattern = MainManager.Instance.AllUnitAttackPatternDic[attackPattern.pattern_id];
-            Reflash();
+            Refresh();
         }
         public void ExitButton()
         {
@@ -50,7 +50,7 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("输入错误！", null);
             }
         }
-        public void Reflash()
+        public void Refresh()
         {
             startText.text = "" + attackPattern.loop_start;
             endText.text = "" + attackPattern.loop_end;

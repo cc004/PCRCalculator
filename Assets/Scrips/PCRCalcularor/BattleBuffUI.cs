@@ -24,9 +24,9 @@ namespace PCRCaculator.Battle
             detailText.text = detail;
             describe = detail;
             removeThis = remove;
-            StartCoroutine(ReflashTime(stayTime, BattleHeaderController.CurrentFrameCount));
+            StartCoroutine(RefreshTime(stayTime, BattleHeaderController.CurrentFrameCount));
         }
-        public IEnumerator ReflashTime(float stayTime,int startFrame)
+        public IEnumerator RefreshTime(float stayTime,int startFrame)
         {
             int stayFrame =(int)(stayTime * 60);
             while (true)

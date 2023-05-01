@@ -46,7 +46,7 @@ namespace PCRCaculator.Battle
         {
             if(stateIconType == eStateIconType.NONE)
             {
-                Reflash();
+                Refresh();
                 return;
             }
             if (currentBuffs.Contains(stateIconType))
@@ -57,7 +57,7 @@ namespace PCRCaculator.Battle
             {
                 currentBuffs.Add(stateIconType);
             }
-            Reflash();
+            Refresh();
         }
         public void SetHPBar(float normalizedHP)
         {
@@ -69,7 +69,7 @@ namespace PCRCaculator.Battle
             eStateIconType stateIconType = (eStateIconType)(int)stateIconType_2;
             if (stateIconType == eStateIconType.NONE)
             {
-                Reflash();
+                Refresh();
                 return;
             }
             if (currentBuffs.Contains(stateIconType))
@@ -80,9 +80,9 @@ namespace PCRCaculator.Battle
             {
                 currentBuffs.Add(stateIconType);
             }
-            Reflash();
+            Refresh();
         }
-        private void Reflash()
+        private void Refresh()
         {
             
             for(int i = 0; i < 4; i++)

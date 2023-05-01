@@ -492,6 +492,8 @@ namespace Elements.Battle
 
         private bool spacePressed = false;
 
+        private Stopwatch stopWatch = new Stopwatch();
+
         private void Update()
         {
             if (Input.GetKey(KeyCode.Space))
@@ -536,39 +538,26 @@ namespace Elements.Battle
             {
                 if (!IsFramePause)
                     deltaTimeAccumulated += Time.deltaTime;
+
+                if (skipping) stopWatch.Restart();
+
                 do
                 {
                     if (IsFramePause && !CoroutineManager.VisualPause)
                     {
                         CoroutineManager.VisualPause = true;
-                        //int index2 = 0;
-                        /*for (int count = this.UnitList.Count; index2 < count; ++index2)
-                        {
-                            if ((UnityEngine.Object)this.UnitList[index2] != (UnityEngine.Object)this.voiceOnUnit)
-                                this.UnitList[index2].StopVoiceExceptUbVoice();
-                        }*/
-                        //int index3 = 0;
-                        /*for (int count = this.EnemyList.Count; index3 < count; ++index3)
-                        {
-                            if ((UnityEngine.Object)this.EnemyList[index3] != (UnityEngine.Object)this.voiceOnUnit)
-                                this.EnemyList[index3].StopVoiceExceptUbVoice();
-                        }*/
-                        /*if ((UnityEngine.Object)this.voiceOnUnit != (UnityEngine.Object)null)
-                        {
-                            this.voiceOnUnit.SeSource.Pause(false);
-                            this.voiceOnUnit.PauseVoice(false);
-                        }*/
-                        //this.battleEffectManager.Pause();
                     }
-                    if (!IsFramePause && deltaTimeAccumulated >= 0.0)
-                    {
-                        updateFrame();
-                        deltaTimeAccumulated -= DeltaTime_60fps;
-                    }
-                    else
+
+                    if ((IsFramePause || !(deltaTimeAccumulated >= 0.0)) && !skipping)
                         break;
+                    
+                    updateFrame();
+                    deltaTimeAccumulated -= DeltaTime_60fps;
+
+                    if (stopWatch.ElapsedMilliseconds >= 1000) break;
                 }
-                while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps);
+                while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps || skipping);
+
                 while (FrameCount < PPNHIMOOKDD && !IsFramePause)
                 {
                     updateFrame();
@@ -590,6 +579,7 @@ namespace Elements.Battle
         }
 
         public bool stepping = false;
+        public bool skipping = false;
 
         private void updateFrame()
         {
@@ -3442,7 +3432,12 @@ namespace Elements.Battle
         }*/
 
         //public void Init(ViewBattle GJABBKPIEHH) => this.StartCoroutine(this.coroutineStartProcess(GJABBKPIEHH));
-        public void Init(MyGameCtrl gameCtrl) => StartCoroutine(coroutineStartProcess(gameCtrl));
+        public void Init(MyGameCtrl gameCtrl)
+        {
+            stepping = false;
+            skipping = false;
+            StartCoroutine(coroutineStartProcess(gameCtrl));
+        }
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {

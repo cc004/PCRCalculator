@@ -34,7 +34,7 @@ namespace PCRCaculator
             //Debug.Log("开始战斗！");
             MainManager.Instance.ChangeSceneToBalttle(myCharid, players[attackplayerPos - 2]);
         }
-        public void Reflash(bool reload = true)
+        public void Refresh(bool reload = true)
         {
             playerLevelText.text = MainManager.Instance.PlayerSetting.playerLevel + "";
             if (reload) { LoadAddedPlayerData(); }
@@ -103,7 +103,7 @@ namespace PCRCaculator
         public void FinishAddingNewPlayer(AddedPlayerData addedPlayerData)
         {
             players.Add(addedPlayerData);
-            Reflash(false);
+            Refresh(false);
             SaveDataToJson();
         }
         public void DeleteButton(int pos)
@@ -116,7 +116,7 @@ namespace PCRCaculator
             if (waitDeletePlayerPos >= 2 && waitDeletePlayerPos < players.Count + 2)
             {
                 players.RemoveAt(waitDeletePlayerPos - 2);
-                Reflash(false);
+                Refresh(false);
                 SaveDataToJson();
                 MainManager.Instance.WindowMessage("删除成功！");
             }

@@ -49,7 +49,7 @@ namespace PCRCaculator.Guild
         {
             /*GuildManager.Instance.SettingData.guildRandomDatas.RemoveAt(GuildManager.Instance.SettingData.currentRandomLine);
             GuildManager.Instance.SettingData.currentRandomLine = 0;
-            Reflash();*/
+            Refresh();*/
         }
         public void SaveButton()
         {
@@ -75,7 +75,7 @@ namespace PCRCaculator.Guild
         {
             /*GuildManager.Instance.SettingData.guildRandomDatas.Add(new GuildRandomData(name));
             GuildManager.Instance.SettingData.currentRandomLine = GuildManager.Instance.SettingData.guildRandomDatas.Count - 1;
-            Reflash();*/
+            Refresh();*/
         }
         public void RenameButton()
         {
@@ -94,12 +94,12 @@ namespace PCRCaculator.Guild
                 randomData.randomSpecialDatas = new List<GuildRandomSpecialData>();
             }
             randomData.randomSpecialDatas.Add(new GuildRandomSpecialData());
-            Reflash();
+            Refresh();
         }
         public void OpenSettingPage()
         {
             BasePage.SetActive(true);
-            Reflash();
+            Refresh();
         }
         /*public void OnDropDownChoosed()
         {
@@ -109,7 +109,7 @@ namespace PCRCaculator.Guild
             timeLineNameText.text = randomData.DataName;
 
         }*/
-        public void Reflash()
+        public void Refresh()
         {
             randomData = GuildManager.Instance.SettingData.GetCurrentRandomData();
             //calPageText.text = randomData.DataName;
@@ -161,7 +161,7 @@ namespace PCRCaculator.Guild
         }
         public void EditSpecialData(int idx)
         {
-            GuildSpecialSetting.OpenAndReflash(randomData.randomSpecialDatas[idx]);
+            GuildSpecialSetting.OpenAndRefresh(randomData.randomSpecialDatas[idx]);
         }
     }
     public class GuildRandomData

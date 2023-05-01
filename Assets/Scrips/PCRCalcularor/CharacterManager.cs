@@ -45,7 +45,7 @@ namespace PCRCaculator
             {
                 baseBack.SetActive(true);
                 detailBack.SetActive(false);
-                StartCoroutine(ReflashBasePage(0));
+                StartCoroutine(RefreshBasePage(0));
             }
             else if (i == 2)
             {
@@ -66,7 +66,7 @@ namespace PCRCaculator
             {
                 if (toggles[i].isOn)
                 {
-                    StartCoroutine(ReflashBasePage(i));
+                    StartCoroutine(RefreshBasePage(i));
                     break;
                 }
             }
@@ -78,7 +78,7 @@ namespace PCRCaculator
             yield return null;
             isUpdated = false;
         }
-        private IEnumerator ReflashBasePage(int type)
+        private IEnumerator RefreshBasePage(int type)
         {
             isIniting = true;
             PositionType positionType = PositionType.frount;

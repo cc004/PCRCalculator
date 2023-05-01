@@ -48,7 +48,7 @@ namespace PCRCaculator
         {
             gameObject.SetActive(true);
             unitId = id;
-            Reflash();
+            Refresh();
         }
         public void Next(bool next)
         {
@@ -62,7 +62,7 @@ namespace PCRCaculator
                 SetId(CharacterManager.Instance.showUnitIDs[nextid + 1]);
             }
         }
-        private void Reflash()
+        private void Refresh()
         {
             //try
             //{
@@ -362,7 +362,7 @@ namespace PCRCaculator
         public void LoadButton()
         {
             MainManager.Instance.ReLoad();
-            Reflash();
+            Refresh();
             MainManager.Instance.WindowMessage("读取成功！");
         }
         public void SaveButton()

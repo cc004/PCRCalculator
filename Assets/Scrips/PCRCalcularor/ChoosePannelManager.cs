@@ -123,9 +123,9 @@ namespace PCRCaculator
                     selectedCharId.Clear();
                 }
             }
-            yield return ReflashBasePage(0);
+            yield return RefreshBasePage(0);
             switchToggles[0].isOn = true;
-            ReflashSelectedButtons();
+            RefreshSelectedButtons();
             if (type == 1)
             {
                 nextButtonText.text = "战斗开始";
@@ -150,7 +150,7 @@ namespace PCRCaculator
                 {
                     if (switchToggles[i].isOn)
                     {
-                        StartCoroutine(ReflashBasePage(i));
+                        StartCoroutine(RefreshBasePage(i));
                     }
                 }
             }
@@ -229,8 +229,8 @@ namespace PCRCaculator
                     charToggles_setting[i].interactable = i < selectedCharId.Count;
                     //charToggles_setting[i].isOn = i == 0;
                 }
-                ReflashSettingPage();
-                ReflashSettingValues();
+                RefreshSettingPage();
+                RefreshSettingValues();
             }
             /*else if(type == 4)
             {
@@ -246,8 +246,8 @@ namespace PCRCaculator
                     charToggles_setting[i].interactable = i < selectedCharId.Count;
                     //charToggles_setting[i].isOn = i == 0;
                 }
-                ReflashSettingPage();
-                ReflashSettingValues();
+                RefreshSettingPage();
+                RefreshSettingValues();
 
             }*/
         }
@@ -302,7 +302,7 @@ namespace PCRCaculator
             {
                 MainManager.Instance.WindowMessage("最多选5个！");
             }
-            ReflashSelectedButtons();
+            RefreshSelectedButtons();
         }
         public void OnToggleSwitched_setting(int id)
         {
@@ -311,7 +311,7 @@ namespace PCRCaculator
                 if (a.interactable && a.isOn)
                 {
                     selectedCharacterId_setting = id;
-                    ReflashSettingValues();
+                    RefreshSettingValues();
                 }
             }
         }
@@ -352,7 +352,7 @@ namespace PCRCaculator
             {
                 data.uniqueEqLv = (int)detailSliders_setting[14].value;
             }
-            ReflashSettingPage();
+            RefreshSettingPage();
 
             if (data.rank < 2) data.skillLevel[1] = 0;
             if (data.rank < 4) data.skillLevel[2] = 0;
@@ -361,7 +361,7 @@ namespace PCRCaculator
                 data.skillLevel[3] = 0;
                 data.uniqueEqLv = 0;
             }
-            ReflashSettingValues();
+            RefreshSettingValues();
 
         }
         public void AddButton_setting(int buttonid)
@@ -383,8 +383,8 @@ namespace PCRCaculator
         public void SetSelectedUnitMax()
         {
             playerData.playrCharacters[selectedCharacterId_setting].SetMax();
-            ReflashSettingValues();
-            ReflashSettingPage();
+            RefreshSettingValues();
+            RefreshSettingPage();
             MainManager.Instance.WindowMessage("成功！");
         }
         public void SetAllUnitMax()
@@ -393,8 +393,8 @@ namespace PCRCaculator
             {
                 a.SetMax();
             }
-            ReflashSettingValues();
-            ReflashSettingPage();
+            RefreshSettingValues();
+            RefreshSettingPage();
             MainManager.Instance.WindowMessage("成功！");
         }
         public void OpenEXSettingPannel()
@@ -455,7 +455,7 @@ namespace PCRCaculator
                 }
             }
         }
-        private IEnumerator ReflashBasePage(int type)
+        private IEnumerator RefreshBasePage(int type)
         {
             PositionType positionType = PositionType.frount;
             switch (type)
@@ -505,7 +505,7 @@ namespace PCRCaculator
                 parent.sizeDelta = new Vector2(100, Mathf.CeilToInt(count / 8) * 95 + 105);
             }
         }
-        private void ReflashSelectedButtons()
+        private void RefreshSelectedButtons()
         {
             selectedCharId.Sort((x, y) => MainManager.Instance.UnitRarityDic[x].CompareTo(MainManager.Instance.UnitRarityDic[y]));
             for (int i = 0; i < 5; i++)
@@ -520,7 +520,7 @@ namespace PCRCaculator
                 }
             }
         }
-        private void ReflashSettingPage()
+        private void RefreshSettingPage()
         {
             for (int i = 0; i < 5; i++)
             {
@@ -535,7 +535,7 @@ namespace PCRCaculator
             }
 
         }
-        private void ReflashSettingValues()
+        private void RefreshSettingValues()
         {
             isinstating = true;
             UnitData data = playerData.playrCharacters[selectedCharacterId_setting];

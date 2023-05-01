@@ -20,6 +20,7 @@ using PCRCaculator.Guild;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 using Attachment = Spine.Attachment;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
@@ -1665,7 +1666,7 @@ namespace Elements
 
         //private SoundManager soundManager { get; set; }
 
-        private BattleManager battleManager => staticBattleManager;
+        public BattleManager battleManager => staticBattleManager;
         public bool energyjudged = false;
 
         public FloatWithEx Energy
@@ -3350,6 +3351,7 @@ this.updateCurColor();
             UnitCtrl LIMEKPEENOB = unitCtrl2;
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             Energy = energy;
+            if (!battleManager.skipping)
             MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
             uIManager.LogMessage("TP变更为：" + energy, eLogMessageType.CHANGE_TP, this);
@@ -4033,7 +4035,7 @@ this.updateCurColor();
             stateCategoryData.ShowsIcon = _showsIconAfterSwitch;
             EnableAbnormalState(abnormalState, true);
             stateCategoryData.CurrentAbnormalState = abnormalState;
-            StartCoroutine(waitReflashAbnormalStateUI(abnormalState));
+            StartCoroutine(waitRefreshAbnormalStateUI(abnormalState));
             /*for (int index = 0; index < stateCategoryData.Effects.Count; ++index)
             {
                 if ((UnityEngine.Object)stateCategoryData.Effects[index].RightEffect != (UnityEngine.Object)null)
@@ -4049,7 +4051,7 @@ this.updateCurColor();
         }
         //added
 
-            private IEnumerator waitReflashAbnormalStateUI(eAbnormalState abnormalState)
+            private IEnumerator waitRefreshAbnormalStateUI(eAbnormalState abnormalState)
         {
             yield return null;
             AbnormalStateCategoryData stateCategoryData = abnormalStateCategoryDataDictionary[GetAbnormalStateCategory(abnormalState)];
@@ -7813,26 +7815,32 @@ this.updateCurColor();
                     this.OnLifeAmmountChange.Call<float>(NormalizedHP);
                 }
             }*/
-            float NormalizedHP = (long)Hp / (float)(long)MaxHp;
-            /*
-            this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
-            string des;
-            //var prob = Hp.Probability(x => x <= 0f);
-
-            des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
-            if (_damageData.Target?.Owner?.IsPartsBoss ?? false)
-            {
-                des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
-            }
-
-            des += $",剩余HP: {Hp}";
-
-            MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp, (int)num6, BattleHeaderController.CurrentFrameCount,des, _damageData.Source);
-            uIManager.LogMessage(des,eLogMessageType.GET_DAMAGE, this);
-            createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
             if (OnDamage != null)
                 OnDamage(_byAttack, num6, _critical);
-            MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
+
+
+            if (!battleManager.skipping)
+            {
+                float NormalizedHP = (long)Hp / (float)(long)MaxHp;
+                /*
+                this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
+                string des;
+                //var prob = Hp.Probability(x => x <= 0f);
+
+                des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
+                if (_damageData.Target?.Owner?.IsPartsBoss ?? false)
+                {
+                    des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
+                }
+                des += $",剩余HP: {Hp}";
+
+                MyOnLifeChanged?.Invoke(UnitId, NormalizedHP, (int)Hp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
+                createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
+                MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
+
+            }
+
             MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, (float)num6, _critical);
             OnDamageForLoopRepeat.Call((float)num6);
@@ -8400,7 +8408,7 @@ this.updateCurColor();
                 }
                 else
                 {
-                    if (_useNumberEffect)
+                    if (_useNumberEffect && !battleManager.skipping)
                     {
                         UIManager.SetHealNumber(gameObject.transform.position, (int)_value);
                     }   //this.createHealNumEffect(_value, _target);
@@ -8494,7 +8502,7 @@ this.updateCurColor();
             action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点");
             SetEnergy(Energy + num, _setEnergyType, _source);
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
-            if (_hasNumberEffect)
+            if (_hasNumberEffect && !battleManager.skipping)
             {
                 /*float time = Time.time;
                 if ((double)this.lastEnergyHealTime + 0.449999988079071 < (double)time)
@@ -9053,8 +9061,11 @@ this.updateCurColor();
         public void SetState(ActionState _state, int _nextSkillId = 0, int _skillId = 0, bool _quiet = false)
         {
             string des = _state == ActionState.SKILL ? (unitActionController.skillDictionary.TryGetValue(_skillId,out var value)?value.SkillName:"UnknownSkill") : "";
-            uIManager?.LogMessage($"切换到{_state}状态", eLogMessageType.OTHER, this);
-            MyOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount,des, this);
+            if (!battleManager.skipping)
+            {
+                uIManager?.LogMessage($"切换到{_state}状态", eLogMessageType.OTHER, this);
+                MyOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount, des, this);
+            }
             /*switch (UnitId)
             {
                 case 101701:
@@ -10745,6 +10756,8 @@ this.updateCurColor();
             {
                 currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, MotionPrefix);
             }
+
+            if (battleManager.skipping) isIdleDamage = false;
         }
 
         /*private void resumeSpineWithTime()

@@ -148,22 +148,22 @@ namespace PCRCaculator.Guild
             lineChart.gameObject.SetActive(idx == 2 || idx == 3);
             showHPLine = idx == 2;
             showTPLine = idx == 3;
-            ReflashLineChat();
+            RefreshLineChat();
         }
 
-        public void ReflashHPChat(List<ValueChangeData> hpList)
+        public void RefreshHPChat(List<ValueChangeData> hpList)
         {
             if(hpList!=null)
                 hpValueList = GuildCalculator.CreateLineChatData(hpList);
-            ReflashLineChat();
+            RefreshLineChat();
         }
-        public void ReflashTPChat(List<ValueChangeData> tpList)
+        public void RefreshTPChat(List<ValueChangeData> tpList)
         {
             if(tpList!=null)
                 tpValueList = GuildCalculator.CreateLineChatData(tpList);
-            ReflashLineChat();
+            RefreshLineChat();
         }
-        private void ReflashLineChat()
+        private void RefreshLineChat()
         {
             if(showHPLine)
             {

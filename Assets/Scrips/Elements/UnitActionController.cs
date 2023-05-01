@@ -870,7 +870,8 @@ namespace Elements
             {
                 skillExecData.energy = Owner.Energy;
             }
-            Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
+            if (!Owner.battleManager.skipping)
+                Owner.MyOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
             //end added Scripts
             Owner.lastCritPoint = new UnitCtrl.CritPoint
@@ -1389,7 +1390,8 @@ namespace Elements
                 actionExecData.describe = "执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
             }
             actionExecData.result = isResisted ? UnitActionExecData.ActionState.MISS : UnitActionExecData.ActionState.NORMAL;
-            Owner.MyOnExecAction?.Invoke(Owner.UnitId, skill.SkillId, actionExecData);
+            if (!Owner.battleManager.skipping)
+                Owner.MyOnExecAction?.Invoke(Owner.UnitId, skill.SkillId, actionExecData);
             var a = skill.ActionParameters.Count(ap => ap.ActionType == action.ActionType);
             var b = skill.ActionParameters.Where(ap => ap.ActionType == action.ActionType).TakeWhile(ap => ap != action).Count();
             Owner.lastCritPoint = new UnitCtrl.CritPoint

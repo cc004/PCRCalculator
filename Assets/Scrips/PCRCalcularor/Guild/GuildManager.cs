@@ -137,7 +137,7 @@ namespace PCRCaculator.Guild
             yield return null;
             //Load();
             //LoadAddedPlayerData();
-            ReflashOnStart();
+            RefreshOnStart();
             if (MainManager.Instance.AutoCalculatorData.isCalculating && !MainManager.Instance.AutoCalculatorData.isConfig)
             {
                 OpenAutoCalculatePage();
@@ -217,7 +217,7 @@ namespace PCRCaculator.Guild
         }
         public void FinishEditCharacterdetail()
         {
-            ReflashCharacterGroupToggle();
+            RefreshCharacterGroupToggle();
             ChooseCharacterGroup();
             SaveDataToJson();
         }
@@ -231,7 +231,7 @@ namespace PCRCaculator.Guild
                 if (toggle.isOn)
                 {
                     SettingData.currentPlayerGroupNum = idx + currentPage*5-5;
-                    Reflash();
+                    Refresh();
                 }
                 idx++;
             }
@@ -240,7 +240,7 @@ namespace PCRCaculator.Guild
         {
             //addedPlayerDatas = new List<AddedPlayerData>() { playerData };
             SettingData.SetCurrentPlayerData(playerData);
-            Reflash();
+            Refresh();
             SaveDataToJson();
         }
         private void CreateMonthDropDown()
@@ -368,7 +368,7 @@ namespace PCRCaculator.Guild
             //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
             SaveDataToJson();
-            Reflash();
+            Refresh();
         }
         public int GetGuildBossID(int clanBattleID, int num, int turn)
         {
@@ -481,7 +481,7 @@ namespace PCRCaculator.Guild
             MainManager.Instance.WindowConfigMessage(guildMonthNames[month] + "的怪物数据丢失，无法继续！",null, null);
             return false;
         }*/
-        private void ReflashOnStart()
+        private void RefreshOnStart()
         {
             isInit = true;
             currentPage = Mathf.FloorToInt(SettingData.currentPlayerGroupNum / 5.0f) + 1;
@@ -489,7 +489,7 @@ namespace PCRCaculator.Guild
             {
                 //currentPage = 1;
             }
-            ReflashCharacterGroupToggle();
+            RefreshCharacterGroupToggle();
             CreateMonthDropDown();
 
             var data = SettingData.GetCurrentPlayerGroup();
@@ -524,13 +524,13 @@ namespace PCRCaculator.Guild
                 };
                 //SettingData.guildRandomDatas.Add(randomData);
             }
-            Reflash();
-            ReflashCalcSettings_start();
+            Refresh();
+            RefreshCalcSettings_start();
             EditingUBTime(false);
             AutoModeToggle.isOn = data.useAutoMode;
             isInit = false;
         }
-        private void ReflashCharacterGroupToggle()
+        private void RefreshCharacterGroupToggle()
         {
             for(int i = 0; i < 5; i++)
             {
@@ -544,7 +544,7 @@ namespace PCRCaculator.Guild
             characterGroupToggles[toggleIdx].isOn = true;
             characterGroupPageText.text = "" + currentPage;
         }
-        private void Reflash()
+        private void Refresh()
         {
             var data = SettingData.GetCurrentPlayerGroup();
             AddedPlayerData playerData = data.playerData;
@@ -636,7 +636,7 @@ namespace PCRCaculator.Guild
                 $"\n<size=10>({data.currentGuildMonth})</size>";
             //group.useLogBarrier = toggles_ChooseBoss[3].isOn;
         }
-        private void ReflashCalcSettings_start()
+        private void RefreshCalcSettings_start()
         {
             SettingSliders[0].value = SettingData.FPSforLogic / 10;
             SettingTexts[0].text = SettingData.FPSforLogic + "";
@@ -655,7 +655,7 @@ namespace PCRCaculator.Guild
             //SettingInputs[1].text = SettingData.BodyColliderWidth + "";
             //SettingInputs[2].text = SettingData.BossAbnormalMultValue + "";
             //SettingInputs[3].text = SettingData.BossAbnormalAddValue + "";
-            RandomManager.Reflash();
+            RandomManager.Refresh();
             // SettingToggles[7].isOn = SettingData.usePhysics;
             //SettingToggles[8].isOn = SettingData.useSkillEffects;
             //SettingInputs[4].text = SettingData.skillEffeckFix + "";
@@ -668,7 +668,7 @@ namespace PCRCaculator.Guild
             SettingInputs[10].text = SettingData.n2.ToString();
             SettingInputs[11].text = SettingData.dispFields;
         }
-        public void ReflashCalcUI()
+        public void RefreshCalcUI()
         {
             SettingTexts[0].text = (int)SettingSliders[0].value * 10 + "";
             SettingTexts[1].text = (int)SettingSliders[1].value * 10 + "";
@@ -831,7 +831,7 @@ namespace PCRCaculator.Guild
             SettingData.SetCurrentRandomData(timeLine);
             SettingData.SetCurrentPlayerGroup(guildTimelineData.playerGroupData);
             SettingData.GetCurrentPlayerGroup().UBExecTimeData = guildTimelineData.UBExecTime;
-            Reflash();
+            Refresh();
             SaveDataToJson();
         }
         private void LoadDataFromExcel_1(string dataStr)
@@ -894,7 +894,7 @@ namespace PCRCaculator.Guild
             }
             currentPage--;
             SettingData.currentPlayerGroupNum -= 5;
-            ReflashCharacterGroupToggle();
+            RefreshCharacterGroupToggle();
             ChooseCharacterGroup();
         }
         public void PlayerDatasNextButton()
@@ -911,7 +911,7 @@ namespace PCRCaculator.Guild
             {
                 currentPage++;
                 SettingData.currentPlayerGroupNum += 5;
-                ReflashCharacterGroupToggle();
+                RefreshCharacterGroupToggle();
                 ChooseCharacterGroup();
             }
         }
@@ -920,7 +920,7 @@ namespace PCRCaculator.Guild
             currentPage++;
             SettingData.currentPlayerGroupNum += 5;
             SettingData.AddOnePlayerGroup();
-            ReflashCharacterGroupToggle();
+            RefreshCharacterGroupToggle();
             ChooseCharacterGroup();
 
         }
@@ -935,7 +935,7 @@ namespace PCRCaculator.Guild
         public void ReNameButton_1(string name)
         {
             SettingData.RenameGroupName(name);
-            Reflash();
+            Refresh();
             SaveDataToJson();
         }
         public void HideButton()
@@ -970,7 +970,7 @@ namespace PCRCaculator.Guild
                     //FinishEditingPlayers(deepCopy);
                     SettingData.SetCurrentPlayerGroup(deepCopy);
                     SaveDataToJson();
-                    Reflash();
+                    Refresh();
 
                 }
                 else
@@ -989,7 +989,7 @@ namespace PCRCaculator.Guild
         {
             SettingData.ClearCurrentPlayerGroup();
             SaveDataToJson();
-            Reflash();
+            Refresh();
         }
         public void OpenUpdatePage()
         {

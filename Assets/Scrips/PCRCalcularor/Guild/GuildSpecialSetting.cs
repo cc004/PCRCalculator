@@ -26,7 +26,7 @@ namespace PCRCaculator.Guild
         {
             RandomManager.RandomData.randomSpecialDatas.Remove(specialData);
             CancelButton();
-            RandomManager.Reflash();
+            RandomManager.Refresh();
         }
         public void SaveButton()
         {
@@ -43,14 +43,14 @@ namespace PCRCaculator.Guild
                 specialData.targetNum = (GuildRandomSpecialData.UnitType)targetDropDown.value;
                 specialData.resuleType = (GuildRandomSpecialData.ResultType)resultDropdown.value;
                 CancelButton();
-                RandomManager.Reflash();
+                RandomManager.Refresh();
             }
             catch (Exception e)
             {
                 MainManager.Instance.WindowConfigMessage("错误：" + e.Message, null);
             }
         }
-        public void OpenAndReflash(GuildRandomSpecialData specialData)
+        public void OpenAndRefresh(GuildRandomSpecialData specialData)
         {
             gameObject.SetActive(true);
             this.specialData = specialData;

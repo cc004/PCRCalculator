@@ -23,9 +23,9 @@ namespace PCRCaculator.Battle
             debugLogs = BattleUIManager.Instance.DebugStrList;
             pageMax = Mathf.Max(1, Mathf.CeilToInt((float)debugLogs.Count / messageCount));
             page = pageMax;
-            Reflash();
+            Refresh();
         }
-        public void Reflash()
+        public void Refresh()
         {
             string str = "";
             for(int i = (page - 1) * messageCount; i < page * messageCount; i++)
@@ -48,7 +48,7 @@ namespace PCRCaculator.Battle
             {
                 page--;
             }
-            Reflash();
+            Refresh();
         }
         public void NextButton()
         {
@@ -56,7 +56,7 @@ namespace PCRCaculator.Battle
             {
                 page++;
             }
-            Reflash();
+            Refresh();
         }
     }
 }

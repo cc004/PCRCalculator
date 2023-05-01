@@ -70,10 +70,9 @@ namespace PCRCaculator.Guild
                 ? new[] {"本体"}
                 : Enumerable.Range(1, partCount).Select(x => $"部位{x}").ToArray();
 
-            Reflash();
         }
 
-        private void Reflash()
+        public void Refresh()
         {
             for(int i=0;i<GuildTypeToggles.Count;i++)
             {

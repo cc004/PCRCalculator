@@ -99,7 +99,7 @@ namespace PCRCaculator.Guild
                 guildPageUI.SetActive(false);
             }
 
-            ReflashTotalDamage(false, 0, false, 0, 0);
+            RefreshTotalDamage(false, 0, false, 0, 0);
             CurrentBossText.text = MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes();
             currentSeedText.text = "" + MyGameCtrl.Instance.CurrentSeedForSave;
             int idx = 0;
@@ -138,7 +138,7 @@ namespace PCRCaculator.Guild
             b.MyOnChangeState += AppendChangeState;
             if (b.UnitId >= 300000 && b.UnitId <= 400000)
             {
-                b.MyOnDamage2 += ReflashTotalDamage;
+                b.MyOnDamage2 += RefreshTotalDamage;
             }
             else if (isPlayer)
             {
@@ -271,14 +271,14 @@ namespace PCRCaculator.Guild
             };
             allUnitHPDic[unitid].Add(valueData);
             if (!GuildManager.StaticsettingData.calcSpineAnimation)
-                skillGroupPrefabDic[unitid].ReflashHPChat(allUnitHPDic[unitid]);
+                skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
         }
         public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
             allUnitTPDic[unitid].Add(new ValueChangeData(frame, currentTP, 0, describe));
             if (!GuildManager.StaticsettingData.calcSpineAnimation)
-                skillGroupPrefabDic[unitid].ReflashTPChat(allUnitTPDic[unitid]);
+                skillGroupPrefabDic[unitid].RefreshTPChat(allUnitTPDic[unitid]);
         }
         public void AppendStartSkill(int unitid, UnitSkillExecData unitSkillExecData)
         {
@@ -379,7 +379,7 @@ namespace PCRCaculator.Guild
             guildSkill.Initialize(Name, skillGroupColors[colorIdx]);
             skillGroupPrefabDic.Add(unitid, guildSkill);
         }
-        public void ReflashTotalDamage(bool byAttack, float value, bool critical, float criticalEXdamage, FloatWithEx exvalue)
+        public void RefreshTotalDamage(bool byAttack, float value, bool critical, float criticalEXdamage, FloatWithEx exvalue)
         {
             totalDamage += (long)value;
             totalDamageExcept += exvalue;
@@ -422,8 +422,8 @@ namespace PCRCaculator.Guild
             
             foreach (var pair in skillGroupPrefabDic)
             {
-                pair.Value.ReflashHPChat(allUnitHPDic[pair.Key]);
-                pair.Value.ReflashTPChat(allUnitTPDic[pair.Key]);
+                pair.Value.RefreshHPChat(allUnitHPDic[pair.Key]);
+                pair.Value.RefreshTPChat(allUnitTPDic[pair.Key]);
             }
 
             foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
@@ -441,7 +441,7 @@ namespace PCRCaculator.Guild
             if (currentFrame < 5400)
             {
                 backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
-                ReflashTotalDamage(true, 0, false, 0, 0);
+                RefreshTotalDamage(true, 0, false, 0, 0);
             }
 
             var n = GuildManager.StaticsettingData.n1;
@@ -486,6 +486,7 @@ namespace PCRCaculator.Guild
         {
             if (isFinishCalc)
             {
+                 chatPannel.Refresh();
                 chatPannel.gameObject.SetActive(true);
             }
         }
