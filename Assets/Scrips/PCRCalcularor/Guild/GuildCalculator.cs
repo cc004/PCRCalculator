@@ -114,8 +114,12 @@ namespace PCRCaculator.Guild
                 PlayerIds.Add(unitCtrl.UnitId);
             }
             playerUnitDamageDic.Add(0, new List<ValueChangeData> { new ValueChangeData(0, 0) });
-            AppendChangeBaseValue(bossId, 1, boss.Def, 0, "初始化");
-            AppendChangeBaseValue(bossId, 2, boss.MagicDef, 0, "初始化");
+            foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) : 
+                         new[] {(0, boss.Def, boss.MagicDef)})
+            {
+                AppendChangeBaseValue(bossId + part * 10, 1, def, 0, "初始化");
+                AppendChangeBaseValue(bossId + part * 10, 2, mdef, 0, "初始化");
+            }
             OnToggleSwitched(0);
             BattleManager.OnCallRandom = AppendCallRandom;
         }
@@ -321,7 +325,7 @@ namespace PCRCaculator.Guild
         }
         public void AppendChangeBaseValue(int unitid, int valueType, float value, int currentFrame, string describe)
         {
-            if (unitid == bossId)
+            if (unitid - unitid / 10 % 10 * 10 == bossId)
             {
                 if (value < 0)
                 {
@@ -330,10 +334,16 @@ namespace PCRCaculator.Guild
                 switch (valueType)
                 {
                     case 1:
-                        bossDefChangeDic.Add(new ValueChangeData(currentFrame, value, 0, describe));
+                        bossDefChangeDic.Add(new ValueChangeData(currentFrame, value, 0, describe)
+                        {
+                            target = unitid / 10 % 10
+                        });
                         break;
                     case 2:
-                        bossMgcDefChangeDic.Add(new ValueChangeData(currentFrame, value, 0, describe));
+                        bossMgcDefChangeDic.Add(new ValueChangeData(currentFrame, value, 0, describe)
+                        {
+                            target = unitid / 10 % 10
+                        });
                         break;
                 }
             }
@@ -416,8 +426,13 @@ namespace PCRCaculator.Guild
                 pair.Value.ReflashTPChat(allUnitTPDic[pair.Key]);
             }
 
-            AppendChangeBaseValue(bossId, 1, boss.Def, 5400, "时间耗尽");
-            AppendChangeBaseValue(bossId, 2, boss.MagicDef, 5400, "时间耗尽");
+            foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
+                         new[] { (0, boss.Def, boss.MagicDef) })
+            {
+                AppendChangeBaseValue(bossId + part * 10, 1, def, 5400, "时间耗尽");
+                AppendChangeBaseValue(bossId + part * 10, 2, mdef, 5400, "时间耗尽");
+            }
+
             skillScrollRect.horizontalNormalizedPosition = 1;
             guildPageUI.SetActive(true);
             isFinishCalc = true;
@@ -1226,6 +1241,7 @@ namespace PCRCaculator.Guild
         public string describe;
         public int id;
         public int source;
+        public int target;
         public ValueChangeData() { }
         public ValueChangeData(int x, float y)
         {

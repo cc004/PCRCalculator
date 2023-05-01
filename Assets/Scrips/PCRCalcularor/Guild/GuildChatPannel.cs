@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elements;
 using UnityEngine;
+using UnityEngine.Diagnostics;
 using UnityEngine.UI;
 using XCharts.Runtime;
 
@@ -24,15 +25,18 @@ namespace PCRCaculator.Guild
         private List<List<ValueChangeData>> AllUnitDamageDates = new List<List<ValueChangeData>>();
         private List<float> DamageMax = new List<float>();
         private List<List<ValueChangeData>> AllUnitTotalDamageDates = new List<List<ValueChangeData>>();
-        private List<ValueChangeData> BossDefData = new List<ValueChangeData>();
-        private float bossDefMax;
-        private List<ValueChangeData> BossMagicDefData = new List<ValueChangeData>();
-        private float bossMagicDefMax;
+        private List<ValueChangeData>[] BossDefData = Array.Empty<List<ValueChangeData>>();
+        private List<ValueChangeData>[] BossMagicDefData = Array.Empty<List<ValueChangeData>>();
         private const float Max_Y_Rate = 1.1f;
         private static List<ValueChangeData> emptyList = new List<ValueChangeData> { new ValueChangeData(0, 0), new ValueChangeData(1, 0) };
 
         private List<GameObject> lineChatXPrefabList = new List<GameObject>();
         private List<GameObject> lineChatYPrefabList = new List<GameObject>();
+
+        private string[] textForUnits;
+
+        private string[] textForBoss;
+        private int partCount;
 
         //private int currentType = 1;
 
@@ -50,10 +54,22 @@ namespace PCRCaculator.Guild
                 AllUnitTotalDamageDates.Add(GuildCalculator.CreateTotalChatData(value));
                 DamageMax.Add(value2.Max(a => a.yValue));
             }
-            BossDefData = GuildCalculator.CreateLineChatData(GuildCalculator.Instance.bossDefChangeDic);
-            bossDefMax = BossDefData.Max(a => a.yValue);
-            BossMagicDefData = GuildCalculator.CreateLineChatData(GuildCalculator.Instance.bossMgcDefChangeDic);
-            bossMagicDefMax = BossMagicDefData.Max(a => a.yValue);
+            BossDefData = GuildCalculator.Instance.bossDefChangeDic
+                .GroupBy(x => x.target).OrderBy(x => x.Key)
+                .Select(x => x.ToList()).ToArray();
+            BossMagicDefData = GuildCalculator.Instance.bossMgcDefChangeDic
+                .GroupBy(x => x.target).OrderBy(x => x.Key)
+                .Select(x => x.ToList()).ToArray();
+
+            textForUnits = GuildCalculator.Instance.playerUnitDamageDic.Keys
+                .Select(unit => MainManager.Instance.GetUnitNickName(unit))
+                .Prepend("全部").ToArray();
+
+            partCount = GuildCalculator.Instance.bossDefChangeDic.Max(x => x.target);
+            textForBoss = partCount == 0
+                ? new[] {"本体"}
+                : Enumerable.Range(1, partCount).Select(x => $"部位{x}").ToArray();
+
             Reflash();
         }
 
@@ -69,8 +85,12 @@ namespace PCRCaculator.Guild
             }
         }
 
-        private void DrawData(List<ValueChangeData>[] data, LineType type)
+        private void DrawData(List<ValueChangeData>[] data, LineType type, string[] serieTitle)
         {
+            chart.RemoveData();
+
+            if (data.Length == 0) return;
+
             var xpos = 
                 data.Length > 1 ? 
                     Enumerable.Range(0, data.SelectMany(x => x).Max(x => x.xValue)).ToArray() :
@@ -78,11 +98,10 @@ namespace PCRCaculator.Guild
 
             var nowx = new int[data.Length];
 
-            chart.RemoveData();
-
-            foreach (var t in data)
+            foreach (var title in serieTitle)
             {
                 var serie = chart.AddSerie<Line>();
+                serie.serieName = title;
                 if (data.Length == 1) serie.lineType = type;
             }
 
@@ -105,31 +124,37 @@ namespace PCRCaculator.Guild
             var data = Enumerable.Range(0, 6).Select(_ => new List<ValueChangeData>()).ToArray();
             float TotalMax = 1;
             LineType type = LineType.StepEnd;
+            var serieTitle = textForUnits.ToArray();
             switch (TypeId)
             {
                 case 1:
+                case 2:
+                {
+                    var t = TypeId == 1 ? AllUnitDamageDates : AllUnitTotalDamageDates;
                     for (int i = 0; i < 6; i++)
-                        if (GuildUnitToggles[i].interactable && GuildUnitToggles[i].isOn)
-                            data[i] = GuildCalculator.NormalizeLineChatData(AllUnitDamageDates[i], TotalMax);
+                        data[i] = GuildCalculator.NormalizeLineChatData(AllUnitDamageDates[i], TotalMax);
                     type = LineType.Normal;
                     break;
-                case 2:
-                    for (int i = 0; i < 6; i++)
-                        if (GuildUnitToggles[i].interactable && GuildUnitToggles[i].isOn)
-                            data[i] = GuildCalculator.NormalizeLineChatData(AllUnitTotalDamageDates[i], TotalMax);
-
-                    break;
+                }
                 case 3:
-                    data[0] = GuildCalculator.NormalizeLineChatData(BossDefData, bossDefMax);
-                    break;
                 case 4:
-                    data[0] = GuildCalculator.NormalizeLineChatData(BossMagicDefData, bossMagicDefMax);
+                {
+                    var t = TypeId == 3 ? BossDefData : BossMagicDefData;
+                    foreach (var (k, l) in t.Where(x => x.Count > 0).Select(x => (x[0].target, x)))
+                        data[k - (partCount > 0 ? 1 : 0)] = l;
+                    serieTitle = textForBoss.ToArray();
                     break;
-
+                }
             }
 
-            DrawData(data.Where(x => x != null && x.Count > 0).ToArray(),
-                type);
+            for (var i = 0; i < 6; ++i)
+                if (!(GuildUnitToggles[i].interactable && GuildUnitToggles[i].isOn))
+                    data[i] = null;
+
+            var t0 = serieTitle.Zip(data, (x, y) => (x, y))
+                .Where(p => p.y != null && p.y.Count > 0).ToArray();
+            DrawData(t0.Select(x => x.y).ToArray(),
+                type, t0.Select(x => x.x).ToArray());
         }
 
         private void SetUnitToggles(int TypeId)
@@ -156,13 +181,25 @@ namespace PCRCaculator.Guild
                     break;
                 case 3:
                 case 4:
-                    GuildUnitTexts[0].text = MyGameCtrl.Instance.enemyUnitCtrl[0].UnitName;
-                    GuildUnitToggles[0].interactable = true;
-                    for (int i = 0; i < 5; i++)
+                    if (partCount == 0)
                     {
-                        GuildUnitTexts[i + 1].text = "???";
-                        GuildUnitToggles[i + 1].interactable = false;
+                        GuildUnitTexts[0].text = MyGameCtrl.Instance.enemyUnitCtrl[0].UnitName;
+                        GuildUnitToggles[0].interactable = true;
                     }
+                    else
+                        for (var i = 0; i < 6; i++)
+                        {
+                            if (i >= partCount)
+                            {
+                                GuildUnitTexts[i].text = "???";
+                                GuildUnitToggles[i].interactable = false;
+                            }
+                            else
+                            {
+                                GuildUnitTexts[i].text = $"部位{i + 1}";
+                                GuildUnitToggles[i].interactable = true;
+                            }
+                        }
                     break;
             }
         }

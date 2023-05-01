@@ -288,12 +288,16 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         Def = (int)((int)Def + _value);
+                        string des = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
+                        Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 1, Def, BattleHeaderController.CurrentFrameCount, des);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
                         MagicStr = (int)(MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         MagicDef = (int)((int)MagicDef + _value);
+                        string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
+                        Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 2, MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
                         Dodge = (int)((int)Dodge + _value);
