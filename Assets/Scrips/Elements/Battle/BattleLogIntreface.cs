@@ -10,8 +10,14 @@ namespace Elements.Battle
 {
   public class BattleLogIntreface
   {
+      private BattleLogIntreface()
+      {
+      }
+
+      public static BattleLogIntreface Instance = new BattleLogIntreface();
+
       [Conditional("False")]
-      void AppendBattleLog(
+      public void AppendBattleLog(
           eBattleLogType LIFIGNMLOLF,
           int HLIKLPNIOKJ,
           long KGNFLOPBOMB,

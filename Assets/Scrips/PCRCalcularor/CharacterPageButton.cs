@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Elements;
+using Elements.Battle;
 using PCRCaculator.Battle;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 using eStateIconType = Elements.eStateIconType;
 
 namespace PCRCaculator
@@ -166,6 +169,8 @@ namespace PCRCaculator
                 if (unitid <= 200000)
                 {
                     levelText_B.gameObject.SetActive(true);
+                    if (!MainManager.Instance.UnitRarityDic.ContainsKey(unitid))
+                        Debugger.Break();
                     UnitRarityData rarityData = MainManager.Instance.UnitRarityDic[unitid];
                     //levelText_B.text = "lv:" + data.level;
                     levelText_B.text = "" + Mathf.RoundToInt(rarityData.GetPowerValue(data));
@@ -242,6 +247,7 @@ namespace PCRCaculator
         }
         public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???")
         {
+            if (BattleManager.Instance.skipping) return;
             if (stayTime == 0) stayTime = unitCtrl.fieldTime;
             if(stateIconType_2 == eStateIconType.NONE) { return; }
             if (BattleUIManager.Instance.ShowBuffDic.TryGetValue(eStateIconType.NONE, out bool value))

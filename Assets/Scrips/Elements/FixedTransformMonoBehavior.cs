@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -57,11 +58,7 @@ namespace Elements
                 }
             }
 
-            public Vector3 position
-            {
-                get => !(TargetTransform.parent == null) ? TargetTransform.parent.TransformPoint(localPosition) : localPosition;
-                set => localPosition = TargetTransform.parent == null ? value : TargetTransform.parent.InverseTransformPoint(value);
-            }
+            public Vector3 position => !(TargetTransform.parent == null) ? TargetTransform.parent.TransformPoint(localPosition) : localPosition;
 
             public Transform parent
             {
@@ -87,6 +84,7 @@ namespace Elements
             {
                 positionX = BattleUtil.FloatToInt(_x * DIGID / SCALE);
                 TargetTransform.SetLocalPosX(positionX / DIGID);
+                BattleManager.Instance.shouldUpdateSkillTarget = true;
             }
 
             public void SetLocalPosY(float _y)

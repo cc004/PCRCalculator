@@ -2675,7 +2675,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1212528156}
         m_TargetAssemblyTypeName: PCRCaculator.Battle.BattleUIManager, Assembly-CSharp
-        m_MethodName: StepButton
+        m_MethodName: SkipButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17909,6 +17909,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c34551cf91ae5064290da6cb0b20ffd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shouldUpdateSkillTarget: 0
   unitParentTransform: {fileID: 1199446829}
   enemyParentTransform: {fileID: 1199446829}
   playCamera: {fileID: 1991992500}
@@ -17929,6 +17930,7 @@ MonoBehaviour:
   ActionStartTimeCounter: 0
   princessFormMoviePlayer: {fileID: 0}
   stepping: 0
+  skipping: 0
 --- !u!114 &2080290836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19727,6 +19729,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c34551cf91ae5064290da6cb0b20ffd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shouldUpdateSkillTarget: 0
   unitParentTransform: {fileID: 2177380771696129155}
   enemyParentTransform: {fileID: 2081915953115004115}
   playCamera: {fileID: 2578344062992442740}
@@ -19747,6 +19750,7 @@ MonoBehaviour:
   ActionStartTimeCounter: 0
   princessFormMoviePlayer: {fileID: 1992102222}
   stepping: 0
+  skipping: 0
 --- !u!1 &8254703915107425000
 GameObject:
   m_ObjectHideFlags: 0

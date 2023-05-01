@@ -155,7 +155,8 @@ namespace Elements
       Skill _skill)
     {
       (_source.IsOther ? battleManager.EnemyList : battleManager.UnitList).Add(_source);
-      _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1);
+      BattleManager.Instance.shouldUpdateSkillTarget = true;
+            _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1);
       _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false);
       _source.AppendCoroutine(updateUndoMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _source);
       _source.gameObject.SetActive(true);

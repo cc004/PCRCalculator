@@ -164,9 +164,9 @@ namespace Elements
             //if (ActionParameter.staticSingletonTree != null)
             //  return;
             //ActionParameter.staticSingletonTree = this.CreateSingletonTree<ActionParameter>();
-            staticBattleManager = BattleManager.Instance;
+      staticBattleManager = BattleManager.Instance;
       staticBattleEffectPool = staticBattleManager.battleEffectPool;
-      staticBattleLog = staticBattleManager;
+      staticBattleLog = BattleLogIntreface.Instance;
     }
 
     public virtual void Initialize()

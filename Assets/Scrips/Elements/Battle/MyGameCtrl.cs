@@ -158,7 +158,7 @@ namespace Elements
             BattleUIManager.Instance.SetUI_2(this);
             if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
-                GuildCalculator.Instance.Initialize(playerUnitCtrl, enemyUnitCtrl[0]);
+                GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
             }
 
             if (tempData.isGuildBattle)
@@ -256,7 +256,7 @@ namespace Elements
             //callBack.Call<UnitCtrl>(unitCtrl);
             //if (!IsAutoMode && isplayer)
             //{
-                //unitCtrl.SetUBExecTime(tempData.UBExecTimeList[idx], tempData.tryCount);
+            //unitCtrl.SetUBExecTime(tempData.UBExecTimeList[idx], tempData.tryCount);
             //}
 
         }
@@ -416,9 +416,11 @@ namespace Elements
             SpineResourceSet resourceSet = new SpineResourceSet(info, prefabID, 0, 0);
             resourceSet.Skelton = dataAsset;
             battleSpineController.Create(resourceSet);
-            SetSummonUI(summonUnitCtrl);
+            if (!BattleManager.Instance.skipping)
+                SetSummonUI(summonUnitCtrl);
             _callback?.Invoke(battleSpineController);
-            GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);
+            if (!BattleManager.Instance.skipping)
+                GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);
 
         }
         public static void CreateModeChangeSpine(eSpineType _spineType,

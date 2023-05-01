@@ -26,8 +26,10 @@ using Random = UnityEngine.Random;
 
 namespace Elements.Battle
 {
-    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController, BattleLogIntreface
+    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController
     {
+        public bool shouldUpdateSkillTarget = false;
+
         public ScriptManager scriptMgr;
         public static int randomCounter;
         public AutoubManager ubmanager = new AutoubManager();
@@ -496,6 +498,8 @@ namespace Elements.Battle
 
         private void Update()
         {
+            if (battleFinished) return;
+
             if (Input.GetKey(KeyCode.Space))
             {
                 if (!spacePressed) BattleHeaderController.Instance.OnClickPauseButton();
@@ -538,9 +542,9 @@ namespace Elements.Battle
             {
                 if (!IsFramePause)
                     deltaTimeAccumulated += Time.deltaTime;
-
+                
                 if (skipping) stopWatch.Restart();
-
+                
                 do
                 {
                     if (IsFramePause && !CoroutineManager.VisualPause)
@@ -554,9 +558,9 @@ namespace Elements.Battle
                     updateFrame();
                     deltaTimeAccumulated -= DeltaTime_60fps;
 
-                    if (stopWatch.ElapsedMilliseconds >= 1000) break;
+                    // UnityEngine.Debug.LogError(stopWatch.ElapsedMilliseconds);
                 }
-                while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps || skipping);
+                while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps || skipping && stopWatch.ElapsedMilliseconds < 1000);
 
                 while (FrameCount < PPNHIMOOKDD && !IsFramePause)
                 {
@@ -2078,6 +2082,7 @@ namespace Elements.Battle
         private void finishBattle(eBattleResult JJHEBNEEHPB)
         {
             battleFinished = true;
+            skipping = false;
             /*if (BattleHeaderController.Instance.IsPaused && this.dialogManager.IsUse(eDialogId.BATTLE_MENU))
                 this.dialogManager.ForceCloseOne(eDialogId.BATTLE_MENU);*/
             MyGameCtrl.Instance.OnBattleFinished((int)JJHEBNEEHPB);
@@ -3779,22 +3784,20 @@ namespace Elements.Battle
             //battleManager.tempData.DDMKANMNCAA.Clear();
             //battleManager.tempData.MKLNOEGPBLE.Clear();
             //battleManager.battleProcessor.PrepareBattle();
-            battleManager.BattleReady = true;
             // ISSUE: reference to a compiler-generated method
             //yield return (object)new WaitUntil(() => viewBattle.StartFadeInCalled);
-            battleManager.enabled = true;
             //battleManager.battleProcessor.CleanUpData();
             // ISSUE: explicit non-virtual call
             //int currentWave = 0;
             //if (BattleDefine.BattleBgmDic[battleManager.BattleCategory] != null)
             //{ battleManager.battleProcessor.PlayViewBGM(); }
 
-           // else if (!battleManager.tempData.PHDACAOAOMA.CurrentBattleBGM[currentWave].IsNullOrEmpty())
+            // else if (!battleManager.tempData.PHDACAOAOMA.CurrentBattleBGM[currentWave].IsNullOrEmpty())
             //    battleManager.soundManager.PlayBGM(battleManager.tempData.PHDACAOAOMA.CurrentBattleBGMSheet[currentWave], battleManager.tempData.PHDACAOAOMA.CurrentBattleBGM[currentWave]);
             //if (ManagerSingleton<ViewManager>.Instance.IsSnsBattlePause)
             //{
-                // ISSUE: explicit non-virtual call
-              //  battleManager.GamePause(true, false);
+            // ISSUE: explicit non-virtual call
+            //  battleManager.GamePause(true, false);
             //    ManagerSingleton<ViewManager>.Instance.IsSnsBattlePause = false;
             //}
             yield return null;
@@ -3819,14 +3822,16 @@ namespace Elements.Battle
 
             }
 
-
-            battleManager.GameState = eBattleGameState.PLAY;
-
             if (ExcelHelper.ExcelHelper.AsmExportEnabled)
             {
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();
             }
+
+            battleManager.GameState = eBattleGameState.PLAY;
+            battleManager.BattleReady = true;
+            battleManager.enabled = true;
+
         }
 
         public List<UnitCtrl> GetMyUnitList() => (BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? UnitList : EnemyList;
@@ -4656,6 +4661,7 @@ namespace Elements.Battle
                 {
                     _this.UnitList.Add(unitCtrl);
                 }
+                BattleManager.Instance.shouldUpdateSkillTarget = true;
                 unitCtrl.ExecActionOnStartAndDetermineInstanceID();
                 unitCtrl.SummonType = _summonData.SummonType;
                 unitCtrl.IsSummonOrPhantom = unitCtrl.SummonType == SummonAction.eSummonType.SUMMON || unitCtrl.SummonType == SummonAction.eSummonType.PHANTOM;

@@ -325,6 +325,7 @@ namespace PCRCaculator.Guild
         }
         public void AppendChangeBaseValue(int unitid, int valueType, float value, int currentFrame, string describe)
         {
+            if (BattleManager.Instance.skipping) return;
             if (unitid - unitid / 10 % 10 * 10 == bossId)
             {
                 if (value < 0)

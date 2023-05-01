@@ -77,7 +77,10 @@ namespace Elements
       {
         summonUnit1.IdleOnly = true;
         if (battleManager.UnitList.Contains(summonUnit1))
-          battleManager.UnitList.Remove(summonUnit1);
+        {
+            BattleManager.Instance.shouldUpdateSkillTarget = true;
+                    battleManager.UnitList.Remove(summonUnit1);
+        }
       }
             action($"召唤{unitCtrl.UnitNameEx}{ActionDetail2}");
       if (_source.SummonTargetAttachmentName.IsNullOrEmpty() || appliedAttachment != null)

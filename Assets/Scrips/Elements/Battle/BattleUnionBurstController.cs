@@ -32,6 +32,8 @@ namespace Elements.Battle
                 UnitCtrl unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
                 if (unitCtrl.UnionBurstSkillId != 0)
                     unitCtrl.UpdateSkillTarget();
+                else continue;
+
                 var ready = unitCtrl.JudgeSkillReadyAndIsMyTurn();
                 if (ready && !unitCtrl.lastCanReleaseSkill)
                 {

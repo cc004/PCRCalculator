@@ -33,7 +33,7 @@ namespace Elements
         public List<Skill> SubUnionBurstList;
         public Skill Annihilation;
         //private static Yggdrasil<UnitActionController> staticSingletonTree;
-        private static BattleManagerForActionController staticBattleManager;
+        private static BattleManager staticBattleManager;
 
         private IBattleCameraEffectForUnitActionController battleCameraEffect;
         //private static BMIOELFOCPE staticBattleCameraEffect;
@@ -70,7 +70,7 @@ namespace Elements
 
         private bool updateBranchMotionRunning { get; set; }
 
-        private BattleManagerForActionController battleManager => staticBattleManager;
+        private BattleManager battleManager => staticBattleManager;
 
         //private JFJNEHKINFI battleTimeScale => UnitstaticBattleTimeScale;
         public bool GetIsSkillPrincessForm(int _skillId) => skillDictionary[_skillId].IsPrincessForm;
@@ -789,7 +789,7 @@ namespace Elements
                 }
                 return false;
             }
-            if (!flag3)
+            if (!flag3 && !Owner.battleManager.skipping)
                 Owner.IndicateSkillName(skill.SkillName);
             for (int index = 0; index < skill.ShakeEffects.Count; ++index)
             {
@@ -1374,7 +1374,8 @@ namespace Elements
             {
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
-                Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
+                if (battleManager.skipping)
+                    Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
 
                 action.PreExecAction();
                 action.ExecAction(Owner, target, num, this, skill, starttime, dictionary, 
@@ -2060,17 +2061,21 @@ namespace Elements
                 _actionParameter.sortinfo = "";
                 var str = $"对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})进行排序：\n" +
                     $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
-                Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
                 _actionParameter.sortinfo += str + "\n";
                 if (_array.Count == 0)
                     return;
                 UnitCtrl.FunctionalComparer<BasePartsData> instance = UnitCtrl.FunctionalComparer<BasePartsData>.Instance;
                 instance.SetComparer(_compare);
                 UnitCtrl.quickSortImpl(_array, 0, _array.Count - 1, instance);
-                str = $"{Owner.UnitName}对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})排序结果\n" +
+                var str2 = $"{Owner.UnitName}对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})排序结果\n" +
                     $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
-                Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
-                _actionParameter.sortinfo += str + "\n";
+                _actionParameter.sortinfo += str2 + "\n";
+
+                if (!battleManager.skipping)
+                {
+                    Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
+                    Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
+                }
             }
 
             List<BasePartsData> targetList = _actionParameter.TargetList;

@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -23,6 +24,7 @@ namespace Elements
       _transform.localPosition = Vector3.zero;
       _transform.TargetTransform.localRotation = Quaternion.identity;
       _transform.TargetTransform.localScale = Vector3.one;
+      BattleManager.Instance.shouldUpdateSkillTarget = true;
     }
   }
 }

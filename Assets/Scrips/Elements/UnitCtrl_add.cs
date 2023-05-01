@@ -35,7 +35,7 @@ namespace Elements
         public Action<float> MyOnUsingSkill;
         public Dictionary<int, int> MySkillExecDic = new Dictionary<int, int>();
 
-        public BattleUIManager UIManager { get => uIManager; }
+        public BattleUIManager UIManager { get => BattleUIManager.Instance; }
         private const float BOSS_DELTA_FIX = -1f;
 
         private GuildPlayerGroupData.LogBarrierType useLogBarrier;

@@ -26,8 +26,9 @@ namespace Elements
 				case 0:
 					_target.Owner.BodyWidth = _valueDictionary[eValueNumber.VALUE_1];
 					break;
-			}
-		}
+            }
+            battleManager.shouldUpdateSkillTarget = true;
+        }
 		public override void SetLevel(float _level)
 		{
 		}

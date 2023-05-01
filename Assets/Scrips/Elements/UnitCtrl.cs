@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Cute;
 using Elements.Battle;
 using PCRCaculator;
@@ -1123,7 +1124,15 @@ namespace Elements
 
         //public List<CircleEffectController> CircleEffectList { get; private set; }
 
-        public bool IsDead { get; set; }
+        public bool IsDead
+        {
+            get => _isDead;
+            set
+            {
+                battleManager.shouldUpdateSkillTarget = true;
+                _isDead = value;
+            }
+        }
 
         public bool IsRecreated { get; set; }
 
@@ -1176,7 +1185,15 @@ namespace Elements
 
         public bool IdleOnly { get; set; }
 
-        public bool HasUnDeadTime { get; set; }
+        public bool HasUnDeadTime
+        {
+            get => _hasUnDeadTime;
+            set
+            {
+                battleManager.shouldUpdateSkillTarget = true;
+                _hasUnDeadTime = value;
+            }
+        }
 
         public int UnDeadTimeHitCount { get; set; }
 
@@ -1512,15 +1529,19 @@ namespace Elements
 
         public int Level { get; protected set; }
 
-        private FloatWithEx _hp;
+        private FloatWithEx _hp  = 0f;
 
         public FloatWithEx Hp
         {
             get => _hp;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal protected set
             {
+                if ((long)value > 0 ^ (long)_hp > 0)
+                    battleManager.shouldUpdateSkillTarget = true;
                 _hp = value;
-                OnLifeAmmountChange?.Invoke((float)value / MaxHp);
+                if (!battleManager.skipping)
+                    OnLifeAmmountChange?.Invoke((float)value / MaxHp);
             }
         }
         
@@ -1676,12 +1697,12 @@ namespace Elements
             {
                 energyjudged = false;
                 energy = value.Min(UnitDefine.MAX_ENERGY).Max(0f);
-                if (unitUI != null)
+                if (!battleManager.skipping && unitUI != null)
                     unitUI.SetTP((float)energy / UnitDefine.MAX_ENERGY);
                 //this.energy = (float)Mathf.Min((float)UnitDefine.MAX_ENERGY, Mathf.Max(0.0f, value));
-                if (EnergyChange == null)
+                /*if (EnergyChange == null)
                     return;
-                EnergyChange(this);
+                EnergyChange(this);*/
             }
         }
 
@@ -1930,7 +1951,7 @@ this.updateCurColor();
             }*/
 
                 staticBattleManager = BattleManager.Instance;
-                staticBattleLog = battleManager;
+                staticBattleLog = BattleLogIntreface.Instance;
                 staticBattleTimeScale = battleManager.battleTimeScale;
             FunctionalComparer<BasePartsData>.CreateInstance();
             FunctionalComparer<BasePartsDataEx>.CreateInstance();
@@ -2761,9 +2782,16 @@ this.updateCurColor();
 
         public void UpdateSkillTarget()
         {
-            skillTargetList.Clear();
-            List<UnitCtrl> unitCtrlList = IsOther ? battleManager.UnitList : battleManager.EnemyList;
             var distance = SkillAreaWidthList[UnionBurstSkillId];
+
+            if (distance == lastSearchDistance && !battleManager.shouldUpdateSkillTarget)
+            {
+                skillTargetList = IsOther ? targetPlayerList : TargetEnemyList;
+                return;
+            }
+
+            List<UnitCtrl> unitCtrlList = IsOther ? battleManager.UnitList : battleManager.EnemyList;
+            skillTargetList.Clear();
             foreach (var unit in unitCtrlList)
             {
                 if (judgeFrontAreaTarget(unit, distance))
@@ -2834,6 +2862,8 @@ this.updateCurColor();
             }
         }
 
+        private float lastSearchDistance = -1f;
+
         private void updateAttackTargetImpl()
         {
             List<UnitCtrl> unitCtrlList1 = IsOther ? battleManager.UnitList : battleManager.EnemyList;
@@ -2851,6 +2881,9 @@ this.updateCurColor();
                         break;
                 }
             }
+
+            if (_distance == lastSearchDistance && !battleManager.shouldUpdateSkillTarget)
+                return;
 
             TargetEnemyList.Clear();
             targetPlayerList.Clear();
@@ -2874,6 +2907,9 @@ this.updateCurColor();
             foreach (var ctrl in battleManager.EnemyList)
                 if (judgeFrontAreaTarget(ctrl, _distance))
                     list2.Add(ctrl);
+
+            lastSearchDistance = _distance;
+
             /*
             for (int index = 0; index < unitCtrlList1.Count; ++index)
             {
@@ -3022,6 +3058,7 @@ this.updateCurColor();
         public void SetLeftDirection(bool bLeftDir)
         {
             IsLeftDir = bLeftDir;
+            battleManager.shouldUpdateSkillTarget = true;
             if (ToadDatas.Count > 0)
                 GetCurrentSpineCtrl().transform.localScale = IsLeftDir || IsForceLeftDir ? ToadDatas[0].LeftDirScale : ToadDatas[0].RightDirScale;
             else
@@ -7608,7 +7645,8 @@ this.updateCurColor();
                 ChargeEnergy(eSetEnergyType.BY_SET_DAMAGE, num5 * (float)skillStackValDmg, _source: this, _hasNumberEffect: false, _multipleValue: _energyChargeMultiple);
             if ((double)num5 <= 0.0 && _damageData.ActionType == eActionType.FORCE_HP_CHANGE)
             {
-                createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.FloatToInt(num5));
+                if (!battleManager.skipping)
+                    createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.FloatToInt(num5));
                 callBack?.Invoke("伤害无效，因为伤害为负数");
                 return 0f;
             }
@@ -8260,6 +8298,7 @@ this.updateCurColor();
           BasePartsData _parts = null,
           float _scale = 1f)
         {
+            if (battleManager.skipping) return;
             if (_parts == null)
                 _parts = GetFirstParts(true);
             BattleLogIntreface battleLog = this.battleLog;
@@ -8499,11 +8538,10 @@ this.updateCurColor();
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
             var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZero + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
-            action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点");
-            SetEnergy(Energy + num, _setEnergyType, _source);
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_hasNumberEffect && !battleManager.skipping)
             {
+                action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点");
                 /*float time = Time.time;
                 if ((double)this.lastEnergyHealTime + 0.449999988079071 < (double)time)
                     this.energyHealComboCount = 0;
@@ -8516,6 +8554,7 @@ this.updateCurColor();
                 component.SetDamageText(((int)num).ToString(), eDamageEffectColor.BLUE);*/
                 UIManager.SetEnergyNumber(gameObject.transform.position, (int)num);
             }
+            SetEnergy(Energy + num, _setEnergyType, _source);
             //if (!_hasEffect || _effectType != eEffectType.COMMON)
             //    return;
             //this.GetFirstParts(true).RecoveryEffect(this, true, this.battleEffectPool, _isRegenerate);
@@ -9951,6 +9990,7 @@ this.updateCurColor();
                                 List<UnitCtrl> unitCtrlList = unitCtrl.IsOther ? unitCtrl.battleManager.EnemyList : unitCtrl.battleManager.UnitList;
                                 if (unitCtrlList.Contains(unitCtrl))
                                     unitCtrlList.Remove(unitCtrl);
+                                BattleManager.Instance.shouldUpdateSkillTarget = true;
                                 if (!unitCtrl.gameObject.activeSelf)
                                     break;
                                 unitCtrl.gameObject.SetActive(false);
@@ -10506,7 +10546,8 @@ this.updateCurColor();
                                 {
 
                                 }
-                                MyOnSkillCD?.Invoke(m_fCastTimer);
+                                if (!battleManager.skipping)
+                                    MyOnSkillCD?.Invoke(m_fCastTimer);
                             }
                             if (unitCtrl.battleManager.LOGNEDLPEIJ)
                                 yield return null;
@@ -10549,6 +10590,7 @@ this.updateCurColor();
                                 }
                                 unitCtrl.CancelByAwake = false;
                                 unitCtrl.SetState(_state, _nextSkillId, _skillId);
+                                if (!battleManager.skipping)
                                 MyOnChangeSkillID?.Invoke(_skillId, _nextSkillId, m_fCastTimer, 1);
                                 yield break;
                             }
@@ -11345,13 +11387,13 @@ this.updateCurColor();
                 battleManager.isPrincessFormSkill = skillPrincessForm;
                 //SingletonMonoBehaviour<BattleHeaderController>.Instance.PauseNoMoreTimeUp(true);
                 BattleHeaderController.Instance.PauseNoMoreTimeUp(true);
-                StartCoroutine(unitActionController.StartActionWithOutCutIn(this, UnionBurstSkillId, () =>
-                {
+                //StartCoroutine(unitActionController.StartActionWithOutCutIn(this, UnionBurstSkillId, () =>
+                //{
                     battleManager.isPrincessFormSkill = false;
                     PlayingNoCutinMotion = false;
                     battleManager.isUBExecing = false;
                     battleManager.OnCutInEnd(IsOther || IsSummonOrPhantom, this);
-                }));
+                //}));
             }
         }
 
@@ -11459,6 +11501,8 @@ this.updateCurColor();
         public bool JudgeSkillReadyAndIsMyTurnExceptEnergy() => isMyTurn() && IsSkillReadyExceptEnergy;
 
         public bool pressing = false;
+        private bool _isDead;
+        private bool _hasUnDeadTime;
         public static Func<UnitCtrl, string> infoGetter;
 
         public void RebuildInfoGetter()

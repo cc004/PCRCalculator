@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Elements.Battle;
+using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -42,6 +43,7 @@ namespace Elements
                     List<UnitCtrl> unitCtrlList = _target.Owner.IsOther ? battleManager.EnemyList : battleManager.UnitList;
                     if (unitCtrlList.Contains(_target.Owner))
                         unitCtrlList.Remove(_target.Owner);
+                    BattleManager.Instance.shouldUpdateSkillTarget = true;
                     _target.Owner.IsDead = true;
                     _target.Owner.CureAllAbnormalState();
                     battleManager.CallbackFadeOutDone(_target.Owner);
