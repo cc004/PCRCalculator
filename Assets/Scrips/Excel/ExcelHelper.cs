@@ -1301,7 +1301,7 @@ namespace ExcelHelper
                     {
                         foreach(var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue * 5400), data0.Key, idx,"", data1.describe,valueA:data1.hp));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:data1.hp));
                         }
                         idx++;
                     }
@@ -1311,7 +1311,7 @@ namespace ExcelHelper
                     {
                         foreach (var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue * 5400), data0.Key, idx, "", data1.describe,valueB:data1.yValue*1000));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx, "", data1.describe,valueB:data1.yValue*1000));
                         }
                         idx++;
                     }
@@ -1319,13 +1319,13 @@ namespace ExcelHelper
                 case 4:
                     foreach(var data0 in TimelineData.bossDefChangeDic)
                     {
-                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue * 5400), 0, idx, "", data0.describe, valueB: data0.yValue));
+                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue), 0, idx, "", data0.describe, valueB: data0.yValue));
                     }
                     break;
                 case 5:
                     foreach (var data0 in TimelineData.bossMgcDefChangeDic)
                     {
-                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue * 5400), 0, idx, "", data0.describe, valueB: data0.yValue));
+                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue), 0, idx, "", data0.describe, valueB: data0.yValue));
                     }
                     break;
                 case 6:
@@ -1334,7 +1334,7 @@ namespace ExcelHelper
                     {
                         foreach(var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue * 5400), data0.Key, idx, "", "",valueA:(int)data1.yValue));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx, "", "",valueA:(int)data1.yValue));
                         }
                         idx++;
                     }
