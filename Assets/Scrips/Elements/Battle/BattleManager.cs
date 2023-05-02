@@ -4880,13 +4880,11 @@ namespace Elements.Battle
 
         public bool PositionChanged(int cacheKey)
         {
-            return true;
             return cacheKey != skillTargetCacheKey;
         }
 
         public bool PositionChanged(ref int cacheKey)
         {
-            return true;
             var result = cacheKey != skillTargetCacheKey;
             cacheKey = skillTargetCacheKey;
             return result;
