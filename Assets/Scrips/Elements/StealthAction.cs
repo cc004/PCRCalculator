@@ -43,7 +43,7 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             _target.Owner.IsStealth = true;
-            battleManager.shouldUpdateSkillTarget = true;
+            battleManager.QueueUpdateSkillTarget();
             _target.Owner.AppendCoroutine(updateStealth(_valueDictionary[eValueNumber.VALUE_1], _target.Owner), ePauseType.SYSTEM);
             if (_skill.AnimId != 0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum, 1))
             {
@@ -130,7 +130,7 @@ namespace Elements
                 yield return null;
             }
             _target.IsStealth = false;
-            battleManager.shouldUpdateSkillTarget = true;
+            battleManager.QueueUpdateSkillTarget();
         }
 
         public override void SetLevel(float _level) => base.SetLevel(_level);

@@ -42,14 +42,14 @@ namespace Elements
 
         public void Destroy() => Destroy(gameObject);
 
-        private Dictionary<(eSpineCharacterAnimeId, int, int, int), string> animeNameCache = new Dictionary<(eSpineCharacterAnimeId, int, int, int), string>();
+        private Dictionary<long, string> animeNameCache = new Dictionary<long, string>();
         public string ConvertAnimeIdToAnimeName(
           eSpineCharacterAnimeId _animeId,
           int _index1 = -1,
           int _index2 = -1,
           int _index3 = -1)
         {
-            var key = (_animeId, _index1, _index2, _index3);
+            var key = ((long)(ushort)_animeId << 48) | ((long)(ushort)_index1 << 32) | ((long)(ushort)_index2 << 16) | ((ushort)_index3);
             if (animeNameCache.TryGetValue(key, out var val)) return val;
             var str = SpineDefine.GetAnimeName(_animeId, UnitId, MotionType, _index1, _index2, _index3);
             animeNameCache.Add(key, str);

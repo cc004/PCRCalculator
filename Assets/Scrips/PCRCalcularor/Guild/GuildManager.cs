@@ -423,7 +423,10 @@ namespace PCRCaculator.Guild
             calSettingTexts[0].text = "x" + SettingData.calSpeed;
         }
         public int stoptime;
-        public void StartCalButton()
+
+        public void StartCalButton() => StartCalButton(false);
+
+        private void StartCalButton(bool skipping)
         {
             /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
             {
@@ -432,6 +435,7 @@ namespace PCRCaculator.Guild
             stoptime = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
+            battleData.skipping = skipping;
             battleData.players = SettingData.GetCurrentPlayerData();
             battleData.enemyData = new List<EnemyData>();
             foreach (var selectedBossEnemyid in selectedBossEnemyids)
@@ -1043,12 +1047,12 @@ namespace PCRCaculator.Guild
 
             while (true)
             {
-                yield return new WaitForSecondsRealtime(2);
+                yield return new WaitForSecondsRealtime(1);
                 if (MainManager.Instance.AutoCalculatorData.isPaues)
                     continue;
                 if (MainManager.Instance.AutoCalculatorData.isGoing)
                 {                    
-                    StartCalButton();
+                    StartCalButton(true);
                 }
                 break;
             }

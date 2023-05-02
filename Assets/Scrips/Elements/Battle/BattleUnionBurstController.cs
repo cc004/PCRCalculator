@@ -20,16 +20,14 @@ namespace Elements.Battle
             if (battleManager.GetIsPlayCutin() || battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
                 return;
             bool flag = false;
-
-            for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
+            
+            foreach (var unitCtrl in battleManager.UnitList)
             {
-                var unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
                 unitCtrl.skillReleased = false;
             }
 
-            for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
+            foreach (var unitCtrl in battleManager.UnitList)
             {
-                UnitCtrl unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
                 if (unitCtrl.UnionBurstSkillId != 0)
                     unitCtrl.UpdateSkillTarget();
                 else continue;
@@ -69,10 +67,9 @@ namespace Elements.Battle
             var setStatus = new BattleManager.eSetStatus[5];
 
             for (int i = 0; i < 5; ++i) setStatus[i] = BattleManager.eSetStatus.MAY;
-            
-            for (int DNGOJHOHHMF = 0; DNGOJHOHHMF < battleManager.GetUnitCtrlLength(); ++DNGOJHOHHMF)
+
+            foreach (var unitCtrl in battleManager.UnitList)
             {
-                var unitCtrl = battleManager.GetUnitCtrl(DNGOJHOHHMF);
                 unitCtrl.IsUbExecTrying = false;
                 if (unitCtrl.Index < 5 && unitCtrl.Index >= 0)
                     if (unitCtrl.lastCanReleaseSkill)
@@ -113,9 +110,8 @@ namespace Elements.Battle
         }
         public void TryExecEnemyUnionBurst()
         {
-            for (int i = 0; i < battleManager.GetEnemyCtrlLength(); i++)
+            foreach (var enemyCtrl in battleManager.EnemyList)
             {
-                UnitCtrl enemyCtrl = battleManager.GetEnemyCtrl(i);
                 if (enemyCtrl.UnionBurstSkillId != 0)
                 {
                     enemyCtrl.UpdateSkillTarget();

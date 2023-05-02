@@ -75,6 +75,7 @@ namespace Elements
                 tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
                 tempData.SettingData = mainManager.GuildBattleData.SettingData;
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
+                tempData.skipping = mainManager.GuildBattleData.skipping;
                 LoadAllUnitCtrlData();
             }
             else
@@ -597,6 +598,7 @@ namespace Elements
         public GuildSettingData SettingData;
         public Dictionary<int, BaseData> playerUnitBaseDataDic;
         public GuildRandomData randomData;
+        public bool skipping;
 
         public void CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {

@@ -418,8 +418,12 @@ namespace PCRCaculator.Guild
                     }
                 }
             };
-            action(MyGameCtrl.Instance.playerUnitCtrl);
-            action(MyGameCtrl.Instance.enemyUnitCtrl);
+
+            if (!BattleManager.Instance.skipping)
+            {
+                action(MyGameCtrl.Instance.playerUnitCtrl);
+                action(MyGameCtrl.Instance.enemyUnitCtrl);
+            }
             
             foreach (var pair in skillGroupPrefabDic)
             {

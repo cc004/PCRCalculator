@@ -27,6 +27,7 @@ namespace Elements
         private bool isIndependentBattleSync;
         //private static Yggdrasil<BattleSpineController> staticSingletonTree;
         private static BattleManager staticBattleManager;
+        public bool quickNotActive = true;
 
         public UnitCtrl Owner { get; set; }
 

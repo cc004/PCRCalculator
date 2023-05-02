@@ -458,7 +458,7 @@ namespace Elements
             List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.EnemyList : battleManager.UnitList;
             if (unitCtrlList.Contains(_source))
                 unitCtrlList.Remove(_source);
-            BattleManager.Instance.shouldUpdateSkillTarget = true;
+            BattleManager.Instance.QueueUpdateSkillTarget();
             _source.IsDead = true;
             _source.CureAllAbnormalState();
             /*foreach (SkillEffectCtrl repeatEffect in _source.RepeatEffectList)

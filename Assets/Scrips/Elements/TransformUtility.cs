@@ -24,7 +24,7 @@ namespace Elements
       _transform.localPosition = Vector3.zero;
       _transform.TargetTransform.localRotation = Quaternion.identity;
       _transform.TargetTransform.localScale = Vector3.one;
-      BattleManager.Instance.shouldUpdateSkillTarget = true;
+      BattleManager.Instance.QueueUpdateSkillTarget();
     }
   }
 }

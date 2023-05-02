@@ -2094,6 +2094,7 @@ namespace PCRCaculator
        // public int RandomSeed;
         //public Dictionary<int, UnitAttackPattern> changedATKPatternDic = new Dictionary<int, UnitAttackPattern>();
         public GuildSettingData SettingData;
+        public bool skipping;
     }
 
 }

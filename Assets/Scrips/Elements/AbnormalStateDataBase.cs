@@ -7,6 +7,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Elements.Battle
@@ -127,6 +129,9 @@ namespace Elements.Battle
         protected virtual int getClearedIndex(UnitCtrl FNHGFDNICFG) => 0;
 
         protected float remaining;
+        
+        private int skillTargetCacheKey = -1;
+
         public IEnumerator Update()
         {
             float time = 0.0f;
@@ -134,25 +139,30 @@ namespace Elements.Battle
             isPlaying = true;
             remaining = StayTime;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域开始");
+            
             while (true)
             {
                 //if (plfcllhldoo.BattleManager.GetBlackOutUnitLength() == 0 && (UnityEngine.Object) plfcllhldoo.skillEffect != (UnityEngine.Object) null)
                 //  plfcllhldoo.skillEffect.SetSortOrderBack();
-                int index1 = 0;
-                for (int count = ALFDJACNNCL.Count; index1 < count; ++index1)
+                if (BattleManager.Instance.PositionChanged(ref skillTargetCacheKey))
                 {
-                    // ISSUE: reference to a compiler-generated method
-                    UnitCtrl unitCtrl = ALFDJACNNCL[index1];
-                    if (!unitCtrl.IsPartsBoss)
+                    int index1 = 0;
+                    for (int count = ALFDJACNNCL.Count; index1 < count; ++index1)
                     {
-                        Updateb__83_0(unitCtrl.GetFirstParts());
-                    }
-                    else
-                    {
-                        for (int index2 = 0; index2 < unitCtrl.BossPartsListForBattle.Count; ++index2)
-                            Updateb__83_0(unitCtrl.BossPartsListForBattle[index2]);
+                        // ISSUE: reference to a compiler-generated method
+                        UnitCtrl unitCtrl = ALFDJACNNCL[index1];
+                        if (!unitCtrl.IsPartsBoss)
+                        {
+                            Updateb__83_0(unitCtrl.GetFirstParts());
+                        }
+                        else
+                        {
+                            for (int index2 = 0; index2 < unitCtrl.BossPartsListForBattle.Count; ++index2)
+                                Updateb__83_0(unitCtrl.BossPartsListForBattle[index2]);
+                        }
                     }
                 }
+
                 if (HKDBJHAIOMB == eFieldExecType.REPEAT)
                 {
                     if (BattleManager.GetBlackOutUnitLength() == 0)
@@ -163,18 +173,23 @@ namespace Elements.Battle
                         OnRepeat();
                     }
                 }
+
                 if (BattleManager.GetBlackOutUnitLength() == 0)
                 {
                     time += BattleManager.DeltaTime_60fps;
                     remaining = StayTime - time;
                 }
+
                 //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域加时"+);
                 eBattleGameState mmbmbjnnacg = BattleManager.GameState;
-                if (time <= StayTime && mmbmbjnnacg != eBattleGameState.NEXT_WAVE_PROCESS && (mmbmbjnnacg != eBattleGameState.WAIT_WAVE_END && !AHABEPKMKJJ))
+                if (time <= StayTime && mmbmbjnnacg != eBattleGameState.NEXT_WAVE_PROCESS &&
+                    (mmbmbjnnacg != eBattleGameState.WAIT_WAVE_END && !AHABEPKMKJJ))
                     yield return null;
                 else
                     break;
+
             }
+
             for (int index = TargetList.Count - 1; index >= 0; --index)
                 OnExit(TargetList[index]);
             isPlaying = false;
@@ -207,13 +222,19 @@ namespace Elements.Battle
             if (TargetSet.Contains(target))
             {
                 if (owner.IsSummonOrPhantom && owner.IdleOnly || owner.IsStealth ||
-                    getClearedIndex(owner) >= fieldIndex || owner.IsDead) OnExit(target);
+                    getClearedIndex(owner) >= fieldIndex || owner.IsDead)
+                {
+                    OnExit(target);
+                }
                 else
                 {
                     var posx = target.GetLocalPositionX();
                     if (!(posx <= Right &&
                           posx >= Left || BattleUtil.Approximately(posx, Right) ||
-                          BattleUtil.Approximately(posx, Left))) OnExit(target);
+                          BattleUtil.Approximately(posx, Left)))
+                    {
+                        OnExit(target);
+                    }
                 }
             }
             else

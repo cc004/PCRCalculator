@@ -42,8 +42,10 @@ namespace Elements
                     battleManager.CallbackIdleOnlyDone(_target.Owner);
                     List<UnitCtrl> unitCtrlList = _target.Owner.IsOther ? battleManager.EnemyList : battleManager.UnitList;
                     if (unitCtrlList.Contains(_target.Owner))
+                    {
+                        BattleManager.Instance.QueueUpdateSkillTarget();
                         unitCtrlList.Remove(_target.Owner);
-                    BattleManager.Instance.shouldUpdateSkillTarget = true;
+                    }
                     _target.Owner.IsDead = true;
                     _target.Owner.CureAllAbnormalState();
                     battleManager.CallbackFadeOutDone(_target.Owner);

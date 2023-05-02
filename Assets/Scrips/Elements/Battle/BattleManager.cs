@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Assets.Scrips;
 using Cute;
 
@@ -28,7 +29,13 @@ namespace Elements.Battle
 {
     public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController
     {
-        public bool shouldUpdateSkillTarget = false;
+        private int skillTargetCacheKey = Environment.TickCount;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void QueueUpdateSkillTarget()
+        {
+            ++skillTargetCacheKey;
+        }
 
         public ScriptManager scriptMgr;
         public static int randomCounter;
@@ -588,6 +595,7 @@ namespace Elements.Battle
         private void updateFrame()
         {
             if (battleFinished) return;
+            
             bool _canUpdateTime = !isPauseTimeLimit && BlackOutUnitList.Count == 0;
             //BattleHeaderController instance = BattleHeaderController..Instance;
 
@@ -3831,6 +3839,7 @@ namespace Elements.Battle
             battleManager.GameState = eBattleGameState.PLAY;
             battleManager.BattleReady = true;
             battleManager.enabled = true;
+            battleManager.skipping = tempData.skipping;
 
         }
 
@@ -4661,7 +4670,7 @@ namespace Elements.Battle
                 {
                     _this.UnitList.Add(unitCtrl);
                 }
-                BattleManager.Instance.shouldUpdateSkillTarget = true;
+                BattleManager.Instance.QueueUpdateSkillTarget();
                 unitCtrl.ExecActionOnStartAndDetermineInstanceID();
                 unitCtrl.SummonType = _summonData.SummonType;
                 unitCtrl.IsSummonOrPhantom = unitCtrl.SummonType == SummonAction.eSummonType.SUMMON || unitCtrl.SummonType == SummonAction.eSummonType.PHANTOM;
@@ -4868,5 +4877,17 @@ namespace Elements.Battle
             private set;
         }
         public float FNHFJLAENPF => DeltaTime_60fps;
+
+        public bool PositionChanged(int cacheKey)
+        {
+            return cacheKey != skillTargetCacheKey;
+        }
+
+        public bool PositionChanged(ref int cacheKey)
+        {
+            var result = cacheKey != skillTargetCacheKey;
+            cacheKey = skillTargetCacheKey;
+            return result;
+        }
     }
 }

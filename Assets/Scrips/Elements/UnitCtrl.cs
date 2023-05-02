@@ -1129,7 +1129,7 @@ namespace Elements
             get => _isDead;
             set
             {
-                battleManager.shouldUpdateSkillTarget = true;
+                battleManager.QueueUpdateSkillTarget();
                 _isDead = value;
             }
         }
@@ -1183,14 +1183,22 @@ namespace Elements
 
         public eUnitRespawnPos SummonRespawnPos { get; set; }
 
-        public bool IdleOnly { get; set; }
+        public bool IdleOnly
+        {
+            get => _idleOnly;
+            set
+            {
+                battleManager.QueueUpdateSkillTarget();
+                _idleOnly = value;
+            }
+        }
 
         public bool HasUnDeadTime
         {
             get => _hasUnDeadTime;
             set
             {
-                battleManager.shouldUpdateSkillTarget = true;
+                battleManager.QueueUpdateSkillTarget();
                 _hasUnDeadTime = value;
             }
         }
@@ -1329,6 +1337,9 @@ namespace Elements
 
             }
         }
+
+        private int skillTargetCacheKey = -1;
+        private int skillTargetCacheKeyForSkillReady = -1;
 
         private List<UnitCtrl> targetPlayerList { get; set; }
 
@@ -1538,7 +1549,7 @@ namespace Elements
             internal protected set
             {
                 if ((long)value > 0 ^ (long)_hp > 0)
-                    battleManager.shouldUpdateSkillTarget = true;
+                    battleManager.QueueUpdateSkillTarget();
                 _hp = value;
                 if (!battleManager.skipping)
                     OnLifeAmmountChange?.Invoke((float)value / MaxHp);
@@ -2784,9 +2795,16 @@ this.updateCurColor();
         {
             var distance = SkillAreaWidthList[UnionBurstSkillId];
 
-            if (distance == lastSearchDistance && !battleManager.shouldUpdateSkillTarget)
+            if (distance == lastSearchDistanceForSkillReady &&
+                !battleManager.PositionChanged(ref skillTargetCacheKeyForSkillReady))
             {
-                skillTargetList = IsOther ? targetPlayerList : TargetEnemyList;
+                return;
+            }
+
+            if (distance == lastSearchDistance && !battleManager.PositionChanged(skillTargetCacheKey))
+            {
+                skillTargetList = (IsOther ? targetPlayerList : TargetEnemyList).ToList();
+                lastSearchDistanceForSkillReady = distance;
                 return;
             }
 
@@ -2797,6 +2815,8 @@ this.updateCurColor();
                 if (judgeFrontAreaTarget(unit, distance))
                     skillTargetList.Add(unit);
             }
+
+            lastSearchDistanceForSkillReady = distance;
         }
 
         public Vector3 positionCached => parentCache.TransformPoint(transformCache.localPosition);
@@ -2863,6 +2883,7 @@ this.updateCurColor();
         }
 
         private float lastSearchDistance = -1f;
+        private float lastSearchDistanceForSkillReady = -1f;
 
         private void updateAttackTargetImpl()
         {
@@ -2881,9 +2902,12 @@ this.updateCurColor();
                         break;
                 }
             }
-
-            if (_distance == lastSearchDistance && !battleManager.shouldUpdateSkillTarget)
+            
+            if (_distance == lastSearchDistance && !battleManager.PositionChanged(ref skillTargetCacheKey))
                 return;
+
+            var t1 = TargetEnemyList.ToList();
+            var t2 = targetPlayerList.ToList();
 
             TargetEnemyList.Clear();
             targetPlayerList.Clear();
@@ -2907,7 +2931,7 @@ this.updateCurColor();
             foreach (var ctrl in battleManager.EnemyList)
                 if (judgeFrontAreaTarget(ctrl, _distance))
                     list2.Add(ctrl);
-
+            
             lastSearchDistance = _distance;
 
             /*
@@ -3058,7 +3082,7 @@ this.updateCurColor();
         public void SetLeftDirection(bool bLeftDir)
         {
             IsLeftDir = bLeftDir;
-            battleManager.shouldUpdateSkillTarget = true;
+            battleManager.QueueUpdateSkillTarget();
             if (ToadDatas.Count > 0)
                 GetCurrentSpineCtrl().transform.localScale = IsLeftDir || IsForceLeftDir ? ToadDatas[0].LeftDirScale : ToadDatas[0].RightDirScale;
             else
@@ -5778,6 +5802,8 @@ this.updateCurColor();
                 clearedDebuffIndex = buffDebuffIndex;
                 ClearedDebuffFieldIndex = battleManager.MCLFFJEFMIF;
             }
+
+            battleManager.QueueUpdateSkillTarget();
         }
 
         /*private void createBuffDebuffClearEffect(
@@ -9989,8 +10015,10 @@ this.updateCurColor();
                             {
                                 List<UnitCtrl> unitCtrlList = unitCtrl.IsOther ? unitCtrl.battleManager.EnemyList : unitCtrl.battleManager.UnitList;
                                 if (unitCtrlList.Contains(unitCtrl))
+                                {
+                                    BattleManager.Instance.QueueUpdateSkillTarget();
                                     unitCtrlList.Remove(unitCtrl);
-                                BattleManager.Instance.shouldUpdateSkillTarget = true;
+                                }
                                 if (!unitCtrl.gameObject.activeSelf)
                                     break;
                                 unitCtrl.gameObject.SetActive(false);
@@ -10482,6 +10510,7 @@ this.updateCurColor();
                             if (unitCtrlList.Contains(unitCtrl))
                             {
                                 unitCtrlList.Remove(unitCtrl);
+                                BattleManager.Instance.QueueUpdateSkillTarget();
                                 if (!unitCtrl.IsOther)
                                     unitCtrl.battleManager.LPBCBINDJLJ.Add(unitCtrl);
                             }
@@ -11109,7 +11138,10 @@ this.updateCurColor();
         {
             List<UnitCtrl> unitCtrlList = IsOther ? battleManager.EnemyList : battleManager.UnitList;
             if (unitCtrlList.Contains(this))
+            {
+                BattleManager.Instance.QueueUpdateSkillTarget();
                 unitCtrlList.Remove(this);
+            }
             IdleOnly = true;
             CureAllAbnormalState();
             if (!_fadeOut)
@@ -11503,6 +11535,7 @@ this.updateCurColor();
         public bool pressing = false;
         private bool _isDead;
         private bool _hasUnDeadTime;
+        private bool _idleOnly;
         public static Func<UnitCtrl, string> infoGetter;
 
         public void RebuildInfoGetter()

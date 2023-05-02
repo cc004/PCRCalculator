@@ -98,6 +98,7 @@ namespace PCRCaculator
         public void SetButton(UnitData data)
         {
             int unitid = data.unitId;
+            if (unitid == 0) return; // XXX: temp fix
             stars.SetStars(unitid>=200000?-1:data.rarity,data.GetMaxRarity(),true);
             int charid = data.rarity >= 3 ? unitid + 30 : unitid + 10;
             if (unitid >= 400000)
@@ -169,8 +170,6 @@ namespace PCRCaculator
                 if (unitid <= 200000)
                 {
                     levelText_B.gameObject.SetActive(true);
-                    if (!MainManager.Instance.UnitRarityDic.ContainsKey(unitid))
-                        Debugger.Break();
                     UnitRarityData rarityData = MainManager.Instance.UnitRarityDic[unitid];
                     //levelText_B.text = "lv:" + data.level;
                     levelText_B.text = "" + Mathf.RoundToInt(rarityData.GetPowerValue(data));

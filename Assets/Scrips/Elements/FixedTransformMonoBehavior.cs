@@ -84,7 +84,7 @@ namespace Elements
             {
                 positionX = BattleUtil.FloatToInt(_x * DIGID / SCALE);
                 TargetTransform.SetLocalPosX(positionX / DIGID);
-                BattleManager.Instance.shouldUpdateSkillTarget = true;
+                BattleManager.Instance.QueueUpdateSkillTarget();
             }
 
             public void SetLocalPosY(float _y)
