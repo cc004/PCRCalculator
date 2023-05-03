@@ -58,8 +58,8 @@ namespace PCRCaculator
             backgrounds1.Add(sprites["common_unit_frame_gold"]);
             backgrounds1.Add(sprites["common_unit_frame_purple"]);
             backgrounds1.Add(sprites["common_unit_frame_red"]);
-            backgrounds1.Add(sprites["common_unit_frame_orange"]);
             backgrounds1.Add(sprites["common_unit_frame_green"]);
+            backgrounds1.Add(sprites["common_unit_frame_orange"]);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace PCRCaculator
         public void SetHP(float normalizedHPRate)
         {
             HPSlider.value = normalizedHPRate;
-            hpPercent.text = $"{normalizedHPRate:P2}";
+            hpPercent.text = $"{(int)(10000 * normalizedHPRate) / 10000f:P2}";
             if (normalizedHPRate <= 0)
             {
                 SetDie();
@@ -227,7 +227,7 @@ namespace PCRCaculator
         public void SetTP(float normalizedTPRate)
         {
             TPSlider.value = normalizedTPRate;
-            tpPercent.text = $"{normalizedTPRate:P2}";
+            tpPercent.text = $"{(int)(10000 * normalizedTPRate) / 10000f:P2}";
             if (normalizedTPRate >= 1)
             {
                 TPFillImage.color = TPFullColor;

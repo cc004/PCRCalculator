@@ -12,7 +12,7 @@ namespace PCRCaculator.Guild
         public GameObject skillButtonPrefab;
         public GameObject skillButtonPrefab_UB;
         public GameObject skillAbnormalPrefab;
-        public LineChart lineChart;
+        //public LineChart lineChart;
         public GameObject lineChatPosXPrefab;
         public GameObject lineChatPosXParent;
         public Transform prefabParent_A;
@@ -47,14 +47,14 @@ namespace PCRCaculator.Guild
         {
             BackImage.color = color;
             nameText.text = name;
-            SetLineChat();
+            //SetLineChat();
         }
         /// <summary>
         /// 动态添加按钮
         /// </summary>
         /// <param name="frameCount">帧数</param>
         /// <param name="stateInt">状态</param>
-        public void AddButtons(int frameCount, int endCount, int stateInt,Action action = null)
+        public Transform AddButtons(int frameCount, int endCount, int stateInt,Action action = null)
         {
             GameObject a = Instantiate(stateInt == 2 ? skillButtonPrefab_UB : skillButtonPrefab);
             a.transform.SetParent(prefabParent_A, false);
@@ -64,6 +64,7 @@ namespace PCRCaculator.Guild
             a.GetComponent<RectTransform>().sizeDelta = new Vector2(length, prefabHight);
             a.GetComponent<GuildCalcButton>().SetButton(stateColors[stateInt], stateNames[stateInt], frameCount,action);
             prefabs.Add(a);
+            return a.transform;
         }
         public void AddAbnormalStateButtons(UnitAbnormalStateChangeData changeData,Action action = null)
         {
@@ -145,12 +146,13 @@ namespace PCRCaculator.Guild
         {
             prefabParent_A.gameObject.SetActive(idx < 2);
             prefabParent_B.gameObject.SetActive(idx == 1);
-            lineChart.gameObject.SetActive(idx == 2 || idx == 3);
+            // lineChart.gameObject.SetActive(idx == 2 || idx == 3);
             showHPLine = idx == 2;
             showTPLine = idx == 3;
             RefreshLineChat();
         }
 
+        /*
         public void RefreshHPChat(List<ValueChangeData> hpList)
         {
             if(hpList!=null)
@@ -162,9 +164,11 @@ namespace PCRCaculator.Guild
             if(tpList!=null)
                 tpValueList = GuildCalculator.CreateLineChatData(tpList);
             RefreshLineChat();
-        }
+        }*/
+
         private void RefreshLineChat()
         {
+            /*
             if(showHPLine)
             {
                 lineChart.Replace(0, hpValueList);
@@ -183,7 +187,7 @@ namespace PCRCaculator.Guild
             {
                 lineChart.Replace(1, emptyList);
             }
-            
+            */
         }
         private void SetLineChatXpos(List<ValueChangeData> data)
         {
@@ -209,6 +213,7 @@ namespace PCRCaculator.Guild
                 }
             }
         }
+        /*
         private void SetLineChat()
         {
             List<ValueChangeData> data1 = new List<ValueChangeData> { new ValueChangeData(0, 1), new ValueChangeData(1, 1) };
@@ -216,7 +221,7 @@ namespace PCRCaculator.Guild
             lineChart.Inject(data1);
             lineChart.Inject(data2);
             lineChart.ShowUnit();
-        }
+        }*/
         private Color GetButtonColor(UnitAbnormalStateChangeData data)
         {
             if (data.isBuff)

@@ -541,9 +541,9 @@ namespace Elements.Battle
             for (; cutinSkipTimeAccumulated >= (double)DeltaTime_60fps; cutinSkipTimeAccumulated -= DeltaTime_60fps)
                 CoroutineManager.NoDialogUpdate();
             if (IsPlayingPrincessMovie)
-            {
+            {/*
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
-                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());
+                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());*/
             }
             else
             {
@@ -581,8 +581,9 @@ namespace Elements.Battle
                     GamePause(false);
                 if (isUpdateFrameExecuted)
                     goto eof;
+                /*
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
-                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());
+                unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());*/
             }
 
             eof:
@@ -659,8 +660,15 @@ namespace Elements.Battle
             //if (this.JJCJONPDGIM != 0 && this.UnitUiCtrl.UnitCtrls != null && (this.EnemyList != null && !this.callStartCutIn()))
             if (FrameCount != 0 && (EnemyList != null && !callStartCutIn() && !IsPausingEffectSkippedInThisFrame))
                 CoroutineManager._Update();
+
+            foreach (var spineCtrl in unitSpineControllerList)
+            {
+                spineCtrl.RealUpdate();
+                spineCtrl.RealLateUpdate();
+            }
+            /*
             unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
-            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());
+            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());*/
             scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;

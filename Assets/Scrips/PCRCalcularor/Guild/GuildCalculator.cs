@@ -15,7 +15,10 @@ using OfficeOpenXml;
 using PCRCaculator.Battle;
 using SFB;
 using UnityEngine;
+using UnityEngine.Networking.Types;
 using UnityEngine.UI;
+using XCharts.Runtime;
+using static UnityEngine.GraphicsBuffer;
 using BattleDefine = Elements.BattleDefine;
 using Random = UnityEngine.Random;
 
@@ -61,6 +64,7 @@ namespace PCRCaculator.Guild
         public Vector3 skillGroupAddPos;
         public List<Color> skillGroupColors;
         public GameObject UBTimeEditorPrefab;
+        public LineChart lineChart;
 
         private readonly Dictionary<int, UnitStateChangeData> allUnitLastStateDic = new Dictionary<int, UnitStateChangeData>();
         private readonly List<int> playerIds = new List<int>();
@@ -120,6 +124,9 @@ namespace PCRCaculator.Guild
                 AppendChangeBaseValue(bossId + part * 10, 1, def, 0, "初始化");
                 AppendChangeBaseValue(bossId + part * 10, 2, mdef, 0, "初始化");
             }
+
+            lineChart.transform.SetParent(skillGroupParent);
+
             OnToggleSwitched(0);
             BattleManager.OnCallRandom = AppendCallRandom;
         }
@@ -130,8 +137,8 @@ namespace PCRCaculator.Guild
             {
                 allUnitStateChangeDic.Add(a, new List<UnitStateChangeData>());
                 allUnitAbnormalStateDic.Add(a, new List<UnitAbnormalStateChangeData>());
-                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 1, (int)b.MaxHp, "初始化") });
-                allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0) });
+                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.MaxHp, (int)b.MaxHp, "初始化"){target = a} });
+                allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0){describe = "初始化", target = a} });
                 allUnitLastStateDic.Add(a, new UnitStateChangeData(0, UnitCtrl.ActionState.GAME_START, UnitCtrl.ActionState.GAME_START));
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
@@ -198,9 +205,12 @@ namespace PCRCaculator.Guild
                             action = () => { OpenSkillDetailPannel(skillExecData); };
                         }
                     }
-                    skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action);
+                    var trans = skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action);
 
-                    skillScrollRect.horizontalNormalizedPosition = frameCount;
+                    var pos = skillGroupParent.transform.InverseTransformPoint(trans.position);
+
+                    skillScrollRect.horizontalNormalizedPosition = pos.x / 4200f - 0.06f; 
+                                                            // width of scroll rect; foresee
                     allUnitLastStateDic[unitid] = new UnitStateChangeData(frameCount,
                         allUnitLastStateDic[unitid].changStateTo, actionState, describe);
                 }
@@ -267,18 +277,26 @@ namespace PCRCaculator.Guild
             {
                 damage = damage,
                 id = id,
-                source = source?.UnitId ?? unitid
+                source = source?.UnitId ?? unitid,
+                target = unitid
             };
             allUnitHPDic[unitid].Add(valueData);
-            if (!GuildManager.StaticsettingData.calcSpineAnimation)
-                skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
+            if (!GuildManager.StaticsettingData.calcSpineAnimation && currentToggleId == 2)
+                AppendHpDrawData(valueData);
+            // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
         }
         public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
-            allUnitTPDic[unitid].Add(new ValueChangeData(frame, currentTP, 0, describe));
-            if (!GuildManager.StaticsettingData.calcSpineAnimation)
-                skillGroupPrefabDic[unitid].RefreshTPChat(allUnitTPDic[unitid]);
+
+            var t = new ValueChangeData(frame, currentTP, 0, describe)
+            {
+                target = unitid
+            };
+            allUnitTPDic[unitid].Add(t);
+            if (!GuildManager.StaticsettingData.calcSpineAnimation && currentToggleId == 3)
+                AppendTpDrawData(t);
+            // skillGroupPrefabDic[unitid].RefreshTPChat(allUnitTPDic[unitid]);
         }
         public void AppendStartSkill(int unitid, UnitSkillExecData unitSkillExecData)
         {
@@ -355,8 +373,12 @@ namespace PCRCaculator.Guild
             data.currentSeed = Random.seed;
             AllRandomDataList.Add(data);
         }
+
+        private int currentToggleId;
+
         public void OnToggleSwitched(int toggleId)
         {
+            currentToggleId = toggleId;
             if (ModeToggles[toggleId].isOn)
             {
                 foreach (GuildSkillGroupPrefab sk in skillGroupPrefabDic.Values)
@@ -364,13 +386,166 @@ namespace PCRCaculator.Guild
                     sk.SwitchPage(toggleId);
                 }
                 ResizePrefabs(toggleId == 1);
+
+                lineChart.SetActive(toggleId > 1);
+
+                RefreshLineChart();
             }
         }
+
+        private int hpXPos;
+        private int tpXPos;
+        private void RefreshLineChart()
+        {
+            switch (currentToggleId)
+            {
+                // hp
+                case 2:
+                    hpXPos = DrawData(skillGroupList.Select(x => allUnitHPDic[x]).ToArray(),
+                        GetHpDescription,
+                        skillGroupList.Select(x => (float)allUnitHPDic[x].First().hp).ToArray(),
+                        ref lastHp);
+                    hpCache.Clear();
+                    hpCacheFrame = hpXPos;
+                    break;
+                // tp
+                case 3:
+                    tpXPos = DrawData(skillGroupList.Select(x => allUnitTPDic[x]).ToArray(),
+                        GetTpDescription,
+                        skillGroupList.Select(_ => (float) UnitDefine.MAX_ENERGY).ToArray(),
+                        ref lastTp);
+                    tpCache.Clear();
+                    tpCacheFrame = tpXPos;
+                    break;
+            }
+        }
+
+        private static string GetTpDescription(ValueChangeData x)
+        {
+            return $"{(int) (x.yValue * 1000) / 1000f:F3} {MainManager.Instance.GetUnitNickName(x.target)}\n" + $"来源：{MainManager.Instance.GetUnitNickName(x.source)}\n" + $"([{x.xValue}] {x.describe})";
+        }
+
+        private static string GetHpDescription(ValueChangeData x)
+        {
+            return $"{x.yValue}/{x.hp} {MainManager.Instance.GetUnitNickName(x.target)}\n" + $"来源：{MainManager.Instance.GetUnitNickName(x.source)}\n" + $"[{x.xValue}] {x.describe}";
+        }
+
+        private int hpCacheFrame = -1;
+        private List<ValueChangeData> hpCache = new List<ValueChangeData>();
+        private int tpCacheFrame = -1;
+        private List<ValueChangeData> tpCache = new List<ValueChangeData>();
+
+        private List<ValueChangeData> lastHp = new List<ValueChangeData>();
+        private List<ValueChangeData> lastTp = new List<ValueChangeData>();
+
+        private void AppendHpDrawData(ValueChangeData x)
+        {
+            if (hpCacheFrame < x.xValue)
+            {
+                for (++hpXPos; hpXPos <= hpCacheFrame; ++hpXPos)
+                {
+                    if (hpXPos == hpCacheFrame)
+                    {
+                        foreach (var data in hpCache)
+                            lastHp[skillGroupOrder[data.target]] = data;
+                    }
+                    lineChart.AddXAxisData(hpXPos.ToString());
+                    for (var i = 0; i < lastHp.Count; ++i)
+                    {
+                        lastHp[i] ??= ValueChangeData.Default;
+                        lineChart.AddData(i, hpXPos, lastHp[i].yValue / lastHp[i].hp - i, GetHpDescription(lastHp[i]));
+                    }
+                }
+
+                hpXPos = hpCacheFrame;
+                hpCacheFrame = x.xValue;
+                hpCache.Clear();
+            }
+            hpCache.Add(x);
+        }
+
+        private void AppendTpDrawData(ValueChangeData x)
+        {
+            if (tpCacheFrame < x.xValue)
+            {
+                for (++tpXPos; tpXPos <= tpCacheFrame; ++tpXPos)
+                {
+                    if (tpXPos == tpCacheFrame)
+                    {
+                        foreach (var data in tpCache)
+                            lastTp[skillGroupOrder[data.target]] = data;
+                    }
+                    lineChart.AddXAxisData(tpXPos.ToString());
+                    for (var i = 0; i < lastTp.Count; ++i)
+                    {
+                        lastTp[i] ??= ValueChangeData.Default;
+                        lineChart.AddData(i, tpXPos, lastTp[i].yValue / UnitDefine.MAX_ENERGY - i, GetTpDescription(lastTp[i]));
+                    }
+                }
+
+                tpXPos = tpCacheFrame;
+                tpCacheFrame = x.xValue;
+                tpCache.Clear();
+            }
+            tpCache.Add(x);
+        }
+
+        private int DrawData(List<ValueChangeData>[] data, Func<ValueChangeData, string> descriptionFunc,
+            float[] serieMaxValue, ref List<ValueChangeData> last)
+        {
+            lineChart.RemoveData();
+            
+            if (data.Length == 0) return -1;
+
+            var xpos = Enumerable.Range(0, data.SelectMany(x => x).Max(x => x.xValue)).ToArray();
+
+            var nowx = new int[data.Length];
+
+            last = Enumerable.Range(0, data.Length).Select(_ => default(ValueChangeData)).ToList();
+
+            foreach (var _ in serieMaxValue)
+            {
+                var serie = lineChart.AddSerie<Line>();
+                serie.lineType = LineType.StepEnd;
+            }
+
+            foreach (var x in xpos)
+            {
+                lineChart.AddXAxisData(x.ToString());
+                for (var i = 0; i < data.Length; ++i)
+                {
+                    while (nowx[i] + 1 < data[i].Count && data[i][nowx[i] + 1].xValue <= x)
+                        ++nowx[i];
+                    var t = data[i][nowx[i]];
+                    last[i] = t;
+                    lineChart.AddData(i, x, t.yValue / serieMaxValue[i] - i, descriptionFunc(t));
+                }
+            }
+
+            var axis = lineChart.GetChartComponent<YAxis>();
+            axis.max = 1;
+            axis.min = 1 - data.Length;
+
+            return xpos.Length == 0 ? -1 : xpos.Max();
+        }
+
+        private RectTransform headAnchor, tailAnchor;
+        private List<int> skillGroupList = new List<int>();
+        private Dictionary<int, int> skillGroupOrder = new Dictionary<int, int>();
+
         private void AddSkillGroups(int unitid, int idx, int colorIdx, string Name)
         {
             GameObject a = Instantiate(skillGroupPrefab);
             a.transform.SetParent(skillGroupParent, false);
             a.transform.localPosition = skillGroupBasePos + idx * skillGroupAddPos;
+
+            var source = a.GetComponent<RectTransform>();
+
+            if (skillGroupPrefabDic.Count == 0)
+                headAnchor = source;
+            tailAnchor = source;
+
+            
             GuildSkillGroupPrefab guildSkill = a.GetComponent<GuildSkillGroupPrefab>();
             if (colorIdx >= skillGroupColors.Count)
             {
@@ -379,7 +554,30 @@ namespace PCRCaculator.Guild
 
             guildSkill.Initialize(Name, skillGroupColors[colorIdx]);
             skillGroupPrefabDic.Add(unitid, guildSkill);
+
+            skillGroupList.Add(unitid);
+            var order = skillGroupOrder.Count;
+            skillGroupOrder.Add(unitid, order);
+
+            if (!GuildManager.StaticsettingData.calcSpineAnimation)
+            {
+                if (currentToggleId == 2)
+                {
+                    lineChart.AddSerie<Line>();
+                    for (int i = 0; i <= hpXPos; ++i)
+                        lineChart.AddData(order, i, 0);
+                    lastHp.Add(ValueChangeData.Default);
+                }
+                if (currentToggleId == 3)
+                {
+                    lineChart.AddSerie<Line>();
+                    for (int i = 0; i <= tpXPos; ++i)
+                        lineChart.AddData(order, i, 0);
+                    lastTp.Add(ValueChangeData.Default);
+                }
+            }
         }
+        
         public void RefreshTotalDamage(bool byAttack, float value, bool critical, float criticalEXdamage, FloatWithEx exvalue)
         {
             totalDamage += (long)value;
@@ -408,8 +606,8 @@ namespace PCRCaculator.Guild
                 {
                     int unitid = unitCtrl.UnitId;
                     AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                    AppendChangeHP(unitid, unitCtrl.Hp / unitCtrl.MaxHp, 0, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
-                    AppendChangeTP(unitid, (float)unitCtrl.Energy / BattleDefine.SKILL_ENERGY_MAX, 5400, "时间耗尽");
+                    AppendChangeHP(unitid, unitCtrl.Hp, 0, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
+                    AppendChangeTP(unitid, (float)unitCtrl.Energy, 5400, "时间耗尽");
                     foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
                     {
                         changeData.endFrameCount = 5400;
@@ -424,12 +622,12 @@ namespace PCRCaculator.Guild
                 action(MyGameCtrl.Instance.playerUnitCtrl);
                 action(MyGameCtrl.Instance.enemyUnitCtrl);
             }
-            
+            /*
             foreach (var pair in skillGroupPrefabDic)
             {
                 pair.Value.RefreshHPChat(allUnitHPDic[pair.Key]);
                 pair.Value.RefreshTPChat(allUnitTPDic[pair.Key]);
-            }
+            }*/
 
             foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
                          new[] { (0, boss.Def, boss.MagicDef) })
@@ -480,7 +678,18 @@ namespace PCRCaculator.Guild
             }
             float totalHight = Mathf.Abs(localPosY - 3);
             skillGroupParent.sizeDelta = new Vector2(skillGroupParent.sizeDelta.x, totalHight);
+
+            var target = lineChart.GetComponent<RectTransform>();
+
+            const int TEXT_WIDTH = 160;
+
+            target.localPosition = headAnchor.localPosition + TEXT_WIDTH * Vector3.right;
+            target.sizeDelta = -(Vector2)(tailAnchor.localPosition - headAnchor.localPosition) + tailAnchor.sizeDelta 
+                               + TEXT_WIDTH * Vector2.left;
+
+            target.SetAsLastSibling();
         }
+
         public void OpenSkillDetailPannel(UnitSkillExecData data)
         {
             GameObject a = Instantiate(skillDetailPrefab);
@@ -1255,6 +1464,7 @@ namespace PCRCaculator.Guild
             yValue = y;
         }
 
+        public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
         public ValueChangeData(int x, float y, int hp, string describe)
         {
             xValue = x;

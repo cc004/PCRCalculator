@@ -3413,9 +3413,9 @@ this.updateCurColor();
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             Energy = energy;
             if (!battleManager.skipping)
-            MyOnTPChanged?.Invoke(UnitId,(float)Energy / UnitDefine.MAX_ENERGY, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+            MyOnTPChanged?.Invoke(UnitId,(float)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
-            uIManager.LogMessage("TP变更为：" + energy, eLogMessageType.CHANGE_TP, this);
+            uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
 
         public void IndicateSkillName(string _skillName) 
@@ -7898,7 +7898,7 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                MyOnLifeChanged?.Invoke(UnitId, NormalizedHP, (int)Hp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                MyOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
                 createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
                 MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
@@ -8466,7 +8466,7 @@ this.updateCurColor();
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des = "目标HP回复<color=#54FF4F>" + _value + "</color>点";
                 action?.Invoke(des);
-                MyOnLifeChanged?.Invoke(UnitId,NormalizedHP,(int)Hp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+                MyOnLifeChanged?.Invoke(UnitId, Hp,(int)MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
                 if (_isUnionBurstLifeSteal)
                 {
                     unionburstLifeStealNum += (long)_value;
