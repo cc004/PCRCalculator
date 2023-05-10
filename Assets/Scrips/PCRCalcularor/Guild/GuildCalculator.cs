@@ -209,7 +209,8 @@ namespace PCRCaculator.Guild
 
                     var pos = skillGroupParent.transform.InverseTransformPoint(trans.position);
 
-                    skillScrollRect.horizontalNormalizedPosition = pos.x / 4200f - 0.06f; 
+                    skillScrollRect.horizontalNormalizedPosition = 
+                        Math.Max(skillScrollRect.horizontalNormalizedPosition, pos.x / 4200f - 0.06f); 
                                                             // width of scroll rect; foresee
                     allUnitLastStateDic[unitid] = new UnitStateChangeData(frameCount,
                         allUnitLastStateDic[unitid].changStateTo, actionState, describe);
@@ -507,6 +508,7 @@ namespace PCRCaculator.Guild
             {
                 var serie = lineChart.AddSerie<Line>();
                 serie.lineType = LineType.StepEnd;
+                serie.lineStyle.width = 1f;
             }
 
             foreach (var x in xpos)
@@ -563,14 +565,18 @@ namespace PCRCaculator.Guild
             {
                 if (currentToggleId == 2)
                 {
-                    lineChart.AddSerie<Line>();
+                    var serie = lineChart.AddSerie<Line>();
+                    serie.lineType = LineType.StepEnd;
+                    serie.lineStyle.width = 1f;
                     for (int i = 0; i <= hpXPos; ++i)
                         lineChart.AddData(order, i, 0);
                     lastHp.Add(ValueChangeData.Default);
                 }
                 if (currentToggleId == 3)
                 {
-                    lineChart.AddSerie<Line>();
+                    var serie = lineChart.AddSerie<Line>();
+                    serie.lineType = LineType.StepEnd;
+                    serie.lineStyle.width = 1f;
                     for (int i = 0; i <= tpXPos; ++i)
                         lineChart.AddData(order, i, 0);
                     lastTp.Add(ValueChangeData.Default);

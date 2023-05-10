@@ -1374,7 +1374,7 @@ namespace Elements
             {
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
-                if (battleManager.skipping)
+                if (!battleManager.skipping)
                     Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
 
                 action.PreExecAction();

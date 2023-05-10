@@ -88,8 +88,12 @@ namespace PCRCaculator.SQL
                 var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
                 var sql = File.ReadAllText(patchFile);
 #endif
-                
+
+#if UNITY_ANDROID
+                var dbPath = Path.Combine(Application.persistentDataPath, Path.GetFileNameWithoutExtension(path) + "_patch.db");
+#else
                 var dbPath = Path.GetTempFileName();
+#endif
                 File.Copy(path, dbPath, true);
 
                 string connectingPath = "Data Source=" + dbPath;

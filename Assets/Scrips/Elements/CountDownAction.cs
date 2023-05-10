@@ -65,7 +65,7 @@ namespace Elements
             _countDownEffect.SetDamageText((int) _valueDictionary[eValueNumber.VALUE_1]);
           }
         }*/
-        throw new System.Exception("这个技能鸽了！");
+        //throw new System.Exception("这个技能鸽了！");
     }
 
     private IEnumerator updateCountDown(

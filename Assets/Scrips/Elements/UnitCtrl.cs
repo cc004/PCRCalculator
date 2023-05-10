@@ -2902,13 +2902,16 @@ this.updateCurColor();
                         break;
                 }
             }
-            
+
+            //var test = false;
+
             if (_distance == lastSearchDistance && !battleManager.PositionChanged(ref skillTargetCacheKey))
                 return;
-
+                //test = true;
+            /*
             var t1 = TargetEnemyList.ToList();
             var t2 = targetPlayerList.ToList();
-
+            */
             TargetEnemyList.Clear();
             targetPlayerList.Clear();
 
@@ -2931,7 +2934,10 @@ this.updateCurColor();
             foreach (var ctrl in battleManager.EnemyList)
                 if (judgeFrontAreaTarget(ctrl, _distance))
                     list2.Add(ctrl);
-            
+            /*
+            if (test && (!t1.SequenceEqual(TargetEnemyList) || !t2.SequenceEqual(targetPlayerList)))
+                Debugger.Break();
+            */
             lastSearchDistance = _distance;
 
             /*
@@ -10827,8 +10833,7 @@ this.updateCurColor();
             {
                 currentSpineCtrl.AnimationName = currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, MotionPrefix);
             }
-
-            if (battleManager.skipping) isIdleDamage = false;
+            
         }
 
         /*private void resumeSpineWithTime()

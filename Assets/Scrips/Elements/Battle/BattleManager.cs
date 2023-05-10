@@ -549,7 +549,9 @@ namespace Elements.Battle
             {
                 if (!IsFramePause)
                     deltaTimeAccumulated += Time.deltaTime;
-                
+
+                // bool skipping = false;
+
                 if (skipping) stopWatch.Restart();
                 
                 do
@@ -559,7 +561,7 @@ namespace Elements.Battle
                         CoroutineManager.VisualPause = true;
                     }
 
-                    if ((IsFramePause || !(deltaTimeAccumulated >= 0.0)) && !skipping)
+                    if (IsFramePause || !(deltaTimeAccumulated >= 0.0) && !skipping)
                         break;
                     
                     updateFrame();
@@ -567,7 +569,7 @@ namespace Elements.Battle
 
                     // UnityEngine.Debug.LogError(stopWatch.ElapsedMilliseconds);
                 }
-                while (!IsPlayingPrincessMovie && deltaTimeAccumulated >= (double)DeltaTime_60fps || skipping && stopWatch.ElapsedMilliseconds < 1000);
+                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || skipping && stopWatch.ElapsedMilliseconds < 1000));
 
                 while (FrameCount < PPNHIMOOKDD && !IsFramePause)
                 {
@@ -575,6 +577,7 @@ namespace Elements.Battle
                     if (IsPlayingPrincessMovie)
                         break;
                 }
+
                 if (isToPauseOnFrameEnd && !isToResumeOnFrameEnd)
                     GamePause(true);
                 else if (!isToPauseOnFrameEnd && isToResumeOnFrameEnd)

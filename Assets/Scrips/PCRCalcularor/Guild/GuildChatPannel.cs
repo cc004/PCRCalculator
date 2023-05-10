@@ -101,6 +101,7 @@ namespace PCRCaculator.Guild
             {
                 var serie = chart.AddSerie<Line>();
                 serie.serieName = title;
+                serie.lineStyle.width = 1f;
                 if (data.Length == 1) serie.lineType = type;
             }
 

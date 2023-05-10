@@ -50,6 +50,11 @@ namespace Elements
             unitActionController.StartAction(unionBurstSkillId);
             int current = 0;
             Action func = null;
+            if (battleManager.skipping)
+            {
+                //this.finishSkill();
+                //return;
+            }
             func = () =>
             {
                 ++current;
@@ -174,6 +179,7 @@ namespace Elements
             else
                 owner.PlayAnime(eSpineCharacterAnimeId.IDLE, owner.MotionPrefix);
 
+            if (battleManager.skipping) goto nomovie;
             for (int i = 0; i < 120;)
             {
                 for (int j = 0; j < battleManager.battleTimeScale.SpeedUpRate; ++j)
@@ -185,6 +191,8 @@ namespace Elements
                 yield return null;
             }
 
+            nomovie:
+            
             if (_movieIndex == 1)
                 battleManager.CAOHLDNADPB = false;
             if (_callback == null)

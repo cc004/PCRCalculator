@@ -37,11 +37,13 @@ namespace Elements
         parts.PositionX += _valueDictionary[eValueNumber.VALUE_1];
         //parts.BodyWidthValue = 0.0f;
         parts.Owner.PartsMotionPrefix = (int) _valueDictionary[eValueNumber.VALUE_5];
+        battleManager.QueueUpdateSkillTarget();
         OnActionEnd = () =>
         {
             parts.Owner.PartsMotionPrefix = 0;
             parts.PositionX = parts.InitialPositionX;
             OnActionEnd = null;
+            battleManager.QueueUpdateSkillTarget();
         };
       }
       else
@@ -50,7 +52,8 @@ namespace Elements
         //parts.BodyWidthValue = 300f;
         parts.PositionX = parts.InitialPositionX;
         OnActionEnd = null;
-      }
+        battleManager.QueueUpdateSkillTarget();
+            }
     }
   }
 }
