@@ -14,7 +14,6 @@ public class LineChartGraphExample : MonoBehaviour
 {
     public class TestData : IValue
     {
-        int IValue.xValue => (int) xValue;
         public float xValue { get; set; }
         public float yValue { get; set; }
 

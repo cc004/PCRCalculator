@@ -283,8 +283,10 @@ namespace PCRCaculator.Guild
             };
             allUnitHPDic[unitid].Add(valueData);
             if (!GuildManager.StaticsettingData.calcSpineAnimation && currentToggleId == 2)
+            {
                 AppendHpDrawData(valueData);
-            // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
+                // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
+            }
         }
         public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
         {
@@ -296,8 +298,10 @@ namespace PCRCaculator.Guild
             };
             allUnitTPDic[unitid].Add(t);
             if (!GuildManager.StaticsettingData.calcSpineAnimation && currentToggleId == 3)
+            {
                 AppendTpDrawData(t);
-            // skillGroupPrefabDic[unitid].RefreshTPChat(allUnitTPDic[unitid]);
+                // skillGroupPrefabDic[unitid].RefreshTPChat(allUnitTPDic[unitid]);
+            }
         }
         public void AppendStartSkill(int unitid, UnitSkillExecData unitSkillExecData)
         {
@@ -454,7 +458,7 @@ namespace PCRCaculator.Guild
                     for (var i = 0; i < lastHp.Count; ++i)
                     {
                         lastHp[i] ??= ValueChangeData.Default;
-                        lineChart.AddData(i, hpXPos, lastHp[i].yValue / lastHp[i].hp - i, GetHpDescription(lastHp[i]));
+                        lineChart.AddData(i, hpXPos, Mathf.Clamp01(lastHp[i].yValue / lastHp[i].hp) * PREFAB_SCALE - i + 100, GetHpDescription(lastHp[i]));
                     }
                 }
 
@@ -480,7 +484,7 @@ namespace PCRCaculator.Guild
                     for (var i = 0; i < lastTp.Count; ++i)
                     {
                         lastTp[i] ??= ValueChangeData.Default;
-                        lineChart.AddData(i, tpXPos, lastTp[i].yValue / UnitDefine.MAX_ENERGY - i, GetTpDescription(lastTp[i]));
+                        lineChart.AddData(i, tpXPos, Mathf.Clamp01(lastTp[i].yValue / UnitDefine.MAX_ENERGY) * PREFAB_SCALE - i + 100, GetTpDescription(lastTp[i]));
                     }
                 }
 
@@ -491,6 +495,26 @@ namespace PCRCaculator.Guild
             tpCache.Add(x);
         }
 
+        private void AddLine()
+        {
+            var serie = lineChart.AddSerie<Line>();
+            serie.lineType = LineType.StepEnd;
+            serie.lineStyle.width = .5f;
+            
+            var serieColor = SerieHelper.GetLineColor(serie, null, lineChart.theme, -1, SerieState.Normal);
+            
+            serie.areaStyle = new AreaStyle
+            {
+                show = true,
+                opacity = .6f,
+                color = serieColor
+            };
+
+            serie.areaZero = 100 - serie.index;
+        }
+
+        private const float PREFAB_SCALE = 35f / 38;
+        
         private int DrawData(List<ValueChangeData>[] data, Func<ValueChangeData, string> descriptionFunc,
             float[] serieMaxValue, ref List<ValueChangeData> last)
         {
@@ -506,9 +530,7 @@ namespace PCRCaculator.Guild
 
             foreach (var _ in serieMaxValue)
             {
-                var serie = lineChart.AddSerie<Line>();
-                serie.lineType = LineType.StepEnd;
-                serie.lineStyle.width = 1f;
+                AddLine();
             }
 
             foreach (var x in xpos)
@@ -520,13 +542,13 @@ namespace PCRCaculator.Guild
                         ++nowx[i];
                     var t = data[i][nowx[i]];
                     last[i] = t;
-                    lineChart.AddData(i, x, t.yValue / serieMaxValue[i] - i, descriptionFunc(t));
+                    lineChart.AddData(i, x, Mathf.Clamp01(t.yValue / serieMaxValue[i]) * PREFAB_SCALE  - i + 100, descriptionFunc(t));
                 }
             }
 
             var axis = lineChart.GetChartComponent<YAxis>();
-            axis.max = 1;
-            axis.min = 1 - data.Length;
+            axis.max = PREFAB_SCALE + 100; // 少一个interval
+            axis.min = 101 - data.Length;
 
             return xpos.Length == 0 ? -1 : xpos.Max();
         }
@@ -549,12 +571,16 @@ namespace PCRCaculator.Guild
 
             
             GuildSkillGroupPrefab guildSkill = a.GetComponent<GuildSkillGroupPrefab>();
+            /*
             if (colorIdx >= skillGroupColors.Count)
             {
                 colorIdx = skillGroupColors.Count - 1;
             }
+            */
+            var color = lineChart.theme.GetColor(colorIdx);
+            color = Color.Lerp(color, Color.white, .7f);
 
-            guildSkill.Initialize(Name, skillGroupColors[colorIdx]);
+            guildSkill.Initialize(Name, color/*skillGroupColors[colorIdx]*/);
             skillGroupPrefabDic.Add(unitid, guildSkill);
 
             skillGroupList.Add(unitid);
@@ -565,22 +591,27 @@ namespace PCRCaculator.Guild
             {
                 if (currentToggleId == 2)
                 {
-                    var serie = lineChart.AddSerie<Line>();
-                    serie.lineType = LineType.StepEnd;
-                    serie.lineStyle.width = 1f;
+                    AddLine();
                     for (int i = 0; i <= hpXPos; ++i)
                         lineChart.AddData(order, i, 0);
                     lastHp.Add(ValueChangeData.Default);
+
+                    var axis = lineChart.GetChartComponent<YAxis>();
+                    axis.max = PREFAB_SCALE + 100; // 少一个interval
+                    axis.min = 101 - lastHp.Count;
                 }
-                if (currentToggleId == 3)
+                else if (currentToggleId == 3)
                 {
-                    var serie = lineChart.AddSerie<Line>();
-                    serie.lineType = LineType.StepEnd;
-                    serie.lineStyle.width = 1f;
+                    AddLine();
                     for (int i = 0; i <= tpXPos; ++i)
                         lineChart.AddData(order, i, 0);
                     lastTp.Add(ValueChangeData.Default);
+
+                    var axis = lineChart.GetChartComponent<YAxis>();
+                    axis.max = PREFAB_SCALE + 100; // 少一个interval
+                    axis.min = 101 - lastTp.Count;
                 }
+
             }
         }
         
@@ -612,7 +643,7 @@ namespace PCRCaculator.Guild
                 {
                     int unitid = unitCtrl.UnitId;
                     AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                    AppendChangeHP(unitid, unitCtrl.Hp, 0, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
+                    AppendChangeHP(unitid, unitCtrl.Hp, (int)unitCtrl.MaxHp, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
                     AppendChangeTP(unitid, (float)unitCtrl.Energy, 5400, "时间耗尽");
                     foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
                     {
@@ -633,8 +664,8 @@ namespace PCRCaculator.Guild
             {
                 pair.Value.RefreshHPChat(allUnitHPDic[pair.Key]);
                 pair.Value.RefreshTPChat(allUnitTPDic[pair.Key]);
-            }*/
-
+            }
+            */
             foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
                          new[] { (0, boss.Def, boss.MagicDef) })
             {
@@ -1449,7 +1480,7 @@ namespace PCRCaculator.Guild
 
     public interface IValue
     {
-        public int xValue { get; }
+        public float xValue { get; }
         public float yValue { get; }
     }
 
@@ -1457,12 +1488,19 @@ namespace PCRCaculator.Guild
     {
         public int xValue { get; set; }
         public float yValue { get; set; }
+        float IValue.xValue => xValue / XScale;
+        float IValue.yValue => yValue / YScale;
+
         public int hp;
         public int damage;
         public string describe;
         public int id;
         public int source;
         public int target;
+
+        private const float XScale = 5400f;
+        private float YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;
+        
         public ValueChangeData() { }
         public ValueChangeData(int x, float y)
         {

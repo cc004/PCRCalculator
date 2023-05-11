@@ -80,6 +80,8 @@ namespace XCharts.Runtime
         }
 
         private List<string> m_EmptyFliter = new List<string>();
+        public float axisLength;
+
         /// <summary>
         /// 更新dataZoom对应的类目数据列表
         /// </summary>

@@ -855,6 +855,7 @@ namespace XCharts.Runtime
 
         public void UpdateZeroOffset(float axisLength)
         {
+            context.axisLength = axisLength;
             context.offset = context.minValue > 0 || context.minMaxRange == 0 ?
                 0 :
                 (context.maxValue < 0 ?

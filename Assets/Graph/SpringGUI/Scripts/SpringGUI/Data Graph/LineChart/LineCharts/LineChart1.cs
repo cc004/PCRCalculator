@@ -32,6 +32,7 @@ namespace SpringGUI
                     }
                     else
                     {
+                        /*
                         vh.AddUIVertexQuad(new[]
                         {
                             oldVertexs[1],
@@ -45,7 +46,7 @@ namespace SpringGUI
                             oldVertexs[1],
                             newVertexs[3],
                             oldVertexs[2]
-                        });
+                        });*/
                         oldVertexs = newVertexs;
                     }
                     vh.AddUIVertexQuad(newVertexs);

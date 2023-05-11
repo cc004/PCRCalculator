@@ -34,7 +34,11 @@ namespace XCharts.Runtime
         /// The style of area.
         /// |区域填充样式。
         /// </summary>
-        public AreaStyle areaStyle { get { return m_AreaStyles.Count > 0 ? m_AreaStyles[0] : null; } }
+        public AreaStyle areaStyle
+        {
+            get { return m_AreaStyles.Count > 0 ? m_AreaStyles[0] : null; }
+            set { m_AreaStyles = new List<AreaStyle>() {value}; }
+        }
         /// <summary>
         /// Text label of graphic element,to explain some data information about graphic item like value, name and so on.
         /// |图形上的文本标签，可用于说明图形的一些数据信息，比如值，名称等。

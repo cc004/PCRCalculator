@@ -84,6 +84,16 @@ namespace PCRCaculator.Guild
             }
         }
 
+        private void AddLineSerie(string title = null, LineType? lineType = null)
+        {
+            var serie = chart.AddSerie<Line>();
+            if (title != null)
+                serie.serieName = title;
+            serie.lineStyle.width = 1f;
+            if (lineType != null)
+                serie.lineType = lineType.Value;
+        }
+        
         private void DrawData(List<ValueChangeData>[] data, LineType type, string[] serieTitle)
         {
             chart.RemoveData();
@@ -99,10 +109,7 @@ namespace PCRCaculator.Guild
 
             foreach (var title in serieTitle)
             {
-                var serie = chart.AddSerie<Line>();
-                serie.serieName = title;
-                serie.lineStyle.width = 1f;
-                if (data.Length == 1) serie.lineType = type;
+                AddLineSerie(title, type);
             }
 
             foreach (var x in xpos)
@@ -132,8 +139,8 @@ namespace PCRCaculator.Guild
                 {
                     var t = TypeId == 1 ? AllUnitDamageDates : AllUnitTotalDamageDates;
                     for (int i = 0; i < 6; i++)
-                        data[i] = GuildCalculator.NormalizeLineChatData(AllUnitDamageDates[i], TotalMax);
-                    type = LineType.Normal;
+                        data[i] = GuildCalculator.NormalizeLineChatData(t[i], TotalMax);
+                    // type = LineType.Normal;
                     break;
                 }
                 case 3:

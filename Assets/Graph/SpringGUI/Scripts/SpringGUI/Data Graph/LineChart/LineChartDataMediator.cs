@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using PCRCaculator.Guild;
 using UnityEngine;
@@ -30,6 +31,7 @@ namespace SpringGUI
             {
                 float x = vertex.xValue;
                 float y = vertex.yValue;
+                if (x > 1 || x < 0 || y > 1 || y < 0) Debugger.Break();
                 result.Add(new Vector2(x , y));
             }
             return result;

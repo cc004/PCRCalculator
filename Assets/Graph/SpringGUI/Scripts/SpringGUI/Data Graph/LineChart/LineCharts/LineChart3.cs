@@ -22,9 +22,11 @@ namespace SpringGUI
                     continue;
                 var startPos = GetPos(line.Value.vertexs[0]);
                 UIVertex[] oldVertexs = { };
-                for ( int i = 1 ; i < line.Value.vertexs.Count ; i++ )
+                for ( int i = 1 ; i < line.Value.vertexs.Count ; i++)
                 {
-                    var endPos = GetPos(line.Value.vertexs[i]);
+                    var endPos0 = GetPos(line.Value.vertexs[i]);
+                    var endPos = endPos0;
+                    endPos.y = startPos.y; // step end
                     var startBottom = new Vector2(startPos.x , origin.y);
                     var endBottom = new Vector2(endPos.x , origin.y);
                     Color color = new Color(line.Value.color.r , line.Value.color.g , line.Value.color.b , 0.6f);
@@ -35,6 +37,7 @@ namespace SpringGUI
                         GetUIVertex(endPos,color),
                         GetUIVertex(endBottom,line.Value.color),
                     });
+                    /*
                     var newVertexs = GetQuad(startPos , endPos , Color.red,1.0f);
                     if ( oldVertexs.Length.Equals(0) )
                     {
@@ -59,8 +62,8 @@ namespace SpringGUI
                         });
                         oldVertexs = newVertexs;
                     }
-                    vh.AddUIVertexQuad(newVertexs);
-                    startPos = endPos;
+                    vh.AddUIVertexQuad(newVertexs);*/
+                    startPos = endPos0;
                 }
             }
             return vh;

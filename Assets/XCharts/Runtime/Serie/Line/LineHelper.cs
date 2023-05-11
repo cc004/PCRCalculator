@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,11 +36,24 @@ namespace XCharts.Runtime
                 UGL.DrawPolygon(vh, serie.context.dataPoints, areaColor);
                 return;
             }
+
+            var zero0 = serie.areaZero;
+            var axisLength = relativedAxis.context.axisLength;
+            var minValue = relativedAxis.context.minValue - zero0;
+            var maxValue = relativedAxis.context.maxValue - zero0;
+
+            var offset = minValue > 0 || relativedAxis.context.minMaxRange == 0 ?
+                0 :
+                (maxValue < 0 ?
+                    axisLength :
+                    (float) (Math.Abs(minValue) * (axisLength /
+                        (Math.Abs(minValue) + Math.Abs(maxValue))))
+                );
             var gridXY = (isY ? grid.context.x : grid.context.y);
             if (lastStackSerie == null)
             {
                 DrawSerieLineNormalArea(vh, serie, isY,
-                    gridXY + relativedAxis.context.offset,
+                    gridXY + offset,
                     gridXY,
                     gridXY + (isY ? grid.context.width : grid.context.height),
                     areaColor,
@@ -53,7 +67,7 @@ namespace XCharts.Runtime
             else
             {
                 DrawSerieLineStackArea(vh, serie, lastStackSerie, isY,
-                    gridXY + relativedAxis.context.offset,
+                    gridXY + offset,
                     gridXY,
                     gridXY + (isY ? grid.context.width : grid.context.height),
                     areaColor,

@@ -309,6 +309,8 @@ namespace XCharts.Runtime
         [NonSerialized] public List<SerieData> m_FilterData = new List<SerieData>();
         [NonSerialized] private bool m_NameDirty;
 
+        public float areaZero = 1f;
+
         /// <summary>
         /// event callback when click serie.
         /// |点击系列时的回调。

@@ -132,7 +132,6 @@ MonoBehaviour:
     type: 3}
   skillAbnormalPrefab: {fileID: 1812018693535478621, guid: 89dd0e6bf5ee6b74683aae38faf9ee1d,
     type: 3}
-  lineChart: {fileID: 0}
   lineChatPosXPrefab: {fileID: 8947322335597382669, guid: 42bf36f8dae440f42bf6d50e56b9cb34,
     type: 3}
   lineChatPosXParent: {fileID: 0}
