@@ -152,7 +152,7 @@ namespace Elements
         }
         public float Probability(Func<float, bool> predict)
         {
-            var N = GuildManager.StaticsettingData.n1;
+            var N = GuildManager.StaticsettingData.n2;
             int s = 0;
             for (int i = 0; i < N; ++i)
             {

@@ -57,7 +57,8 @@ namespace XCharts.Runtime
             var lineWidth = serie.lineStyle.GetWidth(chart.theme.serie.lineWidth);
             var themeSymbolSize = chart.theme.serie.lineSymbolSize;
             var needInteract = false;
-            serie.ResetDataIndex();
+            // serie.ResetDataIndex();
+            
             if (m_LegendEnter)
             {
                 serie.context.pointerEnter = true;

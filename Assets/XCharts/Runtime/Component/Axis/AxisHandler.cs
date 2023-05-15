@@ -132,6 +132,13 @@ namespace XCharts
             if (!axis.show)
                 return;
 
+            var dataZoom = chart.GetDataZoomOfAxis(axis);
+
+            if (!axis.context.axisUpdate && dataZoom == null)
+                return;
+
+            axis.context.axisUpdate = false;
+
             if (axis.IsCategory())
             {
                 axis.context.minValue = 0;
@@ -144,7 +151,6 @@ namespace XCharts
             double tempMaxValue = 0;
             chart.GetSeriesMinMaxValue(axis, axisIndex, out tempMinValue, out tempMaxValue);
 
-            var dataZoom = chart.GetDataZoomOfAxis(axis);
             if (dataZoom != null && dataZoom.enable)
             {
                 if (axis is XAxis)

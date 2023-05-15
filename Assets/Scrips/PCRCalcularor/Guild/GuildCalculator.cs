@@ -549,7 +549,7 @@ namespace PCRCaculator.Guild
             var axis = lineChart.GetChartComponent<YAxis>();
             axis.max = PREFAB_SCALE + 100; // 少一个interval
             axis.min = 101 - data.Length;
-
+            
             return xpos.Length == 0 ? -1 : xpos.Max();
         }
 
@@ -599,6 +599,7 @@ namespace PCRCaculator.Guild
                     var axis = lineChart.GetChartComponent<YAxis>();
                     axis.max = PREFAB_SCALE + 100; // 少一个interval
                     axis.min = 101 - lastHp.Count;
+                    
                 }
                 else if (currentToggleId == 3)
                 {
@@ -610,6 +611,7 @@ namespace PCRCaculator.Guild
                     var axis = lineChart.GetChartComponent<YAxis>();
                     axis.max = PREFAB_SCALE + 100; // 少一个interval
                     axis.min = 101 - lastTp.Count;
+                    
                 }
 
             }
@@ -718,7 +720,7 @@ namespace PCRCaculator.Guild
 
             var target = lineChart.GetComponent<RectTransform>();
 
-            const int TEXT_WIDTH = 160;
+            const int TEXT_WIDTH = 80;
 
             target.localPosition = headAnchor.localPosition + TEXT_WIDTH * Vector3.right;
             target.sizeDelta = -(Vector2)(tailAnchor.localPosition - headAnchor.localPosition) + tailAnchor.sizeDelta 
@@ -1053,6 +1055,7 @@ namespace PCRCaculator.Guild
                 dname.Add(dmginfo2, 0);
                 dname.Add(totaldie, 0);
                 dname.Add(totaldie2, 0);
+                
                 foreach (var skill in dmglist.Select(n => (n.unit, n.description)).Distinct())
                 {
                     if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());

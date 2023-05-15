@@ -383,10 +383,13 @@ namespace XCharts.Runtime
             {
                 var serieData = serie.AddXYData(xValue, yValue, dataName, dataId);
                 RefreshPainter(serie.painter);
+                GetChartComponent<XAxis>().context.axisUpdate = true;
+                GetChartComponent<YAxis>().context.axisUpdate = true;
                 return serieData;
             }
             return null;
         }
+        
         /// <summary>
         /// Add a (time,y) data to serie.
         /// |添加（time,y）数据到指定的系列中。
