@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Elements;
+using Elements.Battle;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,7 +30,7 @@ namespace PCRCaculator.Battle
         public IEnumerator RefreshTime(float stayTime,int startFrame)
         {
             int stayFrame =(int)(stayTime * 60);
-            while (true)
+            while (!BattleManager.Instance.battleFinished && !BattleManager.Instance.skipping)
             {
                 int currentFrame = BattleHeaderController.CurrentFrameCount;
                 float v = (currentFrame - startFrame) / (float)stayFrame;

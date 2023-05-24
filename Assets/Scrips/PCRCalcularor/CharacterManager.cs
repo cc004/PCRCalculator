@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -97,7 +98,8 @@ namespace PCRCaculator
             }
             buttons.Clear();
             int count = 1;
-            foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+            foreach (int id in MainManager.Instance.UnitRarityDic.Keys
+                         .OrderBy(id => MainManager.Instance.UnitRarityDic[id].detailData.searchAreaWidth))
             {
                 if (type == 0  || type == 4 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
                 {

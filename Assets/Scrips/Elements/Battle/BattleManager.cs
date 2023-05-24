@@ -2097,7 +2097,7 @@ namespace Elements.Battle
 
         //public void RevivalAtFinishBattle() => this.StartCoroutine(this.RecreateDeadUnits((System.Action)(() => this.CallbackRequestFinishBattle()), this.battleResult));
 
-        private bool battleFinished;
+        public bool battleFinished;
         private void finishBattle(eBattleResult JJHEBNEEHPB)
         {
             battleFinished = true;
