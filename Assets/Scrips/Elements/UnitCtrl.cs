@@ -7728,7 +7728,7 @@ this.updateCurColor();
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
-                _hp = (Hp - (num6 - (_overRecoverValue < 0 ? (FloatWithEx)0 : _overRecoverValue)));
+                _hp = (Hp - (num6 - _overRecoverValue.Max(0)));
             }
             if (_onDamageHit != null & flag2)
                 _onDamageHit(num6);
