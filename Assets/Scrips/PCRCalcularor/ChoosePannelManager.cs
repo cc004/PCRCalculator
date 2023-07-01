@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Elements;
 using PCRCaculator.Guild;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace PCRCaculator
 {
@@ -53,7 +55,7 @@ namespace PCRCaculator
         private bool isinstating = true;//是否正在初始化滑动条，是则忽略滑动条的回调事件
         private int type;
         private Dictionary<int, UnitData> unitDataDic => MainManager.Instance.unitDataDic;
-        private void Awake()
+        private void Start()
         {
             Instance = this;
         }
@@ -64,9 +66,9 @@ namespace PCRCaculator
         /// <param name="playerData">敌人队伍/会战要更改的队伍，为空则不显示</param>
         public void CallChooseBack(int type, AddedPlayerData player = null)
         {
-            StartCoroutine(CallChooseBack_0(type, player));
+            CallChooseBack_0(type, player);
         }
-        private IEnumerator CallChooseBack_0(int type, AddedPlayerData player = null)
+        private void CallChooseBack_0(int type, AddedPlayerData player = null)
         {
             this.type = type;
             baseBack.SetActive(true);
@@ -124,8 +126,7 @@ namespace PCRCaculator
                     selectedCharId.Clear();
                 }
             }
-            if (type != 4)
-                yield return RefreshBasePage(0);
+            if (type != 4) RefreshBasePage(0);
             switchToggles[0].isOn = true;
             RefreshSelectedButtons();
 
@@ -146,13 +147,14 @@ namespace PCRCaculator
         }
         public void OnToggleSwitched(bool k)
         {
+            if (!isActiveAndEnabled) return;
             if (k)
             {
                 for (int i = 0; i < 4; i++)
                 {
                     if (switchToggles[i].isOn)
                     {
-                        StartCoroutine(RefreshBasePage(i));
+                        RefreshBasePage(i);
                     }
                 }
             }
@@ -169,6 +171,10 @@ namespace PCRCaculator
         }
         public void CancalButton()
         {
+            parents[0].gameObject.SetActive(false);
+            parents[1].gameObject.SetActive(false);
+            parents[2].gameObject.SetActive(false);
+            last = -1;
             baseBack.SetActive(false);
             chooseBack_A.SetActive(false);
             settingBack.SetActive(false);
@@ -255,7 +261,7 @@ namespace PCRCaculator
         }
         public void BackButton()
         {
-            StartCoroutine(RefreshBasePage(0));
+            RefreshBasePage(0);
             chooseBack_A.SetActive(true);
             settingBack.SetActive(false);
             CloseProperty();
@@ -285,6 +291,8 @@ namespace PCRCaculator
         }
         public void OnToggleSwitched(bool k, int unitid)
         {
+            if (selectedCharId.Contains(unitid) ^ !k) return;
+
             if (selectedCharId.Contains(unitid))
             {
                 selectedCharId.Remove(unitid);
@@ -461,8 +469,10 @@ namespace PCRCaculator
         }
 
         public Dictionary<int, CharacterPageButton> buttons;
+        public Transform[] parents;
+        public int last = -1;
 
-        private IEnumerator RefreshBasePage(int type)
+        private void RefreshBasePage(int type)
         {
             PositionType positionType = PositionType.frount;
             switch (type)
@@ -474,15 +484,10 @@ namespace PCRCaculator
                     positionType = PositionType.backword;
                     break;
             }
-
-            if (type != 0)
-            {
-                parent.gameObject.SetActive(false);
-                yield break;
-            }
-
+            
             if (buttons == null)
             {
+
                 buttons = new Dictionary<int, CharacterPageButton>();
                 foreach (Toggle a in togglePerferbs.Values)
                 {
@@ -492,56 +497,74 @@ namespace PCRCaculator
                 togglePerferbs.Clear();
                 parent.localPosition = new Vector3();
                 parent.sizeDelta = new Vector2(100, original_hight);
-                int count = 1;
                 foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
                 {
-                    if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
+                    /*if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)*/
                     {
                         if (MainManager.Instance.JudgeWeatherShowThisUnit(id)) // || (id>=400000&&id<=499999))
                         {
                             GameObject b = Instantiate(togglePerferb);
-                            b.transform.SetParent(parent);
+                            b.transform.SetParent(parents[(int)MainManager.Instance.UnitRarityDic[id].unitPositionType]);
                             b.transform.localScale = new Vector3(1, 1, 1);
-                            b.transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8),
-                                -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
                             int id0 = id;
-                            if (selectedCharId.Contains(id))
-                            {
-                                b.GetComponent<Toggle>().isOn = true;
-                            }
 
                             b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
                             b.GetComponent<CharacterPageButton>().SetButton(id);
                             togglePerferbs[id0] = b.GetComponent<Toggle>();
                             buttons[id0] = b.GetComponent<CharacterPageButton>();
-                            count++;
                             //showUnitIDs.Add(id);
-                            if (count % 10 == 0)
-                                yield return null;
                         }
                     }
                 }
 
 
-                if (parent.sizeDelta.y <= Mathf.CeilToInt(count / 8) * 95 + 105)
-                {
-                    parent.sizeDelta = new Vector2(100, Mathf.CeilToInt(count / 8) * 95 + 105);
-                }
             }
-            else
+
+            int count = 1;
+
+            foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
             {
-                foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+                if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
                 {
-                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
-                        buttons[id].RefreshData(id);
+                    if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
+                    {
+                        buttons[id].RefreshData(
+                            MainManager.Instance.unitDataDic.TryGetValue(id, out UnitData unitData) ? unitData : new UnitData(id, 1)
+                            );
+                        buttons[id].transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8),
+                            -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
+                        // buttons[id].gameObject.SetActive(true);
+                        togglePerferbs[id].isOn = selectedCharId.Contains(id);
+
+                        count++;
+                    }
+                    else
+                    {
+                        // buttons[id].gameObject.SetActive(false);
+                    }
                 }
             }
 
+            if (last != type)
+            {
+                parents[0].gameObject.SetActive(type == 0 || type == 1);
+                parents[1].gameObject.SetActive(type == 0 || type == 2);
+                parents[2].gameObject.SetActive(type == 0 || type == 3);
+            }
 
-            TurnAllToggles(selectedChars.Count != 5);
-            parent.gameObject.SetActive(true);
+            if (parent.sizeDelta.y < Mathf.CeilToInt(count / 8) * 95 + 105)
+            {
+                parent.sizeDelta = new Vector2(100, Mathf.CeilToInt(count / 8) * 95 + 105);
+            }
 
+            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95 + 105)
+            {
+                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95 + 105);
+            }
+            TurnAllToggles(selectedCharId.Count != 5);
+            last = type;
         }
+
         private void RefreshSelectedButtons()
         {
             if (selectedCharId.Any(x => !MainManager.Instance.UnitRarityDic.ContainsKey(x)))

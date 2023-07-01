@@ -124,14 +124,14 @@ namespace PCRCaculator
             //   characterImage.sprite = MainManager.LoadSourceSprite(path);
             //}
             characterImage.sprite = sprite;
-            RefreshData(unitid);
+            RefreshData(data);
         }
 
         private long current;
 
-        public void RefreshData(int unitid)
+        public void RefreshData(UnitData data)
         {
-            UnitData data = MainManager.Instance.unitDataDic.TryGetValue(unitid, out UnitData unitData) ? unitData : new UnitData(unitid, 1);
+            int unitid = data.unitId;
 
             if (data.GetHashCode() == current) return;
 
