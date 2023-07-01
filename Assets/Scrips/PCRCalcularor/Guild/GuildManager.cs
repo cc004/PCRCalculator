@@ -6,8 +6,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Elements;
+using Elements.Battle;
 using Newtonsoft.Json;
+using PCRCaculator.Update;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -32,6 +35,7 @@ namespace PCRCaculator.Guild
         public CharacterPageButton characterDetailButton;
         public Action execTimeButtonAction;
         public List<Text> characterDetailTexts;
+        public Text characterDetailTPR;
 
         public Image bossPicture;
         public List<Text> bossDetailTexts;
@@ -198,6 +202,9 @@ namespace PCRCaculator.Guild
                 //处理一下四舍五入的问题
                 characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100 - baseData.dataint[i] / 100}</color>");
             }
+
+            characterDetailTPR.text = $"{BattleManager.CalcPlayerDamageTpReduceRate(unitData.rank)}";
+
             execTimeButtonAction = () => { GuildExecTimeSettingButton(unitData); };
         }
 
@@ -1062,6 +1069,9 @@ namespace PCRCaculator.Guild
 
         public void UpdateButton()
         {
+            updateManager.StartCheck();
+            return;
+            /*
             MainManager.Instance.WindowConfigMessage($"是否立即检查更新？", updateManager.StartCheck);
             return;
 #if PLATFORM_ANDROID
@@ -1081,7 +1091,7 @@ namespace PCRCaculator.Guild
 #else
             MainManager.Instance.WindowConfigMessage($"请手动下载新版本", null);
 
-#endif
+#endif*/
         }
         //由java调用
         public void ImportExcelFileByAndroidNative(string filePath)

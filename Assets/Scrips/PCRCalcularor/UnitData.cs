@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using PCRCalcularor;
+using SQLite4Unity3d;
 using UnityEngine;
 using DirectionType = PCRCaculator.Battle.DirectionType;
 using eMoveTypes = PCRCaculator.Battle.eMoveTypes;
@@ -23,7 +24,7 @@ namespace PCRCaculator
     /// 角色基础面板数据，数据由数据库中的unit_rarity表以及其他类生成~
     /// </summary>
     [Serializable]
-    public class UnitRarityData : IComparer<UnitRarityData>, IComparable<UnitRarityData>, IOverride<UnitRarityData>
+    public class UnitRarityData : IComparer<UnitRarityData>, IComparable<UnitRarityData>, IOverride<UnitRarityData>, IOverride2<UnitRarityData>
     {
         public int unitId;
         public string unitName;
@@ -380,6 +381,12 @@ namespace PCRCaculator
             }
         }
 
+        public void Override2With(UnitRarityData other)
+        {
+            other.detailData.name = detailData.name;
+            other.unitName = unitName;
+        }
+
         public override string ToString()
         {
             List<string> s1 = new List<string>();
@@ -444,7 +451,7 @@ namespace PCRCaculator
         [JsonIgnore]
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
-
+        
         public void SetDefaultLoveDict()
         {
             if (playLoveDic != null && playLoveDic.ContainsKey(unitId)) return;
@@ -690,6 +697,32 @@ namespace PCRCaculator
 
             return li;
         }
+        
+        public new long GetHashCode()
+        {
+            unchecked
+            {
+                long hashCode = enemyid;
+                hashCode = (hashCode * 397) ^ _unitId;
+                hashCode = (hashCode * 397) ^ level;
+                hashCode = (hashCode * 397) ^ rarity;
+                hashCode = (hashCode * 397) ^ rank;
+                hashCode = (hashCode * 397) ^ equipLevel[0];
+                hashCode = (hashCode * 397) ^ equipLevel[1];
+                hashCode = (hashCode * 397) ^ equipLevel[2];
+                hashCode = (hashCode * 397) ^ equipLevel[3];
+                hashCode = (hashCode * 397) ^ equipLevel[4];
+                hashCode = (hashCode * 397) ^ equipLevel[5];
+                hashCode = (hashCode * 397) ^ skillLevel[0];
+                hashCode = (hashCode * 397) ^ skillLevel[1];
+                hashCode = (hashCode * 397) ^ skillLevel[2];
+                hashCode = (hashCode * 397) ^ skillLevel[3];
+                hashCode = (hashCode * 397) ^ uniqueEqLv;
+                foreach (var unit in playLoveDic.Keys.OrderBy(x => x))
+                    hashCode = (hashCode * 397) ^ playLoveDic[unit];
+                return hashCode;
+            }
+        }
     }
     /// <summary>
     /// 角色的RANK数据，对应数据库中的unit_promotion_status表和unit_promotion表%
@@ -853,7 +886,7 @@ namespace PCRCaculator
     /// 所有的技能数据，对应数据库中的skill_data表@
     /// </summary>
     [Serializable]
-    public class SkillData
+    public class SkillData : IOverride2<SkillData>
     {
         public int skillid;
         public string name = "空技能";
@@ -958,6 +991,13 @@ namespace PCRCaculator
             }
             return detail;
         }
+
+        public void Override2With(SkillData other)
+        {
+            other.name = name;
+            other.describes = describes;
+        }
+
         public override string ToString()
         {
             string[] da = new string[9]
@@ -976,7 +1016,7 @@ namespace PCRCaculator
     /// 所有技能基础数据，对应数据库中的skill_action表#
     /// </summary>
     [Serializable]
-    public class SkillAction
+    public class SkillAction : IOverride2<SkillAction>
     {
         public int actionid;
         public int classid;//1或2，一般为1，只有yls为2
@@ -1333,6 +1373,13 @@ namespace PCRCaculator
             }
             return b;
         }
+
+        public void Override2With(SkillAction other)
+        {
+            other.description = description;
+            other.levelupdes = levelupdes;
+        }
+
         public override string ToString()
         {
             string[] dat = new string[13]
@@ -1352,7 +1399,7 @@ namespace PCRCaculator
     /// 装备基础数据，对应数据库中的equipment_data 和 equipment_enhance_rate表,忽视部分鸡肋属性-
     /// </summary>
     [Serializable]
-    public class EquipmentData
+    public class EquipmentData : IOverride2<EquipmentData>
     {
         public int equipment_id;
         public string equipment_name;
@@ -1446,6 +1493,13 @@ namespace PCRCaculator
 
             return data;
         }
+
+        public void Override2With(EquipmentData other)
+        {
+            other.description = description;
+            other.equipment_name = equipment_name;
+        }
+
         public override string ToString()
         {
             string[] str = new string[10] { equipment_id + "", equipment_name, promotion_level + "",description,(craftFlg?"1":"0"),
@@ -2057,6 +2111,32 @@ namespace PCRCaculator
             this.atk_patterns = atk_patterns;
         }
     }
+
+    [Serializable, Table("e_reduction")]
+    public class EReduction
+    {
+        public int border { get; set; }
+        public int threshold_1 { get; set; }
+        public int threshold_2 { get; set; }
+        public int threshold_3 { get; set; }
+        public int threshold_4 { get; set; }
+        public int threshold_5 { get; set; }
+        public double value_1 { get; set; }
+        public double value_2 { get; set; }
+        public double value_3 { get; set; }
+        public double value_4 { get; set; }
+        public double value_5 { get; set; }
+
+        public IEnumerable<(int, int, double)> GetThresholdPair()
+        {
+            yield return (threshold_1, threshold_2, value_1);
+            yield return (threshold_2, threshold_3, value_2);
+            yield return (threshold_3, threshold_4, value_3);
+            yield return (threshold_4, threshold_5, value_4);
+            yield return (threshold_5, 0, value_5);
+        }
+    }
+
     [Serializable]
     public class UniqueEquipmentData
     {
@@ -2074,6 +2154,7 @@ namespace PCRCaculator
             return new BaseData();
         }
     }
+
     [Serializable]
     public class GuildBattleData
     {

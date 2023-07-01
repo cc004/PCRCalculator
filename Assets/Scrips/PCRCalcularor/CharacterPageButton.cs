@@ -8,6 +8,7 @@ using PCRCaculator.Battle;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UI.CanvasScaler;
 using Debug = UnityEngine.Debug;
 using eStateIconType = Elements.eStateIconType;
 
@@ -91,6 +92,7 @@ namespace PCRCaculator
             UnitData data = MainManager.Instance.unitDataDic.TryGetValue(unitid, out UnitData unitData) ? unitData : new UnitData(unitid,1);
             SetButton(data);
         }
+
         /// <summary>
         /// 设置组件
         /// </summary>
@@ -99,7 +101,6 @@ namespace PCRCaculator
         {
             int unitid = data.unitId;
             if (unitid == 0) return; // XXX: temp fix
-            stars.SetStars(unitid>=200000?-1:data.rarity,data.GetMaxRarity(),true);
             int charid = data.rarity >= 3 ? unitid + 30 : unitid + 10;
             if (unitid >= 400000)
             {
@@ -123,6 +124,20 @@ namespace PCRCaculator
             //   characterImage.sprite = MainManager.LoadSourceSprite(path);
             //}
             characterImage.sprite = sprite;
+            RefreshData(unitid);
+        }
+
+        private long current;
+
+        public void RefreshData(int unitid)
+        {
+            UnitData data = MainManager.Instance.unitDataDic.TryGetValue(unitid, out UnitData unitData) ? unitData : new UnitData(unitid, 1);
+
+            if (data.GetHashCode() == current) return;
+
+            current = data.GetHashCode();
+
+            stars.SetStars(unitid >= 200000 ? -1 : data.rarity, data.GetMaxRarity(), true);
             int backtype = 0;
             if (data.rank <= 1)
             {
@@ -140,7 +155,7 @@ namespace PCRCaculator
             {
                 backtype = 3;
             }
-            else if(data.rank<=17)
+            else if (data.rank <= 17)
             {
                 backtype = 4;
             }
@@ -165,7 +180,7 @@ namespace PCRCaculator
             {
                 levelText.text = "等级" + data.level;
             }
-            else if (buttonType == ButtonType.typeB||buttonType == ButtonType.typeC|| buttonType == ButtonType.typeD)
+            else if (buttonType == ButtonType.typeB || buttonType == ButtonType.typeC || buttonType == ButtonType.typeD)
             {
                 if (unitid <= 200000)
                 {
@@ -184,6 +199,7 @@ namespace PCRCaculator
 
             }
         }
+
         public void SetButton(UnitCtrl unitCtrl)
         {
             if (buttonType != ButtonType.typeC&&buttonType!= ButtonType.typeD)

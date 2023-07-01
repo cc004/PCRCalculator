@@ -320,8 +320,10 @@ namespace ExcelHelper
             return false;
         }
 
-        public static bool AsmExportEnabled => 
+        public static bool AsmExportEnabled =>
             Application.isEditor || File.Exists("patch_asm_exportaabbabab");
+        public static bool AsmExportEnabled2 =>
+            Application.isEditor || File.Exists("patch_lerist");
         public static void SaveExcel(int type,string defaultName = "")
         {
             bool isSuccess = true;
@@ -784,6 +786,15 @@ namespace ExcelHelper
                 worksheet0.Cells[1, 1].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
                     .GetDescription();
                 worksheet0.Cells[2, 1].Value = "v" + Application.version;
+                worksheet0.Cells[3, 1].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
+                worksheet0.Cells[4, 1].Value = "RB" + MainManager.Instance.PlayerSetting.RBRank_max + "," + MainManager.Instance.PlayerSetting.RBValue1 + "," + MainManager.Instance.PlayerSetting.RBTpValue;
+                worksheet0.Cells[6, 1].Value = $"{MainManager.Instance.Version.BossVersionJP}/{MainManager.Instance.Version.CharacterVersionJP}";
+                worksheet0.Cells[5, 1].Value = MainManager.Instance.Version.useJP
+                    ? $"jp{MainManager.Instance.Version.BossVersionJP}"
+                    : (MainManager.Instance.Version.useQA
+                        ? $"qa{MainManager.Instance.Version.BossVersionCN}"
+                        : $"ob{MainManager.Instance.Version.BossVersionCN}");
+
                 worksheet0.Cells[1, 2, 2, 9].Merge = true;
                 worksheet0.MySetValue(1, 2, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
                 worksheet0.MySetValue(3, 2,

@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ICSharpCode.SharpZipLib.Zip;
 using System.IO;
 using System.Text;
 
 namespace PCRCaculator.Update
 {
+    /*
     public class ZipTool
     {
         #region ZipCallback
@@ -327,6 +327,7 @@ namespace PCRCaculator.Update
         /// <returns></returns>
         private static bool ZipDirectory(string _path, string _parentRelPath, ZipOutputStream _zipOutputStream, ZipCallback _zipCallback = null)
         {
+
             ZipEntry entry = null;
             try
             {
@@ -377,5 +378,5 @@ namespace PCRCaculator.Update
         #endregion
     }
 
-
+    */
 }

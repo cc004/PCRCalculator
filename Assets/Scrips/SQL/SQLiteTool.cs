@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elements;
 using Mono.Data.Sqlite;
+using PCRApi.CN;
 using PCRCaculator.Guild;
 using SQLite3 = SQLite4Unity3d.SQLite3;
 #if !UNITY_EDITOR
@@ -21,76 +22,30 @@ namespace PCRCaculator.SQL
 {
     public class SQLiteTool
     {
-        public static string DatabaseName = "redive_jp.db";
-        public static string DatabaseName_cn = "redive_cn.db";
+        private IDataBaseManager mgr;
 
-        public static string GetDBPath(bool cn = false)
+        public static string sql;
+
+        protected SQLiteTool(IDataBaseManager mgr, bool readOnly)
         {
-            var DatabaseName = cn ? DatabaseName_cn : SQLiteTool.DatabaseName;
-#if UNITY_EDITOR
-            var loadDb = string.Format(@"Assets/StreamingAssets/{0}", DatabaseName);
-#else
-        // check if file exists in Application.persistentDataPath
-        //var filepath = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
-        
-            Debug.Log("Database not in Persistent path");
-            // if it doesn't ->
-            // open StreamingAssets directory and load the db ->
-
-#if UNITY_ANDROID 
-            var loadDb2 = new WWW("jar:file://" + Application.dataPath + "!/assets/" + DatabaseName);  // this is the path to your StreamingAssets in android
-            while (!loadDb2.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
-            // then save to Application.persistentDataPath
-            var loadDb = string.Format("{0}/{1}", Application.persistentDataPath, DatabaseName);
-            File.WriteAllBytes(loadDb, loadDb2.bytes);
-#elif UNITY_IOS
-                 var loadDb = Application.dataPath + "/Raw/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-                // then save to Application.persistentDataPath
-                //File.Copy(loadDb, filepath);
-#elif UNITY_WP8
-                var loadDb = Application.dataPath + "/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-                // then save to Application.persistentDataPath
-               // File.Copy(loadDb, filepath);
-
-#elif UNITY_WINRT
-		var loadDb = Application.dataPath + "/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-		// then save to Application.persistentDataPath
-		//File.Copy(loadDb, filepath);
-		
-#elif UNITY_STANDALONE_OSX
-		var loadDb = Application.dataPath + "/Resources/Data/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-		// then save to Application.persistentDataPath
-		//File.Copy(loadDb, filepath);
-#else
-	var loadDb = Application.dataPath + "/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-	// then save to Application.persistentDataPath
-	//File.Copy(loadDb, filepath);
-
-#endif
-
-            Debug.Log("Database written");
-
-        //var dbPath = filepath;
-#endif
-            return loadDb;
+            this.mgr = mgr;
+            this.@readonly = readOnly;
         }
 
-        
-        protected SQLiteTool(string path, bool readOnly)
+        public void Prepare()
         {
+            this.path = Path.Combine(ABExTool.persistentDataPath, $"{mgr.DataVer}.db");
+
+            if (!File.Exists(this.path))
+                File.WriteAllBytes(this.path, mgr.ResolveDatabase());
+
             try
+
             {
-#if UNITY_ANDROID
-                var loadsql = new WWW("jar:file://" + Application.dataPath + "!/assets/" + "dbdiff.sql");  // this is the path to your StreamingAssets in android
-                while (!loadsql.isDone) { }
-                var sql = Encoding.UTF8.GetString(loadsql.bytes);
-#else
-                var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
-                var sql = File.ReadAllText(patchFile);
-#endif
 
 #if UNITY_ANDROID
-                var dbPath = Path.Combine(Application.persistentDataPath, Path.GetFileNameWithoutExtension(path) + "_patch.db");
+                    var dbPath =
+ Path.Combine(ABExTool.persistentDataPath, Path.GetFileNameWithoutExtension(path) + "_patch.db");
 #else
                 var dbPath = Path.GetTempFileName();
 #endif
@@ -121,8 +76,8 @@ namespace PCRCaculator.SQL
             {
                 Debug.LogError($"error occured while trying to patch database: {e}");
             }
-            
-            ConnectDB(path, readOnly);
+
+            ConnectDB(path, @readonly);
         }
 
         private string path;
@@ -139,7 +94,14 @@ namespace PCRCaculator.SQL
         {
             var conn = new SQLiteConnection(path, @readonly ? SQLiteOpenFlags.ReadOnly : SQLiteOpenFlags.ReadWrite);
             lock (connections) connections.Add(conn);
-            return func == null ? conn.Table<T>() : conn.Table<T>().Where(func);
+            try
+            {
+                return func == null ? conn.Table<T>() : conn.Table<T>().Where(func);
+            }
+            catch
+            {
+                return new T[0];
+            }
         }
         public Dictionary<int, T> GetDatasDic<T>(Func<T, int> func, Func<T, bool> select = null) where T : new()
         {
@@ -205,20 +167,19 @@ namespace PCRCaculator.SQL
         public Dictionary<int, string> Dic10 { get; private set; }
         public Dictionary<int, string[]> Dic11 { get; private set; }
         public Dictionary<int, string> Dic12 { get; private set; }
+        public List<EReduction> eReductions { get; private set; }
 
-        private string path;
         private bool @readonly;
 
-        private SQLData(string path, bool readOnly) : base(path, readOnly)
+        private SQLData(IDataBaseManager mgr, bool readOnly) : base(mgr, readOnly)
         {
         }
-
-        public static SQLData OpenDB(bool cn = false)
+        
+        public static SQLData OpenDB(IDataBaseManager mgr)
         {
-
             //_connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
             //Debug.Log("Final PATH: " + dbPath);
-            var temp = new SQLData(GetDBPath(cn), true);
+            var temp = new SQLData(mgr, true);
             return temp;
         }
 
@@ -293,8 +254,11 @@ namespace PCRCaculator.SQL
                 Task.Run(() => Dic11 = GetSkillName_cn()));
             tasks.Add(
                 Task.Run(() => Dic12 = GetSkillActionDes_cn()));
+            tasks.Add(
+                Task.Run(() => eReductions = GetDatas<EReduction>().ToList()));
             return Task.WhenAll(tasks);
         }
+        
         private Dictionary<int, UnitRarityData> GetUnitRarityData()
         {
             var dic = new Dictionary<int, UnitRarityData>();

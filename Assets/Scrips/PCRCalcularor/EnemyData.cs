@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using PCRCalcularor;
 
 namespace PCRCaculator
 {
     [Serializable]
-    public class EnemyData
+    public class EnemyData : IOverride2<EnemyData>
     {
         public int enemy_id;
         public int unit_id;
@@ -37,6 +38,13 @@ namespace PCRCaculator
             string tostr = JsonConvert.SerializeObject(this);
             EnemyData newData = JsonConvert.DeserializeObject<EnemyData>(tostr);
             return newData;
+        }
+
+        public void Override2With(EnemyData other)
+        {
+            other.detailData.comment = detailData.comment;
+            other.detailData.unit_name = detailData.unit_name;
+            other.name = name;
         }
     }
     [Serializable]

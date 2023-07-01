@@ -4900,5 +4900,16 @@ namespace Elements.Battle
             cacheKey = skillTargetCacheKey;
             return result;
         }
+        
+        public static double CalcPlayerDamageTpReduceRate(int promotionLevel)
+        {
+            return MainManager.Instance.ereductionTable.First(x => MainManager.Instance.levelMax >= x.border)
+                .GetThresholdPair().Select(pair =>
+                {
+                    var (upper, lower, value) = pair;
+                    return value * Math.Max(0, upper - Math.Max(lower, promotionLevel - 1));
+                })
+                .Aggregate(1.0, (val, reduction) => val - reduction);
+        }
     }
 }

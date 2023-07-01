@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,49 +8,42 @@ namespace PCRCaculator.Update
 {
     public class UpdateManager : MonoBehaviour
     {
-        public Text text;
-        public Button button;
-        public Text buttonText;
-
-        public int GameVersion;
-        public int AssetVer;
-        public int AssetVerOld;
-        private int code => CheckUpdate.StateCode;
+        public InputField verCharaJP, verBossJP, verBossCN;
+        public Toggle qa, jp;
+        
         public void StartCheck()
         {
-            text.text = "";
             this.gameObject.SetActive(true);
-            Log.LogAction = SetLog;
-            StartCoroutine(Check_0());
-        }
-        private IEnumerator Check_0()
-        {
-            button.interactable = false;
-            buttonText.text = "请等待...";
-            yield return CheckUpdate.GetGithubData(GameVersion);
-            button.interactable = true;
-            buttonText.text = "确认";
+
+            verCharaJP.text = MainManager.Instance.Version.CharacterVersionJP.ToString();
+            verBossJP.text = MainManager.Instance.Version.BossVersionJP.ToString();
+            verBossCN.text = MainManager.Instance.Version.BossVersionCN.ToString();
+            qa.isOn = MainManager.Instance.Version.useQA;
+            jp.isOn = MainManager.Instance.Version.useJP;
 
         }
+
         public void UpdateButton()
         {
-            if (code < 100)
+            MainManager.Instance.Version.useQA = qa.isOn;
+            MainManager.Instance.Version.useJP = jp.isOn;
+            MainManager.Instance.Version.CharacterVersionJP = long.Parse(verCharaJP.text);
+            MainManager.Instance.Version.BossVersionJP = long.Parse(verBossJP.text);
+            MainManager.Instance.Version.BossVersionCN = long.Parse(verBossCN.text);
+
+            SaveManager.Save(MainManager.Instance.Version);
+            
+            string path = Application.streamingAssetsPath + "/../.ABExt2";
+            if (Application.platform == RuntimePlatform.Android)
             {
-                Application.Quit();
+                path = Application.persistentDataPath + "/AB";
             }
-            else
-            {
-                this.gameObject.SetActive(false);
-            }
-        }
-        public void SetLog(string str,Color color)
-        {
-            text.text += $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{str}</color>\n";
-        }
-        [ContextMenu("生成更新文件")]
-        public void CreateUpdateFile()
-        {
-            CheckUpdate.ExportUpdateHashDataInEditor(GameVersion,AssetVer,AssetVerOld);
+
+            Directory.Delete(path, true);
+            Directory.CreateDirectory(path);
+
+            gameObject.SetActive(false);
+            MainManager.Instance.WindowConfigMessage("缓存清理完成，重启摸轴器以应用更改", Application.Quit, Application.Quit);
         }
     }
 }

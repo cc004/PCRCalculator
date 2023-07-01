@@ -7,14 +7,18 @@ using System.Threading.Tasks;
 
 namespace PCRCalcularor
 {
-    public interface IOverride<T>
+    public interface IOverride<in T>
     {
         void OverrideWith(T other);
     }
-
-    internal class Extensions
+    public interface IOverride2<in T>
     {
-        public static void OverrideWith<TKey, TValue>(Dictionary<TKey, TValue> self,
+        void Override2With(T other);
+    }
+
+    internal static class Extensions
+    {
+        public static void OverrideWith<TKey, TValue>(this Dictionary<TKey, TValue> self,
             Dictionary<TKey, TValue> other)
         {
             foreach (var pair in other)
@@ -32,6 +36,17 @@ namespace PCRCalcularor
                 }
                 else
                     self.Add(pair.Key, pair.Value);
+            }
+        }
+        public static void Override2With<TKey, TValue>(this Dictionary<TKey, TValue> self,
+            Dictionary<TKey, TValue> other) where TValue : IOverride2<TValue>
+        {
+            foreach (var pair in other)
+            {
+                if (self.TryGetValue(pair.Key, out var val))
+                {
+                    pair.Value.Override2With(val);
+                }
             }
         }
     }

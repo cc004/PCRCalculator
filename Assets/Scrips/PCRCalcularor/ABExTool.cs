@@ -413,10 +413,13 @@ namespace PCRCaculator
             return count;
         }
 
-        private static AssetManager mgr = new AssetManager();
-        private static AssetManager mgrold = new AssetManager();
-        private const string KEY_VER_ID = "VER_ID";
-        private const string KEY_VER_ID_OLD = "VER_ID_OLD";
+        public static AssetManager mgrCharacter = new AssetManager();
+        public static AssetManager mgrDataJP = new AssetManager();
+        public static PCRApi.CN.AssetManager mgrDataCN = new PCRApi.CN.AssetManager();
+
+        //private const string KEY_VER_ID = "VER_ID";
+        //private const string KEY_VER_ID_OLD = "VER_ID_OLD";
+        /*
         public static int GetVer(bool old,int? defaultVal = null)
         {
             if (!(MainManager.Instance?.useJapanData ?? false))
@@ -426,39 +429,23 @@ namespace PCRCaculator
 
             return PlayerPrefs.GetInt(old ? KEY_VER_ID_OLD : KEY_VER_ID,
                 defaultVal ?? (10046200));
-        }
+        }*/
 
-        public static Task StaticInitialize(Tuple<int?, int?> verOverride = default)
+        public static Task StaticInitialize(Tuple<int?, int?> _ = default)
         {
-            int verid = GetVer(false);
-            int verid_old = GetVer(true);
+            var ver = MainManager.Instance.Version;
 
-            if (verOverride != null)
-            {
-                verid = verOverride.Item1 ?? verid;
-                verid_old = verOverride.Item2 ?? verid_old;
-            }
-
-            if (verid == verid_old)
-            {
-                return Task.Run(() =>
-                {
-                    mgr.Initialize(verid.ToString());
-                    mgrold = mgr;
-                });
-            }
-            else
-            {
-                return Task.WhenAll(
-                    Task.Run(() => mgr.Initialize(verid.ToString())),
-                    Task.Run(() => mgrold.Initialize(verid_old.ToString()))
-                );
-            }
+            return Task.WhenAll(
+                Task.Run(() => mgrCharacter.Initialize(ver.CharacterVersionJP.ToString())),
+                Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),
+                Task.Run(() => mgrDataCN.Initialize(ver.BossVersionCN.ToString(),
+                    ver.useQA))
+            );
         }
 
         public static IEnumerable<(AssetManager mgr, Content content)> CacheAllFiles(Regex regex, bool useOld)
         {
-            var m = (useOld ? mgrold : mgr);
+            var m = (useOld ? mgrDataJP : mgrCharacter);
             foreach (var pair in m.registries)
                 if (regex.IsMatch(pair.Key))
                     yield return (m, pair.Value);
@@ -484,7 +471,7 @@ namespace PCRCaculator
             {
                 if (!File.Exists(path))
                 {
-                    var bytes = (useOldManifest ? mgrold : mgr).ResolveFile("a/" + fullname);
+                    var bytes = (useOldManifest ? mgrDataJP : mgrCharacter).ResolveFile("a/" + fullname);
                     if (bytes != null) File.WriteAllBytes(path, bytes);
                 }
                 www = new WWW("file://" + path);
@@ -501,6 +488,8 @@ namespace PCRCaculator
             GetAssetBundleByNameCache = new Dictionary<(Type, string, string, bool), object>();
 
         public static string persistentDataPath;
+
+        public static string dataPath;
 
         public static T GetAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
@@ -598,8 +587,8 @@ namespace PCRCaculator
 
         public static void FreeDeleteAndReset(int ver, int verold)
         {
-            PlayerPrefs.SetInt(KEY_VER_ID, ver);
-            PlayerPrefs.SetInt(KEY_VER_ID_OLD, verold);
+            MainManager.Instance.Version.CharacterVersionJP = ver;
+            MainManager.Instance.Version.BossVersionJP = verold;
             PlayerPrefs.Save();
             AssetBundleDic.Clear();
             spriteDic.Clear();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using PCRCaculator.Guild;
@@ -227,14 +228,15 @@ namespace Elements
 
         public string ToExpression(int hash)
         {
-#if UNITY_EDITOR
-            var sb = new StringBuilder();
-            ToExpression(sb, hash);
-            sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
-#else
+            if (ExcelHelper.ExcelHelper.AsmExportEnabled2)
+            {
+                var sb = new StringBuilder();
+                ToExpression(sb, hash);
+                sb.Remove(sb.Length - 1, 1);
+                return sb.ToString();
+            }
+
             return string.Empty;
-#endif
         }
 
         private int ToExpression(StringBuilder sb, int hash, int num = 0)

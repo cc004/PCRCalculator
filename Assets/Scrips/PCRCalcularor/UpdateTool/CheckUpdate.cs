@@ -53,6 +53,7 @@ namespace PCRCaculator.Update
 
         public static IEnumerator GetGithubData(int nowToolVer)
         {
+            /*
             StateCode = 0;
             var updater = new GitHubRelease(Owner, Repo);
             string url = updater.AllReleaseUrl;
@@ -89,15 +90,17 @@ namespace PCRCaculator.Update
                 {
                     Log.SetLog($"当前版本{nowToolVer}是最新版。");
                 }
-                int ver = ABExTool.GetVer(false);
-                int verold = ABExTool.GetVer(true);
-                if(ver != HashData.AssestVer || verold != HashData.AssestVerOld)
+
+                long ver = MainManager.Instance.Version.CharacterVersionJP;
+                long verold = MainManager.Instance.Version.BossVersionJP;
+
+                if (ver != HashData.AssestVer || verold != HashData.AssestVerOld)
                 {
                     Log.SetLog($"正在更新资源版本 {ver}->{HashData.AssestVer}并删除缓存...");
                     ABExTool.FreeDeleteAndReset(HashData.AssestVer, HashData.AssestVerOld);
                     needReLaunch = true;
                 }
-                string dbMD5 = CalcMd5(File.ReadAllBytes(SQL.SQLiteTool.GetDBPath()));
+                string dbMD5 = CalcMd5(File.ReadAllBytes(SQL.SQLiteTool.GetDBPath("chara_jp.db")));
                 if(!string.IsNullOrEmpty(HashData.DBMD5) && HashData.DBMD5 == dbMD5)
                 {
                     Log.SetLog($"当前数据库{dbMD5}已是最新版。");
@@ -135,7 +138,9 @@ namespace PCRCaculator.Update
                 Log.Error($"网络出错:{web.error}");
                 StateCode = 400;
                 yield break;
-            }
+            }*/
+
+            yield break;
         }/*
         public static async Task<int> CheckAsync(bool isPreRelease)
         {
@@ -357,6 +362,7 @@ namespace PCRCaculator.Update
 
         public static void ExportUpdateHashDataInEditor(int ver,int as1,int asold)
         {
+            /*
             string dic = Application.dataPath + "/Editor/Update/";
             string jsonPath = dic + HashJsonName;
             string dbPath = dic + SQL.SQLiteTool.DatabaseName;
@@ -372,7 +378,7 @@ namespace PCRCaculator.Update
             json.AssestVerOld = asold;
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(json));
             File.Copy(SQL.SQLiteTool.GetDBPath(), dbPath);
-            Debug.Log($"成功生成{ver}/{as1}/{asold}!");
+            Debug.Log($"成功生成{ver}/{as1}/{asold}!");*/
         }
     }
     public static class Log

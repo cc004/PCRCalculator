@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using PCRCaculator.Guild;
 using TMPro;
 using UnityEngine;
@@ -66,7 +68,6 @@ namespace PCRCaculator
         }
         private IEnumerator CallChooseBack_0(int type, AddedPlayerData player = null)
         {
-            var waitUI = MainManager.Instance.OpenWaitUI();
             this.type = type;
             baseBack.SetActive(true);
             chooseBack_A.SetActive(true);
@@ -123,9 +124,11 @@ namespace PCRCaculator
                     selectedCharId.Clear();
                 }
             }
-            yield return RefreshBasePage(0);
+            if (type != 4)
+                yield return RefreshBasePage(0);
             switchToggles[0].isOn = true;
             RefreshSelectedButtons();
+
             if (type == 1)
             {
                 nextButtonText.text = "战斗开始";
@@ -140,7 +143,6 @@ namespace PCRCaculator
                 playerDataForGuild = player;
                 NextButton(player);
             }
-            waitUI.Close();
         }
         public void OnToggleSwitched(bool k)
         {
@@ -253,6 +255,7 @@ namespace PCRCaculator
         }
         public void BackButton()
         {
+            StartCoroutine(RefreshBasePage(0));
             chooseBack_A.SetActive(true);
             settingBack.SetActive(false);
             CloseProperty();
@@ -300,7 +303,8 @@ namespace PCRCaculator
             }
             else
             {
-                MainManager.Instance.WindowMessage("最多选5个！");
+                togglePerferbs[unitid].enabled = false;
+                throw new Exception("最多选5个!");
             }
             RefreshSelectedButtons();
         }
@@ -455,6 +459,9 @@ namespace PCRCaculator
                 }
             }
         }
+
+        public Dictionary<int, CharacterPageButton> buttons;
+
         private IEnumerator RefreshBasePage(int type)
         {
             PositionType positionType = PositionType.frount;
@@ -467,46 +474,78 @@ namespace PCRCaculator
                     positionType = PositionType.backword;
                     break;
             }
-            foreach (Toggle a in togglePerferbs.Values)
+
+            if (type != 0)
             {
-                Destroy(a.gameObject);
+                parent.gameObject.SetActive(false);
+                yield break;
             }
-            togglePerferbs.Clear();
-            parent.localPosition = new Vector3();
-            parent.sizeDelta = new Vector2(100, original_hight);
-            int count = 1;
-            foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+
+            if (buttons == null)
             {
-                if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
+                buttons = new Dictionary<int, CharacterPageButton>();
+                foreach (Toggle a in togglePerferbs.Values)
                 {
-                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id))// || (id>=400000&&id<=499999))
+                    Destroy(a.gameObject);
+                }
+
+                togglePerferbs.Clear();
+                parent.localPosition = new Vector3();
+                parent.sizeDelta = new Vector2(100, original_hight);
+                int count = 1;
+                foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+                {
+                    if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
                     {
-                        GameObject b = Instantiate(togglePerferb);
-                        b.transform.SetParent(parent);
-                        b.transform.localScale = new Vector3(1, 1, 1);
-                        b.transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8), -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
-                        int id0 = id;
-                        if (selectedCharId.Contains(id))
+                        if (MainManager.Instance.JudgeWeatherShowThisUnit(id)) // || (id>=400000&&id<=499999))
                         {
-                            b.GetComponent<Toggle>().isOn = true;
+                            GameObject b = Instantiate(togglePerferb);
+                            b.transform.SetParent(parent);
+                            b.transform.localScale = new Vector3(1, 1, 1);
+                            b.transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8),
+                                -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
+                            int id0 = id;
+                            if (selectedCharId.Contains(id))
+                            {
+                                b.GetComponent<Toggle>().isOn = true;
+                            }
+
+                            b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+                            b.GetComponent<CharacterPageButton>().SetButton(id);
+                            togglePerferbs[id0] = b.GetComponent<Toggle>();
+                            buttons[id0] = b.GetComponent<CharacterPageButton>();
+                            count++;
+                            //showUnitIDs.Add(id);
+                            if (count % 10 == 0)
+                                yield return null;
                         }
-                        b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-                        b.GetComponent<CharacterPageButton>().SetButton(id);
-                        togglePerferbs[id0] = b.GetComponent<Toggle>();
-                        count++;
-                        //showUnitIDs.Add(id);
-                        if (count % 3 == 0)
-                            yield return null;
                     }
                 }
+
+
+                if (parent.sizeDelta.y <= Mathf.CeilToInt(count / 8) * 95 + 105)
+                {
+                    parent.sizeDelta = new Vector2(100, Mathf.CeilToInt(count / 8) * 95 + 105);
+                }
             }
-            if (parent.sizeDelta.y <= Mathf.CeilToInt(count / 8) * 95 + 105)
+            else
             {
-                parent.sizeDelta = new Vector2(100, Mathf.CeilToInt(count / 8) * 95 + 105);
+                foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+                {
+                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
+                        buttons[id].RefreshData(id);
+                }
             }
+
+
+            TurnAllToggles(selectedChars.Count != 5);
+            parent.gameObject.SetActive(true);
+
         }
         private void RefreshSelectedButtons()
         {
+            if (selectedCharId.Any(x => !MainManager.Instance.UnitRarityDic.ContainsKey(x)))
+                selectedCharId.Clear();
             selectedCharId.Sort((x, y) => MainManager.Instance.UnitRarityDic[x].CompareTo(MainManager.Instance.UnitRarityDic[y]));
             for (int i = 0; i < 5; i++)
             {

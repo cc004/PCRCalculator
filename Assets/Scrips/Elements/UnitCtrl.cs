@@ -2321,12 +2321,12 @@ this.updateCurColor();
             else
                 skillStackValDmg = 1000f / baseHp;
             //卡rank相关tp获取惩罚……
-            /*if (UnitUtility.IsPlayableUnit(OriginalUnitId))
+            if (UnitId < 200000) // 看起来小精灵和分身不吃
             {
                 int promotionLevel = (int)_data.UniqueData.PromotionLevel;
-                double num5 = (IsPlayerUnit ? battleManager.CalcPlayerDamageTpReduceRate(promotionLevel) : battleManager.CalcEnemyDamageTpReduceRate(promotionLevel));
+                double num5 = BattleManager.CalcPlayerDamageTpReduceRate(promotionLevel);
                 skillStackValDmg = (float)skillStackValDmg * (float)num5;
-            }*/
+            }
 
             switch (UnitUtility.GetUnitPosType((int)_data.MasterData.SearchAreaWidth))
             {

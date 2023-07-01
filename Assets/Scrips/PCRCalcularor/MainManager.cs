@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OfficeOpenXml;
+using PCRApi.CN;
 using PCRCaculator.Calc;
 using PCRCaculator.Guild;
 using PCRCaculator.SQL;
@@ -60,6 +61,7 @@ namespace PCRCaculator
         private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
         private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
         private Dictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic = new Dictionary<int, UniqueEquipmentData>();//角色专武字典
+        public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
         private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf = new Elements.MasterUnitSkillDataRf();//未来可期
         private List<int> enemy_ignore_skill_rf = new List<int>();//未来可期
@@ -141,12 +143,35 @@ namespace PCRCaculator
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
                 Application.targetFrameRate = 60;
+
+                try
+                {
+                    Version = SaveManager.Load<VersionData>();
+                }
+                catch
+                {
+                    Version = new VersionData();
+                    SaveManager.Save(Version);
+                }
             }
             else
             {
                 Destroy(gameObject);
             }
         }
+
+        public class VersionData
+        {
+            public long CharacterVersionJP = 10046200;
+            public long BossVersionJP = Instance.useJapanData ? 10046200 : 10038900;
+            public long BossVersionCN = 202306211827;
+            public bool useQA = true;
+            public bool useJP = true;
+
+        }
+
+        public VersionData Version;
+
         private void Start()
         {
             try
@@ -186,9 +211,7 @@ namespace PCRCaculator
             //CharacterManager = CharacterManager.Instance;
             //BattleManager = AdventureManager.Instance;
         }
-
-        public Dictionary<int, float[]> execTimePatch;
-
+        
         private void Load()
         {
             Application.runInBackground = true;
@@ -202,7 +225,7 @@ namespace PCRCaculator
 
         private void LoadAsync(WaitUI wait)
         {
- //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
+            //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
             /*string jsonStr = LoadJsonDatas("Datas/AllData");
@@ -223,17 +246,43 @@ namespace PCRCaculator
             }
             */
 
-            var tasks = new List<Task>();
             ABExTool.persistentDataPath = Application.persistentDataPath;
-            tasks.Add(ABExTool.StaticInitialize());
-            var dbTool = SQLData.OpenDB();
-            var dbTool2 = SQLData.OpenDB(true);
+            ABExTool.dataPath = Application.dataPath;
+
+#if UNITY_ANDROID
+            var loadsql =
+                new WWW("jar:file://" + ABExTool.dataPath + "!/assets/" + "dbdiff.sql");  // this is the path to your StreamingAssets in android
+            while (!loadsql.isDone) { }
+            var sql = Encoding.UTF8.GetString(loadsql.bytes);
+#else
+                var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
+                var sql = File.ReadAllText(patchFile);
+#endif
+            SQLiteTool.sql = sql;
+
+            ABExTool.StaticInitialize().Wait();
+
+            var tasks = new List<Task>();
+            
+
+            var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
+            var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
+            var dbTool2 = Version.useJP ? SQLData.OpenDB(ABExTool.mgrDataJP) : dbTool3;
+
+            Task.WhenAll(
+                Task.Run(() => dbTool.Prepare()),
+                Task.Run(() => dbTool2.Prepare()),
+                Task.Run(() => dbTool3.Prepare())).Wait();
+
             tasks.Add(
-                Task.WhenAll(dbTool.ParallelGetAll(), dbTool2.ParallelGetAll())
+                Task.WhenAll(dbTool.ParallelGetAll(), dbTool3.ParallelGetAll(), 
+                        Version.useJP ? dbTool2.ParallelGetAll() : Task.CompletedTask)
                     .ContinueWith(_ =>
                     {
                         dbTool.CloseDB();
                         dbTool2.CloseDB();
+
+                        if (Version.useJP) dbTool3.CloseDB();
 
                         equipmentDic = dbTool.Dic8;
                         equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
@@ -250,24 +299,33 @@ namespace PCRCaculator
 
 
                         var (unitStoryDic2, unitStoryEffectDic2) = dbTool2.Pair;
-                        unitName_cn = dbTool2.Dic10;
-                        skillNameAndDescribe_cn = dbTool2.Dic11;
-                        skillActionDescribe_cn = dbTool2.Dic12;
+                        unitName_cn = dbTool3.Dic10;
+                        skillNameAndDescribe_cn = dbTool3.Dic11;
+                        skillActionDescribe_cn = dbTool3.Dic12;
+                        ereductionTable = (useJapanData ? dbTool : dbTool2).eReductions;
 
                         if (!useJapanData)
                         {
                             Task.WhenAll(
-                                Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
-                                Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
-                                Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
-                                Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                Task.Run(() => Extensions.OverrideWith(skillDataDic, dbTool2.Dic3)),
-                                Task.Run(() => Extensions.OverrideWith(skillActionDic, dbTool2.Dic4)),
-                                Task.Run(() => Extensions.OverrideWith(allUnitAttackPatternDic, dbTool2.Dic5)),
-                                Task.Run(() => Extensions.OverrideWith(guildEnemyDatas, dbTool2.Dic6)),
-                                Task.Run(() => Extensions.OverrideWith(enemyMPartsDic, dbTool2.Dic7)),
-                                Task.Run(() => Extensions.OverrideWith(GuildManager.EnemyDataDic, dbTool2.Dic2)),
-                                Task.Run(() => Extensions.OverrideWith(uniqueEquipmentDataDic, dbTool2.Dic9))
+                                //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
+                                //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
+                                //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
+                                //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
+                                Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3)),
+                                Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4)),
+                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
+                                Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
+                                Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
+                                Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2)),
+                                Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
+                            ).Wait();
+
+                            Task.WhenAll(
+                                Task.Run(() => skillDataDic.Override2With(dbTool3.Dic3)),
+                                Task.Run(() => equipmentDic.Override2With(dbTool3.Dic8)),
+                                Task.Run(() => skillActionDic.Override2With(dbTool3.Dic4)),
+                                Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
+                                Task.Run(() => GuildManager.EnemyDataDic.Override2With(dbTool3.Dic2))
                             ).Wait();
                             // unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
                             // unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
@@ -583,8 +641,8 @@ namespace PCRCaculator
                 {
                     showUnitIDs.Add(i);
                 }
-                showUnitIDs.Add(170101);
-                showUnitIDs.Add(170201);
+                //showUnitIDs.Add(170101);
+                //showUnitIDs.Add(170201);
             }
             else
             {
