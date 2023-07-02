@@ -2323,7 +2323,7 @@ this.updateCurColor();
             //卡rank相关tp获取惩罚……
             if (UnitId < 200000) // 看起来小精灵和分身不吃
             {
-                int promotionLevel = (int)_data.UniqueData.PromotionLevel;
+                int promotionLevel = unitData_my.rank;
                 double num5 = BattleManager.CalcPlayerDamageTpReduceRate(promotionLevel);
                 skillStackValDmg = (float)skillStackValDmg * (float)num5;
             }

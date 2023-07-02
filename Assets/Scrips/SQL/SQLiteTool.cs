@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SQLite4Unity3d;
 using System;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -169,6 +170,11 @@ namespace PCRCaculator.SQL
         public Dictionary<int, string> Dic12 { get; private set; }
         public List<EReduction> eReductions { get; private set; }
 
+        public Dictionary<(int, int), promotion_bonus> rbs {
+            get;
+            private set;
+        }
+
         private bool @readonly;
 
         private SQLData(IDataBaseManager mgr, bool readOnly) : base(mgr, readOnly)
@@ -256,6 +262,9 @@ namespace PCRCaculator.SQL
                 Task.Run(() => Dic12 = GetSkillActionDes_cn()));
             tasks.Add(
                 Task.Run(() => eReductions = GetDatas<EReduction>().ToList()));
+            tasks.Add(
+                Task.Run(() => rbs = GetDatas<promotion_bonus>()
+                    .ToDictionary(x => (x.unit_id, x.promotion_level), x => x)));
             return Task.WhenAll(tasks);
         }
         

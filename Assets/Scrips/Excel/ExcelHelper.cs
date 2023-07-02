@@ -787,9 +787,9 @@ namespace ExcelHelper
                     .GetDescription();
                 worksheet0.Cells[2, 1].Value = "v" + Application.version;
                 worksheet0.Cells[3, 1].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
-                worksheet0.Cells[4, 1].Value = "RB" + MainManager.Instance.PlayerSetting.RBRank_max + "," + MainManager.Instance.PlayerSetting.RBValue1 + "," + MainManager.Instance.PlayerSetting.RBTpValue;
-                worksheet0.Cells[6, 1].Value = $"{MainManager.Instance.Version.BossVersionJP}/{MainManager.Instance.Version.CharacterVersionJP}";
-                worksheet0.Cells[5, 1].Value = MainManager.Instance.Version.useJP
+                worksheet0.Cells[4, 1].Value = $"{MainManager.Instance.Version.BossVersionJP}";
+                worksheet0.Cells[5, 1].Value = $"{MainManager.Instance.Version.CharacterVersionJP}";
+                worksheet0.Cells[6, 1].Value = MainManager.Instance.Version.useJP
                     ? $"jp{MainManager.Instance.Version.BossVersionJP}"
                     : (MainManager.Instance.Version.useQA
                         ? $"qa{MainManager.Instance.Version.BossVersionCN}"

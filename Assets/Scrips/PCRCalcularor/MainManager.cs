@@ -130,9 +130,9 @@ namespace PCRCaculator
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
         public int MaxTPUpValue => playerSetting.maxTPUpValue;
-        public int RBRank => playerSetting.RBRank_max;
-        public int RBValue => playerSetting.RBValue1;
-        public int RBTpValue => playerSetting.RBTpValue;
+
+        public Dictionary<(int, int), promotion_bonus> rbs;
+
         public bool LoadFinished { get; private set; }
         public Dictionary<int, GuildEnemyData> GuildEnemyDatas { get => guildEnemyDatas;}
         public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic;}
@@ -163,7 +163,7 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10046200;
-            public long BossVersionJP = Instance.useJapanData ? 10046200 : 10033100;
+            public long BossVersionJP = Instance.useJapanData ? 10046200 : 10031100;
             public long BossVersionCN = 202306211827;
             public bool useQA = true;
             public bool useJP = true;
@@ -296,13 +296,13 @@ namespace PCRCaculator
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         uniqueEquipmentDataDic = dbTool.Dic9;
-
-
+                        
                         var (unitStoryDic2, unitStoryEffectDic2) = dbTool2.Pair;
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
                         skillActionDescribe_cn = dbTool3.Dic12;
                         ereductionTable = (useJapanData ? dbTool : dbTool2).eReductions;
+                        rbs = (useJapanData ? dbTool : dbTool2).rbs;
 
                         if (!useJapanData)
                         {

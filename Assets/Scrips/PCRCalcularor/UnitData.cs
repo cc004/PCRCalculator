@@ -226,25 +226,14 @@ namespace PCRCaculator
                         }
                     }
                 }
-                //计算RANK奖励
-                int RBRank = MainManager.Instance.RBRank;
-                if(a.rank == RBRank || a.rank == RBRank - 1)
-                {
-                    BaseData rbAdd = new BaseData();
-                    if (result.Atk > result.Magic_str)
-                    {
-                        rbAdd.Atk = MainManager.Instance.RBValue;
-                    }
-                    else
-                    {
-                        rbAdd.Magic_str = MainManager.Instance.RBValue;
-                    }
-                    rbAdd.Energy_recovery_rate = MainManager.Instance.RBTpValue;
-                    result += rbAdd;
-                }
-
 
                 result += BaseData.Round(d1);
+
+
+                d1 = MainManager.Instance.rbs.TryGetValue((a.unitId, a.rank), out var val) ? val.GetBaseData() : new BaseData();
+                
+                result += BaseData.Round(d1);
+
                 return result;
             }
 #if UNITY_EDITOR
@@ -1911,9 +1900,6 @@ namespace PCRCaculator
         public bool ignoreLogBarrierCritical = false;
 
         public int maxTPUpValue = 250;//TP上限
-        public int RBRank_max = 24;//RB的最高rank
-        public int RBValue1 = 1400;//RB奖励值
-        public int RBTpValue = 10;//RB奖励TP值
 
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
 

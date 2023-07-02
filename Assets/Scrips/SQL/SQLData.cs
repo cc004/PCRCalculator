@@ -788,6 +788,36 @@ namespace PCRCaculator.SQL
             energy_recovery_rate, energy_reduce_rate, accuracy);
         }
     }
+
+    public class promotion_bonus
+    {
+        public int unit_id { get; set; }
+        public int promotion_level { get; set; }
+        public double hp { get; set; }
+        public double atk { get; set; }
+        public double magic_str { get; set; }
+        public double def { get; set; }
+        public double magic_def { get; set; }
+        public double physical_critical { get; set; }
+        public double magic_critical { get; set; }
+        public double wave_hp_recovery { get; set; }
+        public double wave_energy_recovery { get; set; }
+        public double dodge { get; set; }
+        public double physical_penetrate { get; set; }
+        public double magic_penetrate { get; set; }
+        public double life_steal { get; set; }
+        public double hp_recovery_rate { get; set; }
+        public double energy_recovery_rate { get; set; }
+        public double energy_reduce_rate { get; set; }
+        public double accuracy { get; set; }
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
+                magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
+                physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
+                energy_recovery_rate, energy_reduce_rate, accuracy);
+        }
+    }
     public class unit_rarity
     {
         [PrimaryKey]
