@@ -91,17 +91,17 @@ namespace PCRCaculator.SQL
             this.path = path;
             this.@readonly = readOnly;
         }
-        public IEnumerable<T> GetDatas<T>(Func<T, bool> func = null) where T : new()
+        public T[] GetDatas<T>(Func<T, bool> func = null) where T : new()
         {
             var conn = new SQLiteConnection(path, @readonly ? SQLiteOpenFlags.ReadOnly : SQLiteOpenFlags.ReadWrite);
             lock (connections) connections.Add(conn);
             try
             {
-                return func == null ? conn.Table<T>() : conn.Table<T>().Where(func);
+                return func == null ? conn.Table<T>().ToArray() : conn.Table<T>().Where(func).ToArray();
             }
             catch
             {
-                return new T[0];
+                return null;
             }
         }
         public Dictionary<int, T> GetDatasDic<T>(Func<T, int> func, Func<T, bool> select = null) where T : new()
@@ -164,7 +164,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, GuildEnemyData> Dic6 { get; private set; }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> Dic7 { get; private set; }
         public Dictionary<int, EquipmentData> Dic8 { get; private set; }
-        public Dictionary<int, UniqueEquipmentData> Dic9 { get; private set; }
+        public Dictionary<int, unique_equip_enhance_rate[]> Dic9 { get; private set; }
         public Dictionary<int, string> Dic10 { get; private set; }
         public Dictionary<int, string[]> Dic11 { get; private set; }
         public Dictionary<int, string> Dic12 { get; private set; }
@@ -540,26 +540,15 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-        private Dictionary<int, UniqueEquipmentData> GetUEQData()
+        private Dictionary<int, unique_equip_enhance_rate[]> GetUEQData()
         {
-            Dictionary<int, UniqueEquipmentData> dic = new Dictionary<int, UniqueEquipmentData>();
-            var list = GetDatas<unique_equipment_data>();
-            foreach (var dd in list)
-            {
-                UniqueEquipmentData unique = new UniqueEquipmentData();
-                unique.equipment_id = dd.equipment_id;
-                unique.baseValue = dd.GetBaseData();
-                int unitid = (unique.equipment_id - 130001) * 10 + 100001;
-                dic[unitid] = unique;
-            }
-            var list2 = GetDatas<unique_equipment_enhance_rate>();
-            foreach (var dd in list2)
-            {
-                int equipment_id = dd.equipment_id;
-                int unitid = (equipment_id - 130001) * 10 + 100001;
-                dic[unitid].enhanceValue = dd.GetBaseData();
-            }
-            return dic;
+            var dic = GetDatasDic<unit_unique_equip>(
+                x => x.equip_id);
+            var basearr = GetDatasDic<unique_equipment_data>(x => x.equipment_id);
+
+            return (GetDatas<unique_equip_enhance_rate>() ?? GetDatas<unique_equipment_enhance_rate>())
+                .GroupBy(x => x.equipment_id)
+                .ToDictionary(x => dic[x.Key].unit_id, x => x.OrderBy(x => x.min_lv).Select(x => { x.baseData = basearr[x.equipment_id]; return x; }).ToArray());
         }
 
         private Dictionary<int, string> GetUnitName_cn()

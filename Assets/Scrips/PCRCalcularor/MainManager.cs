@@ -60,7 +60,7 @@ namespace PCRCaculator
         private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
         private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
         private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
-        private Dictionary<int, UniqueEquipmentData> uniqueEquipmentDataDic = new Dictionary<int, UniqueEquipmentData>();//角色专武字典
+        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
         public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
         private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf = new Elements.MasterUnitSkillDataRf();//未来可期
@@ -120,7 +120,7 @@ namespace PCRCaculator
         public bool IsAutoMode { get => isAutoMode;}
         public bool ForceAutoMode { get => forceAutoMode; }
         public GuildBattleData GuildBattleData { get => guildBattleData;}
-        public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
+        //public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
         //public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
         public AllUnitFirearmData FirearmData { get => firearmData;}
         public List<int> Enemy_ignore_skill_rf { get => enemy_ignore_skill_rf;}
@@ -295,7 +295,7 @@ namespace PCRCaculator
                         enemyMPartsDic = dbTool.Dic7;
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
-                        uniqueEquipmentDataDic = dbTool.Dic9;
+                        UniqueEquipmentDataDic = dbTool.Dic9;
                         
                         var (unitStoryDic2, unitStoryEffectDic2) = dbTool2.Pair;
                         unitName_cn = dbTool3.Dic10;
@@ -316,8 +316,8 @@ namespace PCRCaculator
                                 Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
                                 Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                 Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
-                                Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2)),
-                                Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
+                                Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
+                                // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
                             ).Wait();
 
                             Task.WhenAll(

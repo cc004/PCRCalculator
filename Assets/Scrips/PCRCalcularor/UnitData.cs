@@ -187,7 +187,7 @@ namespace PCRCaculator
                 //计算专武加成
                 if (a.uniqueEqLv > 0 && unitId <= 200000)
                 {
-                    if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out UniqueEquipmentData equipmentData))
+                    if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out var equipmentData))
                     {
                         d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv));
                     }
