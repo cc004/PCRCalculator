@@ -48,8 +48,9 @@ namespace PCRCaculator
             texts[2].text = PlayerSetting.maxUniqueEqLv + "";            
             allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
             if(showAllUnitToggle!=null)
-            showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
-            
+                showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
+
+            TPMaxText.text = PlayerSetting.maxTPUpValue.ToString();
 
             isLoading = false;
         }
