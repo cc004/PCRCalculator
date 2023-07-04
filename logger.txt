@@ -1,9 +1,1 @@
 thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.
-thread 0 terminating for meeting eof.

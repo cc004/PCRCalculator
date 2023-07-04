@@ -37,8 +37,8 @@ namespace AssetsTools {
             if (Header.signature != "UnityFS")
                 throw new UnknownFormatException("Signature " + Header.signature + " is not supported");
             // Only supports format6
-            if (Header.format != FORMAT)
-                throw new UnknownFormatException("Format " + Header.format.ToString() + " is not supported");
+            //if (Header.format != FORMAT)
+            //  throw new UnknownFormatException("Format " + Header.format.ToString() + " is not supported");
 
             readFiles(reader);
         }

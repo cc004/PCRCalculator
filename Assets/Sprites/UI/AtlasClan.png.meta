@@ -102,7 +102,7 @@ TextureImporter:
       213: 2584997636647476502
     second: AtlasClan_32
   externalObjects: {}
-  serializedVersion: 10
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -122,6 +122,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -130,9 +132,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -153,9 +155,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -183,6 +190,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -899,6 +918,40 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      AtlasClan_0: -920449103403555596
+      AtlasClan_1: 5066812366120550702
+      AtlasClan_10: -5608269655104162512
+      AtlasClan_11: 2536296316246323124
+      AtlasClan_12: 535012033677814437
+      AtlasClan_13: 6260550900524764770
+      AtlasClan_14: 6069415068344473211
+      AtlasClan_15: -7544215854812697207
+      AtlasClan_16: 7814197101263800652
+      AtlasClan_17: -2979801237519693178
+      AtlasClan_18: 2718865924360699613
+      AtlasClan_19: -6373421971000103339
+      AtlasClan_2: 4715134414097834164
+      AtlasClan_20: 7199694831328050495
+      AtlasClan_21: -4652069897504821827
+      AtlasClan_22: -5055188129681179833
+      AtlasClan_23: -320353555499548262
+      AtlasClan_24: 5903009847409714109
+      AtlasClan_25: -6115202530179041972
+      AtlasClan_26: -748682378514606741
+      AtlasClan_27: -5630031307022613086
+      AtlasClan_28: 5608378646605533329
+      AtlasClan_29: -5246304261951359086
+      AtlasClan_3: 1971435265938029815
+      AtlasClan_30: 5319591734043065763
+      AtlasClan_31: -7051880455253471731
+      AtlasClan_32: 2584997636647476502
+      AtlasClan_4: -8904997331536403720
+      AtlasClan_5: -504743755598140077
+      AtlasClan_6: 1222426342895164877
+      AtlasClan_7: -7421687834330593973
+      AtlasClan_8: 7421316120045778586
+      AtlasClan_9: 3511342418155181938
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

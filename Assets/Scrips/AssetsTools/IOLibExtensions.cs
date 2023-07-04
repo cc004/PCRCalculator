@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace AssetsTools {
     public static class IOLibExtensions {
-        public static void Align(this UnityBinaryReader reader, int align) {
-            var mod = reader.Position % align;
-            if (mod != 0)
-                reader.Position += align - mod;
+        public static void Align(this UnityBinaryReader reader, int align)
+        {
+            int pad = align - (reader.Position % align);
+            if (pad != align) reader.Position += pad;
         }
 
-        public static void Align(this UnityBinaryWriter writer, int align) {
-            var mod = writer.Position % align;
-            if (mod != 0)
-                writer.Position += align - mod;
+        public static void Align(this UnityBinaryWriter writer, int align)
+        {
+            int pad = align - (writer.Position % align);
+            if (pad != align) writer.Position += pad;
         }
         
         public static string ReadAlignedString(this UnityBinaryReader reader) {

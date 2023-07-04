@@ -46,6 +46,14 @@ namespace AssetsTools {
                 DataOffset = reader.ReadIntBE();
                 IsBigEndian = reader.ReadByte() == 0 ? false : true;
                 Reserved = reader.ReadBytes(3);
+
+                if (Version >= 0x16)
+                {
+                    MetadataSize = reader.ReadIntBE();
+                    FileSize = (int) reader.ReadLongBE();
+                    DataOffset = (int) reader.ReadLongBE();
+                    reader.ReadLongBE();
+                }
             }
 
             public void Write(UnityBinaryWriter writer) {

@@ -8,7 +8,7 @@ namespace AssetsTools {
     /// <summary>
     /// TypeTree of the SerializedType.
     /// </summary>
-    public partial class TypeTree : ISerializable {
+    public partial class TypeTree {
         /// <summary>
         /// TypeTreeNodes of this TypeTree.
         /// </summary>
@@ -28,7 +28,7 @@ namespace AssetsTools {
             public int MetaFlag;
         }
 
-        public void Read(UnityBinaryReader reader) {
+        public void Read(UnityBinaryReader reader, int offset) {
             // Read header
             int node_count = reader.ReadInt();
             int strtable_length = reader.ReadInt();
@@ -66,6 +66,8 @@ namespace AssetsTools {
                 Nodes[i].ByteSize = reader.ReadInt();
                 Nodes[i].Index = reader.ReadInt();
                 Nodes[i].MetaFlag = reader.ReadInt();
+
+                reader.Position += offset;
             }
 
             reader.Position += strtable_length;

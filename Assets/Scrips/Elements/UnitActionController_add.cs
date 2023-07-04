@@ -15,7 +15,7 @@ namespace Elements
     public partial class UnitActionController
     {
         private Dictionary<string, List<FirearmCtrlData>> unitFirearmDatas = new Dictionary<string, List<FirearmCtrlData>>();
-        public bool UseSkillEffect = false;
+        // public bool UseSkillEffect = false;
         public void LoadActionControllerData(int unitid,bool isABunit=true)
         {
             unitFirearmDatas = MainManager.Instance.FirearmData.GetData(unitid);
@@ -102,12 +102,13 @@ namespace Elements
             catch (Exception e)
             {
                 //BattleUIManager.Instance.LogMessage(Owner.UnitName + "的技能特效数据丢失！", eLogMessageType.ERROR, Owner.IsOther);
-                string Msg = "加载角色" + Owner.UnitName + "的技能" + skillid + "的弹道数据时发生错误：" + e.Message;
 #if UNITY_EDITOR
+                string Msg = "加载角色" + Owner.UnitName + "的技能" + skillid + "的弹道数据时发生错误：" + e.Message;
                 Debug.LogError(Msg);
 #endif
-                MainManager.Instance.WindowConfigMessage(Msg, null);
-                return new FirearmCtrlData();
+                throw;
+                //MainManager.Instance.WindowConfigMessage(Msg, null);
+                //return new FirearmCtrlData();
             }
         }
         private void CalcDelayByPhysice(ActionParameter action, Skill _skill, int targetmotion, bool first = false, bool _skipCutIn = false,
@@ -503,7 +504,16 @@ namespace Elements
                             waitTime_5_7 = execTime_5_4[0];
                         }
                         //Elements.FirearmCtrlData firearmCtrlData = skillEffect.PrefabData;
-                        FirearmCtrlData firearmCtrlData = GetPrefabDataBySkillid(skill.SkillId);
+                        FirearmCtrlData firearmCtrlData;
+                        try
+                        {
+                            firearmCtrlData = _skilleffect.PrefabData;
+                        }
+                        catch
+                        {
+                            firearmCtrlData = GetPrefabDataBySkillid(skill.SkillId);
+                        }
+
                         if (firearmCtrlData.ignoreFirearm)
                         {
                             action.ExecTime = new float[1] { firearmCtrlData.fixedExecTime };

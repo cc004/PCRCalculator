@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace Elements
     [Serializable]
     public class FirearmCtrlData
     {
+        [JsonIgnore]
         public Vector3 initialPosition;
         public float HitDelay = 0.5f;
         public float MoveRate = 1;

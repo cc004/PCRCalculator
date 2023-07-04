@@ -451,7 +451,7 @@ namespace PCRCaculator
                     yield return (m, pair.Value);
         }
 
-        private static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
+        public static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
         {
             if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
 

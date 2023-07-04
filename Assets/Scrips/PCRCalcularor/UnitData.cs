@@ -1356,6 +1356,12 @@ namespace PCRCaculator
                 case 5:
                     b.Magic_def += (float)(values[1] + values[2] * skilllevel);
                     break;
+                case 6:
+                    b.Physical_critical += (float)(values[1] + values[2] * skilllevel);
+                    break;
+                case 7:
+                    b.Magic_critical += (float)(values[1] + values[2] * skilllevel);
+                    break;
                 default:
                     Debug.LogError("未设置类型为:" + details[0] + "的被动技能应用！");
                     break;

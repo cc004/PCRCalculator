@@ -48,7 +48,7 @@ TextureImporter:
       213: -5224041056244677659
     second: AtlasCoopMap_14
   externalObjects: {}
-  serializedVersion: 10
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -68,6 +68,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -76,9 +78,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -99,9 +101,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -129,6 +136,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -467,6 +486,22 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      AtlasCoopMap_0: -1908814591445853753
+      AtlasCoopMap_1: 7787829256283518084
+      AtlasCoopMap_10: 9023636863360238
+      AtlasCoopMap_11: -4287870495014116624
+      AtlasCoopMap_12: -1172889898363064824
+      AtlasCoopMap_13: 4713790798831132246
+      AtlasCoopMap_14: -5224041056244677659
+      AtlasCoopMap_2: -1008465687105122729
+      AtlasCoopMap_3: -845526135572648212
+      AtlasCoopMap_4: -3410232512605926328
+      AtlasCoopMap_5: -5711150255800343784
+      AtlasCoopMap_6: 5081080757491606555
+      AtlasCoopMap_7: 207541152098525129
+      AtlasCoopMap_8: 9031935012343669065
+      AtlasCoopMap_9: -5725920217342359765
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

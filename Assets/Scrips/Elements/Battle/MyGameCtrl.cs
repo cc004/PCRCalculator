@@ -40,7 +40,7 @@ namespace Elements
         public bool ForceAutoMode;
 
         public int CurrentSeedForSave { get; set; }
-        public bool ignoreEffects => false;//!tempData.SettingData.useSkillEffects;
+        //public bool ignoreEffects => false;//!tempData.SettingData.useSkillEffects;
 
 
         private const float SPINE_SCALE = 0.01f;
@@ -48,6 +48,11 @@ namespace Elements
         private void Awake()
         {
             Instance = this;
+            foreach (var pair in ABExTool.mgrCharacter.registries)
+            {
+                if (!pair.Key.StartsWith("a/all_fxsk_")) continue;
+                ABExTool.TryGetAssetBundleByName(pair.Key.Split("/")[1], false);
+            }
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
@@ -306,10 +311,10 @@ namespace Elements
         {
             int unitid = data.unitId;
             bool useSkillEffects = false;
-            if (!ignoreEffects)
-            {
-                useSkillEffects = LoadSkillEffectPrefabs(unitid);
-            }
+            //if (!ignoreEffects)
+            //{
+            //    useSkillEffects = LoadSkillEffectPrefabs(unitid);
+            //}
             //GameObject b = Instantiate(battleUnitPrefab);
             GameObject prefab = ABExTool.LoadUnitPrefab(unitid);
             GameObject b;
@@ -359,7 +364,7 @@ namespace Elements
             unitCtrl.posIdx = idx;
             var actionController = b.GetComponent<UnitActionController>();
             actionController.LoadActionControllerData(unitid,prefab!=null);
-            actionController.UseSkillEffect = useSkillEffects;
+           //  actionController.UseSkillEffect = useSkillEffects;
             CreateUnitSpine(data, idx, isplayer, BattleDefine.GetUnitRespawnPos(idx, !isplayer), null);
             finishAction?.Invoke();
 
@@ -390,11 +395,11 @@ namespace Elements
             var actionController = b.GetComponent<UnitActionController>();
             actionController.LoadActionControllerData(unitid);
             bool useSkillEffects = false;
-            if (!ignoreEffects)
-            {
-                useSkillEffects = LoadSkillEffectPrefabs(unitid);
-            }
-            actionController.UseSkillEffect = useSkillEffects;
+            //if (!ignoreEffects)
+            //{
+           //     useSkillEffects = LoadSkillEffectPrefabs(unitid);
+           // }
+            //actionController.UseSkillEffect = useSkillEffects;
             return unitCtrl;
         }
         public static void CreateSummonSpine(SummonData summonData,UnitCtrl summonUnitCtrl, GameObject exitObj,

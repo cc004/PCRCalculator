@@ -45,7 +45,13 @@ namespace AssetsTools {
 
             // Decompress Infos (if needed)
             int compressiontype = flag & 0x3F;
-            switch(compressiontype) {
+
+            if (this.Header.format >= 7U)
+            {
+                reader.Align(16);
+            }
+
+            switch (compressiontype) {
                 default:// None
                     inforeader = reader;
                     break;
@@ -78,6 +84,11 @@ namespace AssetsTools {
                 Files[i].Data = new byte[inforeader.ReadLongBE()];
                 Files[i].Flag = inforeader.ReadIntBE();
                 Files[i].Name = inforeader.ReadStringToNull();
+            }
+
+            if ((flag & 0x200) != 0)
+            {
+                reader.Align(16);
             }
 
             // Read Directories

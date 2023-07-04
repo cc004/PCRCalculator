@@ -824,24 +824,24 @@ namespace Elements
                     }
                     else
                     {
-                        if (UseSkillEffect)
-                        {
+                        //if (UseSkillEffect)
+                        //{
                             effectFlag = true;
                             //CalcDelayByPhysice2(actionParameter, skill, 0, true);
                             //this.ExecUnitActionWithDelay(actionParameter, skill, true, true);
-                        }
-                        else
-                        {
-                            CalcDelayByPhysice(actionParameter, skill, 0, true);
-                            ExecUnitActionWithDelay(actionParameter, skill, true, true);
-                        }
+                        //}
+                        //else
+                        //{
+                        //    CalcDelayByPhysice(actionParameter, skill, 0, true);
+                        //    ExecUnitActionWithDelay(actionParameter, skill, true, true);
+                        //}
                     }
                 }
 
             }
             foreach (var unit in battleManager.BlackoutUnitTargetList)
                 unit.DisableSortOrderFrontOnBlackoutTarget = false;
-            if(UseSkillEffect && effectFlag)
+            if(/*UseSkillEffect &&*/ effectFlag)
                 CreateNormalPrefabWithTargetMotion2(skill, 0, true);
             //if (skill.ZoomEffect.Enable)
             // this.battleCameraEffect.StartZoomEffect(skill.ZoomEffect, this.Owner, skill.CutInSkipTime, false, false, skill.SkillId != this.Owner.UnionBurstSkillId);
@@ -1585,8 +1585,8 @@ namespace Elements
                                     }
                             }
                         }
-                        if (UseSkillEffect)
-                        {
+                        //if (UseSkillEffect)
+                        //{
                             switch (_skilleffect.EffectTarget)
                             {
                                 case eEffectTarget.OWNER:
@@ -1634,7 +1634,7 @@ namespace Elements
                                 default:
                                     continue;
                             }
-                        }
+                        //}
                     }
                 }
             }

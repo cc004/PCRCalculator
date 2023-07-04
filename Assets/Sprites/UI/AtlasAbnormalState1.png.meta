@@ -177,7 +177,7 @@ TextureImporter:
       213: -3778457438102279693
     second: AtlasAbnormalState1_57
   externalObjects: {}
-  serializedVersion: 10
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -197,6 +197,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -205,9 +207,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -228,9 +230,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -258,6 +265,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -1499,6 +1518,65 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      AtlasAbnormalState1_0: 8297145807214397252
+      AtlasAbnormalState1_1: -1813500591039924718
+      AtlasAbnormalState1_10: -5803831054955254886
+      AtlasAbnormalState1_11: -6791243951881663448
+      AtlasAbnormalState1_12: -1069533211986984252
+      AtlasAbnormalState1_13: 8564994237851055215
+      AtlasAbnormalState1_14: -5893679941991599788
+      AtlasAbnormalState1_15: -8515968920023797899
+      AtlasAbnormalState1_16: 4586601050460816934
+      AtlasAbnormalState1_17: -882637246585113430
+      AtlasAbnormalState1_18: -1186754807045190894
+      AtlasAbnormalState1_19: -2344091127989553506
+      AtlasAbnormalState1_2: -5555154351353640534
+      AtlasAbnormalState1_20: 3725418788623165093
+      AtlasAbnormalState1_21: 4130420186338914082
+      AtlasAbnormalState1_22: -8670528710036394061
+      AtlasAbnormalState1_23: 4644022837439007080
+      AtlasAbnormalState1_24: -1381804683003641184
+      AtlasAbnormalState1_25: 9212661456800801862
+      AtlasAbnormalState1_26: 2776419669514618340
+      AtlasAbnormalState1_27: 4407933329863292607
+      AtlasAbnormalState1_28: -8605509205726118122
+      AtlasAbnormalState1_29: 2014148884948570458
+      AtlasAbnormalState1_3: 8930385794439093915
+      AtlasAbnormalState1_30: -7587433539045350075
+      AtlasAbnormalState1_31: -744657654796150794
+      AtlasAbnormalState1_32: 67770923902214181
+      AtlasAbnormalState1_33: -2497392624574090902
+      AtlasAbnormalState1_34: 1733068518763958600
+      AtlasAbnormalState1_35: -249040712551872045
+      AtlasAbnormalState1_36: -547577134366368768
+      AtlasAbnormalState1_37: 7044105092842223459
+      AtlasAbnormalState1_38: 1604693258683037319
+      AtlasAbnormalState1_39: 174119537826324412
+      AtlasAbnormalState1_4: 1908472998844261271
+      AtlasAbnormalState1_40: -3464953946907157786
+      AtlasAbnormalState1_41: -6531456785397632347
+      AtlasAbnormalState1_42: 527063534496883063
+      AtlasAbnormalState1_43: -7211189843896181852
+      AtlasAbnormalState1_44: 8698317474515591138
+      AtlasAbnormalState1_45: -7946813225171373065
+      AtlasAbnormalState1_46: -8191151131745174598
+      AtlasAbnormalState1_47: 8098358582837794208
+      AtlasAbnormalState1_48: -6787687425140698378
+      AtlasAbnormalState1_49: -7364374021020790653
+      AtlasAbnormalState1_5: 3271320693334697619
+      AtlasAbnormalState1_50: -4743498105638136316
+      AtlasAbnormalState1_51: -7326126839495054218
+      AtlasAbnormalState1_52: 3607506554662138429
+      AtlasAbnormalState1_53: 1683444615833173535
+      AtlasAbnormalState1_54: 7221604065329479941
+      AtlasAbnormalState1_55: -77620064451403494
+      AtlasAbnormalState1_56: 6261409892537720725
+      AtlasAbnormalState1_57: -3778457438102279693
+      AtlasAbnormalState1_6: -1314949081136502809
+      AtlasAbnormalState1_7: -6351393685439097122
+      AtlasAbnormalState1_8: 3592020669787765746
+      AtlasAbnormalState1_9: -873035438801719069
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

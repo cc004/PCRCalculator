@@ -36,6 +36,10 @@ namespace AssetsTools.LZ4
 
         public static int Encode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
         {
+            return K4os.Compression.LZ4.LZ4Codec.Encode(
+                new ReadOnlySpan<byte>(input, inputOffset, inputLength),
+                new Span<byte>(output, outputOffset, outputLength));
+            /*
             if (IntPtr.Size == 4)
             {
                 return LZ4Codec.Encode32Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
@@ -43,11 +47,15 @@ namespace AssetsTools.LZ4
             else
             {
                 return LZ4Codec.Encode64Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
-            }
+            }*/
         }
 
         public static int Decode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
         {
+            return K4os.Compression.LZ4.LZ4Codec.Decode(
+                new ReadOnlySpan<byte>(input, inputOffset, inputLength),
+                new Span<byte>(output, outputOffset, outputLength));
+            /*
             if (IntPtr.Size == 4)
             {
                 return LZ4Codec.Decode32Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
@@ -55,7 +63,7 @@ namespace AssetsTools.LZ4
             else
             {
                 return LZ4Codec.Decode64Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
-            }
+            }*/
         }
 
 #endif

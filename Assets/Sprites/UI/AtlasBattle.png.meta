@@ -561,7 +561,7 @@ TextureImporter:
       213: -7653390650182353634
     second: AtlasBattle_185
   externalObjects: {}
-  serializedVersion: 10
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -581,6 +581,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -589,9 +591,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -612,9 +614,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -642,6 +649,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -4571,6 +4590,193 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      AtlasBattle_0: -2175143670944326988
+      AtlasBattle_1: 3335250337753384986
+      AtlasBattle_10: -4518346205359604798
+      AtlasBattle_100: -4792130623521433586
+      AtlasBattle_101: 8064718955903160916
+      AtlasBattle_102: 8887274680391386585
+      AtlasBattle_103: 8057522368172864127
+      AtlasBattle_104: -1586832767404132616
+      AtlasBattle_105: -1891049558748350759
+      AtlasBattle_106: -4195510436334377392
+      AtlasBattle_107: 5937200503935067394
+      AtlasBattle_108: -8117628361888471140
+      AtlasBattle_109: -6701838825232882581
+      AtlasBattle_11: 5960857209386160746
+      AtlasBattle_110: 3055890395010742650
+      AtlasBattle_111: 4578839171856945577
+      AtlasBattle_112: 7657734668534694364
+      AtlasBattle_113: -3514160393518398267
+      AtlasBattle_114: 6754021916944301885
+      AtlasBattle_115: -827238424824392555
+      AtlasBattle_116: -2159416205731275463
+      AtlasBattle_117: 7316336144763124576
+      AtlasBattle_118: 3788020610591533688
+      AtlasBattle_119: 1769151946351934580
+      AtlasBattle_12: -1492424493852801901
+      AtlasBattle_120: -891001350142269959
+      AtlasBattle_121: 5956810197893594808
+      AtlasBattle_122: -6926547188915399157
+      AtlasBattle_123: 3897353230707549446
+      AtlasBattle_124: -7274742262050981788
+      AtlasBattle_125: -7641286029530085376
+      AtlasBattle_126: 4950108352050529084
+      AtlasBattle_127: 1013533060319240760
+      AtlasBattle_128: -1239624544712671051
+      AtlasBattle_129: 6394346320227477720
+      AtlasBattle_13: 5376802578299253605
+      AtlasBattle_130: -1129595033567810548
+      AtlasBattle_131: 6685440737804280488
+      AtlasBattle_132: 504699752098655298
+      AtlasBattle_133: 4994060530598340473
+      AtlasBattle_134: 129265847397642350
+      AtlasBattle_135: -2440488370495487348
+      AtlasBattle_136: -8360748920305189084
+      AtlasBattle_137: -8297864203048151235
+      AtlasBattle_138: 3899378570386073509
+      AtlasBattle_139: 6133513936246571416
+      AtlasBattle_14: -3766330082969197350
+      AtlasBattle_140: -5153165150702704787
+      AtlasBattle_141: 5148876791319403426
+      AtlasBattle_142: 3014328080418134292
+      AtlasBattle_143: 2477122290243957281
+      AtlasBattle_144: 3343629777173710794
+      AtlasBattle_145: 6875657678054322867
+      AtlasBattle_146: 9041840879939992112
+      AtlasBattle_147: 3660243584342995489
+      AtlasBattle_148: 1172141331142973003
+      AtlasBattle_149: -5480124740492104428
+      AtlasBattle_15: 3999472326705984129
+      AtlasBattle_150: -6795073083166832420
+      AtlasBattle_151: -1934392283404265145
+      AtlasBattle_152: -6000422045314540075
+      AtlasBattle_153: 3796609304507694980
+      AtlasBattle_154: 6951884126056160086
+      AtlasBattle_155: -1282890885656679879
+      AtlasBattle_156: -5156599779148020595
+      AtlasBattle_157: -9201862442398761599
+      AtlasBattle_158: -2134590102768846498
+      AtlasBattle_159: -5205887740320816687
+      AtlasBattle_16: -3860505650556744099
+      AtlasBattle_160: -3063973026882487965
+      AtlasBattle_161: -3736437386130354487
+      AtlasBattle_162: -7213538471410350625
+      AtlasBattle_163: -5391924530747527114
+      AtlasBattle_164: 7956980573845266965
+      AtlasBattle_165: 1243358645393648099
+      AtlasBattle_166: 7062368990276536200
+      AtlasBattle_167: 8959957418793816222
+      AtlasBattle_168: -2334128953742448461
+      AtlasBattle_169: 4513134063750795137
+      AtlasBattle_17: 189399071231871273
+      AtlasBattle_170: 6636703187188774613
+      AtlasBattle_171: 7972348533981808645
+      AtlasBattle_172: -5591747883281287042
+      AtlasBattle_173: -6453846079630835554
+      AtlasBattle_174: 2600363942882026553
+      AtlasBattle_175: -1766701060804253063
+      AtlasBattle_176: -5767722636667476626
+      AtlasBattle_177: 5809421565220654085
+      AtlasBattle_178: 8008473068289317048
+      AtlasBattle_179: 1569715618781202900
+      AtlasBattle_18: -3139878335629128180
+      AtlasBattle_180: -3667110669995003261
+      AtlasBattle_181: 7401279590847489618
+      AtlasBattle_182: -6138904049910291505
+      AtlasBattle_183: -3229732280938906232
+      AtlasBattle_184: 3393002818440626437
+      AtlasBattle_185: -7653390650182353634
+      AtlasBattle_19: 5393492626822837935
+      AtlasBattle_2: 1732082285423688485
+      AtlasBattle_20: 4048273797402996822
+      AtlasBattle_21: 827487989791143514
+      AtlasBattle_22: 660182945210162523
+      AtlasBattle_23: 4917429497192981325
+      AtlasBattle_24: 2735232546185731269
+      AtlasBattle_25: 388809838041536041
+      AtlasBattle_26: 1657283192758597224
+      AtlasBattle_27: 696928024002542553
+      AtlasBattle_28: 269704760986832059
+      AtlasBattle_29: -6199088892086322991
+      AtlasBattle_3: 6818067844629012192
+      AtlasBattle_30: 1049391279544843066
+      AtlasBattle_31: -3609329842314548698
+      AtlasBattle_32: 2594653064414567796
+      AtlasBattle_33: -7002336334880909240
+      AtlasBattle_34: -8224018432638484904
+      AtlasBattle_35: 3569327514992885583
+      AtlasBattle_36: 8564178452536847657
+      AtlasBattle_37: -3095345570932112690
+      AtlasBattle_38: -4374598087421608608
+      AtlasBattle_39: -4160465079440913067
+      AtlasBattle_4: -4401566780466340538
+      AtlasBattle_40: 2486884902888786683
+      AtlasBattle_41: 871239077254072043
+      AtlasBattle_42: -8778626841113921565
+      AtlasBattle_43: -3329305079502821756
+      AtlasBattle_44: -1672824525808984419
+      AtlasBattle_45: -2439339291004933393
+      AtlasBattle_46: 2311483917311605121
+      AtlasBattle_47: -5186104143160048820
+      AtlasBattle_48: -451293721380675503
+      AtlasBattle_49: 8853355895914456990
+      AtlasBattle_5: 4217436612805455658
+      AtlasBattle_50: 4685336278551289803
+      AtlasBattle_51: 473877619853134060
+      AtlasBattle_52: 7656393590202514799
+      AtlasBattle_53: -6606241685249783198
+      AtlasBattle_54: 364649080590780852
+      AtlasBattle_55: -1495894169187858071
+      AtlasBattle_56: -1351426256343633768
+      AtlasBattle_57: -5991038466790631062
+      AtlasBattle_58: -1176322212111506271
+      AtlasBattle_59: 282680074184196617
+      AtlasBattle_6: -5435367298675445856
+      AtlasBattle_60: 3837780184214795784
+      AtlasBattle_61: 736429448845569217
+      AtlasBattle_62: 4348635842869751986
+      AtlasBattle_63: -6875864039610791939
+      AtlasBattle_64: 1534172082304249340
+      AtlasBattle_65: -4109353511568273819
+      AtlasBattle_66: 2225171983925202266
+      AtlasBattle_67: 8216109264933587788
+      AtlasBattle_68: -1359563328898620267
+      AtlasBattle_69: 8777247591611961091
+      AtlasBattle_7: -3687750285528651405
+      AtlasBattle_70: -4125909009120684074
+      AtlasBattle_71: -6776046067523709577
+      AtlasBattle_72: -9108215149185452418
+      AtlasBattle_73: -4290247908487176445
+      AtlasBattle_74: 8063828668797370992
+      AtlasBattle_75: 5487323815491229954
+      AtlasBattle_76: -2688538548301525262
+      AtlasBattle_77: -255025500172823092
+      AtlasBattle_78: 3489400309381146311
+      AtlasBattle_79: 7811724751539293606
+      AtlasBattle_8: -5447531972116402302
+      AtlasBattle_80: 4787101729742793956
+      AtlasBattle_81: 2950822631097192861
+      AtlasBattle_82: -1054410496436671879
+      AtlasBattle_83: -9027979040432963214
+      AtlasBattle_84: -2196032267796858146
+      AtlasBattle_85: 8216634839297223299
+      AtlasBattle_86: -4775620320573029057
+      AtlasBattle_87: -1791608133995340451
+      AtlasBattle_88: -3367513762819184315
+      AtlasBattle_89: -7256093043917346412
+      AtlasBattle_9: 7526697383464526407
+      AtlasBattle_90: 8070931936426675848
+      AtlasBattle_91: 6541688067895785134
+      AtlasBattle_92: 1429574937984277358
+      AtlasBattle_93: 6104432769395053536
+      AtlasBattle_94: 8454256352680085437
+      AtlasBattle_95: -8146440796313503430
+      AtlasBattle_96: 6763315319992308791
+      AtlasBattle_97: -505890275828623322
+      AtlasBattle_98: -6390175934737461146
+      AtlasBattle_99: 2630282336483535109
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
