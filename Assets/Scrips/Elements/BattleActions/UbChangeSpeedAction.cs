@@ -88,7 +88,8 @@ namespace Elements
         UbAbnormalData ubAbnormalData = new UbAbnormalData
         {
           AbnormalState = abnormalStateDic[(eChangeSpeedType) ActionDetail1],
-          EffectTime = _valueDictionary[eValueNumber.VALUE_3],
+            Source = _source,
+            EffectTime = _valueDictionary[eValueNumber.VALUE_3],
           Value = _valueDictionary[eValueNumber.VALUE_1],
           Timer = _valueDictionary[eValueNumber.VALUE_5],
           //Effect = effect

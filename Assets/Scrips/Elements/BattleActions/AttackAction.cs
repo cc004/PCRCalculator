@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Elements.Battle;
+using PCRCaculator;
 using PCRCaculator.Guild;
 using UnityEngine;
 
@@ -99,6 +100,8 @@ namespace Elements
             DamageData damageData = createDamageData(_source, _target, _num, _valueDictionary, actionDetail1, _isCritical, _skill, eActionType.ATTACK,isPhysicalForTarget);
             if (!TotalDamageDictionary.ContainsKey(_target))
             {
+                bool isDamagedEnergyCalculationChanged = MainManager.Instance.PlayerSetting.tpCalculationChanged;
+
                 FloatWithEx num1 = 0;
                 List<CriticalData> criticalDataList = new List<CriticalData>();
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
@@ -126,7 +129,7 @@ namespace Elements
                         num2 = fix;
                     }
 
-                    criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
+                    criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
 
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
                     if (_valueDictionary[eValueNumber.VALUE_5] == (float) (index + 1))
@@ -147,6 +150,11 @@ namespace Elements
                     criticalData.ExpectedDamage *= 1f + criticalData.critVar * (2f * damageData.CriticalDamageRate - 1);
 
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage);
+
+                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.FloatToInt((float)criticalData.ExpectedDamageForEnergyCalc * 2f * damageData.CriticalDamageRate);
+
+                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.FloatToInt(criticalData.ExpectedDamageForEnergyCalc);
+
                     if (!damageData.IgnoreDef)
                     {
                         switch (damageData.DamageType)
@@ -157,6 +165,11 @@ namespace Elements
                                 criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f))).Floor();
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
 
+                                if (!isDamagedEnergyCalculationChanged)
+                                {
+                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num3 / (defZero + 100.0f))).Floor();
+                                }
+
                                 break;
                             case DamageData.eDamageType.MGC:
                                 var magicDefZero = damageData.Target.GetMagicDefZero();
@@ -164,7 +177,32 @@ namespace Elements
                                 criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
 
+                                if (!isDamagedEnergyCalculationChanged)
+                                {
+                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
+                                }
+
                                 break;
+                        }
+
+                        if (isDamagedEnergyCalculationChanged)
+                        {
+                            switch (damageData.DamageType)
+                            {
+                                case DamageData.eDamageType.ATK:
+                                    var defZero = damageData.Target.GetDefZeroForDamagedEnergy();
+                                    var num3 = (defZero - damageData.DefPenetrate).Max(0);
+                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num3 / (defZero + 100.0f))).Floor();
+
+                                    break;
+                                case DamageData.eDamageType.MGC:
+                                    var magicDefZero = damageData.Target.GetMagicDefZeroForDamagedEnergy();
+                                    var num4 = (magicDefZero - damageData.DefPenetrate).Max(0);
+
+                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
+
+                                    break;
+                            }
                         }
                     }
                     criticalData.CriticalRate = damageData.CriticalDamageRate;
@@ -180,6 +218,7 @@ namespace Elements
             damageData.critVar = CriticalDataDictionary[_target][_num].critVar;
             damageData.IsLogBarrierCritical = CriticalDataDictionary[_target][_num].IsCritical;
             damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage;
+            damageData.LogBarrierExpectedDamageForEnergyCalc = CriticalDataDictionary[_target][_num].ExpectedDamageForEnergyCalc;
             damageData.TotalDamageForLogBarrier = TotalDamageDictionary[_target];
             if (flag)
             {

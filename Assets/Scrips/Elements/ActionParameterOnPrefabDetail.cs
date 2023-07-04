@@ -18,5 +18,6 @@ namespace Elements
         public int ActionId;
         public List<NormalSkillEffect> ActionEffectList = new List<NormalSkillEffect>();
         public List<ActionExecTime> ExecTime { set; get; }
+        public List<NormalSkillEffect> ActionSubEffectList = new List<NormalSkillEffect>();
     }
 }

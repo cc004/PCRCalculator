@@ -166,8 +166,10 @@ namespace Elements
             {*/
             Atk = (int)(StartAtk = (int)data.baseData.Atk);
             Def = StartDef = (int)data.baseData.Def;
+            DefForDamagedEnergy = Def;
             MagicStr = (int)(StartMagicStr = (int)data.baseData.Magic_str);
             MagicDef = StartMagicDef = (int)data.baseData.Magic_def;
+            MagicDefForDamagedEnergy = MagicDef;
             PhysicalCritical = StartPhysicalCritical = (int)data.baseData.Physical_critical;
             MagicCritical = StartMagicCritical = (int)data.baseData.Magic_critical;
             Accuracy = (int)data.baseData.Accuracy;
@@ -287,7 +289,8 @@ namespace Elements
                         Atk = (int)(Atk + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
-                        Def = (int)((int)Def + _value);
+                        Def = (Def + _value).Floor();
+                        DefForDamagedEnergy = (DefForDamagedEnergy + _value).Floor();
                         string des = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 1, Def, BattleHeaderController.CurrentFrameCount, des);
                         break;
@@ -295,7 +298,8 @@ namespace Elements
                         MagicStr = (int)(MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
-                        MagicDef = (int)((int)MagicDef + _value);
+                        MagicDef = (MagicDef + _value).Floor();
+                        MagicDefForDamagedEnergy = (MagicDefForDamagedEnergy + _value).Floor();
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 2, MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
@@ -488,6 +492,20 @@ namespace Elements
             partsData.Owner.AppendCoroutine(partsData.updateChangeAttachment(partsData.ChangeAttachmentEndTime, false), ePauseType.SYSTEM, partsData.Owner);
             partsData.BreakPoint = partsData.MaxBreakPoint;
             partsData.OnBreakEnd.Call();
+        }
+        public override FloatWithEx GetDefZeroForDamagedEnergy()
+        {
+            return Mathf.Max(0, this.DefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+        }
+
+        private FloatWithEx DefForDamagedEnergy = 0;
+
+        // Token: 0x04003038 RID: 12344
+        private FloatWithEx MagicDefForDamagedEnergy = 0;
+
+        public override FloatWithEx GetMagicDefZeroForDamagedEnergy()
+        {
+            return Mathf.Max(0, this.MagicDefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
         }
     }
 }

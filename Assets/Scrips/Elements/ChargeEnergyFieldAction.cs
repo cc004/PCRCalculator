@@ -59,7 +59,12 @@ namespace Elements
 				UnitCtrl owner = base.TargetList[i].Owner;
 				if (!owner.IsDead && !((float)(long)owner.Hp <= 0f) && !list.Contains(owner))
 				{
-					owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, Value, ChargeType == eChargeType.INCREASE, base.PPOJKIDHGNJ);
+					var val = Value;
+					if (owner.IsAbnormalState(UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE) && val < 0f)
+					{
+						val *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
+					}
+					owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, val, ChargeType == eChargeType.INCREASE, base.PPOJKIDHGNJ);
 					list.Add(owner);
 				}
 			}

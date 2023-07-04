@@ -505,5 +505,14 @@ namespace Elements
 
             public Attachment AppliedAttachment { get; set; }
         }
+
+        public virtual FloatWithEx GetDefZeroForDamagedEnergy()
+        {
+            return this.Owner.DefZeroForDamagedEnergy;
+        }
+        public virtual FloatWithEx GetMagicDefZeroForDamagedEnergy()
+        {
+            return this.Owner.MagicDefZeroForDamagedEnergy;
+        }
     }
 }

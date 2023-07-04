@@ -36,6 +36,12 @@ namespace Elements.Battle
         {
             ++skillTargetCacheKey;
         }
+        public int CJJBDIJPHJE { get; set; } // ChangeSpeedOverwriteFieldCounter
+        public void AddChangeSpeedOverwriteFieldCounter()
+        {
+            int changeSpeedOverwriteFieldCounter = this.CJJBDIJPHJE;
+            this.CJJBDIJPHJE = changeSpeedOverwriteFieldCounter + 1;
+        }
 
         public ScriptManager scriptMgr;
         public static int randomCounter;

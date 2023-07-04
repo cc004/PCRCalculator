@@ -21,6 +21,7 @@ namespace Elements
     public bool IsLogBarrierCritical { get; set; }
 
     public FloatWithEx LogBarrierExpectedDamage { get; set; }
+        public FloatWithEx LogBarrierExpectedDamageForEnergyCalc { get; set; }
 
     public FloatWithEx Damage { get; set; }
 

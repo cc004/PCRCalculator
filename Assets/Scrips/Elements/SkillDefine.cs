@@ -306,298 +306,297 @@ namespace Elements
     };
         public static readonly Dictionary<eActionType, Type> SkillActionTypeDictionary = new Dictionary<eActionType, Type>
         {
-      {
-        eActionType.ATTACK,
-        typeof (AttackAction)
-      },
-      {
-        eActionType.MOVE,
-        typeof (MoveAction)
-      },
-      {
-        eActionType.KNOCK,
-        typeof (KnockAction)
-      },
-      {
-        eActionType.HEAL,
-        typeof (HealAction)
-      },
-      {
-        eActionType.CURE,
-        typeof (CureAction)
-      },
-      {
-        eActionType.BARRIER,
-        typeof (BarrierAction)
-      },
-      {
-        eActionType.REFLEXIVE,
-        typeof (ActionParameter)
-      },
-      {
-        eActionType.CHANGE_SPEED,
-        typeof (ChangeSpeedAction)
-      },
-      {
-        eActionType.SLIP_DAMAGE,
-        typeof (SlipDamageAction)
-      },
-      {
-        eActionType.BUFF_DEBUFF,
-        typeof (BuffDebuffAction)
-      },
-      {
-        eActionType.CHARM,
-        typeof (CharmAction)
-      },
-      {
-        eActionType.BLIND,
-        typeof (BlindAction)
-      },
-      {
-        eActionType.SILENCE,
-        typeof (SilenceAction)
-      },
-      {
-        eActionType.MODE_CHANGE,
-        typeof (ModeChangeAction)
-      },
-      {
-        eActionType.SUMMON,
-        typeof (SummonAction)
-      },
-      {
-        eActionType.CHARGE_ENERGY,
-        typeof (ChargeEnergyAction)
-      },
-      {
-        eActionType.TRIGER,
-        typeof (TriggerAction)
-      },
-      {
-        eActionType.DAMAGE_CHARGE,
-        typeof (DamageChargeAction)
-      },
-      {
-        eActionType.CHARGE,
-        typeof (ChargeAction)
-      },
-      {
-        eActionType.DECOY,
-        typeof (DecoyAction)
-      },
-      {
-        eActionType.NO_DAMAGE,
-        typeof (NoDamageAction)
-      },
-      {
-        eActionType.CHANGE_PATTERN,
-        typeof (ChangePatternAction)
-      },
-      {
-        eActionType.IF_FOR_CHILDREN,
-        typeof (IfForChildlenAction)
-      },
-      {
-        eActionType.REVIVAL,
-        typeof (RevivalAction)
-      },
-      {
-        eActionType.CONTINUOUS_ATTACK,
-        typeof (ContinuousAttackAction)
-      },
-      {
-        eActionType.GIVE_VALUE_AS_ADDITIVE,
-        typeof (GiveValueAdditiveAction)
-      },
-      {
-        eActionType.GIVE_VALUE_AS_MULTIPLE,
-        typeof (GiveValueMultipleAction)
-      },
-      {
-        eActionType.IF_FOR_ALL,
-        typeof (IfForAllAction)
-      },
-      {
-        eActionType.SEARCH_AREA_CHANGE,
-        typeof (SearchAreaChangeAction)
-      },
-      {
-        eActionType.DESTROY,
-        typeof (DestroyAction)
-      },
-      {
-        eActionType.CONTINUOUS_ATTACK_NEARBY,
-        typeof (ContinuousAttackNearByAction)
-      },
-      {
-        eActionType.ENCHANT_LIFE_STEAL,
-        typeof (EnchantLifeStealAction)
-      },
-      {
-        eActionType.ENCHANT_STRIKE_BACK,
-        typeof (EnchantStrikeBackAction)
-      },
-      {
-        eActionType.ACCUMULATIVE_DAMAGE,
-        typeof (AccumulativeDamageAction)
-      },
-      {
-        eActionType.SEAL,
-        typeof (SealAction)
-      },
-      {
-        eActionType.ATTACK_FIELD,
-        typeof (AttackFieldAction)
-      },
-      {
-        eActionType.HEAL_FIELD,
-        typeof (HealFieldAction)
-      },
-      {
-        eActionType.CHANGE_PARAMETER_FIELD,
-        typeof (ChangeParameterFieldAction)
-      },
-      {
+            {
+                eActionType.ATTACK,
+                typeof(AttackAction)
+            },
+            {
+                eActionType.MOVE,
+                typeof(MoveAction)
+            },
+            {
+                eActionType.KNOCK,
+                typeof(KnockAction)
+            },
+            {
+                eActionType.HEAL,
+                typeof(HealAction)
+            },
+            {
+                eActionType.CURE,
+                typeof(CureAction)
+            },
+            {
+                eActionType.BARRIER,
+                typeof(BarrierAction)
+            },
+            {
+                eActionType.REFLEXIVE,
+                typeof(ActionParameter)
+            },
+            {
+                eActionType.CHANGE_SPEED,
+                typeof(ChangeSpeedAction)
+            },
+            {
+                eActionType.SLIP_DAMAGE,
+                typeof(SlipDamageAction)
+            },
+            {
+                eActionType.BUFF_DEBUFF,
+                typeof(BuffDebuffAction)
+            },
+            {
+                eActionType.CHARM,
+                typeof(CharmAction)
+            },
+            {
+                eActionType.BLIND,
+                typeof(BlindAction)
+            },
+            {
+                eActionType.SILENCE,
+                typeof(SilenceAction)
+            },
+            {
+                eActionType.MODE_CHANGE,
+                typeof(ModeChangeAction)
+            },
+            {
+                eActionType.SUMMON,
+                typeof(SummonAction)
+            },
+            {
+                eActionType.CHARGE_ENERGY,
+                typeof(ChargeEnergyAction)
+            },
+            {
+                eActionType.TRIGER,
+                typeof(TriggerAction)
+            },
+            {
+                eActionType.DAMAGE_CHARGE,
+                typeof(DamageChargeAction)
+            },
+            {
+                eActionType.CHARGE,
+                typeof(ChargeAction)
+            },
+            {
+                eActionType.DECOY,
+                typeof(DecoyAction)
+            },
+            {
+                eActionType.NO_DAMAGE,
+                typeof(NoDamageAction)
+            },
+            {
+                eActionType.CHANGE_PATTERN,
+                typeof(ChangePatternAction)
+            },
+            {
+                eActionType.IF_FOR_CHILDREN,
+                typeof(IfForChildlenAction)
+            },
+            {
+                eActionType.REVIVAL,
+                typeof(RevivalAction)
+            },
+            {
+                eActionType.CONTINUOUS_ATTACK,
+                typeof(ContinuousAttackAction)
+            },
+            {
+                eActionType.GIVE_VALUE_AS_ADDITIVE,
+                typeof(GiveValueAdditiveAction)
+            },
+            {
+                eActionType.GIVE_VALUE_AS_MULTIPLE,
+                typeof(GiveValueMultipleAction)
+            },
+            {
+                eActionType.IF_FOR_ALL,
+                typeof(IfForAllAction)
+            },
+            {
+                eActionType.SEARCH_AREA_CHANGE,
+                typeof(SearchAreaChangeAction)
+            },
+            {
+                eActionType.DESTROY,
+                typeof(DestroyAction)
+            },
+            {
+                eActionType.CONTINUOUS_ATTACK_NEARBY,
+                typeof(ContinuousAttackNearByAction)
+            },
+            {
+                eActionType.ENCHANT_LIFE_STEAL,
+                typeof(EnchantLifeStealAction)
+            },
+            {
+                eActionType.ENCHANT_STRIKE_BACK,
+                typeof(EnchantStrikeBackAction)
+            },
+            {
+                eActionType.ACCUMULATIVE_DAMAGE,
+                typeof(AccumulativeDamageAction)
+            },
+            {
+                eActionType.SEAL,
+                typeof(SealAction)
+            },
+            {
+                eActionType.ATTACK_FIELD,
+                typeof(AttackFieldAction)
+            },
+            {
                 eActionType.ABNORMAL_STATE_FIELD,
                 typeof(AbnormalStateFieldAction)
             },
-      {
-        eActionType.UB_CHANGE_TIME,
-        typeof (UbChangeSpeedAction)
-      },
-      {
-        eActionType.LOOP_TRIGGER,
-        typeof (LoopTriggerAction)
-      },
-      {
-        eActionType.IF_HAS_TARGET,
-        typeof (IfHasTargetAction)
-      },
-      {
-        eActionType.WAVE_START_IDLE,
-        typeof (WaveStartIdleAction)
-      },
-      {
-        eActionType.SKILL_EXEC_COUNT,
-        typeof (SkillExecCountAction)
-      },
-      {
-        eActionType.RATIO_DAMAGE,
-        typeof (RatioDamageAction)
-      },
-      {
-        eActionType.UPPER_LIMIT_ATTACK,
-        typeof (UpperLimitAttackAction)
-      },
-      {
-        eActionType.REGENERATION,
-        typeof (RegenerationAction)
-      },
-      {
-        eActionType.BUFF_DEBUFF_CLEAR,
-        typeof (BuffDebuffClearAction)
-      },
-      {
-        eActionType.LOOP_MOTION_BUFF_DEBUFF,
-        typeof (LoopMotionBuffDebuffAction)
-      },
-      {
-        eActionType.DIVISION,
-        typeof (DivisionAction)
-      },
-      {
-        eActionType.CHANGE_BODY_WIDTH,
-        typeof (ChangeBodyWidthAction)
-      },
-      {
-        eActionType.IF_EXISTS_FIELD_FOR_ALL,
-        typeof (IfExistsFieldForAllAction)
-      },
-      {
-        eActionType.STEALTH,
-        typeof (StealthAction)
-      },
-      
-      {
-        eActionType.MOVE_PARTS,
-        typeof (MovePartsAction)
-      },
-      {
-        eActionType.COUNT_BLIND,
-        typeof (CountBlindAction)
-      },
-      {
-        eActionType.COUNT_DOWN,
-        typeof (CountDownAction)
-      },
-      {
-        eActionType.STOP_FIELD,
-        typeof (StopFieldAction)
-      },
-      {
-        eActionType.INHIBIT_HEAL,
-        typeof (InhibitHealAction)
-      },
-      {
-        eActionType.ATTACK_SEAL,
-        typeof (AttackSealAction)
-      },
-      {
-        eActionType.FEAR,
-        typeof (FearAction)
-      },
-      {
-        eActionType.AWE,
-        typeof (AweAction)
-      },
-      {
-        eActionType.TOAD,
-        typeof (ToadAction)
-      },
-      {
-        eActionType.LOOP_MOTION_REPEAT,
-        typeof (LoopMotionRepeatAction)
-      },
-      {
-        eActionType.FORCE_HP_CHANGE,
-        typeof (ForceHpChangeAction)
-      },
-      {
-        eActionType.KNGHT_GUARD,
-        typeof (KnightGuardAction)
-      },
-      {
-        eActionType.DAMAGE_CUT,
-        typeof (DamageCutAction)
-      },
-      {
-        eActionType.LOG_BARRIER,
-        typeof (LogBarrierAction)
-      },
-      {
-        eActionType.GIVE_VALUE_AS_DIVIDE,
-        typeof (GiveValueDivideAction)
-      },
-      {
-        eActionType.ACTION_BY_HIT_COUNT,
-        typeof (ActionByHitCountAction)
-      },
-      {
-        eActionType.HEAL_DOWN,
-        typeof (HealDownAction)
-      },
-      {
-        eActionType.PASSIVE_SEAL,
-        typeof (PassiveSealAction)
-      },
-      {
-        eActionType.PASSIVE_DAMAGE_UP,
-        typeof (PassiveDamageUpAction)
-      },
-      {
-        eActionType.DAMAGE_BY_ATTACK,
-        typeof(DamageByBehaviourAction)
+            {
+                eActionType.HEAL_FIELD,
+                typeof(HealFieldAction)
+            },
+            {
+                eActionType.CHANGE_PARAMETER_FIELD,
+                typeof(ChangeParameterFieldAction)
+            },
+            {
+                eActionType.UB_CHANGE_TIME,
+                typeof(UbChangeSpeedAction)
+            },
+            {
+                eActionType.LOOP_TRIGGER,
+                typeof(LoopTriggerAction)
+            },
+            {
+                eActionType.IF_HAS_TARGET,
+                typeof(IfHasTargetAction)
+            },
+            {
+                eActionType.WAVE_START_IDLE,
+                typeof(WaveStartIdleAction)
+            },
+            {
+                eActionType.SKILL_EXEC_COUNT,
+                typeof(SkillExecCountAction)
+            },
+            {
+                eActionType.RATIO_DAMAGE,
+                typeof(RatioDamageAction)
+            },
+            {
+                eActionType.UPPER_LIMIT_ATTACK,
+                typeof(UpperLimitAttackAction)
+            },
+            {
+                eActionType.REGENERATION,
+                typeof(RegenerationAction)
+            },
+            {
+                eActionType.BUFF_DEBUFF_CLEAR,
+                typeof(BuffDebuffClearAction)
+            },
+            {
+                eActionType.LOOP_MOTION_BUFF_DEBUFF,
+                typeof(LoopMotionBuffDebuffAction)
+            },
+            {
+                eActionType.DIVISION,
+                typeof(DivisionAction)
+            },
+            {
+                eActionType.IF_EXISTS_FIELD_FOR_ALL,
+                typeof(IfExistsFieldForAllAction)
+            },
+            {
+                eActionType.STEALTH,
+                typeof(StealthAction)
+            },
+            {
+                eActionType.COUNT_DOWN,
+                typeof(CountDownAction)
+            },
+            {
+                eActionType.MOVE_PARTS,
+                typeof(MovePartsAction)
+            },
+            {
+                eActionType.COUNT_BLIND,
+                typeof(CountBlindAction)
+            },
+            {
+                eActionType.CHANGE_BODY_WIDTH,
+                typeof(ChangeBodyWidthAction)
+            },
+            {
+                eActionType.STOP_FIELD,
+                typeof(StopFieldAction)
+            },
+            {
+                eActionType.INHIBIT_HEAL,
+                typeof(InhibitHealAction)
+            },
+            {
+                eActionType.ATTACK_SEAL,
+                typeof(AttackSealAction)
+            },
+            {
+                eActionType.FEAR,
+                typeof(FearAction)
+            },
+            {
+                eActionType.AWE,
+                typeof(AweAction)
+            },
+            {
+                eActionType.TOAD,
+                typeof(ToadAction)
+            },
+            {
+                eActionType.LOOP_MOTION_REPEAT,
+                typeof(LoopMotionRepeatAction)
+            },
+            {
+                eActionType.FORCE_HP_CHANGE,
+                typeof(ForceHpChangeAction)
+            },
+            {
+                eActionType.KNGHT_GUARD,
+                typeof(KnightGuardAction)
+            },
+            {
+                eActionType.DAMAGE_CUT,
+                typeof(DamageCutAction)
+            },
+            {
+                eActionType.LOG_BARRIER,
+                typeof(LogBarrierAction)
+            },
+            {
+                eActionType.GIVE_VALUE_AS_DIVIDE,
+                typeof(GiveValueDivideAction)
+            },
+            {
+                eActionType.ACTION_BY_HIT_COUNT,
+                typeof(ActionByHitCountAction)
+            },
+            {
+                eActionType.HEAL_DOWN,
+                typeof(HealDownAction)
+            },
+            {
+                eActionType.PASSIVE_SEAL,
+                typeof(PassiveSealAction)
+            },
+            {
+                eActionType.PASSIVE_DAMAGE_UP,
+                typeof(PassiveDamageUpAction)
+            },
+            {
+                eActionType.DAMAGE_BY_ATTACK,
+                typeof(DamageByBehaviourAction)
             },
             {
                 eActionType.SPECIAL_IDLE,
@@ -612,17 +611,17 @@ namespace Elements
                 typeof(DamageLimitAction)
             },
             {
-        eActionType.PASSIVE,
-        typeof (ActionParameter)
-      },
-      {
-        eActionType.CHANGE_ENERGY_RECOVERY_RATIO_BY_DAMAGE,
-        typeof (ChangeEnergyRecoveryRatioByDamage)
-      },
-      {
-        eActionType.IGNORE_DECOY,
-        typeof (IgnoreDecoyAction)
-      },
+                eActionType.PASSIVE,
+                typeof(ActionParameter)
+            },
+            {
+                eActionType.CHANGE_ENERGY_RECOVERY_RATIO_BY_DAMAGE,
+                typeof(ChangeEnergyRecoveryRatioByDamage)
+            },
+            {
+                eActionType.IGNORE_DECOY,
+                typeof(IgnoreDecoyAction)
+            },
             {
                 eActionType.CHANGE_SPEED_OVERLAP,
                 typeof(ChangeSpeedOverlapAction)
@@ -636,12 +635,32 @@ namespace Elements
                 typeof(SpyAction)
             },
             {
+                eActionType.EX_START_PASSIVE,
+                typeof(ActionParameter)
+            },
+            {
+                eActionType.EX_CONDITION_PASSIVE,
+                typeof(ActionParameter)
+            },
+            {
                 eActionType.CHARGE_ENERGY_FIELD,
                 typeof(ChargeEnergyFieldAction)
             },
             {
                 eActionType.CHARGE_ENERGY_BY_DAMAGE,
                 typeof(ChargeEnergyByDamage)
+            },
+            {
+                eActionType.ENERGY_DAMAGE_REDUCE,
+                typeof(EnergyDamageReduceAction)
+            },
+            {
+                eActionType.CHANGE_SPEED_OVERWRITE_FIELD,
+                typeof(ChangeSpeedOverwriteFieldAction)
+            },
+            {
+                eActionType.UNABLE_STATE_GUARD,
+                typeof(UnableStateGuardAction)
             }
         };
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()

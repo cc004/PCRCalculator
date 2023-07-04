@@ -13,8 +13,9 @@ using UnityEngine;
 namespace Elements
 {
   public class ActionParameter : ISingletonField
-  {
-    public ActionParameter oppositeAction;
+    {
+        public List<NormalSkillEffect> ActionSubEffectList { get; set; }
+        public ActionParameter oppositeAction;
     /// <summary>
     /// 1 when the if for all action turns to the other action
     /// null means no other action

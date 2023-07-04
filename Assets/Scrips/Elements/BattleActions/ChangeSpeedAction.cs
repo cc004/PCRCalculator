@@ -98,6 +98,11 @@ namespace Elements
                 action($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
                 return;
             }
+            else if (_target.Owner.OverwriteSpeedDataCount > 0)
+            {
+                action($"存在强制速度改变，技能{actionDetail.GetDescription()}无效！");
+                return;
+            }
 
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
             float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 6, (float)pp));
@@ -106,10 +111,22 @@ namespace Elements
             {
                 num = 1 - fix;
             }
-            if (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || TargetAssignment == eTargetAssignment.OWNER_SITE)
+            UnitCtrl.eAbnormalState abnormalState = ChangeSpeedAction.AbnormalStateDic[(ChangeSpeedAction.eChangeSpeedType)base.ActionDetail1];
+            UnitCtrl owner = _target.Owner;
+            var flag = false;
+            SealData unableStateGuardData = owner.UnableStateGuardData;
+            if (_source.IsOther != owner.IsOther && ChangeSpeedAction.IsUnableAbnormalState(abnormalState) && unableStateGuardData != null && unableStateGuardData.GetCurrentCount() > 0 && !owner.IsNoDamageMotion() && !owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_ABNORMAL))
+            {
+                if (unableStateGuardData.DisplayCount)
+                {
+                    unableStateGuardData.RemoveSeal(1, true);
+                }
+                flag = true;
+            }
+            if (!flag && (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || TargetAssignment == eTargetAssignment.OWNER_SITE))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
-                UnitCtrl.eAbnormalState abnormalState = AbnormalStateDic[(eChangeSpeedType)ActionDetail1];
+                UnitCtrl.eAbnormalState abnormalState2 = AbnormalStateDic[(eChangeSpeedType)ActionDetail1];
                 /*if (abnormalState == UnitCtrl.eAbnormalState.HASTE)
                 {
                     UnitCtrl owner = _target.Owner;
@@ -120,7 +137,7 @@ namespace Elements
                     owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.5f, skillId, _source1, true, eEffectType.COMMON, true, false);
                 }*/
                 float num2 = _valueDictionary[eValueNumber.VALUE_1];
-                if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(num2 + _target.Owner.CalcAbnormalStateSpeed(), 1f))
+                if (abnormalState2 == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(num2 + _target.Owner.CalcAbnormalStateSpeed(), 1f))
                 {
                     _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
                     {
@@ -208,7 +225,35 @@ namespace Elements
                 action("MISS");
             }
         }
-
+        public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
+        {
+            if (_state <= UnitCtrl.eAbnormalState.FAINT)
+            {
+                if (_state <= UnitCtrl.eAbnormalState.DETAIN)
+                {
+                    if (_state - UnitCtrl.eAbnormalState.PARALYSIS > 1 && _state - UnitCtrl.eAbnormalState.CHAINED > 3)
+                    {
+                        return false;
+                    }
+                }
+                else if (_state != UnitCtrl.eAbnormalState.STONE && _state != UnitCtrl.eAbnormalState.FAINT)
+                {
+                    return false;
+                }
+            }
+            else if (_state <= UnitCtrl.eAbnormalState.NPC_STUN)
+            {
+                if (_state != UnitCtrl.eAbnormalState.PAUSE_ACTION && _state != UnitCtrl.eAbnormalState.NPC_STUN)
+                {
+                    return false;
+                }
+            }
+            else if (_state != UnitCtrl.eAbnormalState.CRYSTALIZE && _state != UnitCtrl.eAbnormalState.STUN2)
+            {
+                return false;
+            }
+            return true;
+        }
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);

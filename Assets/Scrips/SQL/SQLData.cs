@@ -344,6 +344,12 @@ namespace PCRCaculator.SQL
             };
         }
     }
+    public class equipment_enhance_data
+    {
+        public int promotion_level { get; set; }
+        public int equipment_enhance_level { get; set; }
+    }
+
     public class equipment_data : DbBaseData
     {
         [PrimaryKey]

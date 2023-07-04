@@ -48,11 +48,78 @@ namespace Elements
         public const int DIE_MOTION1 = 1;
         public const int MODE_CHANGE1 = 1;
         private static readonly Color32 DAMAGE_FLASH_COLOR_32 = new Color32(byte.MaxValue, 60, 30, byte.MaxValue);
+        // Token: 0x060038DD RID: 14557 RVA: 0x000E7B64 File Offset: 0x000E7B64
+        private Dictionary<int, OverwriteAbnormalStateData> overwriteSpeedData = new Dictionary<int, OverwriteAbnormalStateData>();
+        public void AddOverwriteAbnormalState(int _counter, OverwriteAbnormalStateData _data)
+        {
+            this.overwriteSpeedData.Add(_counter, _data);
+            int num = this.overwriteSpeedData.Keys.Max();
+            if (_counter != num)
+            {
+                return;
+            }
+            this.activeOverwriteAbnormalState(_data);
+        }
+        public void RemoveOverwriteAbnormalState(int _counter)
+        {
+            Dictionary<int, OverwriteAbnormalStateData>.KeyCollection keys = this.overwriteSpeedData.Keys;
+            if (keys.Count == 0)
+            {
+                return;
+            }
+            int num = keys.Max();
+            OverwriteAbnormalStateData overwriteAbnormalStateData = this.overwriteSpeedData[_counter];
+            this.overwriteSpeedData.Remove(_counter);
+            if (_counter != num)
+            {
+                return;
+            }
+            if (this.OverwriteSpeedDataCount == 0)
+            {
+                UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(overwriteAbnormalStateData.AbnormalState);
+                this.DisableAbnormalStateById(abnormalState, overwriteAbnormalStateData.ActionParameter.ActionId, false);
+                this.updateEffectForSpeedAbnormalState(false);
+                return;
+            }
+            num = this.overwriteSpeedData.Keys.Max();
+            this.activeOverwriteAbnormalState(this.overwriteSpeedData[num]);
+        }
+        // Token: 0x060038DF RID: 14559 RVA: 0x000E7C38 File Offset: 0x000E7C38
+        private void activeOverwriteAbnormalState(OverwriteAbnormalStateData _data)
+        {
+            UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
+            this.SetAbnormalState(_data.Source, abnormalState, 9999f, _data.ActionParameter, _data.Skill, _data.EffectValue, 0f, false, false, 1f, true);
+            if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(this.CalcAbnormalStateSpeed(), 1f))
+            {
+                this.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
+                {
+                    {
+                        _data.TargetParts,
+                        0
+                    }
+                }, 0.5f, _data.Skill.SkillId, _data.Source, true, eEffectType.COMMON, true, false, false, 0);
+            }
+            this.updateEffectForSpeedAbnormalState(true);
+        }
+
         private static readonly Color DAMAGE_FLASH_COLOR = DAMAGE_FLASH_COLOR_32;
         public const int DAMAGE_FLASH_FRAME = 4;
         public const int FLASH_DELAY_FRAME = 0;
         private const float SORT_OFFSET_RESET_TIME = 0.6f;
         private const int ATTACK_PATTERN_TYPE_DIGIT = 1000;
+        public static UnitCtrl.eAbnormalState GetAbnormalState(UnitCtrl.eOverwriteAbnormalState _abnormalState)
+        {
+            if (_abnormalState == UnitCtrl.eOverwriteAbnormalState.SLOW)
+            {
+                return UnitCtrl.eAbnormalState.SLOW;
+            }
+            if (_abnormalState != UnitCtrl.eOverwriteAbnormalState.HASTE)
+            {
+                return UnitCtrl.eAbnormalState.NONE;
+            }
+            return UnitCtrl.eAbnormalState.HASTE;
+        }
+
         private const int SUMMON_LOOP_MOTION_SUFFIX = 1;
         private const int SUMMON_LOOP_END_MOTION_SUFFIX = 2;
         private const float VOICE_FADE_DURATION = 0.3f;
@@ -692,47 +759,77 @@ namespace Elements
                     IconType = eStateIconType.SPY,
                     IsBuff = true
                 }
+            },
+            {
+                UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.ENERGY_DAMAGE_REDUCE,
+                    IsBuff = true
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.BLACK_FRAME,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.BLACK_FRAME,
+                    IsBuff = false
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.UNABLE_STATE_GUARD,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.BLACK_FRAME,
+                    IsBuff = true
+                }
             }
         };
-        private Dictionary<eAbnormalStateCategory, int> slipDamageIdDictionary = new Dictionary<eAbnormalStateCategory, int>
+
+        // Token: 0x040026C0 RID: 9920
+        private Dictionary<UnitCtrl.eAbnormalStateCategory, int> slipDamageIdDictionary = new Dictionary<UnitCtrl.eAbnormalStateCategory, int>
         {
-      {
-        eAbnormalStateCategory.POISON,
-        0
-      },
-      {
-        eAbnormalStateCategory.CURSE,
-        0
-      },
-      {
-        eAbnormalStateCategory.BURN,
-        0
-      },
-      {
-        eAbnormalStateCategory.NO_EFFECT_SLIP_DAMAGE,
-        0
-      },
-      {
-        eAbnormalStateCategory.VENOM,
-        0
-      },
-      {
-        eAbnormalStateCategory.HEX,
-        0
-      },
-      {
-                eAbnormalStateCategory.COMPENSATION,
+            {
+                UnitCtrl.eAbnormalStateCategory.POISON,
                 0
             },
             {
-                eAbnormalStateCategory.POISON2,
+                UnitCtrl.eAbnormalStateCategory.CURSE,
                 0
             },
             {
-                eAbnormalStateCategory.CURSE2,
+                UnitCtrl.eAbnormalStateCategory.BURN,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.NO_EFFECT_SLIP_DAMAGE,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.VENOM,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.HEX,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.COMPENSATION,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.POISON2,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.CURSE2,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.BLACK_FRAME,
                 0
             }
-    };
+        };
 
         public Dictionary<eAbnormalState, Action<bool>> damageByBehaviourDictionary = new Dictionary<eAbnormalState, Action<bool>>();
 
@@ -2223,6 +2320,7 @@ this.updateCurColor();
             //UnitData uniqueData = _data.UniqueData;
             BaseData baseData = new BaseData();
             BaseData baseDataEX = new BaseData();
+            BaseData baseDataForEnergyCalc = new BaseData();
             var enemy = MyGameCtrl.Instance.tempData.guildEnemy.FirstOrDefault(e => e.unit_id == this.UnitId);
             if (enemy != null)
             {
@@ -2232,6 +2330,7 @@ this.updateCurColor();
             {
                 baseData = MainManager.Instance.UnitRarityDic[UnitId].GetBaseData(unitData_my);//,MyGameCtrl.Instance.tempData.isGuildBattle);
                 baseDataEX = MainManager.Instance.UnitRarityDic[UnitId].GetEXSkillValue(unitData_my);//,MyGameCtrl.Instance.tempData.isGuildBattle);
+                baseDataForEnergyCalc = MainManager.Instance.UnitRarityDic[UnitId].GetBaseDataForEnergyCalc(unitData_my);
             }
             else
             {
@@ -2253,6 +2352,15 @@ this.updateCurColor();
             StartMagicDef = Mathf.RoundToInt(baseData.Magic_def);
 
             var baseHp = Mathf.RoundToInt(baseData.Hp);
+            DefForDamagedEnergy = StartDef;
+            MagicDefForDamagedEnergy = StartMagicDef;
+
+            if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
+            {
+                baseHp = baseDataForEnergyCalc.RealHp;
+                DefForDamagedEnergy = (int)baseDataForEnergyCalc.Def;
+                MagicDefForDamagedEnergy = (int)baseDataForEnergyCalc.Magic_def;
+            }
 
             baseData += baseDataEX;
 
@@ -3822,6 +3930,12 @@ this.updateCurColor();
                 case eAbnormalState.SPY:
                     result = eAbnormalStateCategory.SPY;
                     break;
+                case UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE:
+                    result = UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE;
+                    break;
+                case UnitCtrl.eAbnormalState.BLACK_FRAME:
+                    result = UnitCtrl.eAbnormalStateCategory.BLACK_FRAME;
+                    break;
             }
             return result;
         }
@@ -5214,6 +5328,13 @@ this.updateCurColor();
             }
             return true;
         }
+        public int OverwriteSpeedDataCount
+        {
+            get
+            {
+                return this.overwriteSpeedData.Count;
+            }
+        }
         public void CureAllAbnormalState()
         {
             for (eAbnormalState eAbnormalState = eAbnormalState.GUARD_ATK; eAbnormalState < eAbnormalState.NUM; ++eAbnormalState)
@@ -5224,10 +5345,16 @@ this.updateCurColor();
             overlapAbnormalStateIndexList[eAbnormalState.SLOW_OVERLAP].Clear();
             overlapAbnormalStateIndexList[eAbnormalState.HASTE_OVERLAP].Clear();
             damageByBehaviourDictionary.Clear();
+            this.overwriteSpeedData.Clear();
             foreach (eStateIconType key in ChargeEnergyByReceiveDamageDictionary.Keys)
             {
                 SealData sealData = SealDictionary[key];
                 sealData.RemoveSeal(sealData.Count, _isPassiveSeal: true);
+            }
+            SealData unableStateGuardData = this.UnableStateGuardData;
+            if (unableStateGuardData != null)
+            {
+                unableStateGuardData.RemoveSeal(this.UnableStateGuardData.Count, true);
             }
             ChargeEnergyByReceiveDamageDictionary.Clear();
 
@@ -7526,22 +7653,31 @@ this.updateCurColor();
                 else if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
                     flag1 = true;
             }
+
+            FloatWithEx b = a;
+
             if (flag1)
+            {
                 a = _damageData.LogBarrierExpectedDamage;
+                b = _damageData.LogBarrierExpectedDamageForEnergyCalc;
+            }
             if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.CUT_ATK_DAMAGE))
             {
                 float num2 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_ATK_DAMAGE) / 100f;
                 a *= 1f - num2;
+                b *= 1f - num2;
             }
             else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.CUT_MGC_DAMAGE))
             {
                 float num2 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_MGC_DAMAGE) / 100f;
                 a *= 1f - num2;
+                b *= 1f - num2;
             }
             if (IsAbnormalState(eAbnormalState.CUT_ALL_DAMAGE))
             {
                 float num2 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_ALL_DAMAGE) / 100f;
                 a *= 1f - num2;
+                b *= 1f - num2;
             }
 
             float execBarrier(float total, float main, float sub)
@@ -7557,22 +7693,28 @@ this.updateCurColor();
                 {
                     float abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                     float abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
-                    a *= _damageData.TotalDamageForLogBarrier.Select(x =>
+                    var t = _damageData.TotalDamageForLogBarrier.Select(x =>
                         execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                    a *= t;
+                    b *= t;
                 }
                 else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
                 {
                     float abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                     float abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
-                    a *= _damageData.TotalDamageForLogBarrier.Select(x =>
+                    var t = _damageData.TotalDamageForLogBarrier.Select(x =>
                         execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                    a *= t;
+                    b *= t;
                 }
                 if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
                 {
                     float abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                     float abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
-                    a *= _damageData.TotalDamageForLogBarrier.Select(x =>
+                    var t = _damageData.TotalDamageForLogBarrier.Select(x =>
                         execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                    a *= t;
+                    b *= t;
                 }
             }
             Tuple<StrikeBackData, List<StrikeBackData>> tuple = searchStrikeBack(_damageData);
@@ -7596,6 +7738,22 @@ this.updateCurColor();
                         var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
                         a *= (1.0f - num4 / (magicDefZero + 100.0f));
                         break;
+                }
+                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
+                {
+                    switch (_damageData.DamageType)
+                    {
+                        case DamageData.eDamageType.ATK:
+                            var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
+                            var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                            b *= (1.0f - num3 / (defZero + 100.0f));
+                            break;
+                        case DamageData.eDamageType.MGC:
+                            var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
+                            var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                            b *= (1.0f - num4 / (magicDefZero + 100.0f));
+                            break;
+                    }
                 }
             }
 
@@ -7672,8 +7830,18 @@ this.updateCurColor();
             if (_skill != null && _damageData.ActionType == eActionType.ATTACK)
                 num5 *= _skill.AweValue;
             if (_energyAdd)
+            {
+                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
+                {
+                    float energy = BattleUtil.FloatToInt(b * (float)(skillStackValDmg * 1000.0)) / 1000f;
+                    // XXX: 这里删除了slipdamage项，因为其似乎是对受击tp限制的废弃案
+                    ChargeEnergy(eSetEnergyType.BY_SET_DAMAGE, energy, false, this, false, eEffectType.COMMON, true, false, _energyChargeMultiple);
+                }
+                else
                 ChargeEnergy(eSetEnergyType.BY_SET_DAMAGE, num5 * (float)skillStackValDmg, _source: this, _hasNumberEffect: false, _multipleValue: _energyChargeMultiple);
-            if ((double)num5 <= 0.0 && _damageData.ActionType == eActionType.FORCE_HP_CHANGE)
+            }
+
+            if (num5 <= 0.0 && _damageData.ActionType == eActionType.FORCE_HP_CHANGE)
             {
                 if (!battleManager.skipping)
                     createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.FloatToInt(num5));
@@ -11553,6 +11721,30 @@ this.updateCurColor();
         public float Mid => transformCache.position.x / lossyx;
         public float Right => Mid + BodyWidth / 2;
         public float Left => Mid - BodyWidth / 2;
+
+        public FloatWithEx DefForDamagedEnergy;
+        public FloatWithEx MagicDefForDamagedEnergy;
+
+        public FloatWithEx DefZeroForDamagedEnergy
+        {
+            get
+            {
+                return (Mathf.Max(0, this.DefForDamagedEnergy) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.DEF)).Floor();
+            }
+        }
+
+        // Token: 0x17000BE4 RID: 3044
+        // (get) Token: 0x0600386C RID: 14444 RVA: 0x000E3170 File Offset: 0x000E3170
+        public FloatWithEx MagicDefZeroForDamagedEnergy
+        {
+            get
+            {
+                return (Mathf.Max(0, this.MagicDefForDamagedEnergy) + this.getAdditionalBuffDictionary(UnitCtrl.BuffParamKind.MAGIC_DEF)).Floor();
+            }
+        }
+
+        public SealData UnableStateGuardData;
+
         public string GetInfo()
         {
             if (infoGetter == null) RebuildInfoGetter();
@@ -11729,7 +11921,13 @@ this.updateCurColor();
             SLOW_OVERLAP = 65,
             HASTE_OVERLAP = 66,
             SPY = 67,
-            NUM = 68,
+            // Token: 0x040027E3 RID: 10211
+            ENERGY_DAMAGE_REDUCE,
+            // Token: 0x040027E4 RID: 10212
+            BLACK_FRAME,
+            // Token: 0x040027E5 RID: 10213
+            UNABLE_STATE_GUARD,
+            NUM,
 
 
         }
@@ -11806,9 +12004,13 @@ this.updateCurColor();
             TP_REGENERATION2 = 60,
             SPEED_OVERLAP = 61,
             SPY = 62,
-            NUM = 0x3F,
+            // Token: 0x04002829 RID: 10281
+            ENERGY_DAMAGE_REDUCE,
+            // Token: 0x0400282A RID: 10282
+            BLACK_FRAME,
+            NUM,
             TOP = 0,
-            END = 62
+            END = NUM
         }
         public class eAbnormalStateCategory_DictComparer : IEqualityComparer<eAbnormalStateCategory>
         {

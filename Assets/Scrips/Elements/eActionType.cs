@@ -125,7 +125,20 @@ namespace Elements
         EFFECT = 94,
         SPY = 95,
         CHARGE_ENERGY_FIELD = 96,
-        CHARGE_ENERGY_BY_DAMAGE = 97
+        CHARGE_ENERGY_BY_DAMAGE = 97,
+
+        // Token: 0x04002F49 RID: 12105
+        ENERGY_DAMAGE_REDUCE,
+        // Token: 0x04002F4A RID: 12106
+        CHANGE_SPEED_OVERWRITE_FIELD,
+        // Token: 0x04002F4B RID: 12107
+        UNABLE_STATE_GUARD,
+
+
+        // Token: 0x04002F4C RID: 12108
+        EX_START_PASSIVE = 901,
+        // Token: 0x04002F4D RID: 12109
+        EX_CONDITION_PASSIVE
 
     }
 

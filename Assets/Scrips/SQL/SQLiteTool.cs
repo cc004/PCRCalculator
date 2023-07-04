@@ -299,7 +299,7 @@ namespace PCRCaculator.SQL
                         eq.Add(t2.GetEquips());
                     foreach (var t3 in rankStateDic[pair.Key])
                         datas1.Add(t3.GetBaseData());
-                    eq.RemoveAt(eq.Count - 1);
+                    //eq.RemoveAt(eq.Count - 1);
                     //datas1.RemoveAt(datas1.Count - 1);
                 }
                 catch (KeyNotFoundException ex)
@@ -538,12 +538,14 @@ namespace PCRCaculator.SQL
         {
             Dictionary<int, EquipmentData> dic = new Dictionary<int, EquipmentData>();
             var list = GetDatas<equipment_data>();
+            var dic3 = GetDatas<equipment_enhance_data>().GroupBy(x => x.promotion_level).ToDictionary(g => g.Key, g => g.Max(x => x.equipment_enhance_level));
+
             foreach (var dd in list)
             {
                 EquipmentData equipment = new EquipmentData();
                 equipment.equipment_id = dd.equipment_id;
                 equipment.equipment_name = dd.equipment_name;
-                equipment.promotion_level = dd.promotion_level;
+                equipment.promotion_level = dic3.TryGetValue(dd.promotion_level, out var val) ? val : 0;
                 equipment.description = dd.description;
                 equipment.craftFlg = dd.craft_flg;
                 equipment.equipmentEnhancePoint = dd.equipment_enhance_point;

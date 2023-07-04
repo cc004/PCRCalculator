@@ -40,13 +40,25 @@ namespace Elements
       staticBattleManager = BattleManager.Instance;
     }
 
-    public void Exec(UnitCtrl _target)
-    {
-      if (Timer <= 0.0)
-        return;
-      Timer = 0.0f;
-      _target.SetAbnormalState(_target, AbnormalState, EffectTime, null, null, Value);
-    }
+        public UnitCtrl Source { get; set; }
+
+        public void Exec(UnitCtrl _target)
+        {
+            if (this.Timer > 0f)
+            {
+                this.Timer = 0f;
+                SealData unableStateGuardData = _target.UnableStateGuardData;
+                if (this.Source.IsOther != _target.IsOther && ChangeSpeedAction.IsUnableAbnormalState(this.AbnormalState) && unableStateGuardData != null && unableStateGuardData.GetCurrentCount() > 0 && !_target.IsNoDamageMotion() && !_target.IsAbnormalState(UnitCtrl.eAbnormalState.NO_ABNORMAL))
+                {
+                    if (unableStateGuardData.DisplayCount)
+                    {
+                        unableStateGuardData.RemoveSeal(1, true);
+                    }
+                    return;
+                }
+                _target.SetAbnormalState(_target, this.AbnormalState, this.EffectTime, null, null, this.Value, 0f, false, false, 1f, true);
+            }
+        }
 
     public void StartTimer(UnitCtrl _target) => battleManager.AppendCoroutine(TimerUpdate(_target), ePauseType.SYSTEM, _target);
 

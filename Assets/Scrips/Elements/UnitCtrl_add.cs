@@ -13,6 +13,18 @@ namespace Elements
 {
     public partial class UnitCtrl
     {
+
+        // Token: 0x020006C2 RID: 1730
+        public enum eOverwriteAbnormalState
+        {
+            // Token: 0x0400282F RID: 10287
+            NONE,
+            // Token: 0x04002830 RID: 10288
+            SLOW,
+            // Token: 0x04002831 RID: 10289
+            HASTE
+        }
+
         internal CharacterPageButton unitUI;
         private CharacterBuffUIController unitBuffUI;
         private BattleUIManager uIManager;
@@ -106,8 +118,8 @@ namespace Elements
             stateChangeData.IsReleasedByDamage = data.IsReleasedByDamage;
             stateChangeData.MainValue = data.MainValue;
             stateChangeData.SubValue = data.SubValue;
-            stateChangeData.SkillName = data.Skill.SkillName;
-            stateChangeData.SourceName = data.Source.UnitName;
+            stateChangeData.SkillName = data.Skill?.SkillName ?? string.Empty;
+            stateChangeData.SourceName = data.Source?.UnitName ?? string.Empty;
             MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
         }
         

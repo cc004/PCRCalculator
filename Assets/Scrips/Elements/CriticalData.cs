@@ -19,5 +19,6 @@ namespace Elements
             get;
             set;
         }
+        public FloatWithEx ExpectedDamageForEnergyCalc { get; set; }
     }
 }

@@ -410,6 +410,65 @@ namespace PCRCaculator
             return detailData.searchAreaWidth - other.detailData.searchAreaWidth;
 
         }
+
+        public BaseData GetBaseDataForEnergyCalc(UnitData a)
+        {
+
+            if (a.unitId != unitId)
+            {
+                Debug.LogError("角色id不匹配！" + a.unitId + "!=" + unitId);
+            }
+            if (a.rarity > raritydatas.Count || a.rarity <= 0)
+            {
+                a.rarity = 5;
+            }
+            if (a.rank - 2 >= rankData.datas.Count)
+            {
+                a.rank = 1 + rankData.datas.Count;
+            }
+
+            var rank = a.rank;
+
+            while (MainManager.Instance.rbs.ContainsKey((unitId, rank - 1)))
+                --rank;
+
+            BaseData result = new BaseData();
+
+            BaseData d1 = raritydatas[a.rarity - 1] + (a.level + rank) * ratitydatas_rate[a.rarity - 1];//计算等级与星级、rank
+
+            if (rank >= 2)
+            {
+                d1 += rankData.datas[rank - 2];
+            }
+
+            result += BaseData.Round(d1);
+
+            if (unitId < 200000 && !MainManager.Instance.rbs.ContainsKey((unitId, rank)))
+            {
+                d1 = new BaseData();
+
+                for (int i = 0; i < 6; i++)//计算装备属性
+                {
+                    if (a.equipLevel[i] < 0)
+                    {
+                        continue;
+                    }
+                    int rankid = rank <= rankData.rankEquipments.Count ? rankData.rankEquipments[rank - 1][i] : 999999;
+                    if (MainManager.Instance.EquipmentDic.TryGetValue(rankid, out var equipmentData))
+                    {
+                        d1 += equipmentData.GetEquipmentData(a.equipLevel[i]);
+                    }
+                }
+
+                result += BaseData.Round(d1);
+            }
+
+            d1 = new BaseData();
+
+            result += BaseData.Round(d1);
+
+            return result;
+        }
     }
     /// <summary>
     /// 玩家可以更改的角色数据，用于存档
@@ -1455,19 +1514,7 @@ namespace PCRCaculator
         /// <returns></returns>
         public int GetMaxLevel()
         {
-            switch (promotion_level)
-            {
-                case 1: return 0;
-                case 2: return 1;
-                case 3: return 3;
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                    return 5;
-                default: return 0;
-            }
+            return promotion_level;
         }
         /// <summary>
         /// 获取装备的具体数据
@@ -1893,6 +1940,7 @@ namespace PCRCaculator
     [Serializable]
     public class PlayerSetting
     {
+        public bool tpCalculationChanged = true;
         public int playerLevel = 240;
         public int playerProcess = 55;
         //public int maxLove = 8;

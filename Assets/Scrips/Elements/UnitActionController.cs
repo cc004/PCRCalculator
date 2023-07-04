@@ -545,6 +545,10 @@ namespace Elements
           Skill skill,
           Dictionary<eActionType, int> actionCounter)
         {
+            if (!SkillDefine.SkillActionTypeDictionary.ContainsKey((eActionType)actionParam.action_type))
+            {
+                throw new Exception($"动作{actionParam.action_id}类型{actionParam.action_type}未实现");
+            }
             ActionParameter actionParameter = Activator.CreateInstance(SkillDefine.SkillActionTypeDictionary[(eActionType)(byte)actionParam.action_type]) as ActionParameter;
             actionParameter.TargetSort = (PriorityPattern)(int)actionParam.target_type;
             actionParameter.TargetNth = actionParam.target_number;
@@ -626,6 +630,7 @@ namespace Elements
             actionParameter.KnockDownAnimationCurve = parameterOnPrefab.KnockDownAnimationCurve;
             actionParameter.EffectType = parameterOnPrefab.EffectType;
             actionParameter.ActionEffectList = parameterOnPrefabDetail.ActionEffectList;
+            actionParameter.ActionSubEffectList = parameterOnPrefabDetail.ActionSubEffectList;
             int index4 = 0;
             for (int count = parameterOnPrefabDetail.ExecTime.Count; index4 < count; ++index4)
             {

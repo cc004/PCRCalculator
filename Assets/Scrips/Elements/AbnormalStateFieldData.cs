@@ -38,7 +38,11 @@ namespace Elements
     public override void OnEnter(BasePartsData _parts)
     {
       UnitCtrl owner = _parts.Owner;
-      base.OnEnter(_parts);
+            if (this.TargetAction.ActionType == eActionType.CHANGE_SPEED && (this.TargetAction.ActionDetail1 == 1 || this.TargetAction.ActionDetail1 == 2) && owner.OverwriteSpeedDataCount > 0)
+            {
+                return;
+            }
+            base.OnEnter(_parts);
       if (_parts.Owner.IsSummonOrPhantom)
         TargetAction.AppendTargetNum(_parts.Owner, 0);
       SourceActionController.ExecAction(TargetAction, PMHDBOJMEAD, _parts, 0, 0.0f);

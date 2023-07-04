@@ -97,6 +97,12 @@ namespace Elements
                     if (Owner.UnitId <= 200000 && Owner.unitData.rarity == 6)
                         key = "skill0+";
                 }
+                else if (skillid == Owner.SpecialSkillIdList[0])
+                    key = "special0";
+                else if (skillid == Owner.SpecialSkillIdList[1])
+                    key = "special1";
+                else if (skillid == Owner.SpecialSkillIdList[2])
+                    key = "special2";
                 return unitFirearmDatas[key][0];
             }
             catch (Exception e)
