@@ -63,9 +63,9 @@ namespace PCRCaculator
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
         public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
-        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf = new Elements.MasterUnitSkillDataRf();//未来可期
+        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
         private List<int> enemy_ignore_skill_rf = new List<int>();//未来可期
-
+        
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
         private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
@@ -289,6 +289,7 @@ namespace PCRCaculator
                         unitRarityDic = dbTool.Dic1;
                         (unitStoryDic, unitStoryEffectDic) = dbTool.Pair;
                         skillDataDic = dbTool.Dic3;
+                        masterUnitSkillDataRf = dbTool2.masterUnitSkillDataRf;
                         skillActionDic = dbTool.Dic4;
                         allUnitAttackPatternDic = dbTool.Dic5;
                         guildEnemyDatas = dbTool.Dic6;
@@ -865,7 +866,7 @@ namespace PCRCaculator
         }
         public int GetMotionType(int unitid,int skinid)
         {
-            if (skinid == 170161 || unitid == 170101 && useJapanData)
+            if (skinid == 170161 || unitid == 170101)
                 return 34;
             return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
         }

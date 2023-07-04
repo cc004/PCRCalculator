@@ -161,6 +161,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
         public Dictionary<int, UnitAttackPattern> Dic5 { get; private set; }
+        public Elements.MasterUnitSkillDataRf masterUnitSkillDataRf { get; private set; }
         public Dictionary<int, GuildEnemyData> Dic6 { get; private set; }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> Dic7 { get; private set; }
         public Dictionary<int, EquipmentData> Dic8 { get; private set; }
@@ -265,6 +266,23 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => rbs = GetDatas<promotion_bonus>()
                     .ToDictionary(x => (x.unit_id, x.promotion_level), x => x)));
+
+
+            tasks.Add(Task.Run(() =>
+            {
+                masterUnitSkillDataRf = new MasterUnitSkillDataRf();
+                try
+                {
+                    masterUnitSkillDataRf.dict = GetDatas<MasterUnitSkillDataRf.UnitSkillDataRf>()
+                        .GroupBy(x => x.skill_id)
+                        .ToDictionary(g => g.Key, g => g.OrderBy(x => x.min_lv).ToList());
+                }
+                catch
+                {
+                    masterUnitSkillDataRf.dict = new Dictionary<int, List<MasterUnitSkillDataRf.UnitSkillDataRf>>();
+                }
+            }));
+
             return Task.WhenAll(tasks);
         }
         
@@ -312,10 +330,7 @@ namespace PCRCaculator.SQL
                 unit_skill_data sk = unitSkillDataDic[pair.Key];
                 if (pair.Key == 105701)
                 {
-                    if (MainManager.Instance.useJapanData)
-                    {
-                        sk = unitSkillDataDic[170101];
-                    }
+                    sk = unitSkillDataDic[170101];
                 }
                 skillData.UB = sk.union_burst;
                 skillData.UB_ev = sk.union_burst_evolution;

@@ -207,6 +207,7 @@ namespace Elements
                             SkillAreaWidthList.Add(skillId, (int)_data.MasterData.SearchAreaWidth);
                         else
                             SkillAreaWidthList.Add(skillId, (int)skillData.skill_area_width);
+
                         SkillLevelInfo skillLevelInfo = skillLevelInfoList.Find(e => e.SkillId == skillId);
                         SkillLevels.Add(skillId, skillLevelInfo == null ? 0 : (int)skillLevelInfo.SkillLevel);
                         if (!SkillUseCount.ContainsKey(skillId))

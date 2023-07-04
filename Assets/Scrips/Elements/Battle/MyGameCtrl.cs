@@ -272,7 +272,7 @@ namespace Elements
             int unitid = data.unitId;
             WWW www = new WWW("file:///" + Application.dataPath + "/AB/all_battleunitprefab_" + unitid + ".unity3d");
             yield return www;
-            var ab = www.getAssetBundle();
+            var ab = www.assetBundle;
             foreach (string path_0 in ab.GetAllAssetNames())
             {
                 //try

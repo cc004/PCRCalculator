@@ -325,8 +325,9 @@ namespace Elements
                                 }
 
                             }
-                            catch
+                            catch (Exception e)
                             {
+                                Debug.LogError(e);
                                 MainManager.Instance.WindowMessage($"技能: {_skill.SkillName}({_skill.SkillId})含有超前动作，已被重置为普攻");
                                 Owner.SkillLevels[key] = 0;
                             }
@@ -334,7 +335,7 @@ namespace Elements
                         continue;
                 }
             }
-            if (MainManager.Instance.Enemy_ignore_skill_rf.Contains(Owner.UnitId))//ManagerSingleton<MasterDataManager>.Instance.masterEnemyIgnoreSkillRf.Get(Owner.UnitId) == null)
+            if (!MainManager.Instance.Enemy_ignore_skill_rf.Contains(Owner.UnitId))//ManagerSingleton<MasterDataManager>.Instance.masterEnemyIgnoreSkillRf.Get(Owner.UnitId) == null)
             {
                 foreach (KeyValuePair<int, int> item2 in dictionary)
                 {
@@ -642,7 +643,6 @@ namespace Elements
             actionParameter.TargetAssignment = (eTargetAssignment)(int)actionParam.target_assignment;
             actionParameter.Direction = (DirectionType)(int)actionParam.target_area;
             skill.ActionParameters.Add(actionParameter);
-            skill.SkillId = skillParameter.skill_id;
         }
 
         public bool StartAction(int skillId)

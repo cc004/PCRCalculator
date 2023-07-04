@@ -466,8 +466,8 @@ namespace PCRCaculator
             while (!www.isDone) { Thread.Sleep(0); }
             path = Application.streamingAssetsPath + "/../.ABExt2/" + fullname;
 #endif
-            var asset = www.getAssetBundle();
-            if (asset == null || MainManager.Instance.useJapanData)
+            var asset = www.assetBundle;
+            if (asset == null)
             {
                 if (!File.Exists(path))
                 {
@@ -476,7 +476,7 @@ namespace PCRCaculator
                 }
                 www = new WWW("file://" + path);
                 while (!www.isDone) { Thread.Sleep(0); }
-                asset = www.getAssetBundle();
+                asset = www.assetBundle;
             }
 
             AssetBundleDic.Add(fullname, asset);
@@ -580,7 +580,7 @@ namespace PCRCaculator
         {
             if (unitid == 207001)
                 return 207000;
-            if (unitid == 105701 && MainManager.Instance.useJapanData)
+            if (unitid == 105701)
                 return 170101;
             return unitid;
         }
