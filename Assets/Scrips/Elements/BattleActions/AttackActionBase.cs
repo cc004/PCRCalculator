@@ -181,7 +181,7 @@ namespace Elements
                 ActionType = _actionType
             };
         }*/
-        protected DamageData createDamageData(
+        protected virtual DamageData createDamageData(
           UnitCtrl _source,
           BasePartsData _target,
           int _num,

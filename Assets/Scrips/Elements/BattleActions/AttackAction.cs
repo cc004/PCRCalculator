@@ -242,6 +242,16 @@ namespace Elements
       base.SetLevel(_level);
       Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
       Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+        }
+        protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
+        {
+            DamageData damageData = base.createDamageData(_source, _target, _num, _valueDictionary, _actionDetail1, _isCritical, _skill, _actionTypeForSource, _isPhysicalForTarget);
+            int num = (int)_valueDictionary[eValueNumber.VALUE_7];
+            if (num > 0)
+            {
+                damageData.DefPenetrate += num;
+            }
+            return damageData;
+        }
     }
-  }
 }
