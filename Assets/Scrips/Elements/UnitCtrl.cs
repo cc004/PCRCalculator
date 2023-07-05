@@ -2324,7 +2324,7 @@ this.updateCurColor();
             var enemy = MyGameCtrl.Instance.tempData.guildEnemy.FirstOrDefault(e => e.unit_id == this.UnitId);
             if (enemy != null)
             {
-                baseData = enemy.baseData;
+                baseDataForEnergyCalc = baseData = enemy.baseData;
             }
             else if (MainManager.Instance.unitDataDic.ContainsKey(UnitId))/* if (UnitId <= 200000 || UnitId >= 400000) */
             {

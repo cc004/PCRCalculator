@@ -231,6 +231,7 @@ namespace Elements
                     case UnitCtrl.BuffParamKind.DEF:
                         UnitCtrl owner3 = Owner;
                         owner3.Def = (owner3.Def.Floor() + _value).Floor();
+                        owner3.DefForDamagedEnergy = (owner3.DefForDamagedEnergy.Floor() + _value).Floor();
                         string des = (_source==null?"???":_source.UnitName) + "的技能" + (_enable?"开始":"结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
                         break;
@@ -241,6 +242,7 @@ namespace Elements
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         UnitCtrl owner5 = Owner;
                         owner5.MagicDef = (owner5.MagicDef.Floor() + _value).Floor();
+                        owner5.MagicDefForDamagedEnergy = (owner5.MagicDefForDamagedEnergy.Floor() + _value).Floor();
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;

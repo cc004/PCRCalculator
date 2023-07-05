@@ -151,7 +151,7 @@ namespace Elements
 
                     criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage);
 
-                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.FloatToInt((float)criticalData.ExpectedDamageForEnergyCalc * 2f * damageData.CriticalDamageRate);
+                    criticalData.ExpectedDamageForEnergyCalc *= 1f + criticalData.critVar * (2f * damageData.CriticalDamageRate - 1);
 
                     criticalData.ExpectedDamageForEnergyCalc = BattleUtil.FloatToInt(criticalData.ExpectedDamageForEnergyCalc);
 

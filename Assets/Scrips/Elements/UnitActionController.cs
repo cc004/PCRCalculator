@@ -538,6 +538,134 @@ namespace Elements
             for (int index = 0; index < _skill.ActionParameters.Count; ++index)
                 _skill.ActionParameters[index].Initialize(Owner);
         }
+        private void actionStartFirstProcess(Skill _skill, out bool _hasNoTarget)
+        {
+            //IL_0064: Unknown result type (might be due to invalid IL or missing references)
+            //IL_017a: Unknown result type (might be due to invalid IL or missing references)
+            //IL_019b: Unknown result type (might be due to invalid IL or missing references)
+            //IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0206: Unknown result type (might be due to invalid IL or missing references)
+            //IL_020b: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0210: Unknown result type (might be due to invalid IL or missing references)
+            //IL_022f: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0234: Unknown result type (might be due to invalid IL or missing references)
+            //IL_023d: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0242: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0286: Unknown result type (might be due to invalid IL or missing references)
+            //IL_028b: Unknown result type (might be due to invalid IL or missing references)
+            //IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+            if (_skill.UnionBurstCoolDownTime > 0f)
+            {
+                Owner.UnionBurstCoolDownTime = _skill.UnionBurstCoolDownTime;
+            }
+            _skill.DefeatEnemyCount = 0;
+            _skill.DefeatByThisSkill = false;
+            _skill.AlreadyAddAttackSelfSeal = false;
+            _skill.AlreadyExexActionByHit = false;
+            _skill.LifeSteal = 0;
+            _skill.Cancel = false;
+            _skill.EffectBranchId = 0;
+            _skill.LoopEffectAlreadyDone = false;
+            ContinuousActionEndDone = false;
+            _skill.OwnerReturnPosition = transform.localPosition;
+            _skill.CountBlind = false;
+            _skill.AbsorberValue = battleManager.KIHOGJBONDH;
+            if (_skill.HasAttack && _skill.IsLifeStealEnabled)
+            {
+                for (int num = Owner.LifeStealQueueList.Count - 1; num >= 0; num--)
+                {
+                    _skill.LifeSteal += Owner.LifeStealQueueList[num].Dequeue();
+                    if (Owner.LifeStealQueueList[num].Count == 0)
+                    {
+                        Owner.LifeStealQueueList.RemoveAt(num);
+                        Owner.OnChangeState.Call(Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, false);
+                    }
+                }
+            }
+            _hasNoTarget = true;
+            for (int i = 0; i < _skill.ActionParameters.Count; i++)
+            {
+                ActionParameter actionParameter = _skill.ActionParameters[i];
+                actionParameter.IdOffsetDictionary = new Dictionary<BasePartsData, long>();
+                actionParameter.CancelByIfForAll = false;
+                actionParameter.AdditionalValue = null;
+                actionParameter.MultipleValue = null;
+                actionParameter.DivideValue = null;
+                actionParameter.UsedChargeEnergyByReceiveDamage.Clear();
+                if (actionParameter.ReferencedByReflection)
+                {
+                    continue;
+                }
+                if (!actionParameter.IsSearchAndSorted)
+                {
+                    searchAndSortTarget(_skill, actionParameter, transform.position);
+                }
+                actionParameter.IsSearchAndSorted = false;
+                if (actionParameter.ActionType == eActionType.REFLEXIVE)
+                {
+                    Vector3 basePosition = default(Vector3);
+                    bool considerBodyWidth = true;
+                    float position = 0f;
+                    switch (actionParameter.ActionDetail1)
+                    {
+                        case 2:
+                            basePosition = transform.position + new Vector3((float)((!Owner.IsLeftDir) ? 1 : (-1)) * actionParameter.Value[eValueNumber.VALUE_1] / 540f, 0f);
+                            break;
+                        case 1:
+                            if (actionParameter.TargetList.Count == 0)
+                            {
+                                continue;
+                            }
+                            basePosition = actionParameter.TargetList[0].GetPosition();
+                            break;
+                        case 3:
+                            basePosition = transform.position;
+                            position = (Owner.IsLeftDir ? (-1f) : 1f) * actionParameter.Value[eValueNumber.VALUE_1];
+                            break;
+                        case 4:
+                            if (actionParameter.TargetList.Count == 0)
+                            {
+                                continue;
+                            }
+                            basePosition = actionParameter.TargetList[0].GetPosition();
+                            considerBodyWidth = false;
+                            break;
+                    }
+                    int j = 0;
+                    for (int count = actionParameter.ActionChildrenIndexes.Count; j < count; j++)
+                    {
+                        ActionParameter actionParameter2 = _skill.ActionParameters[actionParameter.ActionChildrenIndexes[j]];
+                        actionParameter2.Position = position;
+                        searchAndSortTarget(_skill, actionParameter2, basePosition, false, considerBodyWidth);
+                    }
+                }
+                if (actionParameter.TargetList.Count != 0)
+                {
+                    _hasNoTarget = false;
+                }
+            }
+        }
+
+        public void ExecExSkill(Skill _skill)
+        {
+            actionStartFirstProcess(_skill, out var _);
+            _skill.ReadySkill();
+            _skill.AweValue = Owner.CalcAweValue(false, false);
+            for (int i = 0; i < _skill.ActionParameters.Count; i++)
+            {
+                ActionParameter actionParameter = _skill.ActionParameters[i];
+                actionParameter.ReadyAction(Owner, this, _skill);
+                if ((_skill.HasParentIndexes.Contains(i) && !actionParameter.ReferencedByReflection) || actionParameter.ReferencedByEffect)
+                {
+                    continue;
+                }
+                foreach (BasePartsData target in actionParameter.TargetList)
+                {
+                    actionParameter.AppendTargetNum(target.Owner, 0);
+                    ExecAction(actionParameter, _skill, target, 0, 0f, true);
+                }
+            }
+        }
 
         private void createActionValue(
           MasterSkillData.SkillData skillParameter,
@@ -1342,7 +1470,7 @@ namespace Elements
           Skill skill,
           BasePartsData target,
           int num,
-          float starttime)
+          float starttime, bool _execChildNoFrame = false)
         {
             Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
 
@@ -1411,7 +1539,7 @@ namespace Elements
                 return;
             if (!action.HitOnceDic.ContainsKey(target))
             {
-                ExecChildrenAction(action, skill, target, num, starttime, dictionary);
+                ExecChildrenAction(action, skill, target, num, starttime, dictionary, _execChildNoFrame);
             }
             else
             {
@@ -1428,7 +1556,7 @@ namespace Elements
                 
                 if (action.HitOnceDic[target])
                 {
-                    ExecChildrenAction(action, skill, target, num, starttime, dictionary);
+                    ExecChildrenAction(action, skill, target, num, starttime, dictionary, _execChildNoFrame);
                 }
                 else
                 {
@@ -1448,7 +1576,7 @@ namespace Elements
           BasePartsData target,
           int num,
           float starttime,
-          Dictionary<int, bool> enabledChildAction)
+          Dictionary<int, bool> enabledChildAction, bool _execNoFrame)
         {
             int index = 0;
             for (int count = action.ActionChildrenIndexes.Count; index < count; ++index)
@@ -1463,7 +1591,16 @@ namespace Elements
                 }
                 if (actionParameter.TargetSort != PriorityPattern.PARENT_TARGET_PARTS)
                 {
-                    AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+
+                    if (!_execNoFrame)
+                    {
+                        AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+                        continue;
+                    }
+                    actionParameter.AppendTargetNum(target.Owner, 0);
+                    ExecAction(actionParameter, skill, target, 0, starttime, true);
+
+                    //AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
                 }
                 else
                 {
@@ -1475,7 +1612,14 @@ namespace Elements
                     {
                         if (item.GetTargetable())
                         {
-                            AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, item, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+                            if (!_execNoFrame)
+                            {
+                                AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, item, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+                                continue;
+                            }
+                            actionParameter.AppendTargetNum(target.Owner, 0);
+                            ExecAction(actionParameter, skill, target, 0, starttime, true);
+                            // AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, item, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
                         }
                     }
                     actionParameter.ExecedMultiBossList.Add(target.Owner);
