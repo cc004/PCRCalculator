@@ -466,7 +466,7 @@ namespace PCRCaculator
             while (!www.isDone) { Thread.Sleep(0); }
             path = Application.streamingAssetsPath + "/../.ABExt2/" + fullname;
 #endif
-            var asset = www.assetBundle;
+            var asset = www.getAssetBundle();
             if (asset == null)
             {
                 if (!File.Exists(path))

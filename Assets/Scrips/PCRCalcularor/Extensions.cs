@@ -18,6 +18,13 @@ namespace PCRCalcularor
 
     internal static class Extensions
     {
+        public static void TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> self,
+            Dictionary<TKey, TValue> other)
+        {
+            foreach (var pair in other)
+                self.TryAdd(pair.Key, pair.Value);
+        }
+
         public static void OverrideWith<TKey, TValue>(this Dictionary<TKey, TValue> self,
             Dictionary<TKey, TValue> other)
         {

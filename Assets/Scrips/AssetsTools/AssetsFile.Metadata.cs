@@ -44,11 +44,7 @@ namespace AssetsTools {
                 Types[i].Read(reader);
                 if(MetadataHeader.EnableTypeTree) {
                     Types[i].TypeTree = new TypeTree();
-                    Types[i].TypeTree.Read(reader, Header.Version >= 19 ? 8 : 0);
-                }
-                if (Header.Version >= 21)
-                {
-                    var a = reader.ReadValueArray<int>();
+                    Types[i].TypeTree.Read(reader);
                 }
             }
         }

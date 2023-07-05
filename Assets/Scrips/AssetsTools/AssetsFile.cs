@@ -44,8 +44,8 @@ namespace AssetsTools {
             Header.Read(reader);
 
             // Only Supports version = 17
-           // if (Header.Version != 17)
-           //     throw new NotSupportedException("Version " + Header.Version.ToString() + " is not supported");
+            if (Header.Version != 17)
+                throw new NotSupportedException("Version " + Header.Version.ToString() + " is not supported");
             // Only Supports LittleEndian
             if (Header.IsBigEndian)
                 throw new NotSupportedException("BigEndian file is not supported");

@@ -42,22 +42,6 @@ namespace AssetsTools {
             int external_count = reader.ReadInt();
             Externals = new ExternalFileType[external_count];
             Externals.Read(reader);
-
-            if (Header.Version >= 20)
-            {
-                // Read Types
-                int type_count = reader.ReadInt();
-                var RefTypes = new SerializedType[type_count];
-                for (int i = 0; i < type_count; i++)
-                {
-                    RefTypes[i].Read(reader);
-                    if (MetadataHeader.EnableTypeTree)
-                    {
-                        RefTypes[i].TypeTree = new TypeTree();
-                        RefTypes[i].TypeTree.Read(reader, Header.Version >= 19 ? 8 : 0);
-                    }
-                }
-            }
         }
 
         private void writeExternals(UnityBinaryWriter writer) {

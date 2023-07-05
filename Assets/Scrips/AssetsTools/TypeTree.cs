@@ -28,7 +28,7 @@ namespace AssetsTools {
             public int MetaFlag;
         }
 
-        public void Read(UnityBinaryReader reader, int offset) {
+        public void Read(UnityBinaryReader reader) {
             // Read header
             int node_count = reader.ReadInt();
             int strtable_length = reader.ReadInt();
@@ -66,8 +66,6 @@ namespace AssetsTools {
                 Nodes[i].ByteSize = reader.ReadInt();
                 Nodes[i].Index = reader.ReadInt();
                 Nodes[i].MetaFlag = reader.ReadInt();
-
-                reader.Position += offset;
             }
 
             reader.Position += strtable_length;

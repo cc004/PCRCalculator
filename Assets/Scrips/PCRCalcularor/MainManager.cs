@@ -266,7 +266,7 @@ namespace PCRCaculator
 
             var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
             var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
-            var dbTool2 = Version.useJP ? SQLData.OpenDB(ABExTool.mgrDataJP) : dbTool3;
+            var dbTool2 = SQLData.OpenDB(ABExTool.mgrDataJP);
 
             Task.WhenAll(
                 Task.Run(() => dbTool.Prepare()),
@@ -274,14 +274,16 @@ namespace PCRCaculator
                 Task.Run(() => dbTool3.Prepare())).Wait();
 
             tasks.Add(
-                Task.WhenAll(dbTool.ParallelGetAll(), dbTool3.ParallelGetAll(), 
-                        Version.useJP ? dbTool2.ParallelGetAll() : Task.CompletedTask)
+                Task.WhenAll(dbTool.ParallelGetAll(), dbTool2.ParallelGetAll(), dbTool3.ParallelGetAll())
                     .ContinueWith(_ =>
                     {
                         dbTool.CloseDB();
                         dbTool2.CloseDB();
+                        dbTool3.CloseDB();
 
-                        if (Version.useJP) dbTool3.CloseDB();
+                        var dbCN = dbTool3;
+
+                        if (!Version.useJP) dbTool2 = dbTool3;
 
                         equipmentDic = dbTool.Dic8;
                         equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
@@ -328,8 +330,17 @@ namespace PCRCaculator
                                 Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
                                 Task.Run(() => GuildManager.EnemyDataDic.Override2With(dbTool3.Dic2))
                             ).Wait();
+
                             // unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
-                            // unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
+
+                            unitRarityDic.TryAdd(dbCN.Dic1);
+                            unitStoryDic.TryAdd(dbCN.Pair.Item1);
+                            unitStoryEffectDic.TryAdd(dbCN.Pair.Item2);
+                            skillDataDic.TryAdd(dbCN.Dic3);
+                            skillActionDic.TryAdd(dbCN.Dic4);
+                            allUnitAttackPatternDic.TryAdd(dbCN.Dic5);
+
+                            unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
                     }));
 

@@ -45,9 +45,9 @@ namespace PCRCaculator
         public Vector2 range;//相邻按钮之间的距离
         public List<Toggle> switchToggles;
 
-        public GameObject enemyGroups;
-        public Text enemyTotalPointText;
-        public List<CharacterPageButton> enemyChars;
+        // public GameObject enemyGroups;
+       // public Text enemyTotalPointText;
+        //public List<CharacterPageButton> enemyChars;
 
         public List<CharacterPageButton> selectedChars;
         public Sprite defaultSprite;
@@ -98,12 +98,12 @@ namespace PCRCaculator
             settingBack.SetActive(false);
             if (player == null || type == 4)
             {
-                enemyGroups.SetActive(false);
+                // enemyGroups.SetActive(false);
             }
             else
             {
-                enemyGroups.SetActive(true);
-                enemyTotalPointText.text = player.totalpoint + "";
+                // enemyGroups.SetActive(true);
+                /*enemyTotalPointText.text = player.totalpoint + "";
                 for (int i = 0; i < 5; i++)
                 {
                     if (player.playrCharacters.Count > i)
@@ -114,7 +114,7 @@ namespace PCRCaculator
                     {
                         enemyChars[i].SetButton(-1);
                     }
-                }
+                }*/
             }
             //selectedCharId.Clear();
             if (type == 4)

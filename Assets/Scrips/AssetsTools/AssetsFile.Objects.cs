@@ -35,7 +35,7 @@ namespace AssetsTools {
 
                 reader.Align(4);
                 Objects[i].PathID = reader.ReadLong();
-                var byteStart = Header.Version >= 22 ? (uint) reader.ReadLong() : reader.ReadUInt();
+                var byteStart = reader.ReadUInt();
                 var byteSize = reader.ReadUInt();
                 Objects[i].TypeID = reader.ReadInt();
 

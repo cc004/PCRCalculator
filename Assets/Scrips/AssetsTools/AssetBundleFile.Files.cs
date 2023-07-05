@@ -45,11 +45,11 @@ namespace AssetsTools {
 
             // Decompress Infos (if needed)
             int compressiontype = flag & 0x3F;
-
+            /*
             if (this.Header.format >= 7U)
             {
                 reader.Align(16);
-            }
+            }*/
 
             switch (compressiontype) {
                 default:// None
