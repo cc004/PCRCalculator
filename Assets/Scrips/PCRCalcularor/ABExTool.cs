@@ -512,6 +512,8 @@ namespace PCRCaculator
         }
         public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
+            throw new NotImplementedException();
+            /*
             var asset = TryGetAssetBundleByName(fullname, useOldManifest);
             List<T> result = new List<T>();
             if (asset != null)
@@ -522,7 +524,7 @@ namespace PCRCaculator
                         result.Add(asset.LoadAsset<T>(path_0));
                 }
             }
-            return result;
+            return result;*/
         }
         public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4}
         public static Sprite GetSprites(SpriteType type, int id)
@@ -568,6 +570,8 @@ namespace PCRCaculator
         {
             //if (unitid >= 200000 && unitid <= 299999)
             //    unitid = (int)(unitid / 100) * 100;
+            // preload battleunit
+            TryGetAssetBundleByName("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false);
             GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab", unitid > 200000);
             /*if(a==null)
             {

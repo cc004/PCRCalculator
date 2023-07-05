@@ -48,11 +48,7 @@ namespace Elements
         private void Awake()
         {
             Instance = this;
-            foreach (var pair in ABExTool.mgrCharacter.registries)
-            {
-                if (!pair.Key.StartsWith("a/all_fxsk_")) continue;
-                ABExTool.TryGetAssetBundleByName(pair.Key.Split("/")[1], false);
-            }
+            
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }

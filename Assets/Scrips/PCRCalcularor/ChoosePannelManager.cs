@@ -674,19 +674,39 @@ namespace PCRCaculator
             }
 
             // ex equip
-            for (int i = 0; i < 3; ++i)
+
+            if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
             {
-                if (changingId)
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (changingId)
+                    {
+                        ExEquip[i].ClearOptions();
+                        ExEquip[i].AddOptions(temp[i].Values
+                            .Select(x => new ExEquipOption(x)).Prepend(ExEquipOption.None)
+                            .ToList<Dropdown.OptionData>());
+                        ExEquip[i].value = Math.Max(0,
+                            ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
+                    }
+
+                    detailSliders_setting[15 + i].maxValue =
+                        data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
+                    detailSliders_setting[15 + i].minValue = 0;
+                    detailSliders_setting[15 + i].value = data.exEquipLevel[i];
+                    detailTexts_setting[15 + i].text = detailSliders_setting[15 + i].value.ToString();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 3; ++i)
                 {
                     ExEquip[i].ClearOptions();
-                    ExEquip[i].AddOptions(MainManager.Instance.unitExEquips[data.unitId][i].Values
-                        .Select(x => new ExEquipOption(x)).Prepend(ExEquipOption.None).ToList<Dropdown.OptionData>());
-                    ExEquip[i].value = Math.Max(0, ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
+                    ExEquip[i].AddOptions(new List<Dropdown.OptionData> {ExEquipOption.None});
+                    detailSliders_setting[15 + i].maxValue = 0;
+                    detailSliders_setting[15 + i].minValue = 0;
+                    detailSliders_setting[15 + i].value = 0;
+                    detailTexts_setting[15 + i].text = "0";
                 }
-                detailSliders_setting[15 + i].maxValue = data.exEquip[i] == 0 ? 0 : MainManager.Instance.unitExEquips[data.unitId][i][data.exEquip[i]].levelMax;
-                detailSliders_setting[15 + i].minValue = 0;
-                detailSliders_setting[15 + i].value = data.exEquipLevel[i];
-                detailTexts_setting[15 + i].text = detailSliders_setting[15 + i].value.ToString();
             }
 
             float to = 0;

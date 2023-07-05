@@ -3193,6 +3193,13 @@ namespace Elements.Battle
 
         private void Awake()
         {
+            // preload fxsk bundles
+            foreach (var pair in ABExTool.mgrCharacter.registries)
+            {
+                if (!pair.Key.StartsWith("a/all_fxsk_")) continue;
+                ABExTool.TryGetAssetBundleByName(pair.Key.Split("/")[1], false);
+            }
+
             Instance = this;
             isValid = true;
             //this.singletonTree = this.CreateSingletonTree<BattleManager>();
@@ -3471,6 +3478,7 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
+
             setStatus.Clear();
             battleFinished = false;
             GuildCalculator.Instance.dmglist.Clear();
