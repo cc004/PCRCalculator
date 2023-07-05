@@ -16,9 +16,9 @@ namespace PCRCaculator
         public TextMeshProUGUI playerLevelText;
         public List<Slider> sliders;
         public List<TextMeshProUGUI> texts;
-        public Toggle allowRarity6Toggle;
+        //public Toggle allowRarity6Toggle;
         public Toggle tpCalculationChanged;
-        public Toggle showAllUnitToggle;
+        //public Toggle showAllUnitToggle;
         public GameObject SettingBack;
 
         public InputField TPMaxText;
@@ -47,10 +47,10 @@ namespace PCRCaculator
             texts[0].text = PlayerSetting.playerLevel + "";
             texts[1].text = PlayerSetting.playerProcess + "";
             texts[2].text = PlayerSetting.maxUniqueEqLv + "";
-            allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
+            //allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
             tpCalculationChanged.isOn = PlayerSetting.tpCalculationChanged;
-            if (showAllUnitToggle!=null)
-                showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
+            //if (showAllUnitToggle!=null)
+           //     showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
 
             TPMaxText.text = PlayerSetting.maxTPUpValue.ToString();
 
@@ -81,10 +81,10 @@ namespace PCRCaculator
         /// </summary>
         public void SaveButton()
         {
-            PlayerSetting.allowRarity6 = allowRarity6Toggle.isOn;
+            //PlayerSetting.allowRarity6 = allowRarity6Toggle.isOn;
             PlayerSetting.tpCalculationChanged = tpCalculationChanged.isOn;
-            if(showAllUnitToggle!=null)
-            PlayerSetting.showAllUnits = showAllUnitToggle.isOn;
+            //if(showAllUnitToggle!=null)
+            //PlayerSetting.showAllUnits = showAllUnitToggle.isOn;
 
             PlayerSetting.maxTPUpValue = int.Parse(TPMaxText.text, System.Globalization.NumberStyles.Any);
 

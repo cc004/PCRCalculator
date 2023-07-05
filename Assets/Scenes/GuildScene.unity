@@ -6487,9 +6487,7 @@ MonoBehaviour:
   - {fileID: 607895915}
   - {fileID: 702721084}
   - {fileID: 1915328048}
-  allowRarity6Toggle: {fileID: 2061374678}
-  tpCalculationChanged: {fileID: 0}
-  showAllUnitToggle: {fileID: 0}
+  tpCalculationChanged: {fileID: 1017195018}
   SettingBack: {fileID: 497788015}
   TPMaxText: {fileID: 1999017513}
   RBLevelText: {fileID: 925922790}
