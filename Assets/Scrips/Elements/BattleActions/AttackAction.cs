@@ -85,7 +85,8 @@ namespace Elements
                 return;
             }
 
-            bool _isCritical = (double)_valueDictionary[eValueNumber.VALUE_5] == _num + 1;
+            var x = (double)_valueDictionary[eValueNumber.VALUE_5];
+            bool _isCritical = x < 0 || x == _num + 1;
             bool isPhysicalForTarget = judgeIsPhysical(actionDetail1);
             eDecideTargetAtkType actionDetail2 = (eDecideTargetAtkType)base.ActionDetail2;
             if (actionDetail2 == eDecideTargetAtkType.TARGET_LOWER_DEF_TYPE)

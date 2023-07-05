@@ -170,6 +170,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, string[]> Dic11 { get; private set; }
         public Dictionary<int, string> Dic12 { get; private set; }
         public List<EReduction> eReductions { get; private set; }
+        public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips { get; private set; }
 
         public Dictionary<(int, int), promotion_bonus> rbs {
             get;
@@ -283,6 +284,30 @@ namespace PCRCaculator.SQL
                 }
             }));
 
+            tasks.Add(Task.Run(() =>
+            {
+                var enhanceLevel = GetDatas<ex_equipment_enhance_data>()
+                    .GroupBy(x => x.rarity)
+                    .ToDictionary(g => g.Key, g => g.Max(x => x.enhance_level));
+
+                var categories = GetDatas<ex_equipment_data>()
+                    .Where(x => x.clan_battle_equip_flag)
+                    .Select(x => x.SetEnhanceLevelMax(enhanceLevel[x.rarity]))
+                    .GroupBy(x => x.category)
+                    .ToDictionary(g => g.Key,
+                        g => g.ToDictionary(x => x.ex_equipment_id));
+
+                var empty = new Dictionary<int, ex_equipment_data>();
+
+                unitExEquips = GetDatas<unit_ex_equipment_slot>()
+                    .ToDictionary(x => x.unit_id,
+                        x => new Dictionary<int, ex_equipment_data>[]
+                        {
+                            categories.TryGetValue(x.slot_category_1, out var val) ? val : empty,
+                            categories.TryGetValue(x.slot_category_2, out var val2) ? val2 : empty,
+                            categories.TryGetValue(x.slot_category_3, out var val3) ? val3 : empty,
+                        });
+            }));
             return Task.WhenAll(tasks);
         }
         

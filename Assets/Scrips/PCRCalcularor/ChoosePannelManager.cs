@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elements;
 using PCRCaculator.Guild;
+using PCRCaculator.SQL;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,25 @@ namespace PCRCaculator
 {
     public class ChoosePannelManager : MonoBehaviour
     {
+        private class ExEquipOption : Dropdown.OptionData
+        {
+            public int equip_id;
+
+            public ExEquipOption(ex_equipment_data data)
+            {
+                equip_id = data.ex_equipment_id;
+                text = data.name;
+            }
+
+            private ExEquipOption()
+            {
+                equip_id = 0;
+                text = "未装备";
+            }
+
+            public static ExEquipOption None = new ExEquipOption();
+        }
+
         public static ChoosePannelManager Instance;
         public GameObject baseBack;
         public GameObject chooseBack_A;
@@ -39,6 +59,8 @@ namespace PCRCaculator
         public List<TextMeshProUGUI> detailTexts_setting;
         public List<Slider> detailSliders_setting;
         public List<Button> detailButtons_setting;
+
+        public Dropdown[] ExEquip;
 
         public GameObject EXsettingPannel;
         public List<SliderPrefab> EXsettingSliders;
@@ -238,7 +260,7 @@ namespace PCRCaculator
                     //charToggles_setting[i].isOn = i == 0;
                 }
                 RefreshSettingPage();
-                RefreshSettingValues();
+                RefreshSettingValues(true);
             }
             /*else if(type == 4)
             {
@@ -323,7 +345,7 @@ namespace PCRCaculator
                 if (a.interactable && a.isOn)
                 {
                     selectedCharacterId_setting = id;
-                    RefreshSettingValues();
+                    RefreshSettingValues(true);
                 }
             }
         }
@@ -373,7 +395,13 @@ namespace PCRCaculator
                 data.skillLevel[3] = 0;
                 data.uniqueEqLv = 0;
             }
-            RefreshSettingValues();
+
+            for (int i = 0; i < 3; ++i)
+            {
+                data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
+                data.exEquipLevel[i] = (int) detailSliders_setting[15 + i].value;
+            }
+            RefreshSettingValues(false);
 
         }
         public void AddButton_setting(int buttonid)
@@ -395,7 +423,7 @@ namespace PCRCaculator
         public void SetSelectedUnitMax()
         {
             playerData.playrCharacters[selectedCharacterId_setting].SetMax();
-            RefreshSettingValues();
+            RefreshSettingValues(false);
             RefreshSettingPage();
             MainManager.Instance.WindowMessage("成功！");
         }
@@ -405,7 +433,7 @@ namespace PCRCaculator
             {
                 a.SetMax();
             }
-            RefreshSettingValues();
+            RefreshSettingValues(false);
             RefreshSettingPage();
             MainManager.Instance.WindowMessage("成功！");
         }
@@ -597,7 +625,7 @@ namespace PCRCaculator
             }
 
         }
-        private void RefreshSettingValues()
+        private void RefreshSettingValues(bool changingId)
         {
             isinstating = true;
             UnitData data = playerData.playrCharacters[selectedCharacterId_setting];
@@ -645,6 +673,22 @@ namespace PCRCaculator
                 detailButtons_setting[1].interactable = false;
             }
 
+            // ex equip
+            for (int i = 0; i < 3; ++i)
+            {
+                if (changingId)
+                {
+                    ExEquip[i].ClearOptions();
+                    ExEquip[i].AddOptions(MainManager.Instance.unitExEquips[data.unitId][i].Values
+                        .Select(x => new ExEquipOption(x)).Prepend(ExEquipOption.None).ToList<Dropdown.OptionData>());
+                    ExEquip[i].value = Math.Max(0, ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
+                }
+                detailSliders_setting[15 + i].maxValue = data.exEquip[i] == 0 ? 0 : MainManager.Instance.unitExEquips[data.unitId][i][data.exEquip[i]].levelMax;
+                detailSliders_setting[15 + i].minValue = 0;
+                detailSliders_setting[15 + i].value = data.exEquipLevel[i];
+                detailTexts_setting[15 + i].text = detailSliders_setting[15 + i].value.ToString();
+            }
+
             float to = 0;
             foreach (UnitData a in playerData.playrCharacters)
             {
@@ -661,6 +705,7 @@ namespace PCRCaculator
                 detailSliders_setting[6].maxValue = 0;
                 detailSliders_setting[14].maxValue = 0;
             }
+
             GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting,data);
         }
     }

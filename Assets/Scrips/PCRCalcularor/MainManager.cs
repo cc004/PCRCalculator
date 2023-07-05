@@ -71,8 +71,7 @@ namespace PCRCaculator
         private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
         private Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
         private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic;
-
-
+        public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips;
         private CharacterManager characterManager;
         private AdventureManager battleManager;
         //private SQLiteHelper sql;
@@ -294,6 +293,7 @@ namespace PCRCaculator
                         allUnitAttackPatternDic = dbTool.Dic5;
                         guildEnemyDatas = dbTool.Dic6;
                         enemyMPartsDic = dbTool.Dic7;
+                        unitExEquips = dbTool.unitExEquips;
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;

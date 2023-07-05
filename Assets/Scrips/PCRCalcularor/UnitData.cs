@@ -234,7 +234,25 @@ namespace PCRCaculator
                 
                 result += BaseData.Round(d1);
 
-                return result;
+                var temp = result;
+
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (a.exEquip[i] == 0) continue;
+                    var equip = MainManager.Instance.unitExEquips[a.unitId][i][a.exEquip[i]];
+                    var def = equip.GetDefaultBaseData();
+                    var max = equip.GetMaxBaseData();
+                    var param = new BaseData();
+                    for (int j = 0; j < 17; ++j)
+                    {
+                        var d = def.dataint[j] / 100.0;
+                        var m = max.dataint[j] / 100.0;
+                        param.dataint[j] = 100 * (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                    }
+                    temp += result * param;
+                }
+                // ex slot
+                return temp;
             }
 #if UNITY_EDITOR
             catch(NotImplementedException e)
@@ -496,6 +514,9 @@ namespace PCRCaculator
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
+        public int[] exEquip = new int[] { 0, 0, 0 };
+        public int[] exEquipLevel = new int[] { 0, 0, 0 };
+
         [JsonIgnore]
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
@@ -766,6 +787,12 @@ namespace PCRCaculator
                 hashCode = (hashCode * 397) ^ skillLevel[2];
                 hashCode = (hashCode * 397) ^ skillLevel[3];
                 hashCode = (hashCode * 397) ^ uniqueEqLv;
+                hashCode = (hashCode * 397) ^ exEquip[0];
+                hashCode = (hashCode * 397) ^ exEquip[1];
+                hashCode = (hashCode * 397) ^ exEquip[2];
+                hashCode = (hashCode * 397) ^ exEquipLevel[0];
+                hashCode = (hashCode * 397) ^ exEquipLevel[1];
+                hashCode = (hashCode * 397) ^ exEquipLevel[2];
                 foreach (var unit in playLoveDic.Keys.OrderBy(x => x))
                     hashCode = (hashCode * 397) ^ playLoveDic[unit];
                 return hashCode;
@@ -1878,6 +1905,39 @@ namespace PCRCaculator
         {
             return k * a;
         }
+
+
+        public BaseData CeilMul(double k)
+        {
+            BaseData data = new BaseData();
+            for (int i = 0; i < 17; i++)
+            {
+                data.dataint[i] = (long) Math.Ceiling(dataint[i] * k);
+            }
+            return data;
+        }
+
+
+        // 高rank
+        public static BaseData operator *(BaseData a, BaseData b)
+        {
+            BaseData data = new BaseData();
+            for (int i = 0; i < 17; i++)
+            {
+                data.dataint[i] = (long) Math.Ceiling(a.dataint[i] * b.dataint[i] / 100000000.0) * 100;
+            }
+            return data;
+        }
+
+        public static BaseData Ceiling(BaseData a)
+        {
+            for (int i = 1; i < a.dataint.Length; i++)
+            {
+                a.dataint[i] = (int) Math.Ceiling(a.dataint[i] / 100.0);
+            }
+            return a;
+        }
+
         public static BaseData CeilToInt(BaseData a)
         {
             for (int i = 1; i < a.dataint.Length; i++)
