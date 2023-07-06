@@ -470,9 +470,14 @@ namespace PCRCaculator.SQL
         public string start_time { get; set; }
         public string end_time { get; set; }
         public int original_unit_id { get; set; }
-       
 
 
+
+    }
+    public class story_detail
+    {
+        public int story_id { get; set; }
+        public int love_level { get; set; }
     }
     public class chara_story_status
     {
@@ -500,15 +505,15 @@ namespace PCRCaculator.SQL
         public int chara_id_9 { get; set; }
         public int chara_id_10 { get; set; }
 
-        public List<int[]> GetStatesValueList()
+        public (int, int)[] GetStatesValueList()
         {
-            return new List<int[]>
+            return new (int, int)[]
             {
-                new int[2]{ status_type_1 , status_rate_1 },
-                new int[2]{ status_type_2 , status_rate_2 },
-                new int[2]{ status_type_3 , status_rate_3 },
-                new int[2]{ status_type_4 , status_rate_4 },
-                new int[2]{ status_type_5 , status_rate_5 }
+                ( status_type_1 , status_rate_1 ),
+                ( status_type_2 , status_rate_2 ),
+                ( status_type_3 , status_rate_3 ),
+                ( status_type_4 , status_rate_4 ),
+                ( status_type_5 , status_rate_5 )
             };
         }
         public List<int> GetCharIdList()

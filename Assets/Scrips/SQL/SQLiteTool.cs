@@ -628,21 +628,22 @@ namespace PCRCaculator.SQL
         {
             Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();
             Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();
-            Dictionary<int, List<List<int[]>>> add_vals = new Dictionary<int, List<List<int[]>>>();
+            Dictionary<int, List<((int, int)[], int)>> add_vals = new Dictionary<int, List<((int, int)[], int)>>();
             Dictionary<int, List<int>> ef_id = new Dictionary<int, List<int>>();
             var list = GetDatas<chara_story_status>();
-
+            var lovedict = GetDatas<story_detail>().ToDictionary(x => x.story_id, x => x.love_level);
             foreach (var dd in list)
             {
                 int storyid = dd.story_id;
+                if (!lovedict.ContainsKey(storyid)) continue;
                 int unitid = storyid / 1000 * 100 + 1;
                 if (!add_vals.ContainsKey(unitid))
                 {
-                    add_vals.Add(unitid, new List<List<int[]>>());
+                    add_vals.Add(unitid, new List<((int, int)[], int)>());
                     ef_id[unitid] = dd.GetCharIdList();
                 }
-                List<int[]> li = dd.GetStatesValueList();
-                add_vals[unitid].Add(li);
+                var li = dd.GetStatesValueList();
+                add_vals[unitid].Add((li, lovedict[storyid]));
             }
             foreach (int id in add_vals.Keys)
             {

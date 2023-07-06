@@ -1583,23 +1583,10 @@ namespace PCRCaculator
     [Serializable]
     public class UnitStoryData
     {
-        static int[] loveTrans = new int[13] { 0, 1, 1, 1, 2, 3, 3, 3, 4 ,4,4,4,4};
         public int unitid;
         public int loveMax;
         public List<int> effectCharacters;//受影响的角色id列表
-        public List<List<int[]>> addValues;//增加的属性，【属性序号，属性值】
-        /// <summary>
-        /// 不要使用这个构造函数
-        /// </summary>
-        public UnitStoryData()
-        {
-            unitid = 0;
-            effectCharacters = new List<int>();
-            effectCharacters.Add(0);
-            addValues = new List<List<int[]>>();
-            addValues.Add(new List<int[]>());
-            addValues[0].Add(new int[2] { 0, 0 });
-        }
+        public List<((int, int)[], int)> addValues;//增加的属性，【属性序号，属性值】
         /// <summary>
         /// 角色羁绊类构造函数
         /// </summary>
@@ -1607,7 +1594,7 @@ namespace PCRCaculator
         /// <param name="lovemax">羁绊上限</param>
         /// <param name="eff_ch">受影响角色列表</param>
         /// <param name="add_v">增加的属性【序号，值】</param>
-        public UnitStoryData(int id, int lovemax, List<int> eff_ch, List<List<int[]>> add_v)
+        public UnitStoryData(int id, int lovemax, List<int> eff_ch, List<((int, int)[], int)> add_v)
         {
             unitid = id;
             loveMax = lovemax;
@@ -1620,7 +1607,7 @@ namespace PCRCaculator
             unitid = int.Parse(data0[0]);
             loveMax = int.Parse(data0[1]);
             effectCharacters = JsonConvert.DeserializeObject<List<int>>(data0[2]);
-            addValues = JsonConvert.DeserializeObject<List<List<int[]>>>(data0[3]);
+            addValues = JsonConvert.DeserializeObject<List<((int, int)[], int)>> (data0[3]);
         }
         /// <summary>
         /// 获取角色羁绊对应的奖励属性
@@ -1635,23 +1622,16 @@ namespace PCRCaculator
                 MainManager.Instance.WindowConfigMessage("<color=#FF0000>" + word + "</color>", null);
                 love = love < 0 ? 0 : 8;
             }
-            if(loveMax == 4)
-            {
-                love = loveTrans[love];
-            }
             //int k = Mathf.Min(love - 2,addValues.Count-1);
             BaseData bt = new BaseData();
             //string message = "";
-            for (int k = 1; k < love; ++k)
+            foreach (var (arr, k) in addValues)
             {
-                if (k >= addValues.Count+1)
-                    break;
-                //message += "第" +k + "轮：";
-                foreach (int[] values in addValues[k-1])
+                if (k > love) break;
+                //message += "属性：" + values[0] + "+" + values[1]+",";
+                foreach (var (type, val) in arr)
                 {
-                    //message += "属性：" + values[0] + "+" + values[1]+",";
-                    int val = values[1];
-                    switch (values[0])
+                    switch (type)
                     {
                         case 1: bt.Hp += val; break;
                         case 2: bt.Atk += val; break;
@@ -1661,20 +1641,20 @@ namespace PCRCaculator
                         case 6: bt.Physical_critical += val; break;
                         case 7: bt.Magic_critical += val; break;
                         case 8: bt.Dodge += val; break;
-                        case 9: bt.Life_steal += val;break;
+                        case 9: bt.Life_steal += val; break;
                         case 10: bt.Atk += val; break;//HP自动回复
                         case 11: bt.Wave_energy_recovery += val; break;//技能自动回复
-                        case 12: bt.Physical_penetrate += val;break;
-                        case 13: bt.Magic_penetrate += val;break;
+                        case 12: bt.Physical_penetrate += val; break;
+                        case 13: bt.Magic_penetrate += val; break;
                         case 14: bt.Energy_recovery_rate += val; break;//TP上升
                         case 15: bt.Hp_recovery_rate += val; break;//回复量上升
-                        case 16: bt.Enerey_reduce_rate += val;break;
+                        case 16: bt.Enerey_reduce_rate += val; break;
 
                         case 0:
                             break;
 
                         case 17://妹弓12级羁绊有这个，暂时不知道是啥
-                            //Debug.LogError("未知属性……"); 
+                                //Debug.LogError("未知属性……"); 
                             bt.Accuracy += val;
                             break;
                         default:

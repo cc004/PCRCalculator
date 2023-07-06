@@ -2205,6 +2205,7 @@ namespace Elements
                     selector = parts => $"{parts.Owner.UnitName}";
                     break;
             }
+
             void QuickSort(List<BasePartsData> _array, Func<BasePartsData, BasePartsData, int> _compare)
             {
                 _actionParameter.sortinfo = "";
@@ -2401,6 +2402,38 @@ namespace Elements
                 case PriorityPattern.PHYSICS_OR_MAGIC_HIGH_ATTACK_ASC:
                     Owner.BaseX = _baseTransform.position.x;
                     targetList.Sort(Owner.CompareHigherAtkOrMagicStrAscSameNear);
+                    break;
+                case PriorityPattern.ALL_ENEMY_INCLUDE_STEALTH:
+                    targetList.Clear();
+                    using (List<UnitCtrl>.Enumerator enumerator = (this.Owner.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList).GetEnumerator())
+                    {
+                        while (enumerator.MoveNext())
+                        {
+                            UnitCtrl unitCtrl = enumerator.Current;
+                            if (!unitCtrl.IsPartsBoss)
+                            {
+                                targetList.Add(unitCtrl.GetFirstParts(false, 0f));
+                            }
+                            else
+                            {
+                                foreach (PartsData partsData in unitCtrl.BossPartsListForBattle)
+                                {
+                                    if (partsData.GetTargetable())
+                                    {
+                                        targetList.Add(partsData);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    bool isForwardPattern = _actionParameter.TargetSort == PriorityPattern.FORWARD;
+                    this.sortTargetPosition(targetList, isForwardPattern, new Comparison<BasePartsData>(this.Owner.CompareLeft), new Comparison<BasePartsData>(this.Owner.CompareRight));
+                case PriorityPattern.ENERGY_ASC_BACK_WITHOUT_OWNER:
+                    this.sortTargetPosition(targetList, false, new Comparison<BasePartsData>(this.Owner.CompareEnergyAscSameLeft), new Comparison<BasePartsData>(this.Owner.CompareEnergyAscSameRight));
+                    break;
+                case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
+                    this.sortTargetPosition(targetList, _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE, new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameLeft), new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameRight));
                     break;
                 default:
                     targetList.Sort(Owner.CompareDistanceAsc);

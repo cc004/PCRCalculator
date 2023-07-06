@@ -3087,6 +3087,47 @@ this.updateCurColor();
             }*/
         }
 
+        // Token: 0x06003957 RID: 14679 RVA: 0x000EB21C File Offset: 0x000EB21C
+        public int CompareEnergyAscSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            if (BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy))
+            {
+                return this.CompareLeft(_a, _b);
+            }
+            return UnitCtrl.CompareEnergyAsc(_a, _b);
+        }
+
+        // Token: 0x06003958 RID: 14680 RVA: 0x000EB24C File Offset: 0x000EB24C
+        public int CompareEnergyAscSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            if (BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy))
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return UnitCtrl.CompareEnergyAsc(_a, _b);
+        }
+        // Token: 0x0600396B RID: 14699 RVA: 0x000EB7EC File Offset: 0x000EB7EC
+        public int CompareAtkDecSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareAtkDec(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareLeft(_a, _b);
+            }
+            return num;
+        }
+
+        // Token: 0x0600396C RID: 14700 RVA: 0x000EB810 File Offset: 0x000EB810
+        public int CompareAtkDecSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareAtkDec(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return num;
+        }
+
         public void _Update()
         {
             if (TimeToDie)
