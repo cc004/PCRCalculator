@@ -759,25 +759,16 @@ namespace Elements
                 return;
             GameObject prefab1 = null;
             //SkillEffectCtrl prefab2 = this.createPrefab(_skillEffect, _skill, _target, ref prefab1);
-            SkillEffectCtrl2 prefab2 = new FirearmCtrl2();
-            //prefab2.InitializeSort();//没用
-            //prefab2.SetStartTime(_starttime);//设置特效激活时间
-            //prefab2.PlaySe(this.Owner.SoundUnitId, this.Owner.IsLeftDir);
-            //prefab2.ExecAppendCoroutine((double)_skill.BlackOutTime > 0.0 ? this.Owner : (UnitCtrl)null, prefab2 is AwakeUbNoneStopEffect);
-            //prefab2.SetTimeToDieByStartHp(this.Owner.StartHpPercent);
-            //if (_modeChangeEndEffect)
-            //    this.Owner.ModeChangeEndEffectList.Add(prefab2);
-            //if (_skipCutIn)
-            //    prefab2.OnAwakeWhenSkipCutIn();
-            prefab2.SetPossitionAppearanceType(_skillEffect, _target, Owner, _skill);
             switch (_skillEffect.EffectBehavior)
             {
                 case eEffectBehavior.FIREARM:
                 case eEffectBehavior.SERIES_FIREARM:
-                    FirearmCtrl2 firearmCtrl = prefab2 as FirearmCtrl2;
+                    var prefab = Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss ? _skillEffect.PrefabLeft : _skillEffect.Prefab;
+                    var firearmCtrl = battleManager.GetFirearmCtrl2FromPool(Owner, prefab == null ? "null" : prefab.name);
+                    firearmCtrl.SetPossitionAppearanceType(_skillEffect, _target, Owner, _skill);
                     try
                     {
-                        firearmCtrl.data = (Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss ? _skillEffect.PrefabLeft : _skillEffect.Prefab)
+                        firearmCtrl.data = prefab
                             .GetComponent<FirearmCtrl>().GetPrefabData();
                         firearmCtrl.position += firearmCtrl.data.initialPosition;
                         SetPrefabDataBySkillid(_skill.SkillId, firearmCtrl.data);
@@ -903,53 +894,28 @@ namespace Elements
         }
 
     }
-    public class SkillEffectCtrl2
+    public class FirearmCtrl2 : IUpdate
     {
-        //[SerializeField]
-        //protected bool isRepeat;
         protected UnitCtrl source;
-        //[SerializeField]
-        //private bool isCommon;
         protected bool timeToDie;
         protected bool isPause;
-        //private SoundManager soundManager = ManagerSingleton<SoundManager>.Instance;
         protected Dictionary<Renderer, int> particleRendererDictionary;
-        private bool isFront;
-        private static readonly string LAYER_NAME = "Default";
-        private const int SORT_ORDER_BOUNDARY = 1000;
-        //private static Yggdrasil<SkillEffectCtrl> staticSingletonTree = (Yggdrasil<SkillEffectCtrl>) null;
-        private static BattleManager staticBattleManager;// = BattleManager.Instance;
-
-        public bool IsAura { get; set; }
-
-        /*public bool IsCommon
-        {
-            get => this.isCommon;
-            set => this.isCommon = value;
-        }*/
-
-        public Action<SkillEffectCtrl> OnEffectEnd { set; get; }
 
         public UnitCtrl SortTarget { get; set; }
 
-        public UnitCtrl Target { get; set; }
+        public bool IsPlaying { get; set; } = true;
 
-        /*public bool IsRepeat
+        public bool _Update()
         {
-            get => this.isRepeat;
-            set => this.isRepeat = value;
-        }*/
-
-        public bool IsPlaying { get; set; }
-
-        protected ParticleSystem[] particles { get; set; }
-
-        private Dictionary<ParticleSystem, float> particleStartDelayDictionary { get; set; }
-
-        private float resumeTime { get; set; }
-
-
-        public virtual Vector3 position { get; set; } = Vector3.zero;
+            if (timeToDie)
+            {
+                // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm set to die @{GetHashCode():x}.");
+                IsPlaying = false;
+                obj.SetActive(false);
+                return false;
+            }
+            return true;
+        }
 
         public virtual void SetPossitionAppearanceType(
   NormalSkillEffect skillEffect,
@@ -994,66 +960,25 @@ namespace Elements
                     }
                     break;
             }
-            if (skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM || skillEffect.EffectBehavior == eEffectBehavior.FIREARM && skillEffect.TargetBone != eTargetBone.BOTTOM )
+            if (skillEffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM || skillEffect.EffectBehavior == eEffectBehavior.FIREARM && skillEffect.TargetBone != eTargetBone.BOTTOM)
             {
-                //this.particle.transform.position += vector3 - target.GetBottomTransformPosition() - target.GetFixedCenterPos();
                 vector3 = target.GetBottomTransformPosition() + target.GetFixedCenterPos();
             }
             position += vector3;
-            /*switch (skillEffect.EffectBehavior)
-            {
-                case eEffectBehavior.FIREARM:
-                case eEffectBehavior.SERIES_FIREARM:
-                    skillEffect.TrackType = eTrackType.NONE;
-                    break;
-            }
-            Vector3 absolutePosition = position - target.GetBottomTransformPosition();
-            switch (skillEffect.TrackType)
-            {
-                case eTrackType.BONE:
-                    switch (skillEffect.TrackDimension)
-                    {
-                        case eTrackDimension.XY:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, bone: bone, _trackRotation: skillEffect.TrackRotation));
-                            return;
-                        case eTrackDimension.X:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, followY: false, bone: bone));
-                            return;
-                        case eTrackDimension.Y:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, false, bone: bone));
-                            return;
-                        default:
-                            return;
-                    }
-                case eTrackType.BOTTOM:
-                    switch (skillEffect.TrackDimension)
-                    {
-                        case eTrackDimension.XY:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition));
-                            return;
-                        case eTrackDimension.X:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, followY: false));
-                            return;
-                        case eTrackDimension.Y:
-                            this.battleManager.StartCoroutine(this.TrackTarget(target, absolutePosition, false));
-                            return;
-                        default:
-                            return;
-                    }
-            }*/
         }
 
-    }
-    public class FirearmCtrl2:SkillEffectCtrl2
-    {
+        public bool activeSelf = true;
+
         public FirearmCtrlData data;
         private GameObject obj;
         private Vector2 _position = Vector2.zero;
-        public override Vector3 position { get => _position;
+        public Vector3 position
+        {
+            get => _position;
             set
             {
                 _position = value;
-                if (obj != null) obj.transform.position = _position;
+                obj.transform.position = _position;
             }
         }
         public bool IsAbsolute { get; set; }
@@ -1080,13 +1005,42 @@ namespace Elements
 
         protected Vector3 speed { get; set; }
 
-        protected UnitCtrl owner { get; set; }
+        public UnitCtrl owner { get; set; }
 
-        protected Action onCowHit { get; set; }
-        //private float SPEED_FIX => MyGameCtrl.Instance.tempData.SettingData.skillEffeckFix;
         protected BattleManager battleManager => BattleManager.Instance;
 
-        public virtual void Initialize(
+        public string name;
+        public FirearmCtrl2(string name)
+        {
+            this.name = name;
+            obj = Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
+            // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm constructing {name}@{GetHashCode():x}.");
+        }
+
+        ~FirearmCtrl2()
+        {
+            try
+            {
+                Object.Destroy(obj);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public void ResetParam()
+        {
+            IsPlaying = true;
+            activeSelf = true;
+            stopFlag = false;
+            timeToDie = false;
+            obj.transform.localPosition = MyGameCtrl.Instance.firearmPrefab.transform.localPosition;
+            this._position = obj.transform.position;
+            obj.SetActive(true);
+        }
+
+        public void Initialize(
   BasePartsData _target,
   List<ActionParameter> _actions,
   Skill _skill,
@@ -1099,7 +1053,11 @@ namespace Elements
   List<ShakeEffect> _shakes,
   eTargetBone _targetBone)
         {
-            obj = Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
+            battleManager.AddEffectToUpdateList(this);
+
+            if (!battleManager.skipping && BattleManager.enableFirearmBug)
+                Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm intiializing {name}@{GetHashCode():x}.");
+
             ShakeEffects = _shakes;
             IsAbsolute = _isAbsolute;
             Skill = _skill;
@@ -1167,10 +1125,10 @@ namespace Elements
 
         private Vector3 GetParaboricPosition(float _currentTime, float _deltaTime)
         {
-            Vector3 position = base.position;
+            Vector3 position = this.position;
             if (easingX.IsMoving)
             {
-                position = new Vector3(easingX.GetCurVal(_deltaTime, true), (_currentTime >= data.duration / 2f) ? easingDownY.GetCurVal(_deltaTime, true) : easingUpY.GetCurVal(_deltaTime, true), base.position.z);
+                position = new Vector3(easingX.GetCurVal(_deltaTime, true), (_currentTime >= data.duration / 2f) ? easingDownY.GetCurVal(_deltaTime, true) : easingUpY.GetCurVal(_deltaTime, true), this.position.z);
             }
             return position;
         }
@@ -1181,13 +1139,22 @@ namespace Elements
         private CustomEasing easingUpRotate;
         private CustomEasing easingDownRotate;
 
+        public bool updatePositionRunning = false;
+
         private IEnumerator updatePosition(float _lifeDistance)
         {
+            updatePositionRunning = true;
             float currentTime = 0.0f;
             bool hitFlag = false;
             float hitTimer = 0.0f;
-            while (true)
+            while (IsPlaying)
             {
+                // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm updating position {name}@{GetHashCode():x}.");
+                if (!this.activeSelf)
+                {
+                    yield return null;
+                    continue;
+                }
                 float deltaTime = battleManager.DeltaTime_60fps;
                 if (hitFlag)
                 {
@@ -1195,11 +1162,11 @@ namespace Elements
                     float _b = ((eMoveTypes)data.MoveType) == eMoveTypes.LINEAR ? 0.2f / data.MoveRate : data.HitDelay;
                     if (hitTimer > (double)_b || BattleUtil.Approximately(hitTimer, _b))
                     {
+                        if (!battleManager.skipping && BattleManager.enableFirearmBug)
+                            Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm hit target and stopping {name}@{GetHashCode():x}.");
                         hitTimer = 0.0f;
                         hitFlag = false;
                         stopFlag = true;
-                        Object.Destroy(obj);
-                        obj = null;
                         if (OnHitAction != null)
                         {
                             //FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
@@ -1209,63 +1176,57 @@ namespace Elements
                         //onCowHit = (Action)null;
                     }
                 }
+
                 if (getStopFlag())
                 {
-                    //activeSelf = false;
+                    activeSelf = false;
                     //data.FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
-                    //data.timeToDie = true;
-                    break;
+                    timeToDie = true;
                 }
-
-                if (data == null)
-                    break;
-                Vector3 b = position;
-                switch ((eMoveTypes)data.MoveType)
+                else
                 {
-                    case eMoveTypes.LINEAR:
-                    case eMoveTypes.HORIZONTAL:
-                        //case eMoveTypes.PARABORIC:
-                        //case eMoveTypes.PARABORIC_ROTATE:
+                    Vector3 b = position;
+                    switch ((eMoveTypes)data.MoveType)
+                    {
+                        case eMoveTypes.LINEAR:
+                        case eMoveTypes.HORIZONTAL:
+                            //case eMoveTypes.PARABORIC:
+                            //case eMoveTypes.PARABORIC_ROTATE:
 
-                        //b += new Vector3(speed.x * deltaTime,0,0);
-                        b += speed * deltaTime;
-                        break;
-                    case eMoveTypes.PARABORIC:
-                    case eMoveTypes.PARABORIC_ROTATE:
-                        currentTime += deltaTime;
-                        b = GetParaboricPosition(currentTime, deltaTime);
-                        if (currentTime > (double)data.duration)
-                        {
-                            hitFlag = true;
-                        }
-                        break;
-                }
-                //if ((eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE)
-                //    data.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, (double)currentTime >= (double)data.duration / 2.0 ? data.easingDownRotate.GetCurVal(deltaTime, true) : data.easingUpRotate.GetCurVal(deltaTime, true));
-                position = b;
-                switch ((eMoveTypes)data.MoveType)
-                {
-                    case eMoveTypes.LINEAR:
-                    case eMoveTypes.HORIZONTAL:
-                        if (Vector3.Distance(initialPosistion, b) > (double)_lifeDistance)
-                            //if ((double)Mathf.Abs(firearmCtrl.initialPosistion.x- b.x) > (double)3*_lifeDistance)
-
-                        {
-                            //data.FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
-                            //data.timeToDie = true;
-                        }
-                        break;
+                            //b += new Vector3(speed.x * deltaTime,0,0);
+                            b += speed * deltaTime;
+                            break;
+                        case eMoveTypes.PARABORIC:
+                        case eMoveTypes.PARABORIC_ROTATE:
+                            currentTime += deltaTime;
+                            b = GetParaboricPosition(currentTime, deltaTime);
+                            if (currentTime > (double)data.duration)
+                            {
+                                hitFlag = true;
+                            }
+                            break;
+                    }
+                    position = b;
+                    var moveType = (eMoveTypes) data.MoveType;
+                    if ((moveType == eMoveTypes.LINEAR || moveType == eMoveTypes.HORIZONTAL) && Vector3.Distance(this.initialPosistion, b) > _lifeDistance)
+                    {
+                        // this.FireTarget.Owner.FirearmCtrlsOnMe.Remove(this);
+                        // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm hit set to die due to out of distance {name}@{GetHashCode():x}.");
+                        this.timeToDie = true;
+                    }
                 }
                 if (!IsAbsolute)
                     hitFlag = collisionDetection(hitFlag, currentTime);
                 yield return null;
 
             }
+            updatePositionRunning = false;
+            // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm update position exit @{GetHashCode():x}.");
         }
         protected virtual bool getStopFlag() => stopFlag;
         private bool collisionDetection(bool _hitFlag, float _currentTime)
         {
-            if ((((eMoveTypes)data.MoveType) == eMoveTypes.PARABORIC ||(eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE) && _currentTime < data.duration * 0.5 || (_hitFlag || InFlag))
+            if ((((eMoveTypes)data.MoveType) == eMoveTypes.PARABORIC || (eMoveTypes)data.MoveType == eMoveTypes.PARABORIC_ROTATE) && _currentTime < data.duration * 0.5 || (_hitFlag || InFlag))
                 return _hitFlag;
             float num1 = position.x + data.ColliderBoxCentre[0];
             float num2 = data.ColliderBoxSize[0] * 0.5f;
@@ -1277,7 +1238,7 @@ namespace Elements
             float _a2 = (float)num3 + num4;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "-弹道检测：" + num1 + "--" + num2 + "--" + num3+"--"+num4);
             //if ((double)_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || (double)_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
-             //   return _hitFlag;
+            //   return _hitFlag;
             if (speed.x > 0)
             {
                 if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2))

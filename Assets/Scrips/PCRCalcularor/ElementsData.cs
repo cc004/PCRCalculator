@@ -9,6 +9,7 @@ namespace Elements
     [Serializable]
     public class FirearmCtrlData
     {
+        public string name;
         [JsonIgnore]
         public Vector3 initialPosition;
         public float HitDelay = 0.5f;

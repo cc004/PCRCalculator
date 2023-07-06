@@ -108,7 +108,7 @@ namespace Elements
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
                 {
                     float criticalRate = damageData.CriticalRate;
-                    if ((double) _valueDictionary[eValueNumber.VALUE_5] == index + 1)
+                    if ((double) x == index + 1 || x < 0)
                     {
                         criticalRate = 1f;
                     }

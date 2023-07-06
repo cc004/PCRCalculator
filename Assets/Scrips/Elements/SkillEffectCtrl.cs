@@ -16,7 +16,7 @@ namespace Elements
 {
     [ExecuteAlways]
     //[RequireComponent(typeof (CriAtomSource))]
-    public class SkillEffectCtrl : MonoBehaviour, ISingletonField
+    public class SkillEffectCtrl : MonoBehaviour, ISingletonField, IUpdate
     {
         /*public static readonly eSE[] BattleCommonSeArray = new eSE[2]
         {

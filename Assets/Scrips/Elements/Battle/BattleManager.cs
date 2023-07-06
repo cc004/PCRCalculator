@@ -27,6 +27,11 @@ using Random = UnityEngine.Random;
 
 namespace Elements.Battle
 {
+    public interface IUpdate
+    {
+        bool _Update();
+    }
+
     public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController
     {
         private int skillTargetCacheKey = Environment.TickCount;
@@ -104,7 +109,7 @@ namespace Elements.Battle
         private bool isAllActionDone = true;
         private bool playerAllDead;
         private bool otherAllDead;
-        private List<SkillEffectCtrl> effectUpdateList = new List<SkillEffectCtrl>();
+        private List<IUpdate> effectUpdateList = new List<IUpdate>();
         private Vector3 playCameraPos0;
         private UnitCtrl voiceOnUnit;
         private bool isAdminChanging;
@@ -900,14 +905,14 @@ namespace Elements.Battle
 
         //public void AppendUITweener(UITweener CHBBDEHNPGH, UnitCtrl GEDLBPMPOKB = null, bool HDJNNDDPDJI = false) => this.battleEffectManager.AppendTweener(CHBBDEHNPGH, GEDLBPMPOKB, HDJNNDDPDJI);
 
-        public void AddEffectToUpdateList(SkillEffectCtrl FJOPFIJMADE)
+        public void AddEffectToUpdateList(IUpdate FJOPFIJMADE)
         {
             if (effectUpdateList.Contains(FJOPFIJMADE))
                 return;
             effectUpdateList.Add(FJOPFIJMADE);
         }
 
-        public void RemoveEffectToUpdateList(SkillEffectCtrl FJOPFIJMADE)
+        public void RemoveEffectToUpdateList(IUpdate FJOPFIJMADE)
         {
             if (effectUpdateList == null)
                 return;
@@ -940,6 +945,39 @@ namespace Elements.Battle
             int num = UnityEngine.Random.Range(Min, Max);
             UnityEngine.Random.state = state;
             return num;
+        }
+
+        private Dictionary<string, List<FirearmCtrl2>> battleEffectDict = new Dictionary<string, List<FirearmCtrl2>>();
+
+        public static bool enableFirearmBug = File.Exists("enable_firearm_bug");
+
+        public FirearmCtrl2 GetFirearmCtrl2FromPool(UnitCtrl source, string name)
+        {
+            if (!battleEffectDict.TryGetValue(name, out var val))
+                battleEffectDict.Add(name, val = new List<FirearmCtrl2>());
+
+            foreach (var t in val)
+            {
+                if (!t.IsPlaying)
+                {
+                    if (t.updatePositionRunning)
+                    {
+                        if (enableFirearmBug)
+                        {
+                            if (!skipping)
+                                UnityEngine.Debug.LogError($"[{BattleHeaderController.CurrentFrameCount}] 检测到弹道BUG {t.owner.UnitName} => {source.UnitName} {name}@{t.GetHashCode():x}");
+                        }
+                        else continue;
+                    }
+                    t.ResetParam();
+
+                    return t;
+                }
+            }
+
+            var res = new FirearmCtrl2(name);
+            val.Add(res);
+            return res;
         }
 
         /*public void CreanteUnit(int Unitid, System.Action<UnitCtrl> callback, bool addUnitList = true)
@@ -3478,7 +3516,7 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
-
+            battleEffectDict.Clear();
             setStatus.Clear();
             battleFinished = false;
             GuildCalculator.Instance.dmglist.Clear();
