@@ -55,15 +55,15 @@ namespace PCRCaculator
             }
             if (a.love >= 0 && unitId <= 200000)
             {
-                foreach (int item in MainManager.Instance.UnitStoryEffectDic[unitId])
+                foreach (int id0 in MainManager.Instance.UnitStoryEffectDic[unitId])
                 {
-                    if (a.playLoveDic != null && a.playLoveDic.TryGetValue(item, out var value2))
+                    if (a.playLoveDic != null && a.playLoveDic.TryGetValue(id0, out int loveLevel))
                     {
-                        result += MainManager.Instance.UnitStoryDic[item].GetLoveValues(value2);
-                    }
-                    else if (MainManager.Instance.JudgeWeatherShowThisUnit(item) && MainManager.Instance.unitDataDic.ContainsKey(item))
-                    {
-                        result += MainManager.Instance.UnitStoryDic[item].GetLoveValues(MainManager.Instance.unitDataDic[item].love);
+                        if (!MainManager.Instance.UnitStoryDic.ContainsKey(id0))
+                        {
+                            Debug.LogError($"{id0}: key not found");
+                        }
+                        result += MainManager.Instance.UnitStoryDic[id0].GetLoveValues(loveLevel);
                     }
                 }
             }
