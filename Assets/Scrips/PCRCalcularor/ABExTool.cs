@@ -457,21 +457,25 @@ namespace PCRCaculator
 
             //internal packed
             var path = Application.streamingAssetsPath + "/AB/" + fullname;
+            var mgr = useOldManifest ? mgrDataJP : mgrCharacter;
 #if PLATFORM_ANDROID
             var www = new WWW(path);
             while (!www.isDone) { Thread.Sleep(0); }
-            path = Application.persistentDataPath + "/AB/" + fullname;
+            path = Application.persistentDataPath + $"/AB/{mgr.SubFolder}/";
 #else
             var www = new WWW(path);
             while (!www.isDone) { Thread.Sleep(0); }
-            path = Application.streamingAssetsPath + "/../.ABExt2/" + fullname;
+            path = Application.streamingAssetsPath + $"/../.ABExt2/{mgr.SubFolder}/";
 #endif
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            path += fullname;
+
             var asset = www.getAssetBundle();
             if (asset == null)
             {
                 if (!File.Exists(path))
                 {
-                    var bytes = (useOldManifest ? mgrDataJP : mgrCharacter).ResolveFile("a/" + fullname);
+                    var bytes = mgr.ResolveFile("a/" + fullname);
                     if (bytes != null) File.WriteAllBytes(path, bytes);
                 }
                 www = new WWW("file://" + path);
@@ -569,7 +573,8 @@ namespace PCRCaculator
             //if (unitid >= 200000 && unitid <= 299999)
             //    unitid = (int)(unitid / 100) * 100;
             // preload battleunit
-            TryGetAssetBundleByName("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false);
+            if (TryGetAssetBundleByName("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
+                TryGetAssetBundleByName("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
             GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab", unitid > 200000);
             /*if(a==null)
             {
@@ -582,8 +587,6 @@ namespace PCRCaculator
         {
             if (unitid == 207001)
                 return 207000;
-            if (unitid == 105701)
-                return 170101;
             return unitid;
         }
 

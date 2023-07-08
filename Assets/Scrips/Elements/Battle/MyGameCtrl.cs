@@ -305,17 +305,20 @@ namespace Elements
         }
         public void LoadCharacterPrefabImmediately(PCRCaculator.UnitData data, int idx, bool isplayer, Action finishAction)
         {
-            int unitid = data.unitId;
+            int prefabId = data.PrefabId;
+            var unitId = data.unitId;
             bool useSkillEffects = false;
+
+            
             //if (!ignoreEffects)
             //{
             //    useSkillEffects = LoadSkillEffectPrefabs(unitid);
             //}
             //GameObject b = Instantiate(battleUnitPrefab);
-            GameObject prefab = ABExTool.LoadUnitPrefab(unitid);
+            GameObject prefab = ABExTool.LoadUnitPrefab(prefabId);
             GameObject b;
             if (prefab != null)
-                b = Instantiate(ABExTool.LoadUnitPrefab(unitid));
+                b = Instantiate(ABExTool.LoadUnitPrefab(prefabId));
             else
             {
                 b = Instantiate(battleUnitPrefab);
@@ -331,12 +334,12 @@ namespace Elements
             if (isplayer)
             {
                 playerUnitCtrl.Add(unitCtrl);
-                playerUnitCtrlDic.Add(unitid, unitCtrl);
+                playerUnitCtrlDic.Add(unitId, unitCtrl);
             }
             else
             {
                 enemyUnitCtrl.Add(unitCtrl);
-                enemyUnitCtrlDic.Add(unitid, unitCtrl);
+                enemyUnitCtrlDic.Add(unitId, unitCtrl);
             }
             if (tempData.isGuildBattle && !isplayer)
             {
@@ -359,7 +362,7 @@ namespace Elements
             unitCtrl.UnitName = (isplayer ? "<color=#FF0000>" : "<color=#0024FF>") + unitCtrl.UnitName + "</color>";
             unitCtrl.posIdx = idx;
             var actionController = b.GetComponent<UnitActionController>();
-            actionController.LoadActionControllerData(unitid,prefab!=null);
+            actionController.LoadActionControllerData(prefabId,prefab!=null);
            //  actionController.UseSkillEffect = useSkillEffects;
             CreateUnitSpine(data, idx, isplayer, BattleDefine.GetUnitRespawnPos(idx, !isplayer), null);
             finishAction?.Invoke();

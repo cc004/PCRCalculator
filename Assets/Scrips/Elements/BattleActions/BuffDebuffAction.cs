@@ -85,7 +85,15 @@ namespace Elements
             }
             UnitCtrl.BuffParamKind changeParamKind = GetChangeParamKind(ActionDetail1);
             Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
-            if (_target.Owner.IsPartsBoss && changeParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (changeParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE) && (changeParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE && changeParamKind != UnitCtrl.BuffParamKind.MAX_HP))
+            if (_target.Owner.IsPartsBoss && changeParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE &&
+                changeParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED &&
+                changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE &&
+                changeParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE &&
+                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE &&
+                changeParamKind != UnitCtrl.BuffParamKind.MAX_HP &&
+                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT &&
+                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT &&
+                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT)
             {
                 for (int index = 0; index < _target.Owner.BossPartsListForBattle.Count; ++index)
                     dictionary.Add(_target.Owner.BossPartsListForBattle[index], CalculateBuffDebuffParam(_target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));

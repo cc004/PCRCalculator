@@ -23,6 +23,11 @@ namespace PCRCaculator.Update
 
         }
 
+        public void CancelButton()
+        {
+            gameObject.SetActive(false);
+        }
+
         public void UpdateButton()
         {
             MainManager.Instance.Version.useQA = qa.isOn;
@@ -32,7 +37,7 @@ namespace PCRCaculator.Update
             MainManager.Instance.Version.BossVersionCN = long.Parse(verBossCN.text);
 
             SaveManager.Save(MainManager.Instance.Version);
-            
+            /*
             string path = Application.streamingAssetsPath + "/../.ABExt2";
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -41,9 +46,10 @@ namespace PCRCaculator.Update
 
             Directory.Delete(path, true);
             Directory.CreateDirectory(path);
+            */
 
             gameObject.SetActive(false);
-            MainManager.Instance.WindowConfigMessage("缓存清理完成，重启摸轴器以应用更改", Application.Quit, Application.Quit);
+            MainManager.Instance.WindowConfigMessage("更新完成，重启摸轴器以应用更改", Application.Quit, Application.Quit);
         }
     }
 }

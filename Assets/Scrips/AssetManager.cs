@@ -125,6 +125,8 @@ namespace PCRApi
 
     public class AssetManager : IContentHolder, IDataBaseManager
     {
+        public string SubFolder => $"jp{Ver}";
+
         public Dictionary<string, Content> registries = new Dictionary<string, Content>();
         private readonly Dictionary<string, Content> hashes = new Dictionary<string, Content>();
 
