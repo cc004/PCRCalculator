@@ -2005,6 +2005,8 @@ namespace Elements
                     unitCtrlList3 = Owner.SummonUnitDictionary.Values.ToList().FindAll(e => !e.IdleOnly && !e.IsDead);
                     break;
                 case PriorityPattern.NEAR_MY_TEAM_WITHOUT_OWNER:
+                case PriorityPattern.ENERGY_ASC_BACK_WITHOUT_OWNER:
+                case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner);
                     break;
             }
