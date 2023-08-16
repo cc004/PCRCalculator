@@ -8629,7 +8629,17 @@ this.updateCurColor();
             _value = BattleUtil.FloatToInt(_healDownValue * _value);
             if ((IsDead || (long)Hp <= 0.0) && !_isRevival || IsClanBattleOrSekaiEnemy)
                 this.battleLog.AppendBattleLog(eBattleLogType.MISS, 8, 0L, 0L, 0, 0, JELADBAMFKH: _source, LIMEKPEENOB: this);
-            else if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL) && _inhibitHealType != eInhibitHealType.NO_EFFECT)
+
+
+            float num = 0f;
+            if (IsAbnormalState(eAbnormalState.DECREASE_HEAL) && _inhibitHealType != eInhibitHealType.NO_EFFECT)
+            {
+                num = Mathf.Min(GetAbnormalStateMainValue(eAbnormalStateCategory.DECREASE_HEAL), 1f);
+            }
+
+            _value = BattleUtil.FloatToInt(_healDownValue * (1f - num) * _value);
+
+            if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL) && _inhibitHealType != eInhibitHealType.NO_EFFECT)
             {
                 if (GetAbnormalStateMainValue(eAbnormalStateCategory.INHIBIT_HEAL) == 0.0)
                     return;
