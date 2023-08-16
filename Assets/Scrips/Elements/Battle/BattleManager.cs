@@ -4715,13 +4715,18 @@ namespace Elements.Battle
                     //parameter = UnitUtility.CreateSummonUnitParameter(this._summonData.Owner.UnitParameter, this._summonData.SummonId, this._summonData.Skill.Level, this._summonData.ConsiderEquipmentAndBonus, this._summonData.Owner.MainSkill1Evolved);
                     PCRCaculator.UnitData ownerData = _summonData.Owner.unitData;
                     unitData_my = new PCRCaculator.UnitData(_summonData.SummonId, _summonData.Skill.Level,ownerData.rarity,ownerData.rank);
+                    unitData_my.uniqueEqLv = ownerData.uniqueEqLv;
                     parameter = TempData.CreateUnitParameter(unitData_my);
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
                 unitCtrl.Initialize(parameter,unitData_my, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
-                    _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my) : null);
+                    _summonData.ConsiderEquipmentAndBonus ? (
+                        MainManager.Instance.PlayerSetting.exDivisionFixed ?
+                        MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my) :
+                        MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
+                    ) : null);
                 unitCtrl.MaxHpAfterPassive = unitCtrl.MaxHp;
 
                 if (flag)

@@ -7799,6 +7799,8 @@ this.updateCurColor();
             }
 
             var num5 = a.Min(999999f);
+            b = b.Min(999999f);
+
             if (CurrentState == ActionState.DIE)
             {
                 //this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.FloatToInt(num5));
@@ -7874,7 +7876,7 @@ this.updateCurColor();
             {
                 if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
                 {
-                    float energy = BattleUtil.FloatToInt(b * (float)(skillStackValDmg * 1000.0)) / 1000f;
+                    var energy = BattleUtil.FloatToInt(b * (float)(skillStackValDmg * 1000.0)) / 1000f;
                     // XXX: 这里删除了slipdamage项，因为其似乎是对受击tp限制的废弃案
                     ChargeEnergy(eSetEnergyType.BY_SET_DAMAGE, energy, false, this, false, eEffectType.COMMON, true, false, _energyChargeMultiple);
                 }
