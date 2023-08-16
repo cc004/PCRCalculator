@@ -17,7 +17,7 @@ namespace PCRCaculator
         public List<Slider> sliders;
         public List<TextMeshProUGUI> texts;
         //public Toggle allowRarity6Toggle;
-        public Toggle tpCalculationChanged;
+        public Toggle tpCalculationChanged, exDivisionFixed;
         //public Toggle showAllUnitToggle;
         public GameObject SettingBack;
 
@@ -49,8 +49,9 @@ namespace PCRCaculator
             texts[2].text = PlayerSetting.maxUniqueEqLv + "";
             //allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
             tpCalculationChanged.isOn = PlayerSetting.tpCalculationChanged;
+            exDivisionFixed.isOn = PlayerSetting.exDivisionFixed;
             //if (showAllUnitToggle!=null)
-           //     showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
+            //     showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
 
             TPMaxText.text = PlayerSetting.maxTPUpValue.ToString();
 
@@ -83,6 +84,7 @@ namespace PCRCaculator
         {
             //PlayerSetting.allowRarity6 = allowRarity6Toggle.isOn;
             PlayerSetting.tpCalculationChanged = tpCalculationChanged.isOn;
+            PlayerSetting.exDivisionFixed = exDivisionFixed.isOn;
             //if(showAllUnitToggle!=null)
             //PlayerSetting.showAllUnits = showAllUnitToggle.isOn;
 
