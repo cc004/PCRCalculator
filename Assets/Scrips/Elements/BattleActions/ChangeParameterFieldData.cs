@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Battle;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Elements
 {
@@ -28,6 +29,34 @@ namespace Elements
 
         protected override int getClearedIndex(UnitCtrl _unit) => !IsBuff ? _unit.ClearedDebuffFieldIndex : _unit.ClearedBuffFieldIndex;
         public bool ShowsIcon = true;
+
+        public void DispelImmediately(UnitCtrl _unit)
+        {
+            if (getClearedIndex(_unit) < base.fieldIndex)
+            {
+                return;
+            }
+            List<BasePartsData> list = new List<BasePartsData>();
+            if (!_unit.IsPartsBoss)
+            {
+                list.Add(_unit.GetFirstParts());
+            }
+            else
+            {
+                for (int i = 0; i < _unit.BossPartsListForBattle.Count; i++)
+                {
+                    list.Add(_unit.BossPartsListForBattle[i]);
+                }
+            }
+            for (int j = 0; j < list.Count; j++)
+            {
+                BasePartsData basePartsData = list[j];
+                if (TargetSet.Contains(basePartsData))
+                {
+                    OnExit(basePartsData);
+                }
+            }
+        }
 
         public override void StartField()
         {
@@ -66,7 +95,10 @@ namespace Elements
             else
                 dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
             _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, _enable: false, null, IsBuff, _additional: false, ShowsIcon);
+            _parts.Owner.DisableBuffDebuffField(node[_parts.Owner]);
         }
+
+        private Dictionary<UnitCtrl, LinkedListNode<ChangeParameterFieldData>> node = new Dictionary<UnitCtrl, LinkedListNode<ChangeParameterFieldData>>();
 
         public override void OnEnter(BasePartsData _parts)
         {
@@ -92,7 +124,8 @@ namespace Elements
             owner.fieldTime = remaining;
             owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, BuffParamKind, dictionary, 0f, 0, null, _despelable: true, Elements.eEffectType.COMMON, IsBuff, _additional: false, _isShowIcon: false);
             owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, null, IsBuff, _additional: false, ShowsIcon);
-        }
+            node[owner] = owner.EnableBuffDebuffField(this);
+    }
 
         public enum eValueType
         {

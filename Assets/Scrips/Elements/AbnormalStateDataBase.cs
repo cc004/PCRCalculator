@@ -57,7 +57,7 @@ namespace Elements.Battle
 
         public UnitCtrl PPOJKIDHGNJ { get; set; }
 
-        private int fieldIndex { get; set; }
+        protected int fieldIndex { get; set; }
 
         //protected BattleEffectPoolInterface IPEGKPHMBBN => AbnormalStateDataBase.staticBattleEffectPool;
 

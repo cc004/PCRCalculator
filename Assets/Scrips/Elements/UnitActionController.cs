@@ -2226,7 +2226,7 @@ namespace Elements
                 if (!battleManager.skipping)
                 {
                     Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
-                    Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
+                    Owner.UIManager.LogMessage(str2, eLogMessageType.EXEC_ACTION, Owner);
                 }
             }
 

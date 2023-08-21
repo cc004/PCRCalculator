@@ -5879,10 +5879,37 @@ this.updateCurColor();
             }
             action?.Invoke("对目标添加" + _kind.GetDescription() + (_isBuff ? "BUFF" : "DEBUFF") + ",值" + valueStr + "持续时间" + _time + "秒");
             IEnumerator _cr = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
+
+            buffDebuffCoroutineList.Add(_cr);
+
             if (!_cr.MoveNext())
                 return;
             AppendCoroutine(_cr, ePauseType.SYSTEM);
 
+        }
+
+        private bool isStopBuffDebuffEffectTimer;
+
+        private List<IEnumerator> buffDebuffCoroutineList = new List<IEnumerator>();
+        private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
+
+        // Elements.UnitCtrl
+        private void dispelBuffDebuffImmediately()
+        {
+            isStopBuffDebuffEffectTimer = true;
+            for (int num = buffDebuffCoroutineList.Count - 1; num >= 0; num--)
+            {
+                if (!buffDebuffCoroutineList[num].MoveNext())
+                {
+                    buffDebuffCoroutineList.RemoveAt(num);
+                }
+            }
+            isStopBuffDebuffEffectTimer = false;
+
+            foreach (var item in buffDebuffFieldDataList.ToArray())
+            {
+                item.DispelImmediately(this);
+            }
         }
 
         private IEnumerator UpdateBuffParam(
@@ -5923,7 +5950,10 @@ this.updateCurColor();
             bool flag2;
             while (true)
             {
-                time += DeltaTimeForPause;
+                if (!isStopBuffDebuffEffectTimer)
+                {
+                    time += DeltaTimeForPause;
+                }
                 if (time > 1f)
                 {
                     buffDebuffSkilIds.Remove(_skillId);
@@ -5975,6 +6005,7 @@ this.updateCurColor();
                 ClearedDebuffFieldIndex = battleManager.MCLFFJEFMIF;
             }
 
+            dispelBuffDebuffImmediately();
             battleManager.QueueUpdateSkillTarget();
         }
 
@@ -12254,6 +12285,16 @@ this.updateCurColor();
             {
                 EnableAbnormalState(_abnormalState, _enable: false);
             }
+        }
+
+        public LinkedListNode<ChangeParameterFieldData> EnableBuffDebuffField(ChangeParameterFieldData _data)
+        {
+            return buffDebuffFieldDataList.AddLast(_data);
+        }
+
+        public void DisableBuffDebuffField(LinkedListNode<ChangeParameterFieldData> _data)
+        {
+            buffDebuffFieldDataList.Remove(_data);
         }
 
     }
