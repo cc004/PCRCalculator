@@ -26,7 +26,7 @@ namespace PCRCalcularor
         }
 
         public static void OverrideWith<TKey, TValue>(this Dictionary<TKey, TValue> self,
-            Dictionary<TKey, TValue> other)
+            IEnumerable<KeyValuePair<TKey, TValue>> other)
         {
             foreach (var pair in other)
             {
@@ -46,7 +46,7 @@ namespace PCRCalcularor
             }
         }
         public static void Override2With<TKey, TValue>(this Dictionary<TKey, TValue> self,
-            Dictionary<TKey, TValue> other) where TValue : IOverride2<TValue>
+            IEnumerable<KeyValuePair<TKey, TValue>> other) where TValue : IOverride2<TValue>
         {
             foreach (var pair in other)
             {

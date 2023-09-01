@@ -8658,8 +8658,11 @@ this.updateCurColor();
             if (_target == null)
                 _target = GetFirstParts(true);
             _value = BattleUtil.FloatToInt(_healDownValue * _value);
-            if ((IsDead || (long)Hp <= 0.0) && !_isRevival || IsClanBattleOrSekaiEnemy)
+            if ((IsDead || (long) Hp <= 0.0) && !_isRevival || IsClanBattleOrSekaiEnemy)
+            {
                 this.battleLog.AppendBattleLog(eBattleLogType.MISS, 8, 0L, 0L, 0, 0, JELADBAMFKH: _source, LIMEKPEENOB: this);
+                return;
+            }
 
 
             float num = 0f;

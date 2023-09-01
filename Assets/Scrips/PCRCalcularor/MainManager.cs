@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -304,6 +305,20 @@ namespace PCRCaculator
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
                         skillActionDescribe_cn = dbTool3.Dic12;
+
+                        {
+                            if (skillNameAndDescribe_cn.TryGetValue(1703001, out var val))
+                                skillNameAndDescribe_cn[1701001] = val;
+                            if (skillNameAndDescribe_cn.TryGetValue(1703002, out val))
+                                skillNameAndDescribe_cn[1701002] = val;
+                            if (skillNameAndDescribe_cn.TryGetValue(1703011, out val))
+                                skillNameAndDescribe_cn[1701011] = val;
+                            if (skillNameAndDescribe_cn.TryGetValue(1703012, out val))
+                                skillNameAndDescribe_cn[1701012] = val;
+                            if (skillNameAndDescribe_cn.TryGetValue(1703003, out val))
+                                skillNameAndDescribe_cn[1701003] = val;
+                        }
+
                         ereductionTable = (useJapanData ? dbTool : dbTool2).eReductions;
                         rbs = (useJapanData ? dbTool : dbTool2).rbs;
 
@@ -314,9 +329,9 @@ namespace PCRCaculator
                                 //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
                                 //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
                                 //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3)),
-                                Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4)),
-                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
+                                Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3.Where(x => x.Key / 1000 != 1701))),
+                                Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4.Where(x => x.Key / 100000 != 1701))),
+                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5.Where(x => x.Value.unit_id != 170101))),
                                 Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                 Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                 Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
@@ -324,7 +339,7 @@ namespace PCRCaculator
                             ).Wait();
 
                             Task.WhenAll(
-                                Task.Run(() => skillDataDic.Override2With(dbTool3.Dic3)),
+                                Task.Run(() => skillDataDic.Override2With(dbTool3.Dic3.Where(x => x.Key / 1000 != 1701))),
                                 Task.Run(() => equipmentDic.Override2With(dbTool3.Dic8)),
                                 Task.Run(() => skillActionDic.Override2With(dbTool3.Dic4)),
                                 Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
