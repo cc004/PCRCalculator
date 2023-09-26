@@ -3058,7 +3058,8 @@ namespace Elements
                   if (_plusSkillFlags != null && _plusSkillFlags.Count > index && _plusSkillFlags[index])
                     _skillId = _plusSkills[index];
                   SkillLevelInfo skillLevelInfo = new SkillLevelInfo();
-                  skillLevelInfo.SetSkillId(_skillId);
+                  skillLevelInfo.
+        Id(_skillId);
                   skillLevelInfo.SetSkillLevel(_levels[index]);
                   skillLevelInfoList.Add(skillLevelInfo);
                 }

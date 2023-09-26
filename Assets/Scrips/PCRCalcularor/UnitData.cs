@@ -520,7 +520,7 @@ namespace PCRCaculator
         [JsonIgnore]
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
-        public int PrefabId => rarity == 6 && unitId == 105701 ? 170101 : unitId;
+        public int PrefabId => rarity == 6 && unitId == 105701 ? 170301 : unitId;
         
         public void SetDefaultLoveDict()
         {

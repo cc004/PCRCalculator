@@ -135,7 +135,7 @@ namespace PCRApi.CN
 
         public void RegisterContent(string url, Content content)
         {
-            registries.Add(url, content);
+            registries[url] = content;
         }
         
         private string manifest => $"https://{res}Manifest/";

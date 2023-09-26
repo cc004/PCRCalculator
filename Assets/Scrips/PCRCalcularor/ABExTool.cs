@@ -435,6 +435,16 @@ namespace PCRCaculator
         {
             var ver = MainManager.Instance.Version;
 
+            if (ver.BossVersionJP == ver.CharacterVersionJP)
+            {
+                mgrCharacter = mgrDataJP;
+                return Task.WhenAll(
+                    Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),
+                    Task.Run(() => mgrDataCN.Initialize(ver.BossVersionCN.ToString(),
+                        ver.useQA))
+                );
+            }
+
             return Task.WhenAll(
                 Task.Run(() => mgrCharacter.Initialize(ver.CharacterVersionJP.ToString())),
                 Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),

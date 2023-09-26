@@ -2314,9 +2314,11 @@ this.updateCurColor();
                 MasterSkillData.SkillData skillData = new MasterSkillData.SkillData(data);
                 unionBurstSkillAreaWidth = skillData.skill_area_width;
             }
-            int defaultActionPatternId = UnitUtility.GetDefaultActionPatternId(UnitId);
+
+            int defaultActionPatternId = UnitUtility.GetDefaultActionPatternId(UnitIdForActionPattern);
             CreateAttackPattern(_data.SkillData, defaultActionPatternId);
             currentActionPatternId = defaultActionPatternId;
+
             //UnitData uniqueData = _data.UniqueData;
             BaseData baseData = new BaseData();
             BaseData baseDataEX = new BaseData();
@@ -2534,6 +2536,16 @@ this.updateCurColor();
             }*/
         }
 
+        public int UnitIdForActionPattern
+        {
+            get
+            {
+                var uid = UnitId;
+                if (UnitId == 105701 && Rarity == 6) uid = 170301;
+                return uid;
+            }
+        }
+
         //public void HideLifeGauge() => this.lifeGauge.SetActiveWithCheck(false);
 
        /* public void ShowLifeGauge()
@@ -2735,7 +2747,7 @@ this.updateCurColor();
 
         private void resetActionPatternAndCastTime()
         {
-            currentActionPatternId = UnitUtility.GetDefaultActionPatternId(this.UnitId);
+            currentActionPatternId = UnitUtility.GetDefaultActionPatternId(this.UnitIdForActionPattern);
             attackPatternIndex = 0;
             attackPatternIsLoop = attackPatternDictionary[currentActionPatternId].Count == 0;
             switch (battleManager.BattleCategory)

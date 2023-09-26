@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -134,7 +135,7 @@ namespace PCRApi
 
         public void RegisterContent(string url, Content content)
         {
-            registries.Add(url, content);
+            registries[url] = content;
         }
         
         private string manifest => $"http://prd-priconne-redive.akamaized.net/dl/Resources/";

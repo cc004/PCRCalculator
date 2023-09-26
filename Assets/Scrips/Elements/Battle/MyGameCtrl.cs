@@ -207,8 +207,8 @@ namespace Elements
             
             if (unitid == 105701 && data.rarity == 6)
             {
-                skinID = 170161;
-                unitid2 = 170101;
+                skinID = 170361;
+                unitid2 = 170301;
             }
 
             if (prefab != 0)

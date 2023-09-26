@@ -260,7 +260,16 @@ namespace PCRCaculator
 #endif
             SQLiteTool.sql = sql;
 
-            ABExTool.StaticInitialize().Wait();
+            try
+            {
+                ABExTool.StaticInitialize().Wait();
+            }
+            catch (Exception e)
+            {
+                WindowMessage("下载数据发生错误，重置版本");
+                SaveManager.Save(new VersionData());
+                return;
+            }
 
             var tasks = new List<Task>();
             
@@ -305,7 +314,7 @@ namespace PCRCaculator
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
                         skillActionDescribe_cn = dbTool3.Dic12;
-
+                        /*
                         {
                             if (skillNameAndDescribe_cn.TryGetValue(1703001, out var val))
                                 skillNameAndDescribe_cn[1701001] = val;
@@ -317,35 +326,50 @@ namespace PCRCaculator
                                 skillNameAndDescribe_cn[1701012] = val;
                             if (skillNameAndDescribe_cn.TryGetValue(1703003, out val))
                                 skillNameAndDescribe_cn[1701003] = val;
-                        }
+                        }*/
 
                         ereductionTable = (useJapanData ? dbTool : dbTool2).eReductions;
                         rbs = (useJapanData ? dbTool : dbTool2).rbs;
 
                         if (!useJapanData)
                         {
-                            Task.WhenAll(
+                            Task.WaitAll(
                                 //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
                                 //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
                                 //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
                                 //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3.Where(x => x.Key / 1000 != 1701))),
-                                Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4.Where(x => x.Key / 100000 != 1701))),
-                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5.Where(x => x.Value.unit_id != 170101))),
+                                Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3)),
+                                Task.Run(() => UniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
+                                Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4)),
+                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
                                 Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                 Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                 Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
                                 // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
-                            ).Wait();
+                            );
 
-                            Task.WhenAll(
-                                Task.Run(() => skillDataDic.Override2With(dbTool3.Dic3.Where(x => x.Key / 1000 != 1701))),
+
+                            Task.WaitAll(
+                                Task.Run(() =>
+                                    unitRarityDic.OverrideWith(dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701))),
+                                Task.Run(() =>
+                                    UniqueEquipmentDataDic.OverrideWith(dbTool3.Dic9.Where(p => p.Key / 10000 == 17))),
+                                Task.Run(() =>
+                                    skillDataDic.OverrideWith(dbTool3.Dic3.Where(p => p.Key / 100000 == 17))),
+                                Task.Run(() =>
+                                    skillActionDic.OverrideWith(dbTool3.Dic4.Where(p => p.Key / 10000000 == 17))),
+                                Task.Run(() =>
+                                    allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5.Where(p => p.Key / 1000000 == 17)))
+                            );
+
+                            Task.WaitAll(
+                                Task.Run(() => skillDataDic.Override2With(dbTool3.Dic3)),
                                 Task.Run(() => equipmentDic.Override2With(dbTool3.Dic8)),
                                 Task.Run(() => skillActionDic.Override2With(dbTool3.Dic4)),
                                 Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
                                 Task.Run(() => GuildManager.EnemyDataDic.Override2With(dbTool3.Dic2))
-                            ).Wait();
-
+                            );
+                            
                             // unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
 
                             unitRarityDic.TryAdd(dbCN.Dic1);
@@ -355,6 +379,7 @@ namespace PCRCaculator
                             skillActionDic.TryAdd(dbCN.Dic4);
                             allUnitAttackPatternDic.TryAdd(dbCN.Dic5);
 
+                            unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
                             unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
                     }));
@@ -892,7 +917,7 @@ namespace PCRCaculator
         }
         public int GetMotionType(int unitid,int skinid)
         {
-            if (skinid == 170161 || unitid == 170101)
+            if (skinid == 170361 || unitid == 170301)
                 return 34;
             return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
         }

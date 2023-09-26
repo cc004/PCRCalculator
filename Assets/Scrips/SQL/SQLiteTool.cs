@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using SQLite4Unity3d;
 using System;
+using System.Diagnostics;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
@@ -14,6 +14,8 @@ using Elements;
 using Mono.Data.Sqlite;
 using PCRApi.CN;
 using PCRCaculator.Guild;
+using UnityEngine.UIElements;
+using Debug = UnityEngine.Debug;
 using SQLite3 = SQLite4Unity3d.SQLite3;
 #if !UNITY_EDITOR
 using System.IO;
@@ -355,7 +357,7 @@ namespace PCRCaculator.SQL
                 unit_skill_data sk = unitSkillDataDic[pair.Key];
                 if (pair.Key == 105701)
                 {
-                    sk = unitSkillDataDic[170101];
+                    sk = unitSkillDataDic.TryGetValue(170301, out var val) ? val : unitSkillDataDic[170101];
                 }
                 skillData.UB = sk.union_burst;
                 skillData.UB_ev = sk.union_burst_evolution;
@@ -582,15 +584,46 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
+        
         private Dictionary<int, unique_equip_enhance_rate[]> GetUEQData()
         {
             var dic = GetDatasDic<unit_unique_equip>(
                 x => x.equip_id);
             var basearr = GetDatasDic<unique_equipment_data>(x => x.equipment_id);
 
-            return (GetDatas<unique_equip_enhance_rate>() ?? GetDatas<unique_equipment_enhance_rate>())
+            return Combine(GetDatas<unique_equip_enhance_rate>(), GetDatas<unique_equipment_enhance_rate>())
                 .GroupBy(x => x.equipment_id)
-                .ToDictionary(x => dic[x.Key].unit_id, x => x.OrderBy(x => x.min_lv).Select(x => { x.baseData = basearr[x.equipment_id]; return x; }).ToArray());
+                .Where(x => dic.ContainsKey(x.Key))
+                .ToDictionary(x => dic[x.Key].unit_id, x => x.OrderBy(x => x.min_lv).Select(x =>
+                {
+                    x.baseData = basearr[x.equipment_id];
+                    return x;
+                }).ToArray());
+        }
+
+        private IEnumerable<unique_equip_enhance_rate> Combine(unique_equip_enhance_rate[] a, unique_equipment_enhance_rate[] b)
+        {
+            if (a == null)
+            {
+                foreach (var x in b)
+                {
+                    yield return x;
+                }
+                yield break;
+            }
+
+            var set = new HashSet<int>();
+
+            foreach (var x in a)
+            {
+                yield return x;
+                set.Add(x.equipment_id);
+            }
+
+            foreach (var x in b)
+            {
+                if (!set.Contains(x.equipment_id)) yield return x;
+            }
         }
 
         private Dictionary<int, string> GetUnitName_cn()

@@ -20,10 +20,9 @@ public static class AssetExtensions
                 asset.MetadataHeader.UnityVersion = "2020.3.17f1";
 
 #if PLATFORM_ANDROID
-            if (asset.MetadataHeader.TargetPlatform != (int) BuildTarget.Android)
-            {
-                asset.MetadataHeader.TargetPlatform = (int) BuildTarget.Android;
-            }
+            asset.MetadataHeader.TargetPlatform = (int) BuildTarget.Android;
+#else
+            asset.MetadataHeader.TargetPlatform = (int) BuildTarget.StandaloneWindows64;
 #endif
                 handle.LoadAssetsFile(asset);
             }
