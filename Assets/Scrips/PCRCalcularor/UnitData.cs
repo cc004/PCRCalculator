@@ -1643,7 +1643,7 @@ namespace PCRCaculator
                         case 7: bt.Magic_critical += val; break;
                         case 8: bt.Dodge += val; break;
                         case 9: bt.Life_steal += val; break;
-                        case 10: bt.Atk += val; break;//HP自动回复
+                        case 10: bt.Wave_hp_recovery += val; break;//HP自动回复
                         case 11: bt.Wave_energy_recovery += val; break;//技能自动回复
                         case 12: bt.Physical_penetrate += val; break;
                         case 13: bt.Magic_penetrate += val; break;
