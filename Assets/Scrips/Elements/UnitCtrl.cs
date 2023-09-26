@@ -4147,10 +4147,11 @@ this.updateCurColor();
             overlapAbnormalStateIndexList[_abnormalState].Add(currentBehaviourIndex);
             overlapAbnormalStateData[currentBehaviourIndex] = _data;
             m_abnormalState[_abnormalState] = true;
+            /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {
                 updateEffectForSpeedAbnormalState(_isEnable: true);
-            }
+            }*/
             float time = 0f;
             for (float effectTime = _data.Time; time < effectTime; time += DeltaTimeForPause)
             {
@@ -4164,10 +4165,11 @@ this.updateCurColor();
             overlapAbnormalStateData[currentBehaviourIndex].enable = false;
             overlapAbnormalStateData.Remove(currentBehaviourIndex);
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
+            /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {
                 updateEffectForSpeedAbnormalState(_isEnable: false);
-            }
+            }*/
         }
         private void updateEffectForSpeedAbnormalState(bool _isEnable)
         {
@@ -12017,7 +12019,9 @@ this.updateCurColor();
             NO_DAMAGE_MOTION2 = 62,
             REGENERATION2 = 0x3F,
             TP_REGENERATION2 = 0x40,
+            [Description("减速v2")]
             SLOW_OVERLAP = 65,
+            [Description("加速v2")]
             HASTE_OVERLAP = 66,
             SPY = 67,
             // Token: 0x040027E3 RID: 10211

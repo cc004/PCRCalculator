@@ -1,1 +1,2 @@
 UPDATE 'skill_action' SET action_detail_2 = 0 WHERE action_id = 107100101;
+INSERT OR IGNORE INTO "promotion_bonus" SELECT 118501 as "unit_id", "promotion_level", "hp", "atk", "magic_str", "def", "magic_def", "physical_critical", "magic_critical", "wave_hp_recovery", "wave_energy_recovery", "dodge", "physical_penetrate", "magic_penetrate", "life_steal", "hp_recovery_rate", "energy_recovery_rate", "energy_reduce_rate", "accuracy" FROM "promotion_bonus" WHERE "unit_id" == 100201;
