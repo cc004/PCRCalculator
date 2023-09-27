@@ -4725,7 +4725,8 @@ namespace Elements.Battle
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?
                         MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my) :
-                        MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
+                        new BaseData()
+                        // MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
                     ) : null);
                 unitCtrl.MaxHpAfterPassive = unitCtrl.MaxHp;
 
