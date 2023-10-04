@@ -348,7 +348,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5121921064374415613}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 0.99701446
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -481,7 +481,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.000049591064}
   m_SizeDelta: {x: 70, y: 88}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6221759812461965526
@@ -653,6 +653,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputField: {fileID: 4061468885160637875}
+  inputTrans: {fileID: 2756473472756788443}
 --- !u!1 &8361071490080963189
 GameObject:
   m_ObjectHideFlags: 0
