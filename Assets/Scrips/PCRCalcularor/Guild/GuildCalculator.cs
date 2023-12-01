@@ -196,6 +196,7 @@ namespace PCRCaculator.Guild
                     Action action = null;
                     int startFrame = allUnitLastStateDic[unitid].currentFrameCount;
                     int oldState = (int)allUnitLastStateDic[unitid].changStateTo;
+                    int variant = 0;
                     if (oldState >= 1 && oldState <= 3)
                     {
                         UnitSkillExecData skillExecData = allUnitSkillExecDic[unitid].FindLast(a => a.startTime == startFrame);
@@ -203,9 +204,13 @@ namespace PCRCaculator.Guild
                         {
                             skillExecData.endTime = frameCount;
                             action = () => { OpenSkillDetailPannel(skillExecData); };
+                            if (skillExecData.skillID < 2000000)
+                                variant = skillExecData.skillID % 1000;
+                            else
+                                variant = skillExecData.skillID % 10;
                         }
                     }
-                    var trans = skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action);
+                    var trans = skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action, variant);
 
                     var pos = skillGroupParent.transform.InverseTransformPoint(trans.position);
 

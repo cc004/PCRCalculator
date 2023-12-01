@@ -18,6 +18,7 @@ using OfficeOpenXml.Style;
 using PCRCaculator;
 using PCRCaculator.Guild;
 using SFB;
+using TMPro;
 using UnityEngine;
 using Application = UnityEngine.Application;
 using Color = System.Drawing.Color;
@@ -124,6 +125,52 @@ namespace ExcelHelper
         
         private static bool ReadJsonTimeLineData(string path, out GuildTimelineData guildTimelineData, SystemWindowMessage.configDelegate failedAction)
         {
+            try
+            {
+                // 可能是一个box json
+                var json = JObject.Parse(File.ReadAllText(path));
+                if (json.ContainsKey("data_headers")) json = (JObject) json["data"];
+
+                MainManager.Instance.PlayerSetting.playerLevel = (int) json["user_info"]["team_level"];
+
+                var lovedict = json["read_story_ids"].ToObject<int[]>()
+                    .Select(x =>
+                        MainManager.Instance.unitStoryLoveDic.TryGetValue(x, out var y)
+                            ? (x / 1000 * 100 + 1, y)
+                            : (0, 0))
+                    .GroupBy(p => p.Item1)
+                    .ToDictionary(g => g.Key, g => g.Select(p => p.Item2).Max());
+
+                foreach (var chara in json["unit_list"])
+                {
+                    var data = MainManager.Instance.unitDataDic[(int) chara["id"]];
+                    data.rarity = (int)chara["unit_rarity"];
+                    data.level = (int)chara["unit_level"];
+                    data.rank = (int)chara["promotion_level"];
+
+                    data.equipLevel = chara["equip_slot"]
+                        .Select(e => (int) e["is_slot"] == 1 ? (int) e["enhancement_level"] : -1).ToArray();
+                    data.uniqueEqLv = chara["unique_equip_slot"].SingleOrDefault()?.Value<int>("enhancement_level") ?? 0;
+                    data.skillLevel = new[]
+                    {
+                        ((JArray) chara["union_burst"]).Count > 0 ? chara["union_burst"][0] : null,
+                        ((JArray) chara["main_skill"]).Count > 0 ? chara["main_skill"][0] : null,
+                        ((JArray) chara["main_skill"]).Count > 1 ? chara["main_skill"][1] : null,
+                        ((JArray) chara["ex_skill"]).Count > 0 ? chara["ex_skill"][0] : null,
+                    }.Select(token => token?.Value<int>("skill_level") ?? 0).ToArray();
+
+                    foreach (var key in data.playLoveDic.Keys.ToArray())
+                        if (lovedict.TryGetValue(key, out var val))
+                            data.playLoveDic[key] = val;
+                }
+
+                guildTimelineData = null;
+                return false;
+            }
+            catch (Exception e)
+            {
+            }
+
             try
             {
                 var json = JToken.Parse(File.ReadAllText(path))["data"];

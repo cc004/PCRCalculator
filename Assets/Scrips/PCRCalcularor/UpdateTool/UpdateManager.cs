@@ -49,7 +49,7 @@ namespace PCRCaculator.Update
             */
 
             gameObject.SetActive(false);
-            MainManager.Instance.WindowConfigMessage("¸üĞÂÍê³É£¬ÖØÆôÃşÖáÆ÷ÒÔÓ¦ÓÃ¸ü¸Ä", Application.Quit, Application.Quit);
+            MainManager.Instance.WindowConfigMessage("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã¸ï¿½ï¿½ï¿½", Application.Quit, Application.Quit);
         }
     }
 }

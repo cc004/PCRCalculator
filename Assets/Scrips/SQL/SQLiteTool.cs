@@ -157,7 +157,7 @@ namespace PCRCaculator.SQL
         private Dictionary<int, equipment_enhance_rate> dic2;
         private Dictionary<int, wave_group_data> waveDic;
 
-        public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>) Pair { get; private set; }
+        public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
         public Dictionary<int, EnemyData> Dic2 { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
@@ -657,7 +657,7 @@ namespace PCRCaculator.SQL
             return dic;
         }
 
-        public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>) GetUnitStoryData()
+        public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) GetUnitStoryData()
         {
             Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();
             Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();
@@ -696,7 +696,7 @@ namespace PCRCaculator.SQL
                 }
             }
 
-            return (unitStoryDic, unitStoryEffectDic);
+            return (unitStoryDic, unitStoryEffectDic, lovedict);
         }
 
     }

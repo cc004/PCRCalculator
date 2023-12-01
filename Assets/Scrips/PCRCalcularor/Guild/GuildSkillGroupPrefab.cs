@@ -21,6 +21,28 @@ namespace PCRCaculator.Guild
         public Image BackImage;
         public Vector3 originalScale;
         public List<Color> stateColors;
+
+        private static Dictionary<int, Color> stateVariantColors = new Dictionary<int, Color>
+        {
+            [2] = new Color(0xc0, 0xc0, 0xff),
+            [12] = new Color(0xc0, 0xc0, 0xff),
+            [3] = new Color(0x90, 0x90, 0xd0),
+            [13] = new Color(0x90, 0x90, 0xd0),
+            [3] = new Color(0x80, 0x80, 0xd0),
+            [4] = new Color(0x70, 0x70, 0xc0),
+            [5] = new Color(0x60, 0x60, 0xb0),
+            [6] = new Color(0x50, 0x50, 0xa0),
+            [7] = new Color(0x40, 0x40, 0x90),
+            [8] = new Color(0x30, 0x30, 0x80),
+            [9] = new Color(0x20, 0x20, 0x70),
+            [10] = new Color(0x10, 0x10, 0x60),
+            [11] = new Color(0x00, 0x00, 0x50),
+            [101] = new Color(0x80, 0xff, 0xff),
+            [102] = new Color(0x60, 0xd0, 0xd0),
+            [103] = new Color(0x40, 0xb0, 0xb0),
+
+        };
+
         public List<Color> buffColors;
         public List<Color> abnormalStateColors;
         public static string[] stateNames = new string[8] { "等待", "普攻", "UB", "技能", "走路", "无法行动", "死亡", "开局" };
@@ -54,7 +76,7 @@ namespace PCRCaculator.Guild
         /// </summary>
         /// <param name="frameCount">帧数</param>
         /// <param name="stateInt">状态</param>
-        public Transform AddButtons(int frameCount, int endCount, int stateInt,Action action = null)
+        public Transform AddButtons(int frameCount, int endCount, int stateInt,Action action, int variant)
         {
             GameObject a = Instantiate(stateInt == 2 ? skillButtonPrefab_UB : skillButtonPrefab);
             a.transform.SetParent(prefabParent_A, false);
@@ -62,7 +84,12 @@ namespace PCRCaculator.Guild
             int length = (int)(Mathf.Max(minLength, endCount - frameCount) * scaleValue);
             //if(stateInt == 2) { length = minLength; }
             a.GetComponent<RectTransform>().sizeDelta = new Vector2(length, prefabHight);
-            a.GetComponent<GuildCalcButton>().SetButton(stateColors[stateInt], stateNames[stateInt], frameCount,action);
+            var color = stateColors[stateInt];
+            if (stateInt == 3 && stateVariantColors.TryGetValue(variant, out var val))
+            {
+                color = new Color(val.r / 255, val.g / 255, val.b / 255, color.a);
+            }
+            a.GetComponent<GuildCalcButton>().SetButton(color, stateNames[stateInt], frameCount,action);
             prefabs.Add(a);
             return a.transform;
         }

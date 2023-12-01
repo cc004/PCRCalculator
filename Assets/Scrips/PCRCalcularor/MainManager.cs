@@ -171,6 +171,7 @@ namespace PCRCaculator
         }
 
         public VersionData Version;
+        public Dictionary<int, int> unitStoryLoveDic;
 
         private void Start()
         {
@@ -298,7 +299,7 @@ namespace PCRCaculator
                         equipmentDic = dbTool.Dic8;
                         equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
                         unitRarityDic = dbTool.Dic1;
-                        (unitStoryDic, unitStoryEffectDic) = dbTool.Pair;
+                        (unitStoryDic, unitStoryEffectDic, unitStoryLoveDic) = dbTool.Pair;
                         skillDataDic = dbTool.Dic3;
                         masterUnitSkillDataRf = dbTool2.masterUnitSkillDataRf;
                         skillActionDic = dbTool.Dic4;
@@ -310,7 +311,7 @@ namespace PCRCaculator
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
                         
-                        var (unitStoryDic2, unitStoryEffectDic2) = dbTool2.Pair;
+                        var (unitStoryDic2, unitStoryEffectDic2, unitStoryLoveDic2) = dbTool2.Pair;
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
                         skillActionDescribe_cn = dbTool3.Dic12;
@@ -375,6 +376,7 @@ namespace PCRCaculator
                             unitRarityDic.TryAdd(dbCN.Dic1);
                             unitStoryDic.TryAdd(dbCN.Pair.Item1);
                             unitStoryEffectDic.TryAdd(dbCN.Pair.Item2);
+                            unitStoryLoveDic.TryAdd(dbCN.Pair.Item3);
                             skillDataDic.TryAdd(dbCN.Dic3);
                             skillActionDic.TryAdd(dbCN.Dic4);
                             allUnitAttackPatternDic.TryAdd(dbCN.Dic5);

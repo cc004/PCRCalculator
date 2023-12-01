@@ -39,7 +39,6 @@ namespace Elements
             //XX: ignore influence by clamp of add value
             if (MasterData.action_value_4 != 0.0 || MasterData.action_value_5 != 0.0)
                 _addValue[_evalue] = _addValue[_evalue].Min(Value[eValueNumber.VALUE_4]);
-            _addValue[_evalue] = _addValue[_evalue].Max(0.0f);
         }
 
         public override void SetLevel(float _level)

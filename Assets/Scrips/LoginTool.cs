@@ -79,12 +79,12 @@ namespace PCRCaculator
                 {
                     requireCheck = false;
                     gameObject.SetActive(false);
-                    response = "Í¨¹ý";
+                    response = "Í¨ï¿½ï¿½";
                 }
             }
             else
             {
-                response = "Á¬½Ó·þÎñÆ÷Ê§°Ü£¡";
+                response = "ï¿½ï¿½ï¿½Ó·ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½";
             }
             msgText.text = response;
             isChecking = false;

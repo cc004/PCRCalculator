@@ -6633,6 +6633,7 @@ this.updateCurColor();
                 foreach (KnightGuardData knightGuardData2 in knightGuardData1.Value)
                 {
                     KnightGuardData data = knightGuardData2;
+                    if (!flag) _hp = Hp.Max(0);
                     flag = true;
                     DMFGKJIEEBF += () => SetRecovery(data.Value, data.InhibitHealType, this, _isRevival: true);
                     if (data.ExecEffectData != null)
@@ -8017,11 +8018,12 @@ this.updateCurColor();
             else
                 GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
 
-            if (Hp < 0)
+            if (Hp <= 0)
             {
                 if (IsTough || ExecKnightGuard())
                 {
-                    Hp = 1;
+                    if (Hp <= 0)
+                        Hp = 1;
                 }
                 else
                 {
