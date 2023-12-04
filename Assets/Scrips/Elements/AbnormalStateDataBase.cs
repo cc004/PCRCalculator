@@ -45,7 +45,7 @@ namespace Elements.Battle
         public eFieldTargetType LCHLGLAFJED { get; set; }
 
         public List<BasePartsData> TargetList { get; set; }
-        public HashSet<BasePartsData> TargetSet { get; set; }
+        public HashSet<BasePartsData> TargetSet { get; set; } = new HashSet<BasePartsData>();
 
         public List<UnitCtrl> ALFDJACNNCL { get; set; }
 

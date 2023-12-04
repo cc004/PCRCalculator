@@ -14,8 +14,21 @@ namespace Elements
 {
     public class AttackActionBase : ActionParameter
     {
+        public enum eCriticalReference
+        {
+            NORMAL = 0,
+            PHYSICAL,
+            MAGIC,
+            SUM
+        }
+
         private const int CRITICAL_RATE_MAX = 1;
         private BasePartsData parts;
+        public bool UseCopyAtkParam; // 0x1B0
+        public FloatWithEx CopyAtk; // 0x1B4
+
+        public AttackActionBase.eCriticalReference CriticalReference { get; set; }
+        public int AdditionalCritical { get; set; }
 
         public override void ReadyAction(
           UnitCtrl _source,
@@ -200,14 +213,29 @@ namespace Elements
             {
                 num = (flag ? _source.AtkZero : _source.MagicStrZero);
                 num2 = (flag ? _source.PhysicalCriticalZero : _source.MagicCriticalZero);
+
+                if (CriticalReference == eCriticalReference.MAGIC) num2 = _source.MagicCriticalZero;
+                if (CriticalReference == eCriticalReference.PHYSICAL) num2 = _source.PhysicalCriticalZero;
+                if (CriticalReference == eCriticalReference.SUM) num2 = _source.PhysicalCriticalZero + _source.MagicCriticalZero;
+
                 num3 = _source.Level;
             }
             else
             {
                 num = (flag ? parts.GetAtkZero() : parts.GetMagicStrZero());
                 num2 = (flag ? parts.GetPhysicalCriticalZero() : parts.GetMagicCriticalZero());
+
+                if (CriticalReference == eCriticalReference.MAGIC) num2 = parts.GetMagicCriticalZero();
+                if (CriticalReference == eCriticalReference.PHYSICAL) num2 = parts.GetPhysicalCriticalZero();
+                if (CriticalReference == eCriticalReference.SUM)
+                    num2 = parts.GetPhysicalCriticalZero() + parts.GetMagicCriticalZero();
+
                 num3 = parts.GetLevel();
             }
+
+            if (UseCopyAtkParam)
+                num = CopyAtk;
+
             FloatWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
             FloatWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
             float num6 = 0f;

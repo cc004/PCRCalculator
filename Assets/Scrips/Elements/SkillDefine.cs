@@ -661,6 +661,10 @@ namespace Elements
             {
                 eActionType.UNABLE_STATE_GUARD,
                 typeof(UnableStateGuardAction)
+            },
+            {
+                eActionType.COPY_ATK_PARAM,
+                typeof(CopyAtkParamAction)
             }
         };
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()

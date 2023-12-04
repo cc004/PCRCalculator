@@ -1721,6 +1721,7 @@ namespace Elements.Battle
 
         public void ExecField(AbnormalStateDataBase PFDAEFDOBIP, int OJHBHHCOAGK)
         {
+            PFDAEFDOBIP.Cache();
             if (FieldDataDictionary.ContainsKey(OJHBHHCOAGK))
                 FieldDataDictionary[OJHBHHCOAGK].Add(PFDAEFDOBIP);
             else

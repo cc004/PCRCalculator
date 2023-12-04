@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Guild;
@@ -222,6 +223,26 @@ namespace Elements
                         var now = _target.Owner.Hp / _target.Owner.MaxHp;
                         var bound = ActionDetail1 % 100 / 100.0;
                         prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
+
+                        if (flag)
+                            GuildCalculator.Instance.dmglist.Add(new ProbEvent()
+                            {
+                                isProb = false,
+                                unit = _source.UnitNameEx,
+                                predict = hash => now.Emulate(hash) >= bound,
+                                exp = hash => $"{now.ToExpression(hash)} > {bound}",
+                                description = $"({BattleHeaderController.CurrentFrameCount})对角色{_target.Owner.UnitNameEx}血量判定条件分歧失败（实际小于{bound}）"
+                            });
+                        else
+                            GuildCalculator.Instance.dmglist.Add(new ProbEvent()
+                            {
+                                isProb = false,
+                                unit = _source.UnitNameEx,
+                                predict = hash => now.Emulate(hash) < bound,
+                                exp = hash => $"{now.ToExpression(hash)} < {bound}",
+                                description = $"({BattleHeaderController.CurrentFrameCount})对角色{_target.Owner.UnitNameEx}血量判定条件分歧失败（实际大于等于{bound}）"
+                            });
+
                         break;
                     }
                     if (ActionDetail1 > 700)
