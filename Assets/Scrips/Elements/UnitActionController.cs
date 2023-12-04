@@ -2007,6 +2007,7 @@ namespace Elements
                 case PriorityPattern.NEAR_MY_TEAM_WITHOUT_OWNER:
                 case PriorityPattern.ENERGY_ASC_BACK_WITHOUT_OWNER:
                 case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
+                case PriorityPattern.HP_ASC_WITHOUT_OWNER:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner);
                     break;
             }
@@ -2436,6 +2437,24 @@ namespace Elements
                     break;
                 case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
                     this.sortTargetPosition(targetList, _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE, new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameLeft), new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameRight));
+                    break;
+                case PriorityPattern.HP_ASC_WITHOUT_OWNER:
+                    this.sortTargetPosition(targetList,
+                        _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE,
+                        new Comparison<BasePartsData>(this.Owner.CompareHpAscSameLeft),
+                        new Comparison<BasePartsData>(this.Owner.CompareHpAscSameRight));
+                    break;
+                case PriorityPattern.ATK_DEF_ASC_FORWARD:
+                    this.sortTargetPosition(targetList,
+                        _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE,
+                        new Comparison<BasePartsData>(this.Owner.CompareAtkDefAscSameLeft),
+                        new Comparison<BasePartsData>(this.Owner.CompareAtkDefAscSameRight));
+                    break;
+                case PriorityPattern.MAGIC_DEF_ASC_FORWARD:
+                    this.sortTargetPosition(targetList,
+                        _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE,
+                        new Comparison<BasePartsData>(this.Owner.CompareMagicDefAscSameLeft),
+                        new Comparison<BasePartsData>(this.Owner.CompareMagicDefAscSameRight));
                     break;
                 default:
                     targetList.Sort(Owner.CompareDistanceAsc);

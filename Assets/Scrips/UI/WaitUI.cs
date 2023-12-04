@@ -37,23 +37,23 @@ public class WaitUI : MonoBehaviour
         m_CurProgressValueTemp = m_CurProgressValue2 / 100f;
         if (m_CurProgressValueTemp > 0.1f && m_CurProgressValueTemp <= 0.3f)
         {
-            text.text = "¡ð¡ð¡ð¡ð¡ñ";
+            text.text = "??????";
         }
         else if (m_CurProgressValueTemp > 0.3f && m_CurProgressValueTemp <= 0.5f)
         {
-            text.text = "¡ñ¡ð¡ð¡ð¡ð";
+            text.text = "??????";
         }
         else if (m_CurProgressValueTemp > 0.5f && m_CurProgressValueTemp <= 0.7f)
         {
-            text.text = "¡ð¡ñ¡ð¡ð¡ð";
+            text.text = "??????";
         }
         else if (m_CurProgressValueTemp > 0.7f && m_CurProgressValueTemp <= 0.9f)
         {
-            text.text = "¡ð¡ð¡ñ¡ð¡ð";
+            text.text = "??????";
         }
         else
         {
-            text.text = "¡ð¡ð¡ð¡ñ¡ð";
+            text.text = "??????";
         }
     }
 }

@@ -13,25 +13,25 @@ namespace PCRCaculator.Update
         public abstract class ZipCallback
         {
             /// <summary>
-            /// Ñ¹Ëõµ¥¸öÎÄ¼þ»òÎÄ¼þ¼ÐÇ°Ö´ÐÐµÄ»Øµ÷
+            /// Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ç°Ö´ï¿½ÐµÄ»Øµï¿½
             /// </summary>
             /// <param name="_entry"></param>
-            /// <returns>Èç¹û·µ»Øtrue£¬ÔòÑ¹ËõÎÄ¼þ»òÎÄ¼þ¼Ð£¬·´Ö®Ôò²»Ñ¹ËõÎÄ¼þ»òÎÄ¼þ¼Ð</returns>
+            /// <returns>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½trueï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ð£ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</returns>
             public virtual bool OnPreZip(ZipEntry _entry)
             {
                 return true;
             }
 
             /// <summary>
-            /// Ñ¹Ëõµ¥¸öÎÄ¼þ»òÎÄ¼þ¼ÐºóÖ´ÐÐµÄ»Øµ÷
+            /// Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ðºï¿½Ö´ï¿½ÐµÄ»Øµï¿½
             /// </summary>
             /// <param name="_entry"></param>
             public virtual void OnPostZip(ZipEntry _entry) { }
 
             /// <summary>
-            /// Ñ¹ËõÖ´ÐÐÍê±ÏºóµÄ»Øµ÷
+            /// Ñ¹ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½Ïºï¿½Ä»Øµï¿½
             /// </summary>
-            /// <param name="_result">true±íÊ¾Ñ¹Ëõ³É¹¦£¬false±íÊ¾Ñ¹ËõÊ§°Ü</param>
+            /// <param name="_result">trueï¿½ï¿½Ê¾Ñ¹ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½falseï¿½ï¿½Ê¾Ñ¹ï¿½ï¿½Ê§ï¿½ï¿½</param>
             public virtual void OnFinished(bool _result) { }
         }
         #endregion
@@ -40,36 +40,36 @@ namespace PCRCaculator.Update
         public abstract class UnzipCallback
         {
             /// <summary>
-            /// ½âÑ¹µ¥¸öÎÄ¼þ»òÎÄ¼þ¼ÐÇ°Ö´ÐÐµÄ»Øµ÷
+            /// ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ç°Ö´ï¿½ÐµÄ»Øµï¿½
             /// </summary>
             /// <param name="_entry"></param>
-            /// <returns>Èç¹û·µ»Øtrue£¬ÔòÑ¹ËõÎÄ¼þ»òÎÄ¼þ¼Ð£¬·´Ö®Ôò²»Ñ¹ËõÎÄ¼þ»òÎÄ¼þ¼Ð</returns>
+            /// <returns>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½trueï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ð£ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</returns>
             public virtual bool OnPreUnzip(ZipEntry _entry)
             {
                 return true;
             }
 
             /// <summary>
-            /// ½âÑ¹µ¥¸öÎÄ¼þ»òÎÄ¼þ¼ÐºóÖ´ÐÐµÄ»Øµ÷
+            /// ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ðºï¿½Ö´ï¿½ÐµÄ»Øµï¿½
             /// </summary>
             /// <param name="_entry"></param>
             public virtual void OnPostUnzip(ZipEntry _entry) { }
 
             /// <summary>
-            /// ½âÑ¹Ö´ÐÐÍê±ÏºóµÄ»Øµ÷
+            /// ï¿½ï¿½Ñ¹Ö´ï¿½ï¿½ï¿½ï¿½Ïºï¿½Ä»Øµï¿½
             /// </summary>
-            /// <param name="_result">true±íÊ¾½âÑ¹³É¹¦£¬false±íÊ¾½âÑ¹Ê§°Ü</param>
+            /// <param name="_result">trueï¿½ï¿½Ê¾ï¿½ï¿½Ñ¹ï¿½É¹ï¿½ï¿½ï¿½falseï¿½ï¿½Ê¾ï¿½ï¿½Ñ¹Ê§ï¿½ï¿½</param>
             public virtual void OnFinished(bool _result) { }
         }
         #endregion
 
         /// <summary>
-        /// Ñ¹ËõÎÄ¼þºÍÎÄ¼þ¼Ð
+        /// Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
         /// </summary>
-        /// <param name="_fileOrDirectoryArray">ÎÄ¼þ¼ÐÂ·¾¶ºÍÎÄ¼þÃû</param>
-        /// <param name="_outputPathName">Ñ¹ËõºóµÄÊä³öÂ·¾¶ÎÄ¼þÃû</param>
-        /// <param name="_password">Ñ¹ËõÃÜÂë</param>
-        /// <param name="_zipCallback">ZipCallback¶ÔÏó£¬¸ºÔð»Øµ÷</param>
+        /// <param name="_fileOrDirectoryArray">ï¿½Ä¼ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</param>
+        /// <param name="_outputPathName">Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</param>
+        /// <param name="_password">Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_zipCallback">ZipCallbackï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½Øµï¿½</param>
         /// <returns></returns>
         public static bool Zip(string[] _fileOrDirectoryArray, string _outputPathName, string _password = null, ZipCallback _zipCallback = null)
         {
@@ -82,7 +82,7 @@ namespace PCRCaculator.Update
             }
 
             ZipOutputStream zipOutputStream = new ZipOutputStream(File.Create(_outputPathName));
-            zipOutputStream.SetLevel(6);    // Ñ¹ËõÖÊÁ¿ºÍÑ¹ËõËÙ¶ÈµÄÆ½ºâµã
+            zipOutputStream.SetLevel(6);    // Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Ù¶Èµï¿½Æ½ï¿½ï¿½ï¿½
             if (!string.IsNullOrEmpty(_password))
                 zipOutputStream.Password = _password;
 
@@ -114,12 +114,12 @@ namespace PCRCaculator.Update
         }
 
         /// <summary>
-        /// ½âÑ¹Zip°ü
+        /// ï¿½ï¿½Ñ¹Zipï¿½ï¿½
         /// </summary>
-        /// <param name="_filePathName">Zip°üµÄÎÄ¼þÂ·¾¶Ãû</param>
-        /// <param name="_outputPath">½âÑ¹Êä³öÂ·¾¶</param>
-        /// <param name="_password">½âÑ¹ÃÜÂë</param>
-        /// <param name="_unzipCallback">UnzipCallback¶ÔÏó£¬¸ºÔð»Øµ÷</param>
+        /// <param name="_filePathName">Zipï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_outputPath">ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Â·ï¿½ï¿½</param>
+        /// <param name="_password">ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_unzipCallback">UnzipCallbackï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½Øµï¿½</param>
         /// <returns></returns>
         public static bool UnzipFile(string _filePathName, string _outputPath, string _password = null, UnzipCallback _unzipCallback = null)
         {
@@ -147,12 +147,12 @@ namespace PCRCaculator.Update
         }
 
         /// <summary>
-        /// ½âÑ¹Zip°ü
+        /// ï¿½ï¿½Ñ¹Zipï¿½ï¿½
         /// </summary>
-        /// <param name="_fileBytes">Zip°ü×Ö½ÚÊý×é</param>
-        /// <param name="_outputPath">½âÑ¹Êä³öÂ·¾¶</param>
-        /// <param name="_password">½âÑ¹ÃÜÂë</param>
-        /// <param name="_unzipCallback">UnzipCallback¶ÔÏó£¬¸ºÔð»Øµ÷</param>
+        /// <param name="_fileBytes">Zipï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_outputPath">ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Â·ï¿½ï¿½</param>
+        /// <param name="_password">ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_unzipCallback">UnzipCallbackï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½Øµï¿½</param>
         /// <returns></returns>
         public static bool UnzipFile(byte[] _fileBytes, string _outputPath, string _password = null, UnzipCallback _unzipCallback = null)
         {
@@ -175,12 +175,12 @@ namespace PCRCaculator.Update
         }
 
         /// <summary>
-        /// ½âÑ¹Zip°ü
+        /// ï¿½ï¿½Ñ¹Zipï¿½ï¿½
         /// </summary>
-        /// <param name="_inputStream">Zip°üÊäÈëÁ÷</param>
-        /// <param name="_outputPath">½âÑ¹Êä³öÂ·¾¶</param>
-        /// <param name="_password">½âÑ¹ÃÜÂë</param>
-        /// <param name="_unzipCallback">UnzipCallback¶ÔÏó£¬¸ºÔð»Øµ÷</param>
+        /// <param name="_inputStream">Zipï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_outputPath">ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Â·ï¿½ï¿½</param>
+        /// <param name="_password">ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_unzipCallback">UnzipCallbackï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½Øµï¿½</param>
         /// <returns></returns>
         public static bool UnzipFile(Stream _inputStream, string _outputPath, string _password = null, UnzipCallback _unzipCallback = null)
         {
@@ -192,11 +192,11 @@ namespace PCRCaculator.Update
                 return false;
             }
 
-            // ´´½¨ÎÄ¼þÄ¿Â¼
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ä¿Â¼
             if (!Directory.Exists(_outputPath))
                 Directory.CreateDirectory(_outputPath);
 
-            // ½âÑ¹Zip°ü
+            // ï¿½ï¿½Ñ¹Zipï¿½ï¿½
             ZipEntry entry = null;
             using (ZipInputStream zipInputStream = new ZipInputStream(_inputStream))
             {
@@ -209,18 +209,18 @@ namespace PCRCaculator.Update
                         continue;
 
                     if ((null != _unzipCallback) && !_unzipCallback.OnPreUnzip(entry))
-                        continue;   // ¹ýÂË
+                        continue;   // ï¿½ï¿½ï¿½ï¿½
 
                     string filePathName = Path.Combine(_outputPath, entry.Name);
 
-                    // ´´½¨ÎÄ¼þÄ¿Â¼
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ä¿Â¼
                     if (entry.IsDirectory)
                     {
                         Directory.CreateDirectory(filePathName);
                         continue;
                     }
 
-                    // Ð´ÈëÎÄ¼þ
+                    // Ð´ï¿½ï¿½ï¿½Ä¼ï¿½
                     try
                     {
                         using (FileStream fileStream = File.Create(filePathName))
@@ -261,12 +261,12 @@ namespace PCRCaculator.Update
 
         #region PrivateMethod
         /// <summary>
-        /// Ñ¹ËõÎÄ¼þ
+        /// Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½
         /// </summary>
-        /// <param name="_filePathName">ÎÄ¼þÂ·¾¶Ãû</param>
-        /// <param name="_parentRelPath">ÒªÑ¹ËõµÄÎÄ¼þµÄ¸¸Ïà¶ÔÎÄ¼þ¼Ð</param>
-        /// <param name="_zipOutputStream">Ñ¹ËõÊä³öÁ÷</param>
-        /// <param name="_zipCallback">ZipCallback¶ÔÏó£¬¸ºÔð»Øµ÷</param>
+        /// <param name="_filePathName">ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_parentRelPath">ÒªÑ¹ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</param>
+        /// <param name="_zipOutputStream">Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_zipCallback">ZipCallbackï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½Øµï¿½</param>
         /// <returns></returns>
         private static bool ZipFile(string _filePathName, string _parentRelPath, ZipOutputStream _zipOutputStream, ZipCallback _zipCallback = null)
         {
@@ -281,7 +281,7 @@ namespace PCRCaculator.Update
                 entry.DateTime = System.DateTime.Now;
 
                 if ((null != _zipCallback) && !_zipCallback.OnPreZip(entry))
-                    return true;    // ¹ýÂË
+                    return true;    // ï¿½ï¿½ï¿½ï¿½
 
                 fileStream = File.OpenRead(_filePathName);
                 byte[] buffer = new byte[fileStream.Length];
@@ -318,12 +318,12 @@ namespace PCRCaculator.Update
         }
 
         /// <summary>
-        /// Ñ¹ËõÎÄ¼þ¼Ð
+        /// Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
         /// </summary>
-        /// <param name="_path">ÒªÑ¹ËõµÄÎÄ¼þ¼Ð</param>
-        /// <param name="_parentRelPath">ÒªÑ¹ËõµÄÎÄ¼þ¼ÐµÄ¸¸Ïà¶ÔÎÄ¼þ¼Ð</param>
-        /// <param name="_zipOutputStream">Ñ¹ËõÊä³öÁ÷</param>
-        /// <param name="_zipCallback">ZipCallback¶ÔÏó£¬¸ºÔð»Øµ÷</param>
+        /// <param name="_path">ÒªÑ¹ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</param>
+        /// <param name="_parentRelPath">ÒªÑ¹ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ÐµÄ¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</param>
+        /// <param name="_zipOutputStream">Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+        /// <param name="_zipCallback">ZipCallbackï¿½ï¿½ï¿½ó£¬¸ï¿½ï¿½ï¿½Øµï¿½</param>
         /// <returns></returns>
         private static bool ZipDirectory(string _path, string _parentRelPath, ZipOutputStream _zipOutputStream, ZipCallback _zipCallback = null)
         {
@@ -337,7 +337,7 @@ namespace PCRCaculator.Update
                 entry.Size = 0;
 
                 if ((null != _zipCallback) && !_zipCallback.OnPreZip(entry))
-                    return true;    // ¹ýÂË
+                    return true;    // ï¿½ï¿½ï¿½ï¿½
 
                 _zipOutputStream.PutNextEntry(entry);
                 _zipOutputStream.Flush();
@@ -345,7 +345,7 @@ namespace PCRCaculator.Update
                 string[] files = Directory.GetFiles(_path);
                 for (int index = 0; index < files.Length; ++index)
                 {
-                    // ÅÅ³ýUnityÖÐ¿ÉÄÜµÄ .meta ÎÄ¼þ
+                    // ï¿½Å³ï¿½Unityï¿½Ð¿ï¿½ï¿½Üµï¿½ .meta ï¿½Ä¼ï¿½
                     if (files[index].EndsWith(".meta") == true)
                     {
                         Debug.LogWarning(files[index] + " not to zip");

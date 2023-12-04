@@ -76,7 +76,7 @@ namespace Elements
           LimitTime = _valueDictionary[eValueNumber.VALUE_3],
           IconType = key,
           ActionId = ActionId,
-          OnlyCritical = ActionDetail1 == 4
+          ExecConditionType = (AttackSealData.eExecConditionType) ActionDetail1
         };
         if (!dataDictionary.ContainsKey(_source))
           dataDictionary.Add(_source, new Dictionary<int, AttackSealData>
@@ -90,8 +90,8 @@ namespace Elements
           dataDictionary[_source].Add(ActionId, _attackSealData);
         _sourceActionController.AppendCoroutine(updateAttackSealData(_attackSealData, _source, () => dataDictionary[_source].Remove(ActionId)), ePauseType.SYSTEM, _source);
       }
-            action("标记");
-    }
+      action($"每{(AttackSealData.eExecConditionType)ActionDetail1}增加标记");
+        }
 
     private IEnumerator updateAttackSealData(
       AttackSealData _attackSealData,

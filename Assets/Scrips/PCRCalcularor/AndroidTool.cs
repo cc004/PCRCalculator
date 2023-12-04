@@ -15,14 +15,14 @@ namespace PCRCaculator
         {
             AndroidJavaObject Main = new AndroidJavaObject("com.pcrfans.mylibrary.ToolActivity");
             int s = Main.Call<int>("Add", 2, 8);
-            Debug.Log($"²âÊÔÊý¾Ý{s}(5)");
+            Debug.Log($"æµ‹è¯•æ•°æ®{s}(5)");
         }
         public static void q()
         {
             AndroidJavaObject jc = new AndroidJavaObject("com.pcrfans.mylibrary.TestClass");
             var jo = jc.CallStatic<AndroidJavaObject>("Instance");
             int s = jo.Call<int>("Sub", 3, 2);
-            Debug.Log($"²âÊÔÊý¾Ý{s}(1)");
+            Debug.Log($"æµ‹è¯•æ•°æ®{s}(1)");
         }
 
         public static void OpenAndroidFileBrower()
@@ -36,9 +36,9 @@ namespace PCRCaculator
             if (ver >= 30)
             {
                 MainManager.Instance.WindowConfigMessage(
-                    "ÄãÏÖÔÚÊ¹ÓÃandroid11¼°ÒÔÉÏµÄ°æ±¾£¬²»Ö§³ÖÄÚ²¿´æ´¢µÄ¶ÁÈ¡£¬" +
-                    "Çë½«excelÎÄ¼þ·ÅÈë/sdcard/Android/data/com.PCRFans.PCRGuildCalculator/files" +
-                    "ÏÂ£¬·ñÔò½«»á³ö´í»òÕßÉÁÍË",
+                    "ä½ çŽ°åœ¨ä½¿ç”¨android11åŠä»¥ä¸Šçš„ç‰ˆæœ¬ï¼Œä¸æ”¯æŒå†…éƒ¨å­˜å‚¨çš„è¯»å–ï¼Œ" +
+                    "è¯·å°†excelæ–‡ä»¶æ”¾å…¥/sdcard/Android/data/com.PCRFans.PCRGuildCalculator/files" +
+                    "ä¸‹ï¼Œå¦åˆ™å°†ä¼šå‡ºé”™æˆ–è€…é—ªé€€",
                     OpenAndroidFileBrowerInternal);
             }
             else OpenAndroidFileBrowerInternal();
@@ -47,7 +47,7 @@ namespace PCRCaculator
         private static void OpenAndroidFileBrowerInternal()
         {
             MainManager.Instance.WindowConfigMessage(
-                "ÊÖ»úÑ¡È¡ÎÄ¼þÊ±£¬ÇëÊ¹ÓÃÎÄ¼þ¹ÜÀí½øÐÐÎÄ¼þÑ¡È¡£¬Èç¹ûÔÚ\"ÏÂÔØÄÚÈÝ\"ÖÐÑ¡È¡ÎÄ¼þ½«»áÉÁÍË",
+                "æ‰‹æœºé€‰å–æ–‡ä»¶æ—¶ï¼Œè¯·ä½¿ç”¨æ–‡ä»¶ç®¡ç†è¿›è¡Œæ–‡ä»¶é€‰å–ï¼Œå¦‚æžœåœ¨\"ä¸‹è½½å†…å®¹\"ä¸­é€‰å–æ–‡ä»¶å°†ä¼šé—ªé€€",
                 OpenAndroidFileBrowerInternal2);
         }
 
@@ -97,7 +97,7 @@ namespace PCRCaculator
             byte[] d = request.downloadHandler.data;
             File.WriteAllBytes(down, d);
 
-            //µ÷ÓÃ°²×¿·½·¨
+            //è°ƒç”¨å®‰å“æ–¹æ³•
             //AndroidJavaObject activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             //AndroidJavaObject context = activity.GetStatic<AndroidJavaObject>("currentActivity");
             string downapk = Application.persistentDataPath + "/3.apk";

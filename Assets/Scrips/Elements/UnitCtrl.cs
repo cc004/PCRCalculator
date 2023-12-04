@@ -5449,6 +5449,7 @@ this.updateCurColor();
             ClearAwe();
             DamageSealDataDictionary.Clear();
             DamageOnceOwnerSealDateDictionary.Clear();
+            AttackSealDataDictionary.Clear();
             DamageOwnerSealDataDictionary.Clear();
             UbIsDisableByChangePattern = false;
             passiveSealDictionary.Clear();
@@ -7577,7 +7578,8 @@ this.updateCurColor();
             }
             else _damageData.critVar = 0f;
 
-            var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate);
+            var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
+                _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate, out bool isHit);
             if (_damageData.Target is PartsData)
             {
                 if (!_damageData.IsSlipDamage)
@@ -7635,18 +7637,23 @@ this.updateCurColor();
             }
             if (_skill != null && num1 > 0L && !_skill.DamagedPartsList.Contains(_damageData.Target))
                 _skill.DamagedPartsList.Add(_damageData.Target);
-            if (_damageData.Source != null && DamageSealDataDictionary.ContainsKey(_damageData.Source) && num1 > 0L)
+            if (!this.IsDead)
+                if (_damageData.Source != null && DamageSealDataDictionary.ContainsKey(_damageData.Source))
             {
-                Dictionary<int, AttackSealData>.Enumerator enumerator = DamageSealDataDictionary[_damageData.Source].GetEnumerator();
-                while (enumerator.MoveNext())
+                foreach (KeyValuePair<int, AttackSealData> keyValuePair in _damageData.Source.DamageSealDataDictionary[
+                             _damageData.Source])
                 {
-                    if (enumerator.Current.Value.OnlyCritical)
-                    {
-                        if (_critical)
-                            enumerator.Current.Value.AddSeal(this);
-                    }
-                    else
-                        enumerator.Current.Value.AddSeal(this);
+                    if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.DAMAGE &&
+                        num1 == 0)
+                        continue;
+                    if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.CRITICAL &&
+                        (!_critical || num1 == 0))
+                        continue;
+                    if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.HIT &&
+                        !isHit)
+                        continue;
+
+                    keyValuePair.Value.AddSeal(this);
                 }
             }
             if (_damageData.Source != null && _damageData.Source.DamageOnceOwnerSealDateDictionary.ContainsKey(_damageData.Source) && (num1 > 0L && _skill != null) && !_skill.AlreadyAddAttackSelfSeal)
@@ -7655,20 +7662,51 @@ this.updateCurColor();
                     keyValuePair.Value.AddSeal(_damageData.Source);
                 _skill.AlreadyAddAttackSelfSeal = true;
             }
-            if (_damageData.Source != null && _damageData.Source.DamageOwnerSealDataDictionary.ContainsKey(_damageData.Source) && num1 > 0L)
+            if (_damageData.Source != null && _damageData.Source.DamageOwnerSealDataDictionary.ContainsKey(_damageData.Source))
             {
                 UnitCtrl source2 = _damageData.Source;
                 foreach (AttackSealData attackSealData in _damageData.Source.DamageOwnerSealDataDictionary[source2].Values)
                 {
-                    if (attackSealData.OnlyCritical)
-                    {
-                        if (_critical)
-                            attackSealData.AddSeal(source2);
-                    }
-                    else
-                        attackSealData.AddSeal(source2);
+                    if (attackSealData.ExecConditionType == AttackSealData.eExecConditionType.DAMAGE &&
+                        num1 == 0)
+                        continue;
+                    if (attackSealData.ExecConditionType == AttackSealData.eExecConditionType.CRITICAL &&
+                        (!_critical || num1 == 0))
+                        continue;
+                    if (attackSealData.ExecConditionType == AttackSealData.eExecConditionType.HIT &&
+                        !isHit)
+                        continue;
+
+                    attackSealData.AddSeal(source2);
                 }
             }
+
+            if (!this.IsDead)
+            {
+                if (_damageData.Source != null && _damageData.Source.IsOther != this.IsOther)
+                {
+                    foreach (var keyValuePair in _damageData.Source.AttackSealDataDictionary)
+                    {
+                        if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.DAMAGE_ONCE &&
+                            (num1 == 0 || _skill.AlreadyAddAttackSelfSeal))
+                            continue;
+                        if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.TARGET)
+                            continue;
+                        if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.DAMAGE &&
+                            num1 == 0)
+                            continue;
+                        if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.CRITICAL &&
+                            (!_critical || num1 == 0))
+                            continue;
+                        if (keyValuePair.Value.ExecConditionType == AttackSealData.eExecConditionType.HIT &&
+                            !isHit)
+                            continue;
+
+                        keyValuePair.Value.AddSeal(this);
+                    }
+                }
+            }
+
             if (_damageData.Source != null && num1 > 0L)
             {
                 _damageData.Source.OnActionByDamage.Call();
@@ -7703,12 +7741,15 @@ this.updateCurColor();
           bool _noMotion,
           Func<int, float, int> _upperLimitFunc,
           float _energyChargeMultiple,
-          Action<string> callBack = null,
-          float criticalRate = 0)
+          Action<string> callBack,
+          float criticalRate,
+          out bool isHit)
         {
+            isHit = true;
             if (IdleOnly || IsDivisionSourceForDamage && !_damageData.IsDivisionDamage)
             {
                 callBack?.Invoke("伤害无效,目标不是可攻击状态");
+                isHit = false;
                 return 0f;
             }
             //if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.SHIELD && this.IsBoss)
@@ -7717,12 +7758,14 @@ this.updateCurColor();
             if (IsNoDamageMotion())
             {
                 callBack?.Invoke("伤害无效，目标处于无敌状态");
+                isHit = false;
                 return 0f;
             }
             if (IsAbnormalState(eAbnormalState.PHYSICS_DODGE) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 SetMissAtk(_damageData.Source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION, _parts: _damageData.Target);
                 callBack?.Invoke("伤害无效，目标处于物理闪避状态");
+                isHit = false;
                 return 0f;
             }
             var a = _damageData.Damage;
@@ -12318,5 +12361,74 @@ this.updateCurColor();
             buffDebuffFieldDataList.Remove(_data);
         }
 
+        public int CompareHpAscSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            if (BattleUtil.Approximately(_a.Owner.Hp / _a.Owner.MaxHp, _b.Owner.Hp / _b.Owner.MaxHp))
+            {
+                return this.CompareLeft(_a, _b);
+            }
+
+            return UnitCtrl.CompareLifeAsc(_a, _b);
+        }
+
+        public static int CompareAtkDefAsc(BasePartsData _a, BasePartsData _b) => _a.GetDefZero().CompareTo(_b.GetDefZero());
+        public static int CompareMagicDefAsc(BasePartsData _a, BasePartsData _b) => _a.GetMagicDefZero().CompareTo(_b.GetMagicDefZero());
+
+
+        // Token: 0x06003958 RID: 14680 RVA: 0x000EB24C File Offset: 0x000EB24C
+        public int CompareHpAscSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            if (BattleUtil.Approximately(_a.Owner.Hp / _a.Owner.MaxHp, _b.Owner.Hp / _b.Owner.MaxHp))
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return UnitCtrl.CompareLifeAsc(_a, _b);
+        }
+        // Token: 0x0600396B RID: 14699 RVA: 0x000EB7EC File Offset: 0x000EB7EC
+        public int CompareAtkDefAscSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareAtkDefAsc(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareLeft(_a, _b);
+            }
+            return num;
+        }
+
+        // Token: 0x0600396C RID: 14700 RVA: 0x000EB810 File Offset: 0x000EB810
+        public int CompareAtkDefAscSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareAtkDefAsc(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return num;
+        }
+
+        // Token: 0x0600396B RID: 14699 RVA: 0x000EB7EC File Offset: 0x000EB7EC
+        public int CompareMagicDefAscSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareMagicDefAsc(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareLeft(_a, _b);
+            }
+            return num;
+        }
+
+        // Token: 0x0600396C RID: 14700 RVA: 0x000EB810 File Offset: 0x000EB810
+        public int CompareMagicDefAscSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareMagicDefAsc(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return num;
+        }
+        public Dictionary<int, AttackSealDataForAllEnemy> AttackSealDataDictionary { get; set; } = new Dictionary<int, AttackSealDataForAllEnemy>();
+
     }
+
 }

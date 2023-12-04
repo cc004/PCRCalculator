@@ -225,35 +225,28 @@ namespace Elements
                 action("MISS");
             }
         }
-        public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
-        {
-            if (_state <= UnitCtrl.eAbnormalState.FAINT)
-            {
-                if (_state <= UnitCtrl.eAbnormalState.DETAIN)
-                {
-                    if (_state - UnitCtrl.eAbnormalState.PARALYSIS > 1 && _state - UnitCtrl.eAbnormalState.CHAINED > 3)
-                    {
-                        return false;
-                    }
-                }
-                else if (_state != UnitCtrl.eAbnormalState.STONE && _state != UnitCtrl.eAbnormalState.FAINT)
-                {
-                    return false;
-                }
-            }
-            else if (_state <= UnitCtrl.eAbnormalState.NPC_STUN)
-            {
-                if (_state != UnitCtrl.eAbnormalState.PAUSE_ACTION && _state != UnitCtrl.eAbnormalState.NPC_STUN)
-                {
-                    return false;
-                }
-            }
-            else if (_state != UnitCtrl.eAbnormalState.CRYSTALIZE && _state != UnitCtrl.eAbnormalState.STUN2)
-            {
-                return false;
-            }
-            return true;
-        }
+		public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
+		{
+			switch (_state)
+			{
+			case UnitCtrl.eAbnormalState.PARALYSIS:
+			case UnitCtrl.eAbnormalState.FREEZE:
+			case UnitCtrl.eAbnormalState.CHAINED:
+			case UnitCtrl.eAbnormalState.SLEEP:
+			case UnitCtrl.eAbnormalState.STUN:
+			case UnitCtrl.eAbnormalState.DETAIN:
+			case UnitCtrl.eAbnormalState.STONE:
+			case UnitCtrl.eAbnormalState.FAINT:
+			case UnitCtrl.eAbnormalState.PAUSE_ACTION:
+			case UnitCtrl.eAbnormalState.NPC_STUN:
+			case UnitCtrl.eAbnormalState.CRYSTALIZE:
+			case UnitCtrl.eAbnormalState.STUN2:
+				return true;
+			default:
+				return false;
+			}
+		}
+
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);

@@ -134,7 +134,9 @@ namespace Elements
         // Token: 0x04002F4B RID: 12107
         UNABLE_STATE_GUARD,
 
+        ATTACK_SEAL_FOR_ALL_ENEMY = 101,
         COPY_ATK_PARAM = 103,
+
         EVERY_ATTACK_CRITICAL = 104,
         CHANGE_CRITICAL_REFERENCE = 107,
 

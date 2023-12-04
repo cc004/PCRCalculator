@@ -542,6 +542,8 @@ namespace PCRCaculator.SQL
                 e.detailData = detailData;
                 EnemySkillData skillData = new EnemySkillData();
 
+                if (!unitSkillDataDic.ContainsKey(e.unit_id) || !unitAttackPatternDic.ContainsKey(e.unit_id)) continue;
+
                 var skList = unitSkillDataDic[e.unit_id];//GetDatas<unit_skill_data>(a => a.unit_id == e.unit_id)[0];
                 skillData.UB = skList.union_burst;
                 skillData.MainSkills = skList.GetMainSkillIDs();

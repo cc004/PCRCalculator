@@ -665,6 +665,10 @@ namespace Elements
             {
                 eActionType.COPY_ATK_PARAM,
                 typeof(CopyAtkParamAction)
+            },
+            {
+                eActionType.ATTACK_SEAL_FOR_ALL_ENEMY,
+                typeof(AttackSealActionForAllEnemy)
             }
         };
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()
