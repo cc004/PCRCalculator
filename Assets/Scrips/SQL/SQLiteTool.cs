@@ -101,7 +101,7 @@ namespace PCRCaculator.SQL
             {
                 return func == null ? conn.Table<T>().ToArray() : conn.Table<T>().Where(func).ToArray();
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }
@@ -110,6 +110,7 @@ namespace PCRCaculator.SQL
         {
             Dictionary<int, T> dict = new Dictionary<int, T>();
             var list = GetDatas<T>(select);
+            if (list == null) return null;
             foreach (var item in list)
                 dict[func(item)] = item;
             return dict;
@@ -589,13 +590,16 @@ namespace PCRCaculator.SQL
         
         private Dictionary<int, unique_equip_enhance_rate[]> GetUEQData()
         {
-            var dic = GetDatasDic<unit_unique_equip>(
-                x => x.equip_id);
+            var dic = GetDatasDic<unit_unique_equipment>(
+                x => x.equip_id)?.ToDictionary(p => p.Key, p => p.Value as unit_unique_equip);
+            
+            dic = dic ?? GetDatasDic<unit_unique_equip>(x => x.equip_id); 
+            
             var basearr = GetDatasDic<unique_equipment_data>(x => x.equipment_id);
 
             return Combine(GetDatas<unique_equip_enhance_rate>(), GetDatas<unique_equipment_enhance_rate>())
                 .GroupBy(x => x.equipment_id)
-                .Where(x => dic.ContainsKey(x.Key))
+                .Where(x => dic.TryGetValue(x.Key, out var val) && val.equip_slot == 1)
                 .ToDictionary(x => dic[x.Key].unit_id, x => x.OrderBy(x => x.min_lv).Select(x =>
                 {
                     x.baseData = basearr[x.equipment_id];

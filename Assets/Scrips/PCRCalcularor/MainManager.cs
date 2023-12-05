@@ -281,15 +281,24 @@ namespace PCRCaculator
 
             Task.WhenAll(
                 Task.Run(() => dbTool.Prepare()),
-                Task.Run(() => dbTool2.Prepare()),
+                Task.Run(() =>
+                {
+                    if (ABExTool.mgrDataJP != ABExTool.mgrCharacter) dbTool2.Prepare();
+                }),
                 Task.Run(() => dbTool3.Prepare())).Wait();
 
             tasks.Add(
-                Task.WhenAll(dbTool.ParallelGetAll(), dbTool2.ParallelGetAll(), dbTool3.ParallelGetAll())
+                Task.WhenAll(
+                        dbTool.ParallelGetAll(), 
+                        ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask, 
+                        dbTool3.ParallelGetAll())
                     .ContinueWith(_ =>
                     {
                         dbTool.CloseDB();
-                        dbTool2.CloseDB();
+                        if (ABExTool.mgrDataJP != ABExTool.mgrCharacter)
+                            dbTool2.CloseDB();
+                        else
+                            dbTool2 = dbTool;
                         dbTool3.CloseDB();
 
                         var dbCN = dbTool3;
@@ -334,20 +343,21 @@ namespace PCRCaculator
 
                         if (!useJapanData)
                         {
-                            Task.WaitAll(
-                                //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
-                                //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
-                                //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
-                                //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3)),
-                                Task.Run(() => UniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
-                                Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4)),
-                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
-                                Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
-                                Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
-                                Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
-                                // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
-                            );
+                            if (dbTool != dbTool2)
+                                Task.WaitAll(
+                                    //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
+                                    //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
+                                    //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
+                                    //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
+                                    Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3)),
+                                    Task.Run(() => UniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
+                                    Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4)),
+                                    Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
+                                    Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
+                                    Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
+                                    Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
+                                    // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
+                                );
 
 
                             Task.WaitAll(

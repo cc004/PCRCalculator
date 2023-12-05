@@ -2044,6 +2044,7 @@ this.updateCurColor();
             transformCache = transform;
             m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;
             lossyx = transformCache.parent.lossyScale.x;
+            unitParameter = _data;
                 //this.soundManager = ManagerSingleton<SoundManager>.Instance;
             /*if (UnitCtrl.staticSingletonTree == null)
             {

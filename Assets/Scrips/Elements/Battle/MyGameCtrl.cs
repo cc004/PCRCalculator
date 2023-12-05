@@ -252,7 +252,6 @@ namespace Elements
             //battleProcessor.AddUnitSkillUseCount(ref unitCtrl.SkillUseCount, pPararm.MasterData.PrefabId);
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
-            unitCtrl.unitParameter = unitParameter;
             unitCtrl.Initialize(unitParameter,unitData ,false, true);
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
@@ -435,6 +434,9 @@ namespace Elements
           Action<BattleSpineController> _callback = null)
         {
             int skinId = UnitUtility.GetSkinId(_spineType, _unitId, _rarity);
+
+            if (_unitId > 200000)
+                skinId = _unitId;
             int num = 0;
 
             //GameObject a = Instantiate(Instance.emptyObject);

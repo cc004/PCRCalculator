@@ -93,15 +93,34 @@ namespace Elements
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             eChangeSpeedType actionDetail = (eChangeSpeedType)base.ActionDetail1;
-            if ((uint)(actionDetail - 3) <= 10u && _target.Owner.ModeChangeUnableStateBarrier)
+
+            switch (base.ActionDetail1)
             {
-                action($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
-                return;
-            }
-            else if (_target.Owner.OverwriteSpeedDataCount > 0)
-            {
-                action($"存在强制速度改变，技能{actionDetail.GetDescription()}无效！");
-                return;
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                    if (_target.Owner.ModeChangeUnableStateBarrier)
+                    {
+                        action($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
+                        return;
+                    }
+                    break;
+                case 1:
+                case 2:
+                    if (_target.Owner.OverwriteSpeedDataCount > 0)
+                    {
+                        action($"存在强制速度改变，技能{actionDetail.GetDescription()}无效！");
+                        return;
+                    }
+                    break;
             }
 
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());

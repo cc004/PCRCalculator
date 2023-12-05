@@ -564,7 +564,12 @@ namespace PCRCaculator.SQL
     public class unit_unique_equip
     {
         public int unit_id { get; set; }
+        public int equip_slot { get; set; }
         public int equip_id { get; set; }
+    }
+
+    public class unit_unique_equipment : unit_unique_equip
+    {
     }
 
     public class unique_equip_enhance_rate : DbBaseData
