@@ -5,6 +5,7 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using Cute;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -31,8 +32,8 @@ namespace Elements
             if (seal.GetCurrentCount() == 0)
             {
                 _target.OnChangeState.Call(_target, IconType, true);
-                _target.MyOnChangeAbnormalState?.Invoke(_target, IconType, true, LimitTime, "NaN");
             }
+
             seal.AddSeal(LimitTime, _target, IconType, 1);
         }
     }
@@ -51,7 +52,16 @@ namespace Elements
         public AttackSealData.eExecConditionType ExecConditionType { get; set; }
 
         // RVA: 0x121B3E0 Offset: 0x121B3E0 VA: 0x7FFD9D2BB3E0
-        public void AddSeal(UnitCtrl _target) { }
+        public void AddSeal(UnitCtrl _target)
+        {
+            SealData seal = _target.SealDictionary[iconType];
+            if (seal.GetCurrentCount() == 0)
+            {
+                _target.OnChangeState.Call(_target, iconType, true);
+            }
+
+            seal.AddSeal(LimitTime, _target, iconType, 1);
+        }
     }
 
 }

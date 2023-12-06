@@ -42,6 +42,7 @@ namespace Elements
         public Action<bool, float, bool, float, FloatWithEx> MyOnDamage2;
         public Action<int, int, float, int,string> MyOnBaseValueChanged;
         public Action<UnitCtrl, eStateIconType, bool,float,string> MyOnChangeAbnormalState;
+        public CharacterPageButton button;
         public Action<int, int, float, float> MyOnChangeSkillID;
         public Action<float> MyOnSkillCD;
         public Action<float> MyOnUsingSkill;

@@ -269,6 +269,8 @@ namespace Elements
 		MISORA_CARVED_SEAL,
 		// Token: 0x0400885F RID: 34911
 		EX_PASSIVE_1 = 999,
+		[Description("重叠加速")]
+		SPEED_OVERLAP,
 		// Token: 0x04008860 RID: 34912
 		NUM,
 		// Token: 0x04008861 RID: 34913

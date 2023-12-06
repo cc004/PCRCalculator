@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using Cute;
 using Elements.Battle;
 using PCRCaculator;
@@ -4089,6 +4090,14 @@ this.updateCurColor();
                         return;
                     if (CanOverlapAbnormalState(_abnormalState))
                     {
+                        if (!BattleManager.Instance.skipping)
+                        {
+                            if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
+                            {
+                                button.SetAbnormalIcons(this, eStateIconType.SPEED_OVERLAP, true, _effectTime, $"{_value}");
+                            }
+                        }
+
                         battleManager.AppendCoroutine(updateOverlapAbnormalState(_abnormalState, new AbnormalStateCategoryData
                         {
                             CurrentAbnormalState = _abnormalState,
@@ -4143,11 +4152,13 @@ this.updateCurColor();
         }
         private IEnumerator updateOverlapAbnormalState(eAbnormalState _abnormalState, AbnormalStateCategoryData _data)
         {
+
             int currentBehaviourIndex = overlapAbnormalStateCount;
             overlapAbnormalStateCount++;
             overlapAbnormalStateIndexList[_abnormalState].Add(currentBehaviourIndex);
             overlapAbnormalStateData[currentBehaviourIndex] = _data;
             m_abnormalState[_abnormalState] = true;
+
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {
@@ -7703,7 +7714,7 @@ this.updateCurColor();
                             !isHit)
                             continue;
 
-                        keyValuePair.Value.AddSeal(this);
+                        keyValuePair.Value.AddSeal(_damageData.Source);
                     }
                 }
             }
@@ -7956,6 +7967,7 @@ this.updateCurColor();
                 strikeBack.Exec(_damageData.Source, this, (int)BattleUtil.FloatToInt(num5), delegate
                 {
                     strikeBackList.Remove(strikeBack);
+                    MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
                 });
                 OnChangeState.Call(this, eStateIconType.STRIKE_BACK, ADIFIOLCOPN: false);
                 return 0L;

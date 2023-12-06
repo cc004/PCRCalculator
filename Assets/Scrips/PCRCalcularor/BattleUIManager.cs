@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Elements;
 using Elements.Battle;
 using UnityEngine;
@@ -665,12 +666,15 @@ namespace PCRCaculator.Battle
             {
                 buffUISettingBack.SetActive(true);
                 buffUIScrollEX.ClearAll();
-                foreach (Elements.eStateIconType stateIconType in Enum.GetValues(typeof(Elements.eStateIconType)))
+                foreach (Elements.eStateIconType stateIconType in Enum.GetValues(typeof(Elements.eStateIconType))
+                             .OfType<Elements.eStateIconType>().OrderByDescending(type => 
+                                 type == Elements.eStateIconType.NONE ? int.MaxValue : 
+                                 CharacterPageButton.SetAbnormalIconsCounter.TryGetValue(type, out var val) ? val : 0))
                 {
                     buffUIScrollEX.CreatePrefab(
                         a =>
                         {
-                            bool isshow = ShowBuffDic.TryGetValue(stateIconType, out bool value) ? value : false;
+                            bool isshow = ShowBuffDic.TryGetValue(stateIconType, out bool value) && value;
                             a.GetComponent<BUFFShowPrefab>().Init(stateIconType, isshow);
                         });
                 }

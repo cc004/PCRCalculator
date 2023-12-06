@@ -48,6 +48,9 @@ namespace PCRCaculator
         //private List<eStateIconType> currentBuffs = new List<eStateIconType>();
         private List<BattleBuffUI> battleBuffUIs = new List<BattleBuffUI>();
 
+        public Dictionary<eStateIconType, BattleBuffUI>
+            battleBuffUIDic = new Dictionary<eStateIconType, BattleBuffUI>();
+
         public void Awake()
         {
             backgrounds1 = new List<Sprite>();
@@ -218,6 +221,7 @@ namespace PCRCaculator
             //owner2.OnChangeState += SetAbnormalIcons_2;
             //SetAbnormalIcons(owner, eStateIconType.NONE, false);
             owner2.MyOnChangeAbnormalState += SetAbnormalIcons;
+            owner2.button = this;
             SetHPAndTP(1, 0);
             skillUI.Init(unitCtrl.unitParameter.SkillData.MainSkillIds.ToArray(),unitCtrl.unitParameter.SkillData.main_skill_evolution_1, unitCtrl.unitParameter.SkillData.main_skill_evolution_2);
             skillUI.Init(unitCtrl.unitParameter.SkillData.SpSkillIds.ToArray(), unitCtrl.unitParameter.SkillData.sp_skill_evolution_1, unitCtrl.unitParameter.SkillData.sp_skill_evolution_2);
@@ -260,8 +264,47 @@ namespace PCRCaculator
             TPSlider.value = 0;
             stars.SetStarColor(grayColor);
         }
+
+        public static Dictionary<eStateIconType, int> SetAbnormalIconsCounter = new Dictionary<eStateIconType, int>();
+
+        public void SetSealIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2)
+        {
+            if (SetAbnormalIconsCounter.ContainsKey(stateIconType_2))
+                SetAbnormalIconsCounter[stateIconType_2]++;
+            else
+                SetAbnormalIconsCounter[stateIconType_2] = 1;
+
+            if (BattleManager.Instance.skipping) return;
+
+            if (BattleUIManager.Instance.ShowBuffDic.TryGetValue(eStateIconType.NONE, out bool value))
+            {
+                if (value)
+                    return;
+            }
+            if (BattleUIManager.Instance.ShowBuffDic.TryGetValue(stateIconType_2, out bool value2))
+            {
+                if (!value2)
+                    return;
+            }
+
+            if (battleBuffUIDic.ContainsKey(stateIconType_2)) return;
+
+            GameObject a = Instantiate(buffUIPrefab);
+            a.transform.SetParent(buffUIParent, false);
+            BattleBuffUI buffUI = a.GetComponent<BattleBuffUI>();
+            buffUI.Init(uIManager.GetAbnormalIconSprite((Battle.eStateIconType)(int)stateIconType_2), stateIconType_2);
+            battleBuffUIDic[stateIconType_2] = buffUI;
+            battleBuffUIs.Add(buffUI);
+            RefreshBattleBuffUIs();
+        }
+
         public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???")
         {
+            if (SetAbnormalIconsCounter.ContainsKey(stateIconType_2))
+                SetAbnormalIconsCounter[stateIconType_2]++;
+            else
+                SetAbnormalIconsCounter[stateIconType_2] = 1;
+
             if (BattleManager.Instance.skipping) return;
             if (stayTime == 0) stayTime = unitCtrl.fieldTime;
             if(stateIconType_2 == eStateIconType.NONE) { return; }

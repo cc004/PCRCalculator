@@ -4,9 +4,11 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cute;
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -57,8 +59,8 @@ namespace Elements
 			for (int i = 0; i < _count; i++)
 			{
 				addSealImpl(_limitTime, _target, _iconType);
-			}
-		}
+            }
+        }
 
 		private void addSealImpl(float _limitTime, UnitCtrl _target, eStateIconType _iconType)
 		{
@@ -71,27 +73,52 @@ namespace Elements
 			if (DisplayCount)
 			{
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
-			}
-			IEnumerator enumerator = updateData(_limitTime, _target, _iconType, currentSealId);
+
+            }
+            if (!BattleManager.Instance.skipping)
+            {
+                _target.button.SetSealIcons(_target, _iconType);
+                if (_target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
+                {
+                    val.detailText.text = $"{GetCurrentCount()}/{Max} [{(int)_iconType}]";
+                }
+            }
+            IEnumerator enumerator = updateData(_limitTime, _target, _iconType, currentSealId);
 			updateDataDic.Add(currentSealId, enumerator);
 			_target.AppendCoroutine(enumerator, ePauseType.SYSTEM);
 			currentSealId++;
 		}
 
 		private IEnumerator updateData(float _limitTime, UnitCtrl _target, eStateIconType _iconType, int _sealId)
-		{
+        {
+            var total = _limitTime;
 			while (_limitTime > 0f && !_target.IdleOnly && !_target.IsDead && enableSealIdList.Contains(_sealId))
 			{
 				_limitTime -= _target.DeltaTimeForPause;
-				yield return null;
+
+                if (_sealId == enableSealIdList[0] && _target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
+                {
+                    val.timeCountSlider.value = 1f - Math.Clamp(_limitTime / total, 0f, 1f);
+                }
+
+                yield return null;
 			}
 			enableSealIdList.Remove(_sealId);
 			Count--;
 			if (DisplayCount)
 			{
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
-			}
-			if (Count == 0 && GetCurrentCount() == 0)
+
+            }
+            if (!BattleManager.Instance.skipping)
+            {
+                _target.button.SetSealIcons(_target, _iconType);
+                if (_target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
+                {
+                    val.detailText.text = $"{GetCurrentCount()}/{Max} [{(int)_iconType}]";
+                }
+            }
+            if (Count == 0 && GetCurrentCount() == 0)
 			{
 				if (Effect != null)
 				{
