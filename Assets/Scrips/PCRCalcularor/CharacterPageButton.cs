@@ -220,7 +220,7 @@ namespace PCRCaculator
             uIManager = BattleUIManager.Instance;
             //owner2.OnChangeState += SetAbnormalIcons_2;
             //SetAbnormalIcons(owner, eStateIconType.NONE, false);
-            owner2.MyOnChangeAbnormalState += SetAbnormalIcons;
+            owner2.MyOnChangeAbnormalState += (a, b, c, d, e) => SetAbnormalIcons(a, b, c, d, e);
             owner2.button = this;
             SetHPAndTP(1, 0);
             skillUI.Init(unitCtrl.unitParameter.SkillData.MainSkillIds.ToArray(),unitCtrl.unitParameter.SkillData.main_skill_evolution_1, unitCtrl.unitParameter.SkillData.main_skill_evolution_2);
@@ -298,7 +298,8 @@ namespace PCRCaculator
             RefreshBattleBuffUIs();
         }
 
-        public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???")
+        public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???",
+            object extraKey = null)
         {
             if (SetAbnormalIconsCounter.ContainsKey(stateIconType_2))
                 SetAbnormalIconsCounter[stateIconType_2]++;
@@ -319,12 +320,14 @@ namespace PCRCaculator
                     return;
             }
 
+            extraKey = extraKey ?? describe;
             if (enable)
             {
                 GameObject a = Instantiate(buffUIPrefab);
                 a.transform.SetParent(buffUIParent,false);
                 BattleBuffUI buffUI = a.GetComponent<BattleBuffUI>();
                 buffUI.Init(uIManager.GetAbnormalIconSprite((Battle.eStateIconType)(int)stateIconType_2),stateIconType_2,stayTime,describe,RemoveBuffIcon);
+                buffUI.key = extraKey;
                 battleBuffUIs.Add(buffUI);
                 RefreshBattleBuffUIs();
             }
@@ -338,8 +341,7 @@ namespace PCRCaculator
                 else
                 {
                     idx = battleBuffUIs.FindIndex(
-                    a => a.stateIconType == stateIconType_2 &&
-                    a.describe == describe);
+                    a => a.key == extraKey);
                 }
                 if (idx >= 0)
                 {

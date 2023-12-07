@@ -94,7 +94,7 @@ namespace Elements
             }
             else
                 dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
-            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, _enable: false, null, IsBuff, _additional: false, ShowsIcon);
+            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, _enable: false, null, IsBuff, _additional: false, ShowsIcon, extraKey: this);
             _parts.Owner.DisableBuffDebuffField(node[_parts.Owner]);
         }
 
@@ -123,7 +123,7 @@ namespace Elements
 
             owner.fieldTime = remaining;
             owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, BuffParamKind, dictionary, 0f, 0, null, _despelable: true, Elements.eEffectType.COMMON, IsBuff, _additional: false, _isShowIcon: false);
-            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, null, IsBuff, _additional: false, ShowsIcon);
+            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, null, IsBuff, _additional: false, ShowsIcon, extraKey: this);
             node[owner] = owner.EnableBuffDebuffField(this);
     }
 

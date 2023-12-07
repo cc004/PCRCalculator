@@ -200,7 +200,7 @@ namespace Elements
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
-          bool _additional, int hash)
+          bool _additional)
         {
             if (!_enable)
                 _value = _value * -1f;

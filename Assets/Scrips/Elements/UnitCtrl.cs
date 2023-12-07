@@ -6086,12 +6086,15 @@ this.updateCurColor();
           bool _isBuff,
           bool _additional,
           bool _showsIcon = true,
-          float buffTime = 0)
+          float buffTime = 0,
+          object extraKey = null)
         {
             if (_value.Values.All((FloatWithEx _val) => _val == 0))
             {
                 return;
             }
+
+            extraKey = extraKey ?? _value;
             BuffDebuffConstData buffDebuff = new BuffDebuffConstData
             {
                 BuffIcon = eStateIconType.NONE,
@@ -6131,7 +6134,7 @@ this.updateCurColor();
             stateChangeData.isBuff = true;
             stateChangeData.BUFF_Type = _kind;
             MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
-            MyOnChangeAbnormalState?.Invoke(this, IDAFJHFJKOL, _enable,buffTime,des);
+            button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)
             {
@@ -6160,8 +6163,7 @@ this.updateCurColor();
             }
             Dictionary<BasePartsData, FloatWithEx>.Enumerator enumerator = _value.GetEnumerator();
             while (enumerator.MoveNext())
-                enumerator.Current.Key.SetBuffDebuff(_enable, enumerator.Current.Value, _kind, _source, battleLog, _additional,
-                    (_value, enumerator.Current.Key).GetHashCode());
+                enumerator.Current.Key.SetBuffDebuff(_enable, enumerator.Current.Value, _kind, _source, battleLog, _additional);
         }
         public bool IsBuffDebuff(BuffParamKind _kind, bool _isBuff)
         {

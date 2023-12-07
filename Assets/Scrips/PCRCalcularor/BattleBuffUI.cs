@@ -17,6 +17,7 @@ namespace PCRCaculator.Battle
         public Elements.eStateIconType stateIconType;
         public string describe;
         private Action<BattleBuffUI> removeThis;
+        public object key;
 
         public void Init(Sprite icon, Elements.eStateIconType stateIconType)
         {
