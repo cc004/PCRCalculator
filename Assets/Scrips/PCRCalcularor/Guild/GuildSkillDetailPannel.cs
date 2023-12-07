@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Elements;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,14 +25,16 @@ namespace PCRCaculator.Guild
 
         }
 
+        private float posy;
         public void Setdetails(UnitSkillExecData data)
         {
-            detailTexts[0].text = data.skillName;
-            detailTexts[1].text = data.UnitName;
-            detailTexts[2].text = data.skillState.GetDescription();
-            detailTexts[3].text = data.startTime + "~" + data.endTime;
-            detailTexts[4].text = data.energy == 0f ? "无" : $"{data.energy}";
-            for(int i = 0; i < data.actionExecDatas.Count; i++)
+            detailTexts[0].text = data.UnitName;
+            // detailTexts[2].text = data.skillState.GetDescription();
+            detailTexts[1].text = data.startTime + "~" + data.endTime;
+            detailTexts[2].text = data.energy == 0f ? "无" : $"{data.energy}";
+            detailTexts[3].text = data.skillName;
+            posy = prefabBasePos.y;
+            for (int i = 0; i < data.actionExecDatas.Count; i++)
             {
                 AddActionDetails(data.actionExecDatas[i], i);
             }
@@ -45,17 +48,19 @@ namespace PCRCaculator.Guild
         private void AddActionDetails(UnitActionExecData data,int idx)
         {
             GameObject a = Instantiate(actionPrefab);
-            a.transform.SetParent(prefabParent, false); 
-            a.transform.localPosition = prefabBasePos + idx*prefabAddPos;
-            List<string> details = new List<string>();
-            details.Add(data.actionID + "");
-            details.Add(data.actionType);
-            details.Add(string.Join("/", data.targetNames));
-            details.Add(data.execTime + "");
-            details.Add(data.result.GetDescription());
-            details.Add(data.describe);
+            a.transform.SetParent(prefabParent, false);
+            a.transform.localPosition = Vector3.up * posy;
+            var view = a.GetComponent<GuildSkillActionDetail>().View;
+            List<string> details = new List<string>
+            {
+                $"{data.actionID}({data.actionType})",
+                string.Join(" ", data.targetNames),
+                $"{data.result.GetDescription()}[{data.execTime}]",
+                data.describe
+            };
             a.GetComponent<GuildSkillActionDetail>().SetTexts(details);
             prefabs.Add(a);
+            posy += (view.localPosition.y - view.sizeDelta.y - 20);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ActionParameterSerializer;
 using Elements;
 using ExcelDataReader.Log;
 using Newtonsoft.Json;
@@ -1052,7 +1053,7 @@ namespace PCRCaculator
             {
                 if (action != 0)
                 {
-                    string acdetail = MainManager.Instance.SkillActionDic[action].GetDetail(lv, atk);
+                    string acdetail = MainManager.Instance.SkillActionDic[action].GetDetail(lv, atk, dependactions[i]);
                     if (dependactions[i] > 0)
                     {
                         List<int> list = new List<int>(skillactions);
@@ -1191,16 +1192,29 @@ namespace PCRCaculator
             }
             return  ((DirectionType)target_area).GetDescription() + "范围" + (target_range < 1 ? "普攻范围" : target_range.ToString())
                 + "按照" + ((PirorityPattern)target_type).GetDescription() + "排列的从第" + (target_number + 1) + "个开始的" + target_count
-                + "个" + ((eTargetAssignment)target_assigment).GetDescription() +"目标"; 
+                + "个" + ((eTargetAssignment)target_assigment).GetDescription() +"目标";
         }
+
+
         /// <summary>
-        /// 获取技能片段的详情
-        /// </summary>
-        /// <param name="skilllevel">技能等级</param>
-        /// <param name="atk">角色攻击力（物理/魔法）</param>
-        /// <returns>技能详情描述字符串</returns>
-        public string GetDetail(int skilllevel, float atk)
+            /// 获取技能片段的详情
+            /// </summary>
+            /// <param name="skilllevel">技能等级</param>
+            /// <param name="atk">角色攻击力（物理/魔法）</param>
+            /// <returns>技能详情描述字符串</returns>
+            public string GetDetail(int skilllevel, float atk, int depend = 0)
         {
+            var param = ActionParameterSerializer.Actions.ActionParameter.type(this.type);
+            param.init(false, actionid, depend, classid, type, details[0],
+                details[1], details[2], values[0], values[1], values[2], values[3],
+                values[4], values[5], values[6], target_assigment, target_area, target_range,
+                target_type, target_number, target_count, null, new List<ActionParameterSerializer.SkillAction>());
+            UserSettings.expression = UserSettings.EXPRESSION_VALUE;
+            return param.localizedDetail(skilllevel, new Property()
+            {
+                atk = atk, magicStr = atk
+            });
+            /*
             string description_old = this.description;
             if (MainManager.Instance.SkillActionDescribe_cn.ContainsKey(actionid))
             {
@@ -1416,7 +1430,7 @@ namespace PCRCaculator
                 detailstr += ",范围：" + target_range;
             }
             detailstr += ")</color>";
-            return detailstr;
+            return detailstr;*/
         }
         /// <summary>
         /// 获取被动技能加的数值

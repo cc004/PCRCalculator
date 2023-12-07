@@ -54,6 +54,16 @@ namespace Elements
         // RVA: 0x121B3E0 Offset: 0x121B3E0 VA: 0x7FFD9D2BB3E0
         public void AddSeal(UnitCtrl _target)
         {
+            if (!_target.SealDictionary.ContainsKey(iconType))
+            {
+                SealData sealData = new SealData
+                {
+                    Max = maxCount,
+                    DisplayCount = isDisplayCount
+                };
+                _target.SealDictionary.Add(iconType, sealData);
+            }
+
             SealData seal = _target.SealDictionary[iconType];
             if (seal.GetCurrentCount() == 0)
             {

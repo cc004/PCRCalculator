@@ -1510,6 +1510,10 @@ namespace Elements
                 if (!battleManager.skipping)
                     Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
 
+                var detail = action.GetSkillDetail(Owner);
+                if (!string.IsNullOrEmpty(detail))
+                    actionExecData.describe += $"<color=#c080ff><size=8>{detail}\n</size></color>";
+
                 action.PreExecAction();
                 action.ExecAction(Owner, target, num, this, skill, starttime, dictionary, 
                     _valueDictionary,a=> 

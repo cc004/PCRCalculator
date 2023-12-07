@@ -34,15 +34,6 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             eStateIconType key = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2];
-            if (!_target.Owner.SealDictionary.ContainsKey(key))
-            {
-                SealData sealData = new SealData
-                {
-                    Max = (int)_valueDictionary[eValueNumber.VALUE_1],
-                    DisplayCount = ActionDetail2 == 1
-                };
-                _target.Owner.SealDictionary.Add(key, sealData);
-            }
             var dataDictionary = _target.Owner.AttackSealDataDictionary;
 
             if (dataDictionary.ContainsKey(ActionId))
@@ -53,6 +44,8 @@ namespace Elements
             {
                 var _attackSealData = new AttackSealDataForAllEnemy
                 {
+                    maxCount = (int)_valueDictionary[eValueNumber.VALUE_1],
+                    isDisplayCount = ActionDetail2 == 1,
                     LimitTime = _valueDictionary[eValueNumber.VALUE_3],
                     iconType = key,
                     ExecConditionType = (AttackSealData.eExecConditionType)ActionDetail1

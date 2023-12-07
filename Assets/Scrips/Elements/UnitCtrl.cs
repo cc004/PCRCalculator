@@ -4090,7 +4090,7 @@ this.updateCurColor();
                         return;
                     if (CanOverlapAbnormalState(_abnormalState))
                     {
-                        if (!BattleManager.Instance.skipping)
+                        if (!BattleManager.Instance.skipping && button != null)
                         {
                             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
                             {
@@ -7716,7 +7716,7 @@ this.updateCurColor();
                             !isHit)
                             continue;
 
-                        keyValuePair.Value.AddSeal(_damageData.Source);
+                        keyValuePair.Value.AddSeal(this);
                     }
                 }
             }

@@ -75,7 +75,7 @@ namespace Elements
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
 
             }
-            if (!BattleManager.Instance.skipping)
+            if (!BattleManager.Instance.skipping && _target.button != null)
             {
                 _target.button.SetSealIcons(_target, _iconType);
                 if (_target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
@@ -96,7 +96,7 @@ namespace Elements
 			{
 				_limitTime -= _target.DeltaTimeForPause;
 
-                if (_sealId == enableSealIdList[0] && _target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
+                if (_sealId == enableSealIdList[0] && _target.button != null && _target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
                 {
                     val.timeCountSlider.value = 1f - Math.Clamp(_limitTime / total, 0f, 1f);
                 }
@@ -110,7 +110,7 @@ namespace Elements
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
 
             }
-            if (!BattleManager.Instance.skipping)
+            if (!BattleManager.Instance.skipping && _target.button != null)
             {
                 _target.button.SetSealIcons(_target, _iconType);
                 if (_target.button.battleBuffUIDic.TryGetValue(_iconType, out var val))
