@@ -1763,9 +1763,19 @@ namespace Elements
             get
             {
                 int num = (int)Mathf.Max(0, (int)EnergyRecoveryRate + getAdditionalBuffDictionary(BuffParamKind.ENERGY_RECOVER_RATE));
+                return num;
+            }
+        }
+
+        public int EnergyRecoveryRateZeroCapped
+        {
+            get
+            {
+                int num = EnergyRecoveryRateZero;
                 return (MainManager.Instance.MaxTPUpValue <= 0) ? num : Mathf.Min(num, MainManager.Instance.MaxTPUpValue);
             }
         }
+
         public int LifeStealZero => (int)(Mathf.Max(0, LifeSteal) + getAdditionalBuffDictionary(BuffParamKind.LIFE_STEAL));
 
         public int PhysicalPenetrateZero => Mathf.Max(0, PhysicalPenetrate);
@@ -8897,7 +8907,7 @@ this.updateCurColor();
         {
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
-            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZero + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
+            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroCapped + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_hasNumberEffect && !battleManager.skipping)
             {

@@ -182,16 +182,6 @@ namespace PCRCaculator.Guild
                             priority = UnitCtrl.eCritPointPriority.ExecAction
                         };
                     }
-                    allUnitStateChangeDic[unitid].Add(
-                        new UnitStateChangeData
-                        {
-                            id = ++id,
-                            changStateFrom = allUnitLastStateDic[unitid].changStateTo,
-                            changStateTo = actionState,
-                            currentFrameCount = frameCount,
-                            realFrameCount = BattleManager.Instance.FrameCount,
-                            operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null
-                        });
                     //skillGroupPrefabDic[unitid].AddButtons(allUnitLastStateDic[unitid].currentFrameCount, frameCount, (int)actionState);
                     Action action = null;
                     int startFrame = allUnitLastStateDic[unitid].currentFrameCount;
@@ -210,6 +200,19 @@ namespace PCRCaculator.Guild
                                 variant = skillExecData.skillID % 10;
                         }
                     }
+
+                    allUnitStateChangeDic[unitid].Add(
+                        new UnitStateChangeData
+                        {
+                            id = ++id,
+                            changStateFrom = allUnitLastStateDic[unitid].changStateTo,
+                            changStateTo = actionState,
+                            currentFrameCount = frameCount,
+                            realFrameCount = BattleManager.Instance.FrameCount,
+                            operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null,
+                            variant = variant
+                        });
+
                     var trans = skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action, variant);
 
                     var pos = skillGroupParent.transform.InverseTransformPoint(trans.position);
@@ -1420,7 +1423,7 @@ namespace PCRCaculator.Guild
     }
     public struct UnitStateChangeData
     {
-        public int id;
+        public int id, variant;
         public int currentFrameCount, realFrameCount;
         public UnitCtrl.ActionState changStateFrom;
         public UnitCtrl.ActionState changStateTo;
@@ -1436,7 +1439,7 @@ namespace PCRCaculator.Guild
             this.changStateTo = changStateTo;
             this.describe = describe;
             operation = null;
-            id = 0;
+            id = variant = 0;
         }
         public string GetMainDescribe()
         {

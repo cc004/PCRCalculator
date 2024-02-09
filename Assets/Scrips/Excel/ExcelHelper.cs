@@ -1114,6 +1114,7 @@ namespace ExcelHelper
                     worksheet2.Cells[lineNum - 1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     int currentLoc = 3;
                     int lastFrameCount = 0;
+                    // int lastVariant = 0;
                     foreach(var exec in unit.Value)
                     {
                         //int length = Mathf.RoundToInt((exec.currentFrameCount - lastFrameCount) / 60.0f);
@@ -1129,6 +1130,16 @@ namespace ExcelHelper
                         }
                         else
                         {
+                            var variantString = string.Empty;
+                            if (exec.variant != 0)
+                            {
+                                if (exec.variant > 100)
+                                    variantString = $"_SP{exec.variant % 10}";
+                                else if (exec.variant > 10)
+                                    variantString = $"_{(exec.variant - 1) % 10}+";
+                                else
+                                    variantString = $"_{exec.variant - 1}";
+                            }
                             if (length < 1 && exec.currentFrameCount != lastFrameCount)
                             {
                                 length = 1;
@@ -1139,13 +1150,15 @@ namespace ExcelHelper
                                 worksheet2.Cells[lineNum, currentLoc].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                                 worksheet2.Cells[lineNum, currentLoc].Style.Fill.PatternType = ExcelFillStyle.DarkGray;
                                 worksheet2.Cells[lineNum, currentLoc].Style.Fill.BackgroundColor.SetColor(stateColors[(int)exec.changStateFrom]);
-                                worksheet2.Cells[lineNum, currentLoc].Value = exec.changStateFrom.GetDescription();
+                                worksheet2.Cells[lineNum, currentLoc].Value = exec.changStateFrom.GetDescription() + variantString;
                                 worksheet2.Cells[lineNum + 1, currentLoc].Value = lastFrameCount;
                                 worksheet2.Cells[lineNum + 1, currentLoc].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                                 lastFrameCount = exec.currentFrameCount;
                                 currentLoc += length + 1;
                             }
                         }
+
+                        // lastVariant = exec.variant;
                     }
                     lineNum++;
                     lineNum++;
