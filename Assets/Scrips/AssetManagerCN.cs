@@ -1,4 +1,6 @@
 ﻿using AssetsTools;
+using AssetsTools.NET;
+using AssetsTools.NET.Extra;
 using Newtonsoft.Json;
 using PCRCaculator;
 using System;
@@ -208,14 +210,29 @@ namespace PCRApi.CN
             }
             return null;
         }
-        
-        public AssetBundleFile ResolveAssetsBundle(string path, string cache = null)
+
+        AssetsManager am = new AssetsManager();
+        /*
+        public AssetManager()
+        {
+#if PLATFORM_ANDROID
+            am.LoadClassPackage(Path.Combine(Application.persistentDataPath, "classdata.tpk"));
+#else
+            am.LoadClassPackage(Path.Combine(Application.streamingAssetsPath, "classdata.tpk"));
+#endif
+        }
+        */
+        public BundleFileInstance ResolveAssetsBundle(string path, string cache = null)
         {
             if (registries.TryGetValue(path, out var content))
             {
-                return AssetBundleFile.LoadFromMemory(
-                    content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}", cache)
-                    );
+                BundleFileInstance bundleFileInstance;
+                bundleFileInstance = am.LoadBundleFile(new MemoryStream(
+                        content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}",
+                            cache)),
+                    ABExTool.persistentDataPath, unpackIfPacked: false);
+                bundleFileInstance.file = AssetExtensions.DecompressToMemory(bundleFileInstance);
+                return bundleFileInstance;
             }
             return null;
         }
@@ -225,9 +242,10 @@ namespace PCRApi.CN
         public byte[] ResolveDatabase()
         {
             var ab = ResolveAssetsBundle("a/masterdata_master.unity3d");
-            var af = ab.Files[0].ToAssetsFile();
-
-            return af.Objects[0].Data.Skip(16).ToArray();
+            var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
+            var text = assetsFileInstance.file.GetAssetsOfType(AssetClassID.TextAsset).SingleOrDefault();
+            var root = am.GetBaseField(assetsFileInstance, text);
+            return root["m_Script"].AsByteArray;
         }
 
         public string DataVer => $"{(qa ? "qa" : "prod")}{Ver}";
