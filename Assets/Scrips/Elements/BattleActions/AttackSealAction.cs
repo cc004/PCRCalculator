@@ -52,8 +52,9 @@ namespace Elements
             dataDictionary = _target.Owner.DamageOnceOwnerSealDateDictionary;
           }
           break;
-        case eExecConditionType.HIT:
+        case eExecConditionType.DAMAGE:
         case eExecConditionType.CRITICAL:
+        case eExecConditionType.HIT:
           switch ((eSealTarget) ActionDetail3)
           {
             case eSealTarget.TARGET:
@@ -67,13 +68,14 @@ namespace Elements
       }
       if (dataDictionary.ContainsKey(_source) && dataDictionary[_source].ContainsKey(ActionId))
       {
-        dataDictionary[_source][ActionId].LimitTime = _valueDictionary[eValueNumber.VALUE_3];
+        dataDictionary[_source][ActionId].LimitTime = _valueDictionary[eValueNumber.VALUE_5];
       }
       else
       {
         AttackSealData _attackSealData = new AttackSealData
         {
-          LimitTime = _valueDictionary[eValueNumber.VALUE_3],
+          SealEffectTime = _valueDictionary[eValueNumber.VALUE_3],
+          LimitTime = _valueDictionary[eValueNumber.VALUE_5],
           IconType = key,
           ActionId = ActionId,
           ExecConditionType = (AttackSealData.eExecConditionType) ActionDetail1
@@ -113,15 +115,17 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
-    }
+      Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_5] = (float)(MasterData.action_value_5 + MasterData.action_value_6 * _level);
+        }
 
     public enum eExecConditionType
     {
       DAMAGE_ONCE = 1,
       TARGET = 2,
-      HIT = 3,
+      DAMAGE = 3,
       CRITICAL = 4,
+      HIT = 5
     }
 
     public enum eSealTarget
