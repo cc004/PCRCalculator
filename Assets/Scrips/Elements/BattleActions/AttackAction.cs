@@ -228,7 +228,7 @@ namespace Elements
             }
 
             _target.Owner.lastBarrier = null;
-            if (_target.Owner.SetDamage(damageData, true, ActionId, OnDamageHit, _skill: _skill, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple, callBack: action) != 0L)
+            if (_target.Owner.SetDamage(damageData, true, ActionId, OnDamageHit, _skill: _skill, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple, callBack: action, _usedChargeEnergyByReceiveDamage: UsedChargeEnergyByReceiveDamage) != 0L)
                 HitOnceDic[_target] = true;
             HitOnceProbDic[_target] = _target.Owner.lastBarrier;
             //if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK)

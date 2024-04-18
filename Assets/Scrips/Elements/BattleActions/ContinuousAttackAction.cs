@@ -154,7 +154,7 @@ label_29:
               Damage = (long) BattleUtil.FloatToInt(Math.Max(continuousAttackAction.continuousDeltaHp * _source.DeltaTimeForPause, 1f)),
               DamageType = DamageData.eDamageType.NONE,
               ActionType = eActionType.CONTINUOUS_ATTACK
-            }, false, continuousAttackAction.ActionId, _hasEffect: false, _energyAdd: false, _energyChargeMultiple: continuousAttackAction.EnergyChargeMultiple);
+            }, false, continuousAttackAction.ActionId, _hasEffect: false, _energyAdd: false, _energyChargeMultiple: EnergyChargeMultiple);
           if ((long) _source.Hp <= 0L)
             break;
         }

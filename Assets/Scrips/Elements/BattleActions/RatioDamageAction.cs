@@ -102,7 +102,7 @@ namespace Elements
             
             if (owner.SetDamage(_damageData, true, actionId, _onDamageHit, _skill: _skill1,
                     _damageWeight: ((float) weight), _damageWeightSum: ((float) actionWeightSum),
-                    _energyChargeMultiple: ((float) energyChargeMultiple), callBack: action) !=
+                    _energyChargeMultiple: ((float) energyChargeMultiple), callBack: action, _usedChargeEnergyByReceiveDamage: UsedChargeEnergyByReceiveDamage) !=
                 0L) HitOnceDic[_target] = true;
             
             HitOnceProbDic[_target] = _target.Owner.lastBarrier;
