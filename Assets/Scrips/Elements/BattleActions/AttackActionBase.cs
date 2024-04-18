@@ -246,6 +246,21 @@ namespace Elements
             {
                 value.DamagedCount++;
             }
+
+            if (_source.IsOther != _target.Owner.IsOther)
+            {
+                foreach (var val in _source.AccumulativeDamageSourceDataDictionary.Values)
+                {
+                    if (!_target.Owner.AccumulativeDamageDataForAllEnemyDictionary.TryGetValue(
+                            val, out var val2))
+                    {
+                        val2 = _target.Owner.AccumulativeDamageDataForAllEnemyDictionary[val] =
+                            val.CreateAccumulativeDamageData();
+                    }
+
+                    ++val2.DamagedCount;
+                }
+            }
             float criticalDamageRate = getCriticalDamageRate(_valueDictionary);
             float num7 = (flag ? ((float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f) : ((float)(int)_source.MagicCriticalDamageRateOrMin / 100f));
             float num8 = (float)(int)_target.Owner.ReceiveCriticalDamageRateOrMin / 100f;
@@ -314,14 +329,29 @@ namespace Elements
             num *= _target.Owner.GetDebuffDamageUpValue();
             if (!_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
-                return BattleUtil.FloatToInt(num);
+                if (_target.Owner.IsOther == _source.IsOther ||
+                    _source.AccumulativeDamageSourceDataDictionary.Count == 0)
+                    return BattleUtil.FloatToInt(num);
             }
-            int num2 = value.DamagedCount - _num;
             FloatWithEx num3 = 0;
             for (int i = 0; i < base.ActionExecTimeList.Count; i++)
             {
                 FloatWithEx num4 = BattleUtil.FloatToInt(num * base.ActionExecTimeList[i].Weight / base.ActionWeightSum);
-                num4 += value.CalcAdditionalDamage(num2 + i, num4);
+
+                if (value != null)
+                {
+                    int num2 = value.DamagedCount - _num;
+                    num4 += value.CalcAdditionalDamage(num2 + i, num4);
+                }
+
+                if (_target.Owner.IsOther != _source.IsOther)
+                {
+                    foreach (var val in _source.AccumulativeDamageSourceDataDictionary.Values)
+                    {
+                        if (_target.Owner.AccumulativeDamageDataForAllEnemyDictionary.TryGetValue(val, out var val2))
+                            num4 += val2.CalcAdditionalDamage(val2.DamagedCount, num4);
+                    }
+                }
                 num3 += num4;
             }
             return num3;
@@ -334,6 +364,16 @@ namespace Elements
             {
                 num += value.CalcAdditionalDamage(value.DamagedCount, num);
             }
+
+            if (_target.Owner.IsOther != _source.IsOther)
+            {
+                foreach (var val in _source.AccumulativeDamageSourceDataDictionary.Values)
+                {
+                    if (_target.Owner.AccumulativeDamageDataForAllEnemyDictionary.TryGetValue(val, out var val2))
+                        num += val2.CalcAdditionalDamage(val2.DamagedCount, num);
+                }
+            }
+
             return num;
         }
 

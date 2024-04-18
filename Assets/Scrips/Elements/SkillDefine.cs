@@ -667,6 +667,10 @@ namespace Elements
                 typeof(CopyAtkParamAction)
             },
             {
+                eActionType.ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY,
+                typeof(AccumulativeDamageActionForAllEnemy)
+            },
+            {
                 eActionType.ATTACK_SEAL_FOR_ALL_ENEMY,
                 typeof(AttackSealActionForAllEnemy)
             }

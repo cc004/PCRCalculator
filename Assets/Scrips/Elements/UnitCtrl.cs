@@ -31,6 +31,46 @@ using Object = UnityEngine.Object;
 
 namespace Elements
 {
+    public class AccumulativeDamageSourceData // TypeDefIndex: 2274
+    {
+        // Fields
+        private eAccumulativeDamageType AccumulativeDamageType; // 0x10
+        private float effectValue; // 0x14
+        private int countLimit; // 0x18
+
+        // Methods
+
+        // RVA: 0x2ED65A4 Offset: 0x2ED65A4 VA: 0x2ED65A4
+        public AccumulativeDamageSourceData(eAccumulativeDamageType _damageType, float _effectValue, int _countLimit)
+        {
+            this.AccumulativeDamageType = _damageType;
+            this.effectValue = _effectValue;
+            this.countLimit = _countLimit;
+        }
+
+        public AccumulativeDamageData CreateAccumulativeDamageData()
+        {
+            if (AccumulativeDamageType == eAccumulativeDamageType.FIXED)
+            {
+                return new AccumulativeDamageData
+                {
+                    AccumulativeDamageType = eAccumulativeDamageType.FIXED,
+                    FixedValue = effectValue,
+                    CountLimit = countLimit
+                };
+            }
+            else
+            {
+                return new AccumulativeDamageData
+                {
+                    AccumulativeDamageType = eAccumulativeDamageType.PERCENTAGE,
+                    PercentageValue = effectValue,
+                    CountLimit = countLimit
+                };
+            }
+        }
+    }
+
     public class BasePartsDataEx
     {
         public FloatWithEx Energy, Hp, GetAtkZeroEx, GetMagicStrZeroEx;
@@ -467,6 +507,14 @@ namespace Elements
             },
             {
                 eAbnormalState.ACCUMULATIVE_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = false
+                }
+            },
+            {
+                eAbnormalState.ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY,
                 new AbnormalConstData
                 {
                     IconType = eStateIconType.NONE,
@@ -1896,6 +1944,9 @@ this.updateCurColor();
             LifeStealQueueList = new List<Queue<int>>();
             StrikeBackDictionary = new Dictionary<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet>(new EnchantStrikeBackAction.eStrikeBackEffectType_DictComparer());
             AccumulativeDamageDataDictionary = new Dictionary<UnitCtrl, AccumulativeDamageData>();
+            AccumulativeDamageDataForAllEnemyDictionary =
+                new Dictionary<AccumulativeDamageSourceData, AccumulativeDamageData>();
+            AccumulativeDamageSourceDataDictionary = new Dictionary<int, AccumulativeDamageSourceData>();
             DamageSealDataDictionary = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
             SealDictionary = new Dictionary<eStateIconType, SealData>();
             UbAbnormalDataList = new List<UbAbnormalData>();
@@ -1982,6 +2033,8 @@ this.updateCurColor();
             this.LifeStealQueueList = (List<Queue<int>>)null;
             this.StrikeBackDictionary = (Dictionary<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet>)null;
             this.AccumulativeDamageDataDictionary = (Dictionary<UnitCtrl, AccumulativeDamageData>)null;
+            AccumulativeDamageDataForAllEnemyDictionary = null;
+            AccumulativeDamageSourceDataDictionary = null;
             this.DamageSealDataDictionary = (Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>)null;
             this.DamageOnceOwnerSealDateDictionary = (Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>)null;
             this.DamageOwnerSealDataDictionary = (Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>)null;
@@ -3909,6 +3962,9 @@ this.updateCurColor();
                     result = eAbnormalStateCategory.PARTS_NO_DAMAGE;
                     break;
                 case eAbnormalState.ACCUMULATIVE_DAMAGE:
+                    result = eAbnormalStateCategory.ACCUMULATIVE_DAMAGE;
+                    break;
+                case eAbnormalState.ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY:
                     result = eAbnormalStateCategory.ACCUMULATIVE_DAMAGE;
                     break;
                 case eAbnormalState.SLEEP:
@@ -6384,6 +6440,8 @@ this.updateCurColor();
         public Dictionary<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet> StrikeBackDictionary { get; private set; }
 
         public Dictionary<UnitCtrl, AccumulativeDamageData> AccumulativeDamageDataDictionary { get; private set; }
+        public Dictionary<int, AccumulativeDamageSourceData> AccumulativeDamageSourceDataDictionary { get; private set; }
+        public Dictionary<AccumulativeDamageSourceData, AccumulativeDamageData> AccumulativeDamageDataForAllEnemyDictionary { get; private set; }
 
         public Dictionary<eStateIconType, SealData> SealDictionary { get; private set; }
 
@@ -12100,6 +12158,10 @@ this.updateCurColor();
             BLACK_FRAME,
             // Token: 0x040027E5 RID: 10213
             UNABLE_STATE_GUARD,
+
+            FLIGHT = 71,
+            ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY = 72,
+            WORLD_LIGHTNING = 73,
             NUM,
 
 

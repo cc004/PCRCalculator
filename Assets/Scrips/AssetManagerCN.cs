@@ -172,8 +172,8 @@ namespace PCRApi.CN
         public async Task Initialize(string ver, bool qa)
         {
             this.qa = qa;
-            res = qa ? "l2-dev-patch-gzlj.bilibiligame.net/client_qa2_345/" :
-                "l1-prod-patch-gzlj.bilibiligame.net/client_ob_345/";
+            res = qa ? "l2-dev-patch-gzlj.bilibiligame.net/client_qa2_771/" :
+                "l1-prod-patch-gzlj.bilibiligame.net/client_ob_771/";
             Ver = ver;
             registries.Clear();
 

@@ -49,7 +49,7 @@ namespace PCRCaculator.Update
             */
 
             gameObject.SetActive(false);
-            MainManager.Instance.WindowConfigMessage("������ɣ�������������Ӧ�ø���", Application.Quit, Application.Quit);
+            MainManager.Instance.WindowConfigMessage("更新完成，重启摸轴器生效", Application.Quit, Application.Quit);
         }
     }
 }
