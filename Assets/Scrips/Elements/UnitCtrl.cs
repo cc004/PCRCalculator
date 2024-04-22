@@ -11998,7 +11998,12 @@ this.updateCurColor();
             
             if (Index >= 0 && Index <= 4 && Input.GetKey(KeyCode.Alpha5 - Index)) return true;
 
-            return MyGameCtrl.Instance.IsAutoMode && CurrentState == ActionState.IDLE;
+            if (CurrentState != ActionState.IDLE) return false;
+
+            if (IsSummonOrPhantom && SummonSource != null && SummonSource.Hp < 0) return false;
+            if (MyGameCtrl.Instance.IsAutoMode)
+                return true;
+            return IsSummonOrPhantom;
         }
 
         private bool isMyTurn() => battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE || unitActionController.Skill1Charging;

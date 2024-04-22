@@ -26,7 +26,8 @@ namespace PCRCalcularor
         }
 
         public static void OverrideWith<TKey, TValue>(this Dictionary<TKey, TValue> self,
-            IEnumerable<KeyValuePair<TKey, TValue>> other)
+            IEnumerable<KeyValuePair<TKey, TValue>> other,
+            Predicate<TKey> predict = null)
         {
             foreach (var pair in other)
             {
@@ -36,7 +37,7 @@ namespace PCRCalcularor
                     {
                         val2.OverrideWith(pair.Value);
                     }
-                    else
+                    else if (predict == null || predict(pair.Key))
                     {
                         self[pair.Key] = pair.Value;
                     }
