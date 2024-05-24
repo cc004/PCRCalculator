@@ -9,7 +9,7 @@ namespace PCRCaculator.Update
     public class UpdateManager : MonoBehaviour
     {
         public InputField verCharaJP, verBossJP, verBossCN;
-        public Toggle qa, jp;
+        public Toggle qa, jp, newab;
         
         public void StartCheck()
         {
@@ -20,6 +20,7 @@ namespace PCRCaculator.Update
             verBossCN.text = MainManager.Instance.Version.BossVersionCN.ToString();
             qa.isOn = MainManager.Instance.Version.useQA;
             jp.isOn = MainManager.Instance.Version.useJP;
+            newab.isOn = MainManager.Instance.Version.newAB;
 
         }
 
@@ -32,6 +33,7 @@ namespace PCRCaculator.Update
         {
             MainManager.Instance.Version.useQA = qa.isOn;
             MainManager.Instance.Version.useJP = jp.isOn;
+            MainManager.Instance.Version.newAB = newab.isOn;
             MainManager.Instance.Version.CharacterVersionJP = long.Parse(verCharaJP.text);
             MainManager.Instance.Version.BossVersionJP = long.Parse(verBossJP.text);
             MainManager.Instance.Version.BossVersionCN = long.Parse(verBossCN.text);

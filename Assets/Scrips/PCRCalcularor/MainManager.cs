@@ -167,6 +167,7 @@ namespace PCRCaculator
             public long BossVersionCN = 202404181932;
             public bool useQA = true;
             public bool useJP = true;
+            public bool newAB = true;
 
         }
 

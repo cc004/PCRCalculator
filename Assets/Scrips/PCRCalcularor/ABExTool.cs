@@ -465,6 +465,8 @@ namespace PCRCaculator
         {
             if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
 
+            useOldManifest &= !MainManager.Instance.Version.newAB;
+
             //internal packed
             var path = Application.streamingAssetsPath + "/AB/" + fullname;
             var mgr = useOldManifest ? mgrDataJP : mgrCharacter;
