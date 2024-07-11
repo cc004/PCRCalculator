@@ -484,7 +484,15 @@ namespace ExcelHelper
 
             foreach (var tuple in cdict)
             {
+              //修改姬塔id
+              if (tuple.Value.unit.unitId == 105701) 
+              {
+                src.AppendLine($"mov 170301,{tuple.Value.name}");
+              }
+              else
+              {
                 src.AppendLine($"mov {tuple.Value.unit.unitId},{tuple.Value.name}");
+              }
             }
 
             //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
@@ -509,7 +517,7 @@ namespace ExcelHelper
                 {
                     var name = cdict[unit].name;
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
-                    src.AppendLine($"wait {data.realFrameCount}; press {name},5; // lframe {data.currentFrameCount}");
+                    src.AppendLine($"wait {data.realFrameCount}; pressub {name}; // lframe {data.currentFrameCount}");
                 }
                 else
                 {
