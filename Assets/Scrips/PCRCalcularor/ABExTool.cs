@@ -475,7 +475,7 @@ namespace PCRCaculator
             while (!www.isDone) { Thread.Sleep(0); }
             path = Application.persistentDataPath + $"/AB/{mgr.SubFolder}/";
 #else
-            var www = new WWW(path);
+            var www = new WWW("file://" + path);
             while (!www.isDone) { Thread.Sleep(0); }
             path = Application.streamingAssetsPath + $"/../.ABExt2/{mgr.SubFolder}/";
 #endif

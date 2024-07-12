@@ -41296,7 +41296,7 @@ MonoBehaviour:
   verBossCN: {fileID: 1178447376}
   qa: {fileID: 1477918602}
   jp: {fileID: 467167928}
-  newab: {fileID: 0}
+  newab: {fileID: 1851330077}
 --- !u!114 &1397829692
 MonoBehaviour:
   m_ObjectHideFlags: 0

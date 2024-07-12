@@ -283,22 +283,56 @@ namespace PCRCaculator.SQL
         public int depend_action_7 { get; set; }
         public string description { get; set; }
         public int icon_type { get; set; }
-        public List<int> GetAllActionIDs()
+        public virtual List<int> GetAllActionIDs()
         {
             List<int> ids = new List<int>
             {
                 action_1,action_2,action_3,action_4,
-                action_5,action_6,action_7
+                action_5,action_6,action_7,0,0,0
             };           
 
             return ids;
         }
-        public List<int> GetAllDependActionIDs()
+        public virtual List<int> GetAllDependActionIDs()
         {
             List<int> ids = new List<int>
             {
                 depend_action_1,depend_action_2,depend_action_3,depend_action_4,
-                depend_action_5,depend_action_6,depend_action_7
+                depend_action_5,depend_action_6,depend_action_7,0,0,0
+            };
+
+            return ids;
+        }
+    }
+
+    [Table("skill_data")]
+    public class skill_data_new : skill_data
+    {
+        public int action_8 { get; set; }
+        public int action_9 { get; set; }
+        public int action_10 { get; set; }
+        public int depend_action_8 { get; set; }
+        public int depend_action_9 { get; set; }
+        public int depend_action_10 { get; set; }
+
+        public override List<int> GetAllActionIDs()
+        {
+            List<int> ids = new List<int>
+            {
+                action_1,action_2,action_3,action_4,
+                action_5,action_6,action_7,action_8,
+                action_9,action_10,
+            };
+
+            return ids;
+        }
+        public override List<int> GetAllDependActionIDs()
+        {
+            List<int> ids = new List<int>
+            {
+                depend_action_1,depend_action_2,depend_action_3,depend_action_4,
+                depend_action_5,depend_action_6,depend_action_7,depend_action_8,
+                depend_action_9,depend_action_10
             };
 
             return ids;

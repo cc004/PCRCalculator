@@ -37,6 +37,8 @@ public static class AssetExtensions
 
 #if PLATFORM_ANDROID
             var preferredPlatform = (uint)BuildTarget.Android;
+#elif UNITY_STANDALONE_OSX
+            var preferredPlatform = (uint)BuildTarget.StandaloneOSX;
 #else
             var preferredPlatform = (uint)BuildTarget.StandaloneWindows64;
 #endif

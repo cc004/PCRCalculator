@@ -412,7 +412,10 @@ namespace PCRCaculator.SQL
         private Dictionary<int, SkillData> GetSkillDataDic()
         {
             Dictionary<int, SkillData> dic = new Dictionary<int, SkillData>();
-            var list = GetDatas<skill_data>();
+            skill_data[] list;
+            list = GetDatas<skill_data_new>();
+            if (list == null)
+                list = GetDatas<skill_data>();
             foreach (var dd in list)
             {
                 SkillData sk = new SkillData(dd.skill_id, dd.name, dd.skill_type,

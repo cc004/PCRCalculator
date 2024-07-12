@@ -108,6 +108,9 @@ namespace Elements
             protected int _action_5;
             protected int _action_6;
             protected int _action_7;
+            protected int _action_8;
+            protected int _action_9;
+            protected int _action_10;
             protected int _depend_action_1;
             protected int _depend_action_2;
             protected int _depend_action_3;
@@ -115,6 +118,9 @@ namespace Elements
             protected int _depend_action_5;
             protected int _depend_action_6;
             protected int _depend_action_7;
+            protected int _depend_action_8;
+            protected int _depend_action_9;
+            protected int _depend_action_10;
             protected string _description;
             protected int _icon_type;
 
@@ -138,6 +144,9 @@ namespace Elements
                 ActionIds.Add(action_5);
                 ActionIds.Add(action_6);
                 ActionIds.Add(action_7);
+                ActionIds.Add(_action_8);
+                ActionIds.Add(_action_9);
+                ActionIds.Add(_action_10);
                 DependedIds = new List<int>();
                 DependedIds.Add(depend_action_1);
                 DependedIds.Add(depend_action_2);
@@ -146,6 +155,9 @@ namespace Elements
                 DependedIds.Add(depend_action_5);
                 DependedIds.Add(depend_action_6);
                 DependedIds.Add(depend_action_7);
+                DependedIds.Add(_depend_action_8);
+                DependedIds.Add(_depend_action_9);
+                DependedIds.Add(_depend_action_10);
                 ActionDataList = new List<MasterSkillAction.SkillAction>();
                 int index = 0;
                 for (int count = ActionIds.Count; index < count; ++index)
@@ -274,6 +286,9 @@ namespace Elements
                 _action_5 = data.skillactions[4];
                 _action_6 = data.skillactions[5];
                 _action_7 = data.skillactions[6];
+                _action_8 = data.skillactions[7];
+                _action_9 = data.skillactions[8];
+                _action_10 = data.skillactions[9];
                 _depend_action_1 = data.dependactions[0];
                 _depend_action_2 = data.dependactions[1];
                 _depend_action_3 = data.dependactions[2];
@@ -281,6 +296,9 @@ namespace Elements
                 _depend_action_5 = data.dependactions[4];
                 _depend_action_6 = data.dependactions[5];
                 _depend_action_7 = data.dependactions[6];
+                _depend_action_8 = data.dependactions[7];
+                _depend_action_9 = data.dependactions[8];
+                _depend_action_10 = data.dependactions[9];
                 _description = data.describes;
                 _icon_type = data.icon;
                 SetUp();
