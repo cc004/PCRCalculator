@@ -1351,7 +1351,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -15}
+  m_AnchoredPosition: {x: 0, y: -14.999985}
   m_SizeDelta: {x: -110, y: -140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &77241775
@@ -10363,7 +10363,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u4FDD\u5B58\n"
+  m_Text: "\u4FDD\u5B58"
 --- !u!222 &494426946
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17456,9 +17456,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'STEP
-
-'
+  m_Text: STEP
 --- !u!222 &813599674
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -35605,7 +35603,7 @@ PrefabInstance:
     - target: {fileID: 8965163776911997731, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.00000011920929
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8965163777344137641, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
@@ -35660,7 +35658,7 @@ PrefabInstance:
     - target: {fileID: 8965163778149962079, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.32333338
+      value: 0.32333332
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 42fce9398644d4946a5823abbe9654d6, type: 3}
