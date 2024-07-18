@@ -8,7 +8,7 @@ using Elements.Battle;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using PCRCaculator.Guild;
 namespace PCRCaculator.Battle
 {
     public enum eLogMessageType
@@ -367,7 +367,27 @@ namespace PCRCaculator.Battle
             }
         }
 
-        public void PauseButton()
+        public void RetryButton()
+        {
+          bool isGuildBossBattle = false;
+          if (MyGameCtrl.Instance != null)
+          {
+            isGuildBossBattle = MyGameCtrl.Instance.tempData.isGuildBattle;
+          }
+
+          Time.timeScale = 1;
+          GuildManager.Instance.StartCalButton();
+      // if (isGuildBossBattle)
+      // {
+      //   SceneManager.LoadScene("GuildScene");
+      // }
+      // else
+      // {
+      //   SceneManager.LoadScene("BeginScene");
+      // }
+    }
+
+    public void PauseButton()
         {
             {
                 MyGameCtrl.Instance.PauseButton();
