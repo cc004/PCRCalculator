@@ -743,11 +743,18 @@ namespace PCRCaculator
             result += count;
             if (special)
                 result += "*";
-            if (uniqueEqLv > 0)
-                result += "(" + uniqueEqLv + ")";
+            // if (uniqueEqLv > 0)
+            //     result += "(" + uniqueEqLv + ")";
             return result;
         }
-        public string GetLevelDescribe()
+        public string GetUniqueEqLvDescribe()
+        {
+          string result = "无";
+          if (uniqueEqLv > 0)
+            result = uniqueEqLv.ToString();
+          return result;
+        }
+    public string GetLevelDescribe()
         {
             string result = "" + level;
             bool special = false;
