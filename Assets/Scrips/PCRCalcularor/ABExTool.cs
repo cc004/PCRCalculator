@@ -547,7 +547,7 @@ namespace PCRCaculator
             switch (type)
             {
                 case SpriteType.角色图标:
-                    assetName = "unit_icon_unit_" + (id >= 200000 ? id : id + 30) + ".unity3d";
+                    assetName = "unit_icon_unit_" + id + ".unity3d";
                     break;
                 case SpriteType.角色长条:
                     assetName = "icon_unit_plate_" + (id >= 200000 ? id : id + 30) + ".unity3d";
