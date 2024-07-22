@@ -119,9 +119,10 @@ namespace PCRCaculator
             else if (buttonType == ButtonType.typeB || buttonType == ButtonType.typeC||buttonType== ButtonType.typeD)
             {
                 //path = "charicons/fav_push_notif_" + unitid;
-                int iconUnitid = data.rarity != null && data.rarity >= 6 ? unitid + 60 :  unitid + 30;
-        
-                sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, iconUnitid);
+                int iconUnitid = unitid >= 200000 ? unitid : data.rarity >= 6 ? unitid + 60 : unitid + 30;
+
+
+        sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, iconUnitid);
             }
             //Sprite sprite = MainManager.LoadSourceSprite(path);
             //if (sprite != null)
