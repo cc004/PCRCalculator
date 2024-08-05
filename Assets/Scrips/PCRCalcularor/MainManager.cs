@@ -28,44 +28,44 @@ namespace PCRCaculator
     public class MainManager : MonoBehaviour
     {
         public static MainManager Instance;
-        public GameObject MassagePerferb;//µ¯³öÏûÏ¢Ìõµ×°å
-        public GameObject SystemWindowMessagePerferb;//¶þ´ÎÈ·ÈÏµ×°å
+        public GameObject MassagePerferb;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½×°ï¿½
+        public GameObject SystemWindowMessagePerferb;//ï¿½ï¿½ï¿½ï¿½È·ï¿½Ïµ×°ï¿½
         public GameObject asyncPrefab;
-        public GameObject SystemInputPrefab;//µ¯´°ÊäÈëÃæ°å
-        public GameObject LoadingPagePrefab;//¼ÓÔØÃæ°å
-        public GameObject LoadingPagePrefab_2;//¼ÓÔØÃæ°å2
-        public GameObject WaitingPrefab;//µÈ´ýÃæ°å
+        public GameObject SystemInputPrefab;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        public GameObject LoadingPagePrefab;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        public GameObject LoadingPagePrefab_2;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2
+        public GameObject WaitingPrefab;//ï¿½È´ï¿½ï¿½ï¿½ï¿½
         //public TextAsset db;
         //public TextAsset unitTimeTxt;
         //public TextAsset unitPrefabData;
         public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3,calculator = 4 }
         public StayPage stayPage;
-        //public int loadCharacterMax;//×î¶à¼ÓÔØµ½µÄ½ÇÉ«ÐòºÅ
+        //public int loadCharacterMax;//ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½Ä½ï¿½É«ï¿½ï¿½ï¿½
         public int levelMax { get => playerSetting.playerLevel; }
         public bool UseNewBattleSystem = true;
         public bool useJapanData;
         public bool useVerification;
         public LoginTool loginTool;
 
-        private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//Í¼Æ¬»º´æ
-        private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//×°±¸ÀàÓë×°±¸idµÄ¶ÔÓ¦×Öµä
-        public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//½ÇÉ«Àà¿É¸ü¸ÄÊý¾ÝÓë½ÇÉ«idµÄ¶ÔÓ¦×Öµä(ÁÙÊ±)
-        public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//½ÇÉ«Àà¿É¸ü¸ÄÊý¾ÝÓë½ÇÉ«idµÄ¶ÔÓ¦×Öµä(ÒÑ±£´æ)
-        private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//½ÇÉ«»ù´¡Êý¾ÝÓë½ÇÉ«idµÄ¶ÔÓ¦×Öµä 
-        private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//½ÇÉ«î¿°í½±ÀøÁÐ±í
-        private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//½ÇÉ«µÄÂí¼×ÁÐ±í
-        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//ËùÓÐµÄ¼¼ÄÜÁÐ±í
-        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//ËùÓÐÐ¡¼¼ÄÜÁÐ±í
-        private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//½ÇÉ«ÖÐÎÄÃû×Ö
-        private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//¼¼ÄÜÖÐÎÄÃû×ÖºÍÃèÊö
-        private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//¼¼ÄÜÆ¬¶ÎÖÐÎÄÃèÊö
-        private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//ËùÓÐ½ÇÉ«µÄ¼¼ÄÜÊ±¼äÊý¾Ý
-        private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//ËùÓÐ½ÇÉ«¼¼ÄÜÑ­»·Êý¾Ý
-        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//½ÇÉ«×¨Îä×Öµä
+        private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
+        private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½idï¿½Ä¶ï¿½Ó¦ï¿½Öµï¿½
+        public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//ï¿½ï¿½É«ï¿½ï¿½É¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«idï¿½Ä¶ï¿½Ó¦ï¿½Öµï¿½(ï¿½ï¿½Ê±)
+        public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//ï¿½ï¿½É«ï¿½ï¿½É¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«idï¿½Ä¶ï¿½Ó¦ï¿½Öµï¿½(ï¿½Ñ±ï¿½ï¿½ï¿½)
+        private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«idï¿½Ä¶ï¿½Ó¦ï¿½Öµï¿½ 
+        private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//ï¿½ï¿½É«î¿°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
+        private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
+        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//ï¿½ï¿½ï¿½ÐµÄ¼ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
+        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
+        private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öºï¿½ï¿½ï¿½ï¿½ï¿½
+        private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//ï¿½ï¿½ï¿½Ð½ï¿½É«ï¿½Ä¼ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//ï¿½ï¿½ï¿½Ð½ï¿½É«ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//ï¿½ï¿½É«×¨ï¿½ï¿½ï¿½Öµï¿½
         public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
-        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//Î´À´¿ÉÆÚ
-        private List<int> enemy_ignore_skill_rf = new List<int>();//Î´À´¿ÉÆÚ
+        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        private List<int> enemy_ignore_skill_rf = new List<int>();//Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
@@ -163,8 +163,8 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10051600;
-            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10037800;
-            public long BossVersionCN = 202404181932;
+            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10040900;
+            public long BossVersionCN = 202408051714;
             public bool useQA = true;
             public bool useJP = true;
             public bool newAB = true;
@@ -187,7 +187,7 @@ namespace PCRCaculator
                     callback);
                 Permission.RequestUserPermission("android.permission.WRITE_EXTERNAL_STORAGE",
                     callback);
-                var fs = new FileStream("/storage/emulated/0/Download/D4-µûÂèËÆËÆ»¨Ë®÷ÈÄ§Ê¥Ç§Õæ²½-2170w.xlsx"
+                var fs = new FileStream("/storage/emulated/0/Download/D4-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ»ï¿½Ë®ï¿½ï¿½Ä§Ê¥Ç§ï¿½æ²½-2170w.xlsx"
                     , FileMode.Open, FileAccess.Read);
 #endif*/
                 if (useVerification)
@@ -268,7 +268,7 @@ namespace PCRCaculator
             }
             catch (Exception e)
             {
-                WindowMessage("ÏÂÔØÊý¾Ý·¢Éú´íÎó£¬ÖØÖÃ°æ±¾");
+                WindowMessage("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã°æ±¾");
                 SaveManager.Save(new VersionData());
                 return;
             }
@@ -413,21 +413,21 @@ namespace PCRCaculator
             string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
             //Guild.GuildManager.EnemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
 
-            Debug.LogError($"¶ÁÈ¡DBÊ§°Ü£¡{ex.Message}");*/
+            Debug.LogError($"ï¿½ï¿½È¡DBÊ§ï¿½Ü£ï¿½{ex.Message}");*/
 
             
             //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
             //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
             //allUnitFirearmDatas = allUnitPrefabData.allUnitFirearmDatas;
-            //Debugtext.text += "\n³É¹¦¼ÓÔØ" + allUnitFirearmDatas.Count + "¸ö¼¼ÄÜÌØÐ§Êý¾Ý£¡";
+            //Debugtext.text += "\nï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½" + allUnitFirearmDatas.Count + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½Ý£ï¿½";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
-            //Debugtext.text += "\n³É¹¦¼ÓÔØ" + allUnitActionControllerDatas.Count + "¸ö½ÇÉ«Ô¤ÖÆÌåÊý¾Ý£¡";
+            //Debugtext.text += "\nï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½" + allUnitActionControllerDatas.Count + "ï¿½ï¿½ï¿½ï¿½É«Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½";
             
             string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
-            //Debugtext.text += "\n³É¹¦¼ÓÔØ" + allUnitSkillTimeDataDic.Count + "¸ö¼¼ÄÜÊ±¼äÊý¾Ý£¡";
+            //Debugtext.text += "\nï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½" + allUnitSkillTimeDataDic.Count + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½";
             //string attackPatternStr = Resources.Load<TextAsset>("Datas/UnitAtttackPatternDic").text;
             //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
@@ -448,7 +448,7 @@ namespace PCRCaculator
             LoadUnitData();
 
             LoadFinished = true;
-            Debugtext.text += "\nÊý¾Ý¼ÓÔØÍê±Ï£¡";
+            Debugtext.text += "\nï¿½ï¿½ï¿½Ý¼ï¿½ï¿½ï¿½ï¿½ï¿½Ï£ï¿½";
             CreateShowUnitIDS();
             wait.Close();
         }
@@ -489,8 +489,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 12;
-                playerSetting.playerLevel = 100;
+                playerSetting.playerProcess = 61;
+                playerSetting.playerLevel = 244;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
@@ -499,14 +499,14 @@ namespace PCRCaculator
         }
 
         /// <summary>
-        /// ±£´æÍæ¼ÒÉèÖÃµ½json
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½json
         /// </summary>
         public void SaveUnitData()
         {
             SaveManager.Save(unitDataDic);
         }
         /// <summary>
-        /// ´Ójson¶ÁÈ¡Íæ¼ÒÉèÖÃ
+        /// ï¿½ï¿½jsonï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         public void ReLoad()
         {
@@ -527,7 +527,7 @@ namespace PCRCaculator
         }
         public void DeletePlayerData()
         {
-            WindowMessage("É¾³ýÊ§°Ü£¡£¨¹¦ÄÜÒÑÉ¾³ý£©");
+            WindowMessage("É¾ï¿½ï¿½Ê§ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½");
         }
         public void WindowMessage(string word)
         {
@@ -594,7 +594,7 @@ namespace PCRCaculator
         }
         public void GambleButton()
         {
-            WindowMessage("¹¾¹¾¹¾£¡");
+            WindowMessage("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
         }
         public void CalculatorButton()
         {
@@ -631,7 +631,7 @@ namespace PCRCaculator
             }
             else
             {
-                mess += "ÊÇ·ñ¼ÌÐø£¿";
+                mess += "ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
                 WindowConfigMessage(mess, Config_1);
             }
         }
@@ -649,7 +649,7 @@ namespace PCRCaculator
             }
             else
             {
-                mess += "ÊÇ·ñ¼ÌÐø£¿";
+                mess += "ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
                 WindowConfigMessage(mess, Config_1);
             }
         }
@@ -677,10 +677,10 @@ namespace PCRCaculator
             {
                 if (UnitRarityDic.TryGetValue(unitid, out var data))
                     return data.unitName;
-                return "ÕÙ»½Îï";
+                return "ï¿½Ù»ï¿½ï¿½ï¿½";
             }
             if (unitid >= 200000)
-                return "µÐ·½µ¥Î»";
+                return "ï¿½Ð·ï¿½ï¿½ï¿½Î»";
             if (unitNickNameDic.ContainsKey(unitid))
                 return unitNickNameDic[unitid];
             if (unitNickNameDic2.ContainsKey(unitid))
@@ -748,30 +748,30 @@ namespace PCRCaculator
             try
             {
                 DirectoryInfo dir = new DirectoryInfo(sourceDirectory);
-                //»ñÈ¡Ä¿Â¼ÏÂ£¨²»°üº¬×ÓÄ¿Â¼£©µÄÎÄ¼þºÍ×ÓÄ¿Â¼
+                //ï¿½ï¿½È¡Ä¿Â¼ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼
                 FileSystemInfo[] fileinfo = dir.GetFileSystemInfos();
                 foreach (FileSystemInfo i in fileinfo)
                 {
-                    if (i is DirectoryInfo)     //ÅÐ¶ÏÊÇ·ñÎÄ¼þ¼Ð
+                    if (i is DirectoryInfo)     //ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
                     {
                         if (!Directory.Exists(targetDirectory + "\\" + i.Name))
                         {
-                            //Ä¿±êÄ¿Â¼ÏÂ²»´æÔÚ´ËÎÄ¼þ¼Ð¼´´´½¨×ÓÎÄ¼þ¼Ð
+                            //Ä¿ï¿½ï¿½Ä¿Â¼ï¿½Â²ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½Ä¼ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
                             Directory.CreateDirectory(targetDirectory + "\\" + i.Name);
                         }
-                        //µÝ¹éµ÷ÓÃ¸´ÖÆ×ÓÎÄ¼þ¼Ð
+                        //ï¿½Ý¹ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
                         DirectoryCopy(i.FullName, targetDirectory + "\\" + i.Name);
                     }
                     else
                     {
-                        //²»ÊÇÎÄ¼þ¼Ð¼´¸´ÖÆÎÄ¼þ£¬true±íÊ¾¿ÉÒÔ¸²¸ÇÍ¬ÃûÎÄ¼þ
+                        //ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½trueï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ô¸ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½Ä¼ï¿½
                         File.Copy(i.FullName, targetDirectory + "\\" + i.Name, true);
                     }
                 }
             }
             catch (Exception ex)
             {
-                WindowConfigMessage("³õÊ¼»¯´æµµÎÄ¼þÊ±³öÏÖÒì³£:" + ex.Message,null);
+                WindowConfigMessage("ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½æµµï¿½Ä¼ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ì³£:" + ex.Message,null);
             }
         }
         IEnumerator LoadScene()
@@ -835,20 +835,20 @@ namespace PCRCaculator
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log(relativePath + "Í¼Æ¬¼ÓÔØÊ§°Ü£¬Ô­Òò£º" + ex.Message);
+                    Debug.Log(relativePath + "Í¼Æ¬ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½Ô­ï¿½ï¿½" + ex.Message);
                 }
 
             }
 
-            //ÓÃ¼ÓÔØµÃµ½µÄ×ÊÔ´¶ÔÏó£¬ÊµÀý»¯ÓÎÏ·¶ÔÏó£¬ÊµÏÖÓÎÏ·ÎïÌåµÄ¶¯Ì¬¼ÓÔØ
+            //ï¿½Ã¼ï¿½ï¿½ØµÃµï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½Ä¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½
             return tmpsprite;
         }
         /// <summary>
-        /// DES¼ÓÃÜ×Ö·û´®
+        /// DESï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
         /// </summary>
-        /// <param name="encryptString">´ý¼ÓÃÜµÄ×Ö·û´®</param>
-        /// <param name="encryptKey">¼ÓÃÜÃÜÔ¿,ÒªÇóÎª8Î»</param>
-        /// <returns>¼ÓÃÜ³É¹¦·µ»Ø¼ÓÃÜºóµÄ×Ö·û´®£¬Ê§°Ü·µ»ØÔ´´® </returns>
+        /// <param name="encryptString">ï¿½ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½Ö·ï¿½ï¿½ï¿½</param>
+        /// <param name="encryptKey">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¿,Òªï¿½ï¿½Îª8Î»</param>
+        /// <returns>ï¿½ï¿½ï¿½Ü³É¹ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½Üºï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü·ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ </returns>
         public static string EncryptDES(string encryptString, string encryptKey = "PCRGuild")  
         {
             var ms = new MemoryStream();
@@ -862,11 +862,11 @@ namespace PCRCaculator
 
         }
         /// <summary>
-        /// DES½âÃÜ×Ö·û´®
+        /// DESï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
         /// </summary>
-        /// <param name="decryptString">´ý½âÃÜµÄ×Ö·û´®</param>
-        /// <param name="decryptKey">½âÃÜÃÜÔ¿,ÒªÇóÎª8Î»,ºÍ¼ÓÃÜÃÜÔ¿ÏàÍ¬</param>
-        /// <returns>½âÃÜ³É¹¦·µ»Ø½âÃÜºóµÄ×Ö·û´®£¬Ê§°Ü·µÔ´´®</returns>
+        /// <param name="decryptString">ï¿½ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½Ö·ï¿½ï¿½ï¿½</param>
+        /// <param name="decryptKey">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¿,Òªï¿½ï¿½Îª8Î»,ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½Í¬</param>
+        /// <returns>ï¿½ï¿½ï¿½Ü³É¹ï¿½ï¿½ï¿½ï¿½Ø½ï¿½ï¿½Üºï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü·ï¿½Ô´ï¿½ï¿½</returns>
         public static string DecryptDES(string decryptString, string decryptKey = "PCRGuild")
         {
             try
@@ -907,7 +907,7 @@ namespace PCRCaculator
         {
             return Application.streamingAssetsPath;
         }
-        [ContextMenu("Éú³ÉÅÅµ¶Æ÷ÓÃunitdetailÎÄ¼þ")]
+        [ContextMenu("ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½ï¿½ï¿½ï¿½ï¿½unitdetailï¿½Ä¼ï¿½")]
         public void CreateUnitDetailDic()
         {
             Dictionary<int, UnitDetail_other> dic = new Dictionary<int, UnitDetail_other>();
@@ -920,10 +920,10 @@ namespace PCRCaculator
             StreamWriter sw = new StreamWriter(filePath);
             sw.Write(saveJsonStr);
             sw.Close();
-            Debug.Log("³É¹¦£¡");
+            Debug.Log("ï¿½É¹ï¿½ï¿½ï¿½");
         }
         /// <summary>
-        ///ÉÁ±ÜÊ±¼ÓTPµÄ±ÈÂÊ
+        ///ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½TPï¿½Ä±ï¿½ï¿½ï¿½
         /// </summary>
         /// <returns></returns>
         internal float GetDodgeTPRecoveryRatio()
@@ -939,7 +939,7 @@ namespace PCRCaculator
     }
     public class UnitData_other
     {
-        public string name = "Î´¶¨Òå";
+        public string name = "Î´ï¿½ï¿½ï¿½ï¿½";
         public int type;
         public bool hasRarity6;
 
@@ -1015,8 +1015,8 @@ namespace PCRCaculator
 
         public string GetDetail()
         {
-            string result = "ÉËº¦£º" + currentDamage + "\n±©»÷¶îÍâÉËº¦£º" + criticalEX + "\nÆÚÍûÉËº¦£¨´¥¶ÜÆ«¸ß£©£º" + exceptDamage + "\nËæ»úÖÖ×Ó£º" + randomSeed;
-            if (backTime > 0) result += $"·µ\n{backTime}s";
+            string result = "ï¿½Ëºï¿½ï¿½ï¿½" + currentDamage + "\nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½" + criticalEX + "\nï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ß£ï¿½ï¿½ï¿½" + exceptDamage + "\nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó£ï¿½" + randomSeed;
+            if (backTime > 0) result += $"ï¿½ï¿½\n{backTime}s";
             if (warnings.Count > 0)
             {
                 for(int i=0;i<3;i++)
@@ -1025,7 +1025,7 @@ namespace PCRCaculator
                     result +="\n"+ warnings[i];
                 }
                 if (warnings.Count > 4)
-                    result += "\nµÈ" + warnings.Count + "¸ö´íÎó";
+                    result += "\nï¿½ï¿½" + warnings.Count + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
             }
             return result;
         }

@@ -2003,11 +2003,11 @@ namespace PCRCaculator
     public class PlayerSetting
     {
         public bool tpCalculationChanged = true;
-        public bool exDivisionFixed = false;
-        public int playerLevel = 240;
-        public int playerProcess = 55;
+        public bool exDivisionFixed = true;
+        public int playerLevel = 244;
+        public int playerProcess = 61;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 240;
+        public int maxUniqueEqLv = 250;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;

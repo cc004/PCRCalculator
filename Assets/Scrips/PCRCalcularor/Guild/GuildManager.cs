@@ -782,7 +782,7 @@ namespace PCRCaculator.Guild
         }
         public void UBTimeHelpButton()
         {
-            string msg = "输入UB时间，可以输入帧（>100）或秒(<90),秒支持小数\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入60表示在倒计时60秒末跳到59秒前释放UB\n勾选自动模式则手动输入的UB时间无效";
+            string msg = "可以输入帧(>100)或秒(<90),秒支持小数\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入60表示在倒计时60秒末跳到59秒前释放UB\n勾选自动模式则手动输入的UB时间无效";
             MainManager.Instance.WindowConfigMessage(msg, null);
         }
         public void GuildBossDataEditButton()
@@ -941,7 +941,7 @@ namespace PCRCaculator.Guild
         }
         public void ReNameButton()
         {
-            MainManager.Instance.WindowInputMessage("请输入自定义名字（不要输入特殊符号）", ReNameButton_1);
+            MainManager.Instance.WindowInputMessage("请输入自定义名字\n（不要输入特殊符号）", ReNameButton_1);
         }
         public void ReNameButton_1(string name)
         {
@@ -959,7 +959,7 @@ namespace PCRCaculator.Guild
         }
         public void CopyButon()
         {
-            MainManager.Instance.WindowInputMessage("请输入要复制的队伍的序号（比如要将队伍1复制到这里就输入1）", CopyButton_0);
+            MainManager.Instance.WindowInputMessage("请输入要复制的队伍的序号\n（比如要将队伍1复制到这里就输入1）", CopyButton_0);
         }
         public void CopyButton_0(string numstr)
         {
@@ -1345,9 +1345,9 @@ namespace PCRCaculator.Guild
         public List<List<float>> UBExecTimeData;
         public bool useAutoMode;
         public GuildRandomData timeLineData;
-        public int currentGuildMonth=9;
-        public int currentGuildEnemyNum=1;
-        public int currentTurn=1;
+        public int currentGuildMonth= 1054;
+        public int currentGuildEnemyNum=4;
+        public int currentTurn=5;
         public int[] selectedEnemyIDs;
         public bool isViolent;
         public bool usePlayerSettingHP;
