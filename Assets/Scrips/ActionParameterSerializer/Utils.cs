@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-
+using UnityEngine.Networking;
 namespace ActionParameterSerializer
 {
     public class Property
@@ -318,18 +318,35 @@ namespace ActionParameterSerializer
         }
 
         public static string path = Path.Combine(Application.streamingAssetsPath, "string.json");
-
+        public static string androidpath = "jar:file://" + Application.dataPath + "!/assets/" + "string.json";
         private static Dictionary<string, string> cache;
 
         public static string GetString(string name)
         {
-            if (cache == null)
-                cache = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
-
-            if (cache.TryGetValue(name, out var val)) return val;
+      if (cache == null)
+#if UNITY_ANDROID
+      {
+        UnityWebRequest webRequest = UnityWebRequest.Get(androidpath);
+        webRequest.SendWebRequest();
+        if (webRequest.error == null)
+        {
+            while (!webRequest.downloadHandler.isDone)
+            {
+              Debug.LogError("读取string.json中");
+            }
+            cache = JsonConvert.DeserializeObject<Dictionary<string, string>>(webRequest.downloadHandler.text);
+        }
+        else
+        {
+            Debug.LogError("Cannot open file: " + androidpath);
+        }
+      }
+#else
+        cache = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path)); 
+#endif
+      if (cache.TryGetValue(name, out var val)) return val;
             if (cache.TryGetValue(name.ToUpper(), out val)) return val;
             if (cache.TryGetValue(name[..1].ToUpper() + name[1..], out val)) return val;
-
             return name;
 #if DEBUG
             throw new NotImplementedException();

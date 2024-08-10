@@ -743,11 +743,18 @@ namespace PCRCaculator
             result += count;
             if (special)
                 result += "*";
-            if (uniqueEqLv > 0)
-                result += "(" + uniqueEqLv + ")";
+            // if (uniqueEqLv > 0)
+            //     result += "(" + uniqueEqLv + ")";
             return result;
         }
-        public string GetLevelDescribe()
+        public string GetUniqueEqLvDescribe()
+        {
+          string result = "无";
+          if (uniqueEqLv > 0)
+            result = uniqueEqLv.ToString();
+          return result;
+        }
+    public string GetLevelDescribe()
         {
             string result = "" + level;
             bool special = false;
@@ -1996,11 +2003,11 @@ namespace PCRCaculator
     public class PlayerSetting
     {
         public bool tpCalculationChanged = true;
-        public bool exDivisionFixed = false;
-        public int playerLevel = 240;
-        public int playerProcess = 55;
+        public bool exDivisionFixed = true;
+        public int playerLevel = 244;
+        public int playerProcess = 61;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 240;
+        public int maxUniqueEqLv = 250;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;

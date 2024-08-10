@@ -400,6 +400,10 @@ namespace Assets.Scrips
                     case "mov":
                     {
                         var a = argv[0];
+                        if (a() == 170301)
+                        {
+                          a = () => 105701;
+                        }
                         var b = arg[1];
                         result = pc =>
                         {
