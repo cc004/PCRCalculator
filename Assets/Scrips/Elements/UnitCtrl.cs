@@ -9853,9 +9853,10 @@ this.updateCurColor();
                                     _unit.SetSortOrderBack();
                                 _unit.SetLeftDirection(_unit.IsLeftDir);
                                 int skillNum = _unit.unitActionController.GetSkillNum(skillId);
-                                if (_unit.UnitSpineCtrlModeChange.IsAnimation(_unit.UnitSpineCtrlModeChange.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.SKILL, skillNum, _index3: 1)))
+                                eSpineCharacterAnimeId animeId = unitActionController.GetAnimeId(skillId);
+                                if (_unit.UnitSpineCtrlModeChange.IsAnimation(_unit.UnitSpineCtrlModeChange.ConvertAnimeIdToAnimeName(animeId, skillNum, _index3: 1)))
                                 {
-                                    _unit.PlayAnimeNoOverlap(eSpineCharacterAnimeId.SKILL, skillNum, _index3: 1, _targetCtr: _unit.UnitSpineCtrlModeChange);
+                                    _unit.PlayAnimeNoOverlap(animeId, skillNum, _index3: 1, _targetCtr: _unit.UnitSpineCtrlModeChange);
                                     _unit.AppendCoroutine(_unit.updateModeChange(), ePauseType.SYSTEM, _unit);
                                     yield break;
                                 }
