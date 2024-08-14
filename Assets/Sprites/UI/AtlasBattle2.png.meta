@@ -1,0 +1,2654 @@
+fileFormatVersion: 2
+guid: 3c94c1a172d9b01488185e815d214ef9
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6212186791781272019
+    second: battle_balloon_chara_1
+  - first:
+      213: 9031148994754780073
+    second: battle_balloon_chara_2
+  - first:
+      213: 2642085222698650292
+    second: battle_baloon_reserve_ub
+  - first:
+      213: 4827008439466843879
+    second: battle_baloon_skill
+  - first:
+      213: 9181502364782957421
+    second: battle_bg_flag_lose
+  - first:
+      213: 4269993348720336405
+    second: battle_bg_flag_normal
+  - first:
+      213: 2950676192160643537
+    second: battle_bg_flag_win
+  - first:
+      213: 5509881387287082109
+    second: battle_bg_info
+  - first:
+      213: 1567660439097893017
+    second: battle_bg_skillname_blue
+  - first:
+      213: 1382590114183247550
+    second: battle_bg_skillname_red
+  - first:
+      213: 3365823078459169193
+    second: battle_bg_wave_info
+  - first:
+      213: 1414153508791684990
+    second: battle_btn_main_allset
+  - first:
+      213: 3974920612836714792
+    second: battle_btn_main_auto
+  - first:
+      213: 6743730220779196113
+    second: battle_btn_main_speedup
+  - first:
+      213: 4802323166724785180
+    second: battle_btn_main_speedup4x
+  - first:
+      213: 5719550361487093319
+    second: battle_btn_menu
+  - first:
+      213: 381408961917518629
+    second: battle_btn_sub_allset
+  - first:
+      213: 896962350082668964
+    second: battle_btn_sub_auto
+  - first:
+      213: 8527978554934503979
+    second: battle_btn_sub_speedup
+  - first:
+      213: 4627135073781957593
+    second: battle_ef_critical_white
+  - first:
+      213: 2535809846669445300
+    second: battle_ef_glow_ball
+  - first:
+      213: 4239033166256088258
+    second: battle_ef_glow_skillreserve
+  - first:
+      213: 9001583532878183855
+    second: battle_ef_icon_gold
+  - first:
+      213: 7332003880307936725
+    second: battle_ef_icon_tresure
+  - first:
+      213: 1050784250013546725
+    second: battle_ef_rainbow_circle
+  - first:
+      213: 647102750946210098
+    second: battle_ef_ring_gold
+  - first:
+      213: 6827412138736628289
+    second: battle_ef_ring_tresure
+  - first:
+      213: 8451724058066543825
+    second: battle_ef_time_up_count
+  - first:
+      213: 6708097101603084583
+    second: battle_ef_total_white
+  - first:
+      213: 3022200939686139530
+    second: battle_ef_transition
+  - first:
+      213: 8033303765113492930
+    second: battle_ef_ub_frame
+  - first:
+      213: 4830013782223248434
+    second: battle_effect_frame_reserve_ub
+  - first:
+      213: 2369291368273510553
+    second: battle_gauge_bar
+  - first:
+      213: 4354152741228135966
+    second: battle_gauge_bar_2
+  - first:
+      213: 8472835444433496857
+    second: battle_gauge_bar_boss_blue
+  - first:
+      213: 1271343110429571065
+    second: battle_gauge_bar_boss_orange
+  - first:
+      213: 311262107930276927
+    second: battle_gauge_bar_boss_purple
+  - first:
+      213: 7421659590950042446
+    second: battle_gauge_bar_boss_yellow
+  - first:
+      213: 7963954402544600100
+    second: battle_gauge_bar_boss_yellow_2
+  - first:
+      213: 3840091215836335424
+    second: battle_gauge_bar_damaged_boss
+  - first:
+      213: 1906453912059709276
+    second: battle_gauge_bar_enemy
+  - first:
+      213: 2612753177052352656
+    second: battle_gauge_bar_enemy_2
+  - first:
+      213: 7601218990611098411
+    second: battle_gauge_bar_energy
+  - first:
+      213: 2407114368455136107
+    second: battle_gauge_bar_healed_boss
+  - first:
+      213: 5393898801772745
+    second: battle_gauge_bar_hp
+  - first:
+      213: 8744956583771902237
+    second: battle_gauge_bg
+  - first:
+      213: 6508912297453123222
+    second: battle_gauge_bg_boss
+  - first:
+      213: 5352470512705800059
+    second: battle_gauge_bg_decrease
+  - first:
+      213: 9180691200383733947
+    second: battle_gauge_bg_decrease_gray
+  - first:
+      213: 5671106144111424091
+    second: battle_gauge_bg_decrease_gray_2
+  - first:
+      213: 1056641577786338090
+    second: battle_gauge_bg_result
+  - first:
+      213: 522034836620375239
+    second: battle_gauge_bosshp_Legion_frame
+  - first:
+      213: 2191292637500266821
+    second: battle_gauge_frame_boss
+  - first:
+      213: 284168307606549697
+    second: battle_gauge_raidhp_Legion_frame
+  - first:
+      213: 8527366038045407314
+    second: battle_gem_skil01
+  - first:
+      213: 2027206375865410399
+    second: battle_header_total_damage
+  - first:
+      213: 1410291236404091665
+    second: battle_icon_arrow_weakness
+  - first:
+      213: 1164729326693786273
+    second: battle_icon_flag_corsor
+  - first:
+      213: 3817549266704379336
+    second: battle_icon_flag_Final
+  - first:
+      213: 1673579160919274627
+    second: battle_icon_gold
+  - first:
+      213: 4314297108880817868
+    second: battle_icon_leader
+  - first:
+      213: 7732086228719904078
+    second: battle_icon_order_1
+  - first:
+      213: 1916671551240309363
+    second: battle_icon_order_2
+  - first:
+      213: 5164716028412306225
+    second: battle_icon_order_3
+  - first:
+      213: 4196024629666823687
+    second: battle_icon_shadow
+  - first:
+      213: 8971564425481457782
+    second: battle_icon_time_count
+  - first:
+      213: 7137687306405395675
+    second: battle_icon_treasure_box
+  - first:
+      213: 2522679541031650558
+    second: battle_party_arrow
+  - first:
+      213: 5751056284333107538
+    second: battle_questauto_base
+  - first:
+      213: 107737129629042008
+    second: battle_questauto_text_auro_0
+  - first:
+      213: 1452957501787069496
+    second: battle_questauto_text_auro_1
+  - first:
+      213: 6209399082164022791
+    second: battle_questauto_text_auro_2
+  - first:
+      213: 6943276577202915892
+    second: battle_questauto_text_auro_3
+  - first:
+      213: 3466984153600024119
+    second: battle_questauto_text_auro_4
+  - first:
+      213: 8542110253173501744
+    second: battle_questauto_text_auro_5
+  - first:
+      213: 6520224642892922933
+    second: battle_skill_reserve_on
+  - first:
+      213: 1904588298495267357
+    second: battle_stage_status_line
+  - first:
+      213: 4514785098765727998
+    second: battle_text_critical_purple
+  - first:
+      213: 1949007737227191693
+    second: battle_text_critical_yellow
+  - first:
+      213: 4022668357788775137
+    second: battle_text_flag_1st
+  - first:
+      213: 8898037396323453010
+    second: battle_text_flag_2nd
+  - first:
+      213: 7418096306452710452
+    second: battle_text_miss
+  - first:
+      213: 8971412612935050530
+    second: battle_text_result_lose
+  - first:
+      213: 7288964182344704310
+    second: battle_text_result_win
+  - first:
+      213: 3584242700147979512
+    second: battle_text_total_purple
+  - first:
+      213: 9028801925651032673
+    second: battle_text_total_yellow
+  - first:
+      213: 5514059620135611926
+    second: global_raid_hp_bar_base_battle
+  - first:
+      213: 4455786079862345109
+    second: global_raid_hp_bar_battle
+  - first:
+      213: 7009100789117070585
+    second: global_raid_hp_bar_frame_battle
+  - first:
+      213: 2368730940829378957
+    second: guest_icon_line
+  - first:
+      213: 8329325096483240489
+    second: legion_battle_status_line
+  - first:
+      213: 3211188438615228245
+    second: ribbon_enemy_tower_skip
+  - first:
+      213: 2467311453868348807
+    second: ribbon_enemy_wave1_tower_skip
+  - first:
+      213: 2262342407550546753
+    second: ribbon_enemy_wave2_tower_skip
+  - first:
+      213: 3576753583102692037
+    second: ribbon_enemy_wave3_tower_skip
+  - first:
+      213: 4380003230103462258
+    second: text_arena_suspend_lose
+  - first:
+      213: 8224155749376301744
+    second: text_tower_skip_result_defeat
+  - first:
+      213: 3293342422704514936
+    second: text_tower_skip_result_timeup
+  - first:
+      213: 3854457265697556647
+    second: text_tower_skip_result_win
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: AtlasBattle2_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 702
+        width: 57
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 058a7f9bf679e954391f10805100a5b2
+      internalID: -1341630731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_1
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 672
+        width: 67
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d700482dba9a674696be142362b6984
+      internalID: -1831877429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 634
+        width: 66
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b445815a0cb9b204c83846213c80425e
+      internalID: 1654095168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_3
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 634
+        width: 29
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f98801cadac65a46acf6a7a16b0dcfc
+      internalID: 1595162260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_4
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 652
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31cf261c92a5a7249873c312b7ef175f
+      internalID: 1793422328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_5
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 598
+        width: 64
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57a424c0165a53c41bd30a68b807c03b
+      internalID: 862550502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_6
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 606
+        width: 64
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d993a2b6d55bb724dba6b9a195ea0628
+      internalID: 437054092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_7
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 592
+        width: 64
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 201f733a15780714c86d394b0307cf29
+      internalID: -1584905385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_8
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 634
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a2d68bdccf940a448889232617f1266
+      internalID: 1788889508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_9
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 592
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb7e9460a534cc84b82000814df41d04
+      internalID: -331194875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 598
+        width: 119
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 750ff55104e1d3746814ffea1d61a6fb
+      internalID: -1082031932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_11
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 521
+        width: 64
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6050f522a478e264f9cf483a058bcde2
+      internalID: 342145151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_12
+      rect:
+        serializedVersion: 2
+        x: 777
+        y: 556
+        width: 60
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94ba03a258dd0774da9e1daa4df4e3f1
+      internalID: 1863376877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_13
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 594
+        width: 135
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73b3eb58bbc4b754b8fc5430d0c98d2b
+      internalID: -232016654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 563
+        width: 29
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efeabae9dbe577b4da1bf46f4c8a3957
+      internalID: -1666061362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_15
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 526
+        width: 70
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4cd0f94ecb61af94e8b25c988f89518e
+      internalID: 699574294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_16
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 555
+        width: 119
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7097b18f669f5b243b8c140c0dc84541
+      internalID: 657054322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_17
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 555
+        width: 132
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 261e294849085424e9e1ae0d58114d65
+      internalID: -482353683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_18
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 555
+        width: 131
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9f8d35e62ea0f24888be44b5c5355d2
+      internalID: 1640457607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_19
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 556
+        width: 29
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f7714887e72bfa4f87a192a52f96cbb
+      internalID: -750972814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_20
+      rect:
+        serializedVersion: 2
+        x: 870
+        y: 586
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d600ce19180abb642b6c10bd3ddd8483
+      internalID: 1665320257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_21
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 545
+        width: 111
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 561c01afb43c51a4abdb26c0bfc2e827
+      internalID: 1454418307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_22
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 491
+        width: 94
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a1c2edcdc3039447845c4f349478bec
+      internalID: -1255001497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_23
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 556
+        width: 125
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03fa737e4bf10a149aeb12802f38b95b
+      internalID: 1692690635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_24
+      rect:
+        serializedVersion: 2
+        x: 871
+        y: 556
+        width: 22
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9cf62573a7fe57348b5a5bcb2a9b9867
+      internalID: 952087901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_25
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 543
+        width: 536
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35d0bfc8ce0fed54f9a4c4c4f8192daf
+      internalID: -141545713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_26
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 484
+        width: 78
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 153a6f50575afff4387ab907f0369692
+      internalID: -1568200640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_27
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 440
+        width: 81
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7443ae06af2594c48a6b6f93f1518ff5
+      internalID: 500799518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_28
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 520
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de3cc3ac6f90a4a46b6499ea9eab080d
+      internalID: -226872600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_29
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 520
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27a118d92f7b17544b952886f6f24b8c
+      internalID: 560218643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_30
+      rect:
+        serializedVersion: 2
+        x: 298
+        y: 520
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cd3384ccd55eb94b86f208d98b5f43c
+      internalID: -1694817116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_31
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 513
+        width: 200
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c88be4ef8651a14e85f4b344cd8e08a
+      internalID: -168879286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_32
+      rect:
+        serializedVersion: 2
+        x: 534
+        y: 499
+        width: 119
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 095a88f74687895449c31ec25446ba35
+      internalID: 965388853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_33
+      rect:
+        serializedVersion: 2
+        x: 655
+        y: 499
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0c81fe6e9dc9c84cb1a7c5e447f7576
+      internalID: -746717489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_34
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 459
+        width: 82
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6e0e004e2a4d2e4881d75801ee88900
+      internalID: 1595070065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_35
+      rect:
+        serializedVersion: 2
+        x: 987
+        y: 523
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07c0211132694dd4798d7b30dac75024
+      internalID: 287725133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_36
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 479
+        width: 134
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb8f57e99afbad242803d19022b4efa9
+      internalID: 1913971823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_37
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 497
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2603ec9e60ff8b947996a489176faa15
+      internalID: -295113106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_38
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 473
+        width: 160
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92bbbd12332d2de4bb006206f9c3ba12
+      internalID: -581197874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_39
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 499
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31ae61bdf7870644c9e644f484b0f571
+      internalID: -325622740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_40
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 484
+        width: 134
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b11a7d3d9879d4541ba0926bb34cb22d
+      internalID: -1360318824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_41
+      rect:
+        serializedVersion: 2
+        x: 987
+        y: 493
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97b8325d719b7d848808c3038cbc8a87
+      internalID: -138972334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_42
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 379
+        width: 110
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab558986dcc2e5b41a5b80fa604e0abf
+      internalID: 707314284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_43
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 479
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3de5b5a0068a5045b4ee2d336687a78
+      internalID: -390563603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_44
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 459
+        width: 160
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 426daeef67c82864abf7c088c4c250ba
+      internalID: -137013812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_45
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 459
+        width: 32
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 672e965be8072c1488d1676c7446a266
+      internalID: 1622532767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_46
+      rect:
+        serializedVersion: 2
+        x: 714
+        y: 459
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50817a1431f81b249b5742df031b7d24
+      internalID: 1004923975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_47
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 437
+        width: 158
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 170d95607ef975f4d8cbfa3ac8689624
+      internalID: 946792991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_48
+      rect:
+        serializedVersion: 2
+        x: 987
+        y: 459
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8c1949f32dd11645b9ce007e298e9aa
+      internalID: 1363549147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_49
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 440
+        width: 31
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d48336fd2bf0c74f868b4c4005ceae5
+      internalID: 636741906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_50
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 440
+        width: 31
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d186787a529b7f42952df148b6ecc9b
+      internalID: 693953229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_51
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 393
+        width: 81
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75720c912c1f150418554c6419424dfa
+      internalID: 1634350485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_52
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 433
+        width: 160
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 455971c15ab1ef743818d8fa3b8d7e55
+      internalID: -1240665307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_53
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 433
+        width: 30
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 229ea46953771e4488f68aa9c880c4ad
+      internalID: 1817393347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_54
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 447
+        width: 16
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8188784ac885e9f4bbb4d65feb2f86c0
+      internalID: -1834332371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_55
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 412
+        width: 158
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 075b80050aaf65f408bff17c414f600f
+      internalID: 451826436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_56
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 451
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f678f0312bbdf5479bfe67e94686f63
+      internalID: -839599368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_57
+      rect:
+        serializedVersion: 2
+        x: 922
+        y: 373
+        width: 81
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e92aac0d8d80c046875a7c2daa32354
+      internalID: -1341048885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_58
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 443
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3b33287630bec748aaf241fa1673a3b
+      internalID: -1710732465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_59
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 393
+        width: 158
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20ebea37777922a47a901593c327b42a
+      internalID: 947153386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_60
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 433
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e81b3d0a8bc0e934fa0da48bf6ed4f25
+      internalID: 287840298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_61
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 437
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9be8fa23e06d40e49806dedbd3300def
+      internalID: -1013345901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_62
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 429
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 878c16844722cac4fb9e2d06ecebf16a
+      internalID: -904930647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_63
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 393
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4de972d288a8145429f46d468c6a1689
+      internalID: -1923563458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_64
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 404
+        width: 23
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1abc34c08f01df14fa0a1a724730280e
+      internalID: 1962500370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_65
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 366
+        width: 159
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3801f430ab4d8f40b3b3a87cb7ea42e
+      internalID: -1079245765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_66
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 412
+        width: 36
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dec668de3bda11e489d882f242582c36
+      internalID: 1210745670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_67
+      rect:
+        serializedVersion: 2
+        x: 782
+        y: 373
+        width: 137
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 212b3846dde60754fb15765d08516487
+      internalID: 127368932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_68
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 415
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35c8d7ceece29054ba1d7d465d283b98
+      internalID: -140469405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_69
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 393
+        width: 23
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c5c0c8deddfa2948b1a9ed545cf910e
+      internalID: -1338256207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_70
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 366
+        width: 197
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f99eacc9c26ed5419844ea26d1822b9
+      internalID: -1693147239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_71
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 401
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f82940ef9ce3c34bbfdbe1e4f70b002
+      internalID: -1545333951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_72
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 334
+        width: 176
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d771e6f22a5a18458a807d3ca56c913
+      internalID: 405502044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_73
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 387
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24183eaa9cfee0d48a7ff8202374ad35
+      internalID: 161295457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_74
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 258
+        width: 120
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bce17293271efb943bf19ccd39fd13e0
+      internalID: -1188712655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_75
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 258
+        width: 120
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9503a190897028248a8ed68830201ae6
+      internalID: -916940258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_76
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 373
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2376ea034a1c7ce4985f5e4b93dbdfa5
+      internalID: -1840122902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_77
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 334
+        width: 75
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60a98e8085dd7b0418d97feeb0641cb2
+      internalID: -518243944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_78
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 348
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42802c2d4f73f064297b666fc7017530
+      internalID: 1050547190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_79
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 320
+        width: 302
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1510113490315fd40bd5158088626bf8
+      internalID: -746488532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_80
+      rect:
+        serializedVersion: 2
+        x: 866
+        y: 115
+        width: 71
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3491e25d4c110cc4db581f367c4df395
+      internalID: -1954705035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_81
+      rect:
+        serializedVersion: 2
+        x: 941
+        y: 287
+        width: 81
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b640aff4ca224c94594a7779a5fbd710
+      internalID: 957117840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_82
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 334
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1fdd9400199a5d841be3ac047134e1b5
+      internalID: 272614590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_83
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 204
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8820b0e6f536bac40a9de70d3bb195f4
+      internalID: -1535272100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_84
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 204
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27e3c72f4298b61429614d0fe2c8fb62
+      internalID: 1278933658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_85
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 274
+        width: 302
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca799047c1f2b1540b9d3b2cb353ccd6
+      internalID: -749739157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_86
+      rect:
+        serializedVersion: 2
+        x: 941
+        y: 201
+        width: 81
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57433cff8b686cd4db585358ea8c2a88
+      internalID: -186447930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_87
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 400379b890f137642b162e957850eee8
+      internalID: -1340577496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_88
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 228
+        width: 302
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4584198e1da924044a5d188d4d8b7516
+      internalID: -1711109531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_89
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 204
+        width: 52
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94b053a9102b4fe4cad127e0a82cb01b
+      internalID: -61708830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_90
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 115
+        width: 280
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57f9b03045744164482b9828644f2f03
+      internalID: -841339545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_91
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 102
+        width: 79
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd25e7ebcc160cf46973fb92d84c904c
+      internalID: -431639626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_92
+      rect:
+        serializedVersion: 2
+        x: 324
+        y: 106
+        width: 257
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3cba329243d03724c8d53c7fe762e4ee
+      internalID: -2023661055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_93
+      rect:
+        serializedVersion: 2
+        x: 941
+        y: 115
+        width: 81
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22f6fcf441751e04c896d87a43b71e6d
+      internalID: -1708333914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_94
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 102
+        width: 16
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6f027f323947a447861d5060a382743
+      internalID: 7128989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_95
+      rect:
+        serializedVersion: 2
+        x: 663
+        y: 0
+        width: 307
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d17022e4d8277641b3922544047fa6e
+      internalID: 1803861871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_96
+      rect:
+        serializedVersion: 2
+        x: 972
+        y: 90
+        width: 43
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc70451b97a4bee4c87e0d31040d4885
+      internalID: -390115127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_97
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 0
+        width: 246
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06f55edf8a084df4b8770705af12387c
+      internalID: 1195593405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_98
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 4
+        width: 144
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49bfd30a3e92eae4e887b4a91fa22f96
+      internalID: 1423009984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_99
+      rect:
+        serializedVersion: 2
+        x: 972
+        y: 47
+        width: 41
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd05f63a513f0e9418a480f84e573682
+      internalID: -1619095939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasBattle2_100
+      rect:
+        serializedVersion: 2
+        x: 972
+        y: 0
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fcf3c62a1059d54cab1591bfa45ebfe
+      internalID: 112172744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      AtlasBattle2_0: -1341630731
+      AtlasBattle2_1: -1831877429
+      AtlasBattle2_10: -1082031932
+      AtlasBattle2_100: 112172744
+      AtlasBattle2_11: 342145151
+      AtlasBattle2_12: 1863376877
+      AtlasBattle2_13: -232016654
+      AtlasBattle2_14: -1666061362
+      AtlasBattle2_15: 699574294
+      AtlasBattle2_16: 657054322
+      AtlasBattle2_17: -482353683
+      AtlasBattle2_18: 1640457607
+      AtlasBattle2_19: -750972814
+      AtlasBattle2_2: 1654095168
+      AtlasBattle2_20: 1665320257
+      AtlasBattle2_21: 1454418307
+      AtlasBattle2_22: -1255001497
+      AtlasBattle2_23: 1692690635
+      AtlasBattle2_24: 952087901
+      AtlasBattle2_25: -141545713
+      AtlasBattle2_26: -1568200640
+      AtlasBattle2_27: 500799518
+      AtlasBattle2_28: -226872600
+      AtlasBattle2_29: 560218643
+      AtlasBattle2_3: 1595162260
+      AtlasBattle2_30: -1694817116
+      AtlasBattle2_31: -168879286
+      AtlasBattle2_32: 965388853
+      AtlasBattle2_33: -746717489
+      AtlasBattle2_34: 1595070065
+      AtlasBattle2_35: 287725133
+      AtlasBattle2_36: 1913971823
+      AtlasBattle2_37: -295113106
+      AtlasBattle2_38: -581197874
+      AtlasBattle2_39: -325622740
+      AtlasBattle2_4: 1793422328
+      AtlasBattle2_40: -1360318824
+      AtlasBattle2_41: -138972334
+      AtlasBattle2_42: 707314284
+      AtlasBattle2_43: -390563603
+      AtlasBattle2_44: -137013812
+      AtlasBattle2_45: 1622532767
+      AtlasBattle2_46: 1004923975
+      AtlasBattle2_47: 946792991
+      AtlasBattle2_48: 1363549147
+      AtlasBattle2_49: 636741906
+      AtlasBattle2_5: 862550502
+      AtlasBattle2_50: 693953229
+      AtlasBattle2_51: 1634350485
+      AtlasBattle2_52: -1240665307
+      AtlasBattle2_53: 1817393347
+      AtlasBattle2_54: -1834332371
+      AtlasBattle2_55: 451826436
+      AtlasBattle2_56: -839599368
+      AtlasBattle2_57: -1341048885
+      AtlasBattle2_58: -1710732465
+      AtlasBattle2_59: 947153386
+      AtlasBattle2_6: 437054092
+      AtlasBattle2_60: 287840298
+      AtlasBattle2_61: -1013345901
+      AtlasBattle2_62: -904930647
+      AtlasBattle2_63: -1923563458
+      AtlasBattle2_64: 1962500370
+      AtlasBattle2_65: -1079245765
+      AtlasBattle2_66: 1210745670
+      AtlasBattle2_67: 127368932
+      AtlasBattle2_68: -140469405
+      AtlasBattle2_69: -1338256207
+      AtlasBattle2_7: -1584905385
+      AtlasBattle2_70: -1693147239
+      AtlasBattle2_71: -1545333951
+      AtlasBattle2_72: 405502044
+      AtlasBattle2_73: 161295457
+      AtlasBattle2_74: -1188712655
+      AtlasBattle2_75: -916940258
+      AtlasBattle2_76: -1840122902
+      AtlasBattle2_77: -518243944
+      AtlasBattle2_78: 1050547190
+      AtlasBattle2_79: -746488532
+      AtlasBattle2_8: 1788889508
+      AtlasBattle2_80: -1954705035
+      AtlasBattle2_81: 957117840
+      AtlasBattle2_82: 272614590
+      AtlasBattle2_83: -1535272100
+      AtlasBattle2_84: 1278933658
+      AtlasBattle2_85: -749739157
+      AtlasBattle2_86: -186447930
+      AtlasBattle2_87: -1340577496
+      AtlasBattle2_88: -1711109531
+      AtlasBattle2_89: -61708830
+      AtlasBattle2_9: -331194875
+      AtlasBattle2_90: -841339545
+      AtlasBattle2_91: -431639626
+      AtlasBattle2_92: -2023661055
+      AtlasBattle2_93: -1708333914
+      AtlasBattle2_94: 7128989
+      AtlasBattle2_95: 1803861871
+      AtlasBattle2_96: -390115127
+      AtlasBattle2_97: 1195593405
+      AtlasBattle2_98: 1423009984
+      AtlasBattle2_99: -1619095939
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -649,19 +649,26 @@ namespace PCRCaculator.Guild
         {
             Action<List<UnitCtrl>> action = a =>
             {
-                foreach (UnitCtrl unitCtrl in a)
+              foreach (UnitCtrl unitCtrl in a)
+              {
+                int unitid = unitCtrl.UnitId;
+                AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
+                AppendChangeHP(unitid, unitCtrl.Hp, (int)unitCtrl.MaxHp, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
+                AppendChangeTP(unitid, (float)unitCtrl.Energy, 5400, "时间耗尽");
+                if (allUnitAbnormalStateDic.TryGetValue(unitid, out var value))
                 {
-                    int unitid = unitCtrl.UnitId;
-                    AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                    AppendChangeHP(unitid, unitCtrl.Hp, (int)unitCtrl.MaxHp, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
-                    AppendChangeTP(unitid, (float)unitCtrl.Energy, 5400, "时间耗尽");
-                    foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
-                    {
-                        changeData.endFrameCount = 5400;
-                        changeData.isFinish = true;
-                        skillGroupPrefabDic[unitid].AddAbnormalStateButtons(changeData);
-                    }
+                  foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
+                  {
+                    changeData.endFrameCount = 5400;
+                    changeData.isFinish = true;
+                    skillGroupPrefabDic[unitid].AddAbnormalStateButtons(changeData);
+                  }
                 }
+                else
+                {
+                  Debug.Log($"Key '{unitid}' not found in the dictionary.");
+                }
+              }
             };
 
             if (!BattleManager.Instance.skipping)

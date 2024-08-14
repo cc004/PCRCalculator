@@ -56,7 +56,7 @@ namespace PCRCaculator.Battle
         public List<Sprite> buffDebuffIcons;
         public Toggle AutoToggle;
         public Toggle SpeedToggle;
-
+        public Toggle SetToggle;
         public GameObject numberPrefab;
         public GameObject missPrefab;
         public Vector3 numberPosFix;
@@ -369,22 +369,7 @@ namespace PCRCaculator.Battle
 
         public void RetryButton()
         {
-          bool isGuildBossBattle = false;
-          if (MyGameCtrl.Instance != null)
-          {
-            isGuildBossBattle = MyGameCtrl.Instance.tempData.isGuildBattle;
-          }
-
-          Time.timeScale = 1;
           GuildManager.Instance.StartCalButton();
-      // if (isGuildBossBattle)
-      // {
-      //   SceneManager.LoadScene("GuildScene");
-      // }
-      // else
-      // {
-      //   SceneManager.LoadScene("BeginScene");
-      // }
     }
 
     public void PauseButton()
@@ -450,7 +435,34 @@ namespace PCRCaculator.Battle
         {
             myGameCtrl.SetBattleSpeed(SpeedToggle.isOn ? 2 : 1);
         }
-        public void OnTimeScaleSliderDraged()
+        public void OnSetToggleSwitched()
+        {
+          if (MyGameCtrl.Instance.ForceAutoMode)
+          {
+            MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
+            return;
+          }
+          if (SetToggle.isOn)
+          {
+            for (int i = 0; i < PlayerUI.Count; i++){
+              MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
+              PlayerUI[i].ShowContinousPress(true);
+              UBButtonState[i] = 2;
+            }
+        }
+          else
+          {
+            for (int i = 0; i < PlayerUI.Count; i++)
+            {
+              MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
+              PlayerUI[i].ShowContinousPress(false);
+              UBButtonState[i] = 0;
+            };
+          }
+
+    }
+
+    public void OnTimeScaleSliderDraged()
         {
             int scaleRate = Mathf.RoundToInt(timeScaleSlider.value);
             float timeScale = Mathf.Pow(2, (scaleRate - 3));
