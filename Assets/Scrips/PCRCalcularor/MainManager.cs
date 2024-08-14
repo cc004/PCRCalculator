@@ -1015,20 +1015,20 @@ namespace PCRCaculator
 
         public string GetDetail()
         {
-            string result = "�˺���" + currentDamage + "\n���������˺���" + criticalEX + "\n�����˺�������ƫ�ߣ���" + exceptDamage + "\n������ӣ�" + randomSeed;
-            if (backTime > 0) result += $"��\n{backTime}s";
-            if (warnings.Count > 0)
-            {
-                for(int i=0;i<3;i++)
-                {
-                    if(i<warnings.Count)
-                    result +="\n"+ warnings[i];
-                }
-                if (warnings.Count > 4)
-                    result += "\n��" + warnings.Count + "������";
-            }
-            return result;
+      string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害：" + exceptDamage + "\n随机种子：" + randomSeed;
+      if (backTime > 0) result += $"\n返{backTime}s";
+      if (warnings.Count > 0)
+      {
+        for (int i = 0; i < 3; i++)
+        {
+          if (i < warnings.Count)
+            result += "\n" + warnings[i];
         }
+        if (warnings.Count > 4)
+          result += "\n等" + warnings.Count + "个错误";
+      }
+      return result;
+    }
 
     }
 }
