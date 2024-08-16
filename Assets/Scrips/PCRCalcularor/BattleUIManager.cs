@@ -104,7 +104,8 @@ namespace PCRCaculator.Battle
         private List<byte[]> imageSaved = new List<byte[]>();
 
         public Dictionary<Elements.eStateIconType, bool> ShowBuffDic => MainManager.Instance.PlayerSetting.ShowBuffDic;
-
+        public GameObject battleStatus;
+        public Toggle translucent;
         private void Awake()
         {
             Instance = this;
@@ -370,9 +371,9 @@ namespace PCRCaculator.Battle
         public void RetryButton()
         {
           GuildManager.Instance.StartCalButton();
-    }
+        }
 
-    public void PauseButton()
+        public void PauseButton()
         {
             {
                 MyGameCtrl.Instance.PauseButton();
@@ -437,32 +438,32 @@ namespace PCRCaculator.Battle
         }
         public void OnSetToggleSwitched()
         {
-          if (MyGameCtrl.Instance.ForceAutoMode)
-          {
-            MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
-            return;
-          }
-          if (SetToggle.isOn)
-          {
-            for (int i = 0; i < PlayerUI.Count; i++){
-              MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
-              PlayerUI[i].ShowContinousPress(true);
-              UBButtonState[i] = 2;
-            }
-        }
-          else
-          {
-            for (int i = 0; i < PlayerUI.Count; i++)
+            if (MyGameCtrl.Instance.ForceAutoMode)
             {
-              MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
-              PlayerUI[i].ShowContinousPress(false);
-              UBButtonState[i] = 0;
-            };
-          }
+                MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
+                return;
+            }
+            if (SetToggle.isOn)
+            {
+              for (int i = 0; i < PlayerUI.Count; i++){
+                  MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
+                  PlayerUI[i].ShowContinousPress(true);
+                  UBButtonState[i] = 2;
+              }
+            }
+            else
+            {
+              for (int i = 0; i < PlayerUI.Count; i++)
+              {
+                  MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
+                  PlayerUI[i].ShowContinousPress(false);
+                  UBButtonState[i] = 0;
+              };
+            }
 
-    }
+        }
 
-    public void OnTimeScaleSliderDraged()
+        public void OnTimeScaleSliderDraged()
         {
             int scaleRate = Mathf.RoundToInt(timeScaleSlider.value);
             float timeScale = Mathf.Pow(2, (scaleRate - 3));
@@ -731,6 +732,26 @@ namespace PCRCaculator.Battle
                 }
             }
             MainManager.Instance.SavePlayerSetting();
+        }
+        public void StatusShowButton()
+        {
+            battleStatus.SetActive(!battleStatus.activeSelf);
+        }
+        public void ChangeTranslucent()
+        {
+            Debug.Log(translucent.isOn);
+            if (translucent.isOn)
+            {
+                Color currentColor = battleStatus.GetComponent<Image>().color;
+                currentColor.a = 100f / 255f;
+                battleStatus.GetComponent<Image>().color = currentColor;
+            }
+            else
+            {
+                Color currentColor = battleStatus.GetComponent<Image>().color;
+                currentColor.a = 255f / 255f;
+                battleStatus.GetComponent<Image>().color = currentColor;
+            }
         }
     }
 }

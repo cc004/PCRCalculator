@@ -7419,6 +7419,26 @@ this.updateCurColor();
           KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (float)((double)_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
 
         public List<PartsData> BossPartsListForBattle { get; set; }
+        private static UnitCtrl _instance;
+
+        public static UnitCtrl Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    // 寻找已存在的实例
+                    _instance = FindObjectOfType<UnitCtrl>();
+                    if (_instance == null)
+                    {
+                      // 如果没有找到，创建一个新的实例
+                      var go = new GameObject("UnitCtrl");
+                      _instance = go.AddComponent<UnitCtrl>();
+                    }
+                }
+                return _instance;
+            }
+        }
 
         public bool IsPartsBoss => BossPartsList.Count > 0;
 

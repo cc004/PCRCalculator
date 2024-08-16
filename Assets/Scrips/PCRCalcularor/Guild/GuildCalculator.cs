@@ -75,7 +75,7 @@ namespace PCRCaculator.Guild
         private long totalDamage;
         private long totalDamageCriEX;
         private FloatWithEx totalDamageExcept = 0;
-        private bool isFinishCalc;
+        public bool isFinishCalc;
         private int backTime;
 
         public List<int> PlayerIds => playerIds;
