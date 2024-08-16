@@ -739,7 +739,6 @@ namespace PCRCaculator.Battle
         }
         public void ChangeTranslucent()
         {
-            Debug.Log(translucent.isOn);
             if (translucent.isOn)
             {
                 Color currentColor = battleStatus.GetComponent<Image>().color;

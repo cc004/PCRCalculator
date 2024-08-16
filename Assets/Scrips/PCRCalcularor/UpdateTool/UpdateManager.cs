@@ -92,8 +92,6 @@ namespace PCRCaculator.Update
                 string jsonString = await response.Content.ReadAsStringAsync();
                 Debug.Log("JSON Response: " + jsonString);
                 var json = JsonUtility.FromJson<VersionInfo>(jsonString);
-                Debug.Log("TruthVersion: " + json.TruthVersion);
-
                 prodUpdateButton.GetComponentInChildren<Text>().text = json.TruthVersion;
                 prodUpdateButton.interactable = true;
                 isProdUpdated = true;
