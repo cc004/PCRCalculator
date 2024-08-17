@@ -106,6 +106,7 @@ namespace PCRCaculator.Battle
         public Dictionary<Elements.eStateIconType, bool> ShowBuffDic => MainManager.Instance.PlayerSetting.ShowBuffDic;
         public GameObject battleStatus;
         public Toggle translucent;
+        public InputField pauseTime;
         private void Awake()
         {
             Instance = this;
@@ -127,6 +128,7 @@ namespace PCRCaculator.Battle
                 _Update += _Update_1;
             }
             _Update += _UpdateFPSCount;
+            timeScaleSlider.value = GuildManager.Instance.calSlider.value;
         }
         private void Update()
         {
@@ -370,7 +372,8 @@ namespace PCRCaculator.Battle
 
         public void RetryButton()
         {
-          GuildManager.Instance.StartCalButton();
+            GuildManager.Instance.SettingInputs[8].text = pauseTime.text;
+            GuildManager.Instance.StartCalButton();
         }
 
         public void PauseButton()
@@ -472,12 +475,15 @@ namespace PCRCaculator.Battle
             {
                 timeText += "1/" + Mathf.RoundToInt(1.0f / timeScale);
             }
-            else
-                timeText = "x" + timeScale;
+            else{
+                timeText = "x" + timeScale; 
+                GuildManager.Instance.SettingData.calSpeed = (int)timeScale;
+            }
             timeScaleText.text = timeText;
             //Time.timeScale = timeScale;
             SetTimeScale(timeScale);
-        }
+            GuildManager.Instance.calSlider.value = timeScaleSlider.value;
+    }
         public void SetTimeScale(float scale)
         {
             {

@@ -5713,7 +5713,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -11.246, y: -0.0000038147}
+  m_AnchoredPosition: {x: -15, y: -0.0000038147}
   m_SizeDelta: {x: 280.1, y: 445.12}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192595857
@@ -9136,7 +9136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -9156,7 +9156,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u83B7\u53D6\uFF08\u770B\u8138-\u4E0D\u7A33\u5B9A\uFF09"
+  m_Text: "\u83B7\u53D6"
 --- !u!222 &315151066
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11233,9 +11233,7 @@ MonoBehaviour:
     S65\u72EE\u5B50\u5EA710049300\n2025\u5E7408\u6708 S66\u5904\u5973\u5EA710050000\n2025\u5E7409\u6708
     S67\u5929\u79E4\u5EA710050800\n2025\u5E7410\u6708 S68\u5929\u874E\u5EA710051400\n2025\u5E7411\u6708
     S69\u5C04\u624B\u5EA710051900\n2025\u5E7412\u6708 S70\u6469\u7FAF\u5EA710052500\n----------------------------------\n2026\u5E7401\u6708
-    S71\u6C34\u74F6\u5EA710053100\n2026\u5E7402\u6708 S72\u53CC\u9C7C\u5EA710053700\n2026\u5E7403\u6708
-    S73\u767D\u7F8A\u5EA710054200\n2026\u5E7404\u6708 S74\u91D1\u725B\u5EA710055000\n2024\u5E7405\u6708
-    S75\u53CC\u5B50\u5EA710055700"
+    S71\u6C34\u74F6\u5EA710053100\n2026\u5E7402\u6708 S72\u53CC\u9C7C\u5EA710053700\n----------------------------------\n\u6682\u65F6\u5148\u8FD9\u6837\u663E\u793A\uFF0C\u540E\u7EED\u53EF\u80FD\u4F1A\u4F18\u5316\uFF0C\n\u518D\u6B21\u70B9\u51FB\u6309\u94AE\u5373\u53EF\u5173\u95ED\u7A97\u53E3"
 --- !u!222 &406641546
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13672,7 +13670,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1721371721}
   m_Direction: 0
   m_MinValue: 1
-  m_MaxValue: 15
+  m_MaxValue: 18
   m_WholeNumbers: 1
   m_Value: 1
   m_OnValueChanged:
@@ -21562,8 +21560,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 144.4, y: 108.47}
-  m_SizeDelta: {x: 31.1924, y: 30.939}
+  m_AnchoredPosition: {x: 144, y: 107}
+  m_SizeDelta: {x: 35, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &721744879
 MonoBehaviour:
@@ -24484,7 +24482,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 695659964}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -29736,10 +29734,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 212706222}
   m_HandleRect: {fileID: 216852000}
   m_Direction: 0
-  m_MinValue: 1
-  m_MaxValue: 512
+  m_MinValue: 3
+  m_MaxValue: 12
   m_WholeNumbers: 1
-  m_Value: 1
+  m_Value: 3
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -31729,9 +31727,7 @@ MonoBehaviour:
     S65\u72EE\u5B50\u5EA710049300\n2025\u5E7408\u6708 S66\u5904\u5973\u5EA710050000\n2025\u5E7409\u6708
     S67\u5929\u79E4\u5EA710050800\n2025\u5E7410\u6708 S68\u5929\u874E\u5EA710051400\n2025\u5E7411\u6708
     S69\u5C04\u624B\u5EA710051900\n2025\u5E7412\u6708 S70\u6469\u7FAF\u5EA710052500\n----------------------------------\n2026\u5E7401\u6708
-    S71\u6C34\u74F6\u5EA710053100\n2026\u5E7402\u6708 S72\u53CC\u9C7C\u5EA710053700\n2026\u5E7403\u6708
-    S73\u767D\u7F8A\u5EA710054200\n2026\u5E7404\u6708 S74\u91D1\u725B\u5EA710055000\n2024\u5E7405\u6708
-    S75\u53CC\u5B50\u5EA710055700\n----------------------------------\n\u6682\u65F6\u5148\u8FD9\u6837\u663E\u793A\uFF0C\u540E\u7EED\u53EF\u80FD\u4F1A\u4F18\u5316\uFF0C\n\u518D\u6B21\u70B9\u51FB\u6309\u94AE\u5373\u53EF\u5173\u95ED\u7A97\u53E3"
+    S71\u6C34\u74F6\u5EA710053100\n2026\u5E7402\u6708 S72\u53CC\u9C7C\u5EA710053700\n----------------------------------\n\u518D\u6B21\u70B9\u51FB\u6309\u94AE\u5373\u53EF\u5173\u95ED\u7A97\u53E3"
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -43231,11 +43227,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: IngameDebugConsole
       objectReference: {fileID: 0}
+    - target: {fileID: 178532, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 183006, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400672, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 11410584, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 98e8e1cf8dc7dbf469617c2e40c8a944,
-        type: 3}
+      objectReference: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 11411602, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_FontData.m_MaxSize
       value: 14
@@ -67709,7 +67716,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -67729,7 +67736,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Prod\u5F53\u524D\u6700\u65B0\u7248\u672C\u53F7\u4E3A\uFF1A"
+  m_Text: "Prod\u5F53\u524D\u6700\u65B0\u7248\u672C\u53F7    \uFF1A"
 --- !u!222 &2134228235
 CanvasRenderer:
   m_ObjectHideFlags: 0

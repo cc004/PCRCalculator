@@ -37,7 +37,7 @@ namespace PCRCaculator.Guild
 
         private string[] textForBoss;
         private int partCount;
-
+    public InputField pauseTime;
         //private int currentType = 1;
 
         public void Init()

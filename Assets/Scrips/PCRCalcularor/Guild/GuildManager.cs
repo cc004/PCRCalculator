@@ -426,7 +426,8 @@ namespace PCRCaculator.Guild
         }
         public void OnCalSliderDraged()
         {
-            SettingData.calSpeed = Mathf.RoundToInt(calSlider.value);
+            int scaleRate = Mathf.RoundToInt(calSlider.value);
+            SettingData.calSpeed = (int) Mathf.Pow(2, scaleRate - 3);
             calSettingTexts[0].text = "x" + SettingData.calSpeed;
         }
         public int stoptime;
