@@ -80,7 +80,6 @@ namespace PCRCaculator.Guild
 
         public List<int> PlayerIds => playerIds;
         public int BossId => bossId;
-
         private void Awake()
         {
             Instance = this;

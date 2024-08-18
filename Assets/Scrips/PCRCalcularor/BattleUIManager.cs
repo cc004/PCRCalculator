@@ -107,6 +107,8 @@ namespace PCRCaculator.Battle
         public GameObject battleStatus;
         public Toggle translucent;
         public InputField pauseTime;
+        public Button changeBattlePanel;
+
         private void Awake()
         {
             Instance = this;
@@ -743,6 +745,11 @@ namespace PCRCaculator.Battle
         {
             battleStatus.SetActive(!battleStatus.activeSelf);
         }
+    
+        public void changeBattlePanelButton()
+        {
+            GuildCalculator.Instance.guildPageUI.SetActive(!GuildCalculator.Instance.guildPageUI.activeSelf);
+        }
         public void ChangeTranslucent()
         {
             if (translucent.isOn)
@@ -758,5 +765,5 @@ namespace PCRCaculator.Battle
                 battleStatus.GetComponent<Image>().color = currentColor;
             }
         }
-    }
+        }
 }

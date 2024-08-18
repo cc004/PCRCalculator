@@ -9,6 +9,7 @@ namespace Elements
         public Text nameText;
         public Toggle toggle;
         public eStateIconType stateIconType;
+        public GameObject buffprefab;
 
         public void Init(eStateIconType type,bool enable)
         {
@@ -39,7 +40,18 @@ namespace Elements
                 }
             }
             toggle.isOn = enable;
+            ToggleColorChange();
+        }
+        public void ToggleColorChange()
+        {
+            if(toggle.isOn) 
+            {
+                buffprefab.GetComponent<Image>().color = new Color(121 / 255.0f, 224 / 255.0f, 153 / 255.0f, 1.0f);
+            }
+            else
+            {
+                buffprefab.GetComponent<Image>().color = Color.white;
+            }
         }
     }
-    
 }
