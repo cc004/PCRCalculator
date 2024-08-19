@@ -1346,9 +1346,9 @@ namespace PCRCaculator.Guild
         public List<List<float>> UBExecTimeData;
         public bool useAutoMode;
         public GuildRandomData timeLineData;
-        public int currentGuildMonth= 1054;
-        public int currentGuildEnemyNum=4;
-        public int currentTurn=5;
+        public int currentGuildMonth=9;
+        public int currentGuildEnemyNum=1;
+        public int currentTurn=1;
         public int[] selectedEnemyIDs;
         public bool isViolent;
         public bool usePlayerSettingHP;

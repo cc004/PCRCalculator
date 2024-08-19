@@ -104,7 +104,7 @@ namespace PCRCaculator.Guild
 
             RefreshTotalDamage(false, 0, false, 0, 0);
             CurrentBossText.text = MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes();
-            currentSeedText.text = "" + MyGameCtrl.Instance.CurrentSeedForSave;
+            currentSeedText.text = "随机数种子：" + MyGameCtrl.Instance.CurrentSeedForSave;
             int idx = 0;
             bossId = boss.UnitId;
             AddSkillGroupPrefab(boss.UnitId, boss, 0);
@@ -703,13 +703,14 @@ namespace PCRCaculator.Guild
             var n = GuildManager.StaticsettingData.n1;
             expectedDamage = (int)totalDamageExcept.Expected(n);
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)[<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>]";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>";
             if (backTime > 0)
             {
-                detail = $"返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
+                detail = $" 返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
                 damageStr += detail;
             }
             else detail = string.Empty;
+            damageStr += $" 随机数种子：{MyGameCtrl.Instance.CurrentSeedForSave}";
             totalDamageText.text = damageStr;
             basedmg.text = totalDamageCriEX.ToString();
         }

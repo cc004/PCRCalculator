@@ -566,7 +566,7 @@ namespace PCRCaculator
         {
             GameObject a = Instantiate(MassagePerferb);
             a.transform.SetParent(LatestUIback.transform);
-            a.transform.localPosition = new Vector3();
+            a.transform.localPosition = new Vector3(0,-150,0);
             a.transform.localScale = new Vector3(1, 1, 1);
             a.GetComponentInChildren<Text>().text = word;
             yield return new WaitForSecondsRealtime(1.5f);

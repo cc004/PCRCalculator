@@ -703,8 +703,12 @@ namespace PCRCaculator.Battle
         }
         public void SetBUFFUIShowButton()
         {
-            if (BattleHeaderController.Instance.GetIsPause())
+            if (!BattleHeaderController.Instance.GetIsPause())
             {
+              PauseButton();
+              MainManager.Instance.WindowMessage("已暂停");
+            }
+                battleStatus.SetActive(false);
                 buffUISettingBack.SetActive(true);
                 buffUIScrollEX.ClearAll();
                 foreach (Elements.eStateIconType stateIconType in Enum.GetValues(typeof(Elements.eStateIconType))
@@ -720,11 +724,6 @@ namespace PCRCaculator.Battle
                         });
                 }
                 buffUIScrollEX.AutoFit();
-            }
-            else
-            {
-                MainManager.Instance.WindowMessage("请在暂停时设置！");
-            }
         }
         public void SaveBUFFUISetting()
         {
@@ -743,11 +742,14 @@ namespace PCRCaculator.Battle
         }
         public void StatusShowButton()
         {
+            buffUISettingBack.SetActive(false);
             battleStatus.SetActive(!battleStatus.activeSelf);
         }
     
         public void changeBattlePanelButton()
         {
+            battleStatus.SetActive(false);
+            buffUISettingBack.SetActive(false);
             GuildCalculator.Instance.guildPageUI.SetActive(!GuildCalculator.Instance.guildPageUI.activeSelf);
         }
         public void ChangeTranslucent()
@@ -755,15 +757,15 @@ namespace PCRCaculator.Battle
             if (translucent.isOn)
             {
                 Color currentColor = battleStatus.GetComponent<Image>().color;
-                currentColor.a = 100f / 255f;
+                currentColor.a = 255f / 255f;
                 battleStatus.GetComponent<Image>().color = currentColor;
             }
             else
             {
                 Color currentColor = battleStatus.GetComponent<Image>().color;
-                currentColor.a = 255f / 255f;
+                currentColor.a = 100f / 255f;
                 battleStatus.GetComponent<Image>().color = currentColor;
             }
         }
-        }
+    }
 }
