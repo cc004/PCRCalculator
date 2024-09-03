@@ -2266,7 +2266,8 @@ namespace PCRCaculator
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         public List<List<float>> UBExecTimeList = null;
-        public bool isAutoMode = true;
+        public bool isAutoMode = false;
+        // public bool isSetMode = false;
         public bool forceAutoMode = false;
         //public bool isViolent = false;
         //public int calSpeed;

@@ -117,8 +117,8 @@ namespace PCRCaculator
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
         public List<UnitData> EnemyDataForBattle { get => enemyDataForBattle; }
         public Dictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => allUnitAttackPatternDic; }
-        public bool IsAutoMode { get => isAutoMode;}
-        public bool ForceAutoMode { get => forceAutoMode; }
+        // public bool IsAutoMode { get => isAutoMode;}
+        // public bool ForceAutoMode { get => forceAutoMode; }
         public GuildBattleData GuildBattleData { get => guildBattleData;}
         //public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
         //public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
@@ -163,8 +163,8 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10051600;
-            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10040900;
-            public long BossVersionCN = 202408131632;
+            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10041700;
+            public long BossVersionCN = 202408301650;
             public bool useQA = false;
             public bool useJP = false;
             public bool newAB = true;
@@ -489,8 +489,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 61;
-                playerSetting.playerLevel = 244;
+                playerSetting.playerProcess = 62;
+                playerSetting.playerLevel = 247;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";

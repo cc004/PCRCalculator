@@ -23,12 +23,22 @@ namespace PCRCaculator.Guild
         
         public List<float> GetUBTimes()
         {
+            SetUBTimes(inputField.text.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s)).Select(float.Parse).ToList());
             return inputField.text.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s)).Select(float.Parse).ToList();
         }
 
         public void SetUBTimes(List<float> times)
         {
-            inputField.text = string.Join('\n', times);
+            for (int i = 0; i < times.Count; i++)
+            {
+                if (times[i] < 90)
+                {
+                    int integerPart = (int)times[i];
+                    float decimalPart = times[i] - integerPart;
+                    times[i] = GuildManager.Instance.SettingData.limitTime * 60 - integerPart * 60 + decimalPart;
+                }
+            }
+          inputField.text = string.Join('\n', times);
         }
     }
 }

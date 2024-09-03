@@ -60,8 +60,8 @@ namespace Elements
                 return;
             }
             mainManager = MainManager.Instance;
-            IsAutoMode = mainManager.IsAutoMode;
-            ForceAutoMode = mainManager.ForceAutoMode;
+            // IsAutoMode = mainManager.IsAutoMode;
+            // ForceAutoMode = mainManager.ForceAutoMode;
             tempData = new TempData();
             tempData.playerList = mainManager.PlayerDataForBattle;
             if (mainManager.IsGuildBattle)

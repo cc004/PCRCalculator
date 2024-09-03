@@ -120,7 +120,7 @@ namespace PCRCaculator.Battle
             {
                 OldManager.SetActive(true);
             }*/
-
+             
         }
         private void Start()
         {
@@ -311,7 +311,10 @@ namespace PCRCaculator.Battle
                     EnemyUI[i].gameObject.SetActive(false);
                 }
             }
-            AutoToggle.isOn = gameCtrl.IsAutoMode;
+            var data = GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
+            // SetToggle.isOn = GuildManager.Instance.SetModeToggle.isOn;
+            AutoToggle.isOn = data.useAutoMode;
+            SetToggle.isOn = data.useSetMode;
             if (!myGameCtrl.tempData.isGuildBattle)
             {
                 debugBack.SetActive(false);
@@ -400,6 +403,7 @@ namespace PCRCaculator.Battle
                         UBButtonState[charidx] = 1;
                         MyGameCtrl.Instance.TryingExecUB(charidx);
                         StartCoroutine(UBCool(charidx));
+                        SetToggle.isOn = false;
                         break;
                     case 1:
                         UBButtonState[charidx] = 2;
@@ -409,6 +413,7 @@ namespace PCRCaculator.Battle
                     default:
                         PlayerUI[charidx].ShowContinousPress(false);
                         UBButtonState[charidx] = 0;
+                        SetToggle.isOn = false;
                         break;
                 }
                 MyGameCtrl.Instance.TryingExecUB(charidx);
@@ -456,7 +461,7 @@ namespace PCRCaculator.Battle
                   UBButtonState[i] = 2;
               }
             }
-            else
+            else if (!SetToggle.isOn && AllStatesAreTwo(UBButtonState))
             {
               for (int i = 0; i < PlayerUI.Count; i++)
               {
@@ -467,7 +472,17 @@ namespace PCRCaculator.Battle
             }
 
         }
-
+        private bool AllStatesAreTwo(int[] states)
+        {
+            foreach (int state in states)
+            {
+                if (state != 2)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         public void OnTimeScaleSliderDraged()
         {
             int scaleRate = Mathf.RoundToInt(timeScaleSlider.value);

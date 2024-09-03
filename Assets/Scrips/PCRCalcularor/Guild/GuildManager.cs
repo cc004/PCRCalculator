@@ -13,7 +13,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using UnityEngine.Networking;
+using SFB;
 namespace PCRCaculator.Guild
 {
     public class GuildManager : MonoBehaviour
@@ -23,6 +24,7 @@ namespace PCRCaculator.Guild
         public List<CharacterPageButton> charactersUI;
         public Text characterGroupNameText;
         public Toggle AutoModeToggle;
+        public Toggle SetModeToggle;
         public List<UBTime> UnitUBTimes;
         public Text UBTimeEditButtonText;
         public List<Toggle> characterGroupToggles;
@@ -99,7 +101,9 @@ namespace PCRCaculator.Guild
         private bool isInit;
         private int[] specialEnemyid;
         private int specialInputValue;
-
+        public Image backgroundImage;
+        public GameObject setImageButton;
+        public GameObject clearImageButton;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -470,7 +474,7 @@ namespace PCRCaculator.Guild
                 battleData.enemyData.Add(enemyData);
             }
             battleData.UBExecTimeList = SettingData.GetCurrentPlayerGroup().UBExecTimeData;
-            battleData.isAutoMode = AutoModeToggle.isOn;
+            // battleData.isAutoMode = AutoModeToggle.isOn;
             /*battleData.isViolent = SettingData.isViolent;
             battleData.FPSforLogic = SettingData.FPSforLogic;
             battleData.FPSforAnimaton = SettingData.FPSforAnimation;
@@ -540,6 +544,7 @@ namespace PCRCaculator.Guild
             RefreshCalcSettings_start();
             EditingUBTime(false);
             AutoModeToggle.isOn = data.useAutoMode;
+            SetModeToggle.isOn = data.useSetMode;
             isInit = false;
         }
         private void RefreshCharacterGroupToggle()
@@ -578,11 +583,9 @@ namespace PCRCaculator.Guild
                     UnitUBTimes[i].SetUBTimes(new List<float>());
                 }
             }
-
             if (data.UBExecTimeData.Count < 6) data.UBExecTimeData.Add(new List<float>());
             UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             AutoModeToggle.isOn = data.useAutoMode;
-
             timeLineTexts[0].text = data.timeLineData.DataName;
             timeLineTexts[1].text = data.timeLineData.GetDescribe();
 
@@ -742,6 +745,11 @@ namespace PCRCaculator.Guild
         {
             SaveSettingData(SettingData);
         }
+        public void OnToggleSwitched(){
+            SettingData.GetCurrentPlayerGroup().useAutoMode = AutoModeToggle.isOn;
+            SettingData.GetCurrentPlayerGroup().useSetMode = SetModeToggle.isOn;
+            SaveDataToJson();
+    }
         public void EditingUBTime(bool isButton)
         {
             if (isButton)
@@ -751,7 +759,7 @@ namespace PCRCaculator.Guild
             else
             {
                 isEditongUBTime = false;
-                AutoModeToggle.interactable = false;
+                // AutoModeToggle.interactable = false;
             }
             UBTimeEditButtonText.text = isEditongUBTime ? "保存" : "修改";
             int idx = 0;
@@ -762,7 +770,7 @@ namespace PCRCaculator.Guild
                 if (isEditongUBTime)
                 {
                     uBTime.StartEdit();
-                    AutoModeToggle.interactable = true;
+                    // AutoModeToggle.interactable = true;
                 }
                 else
                 {
@@ -776,14 +784,15 @@ namespace PCRCaculator.Guild
             }
             if(isButton && !isEditongUBTime)
             {
-                AutoModeToggle.interactable = false;
+                // AutoModeToggle.interactable = false;
                 SettingData.GetCurrentPlayerGroup().useAutoMode = AutoModeToggle.isOn;
+                // SettingData.GetCurrentPlayerGroup().useSetMode = SetModeToggle.isOn;
                 SaveDataToJson();
             }
         }
         public void UBTimeHelpButton()
         {
-            string msg = "可以输入帧(>100)或秒(<90),秒支持小数\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入60表示在倒计时60秒末跳到59秒前释放UB\n勾选自动模式则手动输入的UB时间无效";
+            string msg = "可以输入帧(>100)或秒(<90)\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入61.001保存则自动转成1860.001帧\nAuto和Set按钮为改变开场状态(非以前强制)";
             MainManager.Instance.WindowConfigMessage(msg, null);
         }
         public void GuildBossDataEditButton()
@@ -1165,6 +1174,54 @@ namespace PCRCaculator.Guild
         }
 
 
+        //根据路径或者URL读取本地文件并转换为Texture2D文件
+        public void GetBookSprite(string url)
+        {
+            StartCoroutine(DownSprite(url));
+        }
+
+        IEnumerator DownSprite(string url)
+        {
+            var uri = new System.Uri(Path.Combine(url));
+            UnityWebRequest www = UnityWebRequest.Get(uri);
+            DownloadHandlerTexture texDl = new DownloadHandlerTexture(true);
+            www.downloadHandler = texDl;
+
+            yield return www.SendWebRequest();
+
+            if (www.isHttpError || www.isNetworkError)
+            {
+                Debug.LogError(www.error);
+            }
+            else
+            {
+                Texture2D tex = new Texture2D(1, 1);
+                tex = texDl.texture;
+                Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                backgroundImage.sprite = sprite;
+            }
+        }
+        public void SelectImage()
+        {
+#if PLATFORM_ANDROID
+            return MainManager.Instance.WindowConfigMessage("Android端暂时不支持！",null);
+#else
+            var imagePath = StandaloneFileBrowser.OpenFilePanel(
+                  "选择背景图片", string.Empty, new ExtensionFilter[]
+                  {
+                                    new ExtensionFilter("", "png", "jpeg", "jpg"),
+                  }, false);
+              if (imagePath.Length > 0) {
+                  _ = imagePath[0];
+                  string file = imagePath[0];
+                  file = file.Replace("\\", "/");
+                  GetBookSprite(file);
+              }
+#endif
+        }
+        public void ClearImage(){
+            backgroundImage.sprite = null;
+        }
     }
     [Serializable]
     public class GuildEnemyData
@@ -1327,7 +1384,7 @@ namespace PCRCaculator.Guild
             else
                 des += (data.currentGuildEnemyNum+1);
             if (data.usePlayerSettingHP)
-                des += "*";
+                des += "#";
             return des;
         }
         public void RenameGroupName(string name)
@@ -1345,6 +1402,7 @@ namespace PCRCaculator.Guild
         public AddedPlayerData playerData;
         public List<List<float>> UBExecTimeData;
         public bool useAutoMode;
+        public bool useSetMode;
         public GuildRandomData timeLineData;
         public int currentGuildMonth=9;
         public int currentGuildEnemyNum=1;
