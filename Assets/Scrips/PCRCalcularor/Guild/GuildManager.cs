@@ -1204,7 +1204,8 @@ namespace PCRCaculator.Guild
         public void SelectImage()
         {
 #if PLATFORM_ANDROID
-            return MainManager.Instance.WindowConfigMessage("Android端暂时不支持！",null);
+            MainManager.Instance.WindowConfigMessage("Android端暂时不支持！", null);
+            return ;
 #else
             var imagePath = StandaloneFileBrowser.OpenFilePanel(
                   "选择背景图片", string.Empty, new ExtensionFilter[]
