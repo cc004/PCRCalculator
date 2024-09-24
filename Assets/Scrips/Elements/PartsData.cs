@@ -10,6 +10,8 @@ using System.Collections.Generic;
 
 using Cute;
 using Elements.Battle;
+using PCRCaculator;
+using PCRCaculator.Guild;
 using Spine;
 using UnityEngine;
 //using Elements.Data;
@@ -140,7 +142,8 @@ namespace Elements
                 }
             }
             // MasterEnemyParameter.EnemyParameter fromAllKind = ManagerSingleton<MasterDataManager>.Instance.masterEnemyParameter.GetFromAllKind(unit_id);
-            var data = MyGameCtrl.Instance.tempData.MPartsDataDic[unit_id]; 
+            var data = MyGameCtrl.Instance.tempData.MPartsDataDic == null ? GuildManager.EnemyDataDic[EnemyId == 100000001 ? Index + 400000000 : EnemyId]
+                : MyGameCtrl.Instance.tempData.MPartsDataDic[unit_id]; 
             Dodge = StartDodge = (int)data.baseData.Dodge;
             LifeSteal = StartLifeSteal = (int)data.baseData.Life_steal;
             HpRecoveryRate = (int)data.baseData.Hp_recovery_rate;
