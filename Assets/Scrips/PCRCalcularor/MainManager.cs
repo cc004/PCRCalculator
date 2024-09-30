@@ -164,8 +164,8 @@ namespace PCRCaculator
         {
             public long CharacterVersionJP = 10051600;
             public long BossVersionJP = Instance.useJapanData ? 10051600 : 10041700;
-            public long BossVersionCN = 202408301650;
-            public bool useQA = false;
+            public long BossVersionCN = 202409141808;
+            public bool useQA = true;
             public bool useJP = false;
             public bool newAB = true;
 
@@ -268,7 +268,7 @@ namespace PCRCaculator
             }
             catch (Exception e)
             {
-                WindowMessage("�������ݷ����������ð汾");
+                WindowMessage("版本错误，重置初始版本");
                 SaveManager.Save(new VersionData());
                 return;
             }
