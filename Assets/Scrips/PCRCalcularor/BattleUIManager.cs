@@ -455,20 +455,20 @@ namespace PCRCaculator.Battle
             }
             if (SetToggle.isOn)
             {
-              for (int i = 0; i < PlayerUI.Count; i++){
-                  MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
-                  PlayerUI[i].ShowContinousPress(true);
-                  UBButtonState[i] = 2;
-              }
+                for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrl.Count; i++){
+                    MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
+                    PlayerUI[i].ShowContinousPress(true);
+                    UBButtonState[i] = 2;
+                }
             }
             else if (!SetToggle.isOn && AllStatesAreTwo(UBButtonState))
             {
-              for (int i = 0; i < PlayerUI.Count; i++)
-              {
-                  MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
-                  PlayerUI[i].ShowContinousPress(false);
-                  UBButtonState[i] = 0;
-              };
+                for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrl.Count; i++)
+                {
+                    MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
+                    PlayerUI[i].ShowContinousPress(false);
+                    UBButtonState[i] = 0;
+                };
             }
 
         }

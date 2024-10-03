@@ -136,7 +136,7 @@ namespace PCRCaculator.Guild
             {
                 allUnitStateChangeDic.Add(a, new List<UnitStateChangeData>());
                 allUnitAbnormalStateDic.Add(a, new List<UnitAbnormalStateChangeData>());
-                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.MaxHp, (int)b.MaxHp, "初始化"){target = a} });
+                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.Hp, (int)b.Hp, "初始化"){target = a} });
                 allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0){describe = "初始化", target = a} });
                 allUnitLastStateDic.Add(a, new UnitStateChangeData(0, UnitCtrl.ActionState.GAME_START, UnitCtrl.ActionState.GAME_START));
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());

@@ -104,6 +104,7 @@ namespace PCRCaculator.Guild
         public Image backgroundImage;
         public GameObject setImageButton;
         public GameObject clearImageButton;
+        public Button clearUbButton;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -201,12 +202,22 @@ namespace PCRCaculator.Guild
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
             var baseDataEX = MainManager.Instance.UnitRarityDic[unitData.unitId].GetEXSkillValue(unitData);//,MyGameCtrl.Instance.tempData.isGuildBattle);
             characterDetailTexts[0].text = "" + baseData.RealHp + (baseDataEX.RealHp == 0 ? string.Empty : $"<color=#FF80C0>+{baseDataEX.RealHp}</color>");
+            long accuracy = Mathf.RoundToInt(EnemyDataDic.ContainsKey(selectedBossEnemyids[0]) ? EnemyDataDic[selectedBossEnemyids[0]].baseData.Accuracy : 0);//boss命中
+            long dodge = baseData.dataint[9] / 100;//角色闪避
+            double dodgerate = dodge <= accuracy ? 0 : 1 / (1 + 100.0 / (dodge - accuracy));//闪避率
             for (int i = 1; i < baseData.dataint.Length; i++)
             {
-                //处理一下四舍五入的问题
-                characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100 - baseData.dataint[i] / 100}</color>");
+                if (i == 9)
+                {
+                    // 处理闪避率
+                    characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100.0 - baseData.dataint[i] / 100.0}</color>") + $"<color=#FF80C0> ({(dodgerate * 100).ToString("F2") + "%"})</color>";
+                }
+                else
+                {
+                    //处理一下四舍五入的问题
+                    characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100 - baseData.dataint[i] / 100}</color>");
+                }
             }
-
             characterDetailTPR.text = $"{BattleManager.CalcPlayerDamageTpReduceRate(unitData.rank)}";
 
             execTimeButtonAction = () => { GuildExecTimeSettingButton(unitData); };
@@ -525,8 +536,8 @@ namespace PCRCaculator.Guild
             else
                 toggles_ChooseBoss[1].isOn = true;
             //FinishChooseBossButton();
-            calSlider.value = SettingData.calSpeed;
-            if(data.timeLineData == null)
+            calSlider.value = (int)(Math.Log(SettingData.calSpeed, 2) + 3);
+            if (data.timeLineData == null)
             {
                 data.timeLineData = new GuildRandomData
                 {
@@ -1223,6 +1234,29 @@ namespace PCRCaculator.Guild
         public void ClearImage(){
             backgroundImage.sprite = null;
         }
+        public void clearUb()
+        {
+            MainManager.Instance.WindowConfigMessage("是否清空当前队伍UB？", clearUb_0);
+        }
+        public void clearUb_0(){
+          SettingData.ClearUBExecTimeData();
+          SaveDataToJson();
+          Refresh();
+        }
+        public void ClearAllTeamButton()
+        {
+          MainManager.Instance.WindowConfigMessage("是否清空所有队伍信息？", ClearAllTeamButton_0);
+        }
+        public void ClearAllTeamButton_0()
+        {
+            SettingData.ClearGuildPlayerGroupDatas();
+            SaveDataToJson();
+            currentPage = 1;
+            SettingData.currentPlayerGroupNum = 0;
+            RefreshCharacterGroupToggle();
+            ChooseCharacterGroup();
+            Refresh();
+        }
     }
     [Serializable]
     public class GuildEnemyData
@@ -1354,6 +1388,14 @@ namespace PCRCaculator.Guild
             var emptyData = new GuildPlayerGroupData();
             emptyData.Init();
             guildPlayerGroupDatas[currentPlayerGroupNum] = emptyData;
+        }
+        public void ClearGuildPlayerGroupDatas()
+        {
+            guildPlayerGroupDatas.Clear();
+        }
+        public void ClearUBExecTimeData()
+        {
+            guildPlayerGroupDatas[currentPlayerGroupNum].UBExecTimeData = new List<List<float>> { new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>() };
         }
         public GuildRandomData GetCurrentRandomData()
         {

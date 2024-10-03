@@ -45,7 +45,7 @@ namespace PCRCaculator
             sliders[2].value = PlayerSetting.maxUniqueEqLv;
 
             texts[0].text = PlayerSetting.playerLevel + "";
-            texts[1].text = PlayerSetting.playerProcess + "";
+            texts[1].text = PlayerSetting.ProcessStr();
             texts[2].text = PlayerSetting.maxUniqueEqLv + "";
             //allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
             tpCalculationChanged.isOn = PlayerSetting.tpCalculationChanged;
@@ -68,7 +68,7 @@ namespace PCRCaculator
             PlayerSetting.maxUniqueEqLv = (int)sliders[2].value;
 
             texts[0].text = PlayerSetting.playerLevel + "";
-            texts[1].text = PlayerSetting.playerProcess + "";
+            texts[1].text = PlayerSetting.ProcessStr();
             texts[2].text = PlayerSetting.maxUniqueEqLv + "";
 
             if (playerLevelText != null)

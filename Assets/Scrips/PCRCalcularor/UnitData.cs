@@ -2004,8 +2004,8 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 244;
-        public int playerProcess = 61;
+        public int playerLevel = 250;
+        public int playerProcess = 63;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 250;
         //public float bodyWidth = 100;
@@ -2124,6 +2124,27 @@ namespace PCRCaculator
                     break;
             }            
             return max;
+        }
+        public string ProcessStr()
+        {
+            
+            int remainder = (playerProcess - 15) % 3;
+            string rankPart="0";
+
+            if (remainder == 0)
+            {
+                rankPart = "5";
+            }
+            else if (remainder == 1)
+            {
+                rankPart = "3";
+            }
+            else if(remainder == 2)
+            {
+                rankPart = "4";
+            }
+          string rank = "R"+GetMaxRank().ToString()+"-"+ rankPart;
+          return rank; 
         }
     }
     /*
