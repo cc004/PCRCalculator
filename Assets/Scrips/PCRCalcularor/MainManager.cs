@@ -28,44 +28,44 @@ namespace PCRCaculator
     public class MainManager : MonoBehaviour
     {
         public static MainManager Instance;
-        public GameObject MassagePerferb;//������Ϣ���װ�
-        public GameObject SystemWindowMessagePerferb;//����ȷ�ϵװ�
+        public GameObject MassagePerferb;//弹出消息条底板
+        public GameObject SystemWindowMessagePerferb;//二次确认底板
         public GameObject asyncPrefab;
-        public GameObject SystemInputPrefab;//�����������
-        public GameObject LoadingPagePrefab;//�������
-        public GameObject LoadingPagePrefab_2;//�������2
-        public GameObject WaitingPrefab;//�ȴ����
+        public GameObject SystemInputPrefab;//弹窗输入面板
+        public GameObject LoadingPagePrefab;//加载面板
+        public GameObject LoadingPagePrefab_2;//加载面板2
+        public GameObject WaitingPrefab;//等待面板
         //public TextAsset db;
         //public TextAsset unitTimeTxt;
         //public TextAsset unitPrefabData;
         public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3,calculator = 4 }
         public StayPage stayPage;
-        //public int loadCharacterMax;//�����ص��Ľ�ɫ���
+        //public int loadCharacterMax;//最多加载到的角色序号
         public int levelMax { get => playerSetting.playerLevel; }
         public bool UseNewBattleSystem = true;
         public bool useJapanData;
         public bool useVerification;
         public LoginTool loginTool;
 
-        private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//ͼƬ����
-        private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//װ������װ��id�Ķ�Ӧ�ֵ�
-        public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//��ɫ��ɸ����������ɫid�Ķ�Ӧ�ֵ�(��ʱ)
-        public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//��ɫ��ɸ����������ɫid�Ķ�Ӧ�ֵ�(�ѱ���)
-        private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//��ɫ�����������ɫid�Ķ�Ӧ�ֵ� 
-        private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//��ɫ������б�
-        private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//��ɫ�������б�
-        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//���еļ����б�
-        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//����С�����б�
-        private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//��ɫ��������
-        private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//�����������ֺ�����
-        private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//����Ƭ����������
-        private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//���н�ɫ�ļ���ʱ������
-        private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//���н�ɫ����ѭ������
-        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//��ɫר���ֵ�
+        private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
+        private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
+        public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(临时)
+        public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(已保存)
+        private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
+        private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
+        private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
+        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
+        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
+        private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
+        private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
+        private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
+        private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
+        private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
+        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
         public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
-        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//δ������
-        private List<int> enemy_ignore_skill_rf = new List<int>();//δ������
+        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
+        private List<int> enemy_ignore_skill_rf = new List<int>();//未来可期
         
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
@@ -163,11 +163,11 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10051600;
-            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10041700;
-            public long BossVersionCN = 202409141808;
-            public bool useQA = true;
+            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10042300;
+            public long BossVersionCN = 202409271949;
+            public bool useQA = false;
             public bool useJP = false;
-            public bool newAB = true;
+            public bool newAB = false;
 
         }
 
@@ -187,7 +187,7 @@ namespace PCRCaculator
                     callback);
                 Permission.RequestUserPermission("android.permission.WRITE_EXTERNAL_STORAGE",
                     callback);
-                var fs = new FileStream("/storage/emulated/0/Download/D4-�������ƻ�ˮ��ħʥǧ�沽-2170w.xlsx"
+                var fs = new FileStream("/storage/emulated/0/Download/D4-蝶妈似似花水魅魔圣千真步-2170w.xlsx"
                     , FileMode.Open, FileAccess.Read);
 #endif*/
                 if (useVerification)
@@ -268,7 +268,7 @@ namespace PCRCaculator
             }
             catch (Exception e)
             {
-                WindowMessage("版本错误，重置初始版本");
+                WindowMessage("下载数据发生错误，重置版本");
                 SaveManager.Save(new VersionData());
                 return;
             }
@@ -413,21 +413,21 @@ namespace PCRCaculator
             string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
             //Guild.GuildManager.EnemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
 
-            Debug.LogError($"��ȡDBʧ�ܣ�{ex.Message}");*/
+            Debug.LogError($"读取DB失败！{ex.Message}");*/
 
             
             //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
             //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
             //allUnitFirearmDatas = allUnitPrefabData.allUnitFirearmDatas;
-            //Debugtext.text += "\n�ɹ�����" + allUnitFirearmDatas.Count + "��������Ч���ݣ�";
+            //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
-            //Debugtext.text += "\n�ɹ�����" + allUnitActionControllerDatas.Count + "����ɫԤ�������ݣ�";
+            //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
             
             string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
-            //Debugtext.text += "\n�ɹ�����" + allUnitSkillTimeDataDic.Count + "������ʱ�����ݣ�";
+            //Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
             //string attackPatternStr = Resources.Load<TextAsset>("Datas/UnitAtttackPatternDic").text;
             //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
@@ -448,7 +448,7 @@ namespace PCRCaculator
             LoadUnitData();
 
             LoadFinished = true;
-            Debugtext.text += "\n���ݼ�����ϣ�";
+            Debugtext.text += "\n数据加载完毕！";
             CreateShowUnitIDS();
             wait.Close();
         }
@@ -489,8 +489,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 62;
-                playerSetting.playerLevel = 247;
+                playerSetting.playerProcess = 63;
+                playerSetting.playerLevel = 250;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
@@ -499,14 +499,14 @@ namespace PCRCaculator
         }
 
         /// <summary>
-        /// ����������õ�json
+        /// 保存玩家设置到json
         /// </summary>
         public void SaveUnitData()
         {
             SaveManager.Save(unitDataDic);
         }
         /// <summary>
-        /// ��json��ȡ�������
+        /// 从json读取玩家设置
         /// </summary>
         public void ReLoad()
         {
@@ -527,7 +527,7 @@ namespace PCRCaculator
         }
         public void DeletePlayerData()
         {
-            WindowMessage("ɾ��ʧ�ܣ���������ɾ����");
+            WindowMessage("删除失败！（功能已删除）");
         }
         public void WindowMessage(string word)
         {
@@ -594,7 +594,7 @@ namespace PCRCaculator
         }
         public void GambleButton()
         {
-            WindowMessage("��������");
+            WindowMessage("咕咕咕！");
         }
         public void CalculatorButton()
         {
@@ -631,7 +631,7 @@ namespace PCRCaculator
             }
             else
             {
-                mess += "�Ƿ������";
+                mess += "是否继续？";
                 WindowConfigMessage(mess, Config_1);
             }
         }
@@ -649,7 +649,7 @@ namespace PCRCaculator
             }
             else
             {
-                mess += "�Ƿ������";
+                mess += "是否继续？";
                 WindowConfigMessage(mess, Config_1);
             }
         }
@@ -677,10 +677,10 @@ namespace PCRCaculator
             {
                 if (UnitRarityDic.TryGetValue(unitid, out var data))
                     return data.unitName;
-                return "�ٻ���";
+                return "召唤物";
             }
             if (unitid >= 200000)
-                return "�з���λ";
+                return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
                 return unitNickNameDic[unitid];
             if (unitNickNameDic2.ContainsKey(unitid))
@@ -748,30 +748,30 @@ namespace PCRCaculator
             try
             {
                 DirectoryInfo dir = new DirectoryInfo(sourceDirectory);
-                //��ȡĿ¼�£���������Ŀ¼�����ļ�����Ŀ¼
+                //获取目录下（不包含子目录）的文件和子目录
                 FileSystemInfo[] fileinfo = dir.GetFileSystemInfos();
                 foreach (FileSystemInfo i in fileinfo)
                 {
-                    if (i is DirectoryInfo)     //�ж��Ƿ��ļ���
+                    if (i is DirectoryInfo)     //判断是否文件夹
                     {
                         if (!Directory.Exists(targetDirectory + "\\" + i.Name))
                         {
-                            //Ŀ��Ŀ¼�²����ڴ��ļ��м��������ļ���
+                            //目标目录下不存在此文件夹即创建子文件夹
                             Directory.CreateDirectory(targetDirectory + "\\" + i.Name);
                         }
-                        //�ݹ���ø������ļ���
+                        //递归调用复制子文件夹
                         DirectoryCopy(i.FullName, targetDirectory + "\\" + i.Name);
                     }
                     else
                     {
-                        //�����ļ��м������ļ���true��ʾ���Ը���ͬ���ļ�
+                        //不是文件夹即复制文件，true表示可以覆盖同名文件
                         File.Copy(i.FullName, targetDirectory + "\\" + i.Name, true);
                     }
                 }
             }
             catch (Exception ex)
             {
-                WindowConfigMessage("��ʼ���浵�ļ�ʱ�����쳣:" + ex.Message,null);
+                WindowConfigMessage("初始化存档文件时出现异常:" + ex.Message,null);
             }
         }
         IEnumerator LoadScene()
@@ -835,20 +835,20 @@ namespace PCRCaculator
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log(relativePath + "ͼƬ����ʧ�ܣ�ԭ��" + ex.Message);
+                    Debug.Log(relativePath + "图片加载失败，原因：" + ex.Message);
                 }
 
             }
 
-            //�ü��صõ�����Դ����ʵ������Ϸ����ʵ����Ϸ����Ķ�̬����
+            //用加载得到的资源对象，实例化游戏对象，实现游戏物体的动态加载
             return tmpsprite;
         }
         /// <summary>
-        /// DES�����ַ���
+        /// DES加密字符串
         /// </summary>
-        /// <param name="encryptString">�����ܵ��ַ���</param>
-        /// <param name="encryptKey">������Կ,Ҫ��Ϊ8λ</param>
-        /// <returns>���ܳɹ����ؼ��ܺ���ַ�����ʧ�ܷ���Դ�� </returns>
+        /// <param name="encryptString">待加密的字符串</param>
+        /// <param name="encryptKey">加密密钥,要求为8位</param>
+        /// <returns>加密成功返回加密后的字符串，失败返回源串 </returns>
         public static string EncryptDES(string encryptString, string encryptKey = "PCRGuild")  
         {
             var ms = new MemoryStream();
@@ -862,11 +862,11 @@ namespace PCRCaculator
 
         }
         /// <summary>
-        /// DES�����ַ���
+        /// DES解密字符串
         /// </summary>
-        /// <param name="decryptString">�����ܵ��ַ���</param>
-        /// <param name="decryptKey">������Կ,Ҫ��Ϊ8λ,�ͼ�����Կ��ͬ</param>
-        /// <returns>���ܳɹ����ؽ��ܺ���ַ�����ʧ�ܷ�Դ��</returns>
+        /// <param name="decryptString">待解密的字符串</param>
+        /// <param name="decryptKey">解密密钥,要求为8位,和加密密钥相同</param>
+        /// <returns>解密成功返回解密后的字符串，失败返源串</returns>
         public static string DecryptDES(string decryptString, string decryptKey = "PCRGuild")
         {
             try
@@ -907,7 +907,7 @@ namespace PCRCaculator
         {
             return Application.streamingAssetsPath;
         }
-        [ContextMenu("�����ŵ�����unitdetail�ļ�")]
+        [ContextMenu("生成排刀器用unitdetail文件")]
         public void CreateUnitDetailDic()
         {
             Dictionary<int, UnitDetail_other> dic = new Dictionary<int, UnitDetail_other>();
@@ -920,10 +920,10 @@ namespace PCRCaculator
             StreamWriter sw = new StreamWriter(filePath);
             sw.Write(saveJsonStr);
             sw.Close();
-            Debug.Log("�ɹ���");
+            Debug.Log("成功！");
         }
         /// <summary>
-        ///����ʱ��TP�ı���
+        ///闪避时加TP的比率
         /// </summary>
         /// <returns></returns>
         internal float GetDodgeTPRecoveryRatio()
@@ -939,7 +939,7 @@ namespace PCRCaculator
     }
     public class UnitData_other
     {
-        public string name = "δ����";
+        public string name = "未定义";
         public int type;
         public bool hasRarity6;
 
@@ -1015,20 +1015,19 @@ namespace PCRCaculator
 
         public string GetDetail()
         {
-      string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害：" + exceptDamage + "\n随机种子：" + randomSeed;
-      if (backTime > 0) result += $"\n返{backTime}s";
-      if (warnings.Count > 0)
-      {
-        for (int i = 0; i < 3; i++)
-        {
-          if (i < warnings.Count)
-            result += "\n" + warnings[i];
+            string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害（触盾偏高）：" + exceptDamage + "\n随机种子：" + randomSeed;
+            if (backTime > 0) result += $"返\n{backTime}s";
+            if (warnings.Count > 0)
+            {
+                for(int i=0;i<3;i++)
+                {
+                  if(i<warnings.Count)
+                    result +="\n"+ warnings[i];
+                }
+                if (warnings.Count > 4)
+                  result += "\n等" + warnings.Count + "个错误";
+            }
+            return result;
         }
-        if (warnings.Count > 4)
-          result += "\n等" + warnings.Count + "个错误";
-      }
-      return result;
-    }
-
     }
 }

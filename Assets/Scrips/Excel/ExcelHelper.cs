@@ -853,7 +853,8 @@ namespace ExcelHelper
                 worksheet0.MySetValue(1, 2,
                     MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes(), 16, blod: true, backColor: backColotInt_1);
                 worksheet0.Cells[1, 3, 2, 9].Merge = true;
-                worksheet0.MySetValue(1, 3, TimelineData.timeLineName.Substring(3) + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
+                TimelineData.timeLineName= TimelineData.timeLineName.Substring(2, 1) == "#" ? TimelineData.timeLineName[4..] : TimelineData.timeLineName[3..];
+                worksheet0.MySetValue(1, 3, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
                 worksheet0.Cells[1, 3, 2, 9].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet0.Cells[3, 2, 5, 2].Merge = true;
                 worksheet0.MySetValue(3, 2, TimelineData.exceptDamage + "w", 14, blod: true, fontColor: new int[3] { 26, 36, 242 }, backColor: backColotInt_1);
