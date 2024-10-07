@@ -826,7 +826,6 @@ namespace ExcelHelper
 
             return result.ToArray();
         }
-        
         private static void CreateGuildTimeLineExcel(FileInfo newFile)
         {
             var setData = ParseSetStatus();
@@ -838,30 +837,50 @@ namespace ExcelHelper
                 int[] backColotInt_1 = new int[3] { 253, 233, 217 };
                 int[] backColotInt_2 = new int[3] { 250, 191, 143 };
                 int[] lineColor = new int[3] { 151, 71, 6 };
-                worksheet0.Cells[1, 1].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
+                worksheet0.Cells[1, 12, 1, 13].Merge = true;
+                worksheet0.Cells[1, 12].Value = "v" + Application.version;
+                worksheet0.Cells[1, 14].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
                     .GetDescription();
-                worksheet0.Cells[2, 1].Value = "v" + Application.version;
-                worksheet0.Cells[3, 1].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
-                worksheet0.Cells[4, 1].Value = (MainManager.Instance.Version.newAB ? "" : "⭕") + $"{MainManager.Instance.Version.BossVersionJP}";
-                worksheet0.Cells[5, 1].Value = (MainManager.Instance.Version.newAB ? "⭕" : "") + $"{MainManager.Instance.Version.CharacterVersionJP}";
-                worksheet0.Cells[6, 1].Value = MainManager.Instance.Version.useJP
-                    ? $"jp{MainManager.Instance.Version.BossVersionJP}"
-                    : (MainManager.Instance.Version.useQA
-                        ? $"qa{MainManager.Instance.Version.BossVersionCN}"
-                        : $"ob{MainManager.Instance.Version.BossVersionCN}");
+                worksheet0.Cells[1, 15].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
+                worksheet0.Cells[2, 12, 2, 13].Merge = true;
+                worksheet0.Cells[2, 12].Value = "角色数据版本";
+                worksheet0.Cells[2, 14, 2, 15].Merge = true;
+                worksheet0.Cells[2, 14].Value = MainManager.Instance.Version.CharacterVersionJP.ToString();
+                worksheet0.Cells[3, 12, 3, 13].Merge = true;
+                worksheet0.Cells[3, 12].Value = "Boss底层版本";
+                worksheet0.Cells[3, 14, 3, 15].Merge = true;
+                worksheet0.Cells[3, 14].Value = MainManager.Instance.Version.BossVersionJP.ToString();
+                worksheet0.Cells[4, 12, 4, 13].Merge = true;
+                worksheet0.Cells[4, 12].Value = "Boss数据版本";
+                worksheet0.Cells[4, 14, 4, 15].Merge = true;
+                worksheet0.Cells[4, 14].Value = MainManager.Instance.Version.BossVersionCN.ToString();
+                worksheet0.Cells[5, 12, 5, 13].Merge = true;
+                worksheet0.Cells[5, 12].Value = "是否为QA版本";
+                worksheet0.Cells[5, 14, 5, 15].Merge = true;
+                worksheet0.Cells[5, 14].Value = MainManager.Instance.Version.useQA? "‌✔" : "";
+                worksheet0.Cells[6, 12, 6, 13].Merge = true;
+                worksheet0.Cells[6, 12].Value = "使用日服Boss数据";
+                worksheet0.Cells[6, 14, 6, 15].Merge = true;
+                worksheet0.Cells[6, 14].Value = MainManager.Instance.Version.useJP? "‌✔" : "";
+                worksheet0.Cells[7, 12, 7, 13].Merge = true;
+                worksheet0.Cells[7, 12].Value = "使用最新Boss数据";
+                worksheet0.Cells[7, 14, 7, 15].Merge = true;
+                worksheet0.Cells[7, 14].Value = MainManager.Instance.Version.newAB ? "‌✔" : "";
                 worksheet0.Cells[1, 2, 2, 2].Merge = true;
                 worksheet0.MySetValue(1, 2,
                     MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes(), 16, blod: true, backColor: backColotInt_1);
-                worksheet0.Cells[1, 3, 2, 9].Merge = true;
+                worksheet0.Cells[1, 3, 2, 10].Merge = true;
                 TimelineData.timeLineName= TimelineData.timeLineName.Substring(2, 1) == "#" ? TimelineData.timeLineName[4..] : TimelineData.timeLineName[3..];
-                worksheet0.MySetValue(1, 3, TimelineData.timeLineName + " " + TimelineData.detail, 16, blod: true, backColor: backColotInt_1);
-                worksheet0.Cells[1, 3, 2, 9].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet0.MySetValue(1, 3, TimelineData.timeLineName, 16, blod: true, backColor: backColotInt_1);
+                worksheet0.Cells[1, 3, 2, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet0.Cells[3, 2, 5, 2].Merge = true;
                 worksheet0.MySetValue(3, 2, TimelineData.exceptDamage + "w", 14, blod: true, fontColor: new int[3] { 26, 36, 242 }, backColor: backColotInt_1);
+                worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 1, false, 1, 3);
                 worksheet0.MySetValue(6, 2, "等级", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(7, 2, "RANK", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(8, 2, "专武", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(9, 2, "星级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(10, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
                 int count = 0;
                 foreach (UnitData unitData in playerDatas.playrCharacters)
                 {
@@ -872,20 +891,35 @@ namespace ExcelHelper
                     worksheet0.MySetValue(7, 7 - count, unitData.GetRankDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(8, 7 - count, unitData.GetUniqueEqLvDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(9, 7 - count, unitData.rarity , backColor: backColotInt_1);
+                    var result = new List<string>();
+                    for (int i = 0; i < unitData.exEquip.Length; i++)
+                    {
+                        int currentEquip = unitData.exEquip[i];
+                        int currentLevel = unitData.exEquipLevel[i];
+                        string exEquipStr = currentEquip.ToString();
+                        string value = currentEquip == 0 ? "-" :
+                            (exEquipStr.Length >= 3 && exEquipStr[exEquipStr.Length - 3] == '3' ? $"G{currentLevel}" :
+                            (exEquipStr.Length >= 3 && exEquipStr[exEquipStr.Length - 3] == '2' ? $"S{currentLevel}" : "-"));
+                        result.Add(value);
+                    }
+                    worksheet0.MySetValue(10, 7 - count, string.Join("/", result), backColor: backColotInt_1);
                     count++;
                 }
-                worksheet0.Cells[3, 8, 9, 9].Merge = true;
-                worksheet0.Cells[3, 8, 9, 9].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-                worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 7, false,2,6);
-                worksheet0.MySetValue(10, 1, "帧数");
-                worksheet0.MySetValue(10, 2, "秒数", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(10, 3, "角色", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(10, 4, "操作", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(10, 5, "伤害", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[10, 6, 10, 9].Merge = true;
-                worksheet0.MySetValue(10, 6, "说明", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[3, 8, 3, 10].Merge = true;
+                worksheet0.MySetValue(3, 8, "备注", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[4, 8, 10, 10].Merge = true;
+                worksheet0.Cells[4, 8, 10, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                // worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 7, false,3,8);//boss头像
+                worksheet0.MySetValue(11, 1, "帧数");
+                worksheet0.MySetValue(11, 2, "秒数", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(11, 3, "角色", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[11, 4, 11, 6].Merge = true;
+                worksheet0.MySetValue(11, 4, "操作", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(11, 7, "伤害", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[11, 8, 11, 10].Merge = true;
+                worksheet0.MySetValue(11, 8, "说明", blod: true, backColor: backColotInt_2);
 
-                int currentLineNum = 11;
+                int currentLineNum = 12;
 
                 List<UBDetail> UBList = TimelineData.uBDetails;
                 //UBList.Sort((a, b) => a.UBTime - b.UBTime);
@@ -923,14 +957,14 @@ namespace ExcelHelper
                                  {
                                      p.Key.frame.ToString(),
                                      $"{p.Value / (float) GuildManager.StaticsettingData.n2:P2}",
+                                     $"seed={seedDict[p.Key]}",
                                      p.Key.unit,
                                      p.Key.description,
-                                     $"seed={seedDict[p.Key]}"
                                  })))
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(10 + curline, 13 + i, cont, centre:false);
+                            worksheet0.MySetValue(11 + curline, 14 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -948,7 +982,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < lframe) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(10 + curline, 11 + i, cont, centre:false);
+                            worksheet0.MySetValue(11 + curline, 12 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -969,21 +1003,23 @@ namespace ExcelHelper
                         worksheet0.MySetValue(currentLineNum, 2, second);
                     if (a.isBossUB)
                     {
-                        worksheet0.Cells[currentLineNum, 3, currentLineNum, 9].Merge = true;
+                        worksheet0.Cells[currentLineNum, 3, currentLineNum, 10].Merge = true;
                         worksheet0.MySetValue(currentLineNum, 3, "BOSS  UB",backColor:backColotInt_1);
                     }
                     else
                     {
-                        worksheet0.Cells[currentLineNum, 6, currentLineNum, 9].Merge = true;
+                        worksheet0.Cells[currentLineNum, 8, currentLineNum, 10].Merge = true;
                         worksheet0.MySetValue(currentLineNum, 3, a.unitData.GetNicName());
+                        worksheet0.Cells[currentLineNum, 4, currentLineNum, 6].Merge = true;
                         worksheet0.MySetValue(currentLineNum, 4, a.description);
-                        worksheet0.MySetValue(currentLineNum, 5, a.Damage , fontColor: a.Critical ? new int[3] { 255, 0, 0 } : new int[3] { 0, 0, 0 });
+                        worksheet0.Cells[currentLineNum, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        worksheet0.MySetValue(currentLineNum, 7, a.Damage , fontColor: a.Critical ? new int[3] { 255, 0, 0 } : new int[3] { 0, 0, 0 }, blod: a.Critical);
                     }
                     currentLineNum++;
                 }
-                worksheet0.Cells[currentLineNum, 2, currentLineNum, 9].Merge = true;
+                worksheet0.Cells[currentLineNum, 2, currentLineNum, 10].Merge = true;
                 worksheet0.MySetValue(currentLineNum, 2, "TIME UP", backColor: backColotInt_1);
-                using (ExcelRange r = worksheet0.Cells[1, 2, currentLineNum, 9])
+                using (ExcelRange r = worksheet0.Cells[1, 2, currentLineNum, 10])
                 {
                     r.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                     r.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
