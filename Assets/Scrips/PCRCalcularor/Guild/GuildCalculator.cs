@@ -704,7 +704,12 @@ namespace PCRCaculator.Guild
             expectedDamage = (int)totalDamageExcept.Expected(n);
             string damageStr =
                 $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>";
-            if (backTime > 0)
+            if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
+            {
+              detail += $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
+              damageStr += detail;
+            }
+            else if (backTime > 0)
             {
                 detail = $" 返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
                 damageStr += detail;
@@ -904,6 +909,14 @@ namespace PCRCaculator.Guild
                 }
             }
             fileName += "-" + Mathf.RoundToInt(expectedDamage / 10000) + "w";
+            if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
+            {
+                fileName += $"-尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
+            }
+            else if (backTime > 0)
+            {
+                fileName += $"-返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
+            }
             return fileName;
         }
         public void ReplaceUBTime()
