@@ -517,6 +517,7 @@ namespace PCRCaculator
         public int uniqueEqLv;//专武等级
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
+        public bool fav = false;
 
         [JsonIgnore]
         public string name;
@@ -2004,10 +2005,10 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 250;
-        public int playerProcess = 63;
+        public int playerLevel = 253;
+        public int playerProcess = 64;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 250;
+        public int maxUniqueEqLv = 260;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;

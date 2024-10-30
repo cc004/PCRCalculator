@@ -1282,6 +1282,8 @@ namespace PCRCaculator.Guild
         public Dictionary<int, EnemyData> changedEnemyDataDic;
 
         public int currentPlayerGroupNum;
+        public bool Favriote = true;
+        public bool Unused = true;
         //public bool isViolent;
         public int calSpeed;
         public int FPSforLogic = 60;
