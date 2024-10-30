@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Elements;
 using Elements.Battle;
+using PCRCaculator.Guild;
 using PCRCaculator.Battle;
 using TMPro;
 using UnityEngine;
@@ -42,7 +43,7 @@ namespace PCRCaculator
         public Vector3 buffUIAddPos;
         public SkillUI skillUI;
         public RectTransform ScreenShotTrans;
-        
+        public Toggle isFav;
         private UnitCtrl owner2;
         private BattleUIManager uIManager;
         //private List<eStateIconType> currentBuffs = new List<eStateIconType>();
@@ -180,6 +181,10 @@ namespace PCRCaculator
             else
             {
                 backtype = 8;
+            }
+            if (isFav != null){
+                isFav.onValueChanged.AddListener(value => OnFavToggleChanged(value, data));
+                isFav.isOn = data.fav;
             }
             backImage.sprite = backgrounds1[backtype < backgrounds1.Count ? backtype : (backgrounds1.Count - 1)];
             if (buttonType == ButtonType.typeA)
@@ -385,58 +390,63 @@ namespace PCRCaculator
                 yield return 0;
             backImage.gameObject.SetActive(true);
         }
-        /*public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType, bool enable)
-        {
-            Debug.LogError("改方法已经过时！");
-            if (stateIconType == eStateIconType.NONE)
-            {
-                Refresh();
-                return;
-            }
-            if (currentBuffs.Contains(stateIconType))
-            {
-                currentBuffs.Remove(stateIconType);
-            }
-            if (enable)
-            {
-                currentBuffs.Add(stateIconType);
-            }
-            Refresh();
-        }*/
-        /*public void SetAbnormalIcons_2(Elements.UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable)
-        {
-            eStateIconType stateIconType = (eStateIconType)(int)stateIconType_2;
-            if (stateIconType == eStateIconType.NONE)
-            {
-                Refresh();
-                return;
-            }
-            if (currentBuffs.Contains(stateIconType))
-            {
-                currentBuffs.Remove(stateIconType);
-            }
-            if (enable)
-            {
-                currentBuffs.Add(stateIconType);
-            }
-            Refresh();
-        }*/
-        /*private void Refresh()
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if (i < currentBuffs.Count)
-                {
-                    abnormalIcons[i].sprite = uIManager.GetAbnormalIconSprite(currentBuffs[i]);
-                    abnormalIcons[i].gameObject.SetActive(true);
-                }
-                else
-                {
-                    abnormalIcons[i].sprite = null;
-                    abnormalIcons[i].gameObject.SetActive(false);
-                }
-            }
-        }*/
-
+    public void OnFavToggleChanged(bool value, UnitData data)
+    {
+        data.fav = value;
+        MainManager.Instance.SaveUnitData();
     }
+    /*public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType, bool enable)
+    {
+        Debug.LogError("改方法已经过时！");
+        if (stateIconType == eStateIconType.NONE)
+        {
+            Refresh();
+            return;
+        }
+        if (currentBuffs.Contains(stateIconType))
+        {
+            currentBuffs.Remove(stateIconType);
+        }
+        if (enable)
+        {
+            currentBuffs.Add(stateIconType);
+        }
+        Refresh();
+    }*/
+    /*public void SetAbnormalIcons_2(Elements.UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable)
+    {
+        eStateIconType stateIconType = (eStateIconType)(int)stateIconType_2;
+        if (stateIconType == eStateIconType.NONE)
+        {
+            Refresh();
+            return;
+        }
+        if (currentBuffs.Contains(stateIconType))
+        {
+            currentBuffs.Remove(stateIconType);
+        }
+        if (enable)
+        {
+            currentBuffs.Add(stateIconType);
+        }
+        Refresh();
+    }*/
+    /*private void Refresh()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < currentBuffs.Count)
+            {
+                abnormalIcons[i].sprite = uIManager.GetAbnormalIconSprite(currentBuffs[i]);
+                abnormalIcons[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                abnormalIcons[i].sprite = null;
+                abnormalIcons[i].gameObject.SetActive(false);
+            }
+        }
+    }*/
+
+  }
 }

@@ -80,9 +80,13 @@ namespace PCRCaculator
     private int type;
     private Dictionary<int, UnitData> unitDataDic => MainManager.Instance.unitDataDic;
     public InputField Search;
+    public Toggle Favriote;
+    public Toggle Unused;
+
     private void Start()
     {
       Instance = this;
+
     }
     /// <summary>
     /// 调用选人面板的函数
@@ -95,6 +99,10 @@ namespace PCRCaculator
     }
     private void CallChooseBack_0(int type, AddedPlayerData player = null)
     {
+      Favriote.isOn = GuildManager.Instance.SettingData.Favriote;
+      Debug.Log(Unused.isOn);
+      Debug.Log(GuildManager.Instance.SettingData.Unused);
+      Unused.isOn = GuildManager.Instance.SettingData.Unused;
       this.type = type;
       baseBack.SetActive(true);
       chooseBack_A.SetActive(true);
@@ -180,7 +188,7 @@ namespace PCRCaculator
           if (switchToggles[i].isOn)
           {
             RefreshBasePage(i);
-            Search.text="";
+            // Search.text="";
           }
         }
       }
@@ -200,7 +208,6 @@ namespace PCRCaculator
       parents[0].gameObject.SetActive(false);
       parents[1].gameObject.SetActive(false);
       parents[2].gameObject.SetActive(false);
-      parents[3].gameObject.SetActive(false);
       last = -1;
       baseBack.SetActive(false);
       chooseBack_A.SetActive(false);
@@ -551,36 +558,44 @@ namespace PCRCaculator
             }
           }
         }
-
-
       }
 
       int count = 1;
 
       foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
       {
-
         if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
         {
           if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
           {
-            buttons[id].RefreshData(
-                MainManager.Instance.unitDataDic.TryGetValue(id, out UnitData unitData) ? unitData : new UnitData(id, 1)
-                );
-            buttons[id].transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8),
-                -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
-            // buttons[id].gameObject.SetActive(true);
-            togglePerferbs[id].isOn = selectedCharId.Contains(id);
-// 
-            count++;
-          }
-          else
-          {
-            // buttons[id].gameObject.SetActive(false);
+            UnitData unitData;
+            if (MainManager.Instance.unitDataDic.TryGetValue(id, out unitData))
+            {
+              unitData = unitData;
+            }
+            else
+            {
+              unitData = new UnitData(id, 1);
+            }
+
+            buttons[id].RefreshData(unitData);
+
+            bool shouldDisplay = (unitData.fav && Favriote.isOn) || (!unitData.fav && Unused.isOn);
+            if (shouldDisplay && (Search.text == "" || results.Contains(id)))
+            {
+              buttons[id].transform.localPosition = new Vector3(
+                  baseRange.x + range.x * ((count - 1) % 8),
+                  -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
+              togglePerferbs[id].isOn = selectedCharId.Contains(id);
+              count++;
+            }
+            else
+            {
+              buttons[id].gameObject.SetActive(false);
+            }
           }
         }
       }
-
       if (last != type)
       {
         parents[0].gameObject.SetActive(type == 0 || type == 1);
@@ -736,84 +751,35 @@ namespace PCRCaculator
 
       GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting, data);
     }
-    private int SearchID;
+    private List<int> results;
     public void SearchChara()
     {
       string filePath = Application.streamingAssetsPath + "/Datas/_pcr_data.json";
       string jsonString = File.ReadAllText(filePath);
       var data = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(jsonString);
-      var results = new List<string>();
-      if (parents[3].childCount > 0)
+      results = new List<int>();
+      foreach (var entry in data)
       {
-        for (int i = parents[3].childCount - 1; i >= 0; i--)
+        int parsedKey = int.Parse(entry.Key + "01");
+        foreach (var value in entry.Value)
         {
-          Destroy(parents[3].GetChild(i).gameObject);
-        }
-      }
-      if (Search.text == "")
-      {
-        parents[0].gameObject.SetActive(true);
-        parents[1].gameObject.SetActive(true);
-        parents[2].gameObject.SetActive(true);
-        parents[3].gameObject.SetActive(false);
-      }
-      else{
-        int count = 1;
-        foreach (var entry in data)
-        {
-          foreach (var value in entry.Value)
+          if (value.Contains(Search.text))
           {
-            if (value.Contains(Search.text))
-            {
-              results.Add(entry.Key);
-              break;
-            }
-          }
-
-        }
-        foreach (var key in results)
-        {
-          SearchID = int.Parse(key + "01");
-          if (MainManager.Instance.JudgeWeatherShowThisUnit(SearchID))
-          {
-            parents[0].gameObject.SetActive(false);
-            parents[1].gameObject.SetActive(false);
-            parents[2].gameObject.SetActive(false);
-            parents[3].gameObject.SetActive(true);
-            GameObject b = Instantiate(togglePerferb);
-            b.transform.SetParent(parents[3]);
-            b.transform.localScale = new Vector3(1, 1, 1);
-            int id0 = SearchID;
-            b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-            b.GetComponent<CharacterPageButton>().SetButton(SearchID);
-            togglePerferbs[id0] = b.GetComponent<Toggle>();
-            searchButtons[id0] = b.GetComponent<CharacterPageButton>();
-            searchButtons[id0].RefreshData(
-            MainManager.Instance.unitDataDic.TryGetValue(id0, out UnitData unitData) ? unitData : new UnitData(id0, 1)
-            );
-            searchButtons[id0].transform.localPosition = new Vector3(baseRange.x + range.x * ((count - 1) % 8),
-                -1 * (baseRange.y + range.y * (Mathf.FloorToInt((count - 1) / 8))), 0);
-            // buttons[id].gameObject.SetActive(true);
-            togglePerferbs[id0].isOn = selectedCharId.Contains(id0);
-            count++;
+            results.Add(parsedKey);
+            break;
           }
         }
       }
+      if (buttons != null) buttons = null;
+      RefreshBasePage(0);
     }
-    static string FindKeyByValue(string jsonString, string value)
+    public void FavIsShow()
     {
-      JObject obj = JObject.Parse(jsonString);
-
-      foreach (var property in obj.Properties())
-      {
-        JArray array = property.Value as JArray;
-        if (array != null && array.Any(item => item.ToString() == value))
-        {
-          return property.Name;
-        }
-
-      }
-      return null;
+      GuildManager.Instance.SettingData.Favriote = Favriote.isOn;
+      GuildManager.Instance.SettingData.Unused = Unused.isOn;
+      SaveManager.Save(GuildManager.Instance.SettingData);
+      if (buttons != null) buttons = null;
+      RefreshBasePage(0);
     }
   }
 }

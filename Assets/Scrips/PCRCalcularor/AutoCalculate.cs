@@ -15,6 +15,7 @@ namespace PCRCaculator
         public Text buttonText;
         public ScrollEx scroll;
         public AutoCalculatorData calculatorData;
+        public InputField count;
 
         public void Init(AutoCalculatorData data)
         {
@@ -38,8 +39,15 @@ namespace PCRCaculator
             }
             else
             {
-                MainManager.Instance.WindowInputMessage("输入计算次数（2到2147483647）", StartNew_0);
-            }
+                // MainManager.Instance.WindowInputMessage("输入计算次数（2到2147483647）", StartNew_0);
+                if (count.text != "") 
+                {
+                    StartNew_0(count.text);
+                }
+                else{
+                    MainManager.Instance.WindowMessage("请输入批量次数");
+                }
+      }
 
         }
         public void Button2Press()
@@ -83,12 +91,13 @@ namespace PCRCaculator
         {
             calculatorData.isCanceled = true;
             calculatorData.isPaues = false;
+            buttonText.text="开始新的计算";
         }
         private void Cancel_1()
         {
             calculatorData.isPaues = false;
         }
-        private void StartNew_0(string  input)
+        private void StartNew_0(string input)
         {
             int num = int.Parse(input, NumberStyles.Any);
             GuildManager.Instance.StartAutoCalculateByButton(num);
