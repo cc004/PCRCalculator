@@ -28,6 +28,7 @@ namespace PCRCaculator
             if(k)
                 onValueChangedAction?.Invoke(Mathf.RoundToInt(slider.value));
                 ChoosePannelManager.Instance.OnFinishEXSettings();
+                ChoosePannelManager.Instance.RefreshSettingValues(false);
         }
         public int GetValue()
         {
@@ -39,7 +40,6 @@ namespace PCRCaculator
             {
                 slider.value++;
             }
-            ChoosePannelManager.Instance.OnFinishEXSettings();
         }
         public void Minus()
         {
@@ -47,7 +47,6 @@ namespace PCRCaculator
             {
                 slider.value--;
             }
-            ChoosePannelManager.Instance.OnFinishEXSettings();
         }
     }
 }
