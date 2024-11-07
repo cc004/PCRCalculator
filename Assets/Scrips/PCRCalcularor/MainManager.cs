@@ -164,9 +164,9 @@ namespace PCRCaculator
         {
             public long CharacterVersionJP = 10051600;
             public long BossVersionJP = Instance.useJapanData ? 10051600 : 10043100;
-            public long BossVersionCN = 202410291431;
+            public long BossVersionCN = 202411061039;
             public bool useQA = false;
-            public bool useJP = false;
+            public bool useJP = true;
             public bool newAB = true;
 
         }

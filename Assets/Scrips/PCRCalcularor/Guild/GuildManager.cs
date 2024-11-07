@@ -185,8 +185,8 @@ namespace PCRCaculator.Guild
         public void ActivateCharacterDetailPage(Vector3 pos, float scale)
         {
             characterDetailPage.SetActive(true);
-            characterDetailPageChild.transform.localPosition = pos;
-            characterDetailPageChild.transform.localScale = Vector3.one * scale;
+            // characterDetailPageChild.transform.localPosition = pos;
+            // characterDetailPageChild.transform.localScale = Vector3.one * scale;
         }
         public void HideCharacterDetailPage()
         {
@@ -229,8 +229,8 @@ namespace PCRCaculator.Guild
             {
                 return;
             }
-
-            ActivateCharacterDetailPage(Vector3.zero, 1f);
+            EditCharacterdetail();
+            ChoosePannelManager.Instance.charToggles_setting[idx].isOn=true;
             RefreshCharacterDetailPage(idx);
         }
         public void EditCharacterdetail()

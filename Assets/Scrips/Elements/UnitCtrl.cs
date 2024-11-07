@@ -12108,13 +12108,13 @@ this.updateCurColor();
             NO_DEBUF = 24, // 0x00000018
             [Description("伤害累加")]
             ACCUMULATIVE_DAMAGE = 25, // 0x00000019
-            [Description("即死")]
+            [Description("嘲讽")]
             DECOY = 26, // 0x0000001A
             [Description("MIFUYU")]
             MIFUYU = 27, // 0x0000001B
             [Description("石化")]
             STONE = 28, // 0x0000001C
-            [Description("反射")]
+            [Description("再生")]
             REGENERATION = 29, // 0x0000001D
             [Description("物理闪避")]
             PHYSICS_DODGE = 30, // 0x0000001E
@@ -12122,7 +12122,7 @@ this.updateCurColor();
             CONFUSION = 31, // 0x0000001F
             [Description("毒")]
             VENOM = 32, // 0x00000020
-            [Description("黑暗")]
+            [Description("黑暗次数")]
             COUNT_BLIND = 33, // 0x00000021
             [Description("禁疗")]
             INHIBIT_HEAL = 34, // 0x00000022
@@ -12152,7 +12152,7 @@ this.updateCurColor();
             LOG_ALL_BARRIR = 46, // 0x0000002E
             [Description("行动暂停")]
             PAUSE_ACTION = 47, // 0x0000002F
-            [Description("不能放UB")]
+            [Description("UB沉默")]
             UB_SILENCE = 48, // 0x00000030
             [Description("魔法黑暗")]
             MAGIC_DARK = 49, // 0x00000031
