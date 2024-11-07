@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4303517222669941316
 RectTransform:
   m_ObjectHideFlags: 0
@@ -238,7 +238,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6250444842877631608}
   m_HandleRect: {fileID: 8424678099802069787}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -616,8 +616,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 8288846247916021398}
+        m_TargetAssemblyTypeName: PCRCaculator.Battle.DebugTextWindow, Assembly-CSharp
         m_MethodName: PreviousButton
         m_Mode: 1
         m_Arguments:
@@ -753,7 +753,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1085,7 +1085,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 7, y: -0.0009774542}
+  m_AnchoredPosition: {x: 9.2, y: 0}
   m_SizeDelta: {x: 663.7947, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &3613268594608024568
@@ -1268,8 +1268,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 8288846247916021398}
+        m_TargetAssemblyTypeName: PCRCaculator.Battle.DebugTextWindow, Assembly-CSharp
         m_MethodName: NextButton
         m_Mode: 1
         m_Arguments:
@@ -1637,8 +1637,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2486942269401251600}
   m_HandleRect: {fileID: 8513311967221433903}
   m_Direction: 0
-  m_Value: -0.0615143
-  m_Size: 0.8285695
+  m_Value: -0.070339344
+  m_Size: 0.80295914
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
