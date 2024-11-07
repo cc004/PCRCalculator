@@ -100,8 +100,6 @@ namespace PCRCaculator
     private void CallChooseBack_0(int type, AddedPlayerData player = null)
     {
       Favriote.isOn = GuildManager.Instance.SettingData.Favriote;
-      Debug.Log(Unused.isOn);
-      Debug.Log(GuildManager.Instance.SettingData.Unused);
       Unused.isOn = GuildManager.Instance.SettingData.Unused;
       this.type = type;
       baseBack.SetActive(true);
@@ -295,10 +293,10 @@ namespace PCRCaculator
     }
     public void BackButton()
     {
+      CloseProperty();
       RefreshBasePage(0);
       chooseBack_A.SetActive(true);
       settingBack.SetActive(false);
-      CloseProperty();
     }
     public void FinishEditButton_setting()
     {
@@ -451,11 +449,11 @@ namespace PCRCaculator
     }
     public void OpenEXSettingPannel()
     {
-      EXsettingPannel.SetActive(true);
       UnitData unit = playerData.playrCharacters[selectedCharacterId_setting];
       List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unit.unitId];
       for (int i = 0; i < EXsettingSliders.Count; i++)
       {
+        EXsettingSliders[i].SetActive(true);
         if (i < effectUnitList.Count)
         {
           var unitRarityData = MainManager.Instance.UnitRarityDic[effectUnitList[i]];
@@ -476,12 +474,12 @@ namespace PCRCaculator
         else
         {
           EXsettingSliders[i].SetSliderPrefab("???", 0, 0, 0, null);
+          EXsettingSliders[i].SetActive(false);
         }
       }
     }
     public void OnFinishEXSettings()
     {
-      EXsettingPannel.SetActive(false);
       List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[playerData.playrCharacters[selectedCharacterId_setting].unitId];
       Dictionary<int, int> loveDic = new Dictionary<int, int>();
       for (int i = 0; i < EXsettingSliders.Count; i++)
@@ -494,6 +492,7 @@ namespace PCRCaculator
       var unitdata = playerData.playrCharacters[selectedCharacterId_setting];
       unitdata.playLoveDic = loveDic;
       GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting, unitdata);
+      RefreshSettingPage();
     }
 
     private void TurnAllToggles(bool k)
@@ -648,7 +647,7 @@ namespace PCRCaculator
       }
 
     }
-    private void RefreshSettingValues(bool changingId)
+    public void RefreshSettingValues(bool changingId)
     {
       isinstating = true;
       UnitData data = playerData.playrCharacters[selectedCharacterId_setting];
@@ -748,7 +747,7 @@ namespace PCRCaculator
         detailSliders_setting[6].maxValue = 0;
         detailSliders_setting[14].maxValue = 0;
       }
-
+      OpenEXSettingPannel();
       GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting, data);
     }
     private List<int> results;
@@ -780,6 +779,7 @@ namespace PCRCaculator
       SaveManager.Save(GuildManager.Instance.SettingData);
       if (buttons != null) buttons = null;
       RefreshBasePage(0);
+      switchToggles[0].isOn = true;
     }
   }
 }

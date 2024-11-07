@@ -140,7 +140,7 @@ namespace PCRCaculator
         {
             int unitid = data.unitId;
 
-            if (data.GetHashCode() == current) return;
+            // if (data.GetHashCode() == current) return;
 
             current = data.GetHashCode();
 

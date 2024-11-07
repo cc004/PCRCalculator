@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 namespace PCRCaculator
 {
     public class SliderPrefab : MonoBehaviour
@@ -28,6 +27,7 @@ namespace PCRCaculator
             valueText.text = Mathf.RoundToInt(slider.value) + "";
             if(k)
                 onValueChangedAction?.Invoke(Mathf.RoundToInt(slider.value));
+                ChoosePannelManager.Instance.OnFinishEXSettings();
         }
         public int GetValue()
         {
@@ -39,6 +39,7 @@ namespace PCRCaculator
             {
                 slider.value++;
             }
+            ChoosePannelManager.Instance.OnFinishEXSettings();
         }
         public void Minus()
         {
@@ -46,6 +47,7 @@ namespace PCRCaculator
             {
                 slider.value--;
             }
+            ChoosePannelManager.Instance.OnFinishEXSettings();
         }
     }
 }

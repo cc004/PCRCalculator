@@ -867,7 +867,7 @@ namespace PCRCaculator.Guild
                         };
                         ValueChangeData changeData = allUnitHPDic[bossId].Find(
                             a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
-                                 a.id == tm.id && a.source == unitData.unitId);
+                                a.source == unitData.unitId && a.xValue == tm.currentFrameCount);
                         if (changeData != null)
                         {
                             detail.Damage = changeData.damage;
