@@ -24,11 +24,14 @@ namespace PCRCaculator
         }
         public void OnSliderdraged()
         {
-            valueText.text = Mathf.RoundToInt(slider.value) + "";
-            if(k)
-                onValueChangedAction?.Invoke(Mathf.RoundToInt(slider.value));
+            if (!ChoosePannelManager.Instance.isSwitchingRole) 
+            {
+                valueText.text = Mathf.RoundToInt(slider.value) + "";
+                if (k)
+                    onValueChangedAction?.Invoke(Mathf.RoundToInt(slider.value));
                 ChoosePannelManager.Instance.OnFinishEXSettings();
                 ChoosePannelManager.Instance.RefreshSettingValues(false);
+            }
         }
         public int GetValue()
         {
