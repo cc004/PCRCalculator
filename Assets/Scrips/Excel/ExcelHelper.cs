@@ -916,8 +916,9 @@ namespace ExcelHelper
                 worksheet0.Cells[11, 4, 11, 6].Merge = true;
                 worksheet0.MySetValue(11, 4, "操作", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(11, 7, "伤害", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[11, 8, 11, 10].Merge = true;
-                worksheet0.MySetValue(11, 8, "说明", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(11, 8, "ub总伤", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[11, 9, 11, 10].Merge = true;
+                worksheet0.MySetValue(11, 9, "说明", blod: true, backColor: backColotInt_2);
 
                 int currentLineNum = 12;
 
@@ -1008,14 +1009,15 @@ namespace ExcelHelper
                     }
                     else
                     {
-                        worksheet0.Cells[currentLineNum, 8, currentLineNum, 10].Merge = true;
+                        worksheet0.Cells[currentLineNum, 9, currentLineNum, 10].Merge = true;
                         worksheet0.MySetValue(currentLineNum, 3, a.unitData.GetNicName());
                         worksheet0.Cells[currentLineNum, 4, currentLineNum, 6].Merge = true;
                         worksheet0.MySetValue(currentLineNum, 4, a.description);
                         worksheet0.Cells[currentLineNum, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         worksheet0.MySetValue(currentLineNum, 7, a.Damage , fontColor: a.Critical ? new int[3] { 255, 0, 0 } : new int[3] { 0, 0, 0 }, blod: a.Critical);
-                    }
-                    currentLineNum++;
+                        worksheet0.MySetValue(currentLineNum, 8, a.totalDamage, fontColor:  new int[3] { 102, 0, 204 }, blod:true);
+          }
+          currentLineNum++;
                 }
                 worksheet0.Cells[currentLineNum, 2, currentLineNum, 10].Merge = true;
                 worksheet0.MySetValue(currentLineNum, 2, "TIME UP", backColor: backColotInt_1);
