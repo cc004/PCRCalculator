@@ -865,19 +865,36 @@ namespace PCRCaculator.Guild
                             UBTime = tm.currentFrameCount,
                             description = tm.operation ?? string.Empty
                         };
-                        ValueChangeData changeData = allUnitHPDic[bossId].Find(
+                        if (allUnitHPDic.ContainsKey(bossId) && allUnitHPDic[bossId] != null)
+                        {
+                            ValueChangeData changeData = allUnitHPDic[bossId].Find(
                             a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
-                                a.source == unitData.unitId && a.xValue == tm.currentFrameCount);
-                        if (changeData != null)
-                        {
-                            detail.Damage = changeData.damage;
-                            detail.Critical = changeData.describe.Contains("暴击");
+                                a.id == tm.id && a.source == unitData.unitId);
+                            if (changeData == null)
+                            {
+                                // 再次查找满足 a.source == unitData.unitId && a.xValue == tm.currentFrameCount 的元素
+                                changeData = allUnitHPDic[bossId].Find(
+                                    a => a.source == unitData.unitId && a.xValue == tm.currentFrameCount);
+                            }
+                            if (changeData != null)
+                            {
+                                detail.Damage = changeData.damage;
+                                detail.Critical = changeData.describe.Contains("暴击");
+                                int totalDamage = 0;
+                                foreach (var data in allUnitHPDic[bossId])
+                                {
+                                    if (data.id == changeData.id)
+                                    {
+                                      totalDamage += data.damage;
+                                      detail.totalDamage = totalDamage;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                detail.Damage = 0;
+                            }
                         }
-                        else
-                        {
-                            detail.Damage = 0;
-                        }
-
                         uBDetails.Add(detail);
                     }
                 }
@@ -1684,6 +1701,7 @@ namespace PCRCaculator.Guild
         public int Damage;
         public bool Critical;
         public string description;
+        public int totalDamage;
     }
     public class RandomData
     {
