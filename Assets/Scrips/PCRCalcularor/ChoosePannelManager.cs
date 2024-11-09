@@ -348,16 +348,16 @@ namespace PCRCaculator
       }
       RefreshSelectedButtons();
     }
+    public bool isSwitchingRole = false;
     public void OnToggleSwitched_setting(int id)
     {
-      foreach (Toggle a in charToggles_setting)
-      {
-        if (a.interactable && a.isOn)
+      isSwitchingRole = true;
+      if (charToggles_setting[id].isOn)
         {
           selectedCharacterId_setting = id;
           RefreshSettingValues(true);
         }
-      }
+      isSwitchingRole = false;
     }
     public void OnButtonPressed(int buttonid)
     {
