@@ -888,7 +888,6 @@ namespace PCRCaculator.Guild
                                     {
                                       totalDamage += data.damage;
                                       detail.totalDamage = totalDamage;
-                                      detail.exceptDamage = data.expectedDamage;
                                     }
                                 }
                             }
@@ -897,7 +896,7 @@ namespace PCRCaculator.Guild
                                 detail.Damage = 0;
                             }
                         }
-                            uBDetails.Add(detail);
+                        uBDetails.Add(detail);
                     }
                 }
             }
@@ -1705,7 +1704,6 @@ namespace PCRCaculator.Guild
         public bool Critical;
         public string description;
         public int totalDamage;
-        public int exceptDamage;
     }
     public class RandomData
     {
