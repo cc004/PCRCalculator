@@ -164,8 +164,9 @@ namespace PCRCaculator.Guild
 
         }
 
-        private int id;
-        public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount, string describe, UnitCtrl ctrl)
+    private int id;
+    private Dictionary<int, int> unit_state_id = new Dictionary<int, int>();
+    public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount, string describe, UnitCtrl ctrl)
         {
             try
             {
@@ -199,19 +200,18 @@ namespace PCRCaculator.Guild
                                 variant = skillExecData.skillID % 10;
                         }
                     }
-
-                    allUnitStateChangeDic[unitid].Add(
-                        new UnitStateChangeData
-                        {
-                            id = ++id,
-                            changStateFrom = allUnitLastStateDic[unitid].changStateTo,
-                            changStateTo = actionState,
-                            currentFrameCount = frameCount,
-                            realFrameCount = BattleManager.Instance.FrameCount,
-                            operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null,
-                            variant = variant
-                        });
-
+                    var newData = new UnitStateChangeData
+                    {
+                        id = ++id,
+                        changStateFrom = allUnitLastStateDic[unitid].changStateTo,
+                        changStateTo = actionState,
+                        currentFrameCount = frameCount,
+                        realFrameCount = BattleManager.Instance.FrameCount,
+                        operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null,
+                        variant = variant
+                    };
+                    allUnitStateChangeDic[unitid].Add(newData);
+                    unit_state_id[unitid]=newData.id;
                     var trans = skillGroupPrefabDic[unitid].AddButtons(startFrame, frameCount, oldState, action, variant);
 
                     var pos = skillGroupParent.transform.InverseTransformPoint(trans.position);
@@ -281,13 +281,13 @@ namespace PCRCaculator.Guild
         public void AppendChangeHP(int unitid, float currentHP, int hp, int damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
+            var sourceId = source?.UnitId ?? unitid;
             ValueChangeData valueData = new ValueChangeData(frame, currentHP, hp, describe)
             {
                 damage = damage,
-                id = id,
-                source = source?.UnitId ?? unitid,
+                id = unit_state_id.ContainsKey(sourceId) ? unit_state_id[sourceId] : 0,
+                source= sourceId,
                 target = unitid,
-                expectedDamage = (int)totalDamageExcept
             };
             allUnitHPDic[unitid].Add(valueData);
             if (!GuildManager.StaticsettingData.calcSpineAnimation && currentToggleId == 2)
@@ -871,12 +871,12 @@ namespace PCRCaculator.Guild
                             ValueChangeData changeData = allUnitHPDic[bossId].Find(
                             a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
                                 a.id == tm.id && a.source == unitData.unitId);
-                            if (changeData == null)
-                            {
-                                // 再次查找满足 a.source == unitData.unitId && a.xValue == tm.currentFrameCount 的元素
-                                changeData = allUnitHPDic[bossId].Find(
-                                    a => a.source == unitData.unitId && a.xValue == tm.currentFrameCount);
-                            }
+                            // if (changeData == null)
+                            // {
+                            //     // 再次查找满足 a.source == unitData.unitId && a.xValue == tm.currentFrameCount 的元素
+                            //     changeData = allUnitHPDic[bossId].Find(
+                            //         a => a.source == unitData.unitId && a.xValue == tm.currentFrameCount);
+                            // }
                             if (changeData != null)
                             {
                                 detail.Damage = changeData.damage;
