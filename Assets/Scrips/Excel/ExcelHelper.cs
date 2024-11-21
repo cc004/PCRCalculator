@@ -1039,11 +1039,11 @@ namespace ExcelHelper
 
                 // 添加一个sheet
                 ExcelWorksheet worksheet1 = package.Workbook.Worksheets.Add("基础数据");
-                string[] HeadNames = new string[18]
+                string[] HeadNames = new string[24]
                 {
                     "角色ID","角色名字","角色等级","角色星级","角色好感度","角色Rank",
                     "装备等级(左上)", "装备等级(右上)", "装备等级(左中)","装备等级(右中)","装备等级(左下)","装备等级(右下)",
-                "UB技能等级","技能1等级","技能2等级","EX技能等级","专武等级","高级设置"};
+                "UB技能等级","技能1等级","技能2等级","EX技能等级","专武等级","EX武器","EX武器等级","EX防具","EX防具等级","EX首饰","EX首饰等级","高级设置"};
                 worksheet1.Cells[1, 1, 1, HeadNames.Length].Merge = true;//合并单元格(1行1列到1行6列)
                 worksheet1.Cells["A1"].Style.Font.Size = 16; //字体大小
                 worksheet1.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; //对其方式
@@ -1074,9 +1074,14 @@ namespace ExcelHelper
                         worksheet1.Cells[lineNum, 13 + i].Value = unitData.skillLevel[i];
                     }
                     worksheet1.Cells[lineNum, 17].Value = unitData.uniqueEqLv;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        worksheet1.Cells[lineNum, 18 + i * 2].Value = unitData.exEquip[i];
+                        worksheet1.Cells[lineNum, 18 + i * 2 + 1].Value = unitData.exEquipLevel[i];
+                    }
                     if (unitData.playLoveDic != null)
                     {
-                        worksheet1.Cells[lineNum, 18].Value = JsonConvert.SerializeObject(unitData.playLoveDic);
+                        worksheet1.Cells[lineNum, 24].Value = JsonConvert.SerializeObject(unitData.playLoveDic);
                     }
                     lineNum++;
                 }
@@ -1463,7 +1468,22 @@ namespace ExcelHelper
                     break;
 
             }
-            timeLines.Sort((a, b) => a.frame - b.frame);
+            timeLines.Sort((a, b) =>
+            {
+                int frameComparison = a.frame.CompareTo(b.frame);
+                if (frameComparison == 0)
+                {
+                    if (type == 2)
+                    {
+                      return b.valueA.CompareTo(a.valueA);
+                    }
+                    else if(type == 6)
+                    {
+                      return a.valueA.CompareTo(b.valueA);
+                    }
+                }
+                return frameComparison;
+            });
             return timeLines;
         }
         private static void AddStringWithJudge(ExcelWorksheet worksheet,int x,int y,string describe)
