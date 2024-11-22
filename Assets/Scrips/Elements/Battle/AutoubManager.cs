@@ -89,7 +89,8 @@ namespace Elements.Battle
         public void UbExecCallback(int pos)
         {
             if (!enabled) return;
-            if (pos == -1) pos = 5;
+            if (pos > 4) return; // 排除兰法召唤物ub
+            if (pos == -1) pos = 5; 
             if (pos < 0 || pos > 5) return;
             if (queues[pos].Count > 0)
                 queues[pos].Dequeue().pressed = true;
