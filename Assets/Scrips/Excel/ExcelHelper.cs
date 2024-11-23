@@ -1286,18 +1286,20 @@ namespace ExcelHelper
                     //charLong = 3;
                     //detailAlong = 1;
                     //detailBlong = 2;
-                    worksheet3.Cells[lineNum, 2, lineNum, 2 + charLong0 - 1].Merge = true;
-                    worksheet3.Cells[lineNum, 2].Value = enemyData.detailData.unit_name;
-                    worksheet3.Cells[lineNum, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet3.Cells[lineNum, 1].Value = "逻辑帧";
+                    worksheet3.Cells[lineNum, 2].Value = "渲染帧";
+                    worksheet3.Cells[lineNum, 3, lineNum, 3 + charLong0 - 1].Merge = true;
+                    worksheet3.Cells[lineNum, 3].Value = enemyData.detailData.unit_name;
+                    worksheet3.Cells[lineNum, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     if (detailType < 4||detailType==6)
                     {
                         for (int i = 0; i < 5; i++)
                         {
                             if (i < playerDatas.playrCharacters.Count)
                             {
-                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1), lineNum, 2 + charLong0 * (i + 2) - 1].Merge = true;
-                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
-                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1), lineNum, 3 + charLong0 * (i + 2) - 1].Merge = true;
+                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
+                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             }
                         }
                     }
@@ -1306,12 +1308,13 @@ namespace ExcelHelper
                     int currentFream0 = 0;
                     foreach (var timeData in timedata)
                     {
-                        int pos = 2 + charLong0 * timeData.idx;
+                        int pos = 3 + charLong0 * timeData.idx;
                         //if (timeData.frame != currentFream0)
                         //{
                             lineNum++;
                             currentFream0 = timeData.frame;
                             worksheet3.Cells[lineNum, 1].Value = timeData.frame;
+                            worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
                         //}
                         //worksheet2.Cells[lineNum, pos].Value = timeData.describeA;//.Replace(/<[^>] +>/ g, "");
                         worksheet3.Cells[lineNum, pos].Value = (detailType==2||detailType==6)?timeData.valueA:timeData.valueB;
@@ -1428,7 +1431,7 @@ namespace ExcelHelper
                     {
                         foreach(var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:(int)data1.yValue));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:(int)data1.yValue, realFrameCount: data1.realFrameCount));
                         }
                         idx++;
                     }
@@ -1438,7 +1441,7 @@ namespace ExcelHelper
                     {
                         foreach (var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx, "", data1.describe,valueB:data1.yValue));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx, "", data1.describe,valueB:data1.yValue, realFrameCount: data1.realFrameCount));
                         }
                         idx++;
                     }
@@ -1446,13 +1449,13 @@ namespace ExcelHelper
                 case 4:
                     foreach(var data0 in TimelineData.bossDefChangeDic)
                     {
-                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue), 0, idx, "", data0.describe, valueB: data0.yValue));
+                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue), 0, idx, "", data0.describe, valueB: data0.yValue, realFrameCount: data0.realFrameCount));
                     }
                     break;
                 case 5:
                     foreach (var data0 in TimelineData.bossMgcDefChangeDic)
                     {
-                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue), 0, idx, "", data0.describe, valueB: data0.yValue));
+                        timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data0.xValue), 0, idx, "", data0.describe, valueB: data0.yValue, realFrameCount: data0.realFrameCount));
                     }
                     break;
                 case 6:
@@ -1461,7 +1464,7 @@ namespace ExcelHelper
                     {
                         foreach(var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx, "", "",valueA:(int)data1.yValue));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx, "", "",valueA:(int)data1.yValue, realFrameCount: data1.realFrameCount));
                         }
                         idx++;
                     }
@@ -1470,19 +1473,16 @@ namespace ExcelHelper
             }
             timeLines.Sort((a, b) =>
             {
-                int frameComparison = a.frame.CompareTo(b.frame);
-                if (frameComparison == 0)
-                {
-                    if (type == 2)
-                    {
-                      return b.valueA.CompareTo(a.valueA);
-                    }
-                    else if(type == 6)
-                    {
-                      return a.valueA.CompareTo(b.valueA);
-                    }
-                }
+              if(type!=1)
+              { 
+                int frameComparison = a.realFrameCount.CompareTo(b.realFrameCount);
                 return frameComparison;
+              }
+              else
+              {
+                int frameComparison = a.frame.CompareTo(b.frame);
+                return frameComparison;
+              }
             });
             return timeLines;
         }
@@ -1674,8 +1674,8 @@ namespace ExcelHelper
         public float valueB;
         public string describeA;
         public string describeB;
-
-        public TimeLineDataA(int frame, int unitid,int idx, string describeA, string describeB,int valueA = 0,float valueB = 0)
+        public int realFrameCount;
+        public TimeLineDataA(int frame, int unitid,int idx, string describeA, string describeB,int valueA = 0,float valueB = 0,int realFrameCount=0)
         {
             this.frame = frame;
             this.unitid = unitid;
@@ -1684,6 +1684,7 @@ namespace ExcelHelper
             this.describeB = describeB;
             this.valueA = valueA;
             this.valueB = valueB;
+            this.realFrameCount = realFrameCount;
         }
     }
 }

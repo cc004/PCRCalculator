@@ -1547,7 +1547,7 @@ namespace PCRCaculator.Guild
         public int id;
         public int source;
         public int target;
-
+        public int realFrameCount;
         private const float XScale = 5400f;
         private float YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;
         
@@ -1556,6 +1556,7 @@ namespace PCRCaculator.Guild
         {
             xValue = x;
             yValue = y;
+             realFrameCount = BattleManager.Instance?.FrameCount ?? 0;
         }
 
         public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
@@ -1565,7 +1566,8 @@ namespace PCRCaculator.Guild
             yValue = y;
             this.hp = hp;
             this.describe = describe;
-        }
+            realFrameCount = BattleManager.Instance?.FrameCount ?? 0;
+    }
     }
     public class UnitSkillExecData
     {
