@@ -12,6 +12,7 @@ using static UnityEngine.UI.CanvasScaler;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Newtonsoft.Json;
+using TinyPinyin;
 namespace PCRCaculator
 {
   public class ChoosePannelManager : MonoBehaviour
@@ -87,7 +88,43 @@ namespace PCRCaculator
     {
       Instance = this;
 
+      SearchCharaInitialize();
     }
+
+    private void InitialButton()
+    {
+      buttons = new Dictionary<int, CharacterPageButton>();
+      searchButtons= new Dictionary<int, CharacterPageButton>();
+      foreach (Toggle a in togglePerferbs.Values)
+      {
+        Destroy(a.gameObject);
+      }
+
+      togglePerferbs.Clear();
+      parent.localPosition = new Vector3();
+      parent.sizeDelta = new Vector2(100, original_hight);
+      foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+      {
+        /*if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)*/
+        {
+          if (MainManager.Instance.JudgeWeatherShowThisUnit(id)) // || (id>=400000&&id<=499999))
+          {
+            GameObject b = Instantiate(togglePerferb);
+            b.transform.SetParent(parent);
+            b.transform.localScale = new Vector3(1, 1, 1);
+            int id0 = id;
+
+            b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+            b.GetComponent<CharacterPageButton>().SetButton(id);
+            togglePerferbs[id0] = b.GetComponent<Toggle>();
+            buttons[id0] = b.GetComponent<CharacterPageButton>();
+            //showUnitIDs.Add(id);
+          }
+        }
+      }
+    }
+
+
     /// <summary>
     /// 调用选人面板的函数
     /// </summary>
@@ -95,6 +132,11 @@ namespace PCRCaculator
     /// <param name="playerData">敌人队伍/会战要更改的队伍，为空则不显示</param>
     public void CallChooseBack(int type, AddedPlayerData player = null)
     {
+      if (buttons == null)
+      {
+        InitialButton();
+      }
+
       CallChooseBack_0(type, player);
     }
     private void CallChooseBack_0(int type, AddedPlayerData player = null)
@@ -157,7 +199,7 @@ namespace PCRCaculator
           selectedCharId.Clear();
         }
       }
-      if (type != 4) RefreshBasePage(0);
+      if (type != 4) RefreshBasePage();
       switchToggles[0].isOn = true;
       RefreshSelectedButtons();
 
@@ -181,14 +223,7 @@ namespace PCRCaculator
       if (!isActiveAndEnabled) return;
       if (k)
       {
-        for (int i = 0; i < 4; i++)
-        {
-          if (switchToggles[i].isOn)
-          {
-            RefreshBasePage(i);
-            // Search.text="";
-          }
-        }
+        RefreshBasePage();
       }
     }
 
@@ -203,10 +238,6 @@ namespace PCRCaculator
     }
     public void CancalButton()
     {
-      parents[0].gameObject.SetActive(false);
-      parents[1].gameObject.SetActive(false);
-      parents[2].gameObject.SetActive(false);
-      last = -1;
       baseBack.SetActive(false);
       chooseBack_A.SetActive(false);
       settingBack.SetActive(false);
@@ -294,7 +325,7 @@ namespace PCRCaculator
     public void BackButton()
     {
       CloseProperty();
-      RefreshBasePage(0);
+      RefreshBasePage();
       chooseBack_A.SetActive(true);
       settingBack.SetActive(false);
     }
@@ -509,97 +540,48 @@ namespace PCRCaculator
 
     public Dictionary<int, CharacterPageButton> buttons;
     public Dictionary<int, CharacterPageButton> searchButtons;
-    public Transform[] parents;
-    public int last = -1;
 
-    private void RefreshBasePage(int type)
+    private bool shouldDisplay(int unitid, UnitData unitData)
     {
-      PositionType positionType = PositionType.frount;
-      switch (type)
-      {
-        case 2:
-          positionType = PositionType.middle;
-          break;
-        case 3:
-          positionType = PositionType.backword;
-          break;
-      }
+      int pos = (int)MainManager.Instance.UnitRarityDic[unitid].unitPositionType;
+      bool position = (switchToggles[0].isOn || switchToggles[pos + 1].isOn);
+      bool fav = (Favriote.isOn && unitData.fav) || (!unitData.fav && Unused.isOn);
+      var pinyin = PinyinHelper.GetPinyin(Search.text, "").ToUpper();
+      bool search = Search.text == "" || id2alias[unitid].Contains(Search.text) || id2pinyin[unitid].Contains(pinyin);
+      return position && fav && search;
+    }
 
-      if (buttons == null)
-      {
-
-        buttons = new Dictionary<int, CharacterPageButton>();
-        searchButtons= new Dictionary<int, CharacterPageButton>();
-        foreach (Toggle a in togglePerferbs.Values)
-        {
-          Destroy(a.gameObject);
-        }
-
-        togglePerferbs.Clear();
-        parent.localPosition = new Vector3();
-        parent.sizeDelta = new Vector2(100, original_hight);
-        foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
-        {
-          /*if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)*/
-          {
-            if (MainManager.Instance.JudgeWeatherShowThisUnit(id)) // || (id>=400000&&id<=499999))
-            {
-              GameObject b = Instantiate(togglePerferb);
-              b.transform.SetParent(parents[(int)MainManager.Instance.UnitRarityDic[id].unitPositionType]);
-              b.transform.localScale = new Vector3(1, 1, 1);
-              int id0 = id;
-
-              b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-              b.GetComponent<CharacterPageButton>().SetButton(id);
-              togglePerferbs[id0] = b.GetComponent<Toggle>();
-              buttons[id0] = b.GetComponent<CharacterPageButton>();
-              //showUnitIDs.Add(id);
-            }
-          }
-        }
-      }
-
+    private void RefreshBasePage()
+    {
       int count = 1;
 
-      foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+      foreach (int id in buttons.Keys)
       {
-        if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
+        UnitData unitData;
+        if (MainManager.Instance.unitDataDic.TryGetValue(id, out unitData))
         {
-          if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)
-          {
-            UnitData unitData;
-            if (MainManager.Instance.unitDataDic.TryGetValue(id, out unitData))
-            {
-              unitData = unitData;
-            }
-            else
-            {
-              unitData = new UnitData(id, 1);
-            }
-
-            buttons[id].RefreshData(unitData);
-
-            bool shouldDisplay = (unitData.fav && Favriote.isOn) || (!unitData.fav && Unused.isOn);
-            if (shouldDisplay && (Search.text == "" || results.Contains(id)))
-            {
-              buttons[id].transform.localPosition = new Vector3(
-                  baseRange.x + range.x * ((count - 1) % 8),
-                  -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
-              togglePerferbs[id].isOn = selectedCharId.Contains(id);
-              count++;
-            }
-            else
-            {
-              buttons[id].gameObject.SetActive(false);
-            }
-          }
+          unitData = unitData;
         }
-      }
-      if (last != type)
-      {
-        parents[0].gameObject.SetActive(type == 0 || type == 1);
-        parents[1].gameObject.SetActive(type == 0 || type == 2);
-        parents[2].gameObject.SetActive(type == 0 || type == 3);
+        else
+        {
+          unitData = new UnitData(id, 1);
+        }
+
+        if (shouldDisplay(id, unitData))
+        {
+          buttons[id].RefreshData(unitData);
+          buttons[id].transform.localPosition = new Vector3(
+              baseRange.x + range.x * ((count - 1) % 8),
+              -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
+          // togglePerferbs[id].isOn = selectedCharId.Contains(id);
+          buttons[id].gameObject.SetActive(true);
+          togglePerferbs[id].isOn = selectedCharId.Contains(id);
+          count++;
+        }
+        else
+        {
+          buttons[id].gameObject.SetActive(false);
+        }
       }
 
       if (parent.sizeDelta.y < Mathf.CeilToInt(count / 8) * 95 + 105)
@@ -612,7 +594,6 @@ namespace PCRCaculator
         parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95 + 105);
       }
       TurnAllToggles(selectedCharId.Count != 5);
-      last = type;
     }
 
     private void RefreshSelectedButtons()
@@ -750,36 +731,32 @@ namespace PCRCaculator
       OpenEXSettingPannel();
       GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting, data);
     }
-    private List<int> results;
-    public void SearchChara()
+    private Dictionary<int, string> id2alias;
+    private Dictionary<int, string> id2pinyin;
+    private void SearchCharaInitialize()
     {
+      id2alias = new Dictionary<int, string>();
+      id2pinyin = new Dictionary<int, string>();
       string filePath = Application.streamingAssetsPath + "/Datas/_pcr_data.json";
       string jsonString = File.ReadAllText(filePath);
       var data = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(jsonString);
-      results = new List<int>();
       foreach (var entry in data)
       {
         int parsedKey = int.Parse(entry.Key + "01");
-        foreach (var value in entry.Value)
-        {
-          if (value.Contains(Search.text))
-          {
-            results.Add(parsedKey);
-            break;
-          }
-        }
+        id2alias[parsedKey] = string.Join("|", entry.Value);
+        id2pinyin[parsedKey] = string.Join("|", entry.Value.Select(x => PinyinHelper.GetPinyin(x, "").ToUpper()));
       }
-      if (buttons != null) buttons = null;
-      RefreshBasePage(0);
+    }
+    public void SearchChara()
+    {
+      RefreshBasePage();
     }
     public void FavIsShow()
     {
       GuildManager.Instance.SettingData.Favriote = Favriote.isOn;
       GuildManager.Instance.SettingData.Unused = Unused.isOn;
       SaveManager.Save(GuildManager.Instance.SettingData);
-      if (buttons != null) buttons = null;
-      RefreshBasePage(0);
-      switchToggles[0].isOn = true;
+      RefreshBasePage();
     }
   }
 }
