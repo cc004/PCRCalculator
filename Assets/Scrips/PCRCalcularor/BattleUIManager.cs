@@ -135,6 +135,10 @@ namespace PCRCaculator.Battle
         private void Update()
         {
             _Update?.Invoke();
+            if (Input.GetMouseButtonDown(1)|| Input.GetKeyDown(KeyCode.RightArrow))
+            { 
+                StepButton(); //鼠标右键或者右方向键 触发step
+            }
         }
         private void _Update_1()
         {
