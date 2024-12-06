@@ -229,13 +229,11 @@ namespace PCRCaculator.Guild
             {
                 return;
             }
-            EditCharacterdetail();
-            ChoosePannelManager.Instance.charToggles_setting[idx].isOn=true;
-            RefreshCharacterDetailPage(idx);
+            EditCharacterdetail(idx);
         }
-        public void EditCharacterdetail()
+        public void EditCharacterdetail(int idx)
         {
-            ChoosePannelManager.Instance.CallChooseBack(4, SettingData.GetCurrentPlayerData());
+            ChoosePannelManager.Instance.CallChooseBack(4, SettingData.GetCurrentPlayerData(), idx);
         }
         public void FinishEditCharacterdetail()
         {
@@ -253,10 +251,10 @@ namespace PCRCaculator.Guild
                 if (toggle.isOn)
                 {
                     SettingData.currentPlayerGroupNum = idx + currentPage*5-5;
-                    Refresh();
                 }
                 idx++;
             }
+            Refresh();
         }
         public void FinishEditingPlayers(AddedPlayerData playerData)
         {
