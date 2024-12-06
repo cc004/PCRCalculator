@@ -83,7 +83,7 @@ namespace PCRCaculator
         private List<UnitData> playerDataForBattle;
         private List<UnitData> enemyDataForBattle;
         private bool isGuildBattle;
-        private GuildBattleData guildBattleData;
+        public GuildBattleData guildBattleData;
         private bool isAutoMode;
         private bool forceAutoMode;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };

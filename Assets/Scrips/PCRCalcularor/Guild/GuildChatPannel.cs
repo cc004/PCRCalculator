@@ -22,13 +22,13 @@ namespace PCRCaculator.Guild
         // public Transform PosXParent;
         // public Transform PosYParent;
 
-        private List<List<ValueChangeData>> AllUnitDamageDates = new List<List<ValueChangeData>>();
-        private List<float> DamageMax = new List<float>();
-        private List<List<ValueChangeData>> AllUnitTotalDamageDates = new List<List<ValueChangeData>>();
-        private List<ValueChangeData>[] BossDefData = Array.Empty<List<ValueChangeData>>();
-        private List<ValueChangeData>[] BossMagicDefData = Array.Empty<List<ValueChangeData>>();
+        private List<List<ValueChangeData>> AllUnitDamageDates;
+        private List<float> DamageMax;
+        private List<List<ValueChangeData>> AllUnitTotalDamageDates;
+        private List<ValueChangeData>[] BossDefData;
+        private List<ValueChangeData>[] BossMagicDefData;
         private const float Max_Y_Rate = 1.1f;
-        private static List<ValueChangeData> emptyList = new List<ValueChangeData> { new ValueChangeData(0, 0), new ValueChangeData(1, 0) };
+        private static List<ValueChangeData> emptyList;
 
         private List<GameObject> lineChatXPrefabList = new List<GameObject>();
         private List<GameObject> lineChatYPrefabList = new List<GameObject>();
@@ -43,6 +43,23 @@ namespace PCRCaculator.Guild
         public void Init()
         {
             SetLineChat();
+            AllUnitDamageDates = new List<List<ValueChangeData>>();
+            AllUnitTotalDamageDates = new List<List<ValueChangeData>>();
+            DamageMax = new List<float>();
+            BossDefData = Array.Empty<List<ValueChangeData>>();
+            BossMagicDefData = Array.Empty<List<ValueChangeData>>();
+            emptyList = new List<ValueChangeData> { new ValueChangeData(0, 0), new ValueChangeData(1, 0) };
+            // clear old object
+            foreach (GameObject a in lineChatXPrefabList)
+            {
+                Destroy(a);
+            }
+            lineChatXPrefabList.Clear();
+            foreach (GameObject b in lineChatYPrefabList)
+            {
+                Destroy(b);
+            }
+            lineChatYPrefabList.Clear();
             List<ValueChangeData> value0 = GuildCalculator.CreateLineChatData2(GuildCalculator.Instance.playerUnitDamageDic[0]);
             AllUnitDamageDates.Add(value0);
             AllUnitTotalDamageDates.Add(GuildCalculator.CreateTotalChatData(GuildCalculator.Instance.playerUnitDamageDic[0]));
