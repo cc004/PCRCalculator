@@ -147,12 +147,17 @@ namespace PCRCaculator.Guild
             //Load();
             //LoadAddedPlayerData();
             RefreshOnStart();
-            if (MainManager.Instance.AutoCalculatorData.isCalculating && !MainManager.Instance.AutoCalculatorData.isConfig)
+            if (MainManager.Instance.AutoCalculatorData.isCalculating)
             {
                 OpenAutoCalculatePage();
-                StartAutoCalculate();
-                if (!MainManager.Instance.AutoCalculatorData.isGoing)
-                    MainManager.Instance.AutoCalculatorData.isConfig = true;
+                if (MainManager.Instance.AutoCalculatorData.isFinish)
+                {
+                    MainManager.Instance.AutoCalculatorData.isCalculating = false;
+                }
+                else
+                {
+                    StartAutoCalculate();
+                }
             }
         }
         private void Load()
@@ -229,13 +234,11 @@ namespace PCRCaculator.Guild
             {
                 return;
             }
-            EditCharacterdetail();
-            ChoosePannelManager.Instance.charToggles_setting[idx].isOn=true;
-            RefreshCharacterDetailPage(idx);
+            EditCharacterdetail(idx);
         }
-        public void EditCharacterdetail()
+        public void EditCharacterdetail(int idx)
         {
-            ChoosePannelManager.Instance.CallChooseBack(4, SettingData.GetCurrentPlayerData());
+            ChoosePannelManager.Instance.CallChooseBack(4, SettingData.GetCurrentPlayerData(), idx);
         }
         public void FinishEditCharacterdetail()
         {
@@ -253,10 +256,10 @@ namespace PCRCaculator.Guild
                 if (toggle.isOn)
                 {
                     SettingData.currentPlayerGroupNum = idx + currentPage*5-5;
-                    Refresh();
                 }
                 idx++;
             }
+            Refresh();
         }
         public void FinishEditingPlayers(AddedPlayerData playerData)
         {
@@ -448,6 +451,44 @@ namespace PCRCaculator.Guild
         public int stoptime;
 
         public void StartCalButton() => StartCalButton(false);
+        public void ReStartCalButton() => ReStartCalButton(false);
+
+        private void ReStartCalButton(bool skipping)
+        {
+            stoptime = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
+            SaveDataToJson();
+            GuildBattleData battleData = new GuildBattleData();
+            battleData.skipping = skipping;
+            battleData.players = SettingData.GetCurrentPlayerData();
+            battleData.enemyData = new List<EnemyData>();
+            foreach (var selectedBossEnemyid in selectedBossEnemyids)
+            {
+                EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
+                if(EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+                {
+                    battleData.mParts = value;
+                    battleData.MPartsDataDic = new Dictionary<int, EnemyData>();
+                    Action<int> action = a =>
+                    {
+                        if (a != 0)
+                        {
+                            battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));                        
+                        }
+                    };
+                    action(value.child_enemy_parameter_1);
+                    action(value.child_enemy_parameter_2);
+                    action(value.child_enemy_parameter_3);
+                    action(value.child_enemy_parameter_4);
+                    action(value.child_enemy_parameter_5);
+
+                }
+                battleData.enemyData.Add(enemyData);
+            }
+            battleData.UBExecTimeList = SettingData.GetCurrentPlayerGroup().UBExecTimeData;
+            battleData.SettingData = SettingData;
+            MainManager.Instance.guildBattleData = battleData;
+            MyGameCtrl.Instance.ReStart();
+        }
 
         private void StartCalButton(bool skipping)
         {
@@ -1054,7 +1095,8 @@ namespace PCRCaculator.Guild
         }
         public void StartAutoCalculate()
         {
-            StartCoroutine(AutoCalculate());
+            // StartCoroutine(AutoCalculate());
+            StartCalButton(true);
         }
         public void StartAutoCalculateByButton(int time)
         {
@@ -1068,25 +1110,21 @@ namespace PCRCaculator.Guild
             MainManager.Instance.AutoCalculatorData.isCalculating = true;
             StartAutoCalculate();
         }
-        private IEnumerator AutoCalculate()
-        {
-            var seed = RandomManager.RandomData.UseFixedRandomSeed;
-            RandomManager.RandomData.UseFixedRandomSeed = false;
-
-            while (true)
-            {
-                yield return new WaitForSecondsRealtime(1);
-                if (MainManager.Instance.AutoCalculatorData.isPaues)
-                    continue;
-                if (MainManager.Instance.AutoCalculatorData.isGoing)
-                {                    
-                    StartCalButton(true);
-                }
-                break;
-            }
-
-            RandomManager.RandomData.UseFixedRandomSeed = seed;
-        }
+        // private IEnumerator AutoCalculate()
+        // {
+            // RandomManager.RandomData.UseFixedRandomSeed = false;
+            // while (true)
+            // {
+            //     yield return new WaitForSecondsRealtime(1);
+            //     if (MainManager.Instance.AutoCalculatorData.isPaues)
+            //         continue;
+            //     if (MainManager.Instance.AutoCalculatorData.isGoing)
+            //     {                    
+            //         StartCalButton(true);
+            //     }
+            //     break;
+            // }
+        // }
 
         public void UpdateButton()
         {

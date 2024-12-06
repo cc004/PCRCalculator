@@ -513,10 +513,19 @@ namespace Elements.Battle
         private bool spacePressed = false;
 
         private Stopwatch stopWatch = new Stopwatch();
+        private bool battleFinishedProcessed = false;
 
         private void Update()
         {
-            if (battleFinished) return;
+            if (battleFinished){
+                if (!battleFinishedProcessed){
+                    CoroutineManager.ClearAll();
+                    onEndFadeOut = (System.Action)null;
+                    battleFinishedProcessed = true;
+                    MyGameCtrl.Instance.OnBattleFinished((int)battleResult);
+                }
+                return;
+            } 
 
             if (Input.GetKey(KeyCode.Space))
             {
@@ -2149,7 +2158,6 @@ namespace Elements.Battle
             skipping = false;
             /*if (BattleHeaderController.Instance.IsPaused && this.dialogManager.IsUse(eDialogId.BATTLE_MENU))
                 this.dialogManager.ForceCloseOne(eDialogId.BATTLE_MENU);*/
-            MyGameCtrl.Instance.OnBattleFinished((int)JJHEBNEEHPB);
             UnityEngine.Random.state = tempRandomState;
             battleResult = JJHEBNEEHPB;
             isPauseTimeLimit = true;
@@ -3517,9 +3525,16 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
+            unitSpineControllerList.Clear();
+            EnemyList.Clear();
+            UnitList.Clear();
+            BlackOutUnitList.Clear();
+            BlackoutUnitTargetList.Clear();
+            LPBCBINDJLJ.Clear();
+            NOMJJDDCBAN.Clear();
+            FieldDataDictionary.Clear();
             battleEffectDict.Clear();
             setStatus.Clear();
-            battleFinished = false;
             GuildCalculator.Instance.dmglist.Clear();
             GuildCalculator.Instance.bossValues.Clear();
             BattleManager battleManager = this;
@@ -3544,7 +3559,7 @@ namespace Elements.Battle
             battleManager.tempRandomState = UnityEngine.Random.state;
             //int seed = 666;//battleManager.battleProcessor.GetSeed();
             int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
-            if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed)
+            if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
                 //UnityRandom.InitState(tempData.randomData.RandomSeed);
@@ -3904,7 +3919,10 @@ namespace Elements.Battle
             battleManager.BattleReady = true;
             battleManager.enabled = true;
             battleManager.skipping = tempData.skipping;
-
+            battleFinished = false;
+            battleFinishedProcessed = false;
+            isPauseTimeLimit = false;
+            FrameCount = 0;
         }
 
         public List<UnitCtrl> GetMyUnitList() => (BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? UnitList : EnemyList;

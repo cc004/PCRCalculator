@@ -216,17 +216,29 @@ namespace Elements
                         {
                             skillData.ChangeSkillCastTime(cast_time);
                         }
-                        if (skillData.skill_area_width < 1)
-                            SkillAreaWidthList.Add(skillId, (int)_data.MasterData.SearchAreaWidth);
-                        else
-                            SkillAreaWidthList.Add(skillId, (int)skillData.skill_area_width);
+                        if (!SkillAreaWidthList.ContainsKey(skillId))
+                        {
+                            if (skillData.skill_area_width < 1)
+                                SkillAreaWidthList.Add(skillId, (int)_data.MasterData.SearchAreaWidth);
+                            else
+                                SkillAreaWidthList.Add(skillId, (int)skillData.skill_area_width);
+                        }
 
                         SkillLevelInfo skillLevelInfo = skillLevelInfoList.Find(e => e.SkillId == skillId);
-                        SkillLevels.Add(skillId, skillLevelInfo == null ? 0 : (int)skillLevelInfo.SkillLevel);
+                        if (!SkillLevels.ContainsKey(skillId))
+                        {
+                            SkillLevels.Add(skillId, skillLevelInfo == null ? 0 : (int)skillLevelInfo.SkillLevel);
+                        }
                         if (!SkillUseCount.ContainsKey(skillId))
                             SkillUseCount.Add(skillId, 0);
-                        castTimeDictionary.Add(skillId, (float)(double)skillData.skill_cast_time);
-                        animeIdDictionary.Add(skillId, animeId);
+                        if (!castTimeDictionary.ContainsKey(skillId))
+                        {
+                            castTimeDictionary.Add(skillId, (float)(double)skillData.skill_cast_time);
+                        }
+                        if (!animeIdDictionary.ContainsKey(skillId))
+                        {
+                            animeIdDictionary.Add(skillId, animeId);
+                        }
                     }
                 }
             }

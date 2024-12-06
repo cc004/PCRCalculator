@@ -68,7 +68,6 @@ namespace PCRCaculator
     public GameObject EXsettingPannel;
     public List<SliderPrefab> EXsettingSliders;
 
-    //private List<Toggle> togglePerferbs = new List<Toggle>();
     private List<int> selectedCharId = new List<int>();
     private Dictionary<int, Toggle> togglePerferbs = new Dictionary<int, Toggle>();
     private bool togglesEnable;
@@ -87,20 +86,22 @@ namespace PCRCaculator
     private void Start()
     {
       Instance = this;
-
       SearchCharaInitialize();
+      StartCoroutine(WaitForLoadFinished());
     }
 
-    private void InitialButton()
+    private IEnumerator WaitForLoadFinished()
     {
-      buttons = new Dictionary<int, CharacterPageButton>();
-      searchButtons= new Dictionary<int, CharacterPageButton>();
-      foreach (Toggle a in togglePerferbs.Values)
-      {
-        Destroy(a.gameObject);
-      }
+        while (!MainManager.Instance.LoadFinished)
+        {
+            yield return null; 
+        }
+        InitialButton();
+    }
 
-      togglePerferbs.Clear();
+
+    public void InitialButton()
+    {
       parent.localPosition = new Vector3();
       parent.sizeDelta = new Vector2(100, original_hight);
       foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
@@ -130,29 +131,60 @@ namespace PCRCaculator
     /// </summary>
     /// <param name="type">1-JJC开战选人，2-JJC编辑敌方队伍选人,3-工会战出战选人,4-公会战更改配置</param>
     /// <param name="playerData">敌人队伍/会战要更改的队伍，为空则不显示</param>
-    public void CallChooseBack(int type, AddedPlayerData player = null)
+    public void CallChooseBack(int type, AddedPlayerData player = null, int selectedId = 0)
     {
-      if (buttons == null)
-      {
-        InitialButton();
-      }
-
-      CallChooseBack_0(type, player);
+      CallChooseBack_0(type, player, selectedId);
     }
-    private void CallChooseBack_0(int type, AddedPlayerData player = null)
+    private void CallChooseBack_0(int type, AddedPlayerData player = null, int selectedId = 0)
     {
-      Favriote.isOn = GuildManager.Instance.SettingData.Favriote;
-      Unused.isOn = GuildManager.Instance.SettingData.Unused;
       this.type = type;
       baseBack.SetActive(true);
-      chooseBack_A.SetActive(true);
-      settingBack.SetActive(false);
-      if (player == null || type == 4)
+      if (type == 4)
       {
-        // enemyGroups.SetActive(false);
+        selectedCharacterId_setting = selectedId;
+        selectedCharId.Clear();
+        for (int i = 0; i < 5; i++)
+        {
+          if (i < player.playrCharacters.Count)
+          {
+            selectedCharId.Add(player.playrCharacters[i].unitId);
+          }
+        }
       }
       else
       {
+        Favriote.isOn = GuildManager.Instance.SettingData.Favriote;
+        Unused.isOn = GuildManager.Instance.SettingData.Unused;
+        chooseBack_A.SetActive(true);
+        settingBack.SetActive(false);
+
+        if (PlayerPrefs.HasKey("selectedCharId"))
+        {
+          string id = PlayerPrefs.GetString("selectedCharId");
+          try
+          {
+            string[] ids = id.Split('-');
+            selectedCharId.Clear();
+            for (int i = 0; i < ids.Length; i++)
+            {
+              selectedCharId.Add(int.Parse(ids[i]));
+            }
+
+          }
+          catch
+          {
+            Debug.LogError("读取预设阵容失败！");
+            selectedCharId.Clear();
+          }
+        }
+        RefreshBasePage();
+      }
+      // if (player == null || type == 4)
+      // {
+        // enemyGroups.SetActive(false);
+      // }
+      // else
+      // {
         // enemyGroups.SetActive(true);
         /*enemyTotalPointText.text = player.totalpoint + "";
         for (int i = 0; i < 5; i++)
@@ -166,43 +198,8 @@ namespace PCRCaculator
                 enemyChars[i].SetButton(-1);
             }
         }*/
-      }
-      //selectedCharId.Clear();
-      if (type == 4)
-      {
-        selectedCharId.Clear();
-        for (int i = 0; i < 5; i++)
-        {
-          if (i < player.playrCharacters.Count)
-          {
-            selectedCharId.Add(player.playrCharacters[i].unitId);
-          }
-        }
-        this.OpenProperty();
-      }
-      else if (PlayerPrefs.HasKey("selectedCharId"))
-      {
-        string id = PlayerPrefs.GetString("selectedCharId");
-        try
-        {
-          string[] ids = id.Split('-');
-          selectedCharId.Clear();
-          for (int i = 0; i < ids.Length; i++)
-          {
-            selectedCharId.Add(int.Parse(ids[i]));
-          }
-
-        }
-        catch
-        {
-          Debug.LogError("读取预设阵容失败！");
-          selectedCharId.Clear();
-        }
-      }
-      if (type != 4) RefreshBasePage();
-      switchToggles[0].isOn = true;
+      // }
       RefreshSelectedButtons();
-
       if (type == 1)
       {
         nextButtonText.text = "战斗开始";
@@ -230,7 +227,6 @@ namespace PCRCaculator
     public void OpenProperty()
     {
       GuildManager.Instance.ActivateCharacterDetailPage(new Vector3(260, 0, 0), 0.6f);
-      GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting);
     }
     public void CloseProperty()
     {
@@ -300,8 +296,15 @@ namespace PCRCaculator
           charToggles_setting[i].interactable = i < selectedCharId.Count;
           //charToggles_setting[i].isOn = i == 0;
         }
+        if (type == 4 && !charToggles_setting[selectedCharacterId_setting].isOn)
+        {
+            charToggles_setting[selectedCharacterId_setting].isOn=true; // auto refresh
+        }
+        else
+        {
+          RefreshSettingValues();
+        }
         RefreshSettingPage();
-        RefreshSettingValues(true);
       }
       /*else if(type == 4)
       {
@@ -325,6 +328,8 @@ namespace PCRCaculator
     public void BackButton()
     {
       CloseProperty();
+      Favriote.isOn = GuildManager.Instance.SettingData.Favriote;
+      Unused.isOn = GuildManager.Instance.SettingData.Unused;
       RefreshBasePage();
       chooseBack_A.SetActive(true);
       settingBack.SetActive(false);
@@ -386,7 +391,7 @@ namespace PCRCaculator
       if (charToggles_setting[id].isOn)
         {
           selectedCharacterId_setting = id;
-          RefreshSettingValues(true);
+          RefreshSettingValues();
         }
       isSwitchingRole = false;
     }
@@ -442,7 +447,7 @@ namespace PCRCaculator
         data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
         data.exEquipLevel[i] = (int)detailSliders_setting[15 + i].value;
       }
-      RefreshSettingValues(false);
+      RefreshSettingValues();
 
     }
     public void AddButton_setting(int buttonid)
@@ -464,7 +469,7 @@ namespace PCRCaculator
     public void SetSelectedUnitMax()
     {
       playerData.playrCharacters[selectedCharacterId_setting].SetMax();
-      RefreshSettingValues(false);
+      RefreshSettingValues();
       RefreshSettingPage();
       MainManager.Instance.WindowMessage("成功！");
     }
@@ -474,7 +479,7 @@ namespace PCRCaculator
       {
         a.SetMax();
       }
-      RefreshSettingValues(false);
+      RefreshSettingValues();
       RefreshSettingPage();
       MainManager.Instance.WindowMessage("成功！");
     }
@@ -538,8 +543,8 @@ namespace PCRCaculator
       }
     }
 
-    public Dictionary<int, CharacterPageButton> buttons;
-    public Dictionary<int, CharacterPageButton> searchButtons;
+    public Dictionary<int, CharacterPageButton> buttons = new Dictionary<int, CharacterPageButton>();
+    public Dictionary<int, CharacterPageButton> searchButtons = new Dictionary<int, CharacterPageButton>();
 
     private bool shouldDisplay(int unitid, UnitData unitData)
     {
@@ -573,9 +578,8 @@ namespace PCRCaculator
           buttons[id].transform.localPosition = new Vector3(
               baseRange.x + range.x * ((count - 1) % 8),
               -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
-          // togglePerferbs[id].isOn = selectedCharId.Contains(id);
-          buttons[id].gameObject.SetActive(true);
           togglePerferbs[id].isOn = selectedCharId.Contains(id);
+          buttons[id].gameObject.SetActive(true);
           count++;
         }
         else
@@ -628,8 +632,11 @@ namespace PCRCaculator
       }
 
     }
-    public void RefreshSettingValues(bool changingId)
+    int lastRefreshedId = -1;
+    public void RefreshSettingValues()
     {
+      bool changingId = lastRefreshedId != selectedCharacterId_setting;
+      lastRefreshedId = selectedCharacterId_setting;
       isinstating = true;
       UnitData data = playerData.playrCharacters[selectedCharacterId_setting];
       detailTexts_setting[0].text = data.level + "";

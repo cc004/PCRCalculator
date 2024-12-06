@@ -265,6 +265,14 @@ namespace PCRCaculator
                 TPFillImage.color = Color.white;
             }
         }
+
+        public void SetAlive()
+        {
+            characterImage.color = Color.white;
+            backImage.color = Color.white;
+            stars.SetStarColor(Color.white);
+        }
+    
         private void SetDie()
         {
             characterImage.color = grayColor;

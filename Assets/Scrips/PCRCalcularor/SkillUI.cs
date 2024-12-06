@@ -28,7 +28,14 @@ namespace PCRCaculator.Battle
                 //string path = "skills/icon_skill_" + MainManager.Instance.SkillDataDic[a].icon;
                 //Sprite im = MainManager.LoadSourceSprite(path);
                 Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[a].icon);
-                skillImageDic.Add(a, im);
+                if (skillImageDic.ContainsKey(a))
+                {
+                    skillImageDic[a] = im;
+                }
+                else
+                {
+                    skillImageDic.Add(a, im);
+                }
             };
             for (int i = 0; i < skilllist.Length; i++)
             {

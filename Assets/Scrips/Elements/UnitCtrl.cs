@@ -2105,6 +2105,7 @@ this.updateCurColor();
           BaseData additional = null,
           BaseData exOverride = null)
         {
+            ToadDatas = new List<ToadData>();
             transformCache = transform;
             m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;
             lossyx = transformCache.parent.lossyScale.x;
@@ -6477,7 +6478,7 @@ this.updateCurColor();
 
         private IEnumerator aweCoroutine { get; set; }
 
-        public List<ToadData> ToadDatas { get; set; } = new List<ToadData>();
+        public List<ToadData> ToadDatas { get; set; }
 
         private Dictionary<eStateIconType, List<KnightGuardData>> knightGuardDatas { get; set; } = new Dictionary<eStateIconType, List<KnightGuardData>>();
 
