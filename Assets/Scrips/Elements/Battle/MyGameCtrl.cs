@@ -77,7 +77,6 @@ namespace Elements
                 tempData.SettingData = mainManager.GuildBattleData.SettingData;
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                 tempData.skipping = mainManager.GuildBattleData.skipping;
-                LoadAllUnitCtrlData();
             }
             else
             {
@@ -95,10 +94,64 @@ namespace Elements
             {
                 BattleManager.Instance.ubmanager.SetUbExec(null, 0);
             }
-    }
-    private void LoadAllUnitCtrlData()
-        {
         }
+        
+        public void ReStart(bool rebuild = true)
+        {
+            if (rebuild)
+            {
+                tempData = new TempData();
+                tempData.playerList = mainManager.PlayerDataForBattle;
+                if (mainManager.IsGuildBattle)
+                {
+                    tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
+                    tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
+                    tempData.mParts = mainManager.GuildBattleData.mParts;
+                    tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
+                    tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
+                    tempData.isGuildBattle = true;
+                    tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
+                    tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
+                    tempData.SettingData = mainManager.GuildBattleData.SettingData;
+                    tempData.randomData = tempData.SettingData.GetCurrentRandomData();
+                    tempData.skipping = mainManager.GuildBattleData.skipping;
+                }
+                else
+                {
+                    tempData.enemyList = mainManager.EnemyDataForBattle;
+                    tempData.SettingData = GuildManager.StaticsettingData;
+                }
+                tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
+            }
+            foreach (Transform child in unitParent)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach (Transform child in enemyParent)
+            {
+                Destroy(child.gameObject);
+            }
+            playerUnitCtrl.Clear();
+            enemyUnitCtrl.Clear();
+            playerUnitCtrlDic.Clear();
+            enemyUnitCtrlDic.Clear();
+            allUnitCtrlDataDic.Clear();
+            IsUnitCreated = false;
+            finishCount = 0;
+            unitCount.Clear();
+            BattleHeaderController.Instance.ReStart();
+            BattleUIManager.Instance.ReStart();
+            staticBattleManager.Init(this);
+            if (!IsAutoMode)
+            {
+                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+            }
+            else
+            {
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+            }
+        }
+
         public void Initialize()//由GameManager的init调用，生成己方战斗小人
         {
             finishCount = 0;
@@ -164,7 +217,7 @@ namespace Elements
             }
 
             if (tempData.isGuildBattle)
-                SetBattleSpeed(mainManager.GuildBattleData.SettingData.calSpeed);
+                SetBattleSpeed(tempData.SettingData.calSpeed);
             else
                 SetBattleSpeed(1);
         }
@@ -562,11 +615,18 @@ namespace Elements
         }*/
         public void OnBattleFinished(int result)//1-lose,2-timeover
         {
-            if (!mainManager.AutoCalculatorData.isFinish)
+            if (mainManager.AutoCalculatorData.isCalculating)
             {
                 mainManager.AutoCalculatorData.resultDatas.Add(
-                  GuildCalculator.Instance.GetOnceResultData( mainManager.AutoCalculatorData.execedTime + 1));
-                StartCoroutine(BackToTitle());
+                GuildCalculator.Instance.GetOnceResultData( mainManager.AutoCalculatorData.execedTime + 1));
+                if (!mainManager.AutoCalculatorData.isFinish)
+                {
+                    ReStart();
+                }
+                else
+                {
+                    StartCoroutine(BackToTitle());
+                }
             }
             else if (tempData.isGuildBattle)
             {

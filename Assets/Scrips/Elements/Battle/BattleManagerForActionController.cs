@@ -36,7 +36,7 @@ namespace Elements.Battle
 
     void SetSkillExeScreenActive(UnitCtrl FNHGFDNICFG, Color BHIJOLHCGKC);
 
-    HashSet<long> PBCLBKCKHAI { get; }
+    HashSet<long> activeActionIds { get; }
 
     void CallbackActionEnd(long NBLAEJPILJM);
 

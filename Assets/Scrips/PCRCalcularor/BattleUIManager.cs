@@ -132,6 +132,13 @@ namespace PCRCaculator.Battle
             _Update += _UpdateFPSCount;
             timeScaleSlider.value = GuildManager.Instance.calSlider.value;
         }
+        public void ReStart()
+        {
+            guildTotalDamage = 0;
+            debugStrList.Clear();
+            imageSaved.Clear();
+            timeScaleSlider.value = GuildManager.Instance.calSlider.value;
+        }
         private void Update()
         {
             _Update?.Invoke();
@@ -271,6 +278,7 @@ namespace PCRCaculator.Battle
         }
         public void ShowSkillName(string skillName, Transform transform)
         {
+            if (BattleManager.Instance.skipping) return;
             if(skillName == "") { return; }
             GameObject a = Instantiate(skillNamePerfab);
             a.transform.SetParent(parent, false);
@@ -289,6 +297,8 @@ namespace PCRCaculator.Battle
                     //BattleManager.Instance.PlayersList[i].SetUI(PlayerUI[i], b);
                     gameCtrl.playerUnitCtrl[i].SetUI(PlayerUI[i], b);
                     b.SetBuffUI(rularSprites[i], gameCtrl.playerUnitCtrl[i]);
+                    PlayerUI[i].SetAlive();
+                    PlayerUI[i].gameObject.SetActive(true);
                 }
                 else
                 {
@@ -308,7 +318,10 @@ namespace PCRCaculator.Battle
                     {
                         gameCtrl.enemyUnitCtrl[i].OnDamage += RefreshGuildEnemyTotalDamage2;
                         guildTotalDamageNumber.gameObject.SetActive(true);
+                    }else{
+                        EnemyUI[i].gameObject.SetActive(false);
                     }
+                    EnemyUI[i].SetAlive();
                 }
                 else
                 {
@@ -322,7 +335,7 @@ namespace PCRCaculator.Battle
             if (!myGameCtrl.tempData.isGuildBattle)
             {
                 debugBack.SetActive(false);
-                backGroundImage.sprite = jjcBackGround;
+                // backGroundImage.sprite = jjcBackGround;
             }
             StartCoroutine(AutoSaveImage2());
         }
@@ -382,7 +395,8 @@ namespace PCRCaculator.Battle
         public void RetryButton()
         {
             GuildManager.Instance.SettingInputs[8].text = pauseTime.text;
-            GuildManager.Instance.StartCalButton();
+            GuildCalculator.Instance.guildPageUI.SetActive(!GuildCalculator.Instance.guildPageUI.activeSelf);
+            GuildManager.Instance.ReStartCalButton();
         }
 
         public void PauseButton()

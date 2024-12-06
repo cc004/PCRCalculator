@@ -38,15 +38,15 @@ namespace PCRCaculator.Guild
     {
         public static GuildCalculator Instance;
         // public const float deltaXforChat = 1 / 5400.0f;
-        public Dictionary<int, List<UnitStateChangeData>> allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
-        public Dictionary<int, List<UnitAbnormalStateChangeData>> allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
-        public Dictionary<int, List<ValueChangeData>> allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();
-        public Dictionary<int, List<ValueChangeData>> allUnitTPDic = new Dictionary<int, List<ValueChangeData>>();
-        public Dictionary<int, List<UnitSkillExecData>> allUnitSkillExecDic = new Dictionary<int, List<UnitSkillExecData>>();
-        public Dictionary<int, List<ValueChangeData>> playerUnitDamageDic = new Dictionary<int, List<ValueChangeData>>();
-        public List<ValueChangeData> bossDefChangeDic = new List<ValueChangeData>();
-        public List<ValueChangeData> bossMgcDefChangeDic = new List<ValueChangeData>();
-        public List<RandomData> AllRandomDataList = new List<RandomData>();
+        public Dictionary<int, List<UnitStateChangeData>> allUnitStateChangeDic;
+        public Dictionary<int, List<UnitAbnormalStateChangeData>> allUnitAbnormalStateDic;
+        public Dictionary<int, List<ValueChangeData>> allUnitHPDic;
+        public Dictionary<int, List<ValueChangeData>> allUnitTPDic;
+        public Dictionary<int, List<UnitSkillExecData>> allUnitSkillExecDic;
+        public Dictionary<int, List<ValueChangeData>> playerUnitDamageDic;
+        public List<ValueChangeData> bossDefChangeDic;
+        public List<ValueChangeData> bossMgcDefChangeDic;
+        public List<RandomData> AllRandomDataList;
         public GameObject guildPageUI;
         public GameObject skillDetailPrefab;
 
@@ -91,6 +91,38 @@ namespace PCRCaculator.Guild
 
         public void Initialize(List<UnitCtrl> players, UnitCtrl boss)
         {
+            foreach (GuildSkillGroupPrefab guildSkillGroupPrefab in skillGroupPrefabDic.Values)
+            {
+                Destroy(guildSkillGroupPrefab.gameObject);
+            }
+            skillGroupPrefabDic.Clear();
+
+            isFinishCalc = false;
+            totalDamage = 0;
+            totalDamageCriEX = 0;
+            totalDamageExcept = 0;
+            allUnitLastStateDic.Clear();
+            playerIds.Clear();
+            allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
+            allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
+            allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();
+            allUnitTPDic = new Dictionary<int, List<ValueChangeData>>();
+            allUnitSkillExecDic = new Dictionary<int, List<UnitSkillExecData>>();
+            playerUnitDamageDic = new Dictionary<int, List<ValueChangeData>>();
+            bossDefChangeDic = new List<ValueChangeData>();
+            bossMgcDefChangeDic = new List<ValueChangeData>();
+            AllRandomDataList = new List<RandomData>();
+            skillGroupList = new List<int>();
+            skillGroupOrder = new Dictionary<int, int>();
+            unit_state_id = new Dictionary<int, int>();
+            hpCache = new List<ValueChangeData>();
+            tpCache = new List<ValueChangeData>();
+            lastHp = new List<ValueChangeData>();
+            lastTp = new List<ValueChangeData>();
+            templateSettings.Clear();
+            dmglist.Clear();
+            bossValues.Clear();
+
             this.players = players;
             this.boss = boss;
             if (MyGameCtrl.Instance.tempData.isGuildBattle && !MainManager.Instance.GuildBattleData.SettingData.calcSpineAnimation)
@@ -165,7 +197,7 @@ namespace PCRCaculator.Guild
         }
 
     private int id;
-    private Dictionary<int, int> unit_state_id = new Dictionary<int, int>();
+    private Dictionary<int, int> unit_state_id;
     public void AppendChangeState(int unitid, UnitCtrl.ActionState actionState, int frameCount, string describe, UnitCtrl ctrl)
         {
             try
@@ -444,12 +476,12 @@ namespace PCRCaculator.Guild
         }
 
         private int hpCacheFrame = -1;
-        private List<ValueChangeData> hpCache = new List<ValueChangeData>();
+        private List<ValueChangeData> hpCache;
         private int tpCacheFrame = -1;
-        private List<ValueChangeData> tpCache = new List<ValueChangeData>();
+        private List<ValueChangeData> tpCache;
 
-        private List<ValueChangeData> lastHp = new List<ValueChangeData>();
-        private List<ValueChangeData> lastTp = new List<ValueChangeData>();
+        private List<ValueChangeData> lastHp;
+        private List<ValueChangeData> lastTp;
 
         private void AppendHpDrawData(ValueChangeData x)
         {
@@ -562,8 +594,8 @@ namespace PCRCaculator.Guild
         }
 
         private RectTransform headAnchor, tailAnchor;
-        private List<int> skillGroupList = new List<int>();
-        private Dictionary<int, int> skillGroupOrder = new Dictionary<int, int>();
+        private List<int> skillGroupList;
+        private Dictionary<int, int> skillGroupOrder;
 
         private void AddSkillGroups(int unitid, int idx, int colorIdx, string Name)
         {
@@ -707,15 +739,17 @@ namespace PCRCaculator.Guild
                 $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
             {
-              detail += $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
-              damageStr += detail;
+                detail = $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
             }
             else if (backTime > 0)
             {
                 detail = $" 返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
-                damageStr += detail;
             }
-            else detail = string.Empty;
+            else
+            { 
+                detail = string.Empty;
+            }
+            damageStr += detail;
             damageStr += $" 随机数种子：{MyGameCtrl.Instance.CurrentSeedForSave}";
             totalDamageText.text = damageStr;
             basedmg.text = totalDamageCriEX.ToString();
@@ -1556,7 +1590,7 @@ namespace PCRCaculator.Guild
         {
             xValue = x;
             yValue = y;
-             realFrameCount = BattleManager.Instance?.FrameCount ?? 0;
+            realFrameCount = BattleManager.Instance?.FrameCount ?? 0;
         }
 
         public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
