@@ -593,7 +593,7 @@ namespace PCRCaculator
             uniqueEqLv = uniqueeqlv;
         }
 
-        public void SetMax()
+        public void SetMax(bool equip_second_full = false)
         {
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
@@ -606,10 +606,10 @@ namespace PCRCaculator
                 skillLevel[3] = playerLevel;
                 //love = GetMaxRarity() == 6 ? 12 : 8;
                 rarity = GetMaxRarity();
-                rank = playerSetting.GetMaxRank();
+                rank = playerSetting.GetMaxRank() - (equip_second_full ? 1 : 0);
                 for (int i = 0; i < 6; i++)
                 {
-                    if (playerSetting.GetEquipmentIsAble()[i])
+                    if (!equip_second_full && playerSetting.GetEquipmentIsAble()[i])
                     {
                         int equipmentID = un.GetRankEquipments(rank)[i];
                         if (MainManager.Instance.EquipmentDic.ContainsKey(equipmentID))

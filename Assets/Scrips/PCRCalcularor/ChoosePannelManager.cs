@@ -470,6 +470,13 @@ namespace PCRCaculator
       }
       OnSliderDraged();
     }
+    public void SetSelectedUnitSecondMax()
+    {
+      playerData.playrCharacters[selectedCharacterId_setting].SetMax(equip_second_full: true);
+      RefreshSettingValues();
+      RefreshSettingPage();
+      MainManager.Instance.WindowMessage("成功！");
+    }
     public void SetSelectedUnitMax()
     {
       playerData.playrCharacters[selectedCharacterId_setting].SetMax();
