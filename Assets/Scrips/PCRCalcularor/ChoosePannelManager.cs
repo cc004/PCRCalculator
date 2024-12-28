@@ -383,8 +383,8 @@ namespace PCRCaculator
       }
       else
       {
-        togglePerferbs[unitid].enabled = false;
-        throw new Exception("最多选5个!");
+        togglePerferbs[unitid].isOn = false;
+        MainManager.Instance.WindowMessage("最多选择5名角色！");
       }
       RefreshSelectedButtons();
     }
@@ -567,18 +567,17 @@ namespace PCRCaculator
       return position && fav && search;
     }
 
+    private int firstShowUnitId;
+
     private void RefreshBasePage()
     {
       int count = 1;
+      firstShowUnitId = -1;
 
       foreach (int id in buttons.Keys)
       {
         UnitData unitData;
-        if (MainManager.Instance.unitDataDic.TryGetValue(id, out unitData))
-        {
-          unitData = unitData;
-        }
-        else
+        if (!MainManager.Instance.unitDataDic.TryGetValue(id, out unitData))
         {
           unitData = new UnitData(id, 1);
         }
@@ -591,6 +590,8 @@ namespace PCRCaculator
               -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
           togglePerferbs[id].isOn = selectedCharId.Contains(id);
           buttons[id].gameObject.SetActive(true);
+          if (count == 1) 
+            firstShowUnitId = id;
           count++;
         }
         else
@@ -765,9 +766,26 @@ namespace PCRCaculator
         id2pinyin[parsedKey] = string.Join("|", entry.Value.Select(x => PinyinHelper.GetPinyin(x, "").ToUpper()));
       }
     }
+
+    private void SelectFirstUnit()
+    {
+      if (firstShowUnitId != -1)
+      {
+        OnToggleSwitched(!togglePerferbs[firstShowUnitId].isOn, firstShowUnitId);
+      }
+    }
+
     public void SearchChara()
     {
-      RefreshBasePage();
+      if (Search.text.EndsWith(" "))
+      {
+        SelectFirstUnit();
+        Search.text = Search.text.TrimEnd(' ');
+      }
+      else
+      {
+        RefreshBasePage();
+      }
     }
     public void FavIsShow()
     {
