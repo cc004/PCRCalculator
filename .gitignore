@@ -1,3 +1,10 @@
 Assets/.ABExt2
 .vscode
 .DS_Store
+UserSettings
+Temp
+Logs
+Library
+*.json
+*.csproj
+PCRCAlculator.sln

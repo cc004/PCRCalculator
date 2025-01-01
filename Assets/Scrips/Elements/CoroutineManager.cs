@@ -68,6 +68,15 @@ namespace Elements
       });
       int num = isRemoved ? 1 : 0;
     }
+    
+    public void ClearAll()
+    {
+      foreach (KeyValuePair<ePauseType, CoroutineData> coroutineData in coroutineDataDictionary)
+      {
+        coroutineData.Value.Destroy();
+        coroutineData.Value.CoroutineDataDictionary.Clear();
+      }
+    }
 
     private void OnDestroy()
     {

@@ -15,6 +15,10 @@ namespace Elements
     {
         public static BattleHeaderController Instance;
         public static int CurrentFrameCount;
+        public void ReStart()
+        {
+            CurrentFrameCount = 0;
+        }
         private void Awake()
         {
             Instance = this;

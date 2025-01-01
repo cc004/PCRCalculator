@@ -1327,11 +1327,11 @@ namespace Elements
             {
                 ids[i] = 0L;
                 long int64 = Convert.ToInt64(_action.ActionId);
-                while (battleManager.PBCLBKCKHAI.Contains(int64 * 100L + ids[i]))
+                while (battleManager.activeActionIds.Contains(int64 * 100L + ids[i]))
                     ++ids[i];
                 long actionIndivisualId = int64 * 100L + ids[i];
                 _target.Owner.ActionsTargetOnMe.Add(actionIndivisualId);
-                battleManager.PBCLBKCKHAI.Add(actionIndivisualId);
+                battleManager.activeActionIds.Add(actionIndivisualId);
                 float waitTime = _action.ExecTime[i];
                 while (true)
                 {

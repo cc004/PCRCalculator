@@ -83,7 +83,7 @@ namespace PCRCaculator
         private List<UnitData> playerDataForBattle;
         private List<UnitData> enemyDataForBattle;
         private bool isGuildBattle;
-        private GuildBattleData guildBattleData;
+        public GuildBattleData guildBattleData;
         private bool isAutoMode;
         private bool forceAutoMode;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
@@ -141,6 +141,7 @@ namespace PCRCaculator
             if (Instance == null)
             {
                 Instance = this;
+                LoadFinished = false;
                 DontDestroyOnLoad(gameObject);
                 Application.targetFrameRate = 60;
 
@@ -176,6 +177,7 @@ namespace PCRCaculator
 
         private void Start()
         {
+            LoadFinished = false;
             try
             {
                 /*
