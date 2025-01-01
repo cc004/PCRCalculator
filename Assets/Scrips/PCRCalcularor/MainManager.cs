@@ -374,6 +374,10 @@ namespace PCRCaculator
                                     skillDataDic.OverrideWith(dbTool3.Dic3.Where(p => p.Key / 100000 == 17))),
                                 Task.Run(() =>
                                     skillActionDic.OverrideWith(dbTool3.Dic4.Where(p => p.Key / 10000000 == 17))),
+                                Task.Run(() => {
+                                    masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
+                                    masterUnitSkillDataRf.dict.OverrideWith(dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17));
+                                }),
                                 Task.Run(() =>
                                     allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5.Where(p => p.Key / 1000000 == 17)))
                             );
