@@ -249,12 +249,12 @@ namespace PCRCaculator
     }
     public void NextButton(AddedPlayerData playerData0 = null)
     {
-      this.OpenProperty();
       if (selectedCharId.Count == 0)
       {
         MainManager.Instance.WindowMessage("请选择至少一个角色！");
         return;
       }
+      this.OpenProperty();
       string saveID = "";
       for (int i = 0; i < selectedCharId.Count; i++)
       {
@@ -648,6 +648,10 @@ namespace PCRCaculator
     public void RefreshSettingValues()
     {
       isinstating = true;
+      if (selectedCharacterId_setting >= playerData.playrCharacters.Count)
+      {
+        selectedCharacterId_setting = playerData.playrCharacters.Count - 1;
+      }
       UnitData data = playerData.playrCharacters[selectedCharacterId_setting];
       bool changingId = lastRefreshedId != data.unitId;
       lastRefreshedId = data.unitId;
