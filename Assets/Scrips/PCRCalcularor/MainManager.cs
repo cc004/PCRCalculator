@@ -364,22 +364,23 @@ namespace PCRCaculator
                                     // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
                                 );
 
-
+                            var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701).ToList();
+                            var filteredUniqueEquipment = dbTool3.Dic9.Where(p => p.Key / 10000 == 17).ToList();
+                            var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
+                            var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
+                            var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
+                            var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17).ToList();
                             Task.WaitAll(
+                                Task.Run(() => unitRarityDic.OverrideWith(filteredUnitRarity)),
+                                Task.Run(() => UniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment)),
+                                Task.Run(() => skillDataDic.OverrideWith(filteredSkillData)),
+                                Task.Run(() => skillActionDic.OverrideWith(filteredSkillAction)),
                                 Task.Run(() =>
-                                    unitRarityDic.OverrideWith(dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701))),
-                                Task.Run(() =>
-                                    UniqueEquipmentDataDic.OverrideWith(dbTool3.Dic9.Where(p => p.Key / 10000 == 17))),
-                                Task.Run(() =>
-                                    skillDataDic.OverrideWith(dbTool3.Dic3.Where(p => p.Key / 100000 == 17))),
-                                Task.Run(() =>
-                                    skillActionDic.OverrideWith(dbTool3.Dic4.Where(p => p.Key / 10000000 == 17))),
-                                Task.Run(() => {
+                                {
                                     masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
-                                    masterUnitSkillDataRf.dict.OverrideWith(dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17));
+                                    masterUnitSkillDataRf.dict.OverrideWith(filteredMasterUnitSkill);
                                 }),
-                                Task.Run(() =>
-                                    allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5.Where(p => p.Key / 1000000 == 17)))
+                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern))
                             );
 
                             Task.WaitAll(
@@ -389,8 +390,6 @@ namespace PCRCaculator
                                 Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
                                 Task.Run(() => GuildManager.EnemyDataDic.Override2With(dbTool3.Dic2))
                             );
-                            
-                            // unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
 
                             unitRarityDic.TryAdd(dbCN.Dic1);
                             unitStoryDic.TryAdd(dbCN.Pair.Item1);
@@ -399,7 +398,7 @@ namespace PCRCaculator
                             skillDataDic.TryAdd(dbCN.Dic3);
                             skillActionDic.TryAdd(dbCN.Dic4);
                             allUnitAttackPatternDic.TryAdd(dbCN.Dic5);
-
+    
                             unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
                             unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
