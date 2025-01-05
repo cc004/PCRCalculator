@@ -1017,6 +1017,11 @@ namespace Elements
             // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm constructing {name}@{GetHashCode():x}.");
         }
 
+        public void Destory()
+        {
+            Object.Destroy(obj);
+        }
+
         ~FirearmCtrl2()
         {
             try

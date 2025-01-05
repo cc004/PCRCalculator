@@ -3531,18 +3531,51 @@ namespace Elements.Battle
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
             activeActionIds.Clear();
+            effectUpdateList.Clear();
+            foreach(var unitSpineController in unitSpineControllerList)
+            {
+                unitSpineController.Destroy();
+            }
             unitSpineControllerList.Clear();
+            foreach(var enemy in EnemyList)
+            {
+                enemy.DestroyAndCoroutineRemove();
+            }
             EnemyList.Clear();
+            foreach(var unit in UnitList)
+            {
+                unit.DestroyAndCoroutineRemove();
+            }
             UnitList.Clear();
+            foreach(var blackOutUnit in BlackOutUnitList)
+            {
+                blackOutUnit.DestroyAndCoroutineRemove();
+            }
             BlackOutUnitList.Clear();
+            foreach(var blackoutUnitTarget in BlackoutUnitTargetList)
+            {
+                blackoutUnitTarget.DestroyAndCoroutineRemove();
+            }
             BlackoutUnitTargetList.Clear();
+            foreach(var unit in LPBCBINDJLJ)
+            {
+                unit.DestroyAndCoroutineRemove();
+            }
             LPBCBINDJLJ.Clear();
             NOMJJDDCBAN.Clear();
             FieldDataDictionary.Clear();
+            foreach(var battleEffects in battleEffectDict)
+            {
+                foreach(var battleEffect in battleEffects.Value)
+                {
+                    battleEffect.Destory();
+                }
+            }
             battleEffectDict.Clear();
             setStatus.Clear();
             GuildCalculator.Instance.dmglist.Clear();
             GuildCalculator.Instance.bossValues.Clear();
+            Resources.UnloadUnusedAssets();
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             // ISSUE: object of a compiler-generated type is created
@@ -3919,7 +3952,6 @@ namespace Elements.Battle
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();
             }
-
             battleManager.GameState = eBattleGameState.PLAY;
             battleManager.skipping = tempData.skipping;
             RestFrameCount();
