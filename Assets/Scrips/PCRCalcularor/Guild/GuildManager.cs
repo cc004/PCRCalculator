@@ -32,7 +32,7 @@ namespace PCRCaculator.Guild
         public Text characterGroupPageText;
         public List<Text> timeLineTexts;
 
-        public GameObject characterDetailPage;
+    public GameObject characterDetailPage;
         public GameObject characterDetailPageChild;
         public CharacterPageButton characterDetailButton;
         public Action execTimeButtonAction;
@@ -105,6 +105,7 @@ namespace PCRCaculator.Guild
         public GameObject setImageButton;
         public GameObject clearImageButton;
         public Button clearUbButton;
+        public GameObject infoPanel;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -138,6 +139,42 @@ namespace PCRCaculator.Guild
         private void Start()
         {
             StartCoroutine(StartAfterWait());
+            foreach (Transform child in infoPanel.transform)
+            {
+              Button button = child.GetComponent<Button>();
+              Text text = child.GetComponentInChildren<Text>();
+              if (button != null && text != null)
+              {
+                  button.onClick.AddListener(() => OnInfoButtonClick(text));
+              }
+            }
+            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
+            SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
+        }
+        private void OnInfoButtonClick(Text text)
+        { 
+            string textContent = text.text;
+            if (!string.IsNullOrEmpty(SettingInputs[11].text))
+            {
+                textContent = "/" + textContent;
+            }
+            textContent = textContent.Replace("\n", "").Replace("\r", "");
+            GUIUtility.systemCopyBuffer = textContent;
+            MainManager.Instance.WindowMessage("文本已复制并自动添加到末尾");
+            SettingInputs[11].text += textContent.Replace("\n", "").Replace("\r", "");
+        }
+        private void OnInputField1ValueChanged(string value)
+        {
+            SettingInputs[12].onValueChanged.RemoveListener(OnInputField2ValueChanged);
+            SettingInputs[12].text = value;
+            SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
+        }
+
+        private void OnInputField2ValueChanged(string value)
+        {
+            SettingInputs[11].onValueChanged.RemoveListener(OnInputField1ValueChanged);
+            SettingInputs[11].text = value;
+            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
         }
         private IEnumerator StartAfterWait()
         {
@@ -734,6 +771,7 @@ namespace PCRCaculator.Guild
             SettingInputs[9].text = SettingData.n1.ToString();
             SettingInputs[10].text = SettingData.n2.ToString();
             SettingInputs[11].text = SettingData.dispFields;
+            SettingInputs[12].text = SettingData.dispFields;
         }
         public void RefreshCalcUI()
         {
@@ -978,7 +1016,9 @@ namespace PCRCaculator.Guild
             }
             if (SettingData.guildPlayerGroupDatas.Count < currentPage * 5 + 5)
             {
-                MainManager.Instance.WindowConfigMessage("是否增加5组预设阵容？", EnlargePlayerDatas);
+                EnlargePlayerDatas();
+                MainManager.Instance.WindowMessage("已新增5支队伍");
+                // MainManager.Instance.WindowConfigMessage("是否增加5组预设阵容？", EnlargePlayerDatas);
             }
             else
             {
@@ -1294,6 +1334,9 @@ namespace PCRCaculator.Guild
             RefreshCharacterGroupToggle();
             ChooseCharacterGroup();
             Refresh();
+        }
+        public void isShowInfoPanelButton(){
+          infoPanel.SetActive(!infoPanel.activeSelf);
         }
     }
     [Serializable]
