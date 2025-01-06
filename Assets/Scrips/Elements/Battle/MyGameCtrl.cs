@@ -33,8 +33,8 @@ namespace Elements
         private int finishCount;
         private MainManager mainManager;
         private BattleManager staticBattleManager;
-        private Dictionary<int, UnitCtrl> playerUnitCtrlDic = new Dictionary<int, UnitCtrl>();
-        private Dictionary<int, UnitCtrl> enemyUnitCtrlDic = new Dictionary<int, UnitCtrl>();
+        public Dictionary<int, UnitCtrl> playerUnitCtrlDic = new Dictionary<int, UnitCtrl>();
+        public Dictionary<int, UnitCtrl> enemyUnitCtrlDic = new Dictionary<int, UnitCtrl>();
 
         public bool IsAutoMode;
         public bool ForceAutoMode;
@@ -142,6 +142,17 @@ namespace Elements
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
             staticBattleManager.Init(this);
+            if (!BattleUIManager.Instance.SetToggle.isOn)
+            {
+              for (int i = 0; i < BattleUIManager.Instance.PlayerUI.Count; i++)
+              {
+                  BattleUIManager.Instance.PlayerUI[i].ShowContinousPress(false);
+              }
+            }
+            else
+            {
+                BattleUIManager.Instance.OnSetToggleSwitched();
+            }
             if (!IsAutoMode)
             {
                 BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);

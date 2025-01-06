@@ -106,6 +106,7 @@ namespace PCRCaculator.Guild
         public GameObject clearImageButton;
         public Button clearUbButton;
         public GameObject infoPanel;
+        public Text version;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -139,6 +140,7 @@ namespace PCRCaculator.Guild
         private void Start()
         {
             StartCoroutine(StartAfterWait());
+            version.text = "v" + Application.version;
             foreach (Transform child in infoPanel.transform)
             {
               Button button = child.GetComponent<Button>();
@@ -160,7 +162,7 @@ namespace PCRCaculator.Guild
             }
             textContent = textContent.Replace("\n", "").Replace("\r", "");
             GUIUtility.systemCopyBuffer = textContent;
-            MainManager.Instance.WindowMessage("文本已复制并自动添加到末尾");
+            MainManager.Instance.WindowMessage("文本已复制并添加到末尾");
             SettingInputs[11].text += textContent.Replace("\n", "").Replace("\r", "");
         }
         private void OnInputField1ValueChanged(string value)
