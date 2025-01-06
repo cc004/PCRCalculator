@@ -484,16 +484,25 @@ namespace ExcelHelper
 
             foreach (var tuple in cdict)
             {
-              //修改姬塔id
-              if (tuple.Value.unit.unitId == 105701) 
-              {
-                src.AppendLine($"mov 170301,{tuple.Value.name}");
-              }
-              else
-              {
-                src.AppendLine($"mov {tuple.Value.unit.unitId},{tuple.Value.name}");
-              }
-            }
+                int unitId = tuple.Value.unit.unitId;
+                string name = tuple.Value.name;
+                switch (unitId)
+                {
+                    case 105701:
+                        unitId = 170301;
+                        break;
+                    case 106101:
+                        name = "矛衣未";
+                        break;
+                    case 104701:
+                        name = "春511";
+                        break;
+                    case 125001:
+                        name = "解511";
+                        break;
+                }
+                src.AppendLine($"mov {unitId},{name}");
+      }
 
             //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
             //msg.AppendLine($"对\"{enemy}\"（{seed}:{enemy}-{PCRBattle.Instance.enemyUnitid}）造成{damage}伤害：");

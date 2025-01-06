@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using Newtonsoft.Json;
 using TinyPinyin;
+using UnityEngine.Networking;
 namespace PCRCaculator
 {
   public class ChoosePannelManager : MonoBehaviour
@@ -86,7 +87,7 @@ namespace PCRCaculator
     private void Start()
     {
       Instance = this;
-      SearchCharaInitialize();
+      StartCoroutine(SearchCharaInitialize());
       StartCoroutine(WaitForLoadFinished());
     }
 
@@ -496,6 +497,7 @@ namespace PCRCaculator
     }
     public void OpenEXSettingPannel()
     {
+      isSwitchingRole = true;
       UnitData unit = playerData.playrCharacters[selectedCharacterId_setting];
       List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unit.unitId];
       for (int i = 0; i < EXsettingSliders.Count; i++)
@@ -522,8 +524,9 @@ namespace PCRCaculator
         {
           EXsettingSliders[i].SetSliderPrefab("???", 0, 0, 0, null);
           EXsettingSliders[i].SetActive(false);
-        }
+        }   
       }
+      isSwitchingRole = false;
     }
     public void OnFinishEXSettings()
     {
@@ -756,12 +759,35 @@ namespace PCRCaculator
     }
     private Dictionary<int, string> id2alias;
     private Dictionary<int, string> id2pinyin;
-    private void SearchCharaInitialize()
+    private IEnumerator SearchCharaInitialize()
     {
       id2alias = new Dictionary<int, string>();
       id2pinyin = new Dictionary<int, string>();
-      string filePath = Application.streamingAssetsPath + "/Datas/_pcr_data.json";
-      string jsonString = File.ReadAllText(filePath);
+
+      string filePath = Path.Combine(Application.streamingAssetsPath, "Datas", "chara_name.json");
+
+      string jsonString = null;
+
+      if (filePath.Contains("jar:file:")) // Android
+      {
+        using (UnityWebRequest www = UnityWebRequest.Get(filePath))
+        {
+          yield return www.SendWebRequest();
+
+          if (www.result != UnityWebRequest.Result.Success)
+          {
+            Debug.LogError("Failed to load file: " + www.error);
+            yield break;
+          }
+
+          jsonString = www.downloadHandler.text;
+        }
+      }
+      else //PC
+      {
+        jsonString = File.ReadAllText(filePath);
+      }
+
       var data = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(jsonString);
       foreach (var entry in data)
       {
@@ -770,7 +796,6 @@ namespace PCRCaculator
         id2pinyin[parsedKey] = string.Join("|", entry.Value.Select(x => PinyinHelper.GetPinyin(x, "").ToUpper()));
       }
     }
-
     private void SelectFirstUnit()
     {
       if (firstShowUnitId != -1)

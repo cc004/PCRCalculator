@@ -74,7 +74,7 @@ namespace Elements
 		// Token: 0x040087FB RID: 34811
 		DEBUF_BARRIAR,
     // Token: 0x040087FC RID: 34812		
-    [Description("反击\n露sk2/圣电ub")]
+    [Description("反击\n露sk1/圣电ub")]
     STRIKE_BACK,
 		// Token: 0x040087FD RID: 34813
 		PARALISYS,

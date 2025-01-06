@@ -427,6 +427,10 @@ namespace PCRCaculator.Battle
                         UBButtonState[charidx] = 2;
                         MyGameCtrl.Instance.playerUnitCtrl[charidx].pressing = true;
                         PlayerUI[charidx].ShowContinousPress(true);
+                        if (AllStatesAreTwo(UBButtonState))
+                        {
+                            SetToggle.isOn = true;
+                        }
                         break;
                     default:
                         PlayerUI[charidx].ShowContinousPress(false);
@@ -473,7 +477,7 @@ namespace PCRCaculator.Battle
             }
             if (SetToggle.isOn)
             {
-                for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrl.Count; i++){
+                for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrlDic.Count; i++){
                     MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
                     PlayerUI[i].ShowContinousPress(true);
                     UBButtonState[i] = 2;
@@ -481,7 +485,7 @@ namespace PCRCaculator.Battle
             }
             else if (!SetToggle.isOn && AllStatesAreTwo(UBButtonState))
             {
-                for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrl.Count; i++)
+                for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrlDic.Count; i++)
                 {
                     MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
                     PlayerUI[i].ShowContinousPress(false);
@@ -492,9 +496,10 @@ namespace PCRCaculator.Battle
         }
         private bool AllStatesAreTwo(int[] states)
         {
-            foreach (int state in states)
+            int count = MyGameCtrl.Instance.playerUnitCtrlDic.Count;
+            for (int i = 0; i < count; i++)
             {
-                if (state != 2)
+                if (states[i] != 2)
                 {
                     return false;
                 }
