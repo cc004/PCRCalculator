@@ -293,6 +293,8 @@ namespace PCRCaculator.Guild
                 if (toggle.isOn)
                 {
                     SettingData.currentPlayerGroupNum = idx + currentPage*5-5;
+                    AutoModeToggle.isOn = SettingData.GetCurrentPlayerGroup().useAutoMode;
+                    SetModeToggle.isOn = SettingData.GetCurrentPlayerGroup().useSetMode;
                 }
                 idx++;
             }
