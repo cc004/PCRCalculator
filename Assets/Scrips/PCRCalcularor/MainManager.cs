@@ -192,6 +192,10 @@ namespace PCRCaculator
                 var fs = new FileStream("/storage/emulated/0/Download/D4-蝶妈似似花水魅魔圣千真步-2170w.xlsx"
                     , FileMode.Open, FileAccess.Read);
 #endif*/
+
+                ABExTool.persistentDataPath = Application.persistentDataPath;
+                ABExTool.dataPath = Application.dataPath;
+
                 if (useVerification)
                 {
                     loginTool?.gameObject.SetActive(true);
@@ -199,7 +203,7 @@ namespace PCRCaculator
 #if PLATFORM_ANDROID
                 var dir = Application.persistentDataPath + "/AB";
 #else
-                var dir = Application.streamingAssetsPath + "/../.ABExt2";
+                var dir = ABExTool.persistentDataPath + "/.ABExt2";
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -249,9 +253,6 @@ namespace PCRCaculator
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
             */
-
-            ABExTool.persistentDataPath = Application.persistentDataPath;
-            ABExTool.dataPath = Application.dataPath;
 
 #if UNITY_ANDROID
             var loadsql =

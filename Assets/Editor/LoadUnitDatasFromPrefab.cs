@@ -75,7 +75,7 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
         {
             foreach (var (mgr, content) in ABExTool.CacheAllFiles(new Regex(reg), !useNew))
             {
-                var filePath = Application.streamingAssetsPath + "/../.ABExt2/" + content.url.Split('/').Last();
+                var filePath = ABExTool.persistentDataPath + "/.ABExt2/" + content.url.Split('/').Last();
                 if (File.Exists(filePath)) continue;
                 Debug.Log($"resolving: {content.url}");
                 var resp = mgr.ResolveFile(content.url);

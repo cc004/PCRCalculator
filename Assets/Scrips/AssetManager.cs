@@ -169,7 +169,7 @@ namespace PCRApi
 #if PLATFORM_ANDROID
             var file = ABExTool.persistentDataPath + $"/AB/manifest_{Ver}.json";
 #else
-            var file = $"manifest_{Ver}.json";
+            var file = $"{ABExTool.persistentDataPath}/manifest_{Ver}.json";
 #endif
             return file;
         }
