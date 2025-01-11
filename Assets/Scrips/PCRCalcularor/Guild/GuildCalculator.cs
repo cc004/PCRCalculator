@@ -95,8 +95,8 @@ namespace PCRCaculator.Guild
             {
                 Destroy(guildSkillGroupPrefab.gameObject);
             }
+            skillScrollRect.horizontalNormalizedPosition = 0;
             skillGroupPrefabDic.Clear();
-
             isFinishCalc = false;
             totalDamage = 0;
             totalDamageCriEX = 0;

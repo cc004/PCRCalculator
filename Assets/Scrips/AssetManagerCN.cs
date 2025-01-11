@@ -162,7 +162,7 @@ namespace PCRApi.CN
 #if PLATFORM_ANDROID
             var file = ABExTool.persistentDataPath + $"/AB/manifest_{(qa ? "qa" : "ob")}{Ver}.json";
 #else
-            var file = $"manifest_{(qa ? "qa" : "ob")}{Ver}.json";
+            var file = $"{ABExTool.persistentDataPath}/manifest_{(qa ? "qa" : "ob")}{Ver}.json";
 #endif
             return file;
         }
