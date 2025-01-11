@@ -21,6 +21,10 @@ namespace PCRCaculator.Battle
             float castTime = 1;
             while (castTime >= 0)
             {
+                if (transform == null)
+                {
+                    yield break; 
+                }
                 //Vector3 pos = posFix + 18 * transform.position;
                 Vector3 pos = posFix + Camera.main.WorldToScreenPoint(transform.position);
                 pos.z = 0;
@@ -30,7 +34,8 @@ namespace PCRCaculator.Battle
                 
                 yield return null;
             }
-            Destroy(gameObject);
+            if (gameObject != null)
+                Destroy(gameObject);
         }
     }
 }

@@ -198,8 +198,7 @@ namespace PCRCaculator
         {
             if (allDependsLoaded)
                 return;
-            //string folderFullName = Application.streamingAssetsPath + "/AB";
-            string folderFullName = Application.streamingAssetsPath + "/../.ABExt2";
+            string folderFullName = ABExTool.persistentDataPath + "/.ABExt2";
             List<string> vs = new List<string>();
             DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
             foreach (FileInfo NextFile in TheFolder.GetFiles())

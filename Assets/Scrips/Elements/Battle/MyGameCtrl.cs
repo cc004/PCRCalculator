@@ -142,17 +142,6 @@ namespace Elements
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
             staticBattleManager.Init(this);
-            if (!BattleUIManager.Instance.SetToggle.isOn)
-            {
-              for (int i = 0; i < BattleUIManager.Instance.PlayerUI.Count; i++)
-              {
-                  BattleUIManager.Instance.PlayerUI[i].ShowContinousPress(false);
-              }
-            }
-            else
-            {
-                BattleUIManager.Instance.OnSetToggleSwitched();
-            }
             if (!IsAutoMode)
             {
                 BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
