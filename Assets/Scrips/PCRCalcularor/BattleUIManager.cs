@@ -292,15 +292,6 @@ namespace PCRCaculator.Battle
         public void SetUI_2(MyGameCtrl gameCtrl)
         {
             guildTotalDamageNumber.gameObject.SetActive(false);            
-            var data = GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
-            // SetToggle.isOn = GuildManager.Instance.SetModeToggle.isOn;
-            AutoToggle.isOn = data.useAutoMode;
-            SetToggle.isOn = data.useSetMode;
-            if (!myGameCtrl.tempData.isGuildBattle)
-            {
-                debugBack.SetActive(false);
-                // backGroundImage.sprite = jjcBackGround;
-            }
             for (int i = 0; i < PlayerUI.Count; i++)
             {
                 if (gameCtrl.playerUnitCtrl.Count > i)
@@ -311,7 +302,7 @@ namespace PCRCaculator.Battle
                     gameCtrl.playerUnitCtrl[i].SetUI(PlayerUI[i], b);
                     b.SetBuffUI(rularSprites[i], gameCtrl.playerUnitCtrl[i]);
                     PlayerUI[i].SetAlive();
-                    PlayerUI[i].ShowContinousPress(SetToggle.isOn);
+                    ChangeUbSet(i, false);
                     PlayerUI[i].gameObject.SetActive(true);
                 }
                 else
@@ -341,6 +332,16 @@ namespace PCRCaculator.Battle
                 {
                     EnemyUI[i].gameObject.SetActive(false);
                 }
+            }
+
+            var data = GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
+            AutoToggle.isOn = data.useAutoMode;
+            SetToggle.isOn = false;
+            SetToggle.isOn = data.useSetMode;
+            if (!myGameCtrl.tempData.isGuildBattle)
+            {
+                debugBack.SetActive(false);
+                // backGroundImage.sprite = jjcBackGround;
             }
             StartCoroutine(AutoSaveImage2());
         }
@@ -429,28 +430,18 @@ namespace PCRCaculator.Battle
                     MainManager.Instance.WindowMessage("强制自动战斗模式下无法手动释放UB！");
                     return;
                 }
-                MyGameCtrl.Instance.playerUnitCtrl[charidx].pressing = false;
                 switch (UBButtonState[charidx])
                 {
                     case 0:
                         UBButtonState[charidx] = 1;
                         MyGameCtrl.Instance.TryingExecUB(charidx);
                         StartCoroutine(UBCool(charidx));
-                        SetToggle.isOn = false;
                         break;
                     case 1:
-                        UBButtonState[charidx] = 2;
-                        MyGameCtrl.Instance.playerUnitCtrl[charidx].pressing = true;
-                        PlayerUI[charidx].ShowContinousPress(true);
-                        if (AllStatesAreTwo(UBButtonState))
-                        {
-                            SetToggle.isOn = true;
-                        }
+                        ChangeUbSet(charidx, true);
                         break;
                     default:
-                        PlayerUI[charidx].ShowContinousPress(false);
-                        UBButtonState[charidx] = 0;
-                        SetToggle.isOn = false;
+                        ChangeUbSet(charidx, false);
                         break;
                 }
                 MyGameCtrl.Instance.TryingExecUB(charidx);
@@ -461,6 +452,21 @@ namespace PCRCaculator.Battle
             yield return new WaitForSeconds(0.6f);
             if (UBButtonState[idx] == 1)
                 UBButtonState[idx] = 0;
+        }
+
+        private void ChangeUbSet(int idx, bool isSet)
+        {
+            PlayerUI[idx].ShowContinousPress(isSet);
+            UBButtonState[idx] = isSet ? 2 : 0;
+            MyGameCtrl.Instance.playerUnitCtrl[idx].pressing = isSet;
+            if (AllStatesAreTwo(UBButtonState))
+            {
+                SetToggle.isOn = true;
+            }
+            else
+            {
+                SetToggle.isOn = false;
+            }
         }
 
         private void HideContinoueText()
@@ -493,18 +499,14 @@ namespace PCRCaculator.Battle
             if (SetToggle.isOn)
             {
                 for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrlDic.Count; i++){
-                    MyGameCtrl.Instance.playerUnitCtrl[i].pressing = true;
-                    PlayerUI[i].ShowContinousPress(true);
-                    UBButtonState[i] = 2;
+                    ChangeUbSet(i, true);
                 }
             }
             else if (!SetToggle.isOn && AllStatesAreTwo(UBButtonState))
             {
                 for (int i = 0; i < MyGameCtrl.Instance.playerUnitCtrlDic.Count; i++)
                 {
-                    MyGameCtrl.Instance.playerUnitCtrl[i].pressing = false;
-                    PlayerUI[i].ShowContinousPress(false);
-                    UBButtonState[i] = 0;
+                    ChangeUbSet(i, false);
                 };
             }
 

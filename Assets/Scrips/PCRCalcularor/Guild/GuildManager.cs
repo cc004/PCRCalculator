@@ -140,7 +140,7 @@ namespace PCRCaculator.Guild
         private void Start()
         {
             StartCoroutine(StartAfterWait());
-            version.text = "v" + Application.version;
+            version.text = "—   v" + Application.version+"   —";
             foreach (Transform child in infoPanel.transform)
             {
               Button button = child.GetComponent<Button>();
