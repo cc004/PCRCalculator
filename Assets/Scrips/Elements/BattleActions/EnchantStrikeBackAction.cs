@@ -111,7 +111,7 @@ namespace Elements
                 strikeBackData.DataSet = strikeBackDataSet;
                 strikeBackDataSet.DataList.Add(strikeBackData);
                 _target.Owner.OnChangeState.Call(_target.Owner, eStateIconType.STRIKE_BACK, true);
-                _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.STRIKE_BACK, true, 90, "反击中");
+                _target.Owner.NoSkipOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.STRIKE_BACK, true, 90, "反击中");
 
             }
         }

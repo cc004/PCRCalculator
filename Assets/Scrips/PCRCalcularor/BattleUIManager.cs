@@ -174,6 +174,8 @@ namespace PCRCaculator.Battle
         }
         private void Update()
         {
+            if (BattleManager.Instance.skipping)
+                return;
             _Update?.Invoke();
             foreach (var kvp in inputActions)
             {
@@ -403,10 +405,9 @@ namespace PCRCaculator.Battle
                 }
             }
 
-            var data = GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
-            AutoToggle.isOn = data.useAutoMode;
+            AutoToggle.isOn = gameCtrl.IsAutoMode;
             SetToggle.isOn = false;
-            SetToggle.isOn = data.useSetMode;
+            SetToggle.isOn = gameCtrl.IsSetMode;
             if (!myGameCtrl.tempData.isGuildBattle)
             {
                 debugBack.SetActive(false);

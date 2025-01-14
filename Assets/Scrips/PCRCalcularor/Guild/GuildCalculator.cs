@@ -89,6 +89,16 @@ namespace PCRCaculator.Guild
             Instance = null;
         }
 
+        public long GetTotalDamage()
+        {
+            return totalDamage;
+        }
+
+        public long GetTotalDamageExpect()
+        {
+            return (long)totalDamageExcept.Expect;
+        }
+
         public void Initialize(List<UnitCtrl> players, UnitCtrl boss)
         {
             foreach (GuildSkillGroupPrefab guildSkillGroupPrefab in skillGroupPrefabDic.Values)
@@ -140,8 +150,8 @@ namespace PCRCaculator.Guild
             int idx = 0;
             bossId = boss.UnitId;
             AddSkillGroupPrefab(boss.UnitId, boss, 0);
-            boss.MyOnDamage += AppendGetDamage;
-            boss.MyOnBaseValueChanged += AppendChangeBaseValue;
+            boss.NoSkipOnDamage += AppendGetDamage;
+            boss.NoSkipOnBaseValueChanged += AppendChangeBaseValue;
             foreach (UnitCtrl unitCtrl in players)
             {
                 idx++;
@@ -173,20 +183,20 @@ namespace PCRCaculator.Guild
                 allUnitLastStateDic.Add(a, new UnitStateChangeData(0, UnitCtrl.ActionState.GAME_START, UnitCtrl.ActionState.GAME_START));
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
-            b.MyOnChangeState += AppendChangeState;
+            b.NoSkipOnChangeState += AppendChangeState;
             if (b.UnitId >= 300000 && b.UnitId <= 400000)
             {
-                b.MyOnDamage2 += RefreshTotalDamage;
+                b.NoSkipOnDamage2 += RefreshTotalDamage;
             }
             else if (isPlayer)
             {
                 playerUnitDamageDic.Add(b.UnitId, new List<ValueChangeData> { new ValueChangeData(0, 0) });
             }
-            b.MyOnAbnormalStateChange += AppendChangeAbnormalState;
-            b.MyOnLifeChanged += AppendChangeHP;
-            b.MyOnTPChanged += AppendChangeTP;
-            b.MyOnStartAction += AppendStartSkill;
-            b.MyOnExecAction += AppendExecAction;
+            b.NoSkipOnAbnormalStateChange += AppendChangeAbnormalState;
+            b.NoSkipOnLifeChanged += AppendChangeHP;
+            b.NoSkipOnTPChanged += AppendChangeTP;
+            b.NoSkipOnStartAction += AppendStartSkill;
+            b.NoSkipOnExecAction += AppendExecAction;
             if (create)
             {
                 AddSkillGroups(a, c, c, b.UnitName);

@@ -2287,10 +2287,13 @@ namespace PCRCaculator
         public List<EnemyData> enemyData;
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
+        public List<List<int>> SemanUBExecTimeList = null;
         public List<List<float>> UBExecTimeList = null;
         public bool isAutoMode = false;
-        // public bool isSetMode = false;
+        public bool isSetMode = false;
+        public bool isSemanMode = false;
         public bool forceAutoMode = false;
+        public int stopFrame = -1;
         //public bool isViolent = false;
         //public int calSpeed;
         //public int FPSforAnimaton;

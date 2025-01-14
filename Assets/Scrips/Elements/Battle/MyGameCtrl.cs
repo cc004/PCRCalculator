@@ -8,6 +8,7 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using Spine.Unity;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Elements
 {
@@ -36,9 +37,15 @@ namespace Elements
         public Dictionary<int, UnitCtrl> playerUnitCtrlDic = new Dictionary<int, UnitCtrl>();
         public Dictionary<int, UnitCtrl> enemyUnitCtrlDic = new Dictionary<int, UnitCtrl>();
 
+        public bool IsGAUbMode;
+        public bool isGAEvaluateFinished;
         public bool IsAutoMode;
+        public bool IsSetMode;
+        public bool IsSemanMode;
         public bool ForceAutoMode;
 
+        public InputField stopFrameText;
+        public int stopFrame;
         public int CurrentSeedForSave { get; set; }
         //public bool ignoreEffects => false;//!tempData.SettingData.useSkillEffects;
 
@@ -60,8 +67,9 @@ namespace Elements
                 return;
             }
             mainManager = MainManager.Instance;
-            // IsAutoMode = mainManager.IsAutoMode;
-            // ForceAutoMode = mainManager.ForceAutoMode;
+            IsAutoMode = mainManager.isAutoMode;
+            IsSetMode = mainManager.isSetMode;
+            IsSemanMode = mainManager.isSemanMode;
             tempData = new TempData();
             tempData.playerList = mainManager.PlayerDataForBattle;
             if (mainManager.IsGuildBattle)
@@ -71,28 +79,32 @@ namespace Elements
                 tempData.mParts = mainManager.GuildBattleData.mParts;
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
+                tempData.SemanUBExecTimeList = mainManager.GuildBattleData.SemanUBExecTimeList;
                 tempData.isGuildBattle = true;
                 tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                 tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
                 tempData.SettingData = mainManager.GuildBattleData.SettingData;
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                 tempData.skipping = mainManager.GuildBattleData.skipping;
+                stopFrame = mainManager.GuildBattleData.stopFrame;
             }
             else
             {
                 tempData.enemyList = mainManager.EnemyDataForBattle;
-                tempData.SettingData = GuildManager.StaticsettingData;
+                // tempData.SettingData = GuildManager.StaticsettingData; // TODO fix setting
             }
             tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
             unitCount.Clear();
             BattleManager.Instance.Init(this);
-            if (!IsAutoMode)
+            if (IsSemanMode)
             {
-                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
             }
             else
             {
-                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+                BattleManager.Instance.semanubmanager.SetUbExec(null);
+                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
             }
         }
         
@@ -100,6 +112,9 @@ namespace Elements
         {
             if (rebuild)
             {
+                IsAutoMode = mainManager.isAutoMode;
+                IsSetMode = mainManager.isSetMode;
+                IsSemanMode = mainManager.isSemanMode;
                 tempData = new TempData();
                 tempData.playerList = mainManager.PlayerDataForBattle;
                 if (mainManager.IsGuildBattle)
@@ -109,17 +124,19 @@ namespace Elements
                     tempData.mParts = mainManager.GuildBattleData.mParts;
                     tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                     tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
+                    tempData.SemanUBExecTimeList = mainManager.GuildBattleData.SemanUBExecTimeList;
                     tempData.isGuildBattle = true;
                     tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                     tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
                     tempData.SettingData = mainManager.GuildBattleData.SettingData;
                     tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                     tempData.skipping = mainManager.GuildBattleData.skipping;
+                    stopFrame = stopFrameText.text == "" ? -1 : int.Parse(stopFrameText.text);
                 }
                 else
                 {
                     tempData.enemyList = mainManager.EnemyDataForBattle;
-                    tempData.SettingData = GuildManager.StaticsettingData;
+                    // tempData.SettingData = GuildManager.StaticsettingData;
                 }
                 tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
             }
@@ -142,13 +159,15 @@ namespace Elements
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
             staticBattleManager.Init(this);
-            if (!IsAutoMode)
+            if (IsSemanMode)
             {
-                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
             }
             else
             {
-                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+                BattleManager.Instance.semanubmanager.SetUbExec(null);
+                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
             }
         }
 
@@ -214,6 +233,7 @@ namespace Elements
             if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
                 GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
+                BattleManager.Instance.semanubmanager.SetUnitCallBack(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
             }
 
             if (tempData.isGuildBattle)
@@ -615,7 +635,11 @@ namespace Elements
         }*/
         public void OnBattleFinished(int result)//1-lose,2-timeover
         {
-            if (mainManager.AutoCalculatorData.isCalculating)
+            if (IsGAUbMode)
+            {
+                isGAEvaluateFinished = true;
+            }
+            else if (mainManager.AutoCalculatorData.isCalculating)
             {
                 mainManager.AutoCalculatorData.resultDatas.Add(
                 GuildCalculator.Instance.GetOnceResultData( mainManager.AutoCalculatorData.execedTime + 1));
@@ -650,6 +674,7 @@ namespace Elements
         public List<List<UnitParameter>> AllUnitParameters;
         public List<UnitParameter> PlayerParameters;
         public List<UnitParameter> EnemyParameters;
+        public List<List<int>> SemanUBExecTimeList;
         public List<List<float>> UBExecTimeList;
         public int tryCount = 30;
         public bool isGuildBattle;

@@ -84,8 +84,10 @@ namespace PCRCaculator
         private List<UnitData> enemyDataForBattle;
         private bool isGuildBattle;
         public GuildBattleData guildBattleData;
-        private bool isAutoMode;
-        private bool forceAutoMode;
+        public bool isAutoMode;
+        public bool forceAutoMode;
+        public bool isSetMode;
+        public bool isSemanMode;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
 
         public Dictionary<int, EquipmentData> EquipmentDic { get => equipmentDic; }
@@ -629,6 +631,8 @@ namespace PCRCaculator
             isGuildBattle = false;
             this.isAutoMode = isAutoMode;
             this.forceAutoMode = forceAutoMode;
+            this.isSetMode = false;
+            this.isSemanMode = false;
             bool isok = CheckIsAllCharacterAble(out string mess);
             if (isok)
             {
@@ -645,6 +649,8 @@ namespace PCRCaculator
             playerDataForBattle = data.players.playrCharacters;
             isGuildBattle = true;
             isAutoMode = data.isAutoMode;
+            isSetMode = data.isSetMode;
+            isSemanMode = data.isSemanMode;
             forceAutoMode = data.forceAutoMode;
             guildBattleData = data;
             bool isok = CheckIsAllCharacterAble(out string mess);

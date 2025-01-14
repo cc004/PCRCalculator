@@ -28,7 +28,7 @@ namespace Elements
                 intQueue.Enqueue((int)_valueDictionary[eValueNumber.VALUE_1]);
             _target.Owner.LifeStealQueueList.Add(intQueue);
             _target.Owner.OnChangeState.Call(_target.Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, true);
-            _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, true, 90, "1次");
+            _target.Owner.NoSkipOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.BUFF_ADD_LIFE_STEAL, true, 90, "1次");
         }
 
         public override void SetLevel(float _level)

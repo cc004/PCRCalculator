@@ -51,6 +51,7 @@ namespace Elements.Battle
         public ScriptManager scriptMgr;
         public static int randomCounter;
         public AutoubManager ubmanager = new AutoubManager();
+        public SemanUbManager semanubmanager = new SemanUbManager();
         public static BattleManager Instance;
         public const int POST_RESULT_TYPE_LOSE = 0;
         public const int POST_RESULT_TYPE_RESIGN = 1;
@@ -636,6 +637,7 @@ namespace Elements.Battle
             if (_canUpdateTime)
             {
                 BattleLeftTime -= DeltaTime_60fps;
+                semanubmanager.ProcessFrame();
                 BattleHeaderController.CurrentFrameCount++;
                 BattleHeaderController.Instance.SetRestTime(BattleLeftTime);
                 if (BattleLeftTime <= 0.0)
@@ -697,9 +699,9 @@ namespace Elements.Battle
             IsPausingEffectSkippedInThisFrame = false;
             isUpdateFrameExecuted = true;
 
-            if (GuildManager.Instance.stoptime == BattleHeaderController.CurrentFrameCount)
+            if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {
-                GuildManager.Instance.stoptime = -1;
+                MyGameCtrl.Instance.stopFrame = -1;
                 MyGameCtrl.Instance.PauseButton();
             }
             else if (stepping)
@@ -2997,19 +2999,19 @@ namespace Elements.Battle
             this.Timer(() => finishWave(otherAllDead));
         }
 
-        public void CallbackFadeOutDone(UnitCtrl GEDLBPMPOKB)
+        public void CallbackFadeOutDone(UnitCtrl unit)
         {
             if (allUnitsFadeOutDone)
                 return;
             if (hasActiveDeadUnit)
             {
-                if (otherAllDead && GEDLBPMPOKB.IsOther || playerAllDead && !GEDLBPMPOKB.IsOther)
+                if (otherAllDead && unit.IsOther || playerAllDead && !unit.IsOther)
                     return;
-                judgeWinUnitFadeOutDone(GEDLBPMPOKB.IsOther);
+                judgeWinUnitFadeOutDone(unit.IsOther);
             }
             else
             {
-                List<UnitCtrl> unitCtrlList = GEDLBPMPOKB.IsOther ? EnemyList : UnitList;
+                List<UnitCtrl> unitCtrlList = unit.IsOther ? EnemyList : UnitList;
                 int index = 0;
                 for (int count = unitCtrlList.Count; index < count; ++index)
                 {
@@ -3027,7 +3029,7 @@ namespace Elements.Battle
                             return;
                     }
                 }
-                judgeWinUnitFadeOutDone(!GEDLBPMPOKB.IsOther);
+                judgeWinUnitFadeOutDone(!unit.IsOther);
             }
         }
 
@@ -3197,8 +3199,9 @@ namespace Elements.Battle
             idleonlyDone = false;
             GameState = eBattleGameState.IDLE;
             //this.appendWaveEndLog();
-            /*if (GIMAJHFCKNE)
+            if (GIMAJHFCKNE)
             {
+            /*
                 int waveEndStoryId = this.battleProcessor.GetWaveEndStoryId();
                 if (this.POKEAEBGPIB < this.tempData.PHDACAOAOMA.AOPCDPIJOIE.Count - 1)
                 {
@@ -3209,9 +3212,10 @@ namespace Elements.Battle
                     BattleHeaderController..Instance.gameObject.SetActive(false);
                     this.UnitUiCtrl.HideSettingButtons();
                     this.PlayStory((System.Action)(() => this.finishBattle(eBattleResult.WIN)), waveEndStoryId, true);
-                }
-            }
-            else*/
+                } */
+                finishBattle(eBattleResult.WIN);
+            } 
+            else
             {
                 //BattleHeaderController.Instance.gameObject.SetActive(false);
                 //this.UnitUiCtrl.HideSettingButtons();

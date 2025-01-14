@@ -233,7 +233,7 @@ namespace Elements
                         owner3.Def = (owner3.Def.Floor() + _value).Floor();
                         owner3.DefForDamagedEnergy = (owner3.DefForDamagedEnergy.Floor() + _value).Floor();
                         string des = (_source==null?"???":_source.UnitName) + "的技能" + (_enable?"开始":"结束") + "变更" + _value;
-                        Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
+                        Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
                         UnitCtrl owner4 = Owner;
@@ -244,7 +244,7 @@ namespace Elements
                         owner5.MagicDef = (owner5.MagicDef.Floor() + _value).Floor();
                         owner5.MagicDefForDamagedEnergy = (owner5.MagicDefForDamagedEnergy.Floor() + _value).Floor();
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
-                        Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
+                        Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
                         UnitCtrl owner6 = Owner;

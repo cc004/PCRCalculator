@@ -1423,7 +1423,8 @@ namespace Elements
 
         public bool CancelByAwake { get; set; }
 
-        public int CurrentTriggerSkillId { get; set; } public bool IsBoss { get; set; }
+        public int CurrentTriggerSkillId { get; set; } 
+        public bool IsBoss { get; set; }
 
         public bool IsClanBattleOrSekaiEnemy { get; set; }
 
@@ -3643,10 +3644,11 @@ this.updateCurColor();
             UnitCtrl LIMEKPEENOB = unitCtrl2;
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             Energy = energy;
+            SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
-            MyOnTPChanged?.Invoke(UnitId,(float)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+                NoSkipOnTPChanged?.Invoke(UnitId,(float)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
-            uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
+                uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
 
         public void IndicateSkillName(string _skillName) 
@@ -4372,7 +4374,7 @@ this.updateCurColor();
             string describe = stateCategoryData.MainValue + "";
             //this.EnableAbnormalState(abnormalState, true);
             //stateCategoryData.CurrentAbnormalState = abnormalState;
-            MyOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[abnormalState].IconType,
+            NoSkipOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[abnormalState].IconType,
     true, stateCategoryData.Duration, describe);
 
         }
@@ -4930,7 +4932,7 @@ this.updateCurColor();
 
             eStateIconType iDAFJHFJKOL = (abnormalStateCategoryData.ShowsIcon ? ABNORMAL_CONST_DATA[_abnormalState].IconType : eStateIconType.NONE);
             OnChangeState.Call(this, iDAFJHFJKOL, _enable);
-            MyOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[_abnormalState].IconType,
+            NoSkipOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[_abnormalState].IconType,
                 _enable, abnormalStateCategoryDataDictionary[abnormalStateCategory].Duration, describe);
             CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory]);
             if (_enable || _switch)
@@ -5499,7 +5501,7 @@ this.updateCurColor();
                 {
                     LifeStealQueueList.RemoveAt(index);
                     OnChangeState.Call(this, eStateIconType.BUFF_ADD_LIFE_STEAL, false);
-                    MyOnChangeAbnormalState?.Invoke(this, eStateIconType.BUFF_ADD_LIFE_STEAL, false, 90, "1次");
+                    NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.BUFF_ADD_LIFE_STEAL, false, 90, "1次");
 
                 }
             }
@@ -5509,7 +5511,7 @@ this.updateCurColor();
                 for (int index = 0; index < strikeBack.Value.DataList.Count; ++index)
                 {
                     OnChangeState.Call(this, eStateIconType.STRIKE_BACK, false);
-                    MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
+                    NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
 
                 }
             }
@@ -6200,7 +6202,7 @@ this.updateCurColor();
             //stateChangeData.SourceName = data.Source.UnitName;
             stateChangeData.isBuff = true;
             stateChangeData.BUFF_Type = _kind;
-            MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
+            NoSkipOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
             button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)
@@ -6572,7 +6574,7 @@ this.updateCurColor();
             if (aweDatas.Count == 0)
             {
                 OnChangeState.Call(this, eStateIconType.AWE, true);
-                MyOnChangeAbnormalState?.Invoke(this, eStateIconType.AWE, true,_aweData.LifeTime,"awe");
+                NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.AWE, true,_aweData.LifeTime,"awe");
             }
             aweDatas.Add(_aweData);
             if (aweCoroutine != null)
@@ -6602,7 +6604,7 @@ this.updateCurColor();
                     if (JEOCPILJNAD.aweDatas.Count == 0)
                     {
                         JEOCPILJNAD.OnChangeState.Call(JEOCPILJNAD, eStateIconType.AWE, false);
-                        JEOCPILJNAD.MyOnChangeAbnormalState?.Invoke(JEOCPILJNAD, eStateIconType.AWE, false,0,"awe");
+                        JEOCPILJNAD.NoSkipOnChangeAbnormalState?.Invoke(JEOCPILJNAD, eStateIconType.AWE, false,0,"awe");
                     }
                     yield return null;
                 }
@@ -6652,7 +6654,7 @@ this.updateCurColor();
             if (aweDatas.Count == 0)
             {
                 OnChangeState.Call(this, eStateIconType.AWE, false);
-                MyOnChangeAbnormalState?.Invoke(this, eStateIconType.AWE, false,90,"awe");
+                NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.AWE, false,90,"awe");
             }
             return Mathf.Max(a, 0.0f);
         }
@@ -6668,7 +6670,7 @@ this.updateCurColor();
             if (knightGuardDataList.Count == 0)
             {
                 OnChangeState.Call(this, _knightGuardData.StateIconType, true);
-                MyOnChangeAbnormalState?.Invoke(this, _knightGuardData.StateIconType, true,90,"???");
+                NoSkipOnChangeAbnormalState?.Invoke(this, _knightGuardData.StateIconType, true,90,"???");
             }
             knightGuardDataList.Add(_knightGuardData);
             if (knightGuardCoroutine != null)
@@ -6700,7 +6702,7 @@ this.updateCurColor();
                         if (knightGuardData1.Value.Count == 0)
                         {
                             JEOCPILJNAD.OnChangeState.Call(JEOCPILJNAD, knightGuardData1.Key, false);
-                            JEOCPILJNAD.MyOnChangeAbnormalState?.Invoke(JEOCPILJNAD, knightGuardData1.Key, false,90,"???");
+                            JEOCPILJNAD.NoSkipOnChangeAbnormalState?.Invoke(JEOCPILJNAD, knightGuardData1.Key, false,90,"???");
                         }
                     }
                 }
@@ -6735,7 +6737,7 @@ this.updateCurColor();
                 knightGuardData1.Value.Clear();
                 DMFGKJIEEBF.Call();
                 OnChangeState.Call(this, knightGuardData1.Key, false);
-                MyOnChangeAbnormalState?.Invoke(this, knightGuardData1.Key, false, 90, "???");
+                NoSkipOnChangeAbnormalState?.Invoke(this, knightGuardData1.Key, false, 90, "???");
             }
             return flag;
         }
@@ -8058,7 +8060,7 @@ this.updateCurColor();
                 strikeBack.Exec(_damageData.Source, this, (int)BattleUtil.FloatToInt(num5), delegate
                 {
                     strikeBackList.Remove(strikeBack);
-                    MyOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
+                    NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
                 });
                 OnChangeState.Call(this, eStateIconType.STRIKE_BACK, ADIFIOLCOPN: false);
                 return 0L;
@@ -8307,14 +8309,14 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                MyOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
                 createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
-                MyOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
+                NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
 
             }
 
-            MyOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
+            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, (float)num6, _critical);
             OnDamageForLoopRepeat.Call((float)num6);
             OnDamageForDivision.Call(_byAttack, Mathf.Min(hp, (float)num6), _critical);
@@ -8889,7 +8891,7 @@ this.updateCurColor();
                 string des = $"目标HP回复<color=#54FF4F>{_value}</color>点，当前HP: {Hp}";
                 action?.Invoke(des);
                 uIManager?.LogMessage(des, eLogMessageType.HP_RECOVERY, _source);
-                MyOnLifeChanged?.Invoke(UnitId, Hp,(int)MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,(int)MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
                 if (_isUnionBurstLifeSteal)
                 {
                     unionburstLifeStealNum += (long)_value;
@@ -9549,10 +9551,11 @@ this.updateCurColor();
         public void SetState(ActionState _state, int _nextSkillId = 0, int _skillId = 0, bool _quiet = false)
         {
             string des = _state == ActionState.SKILL ? (unitActionController.skillDictionary.TryGetValue(_skillId,out var value)?value.SkillName:"UnknownSkill") : "";
+            SemanOnChangeState?.Invoke(UnitId, _state);
             if (!battleManager.skipping)
             {
                 uIManager?.LogMessage($"切换到{_state}状态", eLogMessageType.OTHER, this);
-                MyOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount, des, this);
+                NoSkipOnChangeState?.Invoke(UnitId, _state, BattleHeaderController.CurrentFrameCount, des, this);
             }
             /*switch (UnitId)
             {
@@ -10828,7 +10831,7 @@ this.updateCurColor();
                     UbAbnormalDataList[index].Exec(this);
                     UbAbnormalDataList.RemoveAt(index);
                     OnChangeState.Call(this, eStateIconType.UB_DISABLE, false);
-                    MyOnChangeAbnormalState?.Invoke(this, eStateIconType.UB_DISABLE, false, 90, "???");
+                    NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.UB_DISABLE, false, 90, "???");
                 }
             }
             foreach (KeyValuePair<eAbnormalState, Action<bool>> item in damageByBehaviourDictionary)
@@ -11000,7 +11003,7 @@ this.updateCurColor();
 
                                 }
                                 if (!battleManager.skipping)
-                                    MyOnSkillCD?.Invoke(m_fCastTimer);
+                                    NoSkipOnSkillCD?.Invoke(m_fCastTimer);
                             }
                             if (unitCtrl.battleManager.LOGNEDLPEIJ)
                                 yield return null;
@@ -11044,7 +11047,7 @@ this.updateCurColor();
                                 unitCtrl.CancelByAwake = false;
                                 unitCtrl.SetState(_state, _nextSkillId, _skillId);
                                 if (!battleManager.skipping)
-                                MyOnChangeSkillID?.Invoke(_skillId, _nextSkillId, m_fCastTimer, 1);
+                                NoSkipOnChangeSkillID?.Invoke(_skillId, _nextSkillId, m_fCastTimer, 1);
                                 yield break;
                             }
                             else if ((long)unitCtrl.Hp <= 0L)
@@ -11743,6 +11746,7 @@ this.updateCurColor();
 
         public void StartCutIn()
         {
+            battleManager.semanubmanager.UbExecCallback(battleManager.UnitList.IndexOf(this));
             battleManager.ubmanager.UbExecCallback(battleManager.UnitList.IndexOf(this));
             battleManager.scriptMgr?.UbExecCallback(UnitId);
             ++UbCounter;
@@ -12013,6 +12017,8 @@ this.updateCurColor();
             if (pressing) return true;
             if (Index == -2) Index = battleManager.UnitList.IndexOf(this);
             if (battleManager.scriptMgr?.IsPressed(UnitId) ?? false)
+                return true;
+            if (battleManager.semanubmanager.IsUbExec(Index))
                 return true;
             if (battleManager.ubmanager.IsUbExec(Index))
                 return true;
