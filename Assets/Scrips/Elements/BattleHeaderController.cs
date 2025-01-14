@@ -18,6 +18,7 @@ namespace Elements
         public void ReStart()
         {
             CurrentFrameCount = 0;
+            IsPaused = false;
         }
         private void Awake()
         {
