@@ -108,6 +108,8 @@ namespace PCRCaculator.Battle
         public Toggle translucent;
         public InputField pauseTime;
         public Button changeBattlePanel;
+        private Dictionary<KeyCode, Action> inputActions;
+        private Dictionary<KeyCode, int> keyToValue;
 
         private void Awake()
         {
@@ -131,6 +133,33 @@ namespace PCRCaculator.Battle
             }
             _Update += _UpdateFPSCount;
             timeScaleSlider.value = GuildManager.Instance.calSlider.value;
+            inputActions = new Dictionary<KeyCode, Action>
+            {
+                { KeyCode.RightArrow, StepButton }, // 方向右键
+                { KeyCode.Mouse1, StepButton }, // 鼠标右键
+                { KeyCode.Tab, changeBattlePanelButton }, // Tab键切换面板
+                { KeyCode.Z, StatusShowButton }, // Z键显示状态
+                { KeyCode.F5, RetryButton }, // F5键重打
+                { KeyCode.S, RetryButton }, // S键重打
+                { KeyCode.Escape, ExitButton2 } // Escape键退出
+            };
+
+            keyToValue = new Dictionary<KeyCode, int>
+            {
+                { KeyCode.Q, 0 },
+                { KeyCode.W, 1 },
+                { KeyCode.E, 2 },
+                { KeyCode.R, 3 },
+                { KeyCode.T, 4 },
+                { KeyCode.Y, 5 },
+                { KeyCode.U, 6 },
+                { KeyCode.I, 7 },
+                { KeyCode.O, 8 },
+                { KeyCode.P, 9 },
+                { KeyCode.LeftBracket, 10 }, // [键
+                { KeyCode.RightBracket, 11 }, // ]键
+                { KeyCode.Backslash, 12 } // \键
+            };
         }
         public void ReStart()
         {
@@ -146,9 +175,33 @@ namespace PCRCaculator.Battle
         private void Update()
         {
             _Update?.Invoke();
-            if (Input.GetMouseButtonDown(1)|| Input.GetKeyDown(KeyCode.RightArrow))
-            { 
-                StepButton(); //鼠标右键或者右方向键 触发step
+            foreach (var kvp in inputActions)
+            {
+                if (Input.GetKeyDown(kvp.Key))
+                {
+                    kvp.Value();
+                }
+            }
+            SetTimeScale();
+            // 上方向键和下方向键长按可快速调节速度
+            if (Input.GetKey(KeyCode.UpArrow) && timeScaleSlider.value < timeScaleSlider.maxValue)
+            {
+                timeScaleSlider.value++;
+            }
+            else if (Input.GetKey(KeyCode.DownArrow) && timeScaleSlider.value > timeScaleSlider.minValue)
+            {
+                timeScaleSlider.value--;
+            }
+        }
+        private void SetTimeScale()
+        {
+            foreach (var kvp in keyToValue)
+            {
+                if (Input.GetKeyDown(kvp.Key) && timeScaleSlider.value != kvp.Value)
+                {
+                    timeScaleSlider.value = kvp.Value;
+                    break;
+                }
             }
         }
         private void _Update_1()
@@ -356,7 +409,10 @@ namespace PCRCaculator.Battle
 
         public void StepButton()
         {
-            if (!BattleHeaderController.Instance.IsPaused) return;
+            if (!BattleHeaderController.Instance.IsPaused)
+            {
+                PauseButton();
+            }
             BattleManager.Instance.stepping = true;
             PauseButton();
         }
