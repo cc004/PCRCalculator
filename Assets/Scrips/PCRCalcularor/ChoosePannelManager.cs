@@ -447,10 +447,14 @@ namespace PCRCaculator
         data.uniqueEqLv = 0;
       }
 
-      for (int i = 0; i < 3; ++i)
+      if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
       {
-        data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
-        data.exEquipLevel[i] = (int)detailSliders_setting[15 + i].value;
+        for (int i = 0; i < 3; ++i)
+        {
+          data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
+          var maxStar = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
+          data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[15 + i].value, maxStar);
+        }
       }
       RefreshSettingValues();
 

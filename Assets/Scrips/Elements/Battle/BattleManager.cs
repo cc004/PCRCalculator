@@ -876,7 +876,7 @@ namespace Elements.Battle
             }
         }*/
 
-        public bool IsSkillExeUnit(UnitCtrl AIMGFOAEPLO) => BlackOutUnitList.Contains(AIMGFOAEPLO) || LPAAPDHAIIB == AIMGFOAEPLO;
+        public bool IsSkillExeUnit(UnitCtrl AIMGFOAEPLO) => BlackOutUnitList.Contains(AIMGFOAEPLO) || CurrentCutinUnit == AIMGFOAEPLO;
 
         public void AddUnitSpineControllerList(BattleSpineController NLLGNCKLGHL) => unitSpineControllerList.Add(NLLGNCKLGHL);
 
@@ -1412,11 +1412,11 @@ namespace Elements.Battle
                             unitCtrl.CutInFrameSet.ServerCutInFrame = -3;
                         else
                             unitCtrl.SetState(UnitCtrl.ActionState.SKILL_1);
-                        LJFFAACGDMF = false;
+                        isDamageNumHiddenBySkillScreen = false;
                     }
                     if (unitCtrl.CutInFrameSet.ServerCutInFrame == -3)
                     {
-                        LJFFAACGDMF = false;
+                        isDamageNumHiddenBySkillScreen = false;
                         unitCtrl.CutInFrameSet.CutInFrame = -1;
                         unitCtrl.CutInFrameSet.ServerCutInFrame = -1;
                         OnBlackOutEnd(unitCtrl);
@@ -1449,7 +1449,7 @@ namespace Elements.Battle
                     if (FrameCount == enemy.CutInFrameSet.CutInFrame + 1)
                     {
                         onSyncEnd(enemy);
-                        LJFFAACGDMF = false;
+                        isDamageNumHiddenBySkillScreen = false;
                         if (enemy.ConsumeEnergy() == eConsumeResult.FAILED)
                         {
                             enemy.CutInFrameSet.CutInFrame = -1;
@@ -1461,7 +1461,7 @@ namespace Elements.Battle
                     }
                     if (enemy.CutInFrameSet.ServerCutInFrame == -3)
                     {
-                        LJFFAACGDMF = false;
+                        isDamageNumHiddenBySkillScreen = false;
                         enemy.CutInFrameSet.CutInFrame = -1;
                         enemy.CutInFrameSet.ServerCutInFrame = -1;
                         OnBlackOutEnd(enemy);
@@ -1836,13 +1836,13 @@ namespace Elements.Battle
 
         public int GetBlackOutUnitLength() => BlackOutUnitList.Count;
 
-        public UnitCtrl LPAAPDHAIIB { get; set; }
+        public UnitCtrl CurrentCutinUnit { get; set; }
 
         public void SetStarted(bool AAFJOOCLABG) => isStarted = AAFJOOCLABG;
 
         public UnitCtrl HELHEEOHPFO { get; set; }
 
-        public bool LJFFAACGDMF { get; set; }
+        public bool isDamageNumHiddenBySkillScreen { get; set; }
 
         private UnitCtrl LNMLGGPGEIG { get; set; }
 
@@ -1894,7 +1894,7 @@ namespace Elements.Battle
 
         public void OnCutInEnd(bool MOBKHPNMEDM, UnitCtrl FNHGFDNICFG)
         {
-            LPAAPDHAIIB = null;
+            CurrentCutinUnit = null;
             //this.blockLayerManager.SetBlockDialog(true);
             if (this == null)
                 return;
@@ -1904,7 +1904,7 @@ namespace Elements.Battle
                 FNHGFDNICFG.CutInFrameSet.ServerCutInFrame = -3;
             else
                 FNHGFDNICFG.SetState(UnitCtrl.ActionState.SKILL_1);
-            LJFFAACGDMF = false;
+            isDamageNumHiddenBySkillScreen = false;
             IsPlayCutin = false;
             if (MOBKHPNMEDM)
                 return;
@@ -3529,6 +3529,7 @@ namespace Elements.Battle
             skipping = false;
             isAllActionDone = true;
             isAllActionsCompleted = false;
+            isDamageNumHiddenBySkillScreen = false;
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
@@ -3537,6 +3538,7 @@ namespace Elements.Battle
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
+            SetStarted(false);
             activeActionIds.Clear();
             effectUpdateList.Clear();
             foreach(var unitSpineController in unitSpineControllerList)
@@ -3582,6 +3584,8 @@ namespace Elements.Battle
             setStatus.Clear();
             GuildCalculator.Instance.dmglist.Clear();
             GuildCalculator.Instance.bossValues.Clear();
+            CurrentCutinUnit = null;
+            ChargeSkillTurn = eChargeSkillTurn.NONE;
             Resources.UnloadUnusedAssets();
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;

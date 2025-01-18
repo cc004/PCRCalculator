@@ -11751,7 +11751,7 @@ this.updateCurColor();
                 battleManager.UnitList[index].ThanksTargetUnitId = 0;
             battleManager.FinishBlackFadeOut(null);
             SetSortOrderFront();
-            battleManager.LPAAPDHAIIB = this;
+            battleManager.CurrentCutinUnit = this;
             //this.soundManager.PlaySe(eSE.BTL_BUTTON_SKILL);
             //this.PlayCutInFlag = true;
             //MovieManager instance1 = ManagerSingleton<MovieManager>.Instance;
