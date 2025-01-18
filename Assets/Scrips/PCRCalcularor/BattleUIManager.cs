@@ -140,8 +140,8 @@ namespace PCRCaculator.Battle
                 { KeyCode.Tab, changeBattlePanelButton }, // Tab键切换面板
                 { KeyCode.Z, StatusShowButton }, // Z键显示状态
                 { KeyCode.F5, RetryButton }, // F5键重打
-                { KeyCode.S, RetryButton }, // S键重打
-                { KeyCode.Escape, ExitButton2 } // Escape键退出
+                { KeyCode.C, RetryButton }, // C键重打
+                { KeyCode.Escape, ExitButton2 }, // Escape键退出
             };
 
             keyToValue = new Dictionary<KeyCode, int>
@@ -183,17 +183,10 @@ namespace PCRCaculator.Battle
                 }
             }
             SetTimeScale();
-            // 上方向键和下方向键长按可快速调节速度
-            if (Input.GetKey(KeyCode.UpArrow) && timeScaleSlider.value < timeScaleSlider.maxValue)
-            {
-                timeScaleSlider.value++;
-            }
-            else if (Input.GetKey(KeyCode.DownArrow) && timeScaleSlider.value > timeScaleSlider.minValue)
-            {
-                timeScaleSlider.value--;
-            }
+            HandleTimeScale();
+            HandleToggleKeys();
         }
-        private void SetTimeScale()
+        private void SetTimeScale() 
         {
             foreach (var kvp in keyToValue)
             {
@@ -202,6 +195,29 @@ namespace PCRCaculator.Battle
                     timeScaleSlider.value = kvp.Value;
                     break;
                 }
+            }
+        }
+        private void HandleTimeScale()
+        {
+            if (Input.GetKey(KeyCode.UpArrow) && timeScaleSlider.value < timeScaleSlider.maxValue)
+            {
+                timeScaleSlider.value = Mathf.Clamp(timeScaleSlider.value + 1, timeScaleSlider.minValue, timeScaleSlider.maxValue);
+            }
+            else if (Input.GetKey(KeyCode.DownArrow) && timeScaleSlider.value > timeScaleSlider.minValue)
+            {
+                timeScaleSlider.value = Mathf.Clamp(timeScaleSlider.value - 1, timeScaleSlider.minValue, timeScaleSlider.maxValue);
+            }
+        }
+
+        private void HandleToggleKeys()
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                AutoToggle.isOn = !AutoToggle.isOn;
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                SetToggle.isOn = !SetToggle.isOn;
             }
         }
         private void _Update_1()
