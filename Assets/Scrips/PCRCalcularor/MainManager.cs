@@ -208,7 +208,6 @@ namespace PCRCaculator
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 Load();
-                CreateShowUnitIDS();
             }
             catch (Exception e)
             {
