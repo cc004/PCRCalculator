@@ -29,7 +29,7 @@ namespace Elements.Battle
         {
             if (shake.ShakeType == ShakeType.RANDOM)
             {
-                Debug.Log($"{skill?.SkillName}:{unit?.UnitName} shake random");
+                // Debug.Log($"{skill?.SkillName}:{unit?.UnitName} shake random");
             }
             currentShake.Add(shake);
             shake.ResetStart(skill, unit);

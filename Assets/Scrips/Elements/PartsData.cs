@@ -295,7 +295,7 @@ namespace Elements
                         Def = (Def + _value).Floor();
                         DefForDamagedEnergy = (DefForDamagedEnergy + _value).Floor();
                         string des = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
-                        Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 1, Def, BattleHeaderController.CurrentFrameCount, des);
+                        Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 1, Def, BattleHeaderController.CurrentFrameCount, des);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
                         MagicStr = (int)(MagicStr + _value);
@@ -304,7 +304,7 @@ namespace Elements
                         MagicDef = (MagicDef + _value).Floor();
                         MagicDefForDamagedEnergy = (MagicDefForDamagedEnergy + _value).Floor();
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
-                        Owner.MyOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 2, MagicDef, BattleHeaderController.CurrentFrameCount, des2);
+                        Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 2, MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
                         Dodge = (int)((int)Dodge + _value);

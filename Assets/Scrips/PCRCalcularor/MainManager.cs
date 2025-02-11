@@ -84,8 +84,10 @@ namespace PCRCaculator
         private List<UnitData> enemyDataForBattle;
         private bool isGuildBattle;
         public GuildBattleData guildBattleData;
-        private bool isAutoMode;
-        private bool forceAutoMode;
+        public bool isAutoMode;
+        public bool forceAutoMode;
+        public bool isSetMode;
+        public bool isSemanMode;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
 
         public Dictionary<int, EquipmentData> EquipmentDic { get => equipmentDic; }
@@ -164,8 +166,8 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10051600;
-            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10044700;
-            public long BossVersionCN = 202501061722;
+            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10045500;
+            public long BossVersionCN = 202502051709;
             public bool useQA = false;
             public bool useJP = true;
             public bool newAB = true;
@@ -494,8 +496,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 66;
-                playerSetting.playerLevel = 259;
+                playerSetting.playerProcess = 67;
+                playerSetting.playerLevel = 262;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
@@ -629,6 +631,8 @@ namespace PCRCaculator
             isGuildBattle = false;
             this.isAutoMode = isAutoMode;
             this.forceAutoMode = forceAutoMode;
+            this.isSetMode = false;
+            this.isSemanMode = false;
             bool isok = CheckIsAllCharacterAble(out string mess);
             if (isok)
             {
@@ -645,6 +649,8 @@ namespace PCRCaculator
             playerDataForBattle = data.players.playrCharacters;
             isGuildBattle = true;
             isAutoMode = data.isAutoMode;
+            isSetMode = data.isSetMode;
+            isSemanMode = data.isSemanMode;
             forceAutoMode = data.forceAutoMode;
             guildBattleData = data;
             bool isok = CheckIsAllCharacterAble(out string mess);

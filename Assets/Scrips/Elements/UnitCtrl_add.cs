@@ -32,20 +32,24 @@ namespace Elements
         public UnitParameter unitParameter;
         public string UnitName = "", UnitNameEx = "";
         public int posIdx;//0-4
-        public Action<int,ActionState, int,string, UnitCtrl> MyOnChangeState;
-        public Action<int, UnitAbnormalStateChangeData, int> MyOnAbnormalStateChange;
-        public Action<int,float,int, int,int,string, UnitCtrl> MyOnLifeChanged;
-        public Action<int,float, int,string> MyOnTPChanged;
-        public Action<int, UnitSkillExecData> MyOnStartAction;
-        public Action<int, int, UnitActionExecData> MyOnExecAction;
-        public Action<int, int, float, int> MyOnDamage;
-        public Action<bool, float, bool, float, FloatWithEx> MyOnDamage2;
-        public Action<int, int, float, int,string> MyOnBaseValueChanged;
-        public Action<UnitCtrl, eStateIconType, bool,float,string> MyOnChangeAbnormalState;
+        public Action<int,ActionState, int,string, UnitCtrl> NoSkipOnChangeState;
+        public Action<int,ActionState> SemanOnChangeState;
+        public Action<int, UnitAbnormalStateChangeData, int> NoSkipOnAbnormalStateChange;
+        public Action<int,float,int, int,int,string, UnitCtrl> NoSkipOnLifeChanged;
+        public Action<int,float, int,string> NoSkipOnTPChanged;
+        public Action<int,float> SemanOnTPChanged;
+        public Action<int, UnitSkillExecData> NoSkipOnStartAction;
+        public Action<int, int> SemanOnStartAction;
+        public Action<int, int, UnitActionExecData> NoSkipOnExecAction;
+        public Action<int, int> SemanOnExecAction;
+        public Action<int, int, float, int> NoSkipOnDamage;
+        public Action<bool, float, bool, float, FloatWithEx> NoSkipOnDamage2;
+        public Action<int, int, float, int,string> NoSkipOnBaseValueChanged;
+        public Action<UnitCtrl, eStateIconType, bool,float,string> NoSkipOnChangeAbnormalState;
         public CharacterPageButton button;
-        public Action<int, int, float, float> MyOnChangeSkillID;
-        public Action<float> MyOnSkillCD;
-        public Action<float> MyOnUsingSkill;
+        public Action<int, int, float, float> NoSkipOnChangeSkillID;
+        public Action<float> NoSkipOnSkillCD;
+        public Action<float> NoSkipOnUsingSkill;
         public Dictionary<int, int> MySkillExecDic = new Dictionary<int, int>();
 
         public BattleUIManager UIManager { get => BattleUIManager.Instance; }
@@ -121,7 +125,7 @@ namespace Elements
             stateChangeData.SubValue = data.SubValue;
             stateChangeData.SkillName = data.Skill?.SkillName ?? string.Empty;
             stateChangeData.SourceName = data.Source?.UnitName ?? string.Empty;
-            MyOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
+            NoSkipOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
         }
         
         /// <summary>

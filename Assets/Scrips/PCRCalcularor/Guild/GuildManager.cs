@@ -25,6 +25,7 @@ namespace PCRCaculator.Guild
         public Text characterGroupNameText;
         public Toggle AutoModeToggle;
         public Toggle SetModeToggle;
+        public Toggle SemanModeToggle;
         public List<UBTime> UnitUBTimes;
         public Text UBTimeEditButtonText;
         public List<Toggle> characterGroupToggles;
@@ -95,7 +96,7 @@ namespace PCRCaculator.Guild
             }
         }
         private int[] selectedBossEnemyids => SettingData.GetCurrentPlayerGroup().selectedEnemyIDs;
-        private bool isEditongUBTime;
+        private bool isEditingUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
         private int currentPage;
         private bool isInit;
@@ -489,14 +490,11 @@ namespace PCRCaculator.Guild
             SettingData.calSpeed = (int) Mathf.Pow(2, scaleRate - 3);
             calSettingTexts[0].text = "x" + SettingData.calSpeed;
         }
-        public int stoptime;
-
         public void StartCalButton() => StartCalButton(false);
         public void ReStartCalButton() => ReStartCalButton(false);
 
         private void ReStartCalButton(bool skipping)
         {
-            stoptime = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
             battleData.skipping = skipping;
@@ -526,6 +524,7 @@ namespace PCRCaculator.Guild
                 battleData.enemyData.Add(enemyData);
             }
             battleData.UBExecTimeList = SettingData.GetCurrentPlayerGroup().UBExecTimeData;
+            battleData.SemanUBExecTimeList = SettingData.GetCurrentPlayerGroup().SemanUBExecTimeData;
             battleData.SettingData = SettingData;
             MainManager.Instance.guildBattleData = battleData;
             MyGameCtrl.Instance.ReStart();
@@ -537,7 +536,6 @@ namespace PCRCaculator.Guild
             {
                 return;
             }*/
-            stoptime = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
             battleData.skipping = skipping;
@@ -567,16 +565,11 @@ namespace PCRCaculator.Guild
                 battleData.enemyData.Add(enemyData);
             }
             battleData.UBExecTimeList = SettingData.GetCurrentPlayerGroup().UBExecTimeData;
-            // battleData.isAutoMode = AutoModeToggle.isOn;
-            /*battleData.isViolent = SettingData.isViolent;
-            battleData.FPSforLogic = SettingData.FPSforLogic;
-            battleData.FPSforAnimaton = SettingData.FPSforAnimation;
-            battleData.playAnimation = SettingData.calcSpineAnimation && SettingData.calSpeed == 1;
-            battleData.calSpeed = SettingData.calSpeed;
-            battleData.UBTryingCount = SettingData.UBTryingCount;
-            battleData.useFixedRandomSeed = SettingData.UseFixedRandomSeed;
-            battleData.RandomSeed = SettingData.RandomSeed;
-            battleData.changedATKPatternDic = SettingData.changedEnemyAttackPatternDic;*/
+            battleData.SemanUBExecTimeList = SettingData.GetCurrentPlayerGroup().SemanUBExecTimeData;
+            battleData.isAutoMode = AutoModeToggle.isOn;
+            battleData.isSetMode = SetModeToggle.isOn;
+            battleData.isSemanMode = SemanModeToggle.isOn;
+            battleData.stopFrame = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             battleData.SettingData = SettingData;
             MainManager.Instance.ChangeSceneToBalttle(battleData);
         }
@@ -638,6 +631,7 @@ namespace PCRCaculator.Guild
             EditingUBTime(false);
             AutoModeToggle.isOn = data.useAutoMode;
             SetModeToggle.isOn = data.useSetMode;
+            SemanModeToggle.isOn = data.useSemanMode;
             isInit = false;
         }
         private void RefreshCharacterGroupToggle()
@@ -665,20 +659,29 @@ namespace PCRCaculator.Guild
             characterGroupNameText.text = playerData.playerName;
             for (int i = 0; i < 5; i++)
             {
+                UnitUBTimes[i].SetSemanMode(data.useSemanMode);
                 if (i < playerData.playrCharacters.Count)
                 {
                     charactersUI[i].SetButton(playerData.playrCharacters[i]);
-                    UnitUBTimes[i].SetUBTimes(data.UBExecTimeData[i]);
+                    if (data.UBExecTimeData?.Count > i)
+                        UnitUBTimes[i].SetUBTimes(data.UBExecTimeData[i]);
+                    if (data.SemanUBExecTimeData?.Count > i)
+                        UnitUBTimes[i].SetSemanUBTimes(data.SemanUBExecTimeData[i]);
                 }
                 else
                 {
                     charactersUI[i].SetButton(0);
                     UnitUBTimes[i].SetUBTimes(new List<float>());
+                    UnitUBTimes[i].SetSemanUBTimes(new List<int>());
                 }
             }
-            if (data.UBExecTimeData.Count < 6) data.UBExecTimeData.Add(new List<float>());
-            UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
+            if (data.UBExecTimeData?.Count >= 6)
+                UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
+            if (data.SemanUBExecTimeData?.Count >= 6) 
+                UnitUBTimes[5].SetSemanUBTimes(data.SemanUBExecTimeData[5]);
             AutoModeToggle.isOn = data.useAutoMode;
+            SetModeToggle.isOn = data.useSetMode;
+            SemanModeToggle.isOn = data.useSemanMode;
             timeLineTexts[0].text = data.timeLineData.DataName;
             timeLineTexts[1].text = data.timeLineData.GetDescribe();
 
@@ -844,24 +847,40 @@ namespace PCRCaculator.Guild
             SettingData.GetCurrentPlayerGroup().useSetMode = SetModeToggle.isOn;
             SaveDataToJson();
     }
+
+        public void ToggleSemanMode()
+        {
+            SettingData.GetCurrentPlayerGroup().useSemanMode = SemanModeToggle.isOn;
+            SaveDataToJson();
+            foreach(var ubTime in UnitUBTimes)
+            {
+                ubTime.SetSemanMode(SemanModeToggle.isOn);
+            }
+        }
+
         public void EditingUBTime(bool isButton)
         {
             if (isButton)
             {
-                isEditongUBTime = !isEditongUBTime;
+                isEditingUBTime = !isEditingUBTime;
             }
             else
             {
-                isEditongUBTime = false;
+                isEditingUBTime = false;
                 // AutoModeToggle.interactable = false;
             }
-            UBTimeEditButtonText.text = isEditongUBTime ? "保存" : "修改";
+            UBTimeEditButtonText.text = isEditingUBTime ? "保存" : "修改";
             int idx = 0;
-            if (!isEditongUBTime && isButton)
-                SettingData.GetCurrentPlayerGroup().UBExecTimeData.Clear();
+            if (!isEditingUBTime && isButton)
+            {
+                if (SemanModeToggle.isOn)
+                    SettingData.GetCurrentPlayerGroup().SemanUBExecTimeData.Clear();
+                else
+                    SettingData.GetCurrentPlayerGroup().UBExecTimeData.Clear();
+            }
             foreach (UBTime uBTime in UnitUBTimes)
             {
-                if (isEditongUBTime)
+                if (isEditingUBTime)
                 {
                     uBTime.StartEdit();
                     // AutoModeToggle.interactable = true;
@@ -871,15 +890,22 @@ namespace PCRCaculator.Guild
                     uBTime.FinishEdit();
                     if (isButton)
                     {
-                        SettingData.GetCurrentPlayerGroup().UBExecTimeData.Add(uBTime.GetUBTimes());
+                        if (SemanModeToggle.isOn)
+                        {
+                            SettingData.GetCurrentPlayerGroup().SemanUBExecTimeData.Add(uBTime.GetSemanUBTimes());
+                        }
+                        else
+                        {
+                            SettingData.GetCurrentPlayerGroup().UBExecTimeData.Add(uBTime.GetUBTimes());
+                        }
                     }
                 }
                 idx++;
             }
-            if(isButton && !isEditongUBTime)
+            if(isButton && !isEditingUBTime)
             {
                 // AutoModeToggle.interactable = false;
-                SettingData.GetCurrentPlayerGroup().useAutoMode = AutoModeToggle.isOn;
+                // SettingData.GetCurrentPlayerGroup().useAutoMode = AutoModeToggle.isOn;
                 // SettingData.GetCurrentPlayerGroup().useSetMode = SetModeToggle.isOn;
                 SaveDataToJson();
             }
@@ -1321,7 +1347,7 @@ namespace PCRCaculator.Guild
             MainManager.Instance.WindowConfigMessage("是否清空当前队伍UB？", clearUb_0);
         }
         public void clearUb_0(){
-          SettingData.ClearUBExecTimeData();
+          SettingData.ClearUBExecTimeData(SemanModeToggle.isOn);
           SaveDataToJson();
           Refresh();
         }
@@ -1480,9 +1506,16 @@ namespace PCRCaculator.Guild
         {
             guildPlayerGroupDatas.Clear();
         }
-        public void ClearUBExecTimeData()
+        public void ClearUBExecTimeData(bool semanUB)
         {
-            guildPlayerGroupDatas[currentPlayerGroupNum].UBExecTimeData = new List<List<float>> { new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>() };
+            if (semanUB)
+            {
+                guildPlayerGroupDatas[currentPlayerGroupNum].SemanUBExecTimeData = new List<List<int>> { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+            }
+            else
+            {
+                guildPlayerGroupDatas[currentPlayerGroupNum].UBExecTimeData = new List<List<float>> { new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>() };
+            }
         }
         public GuildRandomData GetCurrentRandomData()
         {
@@ -1530,9 +1563,11 @@ namespace PCRCaculator.Guild
     public class GuildPlayerGroupData
     {
         public AddedPlayerData playerData;
-        public List<List<float>> UBExecTimeData;
+        public List<List<float>> UBExecTimeData = new List<List<float>> {};
+        public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};
         public bool useAutoMode;
         public bool useSetMode;
+        public bool useSemanMode;
         public GuildRandomData timeLineData;
         public int currentGuildMonth=9;
         public int currentGuildEnemyNum=1;
@@ -1561,7 +1596,6 @@ namespace PCRCaculator.Guild
         {
             playerData = new AddedPlayerData();
             playerData.playerName = "新建队伍";
-            UBExecTimeData = new List<List<float>> { new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>() };
             timeLineData = new GuildRandomData();
         }
     }

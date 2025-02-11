@@ -7,6 +7,7 @@ TagManager:
   - UnknownTag1
   - UnknownTag2
   - UnknownTag3
+  - firearm
   layers:
   - Default
   - TransparentFX

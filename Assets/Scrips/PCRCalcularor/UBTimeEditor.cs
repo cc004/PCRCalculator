@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Elements;
+using Elements.Battle;
 using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,8 +32,8 @@ namespace PCRCaculator
             groupData.UBExecTimeData.Clear();
             for (int i = 0; i < 6; i++)
             {
-                groupData.UBExecTimeData.Add(UnitUBTimes[i].GetUBTimes());
                 UnitUBTimes[i].FinishEdit();
+                groupData.UBExecTimeData.Add(UnitUBTimes[i].GetUBTimes());
             }
             GuildManager.SaveSettingData(MyGameCtrl.Instance.tempData.SettingData);
             Exit();
@@ -40,6 +41,11 @@ namespace PCRCaculator
         public void OverRideButton()
         {
             ReplaceUBTime();
+        }
+        public void Auto2SemanButton()
+        {
+            groupData.SemanUBExecTimeData = BattleManager.Instance.semanubmanager.Auto2Seman();
+            MainManager.Instance.WindowMessage("已覆盖为此次战斗语义UB时间");
         }
         public void ReplaceUBTime()
         {

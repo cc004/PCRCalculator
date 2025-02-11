@@ -20,9 +20,9 @@ namespace Elements.Battle
         
         public void SetUbExec(List<List<float>> ublists, int count)
         {
-            if (ublists == null)
+            enabled = false;
+            if (ublists == null || ublists.Count == 0)
             {
-                enabled = false;
                 return;
             }
 

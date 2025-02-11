@@ -2005,10 +2005,10 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 259;
-        public int playerProcess = 66;
+        public int playerLevel = 262;
+        public int playerProcess = 67;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 260;
+        public int maxUniqueEqLv = 270;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
@@ -2287,10 +2287,13 @@ namespace PCRCaculator
         public List<EnemyData> enemyData;
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
+        public List<List<int>> SemanUBExecTimeList = null;
         public List<List<float>> UBExecTimeList = null;
         public bool isAutoMode = false;
-        // public bool isSetMode = false;
+        public bool isSetMode = false;
+        public bool isSemanMode = false;
         public bool forceAutoMode = false;
+        public int stopFrame = -1;
         //public bool isViolent = false;
         //public int calSpeed;
         //public int FPSforAnimaton;

@@ -97,7 +97,7 @@ namespace Elements
         ubAbnormalData.StartTimer(_target.Owner);
         _target.Owner.UbAbnormalDataList.Add(ubAbnormalData);
         _target.Owner.OnChangeState.Call(_target.Owner, eStateIconType.UB_DISABLE, true);
-                _target.Owner.MyOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.UB_DISABLE, true, _valueDictionary[eValueNumber.VALUE_5],
+                _target.Owner.NoSkipOnChangeAbnormalState?.Invoke(_target.Owner, eStateIconType.UB_DISABLE, true, _valueDictionary[eValueNumber.VALUE_5],
                     "???");
 
             }

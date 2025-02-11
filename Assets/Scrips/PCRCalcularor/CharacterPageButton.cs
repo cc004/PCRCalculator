@@ -241,14 +241,14 @@ namespace PCRCaculator
             uIManager = BattleUIManager.Instance;
             //owner2.OnChangeState += SetAbnormalIcons_2;
             //SetAbnormalIcons(owner, eStateIconType.NONE, false);
-            owner2.MyOnChangeAbnormalState += (a, b, c, d, e) => SetAbnormalIcons(a, b, c, d, e);
+            owner2.NoSkipOnChangeAbnormalState += (a, b, c, d, e) => SetAbnormalIcons(a, b, c, d, e);
             owner2.button = this;
             SetHPAndTP(1, 0);
             skillUI.Init(unitCtrl.unitParameter.SkillData.MainSkillIds.ToArray(),unitCtrl.unitParameter.SkillData.main_skill_evolution_1, unitCtrl.unitParameter.SkillData.main_skill_evolution_2);
             skillUI.Init(unitCtrl.unitParameter.SkillData.SpSkillIds.ToArray(), unitCtrl.unitParameter.SkillData.sp_skill_evolution_1, unitCtrl.unitParameter.SkillData.sp_skill_evolution_2);
-            owner2.MyOnChangeSkillID += skillUI.SetSkillState;
-            owner2.MyOnSkillCD += skillUI.SetCastTime;
-            owner2.MyOnUsingSkill += skillUI.SetPlayTime;
+            owner2.NoSkipOnChangeSkillID += skillUI.SetSkillState;
+            owner2.NoSkipOnSkillCD += skillUI.SetCastTime;
+            owner2.NoSkipOnUsingSkill += skillUI.SetPlayTime;
         }
 
         public void SetHPAndTP(float normalizedHPRate,float normalizedTPRate)
