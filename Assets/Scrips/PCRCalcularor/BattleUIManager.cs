@@ -506,7 +506,8 @@ namespace PCRCaculator.Battle
                 {
                     case 0:
                         UBButtonState[charidx] = 1;
-                        MyGameCtrl.Instance.TryingExecUB(charidx);
+                        if (!BattleHeaderController.Instance.IsPaused)
+                            MyGameCtrl.Instance.TryingExecUB(charidx);
                         StartCoroutine(UBCool(charidx));
                         break;
                     case 1:

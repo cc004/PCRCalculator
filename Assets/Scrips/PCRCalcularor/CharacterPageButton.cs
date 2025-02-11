@@ -54,17 +54,22 @@ namespace PCRCaculator
 
         public void Awake()
         {
-            backgrounds1 = new List<Sprite>();
-            var sprites = Resources.LoadAll<Sprite>("AtlasCommon_3")
-                .ToDictionary(x => x.name, x => x);
-            backgrounds1.Add(sprites["common_unit_frame_blue"]);
-            backgrounds1.Add(sprites["common_unit_frame_bronze"]);
-            backgrounds1.Add(sprites["common_unit_frame_silver"]);
-            backgrounds1.Add(sprites["common_unit_frame_gold"]);
-            backgrounds1.Add(sprites["common_unit_frame_purple"]);
-            backgrounds1.Add(sprites["common_unit_frame_red"]);
-            backgrounds1.Add(sprites["common_unit_frame_green"]);
-            backgrounds1.Add(sprites["common_unit_frame_orange"]);
+            if (backgrounds1 == null)
+            {
+                backgrounds1 = new List<Sprite>();
+                var sprites = Resources.LoadAll<Sprite>("AtlasPromotionFrame")
+                    .ToDictionary(x => x.name, x => x);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_white"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_bronze"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_silver"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_gold"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_purple"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_red"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_green"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_orange"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_vivid_blue"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_pink"]);
+            }
         }
 
         /// <summary>
@@ -178,10 +183,18 @@ namespace PCRCaculator
             {
                 backtype = 7;
             }
-            else
+            else if (data.rank <= 31)
             {
                 backtype = 8;
             }
+            else if (data.rank <= 35)
+            {
+                backtype = 9;
+            }
+			else
+			{
+				backtype = 10;
+			}
             if (isFav != null){
                 isFav.onValueChanged.AddListener(value => OnFavToggleChanged(value, data));
                 isFav.isOn = data.fav;
