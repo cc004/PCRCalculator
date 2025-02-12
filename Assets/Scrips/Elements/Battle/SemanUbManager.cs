@@ -395,7 +395,7 @@ namespace Elements.Battle
         {
             if (!ubMod)
             {
-                if (pos != -1) // no boss
+                if (pos >= 0 && pos <= 4) // no boss
                 {
                     auto2semanAll[pos].Add(auto2seman[pos].GetUbNumber(pos));
                     auto2seman[pos].Clear();
