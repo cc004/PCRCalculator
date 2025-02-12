@@ -29,7 +29,7 @@ namespace Elements.Battle
             public bool skillReady { 
                 get
                 {
-                    return SemanUbManager.players[unitId].IsSkillReady;
+                    return unitId < SemanUbManager.players.Count && SemanUbManager.players[unitId].IsSkillReady;
                 }
             }
             public int delay = 0;
@@ -176,7 +176,7 @@ namespace Elements.Battle
             public bool skillReady { 
                 get
                 {
-                    return SemanUbManager.players[unitId].IsSkillReady;
+                    return unitId < SemanUbManager.players.Count && SemanUbManager.players[unitId].IsSkillReady;
                 }
             }
             public int unitId { get; set; }
