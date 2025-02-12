@@ -166,9 +166,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 206
-        width: 64
-        height: 34
+        y: 132
+        width: 123
+        height: 108
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -186,10 +186,10 @@ TextureImporter:
       name: AtlasCoopMap_1
       rect:
         serializedVersion: 2
-        x: 66
-        y: 206
-        width: 28
-        height: 28
+        x: 125
+        y: 176
+        width: 52
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -207,10 +207,10 @@ TextureImporter:
       name: AtlasCoopMap_2
       rect:
         serializedVersion: 2
-        x: 125
-        y: 176
-        width: 52
-        height: 48
+        x: 179
+        y: 211
+        width: 32
+        height: 29
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -228,10 +228,10 @@ TextureImporter:
       name: AtlasCoopMap_3
       rect:
         serializedVersion: 2
-        x: 179
-        y: 211
-        width: 32
-        height: 29
+        x: 234
+        y: 216
+        width: 125
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -249,10 +249,10 @@ TextureImporter:
       name: AtlasCoopMap_4
       rect:
         serializedVersion: 2
-        x: 0
-        y: 132
-        width: 123
-        height: 72
+        x: 373
+        y: 215
+        width: 126
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -315,7 +315,7 @@ TextureImporter:
         x: 401
         y: 122
         width: 92
-        height: 61
+        height: 62
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -381,7 +381,7 @@ TextureImporter:
         height: 130
       alignment: 0
       pivot: {x: 0, y: 0}
-      border: {x: 23, y: 33, z: 22, w: 20}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -470,8 +470,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5e3ca76665a7087b0800000000000000
-      internalID: -5224041056244677659
+      spriteID: 2412ce47dbfd5cf4e8cb87019ffe775a
+      internalID: -1111486136
       vertices: []
       indices: 
       edges: []
@@ -493,7 +493,7 @@ TextureImporter:
       AtlasCoopMap_11: -4287870495014116624
       AtlasCoopMap_12: -1172889898363064824
       AtlasCoopMap_13: 4713790798831132246
-      AtlasCoopMap_14: -5224041056244677659
+      AtlasCoopMap_14: -1111486136
       AtlasCoopMap_2: -1008465687105122729
       AtlasCoopMap_3: -845526135572648212
       AtlasCoopMap_4: -3410232512605926328

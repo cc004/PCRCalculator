@@ -408,9 +408,21 @@ namespace Elements.Battle
         {
             instance = this;
         }
+        
+        private int ParseInt(InputField inputField, int defaultValue)
+        {
+            int ret = string.IsNullOrEmpty(inputField.text) ? defaultValue : int.Parse(inputField.text);
+            inputField.text = ret.ToString();
+            return ret;
+        }
 
         public void Show()
         {
+            if (!MyGameCtrl.Instance.IsSemanMode)
+            {
+                MainManager.Instance.WindowMessage("仅在语义UB模式下可用");
+                return;
+            }
             GAInfo.SetActive(true);
             for (int i = 0; i < 5; i++)
             {
@@ -421,7 +433,7 @@ namespace Elements.Battle
 
         public void Update()
         {
-            if (ga == null)
+            if (ga == null || !ga.IsRunning)
             {
                 return;
             }
@@ -452,7 +464,7 @@ namespace Elements.Battle
                 {
                     SemanUBChromosome.useValue[i].AddRange(SemanUBChromosome.otherSkillValue[i]);
                 }
-                int dealy = ubDelay.text == "" ? 0 : int.Parse(ubDelay.text);
+                int dealy = ParseInt(ubDelay, 0);
                 for (int j = 1; j <= dealy; j++)
                 {
                     SemanUBChromosome.useValue[i].Add(j);
@@ -464,11 +476,12 @@ namespace Elements.Battle
                 var DIYSemanUbList = DIYSemanUb[i].text.Split('\n').Select(x => int.Parse(x)).ToList();
                 SemanUBChromosome.useValue[i].AddRange(DIYSemanUbList);
             }
-            var populationMinValue = int.Parse(populationMin.text);
-            var populationMaxValue = int.Parse(populationMax.text);
+            var populationMinValue = ParseInt(populationMin, 50);
+            var populationMaxValue = ParseInt(populationMax, 1000);
 
             bestDamage = 0;
             bestGenes.Clear();
+            bestDamageText.text = "0";
             historyTexts.text = "";
             MyGameCtrl.Instance.IsGAUbMode = true;
             var selection = new EliteSelection();
@@ -485,11 +498,11 @@ namespace Elements.Battle
             }
             else if (considerPhysicAtk.isOn)
             {
-                fitness = new SemanUBPhysicAtkFitness(int.Parse(tpDemand.text));
+                fitness = new SemanUBPhysicAtkFitness(ParseInt(tpDemand, 0));
             }
             else if (considerMagicAtk.isOn)
             {
-                fitness = new SemanUBMagicAtkFitness(int.Parse(tpDemand.text));
+                fitness = new SemanUBMagicAtkFitness(ParseInt(tpDemand, 0));
             }
             var allSetChr = new SemanUBChromosome(2);
             for (int i = 0; i < 5; i++)
@@ -500,8 +513,8 @@ namespace Elements.Battle
             fixPreGenes.Clear();
             for (int i = 0; i < 5; i++)
             {
-                var raw = MyGameCtrl.Instance.tempData.SemanUBExecTimeList.ElementAtOrDefault(i) ?? new List<int>();
-                fixUb[i].text = Math.Min(int.Parse(fixUb[i].text), raw.Count).ToString();
+                var raw = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup().SemanUBExecTimeData.ElementAtOrDefault(i) ?? new List<int>();
+                fixUb[i].text = Math.Min(ParseInt(fixUb[i], 0), raw.Count).ToString();
                 int fixNum = int.Parse(fixUb[i].text);
                 fixPreGenes.Add(raw.Take(fixNum).ToList());
                 curChr.ReplaceGene(i, new Gene(raw.Skip(fixNum).ToList()));
@@ -511,7 +524,7 @@ namespace Elements.Battle
 
             ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
             // ga.OperatorsStrategy = new SemanUBOperatorsStrategy();
-            ga.Termination = new TimeEvolvingTermination(System.TimeSpan.FromHours(10));
+            ga.Termination = new TimeEvolvingTermination(System.TimeSpan.FromHours(24 * 30));
             // ga.Termination = new GenerationNumberTermination(100);
 
             ga.TaskExecutor = new LinearTaskExecutor();
@@ -572,21 +585,41 @@ namespace Elements.Battle
         public void Save()
         {
             var guildSettingData = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
-            guildSettingData.SemanUBExecTimeData = bestGenes;
+            guildSettingData.SemanUBExecTimeData.Clear();
+            guildSettingData.SemanUBExecTimeData.AddRange(bestGenes);
             GuildManager.SaveSettingData(MyGameCtrl.Instance.tempData.SettingData);
             MainManager.Instance.WindowMessage("保存成功");
         }
 
         public void StopGA()
         {
-            if (ga == null)
+            if (ga == null || !ga.IsRunning)
             {
                 return;
             }
             MyGameCtrl.Instance.IsGAUbMode = false;
             ga.Stop();
-            ga = null;
             gaThread.Abort();
+        }
+
+        public void CopyPopulation()
+        {
+            var chromosomes = ga.Population.CurrentGeneration.Chromosomes;
+            string text = "";
+            foreach (var chromosome in chromosomes)
+            {
+                var genes = new List<List<int>>();
+                for (int i = 0; i < chromosome.Length; i++)
+                {
+                    var gene = chromosome.GetGene(i).Value as List<int>;
+                    genes.Add(gene);
+                }
+                text += string.Join(" ", genes.Select(gene => string.Join(",", gene)));
+                text += " " + ((SemanUBChromosome)chromosome).totalDamage;
+                text += "\n";
+            }
+            GUIUtility.systemCopyBuffer = text;
+            MainManager.Instance.WindowMessage("已复制到剪贴板");
         }
 
         private void OnDestroy()

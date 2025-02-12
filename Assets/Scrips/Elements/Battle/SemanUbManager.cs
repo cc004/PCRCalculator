@@ -29,7 +29,7 @@ namespace Elements.Battle
             public bool skillReady { 
                 get
                 {
-                    return SemanUbManager.players[unitId].IsSkillReady;
+                    return unitId < SemanUbManager.players.Count && SemanUbManager.players[unitId].IsSkillReady;
                 }
             }
             public int delay = 0;
@@ -176,7 +176,7 @@ namespace Elements.Battle
             public bool skillReady { 
                 get
                 {
-                    return SemanUbManager.players[unitId].IsSkillReady;
+                    return unitId < SemanUbManager.players.Count && SemanUbManager.players[unitId].IsSkillReady;
                 }
             }
             public int unitId { get; set; }
@@ -395,7 +395,7 @@ namespace Elements.Battle
         {
             if (!ubMod)
             {
-                if (pos != -1) // no boss
+                if (pos >= 0 && pos <= 4) // no boss
                 {
                     auto2semanAll[pos].Add(auto2seman[pos].GetUbNumber(pos));
                     auto2seman[pos].Clear();
