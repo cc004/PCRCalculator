@@ -44,6 +44,11 @@ namespace PCRCaculator
         }
         public void Auto2SemanButton()
         {
+            if (MyGameCtrl.Instance.IsSemanMode)
+            {
+                MainManager.Instance.WindowMessage("语义UB模式下无法转换成语义UB");
+                return;
+            }
             groupData.SemanUBExecTimeData = BattleManager.Instance.semanubmanager.Auto2Seman();
             MainManager.Instance.WindowMessage("已覆盖为此次战斗语义UB时间");
         }

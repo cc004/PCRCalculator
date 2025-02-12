@@ -441,7 +441,11 @@ namespace PCRCaculator.Battle
 
         public void ExitButton()
         {
-            if ((BattleManager.Instance?.BossUnit?.Hp ?? 0) == 0)
+            if (MyGameCtrl.Instance.IsGAUbMode)
+            {
+                MainManager.Instance.WindowMessage("请先停止优化！");
+            }
+            else if ((BattleManager.Instance?.BossUnit?.Hp ?? 0) == 0)
             {
                 ExitButton2();
             }
