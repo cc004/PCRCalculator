@@ -3763,7 +3763,7 @@ namespace Elements.Battle
                 scale = (battleManager.resourceManager.LoadResourceImmediately(eResourceId.SPINE_MIDDLEGROUND_SCALE, (long) battleBackground) as SpineGroundScale).Scale
               }.coroutineStartProcessb__16));
             }*/
-            battleManager.BattleLeftTime = MyGameCtrl.Instance.tempData.SettingData.limitTime;// battleManager.tempData.PHDACAOAOMA.CAMIPEAOGNI;
+            battleManager.BattleLeftTime = MyGameCtrl.Instance.tempData?.SettingData?.limitTime?? 90;// battleManager.tempData.PHDACAOAOMA.CAMIPEAOGNI;
             // ISSUE: explicit non-virtual call
             BattleHeaderController.Instance.SetRestTime(battleManager.BattleLeftTime);
             battleManager.initializePassiveSkill();
@@ -3962,7 +3962,7 @@ namespace Elements.Battle
 
             }
 
-            if (ExcelHelper.ExcelHelper.AsmExportEnabled)
+            if (ExcelHelper.ExcelHelper.AsmExportEnabled && MainManager.Instance.IsGuildBattle)
             {
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();

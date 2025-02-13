@@ -286,9 +286,16 @@ namespace Elements.Battle
 
         private List<UbRecord> auto2seman;
         private List<List<int>> auto2semanAll;
+        private bool enable = false;
+
+        public void Disable()
+        {
+            enable = false;
+        }
 
         public void SetUbExec(List<List<int>> ublists)
         {
+            enable = true;
             ubMod = false;
             if (ublists == null || ublists.Count == 0)
             {
@@ -309,6 +316,7 @@ namespace Elements.Battle
 
         public bool IsUbExec(int pos)
         {
+            if (!enable) return false;
             if (!ubMod) return false;
             if (pos < 0 || pos > 4) return false;
             if (queues[pos].Count == 0 || queues[pos].Peek().IsUbExec())
@@ -334,6 +342,7 @@ namespace Elements.Battle
 
         public void OnSkillEffectCallBack(int unitPos, int skill)
         {
+            if (!enable) return;
             if (skill == 1) // ignore ub
                 return;
             if (!ubMod)
@@ -355,6 +364,7 @@ namespace Elements.Battle
 
         public void OnChangeStateCallBack(int unitPos, ActionState state)
         {
+            if (!enable) return;
             if (!ubMod)
             {
                 foreach (var ub in auto2seman)
@@ -374,6 +384,7 @@ namespace Elements.Battle
 
         public void ProcessFrame()
         {
+            if (!enable) return;
             if (!ubMod)
             {
                 for(int i = 0; i < auto2seman.Count; i++)
@@ -393,6 +404,7 @@ namespace Elements.Battle
 
         public void UbExecCallback(int pos)
         {
+            if (!enable) return;
             if (!ubMod)
             {
                 if (pos >= 0 && pos <= 4) // no boss
@@ -432,6 +444,7 @@ namespace Elements.Battle
 
         public void SetUnitCallBack(List<UnitCtrl> players, UnitCtrl boss)
         {
+            if (!enable) return;
             SemanUbManager.players = players;
             for (int i = 0; i < players.Count; i++)
             {
