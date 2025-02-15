@@ -99,6 +99,7 @@ namespace PCRCaculator.Guild
         private int[] selectedBossEnemyids => SettingData?.GetCurrentPlayerGroup()?.selectedEnemyIDs ?? new int[1]{0};
         private bool isEditingUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
+        private static string[] guildTurn = new string[5] { "一阶段", "二阶段", "三阶段", "四阶段", "五阶段", };
         private int currentPage;
         private bool isInit;
         private int[] specialEnemyid;
@@ -318,11 +319,16 @@ namespace PCRCaculator.Guild
         {
             Dropdown dp = dropdowns_ChooseBoss[2];
             List<string> list = new List<string>();
-            foreach(var key in guildEnemyDatas.Keys)
+            foreach (var key in guildEnemyDatas.Keys)
             {
                 if (key >= 1024)
                 {
-                    string str = $"{guildMonthNames[(key - 1000 + 11) % 12]}({key})";
+                    int monthKey = (key - 1000 + 11) % 12;
+                    if (key >= 1063)
+                    {
+                      monthKey = (monthKey - 1 + 12) % 12;
+                    }
+                    string str = $"{guildMonthNames[monthKey]}({key})";
                     list.Add(str);
                 }
             }
@@ -331,11 +337,12 @@ namespace PCRCaculator.Guild
         }
         private int GetClanBattleID()
         {
-            return dropdowns_ChooseBoss[2].value + 1024;
+            int value = dropdowns_ChooseBoss[2].value;
+            return value + 1024 + (value >= 38 ? 1 : 0);
         }
         private void SetChooseBossDropDown(int clanBattleID)
         {
-            dropdowns_ChooseBoss[2].value  = clanBattleID - 1024;
+            dropdowns_ChooseBoss[2].value = clanBattleID - 1024;
         }
         public void OnChooseBossDropDownChanged()
         {
@@ -352,33 +359,46 @@ namespace PCRCaculator.Guild
                     //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
                     bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
+
+                    Dropdown dp = dropdowns_ChooseBoss[1];
+                    int turnCount = guildEnemyDatas[GetClanBattleID()].enemyIds.Length - 1;
+                    // dp.options = dp.options.GetRange(0, turnCount);
+                    // 获取 guildTurn 中的前 turnCount 个值
+                    List<string> selectedOptions = new List<string>();
+                    for (int i = 0; i < turnCount; i++)
+                    {
+                      selectedOptions.Add(guildTurn[i]);
+                    }
+
+                    // 更新 Dropdown 的选项
+                    UpdateDropdownOptions(dp, selectedOptions);
                 }
                 else
                 {
                     specialInput.text = "401042401";
                     /*
-                    show_text.text = show_str[dropdowns_ChooseBoss[3].value];
-                    switch (dropdowns_ChooseBoss[3].value)
-                    {
-                        case 0://木桩1
-                            enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
-                            specialInput.text = "100";
-                            //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
-                            //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                            bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
+              show_text.text = show_str[dropdowns_ChooseBoss[3].value];
+              switch (dropdowns_ChooseBoss[3].value)
+              {
+                  case 0://木桩1
+                      enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
+                      specialInput.text = "100";
+                      //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
+                      //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
+                      bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
 
-                            break;
-                        case 1://木桩2
-                            enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
-                            specialInput.text = "100";
-                            //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
-                            //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                            bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
+                      break;
+                  case 1://木桩2
+                      enemyid_0 = specialEnemyDatas[dropdowns_ChooseBoss[3].value];
+                      specialInput.text = "100";
+                      //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
+                      //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
+                      bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, enemyDataDic[enemyid_0].unit_id);
 
-                            break;
-                        case 2:
-                            break;
-                    }*/
+                      break;
+                  case 2:
+                      break;
+              }*/
                 }
 
                 specialEnemyid = new[] {enemyid_0};
@@ -389,9 +409,24 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage($"会战{GetClanBattleID()}的配置缺失！", null);
             }
         }
+        void UpdateDropdownOptions(Dropdown dp, List<string> options)
+        {
+            // 清空当前选项
+            dp.ClearOptions();
+    
+            // 创建新的选项列表
+            List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
+            foreach (string option in options)
+            {
+              optionDataList.Add(new Dropdown.OptionData(option));
+            }
+    
+            // 更新 Dropdown 的选项
+            dp.AddOptions(optionDataList);
+        }
         public void OnInputFinished()
         {
-            if(!isGuildBoss)
+            if (!isGuildBoss)
             {
                 var bossid = specialInput.text.Split(',').Select(x => int.Parse(x, NumberStyles.Any)).ToArray();
                 EnemyData data = null;
@@ -405,7 +440,7 @@ namespace PCRCaculator.Guild
                 else
                 {
                     MainManager.Instance.WindowConfigMessage("bossID无效！", null);
-                    specialEnemyid = new[] {0};
+                    specialEnemyid = new[] { 0 };
                 }
                 specialInputValue = 0;
             }
@@ -747,9 +782,9 @@ namespace PCRCaculator.Guild
                 group.playerSetingHP = 0;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
-            bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" +
-                $"\n<size=10>({data.currentGuildMonth})</size>";
-            //group.useLogBarrier = toggles_ChooseBoss[3].isOn;
+            int monthIndex = (data.currentGuildMonth >= 1062 ? data.currentGuildMonth - 1 : data.currentGuildMonth) - 1000 + 11;
+            monthIndex %= 12;
+            bossDetailTexts[3].text = $"{guildMonthNames[monthIndex]}\n<size=10>({data.currentGuildMonth})</size>";
         }
         private void RefreshCalcSettings_start()
         {
