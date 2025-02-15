@@ -459,6 +459,7 @@ namespace PCRCaculator.Guild
                 SettingData.GetCurrentPlayerGroup().currentGuildEnemyNum = num;
                 int turn = dropdowns_ChooseBoss[1].value + 1; 
                 SettingData.GetCurrentPlayerGroup().currentTurn = turn;
+                turn = clanBattleID >= 1068 && turn == 1 ? turn - 1 : turn;
                 enemyId = new [] {GetGuildBossID(clanBattleID, num, turn)};
             }
             else
