@@ -35,5 +35,15 @@ namespace PCRCaculator
                 }
             }
         }
+
+        public void BattleButton()
+        {
+            JJCManager.Instance.AttackButton(pos);
+        }
+
+        public void DeleteButton()
+        {
+            JJCManager.Instance.DeleteButton(pos);
+        }
     }
 }

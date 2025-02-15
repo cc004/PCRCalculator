@@ -63,6 +63,7 @@ namespace PCRCaculator.Guild
         public List<Text> calSettingTexts;
         public Slider calSlider;
         public GameObject bossDetailPrefab;
+        public bool isLightStart = false;
 
 
         //public List<Sprite> bossSprites;
@@ -95,7 +96,7 @@ namespace PCRCaculator.Guild
                 return staticsettingData;
             }
         }
-        private int[] selectedBossEnemyids => SettingData.GetCurrentPlayerGroup().selectedEnemyIDs;
+        private int[] selectedBossEnemyids => SettingData?.GetCurrentPlayerGroup()?.selectedEnemyIDs ?? new int[1]{0};
         private bool isEditingUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
         private int currentPage;
@@ -140,19 +141,22 @@ namespace PCRCaculator.Guild
         }
         private void Start()
         {
-            StartCoroutine(StartAfterWait());
-            version.text = "—   v" + Application.version+"   —";
-            foreach (Transform child in infoPanel.transform)
+            if (!isLightStart)
             {
-              Button button = child.GetComponent<Button>();
-              Text text = child.GetComponentInChildren<Text>();
-              if (button != null && text != null)
-              {
-                  button.onClick.AddListener(() => OnInfoButtonClick(text));
-              }
+                StartCoroutine(StartAfterWait());
+                foreach (Transform child in infoPanel.transform)
+                {
+                Button button = child.GetComponent<Button>();
+                Text text = child.GetComponentInChildren<Text>();
+                if (button != null && text != null)
+                {
+                    button.onClick.AddListener(() => OnInfoButtonClick(text));
+                }
+                }
+                SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
+                SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
             }
-            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
-            SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
+            version.text = "—   v" + Application.version+"   —";
         }
         private void OnInfoButtonClick(Text text)
         { 

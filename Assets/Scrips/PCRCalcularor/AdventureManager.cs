@@ -17,7 +17,7 @@ namespace PCRCaculator
         // Start is called before the first frame update
         void Start()
         {
-
+            SwitchPage(2);
         }
         /// <summary>
         /// 开启战斗界面

@@ -87,24 +87,32 @@ namespace Elements
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                 tempData.skipping = mainManager.GuildBattleData.skipping;
                 stopFrame = mainManager.GuildBattleData.stopFrame;
+                tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
             }
             else
             {
                 tempData.enemyList = mainManager.EnemyDataForBattle;
+                tempData.CreateAllUnitParameters();
                 // tempData.SettingData = GuildManager.StaticsettingData; // TODO fix setting
             }
-            tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
             unitCount.Clear();
             BattleManager.Instance.Init(this);
-            if (IsSemanMode)
+            if (mainManager.IsGuildBattle)
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
-                BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
+                if (IsSemanMode)
+                {
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
+                }
+                else
+                {
+                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                }
             }
             else
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(null);
-                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                BattleManager.Instance.semanubmanager.Disable();
             }
         }
         
@@ -132,13 +140,14 @@ namespace Elements
                     tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                     tempData.skipping = mainManager.GuildBattleData.skipping;
                     stopFrame = stopFrameText.text == "" ? -1 : int.Parse(stopFrameText.text);
+                    tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
                 }
                 else
                 {
                     tempData.enemyList = mainManager.EnemyDataForBattle;
+                    tempData.CreateAllUnitParameters();
                     // tempData.SettingData = GuildManager.StaticsettingData;
                 }
-                tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
             }
             foreach (Transform child in unitParent)
             {

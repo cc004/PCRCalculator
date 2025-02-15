@@ -158,8 +158,8 @@ namespace PCRCaculator
       }
       else
       {
-        Favriote.isOn = GuildManager.Instance.SettingData.Favriote;
-        Unused.isOn = GuildManager.Instance.SettingData.Unused;
+        Favriote.isOn = GuildManager.Instance.SettingData.Favriote; // 应该放到mainManager
+        Unused.isOn = GuildManager.Instance.SettingData.Unused;  // 应该放到mainManager
         chooseBack_A.SetActive(true);
         settingBack.SetActive(false);
 
@@ -205,14 +205,7 @@ namespace PCRCaculator
         }*/
       // }
       RefreshSelectedButtons();
-      if (type == 1)
-      {
-        nextButtonText.text = "战斗开始";
-      }
-      else if (type == 2 || type == 3 || type == 4)
-      {
-        nextButtonText.text = "下一步";
-      }
+      nextButtonText.text = "下一步";
       if (type == 4)
       {
         playerData = player;
@@ -231,11 +224,11 @@ namespace PCRCaculator
 
     public void OpenProperty()
     {
-      GuildManager.Instance.ActivateCharacterDetailPage(new Vector3(260, 0, 0), 0.6f);
+      GuildManager.Instance.ActivateCharacterDetailPage(new Vector3(260, 0, 0), 0.6f); // 应该放到mainManager
     }
     public void CloseProperty()
     {
-      GuildManager.Instance.HideCharacterDetailPage();
+      GuildManager.Instance.HideCharacterDetailPage(); // 应该放到mainManager
     }
     public void CancalButton()
     {
@@ -266,35 +259,26 @@ namespace PCRCaculator
         }
       }
       PlayerPrefs.SetString("selectedCharId", saveID);
-      if (type == 1)
+      chooseBack_A.SetActive(false);
+      settingBack.SetActive(true);
+      isinstating = true;
+      if (type == 4 && playerData0 != null)
+        playerData = playerData0;
+      else if (type == 4)
       {
-        //MainManager.Instance.WindowMessage("战斗系统还没做好！");
-        //CancalButton();
-        JJCManager.Instance.ReadyAttack(selectedCharId);
-      }
-      else if (type >= 2)
-      {
-        chooseBack_A.SetActive(false);
-        settingBack.SetActive(true);
-        isinstating = true;
-        if (type == 4 && playerData0 != null)
-          playerData = playerData0;
-        else if (type == 4)
+        playerData = playerDataForGuild;
+        playerDataForGuild.playrCharacters.Clear();
+        foreach (int unitid in selectedCharId)
         {
-          playerData = playerDataForGuild;
-          playerDataForGuild.playrCharacters.Clear();
-          foreach (int unitid in selectedCharId)
-          {
-            playerData.playrCharacters.Add(unitDataDic[unitid]);
-          }
+          playerData.playrCharacters.Add(unitDataDic[unitid]);
         }
-        else
+      }
+      else
+      {
+        playerData = new AddedPlayerData();
+        foreach (int unitid in selectedCharId)
         {
-          playerData = new AddedPlayerData();
-          foreach (int unitid in selectedCharId)
-          {
-            playerData.playrCharacters.Add(unitDataDic[unitid]);
-          }
+          playerData.playrCharacters.Add(unitDataDic[unitid]);
         }
         for (int i = 0; i < 5; i++)
         {
@@ -342,7 +326,11 @@ namespace PCRCaculator
     public void FinishEditButton_setting()
     {
       CancalButton();
-      if (type == 2)
+      if (type == 1)
+      {
+        JJCManager.Instance.ReadyAttack(selectedCharId);
+      }
+      else if (type == 2)
       {
         JJCManager.Instance.FinishAddingNewPlayer(playerData);
       }
@@ -759,7 +747,7 @@ namespace PCRCaculator
         detailSliders_setting[14].maxValue = 0;
       }
       OpenEXSettingPannel();
-      GuildManager.Instance.RefreshCharacterDetailPage(selectedCharacterId_setting, data);
+      GuildManager.Instance?.RefreshCharacterDetailPage(selectedCharacterId_setting, data);
     }
     private Dictionary<int, string> id2alias;
     private Dictionary<int, string> id2pinyin;

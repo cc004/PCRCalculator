@@ -2390,7 +2390,7 @@ this.updateCurColor();
             BaseData baseData = new BaseData();
             BaseData baseDataEX = new BaseData();
             BaseData baseDataForEnergyCalc = new BaseData();
-            var enemy = MyGameCtrl.Instance.tempData.guildEnemy.FirstOrDefault(e => e.unit_id == this.UnitId);
+            var enemy = MyGameCtrl.Instance.tempData.guildEnemy?.FirstOrDefault(e => e.unit_id == this.UnitId);
             if (enemy != null)
             {
                 baseDataForEnergyCalc = baseData = enemy.baseData;
@@ -2553,11 +2553,8 @@ this.updateCurColor();
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, gameObject, false);
                     ColliderCenter = (polygonCollider2D.bounds.center - transform.position) / 2;
                     ColliderSize = polygonCollider2D.bounds.size / 2;
-                    if (MyGameCtrl.Instance.tempData.isGuildBattle)
-                    {
-                        float coSize2 = ColliderSize.x / transform.lossyScale.x;
-                        BodyWidth = coSize2 + BossBodyWidthOffset;
-                    }
+                    float coSize2 = ColliderSize.x / transform.lossyScale.x;
+                    BodyWidth = coSize2 + BossBodyWidthOffset;
 
                     Destroy(polygonCollider2D);
                     Destroy(gameObject.GetComponent<Rigidbody2D>());

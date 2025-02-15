@@ -132,7 +132,7 @@ namespace PCRCaculator.Battle
                 _Update += _Update_1;
             }
             _Update += _UpdateFPSCount;
-            timeScaleSlider.value = GuildManager.Instance.calSlider.value;
+            timeScaleSlider.value = GuildManager.Instance?.calSlider?.value ?? 1;
             inputActions = new Dictionary<KeyCode, Action>
             {
                 { KeyCode.RightArrow, StepButton }, // 方向右键
@@ -395,7 +395,7 @@ namespace PCRCaculator.Battle
                         gameCtrl.enemyUnitCtrl[i].OnDamage += RefreshGuildEnemyTotalDamage2;
                         guildTotalDamageNumber.gameObject.SetActive(true);
                     }else{
-                        EnemyUI[i].gameObject.SetActive(false);
+                        EnemyUI[i].gameObject.SetActive(true);
                     }
                     EnemyUI[i].SetAlive();
                 }
@@ -617,7 +617,7 @@ namespace PCRCaculator.Battle
             timeScaleText.text = timeText;
             //Time.timeScale = timeScale;
             SetTimeScale(timeScale);
-            GuildManager.Instance.calSlider.value = timeScaleSlider.value;
+            GuildManager.Instance.calSlider?.SetValueWithoutNotify(timeScaleSlider.value);
     }
         public void SetTimeScale(float scale)
         {
