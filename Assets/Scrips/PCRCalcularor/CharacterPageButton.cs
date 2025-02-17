@@ -187,14 +187,10 @@ namespace PCRCaculator
             {
                 backtype = 8;
             }
-            else if (data.rank <= 35)
+            else
             {
                 backtype = 9;
             }
-			else
-			{
-				backtype = 10;
-			}
             if (isFav != null){
                 isFav.onValueChanged.AddListener(value => OnFavToggleChanged(value, data));
                 isFav.isOn = data.fav;
