@@ -280,21 +280,21 @@ namespace PCRCaculator
         {
           playerData.playrCharacters.Add(unitDataDic[unitid]);
         }
-        for (int i = 0; i < 5; i++)
-        {
-          charToggles_setting[i].interactable = i < selectedCharId.Count;
-          //charToggles_setting[i].isOn = i == 0;
-        }
-        if (type == 4 && !charToggles_setting[selectedCharacterId_setting].isOn)
-        {
-            charToggles_setting[selectedCharacterId_setting].isOn=true; // auto refresh
-        }
-        else
-        {
-          RefreshSettingValues();
-        }
-        RefreshSettingPage();
       }
+      for (int i = 0; i < 5; i++)
+      {
+        charToggles_setting[i].interactable = i < selectedCharId.Count;
+        //charToggles_setting[i].isOn = i == 0;
+      }
+      if (type == 4 && !charToggles_setting[selectedCharacterId_setting].isOn)
+      {
+          charToggles_setting[selectedCharacterId_setting].isOn=true; // auto refresh
+      }
+      else
+      {
+        RefreshSettingValues();
+      }
+      RefreshSettingPage();
       /*else if(type == 4)
       {
           chooseBack_A.SetActive(false);
