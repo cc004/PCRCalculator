@@ -1,0 +1,1477 @@
+fileFormatVersion: 2
+guid: cc19a88ff47002d4cbd0d98058508a53
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_0
+      rect:
+        serializedVersion: 2
+        x: 748
+        y: 558
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51fe209f786ed984cac51d924c96d641
+      internalID: 1360563918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_1
+      rect:
+        serializedVersion: 2
+        x: 782
+        y: 532
+        width: 32
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 54afffed7992ebc4cb882c8aeb8c1691
+      internalID: 622567428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_2
+      rect:
+        serializedVersion: 2
+        x: 827
+        y: 464
+        width: 85
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9555d9e856a61e44786e4d694c1c04a4
+      internalID: -1468667009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_3
+      rect:
+        serializedVersion: 2
+        x: 914
+        y: 464
+        width: 79
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6907100f6b07db42a851d35f9b6df2b
+      internalID: 671297017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_4
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 512
+        width: 29
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aafd806c13586e54b869fa952dd4294a
+      internalID: -1811829346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_5
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 532
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e126ec48cf7db44ab37744ac7e4b490
+      internalID: 1506562444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_6
+      rect:
+        serializedVersion: 2
+        x: 715
+        y: 531
+        width: 31
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43cc833bd656ac14a824609a1afa7d7a
+      internalID: 787585042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_7
+      rect:
+        serializedVersion: 2
+        x: 748
+        y: 532
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0534aff9eb657e4382fbbf98ecebeee
+      internalID: 236590754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 404
+        width: 78
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c93a4b8240ccd7e4492f88b41e5dc283
+      internalID: 945333837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_9
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 450
+        width: 33
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd60bc8eff5793244a99b78ca1ee270f
+      internalID: 1634763245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_10
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 491
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e06f4f17d7833c4b99bc7811ccb9b91
+      internalID: -1785973996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_11
+      rect:
+        serializedVersion: 2
+        x: 617
+        y: 491
+        width: 30
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19feb8455c82d3f4b9e1274aa1b2acff
+      internalID: -1205627427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_12
+      rect:
+        serializedVersion: 2
+        x: 651
+        y: 474
+        width: 31
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7eb1221d5f3bd6c4b8b035ecc075290a
+      internalID: 1524535637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_13
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 494
+        width: 59
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8123c3cdc83ca574aa05406ea171a3bd
+      internalID: 893670444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_14
+      rect:
+        serializedVersion: 2
+        x: 745
+        y: 505
+        width: 34
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2df2c22496e5024d824e4f705076427
+      internalID: -1702296294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_15
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 506
+        width: 35
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f8ddf8ddd92fbe44eacf0708a222af02
+      internalID: -664239006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_16
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 404
+        width: 59
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92a1599f20657b143a48f88305a5ba73
+      internalID: -264436296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_17
+      rect:
+        serializedVersion: 2
+        x: 745
+        y: 494
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 826cb58a6ac338148b2ce5eef0e928a3
+      internalID: 240386969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_18
+      rect:
+        serializedVersion: 2
+        x: 755
+        y: 468
+        width: 35
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b70b1c11bb0c3744c80555ebedaaaa1d
+      internalID: -931015802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_19
+      rect:
+        serializedVersion: 2
+        x: 792
+        y: 468
+        width: 31
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 10e2d45ee4265144d9e696d56008c5f2
+      internalID: -489029452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_20
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 454
+        width: 30
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37c5706710937674aa2777905eaeb646
+      internalID: -1449202047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_21
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 454
+        width: 30
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72d99fc680f8ea640ba076f9cb4da12b
+      internalID: -560404345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_22
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 450
+        width: 30
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 28b64f82233ce4643830f77f4c4deb12
+      internalID: -1027930677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_23
+      rect:
+        serializedVersion: 2
+        x: 616
+        y: 420
+        width: 33
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36d22e70e2a10154288dd1cea14e6e14
+      internalID: 1282874417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_24
+      rect:
+        serializedVersion: 2
+        x: 651
+        y: 420
+        width: 37
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec8b1c9ebbf02154d8bab35f89b62ae8
+      internalID: -2020210036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_25
+      rect:
+        serializedVersion: 2
+        x: 687
+        y: 468
+        width: 65
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 032108c1480918341b96ff21e0c95c06
+      internalID: 1125833055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_26
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 404
+        width: 105
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c696217b789e03d439f167fa39820aa1
+      internalID: 1858098991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_27
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 404
+        width: 100
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2059af40b268cf419ff05126c4ccdca
+      internalID: 1590691701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_28
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 441
+        width: 30
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 039f16000f4025e4bb66fe0d5ba9369e
+      internalID: 1177815242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_29
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 404
+        width: 63
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 029f290bf320788458829f20123c9f96
+      internalID: -615329985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_30
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 414
+        width: 65
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6766568d31326064a801ac0b53d44b36
+      internalID: 2121341842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_31
+      rect:
+        serializedVersion: 2
+        x: 691
+        y: 428
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 573aa71953674844db09d3f2ad962949
+      internalID: 1223991151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_32
+      rect:
+        serializedVersion: 2
+        x: 740
+        y: 363
+        width: 85
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3d7ef180d825934c9873ca8f7f8b531
+      internalID: -1990764401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_33
+      rect:
+        serializedVersion: 2
+        x: 827
+        y: 417
+        width: 42
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 796b06a5c478f3049bff8ccde94b49ce
+      internalID: 1097918596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_34
+      rect:
+        serializedVersion: 2
+        x: 884
+        y: 359
+        width: 90
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7280755205405b54dadd4eddd9bb5b19
+      internalID: -153907833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_35
+      rect:
+        serializedVersion: 2
+        x: 995
+        y: 430
+        width: 27
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d92fb7c1dfad3f459958a6468260423
+      internalID: 1923669043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_36
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 404
+        width: 133
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9215225329089e40a558d0015268c71
+      internalID: -443367274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_37
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 404
+        width: 16
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae7165dd593b9bc439852d581ea4a2b2
+      internalID: -1013202471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_38
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 315
+        width: 75
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc4c9a309a0ea9e4384bca3704835c18
+      internalID: 1472730989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_39
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 315
+        width: 88
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66ac62b07e3e4f546964c4fd20a6ff87
+      internalID: 275022917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_40
+      rect:
+        serializedVersion: 2
+        x: 827
+        y: 363
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72455ea5cd29bc149bb132a3593a35a6
+      internalID: -2000039217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_41
+      rect:
+        serializedVersion: 2
+        x: 976
+        y: 359
+        width: 33
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4ee9a2bdba64694c99162b3ab3a1bba
+      internalID: -730069107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_42
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 202
+        width: 571
+        height: 200
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04fce10205b06f34bba1699495c9dd36
+      internalID: 336705718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_43
+      rect:
+        serializedVersion: 2
+        x: 740
+        y: 315
+        width: 45
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35d519467dea1924e917caf039c9131b
+      internalID: -468441611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_44
+      rect:
+        serializedVersion: 2
+        x: 792
+        y: 257
+        width: 91
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1c40f6ebf8bdc94db7578056a509bbf
+      internalID: -944876707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_45
+      rect:
+        serializedVersion: 2
+        x: 909
+        y: 254
+        width: 90
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be04cb8eae831c643bba1977d4ba4b39
+      internalID: -1074186489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_46
+      rect:
+        serializedVersion: 2
+        x: 572
+        y: 257
+        width: 220
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07e68271ebde0dd4489ec5ce9f7287b6
+      internalID: 995311731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_47
+      rect:
+        serializedVersion: 2
+        x: 1001
+        y: 291
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d8b8bebfd87bb04b95fa459e6460a36
+      internalID: 1411765644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_48
+      rect:
+        serializedVersion: 2
+        x: 812
+        y: 171
+        width: 67
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 288a21e0e2c1c304dbb3f6b99605cbdb
+      internalID: -245449684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_49
+      rect:
+        serializedVersion: 2
+        x: 1001
+        y: 254
+        width: 20
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a42499c775d473f40b82034f896eadce
+      internalID: -288308427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_50
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 205
+        width: 165
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e2e4dd7a60f395429ba1126fa4c5280
+      internalID: 2118201366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_51
+      rect:
+        serializedVersion: 2
+        x: 740
+        y: 227
+        width: 23
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13659a336f47c8e4687c100110649f02
+      internalID: -679691404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_52
+      rect:
+        serializedVersion: 2
+        x: 766
+        y: 186
+        width: 39
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 798f2dc019ca6094eb7b51842d1f8d22
+      internalID: 95975566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_53
+      rect:
+        serializedVersion: 2
+        x: 909
+        y: 152
+        width: 96
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c6449ff760bbdf44863b70d76d71842
+      internalID: 1013657532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_54
+      rect:
+        serializedVersion: 2
+        x: 740
+        y: 204
+        width: 22
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1898fd58d936f34582bc4aeaaf1ec21
+      internalID: -580298163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_55
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 571
+        height: 200
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b18cac356064dc143b068ab5274b7eb5
+      internalID: 573441740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_56
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 0
+        width: 191
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36db1a973bf045746999a4bd4217e492
+      internalID: -1105785682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_57
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 152
+        width: 70
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 252cc329f320d1446811cf8171d7f4db
+      internalID: 1921975484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_58
+      rect:
+        serializedVersion: 2
+        x: 766
+        y: 0
+        width: 147
+        height: 150
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 692d099bc31f6b64a95f88503586f80a
+      internalID: 1615653747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_59
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 104
+        width: 98
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c660564484544c94fa359543cbc7d86e
+      internalID: -661719885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasCaravanCommon_60
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 0
+        width: 91
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4aeb4452bed90184dbfdfd29beb453c7
+      internalID: -1375842851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      AtlasCaravanCommon_0: 1360563918
+      AtlasCaravanCommon_1: 622567428
+      AtlasCaravanCommon_10: -1785973996
+      AtlasCaravanCommon_11: -1205627427
+      AtlasCaravanCommon_12: 1524535637
+      AtlasCaravanCommon_13: 893670444
+      AtlasCaravanCommon_14: -1702296294
+      AtlasCaravanCommon_15: -664239006
+      AtlasCaravanCommon_16: -264436296
+      AtlasCaravanCommon_17: 240386969
+      AtlasCaravanCommon_18: -931015802
+      AtlasCaravanCommon_19: -489029452
+      AtlasCaravanCommon_2: -1468667009
+      AtlasCaravanCommon_20: -1449202047
+      AtlasCaravanCommon_21: -560404345
+      AtlasCaravanCommon_22: -1027930677
+      AtlasCaravanCommon_23: 1282874417
+      AtlasCaravanCommon_24: -2020210036
+      AtlasCaravanCommon_25: 1125833055
+      AtlasCaravanCommon_26: 1858098991
+      AtlasCaravanCommon_27: 1590691701
+      AtlasCaravanCommon_28: 1177815242
+      AtlasCaravanCommon_29: -615329985
+      AtlasCaravanCommon_3: 671297017
+      AtlasCaravanCommon_30: 2121341842
+      AtlasCaravanCommon_31: 1223991151
+      AtlasCaravanCommon_32: -1990764401
+      AtlasCaravanCommon_33: 1097918596
+      AtlasCaravanCommon_34: -153907833
+      AtlasCaravanCommon_35: 1923669043
+      AtlasCaravanCommon_36: -443367274
+      AtlasCaravanCommon_37: -1013202471
+      AtlasCaravanCommon_38: 1472730989
+      AtlasCaravanCommon_39: 275022917
+      AtlasCaravanCommon_4: -1811829346
+      AtlasCaravanCommon_40: -2000039217
+      AtlasCaravanCommon_41: -730069107
+      AtlasCaravanCommon_42: 336705718
+      AtlasCaravanCommon_43: -468441611
+      AtlasCaravanCommon_44: -944876707
+      AtlasCaravanCommon_45: -1074186489
+      AtlasCaravanCommon_46: 995311731
+      AtlasCaravanCommon_47: 1411765644
+      AtlasCaravanCommon_48: -245449684
+      AtlasCaravanCommon_49: -288308427
+      AtlasCaravanCommon_5: 1506562444
+      AtlasCaravanCommon_50: 2118201366
+      AtlasCaravanCommon_51: -679691404
+      AtlasCaravanCommon_52: 95975566
+      AtlasCaravanCommon_53: 1013657532
+      AtlasCaravanCommon_54: -580298163
+      AtlasCaravanCommon_55: 573441740
+      AtlasCaravanCommon_56: -1105785682
+      AtlasCaravanCommon_57: 1921975484
+      AtlasCaravanCommon_58: 1615653747
+      AtlasCaravanCommon_59: -661719885
+      AtlasCaravanCommon_6: 787585042
+      AtlasCaravanCommon_60: -1375842851
+      AtlasCaravanCommon_7: 236590754
+      AtlasCaravanCommon_8: 945333837
+      AtlasCaravanCommon_9: 1634763245
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

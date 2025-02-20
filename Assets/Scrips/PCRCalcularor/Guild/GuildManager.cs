@@ -109,6 +109,8 @@ namespace PCRCaculator.Guild
         public Button clearUbButton;
         public GameObject infoPanel;
         public Text version;
+        public InputField RandomSeed;
+        public Toggle UseFixedRandomSeed;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -130,7 +132,6 @@ namespace PCRCaculator.Guild
             get => MainManager.Instance.EnemyMPartsDic;
         }
         public bool isGuildBoss { get => toggles_ChooseType[0].isOn; }
-
         private void Awake()
         {
             Instance = this;
@@ -607,12 +608,7 @@ namespace PCRCaculator.Guild
             //toggles_ChooseBoss.isOn = SettingData.isViolent;
             if (data.isViolent)
                 toggles_ChooseBoss[0].isOn = true;
-            else if (data.usePlayerSettingHP)
-            {
-                toggles_ChooseBoss[2].isOn = true;
-                currentHPinput.text = "" + data.playerSetingHP;
-            }
-            else
+            else 
                 toggles_ChooseBoss[1].isOn = true;
             //FinishChooseBossButton();
             calSlider.value = (int)(Math.Log(SettingData.calSpeed, 2) + 3);
@@ -736,20 +732,31 @@ namespace PCRCaculator.Guild
             {
                 group.isViolent = false;
             }
-            if (toggles_ChooseBoss[2].isOn)
+            // if (toggles_ChooseBoss[2].isOn)
+            // {
+            //     group.usePlayerSettingHP = true;
+            //     group.playerSetingHP = int.Parse(currentHPinput.text);
+            // }
+            // else
+            // {
+            //     group.usePlayerSettingHP = false;
+            //     group.playerSetingHP = 0;
+            // }
+            if (data.playerSetingHP == 0) 
             {
-                group.usePlayerSettingHP = true;
-                group.playerSetingHP = int.Parse(currentHPinput.text);
+                currentHPinput.text = " " + GetEnemyDataByID(selectedBossEnemyids[0]).baseData.RealHp;
             }
             else
             {
-                group.usePlayerSettingHP = false;
-                group.playerSetingHP = 0;
+                currentHPinput.text = " " + data.playerSetingHP;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
             bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" +
                 $"\n<size=10>({data.currentGuildMonth})</size>";
             //group.useLogBarrier = toggles_ChooseBoss[3].isOn;
+            RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
+            UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
+            toggles_ChooseBoss[2].isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
         }
         private void RefreshCalcSettings_start()
         {
@@ -1371,6 +1378,14 @@ namespace PCRCaculator.Guild
         }
         public void isShowInfoPanelButton(){
           infoPanel.SetActive(!infoPanel.activeSelf);
+        }
+        public void CustomBoss()
+        {
+            SettingData.GetCurrentRandomData().RandomSeed = int.Parse(RandomSeed.text);
+            SettingData.GetCurrentRandomData().UseFixedRandomSeed = UseFixedRandomSeed.isOn;
+            SettingData.GetCurrentPlayerGroup().playerSetingHP = int.Parse(currentHPinput.text);
+            SettingData.GetCurrentPlayerGroup().usePlayerSettingHP = toggles_ChooseBoss[2].isOn;
+            SaveDataToJson();
         }
     }
     [Serializable]
