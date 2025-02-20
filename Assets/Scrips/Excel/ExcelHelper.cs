@@ -494,7 +494,7 @@ namespace ExcelHelper
                     case 106101:
                         name = "矛衣未";
                         break;
-                    case 104701:
+                    case 114701:
                         name = "春511";
                         break;
                     case 125001:
@@ -528,7 +528,7 @@ namespace ExcelHelper
                     name = unit_id switch
                     {
                       106101 => "矛衣未",
-                      104701 => "春511",
+                      114701 => "春511",
                       125001 => "解511",
                       _ => cdict[unit].name,
                     };
