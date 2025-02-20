@@ -434,6 +434,21 @@ namespace PCRCaculator.Guild
         public void OnToggleSwitched(int toggleId)
         {
             currentToggleId = toggleId;
+            foreach (var toggle in ModeToggles)
+            {
+                // 获取子对象 Label 的 Text 组件
+                Text label = toggle.GetComponentInChildren<Text>();
+                // 如果是当前 toggleId，则设置为白色
+                if (toggle.isOn)
+                {
+                    label.color = Color.white;
+                }
+                else
+                {
+                  // 否则设置为默认颜色 #323232
+                    label.color = new Color32(0x32, 0x32, 0x32, 0xFF);
+                }
+            }
             if (ModeToggles[toggleId].isOn)
             {
                 foreach (GuildSkillGroupPrefab sk in skillGroupPrefabDic.Values)

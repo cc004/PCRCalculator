@@ -1492,7 +1492,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 3
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 1
@@ -1695,7 +1695,7 @@ PrefabInstance:
     - target: {fileID: 8965163777475658972, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00007041443
+      value: 0.000046875095
       objectReference: {fileID: 0}
     - target: {fileID: 8965163777772013190, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
@@ -1710,7 +1710,7 @@ PrefabInstance:
     - target: {fileID: 8965163777772013191, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
       propertyPath: m_Size
-      value: 0.9999531
+      value: 0.9999676
       objectReference: {fileID: 0}
     - target: {fileID: 8965163777772013191, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
