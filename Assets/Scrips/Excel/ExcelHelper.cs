@@ -494,7 +494,7 @@ namespace ExcelHelper
                     case 106101:
                         name = "矛衣未";
                         break;
-                    case 104701:
+                    case 114701:
                         name = "春511";
                         break;
                     case 125001:
@@ -502,7 +502,7 @@ namespace ExcelHelper
                         break;
                 }
                 src.AppendLine($"mov {unitId},{name}");
-      }
+            }
 
             //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
             //msg.AppendLine($"对\"{enemy}\"（{seed}:{enemy}-{PCRBattle.Instance.enemyUnitid}）造成{damage}伤害：");
@@ -522,9 +522,16 @@ namespace ExcelHelper
             {
                 var frame = data.currentFrameCount;
                 var unit_id = unit;
+                string name;
                 if (unit_id <= 200000)
                 {
-                    var name = cdict[unit].name;
+                    name = unit_id switch
+                    {
+                      106101 => "矛衣未",
+                      114701 => "春511",
+                      125001 => "解511",
+                      _ => cdict[unit].name,
+                    };
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
                     src.AppendLine($"wait {data.realFrameCount}; pressub {name}; // lframe {data.currentFrameCount}");
                 }
