@@ -294,7 +294,7 @@ namespace PCRCaculator.SQL
                     .ToDictionary(g => g.Key, g => g.Max(x => x.enhance_level));
 
                 var categories = GetDatas<ex_equipment_data>()
-                    .Where(x => x.clan_battle_equip_flag)
+                    // .Where(x => x.clan_battle_equip_flag)
                     .Select(x => x.SetEnhanceLevelMax(enhanceLevel[x.rarity]))
                     .GroupBy(x => x.category)
                     .ToDictionary(g => g.Key,
