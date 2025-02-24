@@ -343,7 +343,7 @@ namespace PCRCaculator.Guild
         }
         private void SetChooseBossDropDown(int clanBattleID)
         {
-            dropdowns_ChooseBoss[2].value = clanBattleID - 1024;
+            dropdowns_ChooseBoss[2].value = clanBattleID - (clanBattleID > 1062 ? 1025 : 1024);
         }
         public void OnChooseBossDropDownChanged()
         {

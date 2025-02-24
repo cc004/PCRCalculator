@@ -320,7 +320,7 @@ namespace PCRCaculator
                         allUnitAttackPatternDic = dbTool.Dic5;
                         guildEnemyDatas = dbTool.Dic6;
                         enemyMPartsDic = dbTool.Dic7;
-                        unitExEquips = dbTool.unitExEquips;
+                        unitExEquips = dbTool3.unitExEquips;
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
