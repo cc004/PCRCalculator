@@ -24,8 +24,17 @@ namespace PCRCaculator
 
       public ExEquipOption(ex_equipment_data data)
       {
+        var color = data.rarity switch
+        {
+          1 => "铜",
+          2 => "银",
+          3 => "金",
+          4 => "粉",
+          5 => "彩",
+          _ => "未知"
+        };
         equip_id = data.ex_equipment_id;
-        text = data.name;
+        text = $"{color}-{data.name}";
       }
 
       private ExEquipOption()
@@ -703,7 +712,17 @@ namespace PCRCaculator
           if (changingId)
           {
             ExEquip[i].ClearOptions();
-            ExEquip[i].AddOptions(temp[i].Values
+            var optionsEx = temp[i].Values.ToList();
+            optionsEx.Sort((x, y) =>
+            {
+              int flagComparison = y.clan_battle_equip_flag.CompareTo(x.clan_battle_equip_flag);
+              if (flagComparison == 0)
+              {
+                return y.rarity.CompareTo(x.rarity);
+              }
+              return flagComparison;
+            });
+            ExEquip[i].AddOptions(optionsEx
                 .Select(x => new ExEquipOption(x)).Prepend(ExEquipOption.None)
                 .ToList<Dropdown.OptionData>());
             ExEquip[i].value = Math.Max(0,
