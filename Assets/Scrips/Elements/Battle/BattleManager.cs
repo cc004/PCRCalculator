@@ -3947,14 +3947,25 @@ namespace Elements.Battle
             try
             {
                 var sh = GuildManager.Instance.SettingData.start_hp.Split(',').Select(float.Parse).ToArray();
-                var st = GuildManager.Instance.SettingData.start_tp.Split(',').Select(float.Parse).ToArray();
-                foreach (var unitCtrl in battleManager.UnitList)
+                int up = Math.Min(sh.Length, battleManager.UnitList.Count);
+                for (int i = 0; i < up; i++)
                 {
-                    var idx = unitCtrl.posIdx;
-                    unitCtrl.Hp = unitCtrl.MaxHp * sh[idx];
-                    unitCtrl.unitUI.SetHP(sh[idx]);
-                    unitCtrl.energy = UnitDefine.MAX_ENERGY * st[idx];
-                    unitCtrl.unitUI.SetTP(st[idx]);
+                    battleManager.UnitList[i].Hp = battleManager.UnitList[i].MaxHp * sh[i];
+                    battleManager.UnitList[i].unitUI.SetHP(sh[i]);
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            try
+            {
+                var st = GuildManager.Instance.SettingData.start_tp.Split(',').Select(float.Parse).ToArray();
+                int up = Math.Min(st.Length, battleManager.UnitList.Count);
+                for (int i = 0; i < up; i++)
+                {
+                    battleManager.UnitList[i].energy = UnitDefine.MAX_ENERGY * st[i];
+                    battleManager.UnitList[i].unitUI.SetTP(st[i]);
                 }
             }
             catch (Exception e)

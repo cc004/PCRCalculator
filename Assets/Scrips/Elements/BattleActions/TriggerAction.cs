@@ -194,18 +194,25 @@ namespace Elements
                     };
                     break;
                 case 7:
-                    bool used1 = false;
-                    target.OnUpdateWhenIdle += _limitTime =>
+                    bool used = false;
+                    target.OnUpdateWhenIdle = (Action<float>)Delegate.Combine(target.OnUpdateWhenIdle, (Action<float>)delegate(float _limitTime)
                     {
-                        if (judgeSilenceOrToad(_source) || used1 || _limitTime > (double)Value[eValueNumber.VALUE_3])
-                            return;
-                        used1 = true;
+                        if (!judgeSilenceOrToad(_source) && !used && _limitTime <= Value[eValueNumber.VALUE_3])
+                        {
+                            used = true;
                         if (BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         _source.CancelByAwake = true;
                         _source.CurrentTriggerSkillId = _skill.SkillId;
-                        _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
-                    };
+                        if (_skill.BlackOutTime > 0f)
+                        {
+                            battleManager.GamePause(true);
+                            battleManager.SetSkillExeScreen(_source, _skill.BlackOutTime, _skill.BlackoutColor, _skill.BlackoutEndWithMotion);
+                            _source.SetSortOrderFront();
+                        }
+                        _source.SetState(UnitCtrl.ActionState.SKILL, 0, _skill.SkillId);
+                        }
+                    });
                     break;
                 case 8:
                     bool used2 = false;
@@ -382,10 +389,10 @@ namespace Elements
                                                     _source.CurrentTriggerSkillId = skill.SkillId;
                                                     if (skill.BlackOutTime > 0f)
                                                     {
-                                                        //_sourceActionController.StopSlowEffect();
+                                                        // _sourceActionController.StopSlowEffect();
                                                         //base.battleManager.SetSkillEffectSortOrderBack();
-                                                        //base.battleManager.GamePause(true, false);
-                                                        //base.battleManager.SetSkillExeScreen(_source, skill.BlackOutTime, skill.BlackoutColor, skill.BlackoutEndWithMotion);
+                                                        base.battleManager.GamePause(true, false);
+                                                        base.battleManager.SetSkillExeScreen(_source, skill.BlackOutTime, skill.BlackoutColor, skill.BlackoutEndWithMotion);
                                                         _source.SetSortOrderFront();
                                                     }
                                                     _source.SetState(UnitCtrl.ActionState.SKILL, 0, skill.SkillId);
