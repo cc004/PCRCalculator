@@ -11879,16 +11879,18 @@ this.updateCurColor();
             {
                 if ((battleManager.BattleCategory == eBattleCategory.DUNGEON ||
                      battleManager.BattleCategory == eBattleCategory.TOWER ||
-                     (battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL ||
-                      battleManager.BattleCategory == eBattleCategory.TOWER_EX) ||
-                     (battleManager.BattleCategory == eBattleCategory.TOWER_REPLAY ||
-                      battleManager.BattleCategory == eBattleCategory.TOWER_EX_REPLAY ||
-                      battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER)
-                        ? 1
-                        : (battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY ? 1 : 0)) != 0 &&
-                    !StandByDone || battleManager.IsSpecialBattle &&
-                    battleManager.ActionStartTimeCounter > 0.0 || 
-                    (battleManager.LOGNEDLPEIJ || skillTargetList.Count == 0 || (battleManager.GameState != eBattleGameState.PLAY || !battleManager.GetAdvPlayed())) || ModeChangeEnd)
+                     battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL ||
+                     battleManager.BattleCategory == eBattleCategory.TOWER_EX ||
+                     battleManager.BattleCategory == eBattleCategory.TOWER_REPLAY ||
+                     battleManager.BattleCategory == eBattleCategory.TOWER_EX_REPLAY ||
+                     battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER ||
+                     battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY) && !StandByDone || 
+                     battleManager.IsSpecialBattle && battleManager.ActionStartTimeCounter > 0.0 || 
+                     battleManager.LOGNEDLPEIJ || 
+                     skillTargetList.Count == 0 || 
+                     battleManager.GameState != eBattleGameState.PLAY || 
+                     !battleManager.GetAdvPlayed() || 
+                     ModeChangeEnd)
                     return false;
                 /*switch (this.battleManager.GetPurpose())
                 {
