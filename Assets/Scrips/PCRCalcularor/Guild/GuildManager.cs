@@ -324,12 +324,7 @@ namespace PCRCaculator.Guild
             {
                 if (key >= 1024)
                 {
-                    int monthKey = (key - 1000 + 11) % 12;
-                    if (key >= 1063)
-                    {
-                      monthKey = (monthKey - 1 + 12) % 12;
-                    }
-                    string str = $"{guildMonthNames[monthKey]}({key})";
+                    string str = $"{guildMonthNames[(key - 1000 + 11) % 12]}({key})";
                     list.Add(str);
                 }
             }
@@ -338,12 +333,11 @@ namespace PCRCaculator.Guild
         }
         private int GetClanBattleID()
         {
-            int value = dropdowns_ChooseBoss[2].value;
-            return value + 1024 + (value >= 38 ? 1 : 0);
+            return dropdowns_ChooseBoss[2].value + 1024;
         }
         private void SetChooseBossDropDown(int clanBattleID)
         {
-            dropdowns_ChooseBoss[2].value = clanBattleID - (clanBattleID > 1062 ? 1025 : 1024);
+            dropdowns_ChooseBoss[2].value = clanBattleID - 1024;
         }
         public void OnChooseBossDropDownChanged()
         {
@@ -460,7 +454,7 @@ namespace PCRCaculator.Guild
                 SettingData.GetCurrentPlayerGroup().currentGuildEnemyNum = num;
                 int turn = dropdowns_ChooseBoss[1].value + 1; 
                 SettingData.GetCurrentPlayerGroup().currentTurn = turn;
-                turn = clanBattleID >= 1068 && turn == 1 ? turn - 1 : turn;
+                turn = clanBattleID >= 1067 && turn == 1 ? turn - 1 : turn;
                 enemyId = new [] {GetGuildBossID(clanBattleID, num, turn)};
             }
             else
@@ -787,9 +781,7 @@ namespace PCRCaculator.Guild
                 currentHPinput.text = " " + data.playerSetingHP;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
-            int monthIndex = (data.currentGuildMonth >= 1062 ? data.currentGuildMonth - 1 : data.currentGuildMonth) - 1000 + 11;
-            monthIndex %= 12;
-            bossDetailTexts[3].text = $"{guildMonthNames[monthIndex]}\n<size=10>({data.currentGuildMonth})</size>";
+            bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" + $"\n<size=10>({data.currentGuildMonth})</size>";
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
             toggles_ChooseBoss[2].isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
