@@ -9712,67 +9712,10 @@ this.updateCurColor();
             setStateCalled = true;
             if (!MultiTargetByTime && GameStartDone && IsPartsBoss && !multiTargetDone)
             {
-                // PlayAndSetUpMultiTarget(_isFirst: true);
-                battleManager.IsPausingEffectSkippedInThisFrame = true;
+                PlayAndSetUpMultiTarget(_isFirst: true);
             }
-            /*
-            if (IsBoss && GameStartDone)
-            {
-                battleManager.StartBonusEffect();
-            }
-            bool flag = false;*/
-            if (GameStartDone && IsPartsBoss && !multiTargetDone)
-            {
-                
-                multiTargetDone = true;
-                /*SaveDataManager instance = ManagerSingleton<SaveDataManager>.Instance;
-                if ((instance.MultiTargetConfirm == 0 ? 1 : (instance.MultiTargetConfirm != 2 ? 0 : (!instance.MultiTargetFirst ? 1 : 0))) != 0)
-                {
-                    instance.MultiTargetFirst = true;
-                    SingletonMonoBehaviour<UnitUiCtrl>.Instance.HidePopUp();
-                    this.battleManager.SetSkillScreen(true);
-                    this.battleManager.GamePause(true, false);
-                    this.battleManager.BossUnit.SetSortOrderFront();
-                    this.soundManager.PlaySe(eSE.MULTI_TARGETS_START);
-                    ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_APPEAR, this.battleManager.UnitUiCtrl.transform).transform.position = this.battleManager.BossUnit.BottomTransform.position + this.battleManager.BossUnit.FixedCenterPos;
-                    this.Timer(1f, (System.Action)(() =>
-                   {
-                       if (this.IsPartsBoss)
-                           this.battleManager.LOGNEDLPEIJ = false;
-                       this.battleManager.SetSkillScreen(false);
-                       this.battleManager.BossUnit.SetSortOrderBack();
-                       if (SingletonMonoBehaviour<BattleHeaderController>.Instance.IsPaused)
-                           return;
-                       this.battleManager.GamePause(false, false);
-                   }));
-                }
-                else if*/
-                if (IsPartsBoss)
-                    battleManager.LOGNEDLPEIJ = false;
-                for (int index = 0; index < BossPartsListForBattle.Count; ++index)
-                {
-                    //MultiTargetCursor cursor = ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<MultiTargetCursor>(this.UseTargetCursorOver ? eResourceId.ANIM_MULTI_TARGET_CURSOR_OVER : eResourceId.ANIM_MULTI_TARGET_CURSOR, this.battleManager.UnitUiCtrl.transform);
-                    PartsData _data = BossPartsListForBattle[index];
-                    //cursor.transform.position = _data.GetBottomTransformPosition();
-                    //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth + (this.UseTargetCursorOver ? 100 : -100);
-                    //_data.MultiTargetCursor = cursor;
-                    //this.battleManager.AppendCoroutine(_data.TrackBottom(), ePauseType.SYSTEM, this);
-                    if (_data.IsBreak)
-                    {
-                        AppendBreakLog(_data.BreakSource);
-                        _data.IsBreak = true;
-                        _data.OnBreak.Call();
-                        _data.SetBreak(true, null);// this.battleManager.UnitUiCtrl.transform);
-                        AppendCoroutine(UpdateBreak(_data.BreakTime, _data), ePauseType.SYSTEM);
-                    }
-                    OnIsFrontFalse += () =>
-                    {
-                        if (UseTargetCursorOver)
-                            return;
-                        //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth - 100;
-                    };
-                }
-            }
+            if (IsPartsBoss)
+                battleManager.LOGNEDLPEIJ = false;
             if (_state != ActionState.IDLE && _state != ActionState.WALK)
             {
                 CancelByConvert = false;
@@ -9851,6 +9794,63 @@ this.updateCurColor();
                     break;
             }
         }
+        
+        public void PlayAndSetUpMultiTarget(bool _isFirst)
+        {
+            multiTargetDone = true;
+            // SaveDataManager instance = ManagerSingleton<SaveDataManager>.Instance;
+            // if (instance.MultiTargetConfirm == 0 || (instance.MultiTargetConfirm == 2 && !instance.MultiTargetFirst))
+            // {
+            //     instance.MultiTargetFirst = _isFirst;
+            //     SingletonMonoBehaviour<UnitUiCtrl>.Instance.HidePopUp();
+            //     battleManager.SetSkillScreen(GABGIKMFNFG: true);
+            //     battleManager.GamePause(ICBCHCGGHLB: true);
+            //     SetSortOrderFront();
+            //     battleManager.MIGBAMLOOKH = true;
+            //     soundManager.PlaySe(eSE.MULTI_TARGETS_START);
+            //     if (!OneRemainingDisableEffect || BossPartsListForBattle.FindAll((PartsData e) => !e.IsBreak).Count >= 2)
+            //     {
+            //         ((Component)ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_APPEAR, ((Component)battleManager.OFMPGBKBOPM).transform, 0L)).transform.position = BottomTransform.position + FixedCenterPos;
+            //     }
+            //     ((MonoBehaviour)(object)this).Timer(1f, delegate
+            //     {
+            //         battleManager.SetSkillScreen(GABGIKMFNFG: false);
+            //         SetSortOrderBack();
+            //         battleManager.MIGBAMLOOKH = false;
+            //         if (!SingletonMonoBehaviour<BattleHeaderController>.Instance.IsPaused)
+            //         {
+            //             battleManager.GamePause(ICBCHCGGHLB: false);
+            //         }
+            //     });
+            // }
+            // else
+            // {
+                battleManager.IsPausingEffectSkippedInThisFrame = true;
+            // }
+            for (int index = 0; index < BossPartsListForBattle.Count; ++index)
+            {
+                //MultiTargetCursor cursor = ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<MultiTargetCursor>(this.UseTargetCursorOver ? eResourceId.ANIM_MULTI_TARGET_CURSOR_OVER : eResourceId.ANIM_MULTI_TARGET_CURSOR, this.battleManager.UnitUiCtrl.transform);
+                PartsData _data = BossPartsListForBattle[index];
+                //cursor.transform.position = _data.GetBottomTransformPosition();
+                //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth + (this.UseTargetCursorOver ? 100 : -100);
+                //_data.MultiTargetCursor = cursor;
+                //this.battleManager.AppendCoroutine(_data.TrackBottom(), ePauseType.SYSTEM, this);
+                if (_data.IsBreak)
+                {
+                    AppendBreakLog(_data.BreakSource);
+                    _data.IsBreak = true;
+                    _data.OnBreak.Call();
+                    _data.SetBreak(true, null);// this.battleManager.UnitUiCtrl.transform);
+                    AppendCoroutine(UpdateBreak(_data.BreakTime, _data), ePauseType.SYSTEM);
+                }
+                OnIsFrontFalse += () =>
+                {
+                    if (UseTargetCursorOver)
+                        return;
+                    //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth - 100;
+                };
+            }
+		}
 
         private void setRecastTime(int skillId)
         {
