@@ -73,6 +73,8 @@ namespace Elements
         public Skill CreateExSkill(int _id, object _exSkillScriptable, ExSkillData _exSkillData)
         {
             Skill skill = new Skill();
+            skill.SkillId = _id;
+            skill.SkillName = MainManager.Instance.SkillDataDic[_id].name;
             skill.ActionParameters = new List<ActionParameter>();
             var skillData = new MasterSkillData.SkillData(MainManager.Instance.SkillDataDic[_id]);
 

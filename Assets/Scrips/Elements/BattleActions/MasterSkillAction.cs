@@ -135,7 +135,7 @@ namespace Elements
         {
             protected int _action_id;
             protected int _class_id;
-            protected byte _action_type;
+            protected ushort _action_type;
             protected int _action_detail_1;
             protected int _action_detail_2;
             protected int _action_detail_3;
@@ -161,7 +161,7 @@ namespace Elements
 
             public int class_id => _class_id;
 
-            public byte action_type => _action_type;
+            public ushort action_type => _action_type;
 
             public int action_detail_1 => _action_detail_1;
 
@@ -248,7 +248,7 @@ namespace Elements
             {
                 _action_id = data.actionid;
                 _class_id = data.classid;
-                _action_type = (byte)data.type;
+                _action_type = (ushort)data.type;
                 _action_detail_1 = data.details[0];
                 _action_detail_2 = data.details[1];
                 _action_detail_3 = data.details[2];

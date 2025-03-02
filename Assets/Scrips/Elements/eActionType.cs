@@ -139,6 +139,7 @@ namespace Elements
         COPY_ATK_PARAM = 103,
 
         EVERY_ATTACK_CRITICAL = 104,
+        ENVIRONMENT = 105,
         CHANGE_CRITICAL_REFERENCE = 107,
 
         // Token: 0x04002F4C RID: 12108

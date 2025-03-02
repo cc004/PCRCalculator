@@ -215,6 +215,9 @@ namespace Elements.Battle
 
         public float EnergyStackRationDamageBack => energyStackRationDamageBack;
 
+        public float multiTargetEffectTime;
+        public bool isShowMultiTarget;
+
         public Vector3 LNKFACBHNBC => playCameraPos0;
 
         public bool PMPACJOAECP => isAdminChanging;
@@ -627,6 +630,23 @@ namespace Elements.Battle
             BattleHeaderController.Instance.PauseNoMoreTimeUp((uint)BlackoutUnitTargetList.Count > 0U);
             if (ActionStartTimeCounter > 0.0)
                 ActionStartTimeCounter -= DeltaTime_60fps;
+            if (multiTargetEffectTime > 0f)
+            {
+                multiTargetEffectTime -= DeltaTime_60fps;
+            }
+            else if (!isShowMultiTarget)
+            {
+                isShowMultiTarget = true;
+                int num = EnemyList.FindLastIndex((UnitCtrl JNOIHMMFADD) => JNOIHMMFADD.IsPartsBoss);
+                for (int i = 0; i < EnemyList.Count; i++)
+                {
+                    UnitCtrl unitCtrl = EnemyList[i];
+                    if (unitCtrl.IsPartsBoss)
+                    {
+                        unitCtrl.PlayAndSetUpMultiTarget(i == num);
+                    }
+                }
+            }
             if (StoryStartTime > 0.0)
                 StoryStartTime -= DeltaTime_60fps;
             else if (StartStoryId != 0)
@@ -3692,7 +3712,6 @@ namespace Elements.Battle
             }
             UnityEngine.Debug.LogError($"exp value = {(int)value[n - 1]}");*/
             randomCounter = 0;
-            battleManager.ActionStartTimeCounter = 0;
             // battleManager.battleProcessor.GetActionStartTime();
                                                      //battleManager.StoryStartTime = battleManager.battleProcessor.GetStoryStartTime();
                                                      //battleManager.StartStoryId = battleManager.battleProcessor.GetStartStoryId();
@@ -3816,6 +3835,22 @@ namespace Elements.Battle
                     unitCtrl.SetState(UnitCtrl.ActionState.WALK);
             }
             // ISSUE: explicit non-virtual call
+            if (battleManager.EnemyList.Count > 0 && battleManager.EnemyList[0].UnitId == 318402)
+            {
+                multiTargetEffectTime = 2.9f;
+            }
+            else
+            {
+                multiTargetEffectTime = 0f;
+            }
+            if (multiTargetEffectTime <= 0f)
+            {
+                isShowMultiTarget = true;
+            }
+            else
+            {
+                isShowMultiTarget = false;
+            }
             for (int index = 0; index < (battleManager.EnemyList).Count; ++index)
             {
                 // ISSUE: explicit non-virtual call
@@ -3827,6 +3862,13 @@ namespace Elements.Battle
                     else
                         unitCtrl.SetState(UnitCtrl.ActionState.WALK);
                 }
+            }
+            // ex5 哥布林的StartTime是5，读自数据库
+            // 活动的sp是1.5或5.5，来自数据库
+            battleManager.ActionStartTimeCounter = 0; 
+            if (battleManager.EnemyList.Count > 0 && battleManager.EnemyList[0].UnitId == 314901)
+            {
+                ActionStartTimeCounter = 5;
             }
             //battleManager.battleProcessor.SetupHpAndEnergyAfterApplyPassiveSkill();
             //battleManager.tempData.InitXorShiftRandom(seed);

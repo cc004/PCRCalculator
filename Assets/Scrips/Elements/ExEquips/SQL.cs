@@ -69,6 +69,9 @@ namespace PCRCaculator.SQL
         public int max_energy_recovery_rate { get; set; }
         public int max_energy_reduce_rate { get; set; }
         public int max_accuracy { get; set; }
+        public int passive_skill_id_1 { get; set; }
+        public int passive_skill_id_2 { get; set; }
+        public int passive_skill_powerup { get; set; }
         public BaseData GetDefaultBaseData()
         {
             return new BaseData(default_hp, default_atk, default_magic_str, default_def, default_magic_def, default_physical_critical,//0-5

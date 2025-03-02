@@ -290,23 +290,18 @@ namespace Elements
         {
             LimitNum = LimitNumMax;
             coolTime = 0f;
-            using (Dictionary<eExSkillCondition, ExConditionPassiveData>.Enumerator enumerator = ExSkillConditionData.GetEnumerator())
+            foreach (KeyValuePair<eExSkillCondition, ExConditionPassiveData> exSkillConditionDatum in ExSkillConditionData)
             {
-                while (enumerator.MoveNext())
-                {
-                    CallFunctionExtend.Call(JEOCPILJNAD: enumerator.Current.Value.IconType, DMFGKJIEEBF: OnChangeState, IDAFJHFJKOL: true);
-                }
+                _owner.OnChangeState.Call(_owner, exSkillConditionDatum.Value.IconType, true);
             }
         }
 
+
         public void DeleteIcon(UnitCtrl _owner)
         {
-            using (Dictionary<eExSkillCondition, ExConditionPassiveData>.Enumerator enumerator = ExSkillConditionData.GetEnumerator())
+            foreach (KeyValuePair<eExSkillCondition, ExConditionPassiveData> exSkillConditionDatum in ExSkillConditionData)
             {
-                while (enumerator.MoveNext())
-                {
-                    CallFunctionExtend.Call(JEOCPILJNAD: enumerator.Current.Value.IconType, DMFGKJIEEBF: OnChangeState, IDAFJHFJKOL: false);
-                }
+                _owner.OnChangeState.Call(_owner, exSkillConditionDatum.Value.IconType, false);
             }
         }
     }

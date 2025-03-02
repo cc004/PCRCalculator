@@ -246,6 +246,10 @@ namespace Elements
         public List<eSpineCharacterAnimeId> TreasureAnimeIdList = new List<eSpineCharacterAnimeId>();
         private bool isDeadBySetCurrentHp;
         private static BattleManager staticBattleManager;
+        private List<ExSkillData> startExSkillList = new List<ExSkillData>();
+        private Dictionary<eExSkillCondition, List<ExSkillData>> conditionExSkillDictionary = new Dictionary<eExSkillCondition, List<ExSkillData>>();
+
+        private bool startSkillExeced;
         private Dictionary<eAbnormalState, bool> m_abnormalState = new Dictionary<eAbnormalState, bool>(new eAbnormalState_DictComparer());
         private Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData> abnormalStateCategoryDataDictionary = new Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData>(new eAbnormalStateCategory_DictComparer());
         private int overlapAbnormalStateCount;
@@ -2598,6 +2602,44 @@ this.updateCurColor();
             {
                 AppendCoroutine(TPRecovery(), ePauseType.SYSTEM);
             }*/
+            List<int> list4 = new List<int>();
+            for (int n = 0; n < unitData.exEquip.Length; n++)
+            {
+                int exEquipId = unitData.exEquip[n];
+                if (exEquipId == 0)
+                {
+                    continue;
+                }
+                var exEquipmentData = MainManager.Instance.unitExEquips[unitData.unitId][n][exEquipId];
+                if (exEquipmentData.passive_skill_id_1 != 0)
+                {
+                    list4.Add(exEquipmentData.passive_skill_id_1);
+                }
+                if (exEquipmentData.passive_skill_id_2 != 0)
+                {
+                    list4.Add(exEquipmentData.passive_skill_id_2);
+                }
+            }
+            foreach (int item2 in list4)
+            {
+                ExSkillData exSkillData = new ExSkillData();
+                exSkillData.Initialize(item2, this, unitActionController, battleManager);
+                if (exSkillData.ExSkillConditionData.ContainsKey(eExSkillCondition.START))
+                {
+                    startExSkillList.Add(exSkillData);
+                    continue;
+                }
+                foreach (KeyValuePair<eExSkillCondition, ExConditionPassiveData> exSkillConditionDatum in exSkillData.ExSkillConditionData)
+                {
+                    if (conditionExSkillDictionary.TryGetValue(exSkillConditionDatum.Key, out var value))
+                    {
+                        value.Add(exSkillData);
+                        continue;
+                    }
+                    conditionExSkillDictionary.Add(exSkillConditionDatum.Key, new List<ExSkillData> { exSkillData });
+                }
+            }
+
         }
 
         public int UnitIdForActionPattern
@@ -2798,6 +2840,13 @@ this.updateCurColor();
             else
                 ResetPosForUserUnit(BattleDefine.UnitRespawnPosList.IndexOf(RespawnPos));
             //this.CreateRunSmoke();
+            foreach (KeyValuePair<eExSkillCondition, List<ExSkillData>> item in conditionExSkillDictionary)
+            {
+                foreach (ExSkillData item2 in item.Value)
+                {
+                    item2.ResetLimitNum(this);
+                }
+            }
             ExecActionOnWaveStart();
         }
 
@@ -3300,6 +3349,7 @@ this.updateCurColor();
             SetState(ActionState.WALK);
             SetLeftDirection(false);
             //this.CreateRunSmoke();
+			startSkillExeced = false;
         }*/
 
         /*private IEnumerator waitCargeEnergy(float _recoveryRate)
@@ -4103,6 +4153,10 @@ this.updateCurColor();
             }
             else
             {
+                if (tryApplyConditionExSkill(_abnormalState, ref _effectTime))
+                {
+                    return;
+                }
                 switch (_abnormalState)
                 {
                     case eAbnormalState.POISON:
@@ -4208,6 +4262,94 @@ this.updateCurColor();
                 }
             }
         }
+
+        private bool tryApplyConditionExSkill(eAbnormalState _abnormalState, ref float _effectTime)
+        {
+            switch (_abnormalState)
+            {
+            case eAbnormalState.PARALYSIS:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.PARALYSIS], ref _effectTime);
+            case eAbnormalState.FREEZE:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.FREEZE], ref _effectTime);
+            case eAbnormalState.CHAINED:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.CHAINED], ref _effectTime);
+            case eAbnormalState.SLEEP:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.SLEEP], ref _effectTime);
+            case eAbnormalState.STUN:
+            case eAbnormalState.NPC_STUN:
+            case eAbnormalState.STUN2:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.STUN], ref _effectTime);
+            case eAbnormalState.STONE:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.STONE], ref _effectTime);
+            case eAbnormalState.PAUSE_ACTION:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.PAUSE_ACTION], ref _effectTime);
+            case eAbnormalState.POISON:
+            case eAbnormalState.POISON_BY_BEHAVIOUR:
+            case eAbnormalState.POISON2:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.POISON], ref _effectTime);
+            case eAbnormalState.BURN:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.BURN], ref _effectTime);
+            case eAbnormalState.CURSE:
+            case eAbnormalState.CURSE2:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.CURSE], ref _effectTime);
+            case eAbnormalState.VENOM:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.VENOM], ref _effectTime);
+            case eAbnormalState.HEX:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.HEX], ref _effectTime);
+            case eAbnormalState.CONVERT:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.CONVERT], ref _effectTime);
+            case eAbnormalState.CONFUSION:
+            case eAbnormalState.CONFUSION2:
+                return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.CONFUSION], ref _effectTime);
+            default:
+                return false;
+            }
+        }
+
+        private bool tryConditionExSkill(List<eExSkillCondition> _conditions, ref float _effectTime)
+        {
+            tryConditionExSkillImpl(_conditions, ExConditionPassiveData.eEffectType.NORMAL, ref _effectTime);
+            if (tryConditionExSkillImpl(_conditions, ExConditionPassiveData.eEffectType.CANCEL, ref _effectTime))
+            {
+                return true;
+            }
+            tryConditionExSkillImpl(_conditions, ExConditionPassiveData.eEffectType.SHORTEN, ref _effectTime);
+            return false;
+        }
+
+        private bool tryConditionExSkillImpl(List<eExSkillCondition> _conditions, ExConditionPassiveData.eEffectType _targetEffectType, ref float _effectTime)
+        {
+            List<ExSkillData> value = null;
+            foreach (eExSkillCondition _condition in _conditions)
+            {
+                if (!conditionExSkillDictionary.TryGetValue(_condition, out value))
+                {
+                    continue;
+                }
+                foreach (ExSkillData item in value)
+                {
+                    switch (_targetEffectType)
+                    {
+                    case ExConditionPassiveData.eEffectType.NORMAL:
+                        item.TryExSkill(_condition, unitActionController, _all: false);
+                        break;
+                    case ExConditionPassiveData.eEffectType.CANCEL:
+                    case ExConditionPassiveData.eEffectType.SHORTEN:
+                        switch (item.TryExSkill(_condition, unitActionController, _all: false, _targetEffectType))
+                        {
+                        case ExSkillData.eTryExResult.CANCEL:
+                            return true;
+                        case ExSkillData.eTryExResult.SHORTEN:
+                            _effectTime *= item.ExSkillConditionData[_condition].Value;
+                            return false;
+                        }
+                        break;
+                    }
+                }
+            }
+            return false;
+        }
+
         public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState)
         {
             if ((uint)(_abnormalState - 65) <= 1u)
@@ -9570,67 +9712,10 @@ this.updateCurColor();
             setStateCalled = true;
             if (!MultiTargetByTime && GameStartDone && IsPartsBoss && !multiTargetDone)
             {
-                // PlayAndSetUpMultiTarget(_isFirst: true);
-                battleManager.IsPausingEffectSkippedInThisFrame = true;
+                PlayAndSetUpMultiTarget(_isFirst: true);
             }
-            /*
-            if (IsBoss && GameStartDone)
-            {
-                battleManager.StartBonusEffect();
-            }
-            bool flag = false;*/
-            if (GameStartDone && IsPartsBoss && !multiTargetDone)
-            {
-                
-                multiTargetDone = true;
-                /*SaveDataManager instance = ManagerSingleton<SaveDataManager>.Instance;
-                if ((instance.MultiTargetConfirm == 0 ? 1 : (instance.MultiTargetConfirm != 2 ? 0 : (!instance.MultiTargetFirst ? 1 : 0))) != 0)
-                {
-                    instance.MultiTargetFirst = true;
-                    SingletonMonoBehaviour<UnitUiCtrl>.Instance.HidePopUp();
-                    this.battleManager.SetSkillScreen(true);
-                    this.battleManager.GamePause(true, false);
-                    this.battleManager.BossUnit.SetSortOrderFront();
-                    this.soundManager.PlaySe(eSE.MULTI_TARGETS_START);
-                    ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_APPEAR, this.battleManager.UnitUiCtrl.transform).transform.position = this.battleManager.BossUnit.BottomTransform.position + this.battleManager.BossUnit.FixedCenterPos;
-                    this.Timer(1f, (System.Action)(() =>
-                   {
-                       if (this.IsPartsBoss)
-                           this.battleManager.LOGNEDLPEIJ = false;
-                       this.battleManager.SetSkillScreen(false);
-                       this.battleManager.BossUnit.SetSortOrderBack();
-                       if (SingletonMonoBehaviour<BattleHeaderController>.Instance.IsPaused)
-                           return;
-                       this.battleManager.GamePause(false, false);
-                   }));
-                }
-                else if*/
-                if (IsPartsBoss)
-                    battleManager.LOGNEDLPEIJ = false;
-                for (int index = 0; index < BossPartsListForBattle.Count; ++index)
-                {
-                    //MultiTargetCursor cursor = ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<MultiTargetCursor>(this.UseTargetCursorOver ? eResourceId.ANIM_MULTI_TARGET_CURSOR_OVER : eResourceId.ANIM_MULTI_TARGET_CURSOR, this.battleManager.UnitUiCtrl.transform);
-                    PartsData _data = BossPartsListForBattle[index];
-                    //cursor.transform.position = _data.GetBottomTransformPosition();
-                    //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth + (this.UseTargetCursorOver ? 100 : -100);
-                    //_data.MultiTargetCursor = cursor;
-                    //this.battleManager.AppendCoroutine(_data.TrackBottom(), ePauseType.SYSTEM, this);
-                    if (_data.IsBreak)
-                    {
-                        AppendBreakLog(_data.BreakSource);
-                        _data.IsBreak = true;
-                        _data.OnBreak.Call();
-                        _data.SetBreak(true, null);// this.battleManager.UnitUiCtrl.transform);
-                        AppendCoroutine(UpdateBreak(_data.BreakTime, _data), ePauseType.SYSTEM);
-                    }
-                    OnIsFrontFalse += () =>
-                    {
-                        if (UseTargetCursorOver)
-                            return;
-                        //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth - 100;
-                    };
-                }
-            }
+            if (IsPartsBoss)
+                battleManager.LOGNEDLPEIJ = false;
             if (_state != ActionState.IDLE && _state != ActionState.WALK)
             {
                 CancelByConvert = false;
@@ -9709,6 +9794,63 @@ this.updateCurColor();
                     break;
             }
         }
+        
+        public void PlayAndSetUpMultiTarget(bool _isFirst)
+        {
+            multiTargetDone = true;
+            // SaveDataManager instance = ManagerSingleton<SaveDataManager>.Instance;
+            // if (instance.MultiTargetConfirm == 0 || (instance.MultiTargetConfirm == 2 && !instance.MultiTargetFirst))
+            // {
+            //     instance.MultiTargetFirst = _isFirst;
+            //     SingletonMonoBehaviour<UnitUiCtrl>.Instance.HidePopUp();
+            //     battleManager.SetSkillScreen(GABGIKMFNFG: true);
+            //     battleManager.GamePause(ICBCHCGGHLB: true);
+            //     SetSortOrderFront();
+            //     battleManager.MIGBAMLOOKH = true;
+            //     soundManager.PlaySe(eSE.MULTI_TARGETS_START);
+            //     if (!OneRemainingDisableEffect || BossPartsListForBattle.FindAll((PartsData e) => !e.IsBreak).Count >= 2)
+            //     {
+            //         ((Component)ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<Animator>(eResourceId.ANIM_MULTI_TARGET_APPEAR, ((Component)battleManager.OFMPGBKBOPM).transform, 0L)).transform.position = BottomTransform.position + FixedCenterPos;
+            //     }
+            //     ((MonoBehaviour)(object)this).Timer(1f, delegate
+            //     {
+            //         battleManager.SetSkillScreen(GABGIKMFNFG: false);
+            //         SetSortOrderBack();
+            //         battleManager.MIGBAMLOOKH = false;
+            //         if (!SingletonMonoBehaviour<BattleHeaderController>.Instance.IsPaused)
+            //         {
+            //             battleManager.GamePause(ICBCHCGGHLB: false);
+            //         }
+            //     });
+            // }
+            // else
+            // {
+                battleManager.IsPausingEffectSkippedInThisFrame = true;
+            // }
+            for (int index = 0; index < BossPartsListForBattle.Count; ++index)
+            {
+                //MultiTargetCursor cursor = ManagerSingleton<ResourceManager>.Instance.InstantiateAndGetComponent<MultiTargetCursor>(this.UseTargetCursorOver ? eResourceId.ANIM_MULTI_TARGET_CURSOR_OVER : eResourceId.ANIM_MULTI_TARGET_CURSOR, this.battleManager.UnitUiCtrl.transform);
+                PartsData _data = BossPartsListForBattle[index];
+                //cursor.transform.position = _data.GetBottomTransformPosition();
+                //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth + (this.UseTargetCursorOver ? 100 : -100);
+                //_data.MultiTargetCursor = cursor;
+                //this.battleManager.AppendCoroutine(_data.TrackBottom(), ePauseType.SYSTEM, this);
+                if (_data.IsBreak)
+                {
+                    AppendBreakLog(_data.BreakSource);
+                    _data.IsBreak = true;
+                    _data.OnBreak.Call();
+                    _data.SetBreak(true, null);// this.battleManager.UnitUiCtrl.transform);
+                    AppendCoroutine(UpdateBreak(_data.BreakTime, _data), ePauseType.SYSTEM);
+                }
+                OnIsFrontFalse += () =>
+                {
+                    if (UseTargetCursorOver)
+                        return;
+                    //cursor.Panel.sortingOrder = this.GetCurrentSpineCtrl().Depth - 100;
+                };
+            }
+		}
 
         private void setRecastTime(int skillId)
         {
@@ -10728,6 +10870,7 @@ this.updateCurColor();
         */
             if (CurrentState == ActionState.IDLE || CurrentState == ActionState.SUMMON)
             {
+                ExecStartSkill();
                 SetDirectionAuto();
                 CurrentState = ActionState.WALK;
                 AppendCoroutine(updateWalk(++walkCoroutineId), ePauseType.SYSTEM, this);
@@ -10873,9 +11016,24 @@ this.updateCurColor();
                         //    BattleVoiceUtility.PlayWaveStartVoice(this);
                         AppendCoroutine(updateStandBy(), ePauseType.VISUAL, this);
                     }
+                    ExecStartSkill();
                     AppendCoroutine(updateIdle(), ePauseType.SYSTEM, this);
                     break;
             }
+        }
+
+        public void ExecStartSkill()
+        {
+            if (startSkillExeced || IdleOnly)
+            {
+                return;
+            }
+            foreach (ExSkillData startExSkill in startExSkillList)
+            {
+                startExSkill.Exec(unitActionController);
+            }
+            startSkillExeced = true;
+            GetCurrentSpineCtrl().SetTimeScale(1f);
         }
 
         private IEnumerator updateStandBy()
