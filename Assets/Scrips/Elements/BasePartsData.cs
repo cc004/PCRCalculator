@@ -318,6 +318,7 @@ namespace Elements
                             {
                                 item.Value?.Invoke(jEOCPILJNAD);
                             }
+                            break;
                         }
                         if ((long)Owner.Hp <= 0L)
                             break;
