@@ -3591,6 +3591,8 @@ namespace Elements.Battle
             CurrentCutinUnit = null;
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             Resources.UnloadUnusedAssets();
+            LKLFFOFDCHK = false;
+            GPFLCBONNMK = false;
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             // ISSUE: object of a compiler-generated type is created
