@@ -166,8 +166,8 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10051600;
-            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10046300;
-            public long BossVersionCN = 202502271137;
+            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10047900;
+            public long BossVersionCN = 202503141844;
             public bool useQA = false;
             public bool useJP = true;
             public bool newAB = true;
@@ -496,8 +496,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 68;
-                playerSetting.playerLevel = 265;
+                playerSetting.playerProcess = 70;
+                playerSetting.playerLevel = 271;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
