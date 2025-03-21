@@ -576,7 +576,7 @@ namespace Elements.Battle
 
                 // bool skipping = false;
 
-                if (skipping) stopWatch.Restart();
+                if (skipping || skipUB) stopWatch.Restart();
                 
                 do
                 {
@@ -585,7 +585,7 @@ namespace Elements.Battle
                         CoroutineManager.VisualPause = true;
                     }
 
-                    if (IsFramePause || !(deltaTimeAccumulated >= 0.0) && !skipping)
+                    if (IsFramePause || !(deltaTimeAccumulated >= 0.0) && !skipping && !skipUB)
                         break;
                     
                     updateFrame();
@@ -593,7 +593,7 @@ namespace Elements.Battle
 
                     // UnityEngine.Debug.LogError(stopWatch.ElapsedMilliseconds);
                 }
-                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || skipping && stopWatch.ElapsedMilliseconds < 1000));
+                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
 
                 while (FrameCount < targetFrameCount && !IsFramePause)
                 {
@@ -619,6 +619,7 @@ namespace Elements.Battle
 
         public bool stepping = false;
         public bool skipping = false;
+        public bool skipUB = false;
 
         private void updateFrame()
         {
@@ -1910,7 +1911,15 @@ namespace Elements.Battle
             //this.onEndFadeOut += (System.Action)(() => this.battleEffectManager.SetSortOrderBack());
             BlackOutUnitList.Clear();
             BlackoutUnitTargetList.Clear();
-            GamePause(false, true);
+            if (skipUB)
+            {
+                skipUB = false;
+                BattleHeaderController.Instance.OnClickPauseButton();
+            }
+            else
+            {
+                GamePause(false, true);
+            }
             AppendCoroutine(updateBlackOutFadeOut(FNHGFDNICFG, ADJGECMDGDK), ePauseType.IGNORE_BLACK_OUT);
         }
 
@@ -3551,6 +3560,7 @@ namespace Elements.Battle
         {
             stepping = false;
             skipping = false;
+            skipUB = false;
             isAllActionDone = true;
             isAllActionsCompleted = false;
             isDamageNumHiddenBySkillScreen = false;

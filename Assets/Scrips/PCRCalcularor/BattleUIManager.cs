@@ -142,6 +142,7 @@ namespace PCRCaculator.Battle
                 { KeyCode.F5, RetryButton }, // F5键重打
                 { KeyCode.C, RetryButton }, // C键重打
                 { KeyCode.Escape, ExitButton2 }, // Escape键退出
+                { KeyCode.B, SkipUBButton }, // Escape键退出
             };
 
             keyToValue = new Dictionary<KeyCode, int>
@@ -432,6 +433,11 @@ namespace PCRCaculator.Battle
             }
             BattleManager.Instance.stepping = true;
             PauseButton();
+        }
+
+        public void SkipUBButton()
+        {
+            BattleHeaderController.Instance.OnClickSkipUBButton();
         }
 
         public void SkipButton()

@@ -66,6 +66,7 @@ namespace Elements
             unitBuffUI = buffui;
             ui.SetHP(LifeAmount);
             ui.SetMaxHP(MaxLifeAmount);
+            ui.SetTP(EnegryAmount);
             //this.unitBuffUI.SetLeftDir(this.IsOther);
             OnLifeAmmountChange += ui.SetHP;
             OnMaxLifeAmmountChange += ui.SetMaxHP;
