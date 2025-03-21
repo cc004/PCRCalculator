@@ -33,6 +33,7 @@ namespace PCRCaculator
         public List<Sprite> positionSprites_B;//0-2
         public Image backImage;
         public Slider HPSlider;
+        public Slider MaxHPSlider;
         public Slider TPSlider;
         public Image TPFillImage;
         public Color TPFullColor;
@@ -260,6 +261,10 @@ namespace PCRCaculator
             {
                 SetDie();
             }
+        }
+        public void SetMaxHP(float normalizedMaxHPRate)
+        {
+            MaxHPSlider.value = normalizedMaxHPRate;
         }
         public void SetTP(float normalizedTPRate)
         {

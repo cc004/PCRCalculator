@@ -1690,6 +1690,7 @@ namespace Elements
         public int Level { get; protected set; }
 
         private FloatWithEx _hp  = 0f;
+        private long _maxhp  = 0;
 
         public FloatWithEx Hp
         {
@@ -1701,11 +1702,21 @@ namespace Elements
                     battleManager.QueueUpdateSkillTarget();
                 _hp = value;
                 if (!battleManager.skipping)
-                    OnLifeAmmountChange?.Invoke((float)value / MaxHp);
+                    OnLifeAmmountChange?.Invoke(LifeAmount);
             }
         }
         
-        public long MaxHp { get; set; }
+        public long MaxHp 
+        { 
+            get => _maxhp; 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal protected set
+            {
+                _maxhp = value;
+                if (!battleManager.skipping)
+                    OnMaxLifeAmmountChange?.Invoke(MaxLifeAmount);
+            }
+        }
 
         public FloatWithEx Atk { get; set; }
 
@@ -1882,7 +1893,7 @@ namespace Elements
 
         public float EnegryAmount => Energy / 1000f;
 
-        public float LifeAmount => (long)Hp / (float)(long)MaxHp;
+        public float LifeAmount => (float)(long)Hp / (float)(long)MaxHpAfterPassive;
         public float MaxLifeAmount => (float)(long)MaxHp / (float)MaxHpAfterPassive;
 
         public Transform BottomTransform
@@ -2049,6 +2060,7 @@ this.updateCurColor();
             //this.OwnerPassiveAction = (Dictionary<eParamType, PassiveActionValue>)null;
             this.KillBonusTarget = (UnitCtrl)null;
             this.OnLifeAmmountChange = (System.Action<float>)null;
+            this.OnMaxLifeAmmountChange = (System.Action<float>)null;
             //this.voiceSuffixDic = (Dictionary<SoundManager.eVoiceType, int>)null;
             this.castTimeDictionary = (Dictionary<int, float>)null;
             this.runSmokeEffect = (SkillEffectCtrl)null;
@@ -2447,20 +2459,20 @@ this.updateCurColor();
                 var data = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
                 if (MyGameCtrl.Instance.tempData.isGuildEnemyViolent)
                 {
-                    MaxHp = StartMaxHP = (long)baseData.RealHp;
+                    MaxHp = StartMaxHP = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = MaxHp / 2 - 1;
                 }
                 else if (MyGameCtrl.Instance.tempData.isGuildBattle && data.usePlayerSettingHP && data.playerSetingHP > 0)
                 {
-                    MaxHp = StartMaxHP = (long)baseData.RealHp;
+                    MaxHp = StartMaxHP = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = data.playerSetingHP;
                 }
                 else
-                    Hp = (long)(MaxHp = StartMaxHP = (long)baseData.RealHp);
+                    Hp = (long)(MaxHp = StartMaxHP = MaxHpAfterPassive = (long)baseData.RealHp);
                 useLogBarrier = data.useLogBarrierNew;
             }
             else
-                Hp = (long)(MaxHp = StartMaxHP = (long)baseData.RealHp);
+                Hp = (long)(MaxHp = StartMaxHP = MaxHpAfterPassive = (long)baseData.RealHp);
 
             /*if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
             {
@@ -7645,6 +7657,7 @@ this.updateCurColor();
         private UnitCtrl KillBonusTarget { get; set; }
 
         public Action<float> OnLifeAmmountChange { get; set; }
+        public Action<float> OnMaxLifeAmmountChange { get; set; }
 
         public void RecoverDodgeTP(DamageData.eDamageType _damageType, long _damage, eActionType _actionType, long _logBarrierExpectedDamage, long _totalDamageForLogBarrier, UnitCtrl _source, bool _ignoreDef, BasePartsData _target, int _defPenetrate, Func<int, float, int> _upperLimitFunc, Skill _skill, float _energyChargeMultiple)
         {
