@@ -1043,6 +1043,14 @@ false
             return IsPaused;
 
         }
+        public void OnClickSkipUBButton()
+        {
+            BattleManager.skipUB = true;
+            if (GetIsPause())
+            {
+                OnClickPauseButton();
+            }
+        }
         public void OnClickPauseButton()
         {
             //XX: experimental
