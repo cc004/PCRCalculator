@@ -173,18 +173,43 @@ namespace PCRCaculator.Battle
             imageSaved.Clear();
             timeScaleSlider.value = GuildManager.Instance.calSlider.value;
         }
+        private HashSet<KeyCode> pressedKeys = new HashSet<KeyCode>();
         private void Update()
         {
             if (BattleManager.Instance.skipping)
                 return;
             _Update?.Invoke();
-            foreach (var kvp in inputActions)
+            // 遍历所有可能的按键
+            foreach (KeyCode key in System.Enum.GetValues(typeof(KeyCode)))
             {
-                if (Input.GetKeyDown(kvp.Key))
+                // 检测按键按下
+                if (Input.GetKeyDown(key))
                 {
-                    kvp.Value();
+                    // 如果集合为空，说明这是第一个按键
+                    if (pressedKeys.Count == 0)
+                    {
+                        Debug.Log($"Key {key} pressed first: Triggering action.");
+                        foreach (var kvp in inputActions)
+                        {
+                            if (Input.GetKeyDown(kvp.Key))
+                            {
+                                kvp.Value();
+                            }
+                        }
+                    }
+
+                    // 将按键添加到集合中
+                    pressedKeys.Add(key);
+                }
+
+                // 检测按键松开
+                if (Input.GetKeyUp(key))
+                {
+                    // 从集合中移除按键
+                    pressedKeys.Remove(key);
                 }
             }
+
             SetTimeScale();
             HandleTimeScale();
             HandleToggleKeys();
