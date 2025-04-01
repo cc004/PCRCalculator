@@ -794,7 +794,7 @@ namespace PCRCaculator.Guild
             SettingTexts[0].text = SettingData.FPSforLogic + "";
             SettingSliders[1].value = SettingData.FPSforAnimation / 10;
             SettingTexts[1].text = SettingData.FPSforAnimation + "";
-            SettingSliders[2].value = SettingData.UBTryingCount / 10;
+            SettingSliders[2].value = SettingData.UBTryingCount / 10 > 18 ? 19 : SettingData.UBTryingCount / 10;
             SettingTexts[2].text = SettingData.UBTryingCount + "";
             SettingToggles[0].isOn = SettingData.calcSpineAnimation;
             SettingToggles[0].interactable = true; //SettingData.calSpeed == 1;
@@ -825,7 +825,7 @@ namespace PCRCaculator.Guild
         {
             SettingTexts[0].text = (int)SettingSliders[0].value * 10 + "";
             SettingTexts[1].text = (int)SettingSliders[1].value * 10 + "";
-            SettingTexts[2].text = (int)SettingSliders[2].value * 10 + "";
+            SettingTexts[2].text = (int)SettingSliders[2].value > 18 ? "9999" : (int)SettingSliders[2].value * 10 + "";
             SettingToggles[0].interactable = SettingData.calSpeed == 1;
             //SettingToggles[7].isOn = SettingData.usePhysics;
         }
@@ -834,7 +834,7 @@ namespace PCRCaculator.Guild
             SettingData.FPSforLogic = (int)SettingSliders[0].value * 10;
             SettingData.FPSforAnimation = (int)SettingSliders[1].value * 10;
             SettingData.calcSpineAnimation = SettingToggles[0].isOn;
-            SettingData.UBTryingCount = (int)SettingSliders[2].value * 10;
+            SettingData.UBTryingCount = (int)SettingSliders[2].value > 18 ? 9999 : (int)SettingSliders[2].value * 10;
             //SettingData.UseFixedRandomSeed = SettingToggles[2].isOn;
             try
             {
@@ -1449,7 +1449,7 @@ namespace PCRCaculator.Guild
         public int FPSforLogic = 60;
         public int FPSforAnimation = 60;
         public bool calcSpineAnimation = true;
-        public int UBTryingCount = 30;
+        public int UBTryingCount = 9999;
         public bool UseFixedRandomSeed = true;
         /*public int RandomSeed = 666;
         public bool ForceNoCritical_player;

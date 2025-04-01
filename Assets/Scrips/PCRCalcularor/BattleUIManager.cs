@@ -188,7 +188,6 @@ namespace PCRCaculator.Battle
                     // 如果集合为空，说明这是第一个按键
                     if (pressedKeys.Count == 0)
                     {
-                        Debug.Log($"Key {key} pressed first: Triggering action.");
                         foreach (var kvp in inputActions)
                         {
                             if (Input.GetKeyDown(kvp.Key))
