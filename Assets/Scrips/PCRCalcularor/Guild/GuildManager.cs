@@ -355,18 +355,7 @@ namespace PCRCaculator.Guild
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
                     bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
 
-                    Dropdown dp = dropdowns_ChooseBoss[1];
-                    int turnCount = guildEnemyDatas[GetClanBattleID()].enemyIds.Length - 1;
-                    // dp.options = dp.options.GetRange(0, turnCount);
-                    // 获取 guildTurn 中的前 turnCount 个值
-                    List<string> selectedOptions = new List<string>();
-                    for (int i = 0; i < turnCount; i++)
-                    {
-                      selectedOptions.Add(guildTurn[i]);
-                    }
 
-                    // 更新 Dropdown 的选项
-                    UpdateDropdownOptions(dp, selectedOptions);
                 }
                 else
                 {
@@ -404,14 +393,23 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage($"会战{GetClanBattleID()}的配置缺失！", null);
             }
         }
-        void UpdateDropdownOptions(Dropdown dp, List<string> options)
+        public void UpdateDropdownOptions()
         {
             // 清空当前选项
+            Dropdown dp = dropdowns_ChooseBoss[1];
             dp.ClearOptions();
-    
+
+            // 获取 guildTurn 中的前 turnCount 个值
+            int turnCount = guildEnemyDatas[GetClanBattleID()].enemyIds.Length - 1;
+            List<string> selectedOptions = new List<string>();
+            for (int i = 0; i < turnCount; i++)
+            {
+                selectedOptions.Add(guildTurn[i]);
+            }
+            
             // 创建新的选项列表
             List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
-            foreach (string option in options)
+            foreach (string option in selectedOptions)
             {
               optionDataList.Add(new Dropdown.OptionData(option));
             }

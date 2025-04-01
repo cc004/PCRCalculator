@@ -3669,6 +3669,7 @@ MonoBehaviour:
   - {fileID: -195546215195111202, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   backImage: {fileID: 665984686}
   HPSlider: {fileID: 0}
+  MaxHPSlider: {fileID: 0}
   TPSlider: {fileID: 0}
   TPFillImage: {fileID: 0}
   TPFullColor: {r: 0, g: 0, b: 0, a: 0}
@@ -30259,6 +30260,18 @@ MonoBehaviour:
       - m_Target: {fileID: 992625733}
         m_TargetAssemblyTypeName: 
         m_MethodName: OnChooseBossDropDownChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 992625733}
+        m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
+        m_MethodName: UpdateDropdownOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -82599,6 +82612,7 @@ MonoBehaviour:
   - {fileID: -195546215195111202, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   backImage: {fileID: 5581843041717938959}
   HPSlider: {fileID: 0}
+  MaxHPSlider: {fileID: 0}
   TPSlider: {fileID: 0}
   TPFillImage: {fileID: 0}
   TPFullColor: {r: 0, g: 0, b: 0, a: 0}
@@ -82643,6 +82657,7 @@ MonoBehaviour:
   - {fileID: -195546215195111202, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   backImage: {fileID: 7229419531358111715}
   HPSlider: {fileID: 0}
+  MaxHPSlider: {fileID: 0}
   TPSlider: {fileID: 0}
   TPFillImage: {fileID: 0}
   TPFullColor: {r: 0, g: 0, b: 0, a: 0}
@@ -83320,6 +83335,7 @@ MonoBehaviour:
   - {fileID: -195546215195111202, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   backImage: {fileID: 2434763529474747008}
   HPSlider: {fileID: 0}
+  MaxHPSlider: {fileID: 0}
   TPSlider: {fileID: 0}
   TPFillImage: {fileID: 0}
   TPFullColor: {r: 0, g: 0, b: 0, a: 0}
@@ -83364,6 +83380,7 @@ MonoBehaviour:
   - {fileID: -195546215195111202, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   backImage: {fileID: 8213659579428959087}
   HPSlider: {fileID: 0}
+  MaxHPSlider: {fileID: 0}
   TPSlider: {fileID: 0}
   TPFillImage: {fileID: 0}
   TPFullColor: {r: 0, g: 0, b: 0, a: 0}
@@ -85944,6 +85961,7 @@ MonoBehaviour:
   - {fileID: -195546215195111202, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   backImage: {fileID: 5707311833697779789}
   HPSlider: {fileID: 0}
+  MaxHPSlider: {fileID: 0}
   TPSlider: {fileID: 0}
   TPFillImage: {fileID: 0}
   TPFullColor: {r: 0, g: 0, b: 0, a: 0}
