@@ -17,6 +17,8 @@ using PCRCaculator.Guild;
 using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
 using SQLite3 = SQLite4Unity3d.SQLite3;
+using Newtonsoft.Json;
+
 #if !UNITY_EDITOR
 using System.IO;
 #endif
@@ -40,7 +42,13 @@ namespace PCRCaculator.SQL
             this.path = Path.Combine(ABExTool.persistentDataPath, $"{mgr.DataVer}.db");
 
             if (!File.Exists(this.path))
+            {
                 File.WriteAllBytes(this.path, mgr.ResolveDatabase());
+                if (!mgr.DataVer.StartsWith("jp"))
+                {
+                    Unhash();
+                }
+            }
 
             try
 
@@ -142,8 +150,144 @@ namespace PCRCaculator.SQL
         }*/
         public void CloseDB()
         {
-            foreach  (var conn in connections) conn.Close();
+            foreach (var conn in connections) conn.Close();
         }
+        private void Unhash()
+        {
+            string rainbowJsonContent = MainManager.Instance.LoadJsonDatas("Datas/rainbow");
+            if (string.IsNullOrEmpty(rainbowJsonContent))
+            {
+                Debug.LogError("Rainbow table not found, unhashing skipped.");
+                return;
+            }
+
+            Debug.Log($"Start Unhashing {mgr.DataVer}.db");
+            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(rainbowJsonContent);
+
+            using (var dbConnection = new SqliteConnection($"Data Source={path};Version=3;"))
+            {
+                dbConnection.Open();
+
+                foreach (var entry in jsonObject)
+                {
+                    string hashedTableName = entry.Key;
+                    var colsDict = entry.Value;
+                    string intactTableName = colsDict["--table_name"];
+
+                    string createTableStatement = GetCreateTable(dbConnection, hashedTableName);
+                    string createDecTableStatement = GetCreateTable(dbConnection, intactTableName);
+
+                    if (createTableStatement == null)
+                    {
+                        if (createDecTableStatement == null)
+                        {
+                            Debug.LogWarning($"CreateTableStatement for '{intactTableName}' not found.");
+                        }
+                        continue;
+                    }
+
+                    List<string> hashedCols = new List<string>();
+                    List<string> intactCols = new List<string>();
+
+                    foreach (var colEntry in colsDict)
+                    {
+                        if (colEntry.Key != "--table_name")
+                        {
+                            hashedCols.Add(colEntry.Key);
+                            intactCols.Add(colEntry.Value);
+                        }
+
+                        createTableStatement = createTableStatement.Replace(
+                            colEntry.Key == "--table_name" ? hashedTableName : colEntry.Key,
+                            colEntry.Key == "--table_name" ? intactTableName : colEntry.Value
+                        );
+                    }
+
+                    var hashedColsFromDb = GetTableColumns(dbConnection, hashedTableName);
+                    foreach (var col in hashedColsFromDb)
+                    {
+                        if (!hashedCols.Contains(col))
+                        {
+                            hashedCols.Add(col);
+                            intactCols.Add(col);
+                        }
+                    }
+
+                    string insertStatement = $"INSERT INTO {intactTableName} (`{string.Join("`, `", intactCols)}`) SELECT `{string.Join("`, `", hashedCols)}` FROM {hashedTableName}";
+                    string dropTableStatement = $"DROP TABLE {hashedTableName}";
+
+                    List<string> transactionCmds = new List<string> { createTableStatement, insertStatement, dropTableStatement };
+
+                    if (!ExecTransaction(dbConnection, transactionCmds))
+                    {
+                        Debug.LogError($"Failed when executing a transaction for '{intactTableName}' ({hashedTableName}). Transaction: {string.Join("; ", transactionCmds)}");
+                        continue;
+                    }
+                }
+                Debug.Log("Unhashing complete.");
+            }
+        }
+
+        private string GetCreateTable(SqliteConnection dbConnection, string tableName)
+        {
+            using (var command = dbConnection.CreateCommand())
+            {
+                command.CommandText = $"SELECT sql FROM sqlite_master WHERE type='table' AND name='{tableName}'";
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return reader.GetString(0);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private List<string> GetTableColumns(SqliteConnection dbConnection, string tableName)
+        {
+            List<string> columns = new List<string>();
+            using (var command = dbConnection.CreateCommand())
+            {
+                command.CommandText = $"PRAGMA table_info({tableName})";
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        columns.Add(reader.GetString(1));
+                    }
+                }
+            }
+            return columns;
+        }
+
+        private bool ExecTransaction(SqliteConnection dbConnection, List<string> commands)
+        {
+            using (var transaction = dbConnection.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var cmd in commands)
+                    {
+                        using (var command = dbConnection.CreateCommand())
+                        {
+                            command.CommandText = cmd;
+                            command.Transaction = transaction;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Transaction failed: {e}");
+                    transaction.Rollback();
+                    return false;
+                }
+            }
+        }
+
     }
 
     public sealed class SQLData : SQLiteTool
