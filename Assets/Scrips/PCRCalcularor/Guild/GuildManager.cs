@@ -395,12 +395,16 @@ namespace PCRCaculator.Guild
         }
         public void UpdateDropdownOptions()
         {
-            // 清空当前选项
             Dropdown dp = dropdowns_ChooseBoss[1];
-            dp.ClearOptions();
 
             // 获取 guildTurn 中的前 turnCount 个值
             int turnCount = guildEnemyDatas[GetClanBattleID()].enemyIds.Length - 1;
+            if (turnCount == dp.options.Count)
+            {
+                return;
+            }
+            // 清空当前选项
+            dp.ClearOptions();
             List<string> selectedOptions = new List<string>();
             for (int i = 0; i < turnCount; i++)
             {
