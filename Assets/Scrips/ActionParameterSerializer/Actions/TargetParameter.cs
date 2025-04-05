@@ -414,6 +414,12 @@ namespace ActionParameterSerializer.Actions
     {
         front = 1,
         frontAndBack = 2,
-        all = 3
+        all = 3,
+        FRONT_INCLUDE_FLIGHT = 4,
+        FRONT_AND_BACK_INCLUDE_FLIGHT = 5,
+        ALL_INCLUDE_FLIGHT = 6,
+        FRONT_WITHOUT_SUMMON = 7,
+        FRONT_AND_BACK_WITHOUT_SUMMON = 8,
+        ALL_WITHOUT_SUMMON = 9,
     }
 }

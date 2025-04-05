@@ -42,6 +42,18 @@ namespace PCRCaculator.Battle
         FRONT_AND_BACK = 2,
         [Description("所有")]
         ALL = 3,
+        [Description("前方包含飞行")]
+        FRONT_INCLUDE_FLIGHT = 4,
+        [Description("前方和后方包含飞行")]
+        FRONT_AND_BACK_INCLUDE_FLIGHT = 5,
+        [Description("所有包含飞行")]
+        ALL_INCLUDE_FLIGHT = 6,
+        [Description("前方不包含召唤物")]
+        FRONT_WITHOUT_SUMMON = 7,
+        [Description("前方和后方不包含召唤物")]
+        FRONT_AND_BACK_WITHOUT_SUMMON = 8,
+        [Description("所有不包含召唤物")]
+        ALL_WITHOUT_SUMMON = 9,
         [Description("未知")]
         UNKNOWN = 0 }
     public enum eAbnormalState

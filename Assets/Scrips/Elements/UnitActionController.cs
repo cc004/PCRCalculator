@@ -1995,10 +1995,11 @@ namespace Elements
                             actionParameter.TargetList.Add(basePartsData2);
                     }
                 }
-                if (actionParameter.TargetSort != PriorityPattern.NEAR || actionParameter.TargetList.Count != 0 || (basePartsData1 == null || Owner.IsConfusionOrConvert()))
-                    return;
-                actionParameter.TargetList.Add(basePartsData1);
+                if (!(actionParameter.TargetSort != PriorityPattern.NEAR || actionParameter.TargetList.Count != 0 || (basePartsData1 == null || Owner.IsConfusionOrConvert()))){
+                    actionParameter.TargetList.Add(basePartsData1);
+                }
             }
+            filterTargetByFlight(actionParameter);
         }
         private bool isInActionTargetArea(Skill _skill, ActionParameter _action, Vector3 _basePosition, bool _considerBodyWidth, BasePartsData _checkUnitCtrl)
         {
