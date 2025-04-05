@@ -355,18 +355,7 @@ namespace PCRCaculator.Guild
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
                     bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
 
-                    Dropdown dp = dropdowns_ChooseBoss[1];
-                    int turnCount = guildEnemyDatas[GetClanBattleID()].enemyIds.Length - 1;
-                    // dp.options = dp.options.GetRange(0, turnCount);
-                    // 获取 guildTurn 中的前 turnCount 个值
-                    List<string> selectedOptions = new List<string>();
-                    for (int i = 0; i < turnCount; i++)
-                    {
-                      selectedOptions.Add(guildTurn[i]);
-                    }
 
-                    // 更新 Dropdown 的选项
-                    UpdateDropdownOptions(dp, selectedOptions);
                 }
                 else
                 {
@@ -404,14 +393,27 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage($"会战{GetClanBattleID()}的配置缺失！", null);
             }
         }
-        void UpdateDropdownOptions(Dropdown dp, List<string> options)
+        public void UpdateDropdownOptions()
         {
+            Dropdown dp = dropdowns_ChooseBoss[1];
+
+            // 获取 guildTurn 中的前 turnCount 个值
+            int turnCount = guildEnemyDatas[GetClanBattleID()].enemyIds.Length - 1;
+            if (turnCount == dp.options.Count)
+            {
+                return;
+            }
             // 清空当前选项
             dp.ClearOptions();
-    
+            List<string> selectedOptions = new List<string>();
+            for (int i = 0; i < turnCount; i++)
+            {
+                selectedOptions.Add(guildTurn[i]);
+            }
+            
             // 创建新的选项列表
             List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
-            foreach (string option in options)
+            foreach (string option in selectedOptions)
             {
               optionDataList.Add(new Dropdown.OptionData(option));
             }
@@ -792,7 +794,7 @@ namespace PCRCaculator.Guild
             SettingTexts[0].text = SettingData.FPSforLogic + "";
             SettingSliders[1].value = SettingData.FPSforAnimation / 10;
             SettingTexts[1].text = SettingData.FPSforAnimation + "";
-            SettingSliders[2].value = SettingData.UBTryingCount / 10;
+            SettingSliders[2].value = SettingData.UBTryingCount / 10 > 18 ? 19 : SettingData.UBTryingCount / 10;
             SettingTexts[2].text = SettingData.UBTryingCount + "";
             SettingToggles[0].isOn = SettingData.calcSpineAnimation;
             SettingToggles[0].interactable = true; //SettingData.calSpeed == 1;
@@ -823,7 +825,7 @@ namespace PCRCaculator.Guild
         {
             SettingTexts[0].text = (int)SettingSliders[0].value * 10 + "";
             SettingTexts[1].text = (int)SettingSliders[1].value * 10 + "";
-            SettingTexts[2].text = (int)SettingSliders[2].value * 10 + "";
+            SettingTexts[2].text = (int)SettingSliders[2].value > 18 ? "9999" : (int)SettingSliders[2].value * 10 + "";
             SettingToggles[0].interactable = SettingData.calSpeed == 1;
             //SettingToggles[7].isOn = SettingData.usePhysics;
         }
@@ -832,7 +834,7 @@ namespace PCRCaculator.Guild
             SettingData.FPSforLogic = (int)SettingSliders[0].value * 10;
             SettingData.FPSforAnimation = (int)SettingSliders[1].value * 10;
             SettingData.calcSpineAnimation = SettingToggles[0].isOn;
-            SettingData.UBTryingCount = (int)SettingSliders[2].value * 10;
+            SettingData.UBTryingCount = (int)SettingSliders[2].value > 18 ? 9999 : (int)SettingSliders[2].value * 10;
             //SettingData.UseFixedRandomSeed = SettingToggles[2].isOn;
             try
             {
@@ -1447,7 +1449,7 @@ namespace PCRCaculator.Guild
         public int FPSforLogic = 60;
         public int FPSforAnimation = 60;
         public bool calcSpineAnimation = true;
-        public int UBTryingCount = 30;
+        public int UBTryingCount = 9999;
         public bool UseFixedRandomSeed = true;
         /*public int RandomSeed = 666;
         public bool ForceNoCritical_player;

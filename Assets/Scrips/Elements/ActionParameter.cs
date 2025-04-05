@@ -85,6 +85,7 @@ namespace Elements
         public List<int> ActionChildrenIndexes { get; set; }
 
         public OnDamageHitDelegate OnDamageHit { get; set; }
+        public bool IsFlightStateTargetByReflection { get; set; }
 
         public List<NormalSkillEffect> ActionEffectList { get; set; }
 

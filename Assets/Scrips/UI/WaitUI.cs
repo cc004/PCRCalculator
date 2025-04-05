@@ -26,34 +26,34 @@ public class WaitUI : MonoBehaviour
 
     void Update()
     {
-        if (m_CurProgressValue2 < m_ProgressValue2)
-        {
-            m_CurProgressValue2++;
-        }
-        if (m_CurProgressValue2 == 100)
-        {
-            m_CurProgressValue2 = 0;
-        }
-        m_CurProgressValueTemp = m_CurProgressValue2 / 100f;
-        if (m_CurProgressValueTemp > 0.1f && m_CurProgressValueTemp <= 0.3f)
-        {
-            text.text = "??????";
-        }
-        else if (m_CurProgressValueTemp > 0.3f && m_CurProgressValueTemp <= 0.5f)
-        {
-            text.text = "??????";
-        }
-        else if (m_CurProgressValueTemp > 0.5f && m_CurProgressValueTemp <= 0.7f)
-        {
-            text.text = "??????";
-        }
-        else if (m_CurProgressValueTemp > 0.7f && m_CurProgressValueTemp <= 0.9f)
-        {
-            text.text = "??????";
-        }
-        else
-        {
-            text.text = "??????";
-        }
+        // if (m_CurProgressValue2 < m_ProgressValue2)
+        // {
+        //     m_CurProgressValue2++;
+        // }
+        // if (m_CurProgressValue2 == 100)
+        // {
+        //     m_CurProgressValue2 = 0;
+        // }
+        // m_CurProgressValueTemp = m_CurProgressValue2 / 100f;
+        // if (m_CurProgressValueTemp > 0.1f && m_CurProgressValueTemp <= 0.3f)
+        // {
+        //     text.text = "??????";
+        // }
+        // else if (m_CurProgressValueTemp > 0.3f && m_CurProgressValueTemp <= 0.5f)
+        // {
+        //     text.text = "??????";
+        // }
+        // else if (m_CurProgressValueTemp > 0.5f && m_CurProgressValueTemp <= 0.7f)
+        // {
+        //     text.text = "??????";
+        // }
+        // else if (m_CurProgressValueTemp > 0.7f && m_CurProgressValueTemp <= 0.9f)
+        // {
+        //     text.text = "??????";
+        // }
+        // else
+        // {
+        //     text.text = "??????";
+        // }
     }
 }

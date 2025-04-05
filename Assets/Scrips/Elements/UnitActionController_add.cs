@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,68 @@ namespace Elements
 {
     public partial class UnitActionController
     {
+
+        void filterTargetByFlight(ActionParameter actionParameter)
+        {
+            if (actionParameter == null)
+                return;
+
+            if ((int)actionParameter.TargetSort != 47 &&
+                ((int)actionParameter.Direction < 4 || (int)actionParameter.Direction > 6) &&
+                (int)actionParameter.TargetAssignment == 1 &&
+                actionParameter.TargetNum != 1)
+            {
+                var targetList = actionParameter.TargetList;
+
+                if (actionParameter.ReferencedByReflection)
+                {
+                    if (actionParameter.TargetNth < 1)
+                    {
+                        bool isFlightTarget = actionParameter.IsFlightStateTargetByReflection;
+
+                        targetList?.RemoveAll(target =>
+                        {
+                            if (target?.Owner == null)
+                                throw new NullReferenceException("target.Owner is null");
+
+                            return isFlightTarget != target.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT);
+                        });
+                    }
+                    else
+                    {
+                        targetList?.RemoveAll(target =>
+                        {
+                            if (target?.Owner == null)
+                                throw new NullReferenceException("target.Owner is null");
+
+                            return target.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT);
+                        });
+                    }
+                }
+                else
+                {
+                    bool hasNonFlying = targetList?.Any(target =>
+                    {
+                        if (target?.Owner == null)
+                            throw new NullReferenceException("target.Owner is null");
+
+                        return !target.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT);
+                    }) ?? false;
+
+                    if (hasNonFlying)
+                    {
+                        targetList?.RemoveAll(target =>
+                        {
+                            if (target?.Owner == null)
+                                throw new NullReferenceException("target.Owner is null");
+
+                            return target.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT);
+                        });
+                    }
+                }
+            }
+        }
+        
         private Dictionary<string, List<FirearmCtrlData>> unitFirearmDatas = new Dictionary<string, List<FirearmCtrlData>>();
         // public bool UseSkillEffect = false;
         public void LoadActionControllerData(int unitid,bool isABunit=true)

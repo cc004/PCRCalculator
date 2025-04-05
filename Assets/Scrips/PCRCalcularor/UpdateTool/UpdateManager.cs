@@ -9,11 +9,10 @@ namespace PCRCaculator.Update
     public class UpdateManager : MonoBehaviour
     {
         public InputField verCharaJP, verBossJP, verBossCN;
-        public Toggle qa, jp, newab;
+        public Toggle qa, jp, newab, useLatestProd;
         public Button prodUpdateButton, jpBossIsShow;
         private bool isProdUpdated = false;
         public GameObject jpBossPanel;
-        private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
         public void StartCheck()
         {
             this.gameObject.SetActive(true);
@@ -23,6 +22,7 @@ namespace PCRCaculator.Update
             qa.isOn = MainManager.Instance.Version.useQA;
             jp.isOn = MainManager.Instance.Version.useJP;
             newab.isOn = MainManager.Instance.Version.newAB;
+            useLatestProd.isOn = MainManager.Instance.Version.useLatestProd;
         }
 
         public void CancelButton()
@@ -38,6 +38,7 @@ namespace PCRCaculator.Update
             MainManager.Instance.Version.useQA = qa.isOn;
             MainManager.Instance.Version.useJP = jp.isOn;
             MainManager.Instance.Version.newAB = newab.isOn;
+            MainManager.Instance.Version.useLatestProd = useLatestProd.isOn;
             MainManager.Instance.Version.CharacterVersionJP = long.Parse(verCharaJP.text);
             MainManager.Instance.Version.BossVersionJP = long.Parse(verBossJP.text);
             MainManager.Instance.Version.BossVersionCN = long.Parse(verBossCN.text);
@@ -58,12 +59,18 @@ namespace PCRCaculator.Update
             MainManager.Instance.WindowConfigMessage("更新完成，重启摸轴器生效", Application.Quit, Application.Quit);
         }
 
-        public void ProdUpdateButton()
+        public async void ProdUpdateButton()
         {
             if (!isProdUpdated)
             {
-              // await ProdUpdate();
-                StartCoroutine(SendPostRequest());
+                prodUpdateButton.GetComponentInChildren<Text>().text = "获取中...";
+                // await ProdUpdate();
+                await MainManager.Instance.SendPostRequestAsync(() =>
+                {
+                    prodUpdateButton.GetComponentInChildren<Text>().text = MainManager.Instance.truthVersion;
+                    prodUpdateButton.interactable = true;
+                    isProdUpdated = true;
+                });
             }
             else
             {
@@ -78,36 +85,7 @@ namespace PCRCaculator.Update
         {
             jpBossPanel.SetActive(!jpBossPanel.activeSelf);
         }
-        public IEnumerator SendPostRequest()
-        {
-            prodUpdateButton.GetComponentInChildren<Text>().text = "获取中...";
-            using UnityWebRequest www = new(Url, UnityWebRequest.kHttpVerbPOST);
-            byte[] formdata = new System.Text.UTF8Encoding().GetBytes("{\"regionCode\":\"cn\"}");
 
-            // 设置请求头部
-            www.SetRequestHeader("Content-Type", "application/json");
-            www.uploadHandler = new UploadHandlerRaw(formdata);
-            www.downloadHandler = new DownloadHandlerBuffer();
-
-            // 发送请求
-            yield return www.SendWebRequest();
-
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-            {
-                Debug.LogError("Error: " + www.error);
-                prodUpdateButton.GetComponentInChildren<Text>().text = "获取失败（重试）";
-                prodUpdateButton.interactable = true;
-            }
-            else
-            {
-                var responseText = www.downloadHandler.text;
-                var response = JsonConvert.DeserializeObject<ApiResponse>(responseText);
-                // 输出truthVersion
-                prodUpdateButton.GetComponentInChildren<Text>().text = response.data.truthVersion;
-                prodUpdateButton.interactable = true;
-                isProdUpdated = true;
-            }
-        }
     }
 
     // 定义模型类

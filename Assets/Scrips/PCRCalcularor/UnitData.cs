@@ -376,6 +376,11 @@ namespace PCRCaculator
             unitName = other.unitName;
             detailData = other.detailData;
             skillData = other.skillData;
+            while (rankData.datas.Count < other.rankData.datas.Count)
+            {
+                rankData.datas.Add(new BaseData());
+                Debug.LogWarning($"rankData.datas length increased to {rankData.datas.Count}.");
+            }
             for (int i = 0; i < other.rankData.datas.Count; ++i)
             {
                 var d = other.rankData.datas[i];

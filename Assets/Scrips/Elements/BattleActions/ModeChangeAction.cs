@@ -12,6 +12,22 @@ namespace Elements
 {
     public class ModeChangeAction : ActionParameter
     {
+        public enum eModeChangeType
+        {
+            TIME = 1,
+            ENERGY = 2,
+            RELEASE = 3,
+        }
+        public enum eAdditionalAbnormalType 
+        {
+            NONE = 0,
+            FLIGHT = 1,
+        }
+        private static readonly Dictionary<ModeChangeAction.eAdditionalAbnormalType, UnitCtrl.eAbnormalState> ABNORMAL_STATE_DIC = new Dictionary<ModeChangeAction.eAdditionalAbnormalType, UnitCtrl.eAbnormalState>
+        {
+            { ModeChangeAction.eAdditionalAbnormalType.FLIGHT, UnitCtrl.eAbnormalState.FLIGHT },
+        };
+
         public bool ReleaseReady;
 
         private int oldUnionBurstId
@@ -79,6 +95,26 @@ namespace Elements
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+            eAdditionalAbnormalType abnormalType = (eAdditionalAbnormalType)base.MasterData.action_value_5;
+            if (abnormalType != eAdditionalAbnormalType.NONE)
+            {
+                var state = ABNORMAL_STATE_DIC[abnormalType];
+                _source.SetAbnormalState(
+                    _source: _source,
+                    _abnormalState: state,
+                    _effectTime: 90f,
+                    _action: this,
+                    _skill: _skill,
+                    _value: 0f,
+                    _value2: 0f,
+                    _reduceEnergy: false,
+                    _isDamageRelease: false,
+                    _reduceEnergyRate: 1.0f,
+                    _showsIcon: true
+                );
+            }
+
+
             switch ((eModeChangeType)ActionDetail1)
             {
                 case eModeChangeType.TIME:
@@ -114,7 +150,7 @@ namespace Elements
                     };
                     if (_action == null)
                         break;
-                    _sourceActionController.AppendCoroutine(updateModeChange(_valueDictionary[eValueNumber.VALUE_1], (eModeChangeType)ActionDetail1, _action, _skill, _source, _sourceActionController), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
+                    _sourceActionController.AppendCoroutine(updateModeChange(_valueDictionary[eValueNumber.VALUE_1], (eModeChangeType)ActionDetail1, _action, _skill, _source, _sourceActionController, (eAdditionalAbnormalType)base.MasterData.action_value_5), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
                     break;
                 case eModeChangeType.RELEASE:
                     if (ReleaseReady)
@@ -205,7 +241,7 @@ namespace Elements
             _sourceActionController.DisableUBByModeChange = false;
             _sourceActionController.ModeChanging = false;
         }*/
-        private IEnumerator updateModeChange(float _value, eModeChangeType _type, ActionParameter _action, Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController)
+        private IEnumerator updateModeChange(float _value, eModeChangeType _type, ActionParameter _action, Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController, eAdditionalAbnormalType _additionalAbnormalType)
         {
             float timer = 0f;
             bool endFlag = false;
@@ -235,12 +271,12 @@ namespace Elements
                         }
                         if (timer >= _value && _source.CurrentState == UnitCtrl.ActionState.IDLE)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController);
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
                             yield break;
                         }
                         if (_source.ToadDatas.Count > 0)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController);
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
                             yield break;
                         }
                         break;
@@ -253,12 +289,12 @@ namespace Elements
                         }
                         if (_source.ToadDatas.Count > 0)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController);
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
                             yield break;
                         }
                         if (_source.CurrentState == UnitCtrl.ActionState.IDLE && endFlag)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController);
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
                             yield break;
                         }
                         break;
@@ -275,7 +311,7 @@ namespace Elements
                 }
                 yield return null;
             }
-            modeChangeEnd(_skill, _action, _source, _sourceActionController);
+            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
         }
 
 
@@ -283,9 +319,22 @@ namespace Elements
           Skill _skill,
           ActionParameter _action,
           UnitCtrl _source,
-          UnitActionController _sourceUnitActionController)
+          UnitActionController _sourceUnitActionController,
+          eAdditionalAbnormalType additionalAbnormalType)
         {
+            // 清除特殊状态（无法操作/魅惑）
             _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = false;
+
+            // 清除异常状态（如眩晕、沉默等）
+            if (additionalAbnormalType != 0)
+            {
+                var abnormalDic = ModeChangeAction.ABNORMAL_STATE_DIC;
+                if (abnormalDic != null)
+                {
+                    var state = abnormalDic[(eAdditionalAbnormalType)additionalAbnormalType];
+                    _source.DispelAbnormalState(state);
+                }
+            }
             if (_source.ToadDatas.Count > 0)
             {
                 _source.ActionsTargetOnMe.Remove(ActionId * 100L + IdOffsetDictionary[_source.GetFirstParts(true)]);
@@ -558,11 +607,5 @@ namespace Elements
             Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
         }
 
-        public enum eModeChangeType
-        {
-            TIME = 1,
-            ENERGY = 2,
-            RELEASE = 3,
-        }
     }
 }

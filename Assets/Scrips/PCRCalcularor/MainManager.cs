@@ -22,6 +22,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 using Object = UnityEngine.Object;
+using PCRCaculator.Update;
+using UnityEngine.Networking;
 
 namespace PCRCaculator
 {
@@ -38,7 +40,7 @@ namespace PCRCaculator
         //public TextAsset db;
         //public TextAsset unitTimeTxt;
         //public TextAsset unitPrefabData;
-        public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3,calculator = 4 }
+        public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3, calculator = 4 }
         public StayPage stayPage;
         //public int loadCharacterMax;//最多加载到的角色序号
         public int levelMax { get => playerSetting.playerLevel; }
@@ -66,7 +68,7 @@ namespace PCRCaculator
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
         private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
         private List<int> enemy_ignore_skill_rf = new List<int>();//未来可期
-        
+
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
         private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
@@ -114,19 +116,19 @@ namespace PCRCaculator
         public TextMeshProUGUI PlayerLevelText { get => BaseBackManager.Instance.playerLevelText; }
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
-        public Dictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => allUnitSkillTimeDataDic;}
-        public bool IsGuildBattle { get => isGuildBattle;}
+        public Dictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => allUnitSkillTimeDataDic; }
+        public bool IsGuildBattle { get => isGuildBattle; }
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
         public List<UnitData> EnemyDataForBattle { get => enemyDataForBattle; }
         public Dictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => allUnitAttackPatternDic; }
         // public bool IsAutoMode { get => isAutoMode;}
         // public bool ForceAutoMode { get => forceAutoMode; }
-        public GuildBattleData GuildBattleData { get => guildBattleData;}
+        public GuildBattleData GuildBattleData { get => guildBattleData; }
         //public Dictionary<int, UniqueEquipmentData> UniqueEquipmentDataDic { get => uniqueEquipmentDataDic;}
         //public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
-        public AllUnitFirearmData FirearmData { get => firearmData;}
-        public List<int> Enemy_ignore_skill_rf { get => enemy_ignore_skill_rf;}
-        public Elements.MasterUnitSkillDataRf MasterUnitSkillDataRf { get => masterUnitSkillDataRf;}
+        public AllUnitFirearmData FirearmData { get => firearmData; }
+        public List<int> Enemy_ignore_skill_rf { get => enemy_ignore_skill_rf; }
+        public Elements.MasterUnitSkillDataRf MasterUnitSkillDataRf { get => masterUnitSkillDataRf; }
 
         public readonly List<int> showUnitIDs = new List<int>();
         public List<int> showSummonIDs;
@@ -136,8 +138,10 @@ namespace PCRCaculator
         public Dictionary<(int, int), promotion_bonus> rbs;
 
         public bool LoadFinished { get; private set; }
-        public Dictionary<int, GuildEnemyData> GuildEnemyDatas { get => guildEnemyDatas;}
-        public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic;}
+        public Dictionary<int, GuildEnemyData> GuildEnemyDatas { get => guildEnemyDatas; }
+        public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic; }
+        private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
+        public string truthVersion;
         private void Awake()
         {
             if (Instance == null)
@@ -167,10 +171,11 @@ namespace PCRCaculator
         {
             public long CharacterVersionJP = 10051600;
             public long BossVersionJP = Instance.useJapanData ? 10051600 : 10047900;
-            public long BossVersionCN = 202503141844;
+            public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
             public bool newAB = true;
+            public bool useLatestProd = true;
 
         }
 
@@ -220,7 +225,7 @@ namespace PCRCaculator
             //CharacterManager = CharacterManager.Instance;
             //BattleManager = AdventureManager.Instance;
         }
-        
+
         private void Load()
         {
             Application.runInBackground = true;
@@ -232,7 +237,7 @@ namespace PCRCaculator
             LoadAsync(wait);
         }
 
-        private void LoadAsync(WaitUI wait)
+        private async void LoadAsync(WaitUI wait)
         {
             //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
@@ -254,18 +259,25 @@ namespace PCRCaculator
                 skillActionDescribe_cn = allData.skillActionDescribe_cn;
             }
             */
-
+            if (Version.BossVersionCN == 0 || Version.useLatestProd == true)
+            {
+                await SendPostRequestAsync(() =>
+                {
+                    Version.useQA = false;
+                    Version.BossVersionCN = long.Parse(truthVersion);
+                    SaveManager.Save(Version);
+                });
+            }
 #if UNITY_ANDROID
             var loadsql =
                 new WWW("jar:file://" + ABExTool.dataPath + "!/assets/" + "dbdiff.sql");  // this is the path to your StreamingAssets in android
             while (!loadsql.isDone) { }
             var sql = Encoding.UTF8.GetString(loadsql.bytes);
 #else
-                var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
-                var sql = File.ReadAllText(patchFile);
+            var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
+            var sql = File.ReadAllText(patchFile);
 #endif
             SQLiteTool.sql = sql;
-
             try
             {
                 ABExTool.StaticInitialize().Wait();
@@ -278,7 +290,7 @@ namespace PCRCaculator
             }
 
             var tasks = new List<Task>();
-            
+
 
             var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
             var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
@@ -294,8 +306,8 @@ namespace PCRCaculator
 
             tasks.Add(
                 Task.WhenAll(
-                        dbTool.ParallelGetAll(), 
-                        ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask, 
+                        dbTool.ParallelGetAll(),
+                        ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask,
                         dbTool3.ParallelGetAll())
                     .ContinueWith(_ =>
                     {
@@ -324,7 +336,7 @@ namespace PCRCaculator
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
-                        
+
                         var (unitStoryDic2, unitStoryEffectDic2, unitStoryLoveDic2) = dbTool2.Pair;
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
@@ -363,7 +375,7 @@ namespace PCRCaculator
                                     Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                     Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                     Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
-                                    // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
+                                // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
                                 );
 
                             var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701).ToList();
@@ -400,7 +412,7 @@ namespace PCRCaculator
                             skillDataDic.TryAdd(dbCN.Dic3);
                             skillActionDic.TryAdd(dbCN.Dic4);
                             allUnitAttackPatternDic.TryAdd(dbCN.Dic5);
-    
+
                             unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
                             unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
@@ -422,7 +434,7 @@ namespace PCRCaculator
 
             Debug.LogError($"读取DB失败！{ex.Message}");*/
 
-            
+
             //LoadPlayerSettings();
             //string prefabData = unitPrefabData.text;
             //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
@@ -430,7 +442,7 @@ namespace PCRCaculator
             //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
-            
+
             string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
             allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
@@ -439,7 +451,7 @@ namespace PCRCaculator
             //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
             //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
-            
+
             //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
             //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
             //
@@ -447,7 +459,7 @@ namespace PCRCaculator
             unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
             unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
             string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
-            
+
             if (!string.IsNullOrEmpty(firearmStr))
                 firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
 
@@ -543,13 +555,13 @@ namespace PCRCaculator
                 windowmassageIE = StartCoroutine(WindowMessage_start(word));
             }
         }
-        public void WindowConfigMessage(string word, SystemWindowMessage.configDelegate configDelegate,SystemWindowMessage.configDelegate cancelDelegate = null)
+        public void WindowConfigMessage(string word, SystemWindowMessage.configDelegate configDelegate, SystemWindowMessage.configDelegate cancelDelegate = null)
         {
             GameObject a = Instantiate(SystemWindowMessagePerferb);
-            a.transform.SetParent(LatestUIback.transform,false);
+            a.transform.SetParent(LatestUIback.transform, false);
             a.transform.localPosition = new Vector3();
             a.transform.localScale = new Vector3(1, 1, 1);
-            a.GetComponent<SystemWindowMessage>().SetWindowMassage(word, configDelegate,cancelDelegate);
+            a.GetComponent<SystemWindowMessage>().SetWindowMassage(word, configDelegate, cancelDelegate);
         }
         public SystemWindowMessage WindowAsyncMessage(string word, SystemWindowMessage.configDelegate configDelegate = null, SystemWindowMessage.configDelegate cancelDelegate = null)
         {
@@ -561,19 +573,19 @@ namespace PCRCaculator
             b.SetWindowMassage(word, configDelegate, cancelDelegate);
             return b;
         }
-        public void WindowInputMessage(string helpword,Action<string> finishAction,Action cancelAction = null)
+        public void WindowInputMessage(string helpword, Action<string> finishAction, Action cancelAction = null)
         {
             GameObject a = Instantiate(SystemInputPrefab);
             a.transform.SetParent(LatestUIback.transform, false);
             a.transform.localPosition = new Vector3();
             a.transform.localScale = new Vector3(1, 1, 1);
-            a.GetComponent<SystemWindowMessage>().SetWindowInputMassage(helpword,finishAction,cancelAction);
+            a.GetComponent<SystemWindowMessage>().SetWindowInputMassage(helpword, finishAction, cancelAction);
         }
         private IEnumerator WindowMessage_start(string word)
         {
             GameObject a = Instantiate(MassagePerferb);
             a.transform.SetParent(LatestUIback.transform);
-            a.transform.localPosition = new Vector3(0,-150,0);
+            a.transform.localPosition = new Vector3(0, -150, 0);
             a.transform.localScale = new Vector3(1, 1, 1);
             a.GetComponentInChildren<Text>().text = word;
             yield return new WaitForSecondsRealtime(1.5f);
@@ -619,7 +631,7 @@ namespace PCRCaculator
             playerdata = PlayerDataForBattle;
             enemydata = EnemyDataForBattle;
         }
-        public void ChangeSceneToBalttle(List<int> my, AddedPlayerData other,bool isAutoMode = true,bool forceAutoMode = true)
+        public void ChangeSceneToBalttle(List<int> my, AddedPlayerData other, bool isAutoMode = true, bool forceAutoMode = true)
         {
             List<UnitData> d1 = new List<UnitData>();
             foreach (int id in my)
@@ -782,12 +794,12 @@ namespace PCRCaculator
             }
             catch (Exception ex)
             {
-                WindowConfigMessage("初始化存档文件时出现异常:" + ex.Message,null);
+                WindowConfigMessage("初始化存档文件时出现异常:" + ex.Message, null);
             }
         }
         IEnumerator LoadScene()
         {
-            GameObject a = IsGuildBattle?Instantiate(LoadingPagePrefab_2): Instantiate(LoadingPagePrefab);
+            GameObject a = IsGuildBattle ? Instantiate(LoadingPagePrefab_2) : Instantiate(LoadingPagePrefab);
             a.transform.SetParent(LatestUIback.transform);
             a.transform.localScale = new Vector3(1, 1, 1);
             a.GetComponent<RectTransform>().offsetMax = new Vector2(5, 5);
@@ -810,7 +822,7 @@ namespace PCRCaculator
             sw.Close();
         }
 
-        public string LoadJsonDatas(string path,bool forceStreaming = true)
+        public string LoadJsonDatas(string path, bool forceStreaming = true)
         {
             string filePath = GetSaveDataPath() + "/" + path + ".json";
 #if PLATFORM_ANDROID
@@ -825,7 +837,7 @@ namespace PCRCaculator
 
         public WaitUI OpenWaitUI()
         {
-            GameObject p = Instantiate(WaitingPrefab, GameObject.Find("Canvas")?.transform);
+            GameObject p = Instantiate(LoadingPagePrefab, GameObject.Find("Canvas")?.transform);
             return p.GetComponent<WaitUI>();
         }
         public static Sprite LoadSourceSprite(string relativePath)
@@ -860,7 +872,7 @@ namespace PCRCaculator
         /// <param name="encryptString">待加密的字符串</param>
         /// <param name="encryptKey">加密密钥,要求为8位</param>
         /// <returns>加密成功返回加密后的字符串，失败返回源串 </returns>
-        public static string EncryptDES(string encryptString, string encryptKey = "PCRGuild")  
+        public static string EncryptDES(string encryptString, string encryptKey = "PCRGuild")
         {
             var ms = new MemoryStream();
             var stream = new GZipStream(ms, CompressionLevel.Optimal);
@@ -922,7 +934,7 @@ namespace PCRCaculator
         public void CreateUnitDetailDic()
         {
             Dictionary<int, UnitDetail_other> dic = new Dictionary<int, UnitDetail_other>();
-            foreach(var unit in UnitRarityDic.Values)
+            foreach (var unit in UnitRarityDic.Values)
             {
                 dic.Add(unit.unitId, new UnitDetail_other(unit.unitId, unit.detailData.searchAreaWidth, GetUnitNickName(unit.unitId)));
             }
@@ -941,11 +953,44 @@ namespace PCRCaculator
         {
             return 0;
         }
-        public int GetMotionType(int unitid,int skinid)
+        public int GetMotionType(int unitid, int skinid)
         {
             if (skinid == 170361 || unitid == 170301)
                 return 34;
             return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
+        }
+        public async Task SendPostRequestAsync(Action onComplete)
+        {
+            using UnityWebRequest www = new UnityWebRequest(Url, UnityWebRequest.kHttpVerbPOST);
+            byte[] formdata = new System.Text.UTF8Encoding().GetBytes("{\"regionCode\":\"cn\"}");
+
+            // 设置请求头部
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.uploadHandler = new UploadHandlerRaw(formdata);
+            www.downloadHandler = new DownloadHandlerBuffer();
+
+            // 使用 TaskCompletionSource 包装 UnityWebRequest
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            www.SendWebRequest().completed += (AsyncOperation op) =>
+            {
+                if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError("Error: " + www.error);
+                    truthVersion = "获取失败（重试）";
+                }
+                else
+                {
+                    var responseText = www.downloadHandler.text;
+                    var response = JsonConvert.DeserializeObject<ApiResponse>(responseText);
+                    // 输出truthVersion
+                    truthVersion = response.data.truthVersion;
+                }
+                onComplete?.Invoke();
+                tcs.SetResult(true);
+            };
+
+            // 等待任务完成
+            await tcs.Task;
         }
     }
     public class UnitData_other

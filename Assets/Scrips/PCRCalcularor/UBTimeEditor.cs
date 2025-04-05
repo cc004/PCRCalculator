@@ -4,6 +4,7 @@ using Elements.Battle;
 using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 namespace PCRCaculator
 {
     public class UBTimeEditor : MonoBehaviour
@@ -18,7 +19,7 @@ namespace PCRCaculator
             groupData = data;
             Set(data.UBExecTimeData);
             var playerUnits = MyGameCtrl.Instance.playerUnitCtrl;
-            var i=1;
+            var i = 1;
             foreach (var unit in playerUnits)
             {
                 characterTexts[i].text = unit.UnitName;
@@ -26,7 +27,7 @@ namespace PCRCaculator
                 if (i > 5) return;
             }
 
-    }
+        }
         public void Save()
         {
             groupData.UBExecTimeData.Clear();
@@ -79,6 +80,11 @@ namespace PCRCaculator
         public void Exit()
         {
             Destroy(gameObject);
+        }
+        public void AddUBTime(int i)
+        {
+            float max_value = UnitUBTimes.SelectMany(ubTime => ubTime.inputField.text.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s)).Select(float.Parse).DefaultIfEmpty(100)).Max();
+            UnitUBTimes[i].inputField.text += $"\n{max_value + 0.001:F3}";
         }
     }
 }
