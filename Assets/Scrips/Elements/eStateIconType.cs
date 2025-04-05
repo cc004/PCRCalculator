@@ -309,22 +309,25 @@ namespace Elements
     [Description("春月sk1标记")]
     MITSUKI_NY_CARVED_SEAL,
 		// Token: 0x0400885B RID: 34907
-		BLACK_FRAME,
-		// Token: 0x0400885C RID: 34908
-		UNABLE_STATE_GUARD,
-		// Token: 0x0400885D RID: 34909
+	BLACK_FRAME,
+	// Token: 0x0400885C RID: 34908
+	UNABLE_STATE_GUARD,
+	// Token: 0x0400885D RID: 34909
     [Description("羁绊之证\n513-ub")]
-		MUIMI_ANNIVERSARY_CARVED_SEAL,
+	MUIMI_ANNIVERSARY_CARVED_SEAL,
     // Token: 0x0400885E RID: 34910
     [Description("PSI★蓄力\n美空sp1")]
     MISORA_CARVED_SEAL,
-		// Token: 0x0400885F RID: 34911
-		EX_PASSIVE_1 = 999,
-		[Description("重叠加速")]
-		SPEED_OVERLAP,
-		// Token: 0x04008860 RID: 34912
-		NUM,
-		// Token: 0x04008861 RID: 34913
-		INVALID_VALUE = -1
+	[Description("飞行")]
+	FLIGHT = 132,
+	DJEETA_WITCH = 133,
+	// Token: 0x0400885F RID: 34911
+	EX_PASSIVE_1 = 999,
+	[Description("重叠加速")]
+	SPEED_OVERLAP,
+	// Token: 0x04008860 RID: 34912
+	NUM,
+	// Token: 0x04008861 RID: 34913
+	INVALID_VALUE = -1
 	}
 }

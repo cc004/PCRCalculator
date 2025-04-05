@@ -836,6 +836,14 @@ namespace Elements
                     IconType = eStateIconType.BLACK_FRAME,
                     IsBuff = true
                 }
+            },
+            {
+                UnitCtrl.eAbnormalState.FLIGHT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.FLIGHT,
+                    IsBuff = true
+                }
             }
         };
 
