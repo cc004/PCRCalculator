@@ -13,7 +13,9 @@ namespace Elements
 		HEX,
 		COMPENSATION,
 		POISON2,
-		CURSE2
+		CURSE2,
+		BLACK_FRAME,
+		WORLD_LIGHTNING,
 	}
 	public class DamageByBehaviourAction : ActionParameter
 	{
@@ -22,13 +24,17 @@ namespace Elements
 			{
 				eSlipDamageType.POISON,
 				UnitCtrl.eAbnormalState.POISON_BY_BEHAVIOUR
+			},
+			{
+				eSlipDamageType.WORLD_LIGHTNING,
+				UnitCtrl.eAbnormalState.WORLD_LIGHTNING
 			}
 		};
 
 		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || ActionDetail1 == (int)eSlipDamageType.WORLD_LIGHTNING) // TODO add world lighting hit
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);
 				_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)base.ActionDetail1], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], (float)_valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f);

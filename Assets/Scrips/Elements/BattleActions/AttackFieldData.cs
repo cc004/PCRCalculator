@@ -45,9 +45,23 @@ namespace Elements
             {
                 if (TargetList[index].Owner.CurrentState != UnitCtrl.ActionState.DIE)
                 {
+                    float receiveDamagePrecent = 0f;
+                    float damageUpPrecent = 0f;
+                    switch (DamageType)
+                    {
+                        case DamageData.eDamageType.ATK:
+                            receiveDamagePrecent = (float)TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100f;
+                            damageUpPrecent = (float)TargetList[index].Owner.PhysicalDamageUpPercentOrMin / 100f; 
+                            break;
+                        case DamageData.eDamageType.MGC:
+                            receiveDamagePrecent = (float)TargetList[index].Owner.MagicReceiveDamagePercentOrMin / 100f;
+                            damageUpPrecent = (float)TargetList[index].Owner.MagicDamageUpPercentOrMin / 100f;
+                            break;
+                    }
+
                     DamageData damageData = new DamageData();
                     damageData.Target = TargetList[index];
-                    damageData.Damage = BattleUtil.FloatToInt(Value);
+                    damageData.Damage = BattleUtil.FloatToInt(Value * receiveDamagePrecent * damageUpPrecent);
                     damageData.DamageType = DamageType;
                     damageData.Source = PPOJKIDHGNJ;
                     damageData.ActionType = eActionType.ATTACK_FIELD;

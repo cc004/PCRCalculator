@@ -301,6 +301,16 @@ namespace Elements
                             owner.AdditionalMagicReceiveDamagePercent = (int)(owner.AdditionalMagicReceiveDamagePercent - _value);
                             break;
                         }
+                    case UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT:
+                        {
+                            owner.AdditionalPhysicalDamageUpPercent = (int)(owner.AdditionalPhysicalDamageUpPercent + _value);
+                            break;
+                        }
+                    case UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT:
+                        {
+                            owner.AdditionalMagicDamageUpPercent = (int)(owner.AdditionalMagicDamageUpPercent + _value);
+                            break;
+                        }
                     case UnitCtrl.BuffParamKind.MAX_HP:
                         if (Owner.MaxHp + (long)_value > 0L)
                         {

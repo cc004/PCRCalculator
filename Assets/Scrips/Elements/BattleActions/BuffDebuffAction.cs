@@ -17,6 +17,8 @@ namespace Elements
         private const int UNDESPELABLE_NUMBER = 2;
         private const int DETAIL_DIGIT = 10;
         private const int DETAIL_DEBUFF = 1;
+        public int ENVIRONMENTID { get; set; }
+
 
         public override void ExecActionOnStart(
           Skill _skill,
@@ -93,7 +95,9 @@ namespace Elements
                 changeParamKind != UnitCtrl.BuffParamKind.MAX_HP &&
                 changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT &&
                 changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT &&
-                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT)
+                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT &&
+                changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT &&
+                changeParamKind != UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT) // TODO check whether this is correct of up precent
             {
                 for (int index = 0; index < _target.Owner.BossPartsListForBattle.Count; ++index)
                     dictionary.Add(_target.Owner.BossPartsListForBattle[index], CalculateBuffDebuffParam(_target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
@@ -104,6 +108,106 @@ namespace Elements
             //_target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
             _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId,action);
 
+        }
+
+        public static float GetBuffDebuffValueForCurrentValuePercentage(
+            BasePartsData target,
+            float value,
+            UnitCtrl.BuffParamKind kind)
+        {
+            if (target == null)
+                return 0f;
+
+            float ratio = value / 100f;
+            float baseStat = 0f;
+
+            var owner = target.Owner;
+
+            switch (kind)
+            {
+                case UnitCtrl.BuffParamKind.ATK:
+                    baseStat = target.GetAtkZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.DEF:
+                    baseStat = target.GetDefZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.MAGIC_STR:
+                    baseStat = target.GetMagicStrZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.MAGIC_DEF:
+                    baseStat = target.GetMagicDefZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.DODGE:
+                    if (owner != null)
+                        baseStat = owner.DodgeZero;
+                    break;
+
+                case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL:
+                    baseStat = target.GetPhysicalCriticalZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.MAGIC_CRITICAL:
+                    baseStat = target.GetMagicCriticalZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE:
+                    if (owner != null)
+                        baseStat = owner.EnergyRecoveryRateZero;
+                    break;
+
+                case UnitCtrl.BuffParamKind.LIFE_STEAL:
+                    baseStat = target.GetLifeStealZero();
+                    break;
+
+                case UnitCtrl.BuffParamKind.MOVE_SPEED:
+                    if (owner != null)
+                        baseStat = owner.MoveSpeedZero;
+                    break;
+
+                case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE:
+                    if (owner != null)
+                        baseStat = owner.PhysicalCriticalDamageRateOrMin;
+                    break;
+
+                case UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE:
+                    if (owner != null)
+                        baseStat = owner.MagicCriticalDamageRateOrMin;
+                    break;
+
+                case UnitCtrl.BuffParamKind.ACCURACY:
+                    if (owner != null)
+                        baseStat = owner.AccuracyZero;
+                    break;
+
+                case UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE:
+                    if (owner != null)
+                        baseStat = owner.ReceiveCriticalDamageRateOrMin;
+                    break;
+
+                case UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT:
+                    if (owner != null)
+                        baseStat = owner.PhysicalDamageUpPercentOrMin;
+                    break;
+
+                case UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT:
+                    if (owner != null)
+                        baseStat = owner.MagicDamageUpPercentOrMin;
+                    break;
+
+                case UnitCtrl.BuffParamKind.MAX_HP:
+                    if (owner != null)
+                        baseStat = (float) owner.MaxHp;
+                    break;
+
+                default:
+                    return 0f;
+            }
+
+            return ratio * baseStat;
         }
 
         public static FloatWithEx CalculateBuffDebuffParam(
@@ -176,10 +280,19 @@ namespace Elements
                         case UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT:
                             f = (float)(int)_target.Owner.StartMagicReceiveDamagePercent * num1;
                             break;
+                        case UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT:
+                            f = (float)(int)_target.Owner.StartPhysicalDamageUpPercent * num1;
+                            break;
+                        case UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT:
+                            f = (float)(int)_target.Owner.StartMagicDamageUpPercent * num1;
+                            break;
                         case UnitCtrl.BuffParamKind.MAX_HP:
                             f = (long)_target.Owner.StartMaxHP * num1;
                             break;
                     }
+                    break;
+                case eChangeParameterType.CURRENT_VALUE_PERCENTAGE:
+                    f = GetBuffDebuffValueForCurrentValuePercentage(_target, _value, _targetChangeParamKind);
                     break;
             }
 
@@ -215,6 +328,7 @@ namespace Elements
         {
             FIXED = 1,
             PERCENTAGE = 2,
+            CURRENT_VALUE_PERCENTAGE = 3,
         }
 
         public enum eBuffDebuffStartReleaseType

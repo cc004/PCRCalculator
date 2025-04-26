@@ -239,9 +239,10 @@ namespace Elements
             FloatWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
             FloatWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
             float num6 = 0f;
-            num6 = ((!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f));
-            num4 = BattleUtil.FloatToInt(num4 * num6);
-            num5 = BattleUtil.FloatToInt(num5 * num6);
+            float damageUpPrecent = (_isPhysicalForTarget ? _target.Owner.PhysicalDamageUpPercentOrMin : _target.Owner.MagicDamageUpPercentOrMin) / 100f;
+            num6 = (!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f);
+            num4 = BattleUtil.FloatToInt(num4 * num6 * damageUpPrecent);
+            num5 = BattleUtil.FloatToInt(num5 * num6 * damageUpPrecent);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 value.DamagedCount++;

@@ -1312,8 +1312,12 @@ namespace Elements
           float _starttime,
           bool _first = false,
           bool _boneCount = true,
-          bool _ignoreCancel = false)
+          bool _ignoreCancel = false,
+          BasePartsData _protectedTarget = null // seems not use in clan battle
+          )
         {
+            // if (_target.Owner.ProtectionTargetData != null)
+                // _target.Owner.ProtectionTargetData.DisableIfOwnerDead();
             // temporary fix for log barrier skill
             if (_action is LogBarrierAction)
                 _action.ExecTime = new[] { 0f };
@@ -1353,7 +1357,7 @@ namespace Elements
                 battleManager.CallbackActionEnd(actionIndivisualId);
                 break;
             label_17:
-                ExecAction(_action, _skill, _target, i, time);
+                ExecAction(_action, _skill, _target, i, time, false, _protectedTarget, false);
                 if ((_action.ActionType != eActionType.CONTINUOUS_ATTACK || _action.ActionDetail1 != 3) && (_action.ActionType != eActionType.MODE_CHANGE || _action.ActionDetail1 == 3))
                 {
                     _target.Owner.ActionsTargetOnMe.Remove(actionIndivisualId);
@@ -1373,7 +1377,10 @@ namespace Elements
           Skill skill,
           BasePartsData target,
           int num,
-          float starttime, bool _execChildNoFrame = false)
+          float starttime, 
+          bool _execChildNoFrame = false,
+          BasePartsData _protectedTarget = null, 
+          bool _ignoreProtect = false) 
         {
             Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
 
@@ -1397,8 +1404,10 @@ namespace Elements
                 action.ExecAction(this.Owner, target, num, this, skill, starttime, dictionary, _valueDictionary);
             }*/
             //change start
+            BasePartsData currentTarget = target;
+            bool hasProtected = _protectedTarget != null;
             bool isResisted = target.ResistStatus(action.ActionType, action.ActionDetail1, Owner, _last, _targetOneParts, target);
-            bool exec = !isResisted && action.JudgeIsAlreadyExeced(target.Owner, num);
+            bool exec = !isResisted && (hasProtected || action.JudgeIsAlreadyExeced(target.Owner, num));
             UnitActionExecData actionExecData = new UnitActionExecData();
             actionExecData.execTime = BattleHeaderController.CurrentFrameCount;
             actionExecData.describe = action.sortinfo;//"执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
@@ -1408,6 +1417,8 @@ namespace Elements
             actionExecData.targetNames = new List<string> { target.Owner.UnitName };
             if (exec)
             {
+                if (hasProtected)
+                    action.SkipAppendIsAlreadyExeced = true;
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 if (!battleManager.skipping)
@@ -1447,7 +1458,7 @@ namespace Elements
                 return;
             if (!action.HitOnceDic.ContainsKey(target))
             {
-                ExecChildrenAction(action, skill, target, num, starttime, dictionary, _execChildNoFrame);
+                ExecChildrenAction(action, skill, target, num, starttime, dictionary, _execChildNoFrame, _protectedTarget);
             }
             else
             {
@@ -1484,7 +1495,9 @@ namespace Elements
           BasePartsData target,
           int num,
           float starttime,
-          Dictionary<int, bool> enabledChildAction, bool _execNoFrame)
+          Dictionary<int, bool> enabledChildAction, 
+          bool _execNoFrame,
+          BasePartsData protectedTarget = null)
         {
             int index = 0;
             for (int count = action.ActionChildrenIndexes.Count; index < count; ++index)
@@ -1493,7 +1506,21 @@ namespace Elements
                 //if ((skill.ActionParameters[actionChildrenIndex].ActionType != eActionType.MODE_CHANGE || skill.ActionParameters[actionChildrenIndex].ActionDetail1 != 3) && (!enabledChildAction.ContainsKey(skill.ActionParameters[actionChildrenIndex].ActionId) || enabledChildAction[skill.ActionParameters[actionChildrenIndex].ActionId]) && (action.ActionType != eActionType.ATTACK || num == action.ExecTime.Length - 1))
                 //    AppendCoroutine(ExecActionWithDelayAndTarget(skill.ActionParameters[actionChildrenIndex], skill, target, starttime), ePauseType.SYSTEM, skill.BlackOutTime > 0.0 ? Owner : null);
                 ActionParameter actionParameter = skill.ActionParameters[action.ActionChildrenIndexes[index]];
-                if ((actionParameter.ActionType == eActionType.MODE_CHANGE && actionParameter.ActionDetail1 == 3) || (enabledChildAction.ContainsKey(actionParameter.ActionId) && !enabledChildAction[actionParameter.ActionId]) || (action.ActionType == eActionType.ATTACK && num != action.ExecTime.Length - 1))
+
+                if (protectedTarget != null)
+                {
+                    bool protectEnabled = SkillDefine.ProtectEnableDic.TryGetValue(actionParameter.ActionType, out bool ok) && ok;
+                    if (protectEnabled)
+                    {
+                    }
+                    else
+                    {
+                        protectedTarget = null;
+                        target = protectedTarget;
+                    }
+                }
+
+                if ((actionParameter.ActionType == eActionType.MODE_CHANGE && actionParameter.ActionDetail1 == 3) || (enabledChildAction.ContainsKey(actionParameter.ActionId) && !enabledChildAction[actionParameter.ActionId]) || (action.ActionType == eActionType.ATTACK && num != action.ExecTime.Length - 1) || (action.ActionType == eActionType.ENVIRONMENT)) // TODO fix real logic
                 {
                     continue;
                 }
@@ -1502,11 +1529,11 @@ namespace Elements
 
                     if (!_execNoFrame)
                     {
-                        AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
+                        AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime, false, true, false, protectedTarget), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
                         continue;
                     }
                     actionParameter.AppendTargetNum(target.Owner, 0);
-                    ExecAction(actionParameter, skill, target, 0, starttime, true);
+                    ExecAction(actionParameter, skill, target, 0, starttime, true, protectedTarget);
 
                     //AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, target, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
                 }

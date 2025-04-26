@@ -36,5 +36,8 @@ namespace Elements
     public Skill Skill { get; set; }
 
     public UnitCtrl Source { get; set; }
+    public int ActionDetail1 { get; set; }
+    public int ActionDetail2 { get; set; }
+
   }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Guild;
 
@@ -138,12 +139,31 @@ namespace Elements
                         flag = BattleManager.Random(0.0f, 100f, new RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double)ActionDetail1;
                         break;
                     }
-                    if ((base.ActionDetail1 > 600 && base.ActionDetail1 < 700) || base.ActionDetail1 > 6000)
+                    else if ((base.ActionDetail1 > 600 && base.ActionDetail1 < 700) || base.ActionDetail1 > 6000)
                     {
                         eStateIconType eStateIconType = eStateIconType.INVALID_VALUE;
                         eStateIconType = (eStateIconType)((base.ActionDetail1 <= 6000) ? (base.ActionDetail1 - 600) : (base.ActionDetail1 - 6000));
                         flag = _target.Owner.SealDictionary.ContainsKey(eStateIconType) && ((_valueDictinary[eValueNumber.VALUE_3] != 0f) ? ((float)_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() >= _valueDictinary[eValueNumber.VALUE_3]) : (_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() > 0));
                         break;
+                    }
+                    else if ((ActionDetail1 & ~1) == 2000)
+                    {
+                        var filterUnit = new HashSet<UnitCtrl>();
+                        int filterType = (ActionDetail1 == 2000 ? 1 : 2);
+                        for (int index = 0; index < TargetList.Count; ++index)
+                        {
+                            if (TargetList[index].Owner.AtkType == filterType)
+                                filterUnit.Add(TargetList[index].Owner);
+                        }
+                        int threshold = (int)_valueDictinary[eValueNumber.VALUE_3];
+                        if (threshold <= filterUnit.Count)
+                        {
+                            flag = true;
+                        }
+                    }
+                    else if (ActionDetail1 >= 3000)
+                    {
+                        flag = battleManager.ExistsEnvironment(ActionDetail1 - 3000);
                     }
                     else if (base.ActionDetail1 >= 1600)
                     {
