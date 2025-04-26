@@ -1015,7 +1015,7 @@ namespace PCRCaculator.Guild
             List<List<float>> ubExecTime = CreateUBExecTimeData();
             for (int i = 0; i < 5; i++)
             {
-                if (players.Count > i)
+                if (ubExecTime.Count > i && MyGameCtrl.Instance.tempData.UBExecTimeList.Count > i)
                 {
                     if (MyGameCtrl.Instance.tempData.UBExecTimeList[i].Count != ubExecTime[i].Count)
                     {
