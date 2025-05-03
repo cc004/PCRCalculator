@@ -72,6 +72,10 @@ namespace PCRCaculator
             {
                 result += BaseData.CeilToInt(value3.CalcUniqueValue(a.uniqueEqLv));
             }
+            if (a.uniqueEq2Lv > 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipment2DataDic.TryGetValue(a.unitId, out var value4))
+            {
+                result += BaseData.CeilToInt(value4.CalcUniqueValue(a.uniqueEq2Lv));
+            }
 
             return result;
         }
@@ -191,6 +195,14 @@ namespace PCRCaculator
                     if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out var equipmentData))
                     {
                         d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv));
+                    }
+                }
+                //计算专武2加成
+                if (a.uniqueEq2Lv > 0 && unitId <= 200000)
+                {
+                    if (MainManager.Instance.UniqueEquipment2DataDic.TryGetValue(a.unitId, out var equipmentData))
+                    {
+                        d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEq2Lv));
                     }
                 }
 
@@ -520,6 +532,7 @@ namespace PCRCaculator
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
+        public int uniqueEq2Lv;//专武2等级
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
         public bool fav = false;
@@ -578,7 +591,7 @@ namespace PCRCaculator
             skillLevel = new int[4] { lv, lv, lv, lv };
         }
 
-        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null,int uniqueeqlv = 0)
+        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null,int uniqueeqlv = 0, int uniqueeq2lv = 0)
         {
             unitId = id;
             level = lv;
@@ -596,6 +609,7 @@ namespace PCRCaculator
                 }
             }
             uniqueEqLv = uniqueeqlv;
+            uniqueEq2Lv = uniqueeq2lv;
         }
 
         public void SetMax(bool equip_second_full = false)
@@ -629,6 +643,7 @@ namespace PCRCaculator
                 }
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
+                uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
             }
             else
             {
@@ -649,7 +664,7 @@ namespace PCRCaculator
         /// <returns></returns>
         public UnitData Copy()
         {
-            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel,playLoveDic,uniqueEqLv);
+            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel,playLoveDic,uniqueEqLv,uniqueEq2Lv);
         }
         /// <summary>
         /// 比较相同角色是否有所提升
@@ -760,6 +775,14 @@ namespace PCRCaculator
             result = uniqueEqLv.ToString();
           return result;
         }
+
+        public string GetUniqueEq2LvDescribe()
+        {
+          string result = "无";
+          if (uniqueEq2Lv > 0)
+            result = uniqueEq2Lv.ToString();
+          return result;
+        }
     public string GetLevelDescribe()
         {
             string result = "" + level;
@@ -778,6 +801,8 @@ namespace PCRCaculator
                 li[0] = skillLevel[0];
             if (uniqueEqLv > 0)
                 li[1] = skillLevel[1];
+            if (uniqueEq2Lv > 0)
+                li[2] = skillLevel[2];
 
             return li;
         }
@@ -802,6 +827,7 @@ namespace PCRCaculator
                 hashCode = (hashCode * 397) ^ skillLevel[2];
                 hashCode = (hashCode * 397) ^ skillLevel[3];
                 hashCode = (hashCode * 397) ^ uniqueEqLv;
+                hashCode = (hashCode * 397) ^ uniqueEq2Lv;
                 hashCode = (hashCode * 397) ^ exEquip[0];
                 hashCode = (hashCode * 397) ^ exEquip[1];
                 hashCode = (hashCode * 397) ^ exEquip[2];
@@ -952,12 +978,16 @@ namespace PCRCaculator
             }
             int rarity = unitData.rarity;
             bool isUnitEquip = unitData.uniqueEqLv > 0;
+            bool isUnitEquip2 = unitData.uniqueEq2Lv > 0;
             int[] li = new int[4] { UB, skill_1, skill_2, EXskill };
             if (rarity >= 5) { li[3] = EXskill_ev; }
             if (rarity == 6 && UB_ev != 0) { li[0] = UB_ev; }
             if (isUnitEquip)
             {
                 li[1] = skill_1_ev == 0 ? li[1] : skill_1_ev;
+            }
+            if (isUnitEquip2)
+            {
                 li[2] = skill_2_ev == 0 ? li[2] : skill_2_ev;
             }
             return li;
@@ -1871,6 +1901,10 @@ namespace PCRCaculator
             if (unit.uniqueEqLv>0)
             {
                 pow += skillLevel[1] * 2 + 100;
+            }
+            if (unit.uniqueEq2Lv>0)
+            {
+                pow += skillLevel[2] * 2 + 100;
             }
             if (unit.rarity >= 6)
             {

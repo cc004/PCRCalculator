@@ -1517,6 +1517,8 @@ namespace PCRCaculator.Guild
 
                 }
 
+                // HUSH TODO Unique2
+
                 if (templateSettings[$"角色{(i + 1)}头像"] != null)
                 {
                     var arr = templateSettings[$"角色{(i + 1)}头像"].Split(',').Select(int.Parse).ToArray();

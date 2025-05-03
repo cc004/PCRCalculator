@@ -151,6 +151,7 @@ namespace ExcelHelper
                     data.equipLevel = chara["equip_slot"]
                         .Select(e => (int) e["is_slot"] == 1 ? (int) e["enhancement_level"] : -1).ToArray();
                     data.uniqueEqLv = chara["unique_equip_slot"].SingleOrDefault()?.Value<int>("enhancement_level") ?? 0;
+                    // HUSH TODO Unique2
                     data.skillLevel = new[]
                     {
                         ((JArray) chara["union_burst"]).Count > 0 ? chara["union_burst"][0] : null,
@@ -217,6 +218,7 @@ namespace ExcelHelper
                                         : (int) t["battle_rarity"],
                                     rank = (int) t["rank"],
                                     uniqueEqLv = (int) t["unique"]
+                                    // HUSH TODO Unique2
                                 };
                                 foreach (var key in unit.playLoveDic.Keys.ToArray())
                                 {
@@ -454,6 +456,7 @@ namespace ExcelHelper
             });
             string unitsLove = JsonConvert.SerializeObject(info.playLoveDic);
             return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|000|{unitsLove}";
+            // HUSH TODO Unique2
         }
 
         private static string ToTime(long time, int limit)
@@ -1090,6 +1093,7 @@ namespace ExcelHelper
                         worksheet1.Cells[lineNum, 13 + i].Value = unitData.skillLevel[i];
                     }
                     worksheet1.Cells[lineNum, 17].Value = unitData.uniqueEqLv;
+                    // HUSH TODO Unique2
                     for (int i = 0; i < 3; i++)
                     {
                         worksheet1.Cells[lineNum, 18 + i * 2].Value = unitData.exEquip[i];

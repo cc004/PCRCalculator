@@ -242,6 +242,7 @@ namespace PCRCaculator
             equipmentLevelSliders[7].maxValue = MainManager.Instance.PlayerSetting.maxUniqueEqLv;
             equipmentLevelSliders[7].value = unit.uniqueEqLv;
             equipmentLevelTexts[7].text = "" + unit.uniqueEqLv;
+            // HUSH TODO Unique2
         }
         private void SetSkills()
         {
@@ -390,6 +391,7 @@ namespace PCRCaculator
             UnitData newdata = new UnitData(unitId, (int)detailSetSliders[0].value, (int)detailSetSliders[1].value,
                 (int)detailSetSliders[2].value, (int)equipmentLevelSliders[0].value, eqlv, sklv);
             newdata.uniqueEqLv = (int)equipmentLevelSliders[7].value;
+            // HUSH TODO Unique2
             MainManager.Instance.unitDataDic[unitId] = newdata;
         }
         public void OnDropDownChanged()

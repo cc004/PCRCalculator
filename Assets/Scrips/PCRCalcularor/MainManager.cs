@@ -65,6 +65,7 @@ namespace PCRCaculator
         private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
         private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
+        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
         public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
         private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
@@ -338,6 +339,7 @@ namespace PCRCaculator
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
+                        UniqueEquipment2DataDic = dbTool.Dic92;
 
                         unitStoryEffectDic2 = dbTool2.Pair.Item2;
                         unitName_cn = dbTool3.Dic10;
@@ -371,6 +373,7 @@ namespace PCRCaculator
                                     Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3,
                                         k => k > 2000000 && k < 4000000)),
                                     Task.Run(() => UniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
+                                    Task.Run(() => UniqueEquipment2DataDic.OverrideWith(dbTool2.Dic92)),
                                     Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4,
                                         k => k > 200000000 && k < 400000000)),
                                     Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
@@ -382,6 +385,7 @@ namespace PCRCaculator
 
                             var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701).ToList();
                             var filteredUniqueEquipment = dbTool3.Dic9.Where(p => p.Key / 10000 == 17).ToList();
+                            var filteredUniqueEquipment2 = dbTool3.Dic92.Where(p => p.Key / 10000 == 17).ToList();
                             var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
                             var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
                             var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
@@ -389,6 +393,7 @@ namespace PCRCaculator
                             Task.WaitAll(
                                 Task.Run(() => unitRarityDic.OverrideWith(filteredUnitRarity)),
                                 Task.Run(() => UniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment)),
+                                Task.Run(() => UniqueEquipment2DataDic.OverrideWith(filteredUniqueEquipment2)),
                                 Task.Run(() => skillDataDic.OverrideWith(filteredSkillData)),
                                 Task.Run(() => skillActionDic.OverrideWith(filteredSkillAction)),
                                 Task.Run(() =>
@@ -695,6 +700,10 @@ namespace PCRCaculator
         public bool JudgeWeatherAllowUniqueEq(int unitid)
         {
             return UniqueEquipmentDataDic.ContainsKey(unitid);
+        }
+        public bool JudgeWeatherAllowUniqueEq2(int unitid)
+        {
+            return UniqueEquipment2DataDic.ContainsKey(unitid);
         }
         public string GetUnitNickName(int unitid)
         {

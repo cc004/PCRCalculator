@@ -4925,6 +4925,7 @@ namespace Elements.Battle
                     PCRCaculator.UnitData ownerData = _summonData.Owner.unitData;
                     unitData_my = new PCRCaculator.UnitData(_summonData.SummonId, _summonData.Skill.Level,ownerData.rarity,ownerData.rank);
                     unitData_my.uniqueEqLv = ownerData.uniqueEqLv;
+                    unitData_my.uniqueEq2Lv = ownerData.uniqueEq2Lv;
                     parameter = TempData.CreateUnitParameter(unitData_my);
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;

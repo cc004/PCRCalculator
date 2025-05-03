@@ -434,6 +434,7 @@ namespace PCRCaculator
       {
         data.uniqueEqLv = (int)detailSliders_setting[14].value;
       }
+      // HUSH TODO Unique2
 
       if (data.rank < 2) data.skillLevel[1] = 0;
       if (data.rank < 4) data.skillLevel[2] = 0;
@@ -441,6 +442,10 @@ namespace PCRCaculator
       {
         data.skillLevel[3] = 0;
         data.uniqueEqLv = 0;
+      }
+      if (data.uniqueEqLv == 0)
+      {
+        data.uniqueEq2Lv = 0;
       }
 
       if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
@@ -718,6 +723,26 @@ namespace PCRCaculator
         detailSliders_setting[14].interactable = false;
         detailButtons_setting[0].interactable = false;
         detailButtons_setting[1].interactable = false;
+      }
+
+      if (MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId))
+      {
+        // HUSH TODO Unique2 fix index
+        detailTexts_setting[].text = data.uniqueEq2Lv + "";
+        detailSliders_setting[].maxValue = 5;
+        detailSliders_setting[].value = data.uniqueEq2Lv;
+        detailSliders_setting[].interactable = true;
+        detailButtons_setting[].interactable = true;
+        detailButtons_setting[].interactable = true;
+      }
+      else
+      {
+        detailTexts_setting[].text = "null";
+        detailSliders_setting[].maxValue = 0;
+        detailSliders_setting[].value = 0;
+        detailSliders_setting[].interactable = false;
+        detailButtons_setting[].interactable = false;
+        detailButtons_setting[].interactable = false;
       }
 
       // ex equip
