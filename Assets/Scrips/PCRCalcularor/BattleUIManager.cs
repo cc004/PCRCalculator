@@ -110,7 +110,6 @@ namespace PCRCaculator.Battle
         public Button changeBattlePanel;
         private Dictionary<KeyCode, Action> inputActions;
         private Dictionary<KeyCode, int> keyToValue;
-        public List<Sprite> EnvironmentSprites;
         public GameObject EnvironmentUI;
 
         private void Awake()

@@ -56,6 +56,10 @@ namespace PCRCaculator.Guild
         public Text totalDamageText;
         public Text currentSeedText;
         public ScrollRect skillScrollRect;
+        public float zoomSpeed = 0.1f;        // 缩放速度
+        public float minZoom = 0.5f;          // 最小缩放比例
+        public float maxZoom = 2.0f;          // 最大缩放比例
+        private float currentZoom = 1.0f;     // 当前缩放比例
         public List<Toggle> ModeToggles;
         public GameObject skillGroupPrefab;
         public InputField basedmg;
@@ -88,7 +92,51 @@ namespace PCRCaculator.Guild
         {
             Instance = null;
         }
+        private void Update()
+        {
+            // 检测鼠标滚轮输入
+            if (skillScrollRect.gameObject.activeInHierarchy && 
+                RectTransformUtility.RectangleContainsScreenPoint(
+                    skillScrollRect.GetComponent<RectTransform>(), 
+                    Input.mousePosition))
+            {
+                float scrollDelta = Input.GetAxis("Mouse ScrollWheel");
+                if (scrollDelta != 0)
+                {
+                    // 按住Ctrl键时进行缩放，否则正常滚动
+                    if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+                    {
+                        ZoomScrollRect(scrollDelta);
+                    }
+                }
+            }
+        }
 
+        private void ZoomScrollRect(float delta)
+        {
+            // 计算新的缩放值
+            float newZoom = currentZoom + delta * zoomSpeed;
+            newZoom = Mathf.Clamp(newZoom, minZoom, maxZoom);
+
+            if (newZoom != currentZoom)
+            {
+                // 保存当前的水平位置
+                float horizontalPos = skillScrollRect.horizontalNormalizedPosition;
+
+                // 应用缩放
+                RectTransform content = skillScrollRect.content;
+                Vector3 scale = content.localScale;
+                scale.x = newZoom;
+                scale.y = newZoom;
+                content.localScale = scale;
+
+                // 更新当前缩放值
+                currentZoom = newZoom;
+
+                // 恢复水平位置
+                skillScrollRect.horizontalNormalizedPosition = horizontalPos;
+            }
+        }
         public long GetTotalDamage()
         {
             return totalDamage;

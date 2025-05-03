@@ -517,7 +517,7 @@ namespace PCRCaculator
     {
       isSwitchingRole = true;
       UnitData unit = playerData.playrCharacters[selectedCharacterId_setting];
-      List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic2[unit.unitId];
+      List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unit.unitId];
       for (int i = 0; i < EXsettingSliders.Count; i++)
       {
         EXsettingSliders[i].SetActive(true);
