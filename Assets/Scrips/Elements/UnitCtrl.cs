@@ -6415,21 +6415,18 @@ this.updateCurColor();
             {
                 return;
             }
+            eStateIconType eStateIconType2 = eStateIconType.NONE;
+			if (_showsIcon)
+			{
+				eStateIconType2 = findBuffDebuffIcon(_kind, _isBuff, _additional);
+                if (eStateIconType2 == eStateIconType.NONE)
+                {
+                    Debug.LogError("角色技能图标" + _kind.GetDescription() + "丢失！");
+                }
+			}
 
             extraKey = extraKey ?? _value;
-            BuffDebuffConstData buffDebuff = new BuffDebuffConstData
-            {
-                BuffIcon = eStateIconType.NONE,
-                DebuffIcon = eStateIconType.NONE
-            };
-
-            if (BUFF_DEBUFF_ICON_DIC.TryGetValue(_kind, out var value0))
-            {
-                buffDebuff = value0;
-            }
-            else
-                Debug.LogError("角色技能图标" + _kind.GetDescription() + "丢失！");
-            eStateIconType IDAFJHFJKOL = _isBuff ? buffDebuff.BuffIcon : buffDebuff.DebuffIcon;
+            eStateIconType IDAFJHFJKOL = eStateIconType2;
             OnChangeState.Call(this, IDAFJHFJKOL, _enable);
             string des = "";
             FloatWithEx MainValue = 0;
@@ -6495,6 +6492,20 @@ this.updateCurColor();
             }
             return debuffCounterDictionary[_kind] > 0;
         }
+
+        private eStateIconType findBuffDebuffIcon(BuffParamKind _kind, bool _isBuff, bool _additional)
+        {
+            if (_additional && ADDITIONAL_BUFF_ICON_DIC.TryGetValue(_kind, out var additionalIcon))
+            {
+                return additionalIcon;
+            }
+            if (BUFF_DEBUFF_ICON_DIC.TryGetValue(_kind, out var buffDebuffIcons))
+            {
+                return _isBuff ? buffDebuffIcons.BuffIcon : buffDebuffIcons.DebuffIcon;
+            }
+            return eStateIconType.NONE;
+        }
+
         private Color curColor { get; set; }
 
         //private Dictionary<ChangeColorEffect, Color> curColorChannel { get; set; }
