@@ -434,7 +434,6 @@ namespace PCRCaculator
       {
         data.uniqueEqLv = (int)detailSliders_setting[14].value;
       }
-      RefreshSettingPage();
 
       if (data.rank < 2) data.skillLevel[1] = 0;
       if (data.rank < 4) data.skillLevel[2] = 0;
@@ -453,6 +452,7 @@ namespace PCRCaculator
           data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[15 + i].value, maxStar);
         }
       }
+      RefreshSettingPage();
       RefreshSettingValues();
 
     }
@@ -472,35 +472,52 @@ namespace PCRCaculator
       }
       OnSliderDraged();
     }
+    private void SetMaxLoveForUnit(UnitData unitData)
+    {
+        if (MainManager.Instance.UnitStoryEffectDic2.TryGetValue(unitData.unitId, out var effectUnitList))
+        {
+            foreach (int effectUnitId in effectUnitList)
+            {
+                if (MainManager.Instance.UnitStoryEffectDic2.ContainsKey(effectUnitId) && 
+                    MainManager.Instance.UnitRarityDic.TryGetValue(effectUnitId, out var unitRarityData))
+                {
+                    unitData.playLoveDic[effectUnitId] = unitRarityData.GetMaxLoveLevel();
+                }
+            }
+        }
+    }
     public void SetSelectedUnitSecondMax()
     {
-      playerData.playrCharacters[selectedCharacterId_setting].SetMax(equip_second_full: true);
-      RefreshSettingValues();
-      RefreshSettingPage();
-      MainManager.Instance.WindowMessage("成功！");
+        playerData.playrCharacters[selectedCharacterId_setting].SetMax(equip_second_full: true);
+        SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
+        RefreshSettingValues();
+        RefreshSettingPage();
+        MainManager.Instance.WindowMessage("成功！");
     }
     public void SetSelectedUnitMax()
     {
-      playerData.playrCharacters[selectedCharacterId_setting].SetMax();
-      RefreshSettingValues();
-      RefreshSettingPage();
-      MainManager.Instance.WindowMessage("成功！");
+        playerData.playrCharacters[selectedCharacterId_setting].SetMax();
+        SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
+        RefreshSettingValues();
+        RefreshSettingPage();
+        MainManager.Instance.WindowMessage("成功！");
     }
     public void SetAllUnitMax()
     {
-      foreach (UnitData a in playerData.playrCharacters)
-      {
-        a.SetMax();
-      }
-      RefreshSettingValues();
-      RefreshSettingPage();
-      MainManager.Instance.WindowMessage("成功！");
+        foreach (UnitData a in playerData.playrCharacters)
+        {
+            a.SetMax();
+            SetMaxLoveForUnit(a);
+        }
+        RefreshSettingValues();
+        RefreshSettingPage();
+        MainManager.Instance.WindowMessage("成功！");
     }
     public void OpenEXSettingPannel()
     {
       isSwitchingRole = true;
       UnitData unit = playerData.playrCharacters[selectedCharacterId_setting];
-      List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic[unit.unitId];
+      List<int> effectUnitList = MainManager.Instance.UnitStoryEffectDic2[unit.unitId];
       for (int i = 0; i < EXsettingSliders.Count; i++)
       {
         EXsettingSliders[i].SetActive(true);

@@ -56,6 +56,7 @@ namespace PCRCaculator
         private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
         private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
         private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
+        private Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
         private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
         private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
         private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
@@ -96,6 +97,7 @@ namespace PCRCaculator
         public Dictionary<int, UnitRarityData> UnitRarityDic { get => unitRarityDic; }
         public Dictionary<int, UnitStoryData> UnitStoryDic { get => unitStoryDic; }
         public Dictionary<int, List<int>> UnitStoryEffectDic { get => unitStoryEffectDic; }
+        public Dictionary<int, List<int>> UnitStoryEffectDic2 { get => unitStoryEffectDic2; }
         public Dictionary<int, SkillData> SkillDataDic { get => skillDataDic; }
         public Dictionary<int, SkillAction> SkillActionDic { get => skillActionDic; }
         public Dictionary<int, string> UnitName_cn { get => unitName_cn; }
@@ -337,7 +339,7 @@ namespace PCRCaculator
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
 
-                        var (unitStoryDic2, unitStoryEffectDic2, unitStoryLoveDic2) = dbTool2.Pair;
+                        unitStoryEffectDic2 = dbTool2.Pair.Item2;
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
                         skillActionDescribe_cn = dbTool3.Dic12;
