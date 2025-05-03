@@ -22,6 +22,7 @@ using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
 //using Elements.Data;
 //using Elements.Uek;
+using Elements;
 
 //using UnityStandardAssets.ImageEffects;
 
@@ -234,7 +235,15 @@ namespace Elements.Battle
 
         //private SaveDataManager.eBattleMaxSpeed ELFKGBFMOIE { get; set; } = SaveDataManager.eBattleMaxSpeed.QUADRUPLE;
 
-        public int FICLPNJNOEP { get; private set; }
+        private EnvironmentData unitEnvironment { get; set; }
+
+        private EnvironmentData enemyEnvironment { get; set; }
+
+        public Dictionary<int, int> EnvironmentCounterDic { get; set; }
+
+        public int CurrentEnvironmentId { get; set; }
+
+        public int FICLPNJNOEP { get; private set; } // CurrentEnemyPoint
 
         //public SpBattleShieldEffect FICPCPIFKCD { get; set; }
 
@@ -1763,6 +1772,64 @@ namespace Elements.Battle
         });
             PFDAEFDOBIP.ALFDJACNNCL = PFDAEFDOBIP.LCHLGLAFJED == eFieldTargetType.ENEMY ? EnemyList : UnitList;
             PFDAEFDOBIP.StartField();
+        }
+
+        // RVA: 0x2E1358C Offset: 0x2E1358C VA: 0x2E1358C Slot: 320
+        public void ExecEnvironment(EnvironmentData env, bool isEnemySide)
+        {
+            EnvironmentData currentEnv = isEnemySide 
+            ? enemyEnvironment 
+            : unitEnvironment;
+
+            if (currentEnv != null && currentEnv.EnvironmentType == env.EnvironmentType)
+            {
+                currentEnv.ResetTimer();
+                return;
+            }
+            currentEnv?.StopEnvironmentImmediately();
+
+            if (isEnemySide) enemyEnvironment = env;
+            else             unitEnvironment  = env;
+
+            env.UnitList      = UnitList;
+            env.EnemyUnitList = EnemyList;
+
+            env.StartEnvironment();
+
+            // BattleHeaderController.Instance .AppearEnvironmentIcon(isEnemySide, env.EnvironmentType);
+        }
+
+        // RVA: 0x2E13704 Offset: 0x2E13704 VA: 0x2E13704 Slot: 260
+        public int GetEnvironmentId(bool isEnemy)
+        {
+            var env = isEnemy ? enemyEnvironment : unitEnvironment;
+
+            if (env != null && env.Enable)
+                return env.EnvironmentType;
+
+            return -1;
+        }
+
+        // RVA: 0x2E13794 Offset: 0x2E13794 VA: 0x2E13794 Slot: 369
+        public void SetEnvironmentResume(bool isEnemy)
+        {
+            var env = isEnemy ? enemyEnvironment : unitEnvironment;
+            if (env == null) 
+                return;
+
+            if (env.Enable && env.WaitingAnotherEnvironmentEnd)
+            {
+                env.WaitingAnotherEnvironmentEnd = false;
+                env.InitializeSkillEffect();
+            }
+        }
+
+        // RVA: 0x2E13834 Offset: 0x2E13834 VA: 0x2E13834 Slot: 355
+        public bool ExistsEnvironment(int id)
+        {
+            if (GetEnvironmentId(isEnemy: true) == id)
+                return true;
+            return GetEnvironmentId(isEnemy: false) == id;
         }
 
         public void StopField(int OJHBHHCOAGK, eTargetAssignment OAHLOGOLMHD, bool MOBKHPNMEDM)
@@ -3334,6 +3401,7 @@ namespace Elements.Battle
             AMLOLHFMOPP = false;
             DAIFDPFABCM = new Dictionary<string, GameObject>();
             FieldDataDictionary = new Dictionary<int, List<AbnormalStateDataBase>>();
+            EnvironmentCounterDic = new Dictionary<int, int>();
             /*switch (this.BattleCategory)
             {
                 case eBattleCategory.CLAN_BATTLE:
@@ -3607,6 +3675,9 @@ namespace Elements.Battle
             LPBCBINDJLJ.Clear();
             NOMJJDDCBAN.Clear();
             FieldDataDictionary.Clear();
+            EnvironmentCounterDic.Clear();
+            unitEnvironment = null;
+            enemyEnvironment = null;
             foreach(var battleEffects in battleEffectDict)
             {
                 foreach(var battleEffect in battleEffects.Value)
@@ -4854,6 +4925,7 @@ namespace Elements.Battle
                     PCRCaculator.UnitData ownerData = _summonData.Owner.unitData;
                     unitData_my = new PCRCaculator.UnitData(_summonData.SummonId, _summonData.Skill.Level,ownerData.rarity,ownerData.rank);
                     unitData_my.uniqueEqLv = ownerData.uniqueEqLv;
+                    unitData_my.uniqueEq2Lv = ownerData.uniqueEq2Lv;
                     parameter = TempData.CreateUnitParameter(unitData_my);
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;

@@ -91,6 +91,10 @@ namespace Elements
 
         public AbnormalStateFieldAction AbnormalStateFieldAction { get; set; }
 
+        public UnitCtrl.eAbnormalState EnvironmentTargetAbnormalState { get; set; }
+
+        public bool IsEnvironmentAbnormalState { get; set; }
+
         public Action OnDefeatEnemy { get; set; }
 
         public Action OnInitWhenNoTarget { get; set; }
@@ -113,6 +117,8 @@ namespace Elements
             new Dictionary<BasePartsData, ProbEvent>();
 
         public Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>> AlreadyExecedData { get; set; }
+
+        public bool SkipAppendIsAlreadyExeced { get; set; }
 
         public Dictionary<UnitCtrl, List<int>> AlreadyExecedKeys { get; set; }
 

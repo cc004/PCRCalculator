@@ -434,14 +434,20 @@ namespace PCRCaculator
       {
         data.uniqueEqLv = (int)detailSliders_setting[14].value;
       }
-      RefreshSettingPage();
-
+      if (MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId))
+      {
+          data.uniqueEq2Lv = (int)detailSliders_setting[15].value;
+      }
       if (data.rank < 2) data.skillLevel[1] = 0;
       if (data.rank < 4) data.skillLevel[2] = 0;
       if (data.rank < 7)
       {
         data.skillLevel[3] = 0;
         data.uniqueEqLv = 0;
+      }
+      if (data.uniqueEqLv == 0)
+      {
+        data.uniqueEq2Lv = 0;
       }
 
       if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
@@ -450,9 +456,10 @@ namespace PCRCaculator
         {
           data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
           var maxStar = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
-          data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[15 + i].value, maxStar);
+          data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[16 + i].value, maxStar);
         }
       }
+      RefreshSettingPage();
       RefreshSettingValues();
 
     }
@@ -472,29 +479,46 @@ namespace PCRCaculator
       }
       OnSliderDraged();
     }
+    private void SetMaxLoveForUnit(UnitData unitData)
+    {
+        if (MainManager.Instance.UnitStoryEffectDic2.TryGetValue(unitData.unitId, out var effectUnitList))
+        {
+            foreach (int effectUnitId in effectUnitList)
+            {
+                if (MainManager.Instance.UnitStoryEffectDic2.ContainsKey(effectUnitId) && 
+                    MainManager.Instance.UnitRarityDic.TryGetValue(effectUnitId, out var unitRarityData))
+                {
+                    unitData.playLoveDic[effectUnitId] = unitRarityData.GetMaxLoveLevel();
+                }
+            }
+        }
+    }
     public void SetSelectedUnitSecondMax()
     {
-      playerData.playrCharacters[selectedCharacterId_setting].SetMax(equip_second_full: true);
-      RefreshSettingValues();
-      RefreshSettingPage();
-      MainManager.Instance.WindowMessage("成功！");
+        playerData.playrCharacters[selectedCharacterId_setting].SetMax(equip_second_full: true);
+        SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
+        RefreshSettingValues();
+        RefreshSettingPage();
+        MainManager.Instance.WindowMessage("成功！");
     }
     public void SetSelectedUnitMax()
     {
-      playerData.playrCharacters[selectedCharacterId_setting].SetMax();
-      RefreshSettingValues();
-      RefreshSettingPage();
-      MainManager.Instance.WindowMessage("成功！");
+        playerData.playrCharacters[selectedCharacterId_setting].SetMax();
+        SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
+        RefreshSettingValues();
+        RefreshSettingPage();
+        MainManager.Instance.WindowMessage("成功！");
     }
     public void SetAllUnitMax()
     {
-      foreach (UnitData a in playerData.playrCharacters)
-      {
-        a.SetMax();
-      }
-      RefreshSettingValues();
-      RefreshSettingPage();
-      MainManager.Instance.WindowMessage("成功！");
+        foreach (UnitData a in playerData.playrCharacters)
+        {
+            a.SetMax();
+            SetMaxLoveForUnit(a);
+        }
+        RefreshSettingValues();
+        RefreshSettingPage();
+        MainManager.Instance.WindowMessage("成功！");
     }
     public void OpenEXSettingPannel()
     {
@@ -703,6 +727,25 @@ namespace PCRCaculator
         detailButtons_setting[1].interactable = false;
       }
 
+      if (MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId))
+      {
+        detailTexts_setting[15].text = data.uniqueEq2Lv + "";
+        detailSliders_setting[15].maxValue = 5;
+        detailSliders_setting[15].value = data.uniqueEq2Lv;
+        detailSliders_setting[15].interactable = true;
+        detailButtons_setting[2].interactable = true;
+        detailButtons_setting[3].interactable = true;
+      }
+      else
+      {
+        detailTexts_setting[15].text = "null";
+        detailSliders_setting[15].maxValue = 0;
+        detailSliders_setting[15].value = 0;
+        detailSliders_setting[15].interactable = false;
+        detailButtons_setting[2].interactable = false;
+        detailButtons_setting[3].interactable = false;
+      }
+
       // ex equip
 
       if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
@@ -729,11 +772,11 @@ namespace PCRCaculator
                 ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
           }
 
-          detailSliders_setting[15 + i].maxValue =
+          detailSliders_setting[16 + i].maxValue =
               data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
-          detailSliders_setting[15 + i].minValue = 0;
-          detailSliders_setting[15 + i].value = data.exEquipLevel[i];
-          detailTexts_setting[15 + i].text = detailSliders_setting[15 + i].value.ToString();
+          detailSliders_setting[16 + i].minValue = 0;
+          detailSliders_setting[16 + i].value = data.exEquipLevel[i];
+          detailTexts_setting[16 + i].text = detailSliders_setting[16 + i].value.ToString();
         }
       }
       else
@@ -742,10 +785,10 @@ namespace PCRCaculator
         {
           ExEquip[i].ClearOptions();
           ExEquip[i].AddOptions(new List<Dropdown.OptionData> { ExEquipOption.None });
-          detailSliders_setting[15 + i].maxValue = 0;
-          detailSliders_setting[15 + i].minValue = 0;
-          detailSliders_setting[15 + i].value = 0;
-          detailTexts_setting[15 + i].text = "0";
+          detailSliders_setting[16 + i].maxValue = 0;
+          detailSliders_setting[16 + i].minValue = 0;
+          detailSliders_setting[16 + i].value = 0;
+          detailTexts_setting[16 + i].text = "0";
         }
       }
 

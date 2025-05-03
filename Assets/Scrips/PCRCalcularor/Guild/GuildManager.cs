@@ -797,6 +797,7 @@ namespace PCRCaculator.Guild
             SettingSliders[2].value = SettingData.UBTryingCount / 10 > 18 ? 19 : SettingData.UBTryingCount / 10;
             SettingTexts[2].text = SettingData.UBTryingCount + "";
             SettingToggles[0].isOn = SettingData.calcSpineAnimation;
+            SettingToggles[7].isOn = SettingData.isFavEnabled;
             SettingToggles[0].interactable = true; //SettingData.calSpeed == 1;
             /*SettingInputs[0].text = SettingData.RandomSeed + "";
             SettingToggles[2].isOn = SettingData.UseFixedRandomSeed;
@@ -834,6 +835,7 @@ namespace PCRCaculator.Guild
             SettingData.FPSforLogic = (int)SettingSliders[0].value * 10;
             SettingData.FPSforAnimation = (int)SettingSliders[1].value * 10;
             SettingData.calcSpineAnimation = SettingToggles[0].isOn;
+            SettingData.isFavEnabled = SettingToggles[7].isOn;
             SettingData.UBTryingCount = (int)SettingSliders[2].value > 18 ? 9999 : (int)SettingSliders[2].value * 10;
             //SettingData.UseFixedRandomSeed = SettingToggles[2].isOn;
             try
@@ -1451,6 +1453,8 @@ namespace PCRCaculator.Guild
         public bool calcSpineAnimation = true;
         public int UBTryingCount = 9999;
         public bool UseFixedRandomSeed = true;
+        public bool isFavEnabled = false;
+
         /*public int RandomSeed = 666;
         public bool ForceNoCritical_player;
         public bool ForceNoCritical_enemy;
@@ -1480,7 +1484,7 @@ namespace PCRCaculator.Guild
             AddOnePlayerGroup();
             //addedPlayerDatas = new List<AddedPlayerData> { new AddedPlayerData(), new AddedPlayerData(), new AddedPlayerData(), new AddedPlayerData(), new AddedPlayerData() };
             changedEnemyDataDic = new Dictionary<int, EnemyData>();
-           // ubExecTimeDataDic = new Dictionary<int, List<List<float>>>();
+            // ubExecTimeDataDic = new Dictionary<int, List<List<float>>>();
             //useAutoModeDic = new Dictionary<int, bool>();
             /*for(int i = 0; i < 5; i++)
             {
@@ -1499,7 +1503,7 @@ namespace PCRCaculator.Guild
         }
         public void AddOnePlayerGroup()
         {
-           //int pr = addedPlayerDatas.Count;
+            //int pr = addedPlayerDatas.Count;
             for (int i = 0; i < 5; i++)
             {
                 //addedPlayerDatas.Add(new AddedPlayerData());
@@ -1594,7 +1598,7 @@ namespace PCRCaculator.Guild
             if (data.currentGuildEnemyNum == 4 && data.isViolent)
                 des += "6";
             else
-                des += (data.currentGuildEnemyNum+1);
+                des += (data.currentGuildEnemyNum + 1);
             if (data.usePlayerSettingHP)
                 des += "#";
             return des;

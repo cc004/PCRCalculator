@@ -10,9 +10,11 @@ namespace Elements
         public Toggle toggle;
         public eStateIconType stateIconType;
         public GameObject buffprefab;
+        public Image buffIcon;
 
-        public void Init(eStateIconType type,bool enable)
+        public void Init(Sprite icon, eStateIconType type, bool enable)
         {
+            buffIcon.sprite = icon;
             stateIconType = type;
             nameText.text = stateIconType.GetDescription();
             if (nameText.text == stateIconType.ToString())

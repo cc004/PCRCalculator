@@ -16,7 +16,7 @@ namespace PCRCaculator.Battle
         MAGIC_DEF = 4,
         [Description("闪避")]
         DODGE = 5,
-        [Description("暴击")]
+        [Description("物理暴击")]
         PHYSICAL_CRITICAL = 6,
         [Description("魔法暴击")]
         MAGIC_CRITICAL = 7,
@@ -91,7 +91,7 @@ namespace PCRCaculator.Battle
         [Description("黑暗")]
         DARK = 15,
         [Description("沉默")]
-        SLIENCE = 16,
+        SILENCE = 16,
         [Description("束缚")]
         CHAINED = 17,
         [Description("睡眠")]
@@ -488,197 +488,374 @@ namespace PCRCaculator.Battle
     public enum eSkillMotionType { DEFAULT = 0, AWAKE = 1, ATTACK = 2, NONE = 3, EVOLUTION = 4 }
     public enum eStateIconType
     {
-        [Description("40")]
-        NONE = 0,
         [Description("0")]
-        BUFF_PHYSICAL_ATK = 1,
-        [Description("2")]
-        BUFF_PHYSICAL_DEF = 2,
+        NONE = 0,
         [Description("1")]
-        BUFF_MAGIC_ATK = 3,
+        BUFF_PHYSICAL_ATK = 1,//物攻BUFF
+        [Description("2")]
+        BUFF_PHYSICAL_DEF = 2,//物防BUFF
         [Description("3")]
-        BUFF_MAGIC_DEF = 4,
-        [Description("8")]
-        BUFF_DODGE = 5,
+        BUFF_MAGIC_ATK = 3,//魔攻BUFF
         [Description("4")]
-        BUFF_CRITICAL = 6,
-        [Description("7")]
-        BUFF_ENERGY_RECOVERY = 7,
+        BUFF_MAGIC_DEF = 4,//魔防BUFF
+        [Description("5")]
+        BUFF_DODGE = 5,//闪避BUFF
         [Description("6")]
-        BUFF_HP_RECOVERY = 8,
+        BUFF_CRITICAL = 6,//暴击BUFF
+        [Description("7")]
+        BUFF_ENERGY_RECOVERY = 7,//TP上升BUFF
+        [Description("8")]
+        BUFF_HP_RECOVERY = 8,//HP回复BUFF
         [Description("9")]
-        HASTE = 9,
-        [Description("29")]
-        NO_DAMAGE = 10,
-        [Description("5")]
-        BUFF_LIFE_STEAL = 11,
-        [Description("5")]
-        BUFF_ADD_LIFE_STEAL = 12,
+        HASTE = 9,///加速BUFF
         [Description("10")]
-        DEBUFF_PHYSICAL_ATK = 13,
-        [Description("12")]
-        DEBUFF_PHYSICAL_DEF = 14,
+        NO_DAMAGE = 10,//无敌状态
         [Description("11")]
-        DEBUFF_MAGIC_ATK = 15,
+        BUFF_LIFE_STEAL = 11,//生命吸收
+        [Description("12")]
+        BUFF_ADD_LIFE_STEAL = 12,//生命吸收+1次\n妹法/松鼠
         [Description("13")]
-        DEBUFF_MAGIC_DEF = 16,
-        [Description("18")]
-        DEBUFF_DODGE = 17,
+        DEBUFF_PHYSICAL_ATK = 13,//物攻DEBUFF
         [Description("14")]
-        DEBUFF_CRITICAL = 18,
-        [Description("17")]
-        DEBUFF_ENERGY_RECOVERY = 19,
-        [Description("16")]
-        DEBUFF_HP_RECOVERY = 20,
+        DEBUFF_PHYSICAL_DEF = 14,//物防DEBUFF
         [Description("15")]
-        DEBUFF_LIFE_STEAL = 21,
+        DEBUFF_MAGIC_ATK = 15,//魔攻DEBUFF
+        [Description("16")]
+        DEBUFF_MAGIC_DEF = 16,//魔防DEBUFF
+        [Description("17")]
+        DEBUFF_DODGE = 17,//闪避DEBUFF
+        [Description("18")]
+        DEBUFF_CRITICAL = 18,///暴击DEBUFF
         [Description("19")]
-        SLOW = 22,
-        [Description("26")]
-        UB_DISABLE = 23,
-        [Description("35")]
-        PHYSICS_BARRIAR = 24,
-        [Description("36")]
-        MAGIC_BARRIAR = 25,
-        [Description("35")]
-        PHYSICAS_DRAIN_BARRIAR = 26,
-        [Description("36")]
-        MAGIC_DRAIN_BARRIAR = 27,
-        [Description("35")]
-        BOTH_BARRIAR = 28,
-        [Description("37")]
-        BOTH_DRAIN_BARRIAR = 29,
-        [Description("40")]//???
-        DEBUF_BARRIAR = 30,
-        [Description("33")]
-        STRIKE_BACK = 31,
+        DEBUFF_ENERGY_RECOVERY = 19,//TP上升DEBUFF
         [Description("20")]
-        PARALISYS = 32,
-        [Description("29")]
-        SLIP_DAMAGE = 33,
-        [Description("25")]
-        DARK = 34,
-        [Description("26")]
-        SILENCE = 35,
-        [Description("40")]//???
-        CONVER = 36,
-        [Description("27")]
-        DECOY = 37,
-        [Description("30")]
-        BURN = 38,
-        [Description("31")]
-        CURSE = 39,
+        DEBUFF_HP_RECOVERY = 20,//HP回复DEBUFF
+        [Description("21")]
+        DEBUFF_LIFE_STEAL = 21,//生命吸收DEBUFF
+        [Description("22")]
+        SLOW = 22,//减速DEBUFF
         [Description("23")]
-        FREEZE = 40,
-        [Description("22")]
-        CHAINED = 41,
+        UB_DISABLE = 23,//禁用UB
         [Description("24")]
-        SLEEP = 42,
-        [Description("21")]
-        STUN = 43,
-        [Description("21")]
-        STONE = 44,
-        [Description("22")]
-        DETAIN = 45,
-        [Description("40")]
-        REGENERATION = 46,
-        [Description("40")]
-        DEBUFF_MOVE_SPEED = 47,
-        [Description("35")]
-        PHYSICS_DODGE = 48,
+        PHYSICS_BARRIAR = 24,//物理屏障
+        [Description("25")]
+        MAGIC_BARRIAR = 25,//魔法屏障
+        [Description("26")]
+        PHYSICAS_DRAIN_BARRIAR = 26,//吸收物理伤害屏障
+        [Description("27")]
+        MAGIC_DRAIN_BARRIAR = 27,//吸收魔法伤害屏障
         [Description("28")]
-        CONFUSION = 49, 
-        HEROIC_SPIRIT_SEAL = 50, 
-        VENOM = 51, 
-        COUNT_BLIND = 52, 
-        INHIBIT_HEAL = 53,
-        [Description("45")]
-        FEAR = 54,
-        ERROR = 55, 
-        SOUL_EAT = 56, 
-        KUROE = 57, 
-        FIRE_NUTS = 58,
-        AWE = 59,
-        [Description("46")]
-        LUNA = 60,
-        CHRISTINA = 61,
-        [Description("44")]
-        TP_REGENERATION = 62,
-        CHEATING_STAR = 63, 
-        TONAKAI = 64, 
-        HEX = 65, 
-        FAINT = 66,
-        [Description("41")]
-        BUFF_PHYSICAL_CRITICAL_DAMAGE = 67,
-        [Description("42")]
-        DEBUFF_PHYSICAL_CRITICAL_DAMAGE = 68,
-        [Description("41")]
-        BUFF_MAGIC_CRITICAL_DAMAGE = 69,
-        [Description("42")]
-        DEBUFF_MAGIC_CRITICAL_DAMAGE = 70,
-        COMPENSATION = 71, 
-        KNIGHT_GUARD = 72,
-        [Description("43")]
-        CUT_ATK_DAMAGE = 73,
-        [Description("43")]
-        CUT_MGC_DAMAGE = 74,
-        [Description("43")]
-        CUT_ALL_DAMAGE = 75, 
-        CHIERU = 76, 
-        REI = 77,
-        [Description("43")]
-        LOG_ATK_BARRIER = 78,
-        [Description("43")]
-        LOG_MGC_BARRIER = 79,
-        [Description("43")]
-        LOG_ALL_BARRIER = 80,
-        PAUSE_ACTION = 81, // 0x00000051
-        BUFF_ACCURACY = 83, // 0x00000053
-        DEBUFF_ACCURACY = 84, // 0x00000054
-        RUKA = 85, // 0x00000055
-        UB_SILENCE = 86, // 0x00000056
-        CUPID = 87, // 0x00000057
-        DEBUFF_MAX_HP = 88, // 0x00000058
-        MAGIC_DARK = 89, // 0x00000059
-        MATSURI = 90, // 0x0000005A
-        HEAL_DOWN = 91, // 0x0000005B
+        BOTH_BARRIAR = 28,//物理/魔法伤害无效化屏障
+        [Description("29")]
+        BOTH_DRAIN_BARRIAR = 29,//吸收物理/魔法伤害屏障
+        [Description("30")]//???
+        DEBUF_BARRIAR = 30,//不明，无用
+        [Description("31")]
+        STRIKE_BACK = 31,//反射伤害\n露/圣电
+        [Description("32")]
+        PARALISYS = 32,//麻痹
+        [Description("33")]
+        SLIP_DAMAGE = 33,//中毒
+        [Description("34")]
+        DARK = 34,//致盲
+        [Description("35")]
+        SILENCE = 35,//沉默
+        [Description("36")]
+        CONVER = 36,//魅惑
+        [Description("37")]
+        DECOY = 37,//挑衅
+        [Description("38")]
+        BURN = 38,//烧伤
+        [Description("39")]
+        CURSE = 39,//诅咒
         [Description("40")]
-        AKINO_CHRISTMAS = 92, // 0x0000005C
-        NPC_STUN = 93, // 0x0000005D
-        BUFF_RECEIVE_CRITICAL_DAMAGE = 94,
-        [Description("51")]
-        DEBUFF_RECEIVE_CRITICAL_DAMAGE = 95,
-        DECREASE_HEAL = 96,
-        SHEFI = 97,
-        SCHOOL_FESTIVAL_YUNI = 98,
-        SCHOOL_FESTIVAL_CHLOE = 99,
-        POISON_BY_BEHAVIOUR = 100,
-        ADDITIONAL_BUFF_PHYSICAL_DEF = 101,
-        CRYSTALIZE = 102,
-        DAMAGE_LIMIT = 103,
-        ADDITIONAL_BUFF_MAGIC_DEF = 104,
-        MAGIC_CHARACTER_OF_WISDOM = 105,
-        MAGIC_CHARACTER_OF_POWER = 106,
+        FREEZE = 40,//冻结
+        [Description("41")]
+        CHAINED = 41,//束缚
+        [Description("42")]
+        SLEEP = 42,//睡眠
+        [Description("43")]
+        STUN = 43,//眩晕
+        [Description("44")]
+        STONE = 44,//石化
+        [Description("45")]
+        DETAIN = 45,//拘留
+        [Description("46")]
+        REGENERATION = 46, //持续生命回复
+        [Description("47")]
+        DEBUFF_MOVE_SPEED = 47,//移动速度DEBUFF
+        [Description("48")]
+        PHYSICS_DODGE = 48,//克总物理闪避
+        [Description("49")]
+        CONFUSION = 49, //混乱
         [Description("50")]
-        DETECT_WEAKNESS = 107,
-        [Description("53")]
-        DEBUFF_RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT = 108,
+        HEROIC_SPIRIT_SEAL = 50,//安的英灵的加护
         [Description("51")]
-        DEBUFF_RECEIVE_PHYSICAL_DAMAGE_PERCENT = 109,
+        VENOM = 51, //猛毒状态
         [Description("52")]
-        DEBUFF_RECEIVE_MAGIC_DAMAGE_PERCENT = 110,
-        SAGITTARIUS = 111,
-        SWORD_SEAL = 112,
-        PHANTOMCORE_WEDGE = 113,
-        SPY = 114,
-        HAPPY_MOMENT = 115,
-        SEA_GOD_PROTECTION = 116,
-        BLUE_MAGIC_SEAL = 117,
-        SHEEP = 118,
-        TWILIGHT_GUARD = 119,
-        PSYCHIC_POWER = 120,
-        CELESTIAL_BODIES = 121,
-        NUM = 122
+        COUNT_BLIND = 52,//拉姆闪避次数
+        [Description("53")]
+        INHIBIT_HEAL = 53,//回复生命无效并造成伤害
+        [Description("54")]
+        FEAR = 54,//恐慌
+        // ERROR = 55,
+        // [Description("56")]
+        // SOUL_EAT = 56,//奄美魔物吸魂
+        [Description("57")]
+        CHLOE = 57,//华哥畏缩
+        // [Description("58")]
+        // FIRE_NUTS = 58,//类龙生物火焰果
+        [Description("59")]
+        AWE = 59,//水瑚麟畏惧
+        [Description("60")]
+        LUNA = 60,//露娜朋友
+        [Description("61")]
+        CHRISTINA = 61,//圣克硬币
+        [Description("62")]
+        TP_REGENERATION = 62, //持续回复TP
+        // [Description("63")]
+        // CHEATING_STAR = 63,//外遇星异心
+        // [Description("64")]
+        // TONAKAI = 64,//变身驯鹿
+        [Description("65")]
+        HEX = 65,//大眼赌咒状态
+        [Description("66")]
+        FAINT = 66,//昏迷（类似击晕）
+        [Description("67")]
+        BUFF_PHYSICAL_CRITICAL_DAMAGE = 67,//物理爆伤BUFF
+        [Description("68")]
+        DEBUFF_PHYSICAL_CRITICAL_DAMAGE = 68,//物理爆伤DEBUFF
+        [Description("69")]
+        BUFF_MAGIC_CRITICAL_DAMAGE = 69,//魔法爆伤BUFF
+        [Description("70")]
+        DEBUFF_MAGIC_CRITICAL_DAMAGE = 70,//魔法爆伤DEBUFF
+        [Description("71")]
+        COMPENSATION = 71,
+        [Description("72")]
+        KNIGHT_GUARD = 72,//公吃骑士的加护
+        [Description("73")]
+        CUT_ATK_DAMAGE = 73,//减轻物理伤害
+        [Description("74")]
+        CUT_MGC_DAMAGE = 74,//减轻魔法伤害
+        [Description("75")]
+        CUT_ALL_DAMAGE = 75,//减轻所有伤害
+        [Description("76")]
+        CHIERU = 76,//切噜
+        [Description("77")]
+        REI = 77,//剑圣风之刃
+        [Description("78")]
+        LOG_ATK_BARRIER = 78,//物理对数盾
+        [Description("79")]
+        LOG_MGC_BARRIER = 79,//魔法对数盾
+        [Description("80")]
+        LOG_ALL_BARRIER = 80,//对数盾
+        [Description("81")]
+        PAUSE_ACTION = 81, //路人兔行动时间停止
+        [Description("83")]
+        BUFF_ACCURACY = 83, //命中BUFF
+        [Description("84")]
+        DEBUFF_ACCURACY = 84, // 命中DEBUFF
+        // BOSS_BUFF = 85, // 0x00000055
+        [Description("86")]
+        UB_SILENCE = 86, // UB沉默
+        // [Description("87")]
+        // CUPID = 87, //变身天使
+        [Description("88")]
+        DEBUFF_MAX_HP = 88, // 最大生命值DEBUFF
+        [Description("89")]
+        // MAGIC_DARK = 89, // 0x00000059
+        // [Description("90")]
+        MATSURI = 90, // 瓜虎标记
+        // [Description("91")]
+        // HEAL_DOWN = 91, // 0x0000005B
+        [Description("92")]
+        AKINO_CHRISTMAS = 92, // 圣哈圣夜的光辉
+        // NPC_STUN = 93, // 鱼叉大叔NPC击晕
+        [Description("94")]
+        BUFF_RECEIVE_CRITICAL_DAMAGE = 94,//爆伤抗性BUFF
+        [Description("95")]
+        DEBUFF_RECEIVE_CRITICAL_DAMAGE = 95,//爆伤抗性DEBUFF
+        [Description("96")]
+        DECREASE_HEAL = 96,//瓜七降低受到的回复量
+        [Description("97")]
+        SHEFI = 97,//雪菲冰龙之印
+        [Description("98")]
+        SCHOOL_FESTIVAL_YUNI = 98,//学优标记
+        // [Description("99")]
+        // SCHOOL_FESTIVAL_CHLOE = 99,
+        [Description("100")]
+        POISON_BY_BEHAVIOUR = 100,//工菜行动中毒
+        [Description("101")]
+        ADDITIONAL_BUFF_PHYSICAL_DEF = 101,//固定物理白甲
+        // [Description("102")]
+        // CRYSTALIZE = 102,//愤怒军团的兰法结晶化
+        [Description("103")]
+        DAMAGE_LIMIT = 103,//伤害限制
+        [Description("104")]
+        ADDITIONAL_BUFF_MAGIC_DEF = 104,//固定魔法白甲
+        // MAGIC_CHARACTER_OF_WISDOM = 105,
+        [Description("106")]
+        MAGIC_CHARACTER_OF_POWER = 106,//绿魔标记
+        [Description("107")]
+        DETECT_WEAKNESS = 107,//龙妈龙之眼
+        [Description("108")]
+        DEBUFF_RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT = 108,//百分比提升其受到的伤害
+        [Description("109")]
+        DEBUFF_RECEIVE_PHYSICAL_DAMAGE_PERCENT = 109,//百分比提升其受到的物理伤害
+        [Description("110")]
+        DEBUFF_RECEIVE_MAGIC_DAMAGE_PERCENT = 110,//百分比提升其受到的魔法伤害
+        [Description("111")]
+        LABYRISTA_OVERLOAD = 111,//超晶标记
+        [Description("112")]
+        SWORD_SEAL = 112,//春流剑之刻印
+        [Description("113")]
+        PHANTOMCORE_WEDGE = 113,//海忍灵锚刻印
+        [Description("114")]
+        SPY = 114,//盗妹盗锤隐秘状态
+        [Description("115")]
+        HAPPY_MOMENT = 115,//野骑幸福一刻
+        [Description("116")]
+        SEA_GOD_PROTECTION = 116,//水怜水刃加护标记
+        [Description("117")]
+        BLUE_MAGIC_SEAL = 117,//scw蝶舞烙印标记
+        [Description("118")]
+        SHEEP = 118,//屁狐软绵绵羊毛标记
+        [Description("119")]
+        TWILIGHT_GUARD = 119,//伊莉雅永夜加护
+        [Description("120")]
+        PSYCHIC_POWER = 120,//忍的灵力
+        // [Description("121")]
+        // CELESTIAL_BODIES = 121,//月之光印
+        [Description("122")]
+        KAISER_INSIGHT_CARVED_SEAL = 122,//霸瞳标记
+        // [Description("123")]
+        // LIKE = 123,//狂乱的主播·镜的点赞
+        [Description("124")]
+        ENERGY_DAMAGE_REDUCE = 124,//减轻TP减少效果
+        [Description("125")]
+        SAGITTARIUS_CARVED_SEAL = 125,//611标记
+        [Description("126")]
+        ANNE_AND_GLARE_CARVED_SEAL = 126,//龙安友情魔印标记
+        [Description("127")]
+        MITSUKI_NY_CARVED_SEAL = 127,//春月朦胧状态
+        [Description("128")]
+        BLACK_FRAME = 128,
+        [Description("129")]
+        IMMUNE_STATE = 129,//611免疫行动不能状态
+        [Description("130")]
+        MUIMI_ANNIVERSARY_CARVED_SEAL = 130,//513情谊的证明标记
+        [Description("131")]
+        MISORA_CARVED_SEAL = 131,//美空标记
+        [Description("132")]
+        FLIGHT = 132,//飞行状态
+        [Description("133")]
+        DJEETA_WITCH = 133,//法鸡万象印记
+        [Description("134")]
+        LIXUE = 134,//礼雪美貌标记
+        [Description("135")]
+        JINIANG = 135,//机娘电池
+        [Description("137")]
+        WORLD_LIGHTNING = 137,//莱莱界雷
+        [Description("139")]
+        WOLF = 139,//狼牙咆哮
+        [Description("140")]
+        HUODIAN = 140,//火电标记
+        [Description("141")]
+        DUOTIANSHI = 141,//可璃亚堕天使的加护
+        [Description("142")]
+        ZAISHENG = 142,//ELS再生（不确定）
+        [Description("143")]
+        SHESHOUZUO = 143,//射手座D5标记
+        [Description("145")]
+        SHENGCHUI = 145,//圣锤噗吉靠垫
+        [Description("150")]
+        LIMIT_ENERGY_RECOVER_RATE = 150,//限制TP回复
+        [Description("152")]
+        EWAIJIASU = 152,//额外加速
+        [Description("153")]
+        EWAIJIANSU = 153,//额外减速
+        [Description("154")]
+        SLIP_DAMAGE_UP = 154,//毒伤提升
+
+        // 分割线,属性没实装应该用不到
+
+        [Description("156")]
+        SHUIYOUNI = 156,//水优妮水祭的安宁
+        [Description("157")]
+        SHUIYUE = 157,//水华水月
+        [Description("158")]
+        WANJUZHIHUA = 158,//银莲婉拒之花
+        [Description("159")]
+        KABANJUN = 159,//库露露卡班君
+        [Description("160")]
+        NIANCHOU = 160,//水涅娅粘稠
+        [Description("161")]
+        TIEQISHOUHU = 161,//涅妃铁气守护
+        [Description("162")]
+        FANGMOCHEN = 162,//涅妃防魔尘
+        [Description("168")]
+        SOUHUI = 168,//六凶·魔蜘蒐輝
+        [Description("171")]
+        PSIFENGBAO = 171,//水美空PSI风暴
+        [Description("173")]
+        RISHI = 173,//水龙妈日食
+        [Description("175")]
+        JUEBING = 175,//公菲绝冰
+        [Description("177")]
+        GUIHUA = 177,//水蕾姆鬼化
+        [Description("178")]
+        KUANGSAO = 178,//水蕾姆狂骚
+        [Description("179")]
+        BUFF_PHYSICAL_DAMAGE = 179,//增加造成的物理伤害
+        [Description("180")]
+        BUFF_MAGIC_DAMAGE = 180,//增加造成的魔法伤害
+        [Description("181")]
+        DEBUFF_PHYSICAL_DAMAGE = 181,//减少造成的物理伤害
+        [Description("182")]
+        DEBUFF_MAGIC_DAMAGE = 182,//减少造成的魔法伤害
+        [Description("183")]
+        XIEMU = 183,//梦狐谢幕
+        [Description("184")]
+        MAGIC_DODGE = 184,//魔法攻击无效
+        [Description("187")]
+        RUOHUABUDING = 187,//潜入阿斯特朗BOSS弱化补丁
+        [Description("188")]
+        EMT = 188,//emt热情的花束
+        [Description("189")]
+        CHAHU = 189,//女仆茶壶
+        [Description("190")]
+        LIANJIN = 190,//炼望炼金素材
+        [Description("191")]
+        XIANGSHUI = 191,//炼望香水
+        [Description("192")]
+        TOULAN = 192,//龙妹偷懒的诱惑
+        [Description("193")]
+        YOUJUNHUDUN = 193,//吹雪友军护盾
+        [Description("194")]
+        TOUZI = 194,//大和蛮贼骰子
+        [Description("195")]
+        JIANCIDUNPAI = 195,//若菜尖刺盾牌
+        [Description("196")]
+        EMOQINWEN = 196,//圣老师恶魔的亲吻
+        [Description("197")]
+        SHUIQIELU = 197,//水切噜
+        [Description("198")]
+        WANGLINGQUTI = 198,//格蕾斯亡灵躯体
+        [Description("199")]
+        HUONIAO = 199,//春电火鸟
+        [Description("200")]
+        MOYAN = 200,//美杜莎魔眼
+        [Description("201")]
+        XUSHU = 201,//原克虚数
+        [Description("0")]
+        EX_PASSIVE_1 = 999,
+        [Description("0")]
+        NUM = 1000,
+        [Description("0")]
+        SPEED_OVERLAP,
+        [Description("0")]
+        INVALID_VALUE = -1,
+
     }
     public enum eSummonType { NONE = 0, SUMMON = 1, PHANTOM = 2, DIVISION = 1001 }
     public enum eTargetAssignment 

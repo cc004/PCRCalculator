@@ -81,6 +81,16 @@ namespace Elements
 
     public partial class UnitCtrl : FixedTransformMonoBehavior, ISingletonField
     {
+
+        public class BuffDebuffCoroutineDataSet // TypeDefIndex: 2261
+        {
+            // Properties
+            public IEnumerator Coroutine { get; set; }
+            public bool Enable { get; set; } // TODO find where use
+            public int EnvironmentId { get; set; }
+        }
+
+
         private PrincessFormProcessor princessFormProcessor;
         public const float SLOW_ANIM_SPEED = 0.5f;
         public const float HASTE_ANIM_SPEED = 2f;
@@ -289,7 +299,7 @@ namespace Elements
                 eAbnormalState.DRAIN_ATK,
                 new AbnormalConstData
                 {
-                    IconType = eStateIconType.PHYSICS_DRAIN_BARRIAR,
+                    IconType = eStateIconType.PHYSICAS_DRAIN_BARRIAR,
                     IsBuff = true
                 }
             },
@@ -733,14 +743,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
-            {
-                eAbnormalState.NPC_STUN,
-                new AbnormalConstData
-                {
-                    IconType = eStateIconType.NPC_STUN,
-                    IsBuff = false
-                }
-            },
+            // {
+            //     eAbnormalState.NPC_STUN,
+            //     new AbnormalConstData
+            //     {
+            //         IconType = eStateIconType.NPC_STUN,
+            //         IsBuff = false
+            //     }
+            // },
             {
                 eAbnormalState.DECREASE_HEAL,
                 new AbnormalConstData
@@ -757,14 +767,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
-            {
-                eAbnormalState.CRYSTALIZE,
-                new AbnormalConstData
-                {
-                    IconType = eStateIconType.CRYSTALIZE,
-                    IsBuff = false
-                }
-            },
+            // {
+            //     eAbnormalState.CRYSTALIZE,
+            //     new AbnormalConstData
+            //     {
+            //         IconType = eStateIconType.CRYSTALIZE,
+            //         IsBuff = false
+            //     }
+            // },
             {
                 eAbnormalState.DAMAGE_LIMIT_ATK,
                 new AbnormalConstData
@@ -844,7 +854,15 @@ namespace Elements
                     IconType = eStateIconType.FLIGHT,
                     IsBuff = true
                 }
-            }
+            },
+            {
+                UnitCtrl.eAbnormalState.WORLD_LIGHTNING,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.WORLD_LIGHTNING, // TODO fix icon
+                    IsBuff = true
+                }
+            },
         };
 
         // Token: 0x040026C0 RID: 9920
@@ -1057,6 +1075,22 @@ namespace Elements
                 {
                     BuffIcon = eStateIconType.NONE,
                     DebuffIcon = eStateIconType.DEBUFF_RECEIVE_MAGIC_DAMAGE_PERCENT
+                }
+            },
+            {
+                BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.BUFF_PHYSICAL_ATK
+                }
+            },
+            {
+                BuffParamKind.MAGIC_DAMAGE_UP_PERCENT,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.NONE,
+                    DebuffIcon = eStateIconType.BUFF_MAGIC_ATK
                 }
             },
             {
@@ -1695,6 +1729,18 @@ namespace Elements
             set;
         }
 
+        public int StartPhysicalDamageUpPercent
+        {
+            get;
+            set;
+        }
+
+        public int StartMagicDamageUpPercent
+        {
+            get;
+            set;
+        }
+
         public int Level { get; protected set; }
 
         private FloatWithEx _hp  = 0f;
@@ -1805,6 +1851,18 @@ namespace Elements
             set;
         }
 
+        public int AdditionalPhysicalDamageUpPercent
+        {
+            get;
+            set;
+        }
+
+        public int AdditionalMagicDamageUpPercent
+        {
+            get;
+            set;
+        }
+
         public long MaxHpAfterPassive
         {
             get;
@@ -1869,6 +1927,10 @@ namespace Elements
         public float PhysicalReceiveDamagePercentOrMin => Mathf.Max(0f, (float)((int)AdditionalPhysicalReceiveDamagePercent + (int)AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
 
         public float MagicReceiveDamagePercentOrMin => Mathf.Max(0f, (float)((int)AdditionalMagicReceiveDamagePercent + (int)AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
+
+        public float PhysicalDamageUpPercentOrMin => Mathf.Max(0f, (float)((int)AdditionalPhysicalDamageUpPercent + 100f));
+
+        public float MagicDamageUpPercentOrMin => Mathf.Max(0f, (float)((int)AdditionalMagicDamageUpPercent + 100f));
 
         public float StartHpPercent { get; private set; }
 
@@ -2509,6 +2571,8 @@ this.updateCurColor();
             AdditionalPhysicalAndMagicReceiveDamagePercent = (StartPhysicalAndMagicReceiveDamagePercent = 0);
             AdditionalPhysicalReceiveDamagePercent = (StartPhysicalReceiveDamagePercent = 0);
             AdditionalMagicReceiveDamagePercent = (StartMagicReceiveDamagePercent = 0);
+            AdditionalPhysicalDamageUpPercent = (StartPhysicalDamageUpPercent = 0);
+            AdditionalMagicDamageUpPercent = (StartMagicDamageUpPercent = 0);
 
             MoveSpeed = StartMoveSpeed = _data.MasterData.MoveSpeed;
             moveRate = IsMoveSpeedForceZero ? 0.0f : MoveSpeedZero * (_isOther ? -1f : 1f);
@@ -4127,6 +4191,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.BLACK_FRAME:
                     result = UnitCtrl.eAbnormalStateCategory.BLACK_FRAME;
                     break;
+                case UnitCtrl.eAbnormalState.WORLD_LIGHTNING:
+                    result = UnitCtrl.eAbnormalStateCategory.WORLD_LIGHTNING;
+                    break;
             }
             return result;
         }
@@ -4187,6 +4254,7 @@ this.updateCurColor();
                     case eAbnormalState.HEX:
                     case eAbnormalState.COMPENSATION:
                     case eAbnormalState.POISON_BY_BEHAVIOUR:
+                    case eAbnormalState.WORLD_LIGHTNING:
                     case eAbnormalState.POISON2:
                     case eAbnormalState.CURSE2:
                         OnSlipDamage.Call();
@@ -4249,7 +4317,9 @@ this.updateCurColor();
                             IsDamageRelease = _isDamageRelease,
                             ShowsIcon = false,
                             Skill = _skill,
-                            Source = _source
+                            Source = _source,
+                            ActionDetail1 = _action?.ActionDetail1 ?? 0,
+                            ActionDetail2 = _action?.ActionDetail2 ?? 0,
                         }), ePauseType.SYSTEM);
                         return;
                     }
@@ -4267,6 +4337,8 @@ this.updateCurColor();
                     stateCategoryData.IsDamageRelease = _isDamageRelease;
                     stateCategoryData.IsReleasedByDamage = false;
                     stateCategoryData.ShowsIcon = _showsIcon;
+                    stateCategoryData.ActionDetail1 = _action?.ActionDetail1 ?? 0;
+                    stateCategoryData.ActionDetail2 = _action?.ActionDetail2 ?? 0;
 
                     if (_action != null)
                         stateCategoryData.EnergyChargeMultiple = _action.EnergyChargeMultiple;
@@ -4988,6 +5060,7 @@ this.updateCurColor();
                     }
                     break;
                 case eAbnormalState.POISON_BY_BEHAVIOUR:
+                case eAbnormalState.WORLD_LIGHTNING:
                     if (_enable)
                     {
                         damageByBehaviourDictionary[_abnormalState] = delegate (bool _isForce)
@@ -5415,7 +5488,26 @@ this.updateCurColor();
             }
             eAbnormalStateCategory abnormalStateCategory = GetAbnormalStateCategory(_abnormalState);
             AbnormalStateCategoryData categoryData = abnormalStateCategoryDataDictionary[abnormalStateCategory];
-            int num = (int)categoryData.MainValue;
+            int num = 0;
+            switch (categoryData.ActionDetail2) 
+            {
+                case 0:
+                    num = (int)categoryData.MainValue;
+                    break;
+                case 1:
+                    num = (int)((int)categoryData.MainValue / 100f * (float)this.MaxHp);
+                    break;
+                case 2:
+                    num = (int)((int)categoryData.MainValue / 100f * (float)this.Hp);
+                    break;
+                case 3:
+                    num = (int)((int)categoryData.MainValue / 100f * (float)this.StartMaxHP);
+                    break;
+            }
+            if (categoryData.ActionDetail2 != 0)
+            {
+                num = Mathf.Min(num, (int)categoryData.SubValue);
+            }
             DamageData damageData = new DamageData
             {
                 Target = GetFirstParts(),
@@ -6133,19 +6225,21 @@ this.updateCurColor();
                 valueStr += i + ",";
             }
             action?.Invoke("对目标添加" + _kind.GetDescription() + (_isBuff ? "BUFF" : "DEBUFF") + ",值" + valueStr + "持续时间" + _time + "秒");
-            IEnumerator _cr = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
+            BuffDebuffCoroutineDataSet _cr = new BuffDebuffCoroutineDataSet();
+            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
+            // TODO fill _cr Enable EnvironmentId
 
             buffDebuffCoroutineList.Add(_cr);
 
-            if (!_cr.MoveNext())
+            if (!_cr.Coroutine.MoveNext())
                 return;
-            AppendCoroutine(_cr, ePauseType.SYSTEM);
+            AppendCoroutine(_cr.Coroutine, ePauseType.SYSTEM);
 
         }
 
         private bool isStopBuffDebuffEffectTimer;
 
-        private List<IEnumerator> buffDebuffCoroutineList = new List<IEnumerator>();
+        public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
 
         // Elements.UnitCtrl
@@ -6154,7 +6248,7 @@ this.updateCurColor();
             isStopBuffDebuffEffectTimer = true;
             for (int num = buffDebuffCoroutineList.Count - 1; num >= 0; num--)
             {
-                if (!buffDebuffCoroutineList[num].MoveNext())
+                if (!buffDebuffCoroutineList[num].Coroutine.MoveNext())
                 {
                     buffDebuffCoroutineList.RemoveAt(num);
                 }
@@ -6321,21 +6415,18 @@ this.updateCurColor();
             {
                 return;
             }
+            eStateIconType eStateIconType2 = eStateIconType.NONE;
+			if (_showsIcon)
+			{
+				eStateIconType2 = findBuffDebuffIcon(_kind, _isBuff, _additional);
+                if (eStateIconType2 == eStateIconType.NONE)
+                {
+                    Debug.LogError("角色技能图标" + _kind.GetDescription() + "丢失！");
+                }
+			}
 
             extraKey = extraKey ?? _value;
-            BuffDebuffConstData buffDebuff = new BuffDebuffConstData
-            {
-                BuffIcon = eStateIconType.NONE,
-                DebuffIcon = eStateIconType.NONE
-            };
-
-            if (BUFF_DEBUFF_ICON_DIC.TryGetValue(_kind, out var value0))
-            {
-                buffDebuff = value0;
-            }
-            else
-                Debug.LogError("角色技能图标" + _kind.GetDescription() + "丢失！");
-            eStateIconType IDAFJHFJKOL = _isBuff ? buffDebuff.BuffIcon : buffDebuff.DebuffIcon;
+            eStateIconType IDAFJHFJKOL = eStateIconType2;
             OnChangeState.Call(this, IDAFJHFJKOL, _enable);
             string des = "";
             FloatWithEx MainValue = 0;
@@ -6401,6 +6492,20 @@ this.updateCurColor();
             }
             return debuffCounterDictionary[_kind] > 0;
         }
+
+        private eStateIconType findBuffDebuffIcon(BuffParamKind _kind, bool _isBuff, bool _additional)
+        {
+            if (_additional && ADDITIONAL_BUFF_ICON_DIC.TryGetValue(_kind, out var additionalIcon))
+            {
+                return additionalIcon;
+            }
+            if (BUFF_DEBUFF_ICON_DIC.TryGetValue(_kind, out var buffDebuffIcons))
+            {
+                return _isBuff ? buffDebuffIcons.BuffIcon : buffDebuffIcons.DebuffIcon;
+            }
+            return eStateIconType.NONE;
+        }
+
         private Color curColor { get; set; }
 
         //private Dictionary<ChangeColorEffect, Color> curColorChannel { get; set; }
@@ -6719,6 +6824,14 @@ this.updateCurColor();
             },
             {
                 BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.MAGIC_DAMAGE_UP_PERCENT,
                 0
             },
             {
@@ -7209,6 +7322,14 @@ this.updateCurColor();
             {
                 num1++;
             }
+            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT] > 0)
+            {
+                num1++;
+            }
+            if (debuffCounterDictionary[BuffParamKind.MAGIC_DAMAGE_UP_PERCENT] > 0)
+            {
+                num1++;
+            }
             if (debuffCounterDictionary[BuffParamKind.MAX_HP] > 0)
                 ++num1;
             float num2 = 1f;
@@ -7301,6 +7422,14 @@ this.updateCurColor();
             },
             {
                 BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT,
+                0
+            },
+            {
+                BuffParamKind.MAGIC_DAMAGE_UP_PERCENT,
                 0
             },
             {
@@ -9697,6 +9826,7 @@ this.updateCurColor();
         private int walkCoroutineId { get; set; }
 
         public bool EnemyPointDone { get; set; }
+        public bool RevivalFlagForEnvironment { get; set; }
 
         public int EnemyPoint { get; private set; }
 
@@ -12454,6 +12584,9 @@ this.updateCurColor();
             ENERGY_DAMAGE_REDUCE,
             // Token: 0x0400282A RID: 10282
             BLACK_FRAME,
+            FLIGHT,
+            ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY,
+            WORLD_LIGHTNING,
             NUM,
             TOP = 0,
             END = NUM
@@ -12510,6 +12643,10 @@ this.updateCurColor();
             RECEIVE_PHYSICAL_DAMAGE_PERCENT = 0x10,
             [Description("受到魔暴伤提升")]
             RECEIVE_MAGIC_DAMAGE_PERCENT = 17,
+            [Description("物理伤害百分比提升")]
+            PHYSICAL_DAMAGE_UP_PERCENT = 18,
+            [Description("魔法伤害百分比提升")]
+            MAGIC_DAMAGE_UP_PERCENT = 19,
             MAX_HP = 100, // 0x00000064
             NONE = 101, // 0x00000065
             NUM = 101, // 0x00000065

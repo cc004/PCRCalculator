@@ -192,9 +192,20 @@ namespace PCRCaculator
             {
                 backtype = 9;
             }
-            if (isFav != null){
-                isFav.onValueChanged.AddListener(value => OnFavToggleChanged(value, data));
-                isFav.isOn = data.fav;
+            if (isFav != null)
+            {
+                if (GuildManager.Instance.SettingData.isFavEnabled)
+                {
+                    isFav.gameObject.SetActive(true);
+
+                    isFav.onValueChanged.RemoveAllListeners();
+                    isFav.onValueChanged.AddListener(value => OnFavToggleChanged(value, data));
+                    isFav.isOn = data.fav;
+                }
+                else
+                {
+                    isFav.gameObject.SetActive(false);
+                }
             }
             backImage.sprite = backgrounds1[backtype < backgrounds1.Count ? backtype : (backgrounds1.Count - 1)];
             if (buttonType == ButtonType.typeA)

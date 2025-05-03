@@ -198,26 +198,45 @@ namespace Elements
                         flag = BattleManager.Random(0.0f, 100f, new RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double)ActionDetail1;
                         break;
                     }
-                    if ((base.ActionDetail1 > 600 && base.ActionDetail1 < 700) || base.ActionDetail1 > 6000)
+                    else if ((base.ActionDetail1 > 600 && base.ActionDetail1 < 700) || base.ActionDetail1 > 6000)
                     {
                         eStateIconType eStateIconType = eStateIconType.INVALID_VALUE;
                         eStateIconType = (eStateIconType)((base.ActionDetail1 <= 6000) ? (base.ActionDetail1 - 600) : (base.ActionDetail1 - 6000));
                         flag = _target.Owner.SealDictionary.ContainsKey(eStateIconType) && ((_valueDictinary[eValueNumber.VALUE_3] != 0f) ? ((float)_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() >= _valueDictinary[eValueNumber.VALUE_3]) : (_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() > 0));
                         break;
                     }
-                    if (base.ActionDetail1 >= 1600)
+                    else if ((ActionDetail1 & ~1) == 2000)
                     {
-                        flag = isAbnormalState((eIfAbnormalState)(base.ActionDetail1 % 100), _target);
+                        var filterUnit = new HashSet<UnitCtrl>();
+                        int filterType = (ActionDetail1 == 2000 ? 1 : 2);
+                        for (int index = 0; index < TargetList.Count; ++index)
+                        {
+                            if (TargetList[index].Owner.AtkType == filterType)
+                                filterUnit.Add(TargetList[index].Owner);
+                        }
+                        int threshold = (int)_valueDictinary[eValueNumber.VALUE_3];
+                        if (threshold <= filterUnit.Count)
+                        {
+                            flag = true;
+                        }
+                    }
+                    else if (ActionDetail1 >= 3000)
+                    {
+                        flag = battleManager.ExistsEnvironment(ActionDetail1 - 3000);
+                    }
+                    else if (ActionDetail1 >= 1600)
+                    {
+                        flag = isAbnormalState((eIfAbnormalState)(ActionDetail1 % 100), _target);
                         break;
                     }
-                    if (ActionDetail1 > 1200)
+                    else if (ActionDetail1 > 1200)
                     {
                         int num = 0;
                         _target.Owner.SkillExecCountDictionary.TryGetValue(ActionDetail1 % 100 / 10, out num);
                         flag = num == ActionDetail1 % 10;
                         break;
                     }
-                    if (ActionDetail1 > 900)
+                    else if (ActionDetail1 > 900)
                     {
                         flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
                         var now = _target.Owner.Hp / _target.Owner.MaxHp;
@@ -245,7 +264,7 @@ namespace Elements
 
                         break;
                     }
-                    if (ActionDetail1 > 700)
+                    else if (ActionDetail1 > 700)
                     {
                         flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner)).Count == ActionDetail1 - 700;
                         break;

@@ -10,7 +10,7 @@ namespace Elements
   {
         OLD_OWNER_SIDE = 0,
         OTHER_SIDE = 1,
-    OWNER_SITE = 2,
-    ALL = 3,
+        OWNER_SITE = 2,
+        ALL = 3,
   }
 }

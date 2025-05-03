@@ -1,160 +1,7 @@
 fileFormatVersion: 2
-guid: a5495ff0675f3f54eaafd63235d59650
+guid: f0ade11d8afe0fe408e3fc030606807d
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -4133904955079355333
-    second: AtlasAbnormalState_0
-  - first:
-      213: -3802270224062804141
-    second: AtlasAbnormalState_1
-  - first:
-      213: 1788650547803496077
-    second: AtlasAbnormalState_2
-  - first:
-      213: 7946346280265874086
-    second: AtlasAbnormalState_3
-  - first:
-      213: -7068747393185864462
-    second: AtlasAbnormalState_4
-  - first:
-      213: -6946948003845490423
-    second: AtlasAbnormalState_5
-  - first:
-      213: -90865779731075538
-    second: AtlasAbnormalState_6
-  - first:
-      213: -3134105120046814956
-    second: AtlasAbnormalState_7
-  - first:
-      213: 1802827965724181975
-    second: AtlasAbnormalState_8
-  - first:
-      213: -7333277435040625405
-    second: AtlasAbnormalState_9
-  - first:
-      213: 5727708138371292075
-    second: AtlasAbnormalState_10
-  - first:
-      213: -4337217415768375973
-    second: AtlasAbnormalState_11
-  - first:
-      213: -6539922729071412873
-    second: AtlasAbnormalState_12
-  - first:
-      213: 5857427677160277440
-    second: AtlasAbnormalState_13
-  - first:
-      213: -6315955320149892227
-    second: AtlasAbnormalState_14
-  - first:
-      213: -5110917521352986063
-    second: AtlasAbnormalState_15
-  - first:
-      213: 2941830105559839289
-    second: AtlasAbnormalState_16
-  - first:
-      213: -6456223709872550457
-    second: AtlasAbnormalState_17
-  - first:
-      213: 2791357293349258492
-    second: AtlasAbnormalState_18
-  - first:
-      213: -5261510123682168072
-    second: AtlasAbnormalState_19
-  - first:
-      213: -6530360067367915677
-    second: AtlasAbnormalState_20
-  - first:
-      213: -3934750432734216537
-    second: AtlasAbnormalState_21
-  - first:
-      213: 276745498116474192
-    second: AtlasAbnormalState_22
-  - first:
-      213: -2158484522665402130
-    second: AtlasAbnormalState_23
-  - first:
-      213: 1788158781460966015
-    second: AtlasAbnormalState_24
-  - first:
-      213: 5146829316291238301
-    second: AtlasAbnormalState_25
-  - first:
-      213: 4021916594729089148
-    second: AtlasAbnormalState_26
-  - first:
-      213: 19047661918407061
-    second: AtlasAbnormalState_27
-  - first:
-      213: -2750100681232310844
-    second: AtlasAbnormalState_28
-  - first:
-      213: -7808797872729396168
-    second: AtlasAbnormalState_29
-  - first:
-      213: 8828252726717682904
-    second: AtlasAbnormalState_30
-  - first:
-      213: -4133628595090840392
-    second: AtlasAbnormalState_31
-  - first:
-      213: -6011666969976663150
-    second: AtlasAbnormalState_32
-  - first:
-      213: -2925194256627272908
-    second: AtlasAbnormalState_33
-  - first:
-      213: 3702512950974943900
-    second: AtlasAbnormalState_34
-  - first:
-      213: 1892515785706763595
-    second: AtlasAbnormalState_35
-  - first:
-      213: 5304859293974807836
-    second: AtlasAbnormalState_36
-  - first:
-      213: -4124508989015322648
-    second: AtlasAbnormalState_37
-  - first:
-      213: 2785858329581777572
-    second: AtlasAbnormalState_38
-  - first:
-      213: -2826022725214553017
-    second: AtlasAbnormalState_39
-  - first:
-      213: -2312930559885196266
-    second: AtlasAbnormalState_40
-  - first:
-      213: -6911504196280554058
-    second: AtlasAbnormalState_41
-  - first:
-      213: -4140987863270884347
-    second: AtlasAbnormalState_42
-  - first:
-      213: 8727756817284616367
-    second: AtlasAbnormalState_43
-  - first:
-      213: -6647194061528021437
-    second: AtlasAbnormalState_44
-  - first:
-      213: 8503595572806792041
-    second: AtlasAbnormalState_45
-  - first:
-      213: 483446060708318749
-    second: AtlasAbnormalState_46
-  - first:
-      213: -9188694677937734909
-    second: AtlasAbnormalState_47
-  - first:
-      213: -227582291755935212
-    second: AtlasAbnormalState_48
-  - first:
-      213: -7727864451665249488
-    second: AtlasAbnormalState_49
-  - first:
-      213: 4320947830955402046
-    second: AtlasAbnormalState_50
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 12
   mipmaps:
@@ -215,8 +62,8 @@ TextureImporter:
   compressionQualitySet: 0
   textureFormatSet: 0
   ignorePngGamma: 0
-  applyGammaDecoding: 1
-  cookieLightType: 1
+  applyGammaDecoding: 0
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -243,7 +90,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Android
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -255,7 +102,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Server
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -274,18 +121,18 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 396
+        y: 923
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b349441885b61a6c0800000000000000
-      internalID: -4133904955079355333
+      spriteID: efc2ccb218936634bbec450c40d184c3
+      internalID: 565574660
       vertices: []
       indices: 
       edges: []
@@ -295,18 +142,18 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 56
-        y: 396
+        y: 923
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 35f01b2606f9b3bc0800000000000000
-      internalID: -3802270224062804141
+      spriteID: 54ce56030138a5243b01e7b1780af6c8
+      internalID: 627816337
       vertices: []
       indices: 
       edges: []
@@ -316,18 +163,18 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 112
-        y: 396
-        width: 58
-        height: 64
+        y: 924
+        width: 64
+        height: 63
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d8e9221523092d810800000000000000
-      internalID: 1788650547803496077
+      spriteID: e3d28f052dc2dbf4b9c6d74a97ba9b90
+      internalID: -1851204342
       vertices: []
       indices: 
       edges: []
@@ -336,19 +183,19 @@ TextureImporter:
       name: AtlasAbnormalState_3
       rect:
         serializedVersion: 2
-        x: 173
-        y: 396
+        x: 178
+        y: 924
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6aa7e7127d7174e60800000000000000
-      internalID: 7946346280265874086
+      spriteID: bee248fc047621b4f93495f37b3d8564
+      internalID: 108065275
       vertices: []
       indices: 
       edges: []
@@ -357,19 +204,19 @@ TextureImporter:
       name: AtlasAbnormalState_4
       rect:
         serializedVersion: 2
-        x: 228
-        y: 396
+        x: 234
+        y: 924
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2f4203e92b3c6ed90800000000000000
-      internalID: -7068747393185864462
+      spriteID: 118c90c1052ff454aae99ed45034e643
+      internalID: 874896930
       vertices: []
       indices: 
       edges: []
@@ -378,19 +225,19 @@ TextureImporter:
       name: AtlasAbnormalState_5
       rect:
         serializedVersion: 2
-        x: 284
-        y: 396
-        width: 58
+        x: 290
+        y: 924
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9093ea5d89b779f90800000000000000
-      internalID: -6946948003845490423
+      spriteID: 81deddbff37b92b42a14c53de788b440
+      internalID: 1563720155
       vertices: []
       indices: 
       edges: []
@@ -399,19 +246,19 @@ TextureImporter:
       name: AtlasAbnormalState_6
       rect:
         serializedVersion: 2
-        x: 344
-        y: 396
+        x: 346
+        y: 923
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e2ee3e40e0e2dbef0800000000000000
-      internalID: -90865779731075538
+      spriteID: fd41104cef1b6b94ba49d9f86eecf62f
+      internalID: -374004196
       vertices: []
       indices: 
       edges: []
@@ -420,19 +267,19 @@ TextureImporter:
       name: AtlasAbnormalState_7
       rect:
         serializedVersion: 2
-        x: 400
-        y: 396
+        x: 402
+        y: 923
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 41960ee9ffb6184d0800000000000000
-      internalID: -3134105120046814956
+      spriteID: df1e5a98de694ee4c9b458169cf43179
+      internalID: 1037476241
       vertices: []
       indices: 
       edges: []
@@ -441,19 +288,19 @@ TextureImporter:
       name: AtlasAbnormalState_8
       rect:
         serializedVersion: 2
-        x: 0
-        y: 330
-        width: 54
-        height: 64
+        x: 458
+        y: 966
+        width: 52
+        height: 52
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7d54128ab7ee40910800000000000000
-      internalID: 1802827965724181975
+      spriteID: 7725ae93896b2cd4c8f88b97ed15ae51
+      internalID: -1345991967
       vertices: []
       indices: 
       edges: []
@@ -462,19 +309,19 @@ TextureImporter:
       name: AtlasAbnormalState_9
       rect:
         serializedVersion: 2
-        x: 56
-        y: 330
-        width: 54
-        height: 64
+        x: 0
+        y: 858
+        width: 63
+        height: 63
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 30d0405b607fa3a90800000000000000
-      internalID: -7333277435040625405
+      spriteID: e28419d028c5d604096661025ef7dbf2
+      internalID: 1296898209
       vertices: []
       indices: 
       edges: []
@@ -484,18 +331,18 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 112
-        y: 330
+        y: 858
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bab1cb48438ec7f40800000000000000
-      internalID: 5727708138371292075
+      spriteID: 5e4c1c9fb807f74419901b1ab074f5fd
+      internalID: 164206876
       vertices: []
       indices: 
       edges: []
@@ -505,18 +352,18 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 168
-        y: 330
-        width: 54
+        y: 858
+        width: 63
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b5dfc7b6dbb1fc3c0800000000000000
-      internalID: -4337217415768375973
+      spriteID: a66d737c0460b0946a31fee78ecad656
+      internalID: 1226688132
       vertices: []
       indices: 
       edges: []
@@ -525,19 +372,19 @@ TextureImporter:
       name: AtlasAbnormalState_12
       rect:
         serializedVersion: 2
-        x: 224
-        y: 330
+        x: 233
+        y: 858
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 779f13b8de68d35a0800000000000000
-      internalID: -6539922729071412873
+      spriteID: 3a1a203dca3b27c44b407b7f8cfb00cb
+      internalID: 409394135
       vertices: []
       indices: 
       edges: []
@@ -546,19 +393,19 @@ TextureImporter:
       name: AtlasAbnormalState_13
       rect:
         serializedVersion: 2
-        x: 280
-        y: 330
+        x: 289
+        y: 858
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0c50eaa3073c94150800000000000000
-      internalID: 5857427677160277440
+      spriteID: dcc1f6920fa5103428f94ad2dcb8bfbd
+      internalID: -987634730
       vertices: []
       indices: 
       edges: []
@@ -567,19 +414,19 @@ TextureImporter:
       name: AtlasAbnormalState_14
       rect:
         serializedVersion: 2
-        x: 336
-        y: 330
+        x: 345
+        y: 857
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d732a3589183958a0800000000000000
-      internalID: -6315955320149892227
+      spriteID: 0e2c50667f2fe184da5a6f6f363f1eee
+      internalID: -964191059
       vertices: []
       indices: 
       edges: []
@@ -588,19 +435,19 @@ TextureImporter:
       name: AtlasAbnormalState_15
       rect:
         serializedVersion: 2
-        x: 392
-        y: 330
+        x: 401
+        y: 857
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1327f67d79f5219b0800000000000000
-      internalID: -5110917521352986063
+      spriteID: a89dc9daaea3b90459f7601f3c9200d0
+      internalID: 900765434
       vertices: []
       indices: 
       edges: []
@@ -609,19 +456,19 @@ TextureImporter:
       name: AtlasAbnormalState_16
       rect:
         serializedVersion: 2
-        x: 0
-        y: 264
-        width: 54
-        height: 64
+        x: 458
+        y: 912
+        width: 52
+        height: 52
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 932b17ff4ea73d820800000000000000
-      internalID: 2941830105559839289
+      spriteID: e0b31ed89fdffc7458159c73f77f03f5
+      internalID: 894007345
       vertices: []
       indices: 
       edges: []
@@ -630,19 +477,19 @@ TextureImporter:
       name: AtlasAbnormalState_17
       rect:
         serializedVersion: 2
-        x: 56
-        y: 264
-        width: 54
-        height: 64
+        x: 457
+        y: 858
+        width: 52
+        height: 52
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7cd879e0eb2e666a0800000000000000
-      internalID: -6456223709872550457
+      spriteID: 82d507667aa34d74cbb30173125ee061
+      internalID: -747919886
       vertices: []
       indices: 
       edges: []
@@ -651,19 +498,19 @@ TextureImporter:
       name: AtlasAbnormalState_18
       rect:
         serializedVersion: 2
-        x: 112
-        y: 264
-        width: 54
-        height: 64
+        x: 511
+        y: 858
+        width: 52
+        height: 52
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cf447474ba4ecb620800000000000000
-      internalID: 2791357293349258492
+      spriteID: 37e2b05890eaf6f46ba2263574585eb0
+      internalID: -1045660681
       vertices: []
       indices: 
       edges: []
@@ -672,19 +519,19 @@ TextureImporter:
       name: AtlasAbnormalState_19
       rect:
         serializedVersion: 2
-        x: 168
-        y: 264
-        width: 58
+        x: 0
+        y: 792
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8f28dcf4b6c5bf6b0800000000000000
-      internalID: -5261510123682168072
+      spriteID: 0463815c6cb3b5347abf2a73c4388356
+      internalID: 1059600281
       vertices: []
       indices: 
       edges: []
@@ -693,19 +540,19 @@ TextureImporter:
       name: AtlasAbnormalState_20
       rect:
         serializedVersion: 2
-        x: 228
-        y: 264
+        x: 56
+        y: 792
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 36fa3293e108f55a0800000000000000
-      internalID: -6530360067367915677
+      spriteID: 0502a52e67661bb42ade00f310c95109
+      internalID: -1365184995
       vertices: []
       indices: 
       edges: []
@@ -714,19 +561,19 @@ TextureImporter:
       name: AtlasAbnormalState_21
       rect:
         serializedVersion: 2
-        x: 284
-        y: 264
+        x: 112
+        y: 792
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7aeff012455f469c0800000000000000
-      internalID: -3934750432734216537
+      spriteID: fd7a084c33cedca4691a94a0db690699
+      internalID: 269480387
       vertices: []
       indices: 
       edges: []
@@ -735,19 +582,19 @@ TextureImporter:
       name: AtlasAbnormalState_22
       rect:
         serializedVersion: 2
-        x: 341
-        y: 263
+        x: 168
+        y: 792
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 055cb64709237d300800000000000000
-      internalID: 276745498116474192
+      spriteID: 44965137d267319459a1fe7adc136baa
+      internalID: -1497049443
       vertices: []
       indices: 
       edges: []
@@ -756,19 +603,19 @@ TextureImporter:
       name: AtlasAbnormalState_23
       rect:
         serializedVersion: 2
-        x: 1
-        y: 198
+        x: 224
+        y: 792
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ee0a95543c58b02e0800000000000000
-      internalID: -2158484522665402130
+      spriteID: d14ea828460576a49bd1025266afe2d9
+      internalID: -2062019162
       vertices: []
       indices: 
       edges: []
@@ -777,19 +624,19 @@ TextureImporter:
       name: AtlasAbnormalState_24
       rect:
         serializedVersion: 2
-        x: 56
-        y: 198
-        width: 58
+        x: 280
+        y: 792
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f7ae9fa00f0d0d810800000000000000
-      internalID: 1788158781460966015
+      spriteID: be2810d65f0385f48842298e4cf46fc3
+      internalID: 588725334
       vertices: []
       indices: 
       edges: []
@@ -798,19 +645,19 @@ TextureImporter:
       name: AtlasAbnormalState_25
       rect:
         serializedVersion: 2
-        x: 116
-        y: 198
+        x: 336
+        y: 791
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d991b1d7ef53d6740800000000000000
-      internalID: 5146829316291238301
+      spriteID: f3a69d4e99dec0c41ba16cceb1e9d9dc
+      internalID: 686559980
       vertices: []
       indices: 
       edges: []
@@ -819,19 +666,19 @@ TextureImporter:
       name: AtlasAbnormalState_26
       rect:
         serializedVersion: 2
-        x: 172
-        y: 198
+        x: 392
+        y: 791
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c78731975d7b0d730800000000000000
-      internalID: 4021916594729089148
+      spriteID: 6d2e2f2ad31dd8e4698cb7c721500190
+      internalID: -656500273
       vertices: []
       indices: 
       edges: []
@@ -840,19 +687,19 @@ TextureImporter:
       name: AtlasAbnormalState_27
       rect:
         serializedVersion: 2
-        x: 228
-        y: 198
+        x: 457
+        y: 792
         width: 54
-        height: 64
+        height: 63
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 599c2726fbba34000800000000000000
-      internalID: 19047661918407061
+      spriteID: 3a6b637a34e844148af7eb1848a4ea89
+      internalID: 1872602344
       vertices: []
       indices: 
       edges: []
@@ -861,19 +708,19 @@ TextureImporter:
       name: AtlasAbnormalState_28
       rect:
         serializedVersion: 2
-        x: 284
-        y: 198
-        width: 54
-        height: 64
+        x: 514
+        y: 792
+        width: 52
+        height: 52
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4cd9696400ea5d9d0800000000000000
-      internalID: -2750100681232310844
+      spriteID: 7e24b3daeb9f09747b6da784ff10650f
+      internalID: 897294209
       vertices: []
       indices: 
       edges: []
@@ -882,19 +729,19 @@ TextureImporter:
       name: AtlasAbnormalState_29
       rect:
         serializedVersion: 2
-        x: 340
-        y: 198
+        x: 0
+        y: 726
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 83c632125b391a390800000000000000
-      internalID: -7808797872729396168
+      spriteID: 7a3e9dde64d75814ba2e8d23126e83b8
+      internalID: -1187420885
       vertices: []
       indices: 
       edges: []
@@ -903,19 +750,19 @@ TextureImporter:
       name: AtlasAbnormalState_30
       rect:
         serializedVersion: 2
-        x: 0
-        y: 132
-        width: 58
+        x: 56
+        y: 726
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8d49163b411448a70800000000000000
-      internalID: 8828252726717682904
+      spriteID: d28cf4c0743951f459cd40f4f5fe959f
+      internalID: -858755688
       vertices: []
       indices: 
       edges: []
@@ -924,19 +771,19 @@ TextureImporter:
       name: AtlasAbnormalState_31
       rect:
         serializedVersion: 2
-        x: 60
-        y: 132
+        x: 112
+        y: 726
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8b4a63491b662a6c0800000000000000
-      internalID: -4133628595090840392
+      spriteID: b7792eb7759c335418d3c52c74972cb1
+      internalID: 1635129970
       vertices: []
       indices: 
       edges: []
@@ -945,19 +792,19 @@ TextureImporter:
       name: AtlasAbnormalState_32
       rect:
         serializedVersion: 2
-        x: 116
-        y: 132
+        x: 168
+        y: 726
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2939792fdb4429ca0800000000000000
-      internalID: -6011666969976663150
+      spriteID: a843c8a0d074e9e4ca2bac9a2be45003
+      internalID: 1651687953
       vertices: []
       indices: 
       edges: []
@@ -966,19 +813,19 @@ TextureImporter:
       name: AtlasAbnormalState_33
       rect:
         serializedVersion: 2
-        x: 172
-        y: 132
+        x: 224
+        y: 726
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 433f7ba625f9767d0800000000000000
-      internalID: -2925194256627272908
+      spriteID: ad3f41d953a1bbb48b49ba4d80324978
+      internalID: -2057246097
       vertices: []
       indices: 
       edges: []
@@ -987,19 +834,19 @@ TextureImporter:
       name: AtlasAbnormalState_34
       rect:
         serializedVersion: 2
-        x: 228
-        y: 132
+        x: 280
+        y: 726
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c92152389e7f16330800000000000000
-      internalID: 3702512950974943900
+      spriteID: 8a87286e51dee9043bfadbcbdaa5cecd
+      internalID: -735766801
       vertices: []
       indices: 
       edges: []
@@ -1008,19 +855,19 @@ TextureImporter:
       name: AtlasAbnormalState_35
       rect:
         serializedVersion: 2
-        x: 284
-        y: 132
+        x: 336
+        y: 725
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b45fed28411934a10800000000000000
-      internalID: 1892515785706763595
+      spriteID: 3787131c58f5c144d9937a8beb5d4791
+      internalID: -907497995
       vertices: []
       indices: 
       edges: []
@@ -1029,19 +876,19 @@ TextureImporter:
       name: AtlasAbnormalState_36
       rect:
         serializedVersion: 2
-        x: 340
-        y: 132
+        x: 392
+        y: 725
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c154cc8eb65ae9940800000000000000
-      internalID: 5304859293974807836
+      spriteID: 3699b4cac9dfb8b46852981299b9c2dc
+      internalID: 994099356
       vertices: []
       indices: 
       edges: []
@@ -1050,19 +897,19 @@ TextureImporter:
       name: AtlasAbnormalState_37
       rect:
         serializedVersion: 2
-        x: 1
-        y: 66
-        width: 54
+        x: 448
+        y: 726
+        width: 58
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8ef06d45decc2c6c0800000000000000
-      internalID: -4124508989015322648
+      spriteID: c5c0bc68b01e18f4691a3a7506675089
+      internalID: -1994510487
       vertices: []
       indices: 
       edges: []
@@ -1071,19 +918,19 @@ TextureImporter:
       name: AtlasAbnormalState_38
       rect:
         serializedVersion: 2
-        x: 56
-        y: 66
+        x: 508
+        y: 726
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4a2f841046b59a620800000000000000
-      internalID: 2785858329581777572
+      spriteID: e47a20d48584e6d4780347d455c9866e
+      internalID: -1361603128
       vertices: []
       indices: 
       edges: []
@@ -1092,19 +939,19 @@ TextureImporter:
       name: AtlasAbnormalState_39
       rect:
         serializedVersion: 2
-        x: 112
-        y: 66
-        width: 54
-        height: 64
+        x: 564
+        y: 725
+        width: 52
+        height: 52
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 74cb768ed43f7c8d0800000000000000
-      internalID: -2826022725214553017
+      spriteID: 00e1dc1a6bdc5c949a789a4c7fa75ea5
+      internalID: -715818276
       vertices: []
       indices: 
       edges: []
@@ -1113,19 +960,19 @@ TextureImporter:
       name: AtlasAbnormalState_40
       rect:
         serializedVersion: 2
-        x: 168
-        y: 66
-        width: 60
+        x: 0
+        y: 660
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 614c5e309e1d6efd0800000000000000
-      internalID: -2312930559885196266
+      spriteID: ce397ed17624de2458604ca4dceb0de3
+      internalID: 1482749151
       vertices: []
       indices: 
       edges: []
@@ -1134,19 +981,19 @@ TextureImporter:
       name: AtlasAbnormalState_41
       rect:
         serializedVersion: 2
-        x: 229
-        y: 65
-        width: 57
-        height: 65
+        x: 56
+        y: 660
+        width: 54
+        height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6bd631d5d876510a0800000000000000
-      internalID: -6911504196280554058
+      spriteID: f11daca8af5e20a4f9ccd269b7035da4
+      internalID: 1412883001
       vertices: []
       indices: 
       edges: []
@@ -1155,19 +1002,19 @@ TextureImporter:
       name: AtlasAbnormalState_42
       rect:
         serializedVersion: 2
-        x: 285
-        y: 63
-        width: 55
-        height: 67
+        x: 112
+        y: 660
+        width: 54
+        height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 50cf88e6a714886c0800000000000000
-      internalID: -4140987863270884347
+      spriteID: 52ca2ff6708f67c4a8d27207dc23fd28
+      internalID: -1893739879
       vertices: []
       indices: 
       edges: []
@@ -1176,19 +1023,19 @@ TextureImporter:
       name: AtlasAbnormalState_43
       rect:
         serializedVersion: 2
-        x: 341
-        y: 65
+        x: 168
+        y: 660
         width: 54
-        height: 65
+        height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fa05e3c65983f1970800000000000000
-      internalID: 8727756817284616367
+      spriteID: a32ce30b82df37b49ba18030a50957f5
+      internalID: -1686428811
       vertices: []
       indices: 
       edges: []
@@ -1197,19 +1044,19 @@ TextureImporter:
       name: AtlasAbnormalState_44
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
+        x: 224
+        y: 660
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3464989283c60c3a0800000000000000
-      internalID: -6647194061528021437
+      spriteID: 25b13d75d61207d4591977b135e736a3
+      internalID: 740651621
       vertices: []
       indices: 
       edges: []
@@ -1218,19 +1065,19 @@ TextureImporter:
       name: AtlasAbnormalState_45
       rect:
         serializedVersion: 2
-        x: 56
-        y: 0
+        x: 280
+        y: 660
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 963bbb69e17d20670800000000000000
-      internalID: 8503595572806792041
+      spriteID: 83e03b557227c6a409fa39c40372b062
+      internalID: 942014775
       vertices: []
       indices: 
       edges: []
@@ -1239,19 +1086,19 @@ TextureImporter:
       name: AtlasAbnormalState_46
       rect:
         serializedVersion: 2
-        x: 112
-        y: 0
-        width: 58
+        x: 336
+        y: 659
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d1ec49c71ab85b600800000000000000
-      internalID: 483446060708318749
+      spriteID: bd0dcb2733842a745b60864474343a8a
+      internalID: 1451459506
       vertices: []
       indices: 
       edges: []
@@ -1260,19 +1107,19 @@ TextureImporter:
       name: AtlasAbnormalState_47
       rect:
         serializedVersion: 2
-        x: 172
-        y: 0
-        width: 58
+        x: 392
+        y: 659
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 30bbffbcfd23b7080800000000000000
-      internalID: -9188694677937734909
+      spriteID: 663eb3ec3a720594781f7dada011a9ad
+      internalID: 502962524
       vertices: []
       indices: 
       edges: []
@@ -1281,19 +1128,19 @@ TextureImporter:
       name: AtlasAbnormalState_48
       rect:
         serializedVersion: 2
-        x: 232
-        y: 0
-        width: 55
+        x: 448
+        y: 660
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 41ad7b68c1777dcf0800000000000000
-      internalID: -227582291755935212
+      spriteID: f3d993dd05913b445b356dfbae191e9e
+      internalID: -1116796448
       vertices: []
       indices: 
       edges: []
@@ -1302,19 +1149,19 @@ TextureImporter:
       name: AtlasAbnormalState_49
       rect:
         serializedVersion: 2
-        x: 288
-        y: 0
+        x: 504
+        y: 660
         width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 03bbf16a93c11c490800000000000000
-      internalID: -7727864451665249488
+      spriteID: d7e8286e7eae11348aab8ba25a84ff4e
+      internalID: -980440173
       vertices: []
       indices: 
       edges: []
@@ -1323,19 +1170,2854 @@ TextureImporter:
       name: AtlasAbnormalState_50
       rect:
         serializedVersion: 2
-        x: 344
-        y: 0
-        width: 55
+        x: 560
+        y: 659
+        width: 54
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e33671da82717fb30800000000000000
-      internalID: 4320947830955402046
+      spriteID: b19a6fd3f94c72c4eb914f18f8405a3e
+      internalID: -136175255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_51
+      rect:
+        serializedVersion: 2
+        x: 616
+        y: 659
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e313c48439b192c45ba652dc5a535178
+      internalID: -1910876271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_52
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 594
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63c37f19c4e9580478c04ab7c2ae3362
+      internalID: 816287685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_53
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 594
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 777caffa7b98ff740aa09323d9a7411b
+      internalID: 1260441889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_54
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 594
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc4cf4c260ff0ec4294b3df9ce414a71
+      internalID: -673324271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_55
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 594
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ca27b04dae5c7f4ea9374b9af607075
+      internalID: 316582028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_56
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 594
+        width: 57
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85ddaa03401f2b7418f10d94f77c7230
+      internalID: 2082957206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_57
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 593
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65b1f1b9e63055d4ab17f1948c436b76
+      internalID: 1853237642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_58
+      rect:
+        serializedVersion: 2
+        x: 339
+        y: 593
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9371d4bed426f164b91441a54ab12181
+      internalID: 1031659091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_59
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 594
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d705ebe8633661469aa7ddc1a2bcc91
+      internalID: -1043449958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_60
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 594
+        width: 63
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4de2660fb08d094cbe5dcb68a37b742
+      internalID: 1343347538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_61
+      rect:
+        serializedVersion: 2
+        x: 574
+        y: 594
+        width: 63
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a57838430bcdef4cb0f83cf043307ac
+      internalID: -383083605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_62
+      rect:
+        serializedVersion: 2
+        x: 639
+        y: 594
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6f432324555144498af1878d5996ae9
+      internalID: -219271261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_63
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99c19551e2b6cf64891d2b236525d076
+      internalID: -1211708195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_64
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af30cc3e743e6c34b826fef859ee681f
+      internalID: -1174468185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_65
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 093f05ccd0366534eb9b1283fdfa1e2a
+      internalID: 1282729604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_66
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 528
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b83d1b4f6fb4e34ab25b531941d05e4
+      internalID: -511200974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_67
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 527
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 549b0fe6ee3e7bb49951064f421c4d02
+      internalID: 1392116950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_68
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 528
+        width: 63
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2586a918480ca5d49928d6b09ebd8d57
+      internalID: 2085947242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_69
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 094a192bd81514d449c770dc856c9d56
+      internalID: -435402863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_70
+      rect:
+        serializedVersion: 2
+        x: 451
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8081bba31d943e54cba10c70d05af568
+      internalID: 169829896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_71
+      rect:
+        serializedVersion: 2
+        x: 507
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89d09d4a768811049bed84140e0fc6d4
+      internalID: 1314911106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_72
+      rect:
+        serializedVersion: 2
+        x: 563
+        y: 528
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b7620d2aedb37d4ca41d769b23369c0
+      internalID: 1644808282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_73
+      rect:
+        serializedVersion: 2
+        x: 619
+        y: 528
+        width: 63
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f95c2464670b4d147829853f956b16d7
+      internalID: 1073269559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_74
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 528
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25298f60661e2b543bd8a2064966979e
+      internalID: 1316739767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_75
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 462
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a62fa6936c9b5894e91eac3310757457
+      internalID: -160041405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_76
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 462
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1af06e0c53d114d45ae2b04000b72c17
+      internalID: 1992659449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_77
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 462
+        width: 64
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad0a5fc002d81364a809b56e63361525
+      internalID: 1525183286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_78
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 461
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f792ec8449e93f4fbb0c57932920962
+      internalID: 845683158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_79
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 462
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09393824721a6564fae26fc10f92f6cd
+      internalID: 1588750628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_80
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 462
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa1ac84e8093e3148ace2d765f0b78cf
+      internalID: 638323575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_81
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 462
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97919e86dacc85e4dacb9057d6d06d45
+      internalID: -48924436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_82
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 462
+        width: 64
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fbd64708223cdd94ea54bc18a74a3e6c
+      internalID: -1279917651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_83
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 462
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73222b4ce987ef34097472139ce01c31
+      internalID: -439247996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_84
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 462
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0066b55411682c479df1515bf6d685f
+      internalID: 1695912887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_85
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 462
+        width: 59
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b6db67f4bbe05245b75629d5b556fd8
+      internalID: 137246846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_86
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d7f41383fad44df41b6bfadf94b67a45
+      internalID: -2073487158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_87
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 396
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0811e15e0a676b4fb63987145d3bb62
+      internalID: -1107141494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_88
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99453260c04ff58478b9ccebcb4ce43a
+      internalID: 764882358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_89
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 395
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0131fc48e845ce4aba58bd75d085213
+      internalID: 812523224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_90
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c63c7efa2b107ee498a4241d5a723e8a
+      internalID: -1212312362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_91
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bd412e774bf08b47876693caf31421e
+      internalID: 1936905955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_92
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f60bd4488f4b67545a7e6e566391d96b
+      internalID: 1327627460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_93
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e77b8332c24aa842b9531b42dad74d0
+      internalID: 540668055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_94
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4bbb98337b91093429d18cbd4f381e17
+      internalID: -437938091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_95
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 396
+        width: 53
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97485bfb8fda6aa4dba55c832a25bb64
+      internalID: -1894748650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_96
+      rect:
+        serializedVersion: 2
+        x: 569
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 423565035e75605429003b4a0a1e9dc2
+      internalID: -1102643837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_97
+      rect:
+        serializedVersion: 2
+        x: 625
+        y: 396
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3170c71a0dc674c448296614453063f8
+      internalID: -1581855833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_98
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 396
+        width: 54
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da9b6881e180d96458c48e1f582c1264
+      internalID: -782686445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_99
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d02332e3f53748243bcfb42a914f99f1
+      internalID: 866396784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_100
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 262858d9eb633a844bbe54bc0c073c49
+      internalID: -617743360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_101
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3adad20e139b745479afda6dffe35411
+      internalID: -75874646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_102
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 329
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b856fff42ef7bb84fa8d747f6aa1d0a8
+      internalID: 1936046024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_103
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8818cb8b36d6ab6409a9f56cb3640c07
+      internalID: -2131777240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_104
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df500d8e58d97c54fb54c6066ba63697
+      internalID: -944183999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_105
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45a4724e9d140944f972ef5c0e9134b5
+      internalID: 561398350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_106
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 330
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5532719d1259a54a93d2e43a73e135b
+      internalID: 1472448895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_107
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e14e1e59b67978c478b4054101d50914
+      internalID: -756844122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_108
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c739c46812643c4eab7e8cf04e8d94c
+      internalID: 1067124345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_109
+      rect:
+        serializedVersion: 2
+        x: 570
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5baf6abf030d0eb46a024ca1d03a0eb6
+      internalID: 1780832290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_110
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 330
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 364875a2fa27ac945adab0a2a127c025
+      internalID: -484193709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_111
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 330
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19a5f1ee81a620844967227285a3a3ed
+      internalID: -2056058423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_112
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7aa471615b81f0c43bec64aba38f935c
+      internalID: -1355729605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_113
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d328781e66ae22f4bb03cc2aaf4899d4
+      internalID: 805221330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_114
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae8b3a9719f23a741bb340ab0991273c
+      internalID: -457081538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_115
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 263
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 300dbee15c0ed9741ad3a382abc3b937
+      internalID: 171190181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_116
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e9278af6176a094494d0105fa113b6a
+      internalID: 963693415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_117
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a154809bdee26844827bfc84e5e616e
+      internalID: 1351173680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_118
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b88d730c316c42745bf5acdf20d43ece
+      internalID: 107356679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_119
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cab5f4b3ffb80aa468c944e45e0ebc0d
+      internalID: 379637640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_120
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73575cb5458564840ba27c32025decef
+      internalID: 1458093543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_121
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00ccf78c61c5e1e46b9f25bf5620e711
+      internalID: 1909039597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_122
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 32353627798559444b7e0f0f92baf127
+      internalID: 2070515965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_123
+      rect:
+        serializedVersion: 2
+        x: 616
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c679f0a38860b8b4ba3bc4f00a07df08
+      internalID: -1144874333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_124
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14a154a2ba0b78941ba16b5ad74f538e
+      internalID: 275153134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_125
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 264
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79f203e978480fe4b955aa934e3d31c7
+      internalID: -153203297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_126
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 198
+        width: 64
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 632aa511df8060941b9c002ef7ef3b00
+      internalID: -495186911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_127
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb2b40a7b8b6e8142b8de20ffff7aa47
+      internalID: 1473787200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_128
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 197
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f49720479d142104c8124eb564684237
+      internalID: 998463680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_129
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc66620b0ad6e484680fee9c615fc17f
+      internalID: -501379593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_130
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d01938e0661afee4bab9d3c728a079e8
+      internalID: -1658285686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_131
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4a7adf45c96eaa42873c3d784bed4b5
+      internalID: -1128149036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_132
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f673a2de5547aa469b4b6715d045482
+      internalID: 372764936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_133
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91df25b488ad14a43bff55d3bc2bf2f9
+      internalID: -1162739751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_134
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 198
+        width: 53
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86e8f34704a92034097d9e4b60bf415b
+      internalID: -173719138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_135
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d797aeb3d314284d883583ff5cb885a
+      internalID: 1861405783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_136
+      rect:
+        serializedVersion: 2
+        x: 615
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dbded59e8835534883e1a63dc0078af
+      internalID: -1934883644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_137
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a22da3bef374da64c9cdb80a9f2ed42d
+      internalID: 1685168728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_138
+      rect:
+        serializedVersion: 2
+        x: 727
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f9d5086b75d7e742b8ba8a795546fdd
+      internalID: -1102139122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_139
+      rect:
+        serializedVersion: 2
+        x: 783
+        y: 198
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 609f2a3e9e4974241aa451cde00d3687
+      internalID: 11690396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_140
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d661ab9c0db09ac4db4e9ffef6f12a3a
+      internalID: 1005642167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_141
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 614f3216a5d7f7344b8519013ceb990d
+      internalID: -1468078333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_142
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 132
+        width: 63
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: deb9c9ca836d34546aed85b4718dcac2
+      internalID: -1150939256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_143
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f299b8d60035d44408c2cb5acd777437
+      internalID: -1979734905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_144
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5eaa27cb09537c14d8db97819fa9a3fc
+      internalID: 1679539657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_145
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1a03b5afa7f3cc46b31102826270a3e
+      internalID: 1481758352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_146
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35fe5bc69d084ef4fad0cd381b73904a
+      internalID: 1998885844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_147
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5d5aa0eeba36fc46b43fe650836f433
+      internalID: -1474974420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_148
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6e6c5a0bca8e364b888f553c76acd80
+      internalID: 376831354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_149
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07c98976bf4d5a341916c7b2774cc20e
+      internalID: 1411260465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_150
+      rect:
+        serializedVersion: 2
+        x: 570
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af508215354b36b43b4c14474cfb7a47
+      internalID: -1250851326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_151
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1575cfbb8765b547bf9590eb68e7875
+      internalID: 707326642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_152
+      rect:
+        serializedVersion: 2
+        x: 682
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5f1e65e7b8b6be45a125d51420ee3a1
+      internalID: 1292654035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_153
+      rect:
+        serializedVersion: 2
+        x: 738
+        y: 132
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66bb59217da0e82438cf5c2ffec44448
+      internalID: 1536152193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_154
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 132
+        width: 53
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94b2e5f2ae8693544aa64dfba242ef8d
+      internalID: -886471775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_155
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 734f504a53c559d4b87cd5983602d59b
+      internalID: 1075222250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_156
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2bb0671f7c2cd049a29558be58f6938
+      internalID: -1180228293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_157
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d023ed64f4daebc459b257cefa4eae54
+      internalID: -1743404208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_158
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 581c5e97fb637a14f91e368d5881725a
+      internalID: -402699744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_159
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d55e5effa9c5be4589a0abf295fdeaa
+      internalID: 1972004336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_160
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9cbee765c6362ff4e8cdaf408265d034
+      internalID: 670592039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_161
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 66
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11b5754019bafd941b82bdc6c72462ad
+      internalID: -273094667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_162
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f515194d476f253469d414e672e70b21
+      internalID: -883870546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_163
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a84e447fd92bf24789bb97b7c78bc82
+      internalID: 72996015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_164
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 66
+        width: 59
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b87a1fb0cc282e24d83ec61ac57e0aac
+      internalID: 64540478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_165
+      rect:
+        serializedVersion: 2
+        x: 569
+        y: 66
+        width: 57
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc7c82fd5b121a4449b0a3f1b6f54cb0
+      internalID: 1923477939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_166
+      rect:
+        serializedVersion: 2
+        x: 628
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1bd9843a02c4c2489678f32c7f58e7d
+      internalID: 1604556098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_167
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4a07bf4165f8e44c947a04d9015ec73
+      internalID: 1329264493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_168
+      rect:
+        serializedVersion: 2
+        x: 740
+        y: 66
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2f9e8576d7a5e8438a727139c59d718
+      internalID: 1825498020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_169
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 66
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bed21997e5efd1941baad0275a4bb55b
+      internalID: -704523911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_170
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 644bcb19d2123f441a79ab82b528d4a1
+      internalID: 1459304053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_171
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 0
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa306552c2a6c34498c50cce2147d5c8
+      internalID: -1365495775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_172
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24562d51b7682d54ab3a7ade545150b5
+      internalID: 197387374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_173
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1198a12a23d31942a7d72ce45d303be
+      internalID: -2087951645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_174
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 149614c590348b342821f273cc889bb0
+      internalID: 684819762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_175
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00f329ac13d40b34b8a19330ac71f01b
+      internalID: 1962701364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_176
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 775b181196a28c14b87a76b7291f52bc
+      internalID: -625861073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_177
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de1740d2506ab6c40a2dc24a862fb145
+      internalID: -128750876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_178
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 570c348be3992b148a6f6fbcdfaaae4a
+      internalID: 1153919058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_179
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23c4f0ee1a45da448832e8f398564a85
+      internalID: 1717268978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_180
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b55489abd4c1d374a9469fcb50eb56f2
+      internalID: -1495463947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_181
+      rect:
+        serializedVersion: 2
+        x: 620
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b2548db4015ad146b4701d1a7db67a1
+      internalID: 1392608208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_182
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ff94261e3a17fe40a19d8f74e662287
+      internalID: 1687106960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_183
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59f30df3068d3e1449e2dfc5657d09be
+      internalID: -1187883453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_184
+      rect:
+        serializedVersion: 2
+        x: 788
+        y: 0
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9872dd4acfe61604db544e03d8c93f6f
+      internalID: 412759717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasAbnormalState_185
+      rect:
+        serializedVersion: 2
+        x: 844
+        y: 0
+        width: 52
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 21f6378b84f5e8d48ad576a2bcafcf08
+      internalID: -1556944479
       vertices: []
       indices: 
       edges: []
@@ -1351,57 +4033,192 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      AtlasAbnormalState_0: -4133904955079355333
-      AtlasAbnormalState_1: -3802270224062804141
-      AtlasAbnormalState_10: 5727708138371292075
-      AtlasAbnormalState_11: -4337217415768375973
-      AtlasAbnormalState_12: -6539922729071412873
-      AtlasAbnormalState_13: 5857427677160277440
-      AtlasAbnormalState_14: -6315955320149892227
-      AtlasAbnormalState_15: -5110917521352986063
-      AtlasAbnormalState_16: 2941830105559839289
-      AtlasAbnormalState_17: -6456223709872550457
-      AtlasAbnormalState_18: 2791357293349258492
-      AtlasAbnormalState_19: -5261510123682168072
-      AtlasAbnormalState_2: 1788650547803496077
-      AtlasAbnormalState_20: -6530360067367915677
-      AtlasAbnormalState_21: -3934750432734216537
-      AtlasAbnormalState_22: 276745498116474192
-      AtlasAbnormalState_23: -2158484522665402130
-      AtlasAbnormalState_24: 1788158781460966015
-      AtlasAbnormalState_25: 5146829316291238301
-      AtlasAbnormalState_26: 4021916594729089148
-      AtlasAbnormalState_27: 19047661918407061
-      AtlasAbnormalState_28: -2750100681232310844
-      AtlasAbnormalState_29: -7808797872729396168
-      AtlasAbnormalState_3: 7946346280265874086
-      AtlasAbnormalState_30: 8828252726717682904
-      AtlasAbnormalState_31: -4133628595090840392
-      AtlasAbnormalState_32: -6011666969976663150
-      AtlasAbnormalState_33: -2925194256627272908
-      AtlasAbnormalState_34: 3702512950974943900
-      AtlasAbnormalState_35: 1892515785706763595
-      AtlasAbnormalState_36: 5304859293974807836
-      AtlasAbnormalState_37: -4124508989015322648
-      AtlasAbnormalState_38: 2785858329581777572
-      AtlasAbnormalState_39: -2826022725214553017
-      AtlasAbnormalState_4: -7068747393185864462
-      AtlasAbnormalState_40: -2312930559885196266
-      AtlasAbnormalState_41: -6911504196280554058
-      AtlasAbnormalState_42: -4140987863270884347
-      AtlasAbnormalState_43: 8727756817284616367
-      AtlasAbnormalState_44: -6647194061528021437
-      AtlasAbnormalState_45: 8503595572806792041
-      AtlasAbnormalState_46: 483446060708318749
-      AtlasAbnormalState_47: -9188694677937734909
-      AtlasAbnormalState_48: -227582291755935212
-      AtlasAbnormalState_49: -7727864451665249488
-      AtlasAbnormalState_5: -6946948003845490423
-      AtlasAbnormalState_50: 4320947830955402046
-      AtlasAbnormalState_6: -90865779731075538
-      AtlasAbnormalState_7: -3134105120046814956
-      AtlasAbnormalState_8: 1802827965724181975
-      AtlasAbnormalState_9: -7333277435040625405
+      AtlasAbnormalState_0: 565574660
+      AtlasAbnormalState_1: 627816337
+      AtlasAbnormalState_10: 164206876
+      AtlasAbnormalState_100: -617743360
+      AtlasAbnormalState_101: -75874646
+      AtlasAbnormalState_102: 1936046024
+      AtlasAbnormalState_103: -2131777240
+      AtlasAbnormalState_104: -944183999
+      AtlasAbnormalState_105: 561398350
+      AtlasAbnormalState_106: 1472448895
+      AtlasAbnormalState_107: -756844122
+      AtlasAbnormalState_108: 1067124345
+      AtlasAbnormalState_109: 1780832290
+      AtlasAbnormalState_11: 1226688132
+      AtlasAbnormalState_110: -484193709
+      AtlasAbnormalState_111: -2056058423
+      AtlasAbnormalState_112: -1355729605
+      AtlasAbnormalState_113: 805221330
+      AtlasAbnormalState_114: -457081538
+      AtlasAbnormalState_115: 171190181
+      AtlasAbnormalState_116: 963693415
+      AtlasAbnormalState_117: 1351173680
+      AtlasAbnormalState_118: 107356679
+      AtlasAbnormalState_119: 379637640
+      AtlasAbnormalState_12: 409394135
+      AtlasAbnormalState_120: 1458093543
+      AtlasAbnormalState_121: 1909039597
+      AtlasAbnormalState_122: 2070515965
+      AtlasAbnormalState_123: -1144874333
+      AtlasAbnormalState_124: 275153134
+      AtlasAbnormalState_125: -153203297
+      AtlasAbnormalState_126: -495186911
+      AtlasAbnormalState_127: 1473787200
+      AtlasAbnormalState_128: 998463680
+      AtlasAbnormalState_129: -501379593
+      AtlasAbnormalState_13: -987634730
+      AtlasAbnormalState_130: -1658285686
+      AtlasAbnormalState_131: -1128149036
+      AtlasAbnormalState_132: 372764936
+      AtlasAbnormalState_133: -1162739751
+      AtlasAbnormalState_134: -173719138
+      AtlasAbnormalState_135: 1861405783
+      AtlasAbnormalState_136: -1934883644
+      AtlasAbnormalState_137: 1685168728
+      AtlasAbnormalState_138: -1102139122
+      AtlasAbnormalState_139: 11690396
+      AtlasAbnormalState_14: -964191059
+      AtlasAbnormalState_140: 1005642167
+      AtlasAbnormalState_141: -1468078333
+      AtlasAbnormalState_142: -1150939256
+      AtlasAbnormalState_143: -1979734905
+      AtlasAbnormalState_144: 1679539657
+      AtlasAbnormalState_145: 1481758352
+      AtlasAbnormalState_146: 1998885844
+      AtlasAbnormalState_147: -1474974420
+      AtlasAbnormalState_148: 376831354
+      AtlasAbnormalState_149: 1411260465
+      AtlasAbnormalState_15: 900765434
+      AtlasAbnormalState_150: -1250851326
+      AtlasAbnormalState_151: 707326642
+      AtlasAbnormalState_152: 1292654035
+      AtlasAbnormalState_153: 1536152193
+      AtlasAbnormalState_154: -886471775
+      AtlasAbnormalState_155: 1075222250
+      AtlasAbnormalState_156: -1180228293
+      AtlasAbnormalState_157: -1743404208
+      AtlasAbnormalState_158: -402699744
+      AtlasAbnormalState_159: 1972004336
+      AtlasAbnormalState_16: 894007345
+      AtlasAbnormalState_160: 670592039
+      AtlasAbnormalState_161: -273094667
+      AtlasAbnormalState_162: -883870546
+      AtlasAbnormalState_163: 72996015
+      AtlasAbnormalState_164: 64540478
+      AtlasAbnormalState_165: 1923477939
+      AtlasAbnormalState_166: 1604556098
+      AtlasAbnormalState_167: 1329264493
+      AtlasAbnormalState_168: 1825498020
+      AtlasAbnormalState_169: -704523911
+      AtlasAbnormalState_17: -747919886
+      AtlasAbnormalState_170: 1459304053
+      AtlasAbnormalState_171: -1365495775
+      AtlasAbnormalState_172: 197387374
+      AtlasAbnormalState_173: -2087951645
+      AtlasAbnormalState_174: 684819762
+      AtlasAbnormalState_175: 1962701364
+      AtlasAbnormalState_176: -625861073
+      AtlasAbnormalState_177: -128750876
+      AtlasAbnormalState_178: 1153919058
+      AtlasAbnormalState_179: 1717268978
+      AtlasAbnormalState_18: -1045660681
+      AtlasAbnormalState_180: -1495463947
+      AtlasAbnormalState_181: 1392608208
+      AtlasAbnormalState_182: 1687106960
+      AtlasAbnormalState_183: -1187883453
+      AtlasAbnormalState_184: 412759717
+      AtlasAbnormalState_185: -1556944479
+      AtlasAbnormalState_19: 1059600281
+      AtlasAbnormalState_2: -1851204342
+      AtlasAbnormalState_20: -1365184995
+      AtlasAbnormalState_21: 269480387
+      AtlasAbnormalState_22: -1497049443
+      AtlasAbnormalState_23: -2062019162
+      AtlasAbnormalState_24: 588725334
+      AtlasAbnormalState_25: 686559980
+      AtlasAbnormalState_26: -656500273
+      AtlasAbnormalState_27: 1872602344
+      AtlasAbnormalState_28: 897294209
+      AtlasAbnormalState_29: -1187420885
+      AtlasAbnormalState_3: 108065275
+      AtlasAbnormalState_30: -858755688
+      AtlasAbnormalState_31: 1635129970
+      AtlasAbnormalState_32: 1651687953
+      AtlasAbnormalState_33: -2057246097
+      AtlasAbnormalState_34: -735766801
+      AtlasAbnormalState_35: -907497995
+      AtlasAbnormalState_36: 994099356
+      AtlasAbnormalState_37: -1994510487
+      AtlasAbnormalState_38: -1361603128
+      AtlasAbnormalState_39: -715818276
+      AtlasAbnormalState_4: 874896930
+      AtlasAbnormalState_40: 1482749151
+      AtlasAbnormalState_41: 1412883001
+      AtlasAbnormalState_42: -1893739879
+      AtlasAbnormalState_43: -1686428811
+      AtlasAbnormalState_44: 740651621
+      AtlasAbnormalState_45: 942014775
+      AtlasAbnormalState_46: 1451459506
+      AtlasAbnormalState_47: 502962524
+      AtlasAbnormalState_48: -1116796448
+      AtlasAbnormalState_49: -980440173
+      AtlasAbnormalState_5: 1563720155
+      AtlasAbnormalState_50: -136175255
+      AtlasAbnormalState_51: -1910876271
+      AtlasAbnormalState_52: 816287685
+      AtlasAbnormalState_53: 1260441889
+      AtlasAbnormalState_54: -673324271
+      AtlasAbnormalState_55: 316582028
+      AtlasAbnormalState_56: 2082957206
+      AtlasAbnormalState_57: 1853237642
+      AtlasAbnormalState_58: 1031659091
+      AtlasAbnormalState_59: -1043449958
+      AtlasAbnormalState_6: -374004196
+      AtlasAbnormalState_60: 1343347538
+      AtlasAbnormalState_61: -383083605
+      AtlasAbnormalState_62: -219271261
+      AtlasAbnormalState_63: -1211708195
+      AtlasAbnormalState_64: -1174468185
+      AtlasAbnormalState_65: 1282729604
+      AtlasAbnormalState_66: -511200974
+      AtlasAbnormalState_67: 1392116950
+      AtlasAbnormalState_68: 2085947242
+      AtlasAbnormalState_69: -435402863
+      AtlasAbnormalState_7: 1037476241
+      AtlasAbnormalState_70: 169829896
+      AtlasAbnormalState_71: 1314911106
+      AtlasAbnormalState_72: 1644808282
+      AtlasAbnormalState_73: 1073269559
+      AtlasAbnormalState_74: 1316739767
+      AtlasAbnormalState_75: -160041405
+      AtlasAbnormalState_76: 1992659449
+      AtlasAbnormalState_77: 1525183286
+      AtlasAbnormalState_78: 845683158
+      AtlasAbnormalState_79: 1588750628
+      AtlasAbnormalState_8: -1345991967
+      AtlasAbnormalState_80: 638323575
+      AtlasAbnormalState_81: -48924436
+      AtlasAbnormalState_82: -1279917651
+      AtlasAbnormalState_83: -439247996
+      AtlasAbnormalState_84: 1695912887
+      AtlasAbnormalState_85: 137246846
+      AtlasAbnormalState_86: -2073487158
+      AtlasAbnormalState_87: -1107141494
+      AtlasAbnormalState_88: 764882358
+      AtlasAbnormalState_89: 812523224
+      AtlasAbnormalState_9: 1296898209
+      AtlasAbnormalState_90: -1212312362
+      AtlasAbnormalState_91: 1936905955
+      AtlasAbnormalState_92: 1327627460
+      AtlasAbnormalState_93: 540668055
+      AtlasAbnormalState_94: -437938091
+      AtlasAbnormalState_95: -1894748650
+      AtlasAbnormalState_96: -1102643837
+      AtlasAbnormalState_97: -1581855833
+      AtlasAbnormalState_98: -782686445
+      AtlasAbnormalState_99: 866396784
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
