@@ -151,7 +151,7 @@ namespace ExcelHelper
                     data.equipLevel = chara["equip_slot"]
                         .Select(e => (int) e["is_slot"] == 1 ? (int) e["enhancement_level"] : -1).ToArray();
                     data.uniqueEqLv = chara["unique_equip_slot"].SingleOrDefault()?.Value<int>("enhancement_level") ?? 0;
-                    // HUSH TODO Unique2
+                    //专2(该模块不用了不修)
                     data.skillLevel = new[]
                     {
                         ((JArray) chara["union_burst"]).Count > 0 ? chara["union_burst"][0] : null,
@@ -205,7 +205,7 @@ namespace ExcelHelper
                                         (int) t["equip5"],
                                         (int) t["equip6"],
                                     },
-                                    level = (int) t["level"],
+                                    level = (int)t["level"],
                                     skillLevel = new int[]
                                     {
                                         (int) t["ub"],
@@ -213,12 +213,12 @@ namespace ExcelHelper
                                         (int) t["main2"],
                                         (int) t["ex"],
                                     },
-                                    rarity = (int) t["battle_rarity"] == 0
-                                        ? (int) t["rarity"]
-                                        : (int) t["battle_rarity"],
-                                    rank = (int) t["rank"],
-                                    uniqueEqLv = (int) t["unique"]
-                                    // HUSH TODO Unique2
+                                    rarity = (int)t["battle_rarity"] == 0
+                                        ? (int)t["rarity"]
+                                        : (int)t["battle_rarity"],
+                                    rank = (int)t["rank"],
+                                    uniqueEqLv = (int)t["unique"],
+                                    //专2(该模块不用了不修)
                                 };
                                 foreach (var key in unit.playLoveDic.Keys.ToArray())
                                 {
@@ -373,7 +373,9 @@ namespace ExcelHelper
             Application.isEditor || File.Exists("patch_asm_exportaabbabab");
         public static bool AsmExportEnabled2 =>
             Application.isEditor || File.Exists("patch_lerist");
-        public static void SaveExcel(int type,string defaultName = "")
+        public static bool PyExportEnabled =>
+            Application.isEditor || File.Exists("patch_py_exportaabbabab");
+        public static void SaveExcel(int type, string defaultName = "")
         {
             bool isSuccess = true;
             string filePath = "";
@@ -418,7 +420,7 @@ namespace ExcelHelper
                     break;
 
             }
-            
+
 #if PLATFORM_ANDROID
                 MainManager.Instance.WindowConfigMessage("EXCEL保存路径为：" + filePath + "\n是否打开？",()=> AndroidTool.ShowExcelFile(filePath));
 #endif
@@ -427,8 +429,10 @@ namespace ExcelHelper
 
             //if (File.Exists("patch_asm_exportaabbabab"))
             //    File.WriteAllText(filePath + ".asm", CreateAsmString());
-                if (AsmExportEnabled)
+            if (AsmExportEnabled)
                 File.WriteAllText(filePath + ".asm", CreateAsmString());
+            if (PyExportEnabled)
+                File.WriteAllText(filePath + ".py", CreatePyString());
         }
 
         private static (string, Func<UnitData, object>)[] conditions =
@@ -455,8 +459,7 @@ namespace ExcelHelper
                 info.skillLevel[0], info.skillLevel[1], info.skillLevel[2], info.skillLevel[3]
             });
             string unitsLove = JsonConvert.SerializeObject(info.playLoveDic);
-            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|000|{unitsLove}";
-            // HUSH TODO Unique2
+            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|{info.uniqueEq2Lv}|000|{unitsLove}";
         }
 
         private static string ToTime(long time, int limit)
@@ -559,10 +562,10 @@ namespace ExcelHelper
             var src = new StringBuilder();
             
             src.AppendLine("from autotimeline import *\nimport sys\nsys.path.append('.')\n");
-
+            src.AppendLine($"print(\"校准位置：暂停\");\nautopcr.calibrate(\"暂停\")");
             foreach (var tuple in cdict)
             {
-                src.AppendLine($"print(\"calibrate for {tuple.Value.name}\");\nautopcr.calibrate(\"{tuple.Value.name}\")");
+                src.AppendLine($"print(\"校准位置： {tuple.Value.name}\");\nautopcr.calibrate(\"{tuple.Value.name}\")");
             }
 
             src.AppendLine("autopcr.setOffset(2, 0); # offset calibration");
@@ -587,7 +590,7 @@ namespace ExcelHelper
                 {
                     var name = cdict[unit].name;
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
-                    src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); autopcr.multipress(\"{name}\", 5) # lframe {data.currentFrameCount}");
+                    src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); autopcr.press(\"{name}\") # lframe {data.currentFrameCount}");
                 }
                 else
                 {
@@ -595,7 +598,7 @@ namespace ExcelHelper
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
                 }
             }
-
+            src.AppendLine($"autopcr.waitLFrame(5390); autopcr.press(\"暂停\") # lframe {5390}");
             src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"# {m}")));
 
             return src.ToString();
@@ -897,7 +900,7 @@ namespace ExcelHelper
                 worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 1, false, 1, 3);
                 worksheet0.MySetValue(6, 2, "等级", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(7, 2, "RANK", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(8, 2, "专武", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(8, 2, "专1/专2", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(9, 2, "星级", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(10, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
                 int count = 0;
@@ -908,20 +911,9 @@ namespace ExcelHelper
                     worksheet0.InsertImage(TimelineData.charImages[count], 2, 6 - count , false,1,3);
                     worksheet0.MySetValue(6, 7 - count, unitData.GetLevelDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(7, 7 - count, unitData.GetRankDescribe(), backColor: backColotInt_1);
-                    worksheet0.MySetValue(8, 7 - count, unitData.GetUniqueEqLvDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(8, 7 - count, unitData.GetUniqueEqsDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(9, 7 - count, unitData.rarity , backColor: backColotInt_1);
-                    var result = new List<string>();
-                    for (int i = 0; i < unitData.exEquip.Length; i++)
-                    {
-                        int currentEquip = unitData.exEquip[i];
-                        int currentLevel = unitData.exEquipLevel[i];
-                        string exEquipStr = currentEquip.ToString();
-                        string value = currentEquip == 0 ? "-" :
-                            (exEquipStr.Length >= 3 && exEquipStr[exEquipStr.Length - 3] == '3' ? $"G{currentLevel}" :
-                            (exEquipStr.Length >= 3 && exEquipStr[exEquipStr.Length - 3] == '2' ? $"S{currentLevel}" : "-"));
-                        result.Add(value);
-                    }
-                    worksheet0.MySetValue(10, 7 - count, string.Join("/", result), backColor: backColotInt_1);
+                    worksheet0.MySetValue(10, 7 - count, unitData.GetExEquipDescribe(), backColor: backColotInt_1);
                     count++;
                 }
                 worksheet0.Cells[3, 8, 3, 10].Merge = true;
@@ -1058,11 +1050,11 @@ namespace ExcelHelper
 
                 // 添加一个sheet
                 ExcelWorksheet worksheet1 = package.Workbook.Worksheets.Add("基础数据");
-                string[] HeadNames = new string[24]
+                string[] HeadNames = new string[25]
                 {
-                    "角色ID","角色名字","角色等级","角色星级","角色好感度","角色Rank",
-                    "装备等级(左上)", "装备等级(右上)", "装备等级(左中)","装备等级(右中)","装备等级(左下)","装备等级(右下)",
-                "UB技能等级","技能1等级","技能2等级","EX技能等级","专武等级","EX武器","EX武器等级","EX防具","EX防具等级","EX首饰","EX首饰等级","高级设置"};
+                    "角色ID","角色名字","角色等级","角色星级","好感度","Rank",
+                    "左上", "右上", "左中","右中","左下","右下",
+                "UB","技能1","技能2","EX技能","专武1","专武2","EX武器","EX武器等级","EX防具","EX防具等级","EX首饰","EX首饰等级","高级设置"};
                 worksheet1.Cells[1, 1, 1, HeadNames.Length].Merge = true;//合并单元格(1行1列到1行6列)
                 worksheet1.Cells["A1"].Style.Font.Size = 16; //字体大小
                 worksheet1.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; //对其方式
@@ -1093,15 +1085,15 @@ namespace ExcelHelper
                         worksheet1.Cells[lineNum, 13 + i].Value = unitData.skillLevel[i];
                     }
                     worksheet1.Cells[lineNum, 17].Value = unitData.uniqueEqLv;
-                    // HUSH TODO Unique2
+                    worksheet1.Cells[lineNum, 18].Value = unitData.uniqueEq2Lv;
                     for (int i = 0; i < 3; i++)
                     {
-                        worksheet1.Cells[lineNum, 18 + i * 2].Value = unitData.exEquip[i];
-                        worksheet1.Cells[lineNum, 18 + i * 2 + 1].Value = unitData.exEquipLevel[i];
+                        worksheet1.Cells[lineNum, 19 + i * 2].Value = unitData.exEquip[i];
+                        worksheet1.Cells[lineNum, 19 + i * 2 + 1].Value = unitData.exEquipLevel[i];
                     }
                     if (unitData.playLoveDic != null)
                     {
-                        worksheet1.Cells[lineNum, 24].Value = JsonConvert.SerializeObject(unitData.playLoveDic);
+                        worksheet1.Cells[lineNum, 25].Value = JsonConvert.SerializeObject(unitData.playLoveDic);
                     }
                     lineNum++;
                 }

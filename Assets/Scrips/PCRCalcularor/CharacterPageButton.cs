@@ -194,7 +194,7 @@ namespace PCRCaculator
             }
             if (isFav != null)
             {
-                if (GuildManager.Instance.SettingToggles[7].isOn)
+                if (GuildManager.Instance.SettingData.isFavEnabled)
                 {
                     isFav.gameObject.SetActive(true);
 

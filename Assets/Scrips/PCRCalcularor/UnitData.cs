@@ -783,7 +783,33 @@ namespace PCRCaculator
             result = uniqueEq2Lv.ToString();
           return result;
         }
-    public string GetLevelDescribe()
+        public string GetUniqueEqsDescribe()
+        {
+            string result = GetUniqueEqLvDescribe();
+            
+            if (uniqueEq2Lv > 0)
+            {
+                result += "/" + GetUniqueEq2LvDescribe();
+            }
+            
+            return result;
+        }
+        public string GetExEquipDescribe()
+        {
+            var result = new List<string>();
+            for (int i = 0; i < exEquip.Length; i++)
+            {
+                int currentEquip = exEquip[i];
+                int currentLevel = exEquipLevel[i];
+                string exEquipStr = currentEquip.ToString();
+                string value = currentEquip == 0 ? "-" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '3' ? $"G{currentLevel}" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '2' ? $"S{currentLevel}" : "-"));
+                result.Add(value);
+            }
+            return string.Join("/", result);
+        }
+        public string GetLevelDescribe()
         {
             string result = "" + level;
             bool special = false;

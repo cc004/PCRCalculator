@@ -214,7 +214,7 @@ namespace PCRCaculator
             {
                 equipmentLevelSliders[i + 1].minValue = -1;
                 int maxStar = 0;
-                if ( unit.rank<maxRank||isable[i])
+                if (unit.rank < maxRank || isable[i])
                 {
                     if (MainManager.Instance.EquipmentDic.ContainsKey(equipmentID[i]))
                     {
@@ -242,7 +242,11 @@ namespace PCRCaculator
             equipmentLevelSliders[7].maxValue = MainManager.Instance.PlayerSetting.maxUniqueEqLv;
             equipmentLevelSliders[7].value = unit.uniqueEqLv;
             equipmentLevelTexts[7].text = "" + unit.uniqueEqLv;
-            // HUSH TODO Unique2
+
+            equipmentLevelSliders[8].minValue = 0;
+            equipmentLevelSliders[8].maxValue = 5;
+            equipmentLevelSliders[8].value = unit.uniqueEq2Lv;
+            equipmentLevelTexts[8].text = "" + unit.uniqueEq2Lv;
         }
         private void SetSkills()
         {
@@ -391,7 +395,7 @@ namespace PCRCaculator
             UnitData newdata = new UnitData(unitId, (int)detailSetSliders[0].value, (int)detailSetSliders[1].value,
                 (int)detailSetSliders[2].value, (int)equipmentLevelSliders[0].value, eqlv, sklv);
             newdata.uniqueEqLv = (int)equipmentLevelSliders[7].value;
-            // HUSH TODO Unique2
+            newdata.uniqueEq2Lv = (int)equipmentLevelSliders[8].value;
             MainManager.Instance.unitDataDic[unitId] = newdata;
         }
         public void OnDropDownChanged()

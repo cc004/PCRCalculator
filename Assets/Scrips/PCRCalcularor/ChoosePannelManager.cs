@@ -434,8 +434,10 @@ namespace PCRCaculator
       {
         data.uniqueEqLv = (int)detailSliders_setting[14].value;
       }
-      // HUSH TODO Unique2
-
+      if (MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId))
+      {
+          data.uniqueEq2Lv = (int)detailSliders_setting[15].value;
+      }
       if (data.rank < 2) data.skillLevel[1] = 0;
       if (data.rank < 4) data.skillLevel[2] = 0;
       if (data.rank < 7)
@@ -454,7 +456,7 @@ namespace PCRCaculator
         {
           data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
           var maxStar = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
-          data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[15 + i].value, maxStar);
+          data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[16 + i].value, maxStar);
         }
       }
       RefreshSettingPage();
@@ -727,22 +729,21 @@ namespace PCRCaculator
 
       if (MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId))
       {
-        // HUSH TODO Unique2 fix index
-        detailTexts_setting[].text = data.uniqueEq2Lv + "";
-        detailSliders_setting[].maxValue = 5;
-        detailSliders_setting[].value = data.uniqueEq2Lv;
-        detailSliders_setting[].interactable = true;
-        detailButtons_setting[].interactable = true;
-        detailButtons_setting[].interactable = true;
+        detailTexts_setting[15].text = data.uniqueEq2Lv + "";
+        detailSliders_setting[15].maxValue = 5;
+        detailSliders_setting[15].value = data.uniqueEq2Lv;
+        detailSliders_setting[15].interactable = true;
+        detailButtons_setting[2].interactable = true;
+        detailButtons_setting[3].interactable = true;
       }
       else
       {
-        detailTexts_setting[].text = "null";
-        detailSliders_setting[].maxValue = 0;
-        detailSliders_setting[].value = 0;
-        detailSliders_setting[].interactable = false;
-        detailButtons_setting[].interactable = false;
-        detailButtons_setting[].interactable = false;
+        detailTexts_setting[15].text = "null";
+        detailSliders_setting[15].maxValue = 0;
+        detailSliders_setting[15].value = 0;
+        detailSliders_setting[15].interactable = false;
+        detailButtons_setting[2].interactable = false;
+        detailButtons_setting[3].interactable = false;
       }
 
       // ex equip
@@ -771,11 +772,11 @@ namespace PCRCaculator
                 ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
           }
 
-          detailSliders_setting[15 + i].maxValue =
+          detailSliders_setting[16 + i].maxValue =
               data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
-          detailSliders_setting[15 + i].minValue = 0;
-          detailSliders_setting[15 + i].value = data.exEquipLevel[i];
-          detailTexts_setting[15 + i].text = detailSliders_setting[15 + i].value.ToString();
+          detailSliders_setting[16 + i].minValue = 0;
+          detailSliders_setting[16 + i].value = data.exEquipLevel[i];
+          detailTexts_setting[16 + i].text = detailSliders_setting[16 + i].value.ToString();
         }
       }
       else
@@ -784,10 +785,10 @@ namespace PCRCaculator
         {
           ExEquip[i].ClearOptions();
           ExEquip[i].AddOptions(new List<Dropdown.OptionData> { ExEquipOption.None });
-          detailSliders_setting[15 + i].maxValue = 0;
-          detailSliders_setting[15 + i].minValue = 0;
-          detailSliders_setting[15 + i].value = 0;
-          detailTexts_setting[15 + i].text = "0";
+          detailSliders_setting[16 + i].maxValue = 0;
+          detailSliders_setting[16 + i].minValue = 0;
+          detailSliders_setting[16 + i].value = 0;
+          detailTexts_setting[16 + i].text = "0";
         }
       }
 

@@ -805,6 +805,10 @@ namespace PCRCaculator.Guild
                 backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
                 RefreshTotalDamage(true, 0, false, 0, 0);
             }
+            else
+            {
+                backTime = 0;
+            }
 
             var n = GuildManager.StaticsettingData.n1;
             expectedDamage = (int)totalDamageExcept.Expected(n);
@@ -1516,8 +1520,7 @@ namespace PCRCaculator.Guild
                     }
 
                 }
-
-                // HUSH TODO Unique2
+                //专2(该模块不用了不修)
 
                 if (templateSettings[$"角色{(i + 1)}头像"] != null)
                 {
