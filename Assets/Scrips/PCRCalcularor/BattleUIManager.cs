@@ -110,6 +110,8 @@ namespace PCRCaculator.Battle
         public Button changeBattlePanel;
         private Dictionary<KeyCode, Action> inputActions;
         private Dictionary<KeyCode, int> keyToValue;
+        public List<Sprite> EnvironmentSprites;
+        public GameObject EnvironmentUI;
 
         private void Awake()
         {
@@ -122,7 +124,7 @@ namespace PCRCaculator.Battle
             {
                 OldManager.SetActive(true);
             }*/
-             
+
         }
         private void Start()
         {
@@ -655,9 +657,20 @@ namespace PCRCaculator.Battle
                 MyGameCtrl.Instance.SetBattleSpeed(scale);
             }
         }
+        public void SetEnvironmentUI(int enyType, bool isActive)
+        {
+            if (isActive)
+            {
+                Sprite iconSprite = buffDebuffIcons[enyType];
+                Transform a = EnvironmentUI.transform.Find("Image");
+                Image b = a.GetComponent<Image>();
+                b.sprite = iconSprite;
+            }
+            EnvironmentUI.SetActive(isActive);
+        }
         public Sprite GetAbnormalIconSprite(eStateIconType stateIconType)
         {
-            int index = 40;
+            int index;
             try
             {
                 index = int.Parse(stateIconType.GetDescription());
@@ -667,7 +680,7 @@ namespace PCRCaculator.Battle
             {
                 LogMessage("未设置" + stateIconType.GetDescription() + "的技能图标！", eLogMessageType.ERROR, false);
             }
-            return buffDebuffIcons[40];
+            return buffDebuffIcons[0];
         }
         public void SetDamageNumber(Vector3 pos,int value, eDamageType damageType, eDamageEffectType effectType, bool isCritical = false, bool isTotal = false)
         {
@@ -883,7 +896,7 @@ namespace PCRCaculator.Battle
                         a =>
                         {
                             bool isshow = ShowBuffDic.TryGetValue(stateIconType, out bool value) && value;
-                            a.GetComponent<BUFFShowPrefab>().Init(stateIconType, isshow);
+                            a.GetComponent<BUFFShowPrefab>().Init(GetAbnormalIconSprite((eStateIconType)(int)stateIconType), stateIconType, isshow);
                         });
                 }
                 buffUIScrollEX.AutoFit();

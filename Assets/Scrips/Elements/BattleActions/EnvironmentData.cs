@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Elements.Battle;
-
+using PCRCaculator.Battle;
 namespace Elements
 {
     public class EnvironmentData : ISingletonField
@@ -158,7 +158,7 @@ namespace Elements
                 var dict = battleManager.EnvironmentCounterDic;
                 var environmentCount = dict[EnvironmentType];
                 dict[EnvironmentType] = environmentCount - 1;
-                
+
                 if (environmentCount == 1)
                 {
                     if (SourceUnit != null)
@@ -168,7 +168,7 @@ namespace Elements
                     }
                 }
             }
-            
+
             // if (Skill != null && Skill.BonusId != 0)
             // {
             //     if (battleManager != null)
@@ -176,7 +176,7 @@ namespace Elements
             //         battleManager.DeleteBonusIcon(Skill.BonusId);
             //     }
             // }
-            
+
             if (TargetList != null)
             {
                 for (int i = TargetList.Count - 1; i >= 0; i--)
@@ -185,13 +185,15 @@ namespace Elements
                     OnExit(target);
                 }
             }
-            
+
             Enable = false;
-            
+
             // if (skillEffect != null)
             // {
             //     skillEffect.SetTimeToDie(true);
             // }
+            // SetEnvironmentUI();
+            BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, false);
         }
 
         public void OnEnter(BasePartsData parts)
@@ -327,7 +329,7 @@ namespace Elements
             // if (effectPool == null) return;
 
             // var prefab = this.UniqueEffectPrefab;
-            
+
             // var skillEffect = effectPool.Instantiate(prefab, false) as Elements_SkillEffectCtrl;
             // this.skillEffect = skillEffect;
 
@@ -347,6 +349,7 @@ namespace Elements
 
             // skillEffect.InvokeInternalNameCall();
             // skillEffect.InvokeInternalInterfaceCall();
+            BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true);
         }
 
         public void UpdateEnvironmentCallback(BasePartsData unit)

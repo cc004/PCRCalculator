@@ -299,7 +299,7 @@ namespace Elements
                 eAbnormalState.DRAIN_ATK,
                 new AbnormalConstData
                 {
-                    IconType = eStateIconType.PHYSICS_DRAIN_BARRIAR,
+                    IconType = eStateIconType.PHYSICAS_DRAIN_BARRIAR,
                     IsBuff = true
                 }
             },
@@ -743,14 +743,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
-            {
-                eAbnormalState.NPC_STUN,
-                new AbnormalConstData
-                {
-                    IconType = eStateIconType.NPC_STUN,
-                    IsBuff = false
-                }
-            },
+            // {
+            //     eAbnormalState.NPC_STUN,
+            //     new AbnormalConstData
+            //     {
+            //         IconType = eStateIconType.NPC_STUN,
+            //         IsBuff = false
+            //     }
+            // },
             {
                 eAbnormalState.DECREASE_HEAL,
                 new AbnormalConstData
@@ -767,14 +767,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
-            {
-                eAbnormalState.CRYSTALIZE,
-                new AbnormalConstData
-                {
-                    IconType = eStateIconType.CRYSTALIZE,
-                    IsBuff = false
-                }
-            },
+            // {
+            //     eAbnormalState.CRYSTALIZE,
+            //     new AbnormalConstData
+            //     {
+            //         IconType = eStateIconType.CRYSTALIZE,
+            //         IsBuff = false
+            //     }
+            // },
             {
                 eAbnormalState.DAMAGE_LIMIT_ATK,
                 new AbnormalConstData
@@ -859,7 +859,7 @@ namespace Elements
                 UnitCtrl.eAbnormalState.WORLD_LIGHTNING,
                 new AbnormalConstData
                 {
-                    IconType = eStateIconType.FLIGHT, // TODO fix icon
+                    IconType = eStateIconType.WORLD_LIGHTNING, // TODO fix icon
                     IsBuff = true
                 }
             },
