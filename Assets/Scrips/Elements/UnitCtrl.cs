@@ -6419,10 +6419,6 @@ this.updateCurColor();
 			if (_showsIcon)
 			{
 				eStateIconType2 = findBuffDebuffIcon(_kind, _isBuff, _additional);
-                if (eStateIconType2 == eStateIconType.NONE)
-                {
-                    Debug.LogError("角色技能图标" + _kind.GetDescription() + "丢失！");
-                }
 			}
 
             extraKey = extraKey ?? _value;
@@ -6503,6 +6499,7 @@ this.updateCurColor();
             {
                 return _isBuff ? buffDebuffIcons.BuffIcon : buffDebuffIcons.DebuffIcon;
             }
+            Debug.LogError("角色技能图标" + _kind.GetDescription() + "丢失！");
             return eStateIconType.NONE;
         }
 
