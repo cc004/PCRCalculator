@@ -614,5 +614,13 @@ namespace PCRCaculator.SQL
         public int equipment_id { get; set; }
     }
 
+    public class ExtraEffectUnitGroup : DbBaseData
+    {
+        public int target_id { get; }
+        public int group_id { get; }
+        public int unit_id { get; }
+    }
+
+
 }
 

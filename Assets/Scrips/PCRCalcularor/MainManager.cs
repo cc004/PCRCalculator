@@ -54,6 +54,7 @@ namespace PCRCaculator
         public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(临时)
         public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(已保存)
         private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
+        private Dictionary<int, List<ExtraEffectUnitGroup>> extraEffectUnitGroupDic = new Dictionary<int, List<ExtraEffectUnitGroup>>();//特别角色组(技能角色存在判断)
         private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
         private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
         private Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
@@ -96,6 +97,7 @@ namespace PCRCaculator
 
         public Dictionary<int, EquipmentData> EquipmentDic { get => equipmentDic; }
         public Dictionary<int, UnitRarityData> UnitRarityDic { get => unitRarityDic; }
+        public Dictionary<int, List<ExtraEffectUnitGroup>> ExtraEffectUnitGroupDic { get => extraEffectUnitGroupDic; }
         public Dictionary<int, UnitStoryData> UnitStoryDic { get => unitStoryDic; }
         public Dictionary<int, List<int>> UnitStoryEffectDic { get => unitStoryEffectDic; }
         public Dictionary<int, List<int>> UnitStoryEffectDic2 { get => unitStoryEffectDic2; }
@@ -328,6 +330,7 @@ namespace PCRCaculator
                         equipmentDic = dbTool.Dic8;
                         equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
                         unitRarityDic = dbTool.Dic1;
+                        extraEffectUnitGroupDic = dbTool.extraEffectUnitGroupDic;
                         (unitStoryDic, unitStoryEffectDic, unitStoryLoveDic) = dbTool.Pair;
                         skillDataDic = dbTool.Dic3;
                         masterUnitSkillDataRf = dbTool2.masterUnitSkillDataRf;
@@ -969,6 +972,10 @@ namespace PCRCaculator
             if (skinid == 170361 || unitid == 170301)
                 return 34;
             return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
+        }
+        public List<ExtraEffectUnitGroup> GetListWithGroupId(int groupId)
+        {
+            return extraEffectUnitGroupDic.ContainsKey(groupId) ? extraEffectUnitGroupDic[groupId] : null;
         }
         public async Task SendPostRequestAsync(Action onComplete)
         {
