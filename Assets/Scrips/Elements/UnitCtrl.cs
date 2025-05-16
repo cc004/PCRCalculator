@@ -241,6 +241,8 @@ namespace Elements
         public Action<UnitCtrl> OnDieFadeOutEnd;
         public Action<UnitCtrl> EnergyChange;
         public OnDamageDelegate OnDamage;
+        public Action OnActiveUnableState;
+        public Action OnActiveCharmState;
         public Action OnSlipDamage;
         public OnDamageDelegate OnHpChange;
         public OnDeadDelegate OnDeadForRevival;
@@ -1592,6 +1594,10 @@ namespace Elements
             get;
             set;
         } = new Dictionary<int, Action<bool>>();
+
+        public Action OnActiveUnableStateForModeChange; // 0x388
+        public Action OnActiveCharmForModeChange; // 0x390
+
         public Dictionary<int, Action<float>> OnRecoverListForChangeSpeedDisableByMaxHp
         {
             get;
@@ -3796,7 +3802,7 @@ this.updateCurColor();
 
         private int currentTpRegeneId { get; set; }
 
-        private bool isContinueIdleForPauseAction { get; set; }
+        public bool isContinueIdleForPauseAction { get; set; }
 
         public eSpecialSleepStatus specialSleepStatus { get; set; } = eSpecialSleepStatus.INVALID;
         private bool isSpecialSleepStatus
@@ -4204,6 +4210,28 @@ this.updateCurColor();
             this.updateCurColor();
         }*/
 
+        public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
+		{
+			switch (_state)
+			{
+			case UnitCtrl.eAbnormalState.PARALYSIS:
+			case UnitCtrl.eAbnormalState.FREEZE:
+			case UnitCtrl.eAbnormalState.CHAINED:
+			case UnitCtrl.eAbnormalState.SLEEP:
+			case UnitCtrl.eAbnormalState.STUN:
+			case UnitCtrl.eAbnormalState.DETAIN:
+			case UnitCtrl.eAbnormalState.STONE:
+			case UnitCtrl.eAbnormalState.FAINT:
+			case UnitCtrl.eAbnormalState.PAUSE_ACTION:
+			case UnitCtrl.eAbnormalState.NPC_STUN:
+			case UnitCtrl.eAbnormalState.CRYSTALIZE:
+			case UnitCtrl.eAbnormalState.STUN2:
+				return true;
+			default:
+				return false;
+			}
+		}
+
         public void SetAbnormalState(
           UnitCtrl _source,
           eAbnormalState _abnormalState,
@@ -4224,6 +4252,10 @@ this.updateCurColor();
             AbnormalStateEffectPrefabData abnormalEffectData = _action?.CreateAbnormalEffectData();
             if (_action != null && _action.AbnormalStateFieldAction != null)
                 _action.AbnormalStateFieldAction.TargetAbnormalState = _abnormalState;
+            // bool isAbnormalState = this.IsNoDamageMotion() || this.IsAbnormalState(eAbnormalState.NO_ABNORMAL);
+            // bool isEnvironmentAbnormalState = action != null && action.IsEnvironmentAbnormalState;
+            // if ((isAbnormalState) && (!ABNORMAL_CONST_DATA[_abnormalState].IsBuff || isEnvironmentAbnormalState))
+            // TODO environment abnormal staet
             if ((IsNoDamageMotion() || IsAbnormalState(eAbnormalState.NO_ABNORMAL)) && !ABNORMAL_CONST_DATA[_abnormalState].IsBuff)
             {
                 BattleLogIntreface battleLog = this.battleLog;
@@ -4259,6 +4291,17 @@ this.updateCurColor();
                     case eAbnormalState.CURSE2:
                         OnSlipDamage.Call();
                         break;
+                    case eAbnormalState.CONVERT:    
+                    case eAbnormalState.CONFUSION:  
+                        OnActiveUnableState.Call();
+                        break;
+                    default:
+                        if (IsUnableAbnormalState(_abnormalState))
+                        {
+                            OnActiveUnableState.Call();
+                        }
+                        break;
+                    // TODO OnActiveCharmState
                 }
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;

@@ -60,6 +60,8 @@ namespace Elements
 
         public bool ModeChanging { get; set; }
 
+        public bool IsCancelModeChangeByTrigger { get; set; }
+
         public bool MoveEnd { get; set; }
 
         public Dictionary<int, Skill> skillDictionary { get; private set; }

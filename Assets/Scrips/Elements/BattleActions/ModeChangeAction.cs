@@ -73,6 +73,15 @@ namespace Elements
             if (_sourceActionController.Skill1IsChargeTime)
                 return;
             _sourceActionController.Skill1IsChargeTime = _skill.SkillId == _source.UnionBurstSkillId && ActionDetail1 == 2;
+
+            _source.OnActiveUnableState += () => 
+            {
+                _source.OnActiveUnableStateForModeChange?.Invoke();
+            };
+            _source.OnActiveCharmState += () => 
+            {
+                _source.OnActiveCharmForModeChange?.Invoke();
+            };
         }
         public override void ReadyAction(UnitCtrl _source, UnitActionController _sourceActionController, Skill _skill)
         {
@@ -95,25 +104,6 @@ namespace Elements
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            eAdditionalAbnormalType abnormalType = (eAdditionalAbnormalType)base.MasterData.action_value_5;
-            if (abnormalType != eAdditionalAbnormalType.NONE)
-            {
-                var state = ABNORMAL_STATE_DIC[abnormalType];
-                _source.SetAbnormalState(
-                    _source: _source,
-                    _abnormalState: state,
-                    _effectTime: 90f,
-                    _action: this,
-                    _skill: _skill,
-                    _value: 0f,
-                    _value2: 0f,
-                    _reduceEnergy: false,
-                    _isDamageRelease: false,
-                    _reduceEnergyRate: 1.0f,
-                    _showsIcon: true
-                );
-            }
-
 
             switch ((eModeChangeType)ActionDetail1)
             {
@@ -137,6 +127,28 @@ namespace Elements
                             _action.TargetList = new List<BasePartsData>(TargetList);
                         }
                     }
+                    if (_valueDictionary[eValueNumber.VALUE_5] != 0f)
+                    {
+                        eAdditionalAbnormalType abnormalType = (eAdditionalAbnormalType)base.MasterData.action_value_5;
+                        if (abnormalType != eAdditionalAbnormalType.NONE)
+                        {
+                            var state = ABNORMAL_STATE_DIC[abnormalType];
+                            _source.SetAbnormalState(
+                                _source: _source,
+                                _abnormalState: state,
+                                _effectTime: 90f,
+                                _action: this,
+                                _skill: _skill,
+                                _value: 0f,
+                                _value2: 0f,
+                                _reduceEnergy: false,
+                                _isDamageRelease: false,
+                                _reduceEnergyRate: 1.0f,
+                                _showsIcon: true
+                            );
+                        }
+                    }
+                    _sourceActionController.IsCancelModeChangeByTrigger = false;
                     _source.OnMotionPrefixChanged = () =>
                     {
                         if (_valueDictionary[eValueNumber.VALUE_3] != 0f)
@@ -147,6 +159,31 @@ namespace Elements
                         }
                         _source.ChangeAttackPattern(ActionDetail2, _skill.Level);
                         _source.OnMotionPrefixChanged = null;
+
+                        if ((int)_valueDictionary[eValueNumber.VALUE_6] == 1)
+                        {
+                            _source.OnActiveUnableStateForModeChange = () =>
+                            {
+                                this.modeChangeEndByCancelTrigger(
+                                    _skill,
+                                    _action,
+                                    _source,
+                                    _sourceActionController,
+                                    (eAdditionalAbnormalType)base.MasterData.action_value_5
+                                );
+                            };
+                            _source.OnActiveCharmForModeChange = () =>
+                            {
+                                this.modeChangeEndByCancelTrigger(
+                                    _skill,
+                                    _action,
+                                    _source,
+                                    _sourceActionController,
+                                    (eAdditionalAbnormalType)base.MasterData.action_value_5
+                                );
+                            };
+                        }
+
                     };
                     if (_action == null)
                         break;
@@ -165,6 +202,117 @@ namespace Elements
             }
             action("改变攻击模式");
         }
+
+        public void modeChangeEndByCancelTrigger(
+            Skill _skill,
+            ActionParameter _action,
+            UnitCtrl _source,
+            UnitActionController _sourceActionController,
+            ModeChangeAction.eAdditionalAbnormalType _additionalAbnormalType)
+        {
+            _sourceActionController.IsCancelModeChangeByTrigger = true;
+
+            if (_additionalAbnormalType != ModeChangeAction.eAdditionalAbnormalType.NONE && _source != null)
+            {
+                if (ModeChangeAction.ABNORMAL_STATE_DIC.TryGetValue(_additionalAbnormalType, out UnitCtrl.eAbnormalState dispelState))
+                {
+                    _source.DispelAbnormalState(dispelState);
+                }
+            }
+
+            if (_source != null && _source.IsReduceEnergyDictionary != null)
+                _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = false;
+
+            endModeChangeFlags(_sourceActionController, _source);
+
+            _sourceActionController.ExecUnitActionWithDelay(_action, _skill, false, false, false);
+
+            // var effects = _source.ModeChangeEndEffectList;
+            // if (effects != null)
+            // {
+            //     int oldCount = effects.Count;
+            //     effects.Clear();
+            //     if (oldCount > 0)
+            //         Array.Clear(effects.Items, 0, oldCount);
+            // }
+            // _sourceActionController.StopModeChangeEndEffectCalled = false;
+
+            _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false, false, true);
+
+            if (_source != null && _source.ActionsTargetOnMe != null && IdOffsetDictionary != null)
+            {
+                var partKey = _source.GetFirstParts(true, 0f);
+                if (IdOffsetDictionary.TryGetValue(partKey, out long offset))
+                {
+                    _source.ActionsTargetOnMe.Remove(offset + 100 * ActionId);
+                }
+            }
+
+            var bm = base.battleManager;
+            if (bm != null && _source != null && IdOffsetDictionary != null)
+            {
+                var partKey = _source.GetFirstParts(true, 0f);
+                if (IdOffsetDictionary.TryGetValue(partKey, out long offset))
+                {
+                    long param = offset + 100 * ActionId;
+                    bm.CallbackActionEnd(param);
+                }
+            }
+
+            _source.MotionPrefix = -1;
+
+            if (_source.IsSubUnionBurstMode)
+            {
+                _source.ChangeChargeSkill(oldUnionBurstId, 0f);
+                _source.IsSubUnionBurstMode = false;
+            }
+
+            var ctrlMode = _source.UnitSpineCtrlModeChange;
+            var ctrlNormal = _source.UnitSpineCtrl;
+            ctrlMode.gameObject.SetActive(false);
+            ctrlNormal.gameObject.SetActive(true); // TODO find real logic
+
+            ctrlNormal.CurColor = ctrlMode.CurColor;
+
+            if (_source.IsFront)
+                _source.SetSortOrderFront();
+            else
+                _source.SetSortOrderBack();
+
+            _source.ModeChangeEnd = false;
+            _source.CancelByConvert = false;
+            _source.OnActiveUnableStateForModeChange = null;
+            _source.OnActiveCharmForModeChange = null;
+
+            if (_source.CurrentState == UnitCtrl.ActionState.DAMAGE)
+            {
+                if (_source.isContinueIdleForPauseAction)
+                {
+                    ctrlNormal.IsStopState = true;
+                    ctrlNormal.Resume();
+                    ctrlNormal.PlayAnime(eSpineCharacterAnimeId.IDLE, -1, true);
+                    ctrlNormal.Pause();
+                }
+                else 
+                {
+                    _source.PlayAnime(
+                        eSpineCharacterAnimeId.DAMEGE,
+                        -1,
+                        -1,
+                        -1,
+                        false,
+                        ctrlNormal,
+                        false,
+                        ctrlMode.StopStateTime,
+                        false);
+                    ctrlNormal.Pause();
+                    ctrlNormal.IsPlayAnimeBattle = ctrlMode.IsPlayAnimeBattle;
+                    ctrlNormal.IsStopState = ctrlMode.IsStopState;
+                }
+            }
+        }
+
+
 
         /*private IEnumerator updateModeChange(
           float _value,
