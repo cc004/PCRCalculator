@@ -677,6 +677,18 @@ namespace Elements
             {
                 eActionType.ENVIRONMENT,
                 typeof(EnvironmentAction)
+            },
+            {
+                eActionType.PROTECT,
+                typeof(ProtectAction)
+            },
+            {
+                eActionType.CHANGE_CRITICAL_REFERENCE,
+                typeof(ChangeCriticalReferenceAction)
+            },
+            {
+                eActionType.IF_CONTAINS_UNIT_GROUP,
+                typeof(IfContainsUnitGroupAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>

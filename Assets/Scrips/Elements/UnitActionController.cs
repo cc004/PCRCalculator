@@ -1315,11 +1315,11 @@ namespace Elements
           bool _first = false,
           bool _boneCount = true,
           bool _ignoreCancel = false,
-          BasePartsData _protectedTarget = null // seems not use in clan battle
+          BasePartsData _protectedTarget = null 
           )
         {
-            // if (_target.Owner.ProtectionTargetData != null)
-                // _target.Owner.ProtectionTargetData.DisableIfOwnerDead();
+            if (_target.Owner.ProtectionTargetData != null)
+                _target.Owner.ProtectionTargetData.DisableIfOwnerDead();
             // temporary fix for log barrier skill
             if (_action is LogBarrierAction)
                 _action.ExecTime = new[] { 0f };
@@ -1407,8 +1407,11 @@ namespace Elements
             }*/
             //change start
             BasePartsData currentTarget = target;
+            BasePartsData finalProtectedTarget = _protectedTarget;
+            int actionDetail = (action.ActionType != eActionType.BLIND) ?  action.ActionDetail1 : action.ActionDetail2;
+
             bool hasProtected = _protectedTarget != null;
-            bool isResisted = target.ResistStatus(action.ActionType, action.ActionDetail1, Owner, _last, _targetOneParts, target);
+            bool isResisted = target.ResistStatus(action.ActionType, actionDetail, Owner, _last, _targetOneParts, target);
             bool exec = !isResisted && (hasProtected || action.JudgeIsAlreadyExeced(target.Owner, num));
             UnitActionExecData actionExecData = new UnitActionExecData();
             actionExecData.execTime = BattleHeaderController.CurrentFrameCount;
@@ -1419,8 +1422,91 @@ namespace Elements
             actionExecData.targetNames = new List<string> { target.Owner.UnitName };
             if (exec)
             {
-                if (hasProtected)
+                if (_protectedTarget != null)
+                {
                     action.SkipAppendIsAlreadyExeced = true;
+                }
+
+                if (SkillDefine.ProtectEnableDic[action.ActionType] && (int)action.TargetAssignment == 1 && !_ignoreProtect && currentTarget != null)
+                {
+                    if (skill.ProtectParts.ContainsKey(currentTarget))
+                    {
+                        var protectedValue = skill.ProtectParts[currentTarget];
+                        var ownerUnit = currentTarget.Owner;
+                        if (ownerUnit != null && ownerUnit.ProtectionTargetData != null)
+                        {
+                            // var battleEffectPool = GetBattleEffectPool();
+                            // var battleManager = GetBattleManager();
+                            // ownerUnit.ProtectionTargetData.StartEffect(
+                            // ownerUnit, 
+                            // battleEffectPool, 
+                            // battleManager, 
+                            // action.ActionType);
+                        }
+                        action.ProtectedParts = currentTarget;
+                        action.SkipAppendIsAlreadyExeced = true;
+                        if (protectedValue != null)
+                        {
+                            hasProtected = false;
+                            finalProtectedTarget = currentTarget;
+                            currentTarget = protectedValue;
+                        }
+                        else
+                        {
+                            finalProtectedTarget = null;
+                        }
+                    }
+                    else
+                    {
+                        var ownerUnit = currentTarget.Owner;
+                        if (ownerUnit != null && ownerUnit.ProtectionTargetData != null)
+                        {
+                            if (ownerUnit.ProtectionTargetData.TryExec())
+                            {
+                                // var battleEffectPool = GetBattleEffectPool();
+                                // var battleManager = GetBattleManager();
+                                // ownerUnit.ProtectionTargetData.StartEffect(
+                                // ownerUnit, 
+                                // battleEffectPool, 
+                                // battleManager, 
+                                // action.ActionType);
+
+                                currentTarget = ownerUnit.ProtectionTargetData.ProtectionParts;
+                                // skill.ProtectParts[target] = currentTarget;
+                                action.ProtectedParts = currentTarget;
+                                action.SkipAppendIsAlreadyExeced = true;
+                                hasProtected = false;
+                                finalProtectedTarget = currentTarget;
+
+                                // if (target.Owner != null && target.Owner.ProtectionSourceData != null)
+                                // {
+                                // target.Owner.ProtectionSourceData.StartEffect(
+                                // actualTarget.Owner,
+                                // battleEffectPool,
+                                // battleManager,
+                                // action.ActionType);
+                                // }
+                            }
+                            else
+                            {
+                                finalProtectedTarget = null;
+                            }
+                        }
+                    }
+                }
+
+                if (currentTarget != null && action.AlreadyExecedData != null)
+                {
+                    if (!action.AlreadyExecedData.ContainsKey(currentTarget.Owner) ||
+                        !action.AlreadyExecedData[currentTarget.Owner].ContainsKey(num))
+                    {
+                        action.AppendTargetNum(currentTarget.Owner, num);
+                    }
+                    else
+                    {
+                    }
+                }
+
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 if (!battleManager.skipping)
@@ -1431,13 +1517,14 @@ namespace Elements
                     actionExecData.describe += $"<color=#c080ff><size=8>{detail}\n</size></color>";
 
                 action.PreExecAction();
-                action.ExecAction(Owner, target, num, this, skill, starttime, dictionary, 
+                action.ExecAction(Owner, currentTarget, num, this, skill, starttime, dictionary, 
                     _valueDictionary,a=> 
                 { 
                     actionExecData.describe += a;
                     //if (b > 0)
                     //    actionExecData.damageList.Add(b);
                 });
+                action.SkipAppendIsAlreadyExeced = false;
             }
             else
             {
@@ -1460,7 +1547,7 @@ namespace Elements
                 return;
             if (!action.HitOnceDic.ContainsKey(target))
             {
-                ExecChildrenAction(action, skill, target, num, starttime, dictionary, _execChildNoFrame, _protectedTarget);
+                ExecChildrenAction(action, skill, currentTarget, num, starttime, dictionary, _execChildNoFrame, finalProtectedTarget);
             }
             else
             {
@@ -1477,7 +1564,7 @@ namespace Elements
                 
                 if (action.HitOnceDic[target])
                 {
-                    ExecChildrenAction(action, skill, target, num, starttime, dictionary, _execChildNoFrame);
+                    ExecChildrenAction(action, skill, currentTarget, num, starttime, dictionary, _execChildNoFrame, finalProtectedTarget);
                 }
                 else
                 {
@@ -1555,7 +1642,7 @@ namespace Elements
                                 continue;
                             }
                             actionParameter.AppendTargetNum(target.Owner, 0);
-                            ExecAction(actionParameter, skill, target, 0, starttime, true);
+                            ExecAction(actionParameter, skill, target, 0, starttime, true, protectedTarget);
                             // AppendCoroutine(ExecActionWithDelayAndTarget(actionParameter, skill, item, starttime), ePauseType.SYSTEM, (skill.BlackOutTime > 0f) ? Owner : null);
                         }
                     }

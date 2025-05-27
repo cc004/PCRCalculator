@@ -86,6 +86,8 @@ namespace Elements
             set;
         }
         [JsonIgnore]
+        public Dictionary<BasePartsData, BasePartsData> ProtectParts = new Dictionary<BasePartsData, BasePartsData>();
+        [JsonIgnore]
         public int SkillNum { get; set; }
         [JsonIgnore]
         public List<SkillEffectCtrl> EffectObjs => effectObjs;
