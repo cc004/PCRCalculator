@@ -376,7 +376,7 @@ namespace ExcelHelper
         public static bool PyExportEnabled =>
             Application.isEditor || File.Exists("patch_py_exportaabbabab");
         public static bool Py2ExportEnabled =>
-            Application.isEditor || File.Exists("patch_py2_exportaabbabab");
+            Application.isEditor || File.Exists("patch_atl6_exportaabbabab");
         public static void SaveExcel(int type, string defaultName = "")
         {
             bool isSuccess = true;
@@ -616,11 +616,12 @@ namespace ExcelHelper
             var src = new StringBuilder();
 
             src.AppendLine("from autotimeline import *\nimport sys\nsys.path.append('.')\n");
+            src.AppendLine($"print(\"minitouch 连接中\")");
             src.AppendLine("minitouch.connect(\"127.0.0.1\", 1111)\nmax_x = minitouch.getMaxX()\nmax_y = minitouch.getMaxY()");
             src.AppendLine("minitouch.setPos(\"暂停\", int(max_x * 0.94), int(max_y * 0.05))\nminitouch.setPos(\"SET\", int(max_x * 0.95), int(max_y * 0.64))\nminitouch.setPos(\"AUTO\", int(max_x * 0.95), int(max_y * 0.76))\nminitouch.setPos(\"SPEED\", int(max_x * 0.95), int(max_y * 0.9))");
             int index = 0;
-            float yPos = 0.80f; // Y 轴统一为 0.80
-            float[] xPosList = { 0.74f, 0.62f, 0.50f, 0.38f, 0.26f }; // 每个角色对应的 X 系数
+            float yPos = 0.80f; 
+            float[] xPosList = { 0.74f, 0.62f, 0.50f, 0.38f, 0.26f }; 
 
             foreach (var tuple in cdict)
             {
@@ -635,7 +636,7 @@ namespace ExcelHelper
             }
             src.AppendLine("print(\"解除暂停，塔塔开!\")\n");
             src.AppendLine("autopcr.setOffset(2, 0); # offset calibration");
-            src.AppendLine("autopcr.waitFrame(autopcr.getFrame() + 10); minitouch.press(\"SPEED\") #加速");
+            src.AppendLine("autopcr.waitFrame(autopcr.getFrame() + 50); minitouch.press(\"SPEED\") #加速");
 
             msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
             msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
@@ -657,17 +658,19 @@ namespace ExcelHelper
 
                     if (data.operation == "连点")
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount - 15}); minitouch.press(\"{name}\") #连点 lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 30); minitouch.press(\"{name}\") #连点 lframe {data.currentFrameCount}");
                     }
                     else if (data.operation == "AUTO")
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount - 15}); minitouch.press(\"AUTO\") #AUTO lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 30); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 30); minitouch.press(\"AUTO\") #关AUTO lframe {data.currentFrameCount}");
+
                     }
                     else
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount - 30}); minitouch.press(\"SPEED\") #减速 lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 60); minitouch.press(\"SPEED\") #减速 lframe {data.currentFrameCount}");
                         src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"{name}\") # lframe {data.currentFrameCount}");
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount + 30}); minitouch.press(\"SPEED\") #加速 lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 30); minitouch.press(\"SPEED\") #加速 lframe {data.currentFrameCount}");
                     }
 
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
@@ -678,7 +681,8 @@ namespace ExcelHelper
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
                 }
             }
-            src.AppendLine($"autopcr.waitLFrame(5390); minitouch.press(\"暂停\") # lframe {5390}");
+            var dieFrame = TimelineData.allUnitStateChangeDic.FirstOrDefault().Value.LastOrDefault().realFrameCount;
+            src.AppendLine($"autopcr.waitFrame({dieFrame} - 60); minitouch.press(\"暂停\") # lframe {dieFrame / 60}");
             src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"# {m}")));
 
             return src.ToString();
