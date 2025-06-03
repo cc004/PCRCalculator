@@ -7964,6 +7964,8 @@ this.updateCurColor();
         }
         private UnitCtrl KillBonusTarget { get; set; }
 
+        public bool AlreadyCounted { get; set; } = false;
+
         public Action<float> OnLifeAmmountChange { get; set; }
         public Action<float> OnMaxLifeAmmountChange { get; set; }
 

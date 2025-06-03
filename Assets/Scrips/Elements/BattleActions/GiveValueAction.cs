@@ -227,6 +227,32 @@ namespace Elements
                         _addValue[_evalue] = BattleUtil.FloatToPerMille(value);
                         return;
                     }
+                case 14:
+                    _addValue[_evalue] = calcMaxHpValue(_source, _valueDictionary);
+                    return;
+                case 15:
+                    FloatWithEx sumHp = 0;
+                    foreach(BasePartsData target in TargetList)
+                    {
+                        if (target != null && target.Owner != null)
+                        {
+                            if (!target.Owner.AlreadyCounted)
+                            {
+                                target.Owner.AlreadyCounted = true;
+                                sumHp += _valueDictionary[eValueNumber.VALUE_2] * target.Owner.Hp;
+                            }
+                        }
+                    }
+                    foreach(BasePartsData target in TargetList)
+                    {
+                        if (target != null && target.Owner != null)
+                        {
+                            target.Owner.AlreadyCounted = false;
+                        }
+                    }
+                    _addValue[_evalue] = sumHp;
+                    break;
+
                 default:
                     if (_valueDictionary[eValueNumber.VALUE_1] > 200f)
                     {
@@ -271,6 +297,12 @@ namespace Elements
         protected virtual FloatWithEx calcHpValue(
             UnitCtrl _source,
             Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+
+        protected virtual FloatWithEx calcMaxHpValue(UnitCtrl _source, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+        {
+            return 0f;
+        }
+
         protected int countUnitNumCompareX(
       List<UnitCtrl> _targetList,
       BasePartsData _source,
@@ -319,6 +351,10 @@ namespace Elements
             TARGET_MAGIC_DEF = 10, // 0x0000000A
             AHEAD_UNIT_NUM = 11, // 0x0000000B
             BEHIND_UNIT_NUM = 12, // 0x0000000C
+            DAMAGE_RATE = 13,
+			MAX_HP = 14,
+			HP_SUM = 15,
+			SKILL_COUNT = 20,
             STRIKE_BACK_COUNT = 100, // 0x00000064
             SEAL_COUNT = 200, // 0x000000C8
             SEAL_COUNT_THREE_DIGIT = 2000
