@@ -50,6 +50,8 @@ namespace Elements
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+            if (ActionDetail3 != 0)
+                EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             ++_target.UbAttackHitCount;
             int actionDetail1 = ActionDetail1;
             if (!HitOnceDic.ContainsKey(_target))

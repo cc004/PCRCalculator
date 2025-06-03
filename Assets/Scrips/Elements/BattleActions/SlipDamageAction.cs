@@ -74,6 +74,8 @@ namespace Elements
           Action<string> callback  )
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+            if (ActionDetail3 != 0)
+              EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             //start add
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
             float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 15, (float)pp));
