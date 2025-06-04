@@ -375,6 +375,8 @@ namespace ExcelHelper
             Application.isEditor || File.Exists("patch_lerist");
         public static bool PyExportEnabled =>
             Application.isEditor || File.Exists("patch_py_exportaabbabab");
+        public static bool Py2ExportEnabled =>
+            Application.isEditor || File.Exists("patch_atl6_exportaabbabab");
         public static void SaveExcel(int type, string defaultName = "")
         {
             bool isSuccess = true;
@@ -433,6 +435,8 @@ namespace ExcelHelper
                 File.WriteAllText(filePath + ".asm", CreateAsmString());
             if (PyExportEnabled)
                 File.WriteAllText(filePath + ".py", CreatePyString());
+            if (Py2ExportEnabled)
+                File.WriteAllText(filePath + ".py", CreatePy2String());
         }
 
         private static (string, Func<UnitData, object>)[] conditions =
@@ -604,6 +608,85 @@ namespace ExcelHelper
             return src.ToString();
         }
 
+        private static string CreatePy2String()
+        {
+            var units = TimelineData.playerGroupData.playerData.playrCharacters;
+            var cdict = units.ToDictionary(u => u.unitId, u => new { name = u.GetNicName(), unit = u });
+            var msg = new StringBuilder();
+            var src = new StringBuilder();
+
+            src.AppendLine("from autotimeline import *\nimport sys\nsys.path.append('.')\n");
+            src.AppendLine($"print(\"minitouch 连接中\")");
+            src.AppendLine("minitouch.connect(\"127.0.0.1\", 1111)\nmax_x = minitouch.getMaxX()\nmax_y = minitouch.getMaxY()");
+            src.AppendLine("minitouch.setPos(\"暂停\", int(max_x * 0.94), int(max_y * 0.05))\nminitouch.setPos(\"SET\", int(max_x * 0.95), int(max_y * 0.64))\nminitouch.setPos(\"AUTO\", int(max_x * 0.95), int(max_y * 0.76))\nminitouch.setPos(\"SPEED\", int(max_x * 0.95), int(max_y * 0.9))");
+            int index = 0;
+            float yPos = 0.80f; 
+            float[] xPosList = { 0.74f, 0.62f, 0.50f, 0.38f, 0.26f }; 
+
+            foreach (var tuple in cdict)
+            {
+                string name = tuple.Value.name;
+                if (index < xPosList.Length)
+                {
+                    float xPosRatio = xPosList[index];
+                    src.AppendLine($"print(\"{name} 定位中\")");
+                    src.AppendLine($"minitouch.setPos(\"{name}\", int(max_x * {xPosRatio}), int(max_y * {yPos}))");
+                }
+                index++;
+            }
+            src.AppendLine("print(\"解除暂停，塔塔开!\")\n");
+            src.AppendLine("autopcr.setOffset(2, 0); # offset calibration");
+            src.AppendLine("autopcr.waitFrame(autopcr.getFrame() + 50); minitouch.press(\"SPEED\") #加速");
+
+            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
+            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
+            msg.AppendLine("帧轴：");
+
+            cdict.Add(TimelineData.playerGroupData.selectedEnemyIDs[0], new { name = string.Empty, unit = (UnitData)null });
+
+            var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
+            foreach (var (unit, data) in TimelineData.allUnitStateChangeDic.SelectMany(pair =>
+                             pair.Value.Select(dat => (pair.Key, dat)))
+                         .Where(t => t.dat.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                         .OrderBy(t => t.dat.realFrameCount))
+            {
+                var frame = data.currentFrameCount;
+                var unit_id = unit;
+                if (unit_id <= 200000)
+                {
+                    var name = cdict[unit].name;
+
+                    if (data.operation == "连点")
+                    {
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 30); minitouch.press(\"{name}\") #连点 lframe {data.currentFrameCount}");
+                    }
+                    else if (data.operation == "AUTO")
+                    {
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 30); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 30); minitouch.press(\"AUTO\") #关AUTO lframe {data.currentFrameCount}");
+
+                    }
+                    else
+                    {
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 60); minitouch.press(\"SPEED\") #减速 lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"{name}\") # lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 30); minitouch.press(\"SPEED\") #加速 lframe {data.currentFrameCount}");
+                    }
+
+                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
+                }
+                else
+                {
+                    src.AppendLine("# bossub");
+                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
+                }
+            }
+            var dieFrame = TimelineData.allUnitStateChangeDic.FirstOrDefault().Value.LastOrDefault().realFrameCount;
+            src.AppendLine($"autopcr.waitFrame({dieFrame} - 60); minitouch.press(\"暂停\") # lframe {dieFrame / 60}");
+            src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"# {m}")));
+
+            return src.ToString();
+        }
         private static void CreateUnitExecTimeExcel(FileInfo newFile)
         {
             using (ExcelPackage package = new ExcelPackage(newFile))

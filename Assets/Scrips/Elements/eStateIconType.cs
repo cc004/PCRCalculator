@@ -297,7 +297,7 @@ namespace Elements
         // [Description("圣华计数器")]
         // SCHOOL_FESTIVAL_CHLOE,
         // Token: 0x0400883F RID: 34879
-        [Description("行动中毒/工菜")]
+        [Description("行动中毒\n工菜")]
         POISON_BY_BEHAVIOUR = 100,
         // Token: 0x04008840 RID: 34880
         [Description("固定物理白甲")]

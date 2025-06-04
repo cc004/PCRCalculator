@@ -86,5 +86,35 @@ namespace PCRCaculator
             float max_value = UnitUBTimes.SelectMany(ubTime => ubTime.inputField.text.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s)).Select(float.Parse).DefaultIfEmpty(100)).Max();
             UnitUBTimes[i].inputField.text += $"\n{max_value + 0.001:F3}";
         }
+        public void BatchRemoveUBTime()
+        {
+            MainManager.Instance.WindowInputMessage("清除该帧之后的所有UB\n（包含该帧，默认为空即清空所有UB）", BatchRemove);
+        }
+        public void BatchRemove(string frame)
+        {
+            if (string.IsNullOrWhiteSpace(frame))
+            {
+                foreach (var ubTime in UnitUBTimes)
+                    ubTime.inputField.text = string.Empty;
+                return;
+            }
+
+            if (!float.TryParse(frame, out float targetFrame))
+            {
+                MainManager.Instance.WindowMessage("请输入有效的数字作为帧值");
+                return;
+            }
+
+            foreach (var ubTime in UnitUBTimes)
+            {
+                var values = ubTime.inputField.text
+                    .Split('\n')
+                    .Where(s => !string.IsNullOrWhiteSpace(s) && float.TryParse(s, out _))
+                    .Select(float.Parse)
+                    .Where(v => v < targetFrame);
+
+                ubTime.inputField.text = string.Join("\n", values);
+            }
+        }
     }
 }
