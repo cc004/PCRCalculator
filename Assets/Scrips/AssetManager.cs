@@ -24,6 +24,7 @@ namespace PCRApi
         public string url, md5;
         public string type;
         public string @class;
+        public string path;
         public int size;
         public List<Content> children;
 
@@ -31,14 +32,14 @@ namespace PCRApi
 
         public static string CalcMd5(byte[] content)
         {
-            using var md5 = System.Security.Cryptography.MD5.Create();
-            return string.Concat(md5.ComputeHash(content).Select(b => $"{b:x2}"));
+            using var path = System.Security.Cryptography.MD5.Create();
+            return string.Concat(path.ComputeHash(content).Select(b => $"{b:x2}"));
         }
         public static string CalcMd5(string content) => CalcMd5(Encoding.UTF8.GetBytes(content));
 
-        public string MD5 => modified == null ? md5 : CalcMd5(modified);
+        public string MD5 => modified == null ? path : CalcMd5(modified);
         [JsonIgnore]
-        public bool IsAssets => type != "every" || url.EndsWith(".cdb");
+        public bool IsAssets => type != "every" || url.EndsWith(".cdb") || url == "manifest/seven2_assetmanifest";
 
         [JsonIgnore]
         public byte[] modified;
@@ -46,15 +47,33 @@ namespace PCRApi
         public static Content FromLine(string line, string @class)
         {
             var splits = line.Split(',');
-            return new Content
+            if (splits.Length == 5)
             {
-                url = splits[0],
-                @class = @class,
-                md5 = splits[1],
-                type = splits[2],
-                size = int.Parse(splits[3]),
-                children = new List<Content>()
-            };
+                return new Content
+                {
+                    url = splits[0],
+                    @class = @class,
+                    md5 = splits[1],
+                    path = splits[1],
+                    type = splits[2],
+                    size = int.Parse(splits[3]),
+                    children = new List<Content>()
+                };
+            }
+            else
+            {
+                return new Content
+                {
+                    url = splits[0],
+                    @class = @class,
+                    md5 = splits[1],
+                    path = splits[2],
+                    type = splits[3],
+                    size = int.Parse(splits[4]),
+                    children = new List<Content>()
+                };
+            }
+
         }
 
         public static List<Content> FromUrl(string urlroot, string url, string @class)
@@ -78,9 +97,9 @@ namespace PCRApi
             if (cache != null && File.Exists(cache))
             {
                 var bytes = File.ReadAllBytes(cache);
-                if (CalcMd5(bytes) == md5) return bytes;
+                if (CalcMd5(bytes) == path) return bytes;
             }
-            var result = client.GetByteArrayAsync(urlgetter(md5)).Result;
+            var result = client.GetByteArrayAsync(urlgetter(path)).Result;
             if (cache != null)
                 File.WriteAllBytes(cache, result);
             return result;
@@ -103,12 +122,12 @@ namespace PCRApi
             if (!IsAssets)
             {
                 var content = GenerateCsv();
-                return $"{url},{CalcMd5(content)},every,{content.Length},";
+                return $"{url},{CalcMd5(content)},{path},every,{content.Length},";
             }
             else if (modified != null)
-                return $"{url},{CalcMd5(modified)},{type},{modified.Length},";
+                return $"{url},{CalcMd5(modified)},{path},{type},{modified.Length},";
             else
-                return $"{url},{md5},{type},{size},";
+                return $"{url},{md5},{path},{type},{size},";
         }
 
         public void RegisterTo(IContentHolder holder)

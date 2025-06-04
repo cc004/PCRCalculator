@@ -257,9 +257,10 @@ namespace PCRCaculator
                     oldPath.Add("manifest/room_assetmanifest");
                     oldPath.Add("manifest/spine_assetmanifest");
                     oldPath.Add("manifest/storydata_assetmanifest");
-                    oldPath.Add("manifest/moviemanifest");
+                    oldPath.Add("manifest/movie2manifest");
                     oldPath.Add("manifest/unit_assetmanifest");
-                    oldPath.Add("manifest/sound2manifest");
+                    oldPath.Add("manifest/soundmanifest");
+                    oldPath.Add("manifest/seven2_assetmanifest");
 
                     break;
                 case 5:
