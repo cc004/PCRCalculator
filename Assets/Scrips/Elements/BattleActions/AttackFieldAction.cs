@@ -42,6 +42,8 @@ namespace Elements
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+            if (ActionDetail3 != 0)
+                EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             DamageData.eDamageType eDamageType;
             FloatWithEx num;
             if (ActionDetail1 % 2 == 0)

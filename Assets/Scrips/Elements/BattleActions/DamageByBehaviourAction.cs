@@ -34,6 +34,8 @@ namespace Elements
 		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+			if (ActionDetail3 != 0)
+                EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
 			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || ActionDetail1 == (int)eSlipDamageType.WORLD_LIGHTNING) // TODO add world lighting hit
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);

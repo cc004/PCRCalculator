@@ -319,6 +319,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, string> Dic12 { get; private set; }
         public List<EReduction> eReductions { get; private set; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips { get; private set; }
+        public Dictionary<int, List<ExtraEffectUnitGroup>> extraEffectUnitGroupDic { get; private set; }
 
         public Dictionary<(int, int), promotion_bonus> rbs {
             get;
@@ -457,6 +458,10 @@ namespace PCRCaculator.SQL
                             categories.TryGetValue(x.slot_category_2, out var val2) ? val2 : empty,
                             categories.TryGetValue(x.slot_category_3, out var val3) ? val3 : empty,
                         });
+                
+                extraEffectUnitGroupDic = GetDatas<ExtraEffectUnitGroup>()
+                    .GroupBy(x => x.group_id)
+                    .ToDictionary(g => g.Key, g => g.ToList());
             }));
             return Task.WhenAll(tasks);
         }

@@ -6796,6 +6796,12 @@ this.updateCurColor();
 
         private List<DebuffDamageUpData> debuffDamageUpDataList { get; set; } = new List<DebuffDamageUpData>();
 
+        public Dictionary<EveryAttackCriticalAction.eEveryAtkCriticalType, EveryAttackCriticalData> everyAttackCriticalData { get; set; }
+
+        public ProtectionData ProtectionTargetData { get; set; }
+        
+        public ProtectionData ProtectionSourceData { get; set; }
+
         private Dictionary<BuffParamKind, int> debuffCounterDictionary { get; set; } = new Dictionary<BuffParamKind, int>
         {
       {
@@ -7390,6 +7396,131 @@ this.updateCurColor();
             return num2;
         }
 
+        public bool JudgeEveryAttackCritical(bool isPhysical, bool targetSideOwners) 
+        { 
+            if (targetSideOwners)
+                return false;
+
+            if (everyAttackCriticalData == null)
+                return false;
+
+            if (everyAttackCriticalData.ContainsKey(EveryAttackCriticalAction.eEveryAtkCriticalType.BOTH))
+            {
+                var data = everyAttackCriticalData[EveryAttackCriticalAction.eEveryAtkCriticalType.BOTH];
+                if (data != null && data.Enable)
+                    return true;
+            }
+
+            var key = isPhysical
+                ? EveryAttackCriticalAction.eEveryAtkCriticalType.PHYSICAL
+                : EveryAttackCriticalAction.eEveryAtkCriticalType.MAGICAL;
+
+            if (everyAttackCriticalData.ContainsKey(key))
+            {
+                var data = everyAttackCriticalData[key];
+                if (data != null && data.Enable)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void EnchantEveryAttackCritical(EveryAttackCriticalAction.eEveryAtkCriticalType type, EveryAttackCriticalData data) 
+        { 
+            if (everyAttackCriticalData == null)
+                return;
+
+            if (!everyAttackCriticalData.TryGetValue((EveryAttackCriticalAction.eEveryAtkCriticalType)type, out var oldData))
+            {
+                if (data == null)
+                    return;
+                OnChangeState?.Invoke(this, data.IconType, true);
+                everyAttackCriticalData[(EveryAttackCriticalAction.eEveryAtkCriticalType)type] = data;
+                data.StartTimer(this);
+                return;
+            }
+
+            if (oldData != null && data != null)
+            {
+                if (oldData.Timer <= data.Timer)
+                {
+                    if (oldData.Enable)
+                    {
+                        if (oldData.IconType != data.IconType)
+                        {
+                            OnChangeState?.Invoke(this, oldData.IconType, false);
+                            OnChangeState?.Invoke(this, data.IconType, true);
+                        }
+                        oldData.Enable = false;
+                        oldData.Timer = 0f;
+                    }
+                    else
+                    {
+                        OnChangeState?.Invoke(this, data.IconType, true);
+                    }
+                    everyAttackCriticalData[(EveryAttackCriticalAction.eEveryAtkCriticalType)type] = data;
+                    data.StartTimer(this);
+                }
+            }
+
+        }
+
+        public void EnchantProtection(ProtectionData data) 
+        { 
+            if (ProtectionTargetData != null && ProtectionTargetData.Enable)
+            {
+                if (data == null)
+                    return;
+
+                if (ProtectionTargetData.IconType != data.IconType)
+                {
+                    OnChangeState?.Invoke(this, ProtectionTargetData.IconType, false);
+                    OnChangeState?.Invoke(this, data.IconType, true);
+                }
+
+                if (data.HasCountLimit)
+                {
+                    OnChangeStateNum?.Invoke(this, data.IconType, data.Counter);
+                }
+
+                ProtectionTargetData.Enable = false;
+                ProtectionTargetData.Timer = 0f;
+            }
+            else
+            {
+                if (data == null)
+                    return;
+                data.DisplayIcon();
+            }
+
+            ProtectionTargetData = data;
+            data.StartTimer();
+
+        }
+
+        public bool GetIsProtected() 
+        { 
+            if (ProtectionTargetData == null || !ProtectionTargetData.Enable)
+                return false;
+
+            var parts = ProtectionTargetData.ProtectionParts;
+            if (parts == null || parts.Owner == null)
+                return false;
+
+            var owner = parts.Owner;
+
+            if (owner.IsUnableActionState())
+                return false;
+
+            if (owner.IsConfusionOrConvert())
+                return false;
+
+            if (owner.ToadDatas == null || owner.ToadDatas.Count >= 1)
+                return false;
+
+            return true;
+        }
+
         private Dictionary<BuffParamKind, int> buffCounterDictionary
         {
             get;
@@ -7832,6 +7963,8 @@ this.updateCurColor();
             set;
         }
         private UnitCtrl KillBonusTarget { get; set; }
+
+        public bool AlreadyCounted { get; set; } = false;
 
         public Action<float> OnLifeAmmountChange { get; set; }
         public Action<float> OnMaxLifeAmmountChange { get; set; }
@@ -9303,7 +9436,7 @@ this.updateCurColor();
             component.SetDamageText(_value.ToString(), eDamageEffectColor.GREEN);
         }*/
 
-        public void ChargeEnergy(
+        public void ChargeEnergy( // accmulate damage energy todo
           eSetEnergyType _setEnergyType,
           FloatWithEx _energy,
           bool _hasEffect = false,

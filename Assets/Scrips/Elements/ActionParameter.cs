@@ -154,6 +154,8 @@ namespace Elements
         public bool IgnoreDecoy { get; set; }
         public List<UnitCtrl> ExecedMultiBossList { get; set; } = new List<UnitCtrl>();
 
+        public BasePartsData ProtectedParts { get; set; }
+
         public static void StaticRelease()
         {
             //ActionParameter.staticSingletonTree = (Yggdrasil<ActionParameter>) null;

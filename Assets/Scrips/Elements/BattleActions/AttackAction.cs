@@ -37,6 +37,8 @@ namespace Elements
             {
                 Debugger.Break();
             }*/
+            if (ActionDetail3 != 0)
+                EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             _target.IncrementUbAttackHitCount();
             eAttackType actionDetail1 = (eAttackType)ActionDetail1;
             if (_num == 0)

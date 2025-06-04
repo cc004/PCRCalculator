@@ -20,6 +20,11 @@ namespace Elements
             UnitCtrl _source,
             Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp * _valueDictionary[eValueNumber.VALUE_2];
 
+        protected override FloatWithEx calcMaxHpValue(
+            UnitCtrl _source,
+            Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+
+
         protected override void setValue(
       Dictionary<eValueNumber, FloatWithEx> _value,
       ActionParameter _action)

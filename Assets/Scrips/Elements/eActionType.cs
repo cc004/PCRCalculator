@@ -140,7 +140,11 @@ namespace Elements
 
         EVERY_ATTACK_CRITICAL = 104,
         ENVIRONMENT = 105,
+        PROTECT = 106,
+        [Description("改变暴击率")]
         CHANGE_CRITICAL_REFERENCE = 107,
+        [Description("角色存在")]
+        IF_CONTAINS_UNIT_GROUP = 108,
 
         // Token: 0x04002F4C RID: 12108
         EX_START_PASSIVE = 901,
