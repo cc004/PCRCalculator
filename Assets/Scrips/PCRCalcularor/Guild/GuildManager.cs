@@ -797,7 +797,6 @@ namespace PCRCaculator.Guild
             SettingSliders[2].value = SettingData.UBTryingCount / 10 > 18 ? 19 : SettingData.UBTryingCount / 10;
             SettingTexts[2].text = SettingData.UBTryingCount + "";
             SettingToggles[0].isOn = SettingData.calcSpineAnimation;
-            SettingToggles[7].isOn = SettingData.isFavEnabled;
             SettingToggles[0].interactable = true; //SettingData.calSpeed == 1;
             /*SettingInputs[0].text = SettingData.RandomSeed + "";
             SettingToggles[2].isOn = SettingData.UseFixedRandomSeed;
@@ -835,7 +834,6 @@ namespace PCRCaculator.Guild
             SettingData.FPSforLogic = (int)SettingSliders[0].value * 10;
             SettingData.FPSforAnimation = (int)SettingSliders[1].value * 10;
             SettingData.calcSpineAnimation = SettingToggles[0].isOn;
-            SettingData.isFavEnabled = SettingToggles[7].isOn;
             SettingData.UBTryingCount = (int)SettingSliders[2].value > 18 ? 9999 : (int)SettingSliders[2].value * 10;
             //SettingData.UseFixedRandomSeed = SettingToggles[2].isOn;
             try
@@ -1444,8 +1442,6 @@ namespace PCRCaculator.Guild
         public Dictionary<int, EnemyData> changedEnemyDataDic;
 
         public int currentPlayerGroupNum;
-        public bool Favriote = true;
-        public bool Unused = true;
         //public bool isViolent;
         public int calSpeed;
         public int FPSforLogic = 60;
@@ -1453,7 +1449,6 @@ namespace PCRCaculator.Guild
         public bool calcSpineAnimation = true;
         public int UBTryingCount = 9999;
         public bool UseFixedRandomSeed = true;
-        public bool isFavEnabled = false;
 
         /*public int RandomSeed = 666;
         public bool ForceNoCritical_player;

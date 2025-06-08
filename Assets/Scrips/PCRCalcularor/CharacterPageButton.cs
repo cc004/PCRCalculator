@@ -31,6 +31,8 @@ namespace PCRCaculator
         public static List<Sprite> backgrounds1;
         public Image characterPositionImage_B;
         public List<Sprite> positionSprites_B;//0-2
+        public List<Sprite> talentSprites;//0-4火水风光暗
+        public Image characterTalentImage;
         public Image backImage;
         public Slider HPSlider;
         public Slider MaxHPSlider;
@@ -44,7 +46,6 @@ namespace PCRCaculator
         public Vector3 buffUIAddPos;
         public SkillUI skillUI;
         public RectTransform ScreenShotTrans;
-        public Toggle isFav;
         private UnitCtrl owner2;
         private BattleUIManager uIManager;
         //private List<eStateIconType> currentBuffs = new List<eStateIconType>();
@@ -82,6 +83,7 @@ namespace PCRCaculator
             if (unitid >= 200000 || unitid <= 0)
             {
                 stars.SetStars(-1);
+                characterTalentImage.SetActive(false);
                 if (buttonType == ButtonType.typeA)
                 {
                     levelText.text = "";
@@ -129,13 +131,22 @@ namespace PCRCaculator
                 int iconUnitid = unitid >= 200000 ? unitid : data.rarity >= 6 ? unitid + 60 : unitid + 30;
 
 
-        sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, iconUnitid);
+            sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, iconUnitid);
             }
             //Sprite sprite = MainManager.LoadSourceSprite(path);
             //if (sprite != null)
             //{
             //   characterImage.sprite = MainManager.LoadSourceSprite(path);
             //}
+            if (MainManager.Instance.unitTalentDic.TryGetValue(unitid, out var talent))
+            {
+                characterTalentImage.SetActive(true);
+                characterTalentImage.sprite = talentSprites[talent.talent_id - 1];
+            }
+            else
+            {
+                characterTalentImage.SetActive(false);
+            }
             characterImage.sprite = sprite;
             RefreshData(data);
         }
@@ -191,21 +202,6 @@ namespace PCRCaculator
             else
             {
                 backtype = 9;
-            }
-            if (isFav != null)
-            {
-                if (GuildManager.Instance.SettingData.isFavEnabled)
-                {
-                    isFav.gameObject.SetActive(true);
-
-                    isFav.onValueChanged.RemoveAllListeners();
-                    isFav.onValueChanged.AddListener(value => OnFavToggleChanged(value, data));
-                    isFav.isOn = data.fav;
-                }
-                else
-                {
-                    isFav.gameObject.SetActive(false);
-                }
             }
             backImage.sprite = backgrounds1[backtype < backgrounds1.Count ? backtype : (backgrounds1.Count - 1)];
             if (buttonType == ButtonType.typeA)
@@ -423,63 +419,5 @@ namespace PCRCaculator
                 yield return 0;
             backImage.gameObject.SetActive(true);
         }
-    public void OnFavToggleChanged(bool value, UnitData data)
-    {
-        data.fav = value;
-        MainManager.Instance.SaveUnitData();
     }
-    /*public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType, bool enable)
-    {
-        Debug.LogError("改方法已经过时！");
-        if (stateIconType == eStateIconType.NONE)
-        {
-            Refresh();
-            return;
-        }
-        if (currentBuffs.Contains(stateIconType))
-        {
-            currentBuffs.Remove(stateIconType);
-        }
-        if (enable)
-        {
-            currentBuffs.Add(stateIconType);
-        }
-        Refresh();
-    }*/
-    /*public void SetAbnormalIcons_2(Elements.UnitCtrl unitCtrl, Elements.eStateIconType stateIconType_2, bool enable)
-    {
-        eStateIconType stateIconType = (eStateIconType)(int)stateIconType_2;
-        if (stateIconType == eStateIconType.NONE)
-        {
-            Refresh();
-            return;
-        }
-        if (currentBuffs.Contains(stateIconType))
-        {
-            currentBuffs.Remove(stateIconType);
-        }
-        if (enable)
-        {
-            currentBuffs.Add(stateIconType);
-        }
-        Refresh();
-    }*/
-    /*private void Refresh()
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            if (i < currentBuffs.Count)
-            {
-                abnormalIcons[i].sprite = uIManager.GetAbnormalIconSprite(currentBuffs[i]);
-                abnormalIcons[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                abnormalIcons[i].sprite = null;
-                abnormalIcons[i].gameObject.SetActive(false);
-            }
-        }
-    }*/
-
-  }
 }

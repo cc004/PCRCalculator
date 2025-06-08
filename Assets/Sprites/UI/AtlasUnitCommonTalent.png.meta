@@ -1,0 +1,1829 @@
+fileFormatVersion: 2
+guid: 8cd4433fd54eecf40b2d0ef140900325
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_0
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 702
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bb5b812a0a2e41499bf4fce25f16937
+      internalID: 234773701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_1
+      rect:
+        serializedVersion: 2
+        x: 829
+        y: 760
+        width: 60
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ebee20539b7e77542b46f36124db25e5
+      internalID: -217999889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_2
+      rect:
+        serializedVersion: 2
+        x: 891
+        y: 746
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7ca2708c12bd26498871bae08a98124
+      internalID: 79525203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_3
+      rect:
+        serializedVersion: 2
+        x: 953
+        y: 746
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dbfa2087eac1e654284ade6d2deba468
+      internalID: -2022945049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_4
+      rect:
+        serializedVersion: 2
+        x: 643
+        y: 666
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 460b95089544ba74b8f2d033457a64b5
+      internalID: -550074322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_5
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 666
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d0a214e5b770d34f96f70c30a9c468e
+      internalID: 1207960843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_6
+      rect:
+        serializedVersion: 2
+        x: 829
+        y: 694
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b7644eecffb889479e0b8916f13a824
+      internalID: -359456548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_7
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 680
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6750dcd66e22b7e4196b571f1efe05ce
+      internalID: -1681610252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_8
+      rect:
+        serializedVersion: 2
+        x: 965
+        y: 680
+        width: 43
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77c00d10193988942905edc9c725128c
+      internalID: -1067486532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_9
+      rect:
+        serializedVersion: 2
+        x: 996
+        y: 721
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 423563408ce898249b2b57a76281f5fa
+      internalID: 1525561207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_10
+      rect:
+        serializedVersion: 2
+        x: 1002
+        y: 717
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a47a6b0a0073af4f8658b5e9bb4b747
+      internalID: 1791652080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_11
+      rect:
+        serializedVersion: 2
+        x: 361
+        y: 678
+        width: 60
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fbfbe851d2dd822439b45cf4a72dbd28
+      internalID: -344638997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_12
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 678
+        width: 60
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c26c97b0886044c4381bffe372463181
+      internalID: 799572188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_13
+      rect:
+        serializedVersion: 2
+        x: 1007
+        y: 711
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ad899c2297726f4b8315f4f65146c8c
+      internalID: -2108603762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 678
+        width: 131
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f73d86bc59bdddb40a8c040a95bb34a3
+      internalID: 1940513135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_15
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 678
+        width: 76
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f365319ae83ddb48b3a0e897e6b4a3e
+      internalID: 699740651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_16
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 678
+        width: 47
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44c4d96fea79892488dc7150a4246f9b
+      internalID: 1034725784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_17
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 678
+        width: 100
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1bf80f5e5b4f714eacf6ed6838f3451
+      internalID: -1568165399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_18
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 678
+        width: 52
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23e47783a95263948b2d1649b1bb957b
+      internalID: -1421697453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_19
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 636
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0febe11af59d474ab46f698c8f4b07c
+      internalID: 471324598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_20
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 636
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 723df3a8f05d9894782fec966ffcd04e
+      internalID: -1736499343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_21
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 628
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4897e9780c990a4889ebe1406ddda24
+      internalID: 1110293494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_22
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 264
+        width: 19
+        height: 412
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3864edc58bb5c69409ca1c29c582f6ee
+      internalID: -584140549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_23
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 570
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3721515470f63d74bb933c21b2ab7d84
+      internalID: -993603324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_24
+      rect:
+        serializedVersion: 2
+        x: 643
+        y: 600
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 906659d84e6f3bb4fa1572d1b79e02d4
+      internalID: -200718287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_25
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 600
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e1e3f30119d2ba4eb1b869fa477336b
+      internalID: -249106205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_26
+      rect:
+        serializedVersion: 2
+        x: 779
+        y: 570
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4833356c013a3f243b15203eb0ad8a6c
+      internalID: -1825549520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_27
+      rect:
+        serializedVersion: 2
+        x: 877
+        y: 562
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0efc38744e8ffed438b7fc2805372f4b
+      internalID: -729132773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_28
+      rect:
+        serializedVersion: 2
+        x: 939
+        y: 614
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 358e23226a31cdf4a8e581999558408a
+      internalID: 1826917682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_29
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 496
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bb2b66bfb6ac8b46b7f85d945ccc1ca
+      internalID: 1724001408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_30
+      rect:
+        serializedVersion: 2
+        x: 655
+        y: 534
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe59cb7c7eabd214c809075ff44ea621
+      internalID: -1791581481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_31
+      rect:
+        serializedVersion: 2
+        x: 717
+        y: 534
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 126061ce966169044840994a319e3ebf
+      internalID: -1742394077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_32
+      rect:
+        serializedVersion: 2
+        x: 803
+        y: 496
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f04a8e807750d334099661e924d19d6b
+      internalID: -1333260570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_33
+      rect:
+        serializedVersion: 2
+        x: 877
+        y: 496
+        width: 64
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9a9879db6f25a042b46b1d545c11cdc
+      internalID: 267265866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_34
+      rect:
+        serializedVersion: 2
+        x: 943
+        y: 550
+        width: 62
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 517f34e398e5e5843908fd3a97a1d383
+      internalID: 611335510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_35
+      rect:
+        serializedVersion: 2
+        x: 779
+        y: 534
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e7112ac48ae23243b19978e0f1d963b
+      internalID: -1587225306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_36
+      rect:
+        serializedVersion: 2
+        x: 951
+        y: 486
+        width: 62
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6da1c8eef517fb45920fd3069a401ca
+      internalID: -2138568816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_37
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 422
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d2c927bd521f0644bd919b3a4aa617a
+      internalID: -33579017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_38
+      rect:
+        serializedVersion: 2
+        x: 655
+        y: 460
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6fe1bcf468f85994484a2a2f7da0102d
+      internalID: -430175813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_39
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 460
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b87c81a64463ff946a72d9f85fcc21de
+      internalID: 2132335392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_40
+      rect:
+        serializedVersion: 2
+        x: 803
+        y: 422
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fedec363820991a4a801c24ee1d73428
+      internalID: 947493087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_41
+      rect:
+        serializedVersion: 2
+        x: 877
+        y: 422
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd241890be3a4df40aef95af4bfd08c1
+      internalID: -223384148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_42
+      rect:
+        serializedVersion: 2
+        x: 951
+        y: 422
+        width: 62
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc0411170020758429502caccbf4fa1c
+      internalID: 1866580833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_43
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 254
+        width: 139
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b8bdd4956abe0f44bcaaacf25a0be54
+      internalID: 1948486391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_44
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 348
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae48cd6158d78ad409a87e47052d11f0
+      internalID: 1530932479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_45
+      rect:
+        serializedVersion: 2
+        x: 655
+        y: 386
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 556543cc7c1e404418dad496573b481e
+      internalID: 1159072486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_46
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 386
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5080b39602d997748bc2d022e5265235
+      internalID: 1039984527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_47
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 348
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3c7e1e1df2500143aa7e6bdcff36f6a
+      internalID: 184908784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_48
+      rect:
+        serializedVersion: 2
+        x: 879
+        y: 348
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72b1d0de7f50e3c4c9c8aef5b4665aaa
+      internalID: 559193035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_49
+      rect:
+        serializedVersion: 2
+        x: 953
+        y: 338
+        width: 62
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1f3a7b9ddc434249884fd69ecb7a71e
+      internalID: 447124816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_50
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 254
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 432d22a125c219a438896047628d584b
+      internalID: 1893021567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_51
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 264
+        width: 74
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe2a5296d3bc1074b8213fe3b335c89a
+      internalID: -1214036078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_52
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 312
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75ef7425443bb9e49a6fb81ab65a88e7
+      internalID: 1688705065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_53
+      rect:
+        serializedVersion: 2
+        x: 731
+        y: 312
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb6f3fe490693fa4686a39c7fb43dd84
+      internalID: 1317462619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_54
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 274
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3bac27b3c8c65e4b90f00b43fd594db
+      internalID: 1517487110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_55
+      rect:
+        serializedVersion: 2
+        x: 879
+        y: 274
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18f0fe40609ee5f45ae6001e12f12195
+      internalID: 1732589443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_56
+      rect:
+        serializedVersion: 2
+        x: 953
+        y: 274
+        width: 62
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f04871a74f2490f478dfcdcb54499d4c
+      internalID: 1396566681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_57
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 140
+        width: 139
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa51ea2c9e28f5b428a343872cc66143
+      internalID: 426443842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_58
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 140
+        width: 139
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0569994f64c6ac4e9aee242f97dabc3
+      internalID: 538311333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_59
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 264
+        width: 146
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bb4646831fc618428b1a10b49f44798
+      internalID: -1706881704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_60
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 202
+        width: 180
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b87e46fa77615544a2a5d25fc0b6478
+      internalID: -900180533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_61
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 182
+        width: 276
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 684652e2cc60a5b4aa72471d685bfcac
+      internalID: -1339489674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_62
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 132
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24058405de8027643a074059c1eac191
+      internalID: -797380524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_63
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 132
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94ea53ae19d3e5248b13c3cbd58bc267
+      internalID: 1602306721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_64
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 130
+        width: 180
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e63e6f6f70f80c5449a5513da1c6b6c6
+      internalID: 1538421039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_65
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 178
+        height: 180
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75b74283e74d3804bbca74e468a13bc5
+      internalID: 1704154404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_66
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 140
+        width: 60
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61867cfdc3c84cc469d0d77885503c6d
+      internalID: 1170006628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_67
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 0
+        width: 139
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f52734d4ba7ca8419d3bdcc2640a34a
+      internalID: 1152626671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_68
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 0
+        width: 139
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cb479c151f214246a9ca7141e672c18
+      internalID: -309605308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_69
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 0
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7acdee168e7ca874891777e560d63cfc
+      internalID: 455439525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_70
+      rect:
+        serializedVersion: 2
+        x: 595
+        y: 0
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e8ca6a19edd01ac449f5db3773183621
+      internalID: -753563493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_71
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8fc5e83a9870fcd408ea1eddac8424e3
+      internalID: 1329420659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_72
+      rect:
+        serializedVersion: 2
+        x: 858
+        y: 112
+        width: 100
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc5d4e49567b7d94c868553b49d637a3
+      internalID: 684808900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_73
+      rect:
+        serializedVersion: 2
+        x: 859
+        y: 0
+        width: 110
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5092c5ed840e1f94e9958637b5667e8a
+      internalID: 1956345652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_74
+      rect:
+        serializedVersion: 2
+        x: 971
+        y: 56
+        width: 48
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70d88f88181d20842ace54407983da3a
+      internalID: 1147217895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_75
+      rect:
+        serializedVersion: 2
+        x: 971
+        y: 32
+        width: 48
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 144648b2629e2b54ebe565287906f3b4
+      internalID: 1846710154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasUnitCommonTalent_76
+      rect:
+        serializedVersion: 2
+        x: 971
+        y: 0
+        width: 39
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0910f801266e6f44c8b65643704e860b
+      internalID: -1820903095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      AtlasUnitCommonTalent_0: 234773701
+      AtlasUnitCommonTalent_1: -217999889
+      AtlasUnitCommonTalent_10: 1791652080
+      AtlasUnitCommonTalent_11: -344638997
+      AtlasUnitCommonTalent_12: 799572188
+      AtlasUnitCommonTalent_13: -2108603762
+      AtlasUnitCommonTalent_14: 1940513135
+      AtlasUnitCommonTalent_15: 699740651
+      AtlasUnitCommonTalent_16: 1034725784
+      AtlasUnitCommonTalent_17: -1568165399
+      AtlasUnitCommonTalent_18: -1421697453
+      AtlasUnitCommonTalent_19: 471324598
+      AtlasUnitCommonTalent_2: 79525203
+      AtlasUnitCommonTalent_20: -1736499343
+      AtlasUnitCommonTalent_21: 1110293494
+      AtlasUnitCommonTalent_22: -584140549
+      AtlasUnitCommonTalent_23: -993603324
+      AtlasUnitCommonTalent_24: -200718287
+      AtlasUnitCommonTalent_25: -249106205
+      AtlasUnitCommonTalent_26: -1825549520
+      AtlasUnitCommonTalent_27: -729132773
+      AtlasUnitCommonTalent_28: 1826917682
+      AtlasUnitCommonTalent_29: 1724001408
+      AtlasUnitCommonTalent_3: -2022945049
+      AtlasUnitCommonTalent_30: -1791581481
+      AtlasUnitCommonTalent_31: -1742394077
+      AtlasUnitCommonTalent_32: -1333260570
+      AtlasUnitCommonTalent_33: 267265866
+      AtlasUnitCommonTalent_34: 611335510
+      AtlasUnitCommonTalent_35: -1587225306
+      AtlasUnitCommonTalent_36: -2138568816
+      AtlasUnitCommonTalent_37: -33579017
+      AtlasUnitCommonTalent_38: -430175813
+      AtlasUnitCommonTalent_39: 2132335392
+      AtlasUnitCommonTalent_4: -550074322
+      AtlasUnitCommonTalent_40: 947493087
+      AtlasUnitCommonTalent_41: -223384148
+      AtlasUnitCommonTalent_42: 1866580833
+      AtlasUnitCommonTalent_43: 1948486391
+      AtlasUnitCommonTalent_44: 1530932479
+      AtlasUnitCommonTalent_45: 1159072486
+      AtlasUnitCommonTalent_46: 1039984527
+      AtlasUnitCommonTalent_47: 184908784
+      AtlasUnitCommonTalent_48: 559193035
+      AtlasUnitCommonTalent_49: 447124816
+      AtlasUnitCommonTalent_5: 1207960843
+      AtlasUnitCommonTalent_50: 1893021567
+      AtlasUnitCommonTalent_51: -1214036078
+      AtlasUnitCommonTalent_52: 1688705065
+      AtlasUnitCommonTalent_53: 1317462619
+      AtlasUnitCommonTalent_54: 1517487110
+      AtlasUnitCommonTalent_55: 1732589443
+      AtlasUnitCommonTalent_56: 1396566681
+      AtlasUnitCommonTalent_57: 426443842
+      AtlasUnitCommonTalent_58: 538311333
+      AtlasUnitCommonTalent_59: -1706881704
+      AtlasUnitCommonTalent_6: -359456548
+      AtlasUnitCommonTalent_60: -900180533
+      AtlasUnitCommonTalent_61: -1339489674
+      AtlasUnitCommonTalent_62: -797380524
+      AtlasUnitCommonTalent_63: 1602306721
+      AtlasUnitCommonTalent_64: 1538421039
+      AtlasUnitCommonTalent_65: 1704154404
+      AtlasUnitCommonTalent_66: 1170006628
+      AtlasUnitCommonTalent_67: 1152626671
+      AtlasUnitCommonTalent_68: -309605308
+      AtlasUnitCommonTalent_69: 455439525
+      AtlasUnitCommonTalent_7: -1681610252
+      AtlasUnitCommonTalent_70: -753563493
+      AtlasUnitCommonTalent_71: 1329420659
+      AtlasUnitCommonTalent_72: 684808900
+      AtlasUnitCommonTalent_73: 1956345652
+      AtlasUnitCommonTalent_74: 1147217895
+      AtlasUnitCommonTalent_75: 1846710154
+      AtlasUnitCommonTalent_76: -1820903095
+      AtlasUnitCommonTalent_8: -1067486532
+      AtlasUnitCommonTalent_9: 1525561207
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

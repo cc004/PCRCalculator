@@ -32,12 +32,12 @@ namespace PCRApi
 
         public static string CalcMd5(byte[] content)
         {
-            using var path = System.Security.Cryptography.MD5.Create();
-            return string.Concat(path.ComputeHash(content).Select(b => $"{b:x2}"));
+            using var md5 = System.Security.Cryptography.MD5.Create();
+            return string.Concat(md5.ComputeHash(content).Select(b => $"{b:x2}"));
         }
         public static string CalcMd5(string content) => CalcMd5(Encoding.UTF8.GetBytes(content));
 
-        public string MD5 => modified == null ? path : CalcMd5(modified);
+        public string MD5 => modified == null ? md5 : CalcMd5(modified);
         [JsonIgnore]
         public bool IsAssets => type != "every" || url.EndsWith(".cdb") || url == "manifest/seven2_assetmanifest";
 
@@ -97,7 +97,7 @@ namespace PCRApi
             if (cache != null && File.Exists(cache))
             {
                 var bytes = File.ReadAllBytes(cache);
-                if (CalcMd5(bytes) == path) return bytes;
+                if (CalcMd5(bytes) == md5) return bytes;
             }
             var result = client.GetByteArrayAsync(urlgetter(path)).Result;
             if (cache != null)

@@ -535,7 +535,6 @@ namespace PCRCaculator
         public int uniqueEq2Lv;//专武2等级
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
-        public bool fav = false;
 
         [JsonIgnore]
         public string name;

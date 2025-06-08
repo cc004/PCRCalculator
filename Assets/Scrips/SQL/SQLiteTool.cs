@@ -304,6 +304,7 @@ namespace PCRCaculator.SQL
 
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
+        public Dictionary<int, unit_talent> TalentDic { get; private set; }
         public Dictionary<int, EnemyData> Dic2 { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
@@ -366,6 +367,10 @@ namespace PCRCaculator.SQL
             var unitDicTask = Task.Run(() =>
             {
                 unitDic = GetDatasDic<unit_data>(a => a.unit_id);
+            });
+            var talentDicTask = Task.Run(() =>
+            {
+                TalentDic = GetDatasDic<unit_talent>(a => a.unit_id);
             });
             var dic1Task = Task.Run(() =>
             {
@@ -458,7 +463,7 @@ namespace PCRCaculator.SQL
                             categories.TryGetValue(x.slot_category_2, out var val2) ? val2 : empty,
                             categories.TryGetValue(x.slot_category_3, out var val3) ? val3 : empty,
                         });
-                
+
                 extraEffectUnitGroupDic = GetDatas<ExtraEffectUnitGroup>()
                     .GroupBy(x => x.group_id)
                     .ToDictionary(g => g.Key, g => g.ToList());

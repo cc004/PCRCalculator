@@ -601,6 +601,12 @@ namespace PCRCaculator.SQL
         public int equip_slot { get; set; }
         public int equip_id { get; set; }
     }
+    public class unit_talent
+    {
+        public int setting_id { get; set; }
+        public int unit_id { get; set; }
+        public int talent_id { get; set; }
+    }
 
     public class unit_unique_equipment : unit_unique_equip
     {
