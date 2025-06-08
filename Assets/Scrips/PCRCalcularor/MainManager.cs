@@ -67,7 +67,7 @@ namespace PCRCaculator
         private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
-        public Dictionary<int, unit_talent> unitTalentDic = new Dictionary<int, unit_talent>();//角色属性字典
+        // public Dictionary<int, unit_talent> unitTalentDic = new Dictionary<int, unit_talent>();//角色属性字典
         public List<EReduction> ereductionTable = new List<EReduction>();
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
         private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
@@ -344,7 +344,7 @@ namespace PCRCaculator
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
                         UniqueEquipment2DataDic = dbTool.Dic92;
-                        unitTalentDic = dbTool.TalentDic;
+                        // unitTalentDic = dbTool.TalentDic;
                         unitStoryEffectDic2 = dbTool2.Pair.Item2;
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
