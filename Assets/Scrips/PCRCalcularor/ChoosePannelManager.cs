@@ -588,17 +588,16 @@ namespace PCRCaculator
         {
             var pinyin = PinyinHelper.GetPinyin(Search.text, "").ToUpper();
             bool search = Search.text == "" || id2alias[unitid].Contains(Search.text) || id2pinyin[unitid].Contains(pinyin);
+            MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData);
             if (filterToggle.isOn)
             {
-                bool hasTalent = MainManager.Instance.unitTalentDic.TryGetValue(unitid, out var talents)
-                    && talents.talent_id >= 0
-                    && talentToggles[talents.talent_id].isOn
-                    || talentToggles[0].isOn;
+                int talent_id =  rarityData.detailData.talent_id;
+                bool hasTalent = talent_id >= 0 && talentToggles[talent_id].isOn || talentToggles[0].isOn;
                 return hasTalent && search;
             }
             else
             {
-                int pos = (int)MainManager.Instance.UnitRarityDic[unitid].unitPositionType;
+                int pos = (int)rarityData.unitPositionType;
                 bool position = switchToggles[0].isOn || switchToggles[pos + 1].isOn;
                 return position && search;
             }

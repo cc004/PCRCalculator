@@ -368,10 +368,6 @@ namespace PCRCaculator.SQL
             {
                 unitDic = GetDatasDic<unit_data>(a => a.unit_id);
             });
-            var talentDicTask = Task.Run(() =>
-            {
-                TalentDic = GetDatasDic<unit_talent>(a => a.unit_id);
-            });
             var dic1Task = Task.Run(() =>
             {
                 dic1 = GetDatasDic<unit_enemy_data>(a => a.unit_id);
@@ -412,6 +408,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => Dic92 = GetUEQ2Data()));
             tasks.Add(
                 Task.Run(() => Pair = GetUnitStoryData()));
+            tasks.Add(
+                Task.Run(() =>TalentDic = GetDatasDic<unit_talent>(a => a.unit_id)));
             tasks.Add(
                 Task.Run(() => Dic10 = GetUnitName_cn()));
             tasks.Add(
@@ -494,13 +492,19 @@ namespace PCRCaculator.SQL
                 }
                 UnitRankData rankData = new UnitRankData(eq, datas1);
                 UnitDetailData detailData;
+                int talent_id = -1;
                 try
                 {
                     unit_data t4 = unitDic[pair.Key];
+                    if (TalentDic != null)
+                    {
+                        talent_id = TalentDic[pair.Key].talent_id;
+
+                    }
                     detailData = new UnitDetailData(t4.unit_id,
                         t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,
-                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id)
-                    { 
+                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id, talent_id)
+                    {
                         moveSpeed = t4.move_speed,
                         prefabIdBattle = t4.prefab_id_battle
                     };

@@ -138,10 +138,10 @@ namespace PCRCaculator
             //{
             //   characterImage.sprite = MainManager.LoadSourceSprite(path);
             //}
-            if (MainManager.Instance.unitTalentDic.TryGetValue(unitid, out var talent))
+            if (unitid <= 200000 && MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData) && rarityData.detailData.talent_id >= 0)
             {
                 characterTalentImage.SetActive(true);
-                characterTalentImage.sprite = talentSprites[talent.talent_id - 1];
+                characterTalentImage.sprite = talentSprites[rarityData.detailData.talent_id - 1];
             }
             else
             {

@@ -1770,6 +1770,7 @@ namespace PCRCaculator
         public int atkType;//攻击方式
         public float normalAtkCastTime;//普攻间隔
         public int guildId;
+        public int talent_id;
         /// <summary>
         /// 不要用这个构造函数！
         /// </summary>
@@ -1789,11 +1790,11 @@ namespace PCRCaculator
 
         }
         public UnitDetailData(int id, string name, int rarity, int motion, int se, int searchWidth,
-            int atk, float casetime, int guid)
+            int atk, float casetime, int guid, int talent_id)
         {
             unitid = id; this.name = name; minrarity = rarity; motionType = motion;
             seType = se; searchAreaWidth = searchWidth; atkType = atk;
-            normalAtkCastTime = casetime; guildId = guid;
+            normalAtkCastTime = casetime; guildId = guid; this.talent_id = talent_id;
         }
         public override string ToString()
         {
