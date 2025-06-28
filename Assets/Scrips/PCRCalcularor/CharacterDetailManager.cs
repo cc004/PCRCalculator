@@ -243,7 +243,7 @@ namespace PCRCaculator
             equipmentLevelSliders[7].value = unit.uniqueEqLv;
             equipmentLevelTexts[7].text = "" + unit.uniqueEqLv;
 
-            equipmentLevelSliders[8].minValue = 0;
+            equipmentLevelSliders[8].minValue = -1;
             equipmentLevelSliders[8].maxValue = 5;
             equipmentLevelSliders[8].value = unit.uniqueEq2Lv;
             equipmentLevelTexts[8].text = "" + unit.uniqueEq2Lv;

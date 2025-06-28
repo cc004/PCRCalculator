@@ -153,7 +153,7 @@ namespace Elements
                 else if (skillid == Owner.MainSkillIdList[1])
                 {
                     key = "skill2";
-                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEq2Lv > 0)
+                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEq2Lv >= 0)
                         key = "skill2+";
                 }
                 else if (skillid == Owner.UnionBurstSkillId || skillid - 10 == Owner.UnionBurstSkillId)

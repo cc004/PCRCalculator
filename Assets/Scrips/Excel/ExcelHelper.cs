@@ -177,6 +177,7 @@ namespace ExcelHelper
                 var json = JToken.Parse(File.ReadAllText(path))["data"];
                 var turn = (int) json["battle_log"]["data"]["lap_num"];
                 var ids = Enumerable.Range(1, 5).Select(i => (int)json["battle_log"][$"unit_id_{i}"])
+                    .Where(id => id > 0)
                     .OrderBy(t => MainManager.Instance.UnitRarityDic[t].detailData.searchAreaWidth)
                     .ThenBy(t => t).Append((int)json["battle_log"][$"unit_id_{6}"]).ToArray();
                 var idinv = ids.Select((t, i) => (t, i)).ToDictionary(k => k.t, k => k.i);
@@ -194,7 +195,7 @@ namespace ExcelHelper
                         {
                             playrCharacters = json["battle_log"]["data"]["units"].Values().Select(t =>
                             {
-                                var unit = new UnitData(id: (int) t["unit_id"])
+                                var unit = new UnitData(id: (int)t["unit_id"])
                                 {
                                     equipLevel = new int[]
                                     {
@@ -218,7 +219,13 @@ namespace ExcelHelper
                                         : (int)t["battle_rarity"],
                                     rank = (int)t["rank"],
                                     uniqueEqLv = (int)t["unique"],
-                                    //专2(该模块不用了不修)
+                                    uniqueEq2Lv = t["unique2"]?.ToObject<int?>() ?? -1,
+                                    exEquip = t["exEquip"]?.Values<string>() is { } values && values.Any()
+                                        ? values.Select(int.Parse).ToArray()
+                                        : new int[] { 0, 0, 0 },
+                                    exEquipLevel = t["exEquipLevel"]?.Values<string>() is { } levelValues && levelValues.Any()
+                                        ? levelValues.Select(int.Parse).ToArray()
+                                        : new int[] { 0, 0, 0 }
                                 };
                                 foreach (var key in unit.playLoveDic.Keys.ToArray())
                                 {
@@ -230,9 +237,7 @@ namespace ExcelHelper
                         },
                         currentGuildMonth = (int) json["battle_log"]["data"]["clan_battle_id"],
                         currentGuildEnemyNum = (int) json["battle_log"]["data"]["order_num"] - 1,
-                        currentTurn = (turn > 3 ? 1 : 0) + (turn > 10 ? 1 : 0) + (turn > 35 ? 1 : 0) +
-                                      (turn > 45 ? 1 : 0) +
-                                      1,
+                        currentTurn = (int) json["battle_log"]["data"]["phase"],
                     },
                     UBExecTime = json["timeline"].Select(j => new
                             {unit = idinv[(int) j["unit_id"]], frame = (int) j["press"]})
@@ -265,6 +270,7 @@ namespace ExcelHelper
             catch (Exception e)
             {
                 MainManager.Instance.WindowConfigMessage(e.ToString(), null);
+                Debug.LogError(e);
                 guildTimelineData = null;
                 return false;
             }
