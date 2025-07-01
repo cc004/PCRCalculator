@@ -72,7 +72,7 @@ namespace PCRCaculator
             {
                 result += BaseData.CeilToInt(value3.CalcUniqueValue(a.uniqueEqLv));
             }
-            if (a.uniqueEq2Lv > 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipment2DataDic.TryGetValue(a.unitId, out var value4))
+            if (a.uniqueEq2Lv >= 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipment2DataDic.TryGetValue(a.unitId, out var value4))
             {
                 result += BaseData.CeilToInt(value4.CalcUniqueValue(a.uniqueEq2Lv));
             }
@@ -154,7 +154,7 @@ namespace PCRCaculator
                 {
                     Debug.LogError("角色id不匹配！" + a.unitId + "!=" + unitId);
                 }
-                if (a.rarity > raritydatas.Count||a.rarity<=0)
+                if (a.rarity > raritydatas.Count || a.rarity <= 0)
                 {
                     a.rarity = 5;
                 }
@@ -182,7 +182,7 @@ namespace PCRCaculator
                         {
                             continue;
                         }
-                        int rankid = a.rank<=rankData.rankEquipments.Count? rankData.rankEquipments[a.rank - 1][i]:999999;
+                        int rankid = a.rank <= rankData.rankEquipments.Count ? rankData.rankEquipments[a.rank - 1][i] : 999999;
                         if (MainManager.Instance.EquipmentDic.TryGetValue(rankid, out var equipmentData))
                         {
                             d1 += equipmentData.GetEquipmentData(a.equipLevel[i]);
@@ -198,7 +198,7 @@ namespace PCRCaculator
                     }
                 }
                 //计算专武2加成
-                if (a.uniqueEq2Lv > 0 && unitId <= 200000)
+                if (a.uniqueEq2Lv >= 0 && unitId <= 200000)
                 {
                     if (MainManager.Instance.UniqueEquipment2DataDic.TryGetValue(a.unitId, out var equipmentData))
                     {
@@ -244,7 +244,7 @@ namespace PCRCaculator
 
 
                 d1 = MainManager.Instance.rbs.TryGetValue((a.unitId, a.rank), out var val) ? val.GetBaseData() : new BaseData();
-                
+
                 result += BaseData.Round(d1);
 
                 var temp = result;
@@ -270,7 +270,7 @@ namespace PCRCaculator
 #if UNITY_EDITOR
             catch(NotImplementedException e)
 #else
-            catch(Exception e)
+            catch (Exception e)
 #endif
             {
                 Debug.LogError("加载角色" + a.unitId + "时发生错误：" + e);
@@ -283,13 +283,13 @@ namespace PCRCaculator
         /// </summary>
         /// <param name="a">基础数据</param>
         /// <returns>战斗力</returns>
-        public float GetPowerValue(UnitData a, bool usedic_save = false,bool jjc_otherside = false)
+        public float GetPowerValue(UnitData a, bool usedic_save = false, bool jjc_otherside = false)
         {
-            return GetBaseData(a, usedic_save,jjc_otherside).GetPowerValue(a);
+            return GetBaseData(a, usedic_save, jjc_otherside).GetPowerValue(a);
         }
         public int[] GetRankEquipments(int rank)
         {
-            if (rank >rankData.rankEquipments.Count || rank <= 0 || rankData.rankEquipments == null)
+            if (rank > rankData.rankEquipments.Count || rank <= 0 || rankData.rankEquipments == null)
             {
                 return new int[6] { 999999, 999999, 999999, 999999, 999999, 999999 };
             }
@@ -339,9 +339,9 @@ namespace PCRCaculator
                 return 12;
             return 8;
         }
-        public BaseData GetBattleValuesApplyedEX(UnitData a,bool jjc_otherside = false)
+        public BaseData GetBattleValuesApplyedEX(UnitData a, bool jjc_otherside = false)
         {
-            BaseData b = GetBaseData(a,false,jjc_otherside);
+            BaseData b = GetBaseData(a, false, jjc_otherside);
             int[] exSkillActionList = MainManager.Instance.SkillDataDic[skillData.GetSkillList(a)[3]].skillactions;
             foreach (int exActionId in exSkillActionList)
             {
@@ -541,7 +541,7 @@ namespace PCRCaculator
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
         public int PrefabId => rarity == 6 && unitId == 105701 ? 170301 : unitId;
-        
+
         public void SetDefaultLoveDict()
         {
             if (playLoveDic != null && playLoveDic.ContainsKey(unitId)) return;
@@ -582,7 +582,7 @@ namespace PCRCaculator
         /// <param name="lv"></param>
         /// <param name="ra"></param>
         /// <param name="rank"></param>
-        public UnitData(int id, int lv, int ra,int rank)
+        public UnitData(int id, int lv, int ra, int rank)
         {
             unitId = id;
             level = lv;
@@ -591,7 +591,7 @@ namespace PCRCaculator
             skillLevel = new int[4] { lv, lv, lv, lv };
         }
 
-        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null,int uniqueeqlv = 0, int uniqueeq2lv = 0)
+        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1)
         {
             unitId = id;
             level = lv;
@@ -603,7 +603,7 @@ namespace PCRCaculator
             if (playLoveDic != null)
             {
                 this.playLoveDic = new Dictionary<int, int>();
-                foreach(KeyValuePair<int,int> keyValuePair in playLoveDic)
+                foreach (KeyValuePair<int, int> keyValuePair in playLoveDic)
                 {
                     this.playLoveDic.Add(keyValuePair.Key, keyValuePair.Value);
                 }
@@ -652,7 +652,7 @@ namespace PCRCaculator
         }
         public int GetMaxRarity()
         {
-            if (MainManager.Instance.PlayerSetting.allowRarity6 && MainManager.Instance.UnitRarityDic.TryGetValue(unitId,out var data))
+            if (MainManager.Instance.PlayerSetting.allowRarity6 && MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var data))
             {
                 return data.GetMaxRarity();
             }
@@ -664,7 +664,7 @@ namespace PCRCaculator
         /// <returns></returns>
         public UnitData Copy()
         {
-            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel,playLoveDic,uniqueEqLv,uniqueEq2Lv);
+            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv);
         }
         /// <summary>
         /// 比较相同角色是否有所提升
@@ -673,16 +673,16 @@ namespace PCRCaculator
         /// <returns></returns>
         public bool CompairIsUp(UnitData old)
         {
-            if(unitId != old.unitId)
+            if (unitId != old.unitId)
             {
                 Debug.LogError("不能比较不同的角色！");
                 return false;
             }
             if (level > old.level) { return true; }
             if (rank > old.rank) { return true; }
-            if(rank == old.rank)
+            if (rank == old.rank)
             {
-                for(int i = 0; i < 6; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     if (equipLevel[i] > old.equipLevel[i])
                     {
@@ -703,7 +703,7 @@ namespace PCRCaculator
             List<int> equipList = new List<int>();
             if (old.rank < rank)
             {
-                for(int k = 0; k < 6; k++)
+                for (int k = 0; k < 6; k++)
                 {
                     if (old.equipLevel[k] < 0)
                     {
@@ -722,7 +722,7 @@ namespace PCRCaculator
             {
                 if (equipLevel[k] >= 0)
                 {
-                    if (old.rank < rank || old.equipLevel[k]<0)
+                    if (old.rank < rank || old.equipLevel[k] < 0)
                     {
                         equipList.Add(rarityData.GetRankEquipments(rank)[k]);
                     }
@@ -754,7 +754,7 @@ namespace PCRCaculator
             string result = "R" + rank + "-";
             int count = 0;
             bool special = false;
-            for(int i=0;i<equipLevel.Length;i++)
+            for (int i = 0; i < equipLevel.Length; i++)
             {
                 if (equipLevel[i] == 5)
                     count++;
@@ -770,28 +770,28 @@ namespace PCRCaculator
         }
         public string GetUniqueEqLvDescribe()
         {
-          string result = "无";
-          if (uniqueEqLv > 0)
-            result = uniqueEqLv.ToString();
-          return result;
+            string result = "无";
+            if (uniqueEqLv > 0)
+                result = uniqueEqLv.ToString();
+            return result;
         }
 
         public string GetUniqueEq2LvDescribe()
         {
-          string result = "无";
-          if (uniqueEq2Lv > 0)
-            result = uniqueEq2Lv.ToString();
-          return result;
+            string result = "无";
+            if (uniqueEq2Lv >= 0)
+                result = uniqueEq2Lv.ToString();
+            return result;
         }
         public string GetUniqueEqsDescribe()
         {
             string result = GetUniqueEqLvDescribe();
-            
-            if (uniqueEq2Lv > 0)
+
+            if (uniqueEq2Lv >= 0)
             {
                 result += "/" + GetUniqueEq2LvDescribe();
             }
-            
+
             return result;
         }
         public string GetExEquipDescribe()
@@ -827,12 +827,12 @@ namespace PCRCaculator
                 li[0] = skillLevel[0];
             if (uniqueEqLv > 0)
                 li[1] = skillLevel[1];
-            if (uniqueEq2Lv > 0)
+            if (uniqueEq2Lv >= 0)
                 li[2] = skillLevel[2];
 
             return li;
         }
-        
+
         public new long GetHashCode()
         {
             unchecked
@@ -996,7 +996,7 @@ namespace PCRCaculator
         /// <param name="rarity">星级（5*开ex+，6*开ub+）</param>
         /// <param name="isUnitEquip">是否开专武</param>
         /// <returns>返回一个长度为4的数组，对应UB,SKILL1,SKILL2,EXSKILL的skillid</returns>
-        public int[] GetSkillList(UnitData unitData=null)
+        public int[] GetSkillList(UnitData unitData = null)
         {
             if (unitData == null)
             {
@@ -1004,7 +1004,7 @@ namespace PCRCaculator
             }
             int rarity = unitData.rarity;
             bool isUnitEquip = unitData.uniqueEqLv > 0;
-            bool isUnitEquip2 = unitData.uniqueEq2Lv > 0;
+            bool isUnitEquip2 = unitData.uniqueEq2Lv >= 0;
             int[] li = new int[4] { UB, skill_1, skill_2, EXskill };
             if (rarity >= 5) { li[3] = EXskill_ev; }
             if (rarity == 6 && UB_ev != 0) { li[0] = UB_ev; }
@@ -1020,11 +1020,11 @@ namespace PCRCaculator
         }
         public int[] GetFullSkillList()
         {
-            int[] li = new int[8] { UB, skill_1, skill_2, EXskill, UB_ev, skill_1_ev, skill_2_ev,EXskill_ev };
+            int[] li = new int[8] { UB, skill_1, skill_2, EXskill, UB_ev, skill_1_ev, skill_2_ev, EXskill_ev };
             return li;
         }
         public override string ToString()
-        {            
+        {
             return JsonConvert.SerializeObject(this);
         }
     }
@@ -1039,8 +1039,8 @@ namespace PCRCaculator
         public int type;
         public int areawidth;
         public float casttime;
-        public int[] skillactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
-        public int[] dependactions = new int[7] { 0,0,0,0,0,0,0};//长度为7
+        public int[] skillactions = new int[7] { 0, 0, 0, 0, 0, 0, 0 };//长度为7
+        public int[] dependactions = new int[7] { 0, 0, 0, 0, 0, 0, 0 };//长度为7
         public string describes = "";
         public int icon;
         public static string[] num = new string[10] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩" };
@@ -1126,7 +1126,7 @@ namespace PCRCaculator
                     if (dependactions[i] > 0)
                     {
                         List<int> list = new List<int>(skillactions);
-                        acdetail = $"依赖{num[list.FindIndex(a=>a==dependactions[i])]}" + acdetail;
+                        acdetail = $"依赖{num[list.FindIndex(a => a == dependactions[i])]}" + acdetail;
                     }
                     if (acdetail != "")
                     {
@@ -1245,11 +1245,11 @@ namespace PCRCaculator
         }
         public string GetTargetDescription()
         {
-            if(MainManager.Instance.SkillDataDic.TryGetValue(actionid/100,out SkillData skillData))
+            if (MainManager.Instance.SkillDataDic.TryGetValue(actionid / 100, out SkillData skillData))
             {
-                for(int i = 0; i < skillData.skillactions.Length; i++)
+                for (int i = 0; i < skillData.skillactions.Length; i++)
                 {
-                    if(skillData.skillactions[i] == actionid)
+                    if (skillData.skillactions[i] == actionid)
                     {
                         if (skillData.dependactions[i] != 0)
                         {
@@ -1259,19 +1259,19 @@ namespace PCRCaculator
                     }
                 }
             }
-            return  ((DirectionType)target_area).GetDescription() + "范围" + (target_range < 1 ? "普攻范围" : target_range.ToString())
+            return ((DirectionType)target_area).GetDescription() + "范围" + (target_range < 1 ? "普攻范围" : target_range.ToString())
                 + "按照" + ((PirorityPattern)target_type).GetDescription() + "排列的从第" + (target_number + 1) + "个开始的" + target_count
-                + "个" + ((eTargetAssignment)target_assigment).GetDescription() +"目标";
+                + "个" + ((eTargetAssignment)target_assigment).GetDescription() + "目标";
         }
 
 
         /// <summary>
-            /// 获取技能片段的详情
-            /// </summary>
-            /// <param name="skilllevel">技能等级</param>
-            /// <param name="atk">角色攻击力（物理/魔法）</param>
-            /// <returns>技能详情描述字符串</returns>
-            public string GetDetail(int skilllevel, float atk, int depend = 0)
+        /// 获取技能片段的详情
+        /// </summary>
+        /// <param name="skilllevel">技能等级</param>
+        /// <param name="atk">角色攻击力（物理/魔法）</param>
+        /// <returns>技能详情描述字符串</returns>
+        public string GetDetail(int skilllevel, float atk, int depend = 0)
         {
             var param = ActionParameterSerializer.Actions.ActionParameter.type(this.type);
             param.init(false, actionid, depend, classid, type, details[0],
@@ -1281,7 +1281,8 @@ namespace PCRCaculator
             UserSettings.expression = UserSettings.EXPRESSION_VALUE;
             return param.localizedDetail(skilllevel, new Property()
             {
-                atk = atk, magicStr = atk
+                atk = atk,
+                magicStr = atk
             });
             /*
             string description_old = this.description;
@@ -1691,7 +1692,7 @@ namespace PCRCaculator
             unitid = int.Parse(data0[0]);
             loveMax = int.Parse(data0[1]);
             effectCharacters = JsonConvert.DeserializeObject<List<int>>(data0[2]);
-            addValues = JsonConvert.DeserializeObject<List<((int, int)[], int)>> (data0[3]);
+            addValues = JsonConvert.DeserializeObject<List<((int, int)[], int)>>(data0[3]);
         }
         /// <summary>
         /// 获取角色羁绊对应的奖励属性
@@ -1760,7 +1761,7 @@ namespace PCRCaculator
     /// </summary>
     public class UnitDetailData
     {
-        public int unitid; 
+        public int unitid;
         public int prefabIdBattle;
         public string name;
         public int minrarity;//初始星级
@@ -1818,10 +1819,11 @@ namespace PCRCaculator
         public int RealHp => realhp == 0 ? Mathf.RoundToInt(Hp) : realhp;
         [JsonIgnore]
         public float Hp
-        { 
-            get => dataint[0]/100.0f; 
-            set{
-                if (value>int.MaxValue/100)
+        {
+            get => dataint[0] / 100.0f;
+            set
+            {
+                if (value > int.MaxValue / 100)
                     dataint[0] = (long)(value * 100.0);
                 else
                     dataint[0] = Mathf.RoundToInt((value * 100));
@@ -1920,15 +1922,15 @@ namespace PCRCaculator
             pow += Enerey_reduce_rate * 3;
             pow += Accuracy * 2;
             pow += (skillLevel[0] + skillLevel[1] + skillLevel[2] + skillLevel[3]) * 10;
-            if (unit.rarity>=5)
+            if (unit.rarity >= 5)
             {
                 pow += 150;
             }
-            if (unit.uniqueEqLv>0)
+            if (unit.uniqueEqLv > 0)
             {
                 pow += skillLevel[1] * 2 + 100;
             }
-            if (unit.uniqueEq2Lv>0)
+            if (unit.uniqueEq2Lv >= 0)
             {
                 pow += skillLevel[2] * 2 + 100;
             }
@@ -1980,7 +1982,7 @@ namespace PCRCaculator
             BaseData data = new BaseData();
             for (int i = 0; i < 17; i++)
             {
-                data.dataint[i] = (long) Math.Ceiling(dataint[i] * k);
+                data.dataint[i] = (long)Math.Ceiling(dataint[i] * k);
             }
             return data;
         }
@@ -1992,7 +1994,7 @@ namespace PCRCaculator
             BaseData data = new BaseData();
             for (int i = 0; i < 17; i++)
             {
-                data.dataint[i] = (long) Math.Ceiling(a.dataint[i] * b.dataint[i] / 100000000.0) * 100;
+                data.dataint[i] = (long)Math.Ceiling(a.dataint[i] * b.dataint[i] / 100000000.0) * 100;
             }
             return data;
         }
@@ -2001,7 +2003,7 @@ namespace PCRCaculator
         {
             for (int i = 1; i < a.dataint.Length; i++)
             {
-                a.dataint[i] = (int) Math.Ceiling(a.dataint[i] / 100.0);
+                a.dataint[i] = (int)Math.Ceiling(a.dataint[i] / 100.0);
             }
             return a;
         }
@@ -2085,6 +2087,10 @@ namespace PCRCaculator
         public int maxTPUpValue = 250;//TP上限
 
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
+        public Dictionary<int, int> talentLevelDic = new Dictionary<int, int>();
+        public Dictionary<int, int> talentSkillDic = new Dictionary<int, int>();
+        public Dictionary<int, int> teamSkillDic = new Dictionary<int, int>();
+
 
         public int GetMaxRank()
         {
@@ -2137,44 +2143,44 @@ namespace PCRCaculator
         }
         public bool[] GetEquipmentIsAble()
         {
-            bool[] max = new bool[6] { true,true,true,true,true,true };
+            bool[] max = new bool[6] { true, true, true, true, true, true };
             int type = (playerProcess - 15) % 3;
             switch (playerProcess)
             {
                 case 10://8-5
                 case 12://9-5
-                /*case 15://10-5
-                case 18://11-5
-                case 21://12-5
-                case 24://13-5
-                case 27://14-5
-                case 30://15-5
-                case 33://16-5
-                case 36://17-5
-                case 39://18-5*/
+                    /*case 15://10-5
+                    case 18://11-5
+                    case 21://12-5
+                    case 24://13-5
+                    case 27://14-5
+                    case 30://15-5
+                    case 33://16-5
+                    case 36://17-5
+                    case 39://18-5*/
                     max = new bool[6] { false, true, true, true, true, true };
                     break;
                 case 11://9-3
                 case 13://10-3
-                /*case 16://11-3
-                case 19://12-3
-                case 22://13-3
-                case 25://14-3
-                case 28://15-3
-                case 31://16-3
-                case 34://17-3
-                case 37://18-3*/
+                    /*case 16://11-3
+                    case 19://12-3
+                    case 22://13-3
+                    case 25://14-3
+                    case 28://15-3
+                    case 31://16-3
+                    case 34://17-3
+                    case 37://18-3*/
                     max = new bool[6] { false, true, false, true, false, true };
                     break;
                 case 14://10-4
-                /*case 17://11-4
-                case 20://12-4
-                case 23://13-4
-                case 26://14-4
-                case 29://15-4
-                case 32://16-4
-                case 35://17-4
-                case 38://18-4*/
+                    /*case 17://11-4
+                    case 20://12-4
+                    case 23://13-4
+                    case 26://14-4
+                    case 29://15-4
+                    case 32://16-4
+                    case 35://17-4
+                    case 38://18-4*/
                     max = new bool[6] { false, true, false, true, true, true };
                     break;
                 default:
@@ -2188,14 +2194,14 @@ namespace PCRCaculator
                             return new bool[6] { false, true, false, true, true, true };
                     }
                     break;
-            }            
+            }
             return max;
         }
         public string ProcessStr()
         {
-            
+
             int remainder = (playerProcess - 15) % 3;
-            string rankPart="0";
+            string rankPart = "0";
 
             if (remainder == 0)
             {
@@ -2205,12 +2211,12 @@ namespace PCRCaculator
             {
                 rankPart = "3";
             }
-            else if(remainder == 2)
+            else if (remainder == 2)
             {
                 rankPart = "4";
             }
-          string rank = "R"+GetMaxRank().ToString()+"-"+ rankPart;
-          return rank; 
+            string rank = "R" + GetMaxRank().ToString() + "-" + rankPart;
+            return rank;
         }
     }
     /*
@@ -2228,28 +2234,28 @@ namespace PCRCaculator
         public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
 
         public AllData() { }*/
-        /*
-        public AllData(List<string> equipmentDic,
-            List<string> unitRarityDic,
-            List<string> unitStoryDic,
-            Dictionary<int, List<int>> unitStoryEffectDic,
-            List<string> skillDataDic,
-            List<string> skillActionDic,
-            Dictionary<int, string> unitName_cn,
-            Dictionary<int, string[]> skillNameAndDescribe_cn,
-            Dictionary<int, string> skillActionDescribe_cn
-            )
-        {
-            this.equipmentDic = equipmentDic;
-            this.unitRarityDic = unitRarityDic;
-            this.unitStoryDic = unitStoryDic;
-            this.unitStoryEffectDic = unitStoryEffectDic;
-            this.skillDataDic = skillDataDic;
-            this.skillActionDic = skillActionDic;
-            this.unitName_cn = unitName_cn;
-            this.skillNameAndDescribe_cn = skillNameAndDescribe_cn;
-            this.skillActionDescribe_cn = skillActionDescribe_cn;
-        }*/
+    /*
+    public AllData(List<string> equipmentDic,
+        List<string> unitRarityDic,
+        List<string> unitStoryDic,
+        Dictionary<int, List<int>> unitStoryEffectDic,
+        List<string> skillDataDic,
+        List<string> skillActionDic,
+        Dictionary<int, string> unitName_cn,
+        Dictionary<int, string[]> skillNameAndDescribe_cn,
+        Dictionary<int, string> skillActionDescribe_cn
+        )
+    {
+        this.equipmentDic = equipmentDic;
+        this.unitRarityDic = unitRarityDic;
+        this.unitStoryDic = unitStoryDic;
+        this.unitStoryEffectDic = unitStoryEffectDic;
+        this.skillDataDic = skillDataDic;
+        this.skillActionDic = skillActionDic;
+        this.unitName_cn = unitName_cn;
+        this.skillNameAndDescribe_cn = skillNameAndDescribe_cn;
+        this.skillActionDescribe_cn = skillActionDescribe_cn;
+    }*/
     //}
     [Serializable]
     public class UnitPrefabData
@@ -2266,7 +2272,7 @@ namespace PCRCaculator
         public float spineTime_MainSkill2;
         public Dictionary<string, float> all_spineTime_Dic = new Dictionary<string, float>();
         public bool useDefaultDelay;
-        public Dictionary<int, Dictionary<int,bool>> skillExecDependParentaction;
+        public Dictionary<int, Dictionary<int, bool>> skillExecDependParentaction;
         public Dictionary<int, Dictionary<int, bool>> skillExecDependEffect;
         public Dictionary<int, float[]> actionExecTime_Attack;
         public Dictionary<int, float[]> actionExecTime_UB;
@@ -2366,10 +2372,11 @@ namespace PCRCaculator
         //public bool playAnimation;
         //public int UBTryingCount;
         //public bool useFixedRandomSeed;
-       // public int RandomSeed;
+        // public int RandomSeed;
         //public Dictionary<int, UnitAttackPattern> changedATKPatternDic = new Dictionary<int, UnitAttackPattern>();
         public GuildSettingData SettingData;
         public bool skipping;
     }
+
 
 }
