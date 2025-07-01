@@ -299,7 +299,7 @@ namespace Elements
             public string ToString(int frame)
             {
                 if ((priority == eCritPointPriority.FullEnergy || 
-                     priority == eCritPointPriority.ExecAction && description2 == "AUTO") && frame - this.frame <= 1)
+                     priority == eCritPointPriority.ExecAction && description2 == "AUTO") && frame - this.frame <= 0)
                     return description2;
                 if (frame <= this.frame + 2)
                     return $"极限押{description2}({frame - this.frame})";

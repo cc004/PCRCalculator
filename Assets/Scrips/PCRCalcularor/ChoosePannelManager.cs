@@ -136,6 +136,7 @@ namespace PCRCaculator
                     }
                 }
             }
+            
         }
 
 
@@ -446,7 +447,7 @@ namespace PCRCaculator
             }
             if (data.uniqueEqLv == 0)
             {
-                data.uniqueEq2Lv = 0;
+                data.uniqueEq2Lv = -1;
             }
 
             if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
@@ -747,8 +748,8 @@ namespace PCRCaculator
             else
             {
                 detailTexts_setting[15].text = "null";
-                detailSliders_setting[15].maxValue = 0;
-                detailSliders_setting[15].value = 0;
+                detailSliders_setting[15].maxValue = -1;
+                detailSliders_setting[15].value = -1;
                 detailSliders_setting[15].interactable = false;
                 detailButtons_setting[2].interactable = false;
                 detailButtons_setting[3].interactable = false;

@@ -14,5 +14,6 @@ namespace Elements
     BACK_TARGET,
     ALL_OTHER,
     ALL_UNIT_EXCEPT_OWNER,
+    TARGET_CENTER_FOR_FIREARM,
   }
 }

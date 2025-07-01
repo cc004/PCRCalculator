@@ -153,7 +153,7 @@ namespace Elements
                 else if (skillid == Owner.MainSkillIdList[1])
                 {
                     key = "skill2";
-                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEq2Lv > 0)
+                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEq2Lv >= 0)
                         key = "skill2+";
                 }
                 else if (skillid == Owner.UnionBurstSkillId || skillid - 10 == Owner.UnionBurstSkillId)
@@ -736,6 +736,7 @@ namespace Elements
                             switch (_skilleffect.FireArmEndTarget)
                             {
                                 case eEffectTarget.OWNER:
+                                case eEffectTarget.TARGET_CENTER_FOR_FIREARM:
                                     _firearmEndTarget = Owner.GetFirstParts(true);
                                     break;
                                 case eEffectTarget.ALL_TARGET:
@@ -760,6 +761,7 @@ namespace Elements
                         switch (_skilleffect.EffectTarget)
                         {
                             case eEffectTarget.OWNER:
+                            case eEffectTarget.TARGET_CENTER_FOR_FIREARM:
                                 createNormalEffectPrefab2(_skilleffect, _skill, Owner.GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex, _modeChangeEndEffect);
                                 continue;
                             case eEffectTarget.ALL_TARGET:
@@ -846,7 +848,26 @@ namespace Elements
                     List<ActionParameter> _actions = new List<ActionParameter>();
                     if (_skillEffect.FireActionId != -1 & actionStart)
                         _actions.Add(_skillEffect.FireAction);
-                    firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), Owner, _skillEffect.Height, _skill.BlackOutTime > 0.0, _skillEffect.IsAbsoluteFireArm, transform.position + (Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f), _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
+                    Vector3 _targetPosition = transform.position + (Owner.IsLeftDir ? -1f : 1f) * new Vector3(_skillEffect.AbsoluteFireDistance, 0.0f);
+                    bool IsAbsoluteFireArm = _skillEffect.IsAbsoluteFireArm;
+                    if (_skillEffect.FireArmEndTarget == eEffectTarget.TARGET_CENTER_FOR_FIREARM)
+                    {
+                        float minx = float.MaxValue;
+                        float maxx = float.MinValue;
+                        foreach (var targetAction in _skillEffect.TargetAction.TargetList)
+                        {
+                            float x = targetAction.GetPosition().x;
+                            if (x < minx)
+                                minx = x;
+                            if (x > maxx)
+                                maxx = x;
+                        }
+                        _targetPosition.x = (minx + maxx) / 2.0f;
+                        // _targetPosition.y = 0.0f;
+                        _targetPosition.z = 0.0f;
+                        IsAbsoluteFireArm = true;
+                    }
+                    firearmCtrl.Initialize(_firearmEndTarget, _actions, _skill, actionStart ? _skillEffect.FireArmEndEffects : new List<NormalSkillEffect>(), Owner, _skillEffect.Height, _skill.BlackOutTime > 0.0, IsAbsoluteFireArm, _targetPosition, _skillEffect.ShakeEffects, _skillEffect.FireArmEndTargetBone);
                     firearmCtrl.OnHitAction = _skillEffect.EffectBehavior != eEffectBehavior.FIREARM ? fctrl =>
                     {
                         for (int index1 = 0; index1 < fctrl.ShakeEffects.Count; ++index1)
