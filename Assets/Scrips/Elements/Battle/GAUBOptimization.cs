@@ -376,7 +376,6 @@ namespace Elements.Battle
     public class GAUBOptimization : MonoBehaviour
     {
         static public List<List<int>> fixPreGenes = new List<List<int>>();
-        public GameObject GAInfo;
         private long bestDamage;
         private List<List<int>> bestGenes = new List<List<int>>();
         private GeneticAlgorithm ga;
@@ -400,7 +399,8 @@ namespace Elements.Battle
         public Toggle considerRealDamage;
         public Toggle considerExpectDamage;
         public Toggle considerPhysicAtk;
-        public Toggle considerMagicAtk; 
+        public Toggle considerMagicAtk;
+        public GameObject GAInfoPrefab;
 
         static public GAUBOptimization instance;
 
@@ -423,12 +423,17 @@ namespace Elements.Battle
                 MainManager.Instance.WindowMessage("仅在语义UB模式下可用");
                 return;
             }
-            GAInfo.SetActive(true);
+            GameObject a = Instantiate(GAInfoPrefab);
+            a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
             for (int i = 0; i < 5; i++)
             {
                 var raw = MyGameCtrl.Instance.tempData.SemanUBExecTimeList.ElementAtOrDefault(i) ?? new List<int>();
                 bestGenesTexts[i].text = string.Join("\n", raw);
             }
+        }
+        public void Exit()
+        {
+            Destroy(gameObject);
         }
 
         public void Update()
