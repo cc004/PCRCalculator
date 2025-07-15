@@ -24,7 +24,7 @@ using CompressionLevel = System.IO.Compression.CompressionLevel;
 using Object = UnityEngine.Object;
 using PCRCaculator.Update;
 using UnityEngine.Networking;
-
+using System.Reflection;
 namespace PCRCaculator
 {
     public class MainManager : MonoBehaviour
@@ -220,6 +220,20 @@ namespace PCRCaculator
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                try
+                {
+                    var memoryType = typeof(ExcelPackage).Assembly
+                        .GetType("OfficeOpenXml.Utils.RecyclableMemory");
+
+                    var manager = new Microsoft.IO.RecyclableMemoryStreamManager();
+                    memoryType.GetMethod("SetRecyclableMemoryStreamManager",
+                        BindingFlags.Static | BindingFlags.Public)
+                        .Invoke(null, new object[] { manager });
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"强制初始化失败: {e}");
+                }
                 Load();
             }
             catch (Exception e)
