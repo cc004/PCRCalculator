@@ -375,14 +375,52 @@ namespace ExcelHelper
             return false;
         }
 
-        public static bool AsmExportEnabled =>
-            Application.isEditor || File.Exists("patch_asm_exportaabbabab");
-        public static bool AsmExportEnabled2 =>
-            Application.isEditor || File.Exists("patch_lerist");
-        public static bool PyExportEnabled =>
-            Application.isEditor || File.Exists("patch_py_exportaabbabab");
-        public static bool Py2ExportEnabled =>
-            Application.isEditor || File.Exists("patch_atl6_exportaabbabab");
+        private static string CalculateMD5(string file)
+        {
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            using (var stream = File.OpenRead(file))
+            {
+                byte[] hashBytes = md5.ComputeHash(stream);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            }
+        }
+        public static bool AsmExportEnabled
+        {
+            get
+            {
+                if (!File.Exists("asm"))
+                    return false;
+                string file = Application.streamingAssetsPath + "/../../asm";
+                string actualHash = CalculateMD5(file);
+                const string expectedHash = "7031736DBAE9868C928FE7ACDCF3C5D4";
+                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        public static bool PyExportEnabled
+        {
+            get
+            {
+                if (!File.Exists("atl"))
+                    return false;
+                string file = Application.streamingAssetsPath + "/../../atl";
+                string actualHash = CalculateMD5(file);
+                const string expectedHash = "E689182E06404CEFD75F65F7AFF5103B";
+                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        public static bool Py2ExportEnabled
+        {
+            get
+            {
+                if (!File.Exists("atl6"))
+                    return false;
+                string file = Application.streamingAssetsPath + "/../../atl6";
+                string actualHash = CalculateMD5(file);
+                const string expectedHash = "998EFFEF9948561EEC4D625D261534B2";
+                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         public static void SaveExcel(int type, string defaultName = "")
         {
             bool isSuccess = true;
