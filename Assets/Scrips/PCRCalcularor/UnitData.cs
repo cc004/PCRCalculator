@@ -643,6 +643,29 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
+                if (MainManager.Instance.unitExEquips.TryGetValue(unitId, out var temp))
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var validEquip = temp[i]
+                            .Where(e => e.Value.clan_battle_equip_flag && e.Value.rarity == 3)
+                            .FirstOrDefault();
+
+                        if (validEquip.Value != null)
+                        {
+                            exEquip[i] = validEquip.Key;
+                            exEquipLevel[i] = 5;
+                        }
+                        else
+                        {
+                            exEquip[i] = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    exEquip = new int[] { 0, 0, 0 };
+                }
             }
             else
             {

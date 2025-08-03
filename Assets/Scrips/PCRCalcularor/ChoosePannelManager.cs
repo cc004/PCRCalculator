@@ -777,12 +777,9 @@ namespace PCRCaculator
                         ExEquip[i].AddOptions(optionsEx
                             .Select(x => new ExEquipOption(x)).Prepend(ExEquipOption.None)
                             .ToList<Dropdown.OptionData>());
-                        ExEquip[i].value = Math.Max(0,
-                            ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
                     }
-
-                    detailSliders_setting[16 + i].maxValue =
-                        data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
+                    ExEquip[i].value = Math.Max(0, ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
+                    detailSliders_setting[16 + i].maxValue = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
                     detailSliders_setting[16 + i].minValue = 0;
                     detailSliders_setting[16 + i].value = data.exEquipLevel[i];
                     detailTexts_setting[16 + i].text = detailSliders_setting[16 + i].value.ToString();
