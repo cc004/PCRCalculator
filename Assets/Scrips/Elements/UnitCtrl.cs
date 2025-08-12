@@ -1432,6 +1432,7 @@ namespace Elements
         public bool IsDivisionSourceForDie { get; set; }
 
         public bool IsPhantom => SummonType == SummonAction.eSummonType.PHANTOM;
+        public bool IsSummon => SummonType == SummonAction.eSummonType.SUMMON;
 
         public bool IsShadow { get; set; }
 

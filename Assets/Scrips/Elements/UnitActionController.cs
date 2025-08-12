@@ -2149,6 +2149,15 @@ namespace Elements
              float _b2 = _end + bodyWidth * 0.5f;
              return _a >= (double)_b1 && _a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2)) || _actionParameter.Direction == DirectionType.ALL;
          */
+            if (_actionParameter.Direction == DirectionType.FRONT_WITHOUT_SUMMON
+            || _actionParameter.Direction == DirectionType.FRONT_AND_BACK_WITHOUT_SUMMON
+            || _actionParameter.Direction == DirectionType.ALL_WITHOUT_SUMMON)
+            {
+                if (_unitCtrl.Owner.IsPhantom || _unitCtrl.Owner.IsSummon)
+                {
+                    return false;
+                }
+            }
             if (!_unitCtrl.GetTargetable())
             {
                 return false;
@@ -2163,7 +2172,7 @@ namespace Elements
             float num4 = _end + num2 * 0.5f;
             if ((!(num >= num3) || !(num <= num4)) && !BattleUtil.Approximately(num, num3) && !BattleUtil.Approximately(num, num4))
             {
-                return _actionParameter.Direction == DirectionType.ALL;
+                return _actionParameter.Direction == DirectionType.ALL || _actionParameter.Direction == DirectionType.ALL_INCLUDE_FLIGHT || _actionParameter.Direction == DirectionType.ALL_WITHOUT_SUMMON;
             }
             return true;
         }
