@@ -6488,7 +6488,7 @@ this.updateCurColor();
             stateChangeData.MainValue = MainValue;
             //stateChangeData.SubValue = data.SubValue;
             //stateChangeData.SkillName = data.Skill.SkillName;
-            //stateChangeData.SourceName = data.Source.UnitName;
+            stateChangeData.SourceName = _source.UnitName;
             stateChangeData.isBuff = true;
             stateChangeData.BUFF_Type = _kind;
             NoSkipOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);

@@ -1634,7 +1634,7 @@ namespace PCRCaculator.Guild
         public void ShowDetail()
         {
             float total = (endFrameCount - startFrameCount) / 60.0f;
-            string detail = "开始时间：" + startFrameCount + "\n结束时间：" + endFrameCount + "\n持续时间：" + total + "\n效果：" + GetDescription();
+            string detail = "来源："+ SourceName + "\n开始时间：" + startFrameCount + "\n结束时间：" + endFrameCount + "\n持续时间：" + total + "\n效果：" + GetDescription();
             MainManager.Instance.WindowConfigMessage(detail, null);
         }
     }
