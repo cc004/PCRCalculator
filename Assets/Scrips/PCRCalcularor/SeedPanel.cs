@@ -21,7 +21,8 @@ public class SeedPanel : MonoBehaviour
         for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
         {
             var seed = rnd.Next();
-            FloatWithEx.SetState(seed);
+            DoubleWithEx.SetState(seed);
+            LongWithEx.SetState(seed);
             var hash = rnd.Next();
 
             foreach (var evt in dmglist)

@@ -34,12 +34,12 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             UnitCtrl.BuffParamKind changeParamKind = BuffDebuffAction.GetChangeParamKind(ActionDetail1);
-            var intReverseTruncate = (float)BattleUtil.FloatToIntReverseTruncate(_valueDictionary[eValueNumber.VALUE_1]);
+            var intReverseTruncate = (float)BattleUtil.DoubleToIntReverseTruncate(_valueDictionary[eValueNumber.VALUE_1]);
             GameObject gameObject1 = null;
             GameObject gameObject2 = null;
             if (ActionEffectList.Count > 0)
@@ -50,9 +50,9 @@ namespace Elements
             ChangeParameterFieldData parameterFieldData = new ChangeParameterFieldData();
             parameterFieldData.KNLCAOOKHPP = eFieldType.HEAL;
             parameterFieldData.HKDBJHAIOMB = eFieldExecType.NORMAL;
-            parameterFieldData.StayTime = _valueDictionary[eValueNumber.VALUE_3];
+            parameterFieldData.StayTime = (float)_valueDictionary[eValueNumber.VALUE_3];
             parameterFieldData.CenterX = _target.GetLocalPosition().x + Position;
-            parameterFieldData.Size = _valueDictionary[eValueNumber.VALUE_5];
+            parameterFieldData.Size = (float)_valueDictionary[eValueNumber.VALUE_5];
             parameterFieldData.LCHLGLAFJED = _source.IsOther == (ActionDetail1 % 10 == 1) ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
             parameterFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
             parameterFieldData.EffectType = (ChangeParameterFieldData.eEffectType)ActionDetail3;

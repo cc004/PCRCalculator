@@ -17,6 +17,40 @@ namespace Elements
         public const int UPGRADE_SKILL_NUM = 10;
         private const float NO_DISPLAY = 0.0f;
         private const float NO_VALUE_DISPLAY = -1f;
+
+        public static readonly List<eActionType> TALENT_CONSIDER_DAMAGE_ACTION = new List<eActionType>
+        {
+            eActionType.ATTACK,
+            eActionType.SLIP_DAMAGE,
+            eActionType.ENCHANT_STRIKE_BACK,
+            eActionType.ATTACK_FIELD,
+            eActionType.UPPER_LIMIT_ATTACK,
+            eActionType.DAMAGE_BY_ATTACK,
+        };
+
+    public static readonly List<eActionType> IGNORE_DAMAGE_CUT_ACTION = new List<eActionType>
+    {
+            eActionType.DESTROY,
+            eActionType.FORCE_HP_CHANGE,
+            eActionType.CONVERT_DAMAGE_OVER_TIME
+    };
+
+          public static readonly List<eActionType> CONVERT_DAMAGE_OVER_TIME_TARGET_ACTION = new List<eActionType>
+          {
+              eActionType.ATTACK,
+              eActionType.ENCHANT_STRIKE_BACK,
+              eActionType.ATTACK_FIELD,
+              eActionType.UPPER_LIMIT_ATTACK,
+
+          };
+          public static readonly List<eActionType> IGNORE_RESET_DAMAGE_NUM_POS_ACTION = new List<eActionType>
+          {
+              eActionType.ATTACK_FIELD,
+              eActionType.SLIP_DAMAGE,
+              eActionType.CONVERT_DAMAGE_OVER_TIME
+          };
+
+
         public static readonly Dictionary<eActionType, Func<List<float>, List<float>, bool, float>> SkillActionDictionary = new Dictionary<eActionType, Func<List<float>, List<float>, bool, float>>
     {
       {

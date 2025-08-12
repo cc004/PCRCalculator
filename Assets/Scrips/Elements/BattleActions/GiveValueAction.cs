@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
 using System.Collections.Generic;
 using Elements.Battle;
 
@@ -52,10 +53,10 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            Dictionary<eValueNumber, FloatWithEx> _addValue = new Dictionary<eValueNumber, FloatWithEx>();
+            Dictionary<eValueNumber, DoubleWithEx> _addValue = new Dictionary<eValueNumber, DoubleWithEx>();
             eValueNumber eValueNumber = (eValueNumber)(ActionDetail2 - 1);
             _addValue.Add(eValueNumber, 0.0f);
             createValue(_source, _skill, _valueDictionary, _addValue, eValueNumber, _target);
@@ -141,8 +142,8 @@ namespace Elements
         protected virtual void createValue(
       UnitCtrl _source,
       Skill _skill,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
-      Dictionary<eValueNumber, FloatWithEx> _addValue,
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+      Dictionary<eValueNumber, DoubleWithEx> _addValue,
       eValueNumber _evalue,
       BasePartsData _target)
         {
@@ -176,7 +177,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = _target.Owner.AtkZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.AtkZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 8:
@@ -187,7 +188,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = _target.Owner.MagicStrZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.MagicStrZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 9:
@@ -198,7 +199,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = _target.Owner.DefZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.DefZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 10:
@@ -209,7 +210,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = _target.Owner.MagicDefZero.Floor() * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = _target.Owner.MagicDefZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case 11:
@@ -223,15 +224,15 @@ namespace Elements
                 case 13:
                     {
                         long num = _target.Owner.MaxHp;
-                        float value = (float)(num - (long)_target.Owner.Hp) / (float)num * _valueDictionary[eValueNumber.VALUE_2];
-                        _addValue[_evalue] = BattleUtil.FloatToPerMille(value);
+                        double value = (num - (long)_target.Owner.Hp) / (double)num * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = BattleUtil.DoubleToPerMille(value);
                         return;
                     }
                 case 14:
                     _addValue[_evalue] = calcMaxHpValue(_source, _valueDictionary);
                     return;
                 case 15:
-                    FloatWithEx sumHp = 0;
+                    DoubleWithEx sumHp = 0;
                     foreach(BasePartsData target in TargetList)
                     {
                         if (target != null && target.Owner != null)
@@ -286,19 +287,19 @@ namespace Elements
         }
 
 
-        protected virtual void setValue(Dictionary<eValueNumber, FloatWithEx> _value, ActionParameter _action)
+        protected virtual void setValue(Dictionary<eValueNumber, DoubleWithEx> _value, ActionParameter _action)
         {
         }
 
-        protected virtual FloatWithEx calcDamageValue(
+        protected virtual DoubleWithEx calcDamageValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-        protected virtual FloatWithEx calcHpValue(
+        protected virtual DoubleWithEx calcHpValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-        protected virtual FloatWithEx calcMaxHpValue(UnitCtrl _source, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+        protected virtual DoubleWithEx calcMaxHpValue(UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             return 0f;
         }

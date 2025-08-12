@@ -335,7 +335,7 @@ namespace PCRCaculator
             RefreshBattleBuffUIs();
         }
 
-        public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,float stayTime = 90,string describe = "???",
+        public void SetAbnormalIcons(UnitCtrl unitCtrl, eStateIconType stateIconType_2, bool enable,double stayTime = 90,string describe = "???",
             object extraKey = null)
         {
             if (SetAbnormalIconsCounter.ContainsKey(stateIconType_2))
@@ -363,7 +363,7 @@ namespace PCRCaculator
                 GameObject a = Instantiate(buffUIPrefab);
                 a.transform.SetParent(buffUIParent,false);
                 BattleBuffUI buffUI = a.GetComponent<BattleBuffUI>();
-                buffUI.Init(uIManager.GetAbnormalIconSprite((Battle.eStateIconType)(int)stateIconType_2),stateIconType_2,stayTime,describe,RemoveBuffIcon);
+                buffUI.Init(uIManager.GetAbnormalIconSprite((Battle.eStateIconType)(int)stateIconType_2),stateIconType_2, (float)stayTime, describe,RemoveBuffIcon);
                 buffUI.key = extraKey;
                 battleBuffUIs.Add(buffUI);
                 RefreshBattleBuffUIs();

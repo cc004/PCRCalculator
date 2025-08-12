@@ -38,13 +38,13 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             _target.Owner.IsStealth = true;
             battleManager.QueueUpdateSkillTarget();
-            _target.Owner.AppendCoroutine(updateStealth(_valueDictionary[eValueNumber.VALUE_1], _target.Owner), ePauseType.SYSTEM);
+            _target.Owner.AppendCoroutine(updateStealth((float)_valueDictionary[eValueNumber.VALUE_1], _target.Owner), ePauseType.SYSTEM);
             if (_skill.AnimId != 0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum, 1))
             {
                 _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, (_skill.BlackOutTime > 0f) ? _source : null);

@@ -17,8 +17,8 @@ namespace Assets.Scrips
         public class AdditionalData
         {
             public string comment;
-            public FloatWithEx data;
-            public Func<FloatWithEx> getter;
+            public IWithEx data;
+            public Func<IWithEx> getter;
             public Func<bool> condition;
         }
         
@@ -69,7 +69,7 @@ namespace Assets.Scrips
                                 .Single(u => u.UnitId == unit).energy,
                             "hp" => () => mgr.UnitList.Concat(mgr.EnemyList)
                                 .Single(u => u.UnitId == unit).Hp,
-                            _ => () => 0
+                            _ => () => new DoubleWithEx(0)
                         }
                     });
                 }

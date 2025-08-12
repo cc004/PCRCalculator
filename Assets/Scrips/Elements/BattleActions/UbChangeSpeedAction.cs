@@ -71,7 +71,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       AppendIsAlreadyExeced(_target.Owner, _num);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -89,9 +89,9 @@ namespace Elements
         {
           AbnormalState = abnormalStateDic[(eChangeSpeedType) ActionDetail1],
             Source = _source,
-            EffectTime = _valueDictionary[eValueNumber.VALUE_3],
+            EffectTime = (float)_valueDictionary[eValueNumber.VALUE_3],
           Value = _valueDictionary[eValueNumber.VALUE_1],
-          Timer = _valueDictionary[eValueNumber.VALUE_5],
+          Timer = (float)_valueDictionary[eValueNumber.VALUE_5],
           //Effect = effect
         };
         ubAbnormalData.StartTimer(_target.Owner);

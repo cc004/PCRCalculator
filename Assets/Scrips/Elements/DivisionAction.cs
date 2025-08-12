@@ -23,7 +23,7 @@ namespace Elements
     public override void Initialize(UnitCtrl _ownerUnitCtrl)
     {
       Initialize();
-      Action<int, float, eUnitRespawnPos> action = (_id, _position, _respawnPos) =>
+      Action<int, double, eUnitRespawnPos> action = (_id, _position, _respawnPos) =>
       {
           if (_id == 0)
               return;
@@ -49,7 +49,7 @@ namespace Elements
       Skill _skill,
       float _startTime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _startTime, _enabledChildAction, _valueDictionary);
       int defeatCount = 0;
@@ -112,7 +112,7 @@ namespace Elements
         int num = (int) (eReleaseType - 2);
       }
       else
-        _sourceActionController.AppendCoroutine(waitTime(_valueDictionary[eValueNumber.VALUE_2], _source, _sourceActionController, _skill), ePauseType.SYSTEM);
+        _sourceActionController.AppendCoroutine(waitTime((float)_valueDictionary[eValueNumber.VALUE_2], _source, _sourceActionController, _skill), ePauseType.SYSTEM);
     }
 
     private IEnumerator waitMotionEnd(

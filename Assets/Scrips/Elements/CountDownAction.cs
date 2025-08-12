@@ -43,11 +43,11 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
         base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
         _target.Owner.AppendCoroutine(
-            this.updateCountDown(_valueDictionary[eValueNumber.VALUE_1], null, _target.Owner, _skill,
+            this.updateCountDown((float)_valueDictionary[eValueNumber.VALUE_1], null, _target.Owner, _skill,
                 _sourceActionController, _source), ePauseType.SYSTEM);
         /*
         for (int index = 0; index < this.ActionEffectList.Count; ++index)

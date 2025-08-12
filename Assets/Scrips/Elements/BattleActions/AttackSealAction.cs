@@ -28,7 +28,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
       System.Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -68,14 +68,14 @@ namespace Elements
       }
       if (dataDictionary.ContainsKey(_source) && dataDictionary[_source].ContainsKey(ActionId))
       {
-        dataDictionary[_source][ActionId].LimitTime = _valueDictionary[eValueNumber.VALUE_5];
+        dataDictionary[_source][ActionId].LimitTime = (float)_valueDictionary[eValueNumber.VALUE_5];
       }
       else
       {
         AttackSealData _attackSealData = new AttackSealData
         {
-          SealEffectTime = _valueDictionary[eValueNumber.VALUE_3],
-          LimitTime = _valueDictionary[eValueNumber.VALUE_5],
+          SealEffectTime = (float)_valueDictionary[eValueNumber.VALUE_3],
+          LimitTime = (float)_valueDictionary[eValueNumber.VALUE_5],
           IconType = key,
           ActionId = ActionId,
           ExecConditionType = (AttackSealData.eExecConditionType) ActionDetail1

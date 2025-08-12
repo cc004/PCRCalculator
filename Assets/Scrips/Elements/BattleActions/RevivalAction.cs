@@ -35,7 +35,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       _target.Owner.EnemyPointDone = false;
@@ -45,7 +45,7 @@ namespace Elements
                     _target.Owner.SetRecovery((int)(_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_2]), UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _isRevival: true, _useNumberEffect: (ActionDetail2 == 1));
                     break;
         case eRevivalType.PHOENIX:
-          _sourceActionController.AppendCoroutine(updateRevival(_skill, (int) _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _target.Owner, _valueDictionary[eValueNumber.VALUE_4], _source, _sourceActionController), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
+          _sourceActionController.AppendCoroutine(updateRevival(_skill, (int) _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _target.Owner, (float)_valueDictionary[eValueNumber.VALUE_4], _source, _sourceActionController), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
           _source.UnDeadTimeHitCount = (int) _valueDictionary[eValueNumber.VALUE_1] + 1;
           --Value[eValueNumber.VALUE_1];
           break;
@@ -55,7 +55,7 @@ namespace Elements
     private IEnumerator updateRevival(
       Skill _skill,
       int _value1,
-      float _value2,
+      double _value2,
       UnitCtrl _target,
       float _time,
       UnitCtrl _source,

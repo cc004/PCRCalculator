@@ -43,9 +43,9 @@ namespace Elements
         public Action<int, int, UnitActionExecData> NoSkipOnExecAction;
         public Action<int, int> SemanOnExecAction;
         public Action<int, int, float, int> NoSkipOnDamage;
-        public Action<bool, float, bool, float, FloatWithEx> NoSkipOnDamage2;
-        public Action<int, int, float, int,string> NoSkipOnBaseValueChanged;
-        public Action<UnitCtrl, eStateIconType, bool,float,string> NoSkipOnChangeAbnormalState;
+        public Action<bool, long, bool, long, DoubleWithEx> NoSkipOnDamage2;
+        public Action<int, int, double, int,string> NoSkipOnBaseValueChanged;
+        public Action<UnitCtrl, eStateIconType, bool,double,string> NoSkipOnChangeAbnormalState;
         public CharacterPageButton button;
         public Action<int, int, float, float> NoSkipOnChangeSkillID;
         public Action<float> NoSkipOnSkillCD;
@@ -337,5 +337,6 @@ namespace Elements
             if (!string.IsNullOrEmpty(res)) return res;
             return critPoint?.ToString(BattleHeaderController.CurrentFrameCount) + "    " + globalCritPoint?.ToString(BattleHeaderController.CurrentFrameCount);
         }
+
     }
 }

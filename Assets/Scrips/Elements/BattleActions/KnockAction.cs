@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace Elements
@@ -25,7 +26,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,Action<string> action)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             if (_target.Owner.ModeChangeUnableStateBarrier)
@@ -62,7 +63,7 @@ namespace Elements
                     _source.BaseX = _source.transform.position.x;
                     unitListForSort.Sort(_source.CompareDistanceAsc);
                     BasePartsData basePartsData = unitListForSort.Count > (double)_valueDictionary[eValueNumber.VALUE_2] ? unitListForSort[(int)_valueDictionary[eValueNumber.VALUE_2]] : unitListForSort[unitListForSort.Count - 1];
-                    Vector3 _pos = new Vector3((_source.transform.position.x - (double)basePartsData.GetPosition().x > 0.0 ? 1f : -1f) * _valueDictionary[eValueNumber.VALUE_1] + basePartsData.GetLocalPosition().x, _target.GetLocalPosition().y, _target.GetLocalPosition().z);
+                    Vector3 _pos = new Vector3((float)((_source.transform.position.x - (double)basePartsData.GetPosition().x > 0.0 ? 1f : -1f) * _valueDictionary[eValueNumber.VALUE_1] + basePartsData.GetLocalPosition().x), _target.GetLocalPosition().y, _target.GetLocalPosition().z);
                     if (ActionDetail1 == 5)
                     {
                         _sourceActionController.AppendCoroutine(updateParaboricKnock(_pos, _target.Owner), ePauseType.SYSTEM, _source);
@@ -80,7 +81,7 @@ namespace Elements
                         if ((int)_valueDictionary[eValueNumber.VALUE_2] == -1)
                         {
                             BasePartsData firstParts = _source.GetFirstParts();
-                            pos = new Vector3((float)((!_source.IsLeftDir && !_source.IsForceLeftDir) ? 1 : (-1)) * _valueDictionary[eValueNumber.VALUE_1] + firstParts.GetLocalPosition().x, _target.GetLocalPosition().y, _target.GetLocalPosition().z);
+                            pos = new Vector3((float)((float)((!_source.IsLeftDir && !_source.IsForceLeftDir) ? 1 : (-1)) * _valueDictionary[eValueNumber.VALUE_1] + firstParts.GetLocalPosition().x), _target.GetLocalPosition().y, _target.GetLocalPosition().z);
                         }
                         else
                         {
@@ -104,9 +105,9 @@ namespace Elements
                             _source.BaseX = _source.transform.position.x;
                             unitListForSort.Sort(_source.CompareDistanceAsc);
                             BasePartsData basePartsData0 = (((float)unitListForSort.Count > _valueDictionary[eValueNumber.VALUE_2]) ? unitListForSort[(int)_valueDictionary[eValueNumber.VALUE_2]] : unitListForSort[unitListForSort.Count - 1]);
-                            pos = new Vector3((float)((_source.transform.position.x - basePartsData0.GetPosition().x > 0f) ? 1 : (-1)) * _valueDictionary[eValueNumber.VALUE_1] + basePartsData0.GetLocalPosition().x, _target.GetLocalPosition().y, _target.GetLocalPosition().z);
+                            pos = new Vector3((float)((float)((_source.transform.position.x - basePartsData0.GetPosition().x > 0f) ? 1 : (-1)) * _valueDictionary[eValueNumber.VALUE_1] + basePartsData0.GetLocalPosition().x), _target.GetLocalPosition().y, _target.GetLocalPosition().z);
                         }
-                        Func<UnitCtrl, UnitCtrl, FloatWithEx> func = delegate
+                        Func<UnitCtrl, UnitCtrl, DoubleWithEx> func = delegate
                         {
                             if (_target.Owner.IsBoss)
                             {
@@ -152,7 +153,7 @@ namespace Elements
             float a = (float)((_target.transform.localPosition.x > (double)_source.transform.localPosition.x ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)Value[eValueNumber.VALUE_1]));
             return a <= 0.0 ? Mathf.Max(a, -BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x) : Mathf.Min(a, BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x);
         }
-        private float getKnockValueForGiveValue(UnitCtrl _target, UnitCtrl _source, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+        private float getKnockValueForGiveValue(UnitCtrl _target, UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             float num = ((_target.transform.localPosition.x > _source.transform.localPosition.x) ? 1f : (-1f)) * (_target.IsBoss ? 0f : (float)_valueDictionary[eValueNumber.VALUE_1]);
             if (num > 0f)
@@ -186,16 +187,16 @@ namespace Elements
             }
             return num2;
         }
-        private void startKnockBack(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, FloatWithEx> _func)
+        private void startKnockBack(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, DoubleWithEx> _func)
         {
-            float num = _func(_target, _source);
-            float duration = Mathf.Max(Mathf.Abs(num) / base.Value[eValueNumber.VALUE_3], base.battleManager.DeltaTime_60fps);
-            _sourceActionController.AppendCoroutine(updateKnockBackCoroutine(_target, _source, num, duration), ePauseType.IGNORE_BLACK_OUT);
+            double num = _func(_target, _source);
+            double duration = Math.Max(Math.Abs(num) / base.Value[eValueNumber.VALUE_3], base.battleManager.DeltaTime_60fps);
+            _sourceActionController.AppendCoroutine(updateKnockBackCoroutine(_target, _source, (float)num, (float)duration), ePauseType.IGNORE_BLACK_OUT);
         }
-        private void startKnockbackForGiveValue(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, Dictionary<eValueNumber, FloatWithEx>, float> _func, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+        private void startKnockbackForGiveValue(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, Dictionary<eValueNumber, DoubleWithEx>, float> _func, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             float num = _func(_target, _source, _valueDictionary);
-            float num2 = _valueDictionary[eValueNumber.VALUE_3];
+            float num2 = (float)_valueDictionary[eValueNumber.VALUE_3];
             float duration = 90f;
             if (!BattleUtil.Approximately(num2, 0f))
             {
@@ -239,7 +240,7 @@ namespace Elements
             float start = _target.transform.localPosition.x;
             float knockValue = _func(_target, _source);
             float time = 0.0f;
-            float duration = Mathf.Max(Mathf.Abs(knockValue) / knockAction.Value[eValueNumber.VALUE_3], knockAction.battleManager.DeltaTime_60fps);
+            float duration = Mathf.Max(Mathf.Abs(knockValue) / (float)knockAction.Value[eValueNumber.VALUE_3], knockAction.battleManager.DeltaTime_60fps);
             ++_target.KnockBackEnableCount;
             Vector3 localPosition;
             while (true)
@@ -266,7 +267,7 @@ namespace Elements
             float start = _target.transform.localPosition.y;
             float knockValue = _target.IsBoss ? 0.0f : (float)knockAction.Value[eValueNumber.VALUE_1];
             float time = 0.0f;
-            float duration = knockAction.Value[eValueNumber.VALUE_1] / knockAction.Value[eValueNumber.VALUE_3];
+            float duration = (float)knockAction.Value[eValueNumber.VALUE_1] / (float)knockAction.Value[eValueNumber.VALUE_3];
             ++_target.KnockBackEnableCount;
             while (duration > (double)time)
             {
@@ -278,7 +279,7 @@ namespace Elements
                 _target.transform.localPosition = localPosition;
                 yield return null;
             }
-            duration = knockAction.Value[eValueNumber.VALUE_1] / knockAction.Value[eValueNumber.VALUE_4];
+            duration = (float)knockAction.Value[eValueNumber.VALUE_1] / (float)knockAction.Value[eValueNumber.VALUE_4];
             start = _target.transform.localPosition.y;
             time = 0.0f;
             while (duration > (double)time)

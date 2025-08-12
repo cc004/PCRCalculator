@@ -78,7 +78,7 @@ namespace PCRCaculator.Guild
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
         private long totalDamage;
         private long totalDamageCriEX;
-        private FloatWithEx totalDamageExcept = 0;
+        private DoubleWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
         private int backTime;
 
@@ -444,7 +444,7 @@ namespace PCRCaculator.Guild
                 playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame, damage));
             }
         }
-        public void AppendChangeBaseValue(int unitid, int valueType, float value, int currentFrame, string describe)
+        public void AppendChangeBaseValue(int unitid, int valueType, double value, int currentFrame, string describe)
         {
             if (BattleManager.Instance.skipping) return;
             if (unitid - unitid / 10 % 10 * 10 == bossId)
@@ -571,7 +571,7 @@ namespace PCRCaculator.Guild
                     for (var i = 0; i < lastHp.Count; ++i)
                     {
                         lastHp[i] ??= ValueChangeData.Default;
-                        lineChart.AddData(i, hpXPos, Mathf.Clamp01(lastHp[i].yValue / lastHp[i].hp) * PREFAB_SCALE - i + 100, GetHpDescription(lastHp[i]));
+                        lineChart.AddData(i, hpXPos, Mathf.Clamp01((float)(lastHp[i].yValue / lastHp[i].hp)) * PREFAB_SCALE - i + 100, GetHpDescription(lastHp[i]));
                     }
                 }
 
@@ -597,7 +597,7 @@ namespace PCRCaculator.Guild
                     for (var i = 0; i < lastTp.Count; ++i)
                     {
                         lastTp[i] ??= ValueChangeData.Default;
-                        lineChart.AddData(i, tpXPos, Mathf.Clamp01(lastTp[i].yValue / UnitDefine.MAX_ENERGY) * PREFAB_SCALE - i + 100, GetTpDescription(lastTp[i]));
+                        lineChart.AddData(i, tpXPos, Mathf.Clamp01((float)(lastTp[i].yValue / UnitDefine.MAX_ENERGY)) * PREFAB_SCALE - i + 100, GetTpDescription(lastTp[i]));
                     }
                 }
 
@@ -655,7 +655,7 @@ namespace PCRCaculator.Guild
                         ++nowx[i];
                     var t = data[i][nowx[i]];
                     last[i] = t;
-                    lineChart.AddData(i, x, Mathf.Clamp01(t.yValue / serieMaxValue[i]) * PREFAB_SCALE  - i + 100, descriptionFunc(t));
+                    lineChart.AddData(i, x, Mathf.Clamp01((float)(t.yValue / serieMaxValue[i])) * PREFAB_SCALE  - i + 100, descriptionFunc(t));
                 }
             }
 
@@ -729,14 +729,14 @@ namespace PCRCaculator.Guild
 
             }
         }
-        
-        public void RefreshTotalDamage(bool byAttack, float value, bool critical, float criticalEXdamage, FloatWithEx exvalue)
+
+        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, DoubleWithEx exvalue)
         {
-            totalDamage += (long)value;
+            totalDamage += value;
             totalDamageExcept += exvalue;
             if (critical)
             {
-                totalDamageCriEX += (long)criticalEXdamage;
+                totalDamageCriEX += criticalEXdamage;
             }
         }
         public void AddSummonUnit(UnitCtrl unitCtrl)
@@ -1114,7 +1114,7 @@ namespace PCRCaculator.Guild
         public static List<ValueChangeData> CreateTotalChatData(List<ValueChangeData> data)
         {
             List<ValueChangeData> data0 = new List<ValueChangeData>();
-            float add = 0;
+            double add = 0;
             foreach (ValueChangeData value in data)
             {
                 add += value.yValue;
@@ -1149,21 +1149,21 @@ namespace PCRCaculator.Guild
         public static List<ValueChangeData> NormalizeLineChatData(List<ValueChangeData> data, float Max)
         {
             return data;
-            List<ValueChangeData> data0 = new List<ValueChangeData>();
-            foreach (ValueChangeData value in data)
-            {
-                data0.Add(new ValueChangeData(value.xValue, Mathf.Max(0, value.yValue / Max)));
-            }
-            return data0;
+            // List<ValueChangeData> data0 = new List<ValueChangeData>();
+            // foreach (ValueChangeData value in data)
+            // {
+            //     data0.Add(new ValueChangeData(value.xValue, Mathf.Max(0, value.yValue / Max)));
+            // }
+            // return data0;
         }
 
 
 
         private readonly Dictionary<string, string> templateSettings = new Dictionary<string, string>();
         public readonly List<ProbEvent> dmglist = new List<ProbEvent>();
-        public readonly List<(int frame, FloatWithEx value)> bossValues = new List<(int frame, FloatWithEx value)>();
+        public readonly List<(int frame, LongWithEx value)> bossValues = new List<(int frame, LongWithEx value)>();
 
-        private static bool CanKill(long maxhp, params float[] dmgs)
+        private static bool CanKill(long maxhp, params double[] dmgs)
         {
             Array.Sort(dmgs);
             var remaining = maxhp - dmgs.Skip(1).Sum();
@@ -1201,7 +1201,7 @@ namespace PCRCaculator.Guild
                 var dname2 = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
                 var seedset = new Dictionary<string, int>();
-                var dmg = new List<float>();
+                var dmg = new List<double>();
                 var probs = new Dictionary<string, ProbEvent>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
                 {
@@ -1237,7 +1237,8 @@ namespace PCRCaculator.Guild
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
                     var seed = rnd.Next();
-                    FloatWithEx.SetState(seed);
+                    DoubleWithEx.SetState(seed);
+                    LongWithEx.SetState(seed);
                     var flag = false;
                     var hash = rnd.Next();
                     dmg.Add(totalDamageExcept.Emulate(hash));
@@ -1603,13 +1604,13 @@ namespace PCRCaculator.Guild
         public int startFrameCount;
         public int endFrameCount;
         public UnitCtrl.eAbnormalState CurrentAbnormalState;
-        public FloatWithEx MainValue;
+        public DoubleWithEx MainValue;
         public float Time;
         public float Duration;
         public int ActionId;
-        public float SubValue;
+        public double SubValue;
 
-        public float EnergyReduceRate;
+        public double EnergyReduceRate;
         public bool IsEnergyReduceMode;
 
         public bool IsDamageRelease;
@@ -1648,9 +1649,9 @@ namespace PCRCaculator.Guild
     public class ValueChangeData : IValue
     {
         public int xValue { get; set; }
-        public float yValue { get; set; }
+        public double yValue { get; set; }
         float IValue.xValue => xValue / XScale;
-        float IValue.yValue => yValue / YScale;
+        float IValue.yValue => (float)(yValue / YScale);
 
         public int hp;
         public int damage;
@@ -1661,10 +1662,10 @@ namespace PCRCaculator.Guild
         public int target;
         public int realFrameCount;
         private const float XScale = 5400f;
-        private float YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;
-        
+        private double YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;
+
         public ValueChangeData() { }
-        public ValueChangeData(int x, float y)
+        public ValueChangeData(int x, double y)
         {
             xValue = x;
             yValue = y;
@@ -1672,7 +1673,7 @@ namespace PCRCaculator.Guild
         }
 
         public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
-        public ValueChangeData(int x, float y, int hp, string describe)
+        public ValueChangeData(int x, double y, int hp, string describe)
         {
             xValue = x;
             yValue = y;
@@ -1698,7 +1699,7 @@ namespace PCRCaculator.Guild
         public int startTime;
         public int endTime;
         [JsonIgnore]
-        public FloatWithEx energy;
+        public DoubleWithEx energy;
         public List<UnitActionExecData> actionExecDatas = new List<UnitActionExecData>();
 
         public string GetDescribeA()
@@ -1850,10 +1851,10 @@ namespace PCRCaculator.Guild
         public int type;
         public int currentSeed;
         public int randomResult;
-        public float targetResult;
-        public float criticalDamageRate;
+        public double targetResult;
+        public double criticalDamageRate;
         public RandomData() { }
-        public RandomData(UnitCtrl source, UnitCtrl target, int actionid, int type, float targetResult, float criDamage = 0)
+        public RandomData(UnitCtrl source, UnitCtrl target, int actionid, int type, double targetResult, double criDamage = 0)
         {
             ownerID = source == null ? 0 : source.UnitId;
             targetID = target == null ? 0 : target.UnitId;

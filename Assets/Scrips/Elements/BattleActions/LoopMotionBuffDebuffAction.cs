@@ -81,7 +81,7 @@ namespace Elements
           Skill _skill)
         {
             LoopMotionBuffDebuffAction buffDebuffAction = this;
-            float timer = buffDebuffAction.Value[eValueNumber.VALUE_4];
+            float timer = (float)buffDebuffAction.Value[eValueNumber.VALUE_4];
             bool enableTimer = timer > 0.0;
             while (!buffDebuffAction.isActionCancel(_source, _sourceActionController, _skill))
             {
@@ -189,14 +189,14 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             if (triggered)
                 return;
             UnitCtrl.BuffParamKind changeParamKind = BuffDebuffAction.GetChangeParamKind(ActionDetail1);
-            Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
             bool _isDebuf = ActionDetail1 % 10 == 1;
             if (_target.Owner.IsPartsBoss)
             {
@@ -239,7 +239,7 @@ namespace Elements
         {
             public UnitCtrl Target { get; set; }
 
-            public Dictionary<BasePartsData, FloatWithEx> Value { get; set; }
+            public Dictionary<BasePartsData, LongWithEx> Value { get; set; }
 
             public UnitCtrl.BuffParamKind BuffParamKind { get; set; }
         }

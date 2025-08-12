@@ -40,12 +40,11 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             SkillEffectCtrl skillEffectCtrl1 = null;
-            bool flag = true;
             //if (_target.Owner.StrikeBackDictionary.ContainsKey((EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2))
             //  flag = !_target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect.IsPlaying;
             //CircleEffectController effectController;

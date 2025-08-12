@@ -765,7 +765,7 @@ namespace PCRCaculator.Battle
             a.transform.position = pos;
             a.GetComponent<DamageNumbers>().SetMiss(scale*DamageScale);
         }
-        public void RefreshGuildEnemyTotalDamage(float value)
+        public void RefreshGuildEnemyTotalDamage(long value)
         {
             guildTotalDamage += value;
             int valueint = (int)guildTotalDamage;
@@ -781,7 +781,7 @@ namespace PCRCaculator.Battle
 
             guildTotalDamageNumber.SetDamageNumber(null, numbers, sprite_total_physical, 2);
         }
-        public void RefreshGuildEnemyTotalDamage2(bool byAttack, FloatWithEx value,bool critical)
+        public void RefreshGuildEnemyTotalDamage2(bool byAttack, LongWithEx value,bool critical)
         {
             RefreshGuildEnemyTotalDamage(value);
         }

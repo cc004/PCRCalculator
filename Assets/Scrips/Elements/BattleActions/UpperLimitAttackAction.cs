@@ -22,14 +22,14 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             ++_target.UbAttackHitCount;
             eAttackType actionDetail1 = (eAttackType)ActionDetail1;
             if (!HitOnceDic.ContainsKey(_target))
                 HitOnceDic.Add(_target, false);
             bool flag = judgeMiss(_target, _source, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, actionDetail1);
-            if (flag && base.battleManager.FEDKJAIEDGI == 0f)
+            if (flag && base.battleManager.DodgeTPRecoverRatio == 0f)
             {
                 return;
             }
@@ -37,10 +37,10 @@ namespace Elements
             //    return;
             //DamageData damageData = createDamageData(_source, _target, _num, _valueDictionary, actionDetail1, false, _skill, eActionType.UPPER_LIMIT_ATTACK);
             DamageData damageData = createDamageData(_source, _target, _num, _valueDictionary, actionDetail1, _isCritical: false, _skill, eActionType.UPPER_LIMIT_ATTACK, judgeIsPhysical(actionDetail1));
-            Func<int, float, int> upperLimitFunc = delegate (int _damage, float _criticalRate)
+            Func<int, double, int> upperLimitFunc = delegate (int _damage, double _criticalRate)
             {
-                float num = base.ActionExecTimeList[_num].Weight / base.ActionWeightSum;
-                _damage = (int)((float)_damage / num / _criticalRate);
+                double num = base.ActionExecTimeList[_num].Weight / base.ActionWeightSum;
+                _damage = (int)((double)_damage / num / _criticalRate);
                 int actionDetail2 = base.ActionDetail2;
                 int actionDetail3 = base.ActionDetail3;
                 if (_damage > actionDetail3)
@@ -55,7 +55,7 @@ namespace Elements
             };
             if (flag)
             {
-                _target.Owner.RecoverDodgeTP(damageData.DamageType, (long)damageData.Damage, damageData.ActionType, (long)damageData.LogBarrierExpectedDamage, (long)damageData.TotalDamageForLogBarrier, damageData.Source, damageData.IgnoreDef, damageData.Target, damageData.DefPenetrate, upperLimitFunc, _skill, EnergyChargeMultiple);
+                _target.Owner.RecoverDodgeTP(damageData.DamageType, (long)damageData.Damage, damageData.ActionType, false, (long)damageData.LogBarrierExpectedDamage, (long)damageData.TotalDamageForLogBarrier, damageData.Source, damageData.IgnoreDef, damageData.Target, damageData.DefPenetrate, upperLimitFunc, _skill, EnergyChargeMultiple);
                 return;
             }
             /*if (_target.Owner.SetDamage(damageData, true, ActionId, OnDamageHit, _skill: _skill, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _upperLimitFunc: (_damage, _criticalRate) =>

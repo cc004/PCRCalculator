@@ -8,7 +8,7 @@ namespace Elements
 	public class UnableStateGuardAction : ActionParameter
 	{
 		// Token: 0x0600415F RID: 16735 RVA: 0x001141C4 File Offset: 0x001141C4
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			UnitCtrl owner = _target.Owner;
@@ -30,7 +30,7 @@ namespace Elements
 				unableStateGuardData.DisplayCount = !flag;
 			}
 			owner.OnChangeState.Call(owner, eStateIconType.UNABLE_STATE_GUARD, true);
-			owner.UnableStateGuardData.AddSeal(_valueDictionary[eValueNumber.VALUE_3], owner, eStateIconType.UNABLE_STATE_GUARD, num);
+			owner.UnableStateGuardData.AddSeal((float)_valueDictionary[eValueNumber.VALUE_3], owner, eStateIconType.UNABLE_STATE_GUARD, num);
 		}
 
 		// Token: 0x06004160 RID: 16736 RVA: 0x0011427C File Offset: 0x0011427C

@@ -27,7 +27,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -39,10 +39,10 @@ namespace Elements
         switch ((eCountBlindType)(float)_valueDictionary[eValueNumber.VALUE_1])
         {
           case eCountBlindType.TIME:
-            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, _valueDictionary[eValueNumber.VALUE_2], this, _skill, 99999f, ActionDetail1);
+            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, (float)_valueDictionary[eValueNumber.VALUE_2], this, _skill, 99999f, ActionDetail1);
             break;
           case eCountBlindType.COUNT:
-            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, 90f, this, _skill, _valueDictionary[eValueNumber.VALUE_2], ActionDetail1);
+            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.COUNT_BLIND, 90f, this, _skill, (float)_valueDictionary[eValueNumber.VALUE_2], ActionDetail1);
             break;
         }
       }

@@ -17,8 +17,8 @@ namespace Elements
     private ActionParameter repeatAction;
     private ActionParameter failAction;
     private ActionParameter successAction;
-    private float totalDamage;
-    private float triggerDamage;
+    private long totalDamage;
+    private long triggerDamage;
     private bool isLoopMotion;
     private bool cancelAction;
     private float duration;
@@ -45,7 +45,7 @@ namespace Elements
               return;
           cancelAction = true;
           isLoopMotion = false;
-          totalDamage = 0.0f;
+          totalDamage = 0;
       };
     }
 
@@ -54,8 +54,8 @@ namespace Elements
       UnitActionController _sourceActionController,
       Skill _skill)
     {
-            totalDamage = 0.0f;
-            base.ReadyAction(_source, _sourceActionController, _skill);
+      totalDamage = 0;
+      base.ReadyAction(_source, _sourceActionController, _skill);
       if (repeatAction != null)
         repeatAction.CancelByIfForAll = true;
       if (failAction != null)
@@ -73,12 +73,12 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      duration = _valueDictionary[eValueNumber.VALUE_1];
-      repeatTime = _valueDictionary[eValueNumber.VALUE_2];
-      triggerDamage = _valueDictionary[eValueNumber.VALUE_3];
+      duration = (float)_valueDictionary[eValueNumber.VALUE_1];
+      repeatTime = (float)_valueDictionary[eValueNumber.VALUE_2];
+      triggerDamage = (long)_valueDictionary[eValueNumber.VALUE_3];
       isLoopMotion = true;
       cancelAction = false;
       _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);

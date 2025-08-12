@@ -88,7 +88,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -155,10 +155,10 @@ namespace Elements
                     UnitCtrl _source1 = _source;
                     owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.5f, skillId, _source1, true, eEffectType.COMMON, true, false);
                 }*/
-                float num2 = _valueDictionary[eValueNumber.VALUE_1];
+                double num2 = _valueDictionary[eValueNumber.VALUE_1];
                 if (abnormalState2 == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(num2 + _target.Owner.CalcAbnormalStateSpeed(), 1f))
                 {
-                    _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
+                    _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, LongWithEx>
                     {
                         {
                             _target,
@@ -212,12 +212,12 @@ namespace Elements
                         break;
                     case 2:
                         {
-                            float value6 = _valueDictionary[eValueNumber.VALUE_6] / 100f;
+                            double value6 = _valueDictionary[eValueNumber.VALUE_6] / 100f;
                             if (_target.Owner.OnRecoverListForChangeSpeedDisableByMaxHp.ContainsKey(base.ActionId))
                             {
                                 break;
                             }
-                            _target.Owner.OnRecoverListForChangeSpeedDisableByMaxHp.Add(base.ActionId, delegate (float _hpAmount)
+                            _target.Owner.OnRecoverListForChangeSpeedDisableByMaxHp.Add(base.ActionId, delegate (double _hpAmount)
                             {
                                 if (BattleUtil.LessThanOrApproximately(value6, _hpAmount) && _target.Owner.IsAbnormalState(abnormalState))
                                 {

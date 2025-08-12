@@ -20,7 +20,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       int num1 = BattleManager.Random(0.0f, 1f,
@@ -31,7 +31,7 @@ namespace Elements
       if (num1 != 0 && num2 <= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
       {
         AppendIsAlreadyExeced(_target.Owner, _num);
-        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.FEAR, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
+        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.FEAR, (float)_valueDictionary[eValueNumber.VALUE_1], this, _skill);
       }
       else
       {

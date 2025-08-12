@@ -119,6 +119,8 @@ namespace Elements.Battle
         private Dictionary<int, UnitCtrl> currentEnemyUnitCtrlDictionary = new Dictionary<int, UnitCtrl>();
         private List<UnitCtrl>[] allWaveEnemyUnitCtrlListArray;
         public UnitCtrl BossUnit;
+        public TeamEnhanceParameter UnitTeamEnhanceInfo { get; set; }
+        public TeamEnhanceParameter EnemyTeamEnhanceInfo { get; set; }
         private List<Vector2> questWinPositionList = new List<Vector2>();
         private List<BattleSpineController> unitSpineControllerList = new List<BattleSpineController>();
         private bool isUpdateFrameExecuted;
@@ -192,6 +194,10 @@ namespace Elements.Battle
         //private ISingletonNodeForInstanceEditing battleManagerNode;
         private bool isValid = true;
         //private StoryBattleData storyBattleDataPrefab;
+        public bool isReleaseSlipDamageLogBarrier; // 0x501
+
+        public long allLogBarrierStartValue = 10000000; // TODO find where
+        public long allLogBarrierEffectValue = 100000; // 0x4E8
         private bool forcePauseNoDialogUpdate;
         private GameObject focusObject;
 
@@ -234,6 +240,8 @@ namespace Elements.Battle
         private Dictionary<int, List<AbnormalStateDataBase>> FieldDataDictionary { get; set; }
 
         //private SaveDataManager.eBattleMaxSpeed ELFKGBFMOIE { get; set; } = SaveDataManager.eBattleMaxSpeed.QUADRUPLE;
+
+        public bool IsReleasedKnightEnhance { get; set; }
 
         private EnvironmentData unitEnvironment { get; set; }
 
@@ -3383,7 +3391,7 @@ namespace Elements.Battle
             // if (Singleton<UserData>.Instance.InitSettingParameter.BattleLogType != null)
             //     this.BattleLogEnable = this.battleLog.GetLogEnable(Singleton<UserData>.Instance.InitSettingParameter.BattleLogType);
             //this.BattleCategory = this.tempData.PHDACAOAOMA.CLCOKFOINCL;
-            FEDKJAIEDGI = MainManager.Instance.GetDodgeTPRecoveryRatio();
+            DodgeTPRecoverRatio = MainManager.Instance.GetDodgeTPRecoveryRatio();
 
             BattleCategory = eBattleCategory.ARENA;//设定战斗系统为JJC
                                                         //this.battleProcessor = this.createBattleProcessor(PPNELKAAIKP);
@@ -3879,7 +3887,12 @@ namespace Elements.Battle
             {
                 yield return null;
             }
+            calcTalentFormationBonus();
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
+            foreach(var unit in UnitList)
+            {
+                unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
+            }
             yield return battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
@@ -4075,7 +4088,7 @@ namespace Elements.Battle
                 int up = Math.Min(sh.Length, battleManager.UnitList.Count);
                 for (int i = 0; i < up; i++)
                 {
-                    battleManager.UnitList[i].Hp = battleManager.UnitList[i].MaxHp * sh[i];
+                    battleManager.UnitList[i].Hp = (LongWithEx)((LongWithEx)battleManager.UnitList[i].MaxHp * sh[i]);
                     battleManager.UnitList[i].unitUI.SetHP(sh[i]);
                 }
             }
@@ -4114,6 +4127,125 @@ namespace Elements.Battle
             battleManager.BattleReady = true;
             GamePause(false);
         }
+
+        bool _IsReleasedKnightEnhance = true;
+        public Dictionary<int, long> UnitTalentFormationBonusDictionary { get; set; } = new Dictionary<int, long>();
+
+        /// <summary>
+        /// 计算当前编队的天赋阵型加成
+        /// </summary>
+        private void calcTalentFormationBonus()
+        {
+            // 如果未开启"骑士增强"功能，则直接返回
+            if (!_IsReleasedKnightEnhance)
+                return;
+        
+            // 创建一个字典来统计每个天赋ID的出现次数
+            Dictionary<int, int> talentCountDict = new Dictionary<int, int>();
+        
+            // 遍历当前我方编队中的所有单位
+            var unitList = UnitList;
+            if (unitList != null)
+            {
+                for (int i = 0; i < unitList.Count; i++)
+                {
+                    var unit = unitList[i];
+                    if (unit == null)
+                        continue;
+        
+                    // 获取单位的天赋列表
+                    var talents = unit.TalentIds;
+                    if (talents == null)
+                        continue;
+        
+                    // 统计每个天赋的出现次数
+                    for (int j = 0; j < talents.Count; j++)
+                    {
+                        int talentId = talents[j];
+                        
+                        // 获取当前天赋的计数，如果不存在则为0
+                        talentCountDict.TryGetValue(talentId, out int currentCount);
+                        // 更新计数+1
+                        talentCountDict[talentId] = currentCount + 1;
+                    }
+                }
+            }
+        
+            // 遍历统计好的天赋次数字典
+            foreach (var pair in talentCountDict)
+            {
+                int talentId = pair.Key;
+                int count = pair.Value;
+
+                long bonus = 0;
+                if (IsBossBattle)
+                    bonus = ClanBattleGetTalentBonusPermyriad(talentId, count);
+                
+                if (UnitTalentFormationBonusDictionary!= null)
+                {
+                    UnitTalentFormationBonusDictionary[talentId] = bonus;
+                }
+            }
+        }
+
+        public long ClanBattleGetTalentBonusPermyriad(int talentId, int count) // present
+        {
+            long bonus = 0;
+            switch (count)
+            {
+                case 1:
+                    bonus = 0;
+                    break;
+                case 2:
+                    bonus = 500;
+                    break;
+                case 3:
+                    bonus = 1000;
+                    break;
+                case 4:
+                    bonus = 2500;
+                    break;
+                case 5:
+                    bonus = 5000;
+                    break;
+                default:
+                    bonus = 0; // 未知天赋
+                    break;
+            }
+            return bonus;
+        }
+
+        /// <summary>
+        /// 为指定单位的装备部件设置天赋弱点
+        /// </summary>
+        /// <param name="_unitId">单位ID</param>
+        /// <param name="_partsData">装备部件数据</param>
+        // RVA: 0x27065B0 Offset: 0x27065B0 VA: 0x27065B0
+        public void SetPartsTalentWeakness(int _unitId, BasePartsData _partsData)
+        { 
+            // var masterDataManager = ManagerSingleton<MasterDataManager>.Instance;
+            // if (masterDataManager == null)
+            // {
+            //     return;
+            // }
+        
+            // var masterEnemyTalentWeakness = masterDataManager.masterEnemyTalentWeakness;
+            // if (masterEnemyTalentWeakness == null)
+            // {
+            //     return;
+            // }
+        
+            // if (_partsData == null)
+            // {
+            //     return;
+            // }
+        
+            // var weaknessDict = masterEnemyTalentWeakness.GetWeaknessDictionary(_unitId);
+            
+            // TODO hush fix boss weaknessDict
+            // _partsData.talentWeaknessPercent = weaknessDict;
+        }
+
 
         public List<UnitCtrl> GetMyUnitList() => (BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY ? (IsDefenceReplayMode ? 1 : 0) : 0) == 0 ? UnitList : EnemyList;
 
@@ -4937,8 +5069,10 @@ namespace Elements.Battle
                         MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my) :
                         new BaseData()
                         // MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
-                    ) : null);
-                unitCtrl.MaxHpAfterPassive = unitCtrl.MaxHp;
+                    ) : null); // TODO hush add _teamEnhanceParameter
+                if (!flag)
+                    unitCtrl.SetTalentFormationBonus(_this.UnitTalentFormationBonusDictionary);
+                unitCtrl.ApplyPassiveSkill(true, false);
 
                 if (flag)
                 {
@@ -5150,7 +5284,7 @@ namespace Elements.Battle
             RUNNING,
             STOP_PULSE,
         }
-        public float FEDKJAIEDGI
+        public double DodgeTPRecoverRatio
         {
             get;
             private set;

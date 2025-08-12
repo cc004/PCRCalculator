@@ -1837,9 +1837,9 @@ namespace PCRCaculator
             physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
             energy_recovery_rate, enerey_reduce_rate, accuracy;//14-16*/
         public long[] dataint;//数据为*100后的整数，计算升级数据等时用整数计算避免浮点数误差累积。(用decimal不就好了）
-        public int realhp = 0;
+        public long realhp = 0;
         [JsonIgnore]
-        public int RealHp => realhp == 0 ? Mathf.RoundToInt(Hp) : realhp;
+        public long RealHp => realhp == 0 ? Mathf.RoundToInt(Hp) : realhp;
         [JsonIgnore]
         public float Hp
         {
@@ -2041,7 +2041,6 @@ namespace PCRCaculator
         }
         private static int round(float _f)
         {
-            int num = 0;
             if (_f - (float)(int)_f >= 0.5f || Mathf.Approximately((float)(int)_f + 0.5f, _f))
             {
                 return (int)_f + 1;

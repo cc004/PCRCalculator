@@ -124,9 +124,9 @@ namespace Elements
         [JsonIgnore]
         public List<BasePartsData> CriticalPartsList { get; set; }
         [JsonIgnore]
-        public FloatWithEx TotalDamage { get; set; }
+        public LongWithEx TotalDamage { get; set; }
         [JsonIgnore]
-        public float AweValue { get; set; }
+        public double AweValue { get; set; }
         [JsonIgnore]
         public bool IsLifeStealEnabled { get; set; } = true;
         [JsonIgnore]
@@ -145,7 +145,7 @@ namespace Elements
 
         public void ReadySkill()
         {
-            TotalDamage = 0f;
+            TotalDamage = 0;
             DamagedPartsList.Clear();
             for (int index1 = 0; index1 < SkillEffects.Count; ++index1)
             {

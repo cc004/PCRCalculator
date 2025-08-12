@@ -32,16 +32,16 @@ namespace Elements
             
 
         public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController,
-            Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+            Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
             Action<string> callBack = null)
         {
-            FloatWithEx val = 0;
+            LongWithEx val = 0;
 
             var type = (eAtkType) ActionDetail1;
             if (type == eAtkType.PHYSICAL) val = _target.GetAtkZeroEx();
             if (type == eAtkType.MAGIC) val = _target.GetMagicStrZeroEx();
 
-            targetAction.CopyAtk = val.Floor();
+            targetAction.CopyAtk = val;
 
             callBack?.Invoke($"将动作{targetAction.ActionId}的参考攻击力替换为{val}");
         }

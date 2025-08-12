@@ -225,7 +225,7 @@ namespace PCRCaculator.Guild
             lineChatXPrefabList.Clear();
             for(int i = 0; i < data.Count; i++)
             {
-                if(Mathf.Abs(data[i].xValue-changeDataOld.xValue)>=deltaX && Mathf.Abs(data[i].yValue - changeDataOld.yValue) >= deltaY)
+                if(Mathf.Abs(data[i].xValue-changeDataOld.xValue)>=deltaX && Mathf.Abs((float)(data[i].yValue - changeDataOld.yValue)) >= deltaY)
                 {
                     GameObject a = Instantiate(lineChatPosXPrefab);
                     a.transform.SetParent(lineChatPosXParent.transform, false);

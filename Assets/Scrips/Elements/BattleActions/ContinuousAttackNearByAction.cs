@@ -23,7 +23,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       eReleaseType actionDetail1 = (eReleaseType) ActionDetail1;
@@ -33,9 +33,9 @@ namespace Elements
         ReleaseType = actionDetail1,
         AttackType = (AttackActionBase.eAttackType) ActionDetail2,
         StateIconType = (eStateIconType) ActionDetail3,
-        Size = _valueDictionary[eValueNumber.VALUE_1],
-        BaseDamage = _valueDictionary[eValueNumber.VALUE_2],
-        AttackEfficiency = _valueDictionary[eValueNumber.VALUE_4],
+        Size = (float)_valueDictionary[eValueNumber.VALUE_1],
+        BaseDamage = (float)_valueDictionary[eValueNumber.VALUE_2],
+        AttackEfficiency = (float)_valueDictionary[eValueNumber.VALUE_4],
         Timer = actionDetail1 == eReleaseType.TIMER ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
         ReduceEnergy = actionDetail1 == eReleaseType.ENERGY ? (float)_valueDictionary[eValueNumber.VALUE_6] : 0.0f,
         AbsorberValue = battleManager.KIHOGJBONDH,
@@ -84,13 +84,13 @@ namespace Elements
 
       public float Size { get; set; }
 
-      public float BaseDamage { get; set; }
+      public double BaseDamage { get; set; }
 
-      public float AttackEfficiency { get; set; }
+      public double AttackEfficiency { get; set; }
 
       public float Timer { get; set; }
 
-      public float ReduceEnergy { get; set; }
+      public double ReduceEnergy { get; set; }
 
       public int AbsorberValue { get; set; }
 

@@ -33,7 +33,7 @@ namespace Elements.Battle
             List<UnitCtrl> playerUnits = MyGameCtrl.Instance.playerUnitCtrl.Take(5).ToList();
             float totalMagicAtk = playerUnits.Select(unit => (float)unit.MagicStr).Sum();
             bool ok = playerUnits.Where(unit => unit.EnergyRecoveryRate < tp).Count() == 0;
-            int tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
+            long tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
             return (long)totalMagicAtk * (ok ? 1 : 0) + tpSum;
         }
     }
@@ -49,7 +49,7 @@ namespace Elements.Battle
             List<UnitCtrl> playerUnits = MyGameCtrl.Instance.playerUnitCtrl;
             float totalPhysicAtk = playerUnits.Select(unit => (float)unit.Atk).Sum();
             bool ok = playerUnits.Where(unit => unit.EnergyRecoveryRate < tp).Count() == 0;
-            int tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
+            long tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
             return (long)totalPhysicAtk * (ok ? 1 : 0) + tpSum;
         }
     }

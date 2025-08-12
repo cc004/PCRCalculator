@@ -100,7 +100,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -389,7 +389,7 @@ namespace Elements
             _sourceActionController.DisableUBByModeChange = false;
             _sourceActionController.ModeChanging = false;
         }*/
-        private IEnumerator updateModeChange(float _value, eModeChangeType _type, ActionParameter _action, Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController, eAdditionalAbnormalType _additionalAbnormalType)
+        private IEnumerator updateModeChange(double _value, eModeChangeType _type, ActionParameter _action, Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController, eAdditionalAbnormalType _additionalAbnormalType)
         {
             float timer = 0f;
             bool endFlag = false;

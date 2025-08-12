@@ -14,7 +14,7 @@ namespace Elements
     public class DamageChargeAction : ActionParameter
     {
         private const int LOOP_MOTION_NUMBER = 1;
-        private FloatWithEx defaultValue;
+        private DoubleWithEx defaultValue;
         private ActionParameter targetAction;
 
         public override void ExecActionOnStart(
@@ -53,7 +53,7 @@ namespace Elements
                     if (ActionDetail2 == 0)
                         break;
                     ActionParameter toAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail2);
-                    float defaultValue = toAction.Value[eValueNumber.VALUE_1];
+                    double defaultValue = toAction.Value[eValueNumber.VALUE_1];
                     toAction.OnActionEnd += () => toAction.Value[eValueNumber.VALUE_1] = defaultValue;
                     break;
             }
@@ -78,7 +78,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);

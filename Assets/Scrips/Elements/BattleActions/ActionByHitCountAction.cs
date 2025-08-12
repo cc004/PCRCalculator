@@ -47,7 +47,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       AppendIsAlreadyExeced(_target.Owner, _num);
@@ -56,7 +56,7 @@ namespace Elements
       Action action1 = null;
       ActionByHitCountData actionByHitCountData = new ActionByHitCountData
       {
-        LimitTime = _valueDictionary[eValueNumber.VALUE_3],
+        LimitTime = (float)_valueDictionary[eValueNumber.VALUE_3],
         ConditionCount = BattleUtil.FloatToInt((float)_valueDictionary[eValueNumber.VALUE_1]),
         ExecLimit = BattleUtil.FloatToInt((float)_valueDictionary[eValueNumber.VALUE_5]),
         StateIconType = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2],

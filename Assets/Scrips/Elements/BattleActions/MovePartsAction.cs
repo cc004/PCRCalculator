@@ -29,12 +29,12 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       if (_num % 2 == 0)
       {
-        parts.PositionX += _valueDictionary[eValueNumber.VALUE_1];
+        parts.PositionX += (float)_valueDictionary[eValueNumber.VALUE_1];
         //parts.BodyWidthValue = 0.0f;
         parts.Owner.PartsMotionPrefix = (int) _valueDictionary[eValueNumber.VALUE_5];
         battleManager.QueueUpdateSkillTarget();

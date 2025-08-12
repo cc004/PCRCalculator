@@ -14,7 +14,7 @@ namespace Elements
   {
     private bool continuousEnd { get; set; }
 
-    private float continuousDeltaHp { get; set; }
+    private double continuousDeltaHp { get; set; }
 
     public override void ExecActionOnStart(
       Skill _skill,
@@ -29,7 +29,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
             throw new Exception($"这个类鸽了！");
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -44,7 +44,7 @@ namespace Elements
       ActionParameter _childAction = null)
     {
       ContinuousAttackAction continuousAttackAction = this;
-      continuousAttackAction.continuousDeltaHp = (float) (long) _source.MaxHp / continuousAttackAction.Value[eValueNumber.VALUE_3];
+      continuousAttackAction.continuousDeltaHp = (double) (long) _source.MaxHp / continuousAttackAction.Value[eValueNumber.VALUE_3];
       continuousAttackAction.ContinuousTargetCount++;
       if (_childAction != null)
       {
@@ -53,7 +53,7 @@ namespace Elements
         if (continuousAttackAction.OnDamageHit != null)
           _childAction.OnDamageHit = continuousAttackAction.OnDamageHit;
       }
-      float time = continuousAttackAction.Value[eValueNumber.VALUE_1];
+      float time = (float)continuousAttackAction.Value[eValueNumber.VALUE_1];
       float lastAttacktime = 0.0f;
       while (true)
       {
@@ -151,7 +151,7 @@ label_29:
             _source.SetDamage(new DamageData
             {
               Target = null,
-              Damage = (long) BattleUtil.FloatToInt(Math.Max(continuousAttackAction.continuousDeltaHp * _source.DeltaTimeForPause, 1f)),
+              Damage = (long) BattleUtil.DoubleToLong(Math.Max(continuousAttackAction.continuousDeltaHp * _source.DeltaTimeForPause, 1f)),
               DamageType = DamageData.eDamageType.NONE,
               ActionType = eActionType.CONTINUOUS_ATTACK
             }, false, continuousAttackAction.ActionId, _hasEffect: false, _energyAdd: false, _energyChargeMultiple: EnergyChargeMultiple);

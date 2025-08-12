@@ -13,11 +13,11 @@ namespace Elements
 		}
 
 		// Token: 0x06003E97 RID: 16023 RVA: 0x00105EB0 File Offset: 0x00105EB0
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			base.AppendIsAlreadyExeced(_target.Owner, _num);
-			_target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE, _valueDictionary[eValueNumber.VALUE_2], this, _skill, _valueDictionary[eValueNumber.VALUE_1], 0f, false, false, 1f, _valueDictionary[eValueNumber.VALUE_4] == 0f);
+			_target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE, (float)_valueDictionary[eValueNumber.VALUE_2], this, _skill, _valueDictionary[eValueNumber.VALUE_1], 0f, false, false, 1f, _valueDictionary[eValueNumber.VALUE_4] == 0f);
 		}
 
 		// Token: 0x06003E98 RID: 16024 RVA: 0x00105F1C File Offset: 0x00105F1C

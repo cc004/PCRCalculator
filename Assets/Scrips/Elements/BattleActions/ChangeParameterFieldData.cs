@@ -86,7 +86,7 @@ namespace Elements
             AlreadyExecedTargetCount[_parts.Owner]--;
             if (AlreadyExecedTargetCount[_parts.Owner] != 0)
                 return;
-            Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
             if (_parts.Owner.IsPartsBoss && BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE) && BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE)
             {
                 for (int index = 0; index < _parts.Owner.BossPartsListForBattle.Count; ++index)
@@ -112,7 +112,7 @@ namespace Elements
             }
             else
                 AlreadyExecedTargetCount.Add(_parts.Owner, 1);
-            Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
             if (_parts.Owner.IsPartsBoss && BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE) && BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE)
             {
                 for (int index = 0; index < _parts.Owner.BossPartsListForBattle.Count; ++index)

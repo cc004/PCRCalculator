@@ -5,6 +5,7 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Battle;
@@ -42,6 +43,7 @@ namespace Elements
         private Dictionary<int, Dictionary<UnitCtrl.BuffParamKind, int>> debuffResistIdDictionary = new Dictionary<int, Dictionary<UnitCtrl.BuffParamKind, int>>();
 
         public List<NormalSkillEffect> BreakEffectList { get; set; }
+        public Dictionary<int, int> talentWeaknessPercent; // 0xA8
 
         public float InitialPositionX { get; set; }
 
@@ -119,29 +121,29 @@ namespace Elements
 
         public void IncrementUbAttackHitCount() => ++UbAttackHitCount;
 
-        public virtual int GetAtkZero() => (int)Owner.AtkZero;
+        public virtual long GetAtkZero() => (long)Owner.AtkZero;
 
-        public virtual int GetMagicStrZero() => (int)Owner.MagicStrZero;
+        public virtual long GetMagicStrZero() => (long)Owner.MagicStrZero;
 
-        public virtual FloatWithEx GetAtkZeroEx() => Owner.AtkZero;
+        public virtual LongWithEx GetAtkZeroEx() => Owner.AtkZero;
 
-        public virtual FloatWithEx GetMagicStrZeroEx() => Owner.MagicStrZero;
+        public virtual LongWithEx GetMagicStrZeroEx() => Owner.MagicStrZero;
 
-        public virtual int GetAccuracyZero() => Owner.AccuracyZero;
+        public virtual long GetAccuracyZero() => Owner.AccuracyZero;
 
-        public virtual int GetPhysicalCriticalZero() => Owner.PhysicalCriticalZero;
+        public virtual long GetPhysicalCriticalZero() => Owner.PhysicalCriticalZero;
 
-        public virtual int GetMagicCriticalZero() => Owner.MagicCriticalZero;
+        public virtual long GetMagicCriticalZero() => Owner.MagicCriticalZero;
 
-        public virtual int GetLifeStealZero() => Owner.LifeStealZero;
+        public virtual long GetLifeStealZero() => Owner.LifeStealZero;
 
-        public virtual float GetHpRecoverRateZero() => Owner.HpRecoveryRateZero;
+        public virtual long GetHpRecoverRateZero() => Owner.HpRecoveryRateZero;
 
-        public virtual float GetDodgeRate(int _accuracy) => Owner.GetDodgeRate(_accuracy);
+        public virtual float GetDodgeRate(long _accuracy) => Owner.GetDodgeRate(_accuracy);
 
-        public virtual FloatWithEx GetDefZero() => Owner.DefZero;
+        public virtual LongWithEx GetDefZero() => Owner.DefZero;
 
-        public virtual FloatWithEx GetMagicDefZero() => Owner.MagicDefZero;
+        public virtual LongWithEx GetMagicDefZero() => Owner.MagicDefZero;
 
         public virtual void SetMissAtk(
           UnitCtrl _source,
@@ -160,21 +162,21 @@ namespace Elements
           Skill _skill,
           bool _isLeft) => this.Owner.ShowHitEffect(_weaponSeType, _skill, _isLeft, this);*/
 
-        public virtual int GetStartAtk() => Owner.StartAtk;
+        public virtual long GetStartAtk() => Owner.StartAtk;
 
-        public virtual int GetStartDef() => Owner.StartDef;
+        public virtual long GetStartDef() => Owner.StartDef;
 
-        public virtual int GetStartMagicStr() => Owner.StartMagicStr;
+        public virtual long GetStartMagicStr() => Owner.StartMagicStr;
 
-        public virtual int GetStartMagicDef() => Owner.StartMagicDef;
+        public virtual long GetStartMagicDef() => Owner.StartMagicDef;
 
-        public virtual int GetStartDodge() => Owner.StartDodge;
+        public virtual long GetStartDodge() => Owner.StartDodge;
 
-        public virtual int GetStartPhysicalCritical() => Owner.StartPhysicalCritical;
+        public virtual long GetStartPhysicalCritical() => Owner.StartPhysicalCritical;
 
-        public virtual int GetStartMagicCritical() => Owner.StartMagicCritical;
+        public virtual long GetStartMagicCritical() => Owner.StartMagicCritical;
 
-        public virtual int GetStartLifeSteal() => Owner.StartLifeSteal;
+        public virtual long GetStartLifeSteal() => Owner.StartLifeSteal;
 
         /*public IEnumerator StartTotalDamage(bool _isLarge, float _delay)
         {
@@ -186,6 +188,23 @@ namespace Elements
                     damageNumEffect.SetSortOrder((int)((_targetParts.Owner.IsFront ? 11500 : 0) + 11250 + _targetParts.Owner.RespawnPos));
         }*/
 
+        // RVA: 0x218ED5C Offset: 0x218ED5C VA: 0x218ED5C
+        public double GetTalentWeaknessPercent(List<int> _talentIds) 
+        {
+            if (_talentIds == null || _talentIds.Count == 0 || talentWeaknessPercent == null)
+            {
+                return 100.0;
+            }
+            
+            return _talentIds
+                .Select(id => {
+                    if(talentWeaknessPercent.TryGetValue(id, out int value))
+                        return value;
+                    return 100;
+                })
+                .Max();
+        }
+
         public bool JudgeShowTotalDamage() => UbAttackHitCount >= 2 && TotalDamage != 0.0;
 
         public void ResetTotalDamage()
@@ -196,14 +215,14 @@ namespace Elements
 
         public virtual void SetBuffDebuff(
           bool _enable,
-          FloatWithEx _value,
+          LongWithEx _value,
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
           bool _additional)
         {
             if (!_enable)
-                _value = _value * -1f;
+                _value = _value * -1;
             BattleLogIntreface mlegmhaocon = _battleLog;
             UnitCtrl unitCtrl = _source;
             UnitCtrl owner1 = Owner;
@@ -230,8 +249,8 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         UnitCtrl owner3 = Owner;
-                        owner3.Def = (owner3.Def.Floor() + _value).Floor();
-                        owner3.DefForDamagedEnergy = (owner3.DefForDamagedEnergy.Floor() + _value).Floor();
+                        owner3.Def = (owner3.Def) + _value;
+                        owner3.DefForDamagedEnergy = (owner3.DefForDamagedEnergy + _value);
                         string des = (_source==null?"???":_source.UnitName) + "的技能" + (_enable?"开始":"结束") + "变更" + _value;
                         Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId, 1, owner3.Def, BattleHeaderController.CurrentFrameCount,des);
                         break;
@@ -241,8 +260,8 @@ namespace Elements
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         UnitCtrl owner5 = Owner;
-                        owner5.MagicDef = (owner5.MagicDef.Floor() + _value).Floor();
-                        owner5.MagicDefForDamagedEnergy = (owner5.MagicDefForDamagedEnergy.Floor() + _value).Floor();
+                        owner5.MagicDef = (owner5.MagicDef + _value);
+                        owner5.MagicDefForDamagedEnergy = (owner5.MagicDefForDamagedEnergy + _value);
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId, 2, owner5.MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
@@ -324,7 +343,7 @@ namespace Elements
                                 break;
                             }
                             float jEOCPILJNAD = (float)(long)Owner.Hp / (float)(long)Owner.MaxHp;
-                            foreach (KeyValuePair<int, Action<float>> item in Owner.OnRecoverListForChangeSpeedDisableByMaxHp)
+                            foreach (KeyValuePair<int, Action<double>> item in Owner.OnRecoverListForChangeSpeedDisableByMaxHp)
                             {
                                 item.Value?.Invoke(jEOCPILJNAD);
                             }
@@ -519,11 +538,11 @@ namespace Elements
             public Attachment AppliedAttachment { get; set; }
         }
 
-        public virtual FloatWithEx GetDefZeroForDamagedEnergy()
+        public virtual LongWithEx GetDefZeroForDamagedEnergy()
         {
             return this.Owner.DefZeroForDamagedEnergy;
         }
-        public virtual FloatWithEx GetMagicDefZeroForDamagedEnergy()
+        public virtual LongWithEx GetMagicDefZeroForDamagedEnergy()
         {
             return this.Owner.MagicDefZeroForDamagedEnergy;
         }

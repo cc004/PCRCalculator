@@ -14,7 +14,7 @@ namespace Elements
 
     public eEffectType EffectType { get; set; }
 
-    public float Value { get; set; }
+    public double Value { get; set; }
 
     public bool IsMagic { get; set; }
 

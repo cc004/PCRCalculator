@@ -15,11 +15,11 @@ namespace Elements
 
         public int EffectId { get; set; }
 
-        public FloatWithEx Value { get; set; }
+        public DoubleWithEx Value { get; set; }
 
         public int ActionId { get; set; }
 
-        public float EnergyChargeMultiple { get; set; } = 1f;
+        public double EnergyChargeMultiple { get; set; } = 1f;
 
         public int AbsorberValue { get; set; }
 
@@ -61,7 +61,7 @@ namespace Elements
 
                     DamageData damageData = new DamageData();
                     damageData.Target = TargetList[index];
-                    damageData.Damage = BattleUtil.FloatToInt(Value * receiveDamagePrecent * damageUpPrecent);
+                    damageData.Damage = BattleUtil.DoubleToLong(Value * receiveDamagePrecent * damageUpPrecent);
                     damageData.DamageType = DamageType;
                     damageData.Source = PPOJKIDHGNJ;
                     damageData.ActionType = eActionType.ATTACK_FIELD;

@@ -19,7 +19,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       PassiveSealData _data = new PassiveSealData
@@ -29,8 +29,8 @@ namespace Elements
         Source = _source,
         Target = _target.Owner,
         TargetStateIcon = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2],
-        SealDuration = _valueDictionary[eValueNumber.VALUE_3],
-        LifeTime = _valueDictionary[eValueNumber.VALUE_5],
+        SealDuration = (float)_valueDictionary[eValueNumber.VALUE_3],
+        LifeTime = (float)_valueDictionary[eValueNumber.VALUE_5],
         SealNumLimit = (int) _valueDictionary[eValueNumber.VALUE_1],
                         SealNum = (int)_valueDictionary[eValueNumber.VALUE_7]
 

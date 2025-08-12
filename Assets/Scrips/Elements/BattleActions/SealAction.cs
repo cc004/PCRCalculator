@@ -27,7 +27,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
@@ -64,7 +64,7 @@ namespace Elements
                 }*/
             }
             if ((double)_valueDictionary[eValueNumber.VALUE_4] > 0.0)
-                seal.AddSeal(_valueDictionary[eValueNumber.VALUE_3], _target.Owner, eStateIconType, (int)_valueDictionary[eValueNumber.VALUE_4]);
+                seal.AddSeal((float)_valueDictionary[eValueNumber.VALUE_3], _target.Owner, eStateIconType, (int)_valueDictionary[eValueNumber.VALUE_4]);
             if ((double)_valueDictionary[eValueNumber.VALUE_4] >= 0.0)
                 return;
             seal.RemoveSeal(-(int)_valueDictionary[eValueNumber.VALUE_4], false);

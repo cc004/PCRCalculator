@@ -12,20 +12,20 @@ namespace Elements
   {
     public eAccumulativeDamageType AccumulativeDamageType { get; set; }
 
-    public float FixedValue { get; set; }
+    public double FixedValue { get; set; }
 
-    public float PercentageValue { get; set; }
+    public double PercentageValue { get; set; }
 
     public int DamagedCount { get; set; }
 
     public int CountLimit { get; set; }
-		public FloatWithEx CalcAdditionalDamage(int _count, FloatWithEx _baseDamage)
+		public LongWithEx CalcAdditionalDamage(int _count, LongWithEx _baseDamage)
 		{
-			int num = Mathf.Min(_count, CountLimit);
+			long num = Mathf.Min(_count, CountLimit);
 			return AccumulativeDamageType switch
 			{
-				eAccumulativeDamageType.FIXED => (num * FixedValue),
-				eAccumulativeDamageType.PERCENTAGE => ((_baseDamage * num) * PercentageValue / 100f),
+				eAccumulativeDamageType.FIXED => BattleUtil.DoubleToInt(num * FixedValue),
+				eAccumulativeDamageType.PERCENTAGE => BattleUtil.DoubleToInt((_baseDamage * num) * PercentageValue / 100f),
 				_ => 0,
 			};
 		}
