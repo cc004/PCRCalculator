@@ -21,9 +21,9 @@ namespace Elements
 		}
 
 		// Token: 0x06003D7C RID: 15740 RVA: 0x00101610 File Offset: 0x00101610
-		public override void OnEnter(BasePartsData _parts)
+		public override void OnEnter(BasePartsData _parts, UnitCtrl _source)
 		{
-			base.OnEnter(_parts);
+			base.OnEnter(_parts, _source);
 			UnitCtrl owner = _parts.Owner;
 			int num;
 			this.alreadyExecedTargetCount.TryGetValue(owner, out num);
@@ -37,9 +37,9 @@ namespace Elements
 		}
 
 		// Token: 0x06003D7D RID: 15741 RVA: 0x00101680 File Offset: 0x00101680
-		public override void OnExit(BasePartsData _parts)
+		public override void OnExit(BasePartsData _parts, UnitCtrl _source)
 		{
-			base.OnExit(_parts);
+			base.OnExit(_parts, _source);
 			UnitCtrl owner = _parts.Owner;
 			Dictionary<UnitCtrl, int> dictionary = this.alreadyExecedTargetCount;
 			UnitCtrl key = owner;
@@ -77,7 +77,7 @@ namespace Elements
 				BasePartsData basePartsData = list[j];
 				if (base.TargetList.Contains(basePartsData))
 				{
-					this.OnExit(basePartsData);
+					this.OnExit(basePartsData, _unit);
 				}
 			}
 		}

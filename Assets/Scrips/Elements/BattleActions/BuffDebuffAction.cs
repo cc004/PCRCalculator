@@ -47,7 +47,7 @@ namespace Elements
                 //_source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParam, 0.0f, 0, null, true, eEffectType.COMMON, !isDebuff, getIsAdditional());
                 //_source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, getIsAdditional(),90);
 
-                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, null, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
+                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
                 _source.EnableBuffParam(buffParamKind, buffParam, _enable: true, _source, !isDebuff, getIsAdditional());
 
             };

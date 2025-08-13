@@ -84,13 +84,13 @@ namespace Elements.Battle
             //AbnormalStateDataBase.staticBattleEffectPool = (BattleEffectPoolInterface) AbnormalStateDataBase.staticSingletonTree.Get<BattleEffectPool>();
         }
 
-        public virtual void OnEnter(BasePartsData GEDLBPMPOKB)
+        public virtual void OnEnter(BasePartsData GEDLBPMPOKB, UnitCtrl _source)
         {
             TargetList.Add(GEDLBPMPOKB);
             TargetSet.Add(GEDLBPMPOKB);
         }
 
-        public virtual void OnExit(BasePartsData GEDLBPMPOKB)
+        public virtual void OnExit(BasePartsData GEDLBPMPOKB, UnitCtrl _source)
         {
             TargetList.Remove(GEDLBPMPOKB);
             TargetSet.Remove(GEDLBPMPOKB);
@@ -191,7 +191,7 @@ namespace Elements.Battle
             }
 
             for (int index = TargetList.Count - 1; index >= 0; --index)
-                OnExit(TargetList[index]);
+                OnExit(TargetList[index], PPOJKIDHGNJ);
             isPlaying = false;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域结束!");
             /*if ((UnityEngine.Object) plfcllhldoo.skillEffect != (UnityEngine.Object) null)
@@ -224,7 +224,7 @@ namespace Elements.Battle
                 if (owner.IsSummonOrPhantom && owner.IdleOnly || owner.IsStealth ||
                     getClearedIndex(owner) >= fieldIndex || owner.IsDead)
                 {
-                    OnExit(target);
+                    OnExit(target, PPOJKIDHGNJ);
                 }
                 else
                 {
@@ -233,7 +233,7 @@ namespace Elements.Battle
                           posx >= Left || BattleUtil.Approximately(posx, Right) ||
                           BattleUtil.Approximately(posx, Left)))
                     {
-                        OnExit(target);
+                        OnExit(target, PPOJKIDHGNJ);
                     }
                 }
             }
@@ -246,7 +246,7 @@ namespace Elements.Battle
                     posx >= Left || BattleUtil.Approximately(posx, Right) ||
                     BattleUtil.Approximately(posx, Left))
                 {
-                    OnEnter(target);
+                    OnEnter(target, PPOJKIDHGNJ);
                 }
             }
             /*
