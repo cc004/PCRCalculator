@@ -39,7 +39,30 @@ namespace PCRCaculator.SQL
 
         public void Prepare()
         {
-            this.path = Path.Combine(ABExTool.persistentDataPath, $"{mgr.DataVer}.db");
+
+            string rootPath = $"{mgr.DataVer}.db";
+            string publicPath = Path.Combine(ABExTool.persistentDataPath, $"{mgr.DataVer}.db");
+
+            // 检查第一个路径（本体目录）
+            if (File.Exists(rootPath))
+            {
+                this.path = rootPath;
+                Debug.Log($"使用本体目录{mgr.DataVer}.db");
+            }
+            else
+            {
+                // 检查第二个路径（公共目录）
+                if (File.Exists(publicPath))
+                {
+                    this.path = publicPath;
+                    Debug.Log($"使用公共目录{mgr.DataVer}.db");
+                }
+                else
+                {
+                    Debug.Log($"未找到{mgr.DataVer}.db，将自动下载存放至公共目录，如果是jp数据库需要反哈希，无法直接食用");
+                    this.path = publicPath;
+                }
+            }
 
             if (!File.Exists(this.path))
             {
