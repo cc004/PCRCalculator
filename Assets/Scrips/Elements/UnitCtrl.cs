@@ -2183,13 +2183,15 @@ this.updateCurColor();
         public void Initialize(
           UnitParameter _data,
           PCRCaculator.UnitData unitData_my,
+          TeamEnhanceParameter _teamEnhanceParameter,
           bool _isOther,
           bool _isFirstWave,
           bool _isGaugeAlwaysVisible = false,
           BaseData additional = null,
-          BaseData exOverride = null,
-          TeamEnhanceParameter _teamEnhanceParameter = null)
+          BaseData exOverride = null)
         {
+            teamEnhanceParameter = _teamEnhanceParameter;
+            teamEnhanceParameter.UpdateCombinedData();
             ToadDatas = new List<ToadData>();
             transformCache = transform;
             m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;
@@ -2807,8 +2809,8 @@ this.updateCurColor();
                 }
             }
         }
-
-        private Dictionary<eParamType, long> talentBuffParameter; // 0x40
+        private TeamEnhanceParameter teamEnhanceParameter;
+        private Dictionary<int, Dictionary<eParamType, int>> talentBuffParameter; // 0x48
         private Dictionary<eParamType, long> roleBuffParameter; // 0x48
 
 
@@ -2818,25 +2820,22 @@ this.updateCurColor();
             if (_teamEnhanceParameter == null || this?.TalentIds == null || this.TalentIds.Count < 1)
                 return;
 
+            talentBuffParameter = new Dictionary<int, Dictionary<eParamType, int>>();
+
             foreach (var talentId in this.TalentIds)
             {
                 var talentEnhance = _teamEnhanceParameter.GetTalentEnhance(talentId);
                 if (talentEnhance == null)
                     continue;
 
+                talentBuffParameter[talentId] = new Dictionary<eParamType, int>();
+
                 foreach (var kvp in talentEnhance)
                 {
                     var paramType = kvp.Key;
                     var enhanceValue = kvp.Value;
 
-                    if (talentBuffParameter.TryGetValue(paramType, out long currentValue))
-                    {
-                        talentBuffParameter[paramType] = currentValue + enhanceValue;
-                    }
-                    else
-                    {
-                        talentBuffParameter[paramType] = enhanceValue;
-                    }
+                    talentBuffParameter[talentId][paramType] = enhanceValue;
                 }
             }
         }
@@ -2927,16 +2926,19 @@ this.updateCurColor();
             }
         
             bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
-        
-            foreach (KeyValuePair<eParamType, long> pair in talentBuffParameter)
+
+            foreach (KeyValuePair<int, Dictionary<eParamType, int>> pair in teamEnhanceParameter.talentBuffParameter)
             {
-                ApplyEnhanceValue(
-                    pair.Key,          
-                    pair.Value,        
-                    _first,           
-                    isClanBattleOrSekaiEnemy,  
-                    false              
-                );
+                foreach (KeyValuePair<eParamType, int> innerPair in pair.Value)
+                {
+                    ApplyEnhanceValue(
+                        innerPair.Key,    // eParamType 类型
+                        innerPair.Value,  // int 类型，会自动转换为 long
+                        _first,
+                        isClanBattleOrSekaiEnemy,
+                        false
+                    );
+                }
             }
 
         }
@@ -2944,11 +2946,15 @@ this.updateCurColor();
         // RVA: 0x2853654 Offset: 0x2853654 VA: 0x2853654
         private void applyRoleEnhance(bool _first)
         {
-            if (this == null)
+            // if (this == null)
+            // {
+            //     return;
+            // }
+            if (roleBuffParameter == null)
             {
                 return;
             }
-        
+
             bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
         
             // 遍历所有角色增益参数

@@ -25,6 +25,7 @@ using Object = UnityEngine.Object;
 using PCRCaculator.Update;
 using UnityEngine.Networking;
 using System.Reflection;
+using Elements;
 namespace PCRCaculator
 {
     public class MainManager : MonoBehaviour
@@ -110,7 +111,7 @@ namespace PCRCaculator
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => skillNameAndDescribe_cn; }
         public Dictionary<int, string> SkillActionDescribe_cn { get => skillActionDescribe_cn; }
         public PlayerSetting PlayerSetting { get => playerSetting; }
-        public PrincessKnightInfo TalentInfoData { get; } = new();
+        public TeamEnhanceParameter TeamEnhanceData { get; } = new();
         public Dictionary<int, TalentSkillNode> TalentSkillNodeDic = new Dictionary<int, TalentSkillNode>();
         public Dictionary<int, TalentSkillEnhanceData> TalentSkillEnhanceDataDic = new Dictionary<int, TalentSkillEnhanceData>();
         public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();

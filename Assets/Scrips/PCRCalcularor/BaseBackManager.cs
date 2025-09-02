@@ -29,7 +29,7 @@ namespace PCRCaculator
         public ToggleGroup talentToggles;
         public List<GameObject> talentManagers;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
-        public PrincessKnightInfo TalnetInfoData { get => MainManager.Instance.TalentInfoData; }
+        public TeamEnhanceParameter TalnetInfoData { get => MainManager.Instance.TeamEnhanceData; }
 
 
         private bool isLoading;

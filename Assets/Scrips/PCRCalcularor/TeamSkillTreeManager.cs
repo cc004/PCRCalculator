@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Elements;
 using PCRCaculator.SQL;
 namespace PCRCaculator
 {
@@ -443,7 +444,7 @@ namespace PCRCaculator
             }
 
             // 一次性设置所有数据并触发更新
-            MainManager.Instance.TalentInfoData.SetData(PrincessKnightInfo.DataType.TeamSkill, newData);
+            MainManager.Instance.TeamEnhanceData.SetData(TeamEnhanceParameter.DataType.TeamSkill, newData);
         }
         public void SaveTeamSkillsToPlayerSetting()
         {

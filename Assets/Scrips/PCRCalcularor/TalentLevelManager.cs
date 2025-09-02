@@ -77,7 +77,7 @@ namespace PCRCaculator
             // 如果有变化，更新PrincessKnightInfo并通知更新
             if (hasChanged)
             {
-                MainManager.Instance.TalentInfoData.SetTalentLevels(talentLevels);
+                MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);
                 OnTalentLevelChanged?.Invoke();
             }
         }
@@ -106,7 +106,7 @@ namespace PCRCaculator
             }
 
             // 直接将数据设置到PrincessKnightInfo
-            MainManager.Instance.TalentInfoData.SetTalentLevels(talentLevels);
+            MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);
         }
     }
 }

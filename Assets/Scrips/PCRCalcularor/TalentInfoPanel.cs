@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using Elements;
 using PCRCaculator.SQL;
@@ -13,12 +14,12 @@ namespace PCRCaculator
         public Transform tableContainer;
 
         private MainManager mainManager => MainManager.Instance;
-        private PrincessKnightInfo talentInfoData => MainManager.Instance.TalentInfoData;
+        private TeamEnhanceParameter teamEnhanceData => MainManager.Instance.TeamEnhanceData;
         private Dictionary<int, param_type> paramTypeDict => MainManager.Instance.paramTypeDic;
 
         private void OnEnable()
         {
-            talentInfoData.LoadFromPlayerSetting(mainManager.PlayerSetting);
+            teamEnhanceData.LoadFromPlayerSetting(mainManager.PlayerSetting);
             SubscribeEvents();
             RefreshTable();
         }
@@ -30,8 +31,8 @@ namespace PCRCaculator
 
         private void SubscribeEvents()
         {
-            if (talentInfoData != null)
-                talentInfoData.OnDataChanged += RefreshTable;
+            if (teamEnhanceData != null)
+                teamEnhanceData.OnDataChanged += RefreshTable;
 
             if (TalentLevelManager.Instance != null)
                 TalentLevelManager.Instance.OnTalentLevelChanged += RefreshTable;
@@ -39,8 +40,8 @@ namespace PCRCaculator
 
         private void UnsubscribeEvents()
         {
-            if (talentInfoData != null)
-                talentInfoData.OnDataChanged -= RefreshTable;
+            if (teamEnhanceData != null)
+                teamEnhanceData.OnDataChanged -= RefreshTable;
 
             if (TalentLevelManager.Instance != null)
                 TalentLevelManager.Instance.OnTalentLevelChanged -= RefreshTable;
@@ -72,32 +73,56 @@ namespace PCRCaculator
         private void RenderTable()
         {
             // 显示属性攻击力行
-            int[] talentLevels = new int[5];
+            string[] talentLevelStrings = new string[5];
             for (int i = 0; i < 5; i++)
-                talentLevels[i] = talentInfoData.GetAttributeAttackPower(i + 1);
-
-            CreateRow("属性攻击力", talentLevels);
+            {
+                int attackPower = teamEnhanceData.GetAttributeAttackPower(i + 1);
+                talentLevelStrings[i] = attackPower.ToString();
+            }
+            CreateRow("属性攻击力", talentLevelStrings);
 
             // 获取所有使用的参数类型
-            var usedParamTypes = new HashSet<int>();
-            foreach (var levelDict in talentInfoData.TalentInfoData.Values)
+            var usedParamTypes = new HashSet<eParamType>();
+            foreach (var levelDict in teamEnhanceData.talentBuffParameter.Values)
             {
                 foreach (var paramType in levelDict.Keys)
                     usedParamTypes.Add(paramType);
             }
 
             // 为每个参数类型创建一行
-            foreach (int paramType in usedParamTypes)
+            foreach (int paramTypeValue in usedParamTypes.Select(v => (int)v))
             {
-                if (paramTypeDict.TryGetValue(paramType, out param_type param))
+                // 将int转换为eParamType枚举
+                if (Enum.IsDefined(typeof(eParamType), paramTypeValue))
                 {
-                    int[] values = new int[5];
+                    eParamType paramType = (eParamType)paramTypeValue;
+                    string[] values = new string[5];
                     for (int i = 1; i <= 5; i++)
                     {
-                        values[i - 1] = talentInfoData.TalentInfoData.GetValueOrDefault(i)?
+                        int rawValue = teamEnhanceData.talentBuffParameter.GetValueOrDefault(i)?
                             .GetValueOrDefault(paramType) ?? 0;
+
+                        // 获取参数配置并应用百分比格式
+                        if (paramTypeDict.TryGetValue((int)paramType, out var paramConfig))
+                        {
+                            float formattedValue;
+                            if (paramConfig.ratio > 0)
+                                formattedValue = (float)rawValue / paramConfig.ratio;
+                            else
+                                formattedValue = rawValue;
+
+                            if (paramConfig.is_percentage == 1)
+                                values[i - 1] = $"{formattedValue * 100}%";
+                            else
+                                values[i - 1] = formattedValue.ToString("F0");
+                        }
+                        else
+                        {
+                            values[i - 1] = rawValue.ToString();
+                        }
                     }
-                    CreateRow(param.parameter_name, values);
+                    // 使用GetDescription()获取参数名称
+                    CreateRow(paramType.GetDescription(), values);
                 }
             }
         }
@@ -105,7 +130,7 @@ namespace PCRCaculator
         /// <summary>
         /// 创建表格行
         /// </summary>
-        private void CreateRow(string typeName, int[] values)
+        private void CreateRow(string typeName, string[] values)
         {
             GameObject row = Instantiate(rowPrefab, tableContainer);
             Text[] texts = row.GetComponentsInChildren<Text>();

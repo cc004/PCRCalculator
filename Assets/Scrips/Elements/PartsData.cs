@@ -14,6 +14,7 @@ using PCRCaculator;
 using PCRCaculator.Guild;
 using Spine;
 using UnityEngine;
+using PCRCaculator.Battle;
 //using Elements.Data;
 
 namespace Elements
@@ -180,7 +181,7 @@ namespace Elements
             BreakPoint = MaxBreakPoint = (int)data.baseData.RealHp;
             //}
 
-            this.battleManager.SetPartsTalentWeakness(unit_id, this);
+            BattleManager.Instance.SetPartsTalentWeakness(unit_id, this);
 
         }
 

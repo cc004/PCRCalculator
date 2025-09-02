@@ -5083,7 +5083,7 @@ namespace Elements.Battle
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
-                unitCtrl.Initialize(parameter,unitData_my, flag, true, false,
+                unitCtrl.Initialize(parameter,unitData_my, MainManager.Instance.TeamEnhanceData, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?
