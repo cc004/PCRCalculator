@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Elements;
 namespace PCRCaculator
 {
 
@@ -26,7 +26,11 @@ namespace PCRCaculator
         public InputField RBValueText;
         public InputField RBTPValueText;
         public GameObject ShowTextPrefab;
+        public ToggleGroup talentToggles;
+        public List<GameObject> talentManagers;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
+        public PrincessKnightInfo TalnetInfoData { get => MainManager.Instance.TalentInfoData; }
+
 
         private bool isLoading;
         private void Awake()
@@ -43,19 +47,21 @@ namespace PCRCaculator
             sliders[0].value = PlayerSetting.playerLevel;
             sliders[1].value = PlayerSetting.playerProcess;
             sliders[2].value = PlayerSetting.maxUniqueEqLv;
-
             texts[0].text = PlayerSetting.playerLevel + "";
             texts[1].text = PlayerSetting.ProcessStr();
             texts[2].text = PlayerSetting.maxUniqueEqLv + "";
             //allowRarity6Toggle.isOn = PlayerSetting.allowRarity6;
-            tpCalculationChanged.isOn = PlayerSetting.tpCalculationChanged;
-            exDivisionFixed.isOn = PlayerSetting.exDivisionFixed;
+            // tpCalculationChanged.isOn = PlayerSetting.tpCalculationChanged;
+            // exDivisionFixed.isOn = PlayerSetting.exDivisionFixed;
             //if (showAllUnitToggle!=null)
             //     showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
-
             TPMaxText.text = PlayerSetting.maxTPUpValue.ToString();
-
+            // TalnetInfoData.LoadFromPlayerSetting(PlayerSetting);
+            TalentLevelManager.Instance.LoadTalentLevelSliders();
+            TalentSkillTreeManager.Instance.InitializeData();
+            TeamSkillTreeManager.Instance.InitializeData();
             isLoading = false;
+            OnTalentToggleChanged();
         }
         /// <summary>
         /// 滑动条函数
@@ -75,7 +81,6 @@ namespace PCRCaculator
             {
                 playerLevelText.text = PlayerSetting.playerLevel + "";
             }
-
         }
         /// <summary>
         /// 设置界面保存按钮
@@ -89,7 +94,9 @@ namespace PCRCaculator
             //PlayerSetting.showAllUnits = showAllUnitToggle.isOn;
 
             PlayerSetting.maxTPUpValue = int.Parse(TPMaxText.text, System.Globalization.NumberStyles.Any);
-
+            TalentLevelManager.Instance.SaveTalentSkillsToPlayerSetting();
+            TalentSkillTreeManager.Instance.SaveTalentSkillsToPlayerSetting();
+            TeamSkillTreeManager.Instance.SaveTeamSkillsToPlayerSetting();
             MainManager.Instance.SavePlayerSetting();
             MainManager.Instance.WindowMessage("保存成功！");
         }
@@ -136,6 +143,24 @@ namespace PCRCaculator
         {
             GameObject a = Instantiate(ShowTextPrefab, latestUIback.transform, false);
             a.GetComponent<ShowTextUI>().Set(str);
+        }
+        public void OnTalentToggleChanged()
+        {
+            int selectedIndex = 0;
+            for (int i = 0; i < talentToggles.transform.childCount; i++)
+            {
+                Transform child = talentToggles.transform.GetChild(i);
+                if (child.GetComponent<Toggle>().isOn)
+                {
+                    selectedIndex = i;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < talentManagers.Count; i++)
+            {
+                talentManagers[i].SetActive(i == selectedIndex);
+            }
         }
     }
 }

@@ -79,6 +79,8 @@ namespace PCRCaculator
         private Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
         private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic;
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips;
+        public Dictionary<int, int[]> weaknessDic;
+        public Dictionary<int, talentFormationData> talentFormationDic;
         private CharacterManager characterManager;
         private AdventureManager battleManager;
         //private SQLiteHelper sql;
@@ -108,6 +110,12 @@ namespace PCRCaculator
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => skillNameAndDescribe_cn; }
         public Dictionary<int, string> SkillActionDescribe_cn { get => skillActionDescribe_cn; }
         public PlayerSetting PlayerSetting { get => playerSetting; }
+        public PrincessKnightInfo TalentInfoData { get; } = new();
+        public Dictionary<int, TalentSkillNode> TalentSkillNodeDic = new Dictionary<int, TalentSkillNode>();
+        public Dictionary<int, TalentSkillEnhanceData> TalentSkillEnhanceDataDic = new Dictionary<int, TalentSkillEnhanceData>();
+        public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();
+        public Dictionary<int, TeamSkillNode> TeamSkillNodeDic = new Dictionary<int, TeamSkillNode>();
+        public Dictionary<int, TeamSkillEnhanceData> TeamSkillEnhanceDataDic = new Dictionary<int, TeamSkillEnhanceData>();
         public GameObject LatestUIback
         {
             get
@@ -358,11 +366,17 @@ namespace PCRCaculator
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
                         UniqueEquipment2DataDic = dbTool.Dic92;
-                        // unitTalentDic = dbTool.TalentDic;
+                        TalentSkillNodeDic = dbTool.TalentSkillNodeDic;
+                        TalentSkillEnhanceDataDic = dbTool.TalentSkillEnhanceDataDic;
+                        TeamSkillNodeDic = dbTool.TeamSkillNodeDic;
+                        TeamSkillEnhanceDataDic = dbTool.TeamSkillEnhanceDataDic;
+                        paramTypeDic = dbTool.paramTypeDic;
                         unitStoryEffectDic2 = dbTool2.Pair.Item2;
                         unitName_cn = dbTool3.Dic10;
                         skillNameAndDescribe_cn = dbTool3.Dic11;
                         skillActionDescribe_cn = dbTool3.Dic12;
+                        weaknessDic = dbTool.WeaknessDic;
+                        talentFormationDic = dbTool.TalentFormationDic;
                         /*
                         {
                             if (skillNameAndDescribe_cn.TryGetValue(1703001, out var val))

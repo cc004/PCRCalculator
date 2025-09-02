@@ -4179,9 +4179,11 @@ namespace Elements.Battle
 
                 long bonus = 0;
                 if (IsBossBattle)
+                    // bonus = ClanBattleGetTalentBonusPermyriad(talentId, count);
                     bonus = ClanBattleGetTalentBonusPermyriad(talentId, count);
-                
-                if (UnitTalentFormationBonusDictionary!= null)
+
+
+                if (UnitTalentFormationBonusDictionary != null)
                 {
                     UnitTalentFormationBonusDictionary[talentId] = bonus;
                 }
@@ -4222,28 +4224,47 @@ namespace Elements.Battle
         /// <param name="_partsData">装备部件数据</param>
         // RVA: 0x27065B0 Offset: 0x27065B0 VA: 0x27065B0
         public void SetPartsTalentWeakness(int _unitId, BasePartsData _partsData)
-        { 
+        {
             // var masterDataManager = ManagerSingleton<MasterDataManager>.Instance;
             // if (masterDataManager == null)
             // {
             //     return;
             // }
-        
+
             // var masterEnemyTalentWeakness = masterDataManager.masterEnemyTalentWeakness;
             // if (masterEnemyTalentWeakness == null)
             // {
             //     return;
             // }
-        
+
             // if (_partsData == null)
             // {
             //     return;
             // }
-        
+
             // var weaknessDict = masterEnemyTalentWeakness.GetWeaknessDictionary(_unitId);
-            
+
             // TODO hush fix boss weaknessDict
             // _partsData.talentWeaknessPercent = weaknessDict;
+            if (MainManager.Instance.weaknessDic.TryGetValue(_unitId, out int[] weaknessArray))
+            {
+                // 将数组转换为字典格式
+                Dictionary<int, int> weaknessDict = new Dictionary<int, int>();
+
+                // 假设 talentWeaknessPercent 需要的是 Dictionary<int, int> 格式
+                // 键为天赋类型(1-5)，值为弱点倍率
+                for (int i = 0; i < weaknessArray.Length && i < 5; i++)
+                {
+                    weaknessDict[i + 1] = weaknessArray[i]; // 键从1开始对应天赋类型1-5
+                }
+
+                _partsData.talentWeaknessPercent = weaknessDict;
+            }
+            else
+            {
+                // 如果找不到对应单位的弱点数据，使用默认空字典
+                _partsData.talentWeaknessPercent = new Dictionary<int, int>();
+            }
         }
 
 

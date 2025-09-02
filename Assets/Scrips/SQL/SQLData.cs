@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using SQLite4Unity3d;
 using PCRCaculator.Guild;
 using Elements;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
 namespace PCRCaculator.SQL
 {
@@ -289,7 +290,7 @@ namespace PCRCaculator.SQL
             {
                 action_1,action_2,action_3,action_4,
                 action_5,action_6,action_7,0,0,0
-            };           
+            };
 
             return ids;
         }
@@ -601,13 +602,6 @@ namespace PCRCaculator.SQL
         public int equip_slot { get; set; }
         public int equip_id { get; set; }
     }
-    public class unit_talent
-    {
-        public int setting_id { get; set; }
-        public int unit_id { get; set; }
-        public int talent_id { get; set; }
-    }
-
     public class unit_unique_equipment : unit_unique_equip
     {
     }
@@ -626,7 +620,209 @@ namespace PCRCaculator.SQL
         public int group_id { get; }
         public int unit_id { get; }
     }
+    public class unit_talent
+    {
+        public int setting_id { get; set; }
+        public int unit_id { get; set; }
+        public int talent_id { get; set; }
+    }
+    public class talent_weakness
+    {
+        public int resist_id { get; set; }
+        public int talent_1 { get; set; }
+        public int talent_2 { get; set; }
+        public int talent_3 { get; set; }
+        public int talent_4 { get; set; }
+        public int talent_5 { get; set; }
+    }
+    public class enemy_talent_weakness
+    {
+        public int enemy_id { get; set; }
+        public int resist_id { get; set; }
+    }
+    public class talent_formation_overwrite
+    {
+        public int id { get; set; }
+        public int content_type { get; set; }
+        public int target_value_1 { get; set; }
+        public int target_value_2 { get; set; }
+        public int formation_bonus_id_1 { get; set; }
+        public int formation_bonus_id_2 { get; set; }
+        public int formation_bonus_id_3 { get; set; }
+        public int formation_bonus_id_4 { get; set; }
+        public int formation_bonus_id_5 { get; set; }
+    }
+    public class talent_formation_bonus
+    {
+        public int formation_bonus_id { get; set; }
+        public int talent_bonus_1 { get; set; }
+        public int talent_bonus_2 { get; set; }
+        public int talent_bonus_3 { get; set; }
+        public int talent_bonus_4 { get; set; }
+        public int talent_bonus_5 { get; set; }
+    }
+    public class talent_skill_node : DbBaseData
+    {
+        public int node_id { get; set; }
+        public int page_num { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public int pre_node_1 { get; set; }
+        public int pre_node_2 { get; set; }
+        public int pre_node_3 { get; set; }
+        public int pre_node_4 { get; set; }
+        public int pre_node_5 { get; set; }
+        public int enhance_level_id_1 { get; set; }
+        public int enhance_level_id_2 { get; set; }
+        public int enhance_level_id_3 { get; set; }
+        public int enhance_level_id_4 { get; set; }
+        public int enhance_level_id_5 { get; set; }
+        public int icon_id { get; set; }
+        public int title_id { get; set; }
+    }
+    public class team_skill_title : DbBaseData
+    {
+        public int title_id { get; set; }
+        public string title_text { get; set; }
+    }
+    public class talent_skill_enhance_level : DbBaseData
+    {
+        public int enhance_level_id { get; set; }
+        public int enhance_id_1 { get; set; }
+        public int enhance_id_2 { get; set; }
+        public int enhance_id_3 { get; set; }
+        public int enhance_id_4 { get; set; }
+        public int enhance_id_5 { get; set; }
+        public int reward_type { get; set; }
+        public int item_id { get; set; }
+        public int consume_num { get; set; }
+        public int consume_gold { get; set; }
+    }
+    public class talent_skill_enhance_data : DbBaseData
+    {
+        public int enhance_id { get; set; }
+        public int talent_id_1 { get; set; }
+        public int talent_id_2 { get; set; }
+        public int talent_id_3 { get; set; }
+        public int talent_id_4 { get; set; }
+        public int talent_id_5 { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+    }
+    public class param_type : DbBaseData
+    {
+        public int parameter_type { get; set; }
+        public string parameter_name { get; set; }
+        public int ratio { get; set; }
+        public int is_percentage { get; set; }
+    }
+    public class team_skill_node : DbBaseData
+    {
+        public int node_id { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public int pre_node_id { get; set; }
+        public int enhance_level_id_1 { get; set; }
+        public int enhance_level_id_2 { get; set; }
+        public int enhance_level_id_3 { get; set; }
+        public int enhance_level_id_4 { get; set; }
+        public int enhance_level_id_5 { get; set; }
+        public int icon_id { get; set; }
+        public int noise_id { get; set; }
+        public int title_id { get; set; }
+    }
+    public class team_skill_enhance_level : DbBaseData
+    {
+        public int enhance_level_id { get; set; }
+        public int enhance_id_1 { get; set; }
+        public int enhance_id_2 { get; set; }
+        public int enhance_id_3 { get; set; }
+        public int enhance_id_4 { get; set; }
+        public int enhance_id_5 { get; set; }
+        public int reward_type { get; set; }
+        public int item_id { get; set; }
+        public int consume_num { get; set; }
+        public int consume_gold { get; set; }
+    }
+    public class team_skill_enhance_data : DbBaseData
+    {
+        public int enhance_id { get; set; }
+        public int talent_id_1 { get; set; }
+        public int talent_id_2 { get; set; }
+        public int talent_id_3 { get; set; }
+        public int talent_id_4 { get; set; }
+        public int talent_id_5 { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+    }
+    public class talentFormationData
+    {
+        public int id { get; set; }
+        public int content_type { get; set; }
+        public int target_value_1 { get; set; }
+        public int target_value_2 { get; set; }
+        public long[][] formation_bonus_values { get; set; }
+        public talentFormationData(talent_formation_overwrite overwrite, Dictionary<int, talent_formation_bonus> bonusDic)
+        {
+            id = overwrite.id;
+            content_type = overwrite.content_type;
+            target_value_1 = overwrite.target_value_1;
+            target_value_2 = overwrite.target_value_2;
 
+            formation_bonus_values = new long[5][];
+            if (bonusDic != null)
+            {
+                // 获取每个formation_bonus_id对应的加成值数组
+                formation_bonus_values[0] = GetBonusValues(overwrite.formation_bonus_id_1, bonusDic);
+                formation_bonus_values[1] = GetBonusValues(overwrite.formation_bonus_id_2, bonusDic);
+                formation_bonus_values[2] = GetBonusValues(overwrite.formation_bonus_id_3, bonusDic);
+                formation_bonus_values[3] = GetBonusValues(overwrite.formation_bonus_id_4, bonusDic);
+                formation_bonus_values[4] = GetBonusValues(overwrite.formation_bonus_id_5, bonusDic);
+            }
+        }
 
+        private long[] GetBonusValues(int formationBonusId, Dictionary<int, talent_formation_bonus> bonusDic)
+        {
+            if (bonusDic.TryGetValue(formationBonusId, out var bonus))
+            {
+                return new long[5]
+                {
+                bonus.talent_bonus_1,
+                bonus.talent_bonus_2,
+                bonus.talent_bonus_3,
+                bonus.talent_bonus_4,
+                bonus.talent_bonus_5
+                };
+            }
+            return new long[5] { 0, 0, 0, 0, 0 };
+        }
+
+        // 获取指定数量的加成值
+        public long GetBonusForCount(int count)
+        {
+            if (formation_bonus_values == null || count < 1 || count > 5)
+                return 0;
+
+            var bonusArray = formation_bonus_values[count - 1];
+            if (bonusArray == null)
+                return 0;
+
+            // 返回对应数量的加成值
+            return bonusArray[count - 1];
+        }
+
+        // 获取属性指定数量的加成值
+        public long GetBonusForCountAndLevel(int count, int level)
+        {
+            if (formation_bonus_values == null || count < 1 || count > 5 || level < 1 || level > 5)
+                return 0;
+
+            var bonusArray = formation_bonus_values[count - 1];
+            if (bonusArray == null)
+                return 0;
+
+            return bonusArray[level - 1];
+        }
+    }
 }
 

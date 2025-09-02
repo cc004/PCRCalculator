@@ -2400,5 +2400,250 @@ namespace PCRCaculator
         public bool skipping;
     }
 
+    [Serializable]
+    public class TalentSkillNode
+    {
+        public int node_id { get; set; }
+        public int page_num { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public List<int> pre_node_ids { get; set; }// 前置节点数组
+        public List<int> enhance_level_ids { get; set; } // 强化等级ID数组
+        public int icon_id { get; set; }
+        public int title_id { get; set; }
+        public string title_text { get; set; }
+        public List<int> enhance_ids { get; set; } // 强化ID数组
+        public TalentSkillNode(int nodeId, int pageNum, int posX, int posY, List<int> preNodes, List<int> enhanceLevelIds, int iconId, int titleId, string titleText, List<int> enhancelIds)
+        {
+            node_id = nodeId;
+            page_num = pageNum;
+            pos_x = posX;
+            pos_y = posY;
+            pre_node_ids = preNodes;
+            enhance_level_ids = enhanceLevelIds;
+            icon_id = iconId;
+            title_id = titleId;
+            title_text = titleText;
+            enhance_ids = enhancelIds;
+        }
+    }
+    [Serializable]
+    public class TalentSkillEnhanceData
+    {
+        public int enhance_id { get; set; }
+        public List<int> talent_ids { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+        public TalentSkillEnhanceData(int enhance_id, List<int> talent_ids, int parameter_type, int enhance_value)
+        {
+            this.enhance_id = enhance_id;
+            this.talent_ids = talent_ids;
+            this.parameter_type = parameter_type;
+            this.enhance_value = enhance_value;
+        }
+    }
 
+    [Serializable]
+    public class TeamSkillNode
+    {
+        public int node_id { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public int pre_node_id { get; set; }
+        public List<int> enhance_level_ids { get; set; } // 强化等级ID数组
+        public int icon_id { get; set; }
+        public int noise_id { get; set; }
+        public int title_id { get; set; }
+        public string title_text { get; set; }
+        public List<int> enhance_ids { get; set; } // 强化ID数组
+        public TeamSkillNode(int nodeId, int posX, int posY, int preNode, List<int> enhanceLevelIds, int iconId, int noiseId, int titleId, string titleText, List<int> enhancelIds)
+        {
+            node_id = nodeId;
+            pos_x = posX;
+            pos_y = posY;
+            pre_node_id = preNode;
+            enhance_level_ids = enhanceLevelIds;
+            icon_id = iconId;
+            noise_id = noiseId;
+            title_id = titleId;
+            title_text = titleText;
+            enhance_ids = enhancelIds;
+        }
+    }
+
+    [Serializable]
+    public class TeamSkillEnhanceData
+    {
+        public int enhance_id { get; set; }
+        public List<int> talent_ids { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+        public TeamSkillEnhanceData(int enhance_id, List<int> talent_ids, int parameter_type, int enhance_value)
+        {
+            this.enhance_id = enhance_id;
+            this.talent_ids = talent_ids;
+            this.parameter_type = parameter_type;
+            this.enhance_value = enhance_value;
+        }
+    }
+
+    [Serializable]
+    public class PrincessKnightInfo
+    {
+        public Dictionary<int, int> TalentLevelData { get; set; } = new Dictionary<int, int>();
+        public Dictionary<int, Dictionary<int, int>> TalentSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
+        public Dictionary<int, Dictionary<int, int>> TeamSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
+
+        // 合并后的数据
+        public Dictionary<int, Dictionary<int, int>> TalentInfoData { get; private set; } = new Dictionary<int, Dictionary<int, int>>();
+
+        // 事件：当数据变化时触发 UI 更新等操作
+        public event Action OnDataChanged;
+
+        public PrincessKnightInfo()
+        {
+            InitializeDictionaries();
+        }
+
+        private void InitializeDictionaries()
+        {
+            for (int i = 1; i <= 5; i++)
+            {
+                TalentLevelData[i] = 0;
+                TalentSkillData[i] = new Dictionary<int, int>();
+                TeamSkillData[i] = new Dictionary<int, int>();
+                TalentInfoData[i] = new Dictionary<int, int>();
+            }
+        }
+
+        /// <summary>
+        /// 从PlayerSetting加载所有数据
+        /// </summary>
+        public void LoadFromPlayerSetting(PlayerSetting playerSetting)
+        {
+            // 加载属性等级数据
+            foreach (var kvp in playerSetting.talentLevelDic)
+            {
+                TalentLevelData[kvp.Key] = kvp.Value;
+            }
+            UpdateCombinedData();
+        }
+
+        /// <summary>
+        /// 设置属性等级
+        /// </summary>
+        public void SetTalentLevels(Dictionary<int, int> levels)
+        {
+            foreach (var kvp in levels)
+            {
+                TalentLevelData[kvp.Key] = kvp.Value;
+            }
+            OnDataChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// 获取属性等级
+        /// </summary>
+        public int GetTalentLevel(int talentId)
+        {
+            return TalentLevelData.GetValueOrDefault(talentId, 0);
+        }
+
+        /// <summary>
+        /// 获取属性攻击力（属性等级 * 20）
+        /// </summary>
+        public int GetAttributeAttackPower(int talentId)
+        {
+            return GetTalentLevel(talentId) * 20;
+        }
+
+        /// <summary>
+        /// 清空所有数据
+        /// </summary>
+        public void Reset()
+        {
+            foreach (var dict in TalentSkillData.Values)
+                dict.Clear();
+
+            foreach (var dict in TeamSkillData.Values)
+                dict.Clear();
+
+            UpdateCombinedData();
+        }
+
+        /// <summary>
+        /// 添加数据
+        /// </summary>
+        public void SetData(DataType type, Dictionary<int, Dictionary<int, int>> data)
+        {
+            var target = type == DataType.TalentSkill ? TalentSkillData : TeamSkillData;
+
+            foreach (var dict in target.Values)
+                dict.Clear();
+
+            foreach (var talentKvp in data)
+            {
+                if (target.TryGetValue(talentKvp.Key, out var paramDict))
+                {
+                    foreach (var paramKvp in talentKvp.Value)
+                    {
+                        paramDict[paramKvp.Key] = paramKvp.Value;
+                    }
+                }
+            }
+
+            UpdateCombinedData();
+        }
+
+        /// <summary>
+        /// 更新合并后的数据
+        /// </summary>
+        public void UpdateCombinedData()
+        {
+            TalentInfoData = Merge(TalentSkillData, TeamSkillData);
+            OnDataChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// 合并属性技能和大师技能数据
+        /// </summary>
+        public static Dictionary<int, Dictionary<int, int>> Merge(
+            Dictionary<int, Dictionary<int, int>> talentData,
+            Dictionary<int, Dictionary<int, int>> teamData)
+        {
+            var merged = new Dictionary<int, Dictionary<int, int>>();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                merged[i] = new Dictionary<int, int>();
+
+                if (talentData != null && talentData.TryGetValue(i, out var talentParams))
+                {
+                    foreach (var kvp in talentParams)
+                    {
+                        merged[i][kvp.Key] = kvp.Value;
+                    }
+                }
+
+                if (teamData != null && teamData.TryGetValue(i, out var teamParams))
+                {
+                    foreach (var kvp in teamParams)
+                    {
+                        merged[i][kvp.Key] = merged[i].GetValueOrDefault(kvp.Key) + kvp.Value;
+                    }
+                }
+            }
+
+            return merged;
+        }
+
+        /// <summary>
+        /// 数据来源枚举
+        /// </summary>
+        public enum DataType
+        {
+            TalentSkill,
+            TeamSkill
+        }
+    }
 }

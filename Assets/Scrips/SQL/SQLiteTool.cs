@@ -328,6 +328,10 @@ namespace PCRCaculator.SQL
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
         public Dictionary<int, unit_talent> TalentDic { get; private set; }
+        public Dictionary<int, enemy_talent_weakness> EnemyTalentWeaknessDic { get; private set; }
+        public Dictionary<int, talent_weakness> TalentWeaknessDic { get; private set; }
+        public Dictionary<int, int[]> WeaknessDic { get; private set; }
+        public Dictionary<int, talentFormationData> TalentFormationDic { get; private set; }
         public Dictionary<int, EnemyData> Dic2 { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
@@ -344,8 +348,17 @@ namespace PCRCaculator.SQL
         public List<EReduction> eReductions { get; private set; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips { get; private set; }
         public Dictionary<int, List<ExtraEffectUnitGroup>> extraEffectUnitGroupDic { get; private set; }
+        public Dictionary<int, TalentSkillNode> TalentSkillNodeDic { get; private set; }
+        public Dictionary<int, team_skill_title> TalentSkillTitleDic { get; private set; }
+        // public Dictionary<int, talent_skill_enhance_level> TalentSkillEnhanceLevelDic { get; private set; }
+        public Dictionary<int, TalentSkillEnhanceData> TalentSkillEnhanceDataDic { get; private set; }
+        public Dictionary<int, param_type> paramTypeDic { get; private set; }
+        public Dictionary<int, TeamSkillNode> TeamSkillNodeDic { get; private set; }
+        public Dictionary<int, TeamSkillEnhanceData> TeamSkillEnhanceDataDic { get; private set; }
 
-        public Dictionary<(int, int), promotion_bonus> rbs {
+
+        public Dictionary<(int, int), promotion_bonus> rbs
+        {
             get;
             private set;
         }
@@ -355,7 +368,7 @@ namespace PCRCaculator.SQL
         private SQLData(IDataBaseManager mgr, bool readOnly) : base(mgr, readOnly)
         {
         }
-        
+
         public static SQLData OpenDB(IDataBaseManager mgr)
         {
             //_connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
@@ -403,7 +416,14 @@ namespace PCRCaculator.SQL
             {
                 waveDic = GetDatasDic<wave_group_data>(a => a.wave_group_id);
             });
-
+            var enemyTalentWeaknessTask = Task.Run(() =>
+            {
+                EnemyTalentWeaknessDic = GetDatasDic<enemy_talent_weakness>(a => a.enemy_id);
+            });
+            var talentWeaknessTask = Task.Run(() =>
+            {
+                TalentWeaknessDic = GetDatasDic<talent_weakness>(a => a.resist_id);
+            });
             var tasks = new List<Task>();
 
             tasks.Add(
@@ -413,6 +433,11 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
                     .ContinueWith(_ => Dic2 = GetEnemyDataDic()));
+            tasks.Add(
+                Task.WhenAll(enemyTalentWeaknessTask, talentWeaknessTask)
+                    .ContinueWith(_ => WeaknessDic = GetWeaknessDict()));
+            tasks.Add(
+                Task.Run(() =>  TalentFormationDic = GetTalentFormationData()));
             tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
@@ -432,8 +457,6 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => Pair = GetUnitStoryData()));
             tasks.Add(
-                Task.Run(() =>TalentDic = GetDatasDic<unit_talent>(a => a.unit_id)));
-            tasks.Add(
                 Task.Run(() => Dic10 = GetUnitName_cn()));
             tasks.Add(
                 Task.Run(() => Dic11 = GetSkillName_cn()));
@@ -444,8 +467,20 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => rbs = GetDatas<promotion_bonus>()
                     .ToDictionary(x => (x.unit_id, x.promotion_level), x => x)));
-
-
+            tasks.Add(
+                Task.Run(() => TalentDic = GetDatasDic<unit_talent>(a => a.unit_id)));
+            tasks.Add(
+                Task.Run(() => TalentSkillNodeDic = GetTalentSkillData()));
+            // tasks.Add(
+            // Task.Run(() => TalentSkillEnhanceLevelDic = GetDatasDic<talent_skill_enhance_level>(a => a.enhance_level_id)));
+            tasks.Add(
+                Task.Run(() => TalentSkillEnhanceDataDic = GetTalentSkillEnhanceData()));
+            tasks.Add(
+                Task.Run(() => paramTypeDic = GetDatasDic<param_type>(a => a.parameter_type)));
+            tasks.Add(
+                Task.Run(() => TeamSkillNodeDic = GetTeamSkillData()));
+            tasks.Add(
+                Task.Run(() => TeamSkillEnhanceDataDic = GetTeamSkillEnhanceData()));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();
@@ -491,7 +526,7 @@ namespace PCRCaculator.SQL
             }));
             return Task.WhenAll(tasks);
         }
-        
+
         private Dictionary<int, UnitRarityData> GetUnitRarityData()
         {
             var dic = new Dictionary<int, UnitRarityData>();
@@ -774,14 +809,14 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-        
+
         private Dictionary<int, unique_equip_enhance_rate[]> GetUEQData()
         {
             var dic = GetDatasDic<unit_unique_equipment>(
                 x => x.equip_id)?.ToDictionary(p => p.Key, p => p.Value as unit_unique_equip);
-            
-            dic = dic ?? GetDatasDic<unit_unique_equip>(x => x.equip_id); 
-            
+
+            dic = dic ?? GetDatasDic<unit_unique_equip>(x => x.equip_id);
+
             var basearr = GetDatasDic<unique_equipment_data>(x => x.equipment_id);
 
             return Combine(GetDatas<unique_equip_enhance_rate>(), GetDatas<unique_equipment_enhance_rate>())
@@ -798,9 +833,9 @@ namespace PCRCaculator.SQL
         {
             var dic = GetDatasDic<unit_unique_equipment>(
                 x => x.equip_id)?.ToDictionary(p => p.Key, p => p.Value as unit_unique_equip);
-            
-            dic = dic ?? GetDatasDic<unit_unique_equip>(x => x.equip_id); 
-            
+
+            dic = dic ?? GetDatasDic<unit_unique_equip>(x => x.equip_id);
+
             var basearr = GetDatasDic<unique_equipment_data>(x => x.equipment_id);
 
             return Combine(GetDatas<unique_equip_enhance_rate>(), GetDatas<unique_equipment_enhance_rate>())
@@ -911,5 +946,183 @@ namespace PCRCaculator.SQL
             return (unitStoryDic, unitStoryEffectDic, lovedict);
         }
 
+        public Dictionary<int, TalentSkillNode> GetTalentSkillData()
+        {
+            var node_list = GetDatas<talent_skill_node>();
+            var titleDic = GetDatas<team_skill_title>().ToDictionary(x => x.title_id, x => x.title_text);
+            var enhanceLevelDic = GetDatas<talent_skill_enhance_level>().ToDictionary(x => x.enhance_level_id);
+
+            return node_list.ToDictionary(
+                dd => dd.node_id,
+                dd =>
+                {
+                    int[] enhanceLevelIds = new[]
+                    {
+                        dd.enhance_level_id_1,
+                        dd.enhance_level_id_2,
+                        dd.enhance_level_id_3,
+                        dd.enhance_level_id_4,
+                        dd.enhance_level_id_5
+                    };
+
+                    List<int> EnhanceIds = enhanceLevelIds
+                        .Select(id => enhanceLevelDic.TryGetValue(id, out var data) ? data.enhance_id_1 : 0)
+                        .ToList();
+
+                    string titleText = titleDic.TryGetValue(dd.title_id, out var text) ? text : "未知";
+
+                    return new TalentSkillNode(
+                        dd.node_id,
+                        dd.page_num,
+                        dd.pos_x,
+                        dd.pos_y,
+                        new List<int> { dd.pre_node_1, dd.pre_node_2, dd.pre_node_3, dd.pre_node_4, dd.pre_node_5 },
+                        new List<int> { dd.enhance_level_id_1, dd.enhance_level_id_2, dd.enhance_level_id_3, dd.enhance_level_id_4, dd.enhance_level_id_5 },
+                        dd.icon_id,
+                        dd.title_id,
+                        titleText,
+                        EnhanceIds
+                    );
+                }
+            );
+        }
+        public Dictionary<int, TalentSkillEnhanceData> GetTalentSkillEnhanceData()
+        {
+            var enhanceList = GetDatas<talent_skill_enhance_data>();
+
+            return enhanceList.ToDictionary(
+                dd => dd.enhance_id,
+                dd =>
+                {
+                    var talentIds = new List<int>
+                    {
+                        dd.talent_id_1,
+                        dd.talent_id_2,
+                        dd.talent_id_3,
+                        dd.talent_id_4,
+                        dd.talent_id_5
+                    };
+
+                    talentIds = talentIds.Where(id => id != 0).ToList();
+
+                    return new TalentSkillEnhanceData(
+                        enhance_id: dd.enhance_id,
+                        talent_ids: talentIds,
+                        parameter_type: dd.parameter_type,
+                        enhance_value: dd.enhance_value
+                    );
+                }
+            );
+        }
+        public Dictionary<int, TeamSkillNode> GetTeamSkillData()
+        {
+            var node_list = GetDatas<team_skill_node>();
+            var titleDic = GetDatas<team_skill_title>().ToDictionary(x => x.title_id, x => x.title_text);
+            var enhanceLevelDic = GetDatas<team_skill_enhance_level>().ToDictionary(x => x.enhance_level_id);
+
+            return node_list.ToDictionary(
+                dd => dd.node_id,
+                dd =>
+                {
+                    int[] enhanceLevelIds = new[]
+                    {
+                        dd.enhance_level_id_1,
+                        dd.enhance_level_id_2,
+                        dd.enhance_level_id_3,
+                        dd.enhance_level_id_4,
+                        dd.enhance_level_id_5
+                    };
+
+                    List<int> EnhanceIds = enhanceLevelIds
+                        .Select(id => enhanceLevelDic.TryGetValue(id, out var data) ? data.enhance_id_1 : 0)
+                        .ToList();
+
+                    string titleText = titleDic.TryGetValue(dd.title_id, out var text) ? text : "未知";
+
+                    return new TeamSkillNode(
+                        dd.node_id,
+                        dd.pos_x,
+                        dd.pos_y,
+                        dd.pre_node_id,
+                        new List<int> { dd.enhance_level_id_1, dd.enhance_level_id_2, dd.enhance_level_id_3, dd.enhance_level_id_4, dd.enhance_level_id_5 },
+                        dd.icon_id,
+                        dd.noise_id,
+                        dd.title_id,
+                        titleText,
+                        EnhanceIds
+                    );
+                }
+            );
+        }
+        public Dictionary<int, TeamSkillEnhanceData> GetTeamSkillEnhanceData()
+        {
+            var enhanceList = GetDatas<team_skill_enhance_data>();
+
+            return enhanceList.ToDictionary(
+                dd => dd.enhance_id,
+                dd =>
+                {
+                    var talentIds = new List<int>
+                    {
+                        dd.talent_id_1,
+                        dd.talent_id_2,
+                        dd.talent_id_3,
+                        dd.talent_id_4,
+                        dd.talent_id_5
+                    };
+
+                    talentIds = talentIds.Where(id => id != 0).ToList();
+
+                    return new TeamSkillEnhanceData(
+                        enhance_id: dd.enhance_id,
+                        talent_ids: talentIds,
+                        parameter_type: dd.parameter_type,
+                        enhance_value: dd.enhance_value
+                    );
+                }
+            );
+        }
+        private Dictionary<int, int[]> GetWeaknessDict()
+        {
+            Dictionary<int, int[]> dict = new Dictionary<int, int[]>();
+
+            if (EnemyTalentWeaknessDic == null || TalentWeaknessDic == null)
+                return dict;
+
+            foreach (var etw in EnemyTalentWeaknessDic.Values)
+            {
+                int enemyId = etw.enemy_id;
+                int resistId = etw.resist_id;
+
+                if (TalentWeaknessDic.TryGetValue(resistId, out var tw))
+                {
+                    dict[enemyId] = new int[] {
+                        tw.talent_1,
+                        tw.talent_2,
+                        tw.talent_3,
+                        tw.talent_4,
+                        tw.talent_5
+                    };
+                }
+            }
+
+            return dict;
+        }
+
+        private Dictionary<int, talentFormationData> GetTalentFormationData()
+        {
+            var overwriteDic = GetDatasDic<talent_formation_overwrite>(a => a.id);
+            var bonusDic = GetDatasDic<talent_formation_bonus>(a => a.formation_bonus_id);
+
+            if (overwriteDic == null || bonusDic == null)
+                return null;
+
+            var result = new Dictionary<int, talentFormationData>();
+            foreach (var kvp in overwriteDic)
+            {
+                result[kvp.Key] = new talentFormationData(kvp.Value, bonusDic);
+            }
+            return result;
+        }
     }
 }
