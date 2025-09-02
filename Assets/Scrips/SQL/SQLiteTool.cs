@@ -327,7 +327,7 @@ namespace PCRCaculator.SQL
 
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
-        public Dictionary<int, unit_talent> TalentDic { get; private set; }
+        public Dictionary<int, unit_talent[]> TalentDic { get; private set; }
         public Dictionary<int, enemy_talent_weakness> EnemyTalentWeaknessDic { get; private set; }
         public Dictionary<int, talent_weakness> TalentWeaknessDic { get; private set; }
         public Dictionary<int, int[]> WeaknessDic { get; private set; }
@@ -468,7 +468,9 @@ namespace PCRCaculator.SQL
                 Task.Run(() => rbs = GetDatas<promotion_bonus>()
                     .ToDictionary(x => (x.unit_id, x.promotion_level), x => x)));
             tasks.Add(
-                Task.Run(() => TalentDic = GetDatasDic<unit_talent>(a => a.unit_id)));
+                Task.Run(() => TalentDic = GetDatas<unit_talent>()
+                        .GroupBy(x => x.unit_id)
+                        .ToDictionary(g => g.Key, g => g.ToArray())));
             tasks.Add(
                 Task.Run(() => TalentSkillNodeDic = GetTalentSkillData()));
             // tasks.Add(
@@ -550,14 +552,13 @@ namespace PCRCaculator.SQL
                 }
                 UnitRankData rankData = new UnitRankData(eq, datas1);
                 UnitDetailData detailData;
-                int talent_id = -1;
+                List<int> talent_id = new List<int>();
                 try
                 {
                     unit_data t4 = unitDic[pair.Key];
                     if (TalentDic != null)
                     {
-                        talent_id = TalentDic[pair.Key].talent_id;
-
+                        talent_id = TalentDic[pair.Key].Select(x => x.talent_id).ToList();
                     }
                     detailData = new UnitDetailData(t4.unit_id,
                         t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,

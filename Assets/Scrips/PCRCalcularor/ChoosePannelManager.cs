@@ -592,7 +592,7 @@ namespace PCRCaculator
             MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData);
             if (filterToggle.isOn)
             {
-                int talent_id =  rarityData.detailData.talent_id;
+                int talent_id = rarityData.detailData.talent_id.First();
                 bool hasTalent = talent_id >= 0 && talentToggles[talent_id].isOn || talentToggles[0].isOn;
                 return hasTalent && search;
             }

@@ -2190,8 +2190,6 @@ this.updateCurColor();
           BaseData additional = null,
           BaseData exOverride = null)
         {
-            teamEnhanceParameter = _teamEnhanceParameter;
-            teamEnhanceParameter.UpdateCombinedData();
             ToadDatas = new List<ToadData>();
             transformCache = transform;
             m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;
@@ -2393,6 +2391,10 @@ this.updateCurColor();
                 battleManager.KAOHIMNBPOK++;
                 isNotPartsBossReady = true;
             }
+            else
+            {
+                BattleManager.Instance.SetPartsTalentWeakness(this.enemyId, DummyPartsData);
+            }
             castTimeDictionary = new Dictionary<int, float>();
             attackPatternDictionary = new Dictionary<int, List<int>>();
             attackPatternLoopDictionary = new Dictionary<int, List<int>>();
@@ -2494,6 +2496,9 @@ this.updateCurColor();
             }
 
             baseDataEX = exOverride ?? baseDataEX;
+
+            if (MainManager.Instance.UnitRarityDic.ContainsKey(UnitId))
+                TalentIds = MainManager.Instance.UnitRarityDic[UnitId]?.detailData?.talent_id ?? new List<int>();
 
             if (additional != null) baseData += additional;
 
@@ -2726,9 +2731,11 @@ this.updateCurColor();
             }
 
             // TODO where is position?
-            SetAdditiveAtkForTalentLevel(_teamEnhanceParameter);
-            SetTalentEnhance(_teamEnhanceParameter);
-            SetRoleEnhance(_teamEnhanceParameter);
+            var teamEnhanceParameter = _teamEnhanceParameter;
+            teamEnhanceParameter?.UpdateCombinedData();
+            SetAdditiveAtkForTalentLevel(teamEnhanceParameter);
+            SetTalentEnhance(teamEnhanceParameter);
+            SetRoleEnhance(teamEnhanceParameter);
         }
 
         public int UnitIdForActionPattern
@@ -2809,9 +2816,8 @@ this.updateCurColor();
                 }
             }
         }
-        private TeamEnhanceParameter teamEnhanceParameter;
-        private Dictionary<int, Dictionary<eParamType, int>> talentBuffParameter; // 0x48
-        private Dictionary<eParamType, long> roleBuffParameter; // 0x48
+        private Dictionary<eParamType, long> talentBuffParameter = new Dictionary<eParamType, long>();
+        private Dictionary<eParamType, long> roleBuffParameter = new Dictionary<eParamType, long>(); 
 
 
         // RVA: 0x2851D88 Offset: 0x2851D88 VA: 0x2851D88
@@ -2820,22 +2826,25 @@ this.updateCurColor();
             if (_teamEnhanceParameter == null || this?.TalentIds == null || this.TalentIds.Count < 1)
                 return;
 
-            talentBuffParameter = new Dictionary<int, Dictionary<eParamType, int>>();
-
             foreach (var talentId in this.TalentIds)
             {
                 var talentEnhance = _teamEnhanceParameter.GetTalentEnhance(talentId);
                 if (talentEnhance == null)
                     continue;
 
-                talentBuffParameter[talentId] = new Dictionary<eParamType, int>();
-
                 foreach (var kvp in talentEnhance)
                 {
                     var paramType = kvp.Key;
                     var enhanceValue = kvp.Value;
 
-                    talentBuffParameter[talentId][paramType] = enhanceValue;
+                    if (talentBuffParameter.TryGetValue(paramType, out long currentValue))
+                    {
+                        talentBuffParameter[paramType] = currentValue + enhanceValue;
+                    }
+                    else
+                    {
+                        talentBuffParameter[paramType] = enhanceValue;
+                    }
                 }
             }
         }
@@ -2927,18 +2936,15 @@ this.updateCurColor();
         
             bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
 
-            foreach (KeyValuePair<int, Dictionary<eParamType, int>> pair in teamEnhanceParameter.talentBuffParameter)
+            foreach (KeyValuePair<eParamType, long> pair in talentBuffParameter)
             {
-                foreach (KeyValuePair<eParamType, int> innerPair in pair.Value)
-                {
-                    ApplyEnhanceValue(
-                        innerPair.Key,    // eParamType 类型
-                        innerPair.Value,  // int 类型，会自动转换为 long
-                        _first,
-                        isClanBattleOrSekaiEnemy,
-                        false
-                    );
-                }
+                ApplyEnhanceValue(
+                    pair.Key,    // eParamType 类型
+                    pair.Value,  // int 类型，会自动转换为 long
+                    _first,
+                    isClanBattleOrSekaiEnemy,
+                    false
+                );
             }
 
         }

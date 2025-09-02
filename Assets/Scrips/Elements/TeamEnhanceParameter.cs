@@ -199,7 +199,7 @@ namespace Elements
             if (talentLevelParameter == null || !talentLevelParameter.ContainsKey(talentId))
                 return 0;
 
-            return talentLevelParameter[talentId];
+            return talentLevelParameter[talentId] * 20;
         }
 
         public Dictionary<eParamType, int> GetRoleEnhance(int roleId, UnitCtrl owner)

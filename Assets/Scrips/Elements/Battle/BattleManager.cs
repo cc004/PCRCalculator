@@ -3887,12 +3887,7 @@ namespace Elements.Battle
             {
                 yield return null;
             }
-            calcTalentFormationBonus();
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
-            foreach(var unit in UnitList)
-            {
-                unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
-            }
             yield return battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
@@ -3909,6 +3904,11 @@ namespace Elements.Battle
             battleManager.setupEnemyProcess();
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
             if (IsBossBattle) { BossUnit = EnemyList[0]; }
+            calcTalentFormationBonus();
+            foreach(var unit in UnitList)
+            {
+                unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
+            }
             // ISSUE: explicit non-virtual call
             for (int index = 0; index < (battleManager.EnemyList).Count; ++index)
             {
@@ -5083,7 +5083,7 @@ namespace Elements.Battle
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
-                unitCtrl.Initialize(parameter,unitData_my, MainManager.Instance.TeamEnhanceData, flag, true, false,
+                unitCtrl.Initialize(parameter,unitData_my, flag ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?
