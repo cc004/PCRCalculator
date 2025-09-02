@@ -9343,14 +9343,14 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
-                createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
-                NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
+                createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, num6);
+                NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, num6, BattleHeaderController.CurrentFrameCount);
 
             }
 
-            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
+            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((double)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, num6, _critical);
             OnDamageForLoopRepeat.Call(num6);
             OnDamageForDivision.Call(_byAttack, Math.Min(hp, num6), _critical);
@@ -9692,7 +9692,7 @@ this.updateCurColor();
           bool _hasEffect,
           Skill _skill,
           bool _critical,
-          int _damage)
+          long _damage)
         {
             if (((!(battleManager != null) ? 0 : (_damage >= 0 ? 1 : 0)) & (_hasEffect ? 1 : 0)) == 0)
                 return;

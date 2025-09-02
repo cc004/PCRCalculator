@@ -7,6 +7,7 @@ using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
 using Random = System.Random;
+using Elements;
 
 namespace Elements
 {
@@ -104,24 +105,24 @@ namespace Elements
             if (a.pure)
             {
                 if (b.pure)
-                    return new DoubleWithEx(op(a.value, b.value));
+                    return op(a.value, b.value);
                 return new DoubleWithEx(op(vala, b.value), op(vala, b.avg),
-                    root: hash => op(vala, b.Emulate(hash)), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                    root: hash => op(vala, b.Emulate(hash)), min: xs.Min(), max: xs.Max())
                 {
-                    op = ops, op1 = a, op2 = b
+                    op = ops, op1 = vala, op2 = b
                 };
             }
 
             if (b.pure)
                 return new DoubleWithEx(op(a.value, valb), op(a.avg, valb),
-                    root: hash => op(a.Emulate(hash), valb), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                    root: hash => op(a.Emulate(hash), valb), min: xs.Min(), max: xs.Max())
                 {
                     op = ops,
                     op1 = a,
-                    op2 = b
+                    op2 = valb
                 };
             return new DoubleWithEx(op(a.value, b.value), op(a.avg, b.avg),
-                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: xs.Min(), max: xs.Max())
             {
                 op = ops,
                 op1 = a,
@@ -130,7 +131,7 @@ namespace Elements
         }
 
         public double Expect => avg;
-        public float Expected(int N)
+        public double Expected(int N)
         {
             double s = 0;
             for (int i = 0; i < N; ++i)
@@ -138,9 +139,9 @@ namespace Elements
                 SetState(rndd.Next());
                 s += Emulate(rndd.Next());
             }
-            return (float)(s / N);
+            return s / N;
         }
-        public float Stddev
+        public double Stddev
         {
             get
             {
@@ -153,7 +154,7 @@ namespace Elements
                     s += x;
                     s2 += x * x;
                 }
-                return (float)Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
+                return Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
             }
         }
         public double Probability(Func<double, bool> predict)
@@ -165,7 +166,7 @@ namespace Elements
                 SetState(rndd.Next());
                 if (predict(Emulate(rndd.Next()))) ++s;
             }
-            return (double)s / N;
+            return s / N;
         }
 
         public static implicit operator double(DoubleWithEx self) => self.value;
@@ -230,7 +231,10 @@ namespace Elements
 
         public DoubleWithEx ZeroCapForHp()
         {
-            return new DoubleWithEx(value >= 0.0 ? value : 0.0, avg, min, max, root);
+            return new DoubleWithEx(value >= 0.0 ? value : 0.0, avg, min, max, root)
+            {
+                op = op, op1 = op1, op2 = op2, rnd = rnd, select = select, id = id
+            };
         }
         
         private int id;

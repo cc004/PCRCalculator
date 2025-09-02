@@ -104,24 +104,24 @@ namespace Elements
             if (a.pure)
             {
                 if (b.pure)
-                    return new LongWithEx(op(a.value, b.value));
+                    return op(a.value, b.value);
                 return new LongWithEx(op(vala, b.value), op(vala, b.avg),
-                    root: hash => op(vala, b.Emulate(hash)), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                    root: hash => op(vala, b.Emulate(hash)), min: xs.Min(), max: xs.Max())
                 {
-                    op = ops, op1 = a, op2 = b
+                    op = ops, op1 = vala, op2 = b
                 };
             }
 
             if (b.pure)
                 return new LongWithEx(op(a.value, valb), op(a.avg, valb),
-                    root: hash => op(a.Emulate(hash), valb), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                    root: hash => op(a.Emulate(hash), valb), min: xs.Min(), max: xs.Max())
                 {
                     op = ops,
                     op1 = a,
-                    op2 = b
+                    op2 = valb
                 };
             return new LongWithEx(op(a.value, b.value), op(a.avg, b.avg),
-                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: xs.Min(), max: xs.Max())
             {
                 op = ops,
                 op1 = a,
@@ -153,7 +153,7 @@ namespace Elements
                     s += x;
                     s2 += x * x;
                 }
-                return (long)Math.Sqrt((s2 - s * s / N) / N);
+                return (long)Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
             }
         }
         public long Probability(Func<long, bool> predict)
@@ -187,7 +187,10 @@ namespace Elements
         }
 
         public override string ToString() => pure ? ((long)this).ToString() : $"{(long)this}[{(long)Expect}]";
+        public LongWithEx Floor() => Select(x => x, "floor");
+        public LongWithEx Ceil() => Select(x => x, "ceil");
         public LongWithEx Abs() => Select(Math.Abs, "abs");
+
         public int CompareTo(LongWithEx other) => ((long)this).CompareTo(other);
         public static LongWithEx operator +(LongWithEx a, LongWithEx b) => Op(a, b, (x, y) => x + y, "add");
         public static LongWithEx operator -(LongWithEx a, LongWithEx b) => Op(a, b, (x, y) => x - y, "sub");
@@ -198,7 +201,7 @@ namespace Elements
             return Op(a, b, (x, y) => x * y, "mul");
         }
 
-        public static LongWithEx operator /(LongWithEx a, LongWithEx b) => Op(a, b, (x, y) => x / y, "div");
+        public static LongWithEx operator /(LongWithEx a, LongWithEx b) => Op(a, b, (x, y) => x / y, "div").Floor();
 
         public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
         public static bool operator !=(LongWithEx a, LongWithEx b) => !a.Equals(b);
@@ -231,7 +234,10 @@ namespace Elements
 
         public LongWithEx ZeroCapForHp()
         {
-            return new LongWithEx(value >= 0 ? value : 0, avg, min, max, root);
+            return new LongWithEx(value >= 0 ? value : 0, avg, min, max, root)
+            {
+                op = op, op1 = op1, op2 = op2, rnd = rnd, select = select, id = id
+            };
         }
         
         private int id;

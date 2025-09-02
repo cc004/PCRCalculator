@@ -78,7 +78,7 @@ namespace PCRCaculator.Guild
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
         private long totalDamage;
         private long totalDamageCriEX;
-        private DoubleWithEx totalDamageExcept = 0;
+        private LongWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
         private int backTime;
 
@@ -144,7 +144,7 @@ namespace PCRCaculator.Guild
 
         public long GetTotalDamageExpect()
         {
-            return (long)totalDamageExcept.Expect;
+            return totalDamageExcept.Expect;
         }
 
         public void Initialize(List<UnitCtrl> players, UnitCtrl boss)
@@ -368,7 +368,7 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic[unitid].Remove(changeData);
             }
         }
-        public void AppendChangeHP(int unitid, float currentHP, int hp, int damage, int frame, string describe, UnitCtrl source)
+        public void AppendChangeHP(int unitid, float currentHP, int hp, long damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             var sourceId = source?.UnitId ?? unitid;
@@ -431,7 +431,7 @@ namespace PCRCaculator.Guild
                 }
             }
         }
-        public void AppendGetDamage(int unitid, int sourceUnitid, float damage, int currentFrame)
+        public void AppendGetDamage(int unitid, int sourceUnitid, long damage, int currentFrame)
         {
             if (!playerUnitDamageDic.ContainsKey(sourceUnitid))
             {
@@ -730,7 +730,7 @@ namespace PCRCaculator.Guild
             }
         }
 
-        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, DoubleWithEx exvalue)
+        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, LongWithEx exvalue)
         {
             totalDamage += value;
             totalDamageExcept += exvalue;
@@ -811,9 +811,9 @@ namespace PCRCaculator.Guild
             }
 
             var n = GuildManager.StaticsettingData.n1;
-            expectedDamage = (int)totalDamageExcept.Expected(n);
+            expectedDamage = totalDamageExcept.Expected(n);
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(long)totalDamageExcept.Stddev}</color>";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
             {
                 detail = $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
@@ -832,7 +832,7 @@ namespace PCRCaculator.Guild
             basedmg.text = totalDamageCriEX.ToString();
         }
 
-        public int expectedDamage;
+        public long expectedDamage;
         public string detail;
         private void ResizePrefabs(bool change)
         {
@@ -992,7 +992,7 @@ namespace PCRCaculator.Guild
                             {
                                 detail.Damage = changeData.damage;
                                 detail.Critical = changeData.describe.Contains("暴击");
-                                int totalDamage = 0;
+                                long totalDamage = 0;
                                 foreach (var data in allUnitHPDic[bossId])
                                 {
                                     if (data.id == changeData.id)
@@ -1080,7 +1080,7 @@ namespace PCRCaculator.Guild
             return new OnceResultData
             {
                 id = id,
-                exceptDamage = (long)totalDamageExcept.Expect,
+                exceptDamage = totalDamageExcept.Expect,
                 criticalEX = totalDamageCriEX,
                 currentDamage = totalDamage,
                 randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,
@@ -1201,7 +1201,7 @@ namespace PCRCaculator.Guild
                 var dname2 = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
                 var seedset = new Dictionary<string, int>();
-                var dmg = new List<double>();
+                var dmg = new List<long>();
                 var probs = new Dictionary<string, ProbEvent>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
                 {
@@ -1654,8 +1654,8 @@ namespace PCRCaculator.Guild
         float IValue.yValue => (float)(yValue / YScale);
 
         public int hp;
-        public int damage;
-        public int expectedDamage;
+        public long damage;
+        public long expectedDamage;
         public string describe;
         public int id;
         public int source;
@@ -1815,10 +1815,10 @@ namespace PCRCaculator.Guild
         public bool isBossUB;
         public UnitData unitData;
         public int UBTime;
-        public int Damage;
+        public long Damage;
         public bool Critical;
         public string description;
-        public int totalDamage;
+        public long totalDamage;
     }
     public class RandomData
     {

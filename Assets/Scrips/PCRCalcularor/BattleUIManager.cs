@@ -681,7 +681,7 @@ namespace PCRCaculator.Battle
             }
             return buffDebuffIcons[0];
         }
-        public void SetDamageNumber(Vector3 pos,int value, eDamageType damageType, eDamageEffectType effectType, bool isCritical = false, bool isTotal = false)
+        public void SetDamageNumber(Vector3 pos, long value, eDamageType damageType, eDamageEffectType effectType, bool isCritical = false, bool isTotal = false)
         {
             string valuestr = value.ToString();
             List<Sprite> numbers = new List<Sprite>();
