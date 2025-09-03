@@ -2408,12 +2408,12 @@ namespace PCRCaculator
         public int pos_x { get; set; }
         public int pos_y { get; set; }
         public List<int> pre_node_ids { get; set; }// 前置节点数组
-        public List<int> enhance_level_ids { get; set; } // 强化等级ID数组
+        public Dictionary<int, int[]> enhance_level_ids { get; set; } // 强化等级ID字典，键为enhance_level_id，值为对应的enhance_id数组
         public int icon_id { get; set; }
         public int title_id { get; set; }
         public string title_text { get; set; }
-        public List<int> enhance_ids { get; set; } // 强化ID数组
-        public TalentSkillNode(int nodeId, int pageNum, int posX, int posY, List<int> preNodes, List<int> enhanceLevelIds, int iconId, int titleId, string titleText, List<int> enhancelIds)
+
+        public TalentSkillNode(int nodeId, int pageNum, int posX, int posY, List<int> preNodes, Dictionary<int, int[]> enhanceLevelIds, int iconId, int titleId, string titleText)
         {
             node_id = nodeId;
             page_num = pageNum;
@@ -2424,7 +2424,6 @@ namespace PCRCaculator
             icon_id = iconId;
             title_id = titleId;
             title_text = titleText;
-            enhance_ids = enhancelIds;
         }
     }
     [Serializable]
@@ -2450,13 +2449,13 @@ namespace PCRCaculator
         public int pos_x { get; set; }
         public int pos_y { get; set; }
         public int pre_node_id { get; set; }
-        public List<int> enhance_level_ids { get; set; } // 强化等级ID数组
+        public Dictionary<int, int[]> enhance_level_ids { get; set; } // 强化等级ID字典，键为enhance_level_id，值为对应的enhance_id数组
         public int icon_id { get; set; }
         public int noise_id { get; set; }
         public int title_id { get; set; }
         public string title_text { get; set; }
         public List<int> enhance_ids { get; set; } // 强化ID数组
-        public TeamSkillNode(int nodeId, int posX, int posY, int preNode, List<int> enhanceLevelIds, int iconId, int noiseId, int titleId, string titleText, List<int> enhancelIds)
+        public TeamSkillNode(int nodeId, int posX, int posY, int preNode, Dictionary<int, int[]> enhanceLevelIds, int iconId, int noiseId, int titleId, string titleText)
         {
             node_id = nodeId;
             pos_x = posX;
@@ -2467,7 +2466,6 @@ namespace PCRCaculator
             noise_id = noiseId;
             title_id = titleId;
             title_text = titleText;
-            enhance_ids = enhancelIds;
         }
     }
 

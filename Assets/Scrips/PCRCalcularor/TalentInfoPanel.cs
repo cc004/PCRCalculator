@@ -82,6 +82,7 @@ namespace PCRCaculator
             CreateRow("属性攻击力", talentLevelStrings);
 
             // 获取所有使用的参数类型
+            // 获取所有使用的参数类型并排序
             var usedParamTypes = new HashSet<eParamType>();
             foreach (var levelDict in teamEnhanceData.talentBuffParameter.Values)
             {
@@ -89,41 +90,39 @@ namespace PCRCaculator
                     usedParamTypes.Add(paramType);
             }
 
+            // 对参数类型进行排序
+            var sortedParamTypes = usedParamTypes.OrderBy(p => p);
+
             // 为每个参数类型创建一行
-            foreach (int paramTypeValue in usedParamTypes.Select(v => (int)v))
+            foreach (eParamType paramType in sortedParamTypes)
             {
-                // 将int转换为eParamType枚举
-                if (Enum.IsDefined(typeof(eParamType), paramTypeValue))
+                string[] values = new string[5];
+                for (int i = 1; i <= 5; i++)
                 {
-                    eParamType paramType = (eParamType)paramTypeValue;
-                    string[] values = new string[5];
-                    for (int i = 1; i <= 5; i++)
+                    int rawValue = teamEnhanceData.talentBuffParameter.GetValueOrDefault(i)?
+                        .GetValueOrDefault(paramType) ?? 0;
+
+                    // 获取参数配置并应用百分比格式
+                    if (paramTypeDict.TryGetValue((int)paramType, out var paramConfig))
                     {
-                        int rawValue = teamEnhanceData.talentBuffParameter.GetValueOrDefault(i)?
-                            .GetValueOrDefault(paramType) ?? 0;
-
-                        // 获取参数配置并应用百分比格式
-                        if (paramTypeDict.TryGetValue((int)paramType, out var paramConfig))
-                        {
-                            float formattedValue;
-                            if (paramConfig.ratio > 0)
-                                formattedValue = (float)rawValue / paramConfig.ratio;
-                            else
-                                formattedValue = rawValue;
-
-                            if (paramConfig.is_percentage == 1)
-                                values[i - 1] = $"{formattedValue * 100}%";
-                            else
-                                values[i - 1] = formattedValue.ToString("F0");
-                        }
+                        float formattedValue;
+                        if (paramConfig.ratio > 0)
+                            formattedValue = (float)rawValue / paramConfig.ratio;
                         else
-                        {
-                            values[i - 1] = rawValue.ToString();
-                        }
+                            formattedValue = rawValue;
+
+                        if (paramConfig.is_percentage == 1)
+                            values[i - 1] = $"{formattedValue * 100}%";
+                        else
+                            values[i - 1] = formattedValue.ToString("F0");
                     }
-                    // 使用GetDescription()获取参数名称
-                    CreateRow(paramType.GetDescription(), values);
+                    else
+                    {
+                        values[i - 1] = rawValue.ToString();
+                    }
                 }
+                // 使用GetDescription()获取参数名称
+                CreateRow(paramType.GetDescription(), values);
             }
         }
 

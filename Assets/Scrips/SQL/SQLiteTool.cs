@@ -957,18 +957,26 @@ namespace PCRCaculator.SQL
                 dd => dd.node_id,
                 dd =>
                 {
-                    int[] enhanceLevelIds = new[]
+                    var enhanceLevelDict = new[]
                     {
                         dd.enhance_level_id_1,
                         dd.enhance_level_id_2,
                         dd.enhance_level_id_3,
                         dd.enhance_level_id_4,
                         dd.enhance_level_id_5
-                    };
-
-                    List<int> EnhanceIds = enhanceLevelIds
-                        .Select(id => enhanceLevelDic.TryGetValue(id, out var data) ? data.enhance_id_1 : 0)
-                        .ToList();
+                    }
+                    .Where(id => id != 0 && enhanceLevelDic.TryGetValue(id, out var data))
+                    .ToDictionary(
+                        id => id,
+                        id => new[]
+                        {
+                            enhanceLevelDic[id].enhance_id_1,
+                            enhanceLevelDic[id].enhance_id_2,
+                            enhanceLevelDic[id].enhance_id_3,
+                            enhanceLevelDic[id].enhance_id_4,
+                            enhanceLevelDic[id].enhance_id_5
+                        }.Where(x => x != 0).ToArray()
+                    );
 
                     string titleText = titleDic.TryGetValue(dd.title_id, out var text) ? text : "未知";
 
@@ -978,11 +986,10 @@ namespace PCRCaculator.SQL
                         dd.pos_x,
                         dd.pos_y,
                         new List<int> { dd.pre_node_1, dd.pre_node_2, dd.pre_node_3, dd.pre_node_4, dd.pre_node_5 },
-                        new List<int> { dd.enhance_level_id_1, dd.enhance_level_id_2, dd.enhance_level_id_3, dd.enhance_level_id_4, dd.enhance_level_id_5 },
+                        enhanceLevelDict,
                         dd.icon_id,
                         dd.title_id,
-                        titleText,
-                        EnhanceIds
+                        titleText
                     );
                 }
             );
@@ -1025,18 +1032,26 @@ namespace PCRCaculator.SQL
                 dd => dd.node_id,
                 dd =>
                 {
-                    int[] enhanceLevelIds = new[]
+                    var enhanceLevelDict = new[]
                     {
                         dd.enhance_level_id_1,
                         dd.enhance_level_id_2,
                         dd.enhance_level_id_3,
                         dd.enhance_level_id_4,
                         dd.enhance_level_id_5
-                    };
-
-                    List<int> EnhanceIds = enhanceLevelIds
-                        .Select(id => enhanceLevelDic.TryGetValue(id, out var data) ? data.enhance_id_1 : 0)
-                        .ToList();
+                    }
+                    .Where(id => id != 0 && enhanceLevelDic.TryGetValue(id, out var data))
+                    .ToDictionary(
+                        id => id,
+                        id => new[]
+                        {
+                            enhanceLevelDic[id].enhance_id_1,
+                            enhanceLevelDic[id].enhance_id_2,
+                            enhanceLevelDic[id].enhance_id_3,
+                            enhanceLevelDic[id].enhance_id_4,
+                            enhanceLevelDic[id].enhance_id_5
+                        }.Where(x => x != 0).ToArray()
+                    );
 
                     string titleText = titleDic.TryGetValue(dd.title_id, out var text) ? text : "未知";
 
@@ -1045,12 +1060,11 @@ namespace PCRCaculator.SQL
                         dd.pos_x,
                         dd.pos_y,
                         dd.pre_node_id,
-                        new List<int> { dd.enhance_level_id_1, dd.enhance_level_id_2, dd.enhance_level_id_3, dd.enhance_level_id_4, dd.enhance_level_id_5 },
+                        enhanceLevelDict,
                         dd.icon_id,
                         dd.noise_id,
                         dd.title_id,
-                        titleText,
-                        EnhanceIds
+                        titleText
                     );
                 }
             );

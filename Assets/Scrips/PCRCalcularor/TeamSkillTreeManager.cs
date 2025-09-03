@@ -277,12 +277,12 @@ namespace PCRCaculator
                 int currentLevel = GetSkillLevel(nodeData.node_id);
                 int maxLevel = GetMaxSkillLevel(nodeData.node_id);
                 string title_text = nodeData.title_text;
-                enhanceDataDict.TryGetValue(nodeData.enhance_ids[0], out var enhanceData);
+                int firstEnhanceLevelId = nodeData.enhance_level_ids.Keys.FirstOrDefault();
+                enhanceDataDict.TryGetValue(nodeData.enhance_level_ids[firstEnhanceLevelId][0], out var enhanceData);
                 string TalentType = GetElementTypeText(enhanceData.talent_ids);
-                int enhanceId = currentLevel == 0 ? nodeData.enhance_ids[0] : nodeData.enhance_ids[currentLevel - 1];
+                int enhanceId = currentLevel == 0 ? nodeData.enhance_level_ids[firstEnhanceLevelId][0] : nodeData.enhance_level_ids[firstEnhanceLevelId][0];
                 string enhanceValue = currentLevel == 0 ? "0%" : GetEnhanceValueText(enhanceId);
                 nodeUI.SetNodeData(nodeData.node_id, GetSkillIcon(nodeData.node_id), currentLevel, maxLevel, TalentType, title_text, enhanceValue);
-
                 // 添加到字典中
                 nodeUIDict[nodeData.node_id] = nodeUI;
             }
@@ -299,13 +299,7 @@ namespace PCRCaculator
             if (nodeId == 0 || !nodeDataDict.TryGetValue(nodeId, out TeamSkillNode node) || node.enhance_level_ids == null)
                 return 0;
 
-            for (int i = node.enhance_level_ids.Count - 1; i >= 0; i--)
-            {
-                if (node.enhance_level_ids[i] > 0)
-                    return i + 1;
-            }
-
-            return 0;
+            return node.enhance_level_ids.Count;
         }
 
         public void EnhanceSkill(int nodeId, int newLevel)
@@ -352,7 +346,22 @@ namespace PCRCaculator
                 int currentLevel = GetSkillLevel(nodeId);
                 int maxLevel = GetMaxSkillLevel(nodeId);
                 nodeDataDict.TryGetValue(nodeId, out var nodeData);
-                int enhanceId = currentLevel == 0 ? nodeData.enhance_ids[0] : nodeData.enhance_ids[currentLevel - 1];
+                int firstEnhanceLevelId = nodeData.enhance_level_ids.Keys.FirstOrDefault();
+                int enhanceId = 0;
+
+                if (nodeData.enhance_level_ids != null && nodeData.enhance_level_ids.Count > 0)
+                {
+                    var sortedLevelIds = nodeData.enhance_level_ids
+                        .OrderBy(pair => pair.Key)
+                        .ToList();
+
+                    int levelIndex = currentLevel <= 0
+                        ? 0
+                        : Mathf.Clamp(currentLevel - 1, 0, sortedLevelIds.Count - 1);
+
+                    int[] enhanceIds = sortedLevelIds[levelIndex].Value;
+                    enhanceId = enhanceIds.Length > 0 ? enhanceIds[0] : 0;
+                }
                 string enhanceValue = currentLevel == 0 ? "0%" : GetEnhanceValueText(enhanceId);
                 nodeUI.SetNodeData(currentLevel, maxLevel, enhanceValue);
                 nodeUI.UpdateUIState(IsNodeUnlocked(nodeId), currentLevel > 0);
@@ -403,11 +412,25 @@ namespace PCRCaculator
                 if (level <= 0 || !nodeDataDict.TryGetValue(nodeId, out var nodeData))
                     continue;
 
-                // 确保 enhance_ids 存在且长度足够
-                if (nodeData.enhance_ids != null && nodeData.enhance_ids.Count >= level)
+                // 将 enhance_level_ids 转换为有序列表
+                var sortedEnhanceLevelIds = nodeData.enhance_level_ids.OrderBy(kvp => kvp.Key).ToList();
+
+                // 检查是否包含第 (level-1) 个元素
+                if (sortedEnhanceLevelIds.Count >= level)
                 {
-                    int enhanceId = nodeData.enhance_ids[level - 1]; // level从1开始计数
-                    activatedEnhanceIds.Add(enhanceId);
+                    // 获取第 (level-1) 个键值对
+                    var kvp = sortedEnhanceLevelIds[level - 1];
+                    // kvp.Value 是对应的 enhance_id 数组
+                    int[] enhanceIds = kvp.Value;
+
+                    // 将该数组中所有元素添加到激活列表中
+                    foreach (int enhanceId in enhanceIds)
+                    {
+                        if (enhanceId > 0) // 确保 enhanceId 有效
+                        {
+                            activatedEnhanceIds.Add(enhanceId);
+                        }
+                    }
                 }
             }
 
