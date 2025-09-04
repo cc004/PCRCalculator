@@ -105,6 +105,11 @@ namespace Elements
       return Approximately(_num, num1) ? num1 : (long)_num;
     }
 
+    public static LongWithEx DoubleToLong(DoubleWithEx _num)
+    {
+      return _num.ToLongWithEx();
+    }
+
     public static int FloatToIntReverseTruncate(float _num)
     {
       int num = (int)_num;

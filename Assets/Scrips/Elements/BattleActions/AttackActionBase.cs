@@ -327,13 +327,13 @@ namespace Elements
         }
         private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
         {
-            var num = _valueDictionary[eValueNumber.VALUE_1] + _atk * _valueDictionary[eValueNumber.VALUE_3];
+            var num = _valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3];
             num *= _target.Owner.GetDebuffDamageUpValue();
             if (!_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 if (_target.Owner.IsOther == _source.IsOther ||
                     _source.AccumulativeDamageSourceDataDictionary.Count == 0)
-                    return BattleUtil.DoubleToInt(num);
+                    return BattleUtil.DoubleToLong(num);
             }
             LongWithEx num3 = 0;
             for (int i = 0; i < base.ActionExecTimeList.Count; i++)
@@ -361,7 +361,7 @@ namespace Elements
 
         private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
         {
-            LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + _atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+            LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 num += value.CalcAdditionalDamage(value.DamagedCount, num);

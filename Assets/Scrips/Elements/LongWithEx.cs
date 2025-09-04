@@ -85,6 +85,17 @@ namespace Elements
             };
         }
 
+        public DoubleWithEx Select(Func<long, double> selector, string select)
+        {
+            if (pure) return selector(value);
+            double a = selector(min), b = selector(max);
+            return new DoubleWithEx(selector(value), selector(avg), root: hash => selector(Emulate(hash)),
+                min: Math.Min(a, b), max: Math.Max(a, b))
+            {
+                select = select, op1 = this
+            };
+        }
+
         private static LongWithEx Default = new LongWithEx(0);
 
         private static LongWithEx Op(LongWithEx a, LongWithEx b,
@@ -169,11 +180,16 @@ namespace Elements
         }
 
         public static implicit operator long(LongWithEx self) => self.value;
+
         public static implicit operator LongWithEx(long x) =>
             new LongWithEx(x, x, x, x, null);
+
         public static implicit operator DoubleWithEx(LongWithEx x) =>
             new DoubleWithEx((double)x.value, (double)x.avg, (double)x.min, (double)x.max,
                 x.root == null ? null : (hash => (double)x.root(hash)));
+        
+        public DoubleWithEx ToDoubleWithEx() => (DoubleWithEx)this;
+
         public LongWithEx Max(long f)
         {
             if (min > f) return this;
@@ -205,6 +221,27 @@ namespace Elements
 
         public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
         public static bool operator !=(LongWithEx a, LongWithEx b) => !a.Equals(b);
+
+        public static DoubleWithEx operator +(LongWithEx a, double b) => (DoubleWithEx)a + b;
+        public static DoubleWithEx operator +(double a, LongWithEx b) => a + (DoubleWithEx)b;
+        public static DoubleWithEx operator +(LongWithEx a, float b) => (DoubleWithEx)a + b;
+        public static DoubleWithEx operator +(float a, LongWithEx b) => a + (DoubleWithEx)b;
+
+        public static DoubleWithEx operator -(LongWithEx a, double b) => (DoubleWithEx)a - b;
+        public static DoubleWithEx operator -(double a, LongWithEx b) => a - (DoubleWithEx)b;
+        public static DoubleWithEx operator -(LongWithEx a, float b) => (DoubleWithEx)a - b;
+        public static DoubleWithEx operator -(float a, LongWithEx b) => a - (DoubleWithEx)b;
+
+        public static DoubleWithEx operator *(LongWithEx a, double b) => (DoubleWithEx)a * b;
+        public static DoubleWithEx operator *(double a, LongWithEx b) => a * (DoubleWithEx)b;
+        public static DoubleWithEx operator *(LongWithEx a, float b) => (DoubleWithEx)a * b;
+        public static DoubleWithEx operator *(float a, LongWithEx b) => a * (DoubleWithEx)b;
+
+        public static DoubleWithEx operator /(LongWithEx a, double b) => (DoubleWithEx)a / b;
+        public static DoubleWithEx operator /(double a, LongWithEx b) => a / (DoubleWithEx)b;
+        public static DoubleWithEx operator /(LongWithEx a, float b) => (DoubleWithEx)a / b;
+        public static DoubleWithEx operator /(float a, LongWithEx b) => a / (DoubleWithEx)b;
+
         public bool Equals(LongWithEx other)
         {
             if (other is null) return false;

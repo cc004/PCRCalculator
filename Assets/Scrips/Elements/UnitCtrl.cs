@@ -2587,8 +2587,10 @@ this.updateCurColor();
             long hp = (long)Hp;
             UnitCtrl LIMEKPEENOB = unitCtrl;
             battleLog.AppendBattleLog(eBattleLogType.SET_DAMAGE, 3, 0L, hp, 0, 0, LIMEKPEENOB: LIMEKPEENOB);
-            if (_data.EnemyData != null && _data.EnemyData.virtual_hp != 0)
-                skillStackValDmg = 1000f / _data.EnemyData.virtual_hp;
+            if (IsBoss)
+                skillStackValDmg = 0; // guess this for initialize undecompilizable
+            else if (_data.EnemyData != null && _data.EnemyData.virtual_hp != 0)
+                    skillStackValDmg = 1000f / _data.EnemyData.virtual_hp;
             else
                 skillStackValDmg = 1000f / baseHp;
             //卡rank相关tp获取惩罚……
@@ -8848,20 +8850,6 @@ this.updateCurColor();
             // TODO DamageCutForSpecialNullificationData unknown
 
             // 属性
-            var unit = _damageData.Source;
-            if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
-                unit = _damageData.StrikeBackSource;
-            var talentDamageRate = CalcTalentDamageRate(
-                _damageData.ActionType,
-                unit,
-                _damageData.Target,
-                _damageData.TargetIncludeMyTeam, // TODO find where set
-                _damageData.IgnoreTalentBonusForRatioSlip,
-                out bool isNoDamageByResist
-            );
-            a *= talentDamageRate;
-            b *= talentDamageRate;
-
             double execBarrier(double total, double main, double sub)
             {
                 if (total > sub)
@@ -8890,7 +8878,7 @@ this.updateCurColor();
                     {
                         long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
                         var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                            (long)execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
+                            execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
                         a *= t;
                         b *= t;
                     }
@@ -8900,8 +8888,8 @@ this.updateCurColor();
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
-                            var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                                (long)execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                            DoubleWithEx t = _damageData.TotalDamageForLogBarrier.Select(x =>
+                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
                         }
@@ -8909,8 +8897,8 @@ this.updateCurColor();
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
-                            var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                                (long)execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                            DoubleWithEx t = _damageData.TotalDamageForLogBarrier.Select(x =>
+                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
                         }
@@ -8918,8 +8906,8 @@ this.updateCurColor();
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
-                            var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                                (long)execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                            DoubleWithEx t = _damageData.TotalDamageForLogBarrier.Select(x =>
+                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
                         }
@@ -8940,12 +8928,12 @@ this.updateCurColor();
                     case DamageData.eDamageType.ATK:
                         var defZero = _damageData.Target.GetDefZero();
                         var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - num3 / (defZero + 100.0f));
+                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
                         break;
                     case DamageData.eDamageType.MGC:
                         var magicDefZero = _damageData.Target.GetMagicDefZero();
                         var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - num4 / (magicDefZero + 100.0f));
+                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
                         break;
                 }
                 if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
@@ -8955,15 +8943,28 @@ this.updateCurColor();
                         case DamageData.eDamageType.ATK:
                             var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
                             var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - num3 / (defZero + 100.0f));
+                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
                             break;
                         case DamageData.eDamageType.MGC:
                             var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
                             var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - num4 / (magicDefZero + 100.0f));
+                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
                             break;
                     }
                 }
+                var unit = _damageData.Source;
+                if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
+                    unit = _damageData.StrikeBackSource;
+                var talentDamageRate = CalcTalentDamageRate(
+                    _damageData.ActionType,
+                    unit,
+                    _damageData.Target,
+                    _damageData.TargetIncludeMyTeam, // TODO find where set
+                    _damageData.IgnoreTalentBonusForRatioSlip,
+                    out bool isNoDamageByResist
+                );
+                a *= talentDamageRate;
+                b *= talentDamageRate;
             }
 
             var num5 = a;
@@ -9050,7 +9051,8 @@ this.updateCurColor();
                     }
                 }
             }*/
-            if (tuple != null && !isNoDamageByResist)
+            // if (tuple != null && !isNoDamageByResist)
+            if (tuple != null)
             {
                 StrikeBackData strikeBack = tuple.Item1;
                 List<StrikeBackData> strikeBackList = tuple.Item2;
@@ -9116,7 +9118,7 @@ this.updateCurColor();
             if (num5 <= 0.0 && _damageData.ActionType == eActionType.FORCE_HP_CHANGE)
             {
                 if (!battleManager.skipping)
-                    createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.DoubleToInt(num5));
+                    createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.DoubleToLong(num5));
                 callBack?.Invoke("伤害无效，因为伤害为负数");
                 return 0;
             }
@@ -9162,13 +9164,13 @@ this.updateCurColor();
             DoubleWithEx _overRecoverValue = 0;
             if (_damageData.ActionType != eActionType.INHIBIT_HEAL && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
-            var num6 = BattleUtil.DoubleToLong(_fDamage);
+            var num6 = _fDamage.ToLongWithEx();
             bool flag2 = (long)Hp > 0L;
             int num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
-                _hp = (long)(Hp - (num6 - _overRecoverValue.Max(0)));
+                _hp = (long)((DoubleWithEx)Hp - ((DoubleWithEx)num6 - _overRecoverValue.Max(0)));
             }
             if (_onDamageHit != null & flag2)
                 _onDamageHit(num6);

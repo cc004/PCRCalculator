@@ -132,7 +132,7 @@ namespace Elements
                         num2 = fix;
                     }
 
-                    criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
+                    criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = ((DoubleWithEx)damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum).ToLongWithEx();
 
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
                     if (_valueDictionary[eValueNumber.VALUE_5] == (float) (index + 1))
@@ -150,9 +150,9 @@ namespace Elements
                     else
                         criticalData.critVar = 0f;
 
-                    criticalData.ExpectedDamage = BattleUtil.DoubleToLong(criticalData.ExpectedDamage * (1 + criticalData.critVar * (2.0 * damageData.CriticalDamageRate - 1)));
+                    criticalData.ExpectedDamage = ((DoubleWithEx)criticalData.ExpectedDamage * (1 + criticalData.critVar * (2.0 * damageData.CriticalDamageRate - 1))).ToLongWithEx();
 
-                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong(criticalData.ExpectedDamageForEnergyCalc * (1 + criticalData.critVar * (2.0 * damageData.CriticalDamageRate - 1)));
+                    criticalData.ExpectedDamageForEnergyCalc = ((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1 + criticalData.critVar * (2.0 * damageData.CriticalDamageRate - 1))).ToLongWithEx();
 
                     if (!damageData.IgnoreDef)
                     {
@@ -161,24 +161,24 @@ namespace Elements
                             case DamageData.eDamageType.ATK:
                                 var defZero = damageData.Target.GetDefZero();
                                 var num3 = (defZero - damageData.DefPenetrate).Max(0);
-                                criticalData.ExpectedDamage = (long)Math.Floor(criticalData.ExpectedDamage * (1.0 - num3 / (defZero + 100.0)));
+                                criticalData.ExpectedDamage = ((DoubleWithEx)criticalData.ExpectedDamage * (1.0 - (DoubleWithEx)num3 / (defZero + 100.0))).ToLongWithEx();
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
 
                                 if (!isDamagedEnergyCalculationChanged)
                                 {
-                                    criticalData.ExpectedDamageForEnergyCalc = (long)Math.Floor(criticalData.ExpectedDamageForEnergyCalc * (1.0 - num3 / (defZero + 100.0)));
+                                    criticalData.ExpectedDamageForEnergyCalc = ((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num3 / (defZero + 100.0))).ToLongWithEx();
                                 }
 
                                 break;
                             case DamageData.eDamageType.MGC:
                                 var magicDefZero = damageData.Target.GetMagicDefZero();
                                 var num4 = (magicDefZero - damageData.DefPenetrate).Max(0);
-                                criticalData.ExpectedDamage = (long)Math.Floor(criticalData.ExpectedDamage * (1.0 - num4 / (magicDefZero + 100.0)));
+                                criticalData.ExpectedDamage = ((DoubleWithEx)criticalData.ExpectedDamage * (1.0 - (DoubleWithEx)num4 / (magicDefZero + 100.0))).ToLongWithEx();
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
 
                                 if (!isDamagedEnergyCalculationChanged)
                                 {
-                                    criticalData.ExpectedDamageForEnergyCalc = (long)Math.Floor(criticalData.ExpectedDamageForEnergyCalc * (1.0 - num4 / (magicDefZero + 100.0)));
+                                    criticalData.ExpectedDamageForEnergyCalc = ((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num4 / (magicDefZero + 100.0))).ToLongWithEx();
                                 }
 
                                 break;
@@ -191,19 +191,33 @@ namespace Elements
                                 case DamageData.eDamageType.ATK:
                                     var defZero = damageData.Target.GetDefZeroForDamagedEnergy();
                                     var num3 = (defZero - damageData.DefPenetrate).Max(0);
-                                    criticalData.ExpectedDamageForEnergyCalc = (long)Math.Floor((criticalData.ExpectedDamageForEnergyCalc * (1.0 - num3 / (defZero + 100.0))));
+                                    criticalData.ExpectedDamageForEnergyCalc = ((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num3 / (defZero + 100.0))).ToLongWithEx();
 
                                     break;
                                 case DamageData.eDamageType.MGC:
                                     var magicDefZero = damageData.Target.GetMagicDefZeroForDamagedEnergy();
                                     var num4 = (magicDefZero - damageData.DefPenetrate).Max(0);
 
-                                    criticalData.ExpectedDamageForEnergyCalc = (long)Math.Floor((criticalData.ExpectedDamageForEnergyCalc * (1.0 - num4 / (magicDefZero + 100.0))));
+                                    criticalData.ExpectedDamageForEnergyCalc = ((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num4 / (magicDefZero + 100.0))).ToLongWithEx();
 
                                     break;
                             }
                         }
                     }
+
+                    var unit = damageData.Source;
+                    if (damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
+                        unit = damageData.StrikeBackSource;
+                    var talentDamageRate = _target.Owner.CalcTalentDamageRate(
+                        damageData.ActionType,
+                        unit,
+                        damageData.Target,
+                        damageData.TargetIncludeMyTeam, // TODO find where set
+                        damageData.IgnoreTalentBonusForRatioSlip,
+                        out bool isNoDamageByResist
+                    );
+                    criticalData.ExpectedDamage = ((DoubleWithEx)criticalData.ExpectedDamage * talentDamageRate).ToLongWithEx();
+                    criticalData.ExpectedDamageForEnergyCalc = ((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * talentDamageRate).ToLongWithEx();
                     criticalData.CriticalRate = damageData.CriticalDamageRate;
                     num1 += criticalData.ExpectedDamage;
                     criticalDataList.Add(criticalData);

@@ -24,8 +24,8 @@ namespace Elements
 			long num = Mathf.Min(_count, CountLimit);
 			return AccumulativeDamageType switch
 			{
-				eAccumulativeDamageType.FIXED => BattleUtil.DoubleToInt(num * FixedValue),
-				eAccumulativeDamageType.PERCENTAGE => BattleUtil.DoubleToInt((_baseDamage * num) * PercentageValue / 100f),
+				eAccumulativeDamageType.FIXED => BattleUtil.DoubleToLong(num * FixedValue),
+				eAccumulativeDamageType.PERCENTAGE => BattleUtil.DoubleToLong((_baseDamage * num) * PercentageValue / 100f),
 				_ => 0,
 			};
 		}

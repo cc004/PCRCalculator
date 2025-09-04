@@ -8,6 +8,7 @@ using PCRCaculator.Guild;
 using UnityEngine;
 using Random = System.Random;
 using Elements;
+using UnityEngine.Assertions;
 
 namespace Elements
 {
@@ -22,8 +23,9 @@ namespace Elements
         private readonly Func<int, double> root;
         private int hash;
         private double cache;
-        private string select, op, rnd;
-        private DoubleWithEx op1, op2;
+        public string select, op;
+        private string rnd;
+        public DoubleWithEx op1, op2;
 
         public DoubleWithEx(double value = 0.0, double avg = 0.0, double min = 0.0, double max = 0.0,
             Func<int, double> root = null)
@@ -170,11 +172,39 @@ namespace Elements
         }
 
         public static implicit operator double(DoubleWithEx self) => self.value;
+
         public static implicit operator DoubleWithEx(double x) =>
             new DoubleWithEx(x, x, x, x, null);
-        public static explicit operator LongWithEx(DoubleWithEx x) =>
-            new LongWithEx((long)x.value, (long)x.avg, (long)x.min, (long)x.max,
+
+        public static explicit operator LongWithEx(DoubleWithEx x) {
+            // 判断是否接近整数
+            Assert.IsTrue(Math.Abs(x.value - Math.Round(x.value)) < 1e-8);
+            Assert.IsTrue(Math.Abs(x.avg - Math.Round(x.avg)) < 1e-8);
+            Assert.IsTrue(Math.Abs(x.min - Math.Round(x.min)) < 1e-8);
+            Assert.IsTrue(Math.Abs(x.max - Math.Round(x.max)) < 1e-8);
+            return new LongWithEx((long)x.value, (long)x.avg, (long)x.min, (long)x.max,
                 x.root == null ? null : (hash => (long)x.root(hash)));
+        }
+
+        // public LongWithEx ToLongWithEx() => (LongWithEx)this;
+
+		public static bool Approximately(double _a, double _b)
+		{
+			return Math.Abs(_b - _a) < Math.Max(1E-14 * Math.Max(Math.Abs(_a), Math.Abs(_b)), 2.220446049250313E-16);
+		}
+
+        public LongWithEx ToLongWithEx()
+        {
+            double _num = value;
+            if (_num >= 0.0)
+            {
+                long num = Mathf.CeilToInt((float)_num);
+                return Approximately(_num, num) ? (LongWithEx)this.Ceil() : (LongWithEx)this.Floor();
+            }
+            long num1 = Mathf.FloorToInt((float)_num);
+            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Floor();
+        }
+
         public DoubleWithEx Max(double f)
         {
             if (min > f) return this;
