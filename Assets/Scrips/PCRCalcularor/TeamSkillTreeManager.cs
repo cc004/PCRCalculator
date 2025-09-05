@@ -303,16 +303,20 @@ namespace PCRCaculator
                     enhanceId = enhanceIds.Length > 0 ? enhanceIds[0] : 0;
                 }
                 string enhanceValue = currentLevel == 0 ? "0%" : GetEnhanceValueText(enhanceId);
-                nodeUI.SetNodeData(nodeData.node_id, GetSkillIcon(nodeData.node_id), currentLevel, maxLevel, TalentType, title_text, enhanceValue);
+                nodeUI.SetNodeData(nodeData.node_id, GetSkillIcon(nodeData.icon_id), currentLevel, maxLevel, TalentType, title_text, enhanceValue);
                 // 添加到字典中
                 NodeUIDict[nodeData.node_id] = nodeUI;
+                UpdateAllNodeUI();
             }
         }
 
-        private Sprite GetSkillIcon(int nodeId)
+        private Sprite GetSkillIcon(int icon_id)
         {
-            // 获取技能图标
-            return null;
+            string iconName = $"team_node_icon_{icon_id:D6}";
+
+            Sprite icon = Resources.Load<Sprite>($"nodeicon/{iconName}");
+
+            return icon;
         }
 
         private int GetMaxSkillLevel(int nodeId)

@@ -48434,12 +48434,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1378534267}
   m_CullTransparentMesh: 1
---- !u!1 &1379211885 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6184547783101376040, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
-    type: 3}
-  m_PrefabInstance: {fileID: 5392821886425180144}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1380548476
 GameObject:
   m_ObjectHideFlags: 0
@@ -67772,7 +67766,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 5392821886425180144}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1379211885}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf6eb73dc3c49c344a54a93798698069, type: 3}
@@ -82110,7 +82104,7 @@ PrefabInstance:
     - target: {fileID: 6184547783101376040, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6389296689626481444, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
@@ -82165,18 +82159,18 @@ PrefabInstance:
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 1379211885}
+      objectReference: {fileID: 1444518637}
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
@@ -82185,12 +82179,12 @@ PrefabInstance:
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
-      value: SetActive
+      value: OpenTalentButton
       objectReference: {fileID: 0}
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: PCRCaculator.TalentManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7057168694198926755, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}

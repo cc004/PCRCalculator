@@ -32,10 +32,6 @@ namespace PCRCaculator
             isLoading = true;
             talentPanel.SetActive(true);
             GuildManager.LoadAddedPlayerData();
-            for (int i = 0; i < talentManagers.Count; i++)
-            {
-                talentManagers[i].SetActive(true);
-            }
             TalentLevelManager.Instance.LoadTalentLevelSliders();
             TalentSkillTreeManager.Instance.InitializeData();
             TeamSkillTreeManager.Instance.InitializeData();

@@ -872,7 +872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a7fe8ea4340fe40bcbf1b5f74753b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillIcon: {fileID: 0}
+  skillIcon: {fileID: 2157937415432078844}
   backgroundImage: {fileID: 0}
   levelText: {fileID: 1801639815569955962}
   talentText: {fileID: 6354659125037579086}
