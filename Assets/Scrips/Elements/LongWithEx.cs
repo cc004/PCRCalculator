@@ -157,11 +157,11 @@ namespace Elements
             get
             {
                 var N = GuildManager.StaticsettingData.n1;
-                long s = 0, s2 = 0;
+                double s = 0, s2 = 0;
                 for (int i = 0; i < N; ++i)
                 {
                     SetState(rndd.Next());
-                    long x = Emulate(rndd.Next());
+                    double x = Emulate(rndd.Next());
                     s += x;
                     s2 += x * x;
                 }
