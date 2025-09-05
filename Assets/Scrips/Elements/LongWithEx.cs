@@ -22,8 +22,9 @@ namespace Elements
         private readonly Func<int, long> root;
         private int hash;
         private long cache;
-        private string select, op, rnd;
-        private LongWithEx op1, op2;
+        public string select, rnd;
+        public string op;
+        public DoubleWithEx op1, op2;
 
         internal LongWithEx(long value = 0, long avg = 0, long min = 0, long max = 0,
             Func<int, long> root = null)
@@ -51,27 +52,27 @@ namespace Elements
         private static List<int> cachedSeed = new List<int>();
         public static void SetState(int seed)
         {
-            rand.InitState(seed);
-            cachedSeed.Clear();
+            DoubleWithEx.rand.InitState(seed);
+            DoubleWithEx.cachedSeed.Clear();
         }
 
         private static int GetRandN(int n)
         {
-            while (cachedSeed.Count <= n) cachedSeed.Add(rand.Range(0, 1000));
-            return cachedSeed[n];
+            while (DoubleWithEx.cachedSeed.Count <= n) DoubleWithEx.cachedSeed.Add(DoubleWithEx.rand.Range(0, 1000));
+            return DoubleWithEx.cachedSeed[n];
         }
-        public static LongWithEx Binomial(long p, bool val, string rnd, int order)
-        {
-            p = Math.Clamp(p, 0, 1000);
-            if (p == 0) return 0;
-            if (p == 1000) return 1;
-            var result = new LongWithEx(val ? 1 : 0, p, root: _ => GetRandN(order) < p ? 1 : 0, min: 0,
-                max: 1)
-            {
-                rnd = rnd
-            };
-            return result;
-        }
+        // public static LongWithEx Binomial(long p, bool val, string rnd, int order)
+        // {
+        //     p = Math.Clamp(p, 0, 1000);
+        //     if (p == 0) return 0;
+        //     if (p == 1000) return 1;
+        //     var result = new LongWithEx(val ? 1 : 0, p, root: _ => GetRandN(order) < p ? 1 : 0, min: 0,
+        //         max: 1)
+        //     {
+        //         rnd = rnd
+        //     };
+        //     return result;
+        // }
 
 
         public LongWithEx Select(Func<long, long> selector, string select)
@@ -81,7 +82,7 @@ namespace Elements
             return new LongWithEx(selector(value), selector(avg), root: hash => selector(Emulate(hash)),
                 min: Math.Min(a, b), max: Math.Max(a, b))
             {
-                select = select, op1 = this
+                select = select, op1 = (DoubleWithEx)this
             };
         }
 
@@ -92,7 +93,7 @@ namespace Elements
             return new DoubleWithEx(selector(value), selector(avg), root: hash => selector(Emulate(hash)),
                 min: Math.Min(a, b), max: Math.Max(a, b))
             {
-                select = select, op1 = this
+                select = select, op1 = (DoubleWithEx)this
             };
         }
 
@@ -119,7 +120,7 @@ namespace Elements
                 return new LongWithEx(op(vala, b.value), op(vala, b.avg),
                     root: hash => op(vala, b.Emulate(hash)), min: xs.Min(), max: xs.Max())
                 {
-                    op = ops, op1 = vala, op2 = b
+                    op = ops, op1 = vala, op2 = (DoubleWithEx)b
                 };
             }
 
@@ -128,15 +129,15 @@ namespace Elements
                     root: hash => op(a.Emulate(hash), valb), min: xs.Min(), max: xs.Max())
                 {
                     op = ops,
-                    op1 = a,
+                    op1 = (DoubleWithEx)a,
                     op2 = valb
                 };
             return new LongWithEx(op(a.value, b.value), op(a.avg, b.avg),
                 root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: xs.Min(), max: xs.Max())
             {
                 op = ops,
-                op1 = a,
-                op2 = b
+                op1 = (DoubleWithEx)a,
+                op2 = (DoubleWithEx)b
             };
         }
 
@@ -156,11 +157,11 @@ namespace Elements
             get
             {
                 var N = GuildManager.StaticsettingData.n1;
-                long s = 0, s2 = 0;
+                double s = 0, s2 = 0;
                 for (int i = 0; i < N; ++i)
                 {
                     SetState(rndd.Next());
-                    long x = Emulate(rndd.Next());
+                    double x = Emulate(rndd.Next());
                     s += x;
                     s2 += x * x;
                 }
@@ -184,9 +185,15 @@ namespace Elements
         public static implicit operator LongWithEx(long x) =>
             new LongWithEx(x, x, x, x, null);
 
-        public static implicit operator DoubleWithEx(LongWithEx x) =>
+        public static explicit operator DoubleWithEx(LongWithEx x) =>
             new DoubleWithEx((double)x.value, (double)x.avg, (double)x.min, (double)x.max,
-                x.root == null ? null : (hash => (double)x.root(hash)));
+                x.root == null ? null : (hash => (double)x.root(hash)))
+            {
+                select = x.select ?? null,
+                op = x.op ?? null,
+                op1 = x.op1 ?? null,
+                op2 = x.op2 ?? null
+            };
         
         public DoubleWithEx ToDoubleWithEx() => (DoubleWithEx)this;
 
@@ -203,8 +210,6 @@ namespace Elements
         }
 
         public override string ToString() => pure ? ((long)this).ToString() : $"{(long)this}[{(long)Expect}]";
-        public LongWithEx Floor() => Select(x => x, "floor");
-        public LongWithEx Ceil() => Select(x => x, "ceil");
         public LongWithEx Abs() => Select(Math.Abs, "abs");
 
         public int CompareTo(LongWithEx other) => ((long)this).CompareTo(other);
@@ -217,7 +222,7 @@ namespace Elements
             return Op(a, b, (x, y) => x * y, "mul");
         }
 
-        public static LongWithEx operator /(LongWithEx a, LongWithEx b) => Op(a, b, (x, y) => x / y, "div").Floor();
+        public static DoubleWithEx operator /(LongWithEx a, LongWithEx b) => (DoubleWithEx)a / (DoubleWithEx)b;
 
         public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
         public static bool operator !=(LongWithEx a, LongWithEx b) => !a.Equals(b);
@@ -313,7 +318,7 @@ namespace Elements
             }
             else if (rnd != null)
                 sb.AppendFormat("{0}|", rnd);
-            else throw new NotImplementedException();
+            else throw new NotImplementedException($" {this} {rnd} {op} {select}");
             id = num++;
             return num;
         }

@@ -48,16 +48,16 @@ namespace Elements
             return cache;
         }
 
-        private static Random rndd = new Random();
-        private static UnityRandom rand = new UnityRandom();
-        private static List<int> cachedSeed = new List<int>();
+        public static Random rndd = new Random();
+        public static UnityRandom rand = new UnityRandom();
+        public static List<int> cachedSeed = new List<int>();
         public static void SetState(int seed)
         {
             rand.InitState(seed);
             cachedSeed.Clear();
         }
 
-        private static int GetRandN(int n)
+        public static int GetRandN(int n)
         {
             while (cachedSeed.Count <= n) cachedSeed.Add(rand.Range(0, 1000));
             return cachedSeed[n];
@@ -67,7 +67,7 @@ namespace Elements
             p = Math.Clamp(p, 0.0, 1.0);
             if (p == 0.0) return 0.0;
             if (p == 1.0) return 1.0;
-            var p0 = (int) (p * 1000);
+            var p0 = (long) (p * 1000);
             var result = new DoubleWithEx(val ? 1 : 0, p, root: _ => GetRandN(order) < p0 ? 1 : 0, min: 0,
                 max: 1)
             {
@@ -183,7 +183,13 @@ namespace Elements
             Assert.IsTrue(Math.Abs(x.min - Math.Round(x.min)) < 1e-8);
             Assert.IsTrue(Math.Abs(x.max - Math.Round(x.max)) < 1e-8);
             return new LongWithEx((long)x.value, (long)x.avg, (long)x.min, (long)x.max,
-                x.root == null ? null : (hash => (long)x.root(hash)));
+                x.root == null ? null : (hash => (long)x.root(hash)))
+            {
+                select = x.select ?? null,
+                op = x.op ?? null,
+                op1 = x.op1 ?? null,
+                op2 = x.op2 ?? null
+            };
         }
 
         // public LongWithEx ToLongWithEx() => (LongWithEx)this;
@@ -233,6 +239,26 @@ namespace Elements
 
         public static DoubleWithEx operator /(DoubleWithEx a, DoubleWithEx b) => Op(a, b, (x, y) => x / y, "div");
 
+        public static DoubleWithEx operator +(DoubleWithEx a, double b) => a + (DoubleWithEx)b;
+        public static DoubleWithEx operator +(double a, DoubleWithEx b) => (DoubleWithEx)a + b;
+        public static DoubleWithEx operator +(DoubleWithEx a, float b) => a + (DoubleWithEx)b;
+        public static DoubleWithEx operator +(float a, DoubleWithEx b) => (DoubleWithEx)a + b;
+
+        public static DoubleWithEx operator -(DoubleWithEx a, double b) => a - (DoubleWithEx)b;
+        public static DoubleWithEx operator -(double a, DoubleWithEx b) => (DoubleWithEx)a - b;
+        public static DoubleWithEx operator -(DoubleWithEx a, float b) => a - (DoubleWithEx)b;
+        public static DoubleWithEx operator -(float a, DoubleWithEx b) => (DoubleWithEx)a - b;
+
+        public static DoubleWithEx operator *(DoubleWithEx a, double b) => a * (DoubleWithEx)b;
+        public static DoubleWithEx operator *(double a, DoubleWithEx b) => (DoubleWithEx)a * b;
+        public static DoubleWithEx operator *(DoubleWithEx a, float b) => a * (DoubleWithEx)b;
+        public static DoubleWithEx operator *(float a, DoubleWithEx b) => (DoubleWithEx)a * b;
+
+        public static DoubleWithEx operator /(DoubleWithEx a, double b) => a / (DoubleWithEx)b;
+        public static DoubleWithEx operator /(double a, DoubleWithEx b) => (DoubleWithEx)a / b;
+        public static DoubleWithEx operator /(DoubleWithEx a, float b) => a / (DoubleWithEx)b;
+        public static DoubleWithEx operator /(float a, DoubleWithEx b) => (DoubleWithEx)a / b;
+
         public static bool operator ==(DoubleWithEx a, DoubleWithEx b) => a.Equals(b);
         public static bool operator !=(DoubleWithEx a, DoubleWithEx b) => !a.Equals(b);
         public bool Equals(DoubleWithEx other)
@@ -267,7 +293,7 @@ namespace Elements
             };
         }
         
-        private int id;
+        public int id;
 
         public string ToExpression(int hash)
         {
@@ -282,7 +308,7 @@ namespace Elements
             return string.Empty;
         }
 
-        private int ToExpression(StringBuilder sb, int hash, int num = 0)
+        public int ToExpression(StringBuilder sb, int hash, int num = 0)
         {
             if (this.hash == hash) return num;
             this.hash = hash;
@@ -303,7 +329,7 @@ namespace Elements
             }
             else if (rnd != null)
                 sb.AppendFormat("{0}|", rnd);
-            else throw new NotImplementedException();
+            else throw new NotImplementedException($" this={this} rnd={rnd} op={op} select={select} op1={op1} op2={op2}");
             id = num++;
             return num;
         }

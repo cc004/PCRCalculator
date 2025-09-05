@@ -6866,7 +6866,7 @@ this.updateCurColor();
             foreach(var value in _value.Values)
             {
                 des += value;
-                MainValue = value;
+                MainValue = (DoubleWithEx)value;
             }
             ///added script
             UnitAbnormalStateChangeData stateChangeData = new UnitAbnormalStateChangeData();
@@ -8183,57 +8183,57 @@ this.updateCurColor();
                     case eParamType.HP:
                         if (_first && !IsClanBattleOrSekaiEnemy)
                         {
-                            MaxHp = calculatePassiveSkillValue(MaxHp, _passiveActionKV);
-                            Hp = (long)(int)((long)Hp / (double)(long)StartMaxHP * MaxHp);
+                            MaxHp = calculatePassiveSkillValue(MaxHp, _passiveActionKV).ToLongWithEx();
+                            Hp = (Hp / StartMaxHP * MaxHp).ToLongWithEx();
                         }
                         continue;
                     case eParamType.ATK:
-                        Atk = calculatePassiveSkillValue(StartAtk, _passiveActionKV);
+                        Atk = calculatePassiveSkillValue(StartAtk, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.DEF:
-                        Def = calculatePassiveSkillValue(StartDef, _passiveActionKV);
+                        Def = calculatePassiveSkillValue(StartDef, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.MAGIC_ATK:
-                        MagicStr = calculatePassiveSkillValue(StartMagicStr, _passiveActionKV);
+                        MagicStr = calculatePassiveSkillValue(StartMagicStr, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.MAGIC_DEF:
-                        MagicDef = calculatePassiveSkillValue(StartMagicDef, _passiveActionKV);
+                        MagicDef = calculatePassiveSkillValue(StartMagicDef, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.PHYSICAL_CRITICAL:
-                        PhysicalCritical = calculatePassiveSkillValue(StartPhysicalCritical, _passiveActionKV);
+                        PhysicalCritical = (long)calculatePassiveSkillValue(StartPhysicalCritical, _passiveActionKV);
                         continue;
                     case eParamType.MAGIC_CRITICAL:
-                        MagicCritical = calculatePassiveSkillValue(StartMagicCritical, _passiveActionKV);
+                        MagicCritical = (long)calculatePassiveSkillValue(StartMagicCritical, _passiveActionKV);
                         continue;
                     case eParamType.DODGE:
-                        Dodge = calculatePassiveSkillValue(StartDodge, _passiveActionKV);
+                        Dodge = (long)calculatePassiveSkillValue(StartDodge, _passiveActionKV);
                         continue;
                     case eParamType.LIFE_STEAL:
-                        LifeSteal = calculatePassiveSkillValue(StartLifeSteal, _passiveActionKV);
+                        LifeSteal = (long)calculatePassiveSkillValue(StartLifeSteal, _passiveActionKV);
                         continue;
                     case eParamType.WAVE_HP_RECOVERY:
-                        WaveHpRecovery = calculatePassiveSkillValue(StartWaveHpRecovery, _passiveActionKV);
+                        WaveHpRecovery = (long)calculatePassiveSkillValue(StartWaveHpRecovery, _passiveActionKV);
                         continue;
                     case eParamType.WAVE_ENERGY_RECOVERY:
-                        WaveEnergyRecovery = calculatePassiveSkillValue(StartWaveEnergyRecovery, _passiveActionKV);
+                        WaveEnergyRecovery = (long)calculatePassiveSkillValue(StartWaveEnergyRecovery, _passiveActionKV);
                         continue;
                     case eParamType.PHYSICAL_PENETRATE:
-                        PhysicalPenetrate = calculatePassiveSkillValue(StartPhysicalPenetrate, _passiveActionKV);
+                        PhysicalPenetrate = (long)calculatePassiveSkillValue(StartPhysicalPenetrate, _passiveActionKV);
                         continue;
                     case eParamType.MAGIC_PENETRATE:
-                        MagicPenetrate = calculatePassiveSkillValue(StartMagicPenetrate, _passiveActionKV);
+                        MagicPenetrate = (long)calculatePassiveSkillValue(StartMagicPenetrate, _passiveActionKV);
                         continue;
                     case eParamType.ENERGY_RECOVERY_RATE:
-                        EnergyRecoveryRate = calculatePassiveSkillValue(StartEnergyRecoveryRate, _passiveActionKV);
+                        EnergyRecoveryRate = (long)calculatePassiveSkillValue(StartEnergyRecoveryRate, _passiveActionKV);
                         continue;
                     case eParamType.HP_RECOVERY_RATE:
-                        HpRecoveryRate = calculatePassiveSkillValue(StartHpRecoveryRate, _passiveActionKV);
+                        HpRecoveryRate = (long)calculatePassiveSkillValue(StartHpRecoveryRate, _passiveActionKV);
                         continue;
                     case eParamType.ENERGY_REDUCE_RATE:
-                        EnergyReduceRate = calculatePassiveSkillValue(StartEnergyReduceRate, _passiveActionKV);
+                        EnergyReduceRate = (long)calculatePassiveSkillValue(StartEnergyReduceRate, _passiveActionKV);
                         continue;
                     case eParamType.ACCURACY:
-                        Accuracy = calculatePassiveSkillValue(StartAccuracy, _passiveActionKV);
+                        Accuracy = (long)calculatePassiveSkillValue(StartAccuracy, _passiveActionKV);
                         continue;
                     default:
                         continue;
@@ -8272,11 +8272,7 @@ this.updateCurColor();
 
         private DoubleWithEx calculatePassiveSkillValue(
             DoubleWithEx _value,
-          KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => ((double)_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
-
-        private LongWithEx calculatePassiveSkillValue(
-            LongWithEx _value,
-          KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (_value * (long)(_passiveActionKV.Value.Percentage + 100) / 100) + (long)_passiveActionKV.Value.Value;
+          KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
 
         public List<PartsData> BossPartsListForBattle { get; set; }
         private static UnitCtrl _instance;
@@ -8632,7 +8628,7 @@ this.updateCurColor();
                     var num2 = num1 * lifeSteal / (lifeSteal + Level + 100);
                     if (num2 != 0)
                     {   //_damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
-                        _damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
+                        _damageData.Source.SetRecovery(BattleUtil.DoubleToLongReverseTruncate(num2), _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
                     }
                 }
             }
@@ -8796,7 +8792,7 @@ this.updateCurColor();
                 isHit = false;
                 return 0;
             }
-            DoubleWithEx a = _damageData.Damage;
+            DoubleWithEx a = (DoubleWithEx)_damageData.Damage;
             double num1 = 2f * _damageData.CriticalDamageRate;
             a *= 1 + (num1 - 1) * _damageData.critVar;
             if (debuffDamageUpDataList.Count > 0)
@@ -8816,8 +8812,8 @@ this.updateCurColor();
 
             if (flag1)
             {
-                a = _damageData.LogBarrierExpectedDamage;
-                b = _damageData.LogBarrierExpectedDamageForEnergyCalc;
+                a = (DoubleWithEx)_damageData.LogBarrierExpectedDamage;
+                b = (DoubleWithEx)_damageData.LogBarrierExpectedDamageForEnergyCalc;
             }
             if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.CUT_ATK_DAMAGE))
             {
@@ -9164,7 +9160,7 @@ this.updateCurColor();
             DoubleWithEx _overRecoverValue = 0;
             if (_damageData.ActionType != eActionType.INHIBIT_HEAL && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
-            var num6 = _fDamage.ToLongWithEx();
+            var num6 = BattleUtil.DoubleToLong(_fDamage);
             bool flag2 = (long)Hp > 0L;
             int num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)Hp;
@@ -9839,7 +9835,7 @@ this.updateCurColor();
         {
             var num = Hp + _value - MaxHp;
             SetRecovery(_value, _isMagic ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _source, GetHealDownValue(_healSource), _target: _target);
-            return num;
+            return (DoubleWithEx)num;
         }
 
         public void SetRecovery(
