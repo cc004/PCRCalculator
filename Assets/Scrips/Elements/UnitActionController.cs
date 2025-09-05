@@ -2290,8 +2290,8 @@ namespace Elements
                 Energy = part.Owner.Energy,
                 Hp = part.Owner.Hp,
                 MaxHp = part.Owner.MaxHp,
-                GetMagicStrZeroEx = part.GetMagicStrZeroEx(),
-                GetAtkZeroEx = part.GetAtkZeroEx(),
+                GetMagicStrZeroEx = (DoubleWithEx)part.GetMagicStrZeroEx(),
+                GetAtkZeroEx = (DoubleWithEx)part.GetAtkZeroEx(),
                 UnitName = part.Owner.UnitNameEx,
                 hash = part.GetHashCode()
             }).ToList();
