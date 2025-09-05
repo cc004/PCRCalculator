@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using PCRCaculator;
+using PCRCaculator.Guild;
+
 namespace Elements
 {
 
@@ -50,7 +52,7 @@ namespace Elements
         {
             for (int i = 1; i <= 5; i++)
             {
-                talentLevelParameter[i] = 0;
+                talentLevelParameter = new Dictionary<int, int>();
                 TalentSkillData[i] = new Dictionary<int, int>();
                 TeamSkillData[i] = new Dictionary<int, int>();
             }
@@ -59,14 +61,94 @@ namespace Elements
         /// <summary>
         /// 从PlayerSetting加载所有数据
         /// </summary>
-        public void LoadFromPlayerSetting(PlayerSetting playerSetting)
+        public void LoadFromPlayerSetting(bool isGlobal = false)
         {
-            // 加载属性等级数据
-            foreach (var kvp in playerSetting.talentLevelDic)
+            if (GuildManager.Instance.SettingData.GetCurrentPlayerGroup().playerData.playrCharacters.Count == 0 || isGlobal)
             {
-                talentLevelParameter[kvp.Key] = kvp.Value;
+                MainManager.Instance.ReLoadPlayerSetting();
+                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentLevel = MainManager.Instance.PlayerSetting.talentLevel;
+                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentSkill = MainManager.Instance.PlayerSetting.talentSkill;
+                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().teamSkill = MainManager.Instance.PlayerSetting.teamSkill;
             }
+            talentLevelParameter = GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentLevel;
+            UpdateTalentInfoData(GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentSkill, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
+            UpdateTalentInfoData(GuildManager.Instance.SettingData.GetCurrentPlayerGroup().teamSkill, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
             UpdateCombinedData();
+        }
+
+        public List<int> GetActivatedEnhanceIds<T>(Dictionary<int, int> skillLevels, Dictionary<int, T> skillNodeDict)
+            where T : class
+        {
+            List<int> activatedEnhanceIds = new List<int>();
+
+            foreach (var nodeId in skillLevels.Keys)
+            {
+                int level = skillLevels[nodeId];
+                if (level <= 0 || !skillNodeDict.TryGetValue(nodeId, out var nodeData))
+                    continue;
+
+                // 使用反射安全地获取 enhance_level_ids 属性
+                var enhanceLevelIdsProp = typeof(T).GetProperty("enhance_level_ids");
+                if (enhanceLevelIdsProp != null &&
+                    enhanceLevelIdsProp.GetValue(nodeData) is Dictionary<int, int[]> enhanceLevelIds)
+                {
+                    var sortedEnhanceLevelIds = enhanceLevelIds.OrderBy(kvp => kvp.Key).ToList();
+
+                    if (sortedEnhanceLevelIds.Count >= level)
+                    {
+                        var kvp = sortedEnhanceLevelIds[level - 1];
+                        foreach (int enhanceId in kvp.Value)
+                        {
+                            if (enhanceId > 0)
+                            {
+                                activatedEnhanceIds.Add(enhanceId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return activatedEnhanceIds;
+        }
+        public void UpdateTalentInfoData<T>(Dictionary<int, int> skillLevels, Dictionary<int, T> skillNodeDict, DataType type)
+            where T : class
+        {
+            List<int> activatedEnhanceIds = GetActivatedEnhanceIds(skillLevels, skillNodeDict);
+            var newData = new Dictionary<int, Dictionary<int, int>>();
+            for (int i = 1; i <= 5; i++)
+            {
+                newData[i] = new Dictionary<int, int>();
+            }
+            foreach (int enhanceId in activatedEnhanceIds)
+            {
+                if (type == DataType.TalentSkill)
+                {
+                    if (!MainManager.Instance.TalentSkillEnhanceDataDic.TryGetValue(enhanceId, out var data))
+                        continue;
+                    foreach (int talentId in data.talent_ids)
+                    {
+                        if (talentId < 1 || talentId > 5)
+                            continue;
+                        var talentDict = newData[talentId];
+                        int currentValue = talentDict.GetValueOrDefault(data.parameter_type);
+                        talentDict[data.parameter_type] = currentValue + data.enhance_value;
+                    }
+                }
+                else if (type == DataType.TeamSkill)
+                {
+                    if (!MainManager.Instance.TeamSkillEnhanceDataDic.TryGetValue(enhanceId, out var data))
+                        continue;
+                    foreach (int talentId in data.talent_ids)
+                        {
+                            if (talentId < 1 || talentId > 5)
+                                continue;
+                            var talentDict = newData[talentId];
+                            int currentValue = talentDict.GetValueOrDefault(data.parameter_type);
+                            talentDict[data.parameter_type] = currentValue + data.enhance_value;
+                        }
+                }
+            }
+            SetData(type, newData);
         }
 
         /// <summary>
@@ -157,34 +239,28 @@ namespace Elements
             {
                 merged[i] = new Dictionary<eParamType, int>();
 
-                // 将原始的int,int字典转换为eParamType,int字典
-                if (talentData != null && talentData.TryGetValue(i, out var talentParams))
-                {
-                    foreach (var kvp in talentParams)
-                    {
-                        // 这里需要根据你的实际需求进行类型转换
-                        // 假设kvp.Key可以直接映射到eParamType
-                        if (Enum.IsDefined(typeof(eParamType), kvp.Key))
-                        {
-                            merged[i][(eParamType)kvp.Key] = kvp.Value;
-                        }
-                    }
-                }
+                // 合并talentData
+                MergeData(merged[i], talentData, i);
 
-                if (teamData != null && teamData.TryGetValue(i, out var teamParams))
-                {
-                    foreach (var kvp in teamParams)
-                    {
-                        if (Enum.IsDefined(typeof(eParamType), kvp.Key))
-                        {
-                            eParamType paramType = (eParamType)kvp.Key;
-                            merged[i][paramType] = merged[i].GetValueOrDefault(paramType, 0) + kvp.Value;
-                        }
-                    }
-                }
+                // 合并teamData
+                MergeData(merged[i], teamData, i);
             }
 
             return merged;
+        }
+        private static void MergeData(Dictionary<eParamType, int> target, Dictionary<int, Dictionary<int, int>> source, int index)
+        {
+            if (source != null && source.TryGetValue(index, out var sourceParams))
+            {
+                foreach (var kvp in sourceParams)
+                {
+                    if (Enum.IsDefined(typeof(eParamType), kvp.Key))
+                    {
+                        eParamType paramType = (eParamType)kvp.Key;
+                        target[paramType] = target.GetValueOrDefault(paramType, 0) + kvp.Value;
+                    }
+                }
+            }
         }
         public Dictionary<eParamType, int> GetTalentEnhance(int talentId)
         {

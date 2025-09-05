@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Elements;
 using PCRCaculator.SQL;
+using PCRCaculator.Guild;
+
 namespace PCRCaculator
 {
     public class TeamSkillTreeManager : MonoBehaviour
@@ -12,12 +14,12 @@ namespace PCRCaculator
         public GameObject talentSkillPrefab;
         public RectTransform skillTreeContainer;
         public ScrollRect scrollRect;
-        private Dictionary<int, TeamSkillNode> nodeDataDict;
+        private Dictionary<int, TeamSkillNode> NodeDataDict => MainManager.Instance.TeamSkillNodeDic;
         private Dictionary<int, TeamSkillEnhanceData> enhanceDataDict;
         private Dictionary<int, List<int>> nodeChildrenDict;
-        private Dictionary<int, TeamSkillTreeNode> nodeUIDict;
+        private Dictionary<int, TeamSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
-
+        public GuildSettingData SettingData => GuildManager.Instance.SettingData;
         private Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
@@ -29,7 +31,7 @@ namespace PCRCaculator
         { 5, "暗属性" }
     };
         // 布局常量
-        private const float SPACING_X = 75f;
+        private const float SPACING_X = 110f;
         private const float SPACING_Y = 80f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
@@ -45,30 +47,35 @@ namespace PCRCaculator
                 Destroy(gameObject);
             }
             InitializeData();
+            UpdateTalentInfoData();
         }
         void Start()
         {
-            InitializeData();
             BuildSkillTree();
             SetScrollViewToBottom();
         }
-
+        void OnEnable()
+        {
+            // GuildManager.LoadAddedPlayerData();
+            skillLevels = SettingData.GetCurrentPlayerGroup().teamSkill;
+            UpdateAllNodeUI();
+            UpdateTalentInfoData();
+        }
+        public void ReLoad()
+        {
+            GuildManager.LoadAddedPlayerData();
+            OnEnable();
+        }
+        public void LoadGlobalSettings()
+        {
+            SettingData.GetCurrentPlayerGroup().teamSkill = MainManager.Instance.PlayerSetting.teamSkill;
+            OnEnable();
+        }
         public void InitializeData()
         {
-            nodeDataDict = MainManager.Instance.TeamSkillNodeDic;
             enhanceDataDict = MainManager.Instance.TeamSkillEnhanceDataDic;
-            nodeUIDict = new Dictionary<int, TeamSkillTreeNode>();
             paramTypeDict = MainManager.Instance.paramTypeDic;
-            if (MainManager.Instance.PlayerSetting.teamSkillDic != null)
-            {
-                foreach (var kvp in MainManager.Instance.PlayerSetting.teamSkillDic)
-                {
-                    if (nodeDataDict.ContainsKey(kvp.Key))
-                    {
-                        skillLevels[kvp.Key] = kvp.Value;
-                    }
-                }
-            }
+            skillLevels = SettingData.GetCurrentPlayerGroup().teamSkill;
             BuildNodeRelationships();
             UpdateTalentInfoData();
         }
@@ -78,14 +85,14 @@ namespace PCRCaculator
             nodeChildrenDict = new Dictionary<int, List<int>>();
 
             // 初始化子节点列表
-            foreach (var node in nodeDataDict.Values)
+            foreach (var node in NodeDataDict.Values)
             {
                 if (node.node_id > 0)
                     nodeChildrenDict[node.node_id] = new List<int>();
             }
 
             // 建立父子关系
-            foreach (var node in nodeDataDict.Values)
+            foreach (var node in NodeDataDict.Values)
             {
                 if (node.node_id == 0) continue;
                 if (node.pre_node_id > 0 && nodeChildrenDict.ContainsKey(node.pre_node_id))
@@ -148,7 +155,7 @@ namespace PCRCaculator
             // 初始化队列
             if (getAncestors)
             {
-                if (nodeDataDict.TryGetValue(nodeId, out TeamSkillNode node))
+                if (NodeDataDict.TryGetValue(nodeId, out TeamSkillNode node))
                 {
                     if (node.pre_node_id > 0)
                         queue.Enqueue(node.pre_node_id);
@@ -178,7 +185,7 @@ namespace PCRCaculator
 
                     if (getAncestors)
                     {
-                        if (nodeDataDict.TryGetValue(currentId, out TeamSkillNode parentNode))
+                        if (NodeDataDict.TryGetValue(currentId, out TeamSkillNode parentNode))
                         {
                             if (parentNode.pre_node_id > 0 && !relatedNodes.Contains(parentNode.pre_node_id))
                                 queue.Enqueue(parentNode.pre_node_id);
@@ -205,7 +212,7 @@ namespace PCRCaculator
         {
             ClearSkillTree();
 
-            var nodesToShow = nodeDataDict.Values
+            var nodesToShow = NodeDataDict.Values
                 .OrderBy(n => n.pos_x)
                 .ThenBy(n => n.pos_y)
                 .ToList();
@@ -233,7 +240,7 @@ namespace PCRCaculator
 
             float maxX = 0f, maxY = 0f;
 
-            foreach (var nodeUI in nodeUIDict.Values)
+            foreach (var nodeUI in NodeUIDict.Values)
             {
                 RectTransform nodeRect = nodeUI.GetComponent<RectTransform>();
                 Vector2 pos = nodeRect.anchoredPosition;
@@ -245,16 +252,16 @@ namespace PCRCaculator
                 maxY = Mathf.Max(maxY, topY);
             }
 
-            skillTreeContainer.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxX + PADDING);
+            skillTreeContainer.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxX);
             skillTreeContainer.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, maxY + PADDING);
         }
 
         private void ClearSkillTree()
         {
-            foreach (var nodeUI in nodeUIDict.Values)
+            foreach (var nodeUI in NodeUIDict.Values)
                 Destroy(nodeUI.gameObject);
 
-            nodeUIDict.Clear();
+            NodeUIDict.Clear();
         }
 
         private void CreateSkillNode(TeamSkillNode nodeData)
@@ -280,11 +287,25 @@ namespace PCRCaculator
                 int firstEnhanceLevelId = nodeData.enhance_level_ids.Keys.FirstOrDefault();
                 enhanceDataDict.TryGetValue(nodeData.enhance_level_ids[firstEnhanceLevelId][0], out var enhanceData);
                 string TalentType = GetElementTypeText(enhanceData.talent_ids);
-                int enhanceId = currentLevel == 0 ? nodeData.enhance_level_ids[firstEnhanceLevelId][0] : nodeData.enhance_level_ids[firstEnhanceLevelId][0];
+                int enhanceId = 0;
+
+                if (nodeData.enhance_level_ids != null && nodeData.enhance_level_ids.Count > 0)
+                {
+                    var sortedLevelIds = nodeData.enhance_level_ids
+                        .OrderBy(pair => pair.Key)
+                        .ToList();
+
+                    int levelIndex = currentLevel <= 0
+                        ? 0
+                        : Mathf.Clamp(currentLevel - 1, 0, sortedLevelIds.Count - 1);
+
+                    int[] enhanceIds = sortedLevelIds[levelIndex].Value;
+                    enhanceId = enhanceIds.Length > 0 ? enhanceIds[0] : 0;
+                }
                 string enhanceValue = currentLevel == 0 ? "0%" : GetEnhanceValueText(enhanceId);
                 nodeUI.SetNodeData(nodeData.node_id, GetSkillIcon(nodeData.node_id), currentLevel, maxLevel, TalentType, title_text, enhanceValue);
                 // 添加到字典中
-                nodeUIDict[nodeData.node_id] = nodeUI;
+                NodeUIDict[nodeData.node_id] = nodeUI;
             }
         }
 
@@ -296,7 +317,7 @@ namespace PCRCaculator
 
         private int GetMaxSkillLevel(int nodeId)
         {
-            if (nodeId == 0 || !nodeDataDict.TryGetValue(nodeId, out TeamSkillNode node) || node.enhance_level_ids == null)
+            if (nodeId == 0 || !NodeDataDict.TryGetValue(nodeId, out TeamSkillNode node) || node.enhance_level_ids == null)
                 return 0;
 
             return node.enhance_level_ids.Count;
@@ -310,7 +331,7 @@ namespace PCRCaculator
 
             try
             {
-                if (!nodeDataDict.TryGetValue(nodeId, out var node))
+                if (!NodeDataDict.TryGetValue(nodeId, out var node))
                     return;
 
                 // 1. 设置祖先节点为最大等级
@@ -338,14 +359,14 @@ namespace PCRCaculator
         }
         private void UpdateAllNodeUI()
         {
-            foreach (var kvp in nodeUIDict)
+            foreach (var kvp in NodeUIDict)
             {
                 int nodeId = kvp.Key;
                 TeamSkillTreeNode nodeUI = kvp.Value;
 
                 int currentLevel = GetSkillLevel(nodeId);
                 int maxLevel = GetMaxSkillLevel(nodeId);
-                nodeDataDict.TryGetValue(nodeId, out var nodeData);
+                NodeDataDict.TryGetValue(nodeId, out var nodeData);
                 int firstEnhanceLevelId = nodeData.enhance_level_ids.Keys.FirstOrDefault();
                 int enhanceId = 0;
 
@@ -409,7 +430,7 @@ namespace PCRCaculator
             foreach (var nodeId in skillLevels.Keys)
             {
                 int level = skillLevels[nodeId];
-                if (level <= 0 || !nodeDataDict.TryGetValue(nodeId, out var nodeData))
+                if (level <= 0 || !NodeDataDict.TryGetValue(nodeId, out var nodeData))
                     continue;
 
                 // 将 enhance_level_ids 转换为有序列表
@@ -438,46 +459,17 @@ namespace PCRCaculator
         }
         public void UpdateTalentInfoData()
         {
-            // 获取当前 TalentSkillEnhance 数据
-            List<int> activatedEnhanceIds = GetActivatedEnhanceIds();
-
-            // 准备新数据字典
-            var newData = new Dictionary<int, Dictionary<int, int>>();
-            for (int i = 1; i <= 5; i++)
-            {
-                newData[i] = new Dictionary<int, int>();
-            }
-
-            // 填充新数据
-            foreach (int enhanceId in activatedEnhanceIds)
-            {
-                if (!MainManager.Instance.TeamSkillEnhanceDataDic.TryGetValue(enhanceId, out var data))
-                    continue;
-
-                foreach (int talentId in data.talent_ids)
-                {
-                    if (talentId < 1 || talentId > 5)
-                        continue;
-
-                    // 添加参数到新数据中
-                    var talentDict = newData[talentId];
-                    int currentValue = talentDict.GetValueOrDefault(data.parameter_type);
-                    talentDict[data.parameter_type] = currentValue + data.enhance_value;
-                }
-            }
-
-            // 一次性设置所有数据并触发更新
-            MainManager.Instance.TeamEnhanceData.SetData(TeamEnhanceParameter.DataType.TeamSkill, newData);
+            MainManager.Instance.TeamEnhanceData.UpdateTalentInfoData(
+                skillLevels, 
+                NodeDataDict, 
+                TeamEnhanceParameter.DataType.TeamSkill);
         }
-        public void SaveTeamSkillsToPlayerSetting()
+        public void SaveTeamSkills(bool global = false)
         {
             var activeSkills = GetActiveTeamSkills();
-
-            // 清空之前的属性技能数据（可选）
-            MainManager.Instance.PlayerSetting.teamSkillDic.Clear();
-
-            MainManager.Instance.PlayerSetting.teamSkillDic = activeSkills;
-
+            if (global) MainManager.Instance.PlayerSetting.teamSkill = activeSkills; //公共
+            SettingData.GetCurrentPlayerGroup().teamSkill = activeSkills; //队内
+            GuildManager.Instance.SaveDataToJson();
         }
     }
 }

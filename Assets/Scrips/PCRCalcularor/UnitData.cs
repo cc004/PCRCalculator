@@ -2107,11 +2107,10 @@ namespace PCRCaculator
         public bool ignoreLogBarrierCritical = false;
 
         public int maxTPUpValue = 250;//TP上限
-
+        public Dictionary<int, int> talentLevel = new();
+        public Dictionary<int, int> talentSkill = new();
+        public Dictionary<int, int> teamSkill = new();
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
-        public Dictionary<int, int> talentLevelDic = new Dictionary<int, int>();
-        public Dictionary<int, int> talentSkillDic = new Dictionary<int, int>();
-        public Dictionary<int, int> teamSkillDic = new Dictionary<int, int>();
 
 
         public int GetMaxRank()

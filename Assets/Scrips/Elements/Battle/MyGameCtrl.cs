@@ -249,6 +249,7 @@ namespace Elements
                 SetBattleSpeed(tempData.SettingData.calSpeed);
             else
                 SetBattleSpeed(1);
+            BattleUIManager.Instance.SetTalentBonus();
         }
         public static void SetSummonUI(UnitCtrl summon)
         {

@@ -19,7 +19,7 @@ namespace PCRCaculator
 
         private void OnEnable()
         {
-            teamEnhanceData.LoadFromPlayerSetting(mainManager.PlayerSetting);
+            teamEnhanceData.LoadFromPlayerSetting();
             SubscribeEvents();
             RefreshTable();
         }
@@ -81,7 +81,6 @@ namespace PCRCaculator
             }
             CreateRow("属性攻击力", talentLevelStrings);
 
-            // 获取所有使用的参数类型
             // 获取所有使用的参数类型并排序
             var usedParamTypes = new HashSet<eParamType>();
             foreach (var levelDict in teamEnhanceData.talentBuffParameter.Values)

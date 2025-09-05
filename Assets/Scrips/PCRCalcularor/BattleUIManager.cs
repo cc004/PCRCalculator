@@ -65,6 +65,10 @@ namespace PCRCaculator.Battle
         public List<Sprite> number_physical_small;
         public List<Sprite> number_heal_large;
         public List<Sprite> number_energy_large;
+        public List<Sprite> talentBonusBackground;
+        public List<Sprite> talentBonusBackground2;
+        public List<Sprite> talentBonusIcon;
+        public List<Image> talentBonus;
         public Sprite sprite_total_physical;
         public Sprite sprite_total_magical;
         public Sprite sprite_critical_physical;
@@ -388,7 +392,7 @@ namespace PCRCaculator.Battle
         }
         public void SetUI_2(MyGameCtrl gameCtrl)
         {
-            guildTotalDamageNumber.gameObject.SetActive(false);            
+            guildTotalDamageNumber.gameObject.SetActive(false);
             for (int i = 0; i < PlayerUI.Count; i++)
             {
                 if (gameCtrl.playerUnitCtrl.Count > i)
@@ -420,7 +424,9 @@ namespace PCRCaculator.Battle
                     {
                         gameCtrl.enemyUnitCtrl[i].OnDamage += RefreshGuildEnemyTotalDamage2;
                         guildTotalDamageNumber.gameObject.SetActive(true);
-                    }else{
+                    }
+                    else
+                    {
                         EnemyUI[i].gameObject.SetActive(true);
                     }
                     EnemyUI[i].SetAlive();
@@ -440,6 +446,7 @@ namespace PCRCaculator.Battle
                 // backGroundImage.sprite = jjcBackGround;
             }
             StartCoroutine(AutoSaveImage2());
+            SetTalentBonus();
         }
         public void SetSummonUI(UnitCtrl summon)
         {
@@ -666,6 +673,48 @@ namespace PCRCaculator.Battle
                 b.sprite = iconSprite;
             }
             EnvironmentUI.SetActive(isActive);
+        }
+        public void SetTalentBonus()
+        {
+            // 隐藏所有属性图标
+            for (int i = 0; i < talentBonus.Count; i++)
+            {
+                talentBonus[i].gameObject.SetActive(false);
+            }
+
+            // 检查UnitTalentFormationBonusDictionary中的值，如果大于0则设置对应图片
+            int bonusIndex = 0;
+ 
+            for (int talentId = 1; talentId <= 5 && bonusIndex < 2; talentId++)
+            {
+                // 检查是否存在该属性ID且值大于0
+                if (BattleManager.Instance.UnitTalentFormationBonusDictionary.TryGetValue(talentId, out long bonusValue) && bonusValue > 0)
+                {
+                    // 设置对应的属性图标
+                    if (bonusIndex < talentBonus.Count)
+                    {
+                        if (bonusIndex == 0)
+                        {
+                            talentBonus[0].sprite = talentBonusBackground[talentId - 1];
+                            talentBonus[0].gameObject.SetActive(true);
+                            talentBonus[2].sprite = talentBonusIcon[talentId - 1];
+                            talentBonus[4].sprite = talentBonusIcon[talentId - 1];
+                            talentBonus[4].gameObject.SetActive(true);
+                        }
+                        else if (bonusIndex == 1)
+                        {
+                            talentBonus[4].gameObject.SetActive(false);
+                            talentBonus[1].sprite = talentBonusBackground2[talentId - 2];
+                            talentBonus[1].gameObject.SetActive(true);
+                            talentBonus[2].gameObject.SetActive(true);
+                            talentBonus[3].sprite = talentBonusIcon[talentId - 1];
+                            talentBonus[3].gameObject.SetActive(true);
+
+                        }
+                        bonusIndex++;
+                    }
+                }
+            }
         }
         public Sprite GetAbnormalIconSprite(eStateIconType stateIconType)
         {

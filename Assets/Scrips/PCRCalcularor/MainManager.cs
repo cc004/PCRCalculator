@@ -556,7 +556,10 @@ namespace PCRCaculator
                 }
             }
         }
-
+        public void ReLoadPlayerSetting()
+        {
+            playerSetting = SaveManager.Load<PlayerSetting>();
+        }
         /// <summary>
         /// 保存玩家设置到json
         /// </summary>

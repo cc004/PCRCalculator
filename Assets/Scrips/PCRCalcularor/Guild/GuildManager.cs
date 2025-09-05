@@ -112,6 +112,10 @@ namespace PCRCaculator.Guild
         public Text version;
         public InputField RandomSeed;
         public Toggle UseFixedRandomSeed;
+        public List<Sprite> TalentSprites;
+        public List<Image> WeaknessSprites;
+
+
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -787,6 +791,10 @@ namespace PCRCaculator.Guild
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
             toggles_ChooseBoss[2].isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
+            MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
+            UpdateWeaknessSprites();
+            // TeamSkillTreeManager.Instance.UpdateTalentInfoData();
+            // TalentSkillTreeManager.Instance.UpdateTalentInfoData();
         }
         private void RefreshCalcSettings_start()
         {
@@ -868,7 +876,7 @@ namespace PCRCaculator.Guild
             UnitCtrl.infoGetter = null;
             SaveDataToJson();
         }
-        private static void LoadAddedPlayerData()
+        public static void LoadAddedPlayerData()
         {
             try
             {
@@ -1417,6 +1425,39 @@ namespace PCRCaculator.Guild
             SettingData.GetCurrentPlayerGroup().usePlayerSettingHP = toggles_ChooseBoss[2].isOn;
             SaveDataToJson();
         }
+        private void UpdateWeaknessSprites()
+        {
+            int currentBossId = selectedBossEnemyids[0];
+
+            if (MainManager.Instance.weaknessDic.TryGetValue(currentBossId, out int[] weaknessValues))
+            {
+                int spriteIndex = 0;
+
+                for (int i = 0; i < 5 && spriteIndex < 5; i++)
+                {
+                    int value = weaknessValues[i];
+
+                    if (value > 100)
+                    {
+                        WeaknessSprites[spriteIndex].sprite = TalentSprites[i];
+                        WeaknessSprites[spriteIndex].gameObject.SetActive(true); 
+                        spriteIndex++;
+                    }
+                }
+
+                for (int i = spriteIndex; i < WeaknessSprites.Count; i++)
+                {
+                    WeaknessSprites[i].gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                foreach (var weaknessSprite in WeaknessSprites)
+                {
+                    weaknessSprite.gameObject.SetActive(false);
+                }
+            }
+        }
     }
     [Serializable]
     public class GuildEnemyData
@@ -1611,7 +1652,10 @@ namespace PCRCaculator.Guild
     public class GuildPlayerGroupData
     {
         public AddedPlayerData playerData;
-        public List<List<float>> UBExecTimeData = new List<List<float>> {};
+        public Dictionary<int, int> talentLevel = new Dictionary<int, int>();
+        public Dictionary<int, int> talentSkill = new Dictionary<int, int>();
+        public Dictionary<int, int> teamSkill = new Dictionary<int, int>();
+        public List<List<float>> UBExecTimeData = new List<List<float>> { };
         public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};
         public bool useAutoMode;
         public bool useSetMode;
