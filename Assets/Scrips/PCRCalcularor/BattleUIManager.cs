@@ -682,15 +682,17 @@ namespace PCRCaculator.Battle
                 talentBonus[i].gameObject.SetActive(false);
             }
 
-            // 检查UnitTalentFormationBonusDictionary中的值，如果大于0则设置对应图片
+            bool anyBonusGreaterThanZero = BattleManager.Instance.UnitTalentFormationBonusDictionary.Values.Any(value => value > 0);
+            talentBonus[5].SetActive(anyBonusGreaterThanZero);
+
+            if (!anyBonusGreaterThanZero) return;
+
+            // 设置对应的图标
             int bonusIndex = 0;
- 
             for (int talentId = 1; talentId <= 5 && bonusIndex < 2; talentId++)
             {
-                // 检查是否存在该属性ID且值大于0
                 if (BattleManager.Instance.UnitTalentFormationBonusDictionary.TryGetValue(talentId, out long bonusValue) && bonusValue > 0)
                 {
-                    // 设置对应的属性图标
                     if (bonusIndex < talentBonus.Count)
                     {
                         if (bonusIndex == 0)
@@ -709,7 +711,6 @@ namespace PCRCaculator.Battle
                             talentBonus[2].gameObject.SetActive(true);
                             talentBonus[3].sprite = talentBonusIcon[talentId - 1];
                             talentBonus[3].gameObject.SetActive(true);
-
                         }
                         bonusIndex++;
                     }
