@@ -7614,7 +7614,7 @@ RectTransform:
   m_Children:
   - {fileID: 1515503170}
   m_Father: {fileID: 1843822577}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -26617,7 +26617,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1843822577}
-  m_RootOrder: 1
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -36753,13 +36753,15 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: "2023\u5E7401\u6708 S59\u6C34\u74F6\u5EA710044700\n2023\u5E7402\u6708 S60\u53CC\u9C7C\u5EA710045500\n2023\u5E7403\u6708
-    S61\u767D\u7F8A\u5EA710046300\n2023\u5E7404\u6708 S62\u91D1\u725B\u5EA710047200\n2023\u5E7405\u6708
-    S63\u53CC\u5B50\u5EA710047900\n2023\u5E7406\u6708 S64\u5DE8\u87F9\u5EA710048700\n2023\u5E7407\u6708
-    S65\u72EE\u5B50\u5EA710049300\n2023\u5E7408\u6708 S66\u5904\u5973\u5EA710050000\n2023\u5E7409\u6708
-    S67\u5929\u79E4\u5EA710050800\n2023\u5E7410\u6708 S68\u5929\u874E\u5EA710051400\n2023\u5E7411\u6708
-    S69\u5C04\u624B\u5EA710051900\n2023\u5E7412\u6708 S70\u6469\u7FAF\u5EA710052500\n-------------\u4E0D\u517C\u5BB9\u540E\u9762\u7248\u672C-------------\n2024\u5E7401\u6708
-    S71\u6C34\u74F6\u5EA710053100\n2024\u5E7402\u6708 S72\u53CC\u9C7C\u5EA710053700\n\n\u518D\u6B21\u70B9\u51FB\u6309\u94AE\u5373\u53EF\u5173\u95ED\u7A97\u53E3"
+  m_Text: "2024\u5E7401\u6708 S71\u6C34\u74F6\u5EA710053100\r\n2024\u5E7402\u6708
+    S72\u53CC\u9C7C\u5EA710053700\u8DF3\u8FC7\r\n2024\u5E7403\u6708 S73\u767D\u7F8A\u5EA710054200\r\n2024\u5E7404\u6708
+    S74\u91D1\u725B\u5EA710055000\u8DF3\u8FC7\r\n2024\u5E7405\u6708 S75\u53CC\u5B50\u5EA710055800\r\n2024\u5E7406\u6708
+    S76\u5DE8\u87F9\u5EA710056300\u8DF3\u8FC7\r\n2024\u5E7407\u6708 S77\u72EE\u5B50\u5EA710057100\r\n----\u5B57\u6BB5\u987A\u5E8F\u6253\u4E71----\r\n2024\u5E7408\u6708
+    S78\u5904\u5973\u5EA710058000\r\n2024\u5E7409\u6708 S79\u5929\u79E4\u5EA710058800\u8DF3\u8FC7\r\n2024\u5E7410\u6708
+    S80\u5929\u874E\u5EA710059500\r\n2024\u5E7411\u6708 S81\u5C04\u624B\u5EA710060200\u8DF3\u8FC7\r\n2024\u5E7412\u6708
+    S82\u6469\u7FAF\u5EA710060800\r\n---2025\u5E74----\r\n2025\u5E7401\u6708 S83\u6C34\u74F6\u5EA710061500\r\n2025\u5E7402\u6708
+    S84\u53CC\u9C7C\u5EA710062200\u8DF3\u8FC7\r\n2025\u5E7403\u6708 S85\u767D\u7F8A\u5EA710062600\r\n2025\u5E7404\u6708
+    S86\u91D1\u725B\u5EA710063000\u8DF3\u8FC7\r\n2025\u5E7405\u6708 S87\u53CC\u5B50\u5EA710063700"
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -49100,7 +49102,7 @@ RectTransform:
   m_Children:
   - {fileID: 2035126171}
   m_Father: {fileID: 1843822577}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -66597,10 +66599,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 243823276}
-  - {fileID: 756147261}
   - {fileID: 362769143}
   - {fileID: 1397829690}
   - {fileID: 221235843}
+  - {fileID: 756147261}
   - {fileID: 767098494}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -80509,7 +80511,7 @@ PrefabInstance:
     - target: {fileID: 846614980746781776, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 846614980746781776, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
@@ -81884,7 +81886,7 @@ PrefabInstance:
     - target: {fileID: 5392821886617668871, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5392821886617668871, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
         type: 3}

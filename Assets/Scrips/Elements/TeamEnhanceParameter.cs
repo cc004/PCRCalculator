@@ -65,7 +65,7 @@ namespace Elements
         {
             if (GuildManager.Instance.SettingData.GetCurrentPlayerGroup().playerData.playrCharacters.Count == 0 || isGlobal)
             {
-                MainManager.Instance.ReLoadPlayerSetting();
+                MainManager.Instance.LoadPlayerSettings();
                 GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentLevel = MainManager.Instance.PlayerSetting.talentLevel;
                 GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentSkill = MainManager.Instance.PlayerSetting.talentSkill;
                 GuildManager.Instance.SettingData.GetCurrentPlayerGroup().teamSkill = MainManager.Instance.PlayerSetting.teamSkill;

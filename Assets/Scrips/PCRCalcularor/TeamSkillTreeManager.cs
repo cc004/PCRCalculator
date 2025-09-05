@@ -64,7 +64,16 @@ namespace PCRCaculator
         public void ReLoad()
         {
             GuildManager.LoadAddedPlayerData();
-            OnEnable();
+            if ((SettingData.GetCurrentPlayerGroup().talentLevel?.Count ?? 0) > 0 ||
+                (SettingData.GetCurrentPlayerGroup().talentSkill?.Count ?? 0) > 0 ||
+                (SettingData.GetCurrentPlayerGroup().teamSkill?.Count ?? 0) > 0)
+            {
+                OnEnable();
+            }
+            else
+            {
+                MainManager.Instance.WindowMessage("初始队伍无数据可还原!");
+            }
         }
         public void LoadGlobalSettings()
         {

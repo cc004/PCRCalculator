@@ -31,7 +31,16 @@ namespace PCRCaculator
         public void ReLoad()
         {
             GuildManager.LoadAddedPlayerData();
-            OnEnable();
+            if ((SettingData.GetCurrentPlayerGroup().talentLevel?.Count ?? 0) > 0 ||
+                (SettingData.GetCurrentPlayerGroup().talentSkill?.Count ?? 0) > 0 ||
+                (SettingData.GetCurrentPlayerGroup().teamSkill?.Count ?? 0) > 0)
+            {
+                OnEnable();
+            }
+            else
+            {
+                MainManager.Instance.WindowMessage("初始队伍无数据可还原!");
+            }
         }
         /// <summary>
         /// 加载属性等级滑动条
@@ -48,6 +57,7 @@ namespace PCRCaculator
                 }
             }
             loadSliderEvents = false;
+            OnTalentSliderChanged();
         }
 
         /// <summary>
@@ -56,7 +66,6 @@ namespace PCRCaculator
         public void OnTalentSliderChanged()
         {
             if (loadSliderEvents) return;
-            bool hasChanged = false;
             var talentLevels = new Dictionary<int, int>();
 
             for (int i = 0; i < talentLevelSliders.Count; i++)
@@ -74,18 +83,11 @@ namespace PCRCaculator
                     SettingData.GetCurrentPlayerGroup().talentLevel.Add(key, (int)sliderValue);
                 }
                 talentLevels[key] = (int)sliderValue;
-                if (oldValue != (int)sliderValue)
-                {
-                    hasChanged = true;
-                }
-            }
 
-            // 如果有变化，更新PrincessKnightInfo并通知更新
-            if (hasChanged)
-            {
-                MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);
-                OnTalentLevelChanged?.Invoke();
             }
+            MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);
+            OnTalentLevelChanged?.Invoke();
+
         }
         /// <summary>
         /// 保存属性技能到玩家设置

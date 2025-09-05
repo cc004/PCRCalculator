@@ -535,7 +535,7 @@ namespace PCRCaculator
             }
         }
 
-        private void LoadPlayerSettings()
+        public void LoadPlayerSettings()
         {
             try
             {

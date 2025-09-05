@@ -56,9 +56,21 @@ namespace PCRCaculator
         }
         public void UsePlayerSetting()
         {
-            MainManager.Instance.ReLoadPlayerSetting();
-            TalnetInfoData.LoadFromPlayerSetting(true);
-            MainManager.Instance.WindowMessage("已恢复成全局配置！");
+            MainManager.Instance.LoadPlayerSettings();
+            if ((PlayerSetting.teamSkill?.Count ?? 0) > 0 ||
+                (PlayerSetting.talentSkill?.Count ?? 0) > 0 ||
+                (PlayerSetting.talentLevel?.Count ?? 0) > 0)
+            {
+                TalnetInfoData.LoadFromPlayerSetting(true);
+                TalentLevelManager.Instance.LoadGlobalSettings();
+                TalentSkillTreeManager.Instance.LoadGlobalSettings();
+                TeamSkillTreeManager.Instance.LoadGlobalSettings();
+                MainManager.Instance.WindowMessage("已恢复成全局配置！");
+            }
+            else
+            {
+                MainManager.Instance.WindowMessage("未找到全局配置！");
+            }
         }
 
         public void OnTalentToggleChanged()
