@@ -240,7 +240,7 @@ namespace Elements
             LongWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
             LongWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
             float num6 = 0f;
-            double damageUpPrecent = (_isPhysicalForTarget ? _target.Owner.PhysicalDamageUpPercentOrMin : _target.Owner.MagicDamageUpPercentOrMin) / 100f;
+            double damageUpPrecent = (_isPhysicalForTarget ? _source.PhysicalDamageUpPercentOrMin : _source.MagicDamageUpPercentOrMin) / 100f;
             num6 = (!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f);
             num4 = BattleUtil.DoubleToLong(num4 * num6 * damageUpPrecent);
             num5 = BattleUtil.DoubleToLong(num5 * num6 * damageUpPrecent);
