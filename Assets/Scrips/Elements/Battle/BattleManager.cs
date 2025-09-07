@@ -4128,7 +4128,8 @@ namespace Elements.Battle
             GamePause(false);
         }
 
-        bool _IsReleasedKnightEnhance = true;
+        public bool _IsReleasedKnightEnhance = true;
+        public bool _IsReleaseSkillHasteLogic = false;
         public Dictionary<int, long> UnitTalentFormationBonusDictionary { get; set; } = new Dictionary<int, long>();
 
         /// <summary>

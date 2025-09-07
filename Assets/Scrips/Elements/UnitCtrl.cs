@@ -140,6 +140,18 @@ namespace Elements
         private void activeOverwriteAbnormalState(OverwriteAbnormalStateData _data)
         {
             UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
+            if (BattleManager.Instance._IsReleaseSkillHasteLogic)
+            {
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null)
+                {
+                    list1.Clear();
+                }
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null)
+                {
+                    list2.Clear();
+                }
+            }
+
             this.SetAbnormalState(_data.Source, abnormalState, 9999f, _data.ActionParameter, _data.Skill, _data.EffectValue, 0f, false, false, 1f, true);
             if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(this.CalcAbnormalStateSpeed(), 1f))
             {
@@ -268,6 +280,14 @@ namespace Elements
         private int overlapAbnormalStateCount;
         private Dictionary<eAbnormalState, List<int>> overlapAbnormalStateIndexList = new Dictionary<eAbnormalState, List<int>>
         {
+            {
+                eAbnormalState.SLOW,
+                new List<int>()
+            },
+            {
+                eAbnormalState.HASTE,
+                new List<int>()
+            },
             {
                 eAbnormalState.SLOW_OVERLAP,
                 new List<int>()
@@ -4625,6 +4645,64 @@ this.updateCurColor();
 			}
 		}
 
+        // RVA: 0x282C858 Offset: 0x282C858 VA: 0x282C858
+        private int prepareForUpdateOverlapAbnormalState(eAbnormalState _abnormalState, AbnormalStateCategoryData _data, bool _showsIcon)
+        {
+            // var showIconDict = this.overlapAbnormalStateShowIconCount; // Dictionary<eAbnormalState, int>
+
+            if (_abnormalState == eAbnormalState.SLOW)
+            {
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7))
+                {
+                    indexList7.Clear();
+                }
+
+                if (_showsIcon)
+                {
+                    // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
+                    //     showIconDict[eAbnormalState.SLOW] = 0;
+                    // showIconDict[eAbnormalState.SLOW]++;
+                }
+            }
+            else if (_abnormalState == eAbnormalState.HASTE)
+            {
+                if (!overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11))
+                {
+                    indexList11.Clear();
+                }
+
+                if (_showsIcon)
+                {
+                    // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
+                    //     showIconDict[eAbnormalState.HASTE] = 0;
+                    // showIconDict[eAbnormalState.HASTE]++;
+                }
+            }
+
+            int newIndex = this.overlapAbnormalStateCount;
+            this.overlapAbnormalStateCount++;
+
+            if (!overlapAbnormalStateIndexList.TryGetValue(_abnormalState, out var indexList))
+                indexList = overlapAbnormalStateIndexList[_abnormalState] = new List<int>();
+
+            indexList.Add(newIndex);
+
+            overlapAbnormalStateData[newIndex] = _data;
+
+            m_abnormalState[_abnormalState] = true;
+
+            // if (CanOverlapAbnormalState(
+            //         _abnormalState,
+            //         battleManager._IsReleaseSkillHasteLogic,
+            //         ))
+            // {
+            //     this.UpdateEffectForSpeedAbnormalState(true);
+            // }
+
+            return newIndex;
+        }
+
+
         public void SetAbnormalState(
           UnitCtrl _source,
           eAbnormalState _abnormalState,
@@ -4684,8 +4762,8 @@ this.updateCurColor();
                     case eAbnormalState.CURSE2:
                         OnSlipDamage.Call();
                         break;
-                    case eAbnormalState.CONVERT:    
-                    case eAbnormalState.CONFUSION:  
+                    case eAbnormalState.CONVERT:
+                    case eAbnormalState.CONFUSION:
                         OnActiveUnableState.Call();
                         break;
                     default:
@@ -4694,7 +4772,7 @@ this.updateCurColor();
                             OnActiveUnableState.Call();
                         }
                         break;
-                    // TODO OnActiveCharmState
+                        // TODO OnActiveCharmState
                 }
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
@@ -4732,7 +4810,7 @@ this.updateCurColor();
                 {
                     if (IsDead)
                         return;
-                    if (CanOverlapAbnormalState(_abnormalState))
+                    if (CanOverlapAbnormalState(_abnormalState, BattleManager.Instance._IsReleaseSkillHasteLogic))
                     {
                         if (!BattleManager.Instance.skipping && button != null)
                         {
@@ -4742,7 +4820,7 @@ this.updateCurColor();
                             }
                         }
 
-                        battleManager.AppendCoroutine(updateOverlapAbnormalState(_abnormalState, new AbnormalStateCategoryData
+                        var data = new AbnormalStateCategoryData
                         {
                             CurrentAbnormalState = _abnormalState,
                             enable = true,
@@ -4751,16 +4829,20 @@ this.updateCurColor();
                             Time = _effectTime,
                             ActionId = (_action?.ActionId ?? 0),
                             IsDamageRelease = _isDamageRelease,
-                            ShowsIcon = false,
+                            ShowsIcon = _showsIcon,
                             Skill = _skill,
                             Source = _source,
                             ActionDetail1 = _action?.ActionDetail1 ?? 0,
                             ActionDetail2 = _action?.ActionDetail2 ?? 0,
-                        }), ePauseType.SYSTEM);
+                        };
+
+                        int idx = prepareForUpdateOverlapAbnormalState(_abnormalState, data, _showsIcon);
+
+                        battleManager.AppendCoroutine(updateOverlapAbnormalState(_abnormalState, idx, _effectTime), ePauseType.SYSTEM);
                         return;
                     }
                     if (IsAbnormalState(abnormalStateCategory))
-                        switchAbnormalState(_abnormalState, abnormalEffectData,_showsIcon);
+                        switchAbnormalState(_abnormalState, abnormalEffectData, _showsIcon);
                     stateCategoryData.Duration = _effectTime;
                     stateCategoryData.Time = _effectTime;
                     stateCategoryData.MainValue = _value;
@@ -4878,30 +4960,28 @@ this.updateCurColor();
             return false;
         }
 
-        public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState)
+        public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState, bool _isReleaseSkillHasteLogic)
         {
             if ((uint)(_abnormalState - 65) <= 1u)
             {
                 return true;
+            } else if (_abnormalState == eAbnormalState.SLOW || _abnormalState == eAbnormalState.HASTE)
+            {
+                return _isReleaseSkillHasteLogic;
             }
             return false;
         }
-        private IEnumerator updateOverlapAbnormalState(eAbnormalState _abnormalState, AbnormalStateCategoryData _data)
+        private IEnumerator updateOverlapAbnormalState(eAbnormalState _abnormalState, int _index, float _effectTime)
         {
 
-            int currentBehaviourIndex = overlapAbnormalStateCount;
-            overlapAbnormalStateCount++;
-            overlapAbnormalStateIndexList[_abnormalState].Add(currentBehaviourIndex);
-            overlapAbnormalStateData[currentBehaviourIndex] = _data;
-            m_abnormalState[_abnormalState] = true;
-
+            int currentBehaviourIndex = _index;
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {
                 updateEffectForSpeedAbnormalState(_isEnable: true);
             }*/
             float time = 0f;
-            for (float effectTime = _data.Time; time < effectTime; time += DeltaTimeForPause)
+            for (float effectTime = _effectTime; time < effectTime; time += DeltaTimeForPause)
             {
                 yield return null;
                 if (!overlapAbnormalStateIndexList[_abnormalState].Contains(currentBehaviourIndex))
@@ -4961,24 +5041,48 @@ this.updateCurColor();
             [eAbnormalState.GUARD_MGC] = 0f,
             [eAbnormalState.GUARD_BOTH] = 0f,
         };*/
-        public float CalcAbnormalStateSpeed()
+        private double getSpeed()
         {
-            float num = 1f;
-            if (IsAbnormalState(eAbnormalState.SLOW) || IsAbnormalState(eAbnormalState.HASTE))
+            if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out List<int> overlapList) && overlapList.Count > 0)
             {
-                num = (float)abnormalStateCategoryDataDictionary[eAbnormalStateCategory.SPEED].MainValue;
+                return 1f + (double)overlapList.Max(x => overlapAbnormalStateData[x].MainValue);
             }
-            return Mathf.Max(0f, num + calcOverlapSpeed());
+            else if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out overlapList) && overlapList.Count > 0)
+            {
+                return 1f - (double)overlapList.Min(x => overlapAbnormalStateData[x].MainValue);
+            }
+            return 1.0;
         }
-        private float calcOverlapSpeed()
+
+        public double CalcAbnormalStateSpeed()
         {
-            float num = 0f;
+            double num = 1.0;
+            if (BattleManager.Instance._IsReleaseSkillHasteLogic)
+            {
+                num = getSpeed();
+            }
+            else
+            {
+                if (IsAbnormalState(eAbnormalState.SLOW) || IsAbnormalState(eAbnormalState.HASTE))
+                {
+                    num = abnormalStateCategoryDataDictionary[eAbnormalStateCategory.SPEED].MainValue;
+                }
+            }
+            return Math.Max(0.0, num + calcOverlapSpeed());
+        }
+        private double calcOverlapSpeed()
+        {
+            double num = 0.0;
             foreach (KeyValuePair<eAbnormalState, List<int>> overlapAbnormalStateIndex in overlapAbnormalStateIndexList)
             {
-                List<int> value = overlapAbnormalStateIndex.Value;
-                for (int i = 0; i < value.Count; i++)
+                eAbnormalState key = overlapAbnormalStateIndex.Key;
+                if (key == eAbnormalState.SLOW_OVERLAP || key == eAbnormalState.HASTE_OVERLAP)
                 {
-                    num += (float)overlapAbnormalStateData[value[i]].MainValue;
+                    List<int> value = overlapAbnormalStateIndex.Value;
+                    for (int i = 0; i < value.Count; i++)
+                    {
+                        num += (double)overlapAbnormalStateData[value[i]].MainValue;
+                    }
                 }
             }
             return num;
@@ -4989,7 +5093,7 @@ this.updateCurColor();
         }
         public bool IsSlowSpeed()
         {
-            float num = CalcAbnormalStateSpeed();
+            double num = CalcAbnormalStateSpeed();
             if (BattleUtil.Approximately(num, 1f))
             {
                 return false;
@@ -4998,14 +5102,14 @@ this.updateCurColor();
         }
         private void setIdleCastTime()
         {
-            float num = CalcAbnormalStateSpeed();
-            if (BattleUtil.Approximately(num, 0f))
+            double num = CalcAbnormalStateSpeed();
+            if (BattleUtil.Approximately(num, 0.0))
             {
                 m_fCastTimer = 90f;
             }
             else
             {
-                m_fCastTimer = (float)m_fCastTimer / num;
+                m_fCastTimer = (float)m_fCastTimer / (float)num;
             }
         }
         private void switchAbnormalState(
@@ -5112,7 +5216,7 @@ this.updateCurColor();
         }*/
         public void DisableAbnormalStateById(eAbnormalState _abnormalState, int _actionId, bool _isReleasedByDamage)
         {
-            if (CanOverlapAbnormalState(_abnormalState))
+            if (CanOverlapAbnormalState(_abnormalState, BattleManager.Instance._IsReleaseSkillHasteLogic))
             {
                 List<int> list = overlapAbnormalStateIndexList[_abnormalState];
                 for (int num = list.Count - 1; num >= 0; num--)
