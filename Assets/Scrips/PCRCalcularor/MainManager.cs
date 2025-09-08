@@ -759,6 +759,13 @@ namespace PCRCaculator
                 return unitDataDic[unitid].GetUnitNameInternal();
             return "???";
         }
+        public List<int> GetTalentIds(int unitid)
+        {
+
+            if (UnitRarityDic.TryGetValue(unitid, out var data))
+                return data.detailData.talent_id;
+            return new List<int>();
+        }
         private void CreateShowUnitIDS()
         {
             if (!PlayerSetting.showAllUnits)

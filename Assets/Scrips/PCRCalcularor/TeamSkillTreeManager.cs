@@ -470,11 +470,17 @@ namespace PCRCaculator
 
             return activatedEnhanceIds;
         }
+        public string GetFinalTeamSkillNodeDescription()
+        {
+            var teamSkill = SettingData.GetCurrentPlayerGroup().teamSkill;
+
+            return $"第{teamSkill.Keys.Max()}个";
+        }
         public void UpdateTalentInfoData()
         {
             MainManager.Instance.TeamEnhanceData.UpdateTalentInfoData(
-                skillLevels, 
-                NodeDataDict, 
+                skillLevels,
+                NodeDataDict,
                 TeamEnhanceParameter.DataType.TeamSkill);
         }
         public void SaveTeamSkills(bool global = false)

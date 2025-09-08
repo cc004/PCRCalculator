@@ -1029,6 +1029,10 @@ namespace ExcelHelper
                 worksheet0.MySetValue(8, 2, "专1/专2", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(9, 2, "星级", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(10, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(11, 2, "属性等级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(12, 2, "属性技能", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(13, 2, "大师技能", blod: true, backColor: backColotInt_2);
+
                 int count = 0;
                 foreach (UnitData unitData in playerDatas.playrCharacters)
                 {
@@ -1040,24 +1044,31 @@ namespace ExcelHelper
                     worksheet0.MySetValue(8, 7 - count, unitData.GetUniqueEqsDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(9, 7 - count, unitData.rarity , backColor: backColotInt_1);
                     worksheet0.MySetValue(10, 7 - count, unitData.GetExEquipDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(11, 7 - count, unitData.TalentLevelDescribe(), backColor: backColotInt_1);
+
                     count++;
                 }
+                worksheet0.Cells[12, 3, 12, 7].Merge = true;
+                worksheet0.Cells[13, 3, 13, 7].Merge = true;
+                worksheet0.MySetValue(12, 3, TalentSkillTreeManager.Instance.GetFinalTalentSkillNodeDescription(), backColor: backColotInt_1);
+                worksheet0.MySetValue(13, 3,TeamSkillTreeManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
+
                 worksheet0.Cells[3, 8, 3, 10].Merge = true;
                 worksheet0.MySetValue(3, 8, "备注", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[4, 8, 10, 10].Merge = true;
+                worksheet0.Cells[4, 8, 13, 10].Merge = true;
                 worksheet0.Cells[4, 8, 10, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
                 // worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 7, false,3,8);//boss头像
-                worksheet0.MySetValue(11, 1, "帧数");
-                worksheet0.MySetValue(11, 2, "秒数", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 3, "角色", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[11, 4, 11, 6].Merge = true;
-                worksheet0.MySetValue(11, 4, "操作", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 7, "伤害", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 8, "ub总伤", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[11, 9, 11, 10].Merge = true;
-                worksheet0.MySetValue(11, 9, "说明", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 1, "帧数");
+                worksheet0.MySetValue(14, 2, "秒数", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 3, "角色", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[14, 4, 14, 6].Merge = true;
+                worksheet0.MySetValue(14, 4, "操作", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 7, "伤害", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 8, "ub总伤", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[14, 9, 14, 10].Merge = true;
+                worksheet0.MySetValue(14, 9, "说明", blod: true, backColor: backColotInt_2);
 
-                int currentLineNum = 12;
+                int currentLineNum = 15;
 
                 List<UBDetail> UBList = TimelineData.uBDetails;
                 //UBList.Sort((a, b) => a.UBTime - b.UBTime);

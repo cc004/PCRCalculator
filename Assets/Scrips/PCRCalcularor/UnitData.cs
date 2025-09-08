@@ -540,7 +540,7 @@ namespace PCRCaculator
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
         public int PrefabId => rarity == 6 && unitId == 105701 ? 170301 : unitId;
-
+        public List<int> TalentIds => GetTalentIds();
         public void SetDefaultLoveDict()
         {
             if (playLoveDic != null && playLoveDic.ContainsKey(unitId)) return;
@@ -886,6 +886,24 @@ namespace PCRCaculator
                     hashCode = (hashCode * 397) ^ playLoveDic[unit];
                 return hashCode;
             }
+        }
+        public List<int> GetTalentIds()
+        {
+            return MainManager.Instance.GetTalentIds(this.unitId);
+        }
+        public string TalentLevelDescribe()
+        {
+            string talentType = TalentIds[0] switch
+            {
+                1 => "火",
+                2 => "水",
+                3 => "风",
+                4 => "光",
+                5 => "暗",
+                _ => "无"
+            };
+            string level = MainManager.Instance.TeamEnhanceData.GetTalentLevel(TalentIds[0]).ToString();
+            return string.IsNullOrEmpty(talentType) ? level : $"{talentType}{level}";
         }
     }
     /// <summary>
