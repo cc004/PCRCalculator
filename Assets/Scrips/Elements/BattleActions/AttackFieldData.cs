@@ -51,11 +51,11 @@ namespace Elements
                     {
                         case DamageData.eDamageType.ATK:
                             receiveDamagePrecent = (float)TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)TargetList[index].Owner.PhysicalDamageUpPercentOrMin / 100f; 
+                            damageUpPrecent = (float)PPOJKIDHGNJ.PhysicalDamageUpPercentOrMin / 100f; 
                             break;
                         case DamageData.eDamageType.MGC:
                             receiveDamagePrecent = (float)TargetList[index].Owner.MagicReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)TargetList[index].Owner.MagicDamageUpPercentOrMin / 100f;
+                            damageUpPrecent = (float)PPOJKIDHGNJ.MagicDamageUpPercentOrMin / 100f;
                             break;
                     }
 
