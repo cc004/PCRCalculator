@@ -9081,11 +9081,11 @@ this.updateCurColor();
                     _damageData.ActionType == eActionType.ATTACK_FIELD) && 
                     !_damageData.IgnoreLogBarrier)
                 {
-                    long TotalDamageForLogBarrier = 0;
+                    DoubleWithEx TotalDamageForLogBarrier = 0;
                     if (_damageData.ActionType == eActionType.ATTACK)
-                        TotalDamageForLogBarrier = _damageData.TotalDamageForLogBarrier;
+                        TotalDamageForLogBarrier = (DoubleWithEx)_damageData.TotalDamageForLogBarrier;
                     else
-                        TotalDamageForLogBarrier = _damageData.Damage;
+                        TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     if (TotalDamageForLogBarrier > allLogBarrierStartValue)
                     {
@@ -9094,6 +9094,7 @@ this.updateCurColor();
                             execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
                         a *= t;
                         b *= t;
+                        TotalDamageForLogBarrier *= t;
                     }
                     if (_damageData.ActionType == eActionType.ATTACK)
                     {
@@ -9101,28 +9102,31 @@ this.updateCurColor();
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
-                            DoubleWithEx t = _damageData.TotalDamageForLogBarrier.Select(x =>
+                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
                                 execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
+                            TotalDamageForLogBarrier *= t;
                         }
                         else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
-                            DoubleWithEx t = _damageData.TotalDamageForLogBarrier.Select(x =>
+                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
                                 execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
+                            TotalDamageForLogBarrier *= t;
                         }
                         if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
-                            DoubleWithEx t = _damageData.TotalDamageForLogBarrier.Select(x =>
+                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
                                 execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
+                            TotalDamageForLogBarrier *= t;
                         }
                     }
                 }
@@ -9134,6 +9138,7 @@ this.updateCurColor();
                 //if (!this.DisableFlash)
                 //    this.AppendCoroutine(this.setColorOffsetDefaultWithDelay(), ePauseType.NO_DIALOG);
             }
+            // TODO check order with log barrier
             if (!_damageData.IgnoreDef && !flag1)
             {
                 switch (_damageData.DamageType)
@@ -9168,16 +9173,19 @@ this.updateCurColor();
                 var unit = _damageData.Source;
                 if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
                     unit = _damageData.StrikeBackSource;
-                var talentDamageRate = CalcTalentDamageRate(
-                    _damageData.ActionType,
-                    unit,
-                    _damageData.Target,
-                    _damageData.TargetIncludeMyTeam, // TODO find where set
-                    _damageData.IgnoreTalentBonusForRatioSlip,
-                    out bool isNoDamageByResist
-                );
-                a *= talentDamageRate;
-                b *= talentDamageRate;
+                if (!_damageData.IgnoreTalentBonusForRatioSlip)
+                {
+                    var talentDamageRate = CalcTalentDamageRate(
+                        _damageData.ActionType,
+                        unit,
+                        _damageData.Target,
+                        _damageData.TargetIncludeMyTeam,
+                        _damageData.IgnoreTalentBonusForRatioSlip,
+                        out bool isNoDamageByResist
+                    );
+                    a *= talentDamageRate;
+                    b *= talentDamageRate;
+                }
             }
 
             var num5 = a;
