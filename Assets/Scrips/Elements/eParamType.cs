@@ -33,9 +33,9 @@ namespace Elements
     WAVE_HP_RECOVERY = 10, // 0x0000000A
     [Description("TP自动回复")]
     WAVE_ENERGY_RECOVERY = 11, // 0x0000000B
-    [Description("物理贯通伤害")]
+    [Description("物理贯通")]
     PHYSICAL_PENETRATE = 12, // 0x0000000C
-    [Description("魔法贯通伤害")]
+    [Description("魔法贯通")]
     MAGIC_PENETRATE = 13, // 0x0000000D
     [Description("TP上升")]
     ENERGY_RECOVERY_RATE = 14, // 0x0000000E
@@ -46,15 +46,15 @@ namespace Elements
     [Description("命中")]
     ACCURACY = 17, // 0x00000011
     BASE_PARAMETER_NUM = 18,
-    [Description("物理暴击伤害")]
+    [Description("物暴伤害提升")]
     PHYSICAL_CRITICAL_DAMAGE_RATE = 100,
-    [Description("魔法暴击伤害")]
+    [Description("魔暴伤害提升")]
     MAGIC_CRITICAL_DAMAGE_RATE = 101,
-    [Description("物理造成的伤害")]
+    [Description("物理伤害提升")]
     PHYSICAL_DAMAGE_UP_PERCENT = 102,
-    [Description("魔法造成的伤害")]
+    [Description("魔法伤害提升")]
     MAGIC_DAMAGE_UP_PERCENT = 103,
-    [Description("属性奖励")]
+    [Description("属性加成")]
     TALENT_BONUS = 104,
     ABNORMAL_STATE_DODGE_HIT = 105,
     ABNORMAL_STATE_DODGE_RESIST = 106,
