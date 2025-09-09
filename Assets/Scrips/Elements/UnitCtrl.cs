@@ -937,6 +937,10 @@ namespace Elements
 
         private Dictionary<eAbnormalState, int> abnormalStateToCurrentId = new Dictionary<eAbnormalState, int>();
 
+        private Dictionary<eAbnormalState, List<SlipDamageUpData>> slipDamageUpDataDictionary = new Dictionary<eAbnormalState, List<SlipDamageUpData>>();
+
+        private List<SlipDamageUpData> allSlipDamageUpDataList = new List<SlipDamageUpData>();
+
         private bool isDamageReleaseSpecialSleepAnimForUnionBurst;
 
         private bool isPlayDamageAnimForAbnormal;
@@ -4149,6 +4153,73 @@ this.updateCurColor();
             //this.playSeWithMotion(controller, _animeId, _index1, _index2, _index3, _isLoop);
         }
 
+        // RVA: 0x2835ED8 Offset: 0x2835ED8 VA: 0x2835ED8
+        public void EnchantSlipDamageUp(SlipDamageUpData _data, eAbnormalState _abnormalState) 
+        {
+            if (!slipDamageUpDataDictionary.TryGetValue(_abnormalState, out List<SlipDamageUpData> list))
+            {
+                list = new List<SlipDamageUpData>();
+                slipDamageUpDataDictionary[_abnormalState] = list;
+            }
+            list.Add(_data);
+        }
+
+        // RVA: 0x28360AC Offset: 0x28360AC VA: 0x28360AC
+        public void EnchantAllSlipDamageUp(SlipDamageUpData _data) 
+        {
+            allSlipDamageUpDataList.Add(_data);
+        }
+
+        // RVA: 0x2836168 Offset: 0x2836168 VA: 0x2836168
+        private LongWithEx applySlipDamageUp(LongWithEx _current, eAbnormalState _abnormalState, ref LongWithEx _maxLimit) 
+        {
+            double multiplier = 1.0;
+            bool hasDisplayIcon = false;
+
+            // 检查特定异常状态的slip damage up数据
+            if (slipDamageUpDataDictionary != null && slipDamageUpDataDictionary.TryGetValue(_abnormalState, out List<SlipDamageUpData> list))
+            {
+                foreach (var data in list)
+                {
+                    if (data.Enable)
+                    {
+                        multiplier += data.Value;
+                        _maxLimit = Math.Max(_maxLimit, data.LimitDamage);
+                        if (!data.DisplayIcon)
+                        {
+                            hasDisplayIcon = true;
+                        }
+                    }
+                }
+            }
+
+            // 检查全局slip damage up数据
+            if (allSlipDamageUpDataList != null)
+            {
+                foreach (var data in allSlipDamageUpDataList)
+                {
+                    if (data.Enable)
+                    {
+                        multiplier += data.Value;
+                        _maxLimit = Math.Max(_maxLimit, data.LimitDamage);
+                        if (!data.DisplayIcon)
+                        {
+                            hasDisplayIcon = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (hasDisplayIcon)
+            {
+                _maxLimit = -1;
+            }
+
+            return BattleUtil.DoubleToLong(multiplier * _current);
+        }
+
+
         public void AppendCoroutine(IEnumerator _cr, ePauseType _pauseType, UnitCtrl _unit = null) => battleManager.AppendCoroutine(_cr, _pauseType, _unit);
 
         public void SetCurrentHp(long _hp)
@@ -5958,14 +6029,38 @@ this.updateCurColor();
             }
         }
 
+        // TODO implement ExtendSlipDamageData
+        // public ExtendSlipDamageData ExtendSlipDamageData { get; set; }
+        public float GetSlipDamageExtendValue()
+        {
+            // var extendSlipDamageData = ExtendSlipDamageData;
+            
+            // if (extendSlipDamageData != null && extendSlipDamageData.Enable)
+            // {
+            //     return extendSlipDamageData.ExtendValue;
+            // }
+            return 1.0f;
+        }
+
         private IEnumerator UpdateSlipDamage(eAbnormalState _abnormalState, int _slipDamageId)
         {
             eAbnormalStateCategory category = GetAbnormalStateCategory(_abnormalState);
             AbnormalStateCategoryData categoryData = abnormalStateCategoryDataDictionary[category];
             float time = 0f;
-            int damage = (int)categoryData.MainValue;
-            int incrementDamage = (int)(categoryData.MainValue * categoryData.SubValue / 100f);
+            LongWithEx damage = 0;
+            LongWithEx incrementDamage = 0;
+            if (_abnormalState == eAbnormalState.RATIO_SLIP)
+            {
+                var maxHp = this.MaxHp;
+                damage = BattleUtil.DoubleToLong(categoryData.MainValue / 100.0 * maxHp);
+            }
+            else
+            {
+                damage = BattleUtil.DoubleToLong(categoryData.MainValue);
+                incrementDamage = BattleUtil.DoubleToLong(categoryData.MainValue * categoryData.SubValue / 100.0);
+            }
             IsReleaseSlipDamageDic.TryGetValue(_abnormalState, out var isReleaseSlipDamage);
+            float slipDamageInterval = GetSlipDamageExtendValue();
             while (true)
             {
                 yield return null;
@@ -5978,10 +6073,26 @@ this.updateCurColor();
                     break;
                 }
                 time += DeltaTimeForPause;
-                if (!(time > 1f) && !BattleUtil.Approximately(time, 1f))
+                if (!(time > slipDamageInterval) && !BattleUtil.Approximately(time, slipDamageInterval))
                 {
                     continue;
                 }
+                LongWithEx maxLimitDamage = -1;
+                LongWithEx finalDamage = applySlipDamageUp(damage, _abnormalState, ref maxLimitDamage);
+
+                if (_abnormalState == eAbnormalState.RATIO_SLIP)
+                {
+                    LongWithEx subValueLimit = BattleUtil.DoubleToLong(categoryData.SubValue);
+                    if (maxLimitDamage != -1)
+                    {
+                        maxLimitDamage = finalDamage.Min(subValueLimit);
+                    }
+                    else
+                    {
+                        maxLimitDamage = subValueLimit;
+                    }
+                }
+
                 DamageData damageData = new DamageData
                 {
                     Target = GetFirstParts(),
@@ -5991,6 +6102,9 @@ this.updateCurColor();
                     DamageSoundType = DamageData.eDamageSoundType.SLIP,
                     IsSlipDamage = true,
                     ActionType = eActionType.SLIP_DAMAGE,
+                    TargetIncludeMyTeam = this.IsOther == categoryData.Source,
+                    IgnoreTalentBonusForRatioSlip = (_abnormalState == eAbnormalState.RATIO_SLIP),
+                    OverrideDamageLimit = maxLimitDamage,
                     ExecAbsorber = delegate (int _damage)
                     {
                         if (_damage > categoryData.AbsorberValue)
@@ -13350,8 +13464,14 @@ this.updateCurColor();
             FLIGHT = 71,
             ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY = 72,
             WORLD_LIGHTNING = 73,
+            MAGIC_DODGE = 74,
+            TAUNT = 75,
+            HP_LOWER_LIMIT = 76,
+            CHAINED_ACN = 77,
+            PUPPET = 78,
+            DISABLE_HEAL = 79,
+            RATIO_SLIP = 80,
             NUM,
-
 
         }
 
