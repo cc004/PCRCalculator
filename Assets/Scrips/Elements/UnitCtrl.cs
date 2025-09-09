@@ -4174,9 +4174,7 @@ this.updateCurColor();
         private LongWithEx applySlipDamageUp(LongWithEx _current, eAbnormalState _abnormalState, ref LongWithEx _maxLimit) 
         {
             double multiplier = 1.0;
-            bool hasDisplayIcon = false;
 
-            // 检查特定异常状态的slip damage up数据
             if (slipDamageUpDataDictionary != null && slipDamageUpDataDictionary.TryGetValue(_abnormalState, out List<SlipDamageUpData> list))
             {
                 foreach (var data in list)
@@ -4185,15 +4183,10 @@ this.updateCurColor();
                     {
                         multiplier += data.Value;
                         _maxLimit = Math.Max(_maxLimit, data.LimitDamage);
-                        if (!data.DisplayIcon)
-                        {
-                            hasDisplayIcon = true;
-                        }
                     }
                 }
             }
 
-            // 检查全局slip damage up数据
             if (allSlipDamageUpDataList != null)
             {
                 foreach (var data in allSlipDamageUpDataList)
@@ -4202,18 +4195,8 @@ this.updateCurColor();
                     {
                         multiplier += data.Value;
                         _maxLimit = Math.Max(_maxLimit, data.LimitDamage);
-                        if (!data.DisplayIcon)
-                        {
-                            hasDisplayIcon = true;
-                            break;
-                        }
                     }
                 }
-            }
-
-            if (hasDisplayIcon)
-            {
-                _maxLimit = -1;
             }
 
             return BattleUtil.DoubleToLong(multiplier * _current);
@@ -6085,7 +6068,7 @@ this.updateCurColor();
                     LongWithEx subValueLimit = BattleUtil.DoubleToLong(categoryData.SubValue);
                     if (maxLimitDamage != -1)
                     {
-                        maxLimitDamage = finalDamage.Min(subValueLimit);
+                        maxLimitDamage = maxLimitDamage.Min(subValueLimit);
                     }
                     else
                     {
@@ -7874,121 +7857,239 @@ this.updateCurColor();
         {
             if (debuffDamageUpDataList.Count == 0)
                 return 1f;
-            int num1 = 0;
+            int num = 0;
             if (IsAbnormalState(eAbnormalState.SLOW))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.PARALYSIS))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.FREEZE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CHAINED))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.SLEEP))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.STUN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.STONE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.DETAIN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.FAINT))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.PAUSE_ACTION))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.NPC_STUN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.NO_EFFECT_SLIP_DAMAGE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.POISON))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.BURN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CURSE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.VENOM))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.HEX))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.COMPENSATION))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CONVERT))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CONFUSION))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.MAGIC_DARK))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.PHYSICS_DARK))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.SILENCE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.UB_SILENCE))
-                ++num1;
-            if (UbAbnormalDataList.Count > 0)
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.COUNT_BLIND))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.FEAR))
-                ++num1;
-            if (aweDatas.Count > 0)
-                ++num1;
-            if (ToadDatas.Count > 0)
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.HEAL_DOWN))
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.ATK] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.DEF] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_STR] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_DEF] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.DODGE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.ENERGY_RECOVER_RATE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.LIFE_STEAL] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MOVE_SPEED] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.ACCURACY] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_DAMAGE_UP_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.MAX_HP] > 0)
-                ++num1;
+			{
+				num++;
+			}
+			if (overlapAbnormalStateIndexList[eAbnormalState.SLOW_OVERLAP].Count > 0)
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PARALYSIS))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.FREEZE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CHAINED))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.SLEEP))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.STUN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.STUN2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.STONE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.DETAIN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.FAINT))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PAUSE_ACTION))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.NPC_STUN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.NO_EFFECT_SLIP_DAMAGE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.POISON))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.POISON2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.BURN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.BLACK_FRAME))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CURSE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CURSE2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.VENOM))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.HEX))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.COMPENSATION))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CONVERT))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CONFUSION))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CONFUSION2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.MAGIC_DARK))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PHYSICS_DARK))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.SILENCE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.UB_SILENCE))
+			{
+				num++;
+			}
+			if (UbAbnormalDataList.Count > 0)
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.COUNT_BLIND))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.FEAR))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.DECREASE_HEAL))
+			{
+				num++;
+			}
+			if (aweDatas.Count > 0)
+			{
+				num++;
+			}
+			if (ToadDatas.Count > 0)
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.HEAL_DOWN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.POISON_BY_BEHAVIOUR))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CRYSTALIZE))
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.ATK] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.DEF] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_STR] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_DEF] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.DODGE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.ENERGY_RECOVER_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.LIFE_STEAL] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MOVE_SPEED] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.ACCURACY] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAX_HP] > 0)
+			{
+				num++;
+			}
             double num2 = 1.0;
             foreach (DebuffDamageUpData debuffDamageUpData in debuffDamageUpDataList)
             {
@@ -7996,10 +8097,10 @@ this.updateCurColor();
                 switch (debuffDamageUpData.EffectType)
                 {
                     case DebuffDamageUpData.eEffectType.ADD:
-                        num3 = Math.Min(1.0 + debuffDamageUpData.DebuffDamageUpValue * (double)num1, debuffDamageUpData.DebuffDamageUpLimitValue);
+                        num3 = Math.Min(1.0 + debuffDamageUpData.DebuffDamageUpValue * (double)num, debuffDamageUpData.DebuffDamageUpLimitValue);
                         break;
                     case DebuffDamageUpData.eEffectType.SUBTRACT:
-                        num3 = Math.Max(1.0 - debuffDamageUpData.DebuffDamageUpValue * (double)num1, debuffDamageUpData.DebuffDamageUpLimitValue);
+                        num3 = Math.Max(1.0 - debuffDamageUpData.DebuffDamageUpValue * (double)num, debuffDamageUpData.DebuffDamageUpLimitValue);
                         break;
                 }
                 num2 *= num3;
