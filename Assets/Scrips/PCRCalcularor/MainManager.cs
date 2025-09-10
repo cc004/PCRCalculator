@@ -362,7 +362,7 @@ namespace PCRCaculator
                         allUnitAttackPatternDic = dbTool.Dic5;
                         guildEnemyDatas = dbTool.Dic6;
                         enemyMPartsDic = dbTool.Dic7;
-                        unitExEquips = dbTool3.unitExEquips;
+                        unitExEquips = dbTool.unitExEquips;
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
@@ -410,6 +410,7 @@ namespace PCRCaculator
                                     Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4,
                                         k => k > 200000000 && k < 400000000)),
                                     Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
+                                    Task.Run(() => unitExEquips.OverrideWith(dbTool3.unitExEquips)),
                                     Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                     Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                     Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
