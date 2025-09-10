@@ -1458,6 +1458,108 @@ namespace PCRCaculator.Guild
                 }
             }
         }
+        public string GetFinalTalentSkillNodeDescription()
+        {
+            var talentSkill = SettingData.GetCurrentPlayerGroup().talentSkill;
+            var nodeChildrenDict = new Dictionary<int, List<int>>();
+            var NodeDataDict = MainManager.Instance.TalentSkillNodeDic;
+            foreach (var node in NodeDataDict.Values)
+            {
+                if (node.node_id > 0)
+                    nodeChildrenDict[node.node_id] = new List<int>();
+            }
+
+            foreach (var node in NodeDataDict.Values)
+            {
+                if (node.node_id == 0) continue;
+
+                foreach (int parentId in node.pre_node_ids)
+                {
+                    if (parentId > 0 && nodeChildrenDict.ContainsKey(parentId))
+                        nodeChildrenDict[parentId].Add(node.node_id);
+                }
+            }
+            // 找到所有最终节点（已激活且子节点未激活或无子节点）
+            var finalNodes = talentSkill
+                .Where(node => node.Value > 0 &&
+                               (!nodeChildrenDict.TryGetValue(node.Key, out var children) ||
+                                !children.Any(childId => talentSkill.TryGetValue(childId, out int childLevel) && childLevel > 0)))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            // 如果没有最终节点，返回提示信息
+            if (finalNodes.Count == 0)
+                return "无";
+
+            // 找到最高页面编号上的最终节点
+            var targetNode = finalNodes
+                .Where(kvp => NodeDataDict.ContainsKey(kvp.Key))
+                .OrderByDescending(kvp => NodeDataDict[kvp.Key].page_num)
+                .First();
+
+            if (!NodeDataDict.TryGetValue(targetNode.Key, out TalentSkillNode nodeData))
+                return "无";
+
+            int pageNum = nodeData.page_num;
+            int targetNodeId = targetNode.Key;
+            int targetNodeLevel = targetNode.Value;
+
+            // 计算合流编号
+            var confluenceNodes = NodeDataDict.Values
+                .Where(n => n.page_num == pageNum &&
+                           n.pre_node_ids?.Count(id => id > 0) > 1 &&
+                           n.pre_node_ids.Where(id => id > 0).Distinct().Count() > 1)
+                .OrderBy(n => n.node_id)
+                .ToList();
+
+            int confluenceNum = confluenceNodes.FindIndex(n => n.node_id >= targetNodeId) + 1;
+            if (confluenceNum <= 0) confluenceNum = confluenceNodes.Count + 1;
+
+            // 获取页面上左中右节点等级
+            var pageNodeLevels = finalNodes
+                .Where(kvp => NodeDataDict.TryGetValue(kvp.Key, out TalentSkillNode node) &&
+                           node.page_num == pageNum && node.node_id > 0)
+                .ToDictionary(kvp => NodeDataDict[kvp.Key].pos_x, kvp => kvp.Value);
+
+            int leftLevel = pageNodeLevels.GetValueOrDefault(2, 0);
+            int middleLevel = pageNodeLevels.GetValueOrDefault(5, 0);
+            int rightLevel = pageNodeLevels.GetValueOrDefault(8, 0);
+
+            // 计算在最近合流点之后的位置计数（左中右各有多少个节点）
+            float targetNodeY = nodeData.pos_y;
+            var precedingConfluenceNodes = confluenceNodes.Where(c => c.pos_y < targetNodeY).OrderByDescending(c => c.pos_y);
+
+            float confluenceY = precedingConfluenceNodes.FirstOrDefault()?.pos_y ?? float.MinValue;
+
+            // 计算在合流点之后的节点数量
+            int lastConfluenceNodeId = precedingConfluenceNodes.FirstOrDefault()?.node_id ?? 0;
+
+            var counts = NodeDataDict.Values
+                .Where(n => n.page_num == pageNum &&
+                           n.node_id >= lastConfluenceNodeId &&
+                           n.pos_y > confluenceY &&
+                           n.pos_y <= targetNodeY &&
+                           targetNodeLevel > 0)
+                .GroupBy(n => n.pos_x)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            int leftCount = counts.GetValueOrDefault(2, 0);
+            int middleCount = counts.GetValueOrDefault(5, 0);
+            int rightCount = counts.GetValueOrDefault(8, 0);
+
+            // 构造返回文本
+            return confluenceNodes.Any(n => n.node_id == targetNodeId)
+                ? $"第{pageNum}页 第{confluenceNum}合流 交点[{targetNodeLevel}级]"
+                : $"第{pageNum}页 第{confluenceNum}合流 左{leftCount}[{leftLevel}级] 中{middleCount}[{middleLevel}级] 右{rightCount}[{rightLevel}级]";
+        }
+        public string GetFinalTeamSkillNodeDescription()
+        {
+            var teamSkill = SettingData.GetCurrentPlayerGroup().teamSkill;
+            if (teamSkill == null || teamSkill.Count == 0)
+            {
+                return "无";
+            }
+            return $"第{teamSkill.Keys.Max()}个";
+        }
     }
     [Serializable]
     public class GuildEnemyData

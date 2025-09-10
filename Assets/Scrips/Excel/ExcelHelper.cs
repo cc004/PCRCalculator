@@ -1050,8 +1050,8 @@ namespace ExcelHelper
                 }
                 worksheet0.Cells[12, 3, 12, 7].Merge = true;
                 worksheet0.Cells[13, 3, 13, 7].Merge = true;
-                worksheet0.MySetValue(12, 3, TalentSkillTreeManager.Instance.GetFinalTalentSkillNodeDescription(), backColor: backColotInt_1);
-                worksheet0.MySetValue(13, 3,TeamSkillTreeManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
+                worksheet0.MySetValue(12, 3, GuildManager.Instance.GetFinalTalentSkillNodeDescription(), backColor: backColotInt_1);
+                worksheet0.MySetValue(13, 3,GuildManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
 
                 worksheet0.Cells[3, 8, 3, 10].Merge = true;
                 worksheet0.MySetValue(3, 8, "备注", blod: true, backColor: backColotInt_2);
