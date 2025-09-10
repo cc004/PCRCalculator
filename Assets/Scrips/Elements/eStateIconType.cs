@@ -422,6 +422,64 @@ namespace Elements
         SLIP_DAMAGE_UP = 154,
         [Description("水祭的安宁\n水优妮")]
         SHUIJIDEANNING = 156,
+        [Description("水月\n水华")]
+        SHUIYUE = 157,
+        [Description("婉拒之花\n银莲")]
+        WANJUZHIHUA = 158,
+        [Description("卡班君\n库露露")]
+        KABANJUN = 159,
+        [Description("粘稠\n水涅娅")]
+        NIANCHOU = 160,
+        [Description("铁气守护\n涅妃")]
+        TIEQISHOUHU = 161,
+        [Description("PSI风暴\n水美空")]
+        PSIFENGBAO = 171,
+        [Description("日食\n水龙妈")]
+        RISHI = 173,
+        [Description("鬼化\n水蕾姆")]
+        GUIHUA = 177,
+        [Description("狂骚\n水蕾姆")]
+        KUANGSAO = 178,
+        [Description("增加造成的物理伤害")]
+        BUFF_PHYSICAL_DAMAGE = 179,
+        [Description("增加造成的魔法伤害")]
+        BUFF_MAGIC_DAMAGE = 180,
+        [Description("减少造成的物理伤害")]
+        DEBUFF_PHYSICAL_DAMAGE = 181,
+        [Description("减少造成的魔法伤害")]
+        DEBUFF_MAGIC_DAMAGE = 182,
+        [Description("谢幕\n梦狐")]
+        XIEMU = 183,
+        [Description("魔法攻击无效")]
+        MAGIC_DODGE = 184,
+        [Description("热情的花束\nEMT")]
+        REQINGDEHUASHU = 188,
+        [Description("茶壶\n女仆")]
+        CHAHU = 189,
+        [Description("炼金素材\n炼望")]
+        LIANJINSUCAI = 190,
+        [Description("香水\n炼望")]
+        XIANGSHUI = 191,
+        [Description("偷懒的诱惑\n龙妹")]
+        TOULANDEYOUHUO = 192,
+        [Description("友军护盾\n吹雪")]
+        YOUJUNHUDUN = 193,
+        [Description("蛮贼骰子\n大和")]
+        MANZEITOUZI = 194,
+        [Description("尖刺盾牌\n若菜")]
+        JIANCIDUNPAI = 195,
+        [Description("恶魔的亲吻\n圣老师")]
+        EMOQINWEN = 196,
+        [Description("水切噜")]
+        SHUIQIELU = 197,
+        [Description("亡灵躯体\n格蕾斯")]
+        WANGLINGQUTI = 198,
+        [Description("火鸟\n春电")]
+        HUONIAO = 199,
+        [Description("魔眼\n美杜莎")]
+        MOYAN = 200,
+        [Description("虚数\n原克")]
+        XUSHU = 200,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912

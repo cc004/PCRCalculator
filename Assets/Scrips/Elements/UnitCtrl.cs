@@ -7615,7 +7615,7 @@ this.updateCurColor();
             if (knightGuardDataList.Count == 0)
             {
                 OnChangeState.Call(this, _knightGuardData.StateIconType, true);
-                NoSkipOnChangeAbnormalState?.Invoke(this, _knightGuardData.StateIconType, true,90,"???");
+                NoSkipOnChangeAbnormalState?.Invoke(this, _knightGuardData.StateIconType, true,90,"再生");
             }
             knightGuardDataList.Add(_knightGuardData);
             if (knightGuardCoroutine != null)
