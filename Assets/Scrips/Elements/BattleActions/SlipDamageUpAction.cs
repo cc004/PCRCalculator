@@ -34,8 +34,8 @@ namespace Elements
         slipDamageUpData.DisplayIcon = ActionDetail1 == 0;
         slipDamageUpData.StartTimer(_target.Owner);
         
-        double value3 = _valueDictionary[eValueNumber.VALUE_3];
-        if (value3 != double.PositiveInfinity && (int)value3 == APPLY_ALL_SLIP_VALUE)
+        int value3 = (int)_valueDictionary[eValueNumber.VALUE_3];
+        if (value3 == APPLY_ALL_SLIP_VALUE)
         {
             _target.Owner?.EnchantAllSlipDamageUp(slipDamageUpData);
             return;
@@ -44,20 +44,20 @@ namespace Elements
         List<eSlipDamageType> slipDamageTypes = new List<eSlipDamageType>();
         
         // Add slip damage types based on action values
-        if (value3 != double.PositiveInfinity)
-            slipDamageTypes.Add((eSlipDamageType)(int)value3);
+        if (value3 != APPLY_ALL_SLIP_VALUE)
+            slipDamageTypes.Add((eSlipDamageType)value3);
+
+        int value4 = (int)_valueDictionary[eValueNumber.VALUE_4];
+        if (value4 != APPLY_ALL_SLIP_VALUE)
+            slipDamageTypes.Add((eSlipDamageType)value4);
             
-        double value4 = _valueDictionary[eValueNumber.VALUE_4];
-        if (value4 != double.PositiveInfinity)
-            slipDamageTypes.Add((eSlipDamageType)(int)value4);
-            
-        double value5 = _valueDictionary[eValueNumber.VALUE_5];
-        if (value5 != double.PositiveInfinity)
-            slipDamageTypes.Add((eSlipDamageType)(int)value5);
-            
-        double value6 = _valueDictionary[eValueNumber.VALUE_6];
-        if (value6 != double.PositiveInfinity)
-            slipDamageTypes.Add((eSlipDamageType)(int)value6);
+        int value5 = (int)_valueDictionary[eValueNumber.VALUE_5];
+        if (value5 != APPLY_ALL_SLIP_VALUE)
+            slipDamageTypes.Add((eSlipDamageType)value5);
+
+        int value6 = (int)_valueDictionary[eValueNumber.VALUE_6];
+        if (value6 != APPLY_ALL_SLIP_VALUE)
+            slipDamageTypes.Add((eSlipDamageType)value6);
         
         // Apply slip damage up for each specified type
         foreach (SlipDamageAction.eSlipDamageType slipDamageType in slipDamageTypes)

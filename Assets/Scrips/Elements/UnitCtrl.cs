@@ -4174,6 +4174,7 @@ this.updateCurColor();
         private LongWithEx applySlipDamageUp(LongWithEx _current, eAbnormalState _abnormalState, ref LongWithEx _maxLimit) 
         {
             double multiplier = 1.0;
+            bool hasZeroLimit = false;
 
             if (slipDamageUpDataDictionary != null && slipDamageUpDataDictionary.TryGetValue(_abnormalState, out List<SlipDamageUpData> list))
             {
@@ -4182,7 +4183,9 @@ this.updateCurColor();
                     if (data.Enable)
                     {
                         multiplier += data.Value;
-                        _maxLimit = Math.Max(_maxLimit, data.LimitDamage);
+                        _maxLimit = _maxLimit.Max(data.LimitDamage);
+                        if (data.LimitDamage == 0)
+                            hasZeroLimit = true;
                     }
                 }
             }
@@ -4194,10 +4197,15 @@ this.updateCurColor();
                     if (data.Enable)
                     {
                         multiplier += data.Value;
-                        _maxLimit = Math.Max(_maxLimit, data.LimitDamage);
+                        _maxLimit = _maxLimit.Max(data.LimitDamage);
+                        if (data.LimitDamage == 0)
+                            hasZeroLimit = true;
                     }
                 }
             }
+
+            if (hasZeroLimit)
+                _maxLimit = -1;
 
             return BattleUtil.DoubleToLong(multiplier * _current);
         }
@@ -6079,7 +6087,7 @@ this.updateCurColor();
                 DamageData damageData = new DamageData
                 {
                     Target = GetFirstParts(),
-                    Damage = damage,
+                    Damage = finalDamage,
                     DamageType = DamageData.eDamageType.NONE,
                     Source = categoryData.Source,
                     DamageSoundType = DamageData.eDamageSoundType.SLIP,
@@ -9346,19 +9354,16 @@ this.updateCurColor();
                 var unit = _damageData.Source;
                 if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
                     unit = _damageData.StrikeBackSource;
-                if (!_damageData.IgnoreTalentBonusForRatioSlip)
-                {
-                    var talentDamageRate = CalcTalentDamageRate(
-                        _damageData.ActionType,
-                        unit,
-                        _damageData.Target,
-                        _damageData.TargetIncludeMyTeam,
-                        _damageData.IgnoreTalentBonusForRatioSlip,
-                        out bool isNoDamageByResist
-                    );
-                    a *= talentDamageRate;
-                    b *= talentDamageRate;
-                }
+                var talentDamageRate = CalcTalentDamageRate(
+                    _damageData.ActionType,
+                    unit,
+                    _damageData.Target,
+                    _damageData.TargetIncludeMyTeam,
+                    _damageData.IgnoreTalentBonusForRatioSlip,
+                    out bool isNoDamageByResist
+                );
+                a *= talentDamageRate;
+                b *= talentDamageRate;
             }
 
             var num5 = a;
