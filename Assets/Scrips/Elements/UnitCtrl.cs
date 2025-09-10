@@ -6085,7 +6085,7 @@ this.updateCurColor();
                     DamageSoundType = DamageData.eDamageSoundType.SLIP,
                     IsSlipDamage = true,
                     ActionType = eActionType.SLIP_DAMAGE,
-                    TargetIncludeMyTeam = this.IsOther == categoryData.Source,
+                    TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther,
                     IgnoreTalentBonusForRatioSlip = (_abnormalState == eAbnormalState.RATIO_SLIP),
                     OverrideDamageLimit = maxLimitDamage,
                     ExecAbsorber = delegate (int _damage)
