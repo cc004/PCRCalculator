@@ -6827,6 +6827,37 @@ this.updateCurColor();
             return (long)(!AdditionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
+        // RVA: 0x2835B94 Offset: 0x2835B94 VA: 0x2835B94
+        public void SetBuffDebuffWithMultiplyValue(BuffParamKind _kind, Dictionary<BasePartsData, LongWithEx> _partsToBaseValue, bool _enable, UnitCtrl _source, int _multiplyValue)
+        {
+            if (_partsToBaseValue == null)
+                return;
+
+            // 遍历字典中的每个部位数据和基础值
+            foreach (var kvp in _partsToBaseValue)
+            {
+                var partsData = kvp.Key;
+                var baseValue = kvp.Value;
+                
+                if (partsData == null)
+                    continue;
+
+                // 计算最终值：基础值 * 乘数
+                var finalValue = baseValue * _multiplyValue;
+
+                // 调用对应部位的SetBuffDebuff方法
+                partsData.SetBuffDebuff(
+                    _enable, 
+                    finalValue, 
+                    _kind, 
+                    _source, 
+                    battleLog, 
+                    false
+                );
+            }
+        }
+
+
         public void SetBuffParam(
           BuffParamKind _kind,
           BuffParamKind _resistMissCheckParamKind,
@@ -7359,6 +7390,8 @@ this.updateCurColor();
         public bool IsTough { get; set; }
 
         public Dictionary<UnitCtrl, Dictionary<int, AttackSealData>> DamageSealDataDictionary { get; set; }
+
+        public Dictionary<SealAction.eCancelTriggerType, Dictionary<eStateIconType, SealCancelData>> SealCancelDictionary { get; set; } = new Dictionary<SealAction.eCancelTriggerType, Dictionary<eStateIconType, SealCancelData>>();
 
         public Dictionary<UnitCtrl, Dictionary<int, AttackSealData>> DamageOnceOwnerSealDateDictionary { get; set; } = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
 
@@ -9061,6 +9094,7 @@ this.updateCurColor();
                     _damageData.Source.OnActionByCritical.Call();
             }
             applyChargeEnergyByReceiveDamage(_damageData.ActionType, (int)num1, _damageData.IsAlwaysChargeEnegry, _usedChargeEnergyByReceiveDamage);
+            applySealByReceiveDamage(_damageData.ActionType, num1);
             if (num1 > 0L & _critical && _skill.CriticalPartsList != null)
                 _skill.CriticalPartsList.Add(_damageData.Target);
             if (_skill != null)
@@ -9069,6 +9103,44 @@ this.updateCurColor();
             }
             return (long)num1;
         }
+
+        // RVA: 0x2846CBC Offset: 0x2846CBC VA: 0x2846CBC
+        private void applySealByReceiveDamage(eActionType _actionType, LongWithEx _damage)
+        {
+            if (_damage < 1)
+                return;
+
+            if (!SealCancelDictionary.ContainsKey(SealAction.eCancelTriggerType.DAMAGED_COUNT))
+                return;
+
+            if (!(((int)_actionType == 1 || (int)_actionType == 30) || 
+            ((int)_actionType > 30 && (int)_actionType <= 51 && ((1L << (int)_actionType) & 0x8C00200000000L) != 0)))
+            {
+                return;
+            }
+
+            var cancelDict = SealCancelDictionary[SealAction.eCancelTriggerType.DAMAGED_COUNT];
+            if (cancelDict == null)
+                return;
+
+            foreach (var cancelData in cancelDict.Values)
+            {
+                if (cancelData == null)
+                    continue;
+
+                if (!cancelData.GetType().IsSubclassOf(typeof(SealDamageCountCancelData)) &&
+                    cancelData.GetType() != typeof(SealDamageCountCancelData))
+                {
+                    continue;
+                }
+
+                ((SealDamageCountCancelData)cancelData).OnDamage();
+            }
+        }
+
+
+        // RVA: 0x270ECDC Offset: 0x270ECDC VA: 0x270ECDC
+        // public double TryApplyAllUnitDamageSeal(bool _enemySide, UnitCtrl _target, UnitCtrl _effectTarget, ActionParameter _actionParameter) { }
 
         private static readonly WaitForSeconds LARGE_NUM_SHOW_TIME = new WaitForSeconds(0.2f);
         public LongWithEx SetDamageImpl(

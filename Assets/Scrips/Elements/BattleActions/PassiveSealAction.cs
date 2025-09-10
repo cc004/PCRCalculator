@@ -25,38 +25,38 @@ namespace Elements
       PassiveSealData _data = new PassiveSealData
       {
         DisplayCount = ActionDetail2 == 1,
-        SealTarget = (eSealTarget) ActionDetail3,
+        SealTarget = (eSealTarget)ActionDetail3,
         Source = _source,
         Target = _target.Owner,
         TargetStateIcon = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2],
         SealDuration = (float)_valueDictionary[eValueNumber.VALUE_3],
         LifeTime = (float)_valueDictionary[eValueNumber.VALUE_5],
-        SealNumLimit = (int) _valueDictionary[eValueNumber.VALUE_1],
-                        SealNum = (int)_valueDictionary[eValueNumber.VALUE_7]
+        SealNumLimit = (int)_valueDictionary[eValueNumber.VALUE_1],
+        SealNum = (int)_valueDictionary[eValueNumber.VALUE_7]
 
       };
       AppendIsAlreadyExeced(_target.Owner, _num);
       _source.AppendCoroutine(_data.Update(), ePauseType.SYSTEM);
-      _target.Owner.AddPassiveSeal((ePassiveTiming) ActionDetail1, _data);
+      _target.Owner.AddPassiveSeal((ePassiveTiming)ActionDetail1, _data);
     }
 
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
-      Value[eValueNumber.VALUE_5] = (float) (MasterData.action_value_5 + MasterData.action_value_6 * _level);
+      Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_5] = (float)(MasterData.action_value_5 + MasterData.action_value_6 * _level);
     }
 
     public enum ePassiveTiming
     {
       BUFF = 1,
-            DAMAGED
+      DAMAGED = 2
+    }
 
-        }
-
-        public enum eSealTarget
+    public enum eSealTarget
     {
-      SOURCE,
+      SOURCE = 0,
+      TARGET = 1
     }
   }
 }
