@@ -404,10 +404,14 @@ namespace Elements
         WOLF = 139,
         [Description("标记\n火电")]
         HUODIAN = 140,
+        [Description("堕天使的加护\n可璃亚")]
+        DUOTIANSHI = 141,
+        [Description("回归的蔷薇\nels")]
+        QiANGWEI = 142,
         [Description("射手座D5标记")]
         SHESHOUZUO = 143,
         [Description("噗吉靠垫\n圣锤")]
-        SHENGCHUI = 145,//机制没完善用不了
+        SHENGCHUI = 145,
         [Description("限制TP回复")]
         LIMIT_ENERGY_RECOVER_RATE = 150,
         [Description("额外加速")]
@@ -416,8 +420,8 @@ namespace Elements
         EWAIJIANSU = 153,
         [Description("毒伤提升")]
         SLIP_DAMAGE_UP = 154,
-        [Description("堕天使的加护\n可璃亚")]
-        DUOTIANSHI = 141,//机制没完善用不了
+        [Description("水祭的安宁\n水优妮")]
+        SHUIJIDEANNING = 156,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912
