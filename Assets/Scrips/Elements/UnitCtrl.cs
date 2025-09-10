@@ -9194,7 +9194,17 @@ this.updateCurColor();
             double num1 = 2f * _damageData.CriticalDamageRate;
             a *= 1 + (num1 - 1) * _damageData.critVar;
             if (debuffDamageUpDataList.Count > 0)
-                a *= GetDebuffDamageUpValue();
+            {
+                var t = GetDebuffDamageUpValue(); // temp logic
+                                                  // TODO check whether attack field suit it
+                // if no, move this logic to UpdateSlipDamage
+                if (_damageData.OverrideDamageLimit != -1)
+                {
+                    a = a.Min(_damageData.OverrideDamageLimit);
+                    _damageData.OverrideDamageLimit = -1;
+                }
+                a *= t;
+            }
             bool flag1 = false;
             if (_damageData.ActionType == eActionType.ATTACK)
             {
