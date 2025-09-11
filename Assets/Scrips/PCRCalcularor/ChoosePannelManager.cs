@@ -609,6 +609,7 @@ namespace PCRCaculator
         private void RefreshBasePage()
         {
             int count = 1;
+            int displayCount = 0;
             firstShowUnitId = -1;
 
             foreach (int id in buttons.Keys)
@@ -630,22 +631,21 @@ namespace PCRCaculator
                     if (count == 1)
                         firstShowUnitId = id;
                     count++;
+                    displayCount++;
                 }
                 else
                 {
                     buttons[id].gameObject.SetActive(false);
                 }
             }
-
-            if (parent.sizeDelta.y < Mathf.CeilToInt(count / 8) * 95 + 105)
-            {
-                parent.sizeDelta = new Vector2(100, Mathf.CeilToInt(count / 8) * 95 + 105);
-            }
+            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95 + 105;
+            parent.sizeDelta = new Vector2(100, neededHeight);
 
             if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95 + 105)
             {
                 parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95 + 105);
             }
+            Canvas.ForceUpdateCanvases();
             TurnAllToggles(selectedCharId.Count != 5);
         }
 
