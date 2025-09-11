@@ -191,6 +191,8 @@ namespace ActionParameterSerializer.Actions
                     return new ChangeCriticalReferenceAction();
                 case 108:
                     return new IfContainsUnitGroupAction();
+                case 110:
+                    return new SlipDamageUpAction();
                 /*
                 case 901:
                     return new ExStartPassiveAction();
