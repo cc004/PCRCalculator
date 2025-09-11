@@ -1511,8 +1511,8 @@ namespace PCRCaculator.Guild
                 .OrderBy(n => n.node_id)
                 .ToList();
 
-            int confluenceNum = confluenceNodes.FindIndex(n => n.node_id >= targetNodeId) + 1;
-            if (confluenceNum <= 0) confluenceNum = confluenceNodes.Count + 1;
+            int confluenceNum = confluenceNodes.FindIndex(n => n.node_id >= targetNodeId);
+            if (confluenceNum < 0) confluenceNum = confluenceNodes.Count;
 
             // 获取页面上左中右节点等级
             var pageNodeLevels = finalNodes
@@ -1533,18 +1533,24 @@ namespace PCRCaculator.Guild
             // 计算在合流点之后的节点数量
             int lastConfluenceNodeId = precedingConfluenceNodes.FirstOrDefault()?.node_id ?? 0;
 
-            var counts = NodeDataDict.Values
+            // 修改这里：我们需要统计的是合流点之后到目标节点之间所有被强化过的节点
+            var enhancedNodes = NodeDataDict.Values
                 .Where(n => n.page_num == pageNum &&
                            n.node_id >= lastConfluenceNodeId &&
                            n.pos_y > confluenceY &&
                            n.pos_y <= targetNodeY &&
-                           targetNodeLevel > 0)
-                .GroupBy(n => n.pos_x)
-                .ToDictionary(g => g.Key, g => g.Count());
+                           talentSkill.ContainsKey(n.node_id) && // 确保节点在天赋技能中存在
+                           talentSkill[n.node_id] > 0) // 确保强化等级大于0
+                .ToList();
 
-            int leftCount = counts.GetValueOrDefault(2, 0);
-            int middleCount = counts.GetValueOrDefault(5, 0);
-            int rightCount = counts.GetValueOrDefault(8, 0);
+            // 按位置分组并统计数量和等级
+            var leftNodes = enhancedNodes.Where(n => n.pos_x == 2).ToList();
+            var middleNodes = enhancedNodes.Where(n => n.pos_x == 5).ToList();
+            var rightNodes = enhancedNodes.Where(n => n.pos_x == 8).ToList();
+
+            int leftCount = leftNodes.Count;
+            int middleCount = middleNodes.Count;
+            int rightCount = rightNodes.Count;
 
             // 构造返回文本
             return confluenceNodes.Any(n => n.node_id == targetNodeId)

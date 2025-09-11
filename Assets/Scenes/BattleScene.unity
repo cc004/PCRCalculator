@@ -59837,7 +59837,7 @@ MonoBehaviour:
   skipUB: 0
   battleFinished: 0
   _IsReleasedKnightEnhance: 1
-  _IsReleaseSkillHasteLogic: 0
+  _IsReleaseSkillHasteLogic: 1
 --- !u!1 &8254703915107425000
 GameObject:
   m_ObjectHideFlags: 0

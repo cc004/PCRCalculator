@@ -1114,7 +1114,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(11 + curline, 14 + i, cont, centre:false);
+                            worksheet0.MySetValue(14 + curline, 14 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -1132,7 +1132,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < lframe) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(12 + curline, 12 + i, cont, centre:false);
+                            worksheet0.MySetValue(15 + curline, 12 + i, cont, centre:false);
                         ++curline;
                     }
 

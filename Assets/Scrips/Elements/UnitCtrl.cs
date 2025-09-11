@@ -4721,6 +4721,7 @@ this.updateCurColor();
 
                 if (_showsIcon)
                 {
+                    button.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
                     // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
                     //     showIconDict[eAbnormalState.SLOW] = 0;
                     // showIconDict[eAbnormalState.SLOW]++;
@@ -4735,6 +4736,8 @@ this.updateCurColor();
 
                 if (_showsIcon)
                 {
+                    button.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue}");
+
                     // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
                     //     showIconDict[eAbnormalState.HASTE] = 0;
                     // showIconDict[eAbnormalState.HASTE]++;
