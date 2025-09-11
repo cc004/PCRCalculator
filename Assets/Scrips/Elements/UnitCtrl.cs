@@ -142,12 +142,14 @@ namespace Elements
             UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
             if (BattleManager.Instance._IsReleaseSkillHasteLogic)
             {
-                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null)
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null && list1.Count > 0)
                 {
+                    OnChangeState?.Invoke(this, eStateIconType.HASTE, false);
                     list1.Clear();
                 }
-                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null)
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null && list2.Count > 0)
                 {
+                    OnChangeState?.Invoke(this, eStateIconType.SLOW, false);
                     list2.Clear();
                 }
             }
@@ -4714,14 +4716,16 @@ this.updateCurColor();
 
             if (_abnormalState == eAbnormalState.SLOW)
             {
-                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7))
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7) && indexList7.Count > 0)
                 {
+                    OnChangeState?.Invoke(this, eStateIconType.HASTE, false);
                     indexList7.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    button.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
+                    OnChangeState?.Invoke(this, eStateIconType.SLOW, true);
+                    // button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
                     // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
                     //     showIconDict[eAbnormalState.SLOW] = 0;
                     // showIconDict[eAbnormalState.SLOW]++;
@@ -4729,14 +4733,16 @@ this.updateCurColor();
             }
             else if (_abnormalState == eAbnormalState.HASTE)
             {
-                if (!overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11))
+                if (!overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
                 {
+                    OnChangeState?.Invoke(this, eStateIconType.SLOW, false);
                     indexList11.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    button.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue}");
+                    OnChangeState?.Invoke(this, eStateIconType.HASTE, true);
+                    // button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue}");
 
                     // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
                     //     showIconDict[eAbnormalState.HASTE] = 0;
@@ -5110,11 +5116,11 @@ this.updateCurColor();
         {
             if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out List<int> overlapList) && overlapList.Count > 0)
             {
-                return 1f + (double)overlapList.Max(x => overlapAbnormalStateData[x].MainValue);
+                return (double)overlapList.Max(x => overlapAbnormalStateData[x].MainValue);
             }
             else if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out overlapList) && overlapList.Count > 0)
             {
-                return 1f - (double)overlapList.Min(x => overlapAbnormalStateData[x].MainValue);
+                return (double)overlapList.Min(x => overlapAbnormalStateData[x].MainValue);
             }
             return 1.0;
         }
