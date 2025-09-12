@@ -10,6 +10,7 @@ namespace PCRCaculator
         public Text talentText;
         public Text titleText;
         public Text valueText;
+        public Text conutText;
 
         public Slider enhanceSlider;
 
@@ -51,6 +52,7 @@ namespace PCRCaculator
             talentText.text = talent;
             titleText.text = skill;
             valueText.text = value;
+            conutText.text = $"No.{nodeId}";
             // 设置 Slider 最大值和当前值
             if (enhanceSlider != null)
             {

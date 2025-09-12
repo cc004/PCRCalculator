@@ -44,6 +44,7 @@ namespace PCRCaculator.Guild
         public List<Text> bossDetailTexts;
 
         public List<Dropdown> dropdowns_ChooseBoss;
+        public List<Dropdown> dropdowns_ChooseTalentQuestBoss;
         public Image bossImage_ChooseBoss;
         public List<Toggle> toggles_ChooseBoss;
         public InputField currentHPinput;
@@ -80,7 +81,6 @@ namespace PCRCaculator.Guild
         public GameObject autoCalculatePagePrefab;
 
         //private List<AddedPlayerData> addedPlayerDatas;
-        private static Dictionary<int, EnemyData> enemyDataDic;
         //private Dictionary<int, MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, MasterEnemyMParts.EnemyMParts>();
         public GuildSettingData SettingData => StaticsettingData;
 
@@ -136,11 +136,26 @@ namespace PCRCaculator.Guild
                 return MainManager.Instance.EnemyDataDic;
             }
         }
+        public static Dictionary<int, EnemyData> TalentQuestEnemyParameterDic
+        {
+            get
+            {
+                return MainManager.Instance.TalentQuestEnemyParameterDic;
+            }
+        }
+        public static Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic
+        {
+            get
+            {
+                return MainManager.Instance.TalentQuestWaveGroupDataDic;
+            }
+        }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> EnemyMPartsDic
         {
             get => MainManager.Instance.EnemyMPartsDic;
         }
         public bool isGuildBoss { get => toggles_ChooseType[0].isOn; }
+        public bool IsTalentQuestBoss { get => toggles_ChooseType[1].isOn; }
         private void Awake()
         {
             Instance = this;
@@ -401,6 +416,61 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage($"会战{GetClanBattleID()}的配置缺失！", null);
             }
         }
+        public void OnChooseTalentQuestDropDownChanged()
+        {
+            // 获取三个下拉框的选项值（都从0开始，需要+1）
+            int firstOption = dropdowns_ChooseTalentQuestBoss[0].value + 1;   // 第一位数（第2位）
+            int secondOption = dropdowns_ChooseTalentQuestBoss[1].value + 1;  // 第六七位数的第一位
+            int thirdOption = dropdowns_ChooseTalentQuestBoss[2].value + 1;   // 第六七位数的第二位
+
+            // 构造wave_group_id
+            // 格式: 8 + firstOption(第2位) + 001(第3-5位固定) + secondOption(第6位) + thirdOption(第7位) + 1(最后1位)
+            string waveGroupIdStr = $"8{firstOption}001{(secondOption - 1)*10 + thirdOption:D3}1";
+
+            // 尝试解析构造的wave_group_id为整数
+            if (int.TryParse(waveGroupIdStr, out int waveGroupId))
+            {
+                // 查找匹配的TalentQuestWaveGroupData
+                var matchingData = TalentQuestWaveGroupDataDic?.Values
+                    .FirstOrDefault(data => data.wave_group_id == waveGroupId);
+                specialEnemyid = matchingData.enemy_ids.ToArray();
+
+                if (matchingData != null)
+                {
+                    // 使用匹配到的enemy_ids
+                    // 这里可以设置选中的boss id列表
+                    // 例如: selectedTalentQuestEnemyIds = matchingData.enemy_ids.ToArray();
+                }
+                else
+                {
+                    // 没有找到匹配的wave_group_id
+                    Debug.LogWarning($"未找到匹配的wave_group_id: {waveGroupId}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"无法解析wave_group_id字符串: {waveGroupIdStr}");
+            }
+        }
+        public void UpdateTalentQuestDropdownOptions()
+        {
+            Dropdown secondDropdown = dropdowns_ChooseTalentQuestBoss[1];
+            secondDropdown.ClearOptions();
+
+            List<string> secondDropdownOptions = new List<string>();
+
+            if (TalentQuestWaveGroupDataDic != null)
+            {
+                int optionCount = Mathf.CeilToInt(TalentQuestWaveGroupDataDic.Count / 50.0f);
+
+                for (int i = 1; i <= optionCount; i++)
+                {
+                    secondDropdownOptions.Add(i.ToString());
+                }
+            }
+
+            secondDropdown.AddOptions(secondDropdownOptions);
+        }
         public void UpdateDropdownOptions()
         {
             Dropdown dp = dropdowns_ChooseBoss[1];
@@ -418,14 +488,14 @@ namespace PCRCaculator.Guild
             {
                 selectedOptions.Add(guildTurn[i]);
             }
-            
+
             // 创建新的选项列表
             List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
             foreach (string option in selectedOptions)
             {
-              optionDataList.Add(new Dropdown.OptionData(option));
+                optionDataList.Add(new Dropdown.OptionData(option));
             }
-    
+
             // 更新 Dropdown 的选项
             dp.AddOptions(optionDataList);
         }
@@ -476,6 +546,10 @@ namespace PCRCaculator.Guild
             var group = SettingData.GetCurrentPlayerGroup();
             group.selectedEnemyIDs = isGuildBoss ? enemyId : specialEnemyid;
             group.isSpecialBoss = false;//!isGuildBoss;
+            group.isTalentQuestBoss = IsTalentQuestBoss;//!isGuildBoss;
+            group.TalentQuestMap = dropdowns_ChooseTalentQuestBoss[0].value;
+            group.TalentQuestArea = dropdowns_ChooseTalentQuestBoss[1].value;
+            group.TalentQuestIndex = dropdowns_ChooseTalentQuestBoss[2].value;
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
@@ -620,6 +694,10 @@ namespace PCRCaculator.Guild
         }
         private EnemyData GetEnemyDataByID(int enemy_id)
         {
+            if (enemy_id > 800000000 && enemy_id < 900000000)
+            {
+                return TalentQuestEnemyParameterDic[enemy_id];
+            }
             return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
@@ -645,11 +723,16 @@ namespace PCRCaculator.Guild
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
             dropdowns_ChooseBoss[1].value = data.currentTurn - 1;
             dropdowns_ChooseBoss[4].value = (int)data.useLogBarrierNew;
+            dropdowns_ChooseTalentQuestBoss[0].value = data.TalentQuestMap;
+            dropdowns_ChooseTalentQuestBoss[1].value = data.TalentQuestArea;
+            dropdowns_ChooseTalentQuestBoss[2].value = data.TalentQuestIndex;
             //toggles_ChooseBoss.isOn = SettingData.isViolent;
             if (data.isViolent)
                 toggles_ChooseBoss[0].isOn = true;
-            else 
+            else
                 toggles_ChooseBoss[1].isOn = true;
+            if (data.isTalentQuestBoss)
+                toggles_ChooseType[1].isOn = true;
             //FinishChooseBossButton();
             calSlider.value = (int)(Math.Log(SettingData.calSpeed, 2) + 3);
             if (data.timeLineData == null)
@@ -696,6 +779,8 @@ namespace PCRCaculator.Guild
             {
                 playerData = SettingData.addedPlayerDatas[SettingData.currentPlayerGroupNum];
             }*/
+            if (data.isTalentQuestBoss)
+                toggles_ChooseType[1].isOn = true;
             characterGroupNameText.text = playerData.playerName;
             for (int i = 0; i < 5; i++)
             {
@@ -739,8 +824,8 @@ namespace PCRCaculator.Guild
                     {GetGuildBossID(data.currentGuildMonth, data.currentGuildEnemyNum, data.currentTurn)};
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
-            bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
-            bossDetailTexts[0].text = group.isSpecialBoss ? "自定义": EnemyDataDic[selectedBossEnemyids[0]].name;
+            bossPicture.sprite = group.isTalentQuestBoss? ABExTool.GetSprites(ABExTool.SpriteType.角色图标, TalentQuestEnemyParameterDic[selectedBossEnemyids[0]].unit_id) : ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
+            bossDetailTexts[0].text = group.isSpecialBoss ? "自定义" : (group.isTalentQuestBoss ? "深域" : EnemyDataDic[selectedBossEnemyids[0]].name);
             string str = "";
             if (group.isSpecialBoss)
             {
@@ -1902,6 +1987,10 @@ namespace PCRCaculator.Guild
         public bool usePlayerSettingHP;
         public long playerSetingHP;
         public LogBarrierType useLogBarrierNew;
+        public bool isTalentQuestBoss;
+        public int TalentQuestMap;
+        public int TalentQuestArea;
+        public int TalentQuestIndex;
 
         public enum LogBarrierType
         {

@@ -129,6 +129,8 @@ namespace PCRCaculator
 
         public Text Debugtext { get => BaseBackManager.Instance.debugtext; }
         public Dictionary<int, EnemyData> EnemyDataDic { get; private set; }
+        public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get; private set; }
+        public Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic { get; private set; }
         public TextMeshProUGUI PlayerLevelText { get => BaseBackManager.Instance.playerLevelText; }
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
@@ -366,7 +368,8 @@ namespace PCRCaculator
                         unitExEquips = dbTool.unitExEquips;
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                         EnemyDataDic = dbTool.Dic2;
-                        // Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
+                        TalentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
+                        TalentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
                         UniqueEquipmentDataDic = dbTool.Dic9;
                         UniqueEquipment2DataDic = dbTool.Dic92;
                         TalentSkillNodeDic = dbTool.TalentSkillNodeDic;
@@ -415,7 +418,9 @@ namespace PCRCaculator
                                     Task.Run(() => unitExEquips.OverrideWith(dbTool3.unitExEquips)),
                                     Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                     Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
-                                    Task.Run(() => EnemyDataDic.OverrideWith(dbTool2.Dic2))
+                                    Task.Run(() => EnemyDataDic.OverrideWith(dbTool2.Dic2)),
+                                    Task.Run(() => GuildManager.TalentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
+                                    Task.Run(() => GuildManager.TalentQuestWaveGroupDataDic.OverrideWith(dbTool2.TalentQuestWaveGroupDataDic))
                                 // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
                                 );
 

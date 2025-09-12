@@ -284,7 +284,7 @@ namespace Elements
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
             //if(dataAsset == null)
             //{
-            int skinID = UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */);
+            int skinID = UnitUtility.GetSkinId(data.PrefabId, 3 /* force use 3x skin */);
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
             
@@ -293,7 +293,10 @@ namespace Elements
                 skinID = 170361;
                 unitid2 = 170301;
             }
-
+            if (unitid > 600000 && unitid < 700000)
+            {
+                unitid2 = data.PrefabId;
+            }
             if (prefab != 0)
             {
                 prefabOverride = UnitUtility.GetSkinId(prefab, 3);

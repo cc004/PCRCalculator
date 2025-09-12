@@ -265,7 +265,11 @@ namespace Elements
 
     private static int round(float _f) => (double) _f - (double) (int) _f >= 0.5 || Mathf.Approximately((float) (int) _f + 0.5f, _f) ? (int) _f + 1 : (int) _f;
     */
-    private static UnitDefine.UnitType getUnitType(int _unitId) => (UnitDefine.UnitType) (_unitId / 100000);
+    private static UnitDefine.UnitType getUnitType(int _unitId) 
+    {
+        int typeValue = _unitId / 100000;
+        return (UnitDefine.UnitType) (typeValue == 6 ? 1 : typeValue);
+    }
 /*
     public static int GetUnitMaxRank(int _unitId)
     {

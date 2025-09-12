@@ -70,6 +70,13 @@ namespace PCRCaculator
         public List<int> MainSkills = new List<int>();
         public List<UnitAttackPattern> enemyAttackPatterns = new List<UnitAttackPattern>();
     }
+    [Serializable]
+    public class TalentQuestWaveGroupData
+    {
+        public int id;
+        public int wave_group_id;
+        public List<int> enemy_ids = new();
+    }
     /*[Serializable]
     public class EnemyAttackPattern
     {
