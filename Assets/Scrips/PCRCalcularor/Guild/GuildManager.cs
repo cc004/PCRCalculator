@@ -434,18 +434,7 @@ namespace PCRCaculator.Guild
                 var matchingData = TalentQuestWaveGroupDataDic?.Values
                     .FirstOrDefault(data => data.wave_group_id == waveGroupId);
                 specialEnemyid = matchingData.enemy_ids.ToArray();
-
-                if (matchingData != null)
-                {
-                    // 使用匹配到的enemy_ids
-                    // 这里可以设置选中的boss id列表
-                    // 例如: selectedTalentQuestEnemyIds = matchingData.enemy_ids.ToArray();
-                }
-                else
-                {
-                    // 没有找到匹配的wave_group_id
-                    Debug.LogWarning($"未找到匹配的wave_group_id: {waveGroupId}");
-                }
+                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, TalentQuestEnemyParameterDic[specialEnemyid[0]].unit_id);
             }
             else
             {
