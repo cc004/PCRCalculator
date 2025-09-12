@@ -81,7 +81,7 @@ namespace PCRCaculator.Guild
             EnemyData newEnemyData = enemyData.Copy();
             try
             {
-                newEnemyData.baseData.realhp = int.Parse(inputField_HP.text, NumberStyles.AllowExponent);
+                newEnemyData.baseData.realhp = long.Parse(inputField_HP.text, NumberStyles.AllowExponent);
             }
             catch (FormatException e)
             {

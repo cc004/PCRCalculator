@@ -1430,7 +1430,7 @@ namespace PCRCaculator.Guild
         {
             SettingData.GetCurrentRandomData().RandomSeed = int.Parse(RandomSeed.text);
             SettingData.GetCurrentRandomData().UseFixedRandomSeed = UseFixedRandomSeed.isOn;
-            SettingData.GetCurrentPlayerGroup().playerSetingHP = int.Parse(currentHPinput.text);
+            SettingData.GetCurrentPlayerGroup().playerSetingHP = long.Parse(currentHPinput.text);
             SettingData.GetCurrentPlayerGroup().usePlayerSettingHP = toggles_ChooseBoss[2].isOn;
             SaveDataToJson();
         }
@@ -1900,7 +1900,7 @@ namespace PCRCaculator.Guild
         public int[] selectedEnemyIDs;
         public bool isViolent;
         public bool usePlayerSettingHP;
-        public int playerSetingHP;
+        public long playerSetingHP;
         public LogBarrierType useLogBarrierNew;
 
         public enum LogBarrierType

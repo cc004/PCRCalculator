@@ -77,7 +77,7 @@ namespace PCRCaculator.SQL
         public int level { get; set; }
         public int rarity { get; set; }
         public int promotion_level { get; set; }
-        public int hp { get; set; }
+        public long hp { get; set; }
         public int atk { get; set; }
         public int magic_str { get; set; }
         public int def { get; set; }
