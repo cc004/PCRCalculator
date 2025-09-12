@@ -1511,7 +1511,7 @@ namespace PCRCaculator.Guild
                 .OrderBy(n => n.node_id)
                 .ToList();
 
-            int confluenceNum = confluenceNodes.FindIndex(n => n.node_id >= targetNodeId);
+            int confluenceNum = confluenceNodes.FindIndex(n => n.node_id > targetNodeId);
             if (confluenceNum < 0) confluenceNum = confluenceNodes.Count;
 
             // 获取页面上左中右节点等级
