@@ -128,6 +128,7 @@ namespace PCRCaculator
         }
 
         public Text Debugtext { get => BaseBackManager.Instance.debugtext; }
+        public Dictionary<int, EnemyData> EnemyDataDic { get; private set; }
         public TextMeshProUGUI PlayerLevelText { get => BaseBackManager.Instance.playerLevelText; }
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
@@ -364,7 +365,8 @@ namespace PCRCaculator
                         enemyMPartsDic = dbTool.Dic7;
                         unitExEquips = dbTool.unitExEquips;
                         //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
-                        Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
+                        EnemyDataDic = dbTool.Dic2;
+                        // Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
                         UniqueEquipmentDataDic = dbTool.Dic9;
                         UniqueEquipment2DataDic = dbTool.Dic92;
                         TalentSkillNodeDic = dbTool.TalentSkillNodeDic;
@@ -413,7 +415,7 @@ namespace PCRCaculator
                                     Task.Run(() => unitExEquips.OverrideWith(dbTool3.unitExEquips)),
                                     Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                     Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
-                                    Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
+                                    Task.Run(() => EnemyDataDic.OverrideWith(dbTool2.Dic2))
                                 // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
                                 );
 
@@ -443,7 +445,7 @@ namespace PCRCaculator
                                 Task.Run(() => equipmentDic.Override2With(dbTool3.Dic8)),
                                 Task.Run(() => skillActionDic.Override2With(dbTool3.Dic4)),
                                 Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
-                                Task.Run(() => GuildManager.EnemyDataDic.Override2With(dbTool3.Dic2))
+                                Task.Run(() => EnemyDataDic.Override2With(dbTool3.Dic2))
                             );
 
                             unitRarityDic.TryAdd(dbCN.Dic1);

@@ -455,14 +455,13 @@ namespace Elements
         public UnitCtrl LoadSummonPrefabImmediately(SummonData summonData)
         {
             int unitid = summonData.SummonId;
+            int prefab = ABExTool.GetPrefabId(unitid);
             if (unitid >= 999999)
                 unitid = GuildManager.EnemyDataDic[unitid].unit_id;
-            var a = ABExTool.LoadUnitPrefab(unitid);
+            var a = ABExTool.LoadUnitPrefab(prefab);
             if (a == null)
             {
-                unitid = unitid / 100 * 100;
-                GuildManager.EnemyDataDic[summonData.SummonId].unit_id = unitid;
-                a = ABExTool.LoadUnitPrefab(unitid);
+                Debug.LogError("召唤物" + unitid + "的预制体丢失！");
             }
             GameObject b = Instantiate(a);
             b.transform.SetParent(unitParent);
@@ -487,9 +486,9 @@ namespace Elements
           Action<BattleSpineController> _callback = null)
         {
             int unitid = summonData.SummonId;
+            int prefabID = ABExTool.GetPrefabId(unitid);
             if (unitid >= 999999)
                 unitid = GuildManager.EnemyDataDic[unitid].unit_id;
-            int prefabID = ABExTool.GetPrefabId(unitid);
             //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
             //if (dataAsset == null)

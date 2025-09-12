@@ -133,11 +133,7 @@ namespace PCRCaculator.Guild
                     string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
                     enemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
                 }*/
-                return enemyDataDic;
-            }
-            set
-            {
-                enemyDataDic = value;
+                return MainManager.Instance.EnemyDataDic;
             }
         }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> EnemyMPartsDic

@@ -565,7 +565,7 @@ namespace PCRCaculator.SQL
                         t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id, talent_id)
                     {
                         moveSpeed = t4.move_speed,
-                        prefabIdBattle = t4.prefab_id_battle
+                        prefabIdBattle = t4.prefab_id_battle != 0 ? t4.prefab_id_battle : t4.prefab_id
                     };
                 }
                 catch (KeyNotFoundException ex)
