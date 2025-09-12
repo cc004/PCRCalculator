@@ -114,8 +114,16 @@ namespace PCRCaculator.Guild
         public Toggle UseFixedRandomSeed;
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
-
-
+        public List<Text> TalentTexts;
+        public List<GameObject> TalentBonus;
+        public Dictionary<int, long> UnitTalentFormationBonusDictionary { get; set; } = new Dictionary<int, long>();
+        private Color[] elementColors = {
+            new Color(0xE7/255f, 0x55/255f, 0x4A/255f), // "#E7554A" 火
+            new Color(0x44/255f, 0x9C/255f, 0xE9/255f), // "#449CE9" 水
+            new Color(0x59/255f, 0xAF/255f, 0x41/255f), // "#59AF41" 风
+            new Color(0xF1/255f, 0xB1/255f, 0x2F/255f), // "#F1B12F" 光
+            new Color(0x7C/255f, 0x4D/255f, 0xBF/255f)  // "#7C4DBF" 暗
+        };
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -703,14 +711,19 @@ namespace PCRCaculator.Guild
                         UnitUBTimes[i].SetUBTimes(data.UBExecTimeData[i]);
                     if (data.SemanUBExecTimeData?.Count > i)
                         UnitUBTimes[i].SetSemanUBTimes(data.SemanUBExecTimeData[i]);
+                    TalentTexts[i].text = playerData.playrCharacters[i].TalentLevelDescribe();
                 }
                 else
                 {
                     charactersUI[i].SetButton(0);
                     UnitUBTimes[i].SetUBTimes(new List<float>());
                     UnitUBTimes[i].SetSemanUBTimes(new List<int>());
+                    TalentTexts[i].text = "无";
                 }
             }
+            GetTalentFormationBonusDescription();
+            TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
+            TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
             if (data.UBExecTimeData?.Count >= 6)
                 UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             if (data.SemanUBExecTimeData?.Count >= 6) 
@@ -1565,6 +1578,122 @@ namespace PCRCaculator.Guild
                 return "无";
             }
             return $"第{teamSkill.Keys.Max()}个";
+        }
+        public void GetTalentFormationBonusDescription()
+        {
+            CalcTalentFormationBonus();
+            string[] elementNames = { "火", "水", "风", "光", "暗" };
+
+            foreach (var bonusObj in TalentBonus)
+            {
+                bonusObj.SetActive(false);
+            }
+
+            List<KeyValuePair<int, long>> validBonuses = new List<KeyValuePair<int, long>>();
+            foreach (var kvp in UnitTalentFormationBonusDictionary)
+            {
+                long bonusValue = kvp.Value;
+                if (bonusValue > 0)
+                {
+                    validBonuses.Add(kvp);
+                }
+            }
+
+            for (int i = 0; i < validBonuses.Count && i < 2; i++)
+            {
+                var kvp = validBonuses[i];
+                int elementType = kvp.Key;
+                long bonusValue = kvp.Value;
+
+                GameObject bonusObj = TalentBonus[i];
+                bonusObj.SetActive(true);
+
+                // 设置颜色
+                if (bonusObj.TryGetComponent<Image>(out var image))
+                {
+                    image.color = elementColors[elementType-1];
+                }
+
+                // 设置文本
+                Text text = bonusObj.GetComponentInChildren<Text>();
+                if (text != null)
+                {
+                    // bonusValue是万分比，所以需要除以100得到百分比值
+                    text.text = elementNames[elementType-1] + (bonusValue / 100) + "%";
+                }
+            }
+        }
+        /// <summary>
+        /// 计算当前编队的天赋阵型加成
+        /// </summary>
+        public void CalcTalentFormationBonus()
+        {
+            // 如果未开启"骑士增强"功能，则直接返回
+            // if (!_IsReleasedKnightEnhance)
+            //     return;
+
+            // 创建一个字典来统计每个天赋ID的出现次数
+            Dictionary<int, int> talentCountDict = new Dictionary<int, int>();
+            // List<int> talentIds = new List<int>();
+            // 遍历当前我方编队中的所有单位
+            var unitList = SettingData.GetCurrentPlayerGroup().playerData.playrCharacters;
+            for (int i = 1; i <= 5; i++)
+            {
+                talentCountDict[i] = 0;
+            }
+            if (unitList != null)
+            {
+                for (int i = 0; i < unitList.Count; i++)
+                {
+                    var unit = unitList[i];
+                    if (unit == null)
+                        continue;
+                    // List<int> talentIds = MainManager.Instance.GetTalentIds(unit.unitId);
+                    // 获取单位的天赋列表
+                    var talents = MainManager.Instance.GetTalentIds(unit.unitId);
+                    if (talents == null)
+                        continue;
+
+                    // 统计每个天赋的出现次数
+                    for (int j = 0; j < talents.Count; j++)
+                    {
+                        int talentId = talents[j];
+
+                        // 获取当前天赋的计数，如果不存在则为0
+                        talentCountDict.TryGetValue(talentId, out int currentCount);
+                        // 更新计数+1
+                        talentCountDict[talentId] = currentCount + 1;
+                    }
+                }
+            }
+
+            // 遍历统计好的天赋次数字典
+            foreach (var pair in talentCountDict)
+            {
+                int talentId = pair.Key;
+                int count = pair.Value;
+
+                long bonus = 0;
+                bonus = ClanBattleGetTalentBonusPermyriad(count);
+                if (UnitTalentFormationBonusDictionary != null)
+                {
+                    UnitTalentFormationBonusDictionary[talentId] = bonus;
+                }
+            }
+        }
+        public long ClanBattleGetTalentBonusPermyriad(int count) // present
+        {
+            long bonus = 0;
+            bonus = count switch
+            {
+                1 => 0,
+                2 => 500,
+                3 => 1000,
+                4 => 2500,
+                5 => 5000,
+                _ => (long)0,// 未知天赋
+            };
+            return bonus;
         }
     }
     [Serializable]

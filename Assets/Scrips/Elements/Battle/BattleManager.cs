@@ -3903,8 +3903,7 @@ namespace Elements.Battle
             }*/
             battleManager.setupEnemyProcess();
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            if (IsBossBattle) { BossUnit = EnemyList[0]; }
-            calcTalentFormationBonus();
+            if (IsBossBattle) { BossUnit = EnemyList[0]; GuildManager.Instance.CalcTalentFormationBonus(); }
             foreach(var unit in UnitList)
             {
                 unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
@@ -4129,94 +4128,7 @@ namespace Elements.Battle
         }
 
         public bool _IsReleasedKnightEnhance = true;
-        public bool _IsReleaseSkillHasteLogic = false;
-        public Dictionary<int, long> UnitTalentFormationBonusDictionary { get; set; } = new Dictionary<int, long>();
-
-        /// <summary>
-        /// 计算当前编队的天赋阵型加成
-        /// </summary>
-        private void calcTalentFormationBonus()
-        {
-            // 如果未开启"骑士增强"功能，则直接返回
-            if (!_IsReleasedKnightEnhance)
-                return;
-        
-            // 创建一个字典来统计每个天赋ID的出现次数
-            Dictionary<int, int> talentCountDict = new Dictionary<int, int>();
-        
-            // 遍历当前我方编队中的所有单位
-            var unitList = UnitList;
-            if (unitList != null)
-            {
-                for (int i = 0; i < unitList.Count; i++)
-                {
-                    var unit = unitList[i];
-                    if (unit == null)
-                        continue;
-        
-                    // 获取单位的天赋列表
-                    var talents = unit.TalentIds;
-                    if (talents == null)
-                        continue;
-        
-                    // 统计每个天赋的出现次数
-                    for (int j = 0; j < talents.Count; j++)
-                    {
-                        int talentId = talents[j];
-                        
-                        // 获取当前天赋的计数，如果不存在则为0
-                        talentCountDict.TryGetValue(talentId, out int currentCount);
-                        // 更新计数+1
-                        talentCountDict[talentId] = currentCount + 1;
-                    }
-                }
-            }
-        
-            // 遍历统计好的天赋次数字典
-            foreach (var pair in talentCountDict)
-            {
-                int talentId = pair.Key;
-                int count = pair.Value;
-
-                long bonus = 0;
-                if (IsBossBattle)
-                    // bonus = ClanBattleGetTalentBonusPermyriad(talentId, count);
-                    bonus = ClanBattleGetTalentBonusPermyriad(talentId, count);
-
-
-                if (UnitTalentFormationBonusDictionary != null)
-                {
-                    UnitTalentFormationBonusDictionary[talentId] = bonus;
-                }
-            }
-        }
-
-        public long ClanBattleGetTalentBonusPermyriad(int talentId, int count) // present
-        {
-            long bonus = 0;
-            switch (count)
-            {
-                case 1:
-                    bonus = 0;
-                    break;
-                case 2:
-                    bonus = 500;
-                    break;
-                case 3:
-                    bonus = 1000;
-                    break;
-                case 4:
-                    bonus = 2500;
-                    break;
-                case 5:
-                    bonus = 5000;
-                    break;
-                default:
-                    bonus = 0; // 未知天赋
-                    break;
-            }
-            return bonus;
-        }
+        public Dictionary<int, long> UnitTalentFormationBonusDictionary { get => GuildManager.Instance.UnitTalentFormationBonusDictionary; }
 
         /// <summary>
         /// 为指定单位的装备部件设置天赋弱点
