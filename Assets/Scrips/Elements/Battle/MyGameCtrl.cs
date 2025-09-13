@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using Elements.Battle;
 using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
+using PCRCaculator.SQL;
 using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,10 +61,42 @@ namespace Elements
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
+
+        public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
+        {
+            Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
+            int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;
+            int content_type = 0;
+            if (enemy_id >= 800000000)
+            {
+                content_type = (int)eBattleCategory.TALENT_QUEST;
+                enemy_id = GuildManager.Instance.TalentQuestWaveGroupId; // TODO move in tempData
+            }
+            else if (enemy_id >= 500000000)
+            {
+                content_type = (int)eBattleCategory.DUNGEON;
+                // TODO use quest
+            }
+            else if (enemy_id >= 400000000)
+            {
+                content_type = (int)eBattleCategory.CLAN_BATTLE;
+            }
+            foreach (var i in extra_effect_enemy.Keys)
+            {
+                var extraEffect = extra_effect_enemy[i];
+                if (extraEffect != null && (extraEffect.target_value_1 == enemy_id || extraEffect.extra_effect_id == enemy_id) && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
+                {
+                    return extraEffect;
+                }
+            }
+            return null;
+        }
+
+        
         private void Start()
         {
             staticBattleManager = BattleManager.Instance;
-            if(MainManager.Instance == null)
+            if (MainManager.Instance == null)
             {
                 return;
             }
@@ -75,6 +109,21 @@ namespace Elements
             if (mainManager.IsGuildBattle)
             {
                 tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
+
+                var extra_data = GetExtraEffectEnemyData(tempData);
+                if (extra_data != null)
+                {
+                    foreach (var enemy in extra_data.enemy_ids)
+                    {
+                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
+                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
+                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                        else
+                            Debug.LogError("找不到增援敌人ID " + enemy);
+                    }
+                }
+
                 tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
                 tempData.mParts = mainManager.GuildBattleData.mParts;
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();

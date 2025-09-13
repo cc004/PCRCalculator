@@ -526,7 +526,7 @@ namespace Elements
                 _skill.SkillEffects[index].AlreadyFireArmExecedData = new Dictionary<UnitCtrl, bool>();
                 _skill.SkillEffects[index].AlreadyFireArmExecedKeys = new List<UnitCtrl>();
             }
-            _skill.DamagedPartsList = new List<BasePartsData>();
+            _skill.DamagedPartsList.Clear();
         }
 
         private void execActionOnWaveStart(Skill _skill)

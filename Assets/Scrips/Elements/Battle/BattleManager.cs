@@ -23,6 +23,7 @@ using Random = UnityEngine.Random;
 //using Elements.Data;
 //using Elements.Uek;
 using Elements;
+using PCRCaculator.SQL;
 
 //using UnityStandardAssets.ImageEffects;
 
@@ -302,6 +303,7 @@ namespace Elements.Battle
         public eBattleCategory BattleCategory { get; private set; }
 
         public CoroutineManager CoroutineManager { get; private set; }
+        private Dictionary<BattleDefine.eExtraEffectExecTiming, bool> isExtraEffectCalled { get; set; } = new Dictionary<BattleDefine.eExtraEffectExecTiming, bool>();
 
         public eChargeSkillTurn ChargeSkillTurn { get; set; }
 
@@ -3632,6 +3634,274 @@ namespace Elements.Battle
         }*/
 
         //public void Init(ViewBattle GJABBKPIEHH) => this.StartCoroutine(this.coroutineStartProcess(GJABBKPIEHH));
+
+        public List<BonusEnemyData> GetExtraEffectEnemyData(BattleDefine.eExtraEffectExecTiming _timing)
+        {
+            // var extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
+            // int enemy_id = EnemyList.FirstOrDefault()?.enemyId ?? 0;
+            // int content_type = 0;
+            // if (enemy_id >= 800000000)
+            // {
+            //     content_type = (int)eBattleCategory.TALENT_QUEST;
+            //     enemy_id = GuildManager.Instance.TalentQuestWaveGroupId; // TODO move in tempData
+            // }
+            // else if (enemy_id >= 500000000)
+            // {
+            //     content_type = (int)eBattleCategory.DUNGEON;
+            // }
+            // else if (enemy_id >= 400000000)
+            // {
+            //     content_type = (int)eBattleCategory.CLAN_BATTLE;
+            // }
+            // for (int i = 0; i < extra_effect_enemy.Count; i++)
+            //     {
+            //         var extraEffect = extra_effect_enemy[i];
+            //         if (extraEffect != null && extraEffect.target_value_1 == enemy_id && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
+            //         {
+            //             return CreateBonusEnemyDatas(extraEffect, _timing);
+            //         }
+            //     }
+            var data = MyGameCtrl.Instance.GetExtraEffectEnemyData(tempData);
+            if (data != null)
+            {
+                return CreateBonusEnemyDatas(data, _timing);
+            }
+            return new List<BonusEnemyData>();
+        }
+
+        protected List<BonusEnemyData> CreateBonusEnemyDatas(extra_effect_data _extraEffect, BattleDefine.eExtraEffectExecTiming _timing)
+        {
+            var result = new List<BonusEnemyData>();
+            
+            if (_extraEffect == null)
+                return result;
+            var enemy_ids = _extraEffect.enemy_ids;
+            var exec_timings = _extraEffect.exec_timings;
+            for (int i = 0; i < enemy_ids.Count; i++)
+            {
+                if (exec_timings != null && i < exec_timings.Count)
+                {
+                    var execTiming = exec_timings[i];
+                    if (execTiming == (int)_timing)
+                    {
+                        int enemyId = enemy_ids[i];
+
+                        var unitCtrl = EnemyList?.Find(unit => unit.enemyId == enemyId);
+                        if (unitCtrl != null)
+                        {
+                            var skillAndBonusList = new List<ValueTuple<int, int>>();
+                            {
+                                // *(_QWORD *)(v32 + 1216);  0x4c0 
+                                var skillList = unitCtrl.MainSkillIdList;
+                                if (skillList != null)
+                                {
+                                    for (int skillIndex = 0; skillIndex < skillList.Count; skillIndex++)
+                                    {
+                                        var skillId = skillList[skillIndex];
+                                        if (skillId > 0)
+                                        {
+                                            skillAndBonusList.Add(new ValueTuple<int, int>(skillId, 0));
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            var bonusEnemyData = new BonusEnemyData
+                            {
+                                Id = enemyId,
+                                SkillIdAndBonusIdList = skillAndBonusList
+                            };
+                            
+                            result.Add(bonusEnemyData);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        // RVA: 0x2713040 Offset: 0x2713040 VA: 0x2713040
+        public void StartExtraEffect(BattleDefine.eExtraEffectExecTiming _timing)
+        {
+            if (!isExtraEffectCalled.TryGetValue(_timing, out bool alreadyCalled) || !alreadyCalled)
+            {
+                if (isExtraEffectCalled != null)
+                {
+                    isExtraEffectCalled[_timing] = true;
+                }
+
+                var bonusEnemyDatas = GetExtraEffectEnemyData(_timing);
+                if (bonusEnemyDatas == null)
+                    return;
+
+                if (bonusEnemyDatas.Count > 0)
+                {
+                    if (_timing == BattleDefine.eExtraEffectExecTiming.EX_SKILL)
+                    {
+                        startBonusEffectImpl(bonusEnemyDatas);
+                        return;
+                    }
+
+                    IEnumerator coroutine;
+                    if (!isShowMultiTarget)
+                    {
+                        coroutine = waitMultiTargetAppearEnd(bonusEnemyDatas);
+                    }
+                    else
+                    {
+                        coroutine = waitPlayFirstWaveStartStoryEnd(bonusEnemyDatas);
+                    }
+
+                    if (CoroutineManager != null)
+                    {
+                        CoroutineManager.AppendCoroutine(coroutine, ePauseType.SYSTEM);
+                    }
+                }
+            }
+        }
+
+        public class BonusEnemyData // TypeDefIndex: 19716
+        {
+            public int Id { get; set; }
+            public List<ValueTuple<int, int>> SkillIdAndBonusIdList { get; set; }
+        }
+
+        public enum eBonusType
+        {
+            DEFEAT_ENEMY = 0,
+            DOMINANCE_ENEMY = 1,
+            DEFEAT_ALLIES = 2,
+            DOMINANCE_ALLIES = 3,
+        }
+
+        // RVA: 0x2713170 Offset: 0x2713170 VA: 0x2713170
+        private void startBonusEffectImpl(List<BonusEnemyData> bonusEnemyDatas)
+        {
+            
+            // 显示队伍加成动画
+            // 省略了
+
+            // 显示环境特效
+            // if (shouldShowBonusEffect)
+            // {                 
+            //     ShowBonusAppearEffect(bonusEnemyDatas);
+            // }
+            // else
+            // {
+            //     displayBonusIcon();
+            // }
+            execBattleBonus(bonusEnemyDatas);
+        }
+        
+        // private void displayBonusIcon()
+        // {
+        // }
+        
+        // RVA: 0x2712CCC Offset: 0x2712CCC VA: 0x2712CCC
+        private void execBattleBonus(List<BonusEnemyData> _bonusEnemyDatas)
+        {
+            if (_bonusEnemyDatas == null)
+                return;
+
+            foreach (var bonusEnemyData in _bonusEnemyDatas)
+            {
+                var targetUnit = EnemyList.Find(unit => unit.enemyId == bonusEnemyData.Id);
+                
+                if (targetUnit == null)
+                    continue;
+
+                if (bonusEnemyData.SkillIdAndBonusIdList != null)
+                {
+                    foreach (var skillInfo in bonusEnemyData.SkillIdAndBonusIdList)
+                    {
+                        targetUnit.ExecSkillBySkillId(skillInfo.Item1, skillInfo.Item2);
+                    }
+                }
+            }
+        }
+        
+        // 队伍加成动画
+        // private void ShowBonusAppearEffect(List<BonusEnemyData> bonusEnemyDatas)
+        // {
+        //     try
+        //     {
+        //         SetSkillScreen(true);
+                
+        //         GamePause(true, false);
+                
+        //         var resourceManagerType = System.Type.GetType("Elements.ResourceManager");
+        //         if (resourceManagerType != null)
+        //         {
+        //             var instanceProperty = resourceManagerType.GetProperty("Instance");
+        //             if (instanceProperty != null)
+        //             {
+        //                 var resourceManager = instanceProperty.GetValue(null);
+        //                 if (resourceManager != null)
+        //                 {
+        //                     var instantiateMethod = resourceManagerType.GetMethod("InstantiateAndGetComponent");
+        //                     if (instantiateMethod != null)
+        //                     {
+        //                         var bonusAppearEffect = instantiateMethod.Invoke(resourceManager, 
+        //                             new object[] { 1839952676, this.transform, null }); // 0x6DAB7324 = 1839952676
+                                
+        //                         if (bonusAppearEffect != null)
+        //                         {
+        //                             var transformProp = bonusAppearEffect.GetType().GetProperty("transform");
+        //                             if (transformProp != null)
+        //                             {
+        //                                 var transform = transformProp.GetValue(bonusAppearEffect);
+        //                                 // 调用TransformUtility.ResetLocal
+        //                                 var transformUtilityType = System.Type.GetType("Elements.TransformUtility");
+        //                                 if (transformUtilityType != null)
+        //                                 {
+        //                                     var resetLocalMethod = transformUtilityType.GetMethod("ResetLocal");
+        //                                     resetLocalMethod?.Invoke(null, new object[] { transform });
+        //                                 }
+        //                             }
+                                    
+        //                             System.Action callback = () => {
+        //                                 displayBonusIcon();
+        //                                 execBattleBonus(bonusEnemyDatas);
+        //                             };
+                                    
+        //                             var playMethod = bonusAppearEffect.GetType().GetMethod("Play");
+        //                             if (playMethod != null)
+        //                             {
+        //                                 playMethod.Invoke(bonusAppearEffect, new object[] 
+        //                                 { 
+        //                                     bonusDictionary, 
+        //                                     callback, 
+        //                                     UnitList, 
+        //                                     EnemyList 
+        //                                 });
+        //                                 return; 
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     catch
+        //     {
+        //         displayBonusIcon();
+        //     }
+        // }
+
+        private IEnumerator waitMultiTargetAppearEnd(List<BonusEnemyData> bonusEnemyDatas)
+        {
+            while (!isShowMultiTarget)
+                yield return null;
+            startBonusEffectImpl(bonusEnemyDatas);
+        }
+
+        private IEnumerator waitPlayFirstWaveStartStoryEnd(List<BonusEnemyData> bonusEnemyDatas)
+        {
+            // TODO wait eWaveStartAdvState
+            yield return null; // 占位符等待
+            startBonusEffectImpl(bonusEnemyDatas);
+        }
+
         public void Init(MyGameCtrl gameCtrl)
         {
             stepping = false;
@@ -3643,6 +3913,7 @@ namespace Elements.Battle
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
+            
             StartCoroutine(coroutineStartProcess(gameCtrl));
         }
 
@@ -3651,6 +3922,7 @@ namespace Elements.Battle
             SetStarted(false);
             activeActionIds.Clear();
             effectUpdateList.Clear();
+            isExtraEffectCalled.Clear();
             foreach(var unitSpineController in unitSpineControllerList)
             {
                 unitSpineController.Destroy();
@@ -3963,6 +4235,7 @@ namespace Elements.Battle
             {
                 ActionStartTimeCounter = 5;
             }
+            StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             //battleManager.battleProcessor.SetupHpAndEnergyAfterApplyPassiveSkill();
             //battleManager.tempData.InitXorShiftRandom(seed);
             //battleManager.CMINMBPDEOL = new BattleVoiceFlagManager(battleManager.GetMyUnitList(), battleManager.GetOpponentUnitList());

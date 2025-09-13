@@ -120,7 +120,7 @@ namespace Elements
         [JsonIgnore]
         public bool LoopEffectAlreadyDone { get; set; }
         [JsonIgnore]
-        public List<BasePartsData> DamagedPartsList { get; set; }
+        public List<BasePartsData> DamagedPartsList { get; set; } = new List<BasePartsData>();
         [JsonIgnore]
         public List<BasePartsData> CriticalPartsList { get; set; }
         [JsonIgnore]

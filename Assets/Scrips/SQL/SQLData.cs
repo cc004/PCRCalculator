@@ -911,6 +911,22 @@ namespace PCRCaculator.SQL
         public int enemy_id_3 { get; set; }
         public int enemy_id_4 { get; set; }
         public int enemy_id_5 { get; set; }
+
+        public List<int> enemy_ids
+        {
+            get
+            {
+                return new List<int> { enemy_id_1, enemy_id_2, enemy_id_3, enemy_id_4, enemy_id_5 }.Where(x => x != 0).ToList();
+            }
+        }
+
+        public List<int> exec_timings
+        {
+            get
+            {
+                return new List<int> { exec_timing_1, exec_timing_2, exec_timing_3, exec_timing_4, exec_timing_5 }.Where(x => x != 0).ToList();
+            }
+        }
     }
 }
 

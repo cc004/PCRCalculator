@@ -12,6 +12,18 @@ namespace Elements
 {
   public class BattleDefine
   {
+
+    // Namespace: 
+    public enum eExtraEffectExecTiming // TypeDefIndex: 2576
+    {
+      // Fields
+      EX_SKILL = 1,
+      ALL_UNIT_ACTION = 2,
+      MY_TEAM_ACTION = 3,
+      ENEMY_ACTION = 4,
+    }
+
+
     public const string BATTLE_LOGIC_VERSION = "4";
     public const int ARENA_BG_ID = 100001;
     public const int GRANDARENA_BG_ID = 100002;

@@ -11031,6 +11031,8 @@ this.updateCurColor();
             {
                 PlayAndSetUpMultiTarget(_isFirst: true);
             }
+            battleManager.StartExtraEffect(BattleDefine.eExtraEffectExecTiming.ALL_UNIT_ACTION);
+            battleManager.StartExtraEffect(IsOther ? BattleDefine.eExtraEffectExecTiming.ENEMY_ACTION : BattleDefine.eExtraEffectExecTiming.MY_TEAM_ACTION);
             if (IsPartsBoss)
                 battleManager.LOGNEDLPEIJ = false;
             if (_state != ActionState.IDLE && _state != ActionState.WALK)
