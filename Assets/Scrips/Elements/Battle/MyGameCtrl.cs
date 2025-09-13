@@ -31,6 +31,7 @@ namespace Elements
         public TempData tempData;
         public List<UnitCtrl> playerUnitCtrl;
         public List<UnitCtrl> enemyUnitCtrl;
+        public List<UnitCtrl> extraEffectEnemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
 
         private int finishCount;
@@ -109,16 +110,22 @@ namespace Elements
             if (mainManager.IsGuildBattle)
             {
                 tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
-
+                tempData.extra_effect_cnt = 0;
                 var extra_data = GetExtraEffectEnemyData(tempData);
                 if (extra_data != null)
                 {
                     foreach (var enemy in extra_data.enemy_ids)
                     {
                         if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
+                        {
                             tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
                         else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
+                        {
                             tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
                         else
                             Debug.LogError("找不到增援敌人ID " + enemy);
                     }
@@ -257,6 +264,14 @@ namespace Elements
                     var unitData = enemy.CreateUnitData();
                     LoadCharacter(unitData, idx, false, action);
                     idx++;
+                }
+
+                int ed = enemyUnitCtrl.Count - tempData.extra_effect_cnt;
+                for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
+                {
+                    enemyUnitCtrl[i].UnitName = "环境buff";
+                    extraEffectEnemyUnitCtrl.Add(enemyUnitCtrl[i]);
+                    enemyUnitCtrl.RemoveAt(i);
                 }
             }
             else
@@ -397,7 +412,7 @@ namespace Elements
             //}
 
         }
-        private IEnumerator LoadCharacterPrefab(PCRCaculator.UnitData data,int idx,bool isplayer,Action finishAction )
+        private IEnumerator LoadCharacterPrefab(PCRCaculator.UnitData data,int idx,bool isplayer,Action finishAction)
         {
             //yield return new WaitForSeconds(5f);
             int unitid = data.unitId;
@@ -744,6 +759,7 @@ namespace Elements
         public List<PCRCaculator.UnitData> playerList;
         public List<PCRCaculator.UnitData> enemyList;
         public List<EnemyData> guildEnemy;
+        public int extra_effect_cnt = 0;
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         //public bool UseFixedRandomSeed;

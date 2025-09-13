@@ -3686,7 +3686,7 @@ namespace Elements.Battle
                     {
                         int enemyId = enemy_ids[i];
 
-                        var unitCtrl = EnemyList?.Find(unit => unit.enemyId == enemyId);
+                        var unitCtrl = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl?.Find(unit => unit.enemyId == enemyId);
                         if (unitCtrl != null)
                         {
                             var skillAndBonusList = new List<ValueTuple<int, int>>();
@@ -3805,7 +3805,7 @@ namespace Elements.Battle
 
             foreach (var bonusEnemyData in _bonusEnemyDatas)
             {
-                var targetUnit = EnemyList.Find(unit => unit.enemyId == bonusEnemyData.Id);
+                var targetUnit = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl.Find(unit => unit.enemyId == bonusEnemyData.Id);
                 
                 if (targetUnit == null)
                     continue;
@@ -4186,6 +4186,10 @@ namespace Elements.Battle
                 (battleManager.EnemyList)[index].IsOther = true;
                 // ISSUE: explicit non-virtual call
                 (battleManager.EnemyList)[index].WaveStartProcess(true);
+            }
+            for (int index = 0; index < (tempData.extra_effect_cnt); ++index)
+            {
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsOther = true;
             }
             //battleManager.battleProcessor.SetupHpAndEnergy();
             // ISSUE: explicit non-virtual call
