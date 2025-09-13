@@ -4725,7 +4725,7 @@ this.updateCurColor();
                 if (_showsIcon)
                 {
                     // OnChangeState?.Invoke(this, eStateIconType.SLOW, true);
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue:F2}");
                     // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
                     //     showIconDict[eAbnormalState.SLOW] = 0;
                     // showIconDict[eAbnormalState.SLOW]++;
@@ -4742,7 +4742,7 @@ this.updateCurColor();
                 if (_showsIcon)
                 {
                     // OnChangeState?.Invoke(this, eStateIconType.HASTE, true);
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue}");
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}");
 
                     // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
                     //     showIconDict[eAbnormalState.HASTE] = 0;
@@ -4887,7 +4887,7 @@ this.updateCurColor();
                         {
                             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
                             {
-                                button.SetAbnormalIcons(this, eStateIconType.SPEED_OVERLAP, true, _effectTime, $"{_value}");
+                                button.SetAbnormalIcons(this, eStateIconType.SPEED_OVERLAP, true, _effectTime, $"{_value:F2}");
                             }
                         }
 
@@ -5335,7 +5335,7 @@ this.updateCurColor();
             }
             abnormalStateCategoryDataDictionary[abnormalStateCategory].enable = _enable;
             m_abnormalState[_abnormalState] = _enable;
-            string describe = abnormalStateCategoryDataDictionary[abnormalStateCategory].MainValue + "";
+            string describe = $"{abnormalStateCategoryDataDictionary[abnormalStateCategory].MainValue:F2}";
             /*switch (_abnormalState)
             {
                 case eAbnormalState.HASTE:

@@ -207,6 +207,7 @@ namespace Elements
                 {
                     var unitData = enemy.CreateUnitData();
                     LoadCharacter(unitData, idx, false, action);
+                    idx++;
                 }
             }
             else
@@ -741,15 +742,28 @@ namespace Elements
             int[] skillLvEv = unitData.GetEvlotionSkillLv();
             UnitDetailData detailData = rarityData.detailData;
             return new UnitParameter(
-                new UnitData(unitData.unitId, new DateTime(), 1, unitData.rarity, unitData.rarity, unitData.level, 0, ePromotionLevel.Bronze,
-                    new List<SkillLevelInfo> { new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0), new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0) },
+                new UnitData(
+                    unitData.unitId,
+                    new DateTime(),
+                    1,
+                    unitData.rarity,
+                    unitData.rarity,
+                    unitData.level,
+                    0,
+                    ePromotionLevel.Bronze,
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0),
+                        new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0)
+                    },
                     new List<SkillLevelInfo> { 
                         new SkillLevelInfo(skillData.skill_1, unitData.rank < 2 ? 0 : unitData.skillLevel[1], 0), 
                         new SkillLevelInfo(skillData.skill_2, unitData.rank < 4 ? 0 : unitData.skillLevel[2], 0) ,
                         new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0), 
                         new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0)
                     },
-                    new List<SkillLevelInfo> { new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0) },
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0)
+                    },
                     new List<SkillLevelInfo>(), 0),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(unitData.unitId, detailData.name, "?", unitData.unitId, 0, detailData.minrarity, detailData.motionType, detailData.seType,
@@ -790,32 +804,79 @@ namespace Elements
         public static UnitParameter CreateUnitParameter(EnemyData enemyData, GuildPlayerGroupData.LogBarrierType useLogBarrier)
         {
             List<SkillLevelInfo> mainSkillLevelInfo = new List<SkillLevelInfo>();
+            List<SkillLevelInfo> exSkillLevelInfo = new List<SkillLevelInfo>();
             for(int i = 0; i < enemyData.main_skill_lvs.Count; i++)
             {
                 mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.MainSkills[i], enemyData.main_skill_lvs[i], 0));
             }
+            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_1, enemyData.main_skill_lvs[0], 0));
+            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_2, enemyData.main_skill_lvs[1], 0));
+
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_1, enemyData.ex_skill_lvs[0], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_2, enemyData.ex_skill_lvs[1], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_3, enemyData.ex_skill_lvs[2], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_4, enemyData.ex_skill_lvs[3], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_5, enemyData.ex_skill_lvs[4], 0));
+
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_1, enemyData.ex_skill_lvs[0], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_2, enemyData.ex_skill_lvs[1], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_3, enemyData.ex_skill_lvs[2], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_4, enemyData.ex_skill_lvs[3], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_5, enemyData.ex_skill_lvs[4], 0));
+
             return new UnitParameter(
-                new UnitData(enemyData.unit_id, new DateTime(), 1, enemyData.rarity, enemyData.rarity, enemyData.level, 0, ePromotionLevel.Bronze,
-                    new List<SkillLevelInfo> { new SkillLevelInfo(enemyData.skillData.UB, enemyData.union_burst_level, 0) },
-                     mainSkillLevelInfo,       
-                     new List<SkillLevelInfo>(),
+                new UnitData(
+                    enemyData.unit_id,
+                    new DateTime(),
+                    1,
+                    enemyData.rarity,
+                    enemyData.rarity,
+                    enemyData.level,
+                    0,
+                    ePromotionLevel.Bronze,
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(enemyData.skillData.UB, enemyData.union_burst_level, 0),
+                        new SkillLevelInfo(enemyData.skillData.raw_data.union_burst_evolution, enemyData.union_burst_level, 0)
+                    },
+                    mainSkillLevelInfo,
+                    exSkillLevelInfo,
                     new List<SkillLevelInfo>(),
-                    enemyData.resist_status_id),
+                    enemyData.resist_status_id
+                ),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(enemyData.unit_id, enemyData.detailData.unit_name, "?", enemyData.detailData.unit_id, 0, 1, enemyData.detailData.motion_type, enemyData.detailData.se_type,
                 enemyData.detailData.move_speed, enemyData.detailData.search_area_width, enemyData.detailData.atk_type, enemyData.detailData.normal_atk_cast_time),
-                new MasterUnitSkillData.UnitSkillData(unit_id: enemyData.unit_id, union_burst: enemyData.skillData.UB,
-                main_skill_1: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[0],useLogBarrier),
-                main_skill_2: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[1], useLogBarrier),
-                main_skill_3: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[2], useLogBarrier),
-                main_skill_4: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[3], useLogBarrier),
-                main_skill_5: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[4], useLogBarrier),
-                main_skill_6: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[5], useLogBarrier),
-                main_skill_7: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[6], useLogBarrier),
-                main_skill_8: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[7], useLogBarrier),
-                main_skill_9: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[8], useLogBarrier),
-                main_skill_10: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[9], useLogBarrier)
-                ),enemyData);
+                new MasterUnitSkillData.UnitSkillData(
+                    unit_id: enemyData.unit_id,
+                    union_burst: enemyData.skillData.UB,
+                    main_skill_1: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[0], useLogBarrier),
+                    main_skill_2: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[1], useLogBarrier),
+                    main_skill_3: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[2], useLogBarrier),
+                    main_skill_4: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[3], useLogBarrier),
+                    main_skill_5: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[4], useLogBarrier),
+                    main_skill_6: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[5], useLogBarrier),
+                    main_skill_7: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[6], useLogBarrier),
+                    main_skill_8: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[7], useLogBarrier),
+                    main_skill_9: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[8], useLogBarrier),
+                    main_skill_10: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[9], useLogBarrier),
+                    ex_skill_1: enemyData.skillData.raw_data.ex_skill_1,
+                    ex_skill_2: enemyData.skillData.raw_data.ex_skill_2,
+                    ex_skill_3: enemyData.skillData.raw_data.ex_skill_3,
+                    ex_skill_4: enemyData.skillData.raw_data.ex_skill_4,
+                    ex_skill_5: enemyData.skillData.raw_data.ex_skill_5,
+                    sp_skill_1: enemyData.skillData.raw_data.sp_skill_1,
+                    sp_skill_2: enemyData.skillData.raw_data.sp_skill_2,
+                    sp_skill_3: enemyData.skillData.raw_data.sp_skill_3,
+                    sp_skill_4: enemyData.skillData.raw_data.sp_skill_4,
+                    sp_skill_5: enemyData.skillData.raw_data.sp_skill_5,
+                    sp_skill_evolution_1: enemyData.skillData.raw_data.sp_skill_evolution_1,
+                    sp_skill_evolution_2: enemyData.skillData.raw_data.sp_skill_evolution_2,
+                    union_burst_evolution: enemyData.skillData.raw_data.union_burst_evolution,
+                    main_skill_evolution_1: enemyData.skillData.raw_data.main_skill_evolution_1,
+                    main_skill_evolution_2: enemyData.skillData.raw_data.main_skill_evolution_2,
+                    ex_skill_evolution_1: enemyData.skillData.raw_data.ex_skill_evolution_1,
+                    sp_union_burst: enemyData.skillData.raw_data.sp_union_burst)
+                , enemyData);
         }
         private static int JudgeAndSetSkillByID(int skillid, GuildPlayerGroupData.LogBarrierType enableLogBarrier)
         {

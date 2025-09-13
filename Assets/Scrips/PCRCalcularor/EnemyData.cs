@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using PCRCaculator.SQL;
 using PCRCalcularor;
 
 namespace PCRCaculator
@@ -67,6 +68,7 @@ namespace PCRCaculator
     public class EnemySkillData
     {
         public int UB;
+        public unit_skill_data raw_data;
         public List<int> MainSkills = new List<int>();
         public List<UnitAttackPattern> enemyAttackPatterns = new List<UnitAttackPattern>();
     }

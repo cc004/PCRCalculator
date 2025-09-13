@@ -777,6 +777,7 @@ namespace PCRCaculator.SQL
 
                 var skList = unitSkillDataDic[e.unit_id];//GetDatas<unit_skill_data>(a => a.unit_id == e.unit_id)[0];
                 skillData.UB = skList.union_burst;
+                skillData.raw_data = skList;
                 skillData.MainSkills = skList.GetMainSkillIDs();
                 skillData.enemyAttackPatterns = new List<UnitAttackPattern>();
                 var list0 = unitAttackPatternDic[e.unit_id];//GetDatas<unit_attack_pattern>(a=>a.unit_id == e.unit_id);
@@ -847,6 +848,7 @@ namespace PCRCaculator.SQL
 
                 var skList = unitSkillDataDic[e.unit_id];//GetDatas<unit_skill_data>(a => a.unit_id == e.unit_id)[0];
                 skillData.UB = skList.union_burst;
+                skillData.raw_data = skList;
                 skillData.MainSkills = skList.GetMainSkillIDs();
                 skillData.enemyAttackPatterns = new List<UnitAttackPattern>();
                 var list0 = unitAttackPatternDic[e.unit_id];//GetDatas<unit_attack_pattern>(a=>a.unit_id == e.unit_id);
