@@ -357,6 +357,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, param_type> paramTypeDic { get; private set; }
         public Dictionary<int, TeamSkillNode> TeamSkillNodeDic { get; private set; }
         public Dictionary<int, TeamSkillEnhanceData> TeamSkillEnhanceDataDic { get; private set; }
+        public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get; private set; }
 
 
         public Dictionary<(int, int), promotion_bonus> rbs
@@ -490,6 +491,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => TeamSkillNodeDic = GetTeamSkillData()));
             tasks.Add(
                 Task.Run(() => TeamSkillEnhanceDataDic = GetTeamSkillEnhanceData()));
+            tasks.Add(
+                Task.Run(() => ExtraEffectDataDic = GetDatasDic<extra_effect_data>(a => a.extra_effect_id)));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();

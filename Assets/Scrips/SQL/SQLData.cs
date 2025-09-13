@@ -188,7 +188,7 @@ namespace PCRCaculator.SQL
     }
     public class talent_quest_wave_group_data
     {
-        [PrimaryKey]           
+        [PrimaryKey]
         public int id { get; set; }
         public string wave_group_id { get; set; }
         public int enemy_id_1 { get; set; }
@@ -893,6 +893,24 @@ namespace PCRCaculator.SQL
 
             return bonusArray[level - 1];
         }
+    }
+    public class extra_effect_data : DbBaseData
+    {
+        public int extra_effect_id { get; set; }
+        public int content_type { get; set; }
+        public int target_value_1 { get; set; }
+        public int target_value_2 { get; set; }
+        public int set_id { get; set; }
+        public int exec_timing_1 { get; set; }
+        public int exec_timing_2 { get; set; }
+        public int exec_timing_3 { get; set; }
+        public int exec_timing_4 { get; set; }
+        public int exec_timing_5 { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
     }
 }
 
