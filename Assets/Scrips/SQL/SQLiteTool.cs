@@ -1234,7 +1234,18 @@ namespace PCRCaculator.SQL
 
             if (overwriteDic == null || bonusDic == null)
                 return null;
-
+            overwriteDic[1] = new talent_formation_overwrite
+            {
+                id = 1,
+                content_type = 1,
+                target_value_1 = 1,
+                target_value_2 = 1,
+                formation_bonus_id_1 = 1,
+                formation_bonus_id_2 = 1,
+                formation_bonus_id_3 = 1,
+                formation_bonus_id_4 = 1,
+                formation_bonus_id_5 = 1
+            };
             var result = new Dictionary<int, talentFormationData>();
             foreach (var kvp in overwriteDic)
             {

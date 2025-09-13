@@ -39870,7 +39870,7 @@ MonoBehaviour:
   toggles_ChooseBoss:
   - {fileID: 794295222}
   - {fileID: 288736494}
-  - {fileID: 1902799258}
+  usePlayerSettingHP: {fileID: 1902799258}
   currentHPinput: {fileID: 545338086}
   toggles_ChooseType:
   - {fileID: 1605565780}
@@ -39960,6 +39960,7 @@ MonoBehaviour:
   TalentBonus:
   - {fileID: 1048286111}
   - {fileID: 1531784306}
+  TalentQuestWaveGroupId: 0
 --- !u!4 &992625734
 Transform:
   m_ObjectHideFlags: 0
@@ -51846,7 +51847,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1272170264}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
   m_Name: 
@@ -69621,6 +69622,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 992625733}
+        m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
+        m_MethodName: OnChooseBossDropDownChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 1
 --- !u!1 &1605845946
 GameObject:
@@ -82488,7 +82501,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1481991782}
   toggleTransition: 1
   graphic: {fileID: 1676866769}
-  m_Group: {fileID: 1272170268}
+  m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
