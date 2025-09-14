@@ -588,7 +588,9 @@ namespace PCRCaculator
         private bool shouldDisplay(int unitid, UnitData unitData)
         {
             var pinyin = PinyinHelper.GetPinyin(Search.text, "").ToUpper();
-            bool search = Search.text == "" || id2alias[unitid].Contains(Search.text) || id2pinyin[unitid].Contains(pinyin);
+            bool search = Search.text == "" 
+                || (id2alias.ContainsKey(unitid) && id2alias[unitid]?.Contains(Search.text) == true) 
+                || (id2pinyin.ContainsKey(unitid) && id2pinyin[unitid]?.Contains(pinyin) == true);
             MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData);
             if (filterToggle.isOn)
             {
