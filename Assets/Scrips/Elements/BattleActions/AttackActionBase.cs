@@ -281,7 +281,7 @@ namespace Elements
                 DefPenetrate = (_isPhysicalForTarget ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero),
                 LifeSteal = (_source.IsPartsBoss ? parts.GetLifeStealZero() : ((int)_source.LifeStealZero)),
                 CriticalDamageRate = criticalDamageRate,
-                TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther, // TODO check where put it
+                TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
                 ActionType = _actionType,
                 IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
             };

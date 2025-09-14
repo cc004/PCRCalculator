@@ -65,6 +65,7 @@ namespace Elements
         CriticalRate = -1f,
         IgnoreDef = true,
         CriticalDamageRate = 0.0f,
+        TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
         ActionType = eActionType.FORCE_HP_CHANGE
       };
       _target.Owner.SetDamage(_damageData, true, ActionId, OnDamageHit, _skill: _skill, _energyAdd: isEnergyGainEnabled, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple);

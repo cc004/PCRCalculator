@@ -6180,6 +6180,7 @@ this.updateCurColor();
                 DamageSoundType = DamageData.eDamageSoundType.SLIP,
                 IsSlipDamage = true,
                 ActionType = eActionType.DAMAGE_BY_ATTACK,
+                TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther,
                 ExecAbsorber = delegate (int _damage)
                 {
                     if (_damage > categoryData.AbsorberValue)
