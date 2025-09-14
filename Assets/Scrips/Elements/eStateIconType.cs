@@ -428,9 +428,9 @@ namespace Elements
         EWAIJIANSU = 153,
         [Description("毒伤提升")]
         SLIP_DAMAGE_UP = 154,
-        [Description("水祭的安宁\n水优妮")]
-        EXTRA_EFFECT = 155,
         [Description("特殊效果")]
+        EXTRA_EFFECT = 155,
+        [Description("水祭的安宁\n水优妮")]
         SHUIJIDEANNING = 156,
         [Description("水月\n水华")]
         SHUIYUE = 157,
