@@ -98,6 +98,9 @@ namespace PCRCaculator
         public bool isSetMode;
         public bool isSemanMode;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
+        
+        // 优化：添加数据缓存字典，避免重复计算
+        private static readonly Dictionary<string, object> _dataCache = new Dictionary<string, object>();
 
         public Dictionary<int, EquipmentData> EquipmentDic { get => equipmentDic; }
         public Dictionary<int, UnitRarityData> UnitRarityDic { get => unitRarityDic; }
@@ -313,9 +316,9 @@ namespace PCRCaculator
             SQLiteTool.sql = sql;
             try
             {
-                ABExTool.StaticInitialize().Wait();
+                await ABExTool.StaticInitialize(); 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WindowMessage("下载数据发生错误，重置版本");
                 SaveManager.Save(new VersionData());
@@ -324,25 +327,23 @@ namespace PCRCaculator
 
             var tasks = new List<Task>();
 
-
             var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
             var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
             var dbTool2 = SQLData.OpenDB(ABExTool.mgrDataJP);
 
-            Task.WhenAll(
+            await Task.WhenAll(
                 Task.Run(() => dbTool.Prepare()),
                 Task.Run(() =>
                 {
                     if (ABExTool.mgrDataJP != ABExTool.mgrCharacter) dbTool2.Prepare();
                 }),
-                Task.Run(() => dbTool3.Prepare())).Wait();
+                Task.Run(() => dbTool3.Prepare()));
 
-            tasks.Add(
-                Task.WhenAll(
-                        dbTool.ParallelGetAll(),
-                        ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask,
-                        dbTool3.ParallelGetAll())
-                    .ContinueWith(_ =>
+            var dbDataTask = Task.WhenAll(
+                    dbTool.ParallelGetAll(),
+                    ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask,
+                    dbTool3.ParallelGetAll())
+                .ContinueWith(_ =>
                     {
                         dbTool.CloseDB();
                         if (ABExTool.mgrDataJP != ABExTool.mgrCharacter)
@@ -467,7 +468,8 @@ namespace PCRCaculator
                             unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
                             unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
                         }
-                    }));
+                    });
+            tasks.Add(dbDataTask);
 
             /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
             allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
@@ -494,27 +496,47 @@ namespace PCRCaculator
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
 
-            string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
-            //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
-            allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
-            //Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
-            //string attackPatternStr = Resources.Load<TextAsset>("Datas/UnitAtttackPatternDic").text;
-            //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
-            //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
-            //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
+            var jsonLoadTasks = new[]
+            {
+                Task.Run(() => new { Key = "skillTime", Data = LoadJsonDatas("Datas/unitSkillTimeDic") }),
+                Task.Run(() => new { Key = "nickName", Data = LoadJsonDatas("Datas/UnitNickNameDic") }),
+                Task.Run(() => new { Key = "nickName2", Data = LoadJsonDatas("Datas/nickname") }),
+                Task.Run(() => new { Key = "firearm", Data = LoadJsonDatas("Datas/AllUnitFirearmData") })
+            };
 
-            //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
-            //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
-            //
-            string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
-            unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
-            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
-            string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
+            var jsonResults = await Task.WhenAll(jsonLoadTasks);
 
-            if (!string.IsNullOrEmpty(firearmStr))
-                firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
+            var deserializationTasks = new List<Task>();
+            
+            foreach (var result in jsonResults)
+            {
+                switch (result.Key)
+                {
+                    case "skillTime":
+                        deserializationTasks.Add(Task.Run(() => 
+                            allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(result.Data)));
+                        break;
+                    case "nickName":
+                        deserializationTasks.Add(Task.Run(() => 
+                            unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(result.Data)));
+                        break;
+                    case "nickName2":
+                        deserializationTasks.Add(Task.Run(() => 
+                            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(result.Data)));
+                        break;
+                    case "firearm":
+                        if (!string.IsNullOrEmpty(result.Data))
+                        {
+                            deserializationTasks.Add(Task.Run(() => 
+                                firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(result.Data)));
+                        }
+                        break;
+                }
+            }
 
-            Task.WhenAll(tasks).Wait();
+            tasks.AddRange(deserializationTasks);
+
+            await Task.WhenAll(tasks);
             LoadUnitData();
 
             LoadFinished = true;
@@ -889,15 +911,30 @@ namespace PCRCaculator
 
         public string LoadJsonDatas(string path, bool forceStreaming = true)
         {
+            // 优化：添加文件内容缓存，避免重复读取相同文件
+            if (_dataCache.TryGetValue(path, out var cachedContent))
+            {
+                return (string)cachedContent;
+            }
+
             string filePath = GetSaveDataPath() + "/" + path + ".json";
+            string content;
+            
 #if PLATFORM_ANDROID
             var reader = new WWW(filePath);
             while (!reader.isDone) {Thread.Sleep(0);}
-
-            return reader.text;
+            content = reader.text;
 #else
-            return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+            content = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
 #endif
+            
+            // 缓存文件内容
+            if (!string.IsNullOrEmpty(content))
+            {
+                _dataCache[path] = content;
+            }
+            
+            return content;
         }
 
         public WaitUI OpenWaitUI()
@@ -986,7 +1023,7 @@ namespace PCRCaculator
                 cStream.FlushFinalBlock();
                 return Encoding.UTF8.GetString(mStream.ToArray());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return decryptString;
             }
