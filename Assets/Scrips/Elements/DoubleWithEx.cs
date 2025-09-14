@@ -223,7 +223,7 @@ namespace Elements
             return Select(x => Math.Min(x, f), $"min:{f}");
         }
 
-        public override string ToString() => pure ? ((double)this).ToString() : $"{(int)(double)this}[{(int)Expect}]";
+        public override string ToString() => pure ? ((double)this).ToString("0.##") : $"{(int)(double)this:0.##}[{(int)Expect}]";
         public DoubleWithEx Floor() => Select(Math.Floor, "floor");
         public DoubleWithEx Ceil() => Select(Math.Ceiling, "ceil");
         public DoubleWithEx Abs() => Select(Math.Abs, "abs");
