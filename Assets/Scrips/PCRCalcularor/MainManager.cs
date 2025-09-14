@@ -275,6 +275,9 @@ namespace PCRCaculator
 
         private async void LoadAsync(WaitUI wait)
         {
+            try
+            {
+
             //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
             //string jsonStr = db.text;
             //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
@@ -297,6 +300,8 @@ namespace PCRCaculator
             */
             if (Version.BossVersionCN == 0 || Version.useLatestProd == true)
             {
+                // 更新 UI：正在获取远端版本
+                try { wait?.SetMessage("正在获取版本信息..."); } catch { }
                 await SendPostRequestAsync(() =>
                 {
                     Version.useQA = false;
@@ -313,14 +318,19 @@ namespace PCRCaculator
             var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
             var sql = File.ReadAllText(patchFile);
 #endif
+            // 更新 UI：已加载 dbdiff.sql
+            try { wait?.SetMessage("加载 SQL 补丁"); } catch { }
             SQLiteTool.sql = sql;
             try
             {
+                // 更新 UI：初始化 AB 资源
+                try { wait?.SetMessage("初始化 AB 资源"); } catch { }
                 await ABExTool.StaticInitialize(); 
             }
             catch (Exception)
             {
-                WindowMessage("下载数据发生错误，重置版本");
+                // WindowMessage("下载数据发生错误，重置版本");
+                try { wait?.SetMessage("出错啦！ 重置版本，请重新打开"); } catch { }
                 SaveManager.Save(new VersionData());
                 return;
             }
@@ -331,6 +341,8 @@ namespace PCRCaculator
             var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
             var dbTool2 = SQLData.OpenDB(ABExTool.mgrDataJP);
 
+            // 更新 UI：准备数据库
+            try { wait?.SetMessage("正在准备数据库"); } catch { }
             await Task.WhenAll(
                 Task.Run(() => dbTool.Prepare()),
                 Task.Run(() =>
@@ -496,9 +508,10 @@ namespace PCRCaculator
             //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
             //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
 
+            // 更新 UI：开始加载 JSON 数据
             var jsonLoadTasks = new[]
             {
-                Task.Run(() => new { Key = "skillTime", Data = LoadJsonDatas("Datas/unitSkillTimeDic") }),
+                // Task.Run(() => new { Key = "skillTime", Data = LoadJsonDatas("Datas/unitSkillTimeDic") }),
                 Task.Run(() => new { Key = "nickName", Data = LoadJsonDatas("Datas/UnitNickNameDic") }),
                 Task.Run(() => new { Key = "nickName2", Data = LoadJsonDatas("Datas/nickname") }),
                 Task.Run(() => new { Key = "firearm", Data = LoadJsonDatas("Datas/AllUnitFirearmData") })
@@ -537,12 +550,19 @@ namespace PCRCaculator
             tasks.AddRange(deserializationTasks);
 
             await Task.WhenAll(tasks);
+            try { wait?.SetMessage("加载角色数据..."); } catch { }
             LoadUnitData();
 
             LoadFinished = true;
             Debugtext.text += "\n数据加载完毕！";
             CreateShowUnitIDS();
             wait.Close();
+            }
+            catch (Exception e)
+            {
+                try { wait?.SetMessage($"加载时发生致命错误:{e}，请重新打开！"); } catch { }
+                throw e;
+            }
         }
 
         private void LoadUnitData()
