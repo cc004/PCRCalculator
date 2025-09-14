@@ -15,6 +15,7 @@ namespace ActionParameterSerializer.Actions
             switch (actionDetail1)
             {
                 case 1:
+                case 4:
                     if (targetParameter.targetType == TargetType.self)
                     {
                         return Utils.JavaFormat(Utils.GetString("Restore_s1_s2_TP"), targetParameter.buildTargetClause(), buildExpression(level, null, RoundingMode.CEILING, property, false, true, false));

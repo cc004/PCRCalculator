@@ -35,6 +35,7 @@ namespace Elements
       switch (ActionDetail1)
       {
         case 1:
+        case 4:
           _energy = _valueDictionary[eValueNumber.VALUE_1];
           break;
         case 2:
@@ -50,7 +51,7 @@ namespace Elements
             {
                 _energy *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
             }
-            _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1, _source, _effectType: EffectType,action:action);
+            _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1 || ActionDetail1 == 4, _source, _effectType: EffectType,action:action, _useRecoveryRate: ActionDetail1 != 4);
     }
 
     public override void SetLevel(float _level)
