@@ -42,7 +42,7 @@ namespace Elements
         _target.Owner.LimitEnergyRecoveryRateData = limitData;
 
         if (!disableIcon)
-          _target.Owner.OnChangeState(_target.Owner, (eStateIconType)150, true);
+          _target.Owner.NoSkipOnChangeAbnormalState(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
         limitData.StartTimer(_target.Owner);
       }
       else
@@ -54,7 +54,7 @@ namespace Elements
         {
           limitData.DisableIcon = disableIcon;
           if (!disableIcon)
-            _target.Owner.OnChangeState(_target.Owner, (eStateIconType)150, true);
+            _target.Owner.NoSkipOnChangeAbnormalState(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
           limitData.Enable = true;
           limitData.StartTimer(_target.Owner);
         }
@@ -63,12 +63,12 @@ namespace Elements
           if (disableIcon)
           {
             if (!limitData.DisableIcon)
-              _target.Owner.OnChangeState(_target.Owner, (eStateIconType)150, false);
+              _target.Owner.button?.SetAbnormalIcons(_target.Owner, (eStateIconType)150, false);
           }
           else
           {
             if (limitData.DisableIcon)
-              _target.Owner.OnChangeState(_target.Owner, (eStateIconType)150, true);
+              _target.Owner.NoSkipOnChangeAbnormalState(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
           }
           limitData.DisableIcon = disableIcon;
         }

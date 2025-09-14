@@ -144,12 +144,12 @@ namespace Elements
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null && list1.Count > 0)
                 {
-                    OnChangeState?.Invoke(this, eStateIconType.HASTE, false);
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
                     list1.Clear();
                 }
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null && list2.Count > 0)
                 {
-                    OnChangeState?.Invoke(this, eStateIconType.SLOW, false);
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
                     list2.Clear();
                 }
             }
@@ -4317,7 +4317,7 @@ this.updateCurColor();
 
         public List<SkillEffectCtrl> ModeChangeEndEffectList { get; set; } = new List<SkillEffectCtrl>();
 
-        public Action<UnitCtrl, eStateIconType, bool> OnChangeState { get; set; }
+        public Action<UnitCtrl, eStateIconType, bool> OnChangeState { get; set; } // 弃用
         
 
         public Action<UnitCtrl, eStateIconType, int> OnChangeStateNum { get; set; }
@@ -4729,14 +4729,13 @@ this.updateCurColor();
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7) && indexList7.Count > 0)
                 {
-                    OnChangeState?.Invoke(this, eStateIconType.HASTE, false);
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
                     indexList7.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    // OnChangeState?.Invoke(this, eStateIconType.SLOW, true);
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue:F2}");
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
                     // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
                     //     showIconDict[eAbnormalState.SLOW] = 0;
                     // showIconDict[eAbnormalState.SLOW]++;
@@ -4746,13 +4745,12 @@ this.updateCurColor();
             {
                 if (!overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
                 {
-                    OnChangeState?.Invoke(this, eStateIconType.SLOW, false);
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
                     indexList11.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    // OnChangeState?.Invoke(this, eStateIconType.HASTE, true);
                     button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}");
 
                     // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
@@ -5346,7 +5344,7 @@ this.updateCurColor();
             }
             abnormalStateCategoryDataDictionary[abnormalStateCategory].enable = _enable;
             m_abnormalState[_abnormalState] = _enable;
-            string describe = $"{abnormalStateCategoryDataDictionary[abnormalStateCategory].MainValue:F2}";
+            string describe = $"{abnormalStateCategoryDataDictionary[abnormalStateCategory].MainValue}";
             /*switch (_abnormalState)
             {
                 case eAbnormalState.HASTE:

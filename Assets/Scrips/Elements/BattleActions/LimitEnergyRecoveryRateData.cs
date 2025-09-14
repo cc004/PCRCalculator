@@ -6,7 +6,7 @@ namespace Elements
 	public class LimitEnergyRecoveryRateData // TypeDefIndex: 20398
 	{
 		// Fields
-		public double Value; // 0x10
+		public DoubleWithEx Value; // 0x10
 		public bool Enable; // 0x18
 		public float Timer; // 0x1C
 		public bool DisableIcon; // 0x20
@@ -31,7 +31,7 @@ namespace Elements
 
 			if (!DisableIcon)
 			{
-				_owner.OnChangeState(_owner, (eStateIconType)150, false);
+				_owner.button?.SetAbnormalIcons(_owner, (eStateIconType)150, false);
 			}
 			Enable = false;
 		}
