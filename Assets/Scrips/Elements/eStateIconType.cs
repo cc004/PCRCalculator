@@ -444,6 +444,9 @@ namespace Elements
         TIEQISHOUHU = 161,
         [Description("雷云1\n非会战")]
         LEIYUN1 = 164,
+        UNABLE_STATE_GUARD_EXTRA_EFFECT = 165,
+        CHAINED_ACN = 166,
+        PUPPET = 167,
         [Description("暴风\n非会战")]
         BAOFENG = 169,
         [Description("豪雨\n非会战")]
@@ -451,6 +454,7 @@ namespace Elements
         [Description("PSI风暴\n水美空")]
         PSIFENGBAO = 171,
         [Description("日食\n水龙妈")]
+        TAUNT = 172,
         RISHI = 173,
         [Description("鬼化\n水蕾姆")]
         GUIHUA = 177,
@@ -468,6 +472,7 @@ namespace Elements
         XIEMU = 183,
         [Description("魔法攻击无效")]
         MAGIC_DODGE = 184,
+        DISABLE_HEAL = 185,
         [Description("雷云2\n非会战")]
         LEIYUN2 = 186,
         [Description("热情的花束\nEMT")]
@@ -497,7 +502,10 @@ namespace Elements
         [Description("魔眼\n美杜莎")]
         MOYAN = 200,
         [Description("虚数\n原克")]
-        XUSHU = 200,
+        XUSHU = 201,
+        RATIO_SLIP = 202,
+        REDUCE_DAMAGE_BY_HIGHER_DEF = 203,
+        CONVERT_DAMAGE_OVER_TIME = 204,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912

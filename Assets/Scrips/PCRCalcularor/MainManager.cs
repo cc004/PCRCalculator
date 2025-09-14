@@ -452,7 +452,8 @@ namespace PCRCaculator
                                 Task.Run(() => equipmentDic.Override2With(dbTool3.Dic8)),
                                 Task.Run(() => skillActionDic.Override2With(dbTool3.Dic4)),
                                 Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
-                                Task.Run(() => EnemyDataDic.Override2With(dbTool3.Dic2))
+                                Task.Run(() => EnemyDataDic.Override2With(dbTool3.Dic2)),
+                                Task.Run(() => unitExEquips.OverrideWith(dbTool3.unitExEquips))
                             );
 
                             unitRarityDic.TryAdd(dbCN.Dic1);
