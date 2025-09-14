@@ -289,6 +289,7 @@ namespace Elements
                 }
 
                 int ed = enemyUnitCtrl.Count - tempData.extra_effect_cnt;
+                extraEffectEnemyUnitCtrl.Clear();
                 for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
                 {
                     enemyUnitCtrl[i].UnitName = "环境buff";
