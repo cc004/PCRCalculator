@@ -725,6 +725,10 @@ namespace Elements
                 typeof(IfContainsUnitGroupAction)
             },
             {
+                eActionType.LIMIT_ENERGY_RECOVER_RATE,
+                typeof(LimitEnergyRecoveryRateAction)
+            },
+            {
                 eActionType.SLIP_DAMAGE_UP,
                 typeof(SlipDamageUpAction)
             }

@@ -1631,6 +1631,7 @@ namespace Elements
             get;
             set;
         } = new Dictionary<int, Action<double>>();
+        public LimitEnergyRecoveryRateData LimitEnergyRecoveryRateData { get; set; }
         public Dictionary<eAbnormalState, Func<bool>> IsReleaseSlipDamageDic
         {
             get;
@@ -1915,6 +1916,16 @@ namespace Elements
                 int num = (int)Mathf.Max(0, (int)EnergyRecoveryRate + getAdditionalBuffDictionary(BuffParamKind.ENERGY_RECOVER_RATE));
                 return num;
             }
+        }
+
+        public long EnergyRecoveryRateZeroWithLimit
+        {
+            get
+            {
+                long num = EnergyRecoveryRateZeroCapped;
+                return (LimitEnergyRecoveryRateData?.Enable ?? false) ? Math.Min(num, (long)LimitEnergyRecoveryRateData.Value) : num;
+            }
+
         }
 
         public long EnergyRecoveryRateZeroCapped
@@ -10443,7 +10454,7 @@ this.updateCurColor();
         {
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
-            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroCapped + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
+            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_hasNumberEffect && !battleManager.skipping)
             {
