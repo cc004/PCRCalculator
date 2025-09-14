@@ -111,7 +111,7 @@ namespace PCRCaculator
         /// <param name="data">角色详情</param>
         public void SetButton(UnitData data)
         {
-            int unitid = data.unitId;
+            int unitid = data.PrefabId;
             if (unitid == 0) return; // XXX: temp fix
             int charid = data.rarity >= 3 ? unitid + 30 : unitid + 10;
             if (unitid >= 400000)

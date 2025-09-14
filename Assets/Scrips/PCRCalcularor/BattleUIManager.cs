@@ -114,8 +114,8 @@ namespace PCRCaculator.Battle
         public Button changeBattlePanel;
         private Dictionary<KeyCode, Action> inputActions;
         private Dictionary<KeyCode, int> keyToValue;
-        public GameObject EnvironmentUI;
-
+        public GameObject PlayerEnvironmentUI;
+        public GameObject EnemyEnvironmentUI;
         private void Awake()
         {
             Instance = this;
@@ -663,16 +663,19 @@ namespace PCRCaculator.Battle
                 MyGameCtrl.Instance.SetBattleSpeed(scale);
             }
         }
-        public void SetEnvironmentUI(int enyType, bool isActive)
+        public void SetEnvironmentUI(int enyType, bool isActive, bool isEnemy)
         {
+            GameObject targetUI = isEnemy ? PlayerEnvironmentUI : EnemyEnvironmentUI;
+
             if (isActive)
             {
                 Sprite iconSprite = buffDebuffIcons[enyType];
-                Transform a = EnvironmentUI.transform.Find("Image");
-                Image b = a.GetComponent<Image>();
-                b.sprite = iconSprite;
+                Transform imageTransform = targetUI.transform.Find("Image");
+                Image imageComponent = imageTransform.GetComponent<Image>();
+                imageComponent.sprite = iconSprite;
             }
-            EnvironmentUI.SetActive(isActive);
+
+            targetUI.SetActive(isActive);
         }
         public void SetTalentBonus()
         {

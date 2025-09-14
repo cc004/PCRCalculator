@@ -29,9 +29,11 @@ namespace PCRCaculator
         public EnemySkillData skillData;
         public UnitData CreateUnitData()
         {
-            return new UnitData(unit_id, level, 1)
+            return new UnitData(unit_id, level, rarity)
             {
-                enemyid = enemy_id
+                enemyid = enemy_id,
+                level = level,
+                rarity = rarity,
             };
         }
         public EnemyData Copy()

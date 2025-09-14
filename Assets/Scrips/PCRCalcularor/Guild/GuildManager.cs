@@ -158,6 +158,20 @@ namespace PCRCaculator.Guild
         }
         public bool isGuildBoss { get => toggles_ChooseType[0].isOn; }
         public bool IsTalentQuestBoss { get => selectedBossEnemyids[0] > 800000000; }
+        public Dropdown dungeonDropdown;
+        private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
+        {
+            { 0, 0 },
+            { 1, 501010901 },
+            { 2, 501010902 },
+            { 3, 501010903 },
+            { 4, 501010904 },
+            { 5, 501010905 },
+            { 6, 501011001 },
+            { 7, 501011002 },
+            { 8, 501011003 },
+            { 9, 501011004 },
+        };
         private void Awake()
         {
             Instance = this;
@@ -384,7 +398,7 @@ namespace PCRCaculator.Guild
                 }
                 else
                 {
-                    specialInput.text = "401042401";
+                    // specialInput.text = "401042401";
                     /*
               show_text.text = show_str[dropdowns_ChooseBoss[3].value];
               switch (dropdowns_ChooseBoss[3].value)
@@ -488,6 +502,23 @@ namespace PCRCaculator.Guild
 
             // 更新 Dropdown 的选项
             dp.AddOptions(optionDataList);
+        }
+        public void OnDungeonDropdownValueChanged()
+        {
+            if (!isGuildBoss && dungeonEnemy.ContainsKey(dungeonDropdown.value))
+            {
+                int enemyId = dungeonEnemy[dungeonDropdown.value];
+
+                if (EnemyDataDic.TryGetValue(enemyId, out EnemyData data))
+                {
+                    specialInput.text = enemyId.ToString();
+                    OnInputFinished();
+                }
+                else
+                {
+                    specialInput.text = "";
+                }
+            }
         }
         public void OnInputFinished()
         {

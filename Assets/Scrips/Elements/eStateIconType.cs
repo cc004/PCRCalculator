@@ -411,6 +411,14 @@ namespace Elements
         [Description("射手座D5标记")]
         SHESHOUZUO = 143,
         [Description("噗吉靠垫\n圣锤")]
+        BAIHUALIAOLUAN = 146,
+        [Description("百花缭乱\nEX7春临")]
+        YANTIANLIERI = 147,
+        [Description("炎天烈日\nEX7炎夏")]
+        QIUGAOMAFEI = 148,
+        [Description("秋高马肥\nEX7爽秋")]
+        HANQILINLIE = 149,
+        [Description("寒气凛冽\nEX7寒威")]
         SHENGCHUI = 145,
         [Description("限制TP回复")]
         LIMIT_ENERGY_RECOVER_RATE = 150,
@@ -421,6 +429,8 @@ namespace Elements
         [Description("毒伤提升")]
         SLIP_DAMAGE_UP = 154,
         [Description("水祭的安宁\n水优妮")]
+        EXTRA_EFFECT = 155,
+        [Description("特殊效果")]
         SHUIJIDEANNING = 156,
         [Description("水月\n水华")]
         SHUIYUE = 157,
@@ -432,6 +442,12 @@ namespace Elements
         NIANCHOU = 160,
         [Description("铁气守护\n涅妃")]
         TIEQISHOUHU = 161,
+        [Description("雷云1\n非会战")]
+        LEIYUN1 = 164,
+        [Description("暴风\n非会战")]
+        BAOFENG = 169,
+        [Description("豪雨\n非会战")]
+        HAOYU = 170,
         [Description("PSI风暴\n水美空")]
         PSIFENGBAO = 171,
         [Description("日食\n水龙妈")]
@@ -452,6 +468,8 @@ namespace Elements
         XIEMU = 183,
         [Description("魔法攻击无效")]
         MAGIC_DODGE = 184,
+        [Description("雷云2\n非会战")]
+        LEIYUN2 = 186,
         [Description("热情的花束\nEMT")]
         REQINGDEHUASHU = 188,
         [Description("茶壶\n女仆")]

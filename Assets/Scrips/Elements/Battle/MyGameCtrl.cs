@@ -329,7 +329,7 @@ namespace Elements
             BattleUIManager.Instance.SetUI_2(this);
             if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
-                GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
+                GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl.ToList());
                 BattleManager.Instance.semanubmanager.SetUnitCallBack(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
             }
 
@@ -516,7 +516,7 @@ namespace Elements
             }
             if (tempData.isGuildBattle && !isplayer)
             {
-                unitCtrl.UnitName = tempData.guildEnemy.FirstOrDefault(e => e.unit_id == unitCtrl.UnitId)?.name ??
+                unitCtrl.UnitName = tempData.guildEnemy.FirstOrDefault(e => e.enemy_id == unitCtrl.enemyId)?.name ??
                                     "BOSS";
             }
             else
