@@ -532,7 +532,7 @@ namespace PCRCaculator
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
-        public int uniqueEq2Lv;//专武2等级
+        public int uniqueEq2Lv = -1;//专武2等级
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
 

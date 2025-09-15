@@ -560,6 +560,7 @@ namespace PCRCaculator.Guild
             }
             else
             {
+                if (toggles_ChooseType[1].isOn) OnChooseTalentQuestDropDownChanged();
                 enemyId = specialEnemyid;
             }
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
@@ -836,7 +837,9 @@ namespace PCRCaculator.Guild
             SemanModeToggle.isOn = data.useSemanMode;
             timeLineTexts[0].text = data.timeLineData.DataName;
             timeLineTexts[1].text = data.timeLineData.GetDescribe();
-
+            dropdowns_ChooseTalentQuestBoss[0].value = data.TalentQuestMap;
+            dropdowns_ChooseTalentQuestBoss[1].value = data.TalentQuestArea;
+            dropdowns_ChooseTalentQuestBoss[2].value = data.TalentQuestIndex;
             var group = SettingData.GetCurrentPlayerGroup();
             if (data.currentGuildMonth < 1000) data.currentGuildMonth += 1024;
             if (data.currentGuildMonth < 1024) data.currentGuildMonth += 24;
