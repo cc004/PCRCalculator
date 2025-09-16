@@ -131,7 +131,7 @@ namespace PCRCaculator.Guild
         public GameObject BossObject;
         public GameObject TalentBossObject;
         public List<Image> TalentQuestBattleEffectPictures;
-
+        public GameObject ExtraEffectPrefab;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -167,7 +167,6 @@ namespace PCRCaculator.Guild
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
         {
-            { 0, 0 },
             { 1, 501010901 },
             { 2, 501010902 },
             { 3, 501010903 },
@@ -1901,6 +1900,11 @@ namespace PCRCaculator.Guild
                     ? bossData
                     : MainManager.Instance.talentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
             return count > 0 && formationData != null ? formationData.formation_bonus_values[talentId - 1][count-1] : 0;
+        }
+        public void ExtraEffectButton()
+        {
+            GameObject a = Instantiate(ExtraEffectPrefab);
+            a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
         }
     }
     [Serializable]
