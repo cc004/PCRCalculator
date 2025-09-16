@@ -39,7 +39,8 @@ namespace Elements
 
         public Dictionary<int, Dictionary<int, int>> TalentSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
         public Dictionary<int, Dictionary<int, int>> TeamSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
-
+        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
+        private PlayerSetting PlayerSetting => MainManager.Instance.PlayerSetting;
         // 事件：当数据变化时触发 UI 更新等操作
         public event Action OnDataChanged;
 
@@ -63,16 +64,16 @@ namespace Elements
         /// </summary>
         public void LoadFromPlayerSetting(bool isGlobal = false)
         {
-            if (GuildManager.Instance.SettingData.GetCurrentPlayerGroup().playerData.playrCharacters.Count == 0 || isGlobal)
+            if (isGlobal)
             {
                 MainManager.Instance.LoadPlayerSettings();
-                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentLevel = MainManager.Instance.PlayerSetting.talentLevel;
-                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentSkill = MainManager.Instance.PlayerSetting.talentSkill;
-                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().teamSkill = MainManager.Instance.PlayerSetting.teamSkill;
+                PlayerGroup.talentLevel = PlayerSetting.talentLevel;
+                PlayerGroup.talentSkill = PlayerSetting.talentSkill;
+                PlayerGroup.teamSkill = PlayerSetting.teamSkill;
             }
-            talentLevelParameter = GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentLevel;
-            UpdateTalentInfoData(GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentSkill, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
-            UpdateTalentInfoData(GuildManager.Instance.SettingData.GetCurrentPlayerGroup().teamSkill, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
+            talentLevelParameter = PlayerGroup.talentLevel;
+            UpdateTalentInfoData(PlayerGroup.talentSkill, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
+            UpdateTalentInfoData(PlayerGroup.teamSkill, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
             UpdateCombinedData();
         }
 

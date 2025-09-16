@@ -340,13 +340,14 @@ namespace PCRCaculator.Guild
             {
                 if (toggle.isOn)
                 {
-                    SettingData.currentPlayerGroupNum = idx + currentPage*5-5;
+                    SettingData.currentPlayerGroupNum = idx + currentPage * 5 - 5;
                     AutoModeToggle.isOn = SettingData.GetCurrentPlayerGroup().useAutoMode;
                     SetModeToggle.isOn = SettingData.GetCurrentPlayerGroup().useSetMode;
                 }
                 idx++;
             }
             Refresh();
+            SaveDataToJson();
         }
         public void FinishEditingPlayers(AddedPlayerData playerData)
         {
@@ -738,7 +739,6 @@ namespace PCRCaculator.Guild
             }
             RefreshCharacterGroupToggle();
             CreateMonthDropDown();
-
             var data = SettingData.GetCurrentPlayerGroup();
             SetChooseBossDropDown(data.currentGuildMonth);
             //dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
@@ -803,6 +803,7 @@ namespace PCRCaculator.Guild
             }*/
             if (data.isTalentQuestBoss)
                 toggles_ChooseType[1].isOn = true;
+            MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
             characterGroupNameText.text = playerData.playerName;
             for (int i = 0; i < 5; i++)
             {
@@ -914,7 +915,6 @@ namespace PCRCaculator.Guild
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
             usePlayerSettingHP.isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
-            MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
             UpdateWeaknessSprites();
             // TeamSkillTreeManager.Instance.UpdateTalentInfoData();
             // TalentSkillTreeManager.Instance.UpdateTalentInfoData();

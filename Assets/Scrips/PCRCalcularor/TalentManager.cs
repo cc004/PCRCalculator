@@ -17,6 +17,7 @@ namespace PCRCaculator
         public List<GameObject> talentManagers;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
         public TeamEnhanceParameter TalnetInfoData { get => MainManager.Instance.TeamEnhanceData; }
+        public GuildSettingData SettingData => GuildManager.Instance.SettingData;
 
 
         private bool isLoading;
@@ -31,7 +32,6 @@ namespace PCRCaculator
         {
             isLoading = true;
             talentPanel.SetActive(true);
-            GuildManager.LoadAddedPlayerData();
             TalentLevelManager.Instance.LoadTalentLevelSliders();
             TalentSkillTreeManager.Instance.InitializeData();
             TeamSkillTreeManager.Instance.InitializeData();

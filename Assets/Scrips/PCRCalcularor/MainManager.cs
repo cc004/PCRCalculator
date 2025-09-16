@@ -97,6 +97,7 @@ namespace PCRCaculator
         public bool forceAutoMode;
         public bool isSetMode;
         public bool isSemanMode;
+        public TeamEnhanceParameter teamEnhanceData;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
         
         // 优化：添加数据缓存字典，避免重复计算
@@ -114,7 +115,7 @@ namespace PCRCaculator
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => skillNameAndDescribe_cn; }
         public Dictionary<int, string> SkillActionDescribe_cn { get => skillActionDescribe_cn; }
         public PlayerSetting PlayerSetting { get => playerSetting; }
-        public TeamEnhanceParameter TeamEnhanceData { get; } = new();
+        public TeamEnhanceParameter TeamEnhanceData { get => teamEnhanceData ??= new TeamEnhanceParameter(); }
         public Dictionary<int, TalentSkillNode> TalentSkillNodeDic = new Dictionary<int, TalentSkillNode>();
         public Dictionary<int, TalentSkillEnhanceData> TalentSkillEnhanceDataDic = new Dictionary<int, TalentSkillEnhanceData>();
         public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();

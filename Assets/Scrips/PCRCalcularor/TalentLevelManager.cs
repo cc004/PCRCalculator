@@ -11,7 +11,7 @@ namespace PCRCaculator
         public static TalentLevelManager Instance;
         private bool loadSliderEvents = false;
         public List<Slider> talentLevelSliders;
-        public GuildSettingData SettingData => GuildManager.Instance.SettingData;
+        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
         private void Awake()
@@ -25,22 +25,19 @@ namespace PCRCaculator
         }
         public void LoadGlobalSettings()
         {
-            SettingData.GetCurrentPlayerGroup().talentLevel = MainManager.Instance.PlayerSetting.talentLevel;
+            PlayerGroup.talentLevel = MainManager.Instance.PlayerSetting.talentLevel;
             LoadTalentLevelSliders();
         }
         public void ReLoad()
         {
             GuildManager.LoadAddedPlayerData();
-            if ((SettingData.GetCurrentPlayerGroup().talentLevel?.Count ?? 0) > 0 ||
-                (SettingData.GetCurrentPlayerGroup().talentSkill?.Count ?? 0) > 0 ||
-                (SettingData.GetCurrentPlayerGroup().teamSkill?.Count ?? 0) > 0)
+            if ((PlayerGroup.talentLevel?.Count ?? 0) == 0 &&
+                (PlayerGroup.talentSkill?.Count ?? 0) == 0 &&
+                (PlayerGroup.teamSkill?.Count ?? 0) == 0)
             {
-                OnEnable();
+                PlayerGroup.talentLevel = new Dictionary<int, int>();
             }
-            else
-            {
-                MainManager.Instance.WindowMessage("初始队伍无数据可还原!");
-            }
+            OnEnable();
         }
         /// <summary>
         /// 加载属性等级滑动条
@@ -51,9 +48,13 @@ namespace PCRCaculator
             for (int i = 0; i < talentLevelSliders.Count; i++)
             {
                 int key = i + 1;
-                if (SettingData.GetCurrentPlayerGroup().talentLevel.TryGetValue(key, out int savedValue))
+                if (PlayerGroup.talentLevel.TryGetValue(key, out int savedValue))
                 {
                     talentLevelSliders[i].value = savedValue;
+                }
+                else
+                {
+                    talentLevelSliders[i].value = 0;
                 }
             }
             loadSliderEvents = false;
@@ -72,15 +73,15 @@ namespace PCRCaculator
             {
                 float sliderValue = talentLevelSliders[i].value;
                 int key = i + 1;
-                int oldValue = SettingData.GetCurrentPlayerGroup().talentLevel.GetValueOrDefault(key, 0);
+                int oldValue = PlayerGroup.talentLevel.GetValueOrDefault(key, 0);
 
-                if (SettingData.GetCurrentPlayerGroup().talentLevel.ContainsKey(key))
+                if (PlayerGroup.talentLevel.ContainsKey(key))
                 {
-                    SettingData.GetCurrentPlayerGroup().talentLevel[key] = (int)sliderValue;
+                    PlayerGroup.talentLevel[key] = (int)sliderValue;
                 }
                 else
                 {
-                    SettingData.GetCurrentPlayerGroup().talentLevel.Add(key, (int)sliderValue);
+                    PlayerGroup.talentLevel.Add(key, (int)sliderValue);
                 }
                 talentLevels[key] = (int)sliderValue;
 
@@ -99,13 +100,13 @@ namespace PCRCaculator
             {
                 float sliderValue = talentLevelSliders[i].value;
                 int key = i + 1;
-                if (SettingData.GetCurrentPlayerGroup().talentLevel.ContainsKey(key))
+                if (PlayerGroup.talentLevel.ContainsKey(key))
                 {
-                    SettingData.GetCurrentPlayerGroup().talentLevel[key] = (int)sliderValue;
+                    PlayerGroup.talentLevel[key] = (int)sliderValue;
                 }
                 else
                 {
-                    SettingData.GetCurrentPlayerGroup().talentLevel.Add(key, (int)sliderValue);
+                    PlayerGroup.talentLevel.Add(key, (int)sliderValue);
                 }
 
                 talentLevels[key] = (int)sliderValue;
@@ -114,7 +115,7 @@ namespace PCRCaculator
             {
                 MainManager.Instance.PlayerSetting.talentLevel = talentLevels;
             }
-            SettingData.GetCurrentPlayerGroup().talentLevel = talentLevels;
+            PlayerGroup.talentLevel = talentLevels;
             GuildManager.Instance.SaveDataToJson();
             // 直接将数据设置到PrincessKnightInfo
             MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);

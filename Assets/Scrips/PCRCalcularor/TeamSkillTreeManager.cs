@@ -19,7 +19,7 @@ namespace PCRCaculator
         private Dictionary<int, List<int>> nodeChildrenDict;
         private Dictionary<int, TeamSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
-        public GuildSettingData SettingData => GuildManager.Instance.SettingData;
+        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
         private Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
@@ -57,34 +57,31 @@ namespace PCRCaculator
         void OnEnable()
         {
             // GuildManager.LoadAddedPlayerData();
-            skillLevels = SettingData.GetCurrentPlayerGroup().teamSkill;
+            skillLevels = PlayerGroup.teamSkill;
             UpdateAllNodeUI();
             UpdateTalentInfoData();
         }
         public void ReLoad()
         {
             GuildManager.LoadAddedPlayerData();
-            if ((SettingData.GetCurrentPlayerGroup().talentLevel?.Count ?? 0) > 0 ||
-                (SettingData.GetCurrentPlayerGroup().talentSkill?.Count ?? 0) > 0 ||
-                (SettingData.GetCurrentPlayerGroup().teamSkill?.Count ?? 0) > 0)
+            if ((PlayerGroup.talentLevel?.Count ?? 0) == 0 &&
+                (PlayerGroup.talentSkill?.Count ?? 0) == 0 &&
+                (PlayerGroup.teamSkill?.Count ?? 0) == 0)
             {
-                OnEnable();
+                PlayerGroup.teamSkill = new Dictionary<int, int>();
             }
-            else
-            {
-                MainManager.Instance.WindowMessage("初始队伍无数据可还原!");
-            }
+            OnEnable();
         }
         public void LoadGlobalSettings()
         {
-            SettingData.GetCurrentPlayerGroup().teamSkill = MainManager.Instance.PlayerSetting.teamSkill;
+            PlayerGroup.teamSkill = MainManager.Instance.PlayerSetting.teamSkill;
             OnEnable();
         }
         public void InitializeData()
         {
             enhanceDataDict = MainManager.Instance.TeamSkillEnhanceDataDic;
             paramTypeDict = MainManager.Instance.paramTypeDic;
-            skillLevels = SettingData.GetCurrentPlayerGroup().teamSkill;
+            skillLevels = PlayerGroup.teamSkill;
             BuildNodeRelationships();
             UpdateTalentInfoData();
         }
@@ -481,7 +478,7 @@ namespace PCRCaculator
         {
             var activeSkills = GetActiveTeamSkills();
             if (global) MainManager.Instance.PlayerSetting.teamSkill = activeSkills; //公共
-            SettingData.GetCurrentPlayerGroup().teamSkill = activeSkills; //队内
+            PlayerGroup.teamSkill = activeSkills; //队内
             GuildManager.Instance.SaveDataToJson();
         }
     }
