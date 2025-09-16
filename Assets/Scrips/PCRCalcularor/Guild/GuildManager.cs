@@ -899,15 +899,20 @@ namespace PCRCaculator.Guild
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
             if (group.isTalentQuestBoss)
             {
-                // 遍历selectedBossEnemyids并为TalentQuestBossPictures设置图片
                 for (int i = 0; i < selectedBossEnemyids.Length && i < TalentQuestBossPictures.Count; i++)
                 {
                     if (selectedBossEnemyids[i] > 0)
                     {
-                        int prefab_id = TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].detailData.prefab_id;
-                        if (TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].unit_id > 600000 && TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].unit_id < 700000)
+                        int prefab_id = 0;
+                        if (TalentQuestEnemyParameterDic != null && TalentQuestEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
                         {
-                            prefab_id = prefab_id + TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].rarity * 10;
+                            var enemyParam = TalentQuestEnemyParameterDic[selectedBossEnemyids[i]];
+                            prefab_id = enemyParam.detailData.prefab_id;
+                            if (enemyParam.unit_id > 600000 && enemyParam.unit_id < 700000)
+                            {
+                                var rarity = enemyParam.rarity;
+                                prefab_id = rarity > 5 ? prefab_id + 60 : prefab_id + 30;
+                            }
                         }
                         TalentQuestBossPictures[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefab_id);
                         TalentQuestBossPictures[i].gameObject.SetActive(true);
@@ -1483,13 +1488,13 @@ namespace PCRCaculator.Guild
         }
 
         //显示BOSS详细数据
-        public void BossImageButton()
+        public void BossImageButton(int index = 0)
         {
             string detailstr = "    请选择BOSS!";
-            EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyids[0]);
+            EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyids[index]);
             if (enemyData != null)
             {
-                detailstr = $"  {enemyData.detailData.unit_name}({selectedBossEnemyids[0]})/({enemyData.detailData.unit_id})\n";
+                detailstr = $"  {enemyData.detailData.unit_name}({selectedBossEnemyids[index]})/({enemyData.detailData.unit_id})\n";
                 detailstr += $" HP：{enemyData.baseData.RealHp}\n";
                 detailstr += $" ATK：{enemyData.baseData.Atk}\n";
                 detailstr += $" MGSTR：{enemyData.baseData.Magic_str}\n";
@@ -1515,20 +1520,38 @@ namespace PCRCaculator.Guild
                 Action<int, int,string> action = (skID, skLV,str) =>
                  {
                      detailstr += $" {str}:\n {skID}({skLV})\n";
-                     SkillData sk = MainManager.Instance.SkillDataDic[skID];
-                     detailstr += $" {sk.GetSkillDetailsEnemy(skLV, Math.Max(enemyData.baseData.Atk, enemyData.baseData.Magic_str))}\n";
+                     if (MainManager.Instance.SkillDataDic.TryGetValue(skID, out SkillData sk))
+                     {
+                         detailstr += $" {sk.GetSkillDetailsEnemy(skLV, Math.Max(enemyData.baseData.Atk, enemyData.baseData.Magic_str))}\n";
+                     }
                  };
-                action(enemyData.skillData.UB, enemyData.union_burst_level,"UB");
-                for(int i = 0; i < enemyData.main_skill_lvs.Count; i++)
+                if (enemyData.detailData.visual_change_flag == 1)
                 {
-                    int skID = enemyData.skillData.MainSkills[i];
-                    int skLV = enemyData.main_skill_lvs[i];
-                    if(skID>0 && skLV > 0)
+                    var un = MainManager.Instance.UnitRarityDic[enemyData.detailData.prefab_id];
+                    int rarity = enemyData.rarity;
+                    bool isUnitEquip = enemyData.unique_equipment_flag_1 == 1;
+                    action(rarity == 6 ? enemyData.skillData.raw_data.union_burst_evolution : enemyData.skillData.raw_data.union_burst, enemyData.level, rarity == 6 ? "UB+" : "UB");
+                    action(isUnitEquip ? enemyData.skillData.raw_data.main_skill_evolution_1 : enemyData.skillData.raw_data.main_skill_1, enemyData.level, isUnitEquip ? "SK1+" : "SK1");
+                    action(enemyData.skillData.raw_data.main_skill_2, enemyData.level, $"SK2");
+                    action(rarity >= 5 ? enemyData.skillData.raw_data.ex_skill_evolution_1 : enemyData.skillData.raw_data.ex_skill_1, enemyData.level, rarity >= 5 ? "EX+" : "EX");
+                    if (enemyData.skillData.raw_data.sp_skill_1 > 0)
                     {
-                        action(skID, skLV,$"技能{i+1}");
+                        action(enemyData.skillData.raw_data.sp_skill_1, enemyData.level, $"SP");
                     }
                 }
-
+                else
+                {
+                    action(enemyData.skillData.UB, enemyData.union_burst_level, "UB");
+                    for (int i = 0; i < enemyData.main_skill_lvs.Count; i++)
+                    {
+                        int skID = enemyData.skillData.MainSkills[i];
+                        int skLV = enemyData.main_skill_lvs[i];
+                        if (skID > 0 && skLV > 0)
+                        {
+                            action(skID, skLV, $"技能{i + 1}");
+                        }
+                    }
+                }
             }
 
 

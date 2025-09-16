@@ -12364,7 +12364,7 @@ MonoBehaviour:
       - m_Target: {fileID: 992625733}
         m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
         m_MethodName: BossImageButton
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -23627,11 +23627,11 @@ MonoBehaviour:
       - m_Target: {fileID: 992625733}
         m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
         m_MethodName: BossImageButton
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 4
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -42969,6 +42969,7 @@ MonoBehaviour:
   TalentQuestBattleEffectPictures:
   - {fileID: 1809218059}
   - {fileID: 1379508304}
+  - {fileID: 815097422}
   - {fileID: 937260280}
   - {fileID: 753055368}
   - {fileID: 893054608}
@@ -85957,11 +85958,11 @@ MonoBehaviour:
       - m_Target: {fileID: 992625733}
         m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
         m_MethodName: BossImageButton
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -87134,11 +87135,11 @@ MonoBehaviour:
       - m_Target: {fileID: 992625733}
         m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
         m_MethodName: BossImageButton
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -90705,11 +90706,11 @@ MonoBehaviour:
       - m_Target: {fileID: 992625733}
         m_TargetAssemblyTypeName: PCRCaculator.Guild.GuildManager, Assembly-CSharp
         m_MethodName: BossImageButton
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
