@@ -135,7 +135,7 @@ namespace ExcelHelper
 
                 var lovedict = json["read_story_ids"].ToObject<int[]>()
                     .Select(x =>
-                        MainManager.Instance.unitStoryLoveDic.TryGetValue(x, out var y)
+                        MainManager.Instance.UnitStoryLoveDic.TryGetValue(x, out var y)
                             ? (x / 1000 * 100 + 1, y)
                             : (0, 0))
                     .GroupBy(p => p.Item1)

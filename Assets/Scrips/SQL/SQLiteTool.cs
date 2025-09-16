@@ -141,7 +141,7 @@ namespace PCRCaculator.SQL
         {
             Dictionary<int, T> dict = new Dictionary<int, T>();
             var list = GetDatas<T>(select);
-            if (list == null) return null;
+            if (list == null) return dict;
             foreach (var item in list)
                 dict[func(item)] = item;
             return dict;
@@ -349,7 +349,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, string> Dic12 { get; private set; }
         public List<EReduction> eReductions { get; private set; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips { get; private set; }
-        public Dictionary<int, List<ExtraEffectUnitGroup>> extraEffectUnitGroupDic { get; private set; }
+        public Dictionary<int, List<extra_effect_unit_group>> extraEffectUnitGroupDic { get; private set; }
         public Dictionary<int, TalentSkillNode> TalentSkillNodeDic { get; private set; }
         public Dictionary<int, team_skill_title> TalentSkillTitleDic { get; private set; }
         // public Dictionary<int, talent_skill_enhance_level> TalentSkillEnhanceLevelDic { get; private set; }
@@ -360,7 +360,8 @@ namespace PCRCaculator.SQL
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get; private set; }
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get; private set; }
 
-        public Dictionary<(int, int), promotion_bonus> rbs
+        // public Dictionary<(int, int), promotion_bonus> rbs
+        public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
         {
             get;
             private set;
@@ -474,7 +475,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => eReductions = GetDatas<EReduction>().ToList()));
             tasks.Add(
                 Task.Run(() => rbs = GetDatas<promotion_bonus>()
-                    .ToDictionary(x => (x.unit_id, x.promotion_level), x => x)));
+                    .GroupBy(x => x.unit_id)
+                    .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.promotion_level, x => x))));
             tasks.Add(
                 Task.Run(() => TalentDic = GetDatas<unit_talent>()
                         .GroupBy(x => x.unit_id)
@@ -534,7 +536,7 @@ namespace PCRCaculator.SQL
                             categories.TryGetValue(x.slot_category_3, out var val3) ? val3 : empty,
                         });
 
-                extraEffectUnitGroupDic = GetDatas<ExtraEffectUnitGroup>()
+                extraEffectUnitGroupDic = GetDatas<extra_effect_unit_group>()
                     .GroupBy(x => x.group_id)
                     .ToDictionary(g => g.Key, g => g.ToList());
             }));
@@ -1238,7 +1240,7 @@ namespace PCRCaculator.SQL
             var bonusDic = GetDatasDic<talent_formation_bonus>(a => a.formation_bonus_id);
 
             if (overwriteDic == null || bonusDic == null)
-                return null;
+                return new Dictionary<int, talentFormationData>();
             overwriteDic[1] = new talent_formation_overwrite
             {
                 id = 1,

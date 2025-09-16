@@ -2738,7 +2738,7 @@ this.updateCurColor();
                 {
                     continue;
                 }
-                var exEquipmentData = MainManager.Instance.unitExEquips[unitData.unitId][n][exEquipId];
+                var exEquipmentData = MainManager.Instance.UnitExEquips[unitData.unitId][n][exEquipId];
                 if (exEquipmentData.passive_skill_id_1 != 0)
                 {
                     list4.Add(exEquipmentData.passive_skill_id_1);

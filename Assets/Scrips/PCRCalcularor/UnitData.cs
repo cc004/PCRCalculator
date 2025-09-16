@@ -243,7 +243,7 @@ namespace PCRCaculator
                 result += BaseData.Round(d1);
 
 
-                d1 = MainManager.Instance.rbs.TryGetValue((a.unitId, a.rank), out var val) ? val.GetBaseData() : new BaseData();
+                d1 = MainManager.Instance.Rbs.TryGetValue(a.unitId, out var val) ? val.TryGetValue(a.rank, out var val2) ? val2.GetBaseData() : new BaseData() : new BaseData();
 
                 result += BaseData.Round(d1);
 
@@ -252,7 +252,7 @@ namespace PCRCaculator
                 for (int i = 0; i < 3; ++i)
                 {
                     if (a.exEquip[i] == 0) continue;
-                    var equip = MainManager.Instance.unitExEquips[a.unitId][i][a.exEquip[i]];
+                    var equip = MainManager.Instance.UnitExEquips[a.unitId][i][a.exEquip[i]];
                     var def = equip.GetDefaultBaseData();
                     var max = equip.GetMaxBaseData();
                     var param = new BaseData();
@@ -465,7 +465,7 @@ namespace PCRCaculator
 
             var rank = a.rank;
 
-            while (MainManager.Instance.rbs.ContainsKey((unitId, rank - 1)))
+            while (MainManager.Instance.Rbs.ContainsKey(unitId) && MainManager.Instance.Rbs[unitId].ContainsKey(rank - 1))
                 --rank;
 
             BaseData result = new BaseData();
@@ -479,7 +479,7 @@ namespace PCRCaculator
 
             result += BaseData.Round(d1);
 
-            if (unitId < 200000 && !MainManager.Instance.rbs.ContainsKey((unitId, rank)))
+            if (unitId < 200000 && (!MainManager.Instance.Rbs.ContainsKey(unitId) || !MainManager.Instance.Rbs[unitId].ContainsKey(rank)))
             {
                 d1 = new BaseData();
 
@@ -649,7 +649,7 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
-                if (MainManager.Instance.unitExEquips.TryGetValue(unitId, out var temp))
+                if (MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp))
                 {
                     for (int i = 0; i < 3; i++)
                     {
@@ -1716,6 +1716,16 @@ namespace PCRCaculator
         public int loveMax;
         public List<int> effectCharacters;//受影响的角色id列表
         public List<((int, int)[], int)> addValues;//增加的属性，【属性序号，属性值】
+        
+        /// <summary>
+        /// 无参构造函数，用于 JSON 反序列化
+        /// </summary>
+        public UnitStoryData() 
+        {
+            effectCharacters = new List<int>();
+            addValues = new List<((int, int)[], int)>();
+        }
+        
         /// <summary>
         /// 角色羁绊类构造函数
         /// </summary>
@@ -2475,7 +2485,7 @@ namespace PCRCaculator
         public int noise_id { get; set; }
         public int title_id { get; set; }
         public string title_text { get; set; }
-        public List<int> enhance_ids { get; set; } // 强化ID数组
+        public List<int> enhance_ids { get; set; } = new List<int>(); // 强化ID数组
         public TeamSkillNode(int nodeId, int posX, int posY, int preNode, Dictionary<int, int[]> enhanceLevelIds, int iconId, int noiseId, int titleId, string titleText)
         {
             node_id = nodeId;

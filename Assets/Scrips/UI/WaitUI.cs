@@ -19,6 +19,7 @@ public class WaitUI : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
+        MatchTextRectToParent();
     }
 
     /// <summary>
@@ -29,34 +30,19 @@ public class WaitUI : MonoBehaviour
         if (text != null)
         {
             baseMessage = msg;
-            text.alignment = TextAnchor.MiddleCenter; // 保证文本居中
             currentDots = 0;
             dotTimer = 0f;
             text.text = baseMessage;
+            MatchTextRectToParent();
         }
     }
-
-    /// <summary>
-    /// 设置 0/1 指示（例如：0 = 未完成，1 = 已完成）
-    /// </summary>
-    // SetIndicator 已移除，使用纯文字更新。
 
     void Start()
     {
         if (text != null)
         {
-            // 确保默认居中
-            text.alignment = TextAnchor.MiddleCenter;
             text.text = baseMessage;
-            // 强制调整 RectTransform 到中间，防止 prefab 中位置错误
-            var rt = text.GetComponent<RectTransform>();
-            if (rt != null)
-            {
-                rt.anchorMin = new Vector2(0.5f, 0.5f);
-                rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0.5f);
-                rt.anchoredPosition = Vector2.zero;
-            }
+            MatchTextRectToParent();
         }
         dotTimer = 0f;
         currentDots = 0;
@@ -86,5 +72,23 @@ public class WaitUI : MonoBehaviour
         Destroy(gameObject);
     }
 
-
+    /// <summary>
+    /// 让 text 的 RectTransform 和父物体一样大
+    /// </summary>
+    private void MatchTextRectToParent()
+    {
+        if (text != null && text.transform.parent != null)
+        {
+            RectTransform textRect = text.GetComponent<RectTransform>();
+            RectTransform parentRect = text.transform.parent.GetComponent<RectTransform>();
+            if (textRect != null && parentRect != null)
+            {
+                textRect.anchorMin = Vector2.zero;
+                textRect.anchorMax = Vector2.one;
+                textRect.offsetMin = Vector2.zero;
+                textRect.offsetMax = Vector2.zero;
+                textRect.pivot = parentRect.pivot;
+            }
+        }
+    }
 }

@@ -4436,7 +4436,7 @@ namespace Elements.Battle
 
             // TODO hush fix boss weaknessDict
             // _partsData.talentWeaknessPercent = weaknessDict;
-            if (MainManager.Instance.weaknessDic.TryGetValue(_unitId, out int[] weaknessArray))
+            if (MainManager.Instance.WeaknessDic.TryGetValue(_unitId, out int[] weaknessArray))
             {
                 // 将数组转换为字典格式
                 Dictionary<int, int> weaknessDict = new Dictionary<int, int>();
@@ -5516,7 +5516,7 @@ namespace Elements.Battle
         
         public static double CalcPlayerDamageTpReduceRate(int promotionLevel)
         {
-            return MainManager.Instance.ereductionTable.First(x => MainManager.Instance.levelMax >= x.border)
+            return MainManager.Instance.EreductionTable.First(x => MainManager.Instance.levelMax >= x.border)
                 .GetThresholdPair().Select(pair =>
                 {
                     var (upper, lower, value) = pair;

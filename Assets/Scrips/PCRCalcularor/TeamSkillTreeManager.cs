@@ -80,7 +80,7 @@ namespace PCRCaculator
         public void InitializeData()
         {
             enhanceDataDict = MainManager.Instance.TeamSkillEnhanceDataDic;
-            paramTypeDict = MainManager.Instance.paramTypeDic;
+            paramTypeDict = MainManager.Instance.ParamTypeDic;
             skillLevels = PlayerGroup.teamSkill;
             BuildNodeRelationships();
             UpdateTalentInfoData();

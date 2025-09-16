@@ -207,7 +207,7 @@ namespace Elements
                                 }
                             }
                             else
-                                Debug.LogError("找不到增援敌人ID " + enemy);
+                                Debug.LogError("找不到环境Buff ID " + enemy);
                         }
                     }
 
@@ -297,7 +297,7 @@ namespace Elements
                 extraEffectEnemyUnitCtrl.Clear();
                 for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
                 {
-                    enemyUnitCtrl[i].UnitName = "环境buff";
+                    enemyUnitCtrl[i].UnitName = $"环境Buff{extraEffectEnemyUnitCtrl.Count + 1}";
                     extraEffectEnemyUnitCtrl.Add(enemyUnitCtrl[i]);
                     enemyUnitCtrl.RemoveAt(i);
                 }

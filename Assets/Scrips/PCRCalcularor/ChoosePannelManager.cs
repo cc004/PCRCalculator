@@ -95,49 +95,97 @@ namespace PCRCaculator
         public Text filterType;
         public GameObject position;
         public GameObject talent;
+        private bool initialized = false;
 
         private void Start()
         {
             Instance = this;
             StartCoroutine(SearchCharaInitialize());
-            StartCoroutine(WaitForLoadFinished());
+            // StartCoroutine(WaitForLoadFinished());
         }
 
-        private IEnumerator WaitForLoadFinished()
+        private IEnumerator WaitForLoadFinished(Action callback = null)
         {
             while (!MainManager.Instance.LoadFinished)
             {
-                yield return null;
+            yield return null;
             }
-            InitialButton();
+            var wait = MainManager.Instance.OpenWaitUI();
+            yield return StartCoroutine(InitialButtonCoroutine(wait));
+            wait.Close();
+            initialized = true;
+            callback?.Invoke();
         }
 
-
-        public void InitialButton()
+        public IEnumerator InitialButtonCoroutine(WaitUI wait)
         {
-            parent.localPosition = new Vector3();
+            parent.localPosition = Vector3.zero;
             parent.sizeDelta = new Vector2(100, original_hight);
+
+            int total = MainManager.Instance.UnitRarityDic.Count;
+            int cnt = 0;
+            int batchSize = 1; // 每帧加载多少个角色，可根据实际情况调整
+
             foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
             {
-                /*if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)*/
+                cnt++;
+                try
                 {
-                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id)) // || (id>=400000&&id<=499999))
-                    {
-                        GameObject b = Instantiate(togglePerferb);
-                        b.transform.SetParent(parent);
-                        b.transform.localScale = new Vector3(1, 1, 1);
-                        int id0 = id;
+                    wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
+                }
+                catch { }
 
-                        b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-                        b.GetComponent<CharacterPageButton>().SetButton(id);
-                        togglePerferbs[id0] = b.GetComponent<Toggle>();
-                        buttons[id0] = b.GetComponent<CharacterPageButton>();
-                        //showUnitIDs.Add(id);
-                    }
+                if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
+                {
+                    GameObject b = Instantiate(togglePerferb);
+                    b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
+                    b.transform.localScale = Vector3.one;
+
+                    int id0 = id;
+                    b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+                    b.GetComponent<CharacterPageButton>().SetButton(id);
+
+                    togglePerferbs[id0] = b.GetComponent<Toggle>();
+                    buttons[id0] = b.GetComponent<CharacterPageButton>();
+                }
+
+                // **关键：每加载一批后等待一帧，避免卡顿**
+                if (cnt % batchSize == 0)
+                {
+                    yield return null;
                 }
             }
-            
         }
+
+
+
+        // public void InitialButton(WaitUI wait)
+        // {
+        //     parent.localPosition = new Vector3();
+        //     parent.sizeDelta = new Vector2(100, original_hight);
+        //     int cnt = 0;
+        //     foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+        //     {
+        //         /*if (type == 0 || MainManager.Instance.UnitRarityDic[id].unitPositionType == positionType)*/
+        //         {
+        //             try { wait?.SetMessage($"正在加载角色头像({cnt}/{MainManager.Instance.UnitRarityDic.Count})"); } catch { }
+        //             if (MainManager.Instance.JudgeWeatherShowThisUnit(id)) // || (id>=400000&&id<=499999))
+        //             {
+        //                 GameObject b = Instantiate(togglePerferb);
+        //                 b.transform.SetParent(parent);
+        //                 b.transform.localScale = new Vector3(1, 1, 1);
+        //                 int id0 = id;
+
+        //                 b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+        //                 b.GetComponent<CharacterPageButton>().SetButton(id);
+        //                 togglePerferbs[id0] = b.GetComponent<Toggle>();
+        //                 buttons[id0] = b.GetComponent<CharacterPageButton>();
+        //                 //showUnitIDs.Add(id);
+        //             }
+        //         }
+        //     }
+
+        // }
 
 
         /// <summary>
@@ -147,6 +195,11 @@ namespace PCRCaculator
         /// <param name="playerData">敌人队伍/会战要更改的队伍，为空则不显示</param>
         public void CallChooseBack(int type, AddedPlayerData player = null, int selectedId = 0)
         {
+            if (type != 4 && !initialized)
+            {
+                StartCoroutine(WaitForLoadFinished(() => CallChooseBack_0(type, player, selectedId)));
+                return;
+            }
             CallChooseBack_0(type, player, selectedId);
         }
         private void CallChooseBack_0(int type, AddedPlayerData player = null, int selectedId = 0)
@@ -327,11 +380,22 @@ namespace PCRCaculator
         }
         public void BackButton()
         {
+            if (!initialized)
+            {
+                StartCoroutine(WaitForLoadFinished(() => RealBackButton()));
+                return;
+            }
+            RealBackButton();
+        }
+
+        private void RealBackButton()
+        {
             CloseProperty();
             RefreshBasePage();
             chooseBack_A.SetActive(true);
             settingBack.SetActive(false);
         }
+
         public void FinishEditButton_setting()
         {
             CancalButton();
@@ -450,7 +514,7 @@ namespace PCRCaculator
                 data.uniqueEq2Lv = -1;
             }
 
-            if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
+            if (MainManager.Instance.UnitExEquips.TryGetValue(data.unitId, out var temp))
             {
                 for (int i = 0; i < 3; ++i)
                 {
@@ -759,7 +823,7 @@ namespace PCRCaculator
 
             // ex equip
 
-            if (MainManager.Instance.unitExEquips.TryGetValue(data.unitId, out var temp))
+            if (MainManager.Instance.UnitExEquips.TryGetValue(data.unitId, out var temp))
             {
                 for (int i = 0; i < 3; ++i)
                 {

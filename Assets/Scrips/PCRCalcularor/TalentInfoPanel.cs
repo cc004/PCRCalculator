@@ -15,7 +15,7 @@ namespace PCRCaculator
 
         private MainManager mainManager => MainManager.Instance;
         private TeamEnhanceParameter teamEnhanceData => MainManager.Instance.TeamEnhanceData;
-        private Dictionary<int, param_type> paramTypeDict => MainManager.Instance.paramTypeDic;
+        private Dictionary<int, param_type> paramTypeDict => MainManager.Instance.ParamTypeDic;
 
         private void OnEnable()
         {

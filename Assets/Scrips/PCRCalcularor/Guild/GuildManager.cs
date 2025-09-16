@@ -1673,7 +1673,7 @@ namespace PCRCaculator.Guild
         {
             int currentBossId = selectedBossEnemyids[0];
 
-            if (MainManager.Instance.weaknessDic.TryGetValue(currentBossId, out int[] weaknessValues))
+            if (MainManager.Instance.WeaknessDic.TryGetValue(currentBossId, out int[] weaknessValues))
             {
                 int spriteIndex = 0;
 
@@ -1915,10 +1915,10 @@ namespace PCRCaculator.Guild
         public long GetTalentBonusPermyriad(int talentId, int count) // present
         {
             var formationData = IsTalentQuestBoss
-                ? (MainManager.Instance.talentFormationDic.TryGetValue(TalentQuestWaveGroupId, out var talentData) ? talentData : null)
-                : MainManager.Instance.talentFormationDic.TryGetValue(selectedBossEnemyids[0], out var bossData)
+                ? (MainManager.Instance.TalentFormationDic.TryGetValue(TalentQuestWaveGroupId, out var talentData) ? talentData : null)
+                : MainManager.Instance.TalentFormationDic.TryGetValue(selectedBossEnemyids[0], out var bossData)
                     ? bossData
-                    : MainManager.Instance.talentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
+                    : MainManager.Instance.TalentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
             return count > 0 && formationData != null ? formationData.formation_bonus_values[talentId - 1][count-1] : 0;
         }
         public void ExtraEffectButton()
