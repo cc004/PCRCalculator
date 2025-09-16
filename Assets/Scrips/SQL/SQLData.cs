@@ -928,5 +928,13 @@ namespace PCRCaculator.SQL
             }
         }
     }
+    public class talent_quest_battle_effect : DbBaseData
+    {
+        public int id { get; set; }
+        public int quest_id { get; set; }
+        public string icon_name { get; set; }
+        public string effect_name { get; set; }
+        public string description { get; set; }
+    }
 }
 

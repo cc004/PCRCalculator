@@ -126,6 +126,12 @@ namespace PCRCaculator.Guild
             new Color(0xF1/255f, 0xB1/255f, 0x2F/255f), // "#F1B12F" 光
             new Color(0x7C/255f, 0x4D/255f, 0xBF/255f)  // "#7C4DBF" 暗
         };
+        public List<Image> TalentQuestBossPictures;
+        public Text TalentQuestBossText;
+        public GameObject BossObject;
+        public GameObject TalentBossObject;
+        public List<Image> TalentQuestBattleEffectPictures;
+
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -793,6 +799,44 @@ namespace PCRCaculator.Guild
             characterGroupToggles[toggleIdx].isOn = true;
             characterGroupPageText.text = "" + currentPage;
         }
+        private void SetTalentQuestBattleEffectPictures()
+        {
+            // 计算quest_id值
+            int questId = TalentQuestWaveGroupId / 10;
+
+            // 从数据表中找到匹配quest_id的数据
+            var battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
+                .Values
+                .Where(x => x.quest_id == questId)
+                .OrderBy(x => x.id)
+                .ToList();
+
+            // 加载精灵图集
+            var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
+                .ToDictionary(x => x.name, x => x);
+
+            // 按顺序设置TalentQuestBattleEffectPictures的图片
+            for (int i = 0; i < TalentQuestBattleEffectPictures.Count; i++)
+            {
+                if (i < battleEffects.Count)
+                {
+                    var effectData = battleEffects[i];
+                    if (sprites.ContainsKey(effectData.icon_name))
+                    {
+                        TalentQuestBattleEffectPictures[i].sprite = sprites[effectData.icon_name];
+                        TalentQuestBattleEffectPictures[i].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        TalentQuestBattleEffectPictures[i].gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    TalentQuestBattleEffectPictures[i].gameObject.SetActive(false);
+                }
+            }
+        }
         private void Refresh()
         {
             var data = SettingData.GetCurrentPlayerGroup();
@@ -803,6 +847,9 @@ namespace PCRCaculator.Guild
             }*/
             if (data.isTalentQuestBoss)
                 toggles_ChooseType[1].isOn = true;
+                SetTalentQuestBattleEffectPictures();
+            BossObject.SetActive(!data.isTalentQuestBoss);
+            TalentBossObject.SetActive(data.isTalentQuestBoss);
             MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
             characterGroupNameText.text = playerData.playerName;
             for (int i = 0; i < 5; i++)
@@ -831,7 +878,7 @@ namespace PCRCaculator.Guild
             TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
             if (data.UBExecTimeData?.Count >= 6)
                 UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
-            if (data.SemanUBExecTimeData?.Count >= 6) 
+            if (data.SemanUBExecTimeData?.Count >= 6)
                 UnitUBTimes[5].SetSemanUBTimes(data.SemanUBExecTimeData[5]);
             AutoModeToggle.isOn = data.useAutoMode;
             SetModeToggle.isOn = data.useSetMode;
@@ -846,11 +893,39 @@ namespace PCRCaculator.Guild
             if (data.currentGuildMonth < 1024) data.currentGuildMonth += 24;
 
             if (selectedBossEnemyids == null || selectedBossEnemyids.Length == 0 || selectedBossEnemyids[0] == 0)
-                data.selectedEnemyIDs = new []
+                data.selectedEnemyIDs = new[]
                     {GetGuildBossID(data.currentGuildMonth, data.currentGuildEnemyNum, data.currentTurn)};
             //string Path = "GuildEnemy/icon_unit_" + enemyDataDic[selectedBossEnemyid].unit_id;
             //bossPicture.sprite = MainManager.LoadSourceSprite(Path);
-            bossPicture.sprite = group.isTalentQuestBoss? ABExTool.GetSprites(ABExTool.SpriteType.角色图标, TalentQuestEnemyParameterDic[selectedBossEnemyids[0]].unit_id) : ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
+            if (group.isTalentQuestBoss)
+            {
+                // 遍历selectedBossEnemyids并为TalentQuestBossPictures设置图片
+                for (int i = 0; i < selectedBossEnemyids.Length && i < TalentQuestBossPictures.Count; i++)
+                {
+                    if (selectedBossEnemyids[i] > 0)
+                    {
+                        int prefab_id = TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].detailData.prefab_id;
+                        if (TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].unit_id > 600000 && TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].unit_id < 700000)
+                        {
+                            prefab_id = prefab_id + TalentQuestEnemyParameterDic[selectedBossEnemyids[i]].rarity * 10;
+                        }
+                        TalentQuestBossPictures[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefab_id);
+                        TalentQuestBossPictures[i].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        TalentQuestBossPictures[i].gameObject.SetActive(false);
+                    }
+                }
+                for (int i = selectedBossEnemyids.Length; i < TalentQuestBossPictures.Count; i++)
+                {
+                    TalentQuestBossPictures[i].gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
+            }
             bossDetailTexts[0].text = group.isSpecialBoss ? "自定义" : (group.isTalentQuestBoss ? dropdowns_ChooseTalentQuestBoss[0].options[dropdowns_ChooseTalentQuestBoss[0].value].text : EnemyDataDic[selectedBossEnemyids[0]].name);
             string str = "";
             if (group.isSpecialBoss)
@@ -902,7 +977,7 @@ namespace PCRCaculator.Guild
             //     group.usePlayerSettingHP = false;
             //     group.playerSetingHP = 0;
             // }
-            if (data.playerSetingHP == 0) 
+            if (data.playerSetingHP == 0)
             {
                 currentHPinput.text = " " + GetEnemyDataByID(selectedBossEnemyids[0]).baseData.RealHp;
             }
@@ -911,7 +986,11 @@ namespace PCRCaculator.Guild
                 currentHPinput.text = " " + data.playerSetingHP;
             }
             bossDetailTexts[2].text = group.isViolent ? "狂暴" : (group.usePlayerSettingHP ? "自定义HP" : "--");
-            bossDetailTexts[3].text = group.isTalentQuestBoss? $"{dropdowns_ChooseTalentQuestBoss[1].value + 1}-{dropdowns_ChooseTalentQuestBoss[2].value + 1}" : $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" + $"\n<size=10>({data.currentGuildMonth})</size>";
+            if (group.isTalentQuestBoss)
+            {
+                TalentQuestBossText.text = $"{dropdowns_ChooseTalentQuestBoss[0].options[dropdowns_ChooseTalentQuestBoss[0].value].text} {dropdowns_ChooseTalentQuestBoss[1].value + 1}-{dropdowns_ChooseTalentQuestBoss[2].value + 1}";
+            }
+            bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" + $"\n<size=10>({data.currentGuildMonth})</size>";
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
             usePlayerSettingHP.isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;

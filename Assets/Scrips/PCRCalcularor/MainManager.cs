@@ -122,6 +122,7 @@ namespace PCRCaculator
         public Dictionary<int, TeamSkillNode> TeamSkillNodeDic = new Dictionary<int, TeamSkillNode>();
         public Dictionary<int, TeamSkillEnhanceData> TeamSkillEnhanceDataDic = new Dictionary<int, TeamSkillEnhanceData>();
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic = new Dictionary<int, extra_effect_data>();
+        public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
         public GameObject LatestUIback
         {
             get
@@ -399,6 +400,7 @@ namespace PCRCaculator
                         weaknessDic = dbTool.WeaknessDic;
                         talentFormationDic = dbTool.TalentFormationDic;
                         ExtraEffectDataDic = dbTool.ExtraEffectDataDic;
+                        TalentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
                         /*
                         {
                             if (skillNameAndDescribe_cn.TryGetValue(1703001, out var val))
