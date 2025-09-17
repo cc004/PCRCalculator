@@ -831,8 +831,10 @@ namespace PCRCaculator
                 int currentLevel = exEquipLevel[i];
                 string exEquipStr = currentEquip.ToString();
                 string value = currentEquip == 0 ? "-" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '5' ? $"C{currentLevel}" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '4' ? $"P{currentLevel}" :
                     (exEquipStr.Length >= 3 && exEquipStr[^3] == '3' ? $"G{currentLevel}" :
-                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '2' ? $"S{currentLevel}" : "-"));
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '2' ? $"S{currentLevel}" : "-"))));
                 result.Add(value);
             }
             return string.Join("/", result);
