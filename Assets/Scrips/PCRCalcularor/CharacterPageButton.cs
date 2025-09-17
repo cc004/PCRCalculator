@@ -111,24 +111,24 @@ namespace PCRCaculator
         /// <param name="data">角色详情</param>
         public void SetButton(UnitData data)
         {
-            int unitid = data.PrefabId;
-            if (unitid == 0) return; // XXX: temp fix
-            int charid = data.rarity >= 3 ? unitid + 30 : unitid + 10;
-            if (unitid >= 400000)
-            {
-                charid = unitid + 30;
-            }
+            int prefab = data.PrefabId;
+            if (prefab == 0) return; // XXX: temp fix
+            // int charid = data.rarity >= 3 ? prefab + 30 : prefab + 10;
+            // if (prefab >= 400000)
+            // {
+            //     charid = prefab + 30;
+            // }
             //string path = "";
             Sprite sprite = null;
             if (buttonType == ButtonType.typeA)
             {
                 //path = "pictures/unit_plate_" + charid;
-                sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色长条, unitid);
+                sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色长条, prefab);
             }
             else if (buttonType == ButtonType.typeB || buttonType == ButtonType.typeC||buttonType== ButtonType.typeD)
             {
                 //path = "charicons/fav_push_notif_" + unitid;
-                int iconUnitid = unitid >= 200000 ? unitid : data.rarity >= 6 ? unitid + 60 : unitid + 30;
+                int iconUnitid = prefab >= 200000 ? prefab : data.rarity >= 6 ? prefab + 60 : prefab + 30;
 
 
             sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, iconUnitid);
@@ -138,6 +138,7 @@ namespace PCRCaculator
             //{
             //   characterImage.sprite = MainManager.LoadSourceSprite(path);
             //}
+            int unitid = data.unitId;
             if (unitid <= 200000 && MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData) && rarityData.detailData.talent_id.Count > 0)
             {
                 characterTalentImage.SetActive(true);
