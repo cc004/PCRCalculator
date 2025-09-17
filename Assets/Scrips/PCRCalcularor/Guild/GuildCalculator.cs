@@ -898,7 +898,7 @@ namespace PCRCaculator.Guild
 
         private void CallExcelHelper()
         {
-            string fileName = CreateExcelName();
+            string fileName = CurrentBossText.text + "-" + CreateExcelName();
 
             try
             {
@@ -957,30 +957,25 @@ namespace PCRCaculator.Guild
                     .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.001f)))
                 .GroupBy(s => s.t.pos).Select(g =>
                     (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
-                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), Math.Max(0, PlayerIds.Take(5).Count() + bossId.Count - 4))
+                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), Math.Max(0, PlayerIds.Take(5).Count() + bossId.Count))
                     .Select(x => new List<float>())), (result, tuple) =>
                 {
                     int index = tuple.Key;
-                    if (index >= 5 && index <= 9)
+                    int playerCount = Math.Min(PlayerIds.Count, 5);
+                    int bossStartIndex = playerCount;
+
+                    if (index >= bossStartIndex)
                     {
-                        // 合并第6到第10个元素(索引5-9)到索引5中
-                        index = 5;
-                    }
-                    else if (index > 9)
-                    {
-                        // 调整索引大于9的元素位置
-                        index = index - 4;
+                        index = bossStartIndex;
                     }
 
-                    // 确保结果列表足够长以容纳当前索引
                     while (result.Count <= index)
                     {
                         result.Add(new List<float>());
                     }
 
-                    if (tuple.Key >= 5 && tuple.Key <= 9 && result[index].Any())
+                    if (tuple.Key >= bossStartIndex && result[index].Any())
                     {
-                        // 合并第6到第10个元素到同一个列表中并重新排序
                         result[index].AddRange(tuple.list);
                         result[index].Sort();
                     }
@@ -1070,7 +1065,7 @@ namespace PCRCaculator.Guild
         }
         private string CreateExcelName()
         {
-            string fileName = CurrentBossText.text + "-";
+            string fileName = "";
             for (int i = 0; i < 5; i++)
             {
                 if (playerIds.Count > i)
@@ -1221,7 +1216,7 @@ namespace PCRCaculator.Guild
             }
             try
             {
-                var fileName = CreateExcelName();
+                var fileName = CurrentBossText.text + "-" + CreateExcelName();
 #if PLATFORM_ANDROID
 #else
                 var ststrr = StandaloneFileBrowser.SaveFilePanel(
@@ -1470,7 +1465,7 @@ namespace PCRCaculator.Guild
                 detail = detail,
             };
 
-            string fileName = CreateExcelName();
+            string fileName = CurrentBossText.text + "-" + CreateExcelName();
 
 
             var ststrr = StandaloneFileBrowser.SaveFilePanel(

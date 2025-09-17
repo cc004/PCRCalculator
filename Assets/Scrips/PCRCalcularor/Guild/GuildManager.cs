@@ -2098,13 +2098,41 @@ namespace PCRCaculator.Guild
         {
             string des = "";
             var data = GetCurrentPlayerGroup();
-            des += (char)('A' + data.currentTurn - 1);
-            if (data.currentGuildEnemyNum == 4 && data.isViolent)
-                des += "6";
+            if (data.isTalentQuestBoss)
+            {
+                switch (data.TalentQuestMap)
+                {
+                    case 0:
+                        des += "火";
+                        break;
+                    case 1:
+                        des += "水";
+                        break;
+                    case 2:
+                        des += "风";
+                        break;
+                    case 3:
+                        des += "光";
+                        break;
+                    case 4:
+                        des += "暗";
+                        break;
+                    default:
+                        des += data.TalentQuestMap;
+                        break;
+                }
+                des += $"{data.TalentQuestArea + 1}-{data.TalentQuestIndex + 1}";
+            }
             else
-                des += (data.currentGuildEnemyNum + 1);
-            if (data.usePlayerSettingHP)
-                des += "#";
+            {
+                des += (char)('A' + data.currentTurn - 1);
+                if (data.currentGuildEnemyNum == 4 && data.isViolent)
+                    des += "6";
+                else
+                    des += (data.currentGuildEnemyNum + 1);
+                if (data.usePlayerSettingHP)
+                    des += "#";
+            }
             return des;
         }
         public void RenameGroupName(string name)
