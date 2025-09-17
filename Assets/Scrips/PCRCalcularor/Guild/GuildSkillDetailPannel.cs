@@ -2,7 +2,7 @@
 using Elements;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.EventSystems;
 namespace PCRCaculator.Guild
 {
     public class GuildSkillDetailPannel : MonoBehaviour
@@ -19,12 +19,14 @@ namespace PCRCaculator.Guild
         {
             Destroy(gameObject);
         }
-
-        public void OnPointerClick()
+        void Update()
         {
-
+            // 检测鼠标右键点击退出
+            if (Input.GetMouseButtonDown(1))
+            {
+                ExitButton();
+            }
         }
-
         private float posy;
         public void Setdetails(UnitSkillExecData data)
         {

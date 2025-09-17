@@ -185,21 +185,26 @@ namespace Elements
                 {
                     tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
 
-                    tempData.extra_effect_cnt = 0;
                     var extra_data = GetExtraEffectEnemyData(tempData);
+                    tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
                     if (extra_data != null)
                     {
                         foreach (var enemy in extra_data.enemy_ids)
                         {
                             if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
                             {
-                                tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
-                                tempData.extra_effect_cnt++;
+                                if (!tempData.guildEnemy.Contains(GuildManager.EnemyDataDic[enemy]))
+                                {
+                                    tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                                }
+
                             }
                             else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
                             {
-                                tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
-                                tempData.extra_effect_cnt++;
+                                if (!tempData.guildEnemy.Contains(GuildManager.TalentQuestEnemyParameterDic[enemy]))
+                                {
+                                    tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                                }
                             }
                             else
                                 Debug.LogError("找不到增援敌人ID " + enemy);

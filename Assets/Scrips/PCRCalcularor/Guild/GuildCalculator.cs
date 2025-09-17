@@ -161,6 +161,7 @@ namespace PCRCaculator.Guild
             totalDamageExcept = 0;
             allUnitLastStateDic.Clear();
             playerIds.Clear();
+            bossId.Clear();
             allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
             allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
             allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();
@@ -956,10 +957,37 @@ namespace PCRCaculator.Guild
                     .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.001f)))
                 .GroupBy(s => s.t.pos).Select(g =>
                     (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
-                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), PlayerIds.Take(5).Count() + bossId.Count)
+                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), Math.Max(0, PlayerIds.Take(5).Count() + bossId.Count - 4))
                     .Select(x => new List<float>())), (result, tuple) =>
                 {
-                    result[tuple.Key] = tuple.list;
+                    int index = tuple.Key;
+                    if (index >= 5 && index <= 9)
+                    {
+                        // 合并第6到第10个元素(索引5-9)到索引5中
+                        index = 5;
+                    }
+                    else if (index > 9)
+                    {
+                        // 调整索引大于9的元素位置
+                        index = index - 4;
+                    }
+
+                    // 确保结果列表足够长以容纳当前索引
+                    while (result.Count <= index)
+                    {
+                        result.Add(new List<float>());
+                    }
+
+                    if (tuple.Key >= 5 && tuple.Key <= 9 && result[index].Any())
+                    {
+                        // 合并第6到第10个元素到同一个列表中并重新排序
+                        result[index].AddRange(tuple.list);
+                        result[index].Sort();
+                    }
+                    else
+                    {
+                        result[index] = tuple.list;
+                    }
                     return result;
                 });
         }
@@ -1018,11 +1046,11 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
-            foreach (int bossId in BossId)
+            for (int i = 0; i < BossId.Count; i++)
             {
-                if (allUnitStateChangeDic.ContainsKey(bossId))
+                if (allUnitStateChangeDic.ContainsKey(BossId[i]))
                 {
-                    foreach (UnitStateChangeData data in allUnitStateChangeDic[bossId])
+                    foreach (UnitStateChangeData data in allUnitStateChangeDic[BossId[i]])
                     {
                         if (data.changStateTo == UnitCtrl.ActionState.SKILL_1)
                         {
@@ -1030,7 +1058,8 @@ namespace PCRCaculator.Guild
                             {
                                 isBossUB = true,
                                 sorting = data.realFrameCount,
-                                UBTime = data.currentFrameCount
+                                UBTime = data.currentFrameCount,
+                                enemyData = boss[i].unitParameter.EnemyData,
                             };
                             uBDetails.Add(detail);
                         }
@@ -1832,6 +1861,7 @@ namespace PCRCaculator.Guild
         [JsonIgnore] public float sorting;
         public bool isBossUB;
         public UnitData unitData;
+        public EnemyData enemyData;
         public int UBTime;
         public long Damage;
         public bool Critical;

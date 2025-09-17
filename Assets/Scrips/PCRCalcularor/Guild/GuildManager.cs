@@ -836,6 +836,17 @@ namespace PCRCaculator.Guild
                 }
             }
         }
+        public void UpdateTooglesChooseType()
+        {
+            var data = SettingData.GetCurrentPlayerGroup();
+            if (data.isTalentQuestBoss)
+            {
+                toggles_ChooseType[1].isOn = true;
+            }else
+            {
+                toggles_ChooseType[0].isOn = true;
+            }
+        }
         private void Refresh()
         {
             var data = SettingData.GetCurrentPlayerGroup();
@@ -844,9 +855,14 @@ namespace PCRCaculator.Guild
             {
                 playerData = SettingData.addedPlayerDatas[SettingData.currentPlayerGroupNum];
             }*/
+            // toggles_ChooseType[1].isOn = IsTalentQuestBoss;
+            // toggles_ChooseType[0].isOn = isGuildBoss;
+
             if (data.isTalentQuestBoss)
-                toggles_ChooseType[1].isOn = true;
+            {
+
                 SetTalentQuestBattleEffectPictures();
+            }
             BossObject.SetActive(!data.isTalentQuestBoss);
             TalentBossObject.SetActive(data.isTalentQuestBoss);
             MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
@@ -907,7 +923,7 @@ namespace PCRCaculator.Guild
                         {
                             var enemyParam = TalentQuestEnemyParameterDic[selectedBossEnemyids[i]];
                             prefab_id = enemyParam.detailData.prefab_id;
-                            if (enemyParam.unit_id > 600000 && enemyParam.unit_id < 700000)
+                            if (enemyParam.detailData.visual_change_flag == 1)
                             {
                                 var rarity = enemyParam.rarity;
                                 prefab_id = rarity > 5 ? prefab_id + 60 : prefab_id + 30;
@@ -1208,6 +1224,10 @@ namespace PCRCaculator.Guild
             {
                 MainManager.Instance.WindowConfigMessage("无效的存档！" , null);
                 return;
+            }
+            if (guildTimelineData.UBExecTime.Count > 6)
+            {
+                guildTimelineData.UBExecTime.RemoveRange(5, guildTimelineData.UBExecTime.Count - 5);
             }
             if (guildTimelineData.UBExecTime.Count == 5)
                 guildTimelineData.UBExecTime.Add(new List<float>());

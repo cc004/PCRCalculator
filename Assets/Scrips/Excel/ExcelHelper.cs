@@ -1154,7 +1154,7 @@ namespace ExcelHelper
                     if (a.isBossUB)
                     {
                         worksheet0.Cells[currentLineNum, 3, currentLineNum, 10].Merge = true;
-                        worksheet0.MySetValue(currentLineNum, 3, "BOSS  UB",backColor:backColotInt_1);
+                        worksheet0.MySetValue(currentLineNum, 3, a.enemyData.name, backColor:backColotInt_1);
                     }
                     else
                     {
