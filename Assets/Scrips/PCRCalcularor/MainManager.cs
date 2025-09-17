@@ -517,8 +517,8 @@ namespace PCRCaculator
                                 databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
 
-                                databaseCache.ereductionTable = (Version.newAB ? dbTool3 : Version.useJP ? dbTool2 : dbTool).eReductions;
-                                databaseCache.rbs = (Version.newAB ? dbTool3 : Version.useJP ? dbTool2 : dbTool).rbs;
+                                databaseCache.ereductionTable = (Version.useJP ? dbTool2 : dbTool).eReductions;
+                                databaseCache.rbs = (Version.useJP ? dbTool2 : dbTool).rbs;
 
                                 Task.WaitAll(
                                     Task.Run(() =>
