@@ -390,10 +390,10 @@ namespace Elements
             {
                 unitid2 = data.PrefabId;
             }
-            if (prefab != 0)
-            {
-                prefabOverride = UnitUtility.GetSkinId(prefab, 3);
-            }
+            // if (prefab != 0)
+            // {
+            //     prefabOverride = UnitUtility.GetSkinId(prefab, 3);
+            // }
             
             var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true, prefabOverride: prefabOverride);
             //}
