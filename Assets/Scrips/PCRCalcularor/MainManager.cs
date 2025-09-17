@@ -523,7 +523,7 @@ namespace PCRCaculator
                                 Task.WaitAll(
                                     Task.Run(() =>
                                     {
-                                        var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701).ToList();
+                                        var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
                                         databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
                                     }),
                                     Task.Run(() =>
