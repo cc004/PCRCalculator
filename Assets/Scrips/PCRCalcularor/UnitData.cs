@@ -898,7 +898,9 @@ namespace PCRCaculator
 
         public string TalentLevelDescribe()
         {
-           List <int> talentIds = MainManager.Instance.GetTalentIds(this.unitId);
+            List <int> talentIds = MainManager.Instance.GetTalentIds(this.unitId);
+            if (talentIds.Count == 0)
+                return "无";
             string talentType = talentIds[0] switch
             {
                 1 => "火",
