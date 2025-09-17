@@ -525,6 +525,7 @@ namespace PCRCaculator
                                     {
                                         var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
                                         databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
+                                        databaseCache.unitRarityDic[170301] = databaseCache.unitRarityDic[105701];
                                     }),
                                     Task.Run(() =>
                                     {
