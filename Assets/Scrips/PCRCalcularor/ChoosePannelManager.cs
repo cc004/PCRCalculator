@@ -124,7 +124,7 @@ namespace PCRCaculator
 
             int total = MainManager.Instance.UnitRarityDic.Count;
             int cnt = 0;
-            int batchSize = 1; // 每帧加载多少个角色，可根据实际情况调整
+            int batchSize = 5; // 每帧加载多少个角色，可根据实际情况调整
 
             foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
             {
