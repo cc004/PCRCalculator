@@ -17,7 +17,7 @@ using PCRCaculator.Guild;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using ExcelHelper;
 namespace Elements.Battle
 {
 
@@ -434,6 +434,10 @@ namespace Elements.Battle
                     gaubOptimization.bestGenesTexts[i].text = string.Join("\n", raw);
                 }
             }
+            bool asmExportEnabled = ExcelHelper.ExcelHelper.AsmExportEnabled;
+            gaubOptimization.ubDelay.SetActive(asmExportEnabled);
+            gaubOptimization.considerSkill.SetActive(asmExportEnabled);
+            gaubOptimization.considerAll.SetActive(asmExportEnabled);
         }
         public void Exit()
         {

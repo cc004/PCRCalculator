@@ -223,7 +223,7 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10054200;
+            public long CharacterVersionJP = 10063800;
             public long BossVersionJP = 10054200;
             public long BossVersionCN = 0;
             public bool useQA = false;
