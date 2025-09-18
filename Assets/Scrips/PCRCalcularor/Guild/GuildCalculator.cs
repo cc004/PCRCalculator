@@ -377,7 +377,7 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic[unitid].Remove(changeData);
             }
         }
-        public void AppendChangeHP(int unitid, float currentHP, int hp, long damage, int frame, string describe, UnitCtrl source)
+        public void AppendChangeHP(int unitid, long currentHP, int hp, long damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             var sourceId = source?.UnitId ?? unitid;
@@ -395,7 +395,7 @@ namespace PCRCaculator.Guild
                 // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
             }
         }
-        public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
+        public void AppendChangeTP(int unitid, long currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
 
@@ -453,7 +453,7 @@ namespace PCRCaculator.Guild
                 playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame, damage));
             }
         }
-        public void AppendChangeBaseValue(int unitid, int valueType, double value, int currentFrame, string describe)
+        public void AppendChangeBaseValue(int unitid, int valueType, long value, int currentFrame, string describe)
         {
             if (BattleManager.Instance.skipping) return;
             if (bossId.Contains(unitid - unitid / 10 % 10 * 10))
@@ -768,7 +768,7 @@ namespace PCRCaculator.Guild
                 int unitid = unitCtrl.UnitId;
                 AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
                 AppendChangeHP(unitid, unitCtrl.Hp, (int)unitCtrl.MaxHp, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
-                AppendChangeTP(unitid, (float)unitCtrl.Energy, 5400, "时间耗尽");
+                AppendChangeTP(unitid, (long)unitCtrl.Energy, 5400, "时间耗尽");
                 if (allUnitAbnormalStateDic.TryGetValue(unitid, out var value))
                 {
                   foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
@@ -1066,13 +1066,10 @@ namespace PCRCaculator.Guild
         private string CreateExcelName()
         {
             string fileName = "";
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < players.Count; i++)
             {
-                if (playerIds.Count > i)
-                {
-                    int player = playerIds[i];
-                    fileName += MainManager.Instance.GetUnitNickName(player);
-                }
+                int player = playerIds[i];
+                fileName += MainManager.Instance.GetUnitNickName(player);
             }
             fileName += "-" + Mathf.RoundToInt(expectedDamage / 10000) + "w";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
@@ -1151,7 +1148,7 @@ namespace PCRCaculator.Guild
         public static List<ValueChangeData> CreateTotalChatData(List<ValueChangeData> data)
         {
             List<ValueChangeData> data0 = new List<ValueChangeData>();
-            double add = 0;
+            long add = 0;
             foreach (ValueChangeData value in data)
             {
                 add += value.yValue;
@@ -1691,7 +1688,7 @@ namespace PCRCaculator.Guild
     public class ValueChangeData : IValue
     {
         public int xValue { get; set; }
-        public double yValue { get; set; }
+        public long yValue { get; set; }
         float IValue.xValue => xValue / XScale;
         float IValue.yValue => (float)(yValue / YScale);
 
@@ -1707,7 +1704,7 @@ namespace PCRCaculator.Guild
         private double YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;
 
         public ValueChangeData() { }
-        public ValueChangeData(int x, double y)
+        public ValueChangeData(int x, long y)
         {
             xValue = x;
             yValue = y;
@@ -1715,7 +1712,7 @@ namespace PCRCaculator.Guild
         }
 
         public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
-        public ValueChangeData(int x, double y, int hp, string describe)
+        public ValueChangeData(int x, long y, int hp, string describe)
         {
             xValue = x;
             yValue = y;

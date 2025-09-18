@@ -4269,9 +4269,9 @@ this.updateCurColor();
             UnitCtrl LIMEKPEENOB = unitCtrl2;
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             Energy = energy;
-            SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
+            SemanOnTPChanged?.Invoke(UnitId, (long)Energy);
             if (!battleManager.skipping)
-                NoSkipOnTPChanged?.Invoke(UnitId,(float)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+                NoSkipOnTPChanged?.Invoke(UnitId,(long)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }

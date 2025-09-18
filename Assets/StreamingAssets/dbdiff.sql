@@ -10,3 +10,11 @@ INSERT OR IGNORE INTO "enemy_parameter" SELECT 400000004 as "enemy_id", "unit_id
 INSERT OR IGNORE INTO "enemy_parameter" SELECT 400000005 as "enemy_id", "unit_id", '发光蘑菇（部位5）' as "name", "level", "rarity", "promotion_level", "hp", "atk", "magic_str", "def", "magic_def", "physical_critical", "magic_critical", "wave_hp_recovery", "wave_energy_recovery", "dodge", "physical_penetrate", "magic_penetrate", "life_steal", "hp_recovery_rate", "energy_recovery_rate", "energy_reduce_rate", "union_burst_level", "main_skill_lv_1", "main_skill_lv_2", "main_skill_lv_3", "main_skill_lv_4", "main_skill_lv_5", "main_skill_lv_6", "main_skill_lv_7", "main_skill_lv_8", "main_skill_lv_9", "main_skill_lv_10", "ex_skill_lv_1", "ex_skill_lv_2", "ex_skill_lv_3", "ex_skill_lv_4", "ex_skill_lv_5", "resist_status_id", "resist_variation_id", "accuracy", "unique_equipment_flag_1", "break_durability", "virtual_hp" FROM "enemy_parameter" WHERE "enemy_id" == 100000001;
 INSERT OR IGNORE INTO "enemy_parameter" SELECT 400000006 as "enemy_id", "unit_id", '发光蘑菇（部位6）' as "name", "level", "rarity", "promotion_level", "hp", "atk", "magic_str", "def", "magic_def", "physical_critical", "magic_critical", "wave_hp_recovery", "wave_energy_recovery", "dodge", "physical_penetrate", "magic_penetrate", "life_steal", "hp_recovery_rate", "energy_recovery_rate", "energy_reduce_rate", "union_burst_level", "main_skill_lv_1", "main_skill_lv_2", "main_skill_lv_3", "main_skill_lv_4", "main_skill_lv_5", "main_skill_lv_6", "main_skill_lv_7", "main_skill_lv_8", "main_skill_lv_9", "main_skill_lv_10", "ex_skill_lv_1", "ex_skill_lv_2", "ex_skill_lv_3", "ex_skill_lv_4", "ex_skill_lv_5", "resist_status_id", "resist_variation_id", "accuracy", "unique_equipment_flag_1", "break_durability", "virtual_hp" FROM "enemy_parameter" WHERE "enemy_id" == 100000001;
 UPDATE "main"."clan_battle_2_map_data" SET "clan_battle_id" = "clan_battle_id" - 1 WHERE "clan_battle_id" > 1062;
+CREATE TABLE IF NOT EXISTS unit_talent (
+  setting_id INTEGER NOT NULL, 
+  unit_id INTEGER NOT NULL, 
+  talent_id INTEGER NOT NULL, 
+  PRIMARY KEY(setting_id)
+);
+INSERT OR IGNORE INTO "main"."unit_talent" ("setting_id", "unit_id", "talent_id") VALUES (17030101, 170301, 4);
+INSERT OR IGNORE INTO "main"."unit_talent" ("setting_id", "unit_id", "talent_id") VALUES (10570101, 105701, 4);

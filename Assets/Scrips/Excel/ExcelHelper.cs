@@ -1580,7 +1580,7 @@ namespace ExcelHelper
                     {
                         foreach(var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:(int)data1.yValue, realFrameCount: data1.realFrameCount));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:(long)data1.yValue, realFrameCount: data1.realFrameCount));
                         }
                         idx++;
                     }
@@ -1819,12 +1819,12 @@ namespace ExcelHelper
         public int frame;
         public int unitid;
         public int idx;
-        public int valueA;
+        public long valueA;
         public double valueB;
         public string describeA;
         public string describeB;
         public int realFrameCount;
-        public TimeLineDataA(int frame, int unitid,int idx, string describeA, string describeB,int valueA = 0,double valueB = 0,int realFrameCount=0)
+        public TimeLineDataA(int frame, int unitid,int idx, string describeA, string describeB,long valueA = 0,double valueB = 0,int realFrameCount=0)
         {
             this.frame = frame;
             this.unitid = unitid;

@@ -35,8 +35,8 @@ namespace Elements
         public Action<int,ActionState, int,string, UnitCtrl> NoSkipOnChangeState;
         public Action<int,ActionState> SemanOnChangeState;
         public Action<int, UnitAbnormalStateChangeData, int> NoSkipOnAbnormalStateChange;
-        public Action<int,float,int, long, int,string, UnitCtrl> NoSkipOnLifeChanged;
-        public Action<int,float, int,string> NoSkipOnTPChanged;
+        public Action<int,long,int, long, int,string, UnitCtrl> NoSkipOnLifeChanged;
+        public Action<int,long, int,string> NoSkipOnTPChanged;
         public Action<int,float> SemanOnTPChanged;
         public Action<int, UnitSkillExecData> NoSkipOnStartAction;
         public Action<int, int> SemanOnStartAction;
