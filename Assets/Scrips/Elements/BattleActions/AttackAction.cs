@@ -30,7 +30,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           Action<string> action = null)
         {
             /*if (BattleHeaderController.CurrentFrameCount == 4846 && _source.UnitId == 107101)
@@ -55,7 +55,7 @@ namespace Elements
                 {
                     if (base.LimitDamageDictionaryAtk.ContainsKey(_target))
                     {
-                        base.LimitDamageDictionaryAtk[_target] = (long)Mathf.Min(_target.Owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.DAMAGE_LIMIT_ALL), base.LimitDamageDictionaryAtk[_target]);
+                        base.LimitDamageDictionaryAtk[_target] = (long)Math.Min(_target.Owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.DAMAGE_LIMIT_ALL), base.LimitDamageDictionaryAtk[_target]);
                     }
                     else
                     {
@@ -63,7 +63,7 @@ namespace Elements
                     }
                     if (base.LimitDamageDictionaryMgc.ContainsKey(_target))
                     {
-                        base.LimitDamageDictionaryMgc[_target] = (long)Mathf.Min(_target.Owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.DAMAGE_LIMIT_ALL), base.LimitDamageDictionaryMgc[_target]);
+                        base.LimitDamageDictionaryMgc[_target] = (long)Math.Min(_target.Owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.DAMAGE_LIMIT_ALL), base.LimitDamageDictionaryMgc[_target]);
                     }
                     else
                     {
@@ -78,7 +78,7 @@ namespace Elements
                 HitOnceKeyList.Add(_target);
             }
             bool flag = judgeMiss(_target, _source, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, actionDetail1);
-            if (flag && base.battleManager.FEDKJAIEDGI == 0f)
+            if (flag && base.battleManager.DodgeTPRecoverRatio == 0)
             {
                 //add scripts
                 string describe = "MISS";
@@ -105,11 +105,11 @@ namespace Elements
             {
                 bool isDamagedEnergyCalculationChanged = MainManager.Instance.PlayerSetting.tpCalculationChanged;
 
-                FloatWithEx num1 = 0;
+                LongWithEx num1 = 0;
                 List<CriticalData> criticalDataList = new List<CriticalData>();
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
                 {
-                    float criticalRate = damageData.CriticalRate;
+                    double criticalRate = damageData.CriticalRate;
                     if ((double) x == index + 1 || x < 0)
                     {
                         criticalRate = 1f;
@@ -132,31 +132,27 @@ namespace Elements
                         num2 = fix;
                     }
 
-                    criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.FloatToInt(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
+                    criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.DoubleToLong(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
 
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
                     if (_valueDictionary[eValueNumber.VALUE_5] == (float) (index + 1))
                     {
-                        criticalData.critVar = 1f;
+                        criticalData.critVar = 1.0;
                         criticalData.IsCritical = true;
                     }
                     else if (damageData.CriticalDamageRate != 0.0 && damageData.CriticalRateForLogBarrier != 0f)
                     {
                         if (num2 <= criticalRate)
                             criticalData.IsCritical = true;
-                        criticalData.critVar = FloatWithEx.Binomial(criticalRate, criticalData.IsCritical,
+                        criticalData.critVar = DoubleWithEx.Binomial(criticalRate, criticalData.IsCritical,
                             $"rnd:{data.id}:{(int) (criticalRate * 1000)}", data.id);
                     }
                     else
-                        criticalData.critVar = 0f;
+                        criticalData.critVar = 0.0;
 
-                    criticalData.ExpectedDamage *= 1f + criticalData.critVar * (2f * damageData.CriticalDamageRate - 1);
+                    criticalData.ExpectedDamage = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamage * (1 + criticalData.critVar * (2.0 * damageData.CriticalDamageRate - 1)));
 
-                    criticalData.ExpectedDamage = BattleUtil.FloatToInt(criticalData.ExpectedDamage);
-
-                    criticalData.ExpectedDamageForEnergyCalc *= 1f + criticalData.critVar * (2f * damageData.CriticalDamageRate - 1);
-
-                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.FloatToInt(criticalData.ExpectedDamageForEnergyCalc);
+                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1 + criticalData.critVar * (2.0 * damageData.CriticalDamageRate - 1)));
 
                     if (!damageData.IgnoreDef)
                     {
@@ -165,24 +161,24 @@ namespace Elements
                             case DamageData.eDamageType.ATK:
                                 var defZero = damageData.Target.GetDefZero();
                                 var num3 = (defZero - damageData.DefPenetrate).Max(0);
-                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num3 / (defZero + 100.0f))).Floor();
+                                criticalData.ExpectedDamage = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamage * (1.0 - (DoubleWithEx)num3 / (defZero + 100.0)));
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num3 / (defZero + 100f))).Floor();
 
                                 if (!isDamagedEnergyCalculationChanged)
                                 {
-                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num3 / (defZero + 100.0f))).Floor();
+                                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num3 / (defZero + 100.0)));
                                 }
 
                                 break;
                             case DamageData.eDamageType.MGC:
                                 var magicDefZero = damageData.Target.GetMagicDefZero();
                                 var num4 = (magicDefZero - damageData.DefPenetrate).Max(0);
-                                criticalData.ExpectedDamage = (criticalData.ExpectedDamage * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
+                                criticalData.ExpectedDamage = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamage * (1.0 - (DoubleWithEx)num4 / (magicDefZero + 100.0)));
                                 //criticalData.ExpectedDamageNotCritical = (criticalData.ExpectedDamageNotCritical * (1f - num4 / (magicDefZero + 100f))).Floor();
 
                                 if (!isDamagedEnergyCalculationChanged)
                                 {
-                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
+                                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num4 / (magicDefZero + 100.0)));
                                 }
 
                                 break;
@@ -195,19 +191,33 @@ namespace Elements
                                 case DamageData.eDamageType.ATK:
                                     var defZero = damageData.Target.GetDefZeroForDamagedEnergy();
                                     var num3 = (defZero - damageData.DefPenetrate).Max(0);
-                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num3 / (defZero + 100.0f))).Floor();
+                                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num3 / (defZero + 100.0)));
 
                                     break;
                                 case DamageData.eDamageType.MGC:
                                     var magicDefZero = damageData.Target.GetMagicDefZeroForDamagedEnergy();
                                     var num4 = (magicDefZero - damageData.DefPenetrate).Max(0);
 
-                                    criticalData.ExpectedDamageForEnergyCalc = (criticalData.ExpectedDamageForEnergyCalc * (1.0f - num4 / (magicDefZero + 100.0f))).Floor();
+                                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * (1.0 - (DoubleWithEx)num4 / (magicDefZero + 100.0)));
 
                                     break;
                             }
                         }
                     }
+
+                    var unit = damageData.Source;
+                    if (damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
+                        unit = damageData.StrikeBackSource;
+                    var talentDamageRate = _target.Owner.CalcTalentDamageRate(
+                        damageData.ActionType,
+                        unit,
+                        damageData.Target,
+                        damageData.TargetIncludeMyTeam, 
+                        damageData.IgnoreTalentBonusForRatioSlip,
+                        out bool isNoDamageByResist
+                    );
+                    criticalData.ExpectedDamage = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamage * talentDamageRate);
+                    criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * talentDamageRate);
                     criticalData.CriticalRate = damageData.CriticalDamageRate;
                     num1 += criticalData.ExpectedDamage;
                     criticalDataList.Add(criticalData);
@@ -225,7 +235,7 @@ namespace Elements
             damageData.TotalDamageForLogBarrier = TotalDamageDictionary[_target];
             if (flag)
             {
-                _target.Owner.RecoverDodgeTP(damageData.DamageType, (int)damageData.Damage, damageData.ActionType, (int)base.CriticalDataDictionary[_target][_num].ExpectedDamageNotCritical, (int)damageData.TotalDamageForLogBarrier, damageData.Source, damageData.IgnoreDef, damageData.Target, damageData.DefPenetrate, null, _skill, EnergyChargeMultiple);
+                _target.Owner.RecoverDodgeTP(damageData.DamageType, (int)damageData.Damage, damageData.ActionType, false, (int)base.CriticalDataDictionary[_target][_num].ExpectedDamageNotCritical, (int)damageData.TotalDamageForLogBarrier, damageData.Source, damageData.IgnoreDef, damageData.Target, damageData.DefPenetrate, null, _skill, EnergyChargeMultiple);
                 return;
             }
 
@@ -238,7 +248,7 @@ namespace Elements
             //_target.ShowHitEffect(_source.ToadDatas.Count > 0 ? _skill.WeaponType : _source.WeaponSeType, _skill, _source.IsLeftDir);
         }
 
-    protected override float getCriticalDamageRate(Dictionary<eValueNumber, FloatWithEx> _valueDictionary) =>  _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : (float)_valueDictionary[eValueNumber.VALUE_6];
+    protected override double getCriticalDamageRate(Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) =>  _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : _valueDictionary[eValueNumber.VALUE_6];
 
     public override void SetLevel(float _level)
     {
@@ -246,7 +256,7 @@ namespace Elements
       Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
       Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
-        protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
+        protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
         {
             DamageData damageData = base.createDamageData(_source, _target, _num, _valueDictionary, _actionDetail1, _isCritical, _skill, _actionTypeForSource, _isPhysicalForTarget);
             int num = (int)_valueDictionary[eValueNumber.VALUE_7];

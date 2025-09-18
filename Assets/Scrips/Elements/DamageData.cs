@@ -13,17 +13,27 @@ namespace Elements
   public class DamageData
   {
     public eDamageSoundType DamageSoundType { get; set; }
-    public FloatWithEx critVar;
+    public DoubleWithEx critVar;
     public BasePartsData Target { get; set; }
 
-    public FloatWithEx TotalDamageForLogBarrier { get; set; }
+    public LongWithEx TotalDamageForLogBarrier { get; set; }
 
     public bool IsLogBarrierCritical { get; set; }
 
-    public FloatWithEx LogBarrierExpectedDamage { get; set; }
-        public FloatWithEx LogBarrierExpectedDamageForEnergyCalc { get; set; }
+    public bool TargetIncludeMyTeam { get; set; }
 
-    public FloatWithEx Damage { get; set; }
+    public bool IgnoreTalentBonusForRatioSlip { get; set; }
+
+    public long OverrideDamageLimit { get; set; } = -1;
+
+    public bool IgnoreStrikeBackAndAllUnitDamageCutTrigger { get; set; }
+    public bool IgnoreLogBarrier { get; set; }
+
+    public LongWithEx LogBarrierExpectedDamage { get; set; }
+
+    public LongWithEx LogBarrierExpectedDamageForEnergyCalc { get; set; }
+
+    public LongWithEx Damage { get; set; }
 
     public UnitCtrl Source { get; set; }
         public UnitCtrl StrikeBackSource
@@ -41,7 +51,7 @@ namespace Elements
 
     public eDamageEffectType DamegeEffectType { get; set; }
 
-    public int DefPenetrate { get; set; }
+    public long DefPenetrate { get; set; }
 
     public eActionType ActionType { get; set; }
 
@@ -49,15 +59,15 @@ namespace Elements
 
     public bool IsDivisionDamage { get; set; }
 
-    public int LifeSteal { get; set; }
-        public Func<float, float> LimitDamageFunc
-        {
-            get;
-            set;
-        }
-        public bool IsSlipDamage { get; set; }
+    public long LifeSteal { get; set; }
+    public Func<double, double> LimitDamageFunc
+    {
+        get;
+        set;
+    }
+    public bool IsSlipDamage { get; set; }
 
-    public float CriticalDamageRate { get; set; }
+    public double CriticalDamageRate { get; set; }
 
     public bool DamageNumMagic { get; set; }
 

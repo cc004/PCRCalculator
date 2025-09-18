@@ -16,15 +16,15 @@ namespace Elements
 			PARTS
 		}
 
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			switch (base.ActionDetail1)
 			{
 				case 1:
-					_target.Owner.BossPartsListForBattle.Find((PartsData e) => e.Index == base.ActionDetail2).BodyWidthValue = _valueDictionary[eValueNumber.VALUE_1];
+					_target.Owner.BossPartsListForBattle.Find((PartsData e) => e.Index == base.ActionDetail2).BodyWidthValue = (float)_valueDictionary[eValueNumber.VALUE_1];
 					break;
 				case 0:
-					_target.Owner.BodyWidth = _valueDictionary[eValueNumber.VALUE_1];
+					_target.Owner.BodyWidth = (float)_valueDictionary[eValueNumber.VALUE_1];
 					break;
             }
             battleManager.QueueUpdateSkillTarget();

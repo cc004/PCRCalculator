@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using Elements.Battle;
 using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
+using PCRCaculator.SQL;
 using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,6 +31,7 @@ namespace Elements
         public TempData tempData;
         public List<UnitCtrl> playerUnitCtrl;
         public List<UnitCtrl> enemyUnitCtrl;
+        public List<UnitCtrl> extraEffectEnemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
 
         private int finishCount;
@@ -59,10 +62,42 @@ namespace Elements
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
+
+        public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
+        {
+            Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
+            int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;
+            int content_type = 0;
+            if (enemy_id >= 800000000)
+            {
+                content_type = (int)eBattleCategory.TALENT_QUEST;
+                enemy_id = GuildManager.Instance.TalentQuestWaveGroupId; // TODO move in tempData
+            }
+            else if (enemy_id >= 500000000)
+            {
+                content_type = (int)eBattleCategory.DUNGEON;
+                // TODO use quest
+            }
+            else if (enemy_id >= 400000000)
+            {
+                content_type = (int)eBattleCategory.CLAN_BATTLE;
+            }
+            foreach (var i in extra_effect_enemy.Keys)
+            {
+                var extraEffect = extra_effect_enemy[i];
+                if (extraEffect != null && (extraEffect.target_value_1 == enemy_id || extraEffect.extra_effect_id == enemy_id) && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
+                {
+                    return extraEffect;
+                }
+            }
+            return null;
+        }
+
+        
         private void Start()
         {
             staticBattleManager = BattleManager.Instance;
-            if(MainManager.Instance == null)
+            if (MainManager.Instance == null)
             {
                 return;
             }
@@ -75,6 +110,27 @@ namespace Elements
             if (mainManager.IsGuildBattle)
             {
                 tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
+                tempData.extra_effect_cnt = 0;
+                var extra_data = GetExtraEffectEnemyData(tempData);
+                if (extra_data != null)
+                {
+                    foreach (var enemy in extra_data.enemy_ids)
+                    {
+                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else
+                            Debug.LogError("找不到增援敌人ID " + enemy);
+                    }
+                }
+
                 tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
                 tempData.mParts = mainManager.GuildBattleData.mParts;
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
@@ -128,6 +184,33 @@ namespace Elements
                 if (mainManager.IsGuildBattle)
                 {
                     tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
+
+                    var extra_data = GetExtraEffectEnemyData(tempData);
+                    tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
+                    if (extra_data != null)
+                    {
+                        foreach (var enemy in extra_data.enemy_ids)
+                        {
+                            if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
+                            {
+                                if (!tempData.guildEnemy.Contains(GuildManager.EnemyDataDic[enemy]))
+                                {
+                                    tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                                }
+
+                            }
+                            else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
+                            {
+                                if (!tempData.guildEnemy.Contains(GuildManager.TalentQuestEnemyParameterDic[enemy]))
+                                {
+                                    tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                                }
+                            }
+                            else
+                                Debug.LogError("找不到环境Buff ID " + enemy);
+                        }
+                    }
+
                     tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
                     tempData.mParts = mainManager.GuildBattleData.mParts;
                     tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
@@ -207,6 +290,16 @@ namespace Elements
                 {
                     var unitData = enemy.CreateUnitData();
                     LoadCharacter(unitData, idx, false, action);
+                    idx++;
+                }
+
+                int ed = enemyUnitCtrl.Count - tempData.extra_effect_cnt;
+                extraEffectEnemyUnitCtrl.Clear();
+                for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
+                {
+                    enemyUnitCtrl[i].UnitName = $"环境Buff{extraEffectEnemyUnitCtrl.Count + 1}";
+                    extraEffectEnemyUnitCtrl.Add(enemyUnitCtrl[i]);
+                    enemyUnitCtrl.RemoveAt(i);
                 }
             }
             else
@@ -241,7 +334,7 @@ namespace Elements
             BattleUIManager.Instance.SetUI_2(this);
             if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
-                GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
+                GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl.ToList());
                 BattleManager.Instance.semanubmanager.SetUnitCallBack(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
             }
 
@@ -249,6 +342,7 @@ namespace Elements
                 SetBattleSpeed(tempData.SettingData.calSpeed);
             else
                 SetBattleSpeed(1);
+            BattleUIManager.Instance.SetTalentBonus();
         }
         public static void SetSummonUI(UnitCtrl summon)
         {
@@ -283,7 +377,7 @@ namespace Elements
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
             //if(dataAsset == null)
             //{
-            int skinID = UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */);
+            int skinID = UnitUtility.GetSkinId(data.PrefabId, 3 /* force use 3x skin */);
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
             
@@ -292,11 +386,14 @@ namespace Elements
                 skinID = 170361;
                 unitid2 = 170301;
             }
-
-            if (prefab != 0)
+            if (unitid > 600000 && unitid < 700000)
             {
-                prefabOverride = UnitUtility.GetSkinId(prefab, 3);
+                unitid2 = data.PrefabId;
             }
+            // if (prefab != 0)
+            // {
+            //     prefabOverride = UnitUtility.GetSkinId(prefab, 3);
+            // }
             
             var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true, prefabOverride: prefabOverride);
             //}
@@ -334,7 +431,7 @@ namespace Elements
             //battleProcessor.AddUnitSkillUseCount(ref unitCtrl.SkillUseCount, pPararm.MasterData.PrefabId);
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
-            unitCtrl.Initialize(unitParameter,unitData ,false, true);
+            unitCtrl.Initialize(unitParameter, unitData, isplayer ? MainManager.Instance.TeamEnhanceData : null, false, true); // TODO hush add _teamEnhanceParameter
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
             //if (!IsAutoMode && isplayer)
@@ -343,7 +440,7 @@ namespace Elements
             //}
 
         }
-        private IEnumerator LoadCharacterPrefab(PCRCaculator.UnitData data,int idx,bool isplayer,Action finishAction )
+        private IEnumerator LoadCharacterPrefab(PCRCaculator.UnitData data,int idx,bool isplayer,Action finishAction)
         {
             //yield return new WaitForSeconds(5f);
             int unitid = data.unitId;
@@ -424,7 +521,7 @@ namespace Elements
             }
             if (tempData.isGuildBattle && !isplayer)
             {
-                unitCtrl.UnitName = tempData.guildEnemy.FirstOrDefault(e => e.unit_id == unitCtrl.UnitId)?.name ??
+                unitCtrl.UnitName = tempData.guildEnemy.FirstOrDefault(e => e.enemy_id == unitCtrl.enemyId)?.name ??
                                     "BOSS";
             }
             else
@@ -454,14 +551,13 @@ namespace Elements
         public UnitCtrl LoadSummonPrefabImmediately(SummonData summonData)
         {
             int unitid = summonData.SummonId;
+            int prefab = ABExTool.GetPrefabId(unitid);
             if (unitid >= 999999)
                 unitid = GuildManager.EnemyDataDic[unitid].unit_id;
-            var a = ABExTool.LoadUnitPrefab(unitid);
+            var a = ABExTool.LoadUnitPrefab(prefab);
             if (a == null)
             {
-                unitid = unitid / 100 * 100;
-                GuildManager.EnemyDataDic[summonData.SummonId].unit_id = unitid;
-                a = ABExTool.LoadUnitPrefab(unitid);
+                Debug.LogError("召唤物" + unitid + "的预制体丢失！");
             }
             GameObject b = Instantiate(a);
             b.transform.SetParent(unitParent);
@@ -486,9 +582,9 @@ namespace Elements
           Action<BattleSpineController> _callback = null)
         {
             int unitid = summonData.SummonId;
+            int prefabID = ABExTool.GetPrefabId(unitid);
             if (unitid >= 999999)
                 unitid = GuildManager.EnemyDataDic[unitid].unit_id;
-            int prefabID = ABExTool.GetPrefabId(unitid);
             //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
             //if (dataAsset == null)
@@ -691,6 +787,7 @@ namespace Elements
         public List<PCRCaculator.UnitData> playerList;
         public List<PCRCaculator.UnitData> enemyList;
         public List<EnemyData> guildEnemy;
+        public int extra_effect_cnt = 0;
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         //public bool UseFixedRandomSeed;
@@ -738,15 +835,28 @@ namespace Elements
             int[] skillLvEv = unitData.GetEvlotionSkillLv();
             UnitDetailData detailData = rarityData.detailData;
             return new UnitParameter(
-                new UnitData(unitData.unitId, new DateTime(), 1, unitData.rarity, unitData.rarity, unitData.level, 0, ePromotionLevel.Bronze,
-                    new List<SkillLevelInfo> { new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0), new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0) },
+                new UnitData(
+                    unitData.unitId,
+                    new DateTime(),
+                    1,
+                    unitData.rarity,
+                    unitData.rarity,
+                    unitData.level,
+                    0,
+                    ePromotionLevel.Bronze,
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0),
+                        new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0)
+                    },
                     new List<SkillLevelInfo> { 
                         new SkillLevelInfo(skillData.skill_1, unitData.rank < 2 ? 0 : unitData.skillLevel[1], 0), 
                         new SkillLevelInfo(skillData.skill_2, unitData.rank < 4 ? 0 : unitData.skillLevel[2], 0) ,
                         new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0), 
                         new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0)
                     },
-                    new List<SkillLevelInfo> { new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0) },
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0)
+                    },
                     new List<SkillLevelInfo>(), 0),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(unitData.unitId, detailData.name, "?", unitData.unitId, 0, detailData.minrarity, detailData.motionType, detailData.seType,
@@ -787,32 +897,79 @@ namespace Elements
         public static UnitParameter CreateUnitParameter(EnemyData enemyData, GuildPlayerGroupData.LogBarrierType useLogBarrier)
         {
             List<SkillLevelInfo> mainSkillLevelInfo = new List<SkillLevelInfo>();
+            List<SkillLevelInfo> exSkillLevelInfo = new List<SkillLevelInfo>();
             for(int i = 0; i < enemyData.main_skill_lvs.Count; i++)
             {
                 mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.MainSkills[i], enemyData.main_skill_lvs[i], 0));
             }
+            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_1, enemyData.main_skill_lvs[0], 0));
+            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_2, enemyData.main_skill_lvs[1], 0));
+
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_1, enemyData.ex_skill_lvs[0], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_2, enemyData.ex_skill_lvs[1], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_3, enemyData.ex_skill_lvs[2], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_4, enemyData.ex_skill_lvs[3], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_5, enemyData.ex_skill_lvs[4], 0));
+
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_1, enemyData.ex_skill_lvs[0], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_2, enemyData.ex_skill_lvs[1], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_3, enemyData.ex_skill_lvs[2], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_4, enemyData.ex_skill_lvs[3], 0));
+            exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_evolution_5, enemyData.ex_skill_lvs[4], 0));
+
             return new UnitParameter(
-                new UnitData(enemyData.unit_id, new DateTime(), 1, enemyData.rarity, enemyData.rarity, enemyData.level, 0, ePromotionLevel.Bronze,
-                    new List<SkillLevelInfo> { new SkillLevelInfo(enemyData.skillData.UB, enemyData.union_burst_level, 0) },
-                     mainSkillLevelInfo,       
-                     new List<SkillLevelInfo>(),
+                new UnitData(
+                    enemyData.unit_id,
+                    new DateTime(),
+                    1,
+                    enemyData.rarity,
+                    enemyData.rarity,
+                    enemyData.level,
+                    0,
+                    ePromotionLevel.Bronze,
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(enemyData.skillData.UB, enemyData.union_burst_level, 0),
+                        new SkillLevelInfo(enemyData.skillData.raw_data.union_burst_evolution, enemyData.union_burst_level, 0)
+                    },
+                    mainSkillLevelInfo,
+                    exSkillLevelInfo,
                     new List<SkillLevelInfo>(),
-                    enemyData.resist_status_id),
+                    enemyData.resist_status_id
+                ),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(enemyData.unit_id, enemyData.detailData.unit_name, "?", enemyData.detailData.unit_id, 0, 1, enemyData.detailData.motion_type, enemyData.detailData.se_type,
                 enemyData.detailData.move_speed, enemyData.detailData.search_area_width, enemyData.detailData.atk_type, enemyData.detailData.normal_atk_cast_time),
-                new MasterUnitSkillData.UnitSkillData(unit_id: enemyData.unit_id, union_burst: enemyData.skillData.UB,
-                main_skill_1: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[0],useLogBarrier),
-                main_skill_2: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[1], useLogBarrier),
-                main_skill_3: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[2], useLogBarrier),
-                main_skill_4: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[3], useLogBarrier),
-                main_skill_5: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[4], useLogBarrier),
-                main_skill_6: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[5], useLogBarrier),
-                main_skill_7: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[6], useLogBarrier),
-                main_skill_8: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[7], useLogBarrier),
-                main_skill_9: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[8], useLogBarrier),
-                main_skill_10: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[9], useLogBarrier)
-                ),enemyData);
+                new MasterUnitSkillData.UnitSkillData(
+                    unit_id: enemyData.unit_id,
+                    union_burst: enemyData.skillData.UB,
+                    main_skill_1: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[0], useLogBarrier),
+                    main_skill_2: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[1], useLogBarrier),
+                    main_skill_3: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[2], useLogBarrier),
+                    main_skill_4: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[3], useLogBarrier),
+                    main_skill_5: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[4], useLogBarrier),
+                    main_skill_6: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[5], useLogBarrier),
+                    main_skill_7: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[6], useLogBarrier),
+                    main_skill_8: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[7], useLogBarrier),
+                    main_skill_9: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[8], useLogBarrier),
+                    main_skill_10: JudgeAndSetSkillByID(enemyData.skillData.MainSkills[9], useLogBarrier),
+                    ex_skill_1: enemyData.skillData.raw_data.ex_skill_1,
+                    ex_skill_2: enemyData.skillData.raw_data.ex_skill_2,
+                    ex_skill_3: enemyData.skillData.raw_data.ex_skill_3,
+                    ex_skill_4: enemyData.skillData.raw_data.ex_skill_4,
+                    ex_skill_5: enemyData.skillData.raw_data.ex_skill_5,
+                    sp_skill_1: enemyData.skillData.raw_data.sp_skill_1,
+                    sp_skill_2: enemyData.skillData.raw_data.sp_skill_2,
+                    sp_skill_3: enemyData.skillData.raw_data.sp_skill_3,
+                    sp_skill_4: enemyData.skillData.raw_data.sp_skill_4,
+                    sp_skill_5: enemyData.skillData.raw_data.sp_skill_5,
+                    sp_skill_evolution_1: enemyData.skillData.raw_data.sp_skill_evolution_1,
+                    sp_skill_evolution_2: enemyData.skillData.raw_data.sp_skill_evolution_2,
+                    union_burst_evolution: enemyData.skillData.raw_data.union_burst_evolution,
+                    main_skill_evolution_1: enemyData.skillData.raw_data.main_skill_evolution_1,
+                    main_skill_evolution_2: enemyData.skillData.raw_data.main_skill_evolution_2,
+                    ex_skill_evolution_1: enemyData.skillData.raw_data.ex_skill_evolution_1,
+                    sp_union_burst: enemyData.skillData.raw_data.sp_union_burst)
+                , enemyData);
         }
         private static int JudgeAndSetSkillByID(int skillid, GuildPlayerGroupData.LogBarrierType enableLogBarrier)
         {

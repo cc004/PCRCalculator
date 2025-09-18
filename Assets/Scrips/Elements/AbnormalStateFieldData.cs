@@ -28,21 +28,21 @@ namespace Elements
     {
     }
 
-    public override void OnExit(BasePartsData _parts)
+    public override void OnExit(BasePartsData _parts, UnitCtrl _source)
     {
-      base.OnExit(_parts);
+      base.OnExit(_parts, _source);
       TargetAction.ResetHitData();
       _parts.Owner.DisableAbnormalStateById(TargetAction.AbnormalStateFieldAction.TargetAbnormalState, TargetAction.ActionId, false);
     }
 
-    public override void OnEnter(BasePartsData _parts)
+    public override void OnEnter(BasePartsData _parts, UnitCtrl _source)
     {
       UnitCtrl owner = _parts.Owner;
             if (this.TargetAction.ActionType == eActionType.CHANGE_SPEED && (this.TargetAction.ActionDetail1 == 1 || this.TargetAction.ActionDetail1 == 2) && owner.OverwriteSpeedDataCount > 0)
             {
                 return;
             }
-            base.OnEnter(_parts);
+            base.OnEnter(_parts, _source);
       if (_parts.Owner.IsSummonOrPhantom)
         TargetAction.AppendTargetNum(_parts.Owner, 0);
       SourceActionController.ExecAction(TargetAction, PMHDBOJMEAD, _parts, 0, 0.0f);

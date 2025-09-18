@@ -8,7 +8,7 @@ namespace Elements
     public class ChangeSpeedOverwriteFieldAction : ActionParameter
 	{
 		// Token: 0x06003D80 RID: 15744 RVA: 0x00101774 File Offset: 0x00101774
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			GameObject uniqueEffectPrefab = null;
@@ -24,15 +24,15 @@ namespace Elements
 			{
 				KNLCAOOKHPP = eFieldType.HEAL,
 				HKDBJHAIOMB = eFieldExecType.NORMAL,
-				StayTime = _valueDictionary[eValueNumber.VALUE_3],
+				StayTime = (float)_valueDictionary[eValueNumber.VALUE_3],
 				CenterX = _target.GetLocalPosition().x + base.Position,
-				Size = _valueDictionary[eValueNumber.VALUE_5],
+				Size = (float)_valueDictionary[eValueNumber.VALUE_5],
 				LCHLGLAFJED = ((_source.IsOther == (eOverwriteAbnormalState == UnitCtrl.eOverwriteAbnormalState.HASTE)) ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER),
 				EGEPDDJBILL = ((_skill.BlackOutTime > 0f) ? _source : null),
 				AbnormalState = eOverwriteAbnormalState,
 				TargetList = new List<BasePartsData>(),
                 TargetSet = new HashSet<BasePartsData>(),
-                EffectValue = base.Value[eValueNumber.VALUE_1],
+                EffectValue = (float)base.Value[eValueNumber.VALUE_1],
 				PPOJKIDHGNJ = _source,
 				PMHDBOJMEAD = _skill,
 				ActionParameter = this,

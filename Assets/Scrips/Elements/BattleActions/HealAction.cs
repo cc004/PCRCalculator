@@ -32,7 +32,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
       Action<string> action = null)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -41,14 +41,14 @@ namespace Elements
       switch ((eValueType)(float)_valueDictionary[eValueNumber.VALUE_1])
       {
         case eValueType.FIXED:
-          int num2 = _source.IsPartsBoss ? (flag ? parts.GetAtkZero() : parts.GetMagicStrZero()) : (int) (flag ? _source.AtkZero : _source.MagicStrZero);
+          long num2 = _source.IsPartsBoss ? (flag ? parts.GetAtkZero() : parts.GetMagicStrZero()) : (int) (flag ? _source.AtkZero : _source.MagicStrZero);
           num1 = (int) _valueDictionary[eValueNumber.VALUE_2] + (int) (num2 * (double) _valueDictionary[eValueNumber.VALUE_4]);
           break;
         case eValueType.PERCENTAGE:
           num1 = (int) (_target.Owner.MaxHp * (double) _valueDictionary[eValueNumber.VALUE_2] / 100.0);
           break;
       }
-      int num3 = (int) ((int) (num1 * ((_source.IsPartsBoss ? parts.GetHpRecoverRateZero() : (double) (int) _source.HpRecoveryRateZero) + 100.0) / 100.0) / ExecTime.Length * (double) _skill.AweValue);
+      long num3 = (long) ((int) (num1 * ((_source.IsPartsBoss ? parts.GetHpRecoverRateZero() : (double) (int) _source.HpRecoveryRateZero) + 100.0) / 100.0) / ExecTime.Length * (double) _skill.AweValue);
             //_target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, this.EffectType == eEffectType.COMMON, _target: _target,action:action);
             _target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
 

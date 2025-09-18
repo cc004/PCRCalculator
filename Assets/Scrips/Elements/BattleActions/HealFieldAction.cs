@@ -30,16 +30,16 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      float num = ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);
+      double num = ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);
       HealFieldData healFieldData = new HealFieldData();
       healFieldData.KNLCAOOKHPP = eFieldType.HEAL;
       healFieldData.HKDBJHAIOMB = ActionDetail1 > 2 ? eFieldExecType.REPEAT : eFieldExecType.NORMAL;
-      healFieldData.StayTime = _valueDictionary[eValueNumber.VALUE_5];
+      healFieldData.StayTime = (float)_valueDictionary[eValueNumber.VALUE_5];
       healFieldData.CenterX = _target.GetLocalPosition().x + Position;
-      healFieldData.Size = _valueDictionary[eValueNumber.VALUE_7];
+      healFieldData.Size = (float)_valueDictionary[eValueNumber.VALUE_7];
       healFieldData.LCHLGLAFJED = _source.IsOther ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER;
       healFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
       healFieldData.ValueType = (HealFieldData.eValueType) ActionDetail2;

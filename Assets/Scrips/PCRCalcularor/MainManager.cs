@@ -24,7 +24,8 @@ using CompressionLevel = System.IO.Compression.CompressionLevel;
 using Object = UnityEngine.Object;
 using PCRCaculator.Update;
 using UnityEngine.Networking;
-
+using System.Reflection;
+using Elements;
 namespace PCRCaculator
 {
     public class MainManager : MonoBehaviour
@@ -45,39 +46,60 @@ namespace PCRCaculator
         //public int loadCharacterMax;//最多加载到的角色序号
         public int levelMax { get => playerSetting.playerLevel; }
         public bool UseNewBattleSystem = true;
-        public bool useJapanData;
+        public bool useJapanData {get => Version.useJP;}
         public bool useVerification;
         public LoginTool loginTool;
 
+        public DatabaseCache databaseCache = new DatabaseCache();
+
+        public class DatabaseCache
+        {
+            public Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
+            public Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
+            public Dictionary<int, List<extra_effect_unit_group>> extraEffectUnitGroupDic = new Dictionary<int, List<extra_effect_unit_group>>();//特别角色组(技能角色存在判断)
+            public Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
+            public Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
+            public Dictionary<int, Dictionary<int, promotion_bonus>> rbs = new Dictionary<int, Dictionary<int, promotion_bonus>>();
+            public List<EReduction> ereductionTable = new List<EReduction>();
+            public Dictionary<int, talent_quest_battle_effect> talentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
+            public Dictionary<int, extra_effect_data> extraEffectDataDic = new Dictionary<int, extra_effect_data>();
+            public Dictionary<int, talentFormationData> talentFormationDic = new Dictionary<int, talentFormationData>();
+            public Dictionary<int, int[]> weaknessDic = new Dictionary<int, int[]>();//角色的弱点列表
+            public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
+            public Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
+            public Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
+            public Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
+            public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();
+            public Dictionary<int, TeamSkillEnhanceData> teamSkillEnhanceDataDic = new Dictionary<int, TeamSkillEnhanceData>();
+            public Dictionary<int, TeamSkillNode> teamSkillNodeDic = new Dictionary<int, TeamSkillNode>();
+            public Dictionary<int, TalentSkillEnhanceData> talentSkillEnhanceDataDic = new Dictionary<int, TalentSkillEnhanceData>();
+            public Dictionary<int, TalentSkillNode> talentSkillNodeDic = new Dictionary<int, TalentSkillNode>();
+            public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
+            public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
+            public Dictionary<int, TalentQuestWaveGroupData> talentQuestWaveGroupDataDic = new Dictionary<int, TalentQuestWaveGroupData>();
+            public Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
+            public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
+            public Dictionary<int, int> unitStoryLoveDic = new Dictionary<int, int>();
+            public Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
+            public Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
+            public Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
+            public Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic = new Dictionary<int, UnitAttackPattern>();//所有角色技能循环数据
+            public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas = new Dictionary<int, Guild.GuildEnemyData>();
+            public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips = new Dictionary<int, Dictionary<int, ex_equipment_data>[]>();
+            public Dictionary<int, EnemyData> talentQuestEnemyParameterDic = new Dictionary<int, EnemyData>();
+        }
+
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
-        private Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
         public Dictionary<int, UnitData> unitDataDic = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(临时)
         public Dictionary<int, UnitData> unitDataDic_save = new Dictionary<int, UnitData>();//角色类可更改数据与角色id的对应字典(已保存)
-        private Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
-        private Dictionary<int, List<ExtraEffectUnitGroup>> extraEffectUnitGroupDic = new Dictionary<int, List<ExtraEffectUnitGroup>>();//特别角色组(技能角色存在判断)
-        private Dictionary<int, UnitStoryData> unitStoryDic = new Dictionary<int, UnitStoryData>();//角色羁绊奖励列表
-        private Dictionary<int, List<int>> unitStoryEffectDic = new Dictionary<int, List<int>>();//角色的马甲列表
-        private Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
-        private Dictionary<int, SkillData> skillDataDic = new Dictionary<int, SkillData>();//所有的技能列表
-        private Dictionary<int, SkillAction> skillActionDic = new Dictionary<int, SkillAction>();//所有小技能列表
-        private Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
-        private Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
-        private Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
         private Dictionary<int, UnitSkillTimeData> allUnitSkillTimeDataDic;//所有角色的技能时间数据
-        private Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic;//所有角色技能循环数据
-        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
-        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
-        public List<EReduction> ereductionTable = new List<EReduction>();
+        // public Dictionary<int, unit_talent> unitTalentDic = new Dictionary<int, unit_talent>();//角色属性字典
         private AllUnitFirearmData firearmData = new AllUnitFirearmData();
-        private Elements.MasterUnitSkillDataRf masterUnitSkillDataRf;//未来可期
         private List<int> enemy_ignore_skill_rf = new List<int>();//未来可期
 
         private Dictionary<int, string> unitNickNameDic = new Dictionary<int, string>();
 
         private Dictionary<int, string> unitNickNameDic2 = new Dictionary<int, string>();
-        private Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas;
-        private Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic;
-        public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips;
         private CharacterManager characterManager;
         private AdventureManager battleManager;
         //private SQLiteHelper sql;
@@ -93,20 +115,52 @@ namespace PCRCaculator
         public bool forceAutoMode;
         public bool isSetMode;
         public bool isSemanMode;
+        public TeamEnhanceParameter teamEnhanceData;
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
+        
+        // 优化：添加数据缓存字典，避免重复计算
+        private static readonly Dictionary<string, object> _dataCache = new Dictionary<string, object>();
 
-        public Dictionary<int, EquipmentData> EquipmentDic { get => equipmentDic; }
-        public Dictionary<int, UnitRarityData> UnitRarityDic { get => unitRarityDic; }
-        public Dictionary<int, List<ExtraEffectUnitGroup>> ExtraEffectUnitGroupDic { get => extraEffectUnitGroupDic; }
-        public Dictionary<int, UnitStoryData> UnitStoryDic { get => unitStoryDic; }
-        public Dictionary<int, List<int>> UnitStoryEffectDic { get => unitStoryEffectDic; }
-        public Dictionary<int, List<int>> UnitStoryEffectDic2 { get => unitStoryEffectDic2; }
-        public Dictionary<int, SkillData> SkillDataDic { get => skillDataDic; }
-        public Dictionary<int, SkillAction> SkillActionDic { get => skillActionDic; }
-        public Dictionary<int, string> UnitName_cn { get => unitName_cn; }
-        public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => skillNameAndDescribe_cn; }
-        public Dictionary<int, string> SkillActionDescribe_cn { get => skillActionDescribe_cn; }
+        public Dictionary<int, EquipmentData> EquipmentDic { get => databaseCache.equipmentDic; }  // 装备类与装备id的对应字典
+        public Dictionary<int, UnitRarityData> UnitRarityDic { get => databaseCache.unitRarityDic; }  // 角色基础数据与角色id的对应字典 
+        public Dictionary<int, List<extra_effect_unit_group>> ExtraEffectUnitGroupDic { get => databaseCache.extraEffectUnitGroupDic; }  // 特别角色组(技能角色存在判断)
+        public Dictionary<int, UnitStoryData> UnitStoryDic { get => databaseCache.unitStoryDic; }  // 角色羁绊奖励列表
+        public Dictionary<int, List<int>> UnitStoryEffectDic { get => databaseCache.unitStoryEffectDic; }  // 角色的马甲列表
+        public Dictionary<int, Dictionary<int, promotion_bonus>> Rbs { get => databaseCache.rbs; }
+        public List<EReduction> EreductionTable { get => databaseCache.ereductionTable; }
+        public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get => databaseCache.talentQuestBattleEffectDic; }
+        public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get => databaseCache.extraEffectDataDic; }
+        public Dictionary<int, talentFormationData> TalentFormationDic { get => databaseCache.talentFormationDic; }
+        public Dictionary<int, int[]> WeaknessDic { get => databaseCache.weaknessDic; }  // 角色的弱点列表
+        public Dictionary<int, string> SkillActionDescribeCn { get => databaseCache.skillActionDescribe_cn; }  // 技能片段中文描述
+        public Dictionary<int, string[]> SkillNameAndDescribeCn { get => databaseCache.skillNameAndDescribe_cn; }  // 技能中文名字和描述
+        public Dictionary<int, string> UnitNameCn { get => databaseCache.unitName_cn; }  // 角色中文名字
+        public Dictionary<int, List<int>> UnitStoryEffectDic2 { get => databaseCache.unitStoryEffectDic2; }  // 角色的马甲列表
+        public Dictionary<int, param_type> ParamTypeDic { get => databaseCache.paramTypeDic; }
+        public Dictionary<int, TeamSkillEnhanceData> TeamSkillEnhanceDataDic { get => databaseCache.teamSkillEnhanceDataDic; }
+        public Dictionary<int, TeamSkillNode> TeamSkillNodeDic { get => databaseCache.teamSkillNodeDic; }
+        public Dictionary<int, TalentSkillEnhanceData> TalentSkillEnhanceDataDic { get => databaseCache.talentSkillEnhanceDataDic; }
+        public Dictionary<int, TalentSkillNode> TalentSkillNodeDic { get => databaseCache.talentSkillNodeDic; }
+        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic { get => databaseCache.uniqueEquipment2DataDic; }  // 角色专武2字典
+        public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic { get => databaseCache.uniqueEquipmentDataDic; }  // 角色专武字典
+        public Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
+        public Dictionary<int, EnemyData> EnemyDataDic { get => databaseCache.enemyDataDic; }
+        public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => databaseCache.enemyMPartsDic; }
+        public Dictionary<int, int> UnitStoryLoveDic { get => databaseCache.unitStoryLoveDic; }
+        public Dictionary<int, SkillData> SkillDataDic { get => databaseCache.skillDataDic; }  // 所有的技能列表
+        public Elements.MasterUnitSkillDataRf MasterUnitSkillDataRf { get => databaseCache.masterUnitSkillDataRf; }  // 未来可期
+        public Dictionary<int, SkillAction> SkillActionDic { get => databaseCache.skillActionDic; }  // 所有小技能列表
+        public Dictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => databaseCache.allUnitAttackPatternDic; }  // 所有角色技能循环数据
+        public Dictionary<int, Guild.GuildEnemyData> GuildEnemyDatas { get => databaseCache.guildEnemyDatas; }
+        public Dictionary<int, Dictionary<int, ex_equipment_data>[]> UnitExEquips { get => databaseCache.unitExEquips; }
+        public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get => databaseCache.talentQuestEnemyParameterDic; }
+
+
+        public Dictionary<int, string> UnitName_cn { get => databaseCache.unitName_cn; }
+        public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => databaseCache.skillNameAndDescribe_cn; }
+        public Dictionary<int, string> SkillActionDescribe_cn { get => databaseCache.skillActionDescribe_cn; }
         public PlayerSetting PlayerSetting { get => playerSetting; }
+        public TeamEnhanceParameter TeamEnhanceData { get => teamEnhanceData ??= new TeamEnhanceParameter(); }
         public GameObject LatestUIback
         {
             get
@@ -125,7 +179,6 @@ namespace PCRCaculator
         public bool IsGuildBattle { get => isGuildBattle; }
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
         public List<UnitData> EnemyDataForBattle { get => enemyDataForBattle; }
-        public Dictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => allUnitAttackPatternDic; }
         // public bool IsAutoMode { get => isAutoMode;}
         // public bool ForceAutoMode { get => forceAutoMode; }
         public GuildBattleData GuildBattleData { get => guildBattleData; }
@@ -133,18 +186,14 @@ namespace PCRCaculator
         //public float PlayerBodyWidth { get => playerSetting.bodyWidth; }
         public AllUnitFirearmData FirearmData { get => firearmData; }
         public List<int> Enemy_ignore_skill_rf { get => enemy_ignore_skill_rf; }
-        public Elements.MasterUnitSkillDataRf MasterUnitSkillDataRf { get => masterUnitSkillDataRf; }
 
         public readonly List<int> showUnitIDs = new List<int>();
         public List<int> showSummonIDs;
         public AutoCalculatorData AutoCalculatorData = new AutoCalculatorData();
         public int MaxTPUpValue => playerSetting.maxTPUpValue;
 
-        public Dictionary<(int, int), promotion_bonus> rbs;
 
         public bool LoadFinished { get; private set; }
-        public Dictionary<int, GuildEnemyData> GuildEnemyDatas { get => guildEnemyDatas; }
-        public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => enemyMPartsDic; }
         private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
         public string truthVersion;
         private void Awake()
@@ -174,8 +223,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10051600;
-            public long BossVersionJP = Instance.useJapanData ? 10051600 : 10049300;
+            public long CharacterVersionJP = 10063800;
+            public long BossVersionJP = 10054200;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -185,7 +234,6 @@ namespace PCRCaculator
         }
 
         public VersionData Version;
-        public Dictionary<int, int> unitStoryLoveDic;
 
         private void Start()
         {
@@ -219,6 +267,20 @@ namespace PCRCaculator
 #endif
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                try
+                {
+                    var memoryType = typeof(ExcelPackage).Assembly
+                        .GetType("OfficeOpenXml.Utils.RecyclableMemory");
+
+                    var manager = new Microsoft.IO.RecyclableMemoryStreamManager();
+                    memoryType.GetMethod("SetRecyclableMemoryStreamManager",
+                        BindingFlags.Static | BindingFlags.Public)
+                        .Invoke(null, new object[] { manager });
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"强制初始化失败: {e}");
+                }
                 Load();
             }
             catch (Exception e)
@@ -242,244 +304,438 @@ namespace PCRCaculator
             LoadAsync(wait);
         }
 
-        private async void LoadAsync(WaitUI wait)
+        private string cacheKey
         {
-            //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
-            //string jsonStr = db.text;
-            //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
-            /*string jsonStr = LoadJsonDatas("Datas/AllData");
-            
-            if (jsonStr != "")
+            get => $"{Version.CharacterVersionJP}_{Version.BossVersionJP}_{Version.BossVersionCN}_{Version.useJP}_{Version.newAB}";
+        }
+
+        private string cachePath()
+        {
+            return Path.Combine(ABExTool.persistentDataPath, $"cache_{cacheKey}.json");
+        }
+
+        private bool loadFromCahce()
+        {
+            var path = cachePath();
+            if (File.Exists(path))
             {
-                AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
-                //equipmentDic = allData.equipmentDic;
-                //unitRarityDic = allData.unitRarityDic;
-                //unitStoryEffectDic = allData.unitStoryEffectDic;
-                //unitStoryDic = allData.unitStoryDic;
-                //equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-                //skillDataDic = allData.skillDataDic;
-                //skillActionDic = allData.skillActionDic;
-                unitName_cn = allData.unitName_cn;
-                skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
-                skillActionDescribe_cn = allData.skillActionDescribe_cn;
-            }
-            */
-            if (Version.BossVersionCN == 0 || Version.useLatestProd == true)
-            {
-                await SendPostRequestAsync(() =>
+                try
                 {
-                    Version.useQA = false;
-                    Version.BossVersionCN = long.Parse(truthVersion);
-                    SaveManager.Save(Version);
-                });
+                    var jsonStr = File.ReadAllText(path);
+                    databaseCache = JsonConvert.DeserializeObject<DatabaseCache>(jsonStr);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"读取缓存失败: {e.Message}");
+                    return false;
+                }
             }
-#if UNITY_ANDROID
-            var loadsql =
-                new WWW("jar:file://" + ABExTool.dataPath + "!/assets/" + "dbdiff.sql");  // this is the path to your StreamingAssets in android
-            while (!loadsql.isDone) { }
-            var sql = Encoding.UTF8.GetString(loadsql.bytes);
-#else
-            var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
-            var sql = File.ReadAllText(patchFile);
-#endif
-            SQLiteTool.sql = sql;
+            return false;
+        }
+
+        private void saveToCache()
+        {
             try
             {
-                ABExTool.StaticInitialize().Wait();
+                var path = cachePath();
+                var jsonStr = JsonConvert.SerializeObject(databaseCache);
+                File.WriteAllText(path, jsonStr);
             }
             catch (Exception e)
             {
-                WindowMessage("下载数据发生错误，重置版本");
-                SaveManager.Save(new VersionData());
-                return;
+                Debug.LogError($"保存缓存失败: {e.Message}");
             }
+        }
 
-            var tasks = new List<Task>();
+        private async void LoadAsync(WaitUI wait)
+        {
+            // 计时开始
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            Debug.Log("LoadAsync 开始执行");
+            
+            try
+            {
 
+                //           execTimePatch = JsonConvert.DeserializeObject<Dictionary<int, float[]>>(LoadJsonDatas("Datas/ExecTimes"));
+                //string jsonStr = db.text;
+                //string jsonStr = Resources.Load<TextAsset>("Datas/AllData").text;
+                /*string jsonStr = LoadJsonDatas("Datas/AllData");
 
-            var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
-            var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
-            var dbTool2 = SQLData.OpenDB(ABExTool.mgrDataJP);
-
-            Task.WhenAll(
-                Task.Run(() => dbTool.Prepare()),
-                Task.Run(() =>
+                if (jsonStr != "")
                 {
-                    if (ABExTool.mgrDataJP != ABExTool.mgrCharacter) dbTool2.Prepare();
-                }),
-                Task.Run(() => dbTool3.Prepare())).Wait();
-
-            tasks.Add(
-                Task.WhenAll(
-                        dbTool.ParallelGetAll(),
-                        ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask,
-                        dbTool3.ParallelGetAll())
-                    .ContinueWith(_ =>
+                    AllData allData = JsonConvert.DeserializeObject<AllData>(jsonStr);
+                    //equipmentDic = allData.equipmentDic;
+                    //unitRarityDic = allData.unitRarityDic;
+                    //unitStoryEffectDic = allData.unitStoryEffectDic;
+                    //unitStoryDic = allData.unitStoryDic;
+                    //equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                    //skillDataDic = allData.skillDataDic;
+                    //skillActionDic = allData.skillActionDic;
+                    unitName_cn = allData.unitName_cn;
+                    skillNameAndDescribe_cn = allData.skillNameAndDescribe_cn;
+                    skillActionDescribe_cn = allData.skillActionDescribe_cn;
+                }
+                */
+                if (Version.BossVersionCN == 0 || Version.useLatestProd == true)
+                {
+                    // 更新 UI：正在获取远端版本
+                    try { wait?.SetMessage("正在获取版本信息..."); } catch { }
+                    await SendPostRequestAsync(() =>
                     {
-                        dbTool.CloseDB();
-                        if (ABExTool.mgrDataJP != ABExTool.mgrCharacter)
-                            dbTool2.CloseDB();
-                        else
-                            dbTool2 = dbTool;
-                        dbTool3.CloseDB();
+                        Version.useQA = false;
+                        Version.BossVersionCN = long.Parse(truthVersion);
+                        SaveManager.Save(Version);
+                    });
+                }
 
-                        var dbCN = dbTool3;
+                var tasks = new List<Task>();
+                
+                // 缓存加载计时
+                // var cacheStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                if (false && loadFromCahce())
+                {
+                    // cacheStopwatch.Stop();
+                    // Debug.Log($"缓存加载完成，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
+                }
+                else
+                {
+                    // cacheStopwatch.Stop();
+                    // Debug.Log($"缓存加载失败或不存在，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
+                    
+                    // SQL补丁加载计时
+                    var sqlStopwatch = System.Diagnostics.Stopwatch.StartNew();
+#if UNITY_ANDROID
+                    var loadsql =
+                        new WWW("jar:file://" + ABExTool.dataPath + "!/assets/" + "dbdiff.sql");  // this is the path to your StreamingAssets in android
+                    while (!loadsql.isDone) { }
+                    var sql = Encoding.UTF8.GetString(loadsql.bytes);
+#else
+                    var patchFile = Path.Combine(Application.streamingAssetsPath, "dbdiff.sql");
+                    var sql = File.ReadAllText(patchFile);
+#endif
+                    sqlStopwatch.Stop();
+                    Debug.Log($"SQL补丁加载完成，耗时: {sqlStopwatch.ElapsedMilliseconds}ms");
+                    
+                    // 更新 UI：已加载 dbdiff.sql
+                    try { wait?.SetMessage("加载 SQL 补丁"); } catch { }
+                    SQLiteTool.sql = sql;
+                    
+                    // AB资源初始化计时
+                    var abStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                    try
+                    {
+                        // 更新 UI：初始化 AB 资源
+                        try { wait?.SetMessage("初始化 AB 资源"); } catch { }
+                        await ABExTool.StaticInitialize();
+                        abStopwatch.Stop();
+                        Debug.Log($"AB资源初始化完成，耗时: {abStopwatch.ElapsedMilliseconds}ms");
+                    }
+                    catch (Exception)
+                    {
+                        abStopwatch.Stop();
+                        Debug.LogError($"AB资源初始化失败，耗时: {abStopwatch.ElapsedMilliseconds}ms");
+                        // WindowMessage("下载数据发生错误，重置版本");
+                        try { wait?.SetMessage("出错啦！ 重置版本，请重新打开"); } catch { }
+                        SaveManager.Save(new VersionData());
+                        return;
+                    }
 
-                        if (!Version.useJP) dbTool2 = dbTool3;
 
-                        equipmentDic = dbTool.Dic8;
-                        equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-                        unitRarityDic = dbTool.Dic1;
-                        extraEffectUnitGroupDic = dbTool.extraEffectUnitGroupDic;
-                        (unitStoryDic, unitStoryEffectDic, unitStoryLoveDic) = dbTool.Pair;
-                        skillDataDic = dbTool.Dic3;
-                        masterUnitSkillDataRf = dbTool2.masterUnitSkillDataRf;
-                        skillActionDic = dbTool.Dic4;
-                        allUnitAttackPatternDic = dbTool.Dic5;
-                        guildEnemyDatas = dbTool.Dic6;
-                        enemyMPartsDic = dbTool.Dic7;
-                        unitExEquips = dbTool3.unitExEquips;
-                        //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
-                        Guild.GuildManager.EnemyDataDic = dbTool.Dic2;
-                        UniqueEquipmentDataDic = dbTool.Dic9;
-                        UniqueEquipment2DataDic = dbTool.Dic92;
+                    // 数据库初始化计时
+                    var dbInitStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                    var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
+                    var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
+                    var dbTool2 = SQLData.OpenDB(ABExTool.mgrDataJP);
+                    dbInitStopwatch.Stop();
+                    Debug.Log($"数据库打开完成，耗时: {dbInitStopwatch.ElapsedMilliseconds}ms");
 
-                        unitStoryEffectDic2 = dbTool2.Pair.Item2;
-                        unitName_cn = dbTool3.Dic10;
-                        skillNameAndDescribe_cn = dbTool3.Dic11;
-                        skillActionDescribe_cn = dbTool3.Dic12;
-                        /*
+                    // 数据库准备计时
+                    var dbPrepareStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                    // 更新 UI：准备数据库
+                    try { wait?.SetMessage("正在准备数据库"); } catch { }
+                    await Task.WhenAll(
+                        Task.Run(() => dbTool.Prepare()),
+                        Task.Run(() =>
                         {
-                            if (skillNameAndDescribe_cn.TryGetValue(1703001, out var val))
-                                skillNameAndDescribe_cn[1701001] = val;
-                            if (skillNameAndDescribe_cn.TryGetValue(1703002, out val))
-                                skillNameAndDescribe_cn[1701002] = val;
-                            if (skillNameAndDescribe_cn.TryGetValue(1703011, out val))
-                                skillNameAndDescribe_cn[1701011] = val;
-                            if (skillNameAndDescribe_cn.TryGetValue(1703012, out val))
-                                skillNameAndDescribe_cn[1701012] = val;
-                            if (skillNameAndDescribe_cn.TryGetValue(1703003, out val))
-                                skillNameAndDescribe_cn[1701003] = val;
-                        }*/
+                            if (ABExTool.mgrDataJP != ABExTool.mgrCharacter) dbTool2.Prepare();
+                        }),
+                        Task.Run(() => dbTool3.Prepare()));
+                    dbPrepareStopwatch.Stop();
+                    Debug.Log($"数据库准备完成，耗时: {dbPrepareStopwatch.ElapsedMilliseconds}ms");
 
-                        ereductionTable = (useJapanData ? dbTool : dbTool2).eReductions;
-                        rbs = (useJapanData ? dbTool : dbTool2).rbs;
+                    // 数据库数据加载计时
+                    var dbDataStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                    var dbDataTask = Task.WhenAll(
+                            dbTool.ParallelGetAll(),
+                            ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask,
+                            dbTool3.ParallelGetAll())
+                        .ContinueWith(_ =>
+                            {
+                                dbDataStopwatch.Stop();
+                                Debug.Log($"数据库数据加载完成，耗时: {dbDataStopwatch.ElapsedMilliseconds}ms");
+                                dbTool.CloseDB();
+                                if (ABExTool.mgrDataJP != ABExTool.mgrCharacter)
+                                    dbTool2.CloseDB();
+                                else
+                                    dbTool2 = dbTool;
+                                dbTool3.CloseDB();
 
-                        if (!useJapanData)
-                        {
-                            if (dbTool != dbTool2)
+                                var dbCN = dbTool3;
+
+                                // if (!Version.useJP) dbTool2 = dbTool3;
+
+                                databaseCache.equipmentDic = dbTool.Dic8;
+                                databaseCache.equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                                databaseCache.unitRarityDic = dbTool.Dic1;
+                                databaseCache.extraEffectUnitGroupDic = dbTool.extraEffectUnitGroupDic;
+                                (databaseCache.unitStoryDic, databaseCache.unitStoryEffectDic, databaseCache.unitStoryLoveDic) = dbTool.Pair;
+                                databaseCache.skillDataDic = dbTool.Dic3;
+                                databaseCache.skillActionDic = dbTool.Dic4;
+                                databaseCache.allUnitAttackPatternDic = dbTool.Dic5;
+                                databaseCache.guildEnemyDatas = dbTool.Dic6;
+                                databaseCache.enemyMPartsDic = dbTool.Dic7;
+                                databaseCache.unitExEquips = dbTool.unitExEquips;
+                                //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
+                                databaseCache.enemyDataDic = dbTool.Dic2;
+                                databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
+                                databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
+                                databaseCache.uniqueEquipmentDataDic = dbTool.Dic9;
+                                databaseCache.uniqueEquipment2DataDic = dbTool.Dic92;
+                                databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic;
+                                databaseCache.talentSkillEnhanceDataDic = dbTool.TalentSkillEnhanceDataDic;
+                                databaseCache.teamSkillNodeDic = dbTool.TeamSkillNodeDic;
+                                databaseCache.teamSkillEnhanceDataDic = dbTool.TeamSkillEnhanceDataDic;
+                                databaseCache.paramTypeDic = dbTool.paramTypeDic;
+                                databaseCache.weaknessDic = dbTool.WeaknessDic;
+                                databaseCache.talentFormationDic = dbTool.TalentFormationDic;
+                                databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
+                                databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
+
+                                databaseCache.unitName_cn = dbTool3.Dic10;
+                                databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11;
+                                databaseCache.skillActionDescribe_cn = dbTool3.Dic12;
+
+                                databaseCache.masterUnitSkillDataRf = (Version.useJP ? dbTool2 : dbTool3).masterUnitSkillDataRf;
+                                databaseCache.unitStoryEffectDic2 = (Version.useJP ? dbTool2 : dbTool3).Pair.Item2;
+                                databaseCache.ereductionTable = (Version.useJP ? dbTool2 : dbTool3).eReductions;
+                                databaseCache.rbs = (Version.useJP ? dbTool2 : dbTool3).rbs;
+
                                 Task.WaitAll(
-                                    //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
-                                    //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
-                                    //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
-                                    //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                    Task.Run(() => skillDataDic.OverrideWith(dbTool2.Dic3,
-                                        k => k > 2000000 && k < 4000000)),
-                                    Task.Run(() => UniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
-                                    Task.Run(() => UniqueEquipment2DataDic.OverrideWith(dbTool2.Dic92)),
-                                    Task.Run(() => skillActionDic.OverrideWith(dbTool2.Dic4,
-                                        k => k > 200000000 && k < 400000000)),
-                                    Task.Run(() => allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
-                                    Task.Run(() => guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
-                                    Task.Run(() => enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
-                                    Task.Run(() => GuildManager.EnemyDataDic.OverrideWith(dbTool2.Dic2))
-                                // Task.Run(() => uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9))
+                                    Task.Run(() =>
+                                    {
+                                        var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
+                                        databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
+                                        // databaseCache.unitRarityDic[170301] = databaseCache.unitRarityDic[105701];
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        var filteredUniqueEquipment = dbTool3.Dic9.Where(p => p.Key / 10000 == 17).ToList();
+                                        databaseCache.uniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment);
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        var filteredUniqueEquipment2 = dbTool3.Dic92.Where(p => p.Key / 10000 == 17).ToList();
+                                        databaseCache.uniqueEquipment2DataDic.OverrideWith(filteredUniqueEquipment2);
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
+                                        databaseCache.skillDataDic.OverrideWith(filteredSkillData);
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
+                                        databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
+                                        databaseCache.masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
+                                        databaseCache.masterUnitSkillDataRf.dict.OverrideWith(filteredMasterUnitSkill);
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17).ToList();
+                                        databaseCache.allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern);
+                                    }),
+                                    Task.Run(() =>
+                                    {
+                                        // var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
+                                        // databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
+                                        databaseCache.unitExEquips.OverrideWith(dbTool3.unitExEquips);
+                                    }),
+                                    Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
+                                    Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
+                                    Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3))
                                 );
 
-                            var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 1000 == 17 || p.Key == 105701).ToList();
-                            var filteredUniqueEquipment = dbTool3.Dic9.Where(p => p.Key / 10000 == 17).ToList();
-                            var filteredUniqueEquipment2 = dbTool3.Dic92.Where(p => p.Key / 10000 == 17).ToList();
-                            var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
-                            var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
-                            var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
-                            var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17).ToList();
-                            Task.WaitAll(
-                                Task.Run(() => unitRarityDic.OverrideWith(filteredUnitRarity)),
-                                Task.Run(() => UniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment)),
-                                Task.Run(() => UniqueEquipment2DataDic.OverrideWith(filteredUniqueEquipment2)),
-                                Task.Run(() => skillDataDic.OverrideWith(filteredSkillData)),
-                                Task.Run(() => skillActionDic.OverrideWith(filteredSkillAction)),
-                                Task.Run(() =>
+                                // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
+                                
+                                
+                                // databaseCache.unitExEquips.TryAdd(dbCN.unitExEquips);
+                                // databaseCache.skillDataDic.TryAdd(dbCN.Dic3);
+                                // databaseCache.skillActionDic.TryAdd(dbCN.Dic4);
+                                // databaseCache.allUnitAttackPatternDic.TryAdd(dbCN.Dic5);
+
+                                // databaseCache.unitRarityDic[170101].ChangeRankData(databaseCache.unitRarityDic[105701].GetRankData());
+                                // databaseCache.unitRarityDic[170201].ChangeRankData(databaseCache.unitRarityDic[107601].GetRankData());
+
+                                if (Version.useJP)
                                 {
-                                    masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
-                                    masterUnitSkillDataRf.dict.OverrideWith(filteredMasterUnitSkill);
-                                }),
-                                Task.Run(() => allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern))
-                            );
+                                    if (dbTool != dbTool2)
+                                        Task.WaitAll(
+                                            //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
+                                            //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
+                                            //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
+                                            //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
+                                            Task.Run(() => databaseCache.uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
+                                            Task.Run(() => databaseCache.uniqueEquipment2DataDic.OverrideWith(dbTool2.Dic92)),
 
-                            Task.WaitAll(
-                                Task.Run(() => skillDataDic.Override2With(dbTool3.Dic3)),
-                                Task.Run(() => equipmentDic.Override2With(dbTool3.Dic8)),
-                                Task.Run(() => skillActionDic.Override2With(dbTool3.Dic4)),
-                                Task.Run(() => unitRarityDic.Override2With(dbTool3.Dic1)),
-                                Task.Run(() => GuildManager.EnemyDataDic.Override2With(dbTool3.Dic2))
-                            );
+                                            Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool2.Dic3,
+                                                k => k > 2000000)),
+                                            Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool2.Dic4,
+                                                k => k > 200000000)),
+                                            Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
+                                            Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
+                                            Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
+                                            Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2)),
+                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
+                                            Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool2.TalentQuestWaveGroupDataDic))
+                                        );
+                                }
+                                else
+                                // if (Version.newAB)
+                                {
+                                    Task.WaitAll(
+                                        // Task.Run(() => databaseCache.equipmentDic.Override2With(dbTool3.Dic8)),
+                                        // Task.Run(() => databaseCache.unitRarityDic.Override2With(dbTool3.Dic1)),
+                                        // Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool3.Dic3,
+                                        //     k => k > 2000000 && k < 4000000)),
+                                        // Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool3.Dic4,
+                                        //     k => k > 200000000 && k < 400000000)),
+                                        // Task.Run(() => databaseCache.enemyDataDic.Override2With(dbTool3.Dic2)),
+                                        // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5))
 
-                            unitRarityDic.TryAdd(dbCN.Dic1);
-                            unitStoryDic.TryAdd(dbCN.Pair.Item1);
-                            unitStoryEffectDic.TryAdd(dbCN.Pair.Item2);
-                            unitStoryLoveDic.TryAdd(dbCN.Pair.Item3);
-                            skillDataDic.TryAdd(dbCN.Dic3);
-                            skillActionDic.TryAdd(dbCN.Dic4);
-                            allUnitAttackPatternDic.TryAdd(dbCN.Dic5);
 
-                            unitRarityDic[170101].ChangeRankData(unitRarityDic[105701].GetRankData());
-                            unitRarityDic[170201].ChangeRankData(unitRarityDic[107601].GetRankData());
-                        }
-                    }));
+                                        Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool3.Dic3,
+                                            k => k > 2000000)),
+                                        Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool3.Dic4,
+                                            k => k > 200000000)),
+                                        Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
+                                        Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
+                                        Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
+                                        Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
+                                        Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool3.TalentQuestEnemyParameterDic)),
+                                        Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool3.TalentQuestWaveGroupDataDic))
+                                    );
+                                }
+                            });
+                    tasks.Add(dbDataTask);
+                }
 
-            /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
-            allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
+                /*string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
+                allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
 
-            string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
-            if (!string.IsNullOrEmpty(guildenemyDatasStr))
-            {
-                gm.guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, Guild.GuildEnemyData>>(guildenemyDatasStr);
+                string guildenemyDatasStr = MainManager.Instance.LoadJsonDatas("Datas/GuildEnemyDatas");
+                if (!string.IsNullOrEmpty(guildenemyDatasStr))
+                {
+                    gm.guildEnemyDatas = JsonConvert.DeserializeObject<Dictionary<int, Guild.GuildEnemyData>>(guildenemyDatasStr);
+                }
+                string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
+                gm.EnemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>>(enemyMParts);
+
+                string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
+                //Guild.GuildManager.EnemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
+
+                Debug.LogError($"读取DB失败！{ex.Message}");*/
+
+
+                //LoadPlayerSettings();
+                //string prefabData = unitPrefabData.text;
+                //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
+                //allUnitFirearmDatas = allUnitPrefabData.allUnitFirearmDatas;
+                //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
+                //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
+                //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
+
+                // JSON数据加载计时
+                var jsonLoadStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                // 更新 UI：开始加载 JSON 数据
+                var jsonLoadTasks = new[]
+                {
+                    // Task.Run(() => new { Key = "skillTime", Data = LoadJsonDatas("Datas/unitSkillTimeDic") }),
+                    Task.Run(() => new { Key = "nickName", Data = LoadJsonDatas("Datas/UnitNickNameDic") }),
+                    Task.Run(() => new { Key = "nickName2", Data = LoadJsonDatas("Datas/nickname") }),
+                    Task.Run(() => new { Key = "firearm", Data = LoadJsonDatas("Datas/AllUnitFirearmData") })
+                };
+
+                var jsonResults = await Task.WhenAll(jsonLoadTasks);
+
+                // JSON反序列化计时
+                var deserializationTasks = new List<Task>();
+
+                foreach (var result in jsonResults)
+                {
+                    switch (result.Key)
+                    {
+                        case "skillTime":
+                            deserializationTasks.Add(Task.Run(() =>
+                                allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(result.Data)));
+                            break;
+                        case "nickName":
+                            deserializationTasks.Add(Task.Run(() =>
+                                unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(result.Data)));
+                            break;
+                        case "nickName2":
+                            deserializationTasks.Add(Task.Run(() =>
+                                unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(result.Data)));
+                            break;
+                        case "firearm":
+                            if (!string.IsNullOrEmpty(result.Data))
+                            {
+                                deserializationTasks.Add(Task.Run(() =>
+                                    firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(result.Data)));
+                            }
+                            break;
+                    }
+                }
+
+                tasks.AddRange(deserializationTasks);
+
+                jsonLoadStopwatch.Stop();
+                await Task.WhenAll(tasks);
+                Debug.Log($"加载json完成，耗时: {jsonLoadStopwatch.ElapsedMilliseconds}ms");
+
+                // var saveCacheStopWatch = System.Diagnostics.Stopwatch.StartNew();
+                // saveToCache();
+                // saveCacheStopWatch.Stop();
+                // Debug.Log($"保存缓存完成，耗时: {saveCacheStopWatch.ElapsedMilliseconds}ms");
+
+
+                // 角色数据加载计时
+                try { wait?.SetMessage("加载角色数据..."); } catch { }
+                LoadUnitData();
+
+                LoadFinished = true;
+                CreateShowUnitIDS();
+                wait.Close();
+                
+                // 计时结束并输出
+                stopwatch.Stop();
+                var elapsedTime = stopwatch.ElapsedMilliseconds;
+                Debug.Log($"LoadAsync 执行完成，耗时: {elapsedTime}ms ({elapsedTime / 1000.0:F2}s)");
             }
-            string enemyMParts = MainManager.Instance.LoadJsonDatas("Datas/EnemyMPartsDic");
-            gm.EnemyMPartsDic = JsonConvert.DeserializeObject<Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>>(enemyMParts);
-
-            string enemyDataDicTxt = MainManager.Instance.LoadJsonDatas("Datas/EnemyDataDic");
-            //Guild.GuildManager.EnemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
-
-            Debug.LogError($"读取DB失败！{ex.Message}");*/
-
-
-            //LoadPlayerSettings();
-            //string prefabData = unitPrefabData.text;
-            //AllUnitPrefabData allUnitPrefabData = JsonConvert.DeserializeObject<AllUnitPrefabData>(prefabData);
-            //allUnitFirearmDatas = allUnitPrefabData.allUnitFirearmDatas;
-            //Debugtext.text += "\n成功加载" + allUnitFirearmDatas.Count + "个技能特效数据！";
-            //allUnitActionControllerDatas = allUnitPrefabData.allUnitActionControllerDatas;
-            //Debugtext.text += "\n成功加载" + allUnitActionControllerDatas.Count + "个角色预制体数据！";
-
-            string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
-            //string skillTimeStr = LoadJsonDatas("Datas/unitSkillTimeDic");
-            allUnitSkillTimeDataDic = JsonConvert.DeserializeObject<Dictionary<int, UnitSkillTimeData>>(skillTimeStr);
-            //Debugtext.text += "\n成功加载" + allUnitSkillTimeDataDic.Count + "个技能时间数据！";
-            //string attackPatternStr = Resources.Load<TextAsset>("Datas/UnitAtttackPatternDic").text;
-            //string attackPatternStr = LoadJsonDatas("Datas/UnitAtttackPatternDic");
-            //allUnitAttackPatternDic = JsonConvert.DeserializeObject<Dictionary<int, UnitAttackPattern>>(attackPatternStr);
-            //string uniqueStr = Resources.Load<TextAsset>("Datas/UniqueEquipmentDataDic").text;
-
-            //string uniqueStr = LoadJsonDatas("Datas/UniqueEquipmentDataDic");
-            //uniqueEquipmentDataDic = JsonConvert.DeserializeObject<Dictionary<int, UniqueEquipmentData>>(uniqueStr);
-            //
-            string nickNameDic = LoadJsonDatas("Datas/UnitNickNameDic");
-            unitNickNameDic = JsonConvert.DeserializeObject<Dictionary<int, string>>(nickNameDic);
-            unitNickNameDic2 = JsonConvert.DeserializeObject<Dictionary<int, string>>(LoadJsonDatas("Datas/nickname"));
-            string firearmStr = LoadJsonDatas("Datas/AllUnitFirearmData");
-
-            if (!string.IsNullOrEmpty(firearmStr))
-                firearmData = JsonConvert.DeserializeObject<AllUnitFirearmData>(firearmStr);
-
-            Task.WhenAll(tasks).Wait();
-            LoadUnitData();
-
-            LoadFinished = true;
-            Debugtext.text += "\n数据加载完毕！";
-            CreateShowUnitIDS();
-            wait.Close();
+            catch (Exception e)
+            {
+                // 异常情况下也要停止计时并输出
+                stopwatch.Stop();
+                var elapsedTime = stopwatch.ElapsedMilliseconds;
+                Debug.LogError($"LoadAsync 执行失败，耗时: {elapsedTime}ms，错误: {e.Message}");
+                
+                try { wait?.SetMessage($"加载时发生致命错误:{e}，请重新打开！"); } catch { }
+                throw e;
+            }
         }
 
         private void LoadUnitData()
@@ -505,7 +761,7 @@ namespace PCRCaculator
             }
         }
 
-        private void LoadPlayerSettings()
+        public void LoadPlayerSettings()
         {
             try
             {
@@ -518,15 +774,18 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 72;
-                playerSetting.playerLevel = 277;
+                playerSetting.playerProcess = 80;
+                playerSetting.playerLevel = 301;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
                 }
             }
         }
-
+        public void ReLoadPlayerSetting()
+        {
+            playerSetting = SaveManager.Load<PlayerSetting>();
+        }
         /// <summary>
         /// 保存玩家设置到json
         /// </summary>
@@ -726,6 +985,13 @@ namespace PCRCaculator
                 return unitDataDic[unitid].GetUnitNameInternal();
             return "???";
         }
+        public List<int> GetTalentIds(int unitid)
+        {
+
+            if (UnitRarityDic.TryGetValue(unitid, out var data))
+                return data.detailData.talent_id;
+            return new List<int>();
+        }
         private void CreateShowUnitIDS()
         {
             if (!PlayerSetting.showAllUnits)
@@ -838,15 +1104,30 @@ namespace PCRCaculator
 
         public string LoadJsonDatas(string path, bool forceStreaming = true)
         {
+            // 优化：添加文件内容缓存，避免重复读取相同文件
+            if (_dataCache.TryGetValue(path, out var cachedContent))
+            {
+                return (string)cachedContent;
+            }
+
             string filePath = GetSaveDataPath() + "/" + path + ".json";
+            string content;
+            
 #if PLATFORM_ANDROID
             var reader = new WWW(filePath);
             while (!reader.isDone) {Thread.Sleep(0);}
-
-            return reader.text;
+            content = reader.text;
 #else
-            return File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+            content = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
 #endif
+            
+            // 缓存文件内容
+            if (!string.IsNullOrEmpty(content))
+            {
+                _dataCache[path] = content;
+            }
+            
+            return content;
         }
 
         public WaitUI OpenWaitUI()
@@ -935,7 +1216,7 @@ namespace PCRCaculator
                 cStream.FlushFinalBlock();
                 return Encoding.UTF8.GetString(mStream.ToArray());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return decryptString;
             }
@@ -973,9 +1254,9 @@ namespace PCRCaculator
                 return 34;
             return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
         }
-        public List<ExtraEffectUnitGroup> GetListWithGroupId(int groupId)
+        public List<extra_effect_unit_group> GetListWithGroupId(int groupId)
         {
-            return extraEffectUnitGroupDic.ContainsKey(groupId) ? extraEffectUnitGroupDic[groupId] : null;
+            return ExtraEffectUnitGroupDic.ContainsKey(groupId) ? ExtraEffectUnitGroupDic[groupId] : null;
         }
         public async Task SendPostRequestAsync(Action onComplete)
         {

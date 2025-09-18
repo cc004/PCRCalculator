@@ -38,14 +38,15 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             if (ActionDetail3 != 0)
                 EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             DamageData.eDamageType eDamageType;
-            FloatWithEx num;
+            DoubleWithEx num;
+            // TODO ActionDetail1 == 5 => mixed damage
             if (ActionDetail1 % 2 == 0)
             {
                 eDamageType = DamageData.eDamageType.MGC;
@@ -66,9 +67,9 @@ namespace Elements
             AttackFieldData attackFieldData = new AttackFieldData();
             attackFieldData.KNLCAOOKHPP = eFieldType.HEAL;
             attackFieldData.HKDBJHAIOMB = ActionDetail1 > 2 ? eFieldExecType.REPEAT : eFieldExecType.NORMAL;
-            attackFieldData.StayTime = _valueDictionary[eValueNumber.VALUE_5];
+            attackFieldData.StayTime = (float)_valueDictionary[eValueNumber.VALUE_5];
             attackFieldData.CenterX = _target.GetLocalPosition().x + Position;
-            attackFieldData.Size = _valueDictionary[eValueNumber.VALUE_7];
+            attackFieldData.Size = (float)_valueDictionary[eValueNumber.VALUE_7];
             attackFieldData.LCHLGLAFJED = _source.IsOther ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
             attackFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
             attackFieldData.EffectId = ActionDetail2;

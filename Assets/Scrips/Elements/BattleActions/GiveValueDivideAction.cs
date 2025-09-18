@@ -11,7 +11,7 @@ namespace Elements
   public class GiveValueDivideAction : GiveValueAction
   {
     protected override void setValue(
-      Dictionary<eValueNumber, FloatWithEx> _value,
+      Dictionary<eValueNumber, DoubleWithEx> _value,
       ActionParameter _action)
     {
       base.setValue(_value, _action);
@@ -21,14 +21,14 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_2] = (double)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
     }
 
-    protected override FloatWithEx calcDamageValue(UnitCtrl _source, Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float)((long)_source.MaxHp - (long)_source.Hp) / (float)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+    protected override DoubleWithEx calcDamageValue(UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => (double)((long)_source.MaxHp - (long)_source.Hp) / (double)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-    protected override FloatWithEx calcHpValue(UnitCtrl _source, Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => (float)(long)_source.Hp / (float)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+    protected override DoubleWithEx calcHpValue(UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => (double)(long)_source.Hp / (double)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-    protected override FloatWithEx calcMaxHpValue(UnitCtrl _source, Dictionary<eValueNumber, FloatWithEx> _valueDictionary) => _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+    protected override DoubleWithEx calcMaxHpValue(UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
 
   }

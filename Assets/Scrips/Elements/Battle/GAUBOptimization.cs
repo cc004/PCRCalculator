@@ -17,7 +17,7 @@ using PCRCaculator.Guild;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using ExcelHelper;
 namespace Elements.Battle
 {
 
@@ -33,7 +33,7 @@ namespace Elements.Battle
             List<UnitCtrl> playerUnits = MyGameCtrl.Instance.playerUnitCtrl.Take(5).ToList();
             float totalMagicAtk = playerUnits.Select(unit => (float)unit.MagicStr).Sum();
             bool ok = playerUnits.Where(unit => unit.EnergyRecoveryRate < tp).Count() == 0;
-            int tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
+            long tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
             return (long)totalMagicAtk * (ok ? 1 : 0) + tpSum;
         }
     }
@@ -49,7 +49,7 @@ namespace Elements.Battle
             List<UnitCtrl> playerUnits = MyGameCtrl.Instance.playerUnitCtrl;
             float totalPhysicAtk = playerUnits.Select(unit => (float)unit.Atk).Sum();
             bool ok = playerUnits.Where(unit => unit.EnergyRecoveryRate < tp).Count() == 0;
-            int tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
+            long tpSum = playerUnits.Select(unit => unit.EnergyRecoveryRate).Sum();
             return (long)totalPhysicAtk * (ok ? 1 : 0) + tpSum;
         }
     }
@@ -376,7 +376,6 @@ namespace Elements.Battle
     public class GAUBOptimization : MonoBehaviour
     {
         static public List<List<int>> fixPreGenes = new List<List<int>>();
-        public GameObject GAInfo;
         private long bestDamage;
         private List<List<int>> bestGenes = new List<List<int>>();
         private GeneticAlgorithm ga;
@@ -400,7 +399,8 @@ namespace Elements.Battle
         public Toggle considerRealDamage;
         public Toggle considerExpectDamage;
         public Toggle considerPhysicAtk;
-        public Toggle considerMagicAtk; 
+        public Toggle considerMagicAtk;
+        public GameObject GAInfoPrefab;
 
         static public GAUBOptimization instance;
 
@@ -423,12 +423,25 @@ namespace Elements.Battle
                 MainManager.Instance.WindowMessage("仅在语义UB模式下可用");
                 return;
             }
-            GAInfo.SetActive(true);
-            for (int i = 0; i < 5; i++)
+            GameObject a = Instantiate(GAInfoPrefab);
+            a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
+            var gaubOptimization = a.GetComponent<GAUBOptimization>();
+            if (gaubOptimization != null && gaubOptimization.bestGenesTexts != null && gaubOptimization.bestGenesTexts.Count > 0)
             {
-                var raw = MyGameCtrl.Instance.tempData.SemanUBExecTimeList.ElementAtOrDefault(i) ?? new List<int>();
-                bestGenesTexts[i].text = string.Join("\n", raw);
+                for (int i = 0; i < 5; i++)
+                {
+                    var raw = MyGameCtrl.Instance.tempData.SemanUBExecTimeList.ElementAtOrDefault(i) ?? new List<int>();
+                    gaubOptimization.bestGenesTexts[i].text = string.Join("\n", raw);
+                }
             }
+            bool asmExportEnabled = ExcelHelper.ExcelHelper.AsmExportEnabled;
+            gaubOptimization.ubDelay.SetActive(asmExportEnabled);
+            gaubOptimization.considerSkill.SetActive(asmExportEnabled);
+            gaubOptimization.considerAll.SetActive(asmExportEnabled);
+        }
+        public void Exit()
+        {
+            Destroy(gameObject);
         }
 
         public void Update()

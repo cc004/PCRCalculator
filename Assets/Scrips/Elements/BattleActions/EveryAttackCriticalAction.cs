@@ -25,7 +25,7 @@ namespace Elements
             // empty
         }
 
-        public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary, Action<string> callBack = null) 
+        public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, Action<string> callBack = null) 
         { 
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary, callBack);
 
@@ -37,9 +37,9 @@ namespace Elements
                 return;
 
             var data = new EveryAttackCriticalData();
-            if (_valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_1, out FloatWithEx timer))
+            if (_valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_1, out DoubleWithEx timer))
             {
-                data.Timer = timer;
+                data.Timer = (float)timer;
             }
             data.IconType = (eStateIconType)ActionDetail2;
             data.Enable = true;

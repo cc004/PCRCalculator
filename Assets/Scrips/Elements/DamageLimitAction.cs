@@ -32,11 +32,11 @@ namespace Elements
 			base.ExecActionOnStart(_skill, _source, _sourceActionController);
 		}
 
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			AppendIsAlreadyExeced(_target.Owner, _num);
-			_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eDamageCutType)base.ActionDetail1], _valueDictionary[eValueNumber.VALUE_3], this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1]);
+			_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eDamageCutType)base.ActionDetail1], (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1]);
 		}
 
 		public override void SetLevel(float _level)

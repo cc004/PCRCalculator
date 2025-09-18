@@ -24,7 +24,7 @@ namespace Elements
 
 		public eFieldEffectType FieldEffectType;
 
-		public float Value;
+		public double Value;
 
 		public override void StartField()
 		{
@@ -59,7 +59,7 @@ namespace Elements
 				UnitCtrl owner = base.TargetList[i].Owner;
 				if (!owner.IsDead && !((float)(long)owner.Hp <= 0f) && !list.Contains(owner))
 				{
-					var val = Value;
+					double val = Value;
 					if (owner.IsAbnormalState(UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE) && val < 0f)
 					{
 						val *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
@@ -79,14 +79,14 @@ namespace Elements
 			//Singleton<LCEGKJFKOPD>.Instance.LoadChargeEnergyFieldEffect();
 		}
 
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			ChargeEnergyFieldData.eChargeType actionDetail = (ChargeEnergyFieldData.eChargeType)base.ActionDetail1;
-			float num = _valueDictionary[eValueNumber.VALUE_1];
+			double num = _valueDictionary[eValueNumber.VALUE_1];
 			if (actionDetail == ChargeEnergyFieldData.eChargeType.DECREASE)
 			{
-				num *= -1f;
+				num *= -1.0;
 			}
 			GameObject uniqueEffectPrefab = null;
 			GameObject uniqueEffectPrefabLeft = null;
@@ -100,9 +100,9 @@ namespace Elements
 				KNLCAOOKHPP = eFieldType.HEAL,
 				ChargeType = actionDetail,
 				HKDBJHAIOMB = eFieldExecType.REPEAT,
-				StayTime = _valueDictionary[eValueNumber.VALUE_3],
+				StayTime = (float)_valueDictionary[eValueNumber.VALUE_3],
 				CenterX = _target.GetLocalPosition().x + base.Position,
-				Size = _valueDictionary[eValueNumber.VALUE_5],
+				Size = (float)_valueDictionary[eValueNumber.VALUE_5],
 				LCHLGLAFJED = ((_source.IsOther == (actionDetail == ChargeEnergyFieldData.eChargeType.INCREASE)) ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER),
 				EGEPDDJBILL = ((_skill.BlackOutTime > 0f) ? _source : null),
 				FieldEffectType = (ChargeEnergyFieldData.eFieldEffectType)base.ActionDetail3,

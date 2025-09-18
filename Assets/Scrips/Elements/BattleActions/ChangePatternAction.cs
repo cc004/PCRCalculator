@@ -26,7 +26,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -37,10 +37,10 @@ namespace Elements
             switch ((eChangePatternType)ActionDetail1)
             {
                 case eChangePatternType.ATTACK_PATTERN:
-                    _target.Owner.ChangeAttackPattern(ActionDetail2, _skill.Level, _valueDictionary[eValueNumber.VALUE_1]);
+                    _target.Owner.ChangeAttackPattern(ActionDetail2, _skill.Level, (float)_valueDictionary[eValueNumber.VALUE_1]);
                     break;
                 case eChangePatternType.UNION_BURST:
-                    _target.Owner.ChangeChargeSkill(ActionDetail2, _valueDictionary[eValueNumber.VALUE_1]);
+                    _target.Owner.ChangeChargeSkill(ActionDetail2, (float)_valueDictionary[eValueNumber.VALUE_1]);
                     break;
             }
             switch ((eUbActive)ActionDetail3)

@@ -22,7 +22,7 @@ namespace Elements
             actionParameter.ActionDetail1 = _action.action_detail_1;
             actionParameter.ActionDetail2 = _action.action_detail_2;
             actionParameter.ActionDetail3 = _action.action_detail_3;
-            actionParameter.Value = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer());
+            actionParameter.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer());
             actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)_action.action_value_1);
             actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)_action.action_value_2);
             actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)_action.action_value_3);
@@ -61,9 +61,9 @@ namespace Elements
                 {
                     EffectType = (ExConditionPassiveData.eEffectType)actionParameter.ActionDetail2,
                     LimitNum = actionParameter.ActionDetail3,
-                    HitRate = actionParameter.Value[eValueNumber.VALUE_1] + actionParameter.Value[eValueNumber.VALUE_2] * (float)(int)Owner.Level,
+                    HitRate = (float)((float)actionParameter.Value[eValueNumber.VALUE_1] + actionParameter.Value[eValueNumber.VALUE_2] * (float)(int)Owner.Level),
                     Value = actionParameter.Value[eValueNumber.VALUE_3],
-                    CoolTime = actionParameter.Value[eValueNumber.VALUE_4],
+                    CoolTime = (float)actionParameter.Value[eValueNumber.VALUE_4],
                     IconType = (eStateIconType)(int)actionParameter.Value[eValueNumber.VALUE_5]
                 });
             }
@@ -101,7 +101,7 @@ namespace Elements
                     {
                         UnitCtrl owner5 = Owner;
                         owner5.OnDamage = (UnitCtrl.OnDamageDelegate) Delegate.Combine(owner5.OnDamage,
-                            (UnitCtrl.OnDamageDelegate) delegate(bool byAttack, FloatWithEx damage, bool critical)
+                            (UnitCtrl.OnDamageDelegate) delegate(bool byAttack, LongWithEx damage, bool critical)
                             {
                                 if (byAttack)
                                 {
@@ -114,7 +114,7 @@ namespace Elements
                     {
                         UnitCtrl owner3 = Owner;
                         owner3.OnDamage = (UnitCtrl.OnDamageDelegate) Delegate.Combine(owner3.OnDamage,
-                            (UnitCtrl.OnDamageDelegate) delegate(bool byAttack, FloatWithEx damage, bool critical)
+                            (UnitCtrl.OnDamageDelegate) delegate(bool byAttack, LongWithEx damage, bool critical)
                             {
                                 if (byAttack && critical)
                                 {
@@ -129,7 +129,7 @@ namespace Elements
                         owner2.OnHpChange = (UnitCtrl.OnDamageDelegate) Delegate.Combine(owner2.OnHpChange,
                             (UnitCtrl.OnDamageDelegate) delegate
                             {
-                                if ((float) (long) Owner.Hp <= kv.Value.Value / 100f * (float) (long) Owner.MaxHp)
+                                if (Owner.Hp <= kv.Value.Value / 100.0 * Owner.MaxHp)
                                 {
                                     _exSkillData.TryExSkill(eExSkillCondition.TRIGGER_HP, this, true);
                                 }

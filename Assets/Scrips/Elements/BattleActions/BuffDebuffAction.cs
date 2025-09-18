@@ -34,7 +34,7 @@ namespace Elements
             {
                 return;
             }
-            Dictionary<BasePartsData, FloatWithEx> buffParam = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> buffParam = new Dictionary<BasePartsData, LongWithEx>();
             bool isDebuff = ActionDetail1 % 10 == 1;
             UnitCtrl.BuffParamKind buffParamKind = GetChangeParamKind(ActionDetail1);
             partsData.OnBreak += () =>
@@ -47,7 +47,7 @@ namespace Elements
                 //_source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParam, 0.0f, 0, null, true, eEffectType.COMMON, !isDebuff, getIsAdditional());
                 //_source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, getIsAdditional(),90);
 
-                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, null, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
+                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
                 _source.EnableBuffParam(buffParamKind, buffParam, _enable: true, _source, !isDebuff, getIsAdditional());
 
             };
@@ -73,7 +73,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           Action<string> action = null)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -86,7 +86,7 @@ namespace Elements
                 return;
             }
             UnitCtrl.BuffParamKind changeParamKind = GetChangeParamKind(ActionDetail1);
-            Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
             if (_target.Owner.IsPartsBoss && changeParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE &&
                 changeParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED &&
                 changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE &&
@@ -106,20 +106,20 @@ namespace Elements
                 dictionary.Add(_target.Owner.DummyPartsData, CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
 			bool despelable = _valueDictionary[eValueNumber.VALUE_7] != 2f;
             //_target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
-            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId,action);
+            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId,action);
 
         }
 
-        public static float GetBuffDebuffValueForCurrentValuePercentage(
+        public static double GetBuffDebuffValueForCurrentValuePercentage(
             BasePartsData target,
-            float value,
+            double value,
             UnitCtrl.BuffParamKind kind)
         {
             if (target == null)
                 return 0f;
 
-            float ratio = value / 100f;
-            float baseStat = 0f;
+            double ratio = value / 100f;
+            double baseStat = 0f;
 
             var owner = target.Owner;
 
@@ -210,20 +210,20 @@ namespace Elements
             return ratio * baseStat;
         }
 
-        public static FloatWithEx CalculateBuffDebuffParam(
+        public static LongWithEx CalculateBuffDebuffParam(
           BasePartsData _target,
-          FloatWithEx _value,
+          DoubleWithEx _value,
           eChangeParameterType _changeParamType,
           UnitCtrl.BuffParamKind _targetChangeParamKind,
           bool _isDebuf)
         {
-            FloatWithEx f = 0.0f;
+            DoubleWithEx f = 0L;
             if (_targetChangeParamKind == UnitCtrl.BuffParamKind.MAX_HP)
                 _isDebuf = true;
             switch (_changeParamType)
             {
                 case eChangeParameterType.FIXED:
-                    f = BattleUtil.FloatToIntReverseTruncate(_value);
+                    f = (DoubleWithEx)BattleUtil.DoubleToLongReverseTruncate(_value);
                     break;
                 case eChangeParameterType.PERCENTAGE:
                     var num1 = _value / 100f;
@@ -305,7 +305,7 @@ namespace Elements
                 num2 = (num2 * (1f - (float)_target.GetDebuffResistPercent(_targetChangeParamKind) / 100f)).Floor();
                 num2 *= -1;
             }
-            return num2;
+            return (LongWithEx)num2;
         }
 
         public static UnitCtrl.BuffParamKind GetChangeParamKind(int value)

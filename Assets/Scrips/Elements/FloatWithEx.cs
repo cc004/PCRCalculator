@@ -228,7 +228,7 @@ namespace Elements
 
         public string ToExpression(int hash)
         {
-            if (ExcelHelper.ExcelHelper.AsmExportEnabled2)
+            if (ExcelHelper.ExcelHelper.AsmExportEnabled)
             {
                 var sb = new StringBuilder();
                 ToExpression(sb, hash);
@@ -256,7 +256,6 @@ namespace Elements
             {
                 num = op1.ToExpression(sb, hash, num);
                 num = op2.ToExpression(sb, hash, num);
-                if (num == 3657) Debugger.Break();
                 sb.AppendFormat("{0}:{1}:{2}|", op, op1.id, op2.id);
             }
             else if (rnd != null)

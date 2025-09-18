@@ -140,15 +140,15 @@ namespace Elements
             attackAction.TargetWidth = Owner.SearchAreaSize;
             attackAction.Direction = DirectionType.FRONT;
             attackAction.ActionType = eActionType.ATTACK;
-            attackAction.Value = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer())
+            attackAction.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer())
       {
         {
           eValueNumber.VALUE_1,
-          0.0f
+          0.0
         },
         {
           eValueNumber.VALUE_3,
-          1f
+          1.0
         }
       };
             attackAction.ActionDetail1 = _owner.AtkType;
@@ -526,7 +526,7 @@ namespace Elements
                 _skill.SkillEffects[index].AlreadyFireArmExecedData = new Dictionary<UnitCtrl, bool>();
                 _skill.SkillEffects[index].AlreadyFireArmExecedKeys = new List<UnitCtrl>();
             }
-            _skill.DamagedPartsList = new List<BasePartsData>();
+            _skill.DamagedPartsList.Clear();
         }
 
         private void execActionOnWaveStart(Skill _skill)
@@ -611,7 +611,7 @@ namespace Elements
                     switch (actionParameter.ActionDetail1)
                     {
                         case 2:
-                            basePosition = transform.position + new Vector3((float)((!Owner.IsLeftDir) ? 1 : (-1)) * actionParameter.Value[eValueNumber.VALUE_1] / 540f, 0f);
+                            basePosition = transform.position + new Vector3((float)((float)((!Owner.IsLeftDir) ? 1 : (-1)) * actionParameter.Value[eValueNumber.VALUE_1] / 540f), 0f);
                             break;
                         case 1:
                             if (actionParameter.TargetList.Count == 0)
@@ -622,7 +622,7 @@ namespace Elements
                             break;
                         case 3:
                             basePosition = transform.position;
-                            position = (Owner.IsLeftDir ? (-1f) : 1f) * actionParameter.Value[eValueNumber.VALUE_1];
+                            position = (float)((Owner.IsLeftDir ? (-1f) : 1f) * actionParameter.Value[eValueNumber.VALUE_1]);
                             break;
                         case 4:
                             if (actionParameter.TargetList.Count == 0)
@@ -647,6 +647,25 @@ namespace Elements
                 }
             }
         }
+
+        // RVA: 0x21A9054 Offset: 0x21A9054 VA: 0x21A9054
+        public void SetAttackValue(long _additionalAttackEnhance)
+        {
+            if (Attack == null || Attack.ActionParameters == null)
+            {
+                return;
+            }
+
+            foreach (ActionParameter actionParameter in Attack.ActionParameters)
+            {
+                if (actionParameter != null && actionParameter.Value != null)
+                {
+                    // Set attack enhancement value: (_additionalAttackEnhance / 10000.0 + 1.0)
+                    actionParameter.Value[eValueNumber.VALUE_3] = _additionalAttackEnhance / 10000.0f + 1.0f;
+                }
+            }
+        }
+
 
         public void ExecExSkill(Skill _skill)
         {
@@ -688,7 +707,7 @@ namespace Elements
             actionParameter.ActionDetail1 = actionParam.action_detail_1;
             actionParameter.ActionDetail2 = actionParam.action_detail_2;
             actionParameter.ActionDetail3 = actionParam.action_detail_3;
-            actionParameter.Value = new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer());
+            actionParameter.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer());
             actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)actionParam.action_value_1);
             actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)actionParam.action_value_2);
             actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)actionParam.action_value_3);
@@ -2149,6 +2168,15 @@ namespace Elements
              float _b2 = _end + bodyWidth * 0.5f;
              return _a >= (double)_b1 && _a <= (double)_b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2)) || _actionParameter.Direction == DirectionType.ALL;
          */
+            if (_actionParameter.Direction == DirectionType.FRONT_WITHOUT_SUMMON
+            || _actionParameter.Direction == DirectionType.FRONT_AND_BACK_WITHOUT_SUMMON
+            || _actionParameter.Direction == DirectionType.ALL_WITHOUT_SUMMON)
+            {
+                if (_unitCtrl.Owner.IsPhantom || _unitCtrl.Owner.IsSummon)
+                {
+                    return false;
+                }
+            }
             if (!_unitCtrl.GetTargetable())
             {
                 return false;
@@ -2163,7 +2191,7 @@ namespace Elements
             float num4 = _end + num2 * 0.5f;
             if ((!(num >= num3) || !(num <= num4)) && !BattleUtil.Approximately(num, num3) && !BattleUtil.Approximately(num, num4))
             {
-                return _actionParameter.Direction == DirectionType.ALL;
+                return _actionParameter.Direction == DirectionType.ALL || _actionParameter.Direction == DirectionType.ALL_INCLUDE_FLIGHT || _actionParameter.Direction == DirectionType.ALL_WITHOUT_SUMMON;
             }
             return true;
         }
@@ -2192,7 +2220,7 @@ namespace Elements
         private void sortTargetListByTargetPattern(
           ActionParameter _actionParameter,
           Transform _baseTransform,
-          float _value,
+          double _value,
           bool _quiet,
           Skill skill)
         {
@@ -2262,14 +2290,14 @@ namespace Elements
                 Energy = part.Owner.Energy,
                 Hp = part.Owner.Hp,
                 MaxHp = part.Owner.MaxHp,
-                GetMagicStrZeroEx = part.GetMagicStrZeroEx(),
-                GetAtkZeroEx = part.GetAtkZeroEx(),
+                GetMagicStrZeroEx = (DoubleWithEx)part.GetMagicStrZeroEx(),
+                GetAtkZeroEx = (DoubleWithEx)part.GetAtkZeroEx(),
                 UnitName = part.Owner.UnitNameEx,
                 hash = part.GetHashCode()
             }).ToList();
 
             void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare,
-                Func<BasePartsDataEx, FloatWithEx> getter)
+                Func<BasePartsDataEx, DoubleWithEx> getter)
             {
                 if (_actionParameter.TargetNum != 1) return;
                 var nth = _actionParameter.TargetNth;

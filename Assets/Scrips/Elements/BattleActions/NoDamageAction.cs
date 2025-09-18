@@ -40,7 +40,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -72,7 +72,7 @@ namespace Elements
                 case eNoDamageType.DEBUFF:
                 case eNoDamageType.BREAK_POINT:
                 case eNoDamageType.NO_DAMAGE2:
-                    _target.Owner.SetAbnormalState(_source, ABNORMAL_STATE_DIC[actionDetail], _valueDictionary[eValueNumber.VALUE_1], this, _skill, 0f, 0f, _reduceEnergy: false, _isDamageRelease: false, 1f, _valueDictionary[eValueNumber.VALUE_3] == 0f);
+                    _target.Owner.SetAbnormalState(_source, ABNORMAL_STATE_DIC[actionDetail], (float)_valueDictionary[eValueNumber.VALUE_1], this, _skill, 0f, 0f, _reduceEnergy: false, _isDamageRelease: false, 1f, _valueDictionary[eValueNumber.VALUE_3] == 0f);
                     break;
                 case eNoDamageType.ALL_DODGE:
                     break;

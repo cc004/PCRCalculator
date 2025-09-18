@@ -99,6 +99,7 @@ namespace PCRApi
                 var bytes = File.ReadAllBytes(cache);
                 if (CalcMd5(bytes) == path) return bytes;
             }
+            path ??= md5;
             var result = client.GetByteArrayAsync(urlgetter(path)).Result;
             if (cache != null)
                 File.WriteAllBytes(cache, result);

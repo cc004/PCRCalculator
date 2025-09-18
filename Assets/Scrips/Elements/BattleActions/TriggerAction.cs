@@ -26,7 +26,7 @@ namespace Elements
             eTriggerType actionDetail = (eTriggerType)base.ActionDetail1;
             if (actionDetail == eTriggerType.BREAK)
             {
-                _source.PartsBreakTimeDictionary.Add(partsData.Index, base.Value[eValueNumber.VALUE_3]);
+                _source.PartsBreakTimeDictionary.Add(partsData.Index, (float)base.Value[eValueNumber.VALUE_3]);
             }
         }
         public override void ExecActionOnStart(
@@ -269,7 +269,7 @@ namespace Elements
                         parts.SetBreak(true,
                             //this.battleManager.UnitUiCtrl.transform
                             battleManager.transform);
-                        _source.AppendCoroutine(_source.UpdateBreak(Value[eValueNumber.VALUE_3], parts), ePauseType.SYSTEM);
+                        _source.AppendCoroutine(_source.UpdateBreak((float)Value[eValueNumber.VALUE_3], parts), ePauseType.SYSTEM);
                     };
                     break;
                 case 10:
@@ -451,7 +451,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             eTriggerType actionDetail = (eTriggerType)base.ActionDetail1;

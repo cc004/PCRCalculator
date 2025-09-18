@@ -31,7 +31,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       if (_target.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
@@ -65,6 +65,7 @@ namespace Elements
         CriticalRate = -1f,
         IgnoreDef = true,
         CriticalDamageRate = 0.0f,
+        TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
         ActionType = eActionType.FORCE_HP_CHANGE
       };
       _target.Owner.SetDamage(_damageData, true, ActionId, OnDamageHit, _skill: _skill, _energyAdd: isEnergyGainEnabled, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple);

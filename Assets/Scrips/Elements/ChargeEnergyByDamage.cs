@@ -11,7 +11,7 @@ namespace Elements
 			INCREASE = 1
 		}
 
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			UnitCtrl targetUnit = _target.Owner;
@@ -34,13 +34,13 @@ namespace Elements
 			{
 				targetUnit.OnChangeState.Call(targetUnit, actionDetail, ADIFIOLCOPN: true);
 			}
-			sealData.AddSeal(_valueDictionary[eValueNumber.VALUE_5], targetUnit, actionDetail, (int)_valueDictionary[eValueNumber.VALUE_3]);
+			sealData.AddSeal((float)_valueDictionary[eValueNumber.VALUE_5], targetUnit, actionDetail, (int)_valueDictionary[eValueNumber.VALUE_3]);
 			eChargeType chargeType = (eChargeType)base.ActionDetail1;
-			float chargeValue = 0f;
+			double chargeValue = 0.0;
 			eChargeType eChargeType = chargeType;
 			if (eChargeType == eChargeType.INCREASE)
 			{
-				chargeValue = Mathf.Min(1000f, _valueDictionary[eValueNumber.VALUE_1]);
+				chargeValue = Mathf.Min(1000, (float)_valueDictionary[eValueNumber.VALUE_1]);
 			}
 			targetUnit.ChargeEnergyByReceiveDamageDictionary[actionDetail] = delegate
 			{

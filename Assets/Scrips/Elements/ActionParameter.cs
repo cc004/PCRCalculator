@@ -23,7 +23,7 @@ namespace Elements
         /// null means no other action
         /// should always 'is null or is {.value = 0}' when execAction called
         /// </summary>
-        public FloatWithEx oppositeActionProb;
+        public DoubleWithEx oppositeActionProb;
 
         public string sortinfo;
 
@@ -35,7 +35,7 @@ namespace Elements
         public OnActionEndDelegate OnActionEnd;
         public bool IsSearchAndSorted;
         public bool IsAlwaysChargeEnegry;
-        public float EnergyChargeMultiple = 1f;
+        public double EnergyChargeMultiple = 1f;
         //protected List<SkillEffectCtrl> changePatternCurrentSkillEffect = new List<SkillEffectCtrl>();
 
         protected BattleManager battleManager => staticBattleManager;
@@ -68,7 +68,7 @@ namespace Elements
 
         public List<BasePartsData> TargetList { get; set; }
 
-        public Dictionary<eValueNumber, FloatWithEx> Value { get; set; }
+        public Dictionary<eValueNumber, DoubleWithEx> Value { get; set; }
 
         public float[] ExecTime { get; set; }
 
@@ -138,14 +138,14 @@ namespace Elements
         public Dictionary<BasePartsData, long> LimitDamageDictionaryMgc { get; set; } =
             new Dictionary<BasePartsData, long>();
 
-        public Dictionary<BasePartsData, FloatWithEx> TotalDamageDictionary { get; set; } =
-            new Dictionary<BasePartsData, FloatWithEx>();
+        public Dictionary<BasePartsData, LongWithEx> TotalDamageDictionary { get; set; } =
+            new Dictionary<BasePartsData, LongWithEx>();
 
-        public Dictionary<eValueNumber, FloatWithEx> AdditionalValue { get; set; }
+        public Dictionary<eValueNumber, DoubleWithEx> AdditionalValue { get; set; }
 
-        public Dictionary<eValueNumber, FloatWithEx> MultipleValue { get; set; }
+        public Dictionary<eValueNumber, DoubleWithEx> MultipleValue { get; set; }
 
-        public Dictionary<eValueNumber, FloatWithEx> DivideValue { get; set; }
+        public Dictionary<eValueNumber, DoubleWithEx> DivideValue { get; set; }
 
         public MasterSkillAction.SkillAction MasterData { get; set; }
 
@@ -216,7 +216,7 @@ namespace Elements
             Skill _skill,
             float _starttime,
             Dictionary<int, bool> _enabledChildAction,
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
             Action<string> callBack = null)
         {
             ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction,
@@ -235,7 +235,7 @@ namespace Elements
             Skill _skill,
             float _starttime,
             Dictionary<int, bool> _enabledChildAction,
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 
         {
         }
@@ -333,32 +333,32 @@ namespace Elements
                    actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
         }
 
-        public delegate void OnDamageHitDelegate(FloatWithEx damage);
+        public delegate void OnDamageHitDelegate(LongWithEx damage);
 
         public delegate void OnActionEndDelegate();
 
         public ProbEvent relatedEvent;
 
-        public Dictionary<eValueNumber, FloatWithEx> oppositeValue = new Dictionary<eValueNumber, FloatWithEx>();
+        public Dictionary<eValueNumber, DoubleWithEx> oppositeValue = new Dictionary<eValueNumber, DoubleWithEx>();
 
-        public Dictionary<eValueNumber, FloatWithEx> PrepareActionValue()
+        public Dictionary<eValueNumber, DoubleWithEx> PrepareActionValue()
         {
 
-            Dictionary<eValueNumber, FloatWithEx> additionalValue = AdditionalValue;
-            Dictionary<eValueNumber, FloatWithEx> multipleValue = MultipleValue;
-            Dictionary<eValueNumber, FloatWithEx> divideValue = DivideValue;
-            Func<ActionParameter, eValueNumber, FloatWithEx> func = (_action, _type) =>
+            Dictionary<eValueNumber, DoubleWithEx> additionalValue = AdditionalValue;
+            Dictionary<eValueNumber, DoubleWithEx> multipleValue = MultipleValue;
+            Dictionary<eValueNumber, DoubleWithEx> divideValue = DivideValue;
+            Func<ActionParameter, eValueNumber, DoubleWithEx> func = (_action, _type) =>
             {
-                FloatWithEx num1 = 0.0f;
+                DoubleWithEx num1 = 0.0;
                 if (additionalValue != null && additionalValue.ContainsKey(_type))
                     num1 = additionalValue[_type];
-                FloatWithEx num2 = 1f;
+                DoubleWithEx num2 = 1.0;
                 if (multipleValue != null && multipleValue.ContainsKey(_type))
                     num2 = multipleValue[_type];
-                FloatWithEx num3 = 1f;
+                DoubleWithEx num3 = 1;
                 if (divideValue != null && divideValue.ContainsKey(_type) && (double) divideValue[_type] != 0.0)
                     num3 = divideValue[_type];
-                FloatWithEx num4 = 0.0f;
+                DoubleWithEx num4 = 0.0;
                 _action.Value.TryGetValue(_type, out num4);
                 if ((object) oppositeActionProb == null)
                     return (num1 + num4) * num2 / num3;
@@ -366,8 +366,8 @@ namespace Elements
                 var opp = oppositeValue.TryGetValue(_type, out var val) ? val : 0;
                 return result * (1 - oppositeActionProb) + opp * oppositeActionProb;
             };
-            Dictionary<eValueNumber, FloatWithEx> _valueDictionary =
-                new Dictionary<eValueNumber, FloatWithEx>(new eValueNumber_DictComparer())
+            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary =
+                new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer())
                 {
                     {
                         eValueNumber.VALUE_1,

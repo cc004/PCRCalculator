@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Guild;
@@ -7,7 +8,7 @@ namespace Elements
 {
     public class HealDownAction : ActionParameter
     {
-        public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+        public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -24,14 +25,14 @@ namespace Elements
                 _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary1, 0.5f, _skill.SkillId, _source, true, eEffectType.COMMON, false, false);
                 _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.HEAL_DOWN, (AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 9999f, this, _skill, Mathf.Max(_valueDictionary[eValueNumber.VALUE_1], 0f));
             */
-                _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
+                _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, LongWithEx>
                 {
                     {
                         _target,
                         0
                     }
                 }, 0.5f, _skill.SkillId, _source, _despelable: true, eEffectType.COMMON, _isBuff: false, _additional: false, _isShowIcon: false);
-                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.HEAL_DOWN, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 9999f, this, _skill, Mathf.Max(_valueDictionary[eValueNumber.VALUE_1], 0f));
+                _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.HEAL_DOWN, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 9999f, this, _skill, Math.Max(_valueDictionary[eValueNumber.VALUE_1], 0f));
                 return;
             }
             else

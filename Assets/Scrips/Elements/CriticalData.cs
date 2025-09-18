@@ -8,17 +8,17 @@ namespace Elements
 {
   public class CriticalData
   {
-      public FloatWithEx critVar { get; set; }
+    public DoubleWithEx critVar { get; set; }
     public bool IsCritical { get; set; }
 
-    public float CriticalRate { get; set; }
+    public double CriticalRate { get; set; }
 
-    public FloatWithEx ExpectedDamage;
-        public FloatWithEx ExpectedDamageNotCritical
+    public LongWithEx ExpectedDamage;
+        public LongWithEx ExpectedDamageNotCritical
         {
             get;
             set;
         }
-        public FloatWithEx ExpectedDamageForEnergyCalc { get; set; }
+        public LongWithEx ExpectedDamageForEnergyCalc { get; set; }
     }
 }

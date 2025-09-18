@@ -53,7 +53,7 @@ namespace Elements
                 BasePartsData basePartsData = list[j];
                 if (TargetSet.Contains(basePartsData))
                 {
-                    OnExit(basePartsData);
+                    OnExit(basePartsData, _unit);
                 }
             }
         }
@@ -80,13 +80,13 @@ namespace Elements
         {
         }
 
-        public override void OnExit(BasePartsData _parts)
+        public override void OnExit(BasePartsData _parts, UnitCtrl _source)
         {
-            base.OnExit(_parts);
+            base.OnExit(_parts, _source);
             AlreadyExecedTargetCount[_parts.Owner]--;
             if (AlreadyExecedTargetCount[_parts.Owner] != 0)
                 return;
-            Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
             if (_parts.Owner.IsPartsBoss && BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE) && BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE)
             {
                 for (int index = 0; index < _parts.Owner.BossPartsListForBattle.Count; ++index)
@@ -94,16 +94,16 @@ namespace Elements
             }
             else
                 dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
-            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, _enable: false, null, IsBuff, _additional: false, ShowsIcon, extraKey: this);
+            _parts.Owner.EnableBuffParam(BuffParamKind, dictionary, _enable: false, _source, IsBuff, _additional: false, ShowsIcon, extraKey: this);
             _parts.Owner.DisableBuffDebuffField(node[_parts.Owner]);
         }
 
         private Dictionary<UnitCtrl, LinkedListNode<ChangeParameterFieldData>> node = new Dictionary<UnitCtrl, LinkedListNode<ChangeParameterFieldData>>();
 
-        public override void OnEnter(BasePartsData _parts)
+        public override void OnEnter(BasePartsData _parts, UnitCtrl _source)
         {
             UnitCtrl owner = _parts.Owner;
-            base.OnEnter(_parts);
+            base.OnEnter(_parts, _source);
             if (AlreadyExecedTargetCount.ContainsKey(_parts.Owner))
             {
                 AlreadyExecedTargetCount[_parts.Owner]++;
@@ -112,7 +112,7 @@ namespace Elements
             }
             else
                 AlreadyExecedTargetCount.Add(_parts.Owner, 1);
-            Dictionary<BasePartsData, FloatWithEx> dictionary = new Dictionary<BasePartsData, FloatWithEx>();
+            Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
             if (_parts.Owner.IsPartsBoss && BuffParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE && (BuffParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED && BuffParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE) && BuffParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE)
             {
                 for (int index = 0; index < _parts.Owner.BossPartsListForBattle.Count; ++index)
@@ -122,8 +122,8 @@ namespace Elements
                 dictionary.Add(_parts.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_parts, Value, ValueType, BuffParamKind, !IsBuff));
 
             owner.fieldTime = remaining;
-            owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, BuffParamKind, dictionary, 0f, 0, null, _despelable: true, Elements.eEffectType.COMMON, IsBuff, _additional: false, _isShowIcon: false);
-            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, null, IsBuff, _additional: false, ShowsIcon, extraKey: this);
+            owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, BuffParamKind, dictionary, 0f, 0, _source, _despelable: true, Elements.eEffectType.COMMON, IsBuff, _additional: false, _isShowIcon: false);
+            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, _source, IsBuff, _additional: false, ShowsIcon, extraKey: this);
             node[owner] = owner.EnableBuffDebuffField(this);
     }
 

@@ -15,11 +15,11 @@ namespace Elements
 
         public int EffectId { get; set; }
 
-        public FloatWithEx Value { get; set; }
+        public DoubleWithEx Value { get; set; }
 
         public int ActionId { get; set; }
 
-        public float EnergyChargeMultiple { get; set; } = 1f;
+        public double EnergyChargeMultiple { get; set; } = 1f;
 
         public int AbsorberValue { get; set; }
 
@@ -51,20 +51,21 @@ namespace Elements
                     {
                         case DamageData.eDamageType.ATK:
                             receiveDamagePrecent = (float)TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)TargetList[index].Owner.PhysicalDamageUpPercentOrMin / 100f; 
+                            damageUpPrecent = (float)PPOJKIDHGNJ.PhysicalDamageUpPercentOrMin / 100f; 
                             break;
                         case DamageData.eDamageType.MGC:
                             receiveDamagePrecent = (float)TargetList[index].Owner.MagicReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)TargetList[index].Owner.MagicDamageUpPercentOrMin / 100f;
+                            damageUpPrecent = (float)PPOJKIDHGNJ.MagicDamageUpPercentOrMin / 100f;
                             break;
                     }
 
                     DamageData damageData = new DamageData();
                     damageData.Target = TargetList[index];
-                    damageData.Damage = BattleUtil.FloatToInt(Value * receiveDamagePrecent * damageUpPrecent);
+                    damageData.Damage = BattleUtil.DoubleToLong(Value * receiveDamagePrecent * damageUpPrecent);
                     damageData.DamageType = DamageType;
                     damageData.Source = PPOJKIDHGNJ;
                     damageData.ActionType = eActionType.ATTACK_FIELD;
+                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == PPOJKIDHGNJ.IsOther;
                     damageData.ExecAbsorber = _damage =>
                     {
                         if (_damage > AbsorberValue)

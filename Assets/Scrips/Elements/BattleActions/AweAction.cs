@@ -22,7 +22,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double dodgeByLevelDiff = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
@@ -30,7 +30,7 @@ namespace Elements
             double num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 4, (float)dodgeByLevelDiff));
       AweData _aweData = new AweData
       {
-        LifeTime = _valueDictionary[eValueNumber.VALUE_3],
+        LifeTime = (float)_valueDictionary[eValueNumber.VALUE_3],
         AweType = (eAweType) ActionDetail1,
         CountLimit = ActionDetail2 == 0 ? -1 : ActionDetail2,
         Value = _valueDictionary[eValueNumber.VALUE_1] / 100f
@@ -73,7 +73,7 @@ namespace Elements
 
     public class AweData
     {
-      public float Value;
+      public double Value;
       public float LifeTime;
       public int CountLimit = -1;
       public eAweType AweType = eAweType.UB_AND_SKILL;

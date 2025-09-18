@@ -29,7 +29,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           System.Action<string> action)
         {
             if ((long)_target.Owner.Hp <= 0L)
@@ -39,7 +39,7 @@ namespace Elements
             KnightGuardData _knightGuardData = new KnightGuardData
             {
                 Value = (int)((double)_valueDictionary[eValueNumber.VALUE_2] + (double)_valueDictionary[eValueNumber.VALUE_4] * num),
-                LifeTime = _valueDictionary[eValueNumber.VALUE_6],
+                LifeTime = (float)_valueDictionary[eValueNumber.VALUE_6],
                 KnightGuardType = (eKnightGuardType)ActionDetail1,
                 StateIconType = ActionDetail2 == 0 ? eStateIconType.INVALID_VALUE : (eStateIconType)ActionDetail2,
                 InhibitHealType = eValueType == eValueType.PHYSICS ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC,

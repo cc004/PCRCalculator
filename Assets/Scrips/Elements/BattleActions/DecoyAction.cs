@@ -17,12 +17,12 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
-            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DECOY, _valueDictionary[eValueNumber.VALUE_1], this, _skill);
+            _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DECOY, (float)_valueDictionary[eValueNumber.VALUE_1], this, _skill);
             action($"嘲讽，持续{_valueDictionary[eValueNumber.VALUE_1]}秒");
         }
 

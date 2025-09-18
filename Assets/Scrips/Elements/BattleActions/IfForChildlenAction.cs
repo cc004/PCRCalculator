@@ -39,7 +39,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictinary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictinary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
@@ -178,9 +178,9 @@ namespace Elements
                     }
                     if (ActionDetail1 > 900)
                     {
-                        flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
+                        flag = (long)_target.Owner.Hp / (double)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
 
-                        var now = _target.Owner.Hp / _target.Owner.MaxHp;
+                        var now = _target.Owner.Hp / (double)_target.Owner.MaxHp;
                         var bound = ActionDetail1 % 100 / 100.0;
 
                         if (flag)

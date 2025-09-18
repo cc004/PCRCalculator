@@ -17,21 +17,21 @@ namespace Elements
 			}
 		};
 
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,93,0)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) || base.TargetAssignment == eTargetAssignment.OWNER_SITE)
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);
 				UnitCtrl.eAbnormalState abnormalState = AbnormalStateDic[(ChangeSpeedAction.eChangeSpeedType)base.ActionDetail1];
-				float num = _valueDictionary[eValueNumber.VALUE_1];
+				double num = _valueDictionary[eValueNumber.VALUE_1];
 				if (abnormalState == UnitCtrl.eAbnormalState.SLOW_OVERLAP)
 				{
 					num *= -1f;
 				}
 				else if (abnormalState == UnitCtrl.eAbnormalState.HASTE_OVERLAP && !BattleUtil.LessThanOrApproximately(num + _target.Owner.CalcAbnormalStateSpeed(), 1f))
 				{
-					_target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, FloatWithEx>
+					_target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, LongWithEx>
 					{
 						{
 							_target,

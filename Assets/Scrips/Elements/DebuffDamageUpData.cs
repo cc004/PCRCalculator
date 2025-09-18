@@ -8,9 +8,9 @@ namespace Elements
 {
   public class DebuffDamageUpData
   {
-    public float DebuffDamageUpValue { get; set; }
+    public double DebuffDamageUpValue { get; set; }
 
-    public float DebuffDamageUpLimitValue { get; set; }
+    public double DebuffDamageUpLimitValue { get; set; }
 
     public float DebuffDamageUpTimer { get; set; }
 

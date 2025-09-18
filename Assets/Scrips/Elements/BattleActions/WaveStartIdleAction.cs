@@ -40,7 +40,7 @@ namespace Elements
       WaveStartIdleAction waveStartIdleAction = this;
       _source.IsMoveSpeedForceZero = true;
       _source.SetLeftDirection(_source.IsOther);
-      float time = waveStartIdleAction.Value[eValueNumber.VALUE_1] + (waveStartIdleAction.battleManager.IsBossBattle ? waveStartIdleAction.battleManager.GetBossUnit().UnitAppearDelay : 0.0f);
+      float time = (float)waveStartIdleAction.Value[eValueNumber.VALUE_1] + (waveStartIdleAction.battleManager.IsBossBattle ? waveStartIdleAction.battleManager.GetBossUnit().UnitAppearDelay : 0.0f);
       while (true)
       {
         time -= _source.DeltaTimeForPause;
@@ -72,7 +72,7 @@ label_4:
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       BattleSpineController currentSpineCtrl = _source.GetCurrentSpineCtrl();

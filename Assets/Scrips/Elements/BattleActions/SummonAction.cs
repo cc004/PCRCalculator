@@ -36,7 +36,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
       System.Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -44,14 +44,14 @@ namespace Elements
       UnitCtrl unitCtrl = battleManager.Summon(new SummonData
       {
         SummonId = ActionDetail2,
-        TargetPosition = _target.GetLocalPosition() + new Vector3((_source.IsLeftDir || _source.IsForceLeftDir ? -1f : 1f) * _valueDictionary[eValueNumber.VALUE_7], 0.0f),
+        TargetPosition = _target.GetLocalPosition() + new Vector3((float)((_source.IsLeftDir || _source.IsForceLeftDir ? -1f : 1f) * _valueDictionary[eValueNumber.VALUE_7]), 0.0f),
         Owner = _source,
         Skill = _skill,
         //Prefab = this.SummonPrefab,
         SummonSide = (eSummonSide) ActionDetail3,
         SummonType = (eSummonType) (float)_valueDictionary[eValueNumber.VALUE_5],
-        MoveSpeed = _valueDictionary[eValueNumber.VALUE_1],
-        FromPosition = _source.transform.localPosition + new Vector3((_source.IsLeftDir || _source.IsForceLeftDir ? -1f : 1f) * _valueDictionary[eValueNumber.VALUE_6], 0.0f, 0.0f),
+        MoveSpeed = (float)_valueDictionary[eValueNumber.VALUE_1],
+        FromPosition = _source.transform.localPosition + new Vector3((float)((_source.IsLeftDir || _source.IsForceLeftDir ? -1f : 1f) * _valueDictionary[eValueNumber.VALUE_6]), 0.0f, 0.0f),
         UseRespawnPos = (double) _valueDictionary[eValueNumber.VALUE_2] != 99.0,
         RespawnPos = BattleUtil.SearchRespawnPos(_basePos, _source.IsOther ? battleManager.EnemyList : battleManager.UnitList),
         ConsiderEquipmentAndBonus = ActionDetail1 == 3

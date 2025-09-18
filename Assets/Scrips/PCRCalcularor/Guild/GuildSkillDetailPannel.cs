@@ -2,7 +2,7 @@
 using Elements;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.EventSystems;
 namespace PCRCaculator.Guild
 {
     public class GuildSkillDetailPannel : MonoBehaviour
@@ -19,19 +19,21 @@ namespace PCRCaculator.Guild
         {
             Destroy(gameObject);
         }
-
-        public void OnPointerClick()
+        void Update()
         {
-
+            // 检测鼠标右键点击退出
+            if (Input.GetMouseButtonDown(1))
+            {
+                ExitButton();
+            }
         }
-
         private float posy;
         public void Setdetails(UnitSkillExecData data)
         {
-            detailTexts[0].text = data.UnitName;
+            detailTexts[0].text = $"技能来源：{data.UnitName}【{data.skillName}】";
             // detailTexts[2].text = data.skillState.GetDescription();
-            detailTexts[1].text = data.startTime + "~" + data.endTime;
-            detailTexts[2].text = data.energy == 0f ? "无" : $"{data.energy}";
+            detailTexts[1].text = $"执行帧数：{data.startTime}~{data.endTime}";
+            detailTexts[2].text = $"TP值：{(data.energy == 0f ? "无" : data.energy)}";
             detailTexts[3].text = data.skillName;
             posy = prefabBasePos.y;
             for (int i = 0; i < data.actionExecDatas.Count; i++)
@@ -53,14 +55,29 @@ namespace PCRCaculator.Guild
             var view = a.GetComponent<GuildSkillActionDetail>().View;
             List<string> details = new List<string>
             {
-                $"{data.actionID}({data.actionType})",
+                $"{data.actionID}",
+                $"({data.actionType})",
                 string.Join(" ", data.targetNames),
-                $"{data.result.GetDescription()}[{data.execTime}]",
+                $"[{data.execTime}]\n{data.result.GetDescription()}",
                 data.describe
             };
             a.GetComponent<GuildSkillActionDetail>().SetTexts(details);
+            Color backgroundColor = (idx % 2 == 0) ?
+                new Color(255f, 255f, 255f, 1.0f) :  // 白色
+                new Color(0.85f, 0.85f, 0.85f, 1.0f);   // 浅灰色
+
+            var imageComponent = a.GetComponent<Image>();
+            if (imageComponent != null)
+            {
+                imageComponent.color = backgroundColor;
+            }
+            else
+            {
+                var bgImage = a.AddComponent<Image>();
+                bgImage.color = backgroundColor;
+            }
             prefabs.Add(a);
-            posy += (view.localPosition.y - view.sizeDelta.y - 20);
+            posy += (view.localPosition.y - view.sizeDelta.y - 30);
         }
     }
 }

@@ -13,6 +13,7 @@ public class Stars : MonoBehaviour
     public Sprite dark;
     public Sprite blue;
     public Sprite bright6;
+    public List<Sprite> stars_setting;
     /// <summary>
     /// 设置星星数量
     /// </summary>
@@ -28,25 +29,27 @@ public class Stars : MonoBehaviour
         if (i == 6)
             max = 6;
         gameObject.SetActive(true);
-        for(int k = 0; k < stars.Count; k++)
-        {
-            if (k < i)
-            {
-                stars[k].sprite = k==5?bright6: bright;
-            }
-            else
-            {
-                stars[k].sprite = isUnit?blue: dark;
-            }
-            if (k < max)
-            {
-                stars[k].gameObject.SetActive(true);
-            }
-            else
-            {
-                stars[k].gameObject.SetActive(false);
-            }
-        }
+        // for (int k = 0; k < stars.Count; k++)
+        // {
+        //     if (k < i)
+        //     {
+        //         stars[k].sprite = k == 5 ? bright6 : bright;
+        //     }
+        //     else
+        //     {
+        //         stars[k].sprite = isUnit ? blue : dark;
+        //     }
+        //     if (k < max)
+        //     {
+        //         stars[k].gameObject.SetActive(true);
+        //     }
+        //     else
+        //     {
+        //         stars[k].gameObject.SetActive(false);
+        //     }
+        // }
+        if (isUnit) //todo 临时处理
+            stars[0].sprite = stars_setting[i-1];
     }
     public void SetStarColor(Color color)
     {

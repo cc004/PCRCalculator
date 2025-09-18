@@ -26,7 +26,7 @@ namespace Elements
 
         public float HitRate { get; set; }
 
-        public float Value { get; set; }
+        public double Value { get; set; }
 
         public float CoolTime { get; set; }
 

@@ -19,7 +19,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictinary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictinary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
@@ -33,6 +33,7 @@ namespace Elements
                         DamageType = DamageData.eDamageType.NONE,
                         Source = _source,
                         ActionType = eActionType.DESTROY,
+                        TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
                         IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
                     }, _byAttack: false, base.ActionId, null, _hasEffect: false, null, _energyAdd: true, base.OnDefeatEnemy, _noMotion: false, 1f, 1f, null, EnergyChargeMultiple, base.UsedChargeEnergyByReceiveDamage);
                     break;

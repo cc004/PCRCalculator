@@ -56,7 +56,7 @@ public class TimelinePanel : MonoBehaviour
         }
         else
         {
-            content[2] = "<color=#0024FF>BOSS</color>";
+            content[2] = $"<color=#0024FF>{detail.enemyData.name}</color>";
             content[3] = "<color=#0024FF>UB</color>";
             content[4] = "";
             content[5] = "";

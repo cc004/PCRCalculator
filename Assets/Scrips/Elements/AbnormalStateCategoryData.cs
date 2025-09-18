@@ -12,18 +12,18 @@ namespace Elements
   {
     public UnitCtrl.eAbnormalState CurrentAbnormalState;
     public bool enable;
-    public FloatWithEx MainValue;
+    public DoubleWithEx MainValue;
     public const float SLIP_DAMAGE_INTERVAL_TIME = 1f;
     public float Time;
     public float Duration;
     public List<AbnormalStateEffectGameObject> Effects = new List<AbnormalStateEffectGameObject>();
     public int ActionId;
-    public float EnergyChargeMultiple = 1f;
-        public bool ShowsIcon = true;
+    public double EnergyChargeMultiple = 1f;
+    public bool ShowsIcon = true;
 
-        public float SubValue { get; set; }
+    public double SubValue { get; set; }
 
-    public float EnergyReduceRate { get; set; }
+    public double EnergyReduceRate { get; set; }
 
     public bool IsEnergyReduceMode { get; set; }
 

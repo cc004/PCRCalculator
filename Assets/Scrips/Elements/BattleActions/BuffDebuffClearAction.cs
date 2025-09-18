@@ -21,7 +21,7 @@ namespace Elements
 		  Skill _skill,
 		  float _starttime,
 		  Dictionary<int, bool> _enabledChildAction,
-		  Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+		  Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			bool flag = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 18, BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))) >= (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()) && ActionDetail1 == 1;

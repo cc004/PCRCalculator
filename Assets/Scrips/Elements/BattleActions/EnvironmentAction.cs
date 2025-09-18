@@ -66,7 +66,7 @@ namespace Elements
         Skill skill,
         float starttime,
         Dictionary<int, bool> enabledChildAction,
-        Dictionary<eValueNumber, FloatWithEx> valueDictionary)
+        Dictionary<eValueNumber, DoubleWithEx> valueDictionary)
         {
             // SkillEffectCtrl wrapper = null;
             // if (this.ActionEffectList != null && this.ActionEffectList.Count > 0)
@@ -86,7 +86,7 @@ namespace Elements
                 SourceActionController = sourceActionController,
                 // 对应 C++ 里 *(float*)(obj+0x44) = valueDictionary[0]
                 LimitTime = (valueDictionary != null && valueDictionary.TryGetValue((eValueNumber)0, out var t))
-                                         ? t
+                                         ? (float)t
                                          : 0f,
             };
             // data.InitializeSkillEffect(wrapper);

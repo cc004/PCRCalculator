@@ -28,7 +28,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       if (ActionDetail1 == 1)
@@ -48,14 +48,14 @@ namespace Elements
     {
       ChargeAction chargeAction = this;
       float timer = 0.0f;
-      Dictionary<eValueNumber, FloatWithEx> additionalValue = null;
+      Dictionary<eValueNumber, DoubleWithEx> additionalValue = null;
       if (chargeAction.ActionDetail2 != 0)
       {
         // ISSUE: reference to a compiler-generated method
         additionalValue = _skill.ActionParameters.Find(a=>a.ActionId == ActionDetail2).AdditionalValue;
       }
       eValueNumber targetValue = (eValueNumber) ((int) chargeAction.Value[eValueNumber.VALUE_4] + 1);
-      additionalValue = new Dictionary<eValueNumber, FloatWithEx>();
+      additionalValue = new Dictionary<eValueNumber, DoubleWithEx>();
       additionalValue.Add(targetValue, 0.0f);
       while (true)
       {

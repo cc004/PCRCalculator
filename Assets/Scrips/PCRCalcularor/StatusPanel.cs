@@ -73,17 +73,17 @@ public class StatusPanel : MonoBehaviour
     }
     private void UpdateCellTexts(UnitCtrl unitCtrl, Text[] cellTexts)
     {
-        var HpPencent = (float)unitCtrl.Hp != 0 ? string.Format("{0:P2}", (float)unitCtrl.Hp / (float)unitCtrl.MaxHp) : "0.00%";
+        var HpPencent = unitCtrl.Hp != 0 ? string.Format("{0:P2}", (double)unitCtrl.Hp / unitCtrl.MaxHp) : "0.00%";
         string[] properties = new string[]
         {
             unitCtrl.UnitName,
-            $"{(float)unitCtrl.Hp}\n<color=#f75291>{HpPencent}</color>",
-            $"{(float)unitCtrl.Energy}",
+            $"{unitCtrl.Hp}\n<color=#f75291>{HpPencent}</color>",
+            $"{unitCtrl.Energy}",
             $"{unitCtrl.EnergyRecoveryRate}",
-            $"{(float)unitCtrl.Atk}",
-            $"{(float)unitCtrl.MagicStr}",
-            $"{(float)unitCtrl.Def}",
-            $"{(float)unitCtrl.MagicDef}",
+            $"{unitCtrl.Atk}",
+            $"{unitCtrl.MagicStr}",
+            $"{unitCtrl.Def}",
+            $"{unitCtrl.MagicDef}",
         };
 
         for (int i = 0; i < cellTexts.Length; i++)

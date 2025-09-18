@@ -14,6 +14,7 @@ using PCRCaculator;
 using PCRCaculator.Guild;
 using Spine;
 using UnityEngine;
+using PCRCaculator.Battle;
 //using Elements.Data;
 
 namespace Elements
@@ -43,60 +44,60 @@ namespace Elements
 
         public int Level { get; protected set; }
 
-        public FloatWithEx Atk { get; protected set; }
+        public LongWithEx Atk { get; protected set; }
 
-        public FloatWithEx MagicStr { get; protected set; }
+        public LongWithEx MagicStr { get; protected set; }
 
-        public FloatWithEx Def { get; protected set; }
+        public LongWithEx Def { get; protected set; }
 
-        public FloatWithEx MagicDef { get; protected set; }
+        public LongWithEx MagicDef { get; protected set; }
 
-        public int Dodge { get; protected set; }
+        public long Dodge { get; protected set; }
 
-        public int Accuracy { get; protected set; }
+        public long Accuracy { get; protected set; }
 
-        public int PhysicalCritical { get; protected set; }
+        public long PhysicalCritical { get; protected set; }
 
-        public int MagicCritical { get; protected set; }
+        public long MagicCritical { get; protected set; }
 
-        public int LifeSteal { get; private set; }
+        public long LifeSteal { get; private set; }
 
-        public int HpRecoveryRate { get; private set; }
+        public long HpRecoveryRate { get; private set; }
 
-        public int StartAtk { get; protected set; }
+        public long StartAtk { get; protected set; }
 
-        public int StartMagicStr { get; protected set; }
+        public long StartMagicStr { get; protected set; }
 
-        public int StartDef { get; protected set; }
+        public long StartDef { get; protected set; }
 
-        public int StartMagicDef { get; protected set; }
+        public long StartMagicDef { get; protected set; }
 
-        public int StartDodge { get; protected set; }
+        public long StartDodge { get; protected set; }
 
-        public int StartPhysicalCritical { get; protected set; }
+        public long StartPhysicalCritical { get; protected set; }
 
-        public int StartMagicCritical { get; protected set; }
+        public long StartMagicCritical { get; protected set; }
 
-        public int StartLifeSteal { get; private set; }
+        public long StartLifeSteal { get; private set; }
 
-        public FloatWithEx BreakPoint { get; set; }
+        public LongWithEx BreakPoint { get; set; }
 
         public float BreakTime { get; set; }
 
         public float RecoverTime = 1.12f;//添加
-        public int MaxBreakPoint { get; private set; }
+        public long MaxBreakPoint { get; private set; }
 
-        private Dictionary<UnitCtrl.BuffParamKind, FloatWithEx> additionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, FloatWithEx>();
+        private Dictionary<UnitCtrl.BuffParamKind, LongWithEx> additionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, LongWithEx>();
 
-        private int getAdditionalBuff(UnitCtrl.BuffParamKind _kind)
+        private long getAdditionalBuff(UnitCtrl.BuffParamKind _kind)
         {
-            FloatWithEx num;
-            return (int)(!additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
+            LongWithEx num;
+            return (!additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
-        private FloatWithEx getAdditionalBuffEx(UnitCtrl.BuffParamKind _kind)
+        private LongWithEx getAdditionalBuffEx(UnitCtrl.BuffParamKind _kind)
         {
-            FloatWithEx num;
+            LongWithEx num;
             return (!additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
@@ -167,11 +168,11 @@ namespace Elements
             }
             else
             {*/
-            Atk = (int)(StartAtk = (int)data.baseData.Atk);
-            Def = StartDef = (int)data.baseData.Def;
+            Atk = StartAtk = (long)data.baseData.Atk;
+            Def = StartDef = (long)data.baseData.Def;
             DefForDamagedEnergy = Def;
-            MagicStr = (int)(StartMagicStr = (int)data.baseData.Magic_str);
-            MagicDef = StartMagicDef = (int)data.baseData.Magic_def;
+            MagicStr = StartMagicStr = (long)data.baseData.Magic_str;
+            MagicDef = StartMagicDef = (long)data.baseData.Magic_def;
             MagicDefForDamagedEnergy = MagicDef;
             PhysicalCritical = StartPhysicalCritical = (int)data.baseData.Physical_critical;
             MagicCritical = StartMagicCritical = (int)data.baseData.Magic_critical;
@@ -179,6 +180,9 @@ namespace Elements
             Level = data.level;
             BreakPoint = MaxBreakPoint = (int)data.baseData.RealHp;
             //}
+
+            BattleManager.Instance.SetPartsTalentWeakness(unit_id, this);
+
         }
 
         public override Bone GetStateBone() => stateBone;
@@ -205,53 +209,53 @@ namespace Elements
 
         public override Vector3 GetColliderSize() => new Vector3(BodyWidthValue / 540f, 0.0f, 0.0f);
 
-        public override FloatWithEx GetDefZero() => Def.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+        public override LongWithEx GetDefZero() => Def.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
 
-        public override FloatWithEx GetMagicDefZero() => MagicDef.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
+        public override LongWithEx GetMagicDefZero() => MagicDef.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
 
-        private int getDodgeZero() => Mathf.Max(0, Dodge) + getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
+        private long getDodgeZero() => Math.Max(0, Dodge) + getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
 
-        public override int GetAtkZero() => Mathf.Max(0, (int)Atk) + getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
+        public override long GetAtkZero() => Math.Max(0, (int)Atk) + getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
 
-        public override int GetMagicStrZero() => Mathf.Max(0, (int)MagicStr) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override long GetMagicStrZero() => Math.Max(0, (int)MagicStr) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
 
-        public override FloatWithEx GetAtkZeroEx() => Atk.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK);
+        public override LongWithEx GetAtkZeroEx() => Atk.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK);
 
-        public override FloatWithEx GetMagicStrZeroEx() => MagicStr.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override LongWithEx GetMagicStrZeroEx() => MagicStr.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR);
 
-        public override int GetAccuracyZero() => Mathf.Max(0, Accuracy) + getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
+        public override long GetAccuracyZero() => Math.Max(0, Accuracy) + getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
 
-        public override int GetPhysicalCriticalZero() => Mathf.Max(0, PhysicalCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL);
+        public override long GetPhysicalCriticalZero() => Math.Max(0, PhysicalCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL);
 
-        public override int GetMagicCriticalZero() => Mathf.Max(0, MagicCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_CRITICAL);
+        public override long GetMagicCriticalZero() => Math.Max(0, MagicCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_CRITICAL);
 
-        public override int GetLifeStealZero() => Mathf.Max(0, LifeSteal) + getAdditionalBuff(UnitCtrl.BuffParamKind.LIFE_STEAL);
+        public override long GetLifeStealZero() => Math.Max(0, LifeSteal) + getAdditionalBuff(UnitCtrl.BuffParamKind.LIFE_STEAL);
 
-        public override float GetHpRecoverRateZero() => Mathf.Max(0, HpRecoveryRate);
+        public override long GetHpRecoverRateZero() => Math.Max(0, HpRecoveryRate);
 
         public override int GetLevel() => Level;
 
-        public override float GetDodgeRate(int _accuracy)
+        public override float GetDodgeRate(long _accuracy)
         {
-            int num = Mathf.Max(getDodgeZero() - _accuracy, 0);
+            long num = Math.Max(getDodgeZero() - _accuracy, 0);
             return num / (num + 100f);
         }
 
-        public override int GetStartAtk() => StartAtk;
+        public override long GetStartAtk() => StartAtk;
 
-        public override int GetStartDef() => StartDef;
+        public override long GetStartDef() => StartDef;
 
-        public override int GetStartMagicStr() => StartMagicStr;
+        public override long GetStartMagicStr() => StartMagicStr;
 
-        public override int GetStartMagicDef() => StartMagicDef;
+        public override long GetStartMagicDef() => StartMagicDef;
 
-        public override int GetStartDodge() => StartDodge;
+        public override long GetStartDodge() => StartDodge;
 
-        public override int GetStartPhysicalCritical() => StartPhysicalCritical;
+        public override long GetStartPhysicalCritical() => StartPhysicalCritical;
 
-        public override int GetStartMagicCritical() => StartMagicCritical;
+        public override long GetStartMagicCritical() => StartMagicCritical;
 
-        public override int GetStartLifeSteal() => StartLifeSteal;
+        public override long GetStartLifeSteal() => StartLifeSteal;
 
         public override void SetMissAtk(
           UnitCtrl _source,
@@ -261,14 +265,14 @@ namespace Elements
 
         public override void SetBuffDebuff(
           bool _enable,
-          FloatWithEx _value,
+          LongWithEx _value,
           UnitCtrl.BuffParamKind _kind,
           UnitCtrl _source,
           BattleLogIntreface _battleLog,
           bool _additional)
         {
             if (!_enable)
-                _value = _value * -1f;
+                _value = _value * -1;
             if (_additional)
             {
                 if (additionalBuffDictionary.ContainsKey(_kind))
@@ -292,8 +296,8 @@ namespace Elements
                         Atk = (int)(Atk + _value);
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
-                        Def = (Def + _value).Floor();
-                        DefForDamagedEnergy = (DefForDamagedEnergy + _value).Floor();
+                        Def = (Def + _value);
+                        DefForDamagedEnergy = (DefForDamagedEnergy + _value);
                         string des = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 1, Def, BattleHeaderController.CurrentFrameCount, des);
                         break;
@@ -301,8 +305,8 @@ namespace Elements
                         MagicStr = (int)(MagicStr + _value);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
-                        MagicDef = (MagicDef + _value).Floor();
-                        MagicDefForDamagedEnergy = (MagicDefForDamagedEnergy + _value).Floor();
+                        MagicDef = (MagicDef + _value);
+                        MagicDefForDamagedEnergy = (MagicDefForDamagedEnergy + _value);
                         string des2 = (_source == null ? "???" : _source.UnitName) + "的技能" + (_enable ? "开始" : "结束") + "变更" + _value;
                         Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 2, MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
@@ -349,7 +353,7 @@ namespace Elements
             }
         }*/
 
-        public void SetDamage(FloatWithEx _damage, UnitCtrl _source)
+        public void SetDamage(LongWithEx _damage, UnitCtrl _source)
         {
           if (Owner.IsAbnormalState(UnitCtrl.eAbnormalState.PARTS_NO_DAMAGE))
             return;
@@ -496,19 +500,19 @@ namespace Elements
             partsData.BreakPoint = partsData.MaxBreakPoint;
             partsData.OnBreakEnd.Call();
         }
-        public override FloatWithEx GetDefZeroForDamagedEnergy()
+        public override LongWithEx GetDefZeroForDamagedEnergy()
         {
-            return Mathf.Max(0, this.DefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+            return Math.Max(0, this.DefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
         }
 
-        private FloatWithEx DefForDamagedEnergy = 0;
+        private LongWithEx DefForDamagedEnergy = 0;
 
         // Token: 0x04003038 RID: 12344
-        private FloatWithEx MagicDefForDamagedEnergy = 0;
+        private LongWithEx MagicDefForDamagedEnergy = 0;
 
-        public override FloatWithEx GetMagicDefZeroForDamagedEnergy()
+        public override LongWithEx GetMagicDefZeroForDamagedEnergy()
         {
-            return Mathf.Max(0, this.MagicDefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
+            return Math.Max(0, this.MagicDefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
         }
     }
 }

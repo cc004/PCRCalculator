@@ -23,7 +23,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictinary)
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictinary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
       if (!battleManager.ExistsField(ActionDetail1, _source.IsOther))

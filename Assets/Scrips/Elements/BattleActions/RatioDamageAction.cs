@@ -14,7 +14,7 @@ namespace Elements
     {
         private const float PERCENT_DIGIT = 100f;
         private BasePartsData parts;
-        private Dictionary<BasePartsData, FloatWithEx> targetCurrentHps;
+        private Dictionary<BasePartsData, LongWithEx> targetCurrentHps;
 
         public override void ReadyAction(
           UnitCtrl _source,
@@ -35,7 +35,7 @@ namespace Elements
             parts = _source.BossPartsListForBattle.Find(e => e.Index == _skill.ParameterTarget);
             if (targetCurrentHps != null)
                 return;
-            targetCurrentHps = new Dictionary<BasePartsData, FloatWithEx>();
+            targetCurrentHps = new Dictionary<BasePartsData, LongWithEx>();
         }
 
         public override void ExecAction(
@@ -46,7 +46,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -61,18 +61,24 @@ namespace Elements
             }
             if (!HitOnceDic[_target])
                 targetCurrentHps[_target] = _target.Owner.Hp;
-            FloatWithEx num = 0;
+            LongWithEx num = 0;
             switch ((eTargetParameter)ActionDetail1)
             {
                 case eTargetParameter.MAX_HP:
-                    num = BattleUtil.FloatToInt(((float)_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
+                    num = BattleUtil.DoubleToLong((_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100.0) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
                 case eTargetParameter.CURRENT_HP:
-                    num = BattleUtil.FloatToInt((targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
+                    num = BattleUtil.DoubleToLong(((DoubleWithEx)targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100.0) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
                 case eTargetParameter.START_MAX_HP:
-                    num = BattleUtil.FloatToInt((float)(long)_target.Owner.StartMaxHP * _valueDictionary[eValueNumber.VALUE_1] / 100f * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+                    num = BattleUtil.DoubleToLong((long)_target.Owner.StartMaxHP * _valueDictionary[eValueNumber.VALUE_1] / 100.0 * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
                     break;
+            }
+            long override_damage = -1;
+            if (_valueDictionary[eValueNumber.VALUE_3] != 0)
+            {
+                var limit_damage = _valueDictionary[eValueNumber.VALUE_3];
+                override_damage = BattleUtil.DoubleToLong(limit_damage * ActionExecTimeList[_num].Weight / ActionWeightSum);
             }
             DamageData damageData = new DamageData
             {
@@ -86,7 +92,8 @@ namespace Elements
                 IgnoreDef = true,
                 LifeSteal = _source.IsPartsBoss ? parts.GetLifeStealZero() : (int)_source.LifeStealZero,
                 ActionType = eActionType.RATIO_DAMAGE,
-                IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
+                IsAlwaysChargeEnegry = IsAlwaysChargeEnegry,
+                OverrideDamageLimit = override_damage
             };
             UnitCtrl owner = _target.Owner;
             DamageData _damageData = damageData;

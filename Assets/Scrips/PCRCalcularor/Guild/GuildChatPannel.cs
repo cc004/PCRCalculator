@@ -23,7 +23,7 @@ namespace PCRCaculator.Guild
         // public Transform PosYParent;
 
         private List<List<ValueChangeData>> AllUnitDamageDates;
-        private List<float> DamageMax;
+        private List<double> DamageMax;
         private List<List<ValueChangeData>> AllUnitTotalDamageDates;
         private List<ValueChangeData>[] BossDefData;
         private List<ValueChangeData>[] BossMagicDefData;
@@ -45,7 +45,7 @@ namespace PCRCaculator.Guild
             SetLineChat();
             AllUnitDamageDates = new List<List<ValueChangeData>>();
             AllUnitTotalDamageDates = new List<List<ValueChangeData>>();
-            DamageMax = new List<float>();
+            DamageMax = new List<double>();
             BossDefData = Array.Empty<List<ValueChangeData>>();
             BossMagicDefData = Array.Empty<List<ValueChangeData>>();
             emptyList = new List<ValueChangeData> { new ValueChangeData(0, 0), new ValueChangeData(1, 0) };

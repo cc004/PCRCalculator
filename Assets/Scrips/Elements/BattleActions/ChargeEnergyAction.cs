@@ -26,15 +26,16 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, FloatWithEx> _valueDictionary,
+      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
       Action<string> action)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       AppendIsAlreadyExeced(_target.Owner, _num);
-      float _energy = 0.0f;
+      double _energy = 0.0;
       switch (ActionDetail1)
       {
         case 1:
+        case 4:
           _energy = _valueDictionary[eValueNumber.VALUE_1];
           break;
         case 2:
@@ -50,7 +51,7 @@ namespace Elements
             {
                 _energy *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
             }
-            _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1, _source, _effectType: EffectType,action:action);
+            _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1 || ActionDetail1 == 4, _source, _effectType: EffectType,action:action, _useRecoveryRate: ActionDetail1 != 4);
     }
 
     public override void SetLevel(float _level)
