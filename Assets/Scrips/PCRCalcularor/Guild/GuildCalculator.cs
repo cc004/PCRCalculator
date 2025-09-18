@@ -235,7 +235,7 @@ namespace PCRCaculator.Guild
             {
                 allUnitStateChangeDic.Add(a, new List<UnitStateChangeData>());
                 allUnitAbnormalStateDic.Add(a, new List<UnitAbnormalStateChangeData>());
-                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.Hp, (int)b.Hp, "初始化"){target = a} });
+                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.Hp, b.Hp, "初始化"){target = a} });
                 allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0){describe = "初始化", target = a} });
                 allUnitLastStateDic.Add(a, new UnitStateChangeData(0, UnitCtrl.ActionState.GAME_START, UnitCtrl.ActionState.GAME_START));
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
@@ -377,7 +377,7 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic[unitid].Remove(changeData);
             }
         }
-        public void AppendChangeHP(int unitid, long currentHP, int hp, long damage, int frame, string describe, UnitCtrl source)
+        public void AppendChangeHP(int unitid, long currentHP, long hp, long damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             var sourceId = source?.UnitId ?? unitid;
@@ -395,7 +395,7 @@ namespace PCRCaculator.Guild
                 // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
             }
         }
-        public void AppendChangeTP(int unitid, long currentTP, int frame, string describe)
+        public void AppendChangeTP(int unitid, double currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
 
@@ -453,7 +453,7 @@ namespace PCRCaculator.Guild
                 playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame, damage));
             }
         }
-        public void AppendChangeBaseValue(int unitid, int valueType, long value, int currentFrame, string describe)
+        public void AppendChangeBaseValue(int unitid, int valueType, double value, int currentFrame, string describe)
         {
             if (BattleManager.Instance.skipping) return;
             if (bossId.Contains(unitid - unitid / 10 % 10 * 10))
@@ -767,8 +767,8 @@ namespace PCRCaculator.Guild
               {
                 int unitid = unitCtrl.UnitId;
                 AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                AppendChangeHP(unitid, unitCtrl.Hp, (int)unitCtrl.MaxHp, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
-                AppendChangeTP(unitid, (long)unitCtrl.Energy, 5400, "时间耗尽");
+                AppendChangeHP(unitid, unitCtrl.Hp, unitCtrl.MaxHp, unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
+                AppendChangeTP(unitid, unitCtrl.Energy, 5400, "时间耗尽");
                 if (allUnitAbnormalStateDic.TryGetValue(unitid, out var value))
                 {
                   foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
@@ -1148,7 +1148,7 @@ namespace PCRCaculator.Guild
         public static List<ValueChangeData> CreateTotalChatData(List<ValueChangeData> data)
         {
             List<ValueChangeData> data0 = new List<ValueChangeData>();
-            long add = 0;
+            double add = 0;
             foreach (ValueChangeData value in data)
             {
                 add += value.yValue;
@@ -1688,11 +1688,11 @@ namespace PCRCaculator.Guild
     public class ValueChangeData : IValue
     {
         public int xValue { get; set; }
-        public long yValue { get; set; }
+        public double yValue { get; set; }
         float IValue.xValue => xValue / XScale;
         float IValue.yValue => (float)(yValue / YScale);
 
-        public int hp;
+        public long hp;
         public long damage;
         public long expectedDamage;
         public string describe;
@@ -1704,7 +1704,7 @@ namespace PCRCaculator.Guild
         private double YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;
 
         public ValueChangeData() { }
-        public ValueChangeData(int x, long y)
+        public ValueChangeData(int x, double y)
         {
             xValue = x;
             yValue = y;
@@ -1712,7 +1712,7 @@ namespace PCRCaculator.Guild
         }
 
         public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
-        public ValueChangeData(int x, long y, int hp, string describe)
+        public ValueChangeData(int x, double y, long hp, string describe)
         {
             xValue = x;
             yValue = y;

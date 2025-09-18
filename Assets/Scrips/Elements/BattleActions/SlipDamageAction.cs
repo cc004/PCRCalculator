@@ -83,7 +83,7 @@ namespace Elements
             eCancelTriggerType actionDetail = (eCancelTriggerType)base.ActionDetail2;
             if (actionDetail == eCancelTriggerType.MAX_HP)
             {
-                flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (float)(long)targetOwner.Hp / (float)(long)targetOwner.MaxHp);
+                flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)targetOwner.Hp / targetOwner.MaxHp);
             }
             //end add
             if (!flag && num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
@@ -95,7 +95,7 @@ namespace Elements
                 actionDetail = (eCancelTriggerType)base.ActionDetail2;
                 if (actionDetail == eCancelTriggerType.MAX_HP)
                 {
-                    targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (float)(long)targetOwner.Hp / (float)(long)targetOwner.MaxHp);
+                    targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)(long)targetOwner.Hp / (long)targetOwner.MaxHp);
                 }
                 targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _valueDictionary[eValueNumber.VALUE_6] == 0f);
 

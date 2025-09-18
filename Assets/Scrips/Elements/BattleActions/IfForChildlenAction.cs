@@ -178,9 +178,9 @@ namespace Elements
                     }
                     if (ActionDetail1 > 900)
                     {
-                        flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
+                        flag = (long)_target.Owner.Hp / (double)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
 
-                        var now = _target.Owner.Hp / _target.Owner.MaxHp;
+                        var now = _target.Owner.Hp / (double)_target.Owner.MaxHp;
                         var bound = ActionDetail1 % 100 / 100.0;
 
                         if (flag)

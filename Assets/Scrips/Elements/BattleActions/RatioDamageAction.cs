@@ -65,13 +65,13 @@ namespace Elements
             switch ((eTargetParameter)ActionDetail1)
             {
                 case eTargetParameter.MAX_HP:
-                    num = BattleUtil.DoubleToLong((_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
+                    num = BattleUtil.DoubleToLong((_target.Owner.MaxHp * _valueDictionary[eValueNumber.VALUE_1] / 100.0) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
                 case eTargetParameter.CURRENT_HP:
-                    num = BattleUtil.DoubleToLong(((DoubleWithEx)targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100f) * ActionExecTimeList[_num].Weight / ActionWeightSum);
+                    num = BattleUtil.DoubleToLong(((DoubleWithEx)targetCurrentHps[_target] * _valueDictionary[eValueNumber.VALUE_1] / 100.0) * ActionExecTimeList[_num].Weight / ActionWeightSum);
                     break;
                 case eTargetParameter.START_MAX_HP:
-                    num = BattleUtil.DoubleToLong((long)_target.Owner.StartMaxHP * _valueDictionary[eValueNumber.VALUE_1] / 100f * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+                    num = BattleUtil.DoubleToLong((long)_target.Owner.StartMaxHP * _valueDictionary[eValueNumber.VALUE_1] / 100.0 * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
                     break;
             }
             long override_damage = -1;

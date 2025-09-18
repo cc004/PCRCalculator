@@ -4269,9 +4269,9 @@ this.updateCurColor();
             UnitCtrl LIMEKPEENOB = unitCtrl2;
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
             Energy = energy;
-            SemanOnTPChanged?.Invoke(UnitId, (long)Energy);
+            SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
-                NoSkipOnTPChanged?.Invoke(UnitId,(long)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+                NoSkipOnTPChanged?.Invoke(UnitId,Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
@@ -9594,7 +9594,7 @@ this.updateCurColor();
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
             var num6 = BattleUtil.DoubleToLong(_fDamage);
             bool flag2 = (long)Hp > 0L;
-            int num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
+            long num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
@@ -9760,7 +9760,7 @@ this.updateCurColor();
 
             if (!battleManager.skipping)
             {
-                float NormalizedHP = (long)Hp / (float)(long)MaxHp;
+                float NormalizedHP = (float)(Hp / (double)MaxHp);
                 /*
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des;
@@ -9773,7 +9773,7 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
                 createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, num6);
                 NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, num6, BattleHeaderController.CurrentFrameCount);
@@ -10350,13 +10350,13 @@ this.updateCurColor();
                         this.lifeGauge.SetNormalizedLifeAmount(NormalizedHP);
                     this.OnLifeAmmountChange.Call<float>(NormalizedHP);
                 }*/
-                float NormalizedHP = (long)Hp / (float)(long)MaxHp;
+                float NormalizedHP = (float)(Hp / (double)MaxHp);
                 /*
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des = $"目标HP回复<color=#54FF4F>{_value}</color>点，当前HP: {Hp}";
                 action?.Invoke(des);
                 uIManager?.LogMessage(des, eLogMessageType.HP_RECOVERY, _source);
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,(int)MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
                 if (_isUnionBurstLifeSteal)
                 {
                     unionburstLifeStealNum += (long)_value;
