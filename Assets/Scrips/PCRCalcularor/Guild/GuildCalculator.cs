@@ -72,18 +72,18 @@ namespace PCRCaculator.Guild
 
         private readonly Dictionary<int, UnitStateChangeData> allUnitLastStateDic = new Dictionary<int, UnitStateChangeData>();
         private readonly List<int> playerIds = new List<int>();
-        private int bossId;
+        private List<int> bossId = new List<int>();
         private List<UnitCtrl> players;
-        private UnitCtrl boss;
+        private List<UnitCtrl> boss;
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
         private long totalDamage;
         private long totalDamageCriEX;
-        private DoubleWithEx totalDamageExcept = 0;
+        private LongWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
         private int backTime;
 
         public List<int> PlayerIds => playerIds;
-        public int BossId => bossId;
+        public List<int> BossId => bossId;
         private void Awake()
         {
             Instance = this;
@@ -144,10 +144,10 @@ namespace PCRCaculator.Guild
 
         public long GetTotalDamageExpect()
         {
-            return (long)totalDamageExcept.Expect;
+            return totalDamageExcept.Expect;
         }
 
-        public void Initialize(List<UnitCtrl> players, UnitCtrl boss)
+        public void Initialize(List<UnitCtrl> players, List<UnitCtrl> boss)
         {
             foreach (GuildSkillGroupPrefab guildSkillGroupPrefab in skillGroupPrefabDic.Values)
             {
@@ -161,6 +161,7 @@ namespace PCRCaculator.Guild
             totalDamageExcept = 0;
             allUnitLastStateDic.Clear();
             playerIds.Clear();
+            bossId.Clear();
             allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
             allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
             allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();
@@ -196,10 +197,15 @@ namespace PCRCaculator.Guild
             CurrentBossText.text = MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes();
             currentSeedText.text = "随机数种子：" + MyGameCtrl.Instance.CurrentSeedForSave;
             int idx = 0;
-            bossId = boss.UnitId;
-            AddSkillGroupPrefab(boss.UnitId, boss, 0);
-            boss.NoSkipOnDamage += AppendGetDamage;
-            boss.NoSkipOnBaseValueChanged += AppendChangeBaseValue;
+            foreach (UnitCtrl unitCtrl in boss)
+            {
+                idx++;
+                AddSkillGroupPrefab(unitCtrl.UnitId, unitCtrl, idx);
+                unitCtrl.NoSkipOnDamage += AppendGetDamage;
+                bossId.Add(unitCtrl.UnitId);
+            }
+            // AddSkillGroupPrefab(boss.UnitId, boss, 0);
+            // boss.NoSkipOnBaseValueChanged += AppendChangeBaseValue;
             foreach (UnitCtrl unitCtrl in players)
             {
                 idx++;
@@ -207,11 +213,14 @@ namespace PCRCaculator.Guild
                 PlayerIds.Add(unitCtrl.UnitId);
             }
             playerUnitDamageDic.Add(0, new List<ValueChangeData> { new ValueChangeData(0, 0) });
-            foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) : 
-                         new[] {(0, boss.Def, boss.MagicDef)})
+            for (int bossIndex = 0; bossIndex < boss.Count; bossIndex++)
             {
-                AppendChangeBaseValue(bossId + part * 10, 1, def, 0, "初始化");
-                AppendChangeBaseValue(bossId + part * 10, 2, mdef, 0, "初始化");
+                foreach (var (part, def, mdef) in boss[bossIndex].IsPartsBoss ? boss[bossIndex].BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
+                             new[] { (0, boss[bossIndex].Def, boss[bossIndex].MagicDef) })
+                {
+                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 1, def, 5400, "时间耗尽");
+                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 2, mdef, 5400, "时间耗尽");
+                }
             }
 
             lineChart.transform.SetParent(skillGroupParent);
@@ -226,7 +235,7 @@ namespace PCRCaculator.Guild
             {
                 allUnitStateChangeDic.Add(a, new List<UnitStateChangeData>());
                 allUnitAbnormalStateDic.Add(a, new List<UnitAbnormalStateChangeData>());
-                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.Hp, (int)b.Hp, "初始化"){target = a} });
+                allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.Hp, b.Hp, "初始化"){target = a} });
                 allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0){describe = "初始化", target = a} });
                 allUnitLastStateDic.Add(a, new UnitStateChangeData(0, UnitCtrl.ActionState.GAME_START, UnitCtrl.ActionState.GAME_START));
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
@@ -260,7 +269,7 @@ namespace PCRCaculator.Guild
         {
             try
             {
-                if (unitid >= 500000 && allUnitStateChangeDic.ContainsKey(unitid)) { return; }
+                if (unitid >= 700000 && allUnitStateChangeDic.ContainsKey(unitid)) { return; }
                 if (allUnitLastStateDic[unitid].changStateTo != actionState)
                 {
                     if (actionState == UnitCtrl.ActionState.IDLE)
@@ -368,7 +377,7 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic[unitid].Remove(changeData);
             }
         }
-        public void AppendChangeHP(int unitid, float currentHP, int hp, int damage, int frame, string describe, UnitCtrl source)
+        public void AppendChangeHP(int unitid, long currentHP, long hp, long damage, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             var sourceId = source?.UnitId ?? unitid;
@@ -386,7 +395,7 @@ namespace PCRCaculator.Guild
                 // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
             }
         }
-        public void AppendChangeTP(int unitid, float currentTP, int frame, string describe)
+        public void AppendChangeTP(int unitid, double currentTP, int frame, string describe)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
 
@@ -431,14 +440,14 @@ namespace PCRCaculator.Guild
                 }
             }
         }
-        public void AppendGetDamage(int unitid, int sourceUnitid, float damage, int currentFrame)
+        public void AppendGetDamage(int unitid, int sourceUnitid, long damage, int currentFrame)
         {
             if (!playerUnitDamageDic.ContainsKey(sourceUnitid))
             {
                 return;
             }
 
-            if (unitid == bossId)
+            if (bossId.Contains(unitid))
             {
                 playerUnitDamageDic[sourceUnitid].Add(new ValueChangeData(currentFrame, damage));
                 playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame, damage));
@@ -447,7 +456,7 @@ namespace PCRCaculator.Guild
         public void AppendChangeBaseValue(int unitid, int valueType, double value, int currentFrame, string describe)
         {
             if (BattleManager.Instance.skipping) return;
-            if (unitid - unitid / 10 % 10 * 10 == bossId)
+            if (bossId.Contains(unitid - unitid / 10 % 10 * 10))
             {
                 if (value < 0)
                 {
@@ -730,7 +739,7 @@ namespace PCRCaculator.Guild
             }
         }
 
-        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, DoubleWithEx exvalue)
+        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, LongWithEx exvalue)
         {
             totalDamage += value;
             totalDamageExcept += exvalue;
@@ -758,8 +767,8 @@ namespace PCRCaculator.Guild
               {
                 int unitid = unitCtrl.UnitId;
                 AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                AppendChangeHP(unitid, unitCtrl.Hp, (int)unitCtrl.MaxHp, (int)unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
-                AppendChangeTP(unitid, (float)unitCtrl.Energy, 5400, "时间耗尽");
+                AppendChangeHP(unitid, unitCtrl.Hp, unitCtrl.MaxHp, unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
+                AppendChangeTP(unitid, unitCtrl.Energy, 5400, "时间耗尽");
                 if (allUnitAbnormalStateDic.TryGetValue(unitid, out var value))
                 {
                   foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])
@@ -788,11 +797,14 @@ namespace PCRCaculator.Guild
                 pair.Value.RefreshTPChat(allUnitTPDic[pair.Key]);
             }
             */
-            foreach (var (part, def, mdef) in boss.IsPartsBoss ? boss.BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
-                         new[] { (0, boss.Def, boss.MagicDef) })
+            for (int bossIndex = 0; bossIndex < boss.Count; bossIndex++)
             {
-                AppendChangeBaseValue(bossId + part * 10, 1, def, 5400, "时间耗尽");
-                AppendChangeBaseValue(bossId + part * 10, 2, mdef, 5400, "时间耗尽");
+                foreach (var (part, def, mdef) in boss[bossIndex].IsPartsBoss ? boss[bossIndex].BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
+                             new[] { (0, boss[bossIndex].Def, boss[bossIndex].MagicDef) })
+                {
+                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 1, def, 5400, "时间耗尽");
+                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 2, mdef, 5400, "时间耗尽");
+                }
             }
 
             skillScrollRect.horizontalNormalizedPosition = 1;
@@ -811,16 +823,16 @@ namespace PCRCaculator.Guild
             }
 
             var n = GuildManager.StaticsettingData.n1;
-            expectedDamage = (int)totalDamageExcept.Expected(n);
+            expectedDamage = totalDamageExcept.Expected(n);
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(int)totalDamageExcept.Stddev}</color>";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(long)totalDamageExcept.Stddev}</color>";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
             {
                 detail = $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
             }
             else if (backTime > 0)
             {
-                detail = $" 返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
+                detail = $" 返{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
             }
             else
             { 
@@ -832,7 +844,7 @@ namespace PCRCaculator.Guild
             basedmg.text = totalDamageCriEX.ToString();
         }
 
-        public int expectedDamage;
+        public long expectedDamage;
         public string detail;
         private void ResizePrefabs(bool change)
         {
@@ -886,7 +898,7 @@ namespace PCRCaculator.Guild
 
         private void CallExcelHelper()
         {
-            string fileName = CreateExcelName();
+            string fileName = CurrentBossText.text + "-" + CreateExcelName();
 
             try
             {
@@ -938,19 +950,39 @@ namespace PCRCaculator.Guild
                 UBTimes.Add(ubline);
             }
             return UBTimes;*/
-            return PlayerIds.Take(5).Append(bossId).SelectMany((id, i) => allUnitStateChangeDic[id]
+            return PlayerIds.Take(5).Concat(bossId).SelectMany((id, i) => allUnitStateChangeDic[id]
                     .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
                     .Select(s => (state: s, pos: i)))
                 .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.id)
                     .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.001f)))
                 .GroupBy(s => s.t.pos).Select(g =>
                     (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
-                .Aggregate(new List<List<float>>
+                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), Math.Max(0, PlayerIds.Take(5).Count() + bossId.Count))
+                    .Select(x => new List<float>())), (result, tuple) =>
                 {
-                    new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>(), new List<float>()
-                }, (result, tuple) =>
-                {
-                    result[tuple.Key] = tuple.list;
+                    int index = tuple.Key;
+                    int playerCount = Math.Min(PlayerIds.Count, 5);
+                    int bossStartIndex = playerCount;
+
+                    if (index >= bossStartIndex)
+                    {
+                        index = bossStartIndex;
+                    }
+
+                    while (result.Count <= index)
+                    {
+                        result.Add(new List<float>());
+                    }
+
+                    if (tuple.Key >= bossStartIndex && result[index].Any())
+                    {
+                        result[index].AddRange(tuple.list);
+                        result[index].Sort();
+                    }
+                    else
+                    {
+                        result[index] = tuple.list;
+                    }
                     return result;
                 });
         }
@@ -977,65 +1009,67 @@ namespace PCRCaculator.Guild
                             UBTime = tm.currentFrameCount,
                             description = tm.operation ?? string.Empty
                         };
-                        if (allUnitHPDic.ContainsKey(bossId) && allUnitHPDic[bossId] != null)
+                        ValueChangeData changeData = null;
+                        foreach (int bossId in BossId)
                         {
-                            ValueChangeData changeData = allUnitHPDic[bossId].Find(
-                            a => /* Mathf.RoundToInt(a.xValue * 5400) == tm.currentFrameCount && */
-                                a.id == tm.id && a.source == unitData.unitId);
-                            // if (changeData == null)
-                            // {
-                            //     // 再次查找满足 a.source == unitData.unitId && a.xValue == tm.currentFrameCount 的元素
-                            //     changeData = allUnitHPDic[bossId].Find(
-                            //         a => a.source == unitData.unitId && a.xValue == tm.currentFrameCount);
-                            // }
-                            if (changeData != null)
+                            if (allUnitHPDic.ContainsKey(bossId) && allUnitHPDic[bossId] != null)
                             {
-                                detail.Damage = changeData.damage;
-                                detail.Critical = changeData.describe.Contains("暴击");
-                                int totalDamage = 0;
-                                foreach (var data in allUnitHPDic[bossId])
+                                changeData = allUnitHPDic[bossId].Find(
+                                a => a.id == tm.id && a.source == unitData.unitId);
+                                if (changeData != null)
                                 {
-                                    if (data.id == changeData.id)
+                                    detail.Damage = changeData.damage;
+                                    detail.Critical = changeData.describe.Contains("暴击");
+                                    long totalDamage = 0;
+                                    foreach (var data in allUnitHPDic[bossId])
                                     {
-                                      totalDamage += data.damage;
-                                      detail.totalDamage = totalDamage;
+                                        if (data.id == changeData.id)
+                                        {
+                                            totalDamage += data.damage;
+                                            detail.totalDamage = totalDamage;
+                                        }
                                     }
+                                    break;
                                 }
                             }
-                            else
-                            {
-                                detail.Damage = 0;
-                            }
+                        }
+                        if (changeData == null)
+                        {
+                            detail.Damage = 0;
                         }
                         uBDetails.Add(detail);
                     }
                 }
             }
-            foreach (UnitStateChangeData data in allUnitStateChangeDic[bossId])
+            for (int i = 0; i < BossId.Count; i++)
             {
-                if (data.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                if (allUnitStateChangeDic.ContainsKey(BossId[i]))
                 {
-                    UBDetail detail = new UBDetail
+                    foreach (UnitStateChangeData data in allUnitStateChangeDic[BossId[i]])
                     {
-                        isBossUB = true,
-                        sorting = data.realFrameCount,
-                        UBTime = data.currentFrameCount
-                    };
-                    uBDetails.Add(detail);
+                        if (data.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                        {
+                            UBDetail detail = new UBDetail
+                            {
+                                isBossUB = true,
+                                sorting = data.realFrameCount,
+                                UBTime = data.currentFrameCount,
+                                enemyData = boss[i].unitParameter.EnemyData,
+                            };
+                            uBDetails.Add(detail);
+                        }
+                    }
                 }
             }
             return uBDetails.OrderBy(d => d.sorting).ToList();
         }
         private string CreateExcelName()
         {
-            string fileName = CurrentBossText.text + "-";
-            for (int i = 0; i < 5; i++)
+            string fileName = "";
+            for (int i = 0; i < players.Count; i++)
             {
-                if (playerIds.Count > i)
-                {
-                    int player = playerIds[i];
-                    fileName += MainManager.Instance.GetUnitNickName(player);
-                }
+                int player = playerIds[i];
+                fileName += MainManager.Instance.GetUnitNickName(player);
             }
             fileName += "-" + Mathf.RoundToInt(expectedDamage / 10000) + "w";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
@@ -1044,7 +1078,7 @@ namespace PCRCaculator.Guild
             }
             else if (backTime > 0)
             {
-                fileName += $"-返{backTime}s-{boss.Hp.Probability(x => x <= 0f):P0}";
+                detail = $" 返{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
             }
             return fileName;
         }
@@ -1080,7 +1114,7 @@ namespace PCRCaculator.Guild
             return new OnceResultData
             {
                 id = id,
-                exceptDamage = (long)totalDamageExcept.Expect,
+                exceptDamage = totalDamageExcept.Expect,
                 criticalEX = totalDamageCriEX,
                 currentDamage = totalDamage,
                 randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,
@@ -1172,9 +1206,14 @@ namespace PCRCaculator.Guild
 
         public void SaveDieProb()
         {
+            if (boss.Count > 1)
+            {
+                MainManager.Instance.WindowMessage("多个boss不支持计算！");
+                return;
+            }
             try
             {
-                var fileName = CreateExcelName();
+                var fileName = CurrentBossText.text + "-" + CreateExcelName();
 #if PLATFORM_ANDROID
 #else
                 var ststrr = StandaloneFileBrowser.SaveFilePanel(
@@ -1185,7 +1224,7 @@ namespace PCRCaculator.Guild
                     fileName = fileName.Replace("\\", "/");
                 }
                 else return;
-                
+
 #endif
                 const string dmginfo = "标伤到达率";
                 const string dmginfo2 = "标伤到达率(未乱轴)";
@@ -1201,7 +1240,7 @@ namespace PCRCaculator.Guild
                 var dname2 = new Dictionary<string, int>();
                 var dskill = new Dictionary<string, Dictionary<string, int>>();
                 var seedset = new Dictionary<string, int>();
-                var dmg = new List<double>();
+                var dmg = new List<long>();
                 var probs = new Dictionary<string, ProbEvent>();
                 foreach (var name in dmglist.Select(n => n.unit).Distinct())
                 {
@@ -1212,7 +1251,7 @@ namespace PCRCaculator.Guild
                 dname.Add(dmginfo2, 0);
                 dname.Add(totaldie, 0);
                 dname.Add(totaldie2, 0);
-                
+
                 foreach (var skill in dmglist.Select(n => (n.unit, n.description)).Distinct())
                 {
                     if (!dskill.ContainsKey(skill.unit)) dskill.Add(skill.unit, new Dictionary<string, int>());
@@ -1284,7 +1323,7 @@ namespace PCRCaculator.Guild
                     sskill.Clear();
                 }
 
-                var maxhp = boss.MaxHp;
+                var maxhp = boss[0].MaxHp;
                 dname.Add(mb1, 0); dname.Add(mb2, 0); dname.Add(d2, 0); dname.Add(d1, 0);
                 for (int i = 0; i < GuildManager.StaticsettingData.n2; ++i)
                 {
@@ -1328,7 +1367,7 @@ namespace PCRCaculator.Guild
                             {
                                 exp = prob.exp(rnd.Next());
                             }
-                            sw.WriteLine("\t{0}-{1:P1}(seed={2})\n{3}", pair.Key, (float) pair.Value / GuildManager.StaticsettingData.n2, seedset[pair.Key], exp);
+                            sw.WriteLine("\t{0}-{1:P1}(seed={2})\n{3}", pair.Key, (float)pair.Value / GuildManager.StaticsettingData.n2, seedset[pair.Key], exp);
                         }
                     }
 
@@ -1423,7 +1462,7 @@ namespace PCRCaculator.Guild
                 detail = detail,
             };
 
-            string fileName = CreateExcelName();
+            string fileName = CurrentBossText.text + "-" + CreateExcelName();
 
 
             var ststrr = StandaloneFileBrowser.SaveFilePanel(
@@ -1653,9 +1692,9 @@ namespace PCRCaculator.Guild
         float IValue.xValue => xValue / XScale;
         float IValue.yValue => (float)(yValue / YScale);
 
-        public int hp;
-        public int damage;
-        public int expectedDamage;
+        public long hp;
+        public long damage;
+        public long expectedDamage;
         public string describe;
         public int id;
         public int source;
@@ -1673,7 +1712,7 @@ namespace PCRCaculator.Guild
         }
 
         public static readonly ValueChangeData Default = new ValueChangeData(-1, 0, 1, string.Empty);
-        public ValueChangeData(int x, double y, int hp, string describe)
+        public ValueChangeData(int x, double y, long hp, string describe)
         {
             xValue = x;
             yValue = y;
@@ -1814,11 +1853,12 @@ namespace PCRCaculator.Guild
         [JsonIgnore] public float sorting;
         public bool isBossUB;
         public UnitData unitData;
+        public EnemyData enemyData;
         public int UBTime;
-        public int Damage;
+        public long Damage;
         public bool Critical;
         public string description;
-        public int totalDamage;
+        public long totalDamage;
     }
     public class RandomData
     {

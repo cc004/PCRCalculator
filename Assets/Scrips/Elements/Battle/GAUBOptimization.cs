@@ -17,7 +17,7 @@ using PCRCaculator.Guild;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using ExcelHelper;
 namespace Elements.Battle
 {
 
@@ -425,11 +425,19 @@ namespace Elements.Battle
             }
             GameObject a = Instantiate(GAInfoPrefab);
             a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
-            for (int i = 0; i < 5; i++)
+            var gaubOptimization = a.GetComponent<GAUBOptimization>();
+            if (gaubOptimization != null && gaubOptimization.bestGenesTexts != null && gaubOptimization.bestGenesTexts.Count > 0)
             {
-                var raw = MyGameCtrl.Instance.tempData.SemanUBExecTimeList.ElementAtOrDefault(i) ?? new List<int>();
-                bestGenesTexts[i].text = string.Join("\n", raw);
+                for (int i = 0; i < 5; i++)
+                {
+                    var raw = MyGameCtrl.Instance.tempData.SemanUBExecTimeList.ElementAtOrDefault(i) ?? new List<int>();
+                    gaubOptimization.bestGenesTexts[i].text = string.Join("\n", raw);
+                }
             }
+            bool asmExportEnabled = ExcelHelper.ExcelHelper.AsmExportEnabled;
+            gaubOptimization.ubDelay.SetActive(asmExportEnabled);
+            gaubOptimization.considerSkill.SetActive(asmExportEnabled);
+            gaubOptimization.considerAll.SetActive(asmExportEnabled);
         }
         public void Exit()
         {

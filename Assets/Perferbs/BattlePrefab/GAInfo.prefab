@@ -644,7 +644,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5775922313874399357
 RectTransform:
   m_ObjectHideFlags: 0
@@ -907,7 +907,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 121f044ec9794420e8715c8650d1f514, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GAInfo: {fileID: 5775922313910735386}
   bestDamageText: {fileID: 5775922314324547700}
   GenerationsNumberText: {fileID: 5775922314313566631}
   bestGenesTexts:
@@ -3016,7 +3015,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: 123
 --- !u!114 &5775922314230568393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7095,7 +7094,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: 123
 --- !u!114 &5775922314827535558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7721,7 +7720,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: 123
 --- !u!114 &5775922314879740638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8018,7 +8017,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5775922314995910394
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8473,7 +8472,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5775922315045609540
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8682,7 +8681,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: 123
 --- !u!114 &5775922315061116494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11282,7 +11281,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: 123
 --- !u!114 &5775922315690381391
 MonoBehaviour:
   m_ObjectHideFlags: 0

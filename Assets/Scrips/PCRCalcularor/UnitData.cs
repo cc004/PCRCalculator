@@ -243,7 +243,7 @@ namespace PCRCaculator
                 result += BaseData.Round(d1);
 
 
-                d1 = MainManager.Instance.rbs.TryGetValue((a.unitId, a.rank), out var val) ? val.GetBaseData() : new BaseData();
+                d1 = MainManager.Instance.Rbs.TryGetValue(a.unitId, out var val) ? val.TryGetValue(a.rank, out var val2) ? val2.GetBaseData() : new BaseData() : new BaseData();
 
                 result += BaseData.Round(d1);
 
@@ -252,7 +252,7 @@ namespace PCRCaculator
                 for (int i = 0; i < 3; ++i)
                 {
                     if (a.exEquip[i] == 0) continue;
-                    var equip = MainManager.Instance.unitExEquips[a.unitId][i][a.exEquip[i]];
+                    var equip = MainManager.Instance.UnitExEquips[a.unitId][i][a.exEquip[i]];
                     var def = equip.GetDefaultBaseData();
                     var max = equip.GetMaxBaseData();
                     var param = new BaseData();
@@ -465,7 +465,7 @@ namespace PCRCaculator
 
             var rank = a.rank;
 
-            while (MainManager.Instance.rbs.ContainsKey((unitId, rank - 1)))
+            while (MainManager.Instance.Rbs.ContainsKey(unitId) && MainManager.Instance.Rbs[unitId].ContainsKey(rank - 1))
                 --rank;
 
             BaseData result = new BaseData();
@@ -479,7 +479,7 @@ namespace PCRCaculator
 
             result += BaseData.Round(d1);
 
-            if (unitId < 200000 && !MainManager.Instance.rbs.ContainsKey((unitId, rank)))
+            if (unitId < 200000 && (!MainManager.Instance.Rbs.ContainsKey(unitId) || !MainManager.Instance.Rbs[unitId].ContainsKey(rank)))
             {
                 d1 = new BaseData();
 
@@ -532,15 +532,21 @@ namespace PCRCaculator
         public int[] skillLevel = new int[4] { 1, 1, 1, 1 };//技能等级，0123对应UB/技能1/技能2/EX技能
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
-        public int uniqueEq2Lv;//专武2等级
+        public int uniqueEq2Lv = -1;//专武2等级
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
 
         [JsonIgnore]
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
-        public int PrefabId => rarity == 6 && unitId == 105701 ? 170301 : unitId;
-
+        public int PrefabId
+        {
+            get
+            {
+                int adjustedUnitId = unitId > 600000 ? unitId - 500000 : unitId;
+                return rarity == 6 && adjustedUnitId == 105701 ? 170301 : adjustedUnitId;
+            }
+        }
         public void SetDefaultLoveDict()
         {
             if (playLoveDic != null && playLoveDic.ContainsKey(unitId)) return;
@@ -643,7 +649,7 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
-                if (MainManager.Instance.unitExEquips.TryGetValue(unitId, out var temp))
+                if (MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp))
                 {
                     for (int i = 0; i < 3; i++)
                     {
@@ -825,8 +831,10 @@ namespace PCRCaculator
                 int currentLevel = exEquipLevel[i];
                 string exEquipStr = currentEquip.ToString();
                 string value = currentEquip == 0 ? "-" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '5' ? $"C{currentLevel}" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '4' ? $"P{currentLevel}" :
                     (exEquipStr.Length >= 3 && exEquipStr[^3] == '3' ? $"G{currentLevel}" :
-                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '2' ? $"S{currentLevel}" : "-"));
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '2' ? $"S{currentLevel}" : "-"))));
                 result.Add(value);
             }
             return string.Join("/", result);
@@ -886,6 +894,24 @@ namespace PCRCaculator
                     hashCode = (hashCode * 397) ^ playLoveDic[unit];
                 return hashCode;
             }
+        }
+
+        public string TalentLevelDescribe()
+        {
+            List <int> talentIds = MainManager.Instance.GetTalentIds(this.unitId);
+            if (talentIds.Count == 0)
+                return "无";
+            string talentType = talentIds[0] switch
+            {
+                1 => "火",
+                2 => "水",
+                3 => "风",
+                4 => "光",
+                5 => "暗",
+                _ => "无"
+            };
+            string level = MainManager.Instance.TeamEnhanceData.GetTalentLevel(talentIds[0]).ToString();
+            return string.IsNullOrEmpty(talentType) ? level : $"{talentType}{level}";
         }
     }
     /// <summary>
@@ -1694,6 +1720,16 @@ namespace PCRCaculator
         public int loveMax;
         public List<int> effectCharacters;//受影响的角色id列表
         public List<((int, int)[], int)> addValues;//增加的属性，【属性序号，属性值】
+        
+        /// <summary>
+        /// 无参构造函数，用于 JSON 反序列化
+        /// </summary>
+        public UnitStoryData() 
+        {
+            effectCharacters = new List<int>();
+            addValues = new List<((int, int)[], int)>();
+        }
+        
         /// <summary>
         /// 角色羁绊类构造函数
         /// </summary>
@@ -1794,7 +1830,7 @@ namespace PCRCaculator
         public int atkType;//攻击方式
         public float normalAtkCastTime;//普攻间隔
         public int guildId;
-        public int talent_id;
+        public List<int> talent_id;
         /// <summary>
         /// 不要用这个构造函数！
         /// </summary>
@@ -1814,7 +1850,7 @@ namespace PCRCaculator
 
         }
         public UnitDetailData(int id, string name, int rarity, int motion, int se, int searchWidth,
-            int atk, float casetime, int guid, int talent_id)
+            int atk, float casetime, int guid, List<int> talent_id)
         {
             unitid = id; this.name = name; minrarity = rarity; motionType = motion;
             seType = se; searchAreaWidth = searchWidth; atkType = atk;
@@ -2094,10 +2130,10 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 295;
-        public int playerProcess = 78;
+        public int playerLevel = 301;
+        public int playerProcess = 80;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 300;
+        public int maxUniqueEqLv = 310;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
@@ -2105,13 +2141,12 @@ namespace PCRCaculator
         public bool useDMMpath = false;
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
-
+        public bool IsReleaseSkillHasteLogic = true;
         public int maxTPUpValue = 250;//TP上限
-
+        public Dictionary<int, int> talentLevel = new();
+        public Dictionary<int, int> talentSkill = new();
+        public Dictionary<int, int> teamSkill = new();
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
-        public Dictionary<int, int> talentLevelDic = new Dictionary<int, int>();
-        public Dictionary<int, int> talentSkillDic = new Dictionary<int, int>();
-        public Dictionary<int, int> teamSkillDic = new Dictionary<int, int>();
 
 
         public int GetMaxRank()
@@ -2400,5 +2435,248 @@ namespace PCRCaculator
         public bool skipping;
     }
 
+    [Serializable]
+    public class TalentSkillNode
+    {
+        public int node_id { get; set; }
+        public int page_num { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public List<int> pre_node_ids { get; set; }// 前置节点数组
+        public Dictionary<int, int[]> enhance_level_ids { get; set; } // 强化等级ID字典，键为enhance_level_id，值为对应的enhance_id数组
+        public int icon_id { get; set; }
+        public int title_id { get; set; }
+        public string title_text { get; set; }
 
+        public TalentSkillNode(int nodeId, int pageNum, int posX, int posY, List<int> preNodes, Dictionary<int, int[]> enhanceLevelIds, int iconId, int titleId, string titleText)
+        {
+            node_id = nodeId;
+            page_num = pageNum;
+            pos_x = posX;
+            pos_y = posY;
+            pre_node_ids = preNodes;
+            enhance_level_ids = enhanceLevelIds;
+            icon_id = iconId;
+            title_id = titleId;
+            title_text = titleText;
+        }
+    }
+    [Serializable]
+    public class TalentSkillEnhanceData
+    {
+        public int enhance_id { get; set; }
+        public List<int> talent_ids { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+        public TalentSkillEnhanceData(int enhance_id, List<int> talent_ids, int parameter_type, int enhance_value)
+        {
+            this.enhance_id = enhance_id;
+            this.talent_ids = talent_ids;
+            this.parameter_type = parameter_type;
+            this.enhance_value = enhance_value;
+        }
+    }
+
+    [Serializable]
+    public class TeamSkillNode
+    {
+        public int node_id { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public int pre_node_id { get; set; }
+        public Dictionary<int, int[]> enhance_level_ids { get; set; } // 强化等级ID字典，键为enhance_level_id，值为对应的enhance_id数组
+        public int icon_id { get; set; }
+        public int noise_id { get; set; }
+        public int title_id { get; set; }
+        public string title_text { get; set; }
+        public List<int> enhance_ids { get; set; } = new List<int>(); // 强化ID数组
+        public TeamSkillNode(int nodeId, int posX, int posY, int preNode, Dictionary<int, int[]> enhanceLevelIds, int iconId, int noiseId, int titleId, string titleText)
+        {
+            node_id = nodeId;
+            pos_x = posX;
+            pos_y = posY;
+            pre_node_id = preNode;
+            enhance_level_ids = enhanceLevelIds;
+            icon_id = iconId;
+            noise_id = noiseId;
+            title_id = titleId;
+            title_text = titleText;
+        }
+    }
+
+    [Serializable]
+    public class TeamSkillEnhanceData
+    {
+        public int enhance_id { get; set; }
+        public List<int> talent_ids { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+        public TeamSkillEnhanceData(int enhance_id, List<int> talent_ids, int parameter_type, int enhance_value)
+        {
+            this.enhance_id = enhance_id;
+            this.talent_ids = talent_ids;
+            this.parameter_type = parameter_type;
+            this.enhance_value = enhance_value;
+        }
+    }
+
+    // [Serializable]
+    // public class PrincessKnightInfo
+    // {
+    //     public Dictionary<int, int> TalentLevelData { get; set; } = new Dictionary<int, int>();
+    //     public Dictionary<int, Dictionary<int, int>> TalentSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
+    //     public Dictionary<int, Dictionary<int, int>> TeamSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
+
+    //     // 合并后的数据
+    //     public Dictionary<int, Dictionary<int, int>> TalentInfoData { get; private set; } = new Dictionary<int, Dictionary<int, int>>();
+
+    //     // 事件：当数据变化时触发 UI 更新等操作
+    //     public event Action OnDataChanged;
+
+    //     public PrincessKnightInfo()
+    //     {
+    //         InitializeDictionaries();
+    //     }
+
+    //     private void InitializeDictionaries()
+    //     {
+    //         for (int i = 1; i <= 5; i++)
+    //         {
+    //             TalentLevelData[i] = 0;
+    //             TalentSkillData[i] = new Dictionary<int, int>();
+    //             TeamSkillData[i] = new Dictionary<int, int>();
+    //             TalentInfoData[i] = new Dictionary<int, int>();
+    //         }
+    //     }
+
+    //     /// <summary>
+    //     /// 从PlayerSetting加载所有数据
+    //     /// </summary>
+    //     public void LoadFromPlayerSetting(PlayerSetting playerSetting)
+    //     {
+    //         // 加载属性等级数据
+    //         foreach (var kvp in playerSetting.talentLevelDic)
+    //         {
+    //             TalentLevelData[kvp.Key] = kvp.Value;
+    //         }
+    //         UpdateCombinedData();
+    //     }
+
+    //     /// <summary>
+    //     /// 设置属性等级
+    //     /// </summary>
+    //     public void SetTalentLevels(Dictionary<int, int> levels)
+    //     {
+    //         foreach (var kvp in levels)
+    //         {
+    //             TalentLevelData[kvp.Key] = kvp.Value;
+    //         }
+    //         OnDataChanged?.Invoke();
+    //     }
+
+    //     /// <summary>
+    //     /// 获取属性等级
+    //     /// </summary>
+    //     public int GetTalentLevel(int talentId)
+    //     {
+    //         return TalentLevelData.GetValueOrDefault(talentId, 0);
+    //     }
+
+    //     /// <summary>
+    //     /// 获取属性攻击力（属性等级 * 20）
+    //     /// </summary>
+    //     public int GetAttributeAttackPower(int talentId)
+    //     {
+    //         return GetTalentLevel(talentId) * 20;
+    //     }
+
+    //     /// <summary>
+    //     /// 清空所有数据
+    //     /// </summary>
+    //     public void Reset()
+    //     {
+    //         foreach (var dict in TalentSkillData.Values)
+    //             dict.Clear();
+
+    //         foreach (var dict in TeamSkillData.Values)
+    //             dict.Clear();
+
+    //         UpdateCombinedData();
+    //     }
+
+    //     /// <summary>
+    //     /// 添加数据
+    //     /// </summary>
+    //     public void SetData(DataType type, Dictionary<int, Dictionary<int, int>> data)
+    //     {
+    //         var target = type == DataType.TalentSkill ? TalentSkillData : TeamSkillData;
+
+    //         foreach (var dict in target.Values)
+    //             dict.Clear();
+
+    //         foreach (var talentKvp in data)
+    //         {
+    //             if (target.TryGetValue(talentKvp.Key, out var paramDict))
+    //             {
+    //                 foreach (var paramKvp in talentKvp.Value)
+    //                 {
+    //                     paramDict[paramKvp.Key] = paramKvp.Value;
+    //                 }
+    //             }
+    //         }
+
+    //         UpdateCombinedData();
+    //     }
+
+    //     /// <summary>
+    //     /// 更新合并后的数据
+    //     /// </summary>
+    //     public void UpdateCombinedData()
+    //     {
+    //         TalentInfoData = Merge(TalentSkillData, TeamSkillData);
+    //         OnDataChanged?.Invoke();
+    //     }
+
+    //     /// <summary>
+    //     /// 合并属性技能和大师技能数据
+    //     /// </summary>
+    //     public static Dictionary<int, Dictionary<int, int>> Merge(
+    //         Dictionary<int, Dictionary<int, int>> talentData,
+    //         Dictionary<int, Dictionary<int, int>> teamData)
+    //     {
+    //         var merged = new Dictionary<int, Dictionary<int, int>>();
+
+    //         for (int i = 1; i <= 5; i++)
+    //         {
+    //             merged[i] = new Dictionary<int, int>();
+
+    //             if (talentData != null && talentData.TryGetValue(i, out var talentParams))
+    //             {
+    //                 foreach (var kvp in talentParams)
+    //                 {
+    //                     merged[i][kvp.Key] = kvp.Value;
+    //                 }
+    //             }
+
+    //             if (teamData != null && teamData.TryGetValue(i, out var teamParams))
+    //             {
+    //                 foreach (var kvp in teamParams)
+    //                 {
+    //                     merged[i][kvp.Key] = merged[i].GetValueOrDefault(kvp.Key) + kvp.Value;
+    //                 }
+    //             }
+    //         }
+
+    //         return merged;
+    //     }
+
+    //     /// <summary>
+    //     /// 数据来源枚举
+    //     /// </summary>
+    //     public enum DataType
+    //     {
+    //         TalentSkill,
+    //         TeamSkill
+    //     }
+    // }
 }

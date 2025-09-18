@@ -723,6 +723,14 @@ namespace Elements
             {
                 eActionType.IF_CONTAINS_UNIT_GROUP,
                 typeof(IfContainsUnitGroupAction)
+            },
+            {
+                eActionType.LIMIT_ENERGY_RECOVER_RATE,
+                typeof(LimitEnergyRecoveryRateAction)
+            },
+            {
+                eActionType.SLIP_DAMAGE_UP,
+                typeof(SlipDamageUpAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
@@ -824,6 +832,25 @@ namespace Elements
           { (eActionType)106, false },
           { (eActionType)107, false },
           { (eActionType)108, false },
+          { (eActionType)109, false },
+          { (eActionType)110, true },
+          { (eActionType)111, false },
+          { (eActionType)112, false },
+          { (eActionType)113, false },
+          { (eActionType)114, false },
+          { (eActionType)115, true },
+          { (eActionType)116, false },
+          { (eActionType)117, true },
+          { (eActionType)118, false },
+          { (eActionType)119, false },
+          { (eActionType)121, false },
+          { (eActionType)122, false },
+          { (eActionType)123, false },
+          { (eActionType)124, false },
+          { (eActionType)125, false },
+          { (eActionType)128, false },
+          { (eActionType)129, false },
+          { (eActionType)130, false },
         };
 
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()

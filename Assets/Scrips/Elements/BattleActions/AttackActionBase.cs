@@ -240,7 +240,7 @@ namespace Elements
             LongWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
             LongWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
             float num6 = 0f;
-            double damageUpPrecent = (_isPhysicalForTarget ? _target.Owner.PhysicalDamageUpPercentOrMin : _target.Owner.MagicDamageUpPercentOrMin) / 100f;
+            double damageUpPrecent = (_isPhysicalForTarget ? _source.PhysicalDamageUpPercentOrMin : _source.MagicDamageUpPercentOrMin) / 100f;
             num6 = (!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f);
             num4 = BattleUtil.DoubleToLong(num4 * num6 * damageUpPrecent);
             num5 = BattleUtil.DoubleToLong(num5 * num6 * damageUpPrecent);
@@ -281,6 +281,7 @@ namespace Elements
                 DefPenetrate = (_isPhysicalForTarget ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero),
                 LifeSteal = (_source.IsPartsBoss ? parts.GetLifeStealZero() : ((int)_source.LifeStealZero)),
                 CriticalDamageRate = criticalDamageRate,
+                TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
                 ActionType = _actionType,
                 IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
             };
@@ -327,13 +328,13 @@ namespace Elements
         }
         private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
         {
-            var num = _valueDictionary[eValueNumber.VALUE_1] + _atk * _valueDictionary[eValueNumber.VALUE_3];
+            var num = _valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3];
             num *= _target.Owner.GetDebuffDamageUpValue();
             if (!_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 if (_target.Owner.IsOther == _source.IsOther ||
                     _source.AccumulativeDamageSourceDataDictionary.Count == 0)
-                    return BattleUtil.DoubleToInt(num);
+                    return BattleUtil.DoubleToLong(num);
             }
             LongWithEx num3 = 0;
             for (int i = 0; i < base.ActionExecTimeList.Count; i++)
@@ -361,7 +362,7 @@ namespace Elements
 
         private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
         {
-            LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + _atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+            LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 num += value.CalcAdditionalDamage(value.DamagedCount, num);

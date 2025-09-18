@@ -46,6 +46,7 @@ namespace Elements
                 EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             DamageData.eDamageType eDamageType;
             DoubleWithEx num;
+            // TODO ActionDetail1 == 5 => mixed damage
             if (ActionDetail1 % 2 == 0)
             {
                 eDamageType = DamageData.eDamageType.MGC;

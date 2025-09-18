@@ -60,7 +60,8 @@ namespace Elements
         Target = _target.GetFirstParts(true),
         Damage = (long) Damage,
         DamageType = DamageData.eDamageType.NONE,
-        ActionType = eActionType.ENCHANT_STRIKE_BACK
+        ActionType = eActionType.ENCHANT_STRIKE_BACK,
+        TargetIncludeMyTeam = _target.IsOther == _source.IsOther
       };
       _target.SetDamage(_damageData, false, ActionId);
       //CircleEffectController skillEffect = this.DataSet.SkillEffect as CircleEffectController;

@@ -1,9 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Elements.SlipDamageAction
-// Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
-// Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
-
+﻿
 using System;
 using System.Collections.Generic;
 using Elements.Battle;
@@ -13,7 +8,7 @@ namespace Elements
 {
     public class SlipDamageAction : ActionParameter
     {
-        private static readonly Dictionary<eSlipDamageType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eSlipDamageType, UnitCtrl.eAbnormalState>(new eSlipDamageType_DictComparer())
+        public static readonly Dictionary<eSlipDamageType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eSlipDamageType, UnitCtrl.eAbnormalState>(new eSlipDamageType_DictComparer())
     {
       {
         eSlipDamageType.POISONE,
@@ -88,7 +83,7 @@ namespace Elements
             eCancelTriggerType actionDetail = (eCancelTriggerType)base.ActionDetail2;
             if (actionDetail == eCancelTriggerType.MAX_HP)
             {
-                flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (float)(long)targetOwner.Hp / (float)(long)targetOwner.MaxHp);
+                flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)targetOwner.Hp / targetOwner.MaxHp);
             }
             //end add
             if (!flag && num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
@@ -100,7 +95,7 @@ namespace Elements
                 actionDetail = (eCancelTriggerType)base.ActionDetail2;
                 if (actionDetail == eCancelTriggerType.MAX_HP)
                 {
-                    targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (float)(long)targetOwner.Hp / (float)(long)targetOwner.MaxHp);
+                    targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)(long)targetOwner.Hp / (long)targetOwner.MaxHp);
                 }
                 targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _valueDictionary[eValueNumber.VALUE_6] == 0f);
 
@@ -128,7 +123,7 @@ namespace Elements
             Value[eValueNumber.VALUE_5] = (float)(double)MasterData.action_value_5;
         }
 
-        private enum eSlipDamageType
+        public enum eSlipDamageType
         {
             NO_EFFECT,
             POISONE,

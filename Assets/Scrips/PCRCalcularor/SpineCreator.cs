@@ -43,7 +43,8 @@ namespace PCRCaculator
                 //}
                 Material tempMateral = new Material(spineMaterial);
                 tempMateral.mainTexture = texture;
-                tempMateral.mainTexture.name = "force_override";//skinID.ToString();
+                if (texture != null)
+                    tempMateral.mainTexture.name = "force_override";//skinID.ToString();
                 tempMateral.mainTextureScale = new Vector2(1, 1);
                 tempMateral.mainTextureOffset = Vector2.zero;
                 //string path_atlas = Application.streamingAssetsPath + "/Datas/Unit/" + prefabID + "/" + skinID + ".atlas.txt";

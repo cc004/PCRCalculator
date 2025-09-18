@@ -48,7 +48,8 @@ public class Stars : MonoBehaviour
         //         stars[k].gameObject.SetActive(false);
         //     }
         // }
-        stars[0].sprite = stars_setting[i-1];
+        if (isUnit) //todo 临时处理
+            stars[0].sprite = stars_setting[i-1];
     }
     public void SetStarColor(Color color)
     {

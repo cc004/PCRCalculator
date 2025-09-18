@@ -42,7 +42,7 @@ namespace Elements
       switch ((eRevivalType) ActionDetail1)
       {
         case eRevivalType.NORMAL:
-                    _target.Owner.SetRecovery((int)(_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_2]), UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _isRevival: true, _useNumberEffect: (ActionDetail2 == 1));
+                    _target.Owner.SetRecovery((long)(_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_2]), UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _isRevival: true, _useNumberEffect: (ActionDetail2 == 1));
                     break;
         case eRevivalType.PHOENIX:
           _sourceActionController.AppendCoroutine(updateRevival(_skill, (int) _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _target.Owner, (float)_valueDictionary[eValueNumber.VALUE_4], _source, _sourceActionController), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);

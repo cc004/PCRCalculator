@@ -105,6 +105,11 @@ namespace Elements
       return Approximately(_num, num1) ? num1 : (long)_num;
     }
 
+    public static LongWithEx DoubleToLong(DoubleWithEx _num)
+    {
+      return _num.ToLongWithEx();
+    }
+
     public static int FloatToIntReverseTruncate(float _num)
     {
       int num = (int)_num;
@@ -125,6 +130,14 @@ namespace Elements
       if (Approximately(num, _num))
         return num;
       return _num <= 0.0 ? Mathf.FloorToInt((float)_num) : Mathf.CeilToInt((float)_num);
+    }
+
+    public static LongWithEx DoubleToLongReverseTruncate(DoubleWithEx _num)
+    {
+      long num = (long)_num;
+      if (Approximately(num, _num))
+        return num;
+      return _num <= 0.0 ? (LongWithEx)_num.Floor() : (LongWithEx)_num.Ceil();
     }
 
     public static float FloatToPerMille(float _value)

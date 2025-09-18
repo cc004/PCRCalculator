@@ -842,7 +842,7 @@ namespace Elements
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError($"警告：弹道{_skill.SkillId}加载失败，使用旧版弹道可能会导致偏差");
+                        Debug.LogError($"警告：弹道{_skill.SkillId}加载失败{e}，使用旧版弹道可能会导致偏差");
                         firearmCtrl.data = GetPrefabDataBySkillid(_skill.SkillId);
                     }
                     List<ActionParameter> _actions = new List<ActionParameter>();

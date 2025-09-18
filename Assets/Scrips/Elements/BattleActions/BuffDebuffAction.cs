@@ -223,7 +223,7 @@ namespace Elements
             switch (_changeParamType)
             {
                 case eChangeParameterType.FIXED:
-                    f = BattleUtil.DoubleToLongReverseTruncate(_value);
+                    f = (DoubleWithEx)BattleUtil.DoubleToLongReverseTruncate(_value);
                     break;
                 case eChangeParameterType.PERCENTAGE:
                     var num1 = _value / 100f;

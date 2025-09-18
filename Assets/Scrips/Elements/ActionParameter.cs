@@ -333,7 +333,7 @@ namespace Elements
                    actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
         }
 
-        public delegate void OnDamageHitDelegate(FloatWithEx damage);
+        public delegate void OnDamageHitDelegate(LongWithEx damage);
 
         public delegate void OnActionEndDelegate();
 

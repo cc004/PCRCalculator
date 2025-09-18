@@ -34,22 +34,22 @@ namespace Elements
             switch (ActionDetail1)
             {
                 case 1:
-                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.GUARD_ATK, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, intReverseTruncate);
+                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.GUARD_ATK, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (DoubleWithEx)intReverseTruncate);
                     break;
                 case 2:
-                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.GUARD_MGC, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, intReverseTruncate);
+                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.GUARD_MGC, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (DoubleWithEx)intReverseTruncate);
                     break;
                 case 3:
-                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DRAIN_ATK, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, intReverseTruncate);
+                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DRAIN_ATK, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (DoubleWithEx)intReverseTruncate);
                     break;
                 case 4:
-                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DRAIN_MGC, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, intReverseTruncate);
+                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DRAIN_MGC, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (DoubleWithEx)intReverseTruncate);
                     break;
                 case 5:
-                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.GUARD_BOTH, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, intReverseTruncate);
+                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.GUARD_BOTH, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (DoubleWithEx)intReverseTruncate);
                     break;
                 case 6:
-                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DRAIN_BOTH, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, intReverseTruncate);
+                    _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.DRAIN_BOTH, (float)_valueDictionary[eValueNumber.VALUE_3], this, _skill, (DoubleWithEx)intReverseTruncate);
                     break;
             }
             action?.Invoke("生成可以" + ((eBarrierType)ActionDetail1).GetDescription() + "的护盾，数值" + intReverseTruncate + "持续时间" + _valueDictionary[eValueNumber.VALUE_3]);

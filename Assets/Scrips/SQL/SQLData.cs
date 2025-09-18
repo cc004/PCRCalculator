@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using SQLite4Unity3d;
 using PCRCaculator.Guild;
 using Elements;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
 namespace PCRCaculator.SQL
 {
@@ -76,6 +77,65 @@ namespace PCRCaculator.SQL
         public int level { get; set; }
         public int rarity { get; set; }
         public int promotion_level { get; set; }
+        public long hp { get; set; }
+        public int atk { get; set; }
+        public int magic_str { get; set; }
+        public int def { get; set; }
+        public int magic_def { get; set; }
+        public int physical_critical { get; set; }
+        public int magic_critical { get; set; }
+        public int wave_hp_recovery { get; set; }
+        public int wave_energy_recovery { get; set; }
+        public int dodge { get; set; }
+        public int physical_penetrate { get; set; }
+        public int magic_penetrate { get; set; }
+        public int life_steal { get; set; }
+        public int hp_recovery_rate { get; set; }
+        public int energy_recovery_rate { get; set; }
+        public int energy_reduce_rate { get; set; }
+        public int union_burst_level { get; set; }
+        public int main_skill_lv_1 { get; set; }
+        public int main_skill_lv_2 { get; set; }
+        public int main_skill_lv_3 { get; set; }
+        public int main_skill_lv_4 { get; set; }
+        public int main_skill_lv_5 { get; set; }
+        public int main_skill_lv_6 { get; set; }
+        public int main_skill_lv_7 { get; set; }
+        public int main_skill_lv_8 { get; set; }
+        public int main_skill_lv_9 { get; set; }
+        public int main_skill_lv_10 { get; set; }
+        public int ex_skill_lv_1 { get; set; }
+        public int ex_skill_lv_2 { get; set; }
+        public int ex_skill_lv_3 { get; set; }
+        public int ex_skill_lv_4 { get; set; }
+        public int ex_skill_lv_5 { get; set; }
+        public int resist_status_id { get; set; }
+        public int resist_variation_id { get; set; }
+        public int accuracy { get; set; }
+        public int unique_equipment_flag_1 { get; set; }
+        public int break_durability { get; set; }
+        public int virtual_hp { get; set; }
+
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
+            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
+            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
+            energy_recovery_rate, energy_reduce_rate, accuracy)
+            {
+                realhp = hp
+            };
+        }
+    }
+    public class talent_quest_enemy_parameter
+    {
+        [PrimaryKey]
+        public int enemy_id { get; set; }
+        public int unit_id { get; set; }
+        public string name { get; set; }
+        public int level { get; set; }
+        public int rarity { get; set; }
+        public int promotion_level { get; set; }
         public int hp { get; set; }
         public int atk { get; set; }
         public int magic_str { get; set; }
@@ -125,6 +185,17 @@ namespace PCRCaculator.SQL
                 realhp = hp
             };
         }
+    }
+    public class talent_quest_wave_group_data
+    {
+        [PrimaryKey]
+        public int id { get; set; }
+        public string wave_group_id { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
     }
     public class unit_enemy_data
     {
@@ -289,7 +360,7 @@ namespace PCRCaculator.SQL
             {
                 action_1,action_2,action_3,action_4,
                 action_5,action_6,action_7,0,0,0
-            };           
+            };
 
             return ids;
         }
@@ -601,13 +672,6 @@ namespace PCRCaculator.SQL
         public int equip_slot { get; set; }
         public int equip_id { get; set; }
     }
-    public class unit_talent
-    {
-        public int setting_id { get; set; }
-        public int unit_id { get; set; }
-        public int talent_id { get; set; }
-    }
-
     public class unit_unique_equipment : unit_unique_equip
     {
     }
@@ -620,13 +684,257 @@ namespace PCRCaculator.SQL
         public int equipment_id { get; set; }
     }
 
-    public class ExtraEffectUnitGroup : DbBaseData
+    public class extra_effect_unit_group : DbBaseData
     {
         public int target_id { get; }
         public int group_id { get; }
         public int unit_id { get; }
     }
+    public class unit_talent
+    {
+        public int setting_id { get; set; }
+        public int unit_id { get; set; }
+        public int talent_id { get; set; }
+    }
+    public class talent_weakness
+    {
+        public int resist_id { get; set; }
+        public int talent_1 { get; set; }
+        public int talent_2 { get; set; }
+        public int talent_3 { get; set; }
+        public int talent_4 { get; set; }
+        public int talent_5 { get; set; }
+    }
+    public class enemy_talent_weakness
+    {
+        public int enemy_id { get; set; }
+        public int resist_id { get; set; }
+    }
+    public class talent_formation_overwrite
+    {
+        public int id { get; set; }
+        public int content_type { get; set; }
+        public int target_value_1 { get; set; }
+        public int target_value_2 { get; set; }
+        public int formation_bonus_id_1 { get; set; }
+        public int formation_bonus_id_2 { get; set; }
+        public int formation_bonus_id_3 { get; set; }
+        public int formation_bonus_id_4 { get; set; }
+        public int formation_bonus_id_5 { get; set; }
+    }
+    public class talent_formation_bonus
+    {
+        public int formation_bonus_id { get; set; }
+        public int talent_bonus_1 { get; set; }
+        public int talent_bonus_2 { get; set; }
+        public int talent_bonus_3 { get; set; }
+        public int talent_bonus_4 { get; set; }
+        public int talent_bonus_5 { get; set; }
+    }
+    public class talent_skill_node : DbBaseData
+    {
+        public int node_id { get; set; }
+        public int page_num { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public int pre_node_1 { get; set; }
+        public int pre_node_2 { get; set; }
+        public int pre_node_3 { get; set; }
+        public int pre_node_4 { get; set; }
+        public int pre_node_5 { get; set; }
+        public int enhance_level_id_1 { get; set; }
+        public int enhance_level_id_2 { get; set; }
+        public int enhance_level_id_3 { get; set; }
+        public int enhance_level_id_4 { get; set; }
+        public int enhance_level_id_5 { get; set; }
+        public int icon_id { get; set; }
+        public int title_id { get; set; }
+    }
+    public class team_skill_title : DbBaseData
+    {
+        public int title_id { get; set; }
+        public string title_text { get; set; }
+    }
+    public class talent_skill_enhance_level : DbBaseData
+    {
+        public int enhance_level_id { get; set; }
+        public int enhance_id_1 { get; set; }
+        public int enhance_id_2 { get; set; }
+        public int enhance_id_3 { get; set; }
+        public int enhance_id_4 { get; set; }
+        public int enhance_id_5 { get; set; }
+        public int reward_type { get; set; }
+        public int item_id { get; set; }
+        public int consume_num { get; set; }
+        public int consume_gold { get; set; }
+    }
+    public class talent_skill_enhance_data : DbBaseData
+    {
+        public int enhance_id { get; set; }
+        public int talent_id_1 { get; set; }
+        public int talent_id_2 { get; set; }
+        public int talent_id_3 { get; set; }
+        public int talent_id_4 { get; set; }
+        public int talent_id_5 { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+    }
+    public class param_type : DbBaseData
+    {
+        public int parameter_type { get; set; }
+        public string parameter_name { get; set; }
+        public int ratio { get; set; }
+        public int is_percentage { get; set; }
+    }
+    public class team_skill_node : DbBaseData
+    {
+        public int node_id { get; set; }
+        public int pos_x { get; set; }
+        public int pos_y { get; set; }
+        public int pre_node_id { get; set; }
+        public int enhance_level_id_1 { get; set; }
+        public int enhance_level_id_2 { get; set; }
+        public int enhance_level_id_3 { get; set; }
+        public int enhance_level_id_4 { get; set; }
+        public int enhance_level_id_5 { get; set; }
+        public int icon_id { get; set; }
+        public int noise_id { get; set; }
+        public int title_id { get; set; }
+    }
+    public class team_skill_enhance_level : DbBaseData
+    {
+        public int enhance_level_id { get; set; }
+        public int enhance_id_1 { get; set; }
+        public int enhance_id_2 { get; set; }
+        public int enhance_id_3 { get; set; }
+        public int enhance_id_4 { get; set; }
+        public int enhance_id_5 { get; set; }
+        public int reward_type { get; set; }
+        public int item_id { get; set; }
+        public int consume_num { get; set; }
+        public int consume_gold { get; set; }
+    }
+    public class team_skill_enhance_data : DbBaseData
+    {
+        public int enhance_id { get; set; }
+        public int talent_id_1 { get; set; }
+        public int talent_id_2 { get; set; }
+        public int talent_id_3 { get; set; }
+        public int talent_id_4 { get; set; }
+        public int talent_id_5 { get; set; }
+        public int parameter_type { get; set; }
+        public int enhance_value { get; set; }
+    }
+    public class talentFormationData
+    {
+        public int id { get; set; }
+        public int content_type { get; set; }
+        public int target_value_1 { get; set; }
+        public int target_value_2 { get; set; }
+        public long[][] formation_bonus_values { get; set; }
+        public talentFormationData(talent_formation_overwrite overwrite, Dictionary<int, talent_formation_bonus> bonusDic)
+        {
+            id = overwrite.id;
+            content_type = overwrite.content_type;
+            target_value_1 = overwrite.target_value_1;
+            target_value_2 = overwrite.target_value_2;
 
+            formation_bonus_values = new long[5][];
+            if (bonusDic != null)
+            {
+                // 获取每个formation_bonus_id对应的加成值数组
+                formation_bonus_values[0] = GetBonusValues(overwrite.formation_bonus_id_1, bonusDic);
+                formation_bonus_values[1] = GetBonusValues(overwrite.formation_bonus_id_2, bonusDic);
+                formation_bonus_values[2] = GetBonusValues(overwrite.formation_bonus_id_3, bonusDic);
+                formation_bonus_values[3] = GetBonusValues(overwrite.formation_bonus_id_4, bonusDic);
+                formation_bonus_values[4] = GetBonusValues(overwrite.formation_bonus_id_5, bonusDic);
+            }
+        }
 
+        private long[] GetBonusValues(int formationBonusId, Dictionary<int, talent_formation_bonus> bonusDic)
+        {
+            if (bonusDic.TryGetValue(formationBonusId, out var bonus))
+            {
+                return new long[5]
+                {
+                bonus.talent_bonus_1,
+                bonus.talent_bonus_2,
+                bonus.talent_bonus_3,
+                bonus.talent_bonus_4,
+                bonus.talent_bonus_5
+                };
+            }
+            return new long[5] { 0, 0, 0, 0, 0 };
+        }
+
+        // 获取指定数量的加成值
+        public long GetBonusForCount(int count)
+        {
+            if (formation_bonus_values == null || count < 1 || count > 5)
+                return 0;
+
+            var bonusArray = formation_bonus_values[count - 1];
+            if (bonusArray == null)
+                return 0;
+
+            // 返回对应数量的加成值
+            return bonusArray[count - 1];
+        }
+
+        // 获取属性指定数量的加成值
+        public long GetBonusForCountAndLevel(int count, int level)
+        {
+            if (formation_bonus_values == null || count < 1 || count > 5 || level < 1 || level > 5)
+                return 0;
+
+            var bonusArray = formation_bonus_values[count - 1];
+            if (bonusArray == null)
+                return 0;
+
+            return bonusArray[level - 1];
+        }
+    }
+    public class extra_effect_data : DbBaseData
+    {
+        public int extra_effect_id { get; set; }
+        public int content_type { get; set; }
+        public int target_value_1 { get; set; }
+        public int target_value_2 { get; set; }
+        public int set_id { get; set; }
+        public int exec_timing_1 { get; set; }
+        public int exec_timing_2 { get; set; }
+        public int exec_timing_3 { get; set; }
+        public int exec_timing_4 { get; set; }
+        public int exec_timing_5 { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
+
+        public List<int> enemy_ids
+        {
+            get
+            {
+                return new List<int> { enemy_id_1, enemy_id_2, enemy_id_3, enemy_id_4, enemy_id_5 }.Where(x => x != 0).ToList();
+            }
+        }
+
+        public List<int> exec_timings
+        {
+            get
+            {
+                return new List<int> { exec_timing_1, exec_timing_2, exec_timing_3, exec_timing_4, exec_timing_5 }.Where(x => x != 0).ToList();
+            }
+        }
+    }
+    public class talent_quest_battle_effect : DbBaseData
+    {
+        public int id { get; set; }
+        public int quest_id { get; set; }
+        public string icon_name { get; set; }
+        public string effect_name { get; set; }
+        public string description { get; set; }
+    }
 }
 

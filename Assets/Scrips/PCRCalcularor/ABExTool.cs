@@ -600,6 +600,14 @@ namespace PCRCaculator
         {
             if (unitid == 207001)
                 return 207000;
+            if (MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var unit))
+            {
+                return unit.detailData.prefabIdBattle;
+            }
+            else if (MainManager.Instance.EnemyDataDic.TryGetValue(unitid, out var enemy))
+            {
+                return enemy.detailData.prefab_id;
+            }
             return unitid;
         }
 

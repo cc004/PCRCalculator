@@ -404,10 +404,22 @@ namespace Elements
         WOLF = 139,
         [Description("标记\n火电")]
         HUODIAN = 140,
+        [Description("堕天使的加护\n可璃亚")]
+        DUOTIANSHI = 141,
+        [Description("回归的蔷薇\nels")]
+        QiANGWEI = 142,
         [Description("射手座D5标记")]
         SHESHOUZUO = 143,
         [Description("噗吉靠垫\n圣锤")]
-        SHENGCHUI = 145,//机制没完善用不了
+        BAIHUALIAOLUAN = 146,
+        [Description("百花缭乱\nEX7春临")]
+        YANTIANLIERI = 147,
+        [Description("炎天烈日\nEX7炎夏")]
+        QIUGAOMAFEI = 148,
+        [Description("秋高马肥\nEX7爽秋")]
+        HANQILINLIE = 149,
+        [Description("寒气凛冽\nEX7寒威")]
+        SHENGCHUI = 145,
         [Description("限制TP回复")]
         LIMIT_ENERGY_RECOVER_RATE = 150,
         [Description("额外加速")]
@@ -416,8 +428,84 @@ namespace Elements
         EWAIJIANSU = 153,
         [Description("毒伤提升")]
         SLIP_DAMAGE_UP = 154,
-        [Description("堕天使的加护\n可璃亚")]
-        DUOTIANSHI = 141,//机制没完善用不了
+        [Description("特殊效果")]
+        EXTRA_EFFECT = 155,
+        [Description("水祭的安宁\n水优妮")]
+        SHUIJIDEANNING = 156,
+        [Description("水月\n水华")]
+        SHUIYUE = 157,
+        [Description("婉拒之花\n银莲")]
+        WANJUZHIHUA = 158,
+        [Description("卡班君\n库露露")]
+        KABANJUN = 159,
+        [Description("粘稠\n水涅娅")]
+        NIANCHOU = 160,
+        [Description("铁气守护\n涅妃")]
+        TIEQISHOUHU = 161,
+        [Description("雷云1\n非会战")]
+        LEIYUN1 = 164,
+        UNABLE_STATE_GUARD_EXTRA_EFFECT = 165,
+        CHAINED_ACN = 166,
+        PUPPET = 167,
+        [Description("暴风\n非会战")]
+        BAOFENG = 169,
+        [Description("豪雨\n非会战")]
+        HAOYU = 170,
+        [Description("PSI风暴\n水美空")]
+        PSIFENGBAO = 171,
+        [Description("日食\n水龙妈")]
+        TAUNT = 172,
+        RISHI = 173,
+        [Description("鬼化\n水蕾姆")]
+        GUIHUA = 177,
+        [Description("狂骚\n水蕾姆")]
+        KUANGSAO = 178,
+        [Description("增加造成的物理伤害")]
+        BUFF_PHYSICAL_DAMAGE = 179,
+        [Description("增加造成的魔法伤害")]
+        BUFF_MAGIC_DAMAGE = 180,
+        [Description("减少造成的物理伤害")]
+        DEBUFF_PHYSICAL_DAMAGE = 181,
+        [Description("减少造成的魔法伤害")]
+        DEBUFF_MAGIC_DAMAGE = 182,
+        [Description("谢幕\n梦狐")]
+        XIEMU = 183,
+        [Description("魔法攻击无效")]
+        MAGIC_DODGE = 184,
+        DISABLE_HEAL = 185,
+        [Description("雷云2\n非会战")]
+        LEIYUN2 = 186,
+        [Description("热情的花束\nEMT")]
+        REQINGDEHUASHU = 188,
+        [Description("茶壶\n女仆")]
+        CHAHU = 189,
+        [Description("炼金素材\n炼望")]
+        LIANJINSUCAI = 190,
+        [Description("香水\n炼望")]
+        XIANGSHUI = 191,
+        [Description("偷懒的诱惑\n龙妹")]
+        TOULANDEYOUHUO = 192,
+        [Description("友军护盾\n吹雪")]
+        YOUJUNHUDUN = 193,
+        [Description("蛮贼骰子\n大和")]
+        MANZEITOUZI = 194,
+        [Description("尖刺盾牌\n若菜")]
+        JIANCIDUNPAI = 195,
+        [Description("恶魔的亲吻\n圣老师")]
+        EMOQINWEN = 196,
+        [Description("水切噜")]
+        SHUIQIELU = 197,
+        [Description("亡灵躯体\n格蕾斯")]
+        WANGLINGQUTI = 198,
+        [Description("火鸟\n春电")]
+        HUONIAO = 199,
+        [Description("魔眼\n美杜莎")]
+        MOYAN = 200,
+        [Description("虚数\n原克")]
+        XUSHU = 201,
+        RATIO_SLIP = 202,
+        REDUCE_DAMAGE_BY_HIGHER_DEF = 203,
+        CONVERT_DAMAGE_OVER_TIME = 204,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912

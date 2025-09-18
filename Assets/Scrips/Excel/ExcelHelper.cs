@@ -135,7 +135,7 @@ namespace ExcelHelper
 
                 var lovedict = json["read_story_ids"].ToObject<int[]>()
                     .Select(x =>
-                        MainManager.Instance.unitStoryLoveDic.TryGetValue(x, out var y)
+                        MainManager.Instance.UnitStoryLoveDic.TryGetValue(x, out var y)
                             ? (x / 1000 * 100 + 1, y)
                             : (0, 0))
                     .GroupBy(p => p.Item1)
@@ -987,8 +987,7 @@ namespace ExcelHelper
                 int[] lineColor = new int[3] { 151, 71, 6 };
                 worksheet0.Cells[1, 12, 1, 13].Merge = true;
                 worksheet0.Cells[1, 12].Value = "v" + Application.version;
-                worksheet0.Cells[1, 14].Value = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew
-                    .GetDescription();
+                worksheet0.Cells[1, 14].Value = MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic ? "新版加速" : "旧版加速";
                 worksheet0.Cells[1, 15].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
                 worksheet0.Cells[2, 12, 2, 13].Merge = true;
                 worksheet0.Cells[2, 12].Value = "角色数据版本";
@@ -1018,7 +1017,7 @@ namespace ExcelHelper
                 worksheet0.MySetValue(1, 2,
                     MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes(), 16, blod: true, backColor: backColotInt_1);
                 worksheet0.Cells[1, 3, 2, 10].Merge = true;
-                TimelineData.timeLineName= TimelineData.timeLineName.Substring(2, 1) == "#" ? TimelineData.timeLineName[4..] : TimelineData.timeLineName[3..];
+                // TimelineData.timeLineName= TimelineData.timeLineName.Substring(2, 1) == "#" ? TimelineData.timeLineName[4..] : TimelineData.timeLineName[3..];
                 worksheet0.MySetValue(1, 3, TimelineData.timeLineName, 16, blod: true, backColor: backColotInt_1);
                 worksheet0.Cells[1, 3, 2, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet0.Cells[3, 2, 5, 2].Merge = true;
@@ -1029,6 +1028,10 @@ namespace ExcelHelper
                 worksheet0.MySetValue(8, 2, "专1/专2", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(9, 2, "星级", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(10, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(11, 2, "属性等级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(12, 2, "属性技能", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(13, 2, "大师技能", blod: true, backColor: backColotInt_2);
+
                 int count = 0;
                 foreach (UnitData unitData in playerDatas.playrCharacters)
                 {
@@ -1040,24 +1043,31 @@ namespace ExcelHelper
                     worksheet0.MySetValue(8, 7 - count, unitData.GetUniqueEqsDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(9, 7 - count, unitData.rarity , backColor: backColotInt_1);
                     worksheet0.MySetValue(10, 7 - count, unitData.GetExEquipDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(11, 7 - count, unitData.TalentLevelDescribe(), backColor: backColotInt_1);
+
                     count++;
                 }
+                worksheet0.Cells[12, 3, 12, 7].Merge = true;
+                worksheet0.Cells[13, 3, 13, 7].Merge = true;
+                worksheet0.MySetValue(12, 3, GuildManager.Instance.GetFinalTalentSkillNodeDescription(), backColor: backColotInt_1);
+                worksheet0.MySetValue(13, 3,GuildManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
+
                 worksheet0.Cells[3, 8, 3, 10].Merge = true;
                 worksheet0.MySetValue(3, 8, "备注", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[4, 8, 10, 10].Merge = true;
+                worksheet0.Cells[4, 8, 13, 10].Merge = true;
                 worksheet0.Cells[4, 8, 10, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
                 // worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 7, false,3,8);//boss头像
-                worksheet0.MySetValue(11, 1, "帧数");
-                worksheet0.MySetValue(11, 2, "秒数", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 3, "角色", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[11, 4, 11, 6].Merge = true;
-                worksheet0.MySetValue(11, 4, "操作", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 7, "伤害", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 8, "ub总伤", blod: true, backColor: backColotInt_2);
-                worksheet0.Cells[11, 9, 11, 10].Merge = true;
-                worksheet0.MySetValue(11, 9, "说明", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 1, "帧数");
+                worksheet0.MySetValue(14, 2, "秒数", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 3, "角色", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[14, 4, 14, 6].Merge = true;
+                worksheet0.MySetValue(14, 4, "操作", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 7, "伤害", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(14, 8, "ub总伤", blod: true, backColor: backColotInt_2);
+                worksheet0.Cells[14, 9, 14, 10].Merge = true;
+                worksheet0.MySetValue(14, 9, "说明", blod: true, backColor: backColotInt_2);
 
-                int currentLineNum = 12;
+                int currentLineNum = 15;
 
                 List<UBDetail> UBList = TimelineData.uBDetails;
                 //UBList.Sort((a, b) => a.UBTime - b.UBTime);
@@ -1103,7 +1113,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(11 + curline, 14 + i, cont, centre:false);
+                            worksheet0.MySetValue(14 + curline, 14 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -1121,7 +1131,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < lframe) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(12 + curline, 12 + i, cont, centre:false);
+                            worksheet0.MySetValue(15 + curline, 12 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -1143,7 +1153,7 @@ namespace ExcelHelper
                     if (a.isBossUB)
                     {
                         worksheet0.Cells[currentLineNum, 3, currentLineNum, 10].Merge = true;
-                        worksheet0.MySetValue(currentLineNum, 3, "BOSS  UB",backColor:backColotInt_1);
+                        worksheet0.MySetValue(currentLineNum, 3, a.enemyData.name, backColor:backColotInt_1);
                     }
                     else
                     {
@@ -1570,7 +1580,7 @@ namespace ExcelHelper
                     {
                         foreach(var data1 in data0.Value)
                         {
-                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:(int)data1.yValue, realFrameCount: data1.realFrameCount));
+                            timeLines.Add(new TimeLineDataA(Mathf.RoundToInt(data1.xValue), data0.Key, idx,"", data1.describe,valueA:(long)data1.yValue, realFrameCount: data1.realFrameCount));
                         }
                         idx++;
                     }
@@ -1809,12 +1819,12 @@ namespace ExcelHelper
         public int frame;
         public int unitid;
         public int idx;
-        public int valueA;
+        public long valueA;
         public double valueB;
         public string describeA;
         public string describeB;
         public int realFrameCount;
-        public TimeLineDataA(int frame, int unitid,int idx, string describeA, string describeB,int valueA = 0,double valueB = 0,int realFrameCount=0)
+        public TimeLineDataA(int frame, int unitid,int idx, string describeA, string describeB,long valueA = 0,double valueB = 0,int realFrameCount=0)
         {
             this.frame = frame;
             this.unitid = unitid;

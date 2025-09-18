@@ -19,7 +19,7 @@ namespace Elements
 
         protected override DoubleWithEx calcHpValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _source.Hp * _valueDictionary[eValueNumber.VALUE_2];
+            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => (DoubleWithEx)_source.Hp * _valueDictionary[eValueNumber.VALUE_2];
 
         protected override DoubleWithEx calcMaxHpValue(
             UnitCtrl _source,

@@ -6,7 +6,16 @@ namespace Elements
 {
     public class SealAction : ActionParameter
     {
+
+        public enum eCancelTriggerType // TypeDefIndex: 20470
+        {
+            NONE = 0,
+            DAMAGED_COUNT = 1,
+        }
+
+
         private const int DISPLAY_COUNT_NUM = 1;
+        private const int REMOVE_EFFECT_NUM = 1;
 
         public override void Initialize()
         {
@@ -31,7 +40,8 @@ namespace Elements
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
-            eStateIconType eStateIconType = (eStateIconType)(float)_valueDictionary[eValueNumber.VALUE_2];
+            eStateIconType eStateIconType = (eStateIconType)(double)_valueDictionary[eValueNumber.VALUE_2];
+
             if (!_target.Owner.SealDictionary.ContainsKey(eStateIconType))
             {
                 SealData sealData = new SealData
@@ -43,8 +53,31 @@ namespace Elements
             }
             else
                 _target.Owner.SealDictionary[eStateIconType].Max = Mathf.Max((int)_valueDictionary[eValueNumber.VALUE_1], _target.Owner.SealDictionary[eStateIconType].Max);
+
+            if (ActionDetail3 == (int)eCancelTriggerType.DAMAGED_COUNT)
+            {
+                _valueDictionary.TryGetValue(eValueNumber.VALUE_5, out var rawCancel);
+
+                int cancelInt = double.IsInfinity(rawCancel) ? int.MinValue : (int)rawCancel;
+                System.Action cancelAction = () =>
+                {
+                    _target.Owner.SealDictionary[eStateIconType].RemoveSeal(1, true);
+                };
+
+                var cancelData = new SealDamageCountCancelData(
+                    cancelInt, cancelAction
+                );
+
+                var sealCancelDict = _target.Owner.SealCancelDictionary;
+
+                if (!sealCancelDict.ContainsKey(eCancelTriggerType.DAMAGED_COUNT))
+                    sealCancelDict[eCancelTriggerType.DAMAGED_COUNT] = new Dictionary<eStateIconType, SealCancelData>();
+
+                sealCancelDict[eCancelTriggerType.DAMAGED_COUNT][eStateIconType] = cancelData;
+            }
+
             if ((double)_valueDictionary[eValueNumber.VALUE_4] == 0.0)
-                return;
+                    return;
             SealData seal = _target.Owner.SealDictionary[eStateIconType];
             if (seal.GetCurrentCount() == 0 && (double)_valueDictionary[eValueNumber.VALUE_4] > 0.0)
             {

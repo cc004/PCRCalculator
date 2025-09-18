@@ -129,7 +129,7 @@ namespace Elements
                         owner2.OnHpChange = (UnitCtrl.OnDamageDelegate) Delegate.Combine(owner2.OnHpChange,
                             (UnitCtrl.OnDamageDelegate) delegate
                             {
-                                if ((float) (long) Owner.Hp <= kv.Value.Value / 100f * (float) (long) Owner.MaxHp)
+                                if (Owner.Hp <= kv.Value.Value / 100.0 * Owner.MaxHp)
                                 {
                                     _exSkillData.TryExSkill(eExSkillCondition.TRIGGER_HP, this, true);
                                 }

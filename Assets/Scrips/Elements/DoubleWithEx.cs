@@ -7,6 +7,8 @@ using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
 using Random = System.Random;
+using Elements;
+using UnityEngine.Assertions;
 
 namespace Elements
 {
@@ -21,8 +23,9 @@ namespace Elements
         private readonly Func<int, double> root;
         private int hash;
         private double cache;
-        private string select, op, rnd;
-        private DoubleWithEx op1, op2;
+        public string select, op;
+        private string rnd;
+        public DoubleWithEx op1, op2;
 
         public DoubleWithEx(double value = 0.0, double avg = 0.0, double min = 0.0, double max = 0.0,
             Func<int, double> root = null)
@@ -45,16 +48,16 @@ namespace Elements
             return cache;
         }
 
-        private static Random rndd = new Random();
-        private static UnityRandom rand = new UnityRandom();
-        private static List<int> cachedSeed = new List<int>();
+        public static Random rndd = new Random();
+        public static UnityRandom rand = new UnityRandom();
+        public static List<int> cachedSeed = new List<int>();
         public static void SetState(int seed)
         {
             rand.InitState(seed);
             cachedSeed.Clear();
         }
 
-        private static int GetRandN(int n)
+        public static int GetRandN(int n)
         {
             while (cachedSeed.Count <= n) cachedSeed.Add(rand.Range(0, 1000));
             return cachedSeed[n];
@@ -64,7 +67,7 @@ namespace Elements
             p = Math.Clamp(p, 0.0, 1.0);
             if (p == 0.0) return 0.0;
             if (p == 1.0) return 1.0;
-            var p0 = (int) (p * 1000);
+            var p0 = (long) (p * 1000);
             var result = new DoubleWithEx(val ? 1 : 0, p, root: _ => GetRandN(order) < p0 ? 1 : 0, min: 0,
                 max: 1)
             {
@@ -104,24 +107,24 @@ namespace Elements
             if (a.pure)
             {
                 if (b.pure)
-                    return new DoubleWithEx(op(a.value, b.value));
+                    return op(a.value, b.value);
                 return new DoubleWithEx(op(vala, b.value), op(vala, b.avg),
-                    root: hash => op(vala, b.Emulate(hash)), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                    root: hash => op(vala, b.Emulate(hash)), min: xs.Min(), max: xs.Max())
                 {
-                    op = ops, op1 = a, op2 = b
+                    op = ops, op1 = vala, op2 = b
                 };
             }
 
             if (b.pure)
                 return new DoubleWithEx(op(a.value, valb), op(a.avg, valb),
-                    root: hash => op(a.Emulate(hash), valb), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                    root: hash => op(a.Emulate(hash), valb), min: xs.Min(), max: xs.Max())
                 {
                     op = ops,
                     op1 = a,
-                    op2 = b
+                    op2 = valb
                 };
             return new DoubleWithEx(op(a.value, b.value), op(a.avg, b.avg),
-                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: Math.Min(xs.Min(), xs.Max()), max: Math.Max(xs.Min(), xs.Max()))
+                root: hash => op(a.Emulate(hash), b.Emulate(hash)), min: xs.Min(), max: xs.Max())
             {
                 op = ops,
                 op1 = a,
@@ -130,7 +133,7 @@ namespace Elements
         }
 
         public double Expect => avg;
-        public float Expected(int N)
+        public double Expected(int N)
         {
             double s = 0;
             for (int i = 0; i < N; ++i)
@@ -138,9 +141,9 @@ namespace Elements
                 SetState(rndd.Next());
                 s += Emulate(rndd.Next());
             }
-            return (float)(s / N);
+            return s / N;
         }
-        public float Stddev
+        public double Stddev
         {
             get
             {
@@ -153,7 +156,7 @@ namespace Elements
                     s += x;
                     s2 += x * x;
                 }
-                return (float)Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
+                return Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
             }
         }
         public double Probability(Func<double, bool> predict)
@@ -165,15 +168,49 @@ namespace Elements
                 SetState(rndd.Next());
                 if (predict(Emulate(rndd.Next()))) ++s;
             }
-            return (double)s / N;
+            return s / N;
         }
 
         public static implicit operator double(DoubleWithEx self) => self.value;
+
         public static implicit operator DoubleWithEx(double x) =>
             new DoubleWithEx(x, x, x, x, null);
-        public static explicit operator LongWithEx(DoubleWithEx x) =>
-            new LongWithEx((long)x.value, (long)x.avg, (long)x.min, (long)x.max,
-                x.root == null ? null : (hash => (long)x.root(hash)));
+
+        public static explicit operator LongWithEx(DoubleWithEx x) {
+            // 判断是否接近整数
+            Assert.IsTrue(Math.Abs(x.value - Math.Round(x.value)) < 1e-8);
+            Assert.IsTrue(Math.Abs(x.avg - Math.Round(x.avg)) < 1e-8);
+            Assert.IsTrue(Math.Abs(x.min - Math.Round(x.min)) < 1e-8);
+            Assert.IsTrue(Math.Abs(x.max - Math.Round(x.max)) < 1e-8);
+            return new LongWithEx((long)x.value, (long)x.avg, (long)x.min, (long)x.max,
+                x.root == null ? null : (hash => (long)x.root(hash)))
+            {
+                select = x.select ?? null,
+                op = x.op ?? null,
+                op1 = x.op1 ?? null,
+                op2 = x.op2 ?? null
+            };
+        }
+
+        // public LongWithEx ToLongWithEx() => (LongWithEx)this;
+
+		public static bool Approximately(double _a, double _b)
+		{
+			return Math.Abs(_b - _a) < Math.Max(1E-14 * Math.Max(Math.Abs(_a), Math.Abs(_b)), 2.220446049250313E-16);
+		}
+
+        public LongWithEx ToLongWithEx()
+        {
+            double _num = value;
+            if (_num >= 0.0)
+            {
+                long num = Mathf.CeilToInt((float)_num);
+                return Approximately(_num, num) ? (LongWithEx)this.Ceil() : (LongWithEx)this.Floor();
+            }
+            long num1 = Mathf.FloorToInt((float)_num);
+            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Floor();
+        }
+
         public DoubleWithEx Max(double f)
         {
             if (min > f) return this;
@@ -186,7 +223,7 @@ namespace Elements
             return Select(x => Math.Min(x, f), $"min:{f}");
         }
 
-        public override string ToString() => pure ? ((double)this).ToString() : $"{(int)(double)this}[{(int)Expect}]";
+        public override string ToString() => pure ? ((double)this).ToString("0.##") : $"{(int)(double)this:0.##}[{(int)Expect}]";
         public DoubleWithEx Floor() => Select(Math.Floor, "floor");
         public DoubleWithEx Ceil() => Select(Math.Ceiling, "ceil");
         public DoubleWithEx Abs() => Select(Math.Abs, "abs");
@@ -201,6 +238,26 @@ namespace Elements
         }
 
         public static DoubleWithEx operator /(DoubleWithEx a, DoubleWithEx b) => Op(a, b, (x, y) => x / y, "div");
+
+        public static DoubleWithEx operator +(DoubleWithEx a, double b) => a + (DoubleWithEx)b;
+        public static DoubleWithEx operator +(double a, DoubleWithEx b) => (DoubleWithEx)a + b;
+        public static DoubleWithEx operator +(DoubleWithEx a, float b) => a + (DoubleWithEx)b;
+        public static DoubleWithEx operator +(float a, DoubleWithEx b) => (DoubleWithEx)a + b;
+
+        public static DoubleWithEx operator -(DoubleWithEx a, double b) => a - (DoubleWithEx)b;
+        public static DoubleWithEx operator -(double a, DoubleWithEx b) => (DoubleWithEx)a - b;
+        public static DoubleWithEx operator -(DoubleWithEx a, float b) => a - (DoubleWithEx)b;
+        public static DoubleWithEx operator -(float a, DoubleWithEx b) => (DoubleWithEx)a - b;
+
+        public static DoubleWithEx operator *(DoubleWithEx a, double b) => a * (DoubleWithEx)b;
+        public static DoubleWithEx operator *(double a, DoubleWithEx b) => (DoubleWithEx)a * b;
+        public static DoubleWithEx operator *(DoubleWithEx a, float b) => a * (DoubleWithEx)b;
+        public static DoubleWithEx operator *(float a, DoubleWithEx b) => (DoubleWithEx)a * b;
+
+        public static DoubleWithEx operator /(DoubleWithEx a, double b) => a / (DoubleWithEx)b;
+        public static DoubleWithEx operator /(double a, DoubleWithEx b) => (DoubleWithEx)a / b;
+        public static DoubleWithEx operator /(DoubleWithEx a, float b) => a / (DoubleWithEx)b;
+        public static DoubleWithEx operator /(float a, DoubleWithEx b) => (DoubleWithEx)a / b;
 
         public static bool operator ==(DoubleWithEx a, DoubleWithEx b) => a.Equals(b);
         public static bool operator !=(DoubleWithEx a, DoubleWithEx b) => !a.Equals(b);
@@ -230,10 +287,13 @@ namespace Elements
 
         public DoubleWithEx ZeroCapForHp()
         {
-            return new DoubleWithEx(value >= 0.0 ? value : 0.0, avg, min, max, root);
+            return new DoubleWithEx(value >= 0.0 ? value : 0.0, avg, min, max, root)
+            {
+                op = op, op1 = op1, op2 = op2, rnd = rnd, select = select, id = id
+            };
         }
         
-        private int id;
+        public int id;
 
         public string ToExpression(int hash)
         {
@@ -248,7 +308,7 @@ namespace Elements
             return string.Empty;
         }
 
-        private int ToExpression(StringBuilder sb, int hash, int num = 0)
+        public int ToExpression(StringBuilder sb, int hash, int num = 0)
         {
             if (this.hash == hash) return num;
             this.hash = hash;
@@ -269,7 +329,7 @@ namespace Elements
             }
             else if (rnd != null)
                 sb.AppendFormat("{0}|", rnd);
-            else throw new NotImplementedException();
+            else throw new NotImplementedException($" this={this} rnd={rnd} op={op} select={select} op1={op1} op2={op2}");
             id = num++;
             return num;
         }

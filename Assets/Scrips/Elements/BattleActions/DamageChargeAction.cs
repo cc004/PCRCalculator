@@ -31,7 +31,7 @@ namespace Elements
                     {
                         if (!byAttack || !_source.IsOnDamageCharge || ActionDetail2 == 0)
                             return;
-                        targetAction.Value[eValueNumber.VALUE_1] += damage * Value[eValueNumber.VALUE_1];
+                        targetAction.Value[eValueNumber.VALUE_1] += (DoubleWithEx)damage * Value[eValueNumber.VALUE_1];
                     };
                     if (ActionDetail2 == 0)
                         break;
@@ -43,7 +43,7 @@ namespace Elements
                     actionParameter.OnDamageHit += damage =>
                     {
                         for (int index = 0; index < ActionChildrenIndexes.Count; ++index)
-                            _skill.ActionParameters[ActionChildrenIndexes[index]].Value[eValueNumber.VALUE_1] += damage * Value[eValueNumber.VALUE_1];
+                            _skill.ActionParameters[ActionChildrenIndexes[index]].Value[eValueNumber.VALUE_1] += (DoubleWithEx)damage * Value[eValueNumber.VALUE_1];
                     };
                     actionParameter.OnActionEnd += () =>
                     {

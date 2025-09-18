@@ -23,6 +23,7 @@ using Random = UnityEngine.Random;
 //using Elements.Data;
 //using Elements.Uek;
 using Elements;
+using PCRCaculator.SQL;
 
 //using UnityStandardAssets.ImageEffects;
 
@@ -302,6 +303,7 @@ namespace Elements.Battle
         public eBattleCategory BattleCategory { get; private set; }
 
         public CoroutineManager CoroutineManager { get; private set; }
+        private Dictionary<BattleDefine.eExtraEffectExecTiming, bool> isExtraEffectCalled { get; set; } = new Dictionary<BattleDefine.eExtraEffectExecTiming, bool>();
 
         public eChargeSkillTurn ChargeSkillTurn { get; set; }
 
@@ -3632,6 +3634,274 @@ namespace Elements.Battle
         }*/
 
         //public void Init(ViewBattle GJABBKPIEHH) => this.StartCoroutine(this.coroutineStartProcess(GJABBKPIEHH));
+
+        public List<BonusEnemyData> GetExtraEffectEnemyData(BattleDefine.eExtraEffectExecTiming _timing)
+        {
+            // var extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
+            // int enemy_id = EnemyList.FirstOrDefault()?.enemyId ?? 0;
+            // int content_type = 0;
+            // if (enemy_id >= 800000000)
+            // {
+            //     content_type = (int)eBattleCategory.TALENT_QUEST;
+            //     enemy_id = GuildManager.Instance.TalentQuestWaveGroupId; // TODO move in tempData
+            // }
+            // else if (enemy_id >= 500000000)
+            // {
+            //     content_type = (int)eBattleCategory.DUNGEON;
+            // }
+            // else if (enemy_id >= 400000000)
+            // {
+            //     content_type = (int)eBattleCategory.CLAN_BATTLE;
+            // }
+            // for (int i = 0; i < extra_effect_enemy.Count; i++)
+            //     {
+            //         var extraEffect = extra_effect_enemy[i];
+            //         if (extraEffect != null && extraEffect.target_value_1 == enemy_id && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
+            //         {
+            //             return CreateBonusEnemyDatas(extraEffect, _timing);
+            //         }
+            //     }
+            var data = MyGameCtrl.Instance.GetExtraEffectEnemyData(tempData);
+            if (data != null)
+            {
+                return CreateBonusEnemyDatas(data, _timing);
+            }
+            return new List<BonusEnemyData>();
+        }
+
+        protected List<BonusEnemyData> CreateBonusEnemyDatas(extra_effect_data _extraEffect, BattleDefine.eExtraEffectExecTiming _timing)
+        {
+            var result = new List<BonusEnemyData>();
+            
+            if (_extraEffect == null)
+                return result;
+            var enemy_ids = _extraEffect.enemy_ids;
+            var exec_timings = _extraEffect.exec_timings;
+            for (int i = 0; i < enemy_ids.Count; i++)
+            {
+                if (exec_timings != null && i < exec_timings.Count)
+                {
+                    var execTiming = exec_timings[i];
+                    if (execTiming == (int)_timing)
+                    {
+                        int enemyId = enemy_ids[i];
+
+                        var unitCtrl = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl?.Find(unit => unit.enemyId == enemyId);
+                        if (unitCtrl != null)
+                        {
+                            var skillAndBonusList = new List<ValueTuple<int, int>>();
+                            {
+                                // *(_QWORD *)(v32 + 1216);  0x4c0 
+                                var skillList = unitCtrl.MainSkillIdList;
+                                if (skillList != null)
+                                {
+                                    for (int skillIndex = 0; skillIndex < skillList.Count; skillIndex++)
+                                    {
+                                        var skillId = skillList[skillIndex];
+                                        if (skillId > 0)
+                                        {
+                                            skillAndBonusList.Add(new ValueTuple<int, int>(skillId, 0));
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            var bonusEnemyData = new BonusEnemyData
+                            {
+                                Id = enemyId,
+                                SkillIdAndBonusIdList = skillAndBonusList
+                            };
+                            
+                            result.Add(bonusEnemyData);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        // RVA: 0x2713040 Offset: 0x2713040 VA: 0x2713040
+        public void StartExtraEffect(BattleDefine.eExtraEffectExecTiming _timing)
+        {
+            if (!isExtraEffectCalled.TryGetValue(_timing, out bool alreadyCalled) || !alreadyCalled)
+            {
+                if (isExtraEffectCalled != null)
+                {
+                    isExtraEffectCalled[_timing] = true;
+                }
+
+                var bonusEnemyDatas = GetExtraEffectEnemyData(_timing);
+                if (bonusEnemyDatas == null)
+                    return;
+
+                if (bonusEnemyDatas.Count > 0)
+                {
+                    if (_timing == BattleDefine.eExtraEffectExecTiming.EX_SKILL)
+                    {
+                        startBonusEffectImpl(bonusEnemyDatas);
+                        return;
+                    }
+
+                    IEnumerator coroutine;
+                    if (!isShowMultiTarget)
+                    {
+                        coroutine = waitMultiTargetAppearEnd(bonusEnemyDatas);
+                    }
+                    else
+                    {
+                        coroutine = waitPlayFirstWaveStartStoryEnd(bonusEnemyDatas);
+                    }
+
+                    if (CoroutineManager != null)
+                    {
+                        CoroutineManager.AppendCoroutine(coroutine, ePauseType.SYSTEM);
+                    }
+                }
+            }
+        }
+
+        public class BonusEnemyData // TypeDefIndex: 19716
+        {
+            public int Id { get; set; }
+            public List<ValueTuple<int, int>> SkillIdAndBonusIdList { get; set; }
+        }
+
+        public enum eBonusType
+        {
+            DEFEAT_ENEMY = 0,
+            DOMINANCE_ENEMY = 1,
+            DEFEAT_ALLIES = 2,
+            DOMINANCE_ALLIES = 3,
+        }
+
+        // RVA: 0x2713170 Offset: 0x2713170 VA: 0x2713170
+        private void startBonusEffectImpl(List<BonusEnemyData> bonusEnemyDatas)
+        {
+            
+            // 显示队伍加成动画
+            // 省略了
+
+            // 显示环境特效
+            // if (shouldShowBonusEffect)
+            // {                 
+            //     ShowBonusAppearEffect(bonusEnemyDatas);
+            // }
+            // else
+            // {
+            //     displayBonusIcon();
+            // }
+            execBattleBonus(bonusEnemyDatas);
+        }
+        
+        // private void displayBonusIcon()
+        // {
+        // }
+        
+        // RVA: 0x2712CCC Offset: 0x2712CCC VA: 0x2712CCC
+        private void execBattleBonus(List<BonusEnemyData> _bonusEnemyDatas)
+        {
+            if (_bonusEnemyDatas == null)
+                return;
+
+            foreach (var bonusEnemyData in _bonusEnemyDatas)
+            {
+                var targetUnit = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl.Find(unit => unit.enemyId == bonusEnemyData.Id);
+                
+                if (targetUnit == null)
+                    continue;
+
+                if (bonusEnemyData.SkillIdAndBonusIdList != null)
+                {
+                    foreach (var skillInfo in bonusEnemyData.SkillIdAndBonusIdList)
+                    {
+                        targetUnit.ExecSkillBySkillId(skillInfo.Item1, skillInfo.Item2);
+                    }
+                }
+            }
+        }
+        
+        // 队伍加成动画
+        // private void ShowBonusAppearEffect(List<BonusEnemyData> bonusEnemyDatas)
+        // {
+        //     try
+        //     {
+        //         SetSkillScreen(true);
+                
+        //         GamePause(true, false);
+                
+        //         var resourceManagerType = System.Type.GetType("Elements.ResourceManager");
+        //         if (resourceManagerType != null)
+        //         {
+        //             var instanceProperty = resourceManagerType.GetProperty("Instance");
+        //             if (instanceProperty != null)
+        //             {
+        //                 var resourceManager = instanceProperty.GetValue(null);
+        //                 if (resourceManager != null)
+        //                 {
+        //                     var instantiateMethod = resourceManagerType.GetMethod("InstantiateAndGetComponent");
+        //                     if (instantiateMethod != null)
+        //                     {
+        //                         var bonusAppearEffect = instantiateMethod.Invoke(resourceManager, 
+        //                             new object[] { 1839952676, this.transform, null }); // 0x6DAB7324 = 1839952676
+                                
+        //                         if (bonusAppearEffect != null)
+        //                         {
+        //                             var transformProp = bonusAppearEffect.GetType().GetProperty("transform");
+        //                             if (transformProp != null)
+        //                             {
+        //                                 var transform = transformProp.GetValue(bonusAppearEffect);
+        //                                 // 调用TransformUtility.ResetLocal
+        //                                 var transformUtilityType = System.Type.GetType("Elements.TransformUtility");
+        //                                 if (transformUtilityType != null)
+        //                                 {
+        //                                     var resetLocalMethod = transformUtilityType.GetMethod("ResetLocal");
+        //                                     resetLocalMethod?.Invoke(null, new object[] { transform });
+        //                                 }
+        //                             }
+                                    
+        //                             System.Action callback = () => {
+        //                                 displayBonusIcon();
+        //                                 execBattleBonus(bonusEnemyDatas);
+        //                             };
+                                    
+        //                             var playMethod = bonusAppearEffect.GetType().GetMethod("Play");
+        //                             if (playMethod != null)
+        //                             {
+        //                                 playMethod.Invoke(bonusAppearEffect, new object[] 
+        //                                 { 
+        //                                     bonusDictionary, 
+        //                                     callback, 
+        //                                     UnitList, 
+        //                                     EnemyList 
+        //                                 });
+        //                                 return; 
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     catch
+        //     {
+        //         displayBonusIcon();
+        //     }
+        // }
+
+        private IEnumerator waitMultiTargetAppearEnd(List<BonusEnemyData> bonusEnemyDatas)
+        {
+            while (!isShowMultiTarget)
+                yield return null;
+            startBonusEffectImpl(bonusEnemyDatas);
+        }
+
+        private IEnumerator waitPlayFirstWaveStartStoryEnd(List<BonusEnemyData> bonusEnemyDatas)
+        {
+            // TODO wait eWaveStartAdvState
+            yield return null; // 占位符等待
+            startBonusEffectImpl(bonusEnemyDatas);
+        }
+
         public void Init(MyGameCtrl gameCtrl)
         {
             stepping = false;
@@ -3643,6 +3913,7 @@ namespace Elements.Battle
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
+            
             StartCoroutine(coroutineStartProcess(gameCtrl));
         }
 
@@ -3651,6 +3922,7 @@ namespace Elements.Battle
             SetStarted(false);
             activeActionIds.Clear();
             effectUpdateList.Clear();
+            isExtraEffectCalled.Clear();
             foreach(var unitSpineController in unitSpineControllerList)
             {
                 unitSpineController.Destroy();
@@ -3887,12 +4159,7 @@ namespace Elements.Battle
             {
                 yield return null;
             }
-            calcTalentFormationBonus();
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
-            foreach(var unit in UnitList)
-            {
-                unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
-            }
             yield return battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
@@ -3908,13 +4175,21 @@ namespace Elements.Battle
             }*/
             battleManager.setupEnemyProcess();
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            if (IsBossBattle) { BossUnit = EnemyList[0]; }
+            if (IsBossBattle) { BossUnit = EnemyList[0]; GuildManager.Instance.CalcTalentFormationBonus(); }
+            foreach(var unit in UnitList)
+            {
+                unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
+            }
             // ISSUE: explicit non-virtual call
             for (int index = 0; index < (battleManager.EnemyList).Count; ++index)
             {
                 (battleManager.EnemyList)[index].IsOther = true;
                 // ISSUE: explicit non-virtual call
                 (battleManager.EnemyList)[index].WaveStartProcess(true);
+            }
+            for (int index = 0; index < (tempData.extra_effect_cnt); ++index)
+            {
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsOther = true;
             }
             //battleManager.battleProcessor.SetupHpAndEnergy();
             // ISSUE: explicit non-virtual call
@@ -3964,6 +4239,7 @@ namespace Elements.Battle
             {
                 ActionStartTimeCounter = 5;
             }
+            StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             //battleManager.battleProcessor.SetupHpAndEnergyAfterApplyPassiveSkill();
             //battleManager.tempData.InitXorShiftRandom(seed);
             //battleManager.CMINMBPDEOL = new BattleVoiceFlagManager(battleManager.GetMyUnitList(), battleManager.GetOpponentUnitList());
@@ -4128,92 +4404,8 @@ namespace Elements.Battle
             GamePause(false);
         }
 
-        bool _IsReleasedKnightEnhance = true;
-        public Dictionary<int, long> UnitTalentFormationBonusDictionary { get; set; } = new Dictionary<int, long>();
-
-        /// <summary>
-        /// 计算当前编队的天赋阵型加成
-        /// </summary>
-        private void calcTalentFormationBonus()
-        {
-            // 如果未开启"骑士增强"功能，则直接返回
-            if (!_IsReleasedKnightEnhance)
-                return;
-        
-            // 创建一个字典来统计每个天赋ID的出现次数
-            Dictionary<int, int> talentCountDict = new Dictionary<int, int>();
-        
-            // 遍历当前我方编队中的所有单位
-            var unitList = UnitList;
-            if (unitList != null)
-            {
-                for (int i = 0; i < unitList.Count; i++)
-                {
-                    var unit = unitList[i];
-                    if (unit == null)
-                        continue;
-        
-                    // 获取单位的天赋列表
-                    var talents = unit.TalentIds;
-                    if (talents == null)
-                        continue;
-        
-                    // 统计每个天赋的出现次数
-                    for (int j = 0; j < talents.Count; j++)
-                    {
-                        int talentId = talents[j];
-                        
-                        // 获取当前天赋的计数，如果不存在则为0
-                        talentCountDict.TryGetValue(talentId, out int currentCount);
-                        // 更新计数+1
-                        talentCountDict[talentId] = currentCount + 1;
-                    }
-                }
-            }
-        
-            // 遍历统计好的天赋次数字典
-            foreach (var pair in talentCountDict)
-            {
-                int talentId = pair.Key;
-                int count = pair.Value;
-
-                long bonus = 0;
-                if (IsBossBattle)
-                    bonus = ClanBattleGetTalentBonusPermyriad(talentId, count);
-                
-                if (UnitTalentFormationBonusDictionary!= null)
-                {
-                    UnitTalentFormationBonusDictionary[talentId] = bonus;
-                }
-            }
-        }
-
-        public long ClanBattleGetTalentBonusPermyriad(int talentId, int count) // present
-        {
-            long bonus = 0;
-            switch (count)
-            {
-                case 1:
-                    bonus = 0;
-                    break;
-                case 2:
-                    bonus = 500;
-                    break;
-                case 3:
-                    bonus = 1000;
-                    break;
-                case 4:
-                    bonus = 2500;
-                    break;
-                case 5:
-                    bonus = 5000;
-                    break;
-                default:
-                    bonus = 0; // 未知天赋
-                    break;
-            }
-            return bonus;
-        }
+        public bool _IsReleasedKnightEnhance = true;
+        public Dictionary<int, long> UnitTalentFormationBonusDictionary { get => GuildManager.Instance.UnitTalentFormationBonusDictionary; }
 
         /// <summary>
         /// 为指定单位的装备部件设置天赋弱点
@@ -4222,28 +4414,47 @@ namespace Elements.Battle
         /// <param name="_partsData">装备部件数据</param>
         // RVA: 0x27065B0 Offset: 0x27065B0 VA: 0x27065B0
         public void SetPartsTalentWeakness(int _unitId, BasePartsData _partsData)
-        { 
+        {
             // var masterDataManager = ManagerSingleton<MasterDataManager>.Instance;
             // if (masterDataManager == null)
             // {
             //     return;
             // }
-        
+
             // var masterEnemyTalentWeakness = masterDataManager.masterEnemyTalentWeakness;
             // if (masterEnemyTalentWeakness == null)
             // {
             //     return;
             // }
-        
+
             // if (_partsData == null)
             // {
             //     return;
             // }
-        
+
             // var weaknessDict = masterEnemyTalentWeakness.GetWeaknessDictionary(_unitId);
-            
+
             // TODO hush fix boss weaknessDict
             // _partsData.talentWeaknessPercent = weaknessDict;
+            if (MainManager.Instance.WeaknessDic.TryGetValue(_unitId, out int[] weaknessArray))
+            {
+                // 将数组转换为字典格式
+                Dictionary<int, int> weaknessDict = new Dictionary<int, int>();
+
+                // 假设 talentWeaknessPercent 需要的是 Dictionary<int, int> 格式
+                // 键为天赋类型(1-5)，值为弱点倍率
+                for (int i = 0; i < weaknessArray.Length && i < 5; i++)
+                {
+                    weaknessDict[i + 1] = weaknessArray[i]; // 键从1开始对应天赋类型1-5
+                }
+
+                _partsData.talentWeaknessPercent = weaknessDict;
+            }
+            else
+            {
+                // 如果找不到对应单位的弱点数据，使用默认空字典
+                _partsData.talentWeaknessPercent = new Dictionary<int, int>();
+            }
         }
 
 
@@ -5062,7 +5273,7 @@ namespace Elements.Battle
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
-                unitCtrl.Initialize(parameter,unitData_my, flag, true, false,
+                unitCtrl.Initialize(parameter,unitData_my, flag ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?
@@ -5305,7 +5516,7 @@ namespace Elements.Battle
         
         public static double CalcPlayerDamageTpReduceRate(int promotionLevel)
         {
-            return MainManager.Instance.ereductionTable.First(x => MainManager.Instance.levelMax >= x.border)
+            return MainManager.Instance.EreductionTable.First(x => MainManager.Instance.levelMax >= x.border)
                 .GetThresholdPair().Select(pair =>
                 {
                     var (upper, lower, value) = pair;

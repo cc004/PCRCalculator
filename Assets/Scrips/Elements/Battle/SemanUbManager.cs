@@ -156,7 +156,7 @@ namespace Elements.Battle
                 int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
                 if (trigger >= 10 || lastDelay >= 10)
                 {
-                    UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                    // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
                     return delay;
                 }
                 return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;

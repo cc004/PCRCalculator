@@ -26,6 +26,7 @@ namespace PCRCaculator
         public InputField RBValueText;
         public InputField RBTPValueText;
         public GameObject ShowTextPrefab;
+        public Toggle IsReleaseSkillHasteLogic;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
         private bool isLoading;
@@ -52,7 +53,7 @@ namespace PCRCaculator
             exDivisionFixed.isOn = PlayerSetting.exDivisionFixed;
             //if (showAllUnitToggle!=null)
             //     showAllUnitToggle.isOn = PlayerSetting.showAllUnits;
-
+            IsReleaseSkillHasteLogic.isOn = PlayerSetting.IsReleaseSkillHasteLogic;
             TPMaxText.text = PlayerSetting.maxTPUpValue.ToString();
 
             isLoading = false;
@@ -85,6 +86,7 @@ namespace PCRCaculator
             //PlayerSetting.allowRarity6 = allowRarity6Toggle.isOn;
             PlayerSetting.tpCalculationChanged = tpCalculationChanged.isOn;
             PlayerSetting.exDivisionFixed = exDivisionFixed.isOn;
+            PlayerSetting.IsReleaseSkillHasteLogic = IsReleaseSkillHasteLogic.isOn;
             //if(showAllUnitToggle!=null)
             //PlayerSetting.showAllUnits = showAllUnitToggle.isOn;
 

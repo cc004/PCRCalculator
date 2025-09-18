@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using PCRCaculator.SQL;
 using PCRCalcularor;
 
 namespace PCRCaculator
@@ -28,9 +29,11 @@ namespace PCRCaculator
         public EnemySkillData skillData;
         public UnitData CreateUnitData()
         {
-            return new UnitData(unit_id, level, 1)
+            return new UnitData(unit_id, level, rarity)
             {
-                enemyid = enemy_id
+                enemyid = enemy_id,
+                level = level,
+                rarity = rarity,
             };
         }
         public EnemyData Copy()
@@ -67,8 +70,16 @@ namespace PCRCaculator
     public class EnemySkillData
     {
         public int UB;
+        public unit_skill_data raw_data;
         public List<int> MainSkills = new List<int>();
         public List<UnitAttackPattern> enemyAttackPatterns = new List<UnitAttackPattern>();
+    }
+    [Serializable]
+    public class TalentQuestWaveGroupData
+    {
+        public int id;
+        public int wave_group_id;
+        public List<int> enemy_ids = new();
     }
     /*[Serializable]
     public class EnemyAttackPattern

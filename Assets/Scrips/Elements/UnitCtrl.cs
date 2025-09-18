@@ -21,7 +21,6 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using Spine;
 using Spine.Unity;
-using UnityEditor.UIElements;
 using UnityEngine;
 using static UnityEngine.UI.GridLayoutGroup;
 using Attachment = Spine.Attachment;
@@ -141,6 +140,20 @@ namespace Elements
         private void activeOverwriteAbnormalState(OverwriteAbnormalStateData _data)
         {
             UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
+            if (MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+            {
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null && list1.Count > 0)
+                {
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
+                    list1.Clear();
+                }
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null && list2.Count > 0)
+                {
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
+                    list2.Clear();
+                }
+            }
+
             this.SetAbnormalState(_data.Source, abnormalState, 9999f, _data.ActionParameter, _data.Skill, _data.EffectValue, 0f, false, false, 1f, true);
             if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(this.CalcAbnormalStateSpeed(), 1f))
             {
@@ -269,6 +282,14 @@ namespace Elements
         private int overlapAbnormalStateCount;
         private Dictionary<eAbnormalState, List<int>> overlapAbnormalStateIndexList = new Dictionary<eAbnormalState, List<int>>
         {
+            {
+                eAbnormalState.SLOW,
+                new List<int>()
+            },
+            {
+                eAbnormalState.HASTE,
+                new List<int>()
+            },
             {
                 eAbnormalState.SLOW_OVERLAP,
                 new List<int>()
@@ -917,6 +938,10 @@ namespace Elements
         public Dictionary<eAbnormalState, Action<bool>> damageByBehaviourDictionary = new Dictionary<eAbnormalState, Action<bool>>();
 
         private Dictionary<eAbnormalState, int> abnormalStateToCurrentId = new Dictionary<eAbnormalState, int>();
+
+        private Dictionary<eAbnormalState, List<SlipDamageUpData>> slipDamageUpDataDictionary = new Dictionary<eAbnormalState, List<SlipDamageUpData>>();
+
+        private List<SlipDamageUpData> allSlipDamageUpDataList = new List<SlipDamageUpData>();
 
         private bool isDamageReleaseSpecialSleepAnimForUnionBurst;
 
@@ -1606,6 +1631,7 @@ namespace Elements
             get;
             set;
         } = new Dictionary<int, Action<double>>();
+        public LimitEnergyRecoveryRateData LimitEnergyRecoveryRateData { get; set; }
         public Dictionary<eAbnormalState, Func<bool>> IsReleaseSlipDamageDic
         {
             get;
@@ -1890,6 +1916,16 @@ namespace Elements
                 int num = (int)Mathf.Max(0, (int)EnergyRecoveryRate + getAdditionalBuffDictionary(BuffParamKind.ENERGY_RECOVER_RATE));
                 return num;
             }
+        }
+
+        public long EnergyRecoveryRateZeroWithLimit
+        {
+            get
+            {
+                long num = EnergyRecoveryRateZeroCapped;
+                return (LimitEnergyRecoveryRateData?.Enable ?? false) ? Math.Min(num, (long)LimitEnergyRecoveryRateData.Value) : num;
+            }
+
         }
 
         public long EnergyRecoveryRateZeroCapped
@@ -2183,12 +2219,12 @@ this.updateCurColor();
         public void Initialize(
           UnitParameter _data,
           PCRCaculator.UnitData unitData_my,
+          TeamEnhanceParameter _teamEnhanceParameter,
           bool _isOther,
           bool _isFirstWave,
           bool _isGaugeAlwaysVisible = false,
           BaseData additional = null,
-          BaseData exOverride = null,
-          TeamEnhanceParameter _teamEnhanceParameter = null)
+          BaseData exOverride = null)
         {
             ToadDatas = new List<ToadData>();
             transformCache = transform;
@@ -2391,6 +2427,10 @@ this.updateCurColor();
                 battleManager.KAOHIMNBPOK++;
                 isNotPartsBossReady = true;
             }
+            else
+            {
+                BattleManager.Instance.SetPartsTalentWeakness(this.enemyId, DummyPartsData);
+            }
             castTimeDictionary = new Dictionary<int, float>();
             attackPatternDictionary = new Dictionary<int, List<int>>();
             attackPatternLoopDictionary = new Dictionary<int, List<int>>();
@@ -2493,6 +2533,9 @@ this.updateCurColor();
 
             baseDataEX = exOverride ?? baseDataEX;
 
+            if (MainManager.Instance.UnitRarityDic.ContainsKey(UnitId))
+                TalentIds = MainManager.Instance.UnitRarityDic[UnitId]?.detailData?.talent_id ?? new List<int>();
+
             if (additional != null) baseData += additional;
 
 
@@ -2580,8 +2623,10 @@ this.updateCurColor();
             long hp = (long)Hp;
             UnitCtrl LIMEKPEENOB = unitCtrl;
             battleLog.AppendBattleLog(eBattleLogType.SET_DAMAGE, 3, 0L, hp, 0, 0, LIMEKPEENOB: LIMEKPEENOB);
-            if (_data.EnemyData != null && _data.EnemyData.virtual_hp != 0)
-                skillStackValDmg = 1000f / _data.EnemyData.virtual_hp;
+            if (IsBoss)
+                skillStackValDmg = 0; // guess this for initialize undecompilizable
+            else if (_data.EnemyData != null && _data.EnemyData.virtual_hp != 0)
+                    skillStackValDmg = 1000f / _data.EnemyData.virtual_hp;
             else
                 skillStackValDmg = 1000f / baseHp;
             //卡rank相关tp获取惩罚……
@@ -2693,7 +2738,7 @@ this.updateCurColor();
                 {
                     continue;
                 }
-                var exEquipmentData = MainManager.Instance.unitExEquips[unitData.unitId][n][exEquipId];
+                var exEquipmentData = MainManager.Instance.UnitExEquips[unitData.unitId][n][exEquipId];
                 if (exEquipmentData.passive_skill_id_1 != 0)
                 {
                     list4.Add(exEquipmentData.passive_skill_id_1);
@@ -2724,9 +2769,11 @@ this.updateCurColor();
             }
 
             // TODO where is position?
-            SetAdditiveAtkForTalentLevel(_teamEnhanceParameter);
-            SetTalentEnhance(_teamEnhanceParameter);
-            SetRoleEnhance(_teamEnhanceParameter);
+            var teamEnhanceParameter = _teamEnhanceParameter;
+            teamEnhanceParameter?.UpdateCombinedData();
+            SetAdditiveAtkForTalentLevel(teamEnhanceParameter);
+            SetTalentEnhance(teamEnhanceParameter);
+            SetRoleEnhance(teamEnhanceParameter);
         }
 
         public int UnitIdForActionPattern
@@ -2807,9 +2854,8 @@ this.updateCurColor();
                 }
             }
         }
-
-        private Dictionary<eParamType, long> talentBuffParameter; // 0x40
-        private Dictionary<eParamType, long> roleBuffParameter; // 0x48
+        private Dictionary<eParamType, long> talentBuffParameter = new Dictionary<eParamType, long>();
+        private Dictionary<eParamType, long> roleBuffParameter = new Dictionary<eParamType, long>(); 
 
 
         // RVA: 0x2851D88 Offset: 0x2851D88 VA: 0x2851D88
@@ -2927,15 +2973,15 @@ this.updateCurColor();
             }
         
             bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
-        
+
             foreach (KeyValuePair<eParamType, long> pair in talentBuffParameter)
             {
                 ApplyEnhanceValue(
-                    pair.Key,          
-                    pair.Value,        
-                    _first,           
-                    isClanBattleOrSekaiEnemy,  
-                    false              
+                    pair.Key,    // eParamType 类型
+                    pair.Value,  // int 类型，会自动转换为 long
+                    _first,
+                    isClanBattleOrSekaiEnemy,
+                    false
                 );
             }
 
@@ -2944,11 +2990,15 @@ this.updateCurColor();
         // RVA: 0x2853654 Offset: 0x2853654 VA: 0x2853654
         private void applyRoleEnhance(bool _first)
         {
-            if (this == null)
+            // if (this == null)
+            // {
+            //     return;
+            // }
+            if (roleBuffParameter == null)
             {
                 return;
             }
-        
+
             bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
         
             // 遍历所有角色增益参数
@@ -4116,6 +4166,64 @@ this.updateCurColor();
             //this.playSeWithMotion(controller, _animeId, _index1, _index2, _index3, _isLoop);
         }
 
+        // RVA: 0x2835ED8 Offset: 0x2835ED8 VA: 0x2835ED8
+        public void EnchantSlipDamageUp(SlipDamageUpData _data, eAbnormalState _abnormalState) 
+        {
+            if (!slipDamageUpDataDictionary.TryGetValue(_abnormalState, out List<SlipDamageUpData> list))
+            {
+                list = new List<SlipDamageUpData>();
+                slipDamageUpDataDictionary[_abnormalState] = list;
+            }
+            list.Add(_data);
+        }
+
+        // RVA: 0x28360AC Offset: 0x28360AC VA: 0x28360AC
+        public void EnchantAllSlipDamageUp(SlipDamageUpData _data) 
+        {
+            allSlipDamageUpDataList.Add(_data);
+        }
+
+        // RVA: 0x2836168 Offset: 0x2836168 VA: 0x2836168
+        private LongWithEx applySlipDamageUp(LongWithEx _current, eAbnormalState _abnormalState, ref LongWithEx _maxLimit) 
+        {
+            double multiplier = 1.0;
+            bool hasZeroLimit = false;
+
+            if (slipDamageUpDataDictionary != null && slipDamageUpDataDictionary.TryGetValue(_abnormalState, out List<SlipDamageUpData> list))
+            {
+                foreach (var data in list)
+                {
+                    if (data.Enable)
+                    {
+                        multiplier += data.Value;
+                        _maxLimit = _maxLimit.Max(data.LimitDamage);
+                        if (data.LimitDamage == 0)
+                            hasZeroLimit = true;
+                    }
+                }
+            }
+
+            if (allSlipDamageUpDataList != null)
+            {
+                foreach (var data in allSlipDamageUpDataList)
+                {
+                    if (data.Enable)
+                    {
+                        multiplier += data.Value;
+                        _maxLimit = _maxLimit.Max(data.LimitDamage);
+                        if (data.LimitDamage == 0)
+                            hasZeroLimit = true;
+                    }
+                }
+            }
+
+            if (hasZeroLimit)
+                _maxLimit = -1;
+
+            return BattleUtil.DoubleToLong(multiplier * _current);
+        }
+
+
         public void AppendCoroutine(IEnumerator _cr, ePauseType _pauseType, UnitCtrl _unit = null) => battleManager.AppendCoroutine(_cr, _pauseType, _unit);
 
         public void SetCurrentHp(long _hp)
@@ -4163,7 +4271,7 @@ this.updateCurColor();
             Energy = energy;
             SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
-                NoSkipOnTPChanged?.Invoke(UnitId,(float)Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+                NoSkipOnTPChanged?.Invoke(UnitId,Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
             if(uIManager!=null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
@@ -4209,7 +4317,7 @@ this.updateCurColor();
 
         public List<SkillEffectCtrl> ModeChangeEndEffectList { get; set; } = new List<SkillEffectCtrl>();
 
-        public Action<UnitCtrl, eStateIconType, bool> OnChangeState { get; set; }
+        public Action<UnitCtrl, eStateIconType, bool> OnChangeState { get; set; } // 弃用
         
 
         public Action<UnitCtrl, eStateIconType, int> OnChangeStateNum { get; set; }
@@ -4612,6 +4720,69 @@ this.updateCurColor();
 			}
 		}
 
+        // RVA: 0x282C858 Offset: 0x282C858 VA: 0x282C858
+        private int prepareForUpdateOverlapAbnormalState(eAbnormalState _abnormalState, AbnormalStateCategoryData _data, bool _showsIcon)
+        {
+            // var showIconDict = this.overlapAbnormalStateShowIconCount; // Dictionary<eAbnormalState, int>
+
+            if (_abnormalState == eAbnormalState.SLOW)
+            {
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7) && indexList7.Count > 0)
+                {
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
+                    indexList7.Clear();
+                }
+
+                if (_showsIcon)
+                {
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
+                    // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
+                    //     showIconDict[eAbnormalState.SLOW] = 0;
+                    // showIconDict[eAbnormalState.SLOW]++;
+                }
+            }
+            else if (_abnormalState == eAbnormalState.HASTE)
+            {
+                if (!overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
+                {
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
+                    indexList11.Clear();
+                }
+
+                if (_showsIcon)
+                {
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}");
+
+                    // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
+                    //     showIconDict[eAbnormalState.HASTE] = 0;
+                    // showIconDict[eAbnormalState.HASTE]++;
+                }
+            }
+
+            int newIndex = this.overlapAbnormalStateCount;
+            this.overlapAbnormalStateCount++;
+
+            if (!overlapAbnormalStateIndexList.TryGetValue(_abnormalState, out var indexList))
+                indexList = overlapAbnormalStateIndexList[_abnormalState] = new List<int>();
+
+            indexList.Add(newIndex);
+
+            overlapAbnormalStateData[newIndex] = _data;
+
+            m_abnormalState[_abnormalState] = true;
+
+            // if (CanOverlapAbnormalState(
+            //         _abnormalState,
+            //         battleManager._IsReleaseSkillHasteLogic,
+            //         ))
+            // {
+            //     this.UpdateEffectForSpeedAbnormalState(true);
+            // }
+
+            return newIndex;
+        }
+
+
         public void SetAbnormalState(
           UnitCtrl _source,
           eAbnormalState _abnormalState,
@@ -4671,8 +4842,8 @@ this.updateCurColor();
                     case eAbnormalState.CURSE2:
                         OnSlipDamage.Call();
                         break;
-                    case eAbnormalState.CONVERT:    
-                    case eAbnormalState.CONFUSION:  
+                    case eAbnormalState.CONVERT:
+                    case eAbnormalState.CONFUSION:
                         OnActiveUnableState.Call();
                         break;
                     default:
@@ -4681,7 +4852,7 @@ this.updateCurColor();
                             OnActiveUnableState.Call();
                         }
                         break;
-                    // TODO OnActiveCharmState
+                        // TODO OnActiveCharmState
                 }
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
@@ -4719,17 +4890,17 @@ this.updateCurColor();
                 {
                     if (IsDead)
                         return;
-                    if (CanOverlapAbnormalState(_abnormalState))
+                    if (CanOverlapAbnormalState(_abnormalState, MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic))
                     {
                         if (!BattleManager.Instance.skipping && button != null)
                         {
                             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
                             {
-                                button.SetAbnormalIcons(this, eStateIconType.SPEED_OVERLAP, true, _effectTime, $"{_value}");
+                                button.SetAbnormalIcons(this, eStateIconType.SPEED_OVERLAP, true, _effectTime, $"{_value:F2}");
                             }
                         }
 
-                        battleManager.AppendCoroutine(updateOverlapAbnormalState(_abnormalState, new AbnormalStateCategoryData
+                        var data = new AbnormalStateCategoryData
                         {
                             CurrentAbnormalState = _abnormalState,
                             enable = true,
@@ -4738,16 +4909,20 @@ this.updateCurColor();
                             Time = _effectTime,
                             ActionId = (_action?.ActionId ?? 0),
                             IsDamageRelease = _isDamageRelease,
-                            ShowsIcon = false,
+                            ShowsIcon = _showsIcon,
                             Skill = _skill,
                             Source = _source,
                             ActionDetail1 = _action?.ActionDetail1 ?? 0,
                             ActionDetail2 = _action?.ActionDetail2 ?? 0,
-                        }), ePauseType.SYSTEM);
+                        };
+
+                        int idx = prepareForUpdateOverlapAbnormalState(_abnormalState, data, _showsIcon);
+
+                        battleManager.AppendCoroutine(updateOverlapAbnormalState(_abnormalState, idx, _effectTime), ePauseType.SYSTEM);
                         return;
                     }
                     if (IsAbnormalState(abnormalStateCategory))
-                        switchAbnormalState(_abnormalState, abnormalEffectData,_showsIcon);
+                        switchAbnormalState(_abnormalState, abnormalEffectData, _showsIcon);
                     stateCategoryData.Duration = _effectTime;
                     stateCategoryData.Time = _effectTime;
                     stateCategoryData.MainValue = _value;
@@ -4865,30 +5040,28 @@ this.updateCurColor();
             return false;
         }
 
-        public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState)
+        public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState, bool _isReleaseSkillHasteLogic)
         {
             if ((uint)(_abnormalState - 65) <= 1u)
             {
                 return true;
+            } else if (_abnormalState == eAbnormalState.SLOW || _abnormalState == eAbnormalState.HASTE)
+            {
+                return _isReleaseSkillHasteLogic;
             }
             return false;
         }
-        private IEnumerator updateOverlapAbnormalState(eAbnormalState _abnormalState, AbnormalStateCategoryData _data)
+        private IEnumerator updateOverlapAbnormalState(eAbnormalState _abnormalState, int _index, float _effectTime)
         {
 
-            int currentBehaviourIndex = overlapAbnormalStateCount;
-            overlapAbnormalStateCount++;
-            overlapAbnormalStateIndexList[_abnormalState].Add(currentBehaviourIndex);
-            overlapAbnormalStateData[currentBehaviourIndex] = _data;
-            m_abnormalState[_abnormalState] = true;
-
+            int currentBehaviourIndex = _index;
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {
                 updateEffectForSpeedAbnormalState(_isEnable: true);
             }*/
             float time = 0f;
-            for (float effectTime = _data.Time; time < effectTime; time += DeltaTimeForPause)
+            for (float effectTime = _effectTime; time < effectTime; time += DeltaTimeForPause)
             {
                 yield return null;
                 if (!overlapAbnormalStateIndexList[_abnormalState].Contains(currentBehaviourIndex))
@@ -4948,24 +5121,48 @@ this.updateCurColor();
             [eAbnormalState.GUARD_MGC] = 0f,
             [eAbnormalState.GUARD_BOTH] = 0f,
         };*/
-        public float CalcAbnormalStateSpeed()
+        private double getSpeed()
         {
-            float num = 1f;
-            if (IsAbnormalState(eAbnormalState.SLOW) || IsAbnormalState(eAbnormalState.HASTE))
+            if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out List<int> overlapList) && overlapList.Count > 0)
             {
-                num = (float)abnormalStateCategoryDataDictionary[eAbnormalStateCategory.SPEED].MainValue;
+                return (double)overlapList.Max(x => overlapAbnormalStateData[x].MainValue);
             }
-            return Mathf.Max(0f, num + calcOverlapSpeed());
+            else if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out overlapList) && overlapList.Count > 0)
+            {
+                return (double)overlapList.Min(x => overlapAbnormalStateData[x].MainValue);
+            }
+            return 1.0;
         }
-        private float calcOverlapSpeed()
+
+        public double CalcAbnormalStateSpeed()
         {
-            float num = 0f;
+            double num = 1.0;
+            if (MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+            {
+                num = getSpeed();
+            }
+            else
+            {
+                if (IsAbnormalState(eAbnormalState.SLOW) || IsAbnormalState(eAbnormalState.HASTE))
+                {
+                    num = abnormalStateCategoryDataDictionary[eAbnormalStateCategory.SPEED].MainValue;
+                }
+            }
+            return Math.Max(0.0, num + calcOverlapSpeed());
+        }
+        private double calcOverlapSpeed()
+        {
+            double num = 0.0;
             foreach (KeyValuePair<eAbnormalState, List<int>> overlapAbnormalStateIndex in overlapAbnormalStateIndexList)
             {
-                List<int> value = overlapAbnormalStateIndex.Value;
-                for (int i = 0; i < value.Count; i++)
+                eAbnormalState key = overlapAbnormalStateIndex.Key;
+                if (key == eAbnormalState.SLOW_OVERLAP || key == eAbnormalState.HASTE_OVERLAP)
                 {
-                    num += (float)overlapAbnormalStateData[value[i]].MainValue;
+                    List<int> value = overlapAbnormalStateIndex.Value;
+                    for (int i = 0; i < value.Count; i++)
+                    {
+                        num += (double)overlapAbnormalStateData[value[i]].MainValue;
+                    }
                 }
             }
             return num;
@@ -4976,7 +5173,7 @@ this.updateCurColor();
         }
         public bool IsSlowSpeed()
         {
-            float num = CalcAbnormalStateSpeed();
+            double num = CalcAbnormalStateSpeed();
             if (BattleUtil.Approximately(num, 1f))
             {
                 return false;
@@ -4985,14 +5182,14 @@ this.updateCurColor();
         }
         private void setIdleCastTime()
         {
-            float num = CalcAbnormalStateSpeed();
-            if (BattleUtil.Approximately(num, 0f))
+            double num = CalcAbnormalStateSpeed();
+            if (BattleUtil.Approximately(num, 0.0))
             {
                 m_fCastTimer = 90f;
             }
             else
             {
-                m_fCastTimer = (float)m_fCastTimer / num;
+                m_fCastTimer = (float)m_fCastTimer / (float)num;
             }
         }
         private void switchAbnormalState(
@@ -5099,7 +5296,7 @@ this.updateCurColor();
         }*/
         public void DisableAbnormalStateById(eAbnormalState _abnormalState, int _actionId, bool _isReleasedByDamage)
         {
-            if (CanOverlapAbnormalState(_abnormalState))
+            if (CanOverlapAbnormalState(_abnormalState, MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic))
             {
                 List<int> list = overlapAbnormalStateIndexList[_abnormalState];
                 for (int num = list.Count - 1; num >= 0; num--)
@@ -5147,7 +5344,7 @@ this.updateCurColor();
             }
             abnormalStateCategoryDataDictionary[abnormalStateCategory].enable = _enable;
             m_abnormalState[_abnormalState] = _enable;
-            string describe = abnormalStateCategoryDataDictionary[abnormalStateCategory].MainValue + "";
+            string describe = $"{abnormalStateCategoryDataDictionary[abnormalStateCategory].MainValue}";
             /*switch (_abnormalState)
             {
                 case eAbnormalState.HASTE:
@@ -5841,14 +6038,38 @@ this.updateCurColor();
             }
         }
 
+        // TODO implement ExtendSlipDamageData
+        // public ExtendSlipDamageData ExtendSlipDamageData { get; set; }
+        public float GetSlipDamageExtendValue()
+        {
+            // var extendSlipDamageData = ExtendSlipDamageData;
+            
+            // if (extendSlipDamageData != null && extendSlipDamageData.Enable)
+            // {
+            //     return extendSlipDamageData.ExtendValue;
+            // }
+            return 1.0f;
+        }
+
         private IEnumerator UpdateSlipDamage(eAbnormalState _abnormalState, int _slipDamageId)
         {
             eAbnormalStateCategory category = GetAbnormalStateCategory(_abnormalState);
             AbnormalStateCategoryData categoryData = abnormalStateCategoryDataDictionary[category];
             float time = 0f;
-            int damage = (int)categoryData.MainValue;
-            int incrementDamage = (int)(categoryData.MainValue * categoryData.SubValue / 100f);
+            LongWithEx damage = 0;
+            LongWithEx incrementDamage = 0;
+            if (_abnormalState == eAbnormalState.RATIO_SLIP)
+            {
+                var maxHp = this.MaxHp;
+                damage = BattleUtil.DoubleToLong(categoryData.MainValue / 100.0 * maxHp);
+            }
+            else
+            {
+                damage = BattleUtil.DoubleToLong(categoryData.MainValue);
+                incrementDamage = BattleUtil.DoubleToLong(categoryData.MainValue * categoryData.SubValue / 100.0);
+            }
             IsReleaseSlipDamageDic.TryGetValue(_abnormalState, out var isReleaseSlipDamage);
+            float slipDamageInterval = GetSlipDamageExtendValue();
             while (true)
             {
                 yield return null;
@@ -5861,19 +6082,38 @@ this.updateCurColor();
                     break;
                 }
                 time += DeltaTimeForPause;
-                if (!(time > 1f) && !BattleUtil.Approximately(time, 1f))
+                if (!(time > slipDamageInterval) && !BattleUtil.Approximately(time, slipDamageInterval))
                 {
                     continue;
                 }
+                LongWithEx maxLimitDamage = -1;
+                LongWithEx finalDamage = applySlipDamageUp(damage, _abnormalState, ref maxLimitDamage);
+
+                if (_abnormalState == eAbnormalState.RATIO_SLIP)
+                {
+                    LongWithEx subValueLimit = BattleUtil.DoubleToLong(categoryData.SubValue);
+                    if (maxLimitDamage != -1)
+                    {
+                        maxLimitDamage = maxLimitDamage.Min(subValueLimit);
+                    }
+                    else
+                    {
+                        maxLimitDamage = subValueLimit;
+                    }
+                }
+
                 DamageData damageData = new DamageData
                 {
                     Target = GetFirstParts(),
-                    Damage = damage,
+                    Damage = finalDamage,
                     DamageType = DamageData.eDamageType.NONE,
                     Source = categoryData.Source,
                     DamageSoundType = DamageData.eDamageSoundType.SLIP,
                     IsSlipDamage = true,
                     ActionType = eActionType.SLIP_DAMAGE,
+                    TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther,
+                    IgnoreTalentBonusForRatioSlip = (_abnormalState == eAbnormalState.RATIO_SLIP),
+                    OverrideDamageLimit = maxLimitDamage,
                     ExecAbsorber = delegate (int _damage)
                     {
                         if (_damage > categoryData.AbsorberValue)
@@ -5940,6 +6180,7 @@ this.updateCurColor();
                 DamageSoundType = DamageData.eDamageSoundType.SLIP,
                 IsSlipDamage = true,
                 ActionType = eActionType.DAMAGE_BY_ATTACK,
+                TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther,
                 ExecAbsorber = delegate (int _damage)
                 {
                     if (_damage > categoryData.AbsorberValue)
@@ -6613,6 +6854,37 @@ this.updateCurColor();
             return (long)(!AdditionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
         }
 
+        // RVA: 0x2835B94 Offset: 0x2835B94 VA: 0x2835B94
+        public void SetBuffDebuffWithMultiplyValue(BuffParamKind _kind, Dictionary<BasePartsData, LongWithEx> _partsToBaseValue, bool _enable, UnitCtrl _source, int _multiplyValue)
+        {
+            if (_partsToBaseValue == null)
+                return;
+
+            // 遍历字典中的每个部位数据和基础值
+            foreach (var kvp in _partsToBaseValue)
+            {
+                var partsData = kvp.Key;
+                var baseValue = kvp.Value;
+                
+                if (partsData == null)
+                    continue;
+
+                // 计算最终值：基础值 * 乘数
+                var finalValue = baseValue * _multiplyValue;
+
+                // 调用对应部位的SetBuffDebuff方法
+                partsData.SetBuffDebuff(
+                    _enable, 
+                    finalValue, 
+                    _kind, 
+                    _source, 
+                    battleLog, 
+                    false
+                );
+            }
+        }
+
+
         public void SetBuffParam(
           BuffParamKind _kind,
           BuffParamKind _resistMissCheckParamKind,
@@ -6852,7 +7124,7 @@ this.updateCurColor();
             foreach(var value in _value.Values)
             {
                 des += value;
-                MainValue = value;
+                MainValue = (DoubleWithEx)value;
             }
             ///added script
             UnitAbnormalStateChangeData stateChangeData = new UnitAbnormalStateChangeData();
@@ -7146,6 +7418,8 @@ this.updateCurColor();
 
         public Dictionary<UnitCtrl, Dictionary<int, AttackSealData>> DamageSealDataDictionary { get; set; }
 
+        public Dictionary<SealAction.eCancelTriggerType, Dictionary<eStateIconType, SealCancelData>> SealCancelDictionary { get; set; } = new Dictionary<SealAction.eCancelTriggerType, Dictionary<eStateIconType, SealCancelData>>();
+
         public Dictionary<UnitCtrl, Dictionary<int, AttackSealData>> DamageOnceOwnerSealDateDictionary { get; set; } = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
 
         public Dictionary<UnitCtrl, Dictionary<int, AttackSealData>> DamageOwnerSealDataDictionary { get; set; } = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
@@ -7368,7 +7642,7 @@ this.updateCurColor();
             if (knightGuardDataList.Count == 0)
             {
                 OnChangeState.Call(this, _knightGuardData.StateIconType, true);
-                NoSkipOnChangeAbnormalState?.Invoke(this, _knightGuardData.StateIconType, true,90,"???");
+                NoSkipOnChangeAbnormalState?.Invoke(this, _knightGuardData.StateIconType, true,90,"再生");
             }
             knightGuardDataList.Add(_knightGuardData);
             if (knightGuardCoroutine != null)
@@ -7643,121 +7917,239 @@ this.updateCurColor();
         {
             if (debuffDamageUpDataList.Count == 0)
                 return 1f;
-            int num1 = 0;
+            int num = 0;
             if (IsAbnormalState(eAbnormalState.SLOW))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.PARALYSIS))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.FREEZE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CHAINED))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.SLEEP))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.STUN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.STONE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.DETAIN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.FAINT))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.PAUSE_ACTION))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.NPC_STUN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.NO_EFFECT_SLIP_DAMAGE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.POISON))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.BURN))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CURSE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.VENOM))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.HEX))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.COMPENSATION))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CONVERT))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.CONFUSION))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.MAGIC_DARK))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.PHYSICS_DARK))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.SILENCE))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.UB_SILENCE))
-                ++num1;
-            if (UbAbnormalDataList.Count > 0)
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.COUNT_BLIND))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL))
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.FEAR))
-                ++num1;
-            if (aweDatas.Count > 0)
-                ++num1;
-            if (ToadDatas.Count > 0)
-                ++num1;
-            if (IsAbnormalState(eAbnormalState.HEAL_DOWN))
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.ATK] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.DEF] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_STR] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_DEF] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.DODGE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.ENERGY_RECOVER_RATE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.LIFE_STEAL] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MOVE_SPEED] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.ACCURACY] > 0)
-                ++num1;
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.MAGIC_DAMAGE_UP_PERCENT] > 0)
-            {
-                num1++;
-            }
-            if (debuffCounterDictionary[BuffParamKind.MAX_HP] > 0)
-                ++num1;
+			{
+				num++;
+			}
+			if (overlapAbnormalStateIndexList[eAbnormalState.SLOW_OVERLAP].Count > 0)
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PARALYSIS))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.FREEZE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CHAINED))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.SLEEP))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.STUN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.STUN2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.STONE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.DETAIN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.FAINT))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PAUSE_ACTION))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.NPC_STUN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.NO_EFFECT_SLIP_DAMAGE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.POISON))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.POISON2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.BURN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.BLACK_FRAME))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CURSE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CURSE2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.VENOM))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.HEX))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.COMPENSATION))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CONVERT))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CONFUSION))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CONFUSION2))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.MAGIC_DARK))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PHYSICS_DARK))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.SILENCE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.UB_SILENCE))
+			{
+				num++;
+			}
+			if (UbAbnormalDataList.Count > 0)
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.COUNT_BLIND))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.FEAR))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.DECREASE_HEAL))
+			{
+				num++;
+			}
+			if (aweDatas.Count > 0)
+			{
+				num++;
+			}
+			if (ToadDatas.Count > 0)
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.HEAL_DOWN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.POISON_BY_BEHAVIOUR))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CRYSTALIZE))
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.ATK] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.DEF] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_STR] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_DEF] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.DODGE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.ENERGY_RECOVER_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.LIFE_STEAL] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MOVE_SPEED] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.ACCURACY] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT] > 0)
+			{
+				num++;
+			}
+			if (debuffCounterDictionary[BuffParamKind.MAX_HP] > 0)
+			{
+				num++;
+			}
             double num2 = 1.0;
             foreach (DebuffDamageUpData debuffDamageUpData in debuffDamageUpDataList)
             {
@@ -7765,10 +8157,10 @@ this.updateCurColor();
                 switch (debuffDamageUpData.EffectType)
                 {
                     case DebuffDamageUpData.eEffectType.ADD:
-                        num3 = Math.Min(1.0 + debuffDamageUpData.DebuffDamageUpValue * (double)num1, debuffDamageUpData.DebuffDamageUpLimitValue);
+                        num3 = Math.Min(1.0 + debuffDamageUpData.DebuffDamageUpValue * (double)num, debuffDamageUpData.DebuffDamageUpLimitValue);
                         break;
                     case DebuffDamageUpData.eEffectType.SUBTRACT:
-                        num3 = Math.Max(1.0 - debuffDamageUpData.DebuffDamageUpValue * (double)num1, debuffDamageUpData.DebuffDamageUpLimitValue);
+                        num3 = Math.Max(1.0 - debuffDamageUpData.DebuffDamageUpValue * (double)num, debuffDamageUpData.DebuffDamageUpLimitValue);
                         break;
                 }
                 num2 *= num3;
@@ -8169,57 +8561,57 @@ this.updateCurColor();
                     case eParamType.HP:
                         if (_first && !IsClanBattleOrSekaiEnemy)
                         {
-                            MaxHp = calculatePassiveSkillValue(MaxHp, _passiveActionKV);
-                            Hp = (long)(int)((long)Hp / (double)(long)StartMaxHP * MaxHp);
+                            MaxHp = calculatePassiveSkillValue(MaxHp, _passiveActionKV).ToLongWithEx();
+                            Hp = (Hp / StartMaxHP * MaxHp).ToLongWithEx();
                         }
                         continue;
                     case eParamType.ATK:
-                        Atk = calculatePassiveSkillValue(StartAtk, _passiveActionKV);
+                        Atk = calculatePassiveSkillValue(StartAtk, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.DEF:
-                        Def = calculatePassiveSkillValue(StartDef, _passiveActionKV);
+                        Def = calculatePassiveSkillValue(StartDef, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.MAGIC_ATK:
-                        MagicStr = calculatePassiveSkillValue(StartMagicStr, _passiveActionKV);
+                        MagicStr = calculatePassiveSkillValue(StartMagicStr, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.MAGIC_DEF:
-                        MagicDef = calculatePassiveSkillValue(StartMagicDef, _passiveActionKV);
+                        MagicDef = calculatePassiveSkillValue(StartMagicDef, _passiveActionKV).ToLongWithEx();
                         continue;
                     case eParamType.PHYSICAL_CRITICAL:
-                        PhysicalCritical = calculatePassiveSkillValue(StartPhysicalCritical, _passiveActionKV);
+                        PhysicalCritical = (long)calculatePassiveSkillValue(StartPhysicalCritical, _passiveActionKV);
                         continue;
                     case eParamType.MAGIC_CRITICAL:
-                        MagicCritical = calculatePassiveSkillValue(StartMagicCritical, _passiveActionKV);
+                        MagicCritical = (long)calculatePassiveSkillValue(StartMagicCritical, _passiveActionKV);
                         continue;
                     case eParamType.DODGE:
-                        Dodge = calculatePassiveSkillValue(StartDodge, _passiveActionKV);
+                        Dodge = (long)calculatePassiveSkillValue(StartDodge, _passiveActionKV);
                         continue;
                     case eParamType.LIFE_STEAL:
-                        LifeSteal = calculatePassiveSkillValue(StartLifeSteal, _passiveActionKV);
+                        LifeSteal = (long)calculatePassiveSkillValue(StartLifeSteal, _passiveActionKV);
                         continue;
                     case eParamType.WAVE_HP_RECOVERY:
-                        WaveHpRecovery = calculatePassiveSkillValue(StartWaveHpRecovery, _passiveActionKV);
+                        WaveHpRecovery = (long)calculatePassiveSkillValue(StartWaveHpRecovery, _passiveActionKV);
                         continue;
                     case eParamType.WAVE_ENERGY_RECOVERY:
-                        WaveEnergyRecovery = calculatePassiveSkillValue(StartWaveEnergyRecovery, _passiveActionKV);
+                        WaveEnergyRecovery = (long)calculatePassiveSkillValue(StartWaveEnergyRecovery, _passiveActionKV);
                         continue;
                     case eParamType.PHYSICAL_PENETRATE:
-                        PhysicalPenetrate = calculatePassiveSkillValue(StartPhysicalPenetrate, _passiveActionKV);
+                        PhysicalPenetrate = (long)calculatePassiveSkillValue(StartPhysicalPenetrate, _passiveActionKV);
                         continue;
                     case eParamType.MAGIC_PENETRATE:
-                        MagicPenetrate = calculatePassiveSkillValue(StartMagicPenetrate, _passiveActionKV);
+                        MagicPenetrate = (long)calculatePassiveSkillValue(StartMagicPenetrate, _passiveActionKV);
                         continue;
                     case eParamType.ENERGY_RECOVERY_RATE:
-                        EnergyRecoveryRate = calculatePassiveSkillValue(StartEnergyRecoveryRate, _passiveActionKV);
+                        EnergyRecoveryRate = (long)calculatePassiveSkillValue(StartEnergyRecoveryRate, _passiveActionKV);
                         continue;
                     case eParamType.HP_RECOVERY_RATE:
-                        HpRecoveryRate = calculatePassiveSkillValue(StartHpRecoveryRate, _passiveActionKV);
+                        HpRecoveryRate = (long)calculatePassiveSkillValue(StartHpRecoveryRate, _passiveActionKV);
                         continue;
                     case eParamType.ENERGY_REDUCE_RATE:
-                        EnergyReduceRate = calculatePassiveSkillValue(StartEnergyReduceRate, _passiveActionKV);
+                        EnergyReduceRate = (long)calculatePassiveSkillValue(StartEnergyReduceRate, _passiveActionKV);
                         continue;
                     case eParamType.ACCURACY:
-                        Accuracy = calculatePassiveSkillValue(StartAccuracy, _passiveActionKV);
+                        Accuracy = (long)calculatePassiveSkillValue(StartAccuracy, _passiveActionKV);
                         continue;
                     default:
                         continue;
@@ -8258,11 +8650,7 @@ this.updateCurColor();
 
         private DoubleWithEx calculatePassiveSkillValue(
             DoubleWithEx _value,
-          KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => ((double)_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
-
-        private LongWithEx calculatePassiveSkillValue(
-            LongWithEx _value,
-          KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (_value * (long)(_passiveActionKV.Value.Percentage + 100) / 100) + (long)_passiveActionKV.Value.Value;
+          KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
 
         public List<PartsData> BossPartsListForBattle { get; set; }
         private static UnitCtrl _instance;
@@ -8618,7 +9006,7 @@ this.updateCurColor();
                     var num2 = num1 * lifeSteal / (lifeSteal + Level + 100);
                     if (num2 != 0)
                     {   //_damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
-                        _damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
+                        _damageData.Source.SetRecovery(BattleUtil.DoubleToLongReverseTruncate(num2), _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
                     }
                 }
             }
@@ -8733,6 +9121,7 @@ this.updateCurColor();
                     _damageData.Source.OnActionByCritical.Call();
             }
             applyChargeEnergyByReceiveDamage(_damageData.ActionType, (int)num1, _damageData.IsAlwaysChargeEnegry, _usedChargeEnergyByReceiveDamage);
+            applySealByReceiveDamage(_damageData.ActionType, num1);
             if (num1 > 0L & _critical && _skill.CriticalPartsList != null)
                 _skill.CriticalPartsList.Add(_damageData.Target);
             if (_skill != null)
@@ -8741,6 +9130,44 @@ this.updateCurColor();
             }
             return (long)num1;
         }
+
+        // RVA: 0x2846CBC Offset: 0x2846CBC VA: 0x2846CBC
+        private void applySealByReceiveDamage(eActionType _actionType, LongWithEx _damage)
+        {
+            if (_damage < 1)
+                return;
+
+            if (!SealCancelDictionary.ContainsKey(SealAction.eCancelTriggerType.DAMAGED_COUNT))
+                return;
+
+            if (!(((int)_actionType == 1 || (int)_actionType == 30) || 
+            ((int)_actionType > 30 && (int)_actionType <= 51 && ((1L << (int)_actionType) & 0x8C00200000000L) != 0)))
+            {
+                return;
+            }
+
+            var cancelDict = SealCancelDictionary[SealAction.eCancelTriggerType.DAMAGED_COUNT];
+            if (cancelDict == null)
+                return;
+
+            foreach (var cancelData in cancelDict.Values)
+            {
+                if (cancelData == null)
+                    continue;
+
+                if (!cancelData.GetType().IsSubclassOf(typeof(SealDamageCountCancelData)) &&
+                    cancelData.GetType() != typeof(SealDamageCountCancelData))
+                {
+                    continue;
+                }
+
+                ((SealDamageCountCancelData)cancelData).OnDamage();
+            }
+        }
+
+
+        // RVA: 0x270ECDC Offset: 0x270ECDC VA: 0x270ECDC
+        // public double TryApplyAllUnitDamageSeal(bool _enemySide, UnitCtrl _target, UnitCtrl _effectTarget, ActionParameter _actionParameter) { }
 
         private static readonly WaitForSeconds LARGE_NUM_SHOW_TIME = new WaitForSeconds(0.2f);
         public LongWithEx SetDamageImpl(
@@ -8782,11 +9209,21 @@ this.updateCurColor();
                 isHit = false;
                 return 0;
             }
-            DoubleWithEx a = _damageData.Damage;
+            DoubleWithEx a = (DoubleWithEx)_damageData.Damage;
             double num1 = 2f * _damageData.CriticalDamageRate;
             a *= 1 + (num1 - 1) * _damageData.critVar;
             if (debuffDamageUpDataList.Count > 0)
-                a *= GetDebuffDamageUpValue();
+            {
+                var t = GetDebuffDamageUpValue(); // temp logic
+                                                  // TODO check whether attack field suit it
+                // if no, move this logic to UpdateSlipDamage
+                if (_damageData.OverrideDamageLimit != -1)
+                {
+                    a = a.Min(_damageData.OverrideDamageLimit);
+                    _damageData.OverrideDamageLimit = -1;
+                }
+                a *= t;
+            }
             bool flag1 = false;
             if (_damageData.ActionType == eActionType.ATTACK)
             {
@@ -8802,8 +9239,8 @@ this.updateCurColor();
 
             if (flag1)
             {
-                a = _damageData.LogBarrierExpectedDamage;
-                b = _damageData.LogBarrierExpectedDamageForEnergyCalc;
+                a = (DoubleWithEx)_damageData.LogBarrierExpectedDamage;
+                b = (DoubleWithEx)_damageData.LogBarrierExpectedDamageForEnergyCalc;
             }
             if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.CUT_ATK_DAMAGE))
             {
@@ -8836,20 +9273,6 @@ this.updateCurColor();
             // TODO DamageCutForSpecialNullificationData unknown
 
             // 属性
-            var unit = _damageData.Source;
-            if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
-                unit = _damageData.StrikeBackSource;
-            var talentDamageRate = CalcTalentDamageRate(
-                _damageData.ActionType,
-                unit,
-                _damageData.Target,
-                _damageData.TargetIncludeMyTeam, // TODO find where set
-                _damageData.IgnoreTalentBonusForRatioSlip,
-                out bool isNoDamageByResist
-            );
-            a *= talentDamageRate;
-            b *= talentDamageRate;
-
             double execBarrier(double total, double main, double sub)
             {
                 if (total > sub)
@@ -8868,19 +9291,20 @@ this.updateCurColor();
                     _damageData.ActionType == eActionType.ATTACK_FIELD) && 
                     !_damageData.IgnoreLogBarrier)
                 {
-                    long TotalDamageForLogBarrier = 0;
+                    DoubleWithEx TotalDamageForLogBarrier = 0;
                     if (_damageData.ActionType == eActionType.ATTACK)
-                        TotalDamageForLogBarrier = _damageData.TotalDamageForLogBarrier;
+                        TotalDamageForLogBarrier = (DoubleWithEx)_damageData.TotalDamageForLogBarrier;
                     else
-                        TotalDamageForLogBarrier = _damageData.Damage;
+                        TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     if (TotalDamageForLogBarrier > allLogBarrierStartValue)
                     {
                         long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
                         var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                            (long)execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
+                            execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
                         a *= t;
                         b *= t;
+                        TotalDamageForLogBarrier *= t;
                     }
                     if (_damageData.ActionType == eActionType.ATTACK)
                     {
@@ -8888,28 +9312,31 @@ this.updateCurColor();
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
-                            var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                                (long)execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
+                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
+                            TotalDamageForLogBarrier *= t;
                         }
                         else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
-                            var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                                (long)execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
+                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
+                            TotalDamageForLogBarrier *= t;
                         }
                         if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
                         {
                             double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                             double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
-                            var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                                (long)execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
+                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
                             a *= t;
                             b *= t;
+                            TotalDamageForLogBarrier *= t;
                         }
                     }
                 }
@@ -8921,6 +9348,7 @@ this.updateCurColor();
                 //if (!this.DisableFlash)
                 //    this.AppendCoroutine(this.setColorOffsetDefaultWithDelay(), ePauseType.NO_DIALOG);
             }
+            // TODO check order with log barrier
             if (!_damageData.IgnoreDef && !flag1)
             {
                 switch (_damageData.DamageType)
@@ -8928,12 +9356,12 @@ this.updateCurColor();
                     case DamageData.eDamageType.ATK:
                         var defZero = _damageData.Target.GetDefZero();
                         var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - num3 / (defZero + 100.0f));
+                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
                         break;
                     case DamageData.eDamageType.MGC:
                         var magicDefZero = _damageData.Target.GetMagicDefZero();
                         var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - num4 / (magicDefZero + 100.0f));
+                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
                         break;
                 }
                 if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
@@ -8943,15 +9371,28 @@ this.updateCurColor();
                         case DamageData.eDamageType.ATK:
                             var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
                             var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - num3 / (defZero + 100.0f));
+                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
                             break;
                         case DamageData.eDamageType.MGC:
                             var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
                             var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - num4 / (magicDefZero + 100.0f));
+                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
                             break;
                     }
                 }
+                var unit = _damageData.Source;
+                if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
+                    unit = _damageData.StrikeBackSource;
+                var talentDamageRate = CalcTalentDamageRate(
+                    _damageData.ActionType,
+                    unit,
+                    _damageData.Target,
+                    _damageData.TargetIncludeMyTeam,
+                    _damageData.IgnoreTalentBonusForRatioSlip,
+                    out bool isNoDamageByResist
+                );
+                a *= talentDamageRate;
+                b *= talentDamageRate;
             }
 
             var num5 = a;
@@ -9038,7 +9479,8 @@ this.updateCurColor();
                     }
                 }
             }*/
-            if (tuple != null && !isNoDamageByResist)
+            // if (tuple != null && !isNoDamageByResist)
+            if (tuple != null)
             {
                 StrikeBackData strikeBack = tuple.Item1;
                 List<StrikeBackData> strikeBackList = tuple.Item2;
@@ -9104,7 +9546,7 @@ this.updateCurColor();
             if (num5 <= 0.0 && _damageData.ActionType == eActionType.FORCE_HP_CHANGE)
             {
                 if (!battleManager.skipping)
-                    createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)BattleUtil.DoubleToInt(num5));
+                    createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.DoubleToLong(num5));
                 callBack?.Invoke("伤害无效，因为伤害为负数");
                 return 0;
             }
@@ -9152,11 +9594,11 @@ this.updateCurColor();
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
             var num6 = BattleUtil.DoubleToLong(_fDamage);
             bool flag2 = (long)Hp > 0L;
-            int num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
+            long num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
-                _hp = (long)(Hp - (num6 - _overRecoverValue.Max(0)));
+                _hp = (long)((DoubleWithEx)Hp - ((DoubleWithEx)num6 - _overRecoverValue.Max(0)));
             }
             if (_onDamageHit != null & flag2)
                 _onDamageHit(num6);
@@ -9318,7 +9760,7 @@ this.updateCurColor();
 
             if (!battleManager.skipping)
             {
-                float NormalizedHP = (long)Hp / (float)(long)MaxHp;
+                float NormalizedHP = (float)(Hp / (double)MaxHp);
                 /*
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des;
@@ -9331,14 +9773,14 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, (int)MaxHp, (int)num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
-                createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, (int)num6);
-                NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, (float)num6, BattleHeaderController.CurrentFrameCount);
+                createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, num6);
+                NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, num6, BattleHeaderController.CurrentFrameCount);
 
             }
 
-            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((float)num6 * (1 - 1/num1)), num6);
+            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((double)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, num6, _critical);
             OnDamageForLoopRepeat.Call(num6);
             OnDamageForDivision.Call(_byAttack, Math.Min(hp, num6), _critical);
@@ -9680,7 +10122,7 @@ this.updateCurColor();
           bool _hasEffect,
           Skill _skill,
           bool _critical,
-          int _damage)
+          long _damage)
         {
             if (((!(battleManager != null) ? 0 : (_damage >= 0 ? 1 : 0)) & (_hasEffect ? 1 : 0)) == 0)
                 return;
@@ -9825,7 +10267,7 @@ this.updateCurColor();
         {
             var num = Hp + _value - MaxHp;
             SetRecovery(_value, _isMagic ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _source, GetHealDownValue(_healSource), _target: _target);
-            return num;
+            return (DoubleWithEx)num;
         }
 
         public void SetRecovery(
@@ -9908,13 +10350,13 @@ this.updateCurColor();
                         this.lifeGauge.SetNormalizedLifeAmount(NormalizedHP);
                     this.OnLifeAmmountChange.Call<float>(NormalizedHP);
                 }*/
-                float NormalizedHP = (long)Hp / (float)(long)MaxHp;
+                float NormalizedHP = (float)(Hp / (double)MaxHp);
                 /*
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
                 string des = $"目标HP回复<color=#54FF4F>{_value}</color>点，当前HP: {Hp}";
                 action?.Invoke(des);
                 uIManager?.LogMessage(des, eLogMessageType.HP_RECOVERY, _source);
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,(int)MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
                 if (_isUnionBurstLifeSteal)
                 {
                     unionburstLifeStealNum += (long)_value;
@@ -10011,7 +10453,7 @@ this.updateCurColor();
         {
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
-            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroCapped + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
+            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_hasNumberEffect && !battleManager.skipping)
             {
@@ -10599,6 +11041,8 @@ this.updateCurColor();
             {
                 PlayAndSetUpMultiTarget(_isFirst: true);
             }
+            battleManager.StartExtraEffect(BattleDefine.eExtraEffectExecTiming.ALL_UNIT_ACTION);
+            battleManager.StartExtraEffect(IsOther ? BattleDefine.eExtraEffectExecTiming.ENEMY_ACTION : BattleDefine.eExtraEffectExecTiming.MY_TEAM_ACTION);
             if (IsPartsBoss)
                 battleManager.LOGNEDLPEIJ = false;
             if (_state != ActionState.IDLE && _state != ActionState.WALK)
@@ -13237,8 +13681,14 @@ this.updateCurColor();
             FLIGHT = 71,
             ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY = 72,
             WORLD_LIGHTNING = 73,
+            MAGIC_DODGE = 74,
+            TAUNT = 75,
+            HP_LOWER_LIMIT = 76,
+            CHAINED_ACN = 77,
+            PUPPET = 78,
+            DISABLE_HEAL = 79,
+            RATIO_SLIP = 80,
             NUM,
-
 
         }
 
