@@ -208,6 +208,7 @@ namespace ActionParameterSerializer.Actions
         polymorphed = 1400,
         feared = 1600,
         is_invisible = 1601,
-        magic_defence_decreased = 1700,
+        magic_defence_decreased = 1741,
+        physical_defence_decreased = 1721,
     }
 }

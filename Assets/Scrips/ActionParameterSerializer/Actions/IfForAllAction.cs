@@ -1,3 +1,5 @@
+using System;
+
 namespace ActionParameterSerializer.Actions
 {
     public class IfForAllAction : ActionParameter
@@ -16,10 +18,11 @@ namespace ActionParameterSerializer.Actions
             {
                 if (actionDetail1 == 710 || actionDetail1 == 100 || actionDetail1 == 1700 || actionDetail1 == 1601)
                 {
-                    IfType ifType = (IfType)actionDetail1;
-                    if (ifType != null)
-                        trueClause = Utils.JavaFormat(Utils.GetString("use_d1_to_s2_if_s3"),
-                            actionDetail2 % 100, targetParameter.buildTargetClause(true), ifType.description());
+                    var checkId = actionDetail1;
+                    if (actionDetail1 == 1700)
+                        checkId += (int)actionValue3.value;
+                    trueClause = Utils.JavaFormat(Utils.GetString("use_d1_to_s2_if_s3"),
+                        actionDetail2 % 100, targetParameter.buildTargetClause(true), ((IfType)checkId).description());
                 }
                 else if (actionDetail1 >= 0 && actionDetail1 < 100)
                 {
