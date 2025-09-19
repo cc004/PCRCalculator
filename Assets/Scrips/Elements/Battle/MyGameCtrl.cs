@@ -186,9 +186,9 @@ namespace Elements
                     tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
 
                     var extra_data = GetExtraEffectEnemyData(tempData);
-                    tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
                     if (extra_data != null)
                     {
+                        tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
                         foreach (var enemy in extra_data.enemy_ids)
                         {
                             if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
