@@ -44,7 +44,7 @@ namespace Elements
         public Action<int, int> SemanOnExecAction;
         public Action<int, int, long, int> NoSkipOnDamage;
         public Action<bool, long, bool, long, LongWithEx> NoSkipOnDamage2;
-        public Action<int, int, double, int,string> NoSkipOnBaseValueChanged;
+        public Action<int, int, LongWithEx, int,string> NoSkipOnBaseValueChanged;
         public Action<UnitCtrl, eStateIconType, bool,double,string> NoSkipOnChangeAbnormalState;
         public CharacterPageButton button;
         public Action<int, int, float, float> NoSkipOnChangeSkillID;
