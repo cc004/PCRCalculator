@@ -454,8 +454,13 @@ namespace PCRCaculator.Guild
                 var matchingData = TalentQuestWaveGroupDataDic?.Values
                     .FirstOrDefault(data => data.wave_group_id == waveGroupId);
                 specialEnemyid = matchingData.enemy_ids.ToArray();
-                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, TalentQuestEnemyParameterDic[specialEnemyid[0]].unit_id);
-
+                var enemyData = TalentQuestEnemyParameterDic[specialEnemyid[0]];
+                int prefabId = enemyData.detailData.prefab_id;
+                if (enemyData.detailData.visual_change_flag == 1)
+                {
+                    prefabId += enemyData.rarity * 10;
+                }
+                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
             }
             else
             {

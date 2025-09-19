@@ -377,7 +377,7 @@ namespace Elements
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
             //if(dataAsset == null)
             //{
-            int skinID = UnitUtility.GetSkinId(data.PrefabId, 3 /* force use 3x skin */);
+            int skinID = UnitUtility.GetSkinId(data.PrefabId, data.rarity /* force use 3x skin */);
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
             

@@ -539,13 +539,11 @@ namespace PCRCaculator
         [JsonIgnore]
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
+        private int _prefabId;
         public int PrefabId
         {
-            get
-            {
-                int adjustedUnitId = unitId > 600000 ? unitId - 500000 : unitId;
-                return rarity == 6 && adjustedUnitId == 105701 ? 170301 : adjustedUnitId;
-            }
+            get => _prefabId == 0 ? (rarity == 6 && unitId == 105701 ? 170301 : unitId) : _prefabId;
+            set => _prefabId = value;
         }
         public void SetDefaultLoveDict()
         {
@@ -574,11 +572,11 @@ namespace PCRCaculator
             else
                 this.rarity = 1;
         }
-        public UnitData(int id, int lv, int ra)
+        public UnitData(int id, int rarity, int prefabId)
         {
             unitId = id;
-            level = lv;
-            rarity = ra;
+            this.rarity = rarity;
+            PrefabId = prefabId;
         }
         /// <summary>
         /// 召唤物使用，技能等级随召唤物等级
