@@ -143,18 +143,16 @@ namespace PCRCaculator.Battle
         public const int AILMENT_LENGTH = 50;
         public readonly int resist_ststus_id;
         public readonly int[] ailments;
-        static Dictionary<int, int[]> resistDataDic;
+        static Dictionary<int, int[]> resistDataDic => MainManager.Instance.ResistDataDic;
         static ResistData()
         {
-            string jsonStr = MainManager.Instance.LoadJsonDatas("Datas/ResistDataDic");
-            resistDataDic = JsonConvert.DeserializeObject<Dictionary<int, int[]>>(jsonStr);
+            // string jsonStr = MainManager.Instance.LoadJsonDatas("Datas/ResistDataDic");
+            // resistDataDic = JsonConvert.DeserializeObject<Dictionary<int, int[]>>(jsonStr);
         }
         public ResistData()
         {
             resist_ststus_id = 0;
             ailments = new int[AILMENT_LENGTH];
-            
-
         }
         public ResistData(int id,int[] ails)
         {
