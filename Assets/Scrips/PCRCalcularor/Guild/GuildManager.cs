@@ -847,9 +847,12 @@ namespace PCRCaculator.Guild
             if (data.isTalentQuestBoss)
             {
                 toggles_ChooseType[1].isOn = true;
-            }else
+                OnChooseTalentQuestDropDownChanged();
+            }
+            else
             {
                 toggles_ChooseType[0].isOn = true;
+                OnChooseBossDropDownChanged();
             }
         }
         private void Refresh()
