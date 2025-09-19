@@ -428,11 +428,15 @@ namespace PCRCaculator.SQL
             {
                 TalentWeaknessDic = GetDatasDic<talent_weakness>(a => a.resist_id);
             });
+            var talentDicTask =  Task.Run(() => TalentDic = GetDatas<unit_talent>()
+                        .GroupBy(x => x.unit_id)
+                        .ToDictionary(g => g.Key, g => g.ToArray()));
+
             var tasks = new List<Task>();
 
             tasks.Add(
                 Task.WhenAll(rarityDicTask, unitSkillDataDicTask, unitAttackPatternDicTask, equipDicTask,
-                        rankStateDicTask, unitDicTask)
+                        rankStateDicTask, unitDicTask, talentDicTask)
                 .ContinueWith(_ => Dic1 = GetUnitRarityData()));
             tasks.Add(
                 Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
@@ -477,10 +481,6 @@ namespace PCRCaculator.SQL
                 Task.Run(() => rbs = GetDatas<promotion_bonus>()
                     .GroupBy(x => x.unit_id)
                     .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.promotion_level, x => x))));
-            tasks.Add(
-                Task.Run(() => TalentDic = GetDatas<unit_talent>()
-                        .GroupBy(x => x.unit_id)
-                        .ToDictionary(g => g.Key, g => g.ToArray())));
             tasks.Add(
                 Task.Run(() => TalentSkillNodeDic = GetTalentSkillData()));
             // tasks.Add(

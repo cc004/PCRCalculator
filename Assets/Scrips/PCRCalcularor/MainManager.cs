@@ -431,12 +431,11 @@ namespace PCRCaculator
                         abStopwatch.Stop();
                         Debug.Log($"AB资源初始化完成，耗时: {abStopwatch.ElapsedMilliseconds}ms");
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         abStopwatch.Stop();
-                        Debug.LogError($"AB资源初始化失败，耗时: {abStopwatch.ElapsedMilliseconds}ms");
-                        // WindowMessage("下载数据发生错误，重置版本");
-                        try { wait?.SetMessage("出错啦！ 重置版本，请重新打开"); } catch { }
+                        Debug.LogError($"AB资源初始化失败");
+                        try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
                         SaveManager.Save(new VersionData());
                         return;
                     }
