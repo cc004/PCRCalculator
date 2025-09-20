@@ -1920,7 +1920,7 @@ namespace PCRCaculator.Guild
                 case 10:
                     return sourceName + "的技能随机选择判定，目标" + randomResult;
                 case 15:
-                    return sourceName + "对" + targetName + "的DOT判定" + (randomResult < targetResult * 1000 ? "MISS" : "命中");
+                    return sourceName + "对" + targetName + "的DOT判定" + (randomResult < targetResult * 1000 ? "命中" : "MISS");
                 default:
                     return sourceName + "对" + targetName + "的其他判定";
             }
