@@ -740,11 +740,7 @@ namespace PCRCaculator.Guild
         }
         private EnemyData GetEnemyDataByID(int enemy_id)
         {
-            if (enemy_id > 800000000 && enemy_id < 900000000)
-            {
-                return TalentQuestEnemyParameterDic[enemy_id];
-            }
-            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : EnemyDataDic[enemy_id];
+            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : IsTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] : EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
         {
@@ -1207,9 +1203,9 @@ namespace PCRCaculator.Guild
             string msg = "可以输入帧(>100)或秒(<90)\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入61.001保存则自动转成1860.001帧\nAuto和Set按钮为改变开场状态(非以前强制)";
             MainManager.Instance.WindowConfigMessage(msg, null);
         }
-        public void GuildBossDataEditButton()
+        public void GuildBossDataEditButton(int index)
         {
-            BossDataEditdr.SetData(selectedBossEnemyids[0]);
+            BossDataEditdr.SetData(selectedBossEnemyids[index]);
         }
         public void GuildExecTimeSettingButton(UnitData unitData)
         {
@@ -1557,7 +1553,7 @@ namespace PCRCaculator.Guild
                 }
                 //int skID = enemyData.skillData.UB;
                 //int skLV = enemyData.union_burst_level;
-                Action<int, int,string> action = (skID, skLV,str) =>
+                Action<int, int, string> action = (skID, skLV, str) =>
                  {
                      detailstr += $" {str}:\n {skID}({skLV})\n";
                      if (MainManager.Instance.SkillDataDic.TryGetValue(skID, out SkillData sk))
@@ -1597,6 +1593,7 @@ namespace PCRCaculator.Guild
 
             GameObject a = Instantiate(bossDetailPrefab, BaseBackManager.Instance.latestUIback.transform);
             a.GetComponent<ShowTextUI>().Set(detailstr);
+            a.GetComponent<ShowTextUI>().index = index;
         }
 
 
