@@ -33,9 +33,9 @@ namespace Elements
                 action($"目标处于MODECHANGE状态，技能无效!");
                 return;
             }
-            double pp = (double)_valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
+            double pp = (double)_valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
             if (BattleManager.Random(0.0f, 1f,
-                    new RandomData(_source, _target.Owner, ActionId, 7, (float)pp)) < (double)_valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+                    new RandomData(_source, _target.Owner, ActionId, 7, (float)pp)) < (double)_valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.CONVERT;

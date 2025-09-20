@@ -46,7 +46,7 @@ namespace Elements
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
+            double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
                         double randomNum = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 5, (float)judgeNum));
 
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, eActionType.BLIND, BattleHeaderController.CurrentFrameCount, out float fix))
