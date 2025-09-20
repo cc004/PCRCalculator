@@ -35,6 +35,7 @@ namespace PCRCaculator
                 };
                 equip_id = data.ex_equipment_id;
                 text = $"{color}-{data.name}";
+                image = Resources.Load<Sprite>($"extraequip/icon_extra_equip_{equip_id}");
             }
 
             private ExEquipOption()
