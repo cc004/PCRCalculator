@@ -25,6 +25,7 @@ namespace PCRCaculator
         public InputField RBLevelText;
         public InputField RBValueText;
         public InputField RBTPValueText;
+        public GameObject ShowTextPrefab;
         public Toggle IsReleaseSkillHasteLogic;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
@@ -132,6 +133,12 @@ namespace PCRCaculator
                     MainManager.Instance.CalculatorButton();
                     break;
             }
+        }
+        public void ShowText(string str)
+        {
+            GameObject a = Instantiate(ShowTextPrefab, latestUIback.transform, false);
+            a.GetComponent<ShowTextUI>().Set(str);
+            a.GetComponent<ShowTextUI>().bossDetailEditdr.SetActive(false);
         }
     }
 }
