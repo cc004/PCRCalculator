@@ -568,6 +568,7 @@ namespace Elements
             unitCtrl.UnitName = mainManager.GetUnitNickName(unitid) + $"[召唤物{val+1}]";
             unitCtrl.UnitName = ("<color=#C080FF>") + unitCtrl.UnitName + "</color>";
             unitCtrl.UnitNameEx = unitCtrl.UnitName;
+            unitCtrl.unitData.PrefabId = prefab;
             var actionController = b.GetComponent<UnitActionController>();
             actionController.LoadActionControllerData(unitid);
             bool useSkillEffects = false;
