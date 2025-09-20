@@ -975,8 +975,12 @@ namespace PCRCaculator
             {
                 if (UnitRarityDic.TryGetValue(unitid, out var data))
                     return data.unitName;
-                return "召唤物";
+                return $"召唤物";
             }
+            if (EnemyDataDic.TryGetValue(unitid, out var data2))
+                return data2.name;
+            if (TalentQuestEnemyParameterDic.TryGetValue(unitid, out var data3))
+                return data3.name;
             if (unitid >= 200000)
                 return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
