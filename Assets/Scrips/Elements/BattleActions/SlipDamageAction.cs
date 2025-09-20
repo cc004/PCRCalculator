@@ -72,8 +72,8 @@ namespace Elements
             if (ActionDetail3 != 0)
               EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             //start add
-            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
-            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 15, (float)pp));
+            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
+            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 15, pp));
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, ActionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
                 num = 1-fix;
@@ -86,7 +86,7 @@ namespace Elements
                 flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)targetOwner.Hp / targetOwner.MaxHp);
             }
             //end add
-            if (!flag && num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (!flag && num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 //_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)ActionDetail1], AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);

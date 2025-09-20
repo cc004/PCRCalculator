@@ -138,6 +138,7 @@ namespace PCRCaculator
         {
             GameObject a = Instantiate(ShowTextPrefab, latestUIback.transform, false);
             a.GetComponent<ShowTextUI>().Set(str);
+            a.GetComponent<ShowTextUI>().bossDetailEditdr.SetActive(false);
         }
     }
 }

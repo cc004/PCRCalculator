@@ -5273,6 +5273,9 @@ namespace Elements.Battle
                 }
                 bool flag = (_summonData.SummonSide == SummonAction.eSummonSide.OURS) ? _summonData.Owner.IsOther : !_summonData.Owner.IsOther;
 
+                // TODO enemy & unit enhance info 
+                // may be ex+
+
                 unitCtrl.Initialize(parameter,unitData_my, flag ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
@@ -5280,10 +5283,32 @@ namespace Elements.Battle
                         MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValue(unitData_my) :
                         new BaseData()
                         // MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
-                    ) : null); // TODO hush add _teamEnhanceParameter
+                    ) : null); 
                 if (!flag)
                     unitCtrl.SetTalentFormationBonus(_this.UnitTalentFormationBonusDictionary);
                 unitCtrl.ApplyPassiveSkill(true, false);
+
+                // this logic maybe in unitCtrl Initialize
+                // define action function
+                Action<EnvironmentData> action = (EnvironmentData env) =>
+                {
+                    if (env != null && env.Enable)
+                    {
+                        if (unitCtrl.IsPartsBoss)
+                        {
+                            foreach (var part in unitCtrl.BossPartsListForBattle)
+                            {
+                                env.UpdateEnvironmentCallback(part);
+                            }
+                        }
+                        else
+                        {
+                            env.UpdateEnvironmentCallback(unitCtrl.GetFirstParts());
+                        }
+                    }
+                };
+                action(BattleManager.Instance.unitEnvironment);
+                action(BattleManager.Instance.enemyEnvironment);
 
                 if (flag)
                 {
@@ -5294,6 +5319,7 @@ namespace Elements.Battle
                 {
                     _this.UnitList.Add(unitCtrl);
                 }
+                
                 BattleManager.Instance.QueueUpdateSkillTarget();
                 unitCtrl.ExecActionOnStartAndDetermineInstanceID();
                 unitCtrl.SummonType = _summonData.SummonType;

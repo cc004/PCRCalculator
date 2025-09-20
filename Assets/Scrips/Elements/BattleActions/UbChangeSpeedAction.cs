@@ -74,9 +74,9 @@ namespace Elements
       Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       AppendIsAlreadyExeced(_target.Owner, _num);
-            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
+            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
 
-            if (BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 16, (float)pp)) < (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+            if (BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 16, (float)pp)) < (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
       {
         //SkillEffectCtrl effect = this.battleEffectPool.GetEffect(this.effectDictionary[UbChangeSpeedAction.eChangeSpeedType.STUN]);
         //effect.InitializeSort();

@@ -15,7 +15,15 @@ namespace Elements
   {
     public static float GetCriticalRate(float critical, int level, int targetLevel) => (float)(critical * 0.0500000007450581 * (level / (double)targetLevel) * 0.00999999977648258);
 
-    public static float GetDodgeByLevelDiff(int level, int targetLevel) => (float)(1.0 - Mathf.Max(targetLevel - level, 0.0f) / 100.0);
+    public static float GetDodgeByLevelDiff(int level, BasePartsData _target)
+    {
+      float ret = 1.0f;
+      if (!_target.Owner.IsBoss)
+      {
+        ret = (float)(1.0 - Mathf.Max(_target.GetLevel() - level, 0.0f) / 100.0);
+      }
+      return ret;
+    }
 
     /*public static bool IsCheckSupportChara(eBattleCategory _battleCategory)
     {

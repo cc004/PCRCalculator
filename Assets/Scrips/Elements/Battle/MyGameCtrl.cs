@@ -186,9 +186,9 @@ namespace Elements
                     tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
 
                     var extra_data = GetExtraEffectEnemyData(tempData);
-                    tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
                     if (extra_data != null)
                     {
+                        tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
                         foreach (var enemy in extra_data.enemy_ids)
                         {
                             if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
@@ -377,7 +377,7 @@ namespace Elements
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
             //if(dataAsset == null)
             //{
-            int skinID = UnitUtility.GetSkinId(data.PrefabId, 3 /* force use 3x skin */);
+            int skinID = UnitUtility.GetSkinId(data.PrefabId, data.rarity /* force use 3x skin */);
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
             

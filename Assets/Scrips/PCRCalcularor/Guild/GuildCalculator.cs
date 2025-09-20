@@ -204,8 +204,7 @@ namespace PCRCaculator.Guild
                 unitCtrl.NoSkipOnDamage += AppendGetDamage;
                 bossId.Add(unitCtrl.UnitId);
             }
-            // AddSkillGroupPrefab(boss.UnitId, boss, 0);
-            // boss.NoSkipOnBaseValueChanged += AppendChangeBaseValue;
+            boss[0].NoSkipOnBaseValueChanged += AppendChangeBaseValue;
             foreach (UnitCtrl unitCtrl in players)
             {
                 idx++;
@@ -218,8 +217,8 @@ namespace PCRCaculator.Guild
                 foreach (var (part, def, mdef) in boss[bossIndex].IsPartsBoss ? boss[bossIndex].BossPartsListForBattle.Select(x => (x.Index, x.Def, x.MagicDef)) :
                              new[] { (0, boss[bossIndex].Def, boss[bossIndex].MagicDef) })
                 {
-                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 1, def, 5400, "时间耗尽");
-                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 2, mdef, 5400, "时间耗尽");
+                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 1, def, 0, "初始化");
+                    AppendChangeBaseValue(bossId[bossIndex] + part * 10, 2, mdef, 0, "初始化");
                 }
             }
 
@@ -241,7 +240,7 @@ namespace PCRCaculator.Guild
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
             b.NoSkipOnChangeState += AppendChangeState;
-            if (b.UnitId >= 300000 && b.UnitId <= 400000)
+            if (b.enemyId > 0 && !b.IsSummon)
             {
                 b.NoSkipOnDamage2 += RefreshTotalDamage;
             }
@@ -453,7 +452,7 @@ namespace PCRCaculator.Guild
                 playerUnitDamageDic[0].Add(new ValueChangeData(currentFrame, damage));
             }
         }
-        public void AppendChangeBaseValue(int unitid, int valueType, double value, int currentFrame, string describe)
+        public void AppendChangeBaseValue(int unitid, int valueType, LongWithEx value, int currentFrame, string describe)
         {
             if (BattleManager.Instance.skipping) return;
             if (bossId.Contains(unitid - unitid / 10 % 10 * 10))
@@ -1921,7 +1920,7 @@ namespace PCRCaculator.Guild
                 case 10:
                     return sourceName + "的技能随机选择判定，目标" + randomResult;
                 case 15:
-                    return sourceName + "对" + targetName + "的DOT判定" + (randomResult < targetResult * 1000 ? "MISS" : "命中");
+                    return sourceName + "对" + targetName + "的DOT判定" + (randomResult < targetResult * 1000 ? "命中" : "MISS");
                 default:
                     return sourceName + "对" + targetName + "的其他判定";
             }

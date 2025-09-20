@@ -936,5 +936,60 @@ namespace PCRCaculator.SQL
         public string effect_name { get; set; }
         public string description { get; set; }
     }
+
+    public class resist_data : DbBaseData
+    {
+        public int resist_status_id { get; set; }
+        public int ailment_1 { get; set; }
+        public int ailment_2 { get; set; }
+        public int ailment_3 { get; set; }
+        public int ailment_4 { get; set; }
+        public int ailment_5 { get; set; }
+        public int ailment_6 { get; set; }
+        public int ailment_7 { get; set; }
+        public int ailment_8 { get; set; }
+        public int ailment_9 { get; set; }
+        public int ailment_10 { get; set; }
+        public int ailment_11 { get; set; }
+        public int ailment_12 { get; set; }
+        public int ailment_13 { get; set; }
+        public int ailment_14 { get; set; }
+        public int ailment_15 { get; set; }
+        public int ailment_16 { get; set; }
+        public int ailment_17 { get; set; }
+        public int ailment_18 { get; set; }
+        public int ailment_19 { get; set; }
+        public int ailment_20 { get; set; }
+        public int ailment_21 { get; set; }
+        public int ailment_22 { get; set; }
+        public int ailment_23 { get; set; }
+        public int ailment_24 { get; set; }
+        public int ailment_25 { get; set; }
+        public int ailment_26 { get; set; }
+        public int ailment_27 { get; set; }
+        public int ailment_28 { get; set; }
+        public int ailment_29 { get; set; }
+        public int ailment_30 { get; set; }
+        public int ailment_31 { get; set; }
+        public int ailment_32 { get; set; }
+        public int ailment_33 { get; set; }
+        public int ailment_34 { get; set; }
+        public int ailment_35 { get; set; }
+        public int ailment_36 { get; set; }
+        public int ailment_37 { get; set; }
+        public int ailment_38 { get; set; }
+        public int ailment_39 { get; set; }
+        public int ailment_40 { get; set; }
+        public int ailment_41 { get; set; }
+        public int ailment_42 { get; set; }
+        public int ailment_43 { get; set; }
+        public int ailment_44 { get; set; }
+        public int ailment_45 { get; set; }
+        public int ailment_46 { get; set; }
+        public int ailment_47 { get; set; }
+        public int ailment_48 { get; set; }
+        public int ailment_49 { get; set; }
+        public int ailment_50 { get; set; }
+    }
 }
 

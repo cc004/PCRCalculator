@@ -30,10 +30,10 @@ namespace Elements
       Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel());
+            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
 
             if (BattleManager.Random(0.0f, 1f,
-                    new RandomData(_source, _target.Owner, ActionId, 19, (float)pp)) <= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target.GetLevel()))
+                    new RandomData(_source, _target.Owner, ActionId, 19, (float)pp)) <= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
       {
         AppendIsAlreadyExeced(_target.Owner, _num);
         switch ((eCountBlindType)(float)_valueDictionary[eValueNumber.VALUE_1])

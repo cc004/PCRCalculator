@@ -113,6 +113,8 @@ namespace PCRCaculator.Guild
         public Text version;
         public InputField RandomSeed;
         public Toggle UseFixedRandomSeed;
+        public InputField RandomSeedTalent;
+        public Toggle UseFixedRandomSeedTalent;
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
         public List<Text> TalentTexts;
@@ -201,8 +203,26 @@ namespace PCRCaculator.Guild
                 }
                 SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
                 SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
+
+                if (RandomSeed != null && RandomSeedTalent != null)
+                {
+                    RandomSeed.onValueChanged.AddListener((value) => RandomSeedTalent.text = value);
+                    RandomSeedTalent.onValueChanged.AddListener((value) => RandomSeed.text = value);
+                }
+
+                if (UseFixedRandomSeed != null && UseFixedRandomSeedTalent != null)
+                {
+                    UseFixedRandomSeed.onValueChanged.AddListener((value) => UseFixedRandomSeedTalent.isOn = value);
+                    UseFixedRandomSeedTalent.onValueChanged.AddListener((value) => UseFixedRandomSeed.isOn = value);
+                }
             }
-            version.text = "—   v" + Application.version+"   —";
+            version.text = "—   v" + Application.version + "   —";
+        }
+        private void OnInputField2ValueChanged(string value)
+        {
+            SettingInputs[11].onValueChanged.RemoveListener(OnInputField1ValueChanged);
+            SettingInputs[11].text = value;
+            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
         }
         private void OnInfoButtonClick(Text text)
         { 
@@ -221,13 +241,6 @@ namespace PCRCaculator.Guild
             SettingInputs[12].onValueChanged.RemoveListener(OnInputField2ValueChanged);
             SettingInputs[12].text = value;
             SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
-        }
-
-        private void OnInputField2ValueChanged(string value)
-        {
-            SettingInputs[11].onValueChanged.RemoveListener(OnInputField1ValueChanged);
-            SettingInputs[11].text = value;
-            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
         }
         private IEnumerator StartAfterWait()
         {
@@ -454,8 +467,13 @@ namespace PCRCaculator.Guild
                 var matchingData = TalentQuestWaveGroupDataDic?.Values
                     .FirstOrDefault(data => data.wave_group_id == waveGroupId);
                 specialEnemyid = matchingData.enemy_ids.ToArray();
-                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, TalentQuestEnemyParameterDic[specialEnemyid[0]].unit_id);
-
+                var enemyData = TalentQuestEnemyParameterDic[specialEnemyid[0]];
+                int prefabId = enemyData.detailData.prefab_id;
+                if (enemyData.detailData.visual_change_flag == 1)
+                {
+                    prefabId += enemyData.rarity * 10;
+                }
+                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
             }
             else
             {
@@ -722,11 +740,7 @@ namespace PCRCaculator.Guild
         }
         private EnemyData GetEnemyDataByID(int enemy_id)
         {
-            if (enemy_id > 800000000 && enemy_id < 900000000)
-            {
-                return TalentQuestEnemyParameterDic[enemy_id];
-            }
-            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : EnemyDataDic[enemy_id];
+            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : IsTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] : EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
         {
@@ -842,9 +856,12 @@ namespace PCRCaculator.Guild
             if (data.isTalentQuestBoss)
             {
                 toggles_ChooseType[1].isOn = true;
-            }else
+                OnChooseTalentQuestDropDownChanged();
+            }
+            else
             {
                 toggles_ChooseType[0].isOn = true;
+                OnChooseBossDropDownChanged();
             }
         }
         private void Refresh()
@@ -1186,9 +1203,9 @@ namespace PCRCaculator.Guild
             string msg = "可以输入帧(>100)或秒(<90)\n帧从0开始到5400结束\n秒从90秒开始倒计时到0结束\n例如输入61.001保存则自动转成1860.001帧\nAuto和Set按钮为改变开场状态(非以前强制)";
             MainManager.Instance.WindowConfigMessage(msg, null);
         }
-        public void GuildBossDataEditButton()
+        public void GuildBossDataEditButton(int index)
         {
-            BossDataEditdr.SetData(selectedBossEnemyids[0]);
+            BossDataEditdr.SetData(selectedBossEnemyids[index]);
         }
         public void GuildExecTimeSettingButton(UnitData unitData)
         {
@@ -1536,7 +1553,7 @@ namespace PCRCaculator.Guild
                 }
                 //int skID = enemyData.skillData.UB;
                 //int skLV = enemyData.union_burst_level;
-                Action<int, int,string> action = (skID, skLV,str) =>
+                Action<int, int, string> action = (skID, skLV, str) =>
                  {
                      detailstr += $" {str}:\n {skID}({skLV})\n";
                      if (MainManager.Instance.SkillDataDic.TryGetValue(skID, out SkillData sk))
@@ -1576,6 +1593,7 @@ namespace PCRCaculator.Guild
 
             GameObject a = Instantiate(bossDetailPrefab, BaseBackManager.Instance.latestUIback.transform);
             a.GetComponent<ShowTextUI>().Set(detailstr);
+            a.GetComponent<ShowTextUI>().index = index;
         }
 
 
@@ -1665,6 +1683,10 @@ namespace PCRCaculator.Guild
         {
             SettingData.GetCurrentRandomData().RandomSeed = int.Parse(RandomSeed.text);
             SettingData.GetCurrentRandomData().UseFixedRandomSeed = UseFixedRandomSeed.isOn;
+            if (RandomSeedTalent != null)
+                SettingData.GetCurrentRandomData().RandomSeed = int.Parse(RandomSeedTalent.text);
+            if (UseFixedRandomSeedTalent != null)
+                SettingData.GetCurrentRandomData().UseFixedRandomSeed = UseFixedRandomSeedTalent.isOn;
             SettingData.GetCurrentPlayerGroup().playerSetingHP = long.Parse(currentHPinput.text);
             SettingData.GetCurrentPlayerGroup().usePlayerSettingHP = usePlayerSettingHP.isOn;
             SaveDataToJson();

@@ -54,6 +54,7 @@ namespace PCRCaculator
 
         public class DatabaseCache
         {
+            public Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();//抵抗数据
             public Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
             public Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
             public Dictionary<int, List<extra_effect_unit_group>> extraEffectUnitGroupDic = new Dictionary<int, List<extra_effect_unit_group>>();//特别角色组(技能角色存在判断)
@@ -121,6 +122,7 @@ namespace PCRCaculator
         // 优化：添加数据缓存字典，避免重复计算
         private static readonly Dictionary<string, object> _dataCache = new Dictionary<string, object>();
 
+        public Dictionary<int, int[]> ResistDataDic { get => databaseCache.resistDataDic; }  // 抵抗
         public Dictionary<int, EquipmentData> EquipmentDic { get => databaseCache.equipmentDic; }  // 装备类与装备id的对应字典
         public Dictionary<int, UnitRarityData> UnitRarityDic { get => databaseCache.unitRarityDic; }  // 角色基础数据与角色id的对应字典 
         public Dictionary<int, List<extra_effect_unit_group>> ExtraEffectUnitGroupDic { get => databaseCache.extraEffectUnitGroupDic; }  // 特别角色组(技能角色存在判断)
@@ -431,12 +433,11 @@ namespace PCRCaculator
                         abStopwatch.Stop();
                         Debug.Log($"AB资源初始化完成，耗时: {abStopwatch.ElapsedMilliseconds}ms");
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         abStopwatch.Stop();
-                        Debug.LogError($"AB资源初始化失败，耗时: {abStopwatch.ElapsedMilliseconds}ms");
-                        // WindowMessage("下载数据发生错误，重置版本");
-                        try { wait?.SetMessage("出错啦！ 重置版本，请重新打开"); } catch { }
+                        Debug.LogError($"AB资源初始化失败");
+                        try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
                         SaveManager.Save(new VersionData());
                         return;
                     }
@@ -485,6 +486,7 @@ namespace PCRCaculator
 
                                 // if (!Version.useJP) dbTool2 = dbTool3;
 
+                                databaseCache.resistDataDic = dbTool.resistDataDic;
                                 databaseCache.equipmentDic = dbTool.Dic8;
                                 databaseCache.equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
                                 databaseCache.unitRarityDic = dbTool.Dic1;
@@ -973,8 +975,12 @@ namespace PCRCaculator
             {
                 if (UnitRarityDic.TryGetValue(unitid, out var data))
                     return data.unitName;
-                return "召唤物";
+                return $"召唤物";
             }
+            if (EnemyDataDic.TryGetValue(unitid, out var data2))
+                return data2.name;
+            if (TalentQuestEnemyParameterDic.TryGetValue(unitid, out var data3))
+                return data3.name;
             if (unitid >= 200000)
                 return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
