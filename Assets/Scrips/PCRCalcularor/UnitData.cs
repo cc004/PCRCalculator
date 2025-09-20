@@ -21,6 +21,51 @@ using eTargetAssignment = PCRCaculator.Battle.eTargetAssignment;
 namespace PCRCaculator
 {
     public enum PositionType { frount = 0, middle = 1, backword = 2 }//站位，前中后
+
+    public static class ExtraEquipDefine
+    {
+        public enum ePriorityItemType
+        {
+            ENHANCE_PT_ITEM,
+            EXTRA_EQUIP
+        }
+
+        public enum eEquipType
+        {
+            NORMAL,
+            CLAN_BATTLE,
+            MAX
+        }
+
+        public enum eSearchFilterType
+        {
+            NONE,
+            ITEM_LIST,
+            RECOMMENDED_ENHANCE,
+            RECOMMENDED_RECYCLE,
+            AUTO_RECYCLE,
+            ENHANCE_FILTER,
+            SHOP_FILTER
+        }
+
+        public enum eSlotCategory
+        {
+            WEAPON,
+            ARMOR,
+            ACCESSORY
+        }
+
+        public static bool IsRateParam(eParamType _param)
+		{
+			if (_param == eParamType.NONE || (uint)(_param - 8) <= 9u)
+			{
+				return false;
+			}
+			return true;
+		}
+
+	}
+
     /// <summary>
     /// 角色基础面板数据，数据由数据库中的unit_rarity表以及其他类生成~
     /// </summary>
@@ -249,21 +294,32 @@ namespace PCRCaculator
 
                 var temp = result;
 
+                var ex_param = new BaseData();
                 for (int i = 0; i < 3; ++i)
                 {
                     if (a.exEquip[i] == 0) continue;
                     var equip = MainManager.Instance.UnitExEquips[a.unitId][i][a.exEquip[i]];
                     var def = equip.GetDefaultBaseData();
                     var max = equip.GetMaxBaseData();
-                    var param = new BaseData();
                     for (int j = 0; j < 17; ++j)
                     {
-                        var d = def.dataint[j] / 100.0;
-                        var m = max.dataint[j] / 100.0;
-                        param.dataint[j] = 100 * (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                        if (ExtraEquipDefine.IsRateParam((eParamType)j))
+                        {
+                            var d = def.dataint[j] / 100.0;
+                            var m = max.dataint[j] / 100.0;
+                            var present = Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                            ex_param.dataint[j] += (int)Math.Ceiling((double)temp.dataint[j] * present / 1000000.0) * 100;
+                        }
+                        else
+                        {
+                            var d = def.dataint[j] / 100.0;
+                            var m = max.dataint[j] / 100.0;
+                            var present = (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                            ex_param.dataint[j] += present * 100;
+                        }
                     }
-                    temp += result * param;
                 }
+                temp += ex_param;
                 // ex slot
                 return temp;
             }
