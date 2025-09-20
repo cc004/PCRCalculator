@@ -42942,6 +42942,8 @@ MonoBehaviour:
   version: {fileID: 771482321}
   RandomSeed: {fileID: 601288678}
   UseFixedRandomSeed: {fileID: 1357400306}
+  RandomSeedTalent: {fileID: 1245096608}
+  UseFixedRandomSeedTalent: {fileID: 352251211}
   TalentSprites:
   - {fileID: 1866580833, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
   - {fileID: 1396566681, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}

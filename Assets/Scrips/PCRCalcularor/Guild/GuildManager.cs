@@ -113,6 +113,8 @@ namespace PCRCaculator.Guild
         public Text version;
         public InputField RandomSeed;
         public Toggle UseFixedRandomSeed;
+        public InputField RandomSeedTalent;
+        public Toggle UseFixedRandomSeedTalent;
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
         public List<Text> TalentTexts;
@@ -201,8 +203,26 @@ namespace PCRCaculator.Guild
                 }
                 SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
                 SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
+
+                if (RandomSeed != null && RandomSeedTalent != null)
+                {
+                    RandomSeed.onValueChanged.AddListener((value) => RandomSeedTalent.text = value);
+                    RandomSeedTalent.onValueChanged.AddListener((value) => RandomSeed.text = value);
+                }
+
+                if (UseFixedRandomSeed != null && UseFixedRandomSeedTalent != null)
+                {
+                    UseFixedRandomSeed.onValueChanged.AddListener((value) => UseFixedRandomSeedTalent.isOn = value);
+                    UseFixedRandomSeedTalent.onValueChanged.AddListener((value) => UseFixedRandomSeed.isOn = value);
+                }
             }
-            version.text = "—   v" + Application.version+"   —";
+            version.text = "—   v" + Application.version + "   —";
+        }
+        private void OnInputField2ValueChanged(string value)
+        {
+            SettingInputs[11].onValueChanged.RemoveListener(OnInputField1ValueChanged);
+            SettingInputs[11].text = value;
+            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
         }
         private void OnInfoButtonClick(Text text)
         { 
@@ -221,13 +241,6 @@ namespace PCRCaculator.Guild
             SettingInputs[12].onValueChanged.RemoveListener(OnInputField2ValueChanged);
             SettingInputs[12].text = value;
             SettingInputs[12].onValueChanged.AddListener(OnInputField2ValueChanged);
-        }
-
-        private void OnInputField2ValueChanged(string value)
-        {
-            SettingInputs[11].onValueChanged.RemoveListener(OnInputField1ValueChanged);
-            SettingInputs[11].text = value;
-            SettingInputs[11].onValueChanged.AddListener(OnInputField1ValueChanged);
         }
         private IEnumerator StartAfterWait()
         {
@@ -1673,6 +1686,10 @@ namespace PCRCaculator.Guild
         {
             SettingData.GetCurrentRandomData().RandomSeed = int.Parse(RandomSeed.text);
             SettingData.GetCurrentRandomData().UseFixedRandomSeed = UseFixedRandomSeed.isOn;
+            if (RandomSeedTalent != null)
+                SettingData.GetCurrentRandomData().RandomSeed = int.Parse(RandomSeedTalent.text);
+            if (UseFixedRandomSeedTalent != null)
+                SettingData.GetCurrentRandomData().UseFixedRandomSeed = UseFixedRandomSeedTalent.isOn;
             SettingData.GetCurrentPlayerGroup().playerSetingHP = long.Parse(currentHPinput.text);
             SettingData.GetCurrentPlayerGroup().usePlayerSettingHP = usePlayerSettingHP.isOn;
             SaveDataToJson();
