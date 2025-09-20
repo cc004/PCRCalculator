@@ -54,6 +54,7 @@ namespace PCRCaculator
 
         public class DatabaseCache
         {
+            public Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();//抵抗数据
             public Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
             public Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
             public Dictionary<int, List<extra_effect_unit_group>> extraEffectUnitGroupDic = new Dictionary<int, List<extra_effect_unit_group>>();//特别角色组(技能角色存在判断)
@@ -121,6 +122,7 @@ namespace PCRCaculator
         // 优化：添加数据缓存字典，避免重复计算
         private static readonly Dictionary<string, object> _dataCache = new Dictionary<string, object>();
 
+        public Dictionary<int, int[]> ResistDataDic { get => databaseCache.resistDataDic; }  // 抵抗
         public Dictionary<int, EquipmentData> EquipmentDic { get => databaseCache.equipmentDic; }  // 装备类与装备id的对应字典
         public Dictionary<int, UnitRarityData> UnitRarityDic { get => databaseCache.unitRarityDic; }  // 角色基础数据与角色id的对应字典 
         public Dictionary<int, List<extra_effect_unit_group>> ExtraEffectUnitGroupDic { get => databaseCache.extraEffectUnitGroupDic; }  // 特别角色组(技能角色存在判断)
@@ -484,6 +486,7 @@ namespace PCRCaculator
 
                                 // if (!Version.useJP) dbTool2 = dbTool3;
 
+                                databaseCache.resistDataDic = dbTool.resistDataDic;
                                 databaseCache.equipmentDic = dbTool.Dic8;
                                 databaseCache.equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
                                 databaseCache.unitRarityDic = dbTool.Dic1;
