@@ -87,6 +87,10 @@ namespace Assets.Scrips
             var pdict = GuildManager.Instance.SettingData.GetCurrentPlayerData().playrCharacters.ToDictionary(
                 unit => unit.unitId,
                 unit => unit);
+            foreach (var enemy in mgr.EnemyList)
+            {
+                pdict.Add(enemy.enemyId, null);
+            }
             pdict.Add(mgr.BossUnit?.enemyId ?? 0, null);
 
             foreach (var file in Directory.EnumerateFiles(".").Where(f => f.EndsWith(".asm")))
