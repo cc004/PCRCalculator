@@ -96,6 +96,7 @@ namespace PCRCaculator
         public Text filterType;
         public GameObject position;
         public GameObject talent;
+        public Toggle isSetMaxExEquip;
         private bool initialized = false;
 
         private void Start()
@@ -560,7 +561,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitSecondMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(equip_second_full: true);
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(isSetMaxExEquip.isOn, equip_second_full: true);
             SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
             RefreshSettingValues();
             RefreshSettingPage();
@@ -568,7 +569,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax();
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(isSetMaxExEquip.isOn);
             SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
             RefreshSettingValues();
             RefreshSettingPage();
@@ -578,7 +579,7 @@ namespace PCRCaculator
         {
             foreach (UnitData a in playerData.playrCharacters)
             {
-                a.SetMax();
+                a.SetMax(isSetMaxExEquip.isOn);
                 SetMaxLoveForUnit(a);
             }
             RefreshSettingValues();
