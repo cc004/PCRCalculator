@@ -4743,7 +4743,7 @@ this.updateCurColor();
             }
             else if (_abnormalState == eAbnormalState.HASTE)
             {
-                if (!overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
+                if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
                 {
                     button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
                     indexList11.Clear();
