@@ -7343,9 +7343,9 @@ this.updateCurColor();
 
         public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
 
-        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)a.Owner.Hp / (float)(long)a.Owner.MaxHp).CompareTo((long)b.Owner.Hp / (float)(long)b.Owner.MaxHp) : 1);
+        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)a.Owner.Hp / (double)a.Owner.MaxHp).CompareTo((long)b.Owner.Hp / (double)b.Owner.MaxHp) : 1);
 
-        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)b.Owner.Hp / (float)(long)b.Owner.MaxHp).CompareTo((long)a.Owner.Hp / (float)(long)a.Owner.MaxHp) : -1);
+        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)b.Owner.Hp / (double)b.Owner.MaxHp).CompareTo((long)a.Owner.Hp / (double)a.Owner.MaxHp) : -1);
 
         public static int CompareAtkAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZero().CompareTo(b.GetAtkZero()) : 1);
 
@@ -7359,9 +7359,9 @@ this.updateCurColor();
 
         public static int CompareEnergyDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Energy.Emulate(hash).CompareTo(a.Energy.Emulate(hash)) : -1);
 
-        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / a.MaxHp).CompareTo(b.Hp.Emulate(hash) / b.MaxHp) : 1);
+        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / (double)a.MaxHp).CompareTo(b.Hp.Emulate(hash) / (double)b.MaxHp) : 1);
 
-        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / b.MaxHp).CompareTo(a.Hp.Emulate(hash) / a.MaxHp) : -1);
+        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / (double)b.MaxHp).CompareTo(a.Hp.Emulate(hash) / (double)a.MaxHp) : -1);
 
         public static int CompareAtkAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZeroEx.Emulate(hash).CompareTo(b.GetAtkZeroEx.Emulate(hash)) : 1);
 
