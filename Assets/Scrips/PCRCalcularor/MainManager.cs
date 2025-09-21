@@ -1371,22 +1371,23 @@ namespace PCRCaculator
         public long criticalEX;
         public long exceptDamage;
         public int backTime;
-
+        public string backTimeText;
         public List<string> warnings = new List<string>();
+        public bool isVictory;
 
         public string GetDetail()
         {
             string result = "伤害：" + currentDamage + "\n暴击额外伤害：" + criticalEX + "\n期望伤害（触盾偏高）：" + exceptDamage + "\n随机种子：" + randomSeed;
-            if (backTime > 0) result += $"返\n{backTime}s";
+            if (backTime > 0) result += backTimeText;
             if (warnings.Count > 0)
             {
-                for(int i=0;i<3;i++)
+                for (int i = 0; i < 3; i++)
                 {
-                  if(i<warnings.Count)
-                    result +="\n"+ warnings[i];
+                    if (i < warnings.Count)
+                        result += "\n" + warnings[i];
                 }
                 if (warnings.Count > 4)
-                  result += "\n等" + warnings.Count + "个错误";
+                    result += "\n等" + warnings.Count + "个错误";
             }
             return result;
         }
