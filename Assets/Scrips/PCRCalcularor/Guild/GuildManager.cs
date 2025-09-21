@@ -874,12 +874,6 @@ namespace PCRCaculator.Guild
             }*/
             // toggles_ChooseType[1].isOn = IsTalentQuestBoss;
             // toggles_ChooseType[0].isOn = isGuildBoss;
-
-            if (data.isTalentQuestBoss)
-            {
-
-                SetTalentQuestBattleEffectPictures();
-            }
             BossObject.SetActive(!data.isTalentQuestBoss);
             TalentBossObject.SetActive(data.isTalentQuestBoss);
             MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
@@ -904,8 +898,6 @@ namespace PCRCaculator.Guild
                     TalentTexts[i].text = "无";
                 }
             }
-            if (selectedBossEnemyids[0] > 0)
-                GetTalentFormationBonusDescription();
             TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
             TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
             if (data.UBExecTimeData?.Count >= 6)
@@ -1031,9 +1023,15 @@ namespace PCRCaculator.Guild
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
             usePlayerSettingHP.isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
+            if (data.isTalentQuestBoss)
+            {
+                SetTalentQuestBattleEffectPictures();
+            }
             UpdateWeaknessSprites();
-            // TeamSkillTreeManager.Instance.UpdateTalentInfoData();
-            // TalentSkillTreeManager.Instance.UpdateTalentInfoData();
+            if (selectedBossEnemyids[0] > 0)
+            {
+                GetTalentFormationBonusDescription();
+            }
         }
         private void RefreshCalcSettings_start()
         {

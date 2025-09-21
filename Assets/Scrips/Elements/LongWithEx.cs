@@ -52,8 +52,7 @@ namespace Elements
         private static List<int> cachedSeed = new List<int>();
         public static void SetState(int seed)
         {
-            DoubleWithEx.rand.InitState(seed);
-            DoubleWithEx.cachedSeed.Clear();
+            DoubleWithEx.SetState(seed);
         }
 
         private static int GetRandN(int n)
