@@ -843,7 +843,7 @@ namespace PCRCaculator.Guild
             {
                 resultBg.SetActive(true);
                 resultBg.color = isVictory ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
-                string prefix = IsGuildBoss ? (isVictory ? " 返" : " 剩") : " 剩";
+                string prefix = IsGuildBoss ? (isVictory ? "返" : "剩") : "剩";
                 detail = $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
                 backTimeText.SetActive(true);
                 backTimeText.text = $"{detail}";
@@ -1095,8 +1095,8 @@ namespace PCRCaculator.Guild
             }
             else if (backTime > 0)
             {
-                string prefix = boss[0].enemyId / 100000000 == 4 ? (isVictory ? " 返" : " 剩") : " 剩";
-                detail = $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                string prefix = boss[0].enemyId / 100000000 == 4 ? (isVictory ? "-返" : "-剩") : "-剩";
+                fileName += $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
             }
             return fileName;
         }
@@ -1131,7 +1131,7 @@ namespace PCRCaculator.Guild
             var currentFrame = BattleHeaderController.CurrentFrameCount;
             int additionalTime = (isVictory && IsGuildBoss) ? 20 : 0;
             backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
-            string prefix = IsGuildBoss ? (isVictory ? " 返" : " 剩") : " 剩";
+            string prefix = IsGuildBoss ? (isVictory ? "返" : "剩") : "剩";
             detail = $"{prefix}{backTime}s";
             return new OnceResultData
             {
