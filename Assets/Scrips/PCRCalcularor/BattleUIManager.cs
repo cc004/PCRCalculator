@@ -896,10 +896,11 @@ namespace PCRCaculator.Battle
             yield return null;
             foreach (var unitctrl in myGameCtrl.playerUnitCtrl.ToArray())
             {
+                if (unitctrl.IsSummonOrPhantom) continue;
                 screenshootBt.SetButton(unitctrl);
                 yield return null;
-                yield return new WaitForEndOfFrame();                
-                byte[] bytes = SaveRenderTexture(screenShootTx);                
+                yield return new WaitForEndOfFrame();
+                byte[] bytes = SaveRenderTexture(screenShootTx);
                 imageSaved.Add(bytes);
                 yield return null;
             }
