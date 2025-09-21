@@ -3914,6 +3914,7 @@ namespace Elements.Battle
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
             
+            GameState = eBattleGameState.PLAY;
             StartCoroutine(coroutineStartProcess(gameCtrl));
         }
 
@@ -4392,7 +4393,6 @@ namespace Elements.Battle
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();
             }
-            battleManager.GameState = eBattleGameState.PLAY;
             battleManager.skipping = tempData.skipping;
             RestFrameCount();
             stopWatch.Restart();
