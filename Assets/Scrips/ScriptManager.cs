@@ -91,7 +91,8 @@ namespace Assets.Scrips
             {
                 pdict.Add(enemy.enemyId, null);
             }
-            pdict.Add(mgr.BossUnit?.enemyId ?? 0, null);
+            if (mgr.BossUnit != null && mgr.BossUnit.enemyId != 0 && !pdict.ContainsKey(mgr.BossUnit.enemyId))
+                pdict.Add(mgr.BossUnit.enemyId, null);
 
             foreach (var file in Directory.EnumerateFiles(".").Where(f => f.EndsWith(".asm")))
             {
