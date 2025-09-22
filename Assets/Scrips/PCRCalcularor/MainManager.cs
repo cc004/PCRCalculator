@@ -1373,7 +1373,7 @@ namespace PCRCaculator
         public int backTime;
         public string backTimeText;
         public List<string> warnings = new List<string>();
-        public bool isVictory;
+        public eBattleResult BattleResult;
 
         public string GetDetail()
         {

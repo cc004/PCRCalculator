@@ -80,12 +80,13 @@ namespace PCRCaculator.Guild
         private long totalDamageCriEX;
         private LongWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
-        public bool isVictory;
+        public eBattleResult BattleResult => BattleManager.Instance.battleResult;
         public Text seedText;
         public Text backTimeText;
         public Image resultBg;
         private int backTime;
         private bool IsGuildBoss => boss[0].enemyId / 100000000 == 4;
+        public List<Sprite> resultSprite;
         public List<int> PlayerIds => playerIds;
         public List<int> BossId => bossId;
         private void Awake()
@@ -813,12 +814,11 @@ namespace PCRCaculator.Guild
             skillScrollRect.horizontalNormalizedPosition = 1;
             guildPageUI.SetActive(true);
             isFinishCalc = true;
-            isVictory = MyGameCtrl.Instance.enemyUnitCtrl.All(unitCtrl => unitCtrl.Hp == 0);
             chatPannel.Init();
             OnToggleSwitched(0);
             if (currentFrame < 5400)
             {
-                int additionalTime = (isVictory && IsGuildBoss) ? 20 : 0;
+                int additionalTime = (BattleResult == eBattleResult.WIN && IsGuildBoss) ? 20 : 0;
                 backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
                 RefreshTotalDamage(true, 0, false, 0, 0);
             }
@@ -835,24 +835,24 @@ namespace PCRCaculator.Guild
             {
                 resultBg.SetActive(true);
                 resultBg.color = new Color(0x5E / 255f, 0xA5 / 255f, 0xC6 / 255f);
-                detail = $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
+                detail = $" 尾刀：{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
                 backTimeText.SetActive(true);
                 backTimeText.text = $"{detail}";
             }
             else if (backTime > 0)
             {
                 resultBg.SetActive(true);
-                resultBg.color = isVictory ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
-                string prefix = IsGuildBoss ? (isVictory ? "返" : "剩") : "剩";
+                string prefix = BattleResult == eBattleResult.WIN? "胜利：": "失败：";
+                resultBg.color = BattleResult == eBattleResult.WIN ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
+                prefix += IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
                 detail = $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
                 backTimeText.SetActive(true);
                 backTimeText.text = $"{detail}";
             }
             else
             {
-                resultBg.SetActive(false);
-                backTimeText.SetActive(false);
-                backTimeText.text = "";
+                resultBg.color = new Color(0x5E / 255f, 0xA5 / 255f, 0xC6 / 255f);
+                backTimeText.text = "超时";
                 detail = string.Empty;
             }
             // damageStr += detail;
@@ -1095,7 +1095,7 @@ namespace PCRCaculator.Guild
             }
             else if (backTime > 0)
             {
-                string prefix = boss[0].enemyId / 100000000 == 4 ? (isVictory ? "-返" : "-剩") : "-剩";
+                string prefix = boss[0].enemyId / 100000000 == 4 ? (BattleResult == eBattleResult.WIN ? "-返" : "-剩") : "-剩";
                 fileName += $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
             }
             return fileName;
@@ -1127,11 +1127,10 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
-            isVictory = MyGameCtrl.Instance.enemyUnitCtrl.All(unitCtrl => unitCtrl.Hp == 0);
             var currentFrame = BattleHeaderController.CurrentFrameCount;
-            int additionalTime = (isVictory && IsGuildBoss) ? 20 : 0;
+            int additionalTime = (BattleResult == eBattleResult.WIN && IsGuildBoss) ? 20 : 0;
             backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
-            string prefix = IsGuildBoss ? (isVictory ? "返" : "剩") : "剩";
+            string prefix = IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
             detail = $"{prefix}{backTime}s";
             return new OnceResultData
             {
@@ -1143,7 +1142,7 @@ namespace PCRCaculator.Guild
                 backTime = backTime,
                 backTimeText = detail,
                 warnings = errorList,
-                isVictory = isVictory,
+                BattleResult = BattleResult,
             };
         }
         public static List<ValueChangeData> CreateLineChatData(List<ValueChangeData> data, float deltaXforChat = 1 / 5400.0f)

@@ -411,15 +411,15 @@ namespace Elements
         [Description("射手座D5标记")]
         SHESHOUZUO = 143,
         [Description("噗吉靠垫\n圣锤")]
-        BAIHUALIAOLUAN = 146,
-        [Description("百花缭乱\nEX7春临")]
-        YANTIANLIERI = 147,
-        [Description("炎天烈日\nEX7炎夏")]
-        QIUGAOMAFEI = 148,
-        [Description("秋高马肥\nEX7爽秋")]
-        HANQILINLIE = 149,
-        [Description("寒气凛冽\nEX7寒威")]
         SHENGCHUI = 145,
+        [Description("百花缭乱\nEX7春临")]
+        BAIHUALIAOLUAN = 146,
+        [Description("炎天烈日\nEX7炎夏")]
+        YANTIANLIERI = 147,
+        [Description("秋高马肥\nEX7爽秋")]
+        QIUGAOMAFEI = 148,
+        [Description("寒气凛冽\nEX7寒威")]
+        HANQILINLIE = 149,
         [Description("限制TP回复")]
         LIMIT_ENERGY_RECOVER_RATE = 150,
         [Description("额外加速")]

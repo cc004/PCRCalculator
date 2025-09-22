@@ -16,12 +16,16 @@ namespace PCRCaculator
         public ScrollEx scroll;
         public AutoCalculatorData calculatorData;
         public InputField count;
-
+        public Text resultCalText;
         public void Init(AutoCalculatorData data)
         {
             calculatorData = data;
             timesText.text = data.execedTime + "/" + data.execTime;
             averageDamageText.text = data.Average + "";
+            var winCount = calculatorData.resultDatas.Count(r => r.BattleResult == Elements.eBattleResult.WIN);
+            var loseCount = calculatorData.resultDatas.Count(r => r.BattleResult == Elements.eBattleResult.LOSE);
+            var timeoutCount = calculatorData.resultDatas.Count(r => r.BattleResult == Elements.eBattleResult.TIME_OVER);
+            resultCalText.text = $"【胜利{winCount}次】【失败{loseCount}次】【超时{timeoutCount}次】";
             buttonText.text = (data.isCalculating&&!data.isCanceled&&!data.isFinish) ? "取消" : "开始新的计算";
             scroll.ClearAll();
             foreach (var d in data.resultDatas)
