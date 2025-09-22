@@ -303,7 +303,7 @@ namespace PCRCaculator
                     var max = equip.GetMaxBaseData();
                     for (int j = 0; j < 17; ++j)
                     {
-                        if (ExtraEquipDefine.IsRateParam((eParamType)j))
+                        if (ExtraEquipDefine.IsRateParam((eParamType)(j+1)))
                         {
                             var d = def.dataint[j] / 100.0;
                             var m = max.dataint[j] / 100.0;
@@ -671,7 +671,7 @@ namespace PCRCaculator
             uniqueEq2Lv = uniqueeq2lv;
         }
 
-        public void SetMax(bool equip_second_full = false)
+        public void SetMax(bool ex_equip_full = true, bool equip_second_full = false)
         {
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
@@ -703,7 +703,7 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
-                if (MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp))
+                if (ex_equip_full && MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp))
                 {
                     for (int i = 0; i < 3; i++)
                     {
@@ -711,18 +711,14 @@ namespace PCRCaculator
                             .Where(e => e.Value.clan_battle_equip_flag && e.Value.rarity == 3)
                             .FirstOrDefault();
 
+                        exEquip[i] = validEquip.Value != null ? validEquip.Key : 0;
                         if (validEquip.Value != null)
                         {
-                            exEquip[i] = validEquip.Key;
                             exEquipLevel[i] = 5;
-                        }
-                        else
-                        {
-                            exEquip[i] = 0;
                         }
                     }
                 }
-                else
+                else if (ex_equip_full)
                 {
                     exEquip = new int[] { 0, 0, 0 };
                 }

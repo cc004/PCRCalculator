@@ -80,8 +80,13 @@ namespace PCRCaculator.Guild
         private long totalDamageCriEX;
         private LongWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
+        public eBattleResult BattleResult => BattleManager.Instance.battleResult;
+        public Text seedText;
+        public Text backTimeText;
+        public Image resultBg;
         private int backTime;
-
+        private bool IsGuildBoss => boss[0].enemyId / 100000000 == 4;
+        public List<Sprite> resultSprite;
         public List<int> PlayerIds => playerIds;
         public List<int> BossId => bossId;
         private void Awake()
@@ -813,7 +818,8 @@ namespace PCRCaculator.Guild
             OnToggleSwitched(0);
             if (currentFrame < 5400)
             {
-                backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20;
+                int additionalTime = (BattleResult == eBattleResult.WIN && IsGuildBoss) ? 20 : 0;
+                backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
                 RefreshTotalDamage(true, 0, false, 0, 0);
             }
             else
@@ -824,21 +830,33 @@ namespace PCRCaculator.Guild
             var n = GuildManager.StaticsettingData.n1;
             expectedDamage = totalDamageExcept.Expected(n);
             string damageStr =
-                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FFEC00>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(long)totalDamageExcept.Stddev}</color>";
+                $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FF9900>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(long)totalDamageExcept.Stddev}</color>";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
             {
-                detail = $" 尾刀{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
+                resultBg.SetActive(true);
+                resultBg.color = new Color(0x5E / 255f, 0xA5 / 255f, 0xC6 / 255f);
+                detail = $" 尾刀：{MyGameCtrl.Instance.tempData.SettingData.limitTime}s";
+                backTimeText.SetActive(true);
+                backTimeText.text = $"{detail}";
             }
             else if (backTime > 0)
             {
-                detail = $" 返{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                resultBg.SetActive(true);
+                string prefix = BattleResult == eBattleResult.WIN? "胜利：": "失败：";
+                resultBg.color = BattleResult == eBattleResult.WIN ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
+                prefix += IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
+                detail = $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                backTimeText.SetActive(true);
+                backTimeText.text = $"{detail}";
             }
             else
-            { 
+            {
+                resultBg.color = new Color(0x5E / 255f, 0xA5 / 255f, 0xC6 / 255f);
+                backTimeText.text = "超时";
                 detail = string.Empty;
             }
-            damageStr += detail;
-            damageStr += $" 随机数种子：{MyGameCtrl.Instance.CurrentSeedForSave}";
+            // damageStr += detail;
+            seedText.text = $"种子：{MyGameCtrl.Instance.CurrentSeedForSave}";
             totalDamageText.text = damageStr;
             basedmg.text = totalDamageCriEX.ToString();
         }
@@ -1077,7 +1095,8 @@ namespace PCRCaculator.Guild
             }
             else if (backTime > 0)
             {
-                detail = $" 返{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                string prefix = boss[0].enemyId / 100000000 == 4 ? (BattleResult == eBattleResult.WIN ? "-返" : "-剩") : "-剩";
+                fileName += $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
             }
             return fileName;
         }
@@ -1108,8 +1127,11 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
-
             var currentFrame = BattleHeaderController.CurrentFrameCount;
+            int additionalTime = (BattleResult == eBattleResult.WIN && IsGuildBoss) ? 20 : 0;
+            backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
+            string prefix = IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
+            detail = $"{prefix}{backTime}s";
             return new OnceResultData
             {
                 id = id,
@@ -1117,8 +1139,10 @@ namespace PCRCaculator.Guild
                 criticalEX = totalDamageCriEX,
                 currentDamage = totalDamage,
                 randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,
-                backTime = currentFrame < 5400 ? (Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + 20) : 0,
-                warnings = errorList
+                backTime = backTime,
+                backTimeText = detail,
+                warnings = errorList,
+                BattleResult = BattleResult,
             };
         }
         public static List<ValueChangeData> CreateLineChatData(List<ValueChangeData> data, float deltaXforChat = 1 / 5400.0f)
