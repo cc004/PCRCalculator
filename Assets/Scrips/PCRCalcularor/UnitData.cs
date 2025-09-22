@@ -303,7 +303,7 @@ namespace PCRCaculator
                     var max = equip.GetMaxBaseData();
                     for (int j = 0; j < 17; ++j)
                     {
-                        if (ExtraEquipDefine.IsRateParam((eParamType)j))
+                        if (ExtraEquipDefine.IsRateParam((eParamType)(j+1)))
                         {
                             var d = def.dataint[j] / 100.0;
                             var m = max.dataint[j] / 100.0;
