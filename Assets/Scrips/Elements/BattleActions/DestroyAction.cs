@@ -33,7 +33,7 @@ namespace Elements
                         DamageType = DamageData.eDamageType.NONE,
                         Source = _source,
                         ActionType = eActionType.DESTROY,
-                        TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
+                        // TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
                         IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
                     }, _byAttack: false, base.ActionId, null, _hasEffect: false, null, _energyAdd: true, base.OnDefeatEnemy, _noMotion: false, 1f, 1f, null, EnergyChargeMultiple, base.UsedChargeEnergyByReceiveDamage);
                     break;

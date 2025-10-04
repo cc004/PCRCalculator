@@ -65,7 +65,7 @@ namespace Elements
                     damageData.DamageType = DamageType;
                     damageData.Source = PPOJKIDHGNJ;
                     damageData.ActionType = eActionType.ATTACK_FIELD;
-                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == PPOJKIDHGNJ.IsOther;
+                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == PPOJKIDHGNJ.IsOther; // yes it has
                     damageData.ExecAbsorber = _damage =>
                     {
                         if (_damage > AbsorberValue)
