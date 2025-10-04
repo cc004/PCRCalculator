@@ -569,7 +569,8 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
-                                    Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3))
+                                    Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
+                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic))
                                 );
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
