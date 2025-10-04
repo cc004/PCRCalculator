@@ -4240,7 +4240,6 @@ namespace Elements.Battle
             {
                 ActionStartTimeCounter = 5;
             }
-            StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             //battleManager.battleProcessor.SetupHpAndEnergyAfterApplyPassiveSkill();
             //battleManager.tempData.InitXorShiftRandom(seed);
             //battleManager.CMINMBPDEOL = new BattleVoiceFlagManager(battleManager.GetMyUnitList(), battleManager.GetOpponentUnitList());
@@ -4261,6 +4260,12 @@ namespace Elements.Battle
                 // ISSUE: explicit non-virtual call
                 (battleManager.EnemyList)[index2].ExecActionOnStartAndDetermineInstanceID();
             }
+            int index3 = 0;
+            for (int count = (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl).Count; index3 < count; ++ index3)
+            {
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index3].ExecActionOnStartAndDetermineInstanceID();
+            }
+            StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             //battleManager.tempData = Singleton<EHPLBCOOOPK>.Instance;
             // ISSUE: reference to a compiler-generated field
             //fdedccjjghm.mainPlayerViewerId = (int) Singleton<UserData>.Instance.UserInfo.ViewerId;
