@@ -1368,6 +1368,7 @@
         "567495a40fdeb3e4f465d55d8964dccc196460d72cb891c1ad95ad3bda81050e": "boss_id_4",
         "a8314e903a712eb8a391eab5a3d7379760c58e896fcb09a47653e6efe403b61f": "boss_id_5",
         "d69638161b2ef137b0c2063a5b130a11d3e46f39d2d44b5ef2ca7e8b76065f1c": "aura_effect",
+        "9839d7b3914c87cc1bfc2fe48f919e352a579e1194ff638265860d675405972a": "rsl_unlock_lap",
         "177e4ca1be0bf3715ab9c6b4d0dbe5bcd5d8eac205b75e676e17e3c8a2fc020c": "phase",
         "090f53f996e5d23979e5b6741a11277b691650ec60e6027611c83b773fb9f2d3": "wave_group_id_1",
         "0e6619260c474cf5ee89823e71b6134c3d23a8b8ba74af03dffb6e84e3d3c5e3": "wave_group_id_2",
@@ -4124,6 +4125,8 @@
         "a45bfd4d23679246c0ad15f017925ffb9464508fe8b144e0a43f2ca613082f43": "start_time",
         "94b00c6401de1959297d33a55ded0b7744705bd5d8e633809ff5c2f0c520ca44": "end_time",
         "83cedff93a5ea4727f8c9d563983f9cff3babab31d7067e54b9399d1ee8b9b77": "stock_10_flag",
+        "5402edb284541b4f9d69bc8da6b040cb6d9bae43d9c57cede0ba884c6760e054": "relation_id",
+        "1dc034f51b0bc4e394529d2a653b94c203f1056028004e168f536cf09813a8a1": "relation_count",
         "--table_name": "campaign_freegacha"
     },
     "v1_fab66eb6e7f2d23207238463a0cab3cf7a956b812786e33333b0777c6ec2c690": {
@@ -4141,6 +4144,7 @@
         "29423209204004b712fee8dff2a557f35113f978559cd2f9afe8ea64c91ec139": "pickup_gacha_id",
         "772e118cdd52a4d59d8ac4bf9f65071e6695b62f24e0301dae38862d24230d5e": "start_time",
         "5c5e574b327e5bb2f4cae4103ebbffe76a19db1bfbb4178d8cc509d7140b54e7": "end_time",
+        "dced7e5434636f85afb1f27bdc2dbd38d0ea843e6f8e4b29708a8a2c37733c44": "gacha_bonus_id",
         "--table_name": "gacha_exchange_lineup"
     },
     "v1_7611225845ba6c24281a474eea282b91d86088e7c2f11d0c16e8bdb093ea659b": {
