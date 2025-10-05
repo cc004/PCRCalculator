@@ -497,7 +497,7 @@ namespace Elements
         eSE.BTL_HIT_WAND_1
       }
     };*/
-    public static readonly Dictionary<SystemIdDefine.eWeaponSeType, eResourceId> WEAPON_HIT_EFFECT_DIC = new Dictionary<SystemIdDefine.eWeaponSeType, eResourceId>
+    public static readonly Dictionary<SystemIdDefine.eWeaponSeType, eResourceId> WEAPON_HIT_EFFECT_DIC = new Dictionary<SystemIdDefine.eWeaponSeType, eResourceId> // to update but no used
     {
       {
         SystemIdDefine.eWeaponSeType.ARROW,
@@ -597,97 +597,64 @@ namespace Elements
     };
     public static readonly Dictionary<SystemIdDefine.eWeaponMotionType, float> WEAPON_HIT_DELAY_DIC = new Dictionary<SystemIdDefine.eWeaponMotionType, float>
     {
-      {
-        SystemIdDefine.eWeaponMotionType.ARROW,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.AX,
-        0.45f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.KNUCKLE,
-        0.4f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.LONGSWORD,
-        0.47f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.SHORTSWORD,
-        0.4f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.SPEAR,
-        0.35f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.SWORD,
-        0.35f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.WAND,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.DAGGER,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.LONGSWORD_2,
-        0.6f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.SWORD_KIMONO,
-        0.4f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.WAND_KIMONO,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.NO_WAND_WITCH,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.WAND_2,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.NO_WAND_WITCH_2,
-        0.0f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.DUALSWORD,
-        0.3f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.FLAIL,
-        0.45f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.WAND_3,
-        0.0f
-      }
+      { SystemIdDefine.eWeaponMotionType.ARROW, 0.0f },              // 8: 弓箭
+      { SystemIdDefine.eWeaponMotionType.AX, 0.45f },                // 3: 斧头
+      { SystemIdDefine.eWeaponMotionType.KNUCKLE, 0.4f },            // 1: 拳套
+      { SystemIdDefine.eWeaponMotionType.LONGSWORD, 0.47f },         // 5: 长剑
+      { SystemIdDefine.eWeaponMotionType.SHORTSWORD, 0.4f },         // 2: 短剑
+      { SystemIdDefine.eWeaponMotionType.SPEAR, 0.35f },             // 6: 长矛
+      { SystemIdDefine.eWeaponMotionType.SWORD, 0.35f },             // 4: 剑
+      { SystemIdDefine.eWeaponMotionType.WAND, 0.0f },               // 7: 法杖
+      { SystemIdDefine.eWeaponMotionType.DAGGER, 0.0f },             // 9: 匕首
+      { SystemIdDefine.eWeaponMotionType.LONGSWORD_2, 0.6f },        // 10: 长剑2
+      { SystemIdDefine.eWeaponMotionType.SWORD_KIMONO, 0.4f },       // 22: 和服剑
+      { SystemIdDefine.eWeaponMotionType.WAND_KIMONO, 0.0f },        // 21: 和服法杖
+      { SystemIdDefine.eWeaponMotionType.NO_WAND_WITCH, 0.0f },      // 23: 魔女无杖
+      { SystemIdDefine.eWeaponMotionType.WAND_2, 0.0f },             // 25: 法杖2
+      { SystemIdDefine.eWeaponMotionType.NO_WAND_WITCH_2, 0.0f },    // 26: 魔女无杖2
+      { SystemIdDefine.eWeaponMotionType.DUALSWORD, 0.3f },          // 27: 双剑
+      { SystemIdDefine.eWeaponMotionType.FLAIL, 0.45f },             // 28: 连枷
+      { SystemIdDefine.eWeaponMotionType.WAND_3, 0.0f },             // 29: 法杖3
+      { SystemIdDefine.eWeaponMotionType.AX_KIMONO, 0.45f },         // 30: 和服斧
+      { SystemIdDefine.eWeaponMotionType.DAGGER_2, 0.0f },           // 31: 匕首2
+      { SystemIdDefine.eWeaponMotionType.DUALKNUCKLE, 0.4f },        // 32: 双拳套
+      { SystemIdDefine.eWeaponMotionType.SLINGSHOT, 0.0f },          // 33: 弹弓
+      { SystemIdDefine.eWeaponMotionType.GLORY_SWORD, 0.35f },       // 34: 荣耀之剑
+      { SystemIdDefine.eWeaponMotionType.CROSSBOW, 0.0f },           // 35: 弩
+      { SystemIdDefine.eWeaponMotionType.SHORTSWORD_2, 0.4f },       // 36: 短剑2
+      { SystemIdDefine.eWeaponMotionType.KARIN, 0.0f },              // 37: 卡琳
+      { SystemIdDefine.eWeaponMotionType.AX_FURISODE, 0.45f },       // 38: 振袖斧
+      { SystemIdDefine.eWeaponMotionType.FLAG, 0.0f },               // 39: 旗帜
+      { SystemIdDefine.eWeaponMotionType.SWORD_2, 0.35f },           // 40: 剑2
+      { SystemIdDefine.eWeaponMotionType.LONGSWORD_3, 0.47f },       // 41: 长剑3
+      { SystemIdDefine.eWeaponMotionType.WAND_4, 0.0f },             // 42: 法杖4
+      { SystemIdDefine.eWeaponMotionType.WING, 0.0f },               // 43: 翼
+      { SystemIdDefine.eWeaponMotionType.AMES, 0.0f },               // 44: 阿梅斯
+      { SystemIdDefine.eWeaponMotionType.KAISER, 1.0f },             // 45: 凯撒
+      { SystemIdDefine.eWeaponMotionType.LONGSWORD_KIMONO, 0.3f },   // 46: 和服长剑
+      { SystemIdDefine.eWeaponMotionType.TAMAKI_CAFE, 0.0f },        // 47: 环咖啡
+      { SystemIdDefine.eWeaponMotionType.SPEAR_KIMONO, 0.35f },      // 48: 和服长矛
+      { SystemIdDefine.eWeaponMotionType.WAND_DJEETA, 0.0f },        // 50: 吉塔法杖
+      { SystemIdDefine.eWeaponMotionType.SHORTSWORD_SWIMSUIT, 0.4f },// 52: 泳装短剑
+      { SystemIdDefine.eWeaponMotionType.PURESHIA, 0.0f }            // 53: 普蕾西亚
     };
     public static readonly Dictionary<SystemIdDefine.eWeaponMotionType, float> WEAPON_EFFECT_DELAY_DIC = new Dictionary<SystemIdDefine.eWeaponMotionType, float>
     {
-      {
-        SystemIdDefine.eWeaponMotionType.ARROW,
-        0.9f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.WAND,
-        0.3f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.DAGGER,
-        0.3f
-      },
-      {
-        SystemIdDefine.eWeaponMotionType.WAND_3,
-        0.3f
-      }
+      { SystemIdDefine.eWeaponMotionType.ARROW, 0.9f },              // 8: 弓箭
+      { SystemIdDefine.eWeaponMotionType.WAND, 0.3f },               // 7: 法杖
+      { SystemIdDefine.eWeaponMotionType.DAGGER, 0.3f },             // 9: 匕首
+      { SystemIdDefine.eWeaponMotionType.WAND_3, 0.3f },             // 29: 法杖3
+      { SystemIdDefine.eWeaponMotionType.DAGGER_2, 0.3f },           // 31: 匕首2
+      { SystemIdDefine.eWeaponMotionType.SLINGSHOT, 0.9f },          // 33: 弹弓
+      { SystemIdDefine.eWeaponMotionType.CROSSBOW, 0.9f },           // 35: 弩
+      { SystemIdDefine.eWeaponMotionType.KARIN, 0.3f },              // 37: 卡琳
+      { SystemIdDefine.eWeaponMotionType.FLAG, 0.3f },               // 39: 旗帜
+      { SystemIdDefine.eWeaponMotionType.WAND_4, 0.3f },             // 42: 法杖4
+      { SystemIdDefine.eWeaponMotionType.AMES, 0.3f },               // 44: 阿梅斯
+      { SystemIdDefine.eWeaponMotionType.KAISER, 1.0f },             // 45: 凯撒
+      { SystemIdDefine.eWeaponMotionType.LONGSWORD_KIMONO, 0.3f },   // 46: 和服长剑
+      { SystemIdDefine.eWeaponMotionType.WAND_DJEETA, 0.3f },        // 50: 吉塔法杖
+      { SystemIdDefine.eWeaponMotionType.PURESHIA, 0.3f }            // 53: 普蕾西亚
     };
     public const float BATTLE_SCALE = 540f;
     public const float CAMERA_MIN_X = 1100f;

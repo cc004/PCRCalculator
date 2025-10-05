@@ -555,15 +555,39 @@ namespace Elements
       WAND = 7,
       ARROW = 8,
       DAGGER = 9,
-      LONGSWORD_2 = 10, // 0x0000000A
-      WAND_KIMONO = 21, // 0x00000015
-      SWORD_KIMONO = 22, // 0x00000016
-      NO_WAND_WITCH = 23, // 0x00000017
-      WAND_2 = 25, // 0x00000019
-      NO_WAND_WITCH_2 = 26, // 0x0000001A
-      DUALSWORD = 27, // 0x0000001B
-      FLAIL = 28, // 0x0000001C
-      WAND_3 = 29, // 0x0000001D
+      LONGSWORD_2 = 10,
+      WAND_KIMONO = 21,
+      SWORD_KIMONO = 22,
+      NO_WAND_WITCH = 23,
+      WAND_2 = 25,
+      NO_WAND_WITCH_2 = 26,
+      DUALSWORD = 27,
+      FLAIL = 28,
+      WAND_3 = 29,
+      AX_KIMONO = 30,
+      DAGGER_2 = 31,
+      DUALKNUCKLE = 32,
+      SLINGSHOT = 33,
+      GLORY_SWORD = 34,
+      CROSSBOW = 35,
+      SHORTSWORD_2 = 36,
+      KARIN = 37,
+      AX_FURISODE = 38,
+      FLAG = 39,
+      SWORD_2 = 40,
+      LONGSWORD_3 = 41,
+      WAND_4 = 42,
+      WING = 43,
+      AMES = 44,
+      KAISER = 45,
+      LONGSWORD_KIMONO = 46,
+      TAMAKI_CAFE = 47,
+      SPEAR_KIMONO = 48,
+      MISORA = 49,
+      WAND_DJEETA = 50,
+      SHORTSWORD_SWIMSUIT = 52,
+      PURESHIA = 53,
+
     }
 
     /*public class ContentReleaseInfo
