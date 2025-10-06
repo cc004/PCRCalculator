@@ -484,7 +484,7 @@ namespace PCRCaculator
 
                                 var dbCN = dbTool3;
 
-                                // if (!Version.useJP) dbTool2 = dbTool3;
+                                if (!Version.useJP) dbTool2 = dbTool3;
 
                                 databaseCache.resistDataDic = dbTool.resistDataDic;
                                 databaseCache.equipmentDic = dbTool.Dic8;
@@ -502,8 +502,8 @@ namespace PCRCaculator
                                 databaseCache.enemyDataDic = dbTool.Dic2;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
                                 databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
-                                // databaseCache.uniqueEquipmentDataDic = dbTool.Dic9;
-                                // databaseCache.uniqueEquipment2DataDic = dbTool.Dic92;
+                                databaseCache.uniqueEquipmentDataDic = dbTool2.Dic9;
+                                databaseCache.uniqueEquipment2DataDic = dbTool2.Dic92;
                                 databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic;
                                 databaseCache.talentSkillEnhanceDataDic = dbTool.TalentSkillEnhanceDataDic;
                                 databaseCache.teamSkillNodeDic = dbTool.TeamSkillNodeDic;
@@ -592,8 +592,8 @@ namespace PCRCaculator
                                             //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
                                             //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
                                             //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                            Task.Run(() => databaseCache.uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
-                                            Task.Run(() => databaseCache.uniqueEquipment2DataDic.OverrideWith(dbTool2.Dic92)),
+                                            // Task.Run(() => databaseCache.uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
+                                            // Task.Run(() => databaseCache.uniqueEquipment2DataDic.OverrideWith(dbTool2.Dic92)),
 
                                             Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool2.Dic3,
                                                 k => k > 2000000)),
@@ -603,8 +603,7 @@ namespace PCRCaculator
                                             Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                             Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                             Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2)),
-                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
-                                            Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool2.TalentQuestWaveGroupDataDic))
+                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic))
                                         );
                                 // }
                                 // else
@@ -617,22 +616,19 @@ namespace PCRCaculator
                                         //     k => k > 2000000 && k < 4000000)),
                                         // Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool3.Dic4,
                                         //     k => k > 200000000 && k < 400000000)),
-                                        // Task.Run(() => databaseCache.enemyDataDic.Override2With(dbTool3.Dic2)),
+                                        Task.Run(() => databaseCache.enemyDataDic.Override2With(dbTool3.Dic2)),
                                         // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5))
 
 
-                                        Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool3.Dic3,
-                                            k => k > 2000000)),
-                                        Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool3.Dic4,
-                                            k => k > 200000000)),
+                                        Task.Run(() => databaseCache.skillDataDic.Override2With(dbTool3.Dic3)),
+                                        Task.Run(() => databaseCache.skillActionDic.Override2With(dbTool3.Dic4)),
                                         Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
-                                        Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
-                                        Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
-                                        Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
-                                        Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool3.TalentQuestEnemyParameterDic)),
-                                        Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool3.TalentQuestWaveGroupDataDic)),
-                                        Task.Run(() => databaseCache.talentSkillNodeDic.OverrideWith(dbTool3.TalentSkillNodeDic)),
-                                        Task.Run(() => databaseCache.teamSkillNodeDic.OverrideWith(dbTool3.TeamSkillNodeDic))
+                                        // Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
+                                        // Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
+                                        // Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
+                                        Task.Run(() => databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic)),
+                                        Task.Run(() => databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic)),
+                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic))
                                     );
                                 // }
                             });

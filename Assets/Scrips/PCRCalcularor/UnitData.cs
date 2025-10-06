@@ -2486,7 +2486,7 @@ namespace PCRCaculator
     }
 
     [Serializable]
-    public class TalentSkillNode
+    public class TalentSkillNode : IOverride2<TalentSkillNode>
     {
         public int node_id { get; set; }
         public int page_num { get; set; }
@@ -2510,6 +2510,10 @@ namespace PCRCaculator
             title_id = titleId;
             title_text = titleText;
         }
+        public void Override2With(TalentSkillNode other)
+        {
+            other.title_text = title_text;
+        }
     }
     [Serializable]
     public class TalentSkillEnhanceData
@@ -2528,7 +2532,7 @@ namespace PCRCaculator
     }
 
     [Serializable]
-    public class TeamSkillNode
+    public class TeamSkillNode : IOverride2<TeamSkillNode>
     {
         public int node_id { get; set; }
         public int pos_x { get; set; }
@@ -2551,6 +2555,10 @@ namespace PCRCaculator
             noise_id = noiseId;
             title_id = titleId;
             title_text = titleText;
+        }
+        public void Override2With(TeamSkillNode other)
+        {
+            other.title_text = title_text;
         }
     }
 
