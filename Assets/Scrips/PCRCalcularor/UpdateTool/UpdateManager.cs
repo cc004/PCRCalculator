@@ -88,6 +88,19 @@ namespace PCRCaculator.Update
 
     }
 
+    [Serializable]
+    public class BcrResponse
+    {
+        public Data data;
+    }
+
+    [Serializable]
+    public class Data
+    {
+        public string manifest_ver;
+        public string required_manifest_ver;
+    }
+
     // 定义模型类
     [Serializable]
     public class ApiResponse

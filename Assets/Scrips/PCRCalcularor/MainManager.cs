@@ -197,6 +197,7 @@ namespace PCRCaculator
 
         public bool LoadFinished { get; private set; }
         private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
+        private const string Url2 = "https://l3-prod-all-gs-gzlj.bilibiligame.net/source_ini/get_maintenance_status?format=json";
         public string truthVersion;
         private void Awake()
         {
@@ -1263,8 +1264,79 @@ namespace PCRCaculator
         {
             return ExtraEffectUnitGroupDic.ContainsKey(groupId) ? ExtraEffectUnitGroupDic[groupId] : null;
         }
+
+        public async Task SendPostRequestAsync2(Action onComplete)
+        {
+            const string app_ver = "10.7.1"; // change this when the app version changes
+            using UnityWebRequest www = new UnityWebRequest(Url2, UnityWebRequest.kHttpVerbPOST);
+            byte[] postData = System.Text.Encoding.UTF8.GetBytes("{\"viewer_id\": \"0\"}");
+
+            // 设置必要请求头
+            www.uploadHandler = new UploadHandlerRaw(postData);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Accept-Encoding", "gzip");
+            www.SetRequestHeader("User-Agent", "Dalvik/2.1.0 (Linux, U, Android 5.1.1, PCRT00 Build/LMY48Z)");
+            www.SetRequestHeader("X-Unity-Version", "2021.3.20f1c1");
+            www.SetRequestHeader("APP-VER", app_ver);
+            www.SetRequestHeader("BATTLE-LOGIC-VERSION", "4");
+            www.SetRequestHeader("DEVICE", "2");
+            www.SetRequestHeader("DEVICE-NAME", "OPPO PCRT00");
+            www.SetRequestHeader("EXCEL-VER", "1.0.0");
+            www.SetRequestHeader("GRAPHICS-DEVICE-NAME", "Adreno (TM) 640");
+            www.SetRequestHeader("IP-ADDRESS", "10.0.2.15");
+            www.SetRequestHeader("LOCALE", "CN");
+            www.SetRequestHeader("PLATFORM", "2");
+            www.SetRequestHeader("PLATFORM-ID", "2");
+            www.SetRequestHeader("CHANNEL-ID", "1");
+            www.SetRequestHeader("RES-KEY", "ab00a0a6dd915a052a2ef7fd649083e5");
+            www.SetRequestHeader("RES-VER", "10002200");
+
+            // 统一异步等待机制
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+            www.SendWebRequest().completed += (AsyncOperation op) =>
+            {
+                try
+                {
+                    if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+                    {
+                        Debug.LogError($"请求失败: {www.error}");
+                        truthVersion = "获取失败（重试）";
+                    }
+                    else
+                    {
+                        var raw = www.downloadHandler.text;
+                        // Debug.Log($"Response:\n{raw}");
+
+                        try
+                        {
+                            var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
+                            truthVersion = response?.data?.manifest_ver ?? "获取失败（重试）";
+                            // Debug.Log($"manifest_ver = {truthVersion}");
+                        }
+                        catch (Exception jsonEx)
+                        {
+                            // Debug.LogError($"JSON解析失败: {jsonEx}");
+                            truthVersion = "获取失败（重试）";
+                        }
+                    }
+                }
+                finally
+                {
+                    onComplete?.Invoke();
+                    tcs.TrySetResult(true);
+                }
+            };
+
+            await tcs.Task;
+        }
+
         public async Task SendPostRequestAsync(Action onComplete)
         {
+            await SendPostRequestAsync2(onComplete);
+            return;
+
             using UnityWebRequest www = new UnityWebRequest(Url, UnityWebRequest.kHttpVerbPOST);
             byte[] formdata = new System.Text.UTF8Encoding().GetBytes("{\"regionCode\":\"cn\"}");
 
