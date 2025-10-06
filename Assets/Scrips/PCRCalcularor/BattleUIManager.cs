@@ -483,14 +483,13 @@ namespace PCRCaculator.Battle
             {
                 MainManager.Instance.WindowMessage("请先停止优化！");
             }
-            else if ((BattleManager.Instance?.BossUnit?.Hp ?? 0) == 0)
-            {
-                ExitButton2();
-            }
             else
             {
-                BattleManager.Instance.BossUnit.Hp = 0;
-                BattleManager.Instance.BossUnit.SetState(UnitCtrl.ActionState.DIE);
+                for (int i = 0; i < BattleManager.Instance.EnemyList.Count; i++)
+                {
+                    BattleManager.Instance.EnemyList[i].Hp = 0;
+                    BattleManager.Instance.EnemyList[i].SetState(UnitCtrl.ActionState.DIE);
+                }
             }
         }
 

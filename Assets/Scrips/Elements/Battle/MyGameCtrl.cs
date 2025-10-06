@@ -903,8 +903,9 @@ namespace Elements
             {
                 mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.MainSkills[i], enemyData.main_skill_lvs[i], 0));
             }
-            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_1, enemyData.main_skill_lvs[0], 0));
-            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_2, enemyData.main_skill_lvs[1], 0));
+            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_1, enemyData.unique_equipment_flag_1 == 1 ? enemyData.main_skill_lvs[0] : 0, 0));
+            // no skill2
+            mainSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.main_skill_evolution_2, 0, 0));
 
             exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_1, enemyData.ex_skill_lvs[0], 0));
             exSkillLevelInfo.Add(new SkillLevelInfo(enemyData.skillData.raw_data.ex_skill_2, enemyData.ex_skill_lvs[1], 0));

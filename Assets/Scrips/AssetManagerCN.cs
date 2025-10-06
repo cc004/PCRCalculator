@@ -44,13 +44,14 @@ namespace PCRApi.CN
         public static Content FromLine(string line, string @class)
         {
             var splits = line.Split(',');
+            int offset = splits.Count() > 5 ? 1 : 0;
             return new Content
             {
                 url = splits[0],
                 @class = @class,
                 md5 = splits[1],
-                type = splits[2],
-                size = int.Parse(splits[3]),
+                type = splits[2 + offset],
+                size = int.Parse(splits[3 + offset]),
                 children = new List<Content>()
             };
         }

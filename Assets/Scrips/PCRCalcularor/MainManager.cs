@@ -225,13 +225,13 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10063800;
+            public long CharacterVersionJP = 10055800;
             public long BossVersionJP = 10054200;
-            public long BossVersionCN = 0;
+            public long BossVersionCN = 202509291846;
             public bool useQA = false;
             public bool useJP = true;
-            public bool newAB = true;
-            public bool useLatestProd = true;
+            public bool newAB = false;
+            public bool useLatestProd = false;
 
         }
 
@@ -502,8 +502,8 @@ namespace PCRCaculator
                                 databaseCache.enemyDataDic = dbTool.Dic2;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
                                 databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
-                                databaseCache.uniqueEquipmentDataDic = dbTool.Dic9;
-                                databaseCache.uniqueEquipment2DataDic = dbTool.Dic92;
+                                // databaseCache.uniqueEquipmentDataDic = dbTool.Dic9;
+                                // databaseCache.uniqueEquipment2DataDic = dbTool.Dic92;
                                 databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic;
                                 databaseCache.talentSkillEnhanceDataDic = dbTool.TalentSkillEnhanceDataDic;
                                 databaseCache.teamSkillNodeDic = dbTool.TeamSkillNodeDic;
@@ -569,7 +569,8 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
-                                    Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3))
+                                    Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
+                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic))
                                 );
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
@@ -583,8 +584,8 @@ namespace PCRCaculator
                                 // databaseCache.unitRarityDic[170101].ChangeRankData(databaseCache.unitRarityDic[105701].GetRankData());
                                 // databaseCache.unitRarityDic[170201].ChangeRankData(databaseCache.unitRarityDic[107601].GetRankData());
 
-                                if (Version.useJP)
-                                {
+                                // if (Version.useJP)
+                                // {
                                     if (dbTool != dbTool2)
                                         Task.WaitAll(
                                             //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
@@ -605,10 +606,10 @@ namespace PCRCaculator
                                             Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
                                             Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool2.TalentQuestWaveGroupDataDic))
                                         );
-                                }
-                                else
+                                // }
+                                // else
                                 // if (Version.newAB)
-                                {
+                                // {
                                     Task.WaitAll(
                                         // Task.Run(() => databaseCache.equipmentDic.Override2With(dbTool3.Dic8)),
                                         // Task.Run(() => databaseCache.unitRarityDic.Override2With(dbTool3.Dic1)),
@@ -629,9 +630,11 @@ namespace PCRCaculator
                                         Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
                                         Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
                                         Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool3.TalentQuestEnemyParameterDic)),
-                                        Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool3.TalentQuestWaveGroupDataDic))
+                                        Task.Run(() => databaseCache.talentQuestWaveGroupDataDic.OverrideWith(dbTool3.TalentQuestWaveGroupDataDic)),
+                                        Task.Run(() => databaseCache.talentSkillNodeDic.OverrideWith(dbTool3.TalentSkillNodeDic)),
+                                        Task.Run(() => databaseCache.teamSkillNodeDic.OverrideWith(dbTool3.TeamSkillNodeDic))
                                     );
-                                }
+                                // }
                             });
                     tasks.Add(dbDataTask);
                 }

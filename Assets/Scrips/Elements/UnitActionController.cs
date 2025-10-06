@@ -157,12 +157,12 @@ namespace Elements
             {
                 attackAction.ActionExecTimeList = new List<ActionExecTime>
                 {
-          new ActionExecTime
-          {
-            Weight = 1f,
-            DamageNumType = eDamageEffectType.NORMAL
-          }
-        };
+                    new ActionExecTime
+                    {
+                        Weight = 1f,
+                        DamageNumType = eDamageEffectType.NORMAL
+                    }
+                };
                 attackAction.ExecTime = new float[1] { num };
                 attackAction.ActionWeightSum = 1f;
             }

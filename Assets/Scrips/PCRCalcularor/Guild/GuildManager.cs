@@ -1756,10 +1756,10 @@ namespace PCRCaculator.Guild
 
             // 找到最高页面编号上的最终节点
             var targetNode = finalNodes
-                .Where(kvp => NodeDataDict.ContainsKey(kvp.Key))
-                .OrderByDescending(kvp => NodeDataDict[kvp.Key].page_num)
+                .Where(node => NodeDataDict.ContainsKey(node.Key))
+                .OrderByDescending(node => node.Key)
                 .First();
-
+            
             if (!NodeDataDict.TryGetValue(targetNode.Key, out TalentSkillNode nodeData))
                 return "无";
 

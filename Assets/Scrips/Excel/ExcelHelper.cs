@@ -679,7 +679,6 @@ namespace ExcelHelper
             }
             src.AppendLine("print(\"解除暂停，塔塔开!\")\n");
             src.AppendLine("autopcr.setOffset(2, 0); # offset calibration");
-            src.AppendLine("autopcr.waitFrame(autopcr.getFrame() + 50); minitouch.press(\"SPEED\") #加速");
 
             msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
             msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
@@ -701,19 +700,17 @@ namespace ExcelHelper
 
                     if (data.operation == "连点")
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 30); minitouch.press(\"{name}\") #连点 lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 5); minitouch.press(\"{name}\") #连点 lframe {data.currentFrameCount}");
                     }
                     else if (data.operation == "AUTO")
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 30); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}");
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 30); minitouch.press(\"AUTO\") #关AUTO lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 5); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}");
+                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 5); minitouch.press(\"AUTO\") #关AUTO lframe {data.currentFrameCount}");
 
                     }
                     else
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 60); minitouch.press(\"SPEED\") #减速 lframe {data.currentFrameCount}");
                         src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"{name}\") # lframe {data.currentFrameCount}");
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 30); minitouch.press(\"SPEED\") #加速 lframe {data.currentFrameCount}");
                     }
 
                     msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
