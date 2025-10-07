@@ -3955,6 +3955,12 @@ namespace Elements.Battle
             }
             LPBCBINDJLJ.Clear();
             NOMJJDDCBAN.Clear();
+            LNMLGGPGEIG = null;
+            FGBCOBGHGKE = 0;
+            SetBlackoutTimeZero();
+            blackoutTimeCounter = 0;
+            SetStarted(false);
+            ChargeSkillTurn = eChargeSkillTurn.NONE;
             FieldDataDictionary.Clear();
             EnvironmentCounterDic.Clear();
             unitEnvironment = null;
