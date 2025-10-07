@@ -228,11 +228,11 @@ namespace PCRCaculator
         {
             public long CharacterVersionJP = 10055800;
             public long BossVersionJP = 10054200;
-            public long BossVersionCN = 202509291846;
+            public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
             public bool newAB = false;
-            public bool useLatestProd = false;
+            public bool useLatestProd = true;
 
         }
 
