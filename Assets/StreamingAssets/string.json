@@ -359,6 +359,7 @@
   "At_d1_behind_of_s2_summon_a_minion_id_d3": "在%2$s的后方 [%1$d] 的位置，召唤 [ID: %3$d] 的召唤物。",
   "At_the_position_of_s1_summon_a_minion_id_d2": "在%1$s的位置，召唤 [ID: %2$d] 的召唤物。",
   "Restore_s1_s2_TP": "恢复%1$s [%2$s] TP（此值会受到被恢复角色的TP上升值影响）。",
+  "Restore_s1_s2_TP_no_up": "恢复%1$s [%2$s] TP（此值不会受到被恢复角色的TP上升值影响）。",
   "Make_s1_lose_s2_TP": "使%1$s失去 [%2$s] TP。",
   "Trigger_HP_is_below_d": "触发条件：HP为 [%d%%] 以下时触发。",
   "Trigger_Left_time_is_below_s_sec": "触发条件：战斗剩余时间为 [%s] 秒时触发。",

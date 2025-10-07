@@ -267,6 +267,7 @@ namespace Elements
             float num7 = (flag ? ((float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f) : ((float)(int)_source.MagicCriticalDamageRateOrMin / 100f));
             float num8 = (float)(int)_target.Owner.ReceiveCriticalDamageRateOrMin / 100f;
             criticalDamageRate *= Mathf.Max(0.5f, num7 * num8);
+
             DamageData damageData = new DamageData
             {
                 TotalDamageForLogBarrier = num4,
@@ -281,7 +282,7 @@ namespace Elements
                 DefPenetrate = (_isPhysicalForTarget ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero),
                 LifeSteal = (_source.IsPartsBoss ? parts.GetLifeStealZero() : ((int)_source.LifeStealZero)),
                 CriticalDamageRate = criticalDamageRate,
-                // TargetIncludeMyTeam = _target.Owner.IsOther == _source.IsOther,
+                TargetIncludeMyTeam = TargetAssignment != eTargetAssignment.OTHER_SIDE || IsEnvironmentAbnormalState, // TODO IsEnvironmentAbnormalState to find where set
                 ActionType = _actionType,
                 IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
             };

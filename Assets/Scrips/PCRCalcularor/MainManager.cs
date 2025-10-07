@@ -197,6 +197,7 @@ namespace PCRCaculator
 
         public bool LoadFinished { get; private set; }
         private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
+        private const string Url2 = "https://l3-prod-all-gs-gzlj.bilibiligame.net/source_ini/get_maintenance_status?format=json";
         public string truthVersion;
         private void Awake()
         {
@@ -227,11 +228,11 @@ namespace PCRCaculator
         {
             public long CharacterVersionJP = 10055800;
             public long BossVersionJP = 10054200;
-            public long BossVersionCN = 202509291846;
+            public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
             public bool newAB = false;
-            public bool useLatestProd = false;
+            public bool useLatestProd = true;
 
         }
 
@@ -308,7 +309,7 @@ namespace PCRCaculator
 
         private string cacheKey
         {
-            get => $"{Version.CharacterVersionJP}_{Version.BossVersionJP}_{Version.BossVersionCN}_{Version.useJP}_{Version.newAB}";
+            get => $"{Version.CharacterVersionJP}_{Version.BossVersionJP}_{Version.BossVersionCN}_{Version.useQA}_{Version.useJP}_{Version.newAB}";
         }
 
         private string cachePath()
@@ -321,17 +322,9 @@ namespace PCRCaculator
             var path = cachePath();
             if (File.Exists(path))
             {
-                try
-                {
-                    var jsonStr = File.ReadAllText(path);
-                    databaseCache = JsonConvert.DeserializeObject<DatabaseCache>(jsonStr);
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"读取缓存失败: {e.Message}");
-                    return false;
-                }
+                var jsonStr = File.ReadAllText(path);
+                databaseCache = JsonConvert.DeserializeObject<DatabaseCache>(jsonStr);
+                return true;
             }
             return false;
         }
@@ -392,18 +385,37 @@ namespace PCRCaculator
                 }
 
                 var tasks = new List<Task>();
-                
-                // 缓存加载计时
-                // var cacheStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                if (false && loadFromCahce())
+
+                var abStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                try
                 {
-                    // cacheStopwatch.Stop();
-                    // Debug.Log($"缓存加载完成，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
+                    // 更新 UI：初始化 AB 资源
+                    try { wait?.SetMessage("初始化 AB 资源"); } catch { }
+                    await ABExTool.StaticInitialize();
+                    abStopwatch.Stop();
+                    Debug.Log($"AB资源初始化完成，耗时: {abStopwatch.ElapsedMilliseconds}ms");
+                }
+                catch (Exception ex)
+                {
+                    abStopwatch.Stop();
+                    Debug.LogError($"AB资源初始化失败");
+                    try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
+                    SaveManager.Save(new VersionData());
+                    return;
+                }
+
+                bool loadedCache = false;
+                var cacheStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                if (loadFromCahce())
+                {
+                    loadedCache = true;
+                    cacheStopwatch.Stop();
+                    Debug.Log($"缓存加载完成，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
                 }
                 else
                 {
-                    // cacheStopwatch.Stop();
-                    // Debug.Log($"缓存加载失败或不存在，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
+                    cacheStopwatch.Stop();
+                    Debug.Log($"缓存加载不存在，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
                     
                     // SQL补丁加载计时
                     var sqlStopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -424,25 +436,6 @@ namespace PCRCaculator
                     SQLiteTool.sql = sql;
                     
                     // AB资源初始化计时
-                    var abStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                    try
-                    {
-                        // 更新 UI：初始化 AB 资源
-                        try { wait?.SetMessage("初始化 AB 资源"); } catch { }
-                        await ABExTool.StaticInitialize();
-                        abStopwatch.Stop();
-                        Debug.Log($"AB资源初始化完成，耗时: {abStopwatch.ElapsedMilliseconds}ms");
-                    }
-                    catch (Exception ex)
-                    {
-                        abStopwatch.Stop();
-                        Debug.LogError($"AB资源初始化失败");
-                        try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
-                        SaveManager.Save(new VersionData());
-                        return;
-                    }
-
-
                     // 数据库初始化计时
                     var dbInitStopwatch = System.Diagnostics.Stopwatch.StartNew();
                     var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
@@ -709,7 +702,8 @@ namespace PCRCaculator
                 Debug.Log($"加载json完成，耗时: {jsonLoadStopwatch.ElapsedMilliseconds}ms");
 
                 // var saveCacheStopWatch = System.Diagnostics.Stopwatch.StartNew();
-                // saveToCache();
+                if (!loadedCache)
+                    saveToCache();
                 // saveCacheStopWatch.Stop();
                 // Debug.Log($"保存缓存完成，耗时: {saveCacheStopWatch.ElapsedMilliseconds}ms");
 
@@ -1110,7 +1104,7 @@ namespace PCRCaculator
         public string LoadJsonDatas(string path, bool forceStreaming = true)
         {
             // 优化：添加文件内容缓存，避免重复读取相同文件
-            if (_dataCache.TryGetValue(path, out var cachedContent))
+            if (_dataCache.TryGetValue(path, out object cachedContent))
             {
                 return (string)cachedContent;
             }
@@ -1129,7 +1123,10 @@ namespace PCRCaculator
             // 缓存文件内容
             if (!string.IsNullOrEmpty(content))
             {
-                _dataCache[path] = content;
+                lock (_dataCache)
+                {
+                    _dataCache.TryAdd(path, content);
+                }
             }
             
             return content;
@@ -1263,8 +1260,79 @@ namespace PCRCaculator
         {
             return ExtraEffectUnitGroupDic.ContainsKey(groupId) ? ExtraEffectUnitGroupDic[groupId] : null;
         }
+
+        public async Task SendPostRequestAsync2(Action onComplete)
+        {
+            const string app_ver = "10.7.1"; // change this when the app version changes
+            using UnityWebRequest www = new UnityWebRequest(Url2, UnityWebRequest.kHttpVerbPOST);
+            byte[] postData = System.Text.Encoding.UTF8.GetBytes("{\"viewer_id\": \"0\"}");
+
+            // 设置必要请求头
+            www.uploadHandler = new UploadHandlerRaw(postData);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Accept-Encoding", "gzip");
+            www.SetRequestHeader("User-Agent", "Dalvik/2.1.0 (Linux, U, Android 5.1.1, PCRT00 Build/LMY48Z)");
+            www.SetRequestHeader("X-Unity-Version", "2021.3.20f1c1");
+            www.SetRequestHeader("APP-VER", app_ver);
+            www.SetRequestHeader("BATTLE-LOGIC-VERSION", "4");
+            www.SetRequestHeader("DEVICE", "2");
+            www.SetRequestHeader("DEVICE-NAME", "OPPO PCRT00");
+            www.SetRequestHeader("EXCEL-VER", "1.0.0");
+            www.SetRequestHeader("GRAPHICS-DEVICE-NAME", "Adreno (TM) 640");
+            www.SetRequestHeader("IP-ADDRESS", "10.0.2.15");
+            www.SetRequestHeader("LOCALE", "CN");
+            www.SetRequestHeader("PLATFORM", "2");
+            www.SetRequestHeader("PLATFORM-ID", "2");
+            www.SetRequestHeader("CHANNEL-ID", "1");
+            www.SetRequestHeader("RES-KEY", "ab00a0a6dd915a052a2ef7fd649083e5");
+            www.SetRequestHeader("RES-VER", "10002200");
+
+            // 统一异步等待机制
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+            www.SendWebRequest().completed += (AsyncOperation op) =>
+            {
+                try
+                {
+                    if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+                    {
+                        Debug.LogError($"请求失败: {www.error}");
+                        truthVersion = "获取失败（重试）";
+                    }
+                    else
+                    {
+                        var raw = www.downloadHandler.text;
+                        // Debug.Log($"Response:\n{raw}");
+
+                        try
+                        {
+                            var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
+                            truthVersion = response?.data?.manifest_ver ?? "获取失败（重试）";
+                            // Debug.Log($"manifest_ver = {truthVersion}");
+                        }
+                        catch (Exception jsonEx)
+                        {
+                            // Debug.LogError($"JSON解析失败: {jsonEx}");
+                            truthVersion = "获取失败（重试）";
+                        }
+                    }
+                }
+                finally
+                {
+                    onComplete?.Invoke();
+                    tcs.TrySetResult(true);
+                }
+            };
+
+            await tcs.Task;
+        }
+
         public async Task SendPostRequestAsync(Action onComplete)
         {
+            await SendPostRequestAsync2(onComplete);
+            return;
+
             using UnityWebRequest www = new UnityWebRequest(Url, UnityWebRequest.kHttpVerbPOST);
             byte[] formdata = new System.Text.UTF8Encoding().GetBytes("{\"regionCode\":\"cn\"}");
 

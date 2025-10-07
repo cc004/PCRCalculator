@@ -834,6 +834,17 @@ namespace PCRCaculator.SQL
         public long[][] formation_bonus_values { get; set; }
         public talentFormationData(talent_formation_overwrite overwrite, Dictionary<int, talent_formation_bonus> bonusDic)
         {
+            if (overwrite == null)
+            {
+                // 提供默认值以防止空引用异常
+                id = 0;
+                content_type = 0;
+                target_value_1 = 0;
+                target_value_2 = 0;
+                formation_bonus_values = new long[5][];
+                return;
+            }
+
             id = overwrite.id;
             content_type = overwrite.content_type;
             target_value_1 = overwrite.target_value_1;
