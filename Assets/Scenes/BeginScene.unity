@@ -26771,7 +26771,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 886893728}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.143
+  m_Size: 0.14299999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -39868,7 +39868,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2048174546}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -49081,11 +49081,13 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  dropdowns_ChooseTalentQuestBoss: []
   bossImage_ChooseBoss: {fileID: 0}
   toggles_ChooseBoss:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  usePlayerSettingHP: {fileID: 0}
   currentHPinput: {fileID: 0}
   toggles_ChooseType:
   - {fileID: 0}
@@ -49150,6 +49152,20 @@ MonoBehaviour:
   version: {fileID: 335739230}
   RandomSeed: {fileID: 0}
   UseFixedRandomSeed: {fileID: 0}
+  RandomSeedTalent: {fileID: 0}
+  UseFixedRandomSeedTalent: {fileID: 0}
+  TalentSprites: []
+  WeaknessSprites: []
+  TalentTexts: []
+  TalentBonus: []
+  TalentQuestWaveGroupId: 0
+  TalentQuestBossPictures: []
+  TalentQuestBossText: {fileID: 0}
+  BossObject: {fileID: 0}
+  TalentBossObject: {fileID: 0}
+  TalentQuestBattleEffectPictures: []
+  ExtraEffectPrefab: {fileID: 0}
+  dungeonDropdown: {fileID: 0}
 --- !u!114 &1270470274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70575,7 +70591,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!114 &1893070452 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3621289691974351454, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
+  m_CorrespondingSourceObject: {fileID: 2572441801104940048, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
     type: 3}
   m_PrefabInstance: {fileID: 1893070448}
   m_PrefabAsset: {fileID: 0}
@@ -70587,7 +70603,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!114 &1893070453 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2429900892622219314, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
+  m_CorrespondingSourceObject: {fileID: 3917582767256853907, guid: 6acc83d4049ae5a4e9c7cc062e73630c,
     type: 3}
   m_PrefabInstance: {fileID: 1893070448}
   m_PrefabAsset: {fileID: 0}
@@ -72991,9 +73007,7 @@ MonoBehaviour:
   RBValueText: {fileID: 0}
   RBTPValueText: {fileID: 0}
   ShowTextPrefab: {fileID: 0}
-  talentToggles: {fileID: 0}
-  talentManagers: []
-  talentLevelSliders: []
+  IsReleaseSkillHasteLogic: {fileID: 0}
 --- !u!1 &1992364002
 GameObject:
   m_ObjectHideFlags: 0
