@@ -1563,10 +1563,10 @@ namespace PCRCaculator.Guild
                 {
                     var un = MainManager.Instance.UnitRarityDic[enemyData.detailData.prefab_id];
                     int rarity = enemyData.rarity;
-                    bool isUnitEquip = enemyData.unique_equipment_flag_1 == 1;
+                    int UnitEquip = enemyData.unique_equipment_flag_1;
                     action(rarity == 6 ? enemyData.skillData.raw_data.union_burst_evolution : enemyData.skillData.raw_data.union_burst, enemyData.level, rarity == 6 ? "UB+" : "UB");
-                    action(isUnitEquip ? enemyData.skillData.raw_data.main_skill_evolution_1 : enemyData.skillData.raw_data.main_skill_1, enemyData.level, isUnitEquip ? "SK1+" : "SK1");
-                    action(enemyData.skillData.raw_data.main_skill_2, enemyData.level, $"SK2");
+                    action(UnitEquip >= 1 ? enemyData.skillData.raw_data.main_skill_evolution_1 : enemyData.skillData.raw_data.main_skill_1, enemyData.level, UnitEquip >= 1 ? "SK1+" : "SK1");
+                    action(UnitEquip >= 2 ? enemyData.skillData.raw_data.main_skill_evolution_2 : enemyData.skillData.raw_data.main_skill_2, enemyData.level, UnitEquip >= 2 ? "SK2+" : "SK2");
                     action(rarity >= 5 ? enemyData.skillData.raw_data.ex_skill_evolution_1 : enemyData.skillData.raw_data.ex_skill_1, enemyData.level, rarity >= 5 ? "EX+" : "EX");
                     if (enemyData.skillData.raw_data.sp_skill_1 > 0)
                     {
