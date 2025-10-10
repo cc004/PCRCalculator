@@ -46,8 +46,15 @@ namespace Elements
                 EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
             DamageData.eDamageType eDamageType;
             DoubleWithEx num;
-            // TODO ActionDetail1 == 5 => mixed damage
-            if (ActionDetail1 % 2 == 0)
+            if (ActionDetail1 == 5)
+            {
+                eDamageType = (DamageData.eDamageType)_source.AtkType;
+                if (eDamageType == DamageData.eDamageType.ATK)
+                    num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : _source.AtkZero);
+                else
+                    num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : _source.MagicStrZero);
+            }
+            else if (ActionDetail1 % 2 == 0)
             {
                 eDamageType = DamageData.eDamageType.MGC;
                 num = _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : _source.MagicStrZero);
@@ -84,6 +91,8 @@ namespace Elements
             attackFieldData.LALMMFAOJDP = gameObject2;
             attackFieldData.EnergyChargeMultiple = EnergyChargeMultiple;
             attackFieldData.AbsorberValue = battleManager.KIHOGJBONDH;
+            attackFieldData.IsWeakTypeDamage = ActionDetail1 == 5;
+            attackFieldData.IsEnvironmentAbnormalState = IsEnvironmentAbnormalState;
             attackFieldData.onExec = action;
             attackFieldData.Cache();
             action?.Invoke("领域中心：" + attackFieldData.CenterX + "范围：" + attackFieldData.Size + "\n");

@@ -23,6 +23,10 @@ namespace Elements
 
         public int AbsorberValue { get; set; }
 
+        public bool IsWeakTypeDamage { get; set; }
+
+        public bool IsEnvironmentAbnormalState { get; set; }
+
         public override void StartField()
         {
             /*if ((UnityEngine.Object) this.HGMNJJBLJIO != (UnityEngine.Object) null)
@@ -47,7 +51,18 @@ namespace Elements
                 {
                     float receiveDamagePrecent = 0f;
                     float damageUpPrecent = 0f;
-                    switch (DamageType)
+                    var realDamageType = DamageType;
+                    if (IsWeakTypeDamage)
+                    {
+                        var def = TargetList[index].GetDefZero();
+                        var mdef = TargetList[index].GetMagicDefZero();
+                        if (def < mdef)
+                            realDamageType = DamageData.eDamageType.ATK;
+                        else
+                            realDamageType = DamageData.eDamageType.MGC;
+                    }
+
+                    switch (realDamageType)
                     {
                         case DamageData.eDamageType.ATK:
                             receiveDamagePrecent = (float)TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100f;
@@ -62,7 +77,7 @@ namespace Elements
                     DamageData damageData = new DamageData();
                     damageData.Target = TargetList[index];
                     damageData.Damage = BattleUtil.DoubleToLong(Value * receiveDamagePrecent * damageUpPrecent);
-                    damageData.DamageType = DamageType;
+                    damageData.DamageType = realDamageType;
                     damageData.Source = PPOJKIDHGNJ;
                     damageData.ActionType = eActionType.ATTACK_FIELD;
                     damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == PPOJKIDHGNJ.IsOther; // yes it has
