@@ -1881,6 +1881,8 @@ namespace PCRCaculator
         public float normalAtkCastTime;//普攻间隔
         public int guildId;
         public List<int> talent_id;
+        public int unit_role_id;
+
         /// <summary>
         /// 不要用这个构造函数！
         /// </summary>
@@ -1900,11 +1902,11 @@ namespace PCRCaculator
 
         }
         public UnitDetailData(int id, string name, int rarity, int motion, int se, int searchWidth,
-            int atk, float casetime, int guid, List<int> talent_id)
+            int atk, float casetime, int guid, List<int> talent_id, int unit_role_id)
         {
             unitid = id; this.name = name; minrarity = rarity; motionType = motion;
             seType = se; searchAreaWidth = searchWidth; atkType = atk;
-            normalAtkCastTime = casetime; guildId = guid; this.talent_id = talent_id;
+            normalAtkCastTime = casetime; guildId = guid; this.talent_id = talent_id; this.unit_role_id = unit_role_id;
         }
         public override string ToString()
         {
@@ -2197,7 +2199,7 @@ namespace PCRCaculator
         public Dictionary<int, int> talentSkill = new();
         public Dictionary<int, int> teamSkill = new();
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
-
+        public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
 
         public int GetMaxRank()
         {

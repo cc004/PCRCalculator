@@ -1002,5 +1002,54 @@ namespace PCRCaculator.SQL
         public int ailment_49 { get; set; }
         public int ailment_50 { get; set; }
     }
+
+    public class unit_role_data : DbBaseData
+    {
+        public int unit_id { get; set; }
+        public int unit_role_id { get; set; }
+    }
+
+    public class unit_role_mastery_id : DbBaseData
+    {
+        public int mastery_id { get; set; }
+        public int unit_role_id { get; set; }
+        public int slot_id { get; set; }
+    }
+    public class unit_role_mastery_slot_data : DbBaseData
+    {
+        public int mastery_id { get; set; }
+        public int slot_level { get; set; }
+        public int icon_id { get; set; }
+        public string name { get; set; }
+    }
+    public class unit_role_mastery_enhance_data : DbBaseData
+    {
+        public int mastery_id { get; set; }
+        public int slot_level { get; set; }
+        public int enhance_level { get; set; }
+        public int role_param_type_1 { get; set; }
+        public int role_param_type_2 { get; set; }
+        public int enhance_value_1 { get; set; }
+        public int enhance_value_2 { get; set; }
+    }
+    public class UnitRoleMasterySlotEnhanceData
+    {
+        public int mastery_id { get; set; }
+        public Dictionary<int, SlotLevelInfo> slot_level_info { get; set; }
+    }
+
+    public class SlotLevelInfo
+    {
+        public int icon_id { get; set; }
+        public string name { get; set; }
+        public Dictionary<int, EnhanceLevelInfo> enhance_level_info { get; set; }
+    }
+    public class EnhanceLevelInfo
+    {
+        public int role_param_type_1 { get; set; }
+        public int role_param_type_2 { get; set; }
+        public int enhance_value_1 { get; set; }
+        public int enhance_value_2 { get; set; }
+    }
 }
 

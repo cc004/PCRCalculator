@@ -306,7 +306,6 @@ namespace PCRCaculator.Guild
                 return;
             if (unitData == null)
                 unitData = SettingData.GetCurrentPlayerData().playrCharacters[idx];
-            characterDetailButton.SetButton(unitData);
             BaseData baseData = MainManager.Instance.UnitRarityDic[unitData.unitId].GetBaseData(unitData);
             var baseDataEX = MainManager.Instance.UnitRarityDic[unitData.unitId].GetEXSkillValue(unitData);//,MyGameCtrl.Instance.tempData.isGuildBattle);
             characterDetailTexts[0].text = "" + baseData.RealHp + (baseDataEX.RealHp == 0 ? string.Empty : $"<color=#FF80C0>+{baseDataEX.RealHp}</color>");
@@ -2171,6 +2170,7 @@ namespace PCRCaculator.Guild
         public Dictionary<int, int> talentLevel = new Dictionary<int, int>();
         public Dictionary<int, int> talentSkill = new Dictionary<int, int>();
         public Dictionary<int, int> teamSkill = new Dictionary<int, int>();
+        public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
         public List<List<float>> UBExecTimeData = new List<List<float>> { };
         public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};
         public bool useAutoMode;

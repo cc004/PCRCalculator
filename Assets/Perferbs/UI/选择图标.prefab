@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 7868348365897373784}
   - component: {fileID: 3036259145833746086}
   m_Layer: 5
-  m_Name: talent
+  m_Name: role
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2770071304108508373
 RectTransform:
   m_ObjectHideFlags: 0
@@ -35,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -11.3, y: 10.8}
-  m_SizeDelta: {x: 20, y: 20}
+  m_AnchoredPosition: {x: -29.24, y: 9.17}
+  m_SizeDelta: {x: 22, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7868348365897373784
 CanvasRenderer:
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1866580833, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  m_Sprite: {fileID: -729132773, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -194,8 +194,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.6, y: 31.3}
-  m_SizeDelta: {x: 120, y: 40}
+  m_AnchoredPosition: {x: -0.2889, y: 31.3}
+  m_SizeDelta: {x: 150, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7743600925614749449
 CanvasRenderer:
@@ -306,7 +306,7 @@ GameObject:
   - component: {fileID: 7743600925625691102}
   - component: {fileID: 7743600925625691103}
   m_Layer: 5
-  m_Name: position
+  m_Name: talent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,8 +329,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -11.3, y: 10.8}
-  m_SizeDelta: {x: 20, y: 20}
+  m_AnchoredPosition: {x: -8.719994, y: 9.169956}
+  m_SizeDelta: {x: 22, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7743600925625691102
 CanvasRenderer:
@@ -360,8 +360,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1011140826130490407, guid: d8c7915e2b51fd542824a7d05cc1bec1,
-    type: 3}
+  m_Sprite: {fileID: -1791581481, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -587,6 +586,7 @@ MonoBehaviour:
   - {fileID: 2177176151013924680, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   - {fileID: 4111648873913364657, guid: 683bedb62b0621044821807fd9b5373f, type: 3}
   characterPositionImage_B: {fileID: 7743600925625691103}
+  roleImage: {fileID: 3036259145833746086}
   positionSprites_B:
   - {fileID: 1011140826130490407, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   - {fileID: -4825968671982453888, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
@@ -597,7 +597,22 @@ MonoBehaviour:
   - {fileID: 447124816, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
   - {fileID: -2138568816, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
   - {fileID: 611335510, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
-  characterTalentImage: {fileID: 3036259145833746086}
+  talentSprites2:
+  - {fileID: -1791581481, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -1681610252, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: 234773701, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: 471324598, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -249106205, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  roleSprites:
+  - {fileID: -729132773, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: 1207960843, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -550074322, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -2022945049, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -200718287, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: 79525203, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -359456548, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  - {fileID: -1736499343, guid: 8cd4433fd54eecf40b2d0ef140900325, type: 3}
+  characterTalentImage: {fileID: 7743600925625691103}
   backImage: {fileID: 7743600925682188759}
   HPSlider: {fileID: 0}
   MaxHPSlider: {fileID: 0}

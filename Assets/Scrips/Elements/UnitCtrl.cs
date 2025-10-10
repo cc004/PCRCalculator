@@ -2534,7 +2534,10 @@ this.updateCurColor();
             baseDataEX = exOverride ?? baseDataEX;
 
             if (MainManager.Instance.UnitRarityDic.ContainsKey(UnitId))
+            {
                 TalentIds = MainManager.Instance.UnitRarityDic[UnitId]?.detailData?.talent_id ?? new List<int>();
+                RoleId = MainManager.Instance.UnitRarityDic[UnitId]?.detailData?.unit_role_id ?? 0;
+            }
 
             if (additional != null) baseData += additional;
 

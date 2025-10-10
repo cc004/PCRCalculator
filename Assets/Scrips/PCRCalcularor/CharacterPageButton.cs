@@ -29,9 +29,11 @@ namespace PCRCaculator
         public Image characterImage;
         public List<Sprite> backgrounds;//0-4
         public static List<Sprite> backgrounds1;
-        public Image characterPositionImage_B;
+        public Image roleImage;
         public List<Sprite> positionSprites_B;//0-2
         public List<Sprite> talentSprites;//0-4火水风光暗
+        public List<Sprite> talentSprites2;//0-4火水风光暗
+        public List<Sprite> roleSprites;//1-7
         public Image characterTalentImage;
         public Image backImage;
         public Slider HPSlider;
@@ -91,9 +93,9 @@ namespace PCRCaculator
                 else if (buttonType == ButtonType.typeB)
                 {
                     levelText_B.text = "";
-                    if (characterPositionImage_B != null)
+                    if (characterTalentImage != null)
                     {
-                        characterPositionImage_B.gameObject.SetActive(false);
+                        characterTalentImage.gameObject.SetActive(false);
                     }
                 }
                 backImage.sprite = backgrounds1[0];
@@ -142,10 +144,21 @@ namespace PCRCaculator
             if (unitid <= 200000 && MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData) && rarityData.detailData.talent_id.Count > 0)
             {
                 characterTalentImage.SetActive(true);
-                characterTalentImage.sprite = talentSprites[rarityData.detailData.talent_id.First() - 1]; // may be multiple ? such as 407701
+                if (rarityData.detailData.unit_role_id != 0)
+                {
+                    roleImage.SetActive(true);
+                    characterTalentImage.sprite = talentSprites2[rarityData.detailData.talent_id.First() - 1]; // may be multiple ? such as 407701
+                    roleImage.sprite = roleSprites[rarityData.detailData.unit_role_id - 1];
+                }
+                else
+                {
+                    roleImage.SetActive(false);
+                    characterTalentImage.sprite = talentSprites[rarityData.detailData.talent_id.First() - 1]; // may be multiple ? such as 407701
+                }
             }
             else
             {
+                roleImage.SetActive(false);
                 characterTalentImage.SetActive(false);
             }
             characterImage.sprite = sprite;
@@ -219,8 +232,20 @@ namespace PCRCaculator
                     levelText_B.text = "" + Mathf.RoundToInt(rarityData.GetPowerValue(data));
                     if (showPosition)
                     {
-                        PositionType k = rarityData.unitPositionType;
-                        characterPositionImage_B.sprite = positionSprites_B[(int)k];
+                        if (rarityData.detailData.unit_role_id != 0)
+                        {
+                            roleImage.SetActive(true);
+                            characterTalentImage.sprite = talentSprites2[rarityData.detailData.talent_id.First() - 1]; // may be multiple ? such as 407701
+                            roleImage.sprite = roleSprites[rarityData.detailData.unit_role_id - 1];
+                        }
+                        else
+                        {
+                            roleImage.SetActive(false);
+                            characterTalentImage.SetActive(true);
+                            characterTalentImage.sprite = talentSprites[rarityData.detailData.talent_id.First() - 1]; // may be multiple ? such as 407701
+                        }
+                        // PositionType k = rarityData.unitPositionType;
+                        // characterTalentImage.sprite = talentSprites[(int)k];
                     }
                 }
                 else
