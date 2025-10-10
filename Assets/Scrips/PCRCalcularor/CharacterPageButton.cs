@@ -86,6 +86,7 @@ namespace PCRCaculator
             {
                 stars.SetStars(-1);
                 characterTalentImage.SetActive(false);
+                roleImage.gameObject.SetActive(false);
                 if (buttonType == ButtonType.typeA)
                 {
                     levelText.text = "";
@@ -96,6 +97,7 @@ namespace PCRCaculator
                     if (characterTalentImage != null)
                     {
                         characterTalentImage.gameObject.SetActive(false);
+                        roleImage.gameObject.SetActive(false);
                     }
                 }
                 backImage.sprite = backgrounds1[0];

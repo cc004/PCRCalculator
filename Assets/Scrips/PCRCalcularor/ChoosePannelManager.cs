@@ -125,23 +125,18 @@ namespace PCRCaculator
             parent.sizeDelta = new Vector2(100, original_hight);
 
             int total = MainManager.Instance.UnitRarityDic.Count;
-            int cnt = 0;
+            int cnt = 1;
             int batchSize = 5; // 每帧加载多少个角色，可根据实际情况调整
 
             foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
             {
-                cnt++;
-                try
-                {
-                    wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
-                }
-                catch { }
 
                 if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
                 {
                     GameObject b = Instantiate(togglePerferb);
                     b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
                     b.transform.localScale = Vector3.one;
+                    int bundleCountBefore = ABExTool.AssetBundleDic.Count;
 
                     int id0 = id;
                     b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
@@ -149,6 +144,16 @@ namespace PCRCaculator
 
                     togglePerferbs[id0] = b.GetComponent<Toggle>();
                     buttons[id0] = b.GetComponent<CharacterPageButton>();
+                    int bundleCountAfter = ABExTool.AssetBundleDic.Count;
+                    if (bundleCountAfter > bundleCountBefore)
+                    {
+                        cnt++;
+                        try
+                        {
+                            wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
+                        }
+                        catch { }
+                    }
                 }
 
                 // **关键：每加载一批后等待一帧，避免卡顿**
