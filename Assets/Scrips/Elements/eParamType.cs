@@ -33,9 +33,9 @@ namespace Elements
     WAVE_HP_RECOVERY = 10, // 0x0000000A
     [Description("TP自动回复")]
     WAVE_ENERGY_RECOVERY = 11, // 0x0000000B
-    [Description("物理贯通伤害")]
+    [Description("物理贯通")]
     PHYSICAL_PENETRATE = 12, // 0x0000000C
-    [Description("魔法贯通伤害")]
+    [Description("魔法贯通")]
     MAGIC_PENETRATE = 13, // 0x0000000D
     [Description("TP上升")]
     ENERGY_RECOVERY_RATE = 14, // 0x0000000E

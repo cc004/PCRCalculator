@@ -42,7 +42,7 @@ namespace Elements
         DEBUFF_ENHANCE = 12,
         [Description("恢复强化")]
         HEAL_ENHANCE = 13,
-        [Description("TP蓄力")]
+        [Description("初动TP")]
         ENERGY_CHARGE = 14,
     }
 

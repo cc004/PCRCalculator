@@ -948,7 +948,7 @@ namespace PCRCaculator
 
         public string TalentLevelDescribe()
         {
-            List <int> talentIds = MainManager.Instance.GetTalentIds(this.unitId);
+            List<int> talentIds = MainManager.Instance.GetTalentIds(this.unitId);
             if (talentIds.Count == 0)
                 return "无";
             string talentType = talentIds[0] switch
@@ -962,6 +962,53 @@ namespace PCRCaculator
             };
             string level = MainManager.Instance.TeamEnhanceData.GetTalentLevel(talentIds[0]).ToString();
             return string.IsNullOrEmpty(talentType) ? level : $"{talentType}{level}";
+        }
+        public string RoleMasteryDescribe()
+        {
+            // 获取unit_role_id
+            int unit_role_id = MainManager.Instance.UnitRoleDataDic[unitId].unit_role_id;
+
+            // 根据unit_role_id获取所有的masteryId
+            var masteryDataList = MainManager.Instance.UnitRoleMasteryIdDic.Values
+                .Where(data => data.unit_role_id == unit_role_id)
+                .OrderBy(data => data.slot_id)
+                .ToList();
+
+            // 获取玩家组的数据
+            var playerGroup = GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+            if (playerGroup?.roleMastery == null || masteryDataList.Count == 0)
+            {
+                return "0-0/0-0\n0-0/0-0";
+            }
+
+            // 构建结果字符串
+            string[] lines = new string[2];
+            for (int line = 0; line < 2; line++)
+            {
+                string lineStr = "";
+                for (int col = 0; col < 2; col++)
+                {
+                    int index = line * 2 + col;
+                    if (index < masteryDataList.Count)
+                    {
+                        int masteryId = masteryDataList[index].mastery_id;
+                        var (slotLevel, enhanceLevel) = playerGroup.roleMastery.TryGetValue(masteryId, out var value) ? value : (0, 0);
+                        lineStr += $"{slotLevel}-{enhanceLevel}";
+                    }
+                    else
+                    {
+                        lineStr += "0-0";
+                    }
+
+                    if (col == 0)
+                    {
+                        lineStr += "/";
+                    }
+                }
+                lines[line] = lineStr;
+            }
+
+            return string.Join("\n", lines);
         }
     }
     /// <summary>

@@ -134,7 +134,7 @@ namespace PCRCaculator
             float value = GetFormatEnhanceValue(enhanceData?.role_param_type_1 ?? 0, enhanceValue);
 
             roleSlotNameText.text = name;
-            roleSlotValueText.text = enhanceData?.role_param_type_1 != 14 ? $"{value}%" : $"{value}";
+            roleSlotValueText.text = enhanceData?.role_param_type_1 > 7 ? $"{value}" : $"{value}%" ;
             roleSlotLevelText.text = level.ToString();
             roleSlotStarText.text = star.ToString();
             roleSlotIcon.sprite = icon;

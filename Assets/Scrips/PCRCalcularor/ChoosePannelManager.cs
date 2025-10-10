@@ -706,12 +706,12 @@ namespace PCRCaculator
                     buttons[id].gameObject.SetActive(false);
                 }
             }
-            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95 + 105;
+            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95;
             parent.sizeDelta = new Vector2(100, neededHeight);
 
-            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95 + 105)
+            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95)
             {
-                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95 + 105);
+                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95);
             }
             Canvas.ForceUpdateCanvases();
             TurnAllToggles(selectedCharId.Count != 5);
