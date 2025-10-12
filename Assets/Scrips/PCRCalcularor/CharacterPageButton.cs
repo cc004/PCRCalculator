@@ -399,11 +399,11 @@ namespace PCRCaculator
             else
             {
                 int idx = 0;
-                if (stateIconType_2 == eStateIconType.SLOW || stateIconType_2 == eStateIconType.HASTE)
-                {
-                    idx = battleBuffUIs.FindIndex(a => a.stateIconType == eStateIconType.SLOW || a.stateIconType == eStateIconType.HASTE);
-                }
-                else
+                // if (stateIconType_2 == eStateIconType.SLOW || stateIconType_2 == eStateIconType.HASTE)
+                // {
+                    // idx = battleBuffUIs.FindIndex(a => a.stateIconType == eStateIconType.SLOW || a.stateIconType == eStateIconType.HASTE);
+                // }
+                // else
                 {
                     idx = battleBuffUIs.FindIndex(
                     a => a.key == extraKey);

@@ -144,12 +144,18 @@ namespace Elements
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null && list1.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
+                    foreach(var index in list1)
+                    {
+                        button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     list1.Clear();
                 }
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null && list2.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
+                    foreach(var index in list2)
+                    {
+                        button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     list2.Clear();
                 }
             }
@@ -4747,13 +4753,16 @@ this.updateCurColor();
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7) && indexList7.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
+                    foreach (var index in indexList7)
+                    {
+                        button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     indexList7.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}", _data);
                     // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
                     //     showIconDict[eAbnormalState.SLOW] = 0;
                     // showIconDict[eAbnormalState.SLOW]++;
@@ -4763,13 +4772,17 @@ this.updateCurColor();
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
+                    foreach (var index in indexList11)
+                    {
+
+                        button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     indexList11.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}");
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}", _data);
 
                     // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
                     //     showIconDict[eAbnormalState.HASTE] = 0;
