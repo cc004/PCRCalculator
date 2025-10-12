@@ -181,6 +181,37 @@ namespace Elements
             return true;
         }
 
+        public override DoubleWithEx GetActionBaseValue(UnitCtrl _source, eValueNumber _type)
+        {
+            // 默认值
+            DoubleWithEx value = 0.0;
+
+            Value.TryGetValue(_type, out value);
+
+            if (_type != eValueNumber.VALUE_2) // small different
+                return value;
+
+            UnitCtrl.BuffParamKind paramKind = BuffDebuffAction.GetChangeParamKind(ActionDetail1);
+
+            if (!BuffDebuffAction.BUFF_DEBUFF_ENHANCE_TARGET_TYPE.Contains(paramKind))
+                return value;
+
+            if (IsExEquipSkillAction)
+                return value;
+
+            long enhanceZero = 0;
+            if (_source != null)
+            {
+                if (ActionDetail1 % 10 != 1)
+                    enhanceZero = _source.BuffEnhanceZero;
+                else
+                    enhanceZero = _source.DebuffEnhanceZero;
+            }
+
+            double rate = enhanceZero / 10000.0 + 1.0;
+            return value * rate;
+        }
+
         public override void ExecAction(
           UnitCtrl _source,
           BasePartsData _target,

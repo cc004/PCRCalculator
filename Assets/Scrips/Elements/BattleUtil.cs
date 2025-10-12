@@ -25,6 +25,30 @@ namespace Elements
       return ret;
     }
 
+    public static float CalcDodgeByLevelDiffUseParam(int _level, UnitCtrl _source, BasePartsData _target, bool _isExEquipSkillAction, float _coefficient = 1)
+    {
+      var owner = _target.Owner;
+
+      if (owner.IsBoss)
+          return 1f;
+
+      int targetLevel = _target.GetLevel();
+      float baseDodge = 1f + (float)(targetLevel - _level) / -100f;
+      if (targetLevel - _level <= 0)
+          baseDodge = 1f;
+      baseDodge *= _coefficient;
+      baseDodge = Mathf.Min(baseDodge, 1f);
+
+      long targetResist = owner.AbnormalStateDodgeResistZero;
+      long sourceHit = _source.AbnormalStateDodgeHitZero;
+
+      if (!_source.IsBonusEnemy && !_source.IsBoss && !_isExEquipSkillAction)
+          return baseDodge / (1f + targetResist / 10000f) * (1f + sourceHit / 10000f);
+
+      return baseDodge;
+    }
+
+
     /*public static bool IsCheckSupportChara(eBattleCategory _battleCategory)
     {
       switch (_battleCategory)

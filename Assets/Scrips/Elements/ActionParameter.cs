@@ -152,6 +152,7 @@ namespace Elements
         public eEffectType EffectType { get; set; }
 
         public bool IgnoreDecoy { get; set; }
+        public bool IsExEquipSkillAction { get; set; }
         public List<UnitCtrl> ExecedMultiBossList { get; set; } = new List<UnitCtrl>();
 
         public BasePartsData ProtectedParts { get; set; }
@@ -333,6 +334,14 @@ namespace Elements
                    actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
         }
 
+        // RVA: 0x27C95C0 Offset: 0x27C95C0 VA: 0x27C95C0 Slot: 12
+        public virtual DoubleWithEx GetActionBaseValue(UnitCtrl _source, eValueNumber _type)
+        {
+            DoubleWithEx val;
+            Value.TryGetValue(_type, out val);
+            return val;
+        }
+
         public delegate void OnDamageHitDelegate(LongWithEx damage);
 
         public delegate void OnActionEndDelegate();
@@ -341,7 +350,7 @@ namespace Elements
 
         public Dictionary<eValueNumber, DoubleWithEx> oppositeValue = new Dictionary<eValueNumber, DoubleWithEx>();
 
-        public Dictionary<eValueNumber, DoubleWithEx> PrepareActionValue()
+        public Dictionary<eValueNumber, DoubleWithEx> PrepareActionValue(UnitCtrl _owner)
         {
 
             Dictionary<eValueNumber, DoubleWithEx> additionalValue = AdditionalValue;
@@ -359,7 +368,8 @@ namespace Elements
                 if (divideValue != null && divideValue.ContainsKey(_type) && (double) divideValue[_type] != 0.0)
                     num3 = divideValue[_type];
                 DoubleWithEx num4 = 0.0;
-                _action.Value.TryGetValue(_type, out num4);
+                // _action.Value.TryGetValue(_type, out num4);
+                num4 = _action.GetActionBaseValue(_owner, _type);
                 if ((object) oppositeActionProb == null)
                     return (num1 + num4) * num2 / num3;
                 var result = (num1 + num4) * num2 / num3;

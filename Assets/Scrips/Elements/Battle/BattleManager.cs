@@ -197,7 +197,7 @@ namespace Elements.Battle
         //private StoryBattleData storyBattleDataPrefab;
         public bool isReleaseSlipDamageLogBarrier; // 0x501
 
-        public long allLogBarrierStartValue = 10000000; // TODO find where
+        public long allLogBarrierStartValue = 10000000; 
         public long allLogBarrierEffectValue = 100000; // 0x4E8
         private bool forcePauseNoDialogUpdate;
         private GameObject focusObject;

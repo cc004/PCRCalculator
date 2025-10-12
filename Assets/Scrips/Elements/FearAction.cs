@@ -23,12 +23,14 @@ namespace Elements
       Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      int num1 = BattleManager.Random(0.0f, 1f,
-          new RandomData(_source, _target.Owner, ActionId, 20, (float)_valueDictionary[eValueNumber.VALUE_3])) <= (double) _valueDictionary[eValueNumber.VALUE_3] ? 1 : 0;
-            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
 
-            float num2 = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 20, (float)pp));
-      if (num1 != 0 && num2 <= (double) BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
+      int num1 = BattleManager.Random(0.0f, 1f,
+          new RandomData(_source, _target.Owner, ActionId, 20, (float)_valueDictionary[eValueNumber.VALUE_3])) <= (double)_valueDictionary[eValueNumber.VALUE_3] ? 1 : 0;
+      // double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
+      double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
+
+      float num2 = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 20, (float)pp));
+      if (num1 != 0 && num2 <= pp)
       {
         AppendIsAlreadyExeced(_target.Owner, _num);
         _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.FEAR, (float)_valueDictionary[eValueNumber.VALUE_1], this, _skill);
@@ -48,8 +50,8 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
   }
 }

@@ -33,7 +33,13 @@ namespace Elements
       Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
+      long healEnhance = 0;
+      if (!IsExEquipSkillAction)
+      {
+        healEnhance = _source.HealEnhanceZero;
+      }
       double num = ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);
+      num *= (healEnhance + 10000.0) / 10000.0;
       HealFieldData healFieldData = new HealFieldData();
       healFieldData.KNLCAOOKHPP = eFieldType.HEAL;
       healFieldData.HKDBJHAIOMB = ActionDetail1 > 2 ? eFieldExecType.REPEAT : eFieldExecType.NORMAL;

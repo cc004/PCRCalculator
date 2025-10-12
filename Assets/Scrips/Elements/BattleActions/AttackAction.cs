@@ -14,9 +14,9 @@ using UnityEngine;
 
 namespace Elements
 {
-  public class AttackAction : AttackActionBase
-  {
-    private const int DAMAGE_BASE = 100;
+    public class AttackAction : AttackActionBase
+    {
+        private const int DAMAGE_BASE = 100;
         private enum eDecideTargetAtkType
         {
             SELECT_ATTACK_TYPE,
@@ -100,7 +100,7 @@ namespace Elements
                     isPhysicalForTarget = defZero < magicDefZero;
                 }
             }
-            DamageData damageData = createDamageData(_source, _target, _num, _valueDictionary, actionDetail1, _isCritical, _skill, eActionType.ATTACK,isPhysicalForTarget);
+            DamageData damageData = createDamageData(_source, _target, _num, _valueDictionary, actionDetail1, _isCritical, _skill, eActionType.ATTACK, isPhysicalForTarget);
             if (!TotalDamageDictionary.ContainsKey(_target))
             {
                 bool isDamagedEnergyCalculationChanged = MainManager.Instance.PlayerSetting.tpCalculationChanged;
@@ -110,7 +110,7 @@ namespace Elements
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
                 {
                     double criticalRate = damageData.CriticalRate;
-                    if ((double) x == index + 1 || x < 0)
+                    if ((double)x == index + 1 || x < 0)
                     {
                         criticalRate = 1f;
                     }
@@ -135,7 +135,7 @@ namespace Elements
                     criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.DoubleToLong(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
 
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
-                    if (_valueDictionary[eValueNumber.VALUE_5] == (float) (index + 1))
+                    if (_valueDictionary[eValueNumber.VALUE_5] == (float)(index + 1))
                     {
                         criticalData.critVar = 1.0;
                         criticalData.IsCritical = true;
@@ -145,7 +145,7 @@ namespace Elements
                         if (num2 <= criticalRate)
                             criticalData.IsCritical = true;
                         criticalData.critVar = DoubleWithEx.Binomial(criticalRate, criticalData.IsCritical,
-                            $"rnd:{data.id}:{(int) (criticalRate * 1000)}", data.id);
+                            $"rnd:{data.id}:{(int)(criticalRate * 1000)}", data.id);
                     }
                     else
                         criticalData.critVar = 0.0;
@@ -212,7 +212,7 @@ namespace Elements
                         damageData.ActionType,
                         unit,
                         damageData.Target,
-                        damageData.TargetIncludeMyTeam, 
+                        damageData.TargetIncludeMyTeam,
                         damageData.IgnoreTalentBonusForRatioSlip,
                         out bool isNoDamageByResist
                     );
@@ -227,7 +227,7 @@ namespace Elements
             }
 
             if (_isCritical) damageData.CriticalRate = 1f;
-            
+
             damageData.critVar = CriticalDataDictionary[_target][_num].critVar;
             damageData.IsLogBarrierCritical = CriticalDataDictionary[_target][_num].IsCritical;
             damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage;
@@ -248,13 +248,13 @@ namespace Elements
             //_target.ShowHitEffect(_source.ToadDatas.Count > 0 ? _skill.WeaponType : _source.WeaponSeType, _skill, _source.IsLeftDir);
         }
 
-    protected override double getCriticalDamageRate(Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) =>  _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : _valueDictionary[eValueNumber.VALUE_6];
+        protected override double getCriticalDamageRate(Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : _valueDictionary[eValueNumber.VALUE_6];
 
-    public override void SetLevel(float _level)
-    {
-      base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+        public override void SetLevel(float _level)
+        {
+            base.SetLevel(_level);
+            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+            Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
         protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
         {
