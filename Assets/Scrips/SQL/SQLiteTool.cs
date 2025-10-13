@@ -531,13 +531,16 @@ namespace PCRCaculator.SQL
                     .GroupBy(x => x.rarity)
                     .ToDictionary(g => g.Key, g => g.Max(x => x.enhance_level));
 
-                var subStatusGroups = GetDatas<ex_equipment_sub_status_group>()
-                    .GroupBy(x => x.ex_equipment_id)
-                    .ToDictionary(g => g.Key, g => g.ToList());
+                var subStatusGroupData = GetDatas<ex_equipment_sub_status_group>();
+                var subStatusGroups = subStatusGroupData != null ?
+                    subStatusGroupData.GroupBy(x => x.ex_equipment_id)
+                        .ToDictionary(g => g.Key, g => g.ToList()) :
+                    new Dictionary<int, List<ex_equipment_sub_status_group>>();
 
-                var subStatuses = GetDatas<ex_equipment_sub_status>()
-                    .GroupBy(x => x.group_id)
-                    .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values));
+                var subStatusesData = GetDatas<ex_equipment_sub_status>();
+                var subStatuses = subStatusesData != null ?
+                    subStatusesData.GroupBy(x => x.group_id)
+                    .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values)): new Dictionary<int, Dictionary<int, int[]>>();
 
                 var categories = GetDatas<ex_equipment_data>()
                     // .Where(x => x.clan_battle_equip_flag)
