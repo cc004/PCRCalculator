@@ -301,21 +301,49 @@ namespace PCRCaculator
                     var equip = MainManager.Instance.UnitExEquips[a.unitId][i][a.exEquip[i]];
                     var def = equip.GetDefaultBaseData();
                     var max = equip.GetMaxBaseData();
+
                     for (int j = 0; j < 17; ++j)
                     {
-                        if (ExtraEquipDefine.IsRateParam((eParamType)(j+1)))
+                        var isRateParam = ExtraEquipDefine.IsRateParam((eParamType)(j + 1));
+                        var d = def.dataint[j] / 100.0;
+                        var m = max.dataint[j] / 100.0;
+
+                        // 处理status加成
+                        if (equip.status.Count > 0)
                         {
-                            var d = def.dataint[j] / 100.0;
-                            var m = max.dataint[j] / 100.0;
-                            var present = Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                            for (int k = 0; k < 4; ++k)
+                            {
+                                int statusIndex = a.exEquipSubs[i][k * 2];
+                                int statusLevel = a.exEquipSubs[i][k * 2 + 1];
+                                var paramTypes = new List<eParamType>(equip.status.Keys);
+
+                                if (paramTypes[statusIndex] == (eParamType)(j + 1))
+                                {
+                                    var present2 = equip.status[paramTypes[statusIndex]][statusLevel];
+                                    if (isRateParam)
+                                    {
+                                        ex_param.dataint[j] += (int)Math.Ceiling((double)temp.dataint[j] * present2 / 1000000.0) * 100;
+                                    }
+                                    else
+                                    {
+                                        ex_param.dataint[j] += present2 * 100;
+                                    }
+                                }
+                            }
+                        }
+
+                        // 处理基础加成
+                        var present = isRateParam ?
+                            Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) :
+                            (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+
+                        if (isRateParam)
+                        {
                             ex_param.dataint[j] += (int)Math.Ceiling((double)temp.dataint[j] * present / 1000000.0) * 100;
                         }
                         else
                         {
-                            var d = def.dataint[j] / 100.0;
-                            var m = max.dataint[j] / 100.0;
-                            var present = (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
-                            ex_param.dataint[j] += present * 100;
+                            ex_param.dataint[j] += (int)present * 100;
                         }
                     }
                 }
@@ -591,6 +619,7 @@ namespace PCRCaculator
         public int uniqueEq2Lv = -1;//专武2等级
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
+        public Dictionary<int, int[]> exEquipSubs = new Dictionary<int, int[]>();
 
         [JsonIgnore]
         public string name;
@@ -1990,9 +2019,9 @@ namespace PCRCaculator
         [JsonIgnore]
         public float Atk { get => dataint[1] / 100.0f; set => dataint[1] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Magic_str { get => dataint[2] / 100.0f; set => dataint[2] = Mathf.RoundToInt((value * 100)); }
+        public float Def { get => dataint[2] / 100.0f; set => dataint[2] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Def { get => dataint[3] / 100.0f; set => dataint[3] = Mathf.RoundToInt((value * 100)); }
+        public float Magic_str { get => dataint[3] / 100.0f; set => dataint[3] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
         public float Magic_def { get => dataint[4] / 100.0f; set => dataint[4] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
@@ -2000,21 +2029,21 @@ namespace PCRCaculator
         [JsonIgnore]
         public float Magic_critical { get => dataint[6] / 100.0f; set => dataint[6] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Wave_hp_recovery { get => dataint[7] / 100.0f; set => dataint[7] = Mathf.RoundToInt((value * 100)); }
+        public float Dodge { get => dataint[7] / 100.0f; set => dataint[7] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Wave_energy_recovery { get => dataint[8] / 100.0f; set => dataint[8] = Mathf.RoundToInt((value * 100)); }
+        public float Life_steal { get => dataint[8] / 100.0f; set => dataint[8] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Dodge { get => dataint[9] / 100.0f; set => dataint[9] = Mathf.RoundToInt((value * 100)); }
+        public float Wave_hp_recovery { get => dataint[9] / 100.0f; set => dataint[9] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Physical_penetrate { get => dataint[10] / 100.0f; set => dataint[10] = Mathf.RoundToInt((value * 100)); }
+        public float Wave_energy_recovery { get => dataint[10] / 100.0f; set => dataint[10] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Magic_penetrate { get => dataint[11] / 100.0f; set => dataint[11] = Mathf.RoundToInt((value * 100)); }
+        public float Physical_penetrate { get => dataint[11] / 100.0f; set => dataint[11] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Life_steal { get => dataint[12] / 100.0f; set => dataint[12] = Mathf.RoundToInt((value * 100)); }
+        public float Magic_penetrate { get => dataint[12] / 100.0f; set => dataint[12] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Hp_recovery_rate { get => dataint[13] / 100.0f; set => dataint[13] = Mathf.RoundToInt((value * 100)); }
+        public float Energy_recovery_rate { get => dataint[13] / 100.0f; set => dataint[13] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
-        public float Energy_recovery_rate { get => dataint[14] / 100.0f; set => dataint[14] = Mathf.RoundToInt((value * 100)); }
+        public float Hp_recovery_rate { get => dataint[14] / 100.0f; set => dataint[14] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
         public float Enerey_reduce_rate { get => dataint[15] / 100.0f; set => dataint[15] = Mathf.RoundToInt((value * 100)); }
         [JsonIgnore]
@@ -2033,10 +2062,10 @@ namespace PCRCaculator
             double o, double p, double q)
         {
             dataint = new long[17] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            Hp = (float)a; Atk = (float)b; Magic_str = (float)c; Def = (float)d; Magic_def = (float)e; Physical_critical = (float)f;
-            Magic_critical = (float)g; Wave_hp_recovery = (float)h; Wave_energy_recovery = (float)i; Dodge = (float)j;
-            Physical_penetrate = (float)k; Magic_penetrate = (float)l; Life_steal = (float)m; Hp_recovery_rate = (float)n;
-            Energy_recovery_rate = (float)o; Enerey_reduce_rate = (float)p; Accuracy = (float)q;
+            Hp = (float)a; Atk = (float)b; Def = (float)c; Magic_str = (float)d; Magic_def = (float)e; Physical_critical = (float)f;
+            Magic_critical = (float)g; Dodge = (float)h; Life_steal = (float)i; Wave_hp_recovery = (float)j;
+            Wave_energy_recovery = (float)k; Physical_penetrate = (float)l; Magic_penetrate = (float)m; Energy_recovery_rate = (float)n;
+            Hp_recovery_rate = (float)o; Enerey_reduce_rate = (float)p; Accuracy = (float)q;
         }
         /*public BaseData(int[] data)
         {
@@ -2058,10 +2087,10 @@ namespace PCRCaculator
         {
             return new float[17]
             {
-            Hp,Atk,Magic_str,Def, Magic_def,Physical_critical,
-        Magic_critical,Wave_hp_recovery, Wave_energy_recovery,Dodge,
-        Physical_penetrate ,Magic_penetrate,Life_steal,Hp_recovery_rate ,
-        Energy_recovery_rate,Enerey_reduce_rate,Accuracy
+                Hp,Atk,Def,Magic_str,Magic_def,Physical_critical,
+                Magic_critical,Dodge,Life_steal,Wave_hp_recovery, Wave_energy_recovery,
+                Physical_penetrate,Magic_penetrate,Energy_recovery_rate,Hp_recovery_rate ,
+                Enerey_reduce_rate,Accuracy
             };
         }
         public float GetPowerValue(UnitData unit)// int[] skillLevel, int rarity,bool hasUneq)

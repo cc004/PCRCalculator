@@ -310,11 +310,11 @@ namespace PCRCaculator.Guild
             var baseDataEX = MainManager.Instance.UnitRarityDic[unitData.unitId].GetEXSkillValue(unitData);//,MyGameCtrl.Instance.tempData.isGuildBattle);
             characterDetailTexts[0].text = "" + baseData.RealHp + (baseDataEX.RealHp == 0 ? string.Empty : $"<color=#FF80C0>+{baseDataEX.RealHp}</color>");
             long accuracy = Mathf.RoundToInt(EnemyDataDic.ContainsKey(selectedBossEnemyids[0]) ? EnemyDataDic[selectedBossEnemyids[0]].baseData.Accuracy : 0);//boss命中
-            long dodge = baseData.dataint[9] / 100;//角色闪避
+            long dodge = baseData.dataint[7] / 100;//角色闪避
             double dodgerate = dodge <= accuracy ? 0 : 1 / (1 + 100.0 / (dodge - accuracy));//闪避率
             for (int i = 1; i < baseData.dataint.Length; i++)
             {
-                if (i == 9)
+                if (i == 7)
                 {
                     // 处理闪避率
                     characterDetailTexts[i].text = "" + baseData.dataint[i] / 100 + (baseDataEX.dataint[i] == 0 ? string.Empty : $"<color=#FF80C0>+{(baseData.dataint[i] + baseDataEX.dataint[i]) / 100.0 - baseData.dataint[i] / 100.0}</color>") + $"<color=#FF80C0> ({(dodgerate * 100).ToString("F2") + "%"})</color>";

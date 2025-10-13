@@ -34,10 +34,10 @@ namespace PCRCaculator.SQL
         public double accuracy { get; set; }
         public BaseData GetBaseData()
         {
-            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
-            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
-            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
-            energy_recovery_rate, energy_reduce_rate, accuracy);
+            return new BaseData(hp, atk, def, magic_str,  magic_def, physical_critical,//0-5
+            magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery, //6-9
+            physical_penetrate, magic_penetrate, energy_recovery_rate, hp_recovery_rate,//10-13
+            energy_reduce_rate, accuracy);
         }
     }
 
@@ -118,10 +118,10 @@ namespace PCRCaculator.SQL
 
         public BaseData GetBaseData()
         {
-            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
-            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
-            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
-            energy_recovery_rate, energy_reduce_rate, accuracy)
+            return new BaseData(hp, atk, def, magic_str, magic_def, physical_critical,//0-5
+            magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery, //6-9
+            physical_penetrate, magic_penetrate, energy_recovery_rate, hp_recovery_rate,//10-13
+            energy_reduce_rate, accuracy)
             {
                 realhp = hp
             };
@@ -177,10 +177,10 @@ namespace PCRCaculator.SQL
 
         public BaseData GetBaseData()
         {
-            return new BaseData(hp, atk, magic_str, def, magic_def, physical_critical,//0-5
-            magic_critical, wave_hp_recovery, wave_energy_recovery, dodge,//6-9
-            physical_penetrate, magic_penetrate, life_steal, hp_recovery_rate,//10-13
-            energy_recovery_rate, energy_reduce_rate, accuracy)
+            return new BaseData(hp, atk, def, magic_str, magic_def, physical_critical,//0-5
+            magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery, //6-9
+            physical_penetrate, magic_penetrate, energy_recovery_rate, hp_recovery_rate,//10-13
+            energy_reduce_rate, accuracy)
             {
                 realhp = hp
             };
@@ -512,10 +512,10 @@ namespace PCRCaculator.SQL
         public int consume_gold { get; set; }
         public BaseData GetBaseDataGrowth()
         {
-            return new BaseData(hp_growth, atk_growth, magic_str_growth, def_growth, magic_def_growth, physical_critical_growth,//0-5
-            magic_critical_growth, wave_hp_recovery_growth, wave_energy_recovery_growth, dodge_growth,//6-9
-            physical_penetrate_growth, magic_penetrate_growth, life_steal_growth, hp_recovery_rate_growth,//10-13
-            energy_recovery_rate_growth, energy_reduce_rate_growth, accuracy_growth);
+            return new BaseData(hp_growth, atk_growth, def_growth, magic_str_growth, magic_def_growth, physical_critical_growth,//0-5
+            magic_critical_growth, dodge_growth, life_steal_growth, wave_hp_recovery_growth, wave_energy_recovery_growth, //6-9
+            physical_penetrate_growth, magic_penetrate_growth, energy_recovery_rate_growth, hp_recovery_rate_growth,//10-13
+            energy_reduce_rate_growth, accuracy_growth);
         }
     }
     public class unit_promotion
@@ -609,6 +609,10 @@ namespace PCRCaculator.SQL
         public int chara_id_8 { get; set; }
         public int chara_id_9 { get; set; }
         public int chara_id_10 { get; set; }
+        public int chara_id_11 { get; set; }
+        public int chara_id_12 { get; set; }
+        public int chara_id_13 { get; set; }
+        public int chara_id_14 { get; set; }
 
         public (int, int)[] GetStatesValueList()
         {
@@ -626,8 +630,7 @@ namespace PCRCaculator.SQL
             return new int[]
             {
                 chara_id_1, chara_id_2, chara_id_3, chara_id_4, chara_id_5, chara_id_6, chara_id_7, chara_id_8,
-                chara_id_9,
-                chara_id_10
+                chara_id_9,chara_id_10, chara_id_11, chara_id_12, chara_id_13, chara_id_14
             }.Where(x => x != 0).Select(x => 100 * x + 1).ToList();
             /*
         List<int> ids = new List<int>();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elements;
 
 namespace PCRCaculator.SQL
 {
@@ -18,6 +19,24 @@ namespace PCRCaculator.SQL
     {
         public int rarity { get; set; }
         public int enhance_level { get; set; }
+    }
+
+    public class ex_equipment_sub_status_group : DbBaseData
+    {
+        public int ex_equipment_id { get; set; }
+        public int group_id { get; set; }
+    }
+    public class ex_equipment_sub_status : DbBaseData
+    {
+        public int status { get; set; }
+        public int group_id { get; set; }
+        public int value_1 { get; set; }
+        public int value_2 { get; set; }
+        public int value_3 { get; set; }
+        public int value_4 { get; set; }
+        public int value_5 { get; set; }
+
+        public int[] values => new int[] { value_1, value_2, value_3, value_4, value_5 };
     }
 
     public class ex_equipment_data
@@ -72,19 +91,22 @@ namespace PCRCaculator.SQL
         public int passive_skill_id_1 { get; set; }
         public int passive_skill_id_2 { get; set; }
         public int passive_skill_powerup { get; set; }
+        public int group_id { get; set; }
+        public Dictionary<eParamType, int[]> status { get; set; }
+            = new Dictionary<eParamType, int[]>();
         public BaseData GetDefaultBaseData()
         {
-            return new BaseData(default_hp, default_atk, default_magic_str, default_def, default_magic_def, default_physical_critical,//0-5
-            default_magic_critical, default_wave_hp_recovery, default_wave_energy_recovery, default_dodge,//6-9
-            default_physical_penetrate, default_magic_penetrate, default_life_steal, default_hp_recovery_rate,//10-13
-            default_energy_recovery_rate, default_energy_reduce_rate, default_accuracy);
+            return new BaseData(default_hp, default_atk, default_def, default_magic_str, default_magic_def, default_physical_critical,//0-5
+            default_magic_critical, default_dodge, default_life_steal, default_wave_hp_recovery, default_wave_energy_recovery, //6-9
+            default_physical_penetrate, default_magic_penetrate, default_energy_recovery_rate, default_hp_recovery_rate,//10-13
+            default_energy_reduce_rate, default_accuracy);
         }
         public BaseData GetMaxBaseData()
         {
-            return new BaseData(max_hp, max_atk, max_magic_str, max_def, max_magic_def, max_physical_critical,//0-5
-            max_magic_critical, max_wave_hp_recovery, max_wave_energy_recovery, max_dodge,//6-9
-            max_physical_penetrate, max_magic_penetrate, max_life_steal, max_hp_recovery_rate,//10-13
-            max_energy_recovery_rate, max_energy_reduce_rate, max_accuracy);
+            return new BaseData(max_hp, max_atk, max_def, max_magic_str, max_magic_def, max_physical_critical,//0-5
+            max_magic_critical, max_dodge, max_life_steal, max_wave_hp_recovery, max_wave_energy_recovery, //6-9
+            max_physical_penetrate, max_magic_penetrate, max_energy_recovery_rate, max_hp_recovery_rate,//10-13
+            max_energy_reduce_rate, max_accuracy);
         }
     }
 }
