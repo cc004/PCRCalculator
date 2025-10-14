@@ -164,8 +164,9 @@ namespace PCRCaculator.Guild
         {
             get => MainManager.Instance.EnemyMPartsDic;
         }
-        public bool isGuildBoss { get => (selectedBossEnemyids[0] / 100000000) == 4; }
+        public bool IsGuildBoss { get => (selectedBossEnemyids[0] / 100000000) == 4; }
         public bool IsTalentQuestBoss { get => selectedBossEnemyids[0] / 100000000 == 8; }
+        public bool IsDungeonBoss { get => dungeonEnemy.ContainsValue(selectedBossEnemyids[0]); }
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
         {

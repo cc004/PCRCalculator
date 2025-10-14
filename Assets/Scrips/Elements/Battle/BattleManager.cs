@@ -4386,7 +4386,8 @@ namespace Elements.Battle
             }
             try
             {
-                var st = GuildManager.Instance.SettingData.start_tp.Split(',').Select(float.Parse).ToArray();
+                var start_tp = GuildManager.Instance.IsDungeonBoss ? "1,1,1,1,1" : GuildManager.Instance.SettingData.start_tp;
+                var st = start_tp.Split(',').Select(float.Parse).ToArray();
                 int up = Math.Min(st.Length, battleManager.UnitList.Count);
                 for (int i = 0; i < up; i++)
                 {
