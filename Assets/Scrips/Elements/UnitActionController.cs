@@ -660,8 +660,8 @@ namespace Elements
             {
                 if (actionParameter != null && actionParameter.Value != null)
                 {
-                    // Set attack enhancement value: (_additionalAttackEnhance / 10000.0 + 1.0)
                     actionParameter.Value[eValueNumber.VALUE_3] = _additionalAttackEnhance / 10000.0f + 1.0f;
+                    // TODO strange of overwriting this value find the reason
                 }
             }
         }
@@ -1410,10 +1410,10 @@ namespace Elements
                 if (action.oppositeAction == null)
                     action.oppositeValue.Clear();
                 else
-                    action.oppositeValue = action.oppositeAction.PrepareActionValue();
+                    action.oppositeValue = action.oppositeAction.PrepareActionValue(Owner);
             }
             
-            var _valueDictionary = action.PrepareActionValue();
+            var _valueDictionary = action.PrepareActionValue(Owner); // TODO may be right: source
             
             bool _last = action.JudgeLastAndNotExeced(target.Owner, num);
             bool _targetOneParts = action.AlreadyExecedData[target.Owner][num].TargetPartsNumber == 1;

@@ -360,6 +360,11 @@ namespace PCRCaculator.SQL
         public Dictionary<int, TeamSkillEnhanceData> TeamSkillEnhanceDataDic { get; private set; }
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get; private set; }
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get; private set; }
+        public Dictionary<int, unit_role_data> UnitRoleDataDic { get; private set; }
+        public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get; private set; }
+        public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get; private set; }
+        public Dictionary<int, unit_role_mastery_enhance_data[]> UnitRoleMasteryEnhanceDataDic { get; private set; }
+        public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic { get; private set; }
 
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
@@ -429,15 +434,16 @@ namespace PCRCaculator.SQL
             {
                 TalentWeaknessDic = GetDatasDic<talent_weakness>(a => a.resist_id);
             });
-            var talentDicTask =  Task.Run(() => TalentDic = GetDatas<unit_talent>()
+            var talentDicTask = Task.Run(() => TalentDic = GetDatas<unit_talent>()
                         .GroupBy(x => x.unit_id)
                         .ToDictionary(g => g.Key, g => g.ToArray()));
-
+            var UnitRoleDataDicTask =
+                Task.Run(() => UnitRoleDataDic = GetDatasDic<unit_role_data>(a => a.unit_id));
             var tasks = new List<Task>();
 
             tasks.Add(
                 Task.WhenAll(rarityDicTask, unitSkillDataDicTask, unitAttackPatternDicTask, equipDicTask,
-                        rankStateDicTask, unitDicTask, talentDicTask)
+                        rankStateDicTask, unitDicTask, talentDicTask, UnitRoleDataDicTask)
                 .ContinueWith(_ => Dic1 = GetUnitRarityData()));
             tasks.Add(
                 Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
@@ -451,9 +457,9 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => resistDataDic = GetResistData()));
             tasks.Add(
-                Task.Run(() =>  TalentFormationDic = GetTalentFormationData()));
+                Task.Run(() => TalentFormationDic = GetTalentFormationData()));
             tasks.Add(
-                Task.Run(() =>  TalentQuestWaveGroupDataDic = GetTalentQuestWaveGroupDataDic()));
+                Task.Run(() => TalentQuestWaveGroupDataDic = GetTalentQuestWaveGroupDataDic()));
             tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
@@ -500,6 +506,10 @@ namespace PCRCaculator.SQL
                 Task.Run(() => ExtraEffectDataDic = GetDatasDic<extra_effect_data>(a => a.extra_effect_id)));
             tasks.Add(
                 Task.Run(() => TalentQuestBattleEffectDic = GetDatasDic<talent_quest_battle_effect>(a => a.id)));
+            tasks.Add(
+                Task.Run(() => UnitRoleMasteryIdDic = GetDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
+            tasks.Add(
+                Task.Run(() => UnitRoleMasterySlotEnhanceDataDic = GetUnitRoleMasterySlotEnhanceData()));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();
@@ -521,9 +531,38 @@ namespace PCRCaculator.SQL
                     .GroupBy(x => x.rarity)
                     .ToDictionary(g => g.Key, g => g.Max(x => x.enhance_level));
 
+                var subStatusGroupData = GetDatas<ex_equipment_sub_status_group>();
+                var subStatusGroups = subStatusGroupData != null ?
+                    subStatusGroupData.GroupBy(x => x.ex_equipment_id)
+                        .ToDictionary(g => g.Key, g => g.ToList()) :
+                    new Dictionary<int, List<ex_equipment_sub_status_group>>();
+
+                var subStatusesData = GetDatas<ex_equipment_sub_status>();
+                var subStatuses = subStatusesData != null ?
+                    subStatusesData.GroupBy(x => x.group_id)
+                    .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values)): new Dictionary<int, Dictionary<int, int[]>>();
+
                 var categories = GetDatas<ex_equipment_data>()
                     // .Where(x => x.clan_battle_equip_flag)
-                    .Select(x => x.SetEnhanceLevelMax(enhanceLevel[x.rarity]))
+                    .Select(x =>
+                    {
+                        if (subStatusGroups.ContainsKey(x.ex_equipment_id))
+                        {
+                            foreach (var group in subStatusGroups[x.ex_equipment_id])
+                            {
+                                var groupId = group.group_id;
+                                x.group_id = groupId;
+                                if (subStatuses.ContainsKey(groupId))
+                                {
+                                    foreach (var kvp in subStatuses[groupId])
+                                    {
+                                        x.status[(eParamType)kvp.Key] = kvp.Value;
+                                    }
+                                }
+                            }
+                        }
+                        return x.SetEnhanceLevelMax(enhanceLevel[x.rarity]);
+                    })
                     .GroupBy(x => x.category)
                     .ToDictionary(g => g.Key,
                         g => g.ToDictionary(x => x.ex_equipment_id));
@@ -570,6 +609,7 @@ namespace PCRCaculator.SQL
                 UnitRankData rankData = new UnitRankData(eq, datas1);
                 UnitDetailData detailData;
                 List<int> talent_id = new List<int>();
+                int unit_role_id = 0;
                 try
                 {
                     unit_data t4 = unitDic[pair.Key];
@@ -577,9 +617,13 @@ namespace PCRCaculator.SQL
                     {
                         talent_id = TalentDic[pair.Key].Select(x => x.talent_id).ToList();
                     }
+                    if (UnitRoleDataDic.Count > 0)
+                    {
+                        unit_role_id = UnitRoleDataDic[pair.Key].unit_role_id;
+                    }
                     detailData = new UnitDetailData(t4.unit_id,
                         t4.unit_name, t4.rarity, t4.motion_type, t4.se_type,
-                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id, talent_id)
+                        t4.search_area_width, t4.atk_type, (float)t4.normal_atk_cast_time, t4.guild_id, talent_id, unit_role_id)
                     {
                         moveSpeed = t4.move_speed,
                         prefabIdBattle = t4.prefab_id_battle != 0 ? t4.prefab_id_battle : t4.prefab_id
@@ -1332,6 +1376,93 @@ namespace PCRCaculator.SQL
                 result[kvp.Key] = new talentFormationData(kvp.Value, bonusDic);
             }
             return result;
+        }
+
+        private Dictionary<int, UnitRoleMasterySlotEnhanceData> GetUnitRoleMasterySlotEnhanceData()
+        {
+            var slotDataList = GetDatas<unit_role_mastery_slot_data>();
+            var enhanceDataList = GetDatas<unit_role_mastery_enhance_data>();
+
+            // 将slot数据按mastery_id和slot_level分组
+            var slotDataDict = new Dictionary<int, Dictionary<int, unit_role_mastery_slot_data>>();
+            foreach (var slotData in slotDataList)
+            {
+                if (!slotDataDict.ContainsKey(slotData.mastery_id))
+                    slotDataDict[slotData.mastery_id] = new Dictionary<int, unit_role_mastery_slot_data>();
+
+                slotDataDict[slotData.mastery_id][slotData.slot_level] = slotData;
+            }
+
+            // 将增强数据按mastery_id、slot_level和enhance_level分组
+            var enhanceDataDict = new Dictionary<int, Dictionary<int, Dictionary<int, unit_role_mastery_enhance_data>>>();
+            foreach (var enhanceData in enhanceDataList)
+            {
+                if (!enhanceDataDict.ContainsKey(enhanceData.mastery_id))
+                    enhanceDataDict[enhanceData.mastery_id] = new Dictionary<int, Dictionary<int, unit_role_mastery_enhance_data>>();
+
+                if (!enhanceDataDict[enhanceData.mastery_id].ContainsKey(enhanceData.slot_level))
+                    enhanceDataDict[enhanceData.mastery_id][enhanceData.slot_level] = new Dictionary<int, unit_role_mastery_enhance_data>();
+
+                enhanceDataDict[enhanceData.mastery_id][enhanceData.slot_level][enhanceData.enhance_level] = enhanceData;
+            }
+
+            // 创建最终的整合字典
+            UnitRoleMasterySlotEnhanceDataDic = new Dictionary<int, UnitRoleMasterySlotEnhanceData>();
+
+            foreach (var slotDataByMastery in slotDataDict)
+            {
+                var masteryId = slotDataByMastery.Key;
+                var slotDataItems = slotDataByMastery.Value;
+
+                var integratedData = new UnitRoleMasterySlotEnhanceData
+                {
+                    mastery_id = masteryId,
+                    slot_level_info = new Dictionary<int, SlotLevelInfo>()
+                };
+
+                // 为每个slot_level添加图标、名称信息以及增强数据
+                foreach (var slotDataEntry in slotDataItems)
+                {
+                    var slotLevel = slotDataEntry.Key;
+                    var slotData = slotDataEntry.Value;
+
+                    var slotLevelInfo = new SlotLevelInfo
+                    {
+                        icon_id = slotData.icon_id,
+                        name = slotData.name,
+                        enhance_level_info = new Dictionary<int, EnhanceLevelInfo>()
+                    };
+
+                    // 添加增强数据到SlotLevelInfo中
+                    if (enhanceDataDict.ContainsKey(masteryId) &&
+                        enhanceDataDict[masteryId].ContainsKey(slotLevel))
+                    {
+                        var enhanceDataByLevel = enhanceDataDict[masteryId][slotLevel];
+                        foreach (var enhanceDataEntry in enhanceDataByLevel)
+                        {
+                            var enhanceLevel = enhanceDataEntry.Key;
+                            var enhanceData = enhanceDataEntry.Value;
+
+                            var enhanceLevelInfo = new EnhanceLevelInfo
+                            {
+                                role_param_type_1 = enhanceData.role_param_type_1,
+                                role_param_type_2 = enhanceData.role_param_type_2,
+                                enhance_value_1 = enhanceData.enhance_value_1,
+                                enhance_value_2 = enhanceData.enhance_value_2
+                            };
+
+                            slotLevelInfo.enhance_level_info[enhanceLevel] = enhanceLevelInfo;
+                        }
+                    }
+
+                    // 将SlotLevelInfo添加到slot_level_info字典中
+                    integratedData.slot_level_info[slotLevel] = slotLevelInfo;
+                }
+
+                UnitRoleMasterySlotEnhanceDataDic[masteryId] = integratedData;
+            }
+
+            return UnitRoleMasterySlotEnhanceDataDic;
         }
     }
 }

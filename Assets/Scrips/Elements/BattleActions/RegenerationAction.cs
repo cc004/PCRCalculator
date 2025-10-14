@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 namespace Elements
 {
@@ -47,7 +48,7 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             long num = (base.ActionDetail1 != 1) ? (_source.IsPartsBoss ? parts.GetMagicStrZero() : ((int)_source.MagicStrZero)) : (_source.IsPartsBoss ? parts.GetAtkZero() : ((int)_source.AtkZero));
-            long val = calculateHealValue(num, _valueDictionary);
+            long val = calculateHealValue(_source, num, _valueDictionary);
             _target.Owner.SetAbnormalState(_source, ABNORMAL_STATE_DIC[(eTargetType)base.ActionDetail2], (float)_valueDictionary[eValueNumber.VALUE_5], this, _skill, val, base.ActionDetail1, _reduceEnergy: false, _isDamageRelease: false, 1f, _valueDictionary[eValueNumber.VALUE_7] == 0f);
             action($"每秒{((eTargetType)ActionDetail2).ToString()}恢复{val}");
         }
@@ -59,16 +60,21 @@ namespace Elements
             Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
             Value[eValueNumber.VALUE_5] = (float)(MasterData.action_value_5 + MasterData.action_value_6 * _level);
         }
-        private long calculateHealValue(long _statusValue, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+        private long calculateHealValue(UnitCtrl _source, long _statusValue, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
         {
             switch (base.ActionDetail2)
             {
                 case 1:
                 case 3:
-                    return (int)(_valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (float)_statusValue);
+                    long healEnhance = 0;
+                    if (!IsExEquipSkillAction) 
+                    {
+                        healEnhance = _source.HealEnhanceZero;
+                    }
+                    return BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * _statusValue) * (healEnhance + 10000.0) / 10000.0);
                 case 2:
                 case 4:
-                    return (int)_valueDictionary[eValueNumber.VALUE_1];
+                    return BattleUtil.DoubleToLong(_valueDictionary[eValueNumber.VALUE_1]);
                 default:
                     return 0;
             }

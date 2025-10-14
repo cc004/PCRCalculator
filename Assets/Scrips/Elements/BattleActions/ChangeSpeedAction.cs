@@ -123,8 +123,9 @@ namespace Elements
                     break;
             }
 
-            double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
-            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 6, (float)pp));
+            // double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
+            double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
+            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 6, pp));
             //start add
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, ActionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
@@ -142,7 +143,7 @@ namespace Elements
                 }
                 flag = true;
             }
-            if (!flag && (num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target) || TargetAssignment == eTargetAssignment.OWNER_SITE))
+            if (!flag && (num < pp || TargetAssignment == eTargetAssignment.OWNER_SITE))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 UnitCtrl.eAbnormalState abnormalState2 = AbnormalStateDic[(eChangeSpeedType)ActionDetail1];

@@ -98,12 +98,35 @@ namespace PCRCaculator
         public GameObject talent;
         public Toggle isSetMaxExEquip;
         private bool initialized = false;
+        [System.Serializable]
+        public class SubItemData
+        {
+            public Dropdown typeOption;
+            public Dropdown valueOption;
+        }
 
+        [System.Serializable]
+        public class SubGroup
+        {
+            public SubItemData sub1 = new SubItemData();
+            public SubItemData sub2 = new SubItemData();
+            public SubItemData sub3 = new SubItemData();
+            public SubItemData sub4 = new SubItemData();
+        }
+
+        public List<SubGroup> subs = new List<SubGroup>();
+        public GameObject subGroupsContainer;
+        private Dictionary<int, param_type> paramTypeDict => MainManager.Instance.ParamTypeDic;
         private void Start()
         {
             Instance = this;
             StartCoroutine(SearchCharaInitialize());
             // StartCoroutine(WaitForLoadFinished());
+            for (int i = 0; i < ExEquip.Length; i++)
+            {
+                int index = i;
+                ExEquip[i].onValueChanged.AddListener(delegate { OnExEquipChanged(index); });
+            }
         }
 
         private IEnumerator WaitForLoadFinished(Action callback = null)
@@ -125,23 +148,18 @@ namespace PCRCaculator
             parent.sizeDelta = new Vector2(100, original_hight);
 
             int total = MainManager.Instance.UnitRarityDic.Count;
-            int cnt = 0;
+            int cnt = 1;
             int batchSize = 5; // 每帧加载多少个角色，可根据实际情况调整
 
             foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
             {
-                cnt++;
-                try
-                {
-                    wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
-                }
-                catch { }
 
                 if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
                 {
                     GameObject b = Instantiate(togglePerferb);
                     b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
                     b.transform.localScale = Vector3.one;
+                    int bundleCountBefore = ABExTool.AssetBundleDic.Count;
 
                     int id0 = id;
                     b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
@@ -149,6 +167,16 @@ namespace PCRCaculator
 
                     togglePerferbs[id0] = b.GetComponent<Toggle>();
                     buttons[id0] = b.GetComponent<CharacterPageButton>();
+                    int bundleCountAfter = ABExTool.AssetBundleDic.Count;
+                    if (bundleCountAfter > bundleCountBefore)
+                    {
+                        cnt++;
+                        try
+                        {
+                            wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
+                        }
+                        catch { }
+                    }
                 }
 
                 // **关键：每加载一批后等待一帧，避免卡顿**
@@ -523,6 +551,35 @@ namespace PCRCaculator
                     data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
                     var maxStar = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
                     data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[16 + i].value, maxStar);
+                    if (i < subs.Count)
+                    {
+                        var subGroup = subs[i];
+                        var subItems = new[] { subGroup.sub1, subGroup.sub2, subGroup.sub3, subGroup.sub4 };
+
+                        // 格式: [type0, value0, type1, value1, type2, value2, type3, value3]
+                        int[] subItemValues = new int[8];
+
+                        for (int j = 0; j < 4; j++)
+                        {
+                            if (j < subItems.Length)
+                            {
+                                var subItem = subItems[j];
+                                subItemValues[j * 2] = subItem.typeOption.value;     // typeOption值
+                                subItemValues[j * 2 + 1] = subItem.valueOption.value; // valueOption值
+                            }
+                            else
+                            {
+                                subItemValues[j * 2] = -1;
+                                subItemValues[j * 2 + 1] = -1;
+                            }
+                        }
+
+                        data.exEquipSubs[i] = subItemValues;
+                    }
+                    else
+                    {
+                        data.exEquipSubs[i] = new int[] { -1, -1, -1, -1, -1, -1, -1, -1 };
+                    }
                 }
             }
             RefreshSettingPage();
@@ -561,7 +618,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitSecondMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(isSetMaxExEquip.isOn, equip_second_full: true);
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn, equip_second_full: true);
             SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
             RefreshSettingValues();
             RefreshSettingPage();
@@ -569,7 +626,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(isSetMaxExEquip.isOn);
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
             SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
             RefreshSettingValues();
             RefreshSettingPage();
@@ -579,7 +636,7 @@ namespace PCRCaculator
         {
             foreach (UnitData a in playerData.playrCharacters)
             {
-                a.SetMax(isSetMaxExEquip.isOn);
+                a.SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
                 SetMaxLoveForUnit(a);
             }
             RefreshSettingValues();
@@ -706,12 +763,12 @@ namespace PCRCaculator
                     buttons[id].gameObject.SetActive(false);
                 }
             }
-            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95 + 105;
+            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95;
             parent.sizeDelta = new Vector2(100, neededHeight);
 
-            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95 + 105)
+            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95)
             {
-                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95 + 105);
+                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95);
             }
             Canvas.ForceUpdateCanvases();
             TurnAllToggles(selectedCharId.Count != 5);
@@ -845,8 +902,28 @@ namespace PCRCaculator
                         ExEquip[i].AddOptions(optionsEx
                             .Select(x => new ExEquipOption(x)).Prepend(ExEquipOption.None)
                             .ToList<Dropdown.OptionData>());
+                        OnExEquipChanged(i);
                     }
                     ExEquip[i].value = Math.Max(0, ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
+                    var subItems = new[] { subs[i].sub1, subs[i].sub2, subs[i].sub3, subs[i].sub4 };
+                    if (ExEquip[i].value > 0 && data.exEquipSubs.Count > 0)
+                    {
+                        for (int k = 0; k < 4; ++k)
+                        {
+                            int statusIndex = data.exEquipSubs[i][k * 2];
+                            int statusLevel = data.exEquipSubs[i][k * 2 + 1];
+                            subItems[k].typeOption.value = statusIndex;
+                            subItems[k].valueOption.value = statusLevel;
+                        }
+                    }
+                    else
+                    {
+                        for (int k = 0; k < 4; ++k)
+                        {
+                            subItems[k].typeOption.SetActive(false);
+                            subItems[k].valueOption.SetActive(false);
+                        }
+                    }
                     detailSliders_setting[16 + i].maxValue = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
                     detailSliders_setting[16 + i].minValue = 0;
                     detailSliders_setting[16 + i].value = data.exEquipLevel[i];
@@ -885,6 +962,172 @@ namespace PCRCaculator
             OpenEXSettingPannel();
             GuildManager.Instance?.RefreshCharacterDetailPage(selectedCharacterId_setting, data);
         }
+        // 当ExEquip下拉框选项改变时调用
+        public void OnExEquipChanged(int equipIndex)
+        {
+            UpdateTypeOptions(equipIndex);
+
+            for (int i = 0; i < 4; i++)
+            {
+                UpdateValueOptions(equipIndex, i);
+            }
+        }
+
+        // 更新typeOption选项
+        private void UpdateTypeOptions(int equipIndex)
+        {
+            if (equipIndex < 0 || equipIndex >= ExEquip.Length || equipIndex >= subs.Count) return;
+
+            var exEquipDropdown = ExEquip[equipIndex];
+            var subGroup = subs[equipIndex];
+            var subItems = new[] { subGroup.sub1, subGroup.sub2, subGroup.sub3, subGroup.sub4 };
+
+            // 获取当前选中的装备选项
+            var selectedOption = exEquipDropdown.options[exEquipDropdown.value] as ExEquipOption;
+            if (selectedOption.equip_id == 0) // 未装备
+            {
+                // 清空所有typeOption和valueOption
+                foreach (var subItem in subItems)
+                {
+                    subItem.typeOption.ClearOptions();
+                    subItem.valueOption.ClearOptions();
+                }
+                return;
+            }
+
+            // 获取对应装备的数据
+            if (MainManager.Instance.UnitExEquips.TryGetValue(
+                playerData.playrCharacters[selectedCharacterId_setting].unitId,
+                out var exEquipDict) && exEquipDict.Length > equipIndex)
+            {
+                if (exEquipDict[equipIndex].TryGetValue(selectedOption.equip_id, out var exEquipData))
+                {
+                    if (exEquipData.status.Count > 0)
+                    {
+                        // 为每个subItem更新typeOption
+                        for (int i = 0; i < subItems.Length; i++)
+                        {
+                            var subItem = subItems[i];
+                            var statusKeys = exEquipData.status.Keys.Select(k =>
+                            {
+                                if (k is Enum enumKey)
+                                {
+                                    return enumKey.GetDescription();
+                                }
+                                return k.ToString();
+                            }).ToList();
+                            subItem.typeOption.SetActive(true);
+                            subItem.valueOption.SetActive(true);
+                            subItem.typeOption.ClearOptions();
+                            subItem.typeOption.AddOptions(statusKeys);
+
+                            // 添加typeOption变更监听
+                            subItem.typeOption.onValueChanged.RemoveAllListeners();
+                            int subItemIndex = i; // 闭包副本
+                            subItem.typeOption.onValueChanged.AddListener(delegate
+                            {
+                                UpdateValueOptions(equipIndex, subItemIndex);
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // 没有status数据，清空选项
+                        foreach (var subItem in subItems)
+                        {
+                            subItem.typeOption.ClearOptions();
+                            subItem.valueOption.ClearOptions();
+                            subItem.typeOption.SetActive(false);
+                            subItem.valueOption.SetActive(false);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 更新valueOption选项
+        private void UpdateValueOptions(int equipIndex, int subItemIndex)
+        {
+            if (equipIndex < 0 || equipIndex >= ExEquip.Length ||
+                equipIndex >= subs.Count || subItemIndex < 0 ||
+                subItemIndex >= 4) return;
+
+            var exEquipDropdown = ExEquip[equipIndex];
+            var subGroup = subs[equipIndex];
+            var subItem = subItemIndex switch
+            {
+                0 => subGroup.sub1,
+                1 => subGroup.sub2,
+                2 => subGroup.sub3,
+                3 => subGroup.sub4,
+                _ => null
+            };
+
+            if (subItem == null) return;
+
+            // 获取当前选中的装备选项
+            var selectedOption = exEquipDropdown.options[exEquipDropdown.value] as ExEquipOption;
+            if (selectedOption.equip_id == 0) // 未装备
+            {
+                subItem.valueOption.ClearOptions();
+                return;
+            }
+
+            // 获取对应装备的数据
+            if (MainManager.Instance.UnitExEquips.TryGetValue(
+                playerData.playrCharacters[selectedCharacterId_setting].unitId,
+                out var exEquipDict) && exEquipDict.Length > equipIndex)
+            {
+                if (exEquipDict[equipIndex].TryGetValue(selectedOption.equip_id, out var exEquipData))
+                {
+                    if (exEquipData.status != null && exEquipData.status.Count > 0)
+                    {
+                        // 获取当前选中的typeOption键
+                        var statusKeys = exEquipData.status.Keys.ToList();
+                        if (subItem.typeOption.value < statusKeys.Count)
+                        {
+                            var selectedKey = statusKeys[subItem.typeOption.value];
+                            if (exEquipData.status.TryGetValue(selectedKey, out var values))
+                            {
+                                // 使用paramTypeDict来格式化值
+                                var valueOptions = new List<string>();
+
+                                for (int i = 0; i < values.Length; i++)
+                                {
+                                    int rawValue = values[i];
+                                    string formattedValue = rawValue.ToString();
+
+                                    // 获取参数配置并应用百分比格式
+                                    if (paramTypeDict.TryGetValue((int)selectedKey, out var paramConfig))
+                                    {
+                                        float processedValue;
+                                        if (paramConfig.ratio > 0)
+                                            processedValue = (float)rawValue / paramConfig.ratio;
+                                        else
+                                            processedValue = rawValue;
+
+                                        if (paramConfig.is_percentage == 1)
+                                            formattedValue = $"{processedValue * 100}%";
+                                        else
+                                            formattedValue = processedValue.ToString("F0");
+                                    }
+
+                                    valueOptions.Add(formattedValue);
+                                }
+
+                                subItem.valueOption.ClearOptions();
+                                subItem.valueOption.AddOptions(valueOptions);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        subItem.valueOption.ClearOptions();
+                    }
+                }
+            }
+        }
+
         private Dictionary<int, string> id2alias;
         private Dictionary<int, string> id2pinyin;
         private IEnumerator SearchCharaInitialize()

@@ -24,6 +24,10 @@ namespace PCRCaculator
         private void Awake()
         {
             Instance = this;
+            if (MainManager.Instance.UnitRoleDataDic.Count == 0)
+            {
+                talentToggles.transform.GetChild(3).gameObject.SetActive(false);
+            }
         }
         /// <summary>
         /// 主界面设置按钮
@@ -65,6 +69,7 @@ namespace PCRCaculator
                 TalentLevelManager.Instance.LoadGlobalSettings();
                 TalentSkillTreeManager.Instance.LoadGlobalSettings();
                 TeamSkillTreeManager.Instance.LoadGlobalSettings();
+                RoleMasteryManager.Instance.LoadGlobalSettings();
                 MainManager.Instance.WindowMessage("已恢复成全局配置！");
             }
             else

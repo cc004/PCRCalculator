@@ -33,13 +33,13 @@ namespace Elements
             actionParameter.MasterData = _action;
             actionParameter.ActionEffectList = new List<NormalSkillEffect>();
             actionParameter.ActionExecTimeList = new List<ActionExecTime>
-    {
-        new ActionExecTime
-        {
-            Weight = 1f,
-            DamageNumType = eDamageEffectType.NORMAL
-        }
-    };
+            {
+                new ActionExecTime
+                {
+                    Weight = 1f,
+                    DamageNumType = eDamageEffectType.NORMAL
+                }
+            };
             actionParameter.ActionWeightSum = 1f;
             actionParameter.ExecTime = new float[1];
             // actionParameter.KnockAnimationCurve = _exSkillScriptable.KnockAnimationCurve;
@@ -81,7 +81,8 @@ namespace Elements
 
             foreach (var action in skillData.ActionDataList)
             {
-                skill.ActionParameters.Add(createActionParameter(action, _exSkillScriptable, _exSkillData));
+                skill.ActionParameters.Add(createActionParameter(action, _exSkillScriptable, _exSkillData)); // TODO change to createExEquipActionParameter
+                skill.ActionParameters[skill.ActionParameters.Count - 1].IsExEquipSkillAction = true; // temporary fix
             }
 
             foreach (KeyValuePair<eExSkillCondition, ExConditionPassiveData> kv in _exSkillData.ExSkillConditionData)

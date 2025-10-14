@@ -88,6 +88,10 @@ namespace PCRCaculator
             public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas = new Dictionary<int, Guild.GuildEnemyData>();
             public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips = new Dictionary<int, Dictionary<int, ex_equipment_data>[]>();
             public Dictionary<int, EnemyData> talentQuestEnemyParameterDic = new Dictionary<int, EnemyData>();
+            public Dictionary<int, unit_role_data> UnitRoleDataDic = new();
+            public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic = new();
+            public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic = new();
+            public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic = new();
         }
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
@@ -156,7 +160,10 @@ namespace PCRCaculator
         public Dictionary<int, Guild.GuildEnemyData> GuildEnemyDatas { get => databaseCache.guildEnemyDatas; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> UnitExEquips { get => databaseCache.unitExEquips; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get => databaseCache.talentQuestEnemyParameterDic; }
-
+        public Dictionary<int, unit_role_data> UnitRoleDataDic { get => databaseCache.UnitRoleDataDic; }
+        public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get => databaseCache.UnitRoleMasteryIdDic; }
+        public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get => databaseCache.UnitRoleSlotDataDic; }
+        public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic { get => databaseCache.UnitRoleMasterySlotEnhanceDataDic; }
 
         public Dictionary<int, string> UnitName_cn { get => databaseCache.unitName_cn; }
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => databaseCache.skillNameAndDescribe_cn; }
@@ -506,6 +513,10 @@ namespace PCRCaculator
                                 databaseCache.talentFormationDic = dbTool.TalentFormationDic;
                                 databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
+                                databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;
+                                databaseCache.UnitRoleMasteryIdDic = dbTool.UnitRoleMasteryIdDic;
+                                databaseCache.UnitRoleSlotDataDic = dbTool.UnitRoleSlotDataDic;
+                                databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool.UnitRoleMasterySlotEnhanceDataDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10;
                                 databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11;

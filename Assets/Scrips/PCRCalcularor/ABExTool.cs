@@ -25,7 +25,7 @@ namespace PCRCaculator
         private static UTF8Encoding utf8 = null;
 
         static Dictionary<string, string> ABNameDic = new Dictionary<string, string>();
-        static Dictionary<string, AssetBundle> AssetBundleDic = new Dictionary<string, AssetBundle>();
+        public static Dictionary<string, AssetBundle> AssetBundleDic = new Dictionary<string, AssetBundle>();
         static Dictionary<string, Sprite> spriteDic = new Dictionary<string, Sprite>();
 
 /*#if UNITY_EDITOR

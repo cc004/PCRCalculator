@@ -2587,10 +2587,12 @@
         "7c73607ed7631be1e02c879a41434ce779c5210f7d846ff2a4c5acd280532968": "ailment_id",
         "919077e7bf675d0065b6a0f9354d023e31bcca8648c066957255967122d90964": "ailment_action",
         "4079a71a5171ef5eb5c0aa774daed024df2c91d069b2278e6a7a733e54656ee2": "ailment_detail_1",
+        "9a1d900f9ae1e8474fef93c56e53855c120f47e0180f21651d1d8faaaf34a401": "ailment_name",
         "--table_name": "ailment_data"
     },
     "v1_189f41e489610b0ca3f1923e1c4eeaa0494580427f34c1e6e7a8cb01f11032c8": {
         "16289018a2ad21f4f6cb4c02bdffb36e108f51bfd716a31862a90bfc354baa2c": "enemy_id",
+        "a67bb16839d66b7d683dc34687c42381ad7a7491c3dd343d638badd969dc814c": "name",
         "addd6d67eca2db8e4d1e37fbe1719df1892a8ecf3aaecabae8388aa5e631e8c1": "child_enemy_parameter_1",
         "b5a2bb8e2932353143f4bbc12d817c1a7074bb038919a3b14cc39de3d609aa74": "child_enemy_parameter_2",
         "52951a0c7b755b4fc5a8182b111b0da68c16d7f5e6bb52ef0abeee7b9579e832": "child_enemy_parameter_3",

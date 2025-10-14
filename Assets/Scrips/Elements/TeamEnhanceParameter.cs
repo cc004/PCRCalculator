@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using PCRCaculator;
 using PCRCaculator.Guild;
+using System.ComponentModel;
 
 namespace Elements
 {
@@ -15,19 +16,33 @@ namespace Elements
     {
         // Fields
         NONE = 0,
+        [Description("HP")]
         HP = 1,
+        [Description("攻击力")]
         ATTACK = 2,
+        [Description("物防")]
         DEF = 3,
+        [Description("魔防")]
         MAGIC_DEF = 4,
+        [Description("暴击")]
         CRITICAL = 5,
+        [Description("暴击伤害")]
         CRITICAL_DAMAGE_RATE = 6,
+        [Description("伤害提升")]
         DAMAGE_UP_PERCENT = 7,
+        [Description("状态异常命中")]
         ABNORMAL_STATE_DODGE_HIT = 8,
+        [Description("状态异常抵抗")]
         ABNORMAL_STATE_DODGE_RESIST = 9,
+        [Description("平A")]
         ATTACK_ENHANCE = 10,
+        [Description("增益强化")]
         BUFF_ENHANCE = 11,
+        [Description("减益强化")]
         DEBUFF_ENHANCE = 12,
+        [Description("恢复强化")]
         HEAL_ENHANCE = 13,
+        [Description("初动TP")]
         ENERGY_CHARGE = 14,
     }
 
@@ -74,6 +89,7 @@ namespace Elements
             talentLevelParameter = PlayerGroup.talentLevel;
             UpdateTalentInfoData(PlayerGroup.talentSkill, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
             UpdateTalentInfoData(PlayerGroup.teamSkill, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
+            UpdateRoleMasteryData();
             UpdateCombinedData();
         }
 
@@ -303,53 +319,147 @@ namespace Elements
 
             return result;
         }
+        /// <summary>
+        /// 更新职业数据
+        /// </summary>
+        public void UpdateRoleMasteryData()
+        {
+            // 清空现有的roleBuffParameter数据
+            foreach (var dict in roleBuffParameter.Values)
+            {
+                dict.Clear();
+            }
 
+            try
+            {
+                // 获取当前玩家组数据
+                var playerGroup = GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+                if (playerGroup?.roleMastery == null) return;
+
+                // 遍历所有unit_role_id (假设是1-7)
+                for (int unitRoleId = 1; unitRoleId <= 8; unitRoleId++)
+                {
+                    // 获取该unit_role_id对应的所有mastery_id
+                    var masteryIds = MainManager.Instance.UnitRoleMasteryIdDic
+                        .Where(kv => kv.Value.unit_role_id == unitRoleId)
+                        .Select(kv => kv.Value.mastery_id)
+                        .ToList();
+
+                    // 为每个unit_role_id创建新的字典
+                    var roleParams = new Dictionary<eRoleParamType, int>();
+
+                    // 遍历所有mastery_id
+                    foreach (int masteryId in masteryIds)
+                    {
+                        // 检查是否有该mastery_id的数据
+                        if (playerGroup.roleMastery.ContainsKey(masteryId))
+                        {
+                            var (slotLevel, enhanceLevel) = playerGroup.roleMastery[masteryId];
+
+                            // 获取强化数据
+                            if (MainManager.Instance.UnitRoleMasterySlotEnhanceDataDic.TryGetValue(masteryId, out var slotEnhanceData))
+                            {
+                                // 获取对应等级和星级的增强数据
+                                if (slotEnhanceData.slot_level_info?.ContainsKey(slotLevel) == true &&
+                                    slotEnhanceData.slot_level_info[slotLevel].enhance_level_info?.ContainsKey(enhanceLevel) == true)
+                                {
+                                    var enhanceInfo = slotEnhanceData.slot_level_info[slotLevel].enhance_level_info[enhanceLevel];
+
+                                    // 添加第一个参数类型和值
+                                    if (enhanceInfo.role_param_type_1 > 0)
+                                    {
+                                        var paramType1 = (eRoleParamType)enhanceInfo.role_param_type_1;
+                                        if (roleParams.ContainsKey(paramType1))
+                                        {
+                                            roleParams[paramType1] += enhanceInfo.enhance_value_1;
+                                        }
+                                        else
+                                        {
+                                            roleParams[paramType1] = enhanceInfo.enhance_value_1;
+                                        }
+                                    }
+
+                                    // 添加第二个参数类型和值
+                                    if (enhanceInfo.role_param_type_2 > 0)
+                                    {
+                                        var paramType2 = (eRoleParamType)enhanceInfo.role_param_type_2;
+                                        if (roleParams.ContainsKey(paramType2))
+                                        {
+                                            roleParams[paramType2] += enhanceInfo.enhance_value_2;
+                                        }
+                                        else
+                                        {
+                                            roleParams[paramType2] = enhanceInfo.enhance_value_2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 将计算结果保存到roleBuffParameter中
+                    roleBuffParameter[unitRoleId] = roleParams;
+                }
+            }
+            catch (Exception ex)
+            {
+                // 如果出现异常，确保roleBuffParameter至少是空的字典
+                for (int i = 1; i <= 7; i++)
+                {
+                    if (!roleBuffParameter.ContainsKey(i))
+                    {
+                        roleBuffParameter[i] = new Dictionary<eRoleParamType, int>();
+                    }
+                }
+            }
+        }
+        
         private eParamType GetParamType(eRoleParamType roleParamType, bool isAtk)
         {
             switch (roleParamType)
             {
                 case eRoleParamType.HP:
                     return eParamType.HP;
-                    
+
                 case eRoleParamType.ATTACK:
                     return isAtk ? eParamType.ATK : eParamType.MAGIC_ATK;
-                    
+
                 case eRoleParamType.DEF:
                     return eParamType.DEF;
-                    
+
                 case eRoleParamType.MAGIC_DEF:
                     return eParamType.MAGIC_DEF;
-                    
+
                 case eRoleParamType.CRITICAL:
                     return isAtk ? eParamType.PHYSICAL_CRITICAL : eParamType.MAGIC_CRITICAL;
-                    
+
                 case eRoleParamType.CRITICAL_DAMAGE_RATE:
                     return isAtk ? eParamType.PHYSICAL_CRITICAL_DAMAGE_RATE : eParamType.MAGIC_CRITICAL_DAMAGE_RATE;
-                    
+
                 case eRoleParamType.DAMAGE_UP_PERCENT:
                     return isAtk ? eParamType.PHYSICAL_DAMAGE_UP_PERCENT : eParamType.MAGIC_DAMAGE_UP_PERCENT;
-                    
+
                 case eRoleParamType.ABNORMAL_STATE_DODGE_HIT:
                     return eParamType.ABNORMAL_STATE_DODGE_HIT;
-                    
+
                 case eRoleParamType.ABNORMAL_STATE_DODGE_RESIST:
                     return eParamType.ABNORMAL_STATE_DODGE_RESIST;
-                    
+
                 case eRoleParamType.ATTACK_ENHANCE:
                     return eParamType.ATTACK_ENHANCE;
-                    
+
                 case eRoleParamType.BUFF_ENHANCE:
                     return eParamType.BUFF_ENHANCE;
-                    
+
                 case eRoleParamType.DEBUFF_ENHANCE:
                     return eParamType.DEBUFF_ENHANCE;
-                    
+
                 case eRoleParamType.HEAL_ENHANCE:
                     return eParamType.HEAL_ENHANCE;
-                    
+
                 case eRoleParamType.ENERGY_CHARGE:
                     return eParamType.ENERGY_CHARGE;
-                    
+
                 default:
                     return eParamType.NONE;
             }

@@ -144,12 +144,18 @@ namespace Elements
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null && list1.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
+                    foreach(var index in list1)
+                    {
+                        button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     list1.Clear();
                 }
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null && list2.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
+                    foreach(var index in list2)
+                    {
+                        button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     list2.Clear();
                 }
             }
@@ -1429,7 +1435,7 @@ namespace Elements
         public UnitParameter UnitParameter { get; set; }
 
         public bool IsOther { get; set; }
-        public bool IsBonusEnemy
+        public bool IsBonusEnemy // TODO check what is this and where set
         {
             get;
             set;
@@ -1949,21 +1955,45 @@ namespace Elements
 
         public float MoveSpeedZero => Mathf.Max(0.0f, MoveSpeed) + (float)getAdditionalBuffDictionary(BuffParamKind.MOVE_SPEED);
 
-        public double PhysicalCriticalDamageRateOrMin => (double)(Mathf.Max(50, PhysicalCriticalDamageRate) + getAdditionalBuffDictionary(BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE));
+        public double PhysicalCriticalDamageRateOrMin => Math.Min(
+            2000000000.0,
+            (double)(Math.Max(50,
+                (PhysicalCriticalDamageRate * 100.0 + PhysicalCriticalDamagePermyriadByRole) / 100) 
+                + getAdditionalBuffDictionary(BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE))
+            );
 
-        public double MagicCriticalDamageRateOrMin => (double)(Mathf.Max(50, MagicCriticalDamageRate) + getAdditionalBuffDictionary(BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE));
+        public double MagicCriticalDamageRateOrMin => Math.Min(
+            2000000000.0,
+            (double)(Math.Max(50,
+                (MagicCriticalDamageRate * 100.0 + MagicCriticalDamagePermyriadByRole) / 100) 
+                + getAdditionalBuffDictionary(BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE))
+            );
 
-        public long ReceiveCriticalDamageRateOrMin => (long)(Mathf.Max(50, ReceiveCriticalDamageRate) + (float)getAdditionalBuffDictionary(BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE));
+        public long ReceiveCriticalDamageRateOrMin => (long)(Mathf.Max(50, ReceiveCriticalDamageRate) + getAdditionalBuffDictionary(BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE));
 
-        public double PhysicalReceiveDamagePercentOrMin => Mathf.Max(0.0f, (float)((int)AdditionalPhysicalReceiveDamagePercent + (int)AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
+        public double PhysicalReceiveDamagePercentOrMin => Mathf.Max(0.0f, (AdditionalPhysicalReceiveDamagePercent + AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
 
-        public double MagicReceiveDamagePercentOrMin => Mathf.Max(0f, (float)((int)AdditionalMagicReceiveDamagePercent + (int)AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
+        public double MagicReceiveDamagePercentOrMin => Mathf.Max(0f, (AdditionalMagicReceiveDamagePercent + AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
 
-        public double PhysicalDamageUpPercentOrMin => Mathf.Max(0f, (float)((int)AdditionalPhysicalDamageUpPercent + 100f));
+        public double PhysicalDamageUpPercentOrMin => Math.Max(0.0, (AdditionalPhysicalDamageUpPercent * 100.0 + AdditionalPhysicalDamageUpPermyriadByRole + 10000.0) / 100.0);
 
-        public double MagicDamageUpPercentOrMin => Mathf.Max(0f, (float)((int)AdditionalMagicDamageUpPercent + 100f));
+        public double MagicDamageUpPercentOrMin => Math.Max(0.0, (AdditionalMagicDamageUpPercent * 100.0 + AdditionalMagicDamageUpPermyriadByRole + 10000.0) / 100.0);
 
         public long TalentBonusPermyriadZero => Math.Min(2000000000, Math.Max(0, AdditionalTalentBonusPermyriad));
+
+        public long AbnormalStateDodgeHitZero => Math.Min(2000000000, Math.Max(0, AbnormalStateDodgeHit));
+
+        public long AbnormalStateDodgeResistZero => Math.Min(2000000000, Math.Max(0, AbnormalStateDodgeResist));
+
+        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance)); // TODO check use
+
+        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance)); // TODO sealbuffdebuff action
+
+        public long DebuffEnhanceZero => Math.Min(2000000000, Math.Max(0, DebuffEnhance));
+
+        public long HealEnhanceZero => Math.Min(2000000000, Math.Max(0, HealEnhance));
+
+        public double EnergyChargeZero => Math.Min(2000000000, Math.Max(0, EnergyCharge));
 
         public float StartHpPercent { get; private set; }
 
@@ -2534,7 +2564,10 @@ this.updateCurColor();
             baseDataEX = exOverride ?? baseDataEX;
 
             if (MainManager.Instance.UnitRarityDic.ContainsKey(UnitId))
+            {
                 TalentIds = MainManager.Instance.UnitRarityDic[UnitId]?.detailData?.talent_id ?? new List<int>();
+                RoleId = MainManager.Instance.UnitRarityDic[UnitId]?.detailData?.unit_role_id ?? 0;
+            }
 
             if (additional != null) baseData += additional;
 
@@ -2934,16 +2967,7 @@ this.updateCurColor();
         
             MaxHpAfterPassive = MaxHp;
         
-            // 怀疑SP+y用的
-            // // 获取参数钳制组件
-            // var parameterClamped = unitController.ComponentParameterClamped;
-            // if (parameterClamped == null)
-            // {
-            //     return;
-            // }
-        
-            // var additionalAttackEnhance = parameterClamped.AdditionalAttackEnhanceZero;
-            // unitActionController.SetAttackValue(additionalAttackEnhance);
+            unitActionController.SetAttackValue(AdditionalAttackEnhanceZero);
         }
     
         // RVA: 0x285335C Offset: 0x285335C VA: 0x285335C
@@ -4729,13 +4753,16 @@ this.updateCurColor();
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var indexList7) && indexList7.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, false);
+                    foreach (var index in indexList7)
+                    {
+                        button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     indexList7.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}");
+                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, true, _data.Time, $"{_data.MainValue}", _data);
                     // if (!showIconDict.ContainsKey(eAbnormalState.SLOW))
                     //     showIconDict[eAbnormalState.SLOW] = 0;
                     // showIconDict[eAbnormalState.SLOW]++;
@@ -4745,13 +4772,17 @@ this.updateCurColor();
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var indexList11) && indexList11.Count > 0)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.SLOW, false);
+                    foreach (var index in indexList11)
+                    {
+
+                        button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[index]);
+                    }
                     indexList11.Clear();
                 }
 
                 if (_showsIcon)
                 {
-                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}");
+                    button?.SetAbnormalIcons(this, eStateIconType.HASTE, true, _data.Time, $"{_data.MainValue:F2}", _data);
 
                     // if (!showIconDict.ContainsKey(eAbnormalState.HASTE))
                     //     showIconDict[eAbnormalState.HASTE] = 0;
@@ -10439,9 +10470,13 @@ this.updateCurColor();
             component.SetDamageText(_value.ToString(), eDamageEffectColor.GREEN);
         }*/
 
+        private bool wasChargeByAtk = false;
+
         public void ChargeEnergy( // accmulate damage energy todo
           eSetEnergyType _setEnergyType,
           DoubleWithEx _energy,
+        //   bool _slipDamage,
+        //   Skill _skill,
           bool _hasEffect = false,
           UnitCtrl _source = null,
           bool _hasNumberEffect = true,
@@ -10455,6 +10490,36 @@ this.updateCurColor();
                 return;
             var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
+            if (_setEnergyType == eSetEnergyType.BY_ATK)
+            {
+                if (!wasChargeByAtk)
+                {
+                    num += EnergyChargeZero;
+                    wasChargeByAtk = true;
+                }
+            }
+            else if (_setEnergyType == eSetEnergyType.BY_SET_DAMAGE)
+            {
+                // TODO fix
+                // double value = 0.0;
+                // double accumulatedValue = 0.0;
+
+                // if (_skill != null && !_slipDamage && _skill.UseAccumulatedDamage)
+                // {
+                //     var accumulatedTpRecoveryDict = _skill.AccumulatedTpRecovery;
+                //     if (accumulatedTpRecoveryDict != null)
+                //     {
+                //         // 获取当前单位的累积 TP 恢复值
+                //         accumulatedTpRecoveryDict.TryGetValue(this.unitActionController, out value);
+
+                //         // 更新累积 TP 恢复值
+                //         accumulatedTpRecoveryDict[this.unitActionController] = num + value;
+
+                //         accumulatedValue = value;
+                //     }
+                // }
+                // num = BattleUtil.CalcAttenuationForEnergy(accumulatedValue, num, 0);
+            }
             if (_hasNumberEffect && !battleManager.skipping)
             {
                 action?.Invoke("目标能量增加<color=#4C5FFF>" + num + $"</color>点");

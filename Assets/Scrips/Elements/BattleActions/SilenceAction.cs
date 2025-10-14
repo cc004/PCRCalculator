@@ -29,12 +29,13 @@ namespace Elements
       Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            double pp = _valueDictionary[eValueNumber.VALUE_3] * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
-            if (BattleManager.Random(0.0f, 1f,
-                    new RandomData(_source, _target.Owner, ActionId, 14, (float)pp)) < (double) _valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
+      // double pp = _valueDictionary[eValueNumber.VALUE_3] * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
+      double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)_valueDictionary[eValueNumber.VALUE_3]);
+      if (BattleManager.Random(0.0f, 1f,
+              new RandomData(_source, _target.Owner, ActionId, 14, (float)pp)) < pp)
       {
         UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.SILENCE;
-        switch ((eSilenceType) ActionDetail1)
+        switch ((eSilenceType)ActionDetail1)
         {
           case eSilenceType.NORMAL:
             _abnormalState = UnitCtrl.eAbnormalState.SILENCE;
@@ -61,8 +62,8 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+      Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
     }
 
     private enum eSilenceType

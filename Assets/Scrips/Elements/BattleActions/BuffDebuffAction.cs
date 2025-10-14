@@ -87,28 +87,69 @@ namespace Elements
             }
             UnitCtrl.BuffParamKind changeParamKind = GetChangeParamKind(ActionDetail1);
             Dictionary<BasePartsData, LongWithEx> dictionary = new Dictionary<BasePartsData, LongWithEx>();
-            if (_target.Owner.IsPartsBoss && changeParamKind != UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE &&
-                changeParamKind != UnitCtrl.BuffParamKind.MOVE_SPEED &&
-                changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE &&
-                changeParamKind != UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE &&
-                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE &&
-                changeParamKind != UnitCtrl.BuffParamKind.MAX_HP &&
-                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT &&
-                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT &&
-                changeParamKind != UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT &&
-                changeParamKind != UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT &&
-                changeParamKind != UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT) // TODO check whether this is correct of up precent
+            if (_target.Owner.IsPartsBoss && !AbnormalStateDefine.IS_EFFECT_BOSS_BODY_ONLY[changeParamKind])
             {
                 for (int index = 0; index < _target.Owner.BossPartsListForBattle.Count; ++index)
                     dictionary.Add(_target.Owner.BossPartsListForBattle[index], CalculateBuffDebuffParam(_target.Owner.BossPartsListForBattle[index], _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
             }
             else
                 dictionary.Add(_target.Owner.DummyPartsData, CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
-			bool despelable = _valueDictionary[eValueNumber.VALUE_7] != 2f;
+            bool despelable = _valueDictionary[eValueNumber.VALUE_7] != 2f;
             //_target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
-            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId,action);
+            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, action);
 
         }
+
+        public static readonly List<UnitCtrl.BuffParamKind> BUFF_DEBUFF_ENHANCE_TARGET_TYPE = new List<UnitCtrl.BuffParamKind>
+        {
+            UnitCtrl.BuffParamKind.ATK,
+            UnitCtrl.BuffParamKind.DEF,
+            UnitCtrl.BuffParamKind.MAGIC_STR,
+            UnitCtrl.BuffParamKind.MAGIC_DEF,
+            UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL,
+            UnitCtrl.BuffParamKind.MAGIC_CRITICAL,
+            UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE,
+            UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE,
+            UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE,
+            UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT,
+            UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT,
+            UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT,
+            UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT,
+            UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT,
+        };
+
+
+        public override DoubleWithEx GetActionBaseValue(UnitCtrl _source, eValueNumber _type)
+        {
+            // 默认值
+            DoubleWithEx value = 0.0;
+
+            Value.TryGetValue(_type, out value);
+
+            if (_type != eValueNumber.VALUE_2)
+                return value;
+
+            UnitCtrl.BuffParamKind paramKind = BuffDebuffAction.GetChangeParamKind(ActionDetail1);
+
+            if (!BUFF_DEBUFF_ENHANCE_TARGET_TYPE.Contains(paramKind))
+                return value;
+
+            if (IsExEquipSkillAction)
+                return value;
+
+            long enhanceZero = 0;
+            if (_source != null)
+            {
+                if (ActionDetail1 % 10 != 1)
+                    enhanceZero = _source.BuffEnhanceZero;
+                else
+                    enhanceZero = _source.DebuffEnhanceZero;
+            }
+
+            double rate = enhanceZero / 10000.0 + 1.0;
+            return value * rate;
+        }
+
 
         public static double GetBuffDebuffValueForCurrentValuePercentage(
             BasePartsData target,
