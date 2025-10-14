@@ -700,7 +700,7 @@ namespace PCRCaculator
             uniqueEq2Lv = uniqueeq2lv;
         }
 
-        public void SetMax(bool ex_equip_full = true, bool equip_second_full = false)
+        public void SetMax(bool is_guild_boss = true, bool ex_equip_full = true, bool equip_second_full = false)
         {
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
@@ -732,12 +732,30 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
-                if (ex_equip_full && MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp))
+                MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp);
+                if (is_guild_boss && ex_equip_full)
                 {
                     for (int i = 0; i < 3; i++)
                     {
                         var validEquip = temp[i]
                             .Where(e => e.Value.clan_battle_equip_flag && e.Value.rarity == 3)
+                            .FirstOrDefault();
+
+                        exEquip[i] = validEquip.Value != null ? validEquip.Key : 0;
+                        if (validEquip.Value != null)
+                        {
+                            exEquipLevel[i] = 5;
+                        }
+                    }
+                }
+                else if (!is_guild_boss && ex_equip_full)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var validEquip = temp[i]
+                            .Where(e => e.Value.ex_equipment_id != 0 &&
+                                        playerSetting.ExEquipDefault.ContainsKey(e.Value.category) &&
+                                        playerSetting.ExEquipDefault[e.Value.category] == e.Key)
                             .FirstOrDefault();
 
                         exEquip[i] = validEquip.Value != null ? validEquip.Key : 0;
@@ -2276,7 +2294,28 @@ namespace PCRCaculator
         public Dictionary<int, int> teamSkill = new();
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
-
+        public Dictionary<int, int> ExEquipDefault = new Dictionary<int, int>()
+        {
+            { 101, 4101401 },
+            { 102, 4102402 },
+            { 103, 4103401 },
+            { 104, 4104401 },
+            { 105, 4105402 },
+            { 106, 4106402 },
+            { 107, 4107401 },
+            { 108, 4108401 },
+            { 109, 4109401 },
+            { 110, 4110401 },
+            { 201, 4201401 },
+            { 202, 4202401 },
+            { 203, 4203303 },
+            { 204, 4204401 },
+            { 301, 4301401 },
+            { 302, 4302401 },
+            { 303, 4303401 },
+            { 304, 4304401 },
+            { 305, 4305401 },
+        };
         public int GetMaxRank()
         {
             switch (playerProcess)

@@ -164,8 +164,8 @@ namespace PCRCaculator.Guild
         {
             get => MainManager.Instance.EnemyMPartsDic;
         }
-        public bool isGuildBoss { get => toggles_ChooseType[0].isOn; }
-        public bool IsTalentQuestBoss { get => selectedBossEnemyids[0] > 800000000; }
+        public bool isGuildBoss { get => (selectedBossEnemyids[0] / 100000000) == 4; }
+        public bool IsTalentQuestBoss { get => selectedBossEnemyids[0] / 100000000 == 8; }
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
         {
@@ -405,7 +405,7 @@ namespace PCRCaculator.Guild
             string Path;
             try
             {
-                if (isGuildBoss)
+                if (toggles_ChooseType[0].isOn)
                 {
                     enemyid_0 = guildEnemyDatas[GetClanBattleID()].enemyIds[0][dropdowns_ChooseBoss[0].value];
                     //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
@@ -528,7 +528,7 @@ namespace PCRCaculator.Guild
         }
         public void OnDungeonDropdownValueChanged()
         {
-            if (!isGuildBoss && dungeonEnemy.ContainsKey(dungeonDropdown.value))
+            if (!toggles_ChooseType[0].isOn && dungeonEnemy.ContainsKey(dungeonDropdown.value))
             {
                 int enemyId = dungeonEnemy[dungeonDropdown.value];
 
@@ -545,7 +545,7 @@ namespace PCRCaculator.Guild
         }
         public void OnInputFinished()
         {
-            if (!isGuildBoss)
+            if (!toggles_ChooseType[0].isOn)
             {
                 var bossid = specialInput.text.Split(',').Select(x => int.Parse(x, NumberStyles.Any)).ToArray();
                 EnemyData data = null;
@@ -567,7 +567,7 @@ namespace PCRCaculator.Guild
         public void FinishChooseBossButton()
         {
             int[] enemyId = new int[] {0};
-            if (isGuildBoss)
+            if (toggles_ChooseType[0].isOn)
             {
                 //int month = dropdowns_ChooseBoss[2].value;
                 int clanBattleID = GetClanBattleID();
@@ -589,7 +589,7 @@ namespace PCRCaculator.Guild
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
 
             var group = SettingData.GetCurrentPlayerGroup();
-            group.selectedEnemyIDs = isGuildBoss ? enemyId : specialEnemyid;
+            group.selectedEnemyIDs = toggles_ChooseType[0].isOn ? enemyId : specialEnemyid;
             group.isSpecialBoss = false;//!isGuildBoss;
             group.isTalentQuestBoss = IsTalentQuestBoss;//!isGuildBoss;
             group.TalentQuestMap = dropdowns_ChooseTalentQuestBoss[0].value;
