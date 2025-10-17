@@ -221,11 +221,11 @@ namespace PCRCaculator
         /// <summary>
         /// 调用选人面板的函数
         /// </summary>
-        /// <param name="type">1-JJC开战选人，2-JJC编辑敌方队伍选人,3-工会战出战选人,4-公会战更改配置</param>
+        /// <param name="type">1-JJC开战选人，2-JJC添加敌方队伍,3-工会战出战选人,4-公会战更改配置,5-jjc修改敌方队伍</param>
         /// <param name="playerData">敌人队伍/会战要更改的队伍，为空则不显示</param>
         public void CallChooseBack(int type, AddedPlayerData player = null, int selectedId = 0)
         {
-            if (type != 4 && !initialized)
+            if (type < 4 && !initialized)
             {
                 StartCoroutine(WaitForLoadFinished(() => CallChooseBack_0(type, player, selectedId)));
                 return;
@@ -236,7 +236,7 @@ namespace PCRCaculator
         {
             this.type = type;
             baseBack.SetActive(true);
-            if (type == 4)
+            if (type == 4 || type == 5)
             {
                 if (selectedId >= player.playrCharacters.Count)
                 {
@@ -300,7 +300,7 @@ namespace PCRCaculator
             // }
             RefreshSelectedButtons();
             nextButtonText.text = "下一步";
-            if (type == 4)
+            if (type == 4 || type == 5)
             {
                 playerData = player;
                 playerDataForGuild = player;
@@ -356,9 +356,9 @@ namespace PCRCaculator
             chooseBack_A.SetActive(false);
             settingBack.SetActive(true);
             isinstating = true;
-            if (type == 4 && playerData0 != null)
+            if ((type == 4 || type == 5) && playerData0 != null)
                 playerData = playerData0;
-            else if (type == 4)
+            else if (type == 4 || type == 5)
             {
                 playerData = playerDataForGuild;
                 playerDataForGuild.playrCharacters.Clear();
@@ -380,7 +380,7 @@ namespace PCRCaculator
                 charToggles_setting[i].interactable = i < selectedCharId.Count;
                 //charToggles_setting[i].isOn = i == 0;
             }
-            if (type == 4 && !charToggles_setting[selectedCharacterId_setting].isOn)
+            if ((type == 4 || type == 5) && !charToggles_setting[selectedCharacterId_setting].isOn)
             {
                 charToggles_setting[selectedCharacterId_setting].isOn = true; // auto refresh
             }
@@ -433,7 +433,7 @@ namespace PCRCaculator
             {
                 JJCManager.Instance.ReadyAttack(selectedCharId);
             }
-            else if (type == 2)
+            else if (type == 2 || type == 5)
             {
                 JJCManager.Instance.FinishAddingNewPlayer(playerData);
             }

@@ -50,6 +50,10 @@ namespace PCRCaculator
             unitId = id;
             Refresh();
         }
+        public void ExitButton()
+        {
+            Destroy(gameObject);
+        }
         public void Next(bool next)
         {
             int nextid = CharacterManager.Instance.showUnitIDs.FindIndex(a => a.Equals(unitId));
@@ -78,7 +82,7 @@ namespace PCRCaculator
                 SetDetails();
                 SetSilders(data);
                 SetSkills();
-                SetSkillAnimationPage(skillAnimationDropDown.value);
+                // SetSkillAnimationPage(skillAnimationDropDown.value);
             //}
             //catch(System.Exception e)
             //{
@@ -137,15 +141,15 @@ namespace PCRCaculator
                 {
                     equip_path = "equipments/icon_equipment_invalid_" + equipmentid;
                 }*/
-                Sprite im = ABExTool.GetSprites(data.equipLevel[i] == -1? ABExTool.SpriteType.装备碎片:ABExTool.SpriteType.装备图标, equipmentid);
-                if (im != null) { equipmentImages[i].sprite = im; }
-                else { equipmentImages[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.装备图标, 999999); }
-                int maxStar = 0;
-                if (MainManager.Instance.EquipmentDic.ContainsKey(equipmentid))
-                {
-                    maxStar = MainManager.Instance.EquipmentDic[equipmentid].GetMaxLevel();
-                }
-                equipmentStars[i].SetStars(data.equipLevel[i], maxStar);
+                // Sprite im = ABExTool.GetSprites(data.equipLevel[i] == -1? ABExTool.SpriteType.装备碎片:ABExTool.SpriteType.装备图标, equipmentid);
+                // if (im != null) { equipmentImages[i].sprite = im; }
+                // else { equipmentImages[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.装备图标, 999999); }
+                // int maxStar = 0;
+                // if (MainManager.Instance.EquipmentDic.ContainsKey(equipmentid))
+                // {
+                //     maxStar = MainManager.Instance.EquipmentDic[equipmentid].GetMaxLevel();
+                // }
+                // equipmentStars[i].SetStars(data.equipLevel[i], maxStar);
             }
             if (MainManager.Instance.UnitName_cn.ContainsKey(unitId))
             {
@@ -287,6 +291,7 @@ namespace PCRCaculator
                 return $"技能{skillid2}";
 
             }
+            if (skillid == 2001) { return "<color=#DE8234>SP</color>"; }
             return "ERROR!";
         }
         /// <summary>
@@ -400,7 +405,7 @@ namespace PCRCaculator
         }
         public void OnDropDownChanged()
         {
-            SetSkillAnimationPage(skillAnimationDropDown.value);
+            // SetSkillAnimationPage(skillAnimationDropDown.value);
         }
         public void PlayButton()
         {

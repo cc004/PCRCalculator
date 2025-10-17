@@ -12,12 +12,13 @@ using UnityEngine.UI;
 using static UnityEngine.UI.CanvasScaler;
 using Debug = UnityEngine.Debug;
 using eStateIconType = Elements.eStateIconType;
+using UnityEngine.EventSystems;
 
 namespace PCRCaculator
 {
 
 
-    public class CharacterPageButton : MonoBehaviour
+    public class CharacterPageButton : MonoBehaviour, IPointerClickHandler
     {
         private static readonly Color grayColor = Color.gray; 
         public enum ButtonType { typeA = 0, typeB = 1 ,typeC = 2,typeD=3}//按钮样式，A-长条，B-图标,C-战斗场景用角色状态图标,D-截图用
@@ -55,6 +56,9 @@ namespace PCRCaculator
 
         public Dictionary<eStateIconType, BattleBuffUI>
             battleBuffUIDic = new Dictionary<eStateIconType, BattleBuffUI>();
+        public System.Action<int> OnRightClick;
+        private int currentUnitId;
+        public CharacterDetailManager characterDetailManager;
 
         public void Awake()
         {
@@ -102,8 +106,9 @@ namespace PCRCaculator
                 }
                 backImage.sprite = backgrounds1[0];
                 characterImage.sprite = sprite;
-                if(unitid/100000!=4)
-                return;
+                currentUnitId = unitid;
+                if (unitid / 100000 != 4)
+                    return;
             }
             UnitData data = MainManager.Instance.unitDataDic.TryGetValue(unitid, out UnitData unitData) ? unitData : new UnitData(unitid,1);
             SetButton(data);
@@ -129,7 +134,7 @@ namespace PCRCaculator
                 //path = "pictures/unit_plate_" + charid;
                 sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色长条, prefab);
             }
-            else if (buttonType == ButtonType.typeB || buttonType == ButtonType.typeC||buttonType== ButtonType.typeD)
+            else if (buttonType == ButtonType.typeB || buttonType == ButtonType.typeC || buttonType == ButtonType.typeD)
             {
                 //path = "charicons/fav_push_notif_" + unitid;
                 int iconUnitid = (data.unitId == 105701 && data.rarity == 6) ?
@@ -143,6 +148,7 @@ namespace PCRCaculator
             //   characterImage.sprite = MainManager.LoadSourceSprite(path);
             //}
             int unitid = data.unitId;
+            currentUnitId = unitid;
             if (unitid <= 200000 && MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData) && rarityData.detailData.talent_id.Count > 0)
             {
                 characterTalentImage.SetActive(true);
@@ -430,6 +436,23 @@ namespace PCRCaculator
                 Destroy(obj.gameObject);
                 battleBuffUIs.Remove(obj);
                 RefreshBattleBuffUIs();
+            }
+        }
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                OnRightClick?.Invoke(currentUnitId);
+                HandleRightClick(currentUnitId);
+            }
+        }
+        private void HandleRightClick(int unitId)
+        {
+            if (characterDetailManager != null)
+            {
+                CharacterDetailManager a = Instantiate(characterDetailManager);
+                a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
+                a.SetId(unitId);
             }
         }
         public void ShowContinousPress(bool show)

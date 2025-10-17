@@ -585,7 +585,6 @@ MonoBehaviour:
   - {fileID: -6355310026620927118, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   - {fileID: 2177176151013924680, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
   - {fileID: 4111648873913364657, guid: 683bedb62b0621044821807fd9b5373f, type: 3}
-  characterPositionImage_B: {fileID: 7743600925625691103}
   roleImage: {fileID: 3036259145833746086}
   positionSprites_B:
   - {fileID: 1011140826130490407, guid: d8c7915e2b51fd542824a7d05cc1bec1, type: 3}
@@ -625,6 +624,8 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 3996733010849628725, guid: f56b763f1e2d62b4c9f3050d70f2159d,
+    type: 3}
 --- !u!1 &7743600926609927300
 GameObject:
   m_ObjectHideFlags: 0
