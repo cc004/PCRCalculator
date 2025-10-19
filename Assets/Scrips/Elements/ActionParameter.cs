@@ -99,7 +99,10 @@ namespace Elements
 
         public Action OnInitWhenNoTarget { get; set; }
 
-        public bool CancelByIfForAll { get; set; }
+        public bool CancelByIfForAll {
+            get;
+            set; 
+        }
 
         public Dictionary<BasePartsData, long> IdOffsetDictionary { get; set; }
 
@@ -154,6 +157,11 @@ namespace Elements
         public bool IgnoreDecoy { get; set; }
         public bool IsExEquipSkillAction { get; set; }
         public List<UnitCtrl> ExecedMultiBossList { get; set; } = new List<UnitCtrl>();
+        public Dictionary<UnitCtrl, double> AllSealDamageCutExecValueDic { get; set; } = new Dictionary<UnitCtrl, double>();
+        public double AllSealDamageCutValueForCountZero { get; set; } = -1.0;
+        public bool AlreadyTriggerCause { get; set; }
+        public bool IgnoreTriggerCausedByTrigger { get; set; }
+
 
         public BasePartsData ProtectedParts { get; set; }
 
@@ -253,6 +261,10 @@ namespace Elements
             Skill _skill)
         {
             ExecedMultiBossList.Clear();
+            AllSealDamageCutExecValueDic.Clear();
+            AlreadyTriggerCause = false;
+            ExecedMultiBossList.Clear();
+            AllSealDamageCutValueForCountZero = -1.0;
             ResetHitData();
         }
 

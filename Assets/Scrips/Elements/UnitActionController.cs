@@ -666,7 +666,6 @@ namespace Elements
             }
         }
 
-
         public void ExecExSkill(Skill _skill)
         {
             actionStartFirstProcess(_skill, out var _);
@@ -687,6 +686,50 @@ namespace Elements
                 }
             }
         }
+
+        // RVA: 0x35B5C08 Offset: 0x35B5C08 VA: 0x35B5C08
+        // TODO use in enchant trigger action
+        // public void ExecSkillWithTargetId(Skill _skill, int _actionId) { } 
+
+        // RVA: 0x35B5F28 Offset: 0x35B5F28 VA: 0x35B5F28
+        public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        {
+            bool hasNoTarget = false;
+            actionStartFirstProcess(_skill, out hasNoTarget);
+            _skill.ReadySkill();
+            _skill.AweValue = Owner.CalcAweValue(false, false);
+
+            for (int i = 0; i < _actionList.Count; i++)
+            {
+                ActionParameter actionParameter = _actionList[i];
+                actionParameter.ReadyAction(Owner, this, _skill);
+                if ((_skill.HasParentIndexes.Contains(i) && !actionParameter.ReferencedByReflection) || actionParameter.ReferencedByEffect)
+                {
+                    continue;
+                }
+                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                {
+                    if (!_targetParts.Owner.IsStealth && !_targetParts.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                    {
+                        actionParameter.AppendTargetNum(_targetParts.Owner, 0);
+                        ExecAction(actionParameter, _skill, _targetParts, 0, 0f, true);
+                    }
+                }
+                else
+                {
+                    foreach (var target in actionParameter.TargetList)
+                    {
+                        actionParameter.AppendTargetNum(target.Owner, 0);
+                        ExecAction(actionParameter, _skill, target, 0, 0f, true);
+                    }
+                }
+            }
+        }
+
+        // RVA: 0x35B62E0 Offset: 0x35B62E0 VA: 0x35B62E0
+        // TODO use in trigger action DisplayClass5_6___ExecActionOnStart_b__19
+        // public void ExecSkillWithTargetParts(Skill _skill, BasePartsData _parts) { }
+
 
         private void createActionValue(
           MasterSkillData.SkillData skillParameter,
@@ -889,7 +932,7 @@ namespace Elements
             {
                 ActionParameter actionParameter2 = skill.ActionParameters[l];
                 actionParameter2.ReadyAction(Owner, this, skill);
-                if ((!hasParentIndexes.Contains(l) || actionParameter2.ReferencedByReflection) && !actionParameter2.ReferencedByEffect)
+                if ((!hasParentIndexes.Contains(l) || actionParameter2.ReferencedByReflection) && !actionParameter2.ReferencedByEffect && !actionParameter2.IgnoreTriggerCausedByTrigger) // TODO temp fix find real logic
                 {
                     ExecUnitActionWithDelay(actionParameter2, skill, _first: true, _boneCount: true);
                 }

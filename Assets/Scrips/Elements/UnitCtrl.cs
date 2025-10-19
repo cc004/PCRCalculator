@@ -3211,6 +3211,15 @@ this.updateCurColor();
             unitActionController.ExecActionOnStart();
         }
 
+        // public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        public void ExecSkillWithTargetPartsAndActionList(
+          Skill _skill,
+          BasePartsData _targetParts,
+          List<ActionParameter> _actionList)
+        {
+            unitActionController.ExecSkillWithTargetPartsAndActionList(_skill, _targetParts, _actionList);
+        }
+
         public void ExecActionOnWaveStart() => unitActionController.ExecActionOnWaveStart();
 
         public float GetDodgeRate(long _accuracy)
@@ -8709,6 +8718,23 @@ this.updateCurColor();
 
         public BasePartsData DummyPartsData { get; set; }
 
+        // RVA: 0x315027C Offset: 0x315027C VA: 0x315027C
+        public BasePartsData GetIndexSmallestParts()
+        {
+            if (!IsPartsBoss)
+                return DummyPartsData;
+            List<PartsData> all = BossPartsListForBattle.FindAll(e => e.GetTargetable());
+            // PartsData partsData1 = all[0];
+            // for (int index = 0; index < all.Count; ++index)
+            // {
+            //     PartsData partsData2 = all[index];
+            //     if (partsData2.Index < partsData1.Index)
+            //         partsData1 = partsData2;
+            // }
+            return all.OrderBy(p => p.Index).FirstOrDefault();
+        }
+
+
         public BasePartsData GetFirstParts(bool _owner = false, float _basePos = 0.0f)
         {
             if (!IsPartsBoss || _owner)
@@ -9012,7 +9038,7 @@ this.updateCurColor();
             else _damageData.critVar = 0f;
 
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
-                _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate, out bool isHit);
+                _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple, _actionId, callBack, out bool isHit);
             if (_damageData.Target is PartsData)
             {
                 if (!_damageData.IsSlipDamage)
@@ -9196,10 +9222,6 @@ this.updateCurColor();
             }
         }
 
-
-        // RVA: 0x270ECDC Offset: 0x270ECDC VA: 0x270ECDC
-        // public double TryApplyAllUnitDamageSeal(bool _enemySide, UnitCtrl _target, UnitCtrl _effectTarget, ActionParameter _actionParameter) { }
-
         private static readonly WaitForSeconds LARGE_NUM_SHOW_TIME = new WaitForSeconds(0.2f);
         public LongWithEx SetDamageImpl(
           DamageData _damageData,
@@ -9213,8 +9235,8 @@ this.updateCurColor();
           bool _noMotion,
           Func<int, double, int> _upperLimitFunc,
           double _energyChargeMultiple,
+          int _actionId,
           Action<string> callBack,
-          float criticalRate,
           out bool isHit)
         {
             isHit = true;
@@ -9295,7 +9317,25 @@ this.updateCurColor();
 
             if (_byAttack && !_damageData.IgnoreStrikeBackAndAllUnitDamageCutTrigger)
             {
-                // TODO TryApplyAllUnitDamageSeal
+                var savedSkill = _skill;
+                var effectTarget = this.unitActionController;
+                bool enemySide = IsOther;
+                var target = _damageData.Source;
+                
+                var actionParameters = _skill.ActionParameters;
+                
+                var foundActionParam = actionParameters.Find(ap => ap.ActionId == _actionId);
+                
+                double damageCutRate = battleManager.TryApplyAllUnitDamageSeal(
+                    enemySide,
+                    target,
+                    effectTarget.Owner,
+                    foundActionParam);
+                
+                a *= 1f - damageCutRate;
+                b *= 1f - damageCutRate; 
+                
+                _skill = savedSkill;
             }
 
             
