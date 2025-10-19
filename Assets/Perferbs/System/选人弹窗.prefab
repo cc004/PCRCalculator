@@ -35764,6 +35764,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821885137392744
 GameObject:
   m_ObjectHideFlags: 0
@@ -36625,6 +36626,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821885198408748
 GameObject:
   m_ObjectHideFlags: 0
@@ -38062,6 +38064,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821885287680642
 GameObject:
   m_ObjectHideFlags: 0
@@ -38781,6 +38784,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821885336762808
 GameObject:
   m_ObjectHideFlags: 0
@@ -43161,6 +43165,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821885637046518
 GameObject:
   m_ObjectHideFlags: 0
@@ -49975,6 +49980,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821886189610441
 GameObject:
   m_ObjectHideFlags: 0
@@ -50888,6 +50894,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821886286328559
 GameObject:
   m_ObjectHideFlags: 0
@@ -51382,6 +51389,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821886300260508
 GameObject:
   m_ObjectHideFlags: 0
@@ -53446,6 +53454,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821886502559752
 GameObject:
   m_ObjectHideFlags: 0
@@ -55693,6 +55702,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
+  characterDetailManager: {fileID: 0}
 --- !u!1 &5392821886610931165
 GameObject:
   m_ObjectHideFlags: 0
@@ -70207,7 +70217,19 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnSubmit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5392821886617668872}
+        m_TargetAssemblyTypeName: PCRCaculator.ChoosePannelManager, Assembly-CSharp
+        m_MethodName: ParseTeam
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnDidEndEdit:
     m_PersistentCalls:
       m_Calls: []

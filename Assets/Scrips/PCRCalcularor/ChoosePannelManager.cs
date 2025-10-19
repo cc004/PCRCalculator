@@ -117,6 +117,8 @@ namespace PCRCaculator
         public List<SubGroup> subs = new List<SubGroup>();
         public GameObject subGroupsContainer;
         private Dictionary<int, param_type> paramTypeDict => MainManager.Instance.ParamTypeDic;
+        private Dictionary<string, int> nameToIdMap = new Dictionary<string, int>();
+
         private void Start()
         {
             Instance = this;
@@ -1134,6 +1136,7 @@ namespace PCRCaculator
         {
             id2alias = new Dictionary<int, string>();
             id2pinyin = new Dictionary<int, string>();
+            nameToIdMap = new Dictionary<string, int>();
 
             string filePath = Path.Combine(Application.streamingAssetsPath, "Datas", "chara_name.json");
 
@@ -1165,8 +1168,24 @@ namespace PCRCaculator
                 int parsedKey = int.Parse(entry.Key + "01");
                 id2alias[parsedKey] = string.Join("|", entry.Value);
                 id2pinyin[parsedKey] = string.Join("|", entry.Value.Select(x => PinyinHelper.GetPinyin(x, "").ToUpper()));
+                foreach (var name in entry.Value)
+                {
+                    string normalizedName = name.Trim().ToLower();
+                    if (!nameToIdMap.ContainsKey(normalizedName))
+                    {
+                        nameToIdMap[normalizedName] = parsedKey;
+                    }
+
+                    // 添加拼音映射
+                    string pinyinName = PinyinHelper.GetPinyin(name, "").ToLower();
+                    if (!nameToIdMap.ContainsKey(pinyinName))
+                    {
+                        nameToIdMap[pinyinName] = parsedKey;
+                    }
+                }
             }
         }
+
         private void SelectFirstUnit()
         {
             if (firstShowUnitId != -1)
@@ -1186,6 +1205,51 @@ namespace PCRCaculator
             {
                 RefreshBasePage();
             }
+        }
+
+        /// <summary>
+        /// 解析多个角色的字符串
+        /// </summary>
+        public void ParseTeam()
+        {
+            selectedCharId.Clear();
+            var namestr = Search.text.Trim().ToLower();
+            List<int> team = new List<int>();
+            string unknown = "";
+
+            while (!string.IsNullOrEmpty(namestr))
+            {
+                // 寻找最长匹配的前缀
+                string longestMatch = "";
+                int matchedId = -1;
+
+                // 遍历所有可能的前缀，从长到短
+                for (int length = namestr.Length; length > 0; length--)
+                {
+                    string prefix = namestr.Substring(0, length);
+
+                    // 检查是否有角色名匹配这个前缀
+                    if (nameToIdMap.ContainsKey(prefix))
+                    {
+                        longestMatch = prefix;
+                        matchedId = nameToIdMap[prefix];
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(longestMatch))
+                {
+                    OnToggleSwitched(true, matchedId);
+                    namestr = namestr.Substring(longestMatch.Length).TrimStart();
+                }
+                else
+                {
+                    // 没有找到匹配项，跳过第一个字符
+                    unknown += namestr[0];
+                    namestr = namestr[1..].TrimStart();
+                }
+            }
+            Search.text = "";
         }
 
         public void SwitchFilterToggle()
