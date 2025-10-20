@@ -341,7 +341,7 @@ namespace Elements
             if (tempData.isGuildBattle)
                 SetBattleSpeed(tempData.SettingData.calSpeed);
             else
-                SetBattleSpeed(1);
+                SetBattleSpeed(GuildManager.StaticsettingData.calSpeed);
             BattleUIManager.Instance.SetTalentBonus();
         }
         public static void SetSummonUI(UnitCtrl summon)

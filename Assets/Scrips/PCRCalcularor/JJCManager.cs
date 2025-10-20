@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Org.BouncyCastle.Crypto.Engines;
+using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,9 +25,20 @@ namespace PCRCaculator
         private int waitDeletePlayerPos;//等待删除的玩家
         private int attackplayerPos;//战斗对手的序号
         private int editPlayerPos;//战斗对手的序号
+        private GuildSettingData SettingData => GuildManager.Instance.SettingData;
+        public Slider calSlider;
+        public Text calSettingTexts;
         private void Awake()
         {
             Instance = this;
+            calSlider.value = (int)(Math.Log(SettingData.calSpeed, 2) + 3);
+        }
+        public void OnCalSliderDraged()
+        {
+            int scaleRate = Mathf.RoundToInt(calSlider.value);
+            SettingData.calSpeed = (int)Mathf.Pow(2, scaleRate - 3);
+            calSettingTexts.text = "x" + SettingData.calSpeed;
+            GuildManager.Instance.SaveDataToJson();
         }
         /// <summary>
         /// 开始战斗

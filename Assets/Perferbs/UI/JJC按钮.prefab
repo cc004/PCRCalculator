@@ -223,7 +223,8 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
-  characterDetailManager: {fileID: 0}
+  characterDetailManager: {fileID: 3996733010849628725, guid: f56b763f1e2d62b4c9f3050d70f2159d,
+    type: 3}
 --- !u!1 &1496142561374913489
 GameObject:
   m_ObjectHideFlags: 0
@@ -2051,7 +2052,8 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
-  characterDetailManager: {fileID: 0}
+  characterDetailManager: {fileID: 3996733010849628725, guid: f56b763f1e2d62b4c9f3050d70f2159d,
+    type: 3}
 --- !u!1 &2758641190937631319
 GameObject:
   m_ObjectHideFlags: 0
@@ -2505,7 +2507,8 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
-  characterDetailManager: {fileID: 0}
+  characterDetailManager: {fileID: 3996733010849628725, guid: f56b763f1e2d62b4c9f3050d70f2159d,
+    type: 3}
 --- !u!1 &4353054657793530985
 GameObject:
   m_ObjectHideFlags: 0
@@ -2731,7 +2734,8 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
-  characterDetailManager: {fileID: 0}
+  characterDetailManager: {fileID: 3996733010849628725, guid: f56b763f1e2d62b4c9f3050d70f2159d,
+    type: 3}
 --- !u!1 &4662412209069756975
 GameObject:
   m_ObjectHideFlags: 0
@@ -3531,7 +3535,8 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 0, z: 0}
   skillUI: {fileID: 0}
   ScreenShotTrans: {fileID: 0}
-  characterDetailManager: {fileID: 0}
+  characterDetailManager: {fileID: 3996733010849628725, guid: f56b763f1e2d62b4c9f3050d70f2159d,
+    type: 3}
 --- !u!1 &7581591705508471154
 GameObject:
   m_ObjectHideFlags: 0
