@@ -4496,6 +4496,7 @@ namespace Elements.Battle
         }
 
         public bool _IsReleasedKnightEnhance = true;
+        public bool _IsNefeiBugFix = false;
         public Dictionary<int, long> UnitTalentFormationBonusDictionary { get => GuildManager.Instance.UnitTalentFormationBonusDictionary; }
 
         /// <summary>

@@ -99,10 +99,9 @@ namespace Elements
 
         public Action OnInitWhenNoTarget { get; set; }
 
-        public bool CancelByIfForAll {
-            get;
-            set; 
-        }
+        public bool CancelByIfForAll { get; set; }
+
+        public bool NoDelayExecByTriggerOnly { get; set; }
 
         public Dictionary<BasePartsData, long> IdOffsetDictionary { get; set; }
 

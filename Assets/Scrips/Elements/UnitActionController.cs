@@ -540,7 +540,7 @@ namespace Elements
             for (int index = 0; index < _skill.ActionParameters.Count; ++index)
                 _skill.ActionParameters[index].Initialize(Owner);
         }
-        private void actionStartFirstProcess(Skill _skill, out bool _hasNoTarget)
+        private void actionStartFirstProcess(Skill _skill, out bool _hasNoTarget, bool _resetActionTriggerOnly)
         {
             //IL_0064: Unknown result type (might be due to invalid IL or missing references)
             //IL_017a: Unknown result type (might be due to invalid IL or missing references)
@@ -588,6 +588,11 @@ namespace Elements
             for (int i = 0; i < _skill.ActionParameters.Count; i++)
             {
                 ActionParameter actionParameter = _skill.ActionParameters[i];
+
+                if (_resetActionTriggerOnly && !actionParameter.NoDelayExecByTriggerOnly)
+                {
+                    continue;
+                }
                 actionParameter.IdOffsetDictionary = new Dictionary<BasePartsData, long>();
                 actionParameter.CancelByIfForAll = false;
                 actionParameter.AdditionalValue = null;
@@ -668,7 +673,7 @@ namespace Elements
 
         public void ExecExSkill(Skill _skill)
         {
-            actionStartFirstProcess(_skill, out var _);
+            actionStartFirstProcess(_skill, out var _, false);
             _skill.ReadySkill();
             _skill.AweValue = Owner.CalcAweValue(false, false);
             for (int i = 0; i < _skill.ActionParameters.Count; i++)
@@ -695,7 +700,7 @@ namespace Elements
         public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
         {
             bool hasNoTarget = false;
-            actionStartFirstProcess(_skill, out hasNoTarget);
+            actionStartFirstProcess(_skill, out hasNoTarget, battleManager._IsNefeiBugFix);
             _skill.ReadySkill();
             _skill.AweValue = Owner.CalcAweValue(false, false);
 
@@ -851,7 +856,7 @@ namespace Elements
             }
 
             Skill skill = skillDictionary[skillId];
-            actionStartFirstProcess(skill, out var _hasNoTarget);
+            actionStartFirstProcess(skill, out var _hasNoTarget, false);
             bool flag = false;
             List<int> hasParentIndexes = skill.HasParentIndexes;
             if (skill.BlackOutTime > 0f)
