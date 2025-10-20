@@ -4276,6 +4276,8 @@ namespace Elements.Battle
             for (int index = 0; index < (tempData.extra_effect_cnt); ++index)
             {
                 (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsOther = true;
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsBonusEnemy = true;
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].WaveStartProcess(true);
             }
             //battleManager.battleProcessor.SetupHpAndEnergy();
             // ISSUE: explicit non-virtual call

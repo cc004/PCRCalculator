@@ -1435,11 +1435,7 @@ namespace Elements
         public UnitParameter UnitParameter { get; set; }
 
         public bool IsOther { get; set; }
-        public bool IsBonusEnemy // TODO check what is this and where set
-        {
-            get;
-            set;
-        }
+        public bool IsBonusEnemy { get; set; }
         public bool IsPlayerUnit => !IsOther;// == battleManager.BJKKBMOLHDH;
 
         public bool JoyFlag { get; set; }
@@ -3386,6 +3382,11 @@ this.updateCurColor();
 
         public void WaveStartProcess(bool _first)
         {
+            if (IsBonusEnemy) // temp fix for bonus enemy position
+            {
+                resetPosForEnemyUnit(RespawnPos);
+                return;
+            }
             ApplyPassiveSkill(_first, true);
             resetActionPatternAndCastTime();
             if (IsOther)
