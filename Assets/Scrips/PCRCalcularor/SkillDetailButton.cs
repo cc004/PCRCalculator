@@ -9,9 +9,11 @@ namespace PCRCaculator
         public Image smallIcon;
         public Image bigIcon;
         public Text nameText;
+        public Text skillText;
         public Text describeText;
         public Text detailText;
         public List<Vector3> IconPositions;
+        private List<string> skillTexts = new() {"UB", "SK1", "SK2", "EX", "SP1", "SP2"};
         /// <summary>
         /// 设置技能详情面板
         /// </summary>
@@ -35,9 +37,9 @@ namespace PCRCaculator
                 nameText.text = sk.name;
                 describeText.text = sk.describes;
             }
-            detailText.text = sk.GetSkillDetails(pos, unitData);
-            bigIcon.gameObject.transform.localPosition = IconPositions[pos];
-
+            detailText.text = sk.GetSkillDetails(pos > 3 ? 0 : pos, unitData);
+            skillText.text = skillTexts[pos];
+            // bigIcon.gameObject.transform.localPosition = IconPositions[pos];
         }
         /// <summary>
         /// 退出

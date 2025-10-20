@@ -1197,18 +1197,23 @@ namespace PCRCaculator
             int rarity = unitData.rarity;
             bool isUnitEquip = unitData.uniqueEqLv > 0;
             bool isUnitEquip2 = unitData.uniqueEq2Lv >= 0;
-            int[] li = new int[4] { UB, skill_1, skill_2, EXskill };
-            if (rarity >= 5) { li[3] = EXskill_ev; }
-            if (rarity == 6 && UB_ev != 0) { li[0] = UB_ev; }
+            List<int> skills = new List<int> { UB, skill_1, skill_2, EXskill };
+
+            if (rarity >= 5) { skills[3] = EXskill_ev; }
+            if (rarity == 6 && UB_ev != 0) { skills[0] = UB_ev; }
             if (isUnitEquip)
             {
-                li[1] = skill_1_ev == 0 ? li[1] : skill_1_ev;
+                skills[1] = skill_1_ev == 0 ? skills[1] : skill_1_ev;
             }
             if (isUnitEquip2)
             {
-                li[2] = skill_2_ev == 0 ? li[2] : skill_2_ev;
+                skills[2] = skill_2_ev == 0 ? skills[2] : skill_2_ev;
             }
-            return li;
+
+            if (SPskill_1 > 0) skills.Add(SPskill_1);
+            if (SPskill_2 > 0) skills.Add(SPskill_2);
+
+            return skills.ToArray();
         }
         public int[] GetFullSkillList()
         {

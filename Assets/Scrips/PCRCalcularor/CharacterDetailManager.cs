@@ -17,6 +17,7 @@ namespace PCRCaculator
         public List<Stars> equipmentStars;
         //public List<Toggle> toggles;
         public GameObject parent;
+        public GameObject skillParent;
         public List<TextMeshProUGUI> detailSetTexts;
         public List<Slider> detailSetSliders;
         public List<TextMeshProUGUI> equipmentLevelTexts;
@@ -255,16 +256,6 @@ namespace PCRCaculator
         private void SetSkills()
         {
             skilllist = un.GetSkillList(data);
-            for (int i = 0; i < 4; i++)
-            {
-                //string path = "skills/icon_skill_" + MainManager.Instance.SkillDataDic[skilllist[i]].icon;
-                //Sprite im = MainManager.LoadSourceSprite(path);
-                Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[skilllist[i]].icon);
-                if (im != null)
-                {
-                    skillImages[i].sprite = im;
-                }
-            }
             skillDetailTexts[0].text = "" + un.detailData.searchAreaWidth;
             skillDetailTexts[1].text = "" + un.detailData.normalAtkCastTime;
             string begin = "";
@@ -291,7 +282,8 @@ namespace PCRCaculator
                 return $"技能{skillid2}";
 
             }
-            if (skillid == 2001) { return "<color=#DE8234>SP</color>"; }
+            if (skillid == 2001) { return "<color=#DE8234>SP1</color>"; }
+            if (skillid == 2002) { return "<color=#DE8234>SP2</color>"; }
             return "ERROR!";
         }
         /// <summary>
@@ -357,17 +349,26 @@ namespace PCRCaculator
         /// 技能图标按钮
         /// </summary>
         /// <param name="buttonId">按钮序号</param>
-        public void SkillButton(int buttonId)
+        public void SkillButton()
         {
-            GameObject a = Instantiate(skillDetailPerferb);
-            a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform);
-            a.GetComponent<RectTransform>().offsetMax = new Vector2();
-            a.GetComponent<RectTransform>().offsetMin = new Vector2();
-            a.GetComponent<Transform>().localScale = new Vector3(1, 1, 1);
-            a.GetComponent<SkillDetailButton>().SetDetails(skillImages[buttonId].sprite,
-                skilllist[buttonId],
-                data,
-                buttonId);
+            foreach (Transform child in skillParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            for (int i = 0; i < skilllist.Length; i++)
+            {
+                if (MainManager.Instance.SkillDataDic.Count > 0)
+                {
+                    Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[skilllist[i]].icon);
+                    skillImages[i].sprite = im;
+                    GameObject a = Instantiate(skillDetailPerferb);
+                    a.transform.SetParent(skillParent.transform);
+                    a.GetComponent<SkillDetailButton>().SetDetails(skillImages[i].sprite,
+                        skilllist[i],
+                        data,
+                        i);
+                }
+            }
         }
         public void LoadButton()
         {
