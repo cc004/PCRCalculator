@@ -431,6 +431,12 @@ namespace PCRCaculator
         public void FinishEditButton_setting()
         {
             CancalButton();
+            foreach (var c in playerData.playrCharacters)
+            {
+                if (MainManager.Instance.unitDataDic.ContainsKey(c.unitId))
+                    MainManager.Instance.unitDataDic[c.unitId] = c;
+                MainManager.Instance.SaveUnitData();
+            }
             if (type == 1)
             {
                 JJCManager.Instance.ReadyAttack(selectedCharId);
@@ -446,13 +452,6 @@ namespace PCRCaculator
             else if (type == 4)
             {
                 GuildManager.Instance.FinishEditCharacterdetail();
-            }
-
-            foreach (var c in playerData.playrCharacters)
-            {
-                if (MainManager.Instance.unitDataDic.ContainsKey(c.unitId))
-                    MainManager.Instance.unitDataDic[c.unitId] = c;
-                MainManager.Instance.SaveUnitData();
             }
         }
         public void OnToggleSwitched(bool k, int unitid)
