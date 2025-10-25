@@ -105,6 +105,22 @@ namespace Elements
         public void AddOverwriteAbnormalState(int _counter, OverwriteAbnormalStateData _data)
         {
             this.overwriteSpeedData.Add(_counter, _data);
+            UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
+            this.SetAbnormalState(_data.Source, abnormalState, 9999f, _data.ActionParameter, _data.Skill, _data.EffectValue, 0f, false, false, 1f, true);
+            if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(this.CalcAbnormalStateSpeed(), 1f))
+            {
+                this.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, LongWithEx>
+                {
+                    {
+                        _data.TargetParts,
+                        0
+                    }
+                }, 0.5f, _data.Skill.SkillId, _data.Source, true, eEffectType.COMMON, true, false, false, 0);
+            }
+        }
+        public void AddOverwriteAbnormalStateOld(int _counter, OverwriteAbnormalStateData _data)
+        {
+            this.overwriteSpeedData.Add(_counter, _data);
             int num = this.overwriteSpeedData.Keys.Max();
             if (_counter != num)
             {
@@ -113,6 +129,18 @@ namespace Elements
             this.activeOverwriteAbnormalState(_data);
         }
         public void RemoveOverwriteAbnormalState(int _counter)
+        {
+            Dictionary<int, OverwriteAbnormalStateData>.KeyCollection keys = this.overwriteSpeedData.Keys;
+            if (keys.Count == 0)
+            {
+                return;
+            }
+            OverwriteAbnormalStateData overwriteAbnormalStateData = this.overwriteSpeedData[_counter];
+            this.overwriteSpeedData.Remove(_counter);
+            UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(overwriteAbnormalStateData.AbnormalState);
+            DisableAbnormalStateById(abnormalState, overwriteAbnormalStateData.ActionParameter.ActionId, false);
+        }
+        public void RemoveOverwriteAbnormalStateOld(int _counter)
         {
             Dictionary<int, OverwriteAbnormalStateData>.KeyCollection keys = this.overwriteSpeedData.Keys;
             if (keys.Count == 0)
@@ -1644,6 +1672,8 @@ namespace Elements
             get;
             set;
         }
+        public Action<DamageData, ActionParameter> OnDamageForExecToSource { get; set; }
+
         public Action OnDamageForUIShake { set; get; }
 
         public bool IsOnDamageCharge { get; set; }
@@ -5110,10 +5140,22 @@ this.updateCurColor();
                     break;
                 }
             }
+
+            if (_abnormalState == eAbnormalState.SLOW)
+                button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[currentBehaviourIndex]);
+            else if (_abnormalState == eAbnormalState.HASTE)
+                button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[currentBehaviourIndex]);
+
             overlapAbnormalStateIndexList[_abnormalState].Remove(currentBehaviourIndex);
             overlapAbnormalStateData[currentBehaviourIndex].enable = false;
             overlapAbnormalStateData.Remove(currentBehaviourIndex);
+
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
+
+            if (!m_abnormalState[_abnormalState])
+            {
+                battleManager.RestartAbnormalStateField(this, _abnormalState);
+            }
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {

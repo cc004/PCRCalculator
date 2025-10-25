@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Elements.Battle;
+using PCRCaculator;
 
 namespace Elements
 {
@@ -33,7 +34,10 @@ namespace Elements
 			{
 				return;
 			}
-			owner.AddOverwriteAbnormalState(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
+			if (PCRCaculator.MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+				owner.AddOverwriteAbnormalState(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
+			else
+				owner.AddOverwriteAbnormalStateOld(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
 		}
 
 		// Token: 0x06003D7D RID: 15741 RVA: 0x00101680 File Offset: 0x00101680
@@ -49,7 +53,10 @@ namespace Elements
 			{
 				return;
 			}
-			owner.RemoveOverwriteAbnormalState(this.ActionCounter);
+			if (PCRCaculator.MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+				owner.RemoveOverwriteAbnormalState(this.ActionCounter);
+			else
+				owner.RemoveOverwriteAbnormalStateOld(this.ActionCounter);
 		}
 
 		// Token: 0x06003D7E RID: 15742 RVA: 0x001016D0 File Offset: 0x001016D0
@@ -77,6 +84,8 @@ namespace Elements
 				BasePartsData basePartsData = list[j];
 				if (base.TargetList.Contains(basePartsData))
 				{
+					if (MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+						TargetList.Remove(basePartsData);
 					this.OnExit(basePartsData, _unit);
 				}
 			}

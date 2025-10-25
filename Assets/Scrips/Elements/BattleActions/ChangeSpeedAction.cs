@@ -115,11 +115,27 @@ namespace Elements
                     break;
                 case 1:
                 case 2:
-                    if (_target.Owner.OverwriteSpeedDataCount > 0)
+                    if (!PCRCaculator.MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
                     {
-                        action($"存在强制速度改变，技能{actionDetail.GetDescription()}无效！");
-                        return;
+                        if (_target.Owner.OverwriteSpeedDataCount > 0)
+                        {
+                            action($"存在强制速度改变，技能{actionDetail.GetDescription()}无效！");
+                            return;
+                        }
                     }
+                    else
+                    {
+                        if (_target.Owner.OverwriteSpeedDataCount >= 1)
+                        {
+                            var abnormalState0 = ChangeSpeedAction.AbnormalStateDic[(ChangeSpeedAction.eChangeSpeedType)base.ActionDetail1];
+                            if (!_target.Owner.IsAbnormalState(abnormalState0))
+                            {
+                                action($"目标不处于{abnormalState0.GetDescription()}状态，技能{actionDetail.GetDescription()}无效！");
+                                return;
+                            }
+                        }
+
+                    }                    
                     break;
             }
 
