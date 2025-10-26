@@ -60,11 +60,19 @@ namespace Elements
 		}
 
 		// Token: 0x06003D7E RID: 15742 RVA: 0x001016D0 File Offset: 0x001016D0
-		public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState)
+		public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState, bool _strict)
 		{
-			base.ResetTarget(_unit, _abnormalState);
-			if (UnitCtrl.GetAbnormalState(this.AbnormalState) != _abnormalState)
+			base.ResetTarget(_unit, _abnormalState, _strict);
+			if (_strict)
 			{
+				if (UnitCtrl.GetAbnormalState(this.AbnormalState) != _abnormalState)
+				{
+					return;
+				}
+			}
+			else
+			{
+				if (UnitCtrl.GetAbnormalStateCategory(UnitCtrl.GetAbnormalState(this.AbnormalState)) != UnitCtrl.GetAbnormalStateCategory(_abnormalState))
 				return;
 			}
 			List<BasePartsData> list = new List<BasePartsData>();

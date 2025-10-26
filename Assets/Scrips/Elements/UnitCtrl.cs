@@ -5141,20 +5141,20 @@ this.updateCurColor();
                 }
             }
 
-            if (_abnormalState == eAbnormalState.SLOW)
-                button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[currentBehaviourIndex]);
-            else if (_abnormalState == eAbnormalState.HASTE)
-                button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[currentBehaviourIndex]);
-
             overlapAbnormalStateIndexList[_abnormalState].Remove(currentBehaviourIndex);
             overlapAbnormalStateData[currentBehaviourIndex].enable = false;
+            var disableBySwitch = overlapAbnormalStateData[currentBehaviourIndex].DisableBySwitch;
             overlapAbnormalStateData.Remove(currentBehaviourIndex);
 
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
 
-            if (!m_abnormalState[_abnormalState])
+            if (!m_abnormalState[_abnormalState] && !disableBySwitch)
             {
-                battleManager.RestartAbnormalStateField(this, _abnormalState);
+                battleManager.RestartAbnormalStateField(this, _abnormalState, false);
+            }
+            else if (disableBySwitch)
+            {
+                battleManager.RestartAbnormalStateField(this, _abnormalState, true);
             }
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
@@ -5388,6 +5388,11 @@ this.updateCurColor();
                     AbnormalStateCategoryData abnormalStateCategoryData = overlapAbnormalStateData[key];
                     if (abnormalStateCategoryData.enable && abnormalStateCategoryData.ActionId == _actionId)
                     {
+                        if (_abnormalState == eAbnormalState.SLOW)
+                            button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[key]);
+                        else if (_abnormalState == eAbnormalState.HASTE)
+                            button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[key]);
+
                         overlapAbnormalStateData[key].IsReleasedByDamage = _isReleasedByDamage;
                         list.RemoveAt(num);
                     }
@@ -5872,7 +5877,7 @@ this.updateCurColor();
             CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory]);
             if (_enable || _switch)
                 return;
-            battleManager.RestartAbnormalStateField(this, _abnormalState);
+            battleManager.RestartAbnormalStateField(this, _abnormalState, false);
         }
 
         private void shiftAbnormalColor()

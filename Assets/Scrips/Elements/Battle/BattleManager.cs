@@ -1932,14 +1932,15 @@ namespace Elements.Battle
             }
         }
 
-        public void RestartAbnormalStateField(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL)
+        public void RestartAbnormalStateField(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL, bool _strict)
         {
             Dictionary<int, List<AbnormalStateDataBase>>.Enumerator enumerator = FieldDataDictionary.GetEnumerator();
+            QueueUpdateSkillTarget();
             while (enumerator.MoveNext())
             {
                 List<AbnormalStateDataBase> plfcllhldooList = FieldDataDictionary[enumerator.Current.Key];
                 for (int index = 0; index < plfcllhldooList.Count; ++index)
-                    plfcllhldooList[index].ResetTarget(FNHGFDNICFG, GMDFAELOLFL);
+                    plfcllhldooList[index].ResetTarget(FNHGFDNICFG, GMDFAELOLFL, _strict);
             }
         }
 

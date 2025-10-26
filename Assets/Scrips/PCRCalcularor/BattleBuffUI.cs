@@ -36,13 +36,15 @@ namespace PCRCaculator.Battle
         }
         public IEnumerator RefreshTime(float stayTime,int startFrame)
         {
-            int stayFrame =(int)(stayTime * 60);
             while (!BattleManager.Instance.battleFinished && !BattleManager.Instance.skipping)
             {
                 int currentFrame = BattleHeaderController.CurrentFrameCount;
-                float v = (currentFrame - startFrame) / (float)stayFrame;
-                if (v <= 1 && v >= 0)
+                var pass = (currentFrame - startFrame) * BattleManager.Instance.DeltaTime_60fps;
+                if (Elements.BattleUtil.LessThanOrApproximately(pass, stayTime))
+                {
+                    float v = pass / stayTime;
                     timeCountSlider.value = v;
+                }
                 else
                     break;
                 yield return null;

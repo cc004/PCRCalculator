@@ -38,35 +38,43 @@ namespace Elements
     public override void OnEnter(BasePartsData _parts, UnitCtrl _source)
     {
       UnitCtrl owner = _parts.Owner;
-            if (this.TargetAction.ActionType == eActionType.CHANGE_SPEED && (this.TargetAction.ActionDetail1 == 1 || this.TargetAction.ActionDetail1 == 2) && owner.OverwriteSpeedDataCount > 0)
-            {
-                return;
-            }
-            base.OnEnter(_parts, _source);
+      if (this.TargetAction.ActionType == eActionType.CHANGE_SPEED && (this.TargetAction.ActionDetail1 == 1 || this.TargetAction.ActionDetail1 == 2) && owner.OverwriteSpeedDataCount > 0)
+      {
+        return;
+      }
+      base.OnEnter(_parts, _source);
       if (_parts.Owner.IsSummonOrPhantom)
         TargetAction.AppendTargetNum(_parts.Owner, 0);
       SourceActionController.ExecAction(TargetAction, PMHDBOJMEAD, _parts, 0, 0.0f);
     }
 
-    public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState)
+    public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState, bool _strict)
     {
-      base.ResetTarget(_unit, _abnormalState);
-      if (TargetAction.AbnormalStateFieldAction.TargetAbnormalState != _abnormalState)
-        return;
-      TargetAction.ResetHitData();
-      if (!_unit.IsPartsBoss)
-            {
-                TargetList.Remove(_unit.GetFirstParts());
-                TargetSet.Remove(_unit.GetFirstParts());
-            }
+      base.ResetTarget(_unit, _abnormalState, _strict);
+      if (_strict)
+      {
+        if (TargetAction.AbnormalStateFieldAction.TargetAbnormalState != _abnormalState)
+          return;
+      }
       else
       {
-                for (int index = 0; index < _unit.BossPartsListForBattle.Count; ++index)
-                {
-                    TargetList.Remove(_unit.BossPartsListForBattle[index]);
-                    TargetSet.Remove(_unit.BossPartsListForBattle[index]);
-                }
-            }
+        if (UnitCtrl.GetAbnormalStateCategory(TargetAction.AbnormalStateFieldAction.TargetAbnormalState) != UnitCtrl.GetAbnormalStateCategory(_abnormalState))
+          return;
+      }
+      TargetAction.ResetHitData();
+      if (!_unit.IsPartsBoss)
+      {
+        TargetList.Remove(_unit.GetFirstParts());
+        TargetSet.Remove(_unit.GetFirstParts());
+      }
+      else
+      {
+        for (int index = 0; index < _unit.BossPartsListForBattle.Count; ++index)
+        {
+          TargetList.Remove(_unit.BossPartsListForBattle[index]);
+          TargetSet.Remove(_unit.BossPartsListForBattle[index]);
+        }
+      }
     }
   }
 }
