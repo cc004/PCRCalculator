@@ -3246,6 +3246,13 @@ this.updateCurColor();
             unitActionController.ExecSkillWithTargetPartsAndActionList(_skill, _targetParts, _actionList);
         }
 
+        public void ExecSkillWithTargetParts(
+            Skill _skill,
+            BasePartsData _parts)
+        {
+            unitActionController.ExecSkillWithTargetParts(_skill, _parts);
+        }
+
         public void ExecActionOnWaveStart() => unitActionController.ExecActionOnWaveStart();
 
         public float GetDodgeRate(long _accuracy)
@@ -9069,6 +9076,13 @@ this.updateCurColor();
 
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
                 _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple, _actionId, callBack, out bool isHit);
+            if (_skill != null && isHit && _byAttack)
+            {
+                var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
+                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                    OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
+            }
+
             if (_damageData.Target is PartsData)
             {
                 if (!_damageData.IsSlipDamage)

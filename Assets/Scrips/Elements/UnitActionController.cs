@@ -732,9 +732,74 @@ namespace Elements
         }
 
         // RVA: 0x35B62E0 Offset: 0x35B62E0 VA: 0x35B62E0
-        // TODO use in trigger action DisplayClass5_6___ExecActionOnStart_b__19
-        // public void ExecSkillWithTargetParts(Skill _skill, BasePartsData _parts) { }
+        public void ExecSkillWithTargetParts(Skill _skill, BasePartsData _parts)
+        {
+            bool hasNoTarget = false;
+            actionStartFirstProcess(_skill, out hasNoTarget, false);
 
+            if (_skill == null)
+                return;
+                
+            _skill.ReadySkill();
+
+            _skill.AweValue = _parts.Owner.CalcAweValue(false, false);
+            
+            foreach (var actionParam in _skill.ActionParameters)
+            {
+                actionParam.ReadyAction(_parts.Owner, this, _skill);
+                
+                if (actionParam.ActionType == eActionType.IF_FOR_ALL) 
+                {
+                    if (actionParam.TargetAssignment == eTargetAssignment.OTHER_SIDE) 
+                    {
+                        var owner = _parts.Owner;
+                        actionParam.AppendTargetNum(owner, 0);
+                        ExecAction(actionParam, _skill, _parts, 0, 0f, true);
+                    }
+                    else
+                    {
+                        foreach (var targetPart in actionParam.TargetList)
+                        {
+                            var targetOwner = targetPart.Owner;
+                            actionParam.AppendTargetNum(targetOwner, 0);
+                            ExecAction(actionParam, _skill, targetPart, 0, 0f, true);
+                        }
+                    }
+                }
+            }
+            
+            for (int i = 0; i < _skill.ActionParameters.Count; i++)
+            {
+                var actionParam = _skill.ActionParameters[i];
+                
+                if (actionParam.ActionType == eActionType.IF_FOR_ALL || actionParam.CancelByIfForAll)
+                    continue;
+                    
+                bool isParentAction = _skill.HasParentIndexes?.Contains(i) ?? false;
+                
+                if (!isParentAction && !actionParam.ReferencedByReflection && !actionParam.ReferencedByEffect)
+                {
+                    if (actionParam.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                    {
+                        var targetAbnormal = _parts.Owner;
+                        if (!_parts.Owner.IsStealth && !targetAbnormal.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                        {
+                            actionParam.AppendTargetNum(_parts.Owner, 0);
+                            ExecAction(actionParam, _skill, _parts, 0, 0f, true);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var targetPart in actionParam.TargetList)
+                        {
+                            var targetOwner = targetPart.Owner;
+                            actionParam.AppendTargetNum(targetOwner, 0);
+                            ExecAction(actionParam, _skill, targetPart, 0, 0f, true);
+                        }
+                    }
+                }
+            }
+        }        
 
         private void createActionValue(
           MasterSkillData.SkillData skillParameter,

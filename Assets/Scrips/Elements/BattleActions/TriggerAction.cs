@@ -19,6 +19,8 @@ namespace Elements
     {
         private const int TOUGH_VALUE = 99;
         private const int NO_MOTION_VALUE = 1;
+        private int actionCountWaveReset; // 0x1C4
+
         public override void ExecActionOnWaveStart(Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController)
         {
             base.ExecActionOnWaveStart(_skill, _source, _sourceActionController);
@@ -418,6 +420,53 @@ namespace Elements
                         };
                         break;
                     }
+                case 14:
+                    foreach (var actionParameter in _skill.ActionParameters)
+                    {
+                        actionParameter.IgnoreTriggerCausedByTrigger = true;
+                    }
+                    target.OnDamageForExecToSource += (DamageData damageData, ActionParameter actionParameter) => 
+                    {
+                        if (ActionDetail3 == 0 || ActionDetail3 != actionCountWaveReset)
+                        {
+                            var source = damageData.Source;
+                            if (!actionParameter.IgnoreTriggerCausedByTrigger && !actionParameter.AlreadyTriggerCause)
+                            {
+                                var p = Value[eValueNumber.VALUE_1] / 100f;
+                                float num5 = BattleManager.Random(0f, 1f,new RandomData(_source,target,ActionId,17, base.Value[eValueNumber.VALUE_1] / 100f, 0));
+                                if (p < num5)
+                                    return;
+                                actionParameter.AlreadyTriggerCause = true;
+                                actionCountWaveReset++;
+                                Action<bool> callback = (bool _waitUbTurn) =>
+                                {
+                                    uint actionType = (uint)damageData.ActionType;
+                                    bool inRange = actionType <= 0x2F;
+                                    long mask = (1L << (int)actionType) & 0xC00000000002L;
+
+                                    if (inRange && mask != 0)
+                                    {
+                                        var targetPart = damageData.Source.GetIndexSmallestParts();
+                                        _source.ExecSkillWithTargetParts(_skill, targetPart);
+                                        return;
+                                    }
+                                };
+                                if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
+                                {
+                                    _source.AppendCoroutine(waitStateIdle(callback, _source), ePauseType.SYSTEM, _source);
+                                }
+                                else
+                                {
+                                    _source.AppendCoroutine(waitChargeSkillTurnNone(callback, _source), ePauseType.SYSTEM, _source);
+                                }
+                            }
+                        }
+
+                    };
+                    break;
+                default:
+                    UnityEngine.Debug.LogError("未知的Trigger类型: " + ActionDetail1);
+                    return;
 
             }
         }
@@ -497,8 +546,9 @@ namespace Elements
             BREAK = 9,
             SLIP_DAMAGE = 10, // 0x0000000A
             ALL_BREAK = 11, // 0x0000000B
-            DAMAGED_2,
-            DAMAGED_HP
+            DAMAGED_2 = 12,
+            DAMAGED_HP = 13,
+            DAMAGED_FOR_EXEC_TO_SOURCE = 14
         }
     }
 }
