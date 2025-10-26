@@ -79,7 +79,7 @@ namespace PCRCaculator
                 }
                 data = MainManager.Instance.unitDataDic[unitId];
                 if (spine != null) { Destroy(spine); spine = null; }
-                LoadSpine(unitId);
+                LoadSpine(unitId,data.rarity);
                 SetDetails();
                 SetSilders(data);
                 SetSkills();
@@ -90,7 +90,7 @@ namespace PCRCaculator
             //    MainManager.Instance.WindowConfigMessage("<color=#FF0000>出现BUG：" + e.Message + "</color>", null, null);
             //}
         }
-        private void LoadSpine(int unitid)
+        private void LoadSpine(int unitid, int rarity = 3)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace PCRCaculator
                 //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
                 //if (dataAsset == null)
                 //{
-                     dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */), 0.01f, true);
+                     dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(unitid, rarity), 0.01f, true);
                 //}
                 if (dataAsset == null)
                 {
