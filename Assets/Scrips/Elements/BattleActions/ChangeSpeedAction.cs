@@ -115,7 +115,7 @@ namespace Elements
                     break;
                 case 1:
                 case 2:
-                    if (!PCRCaculator.MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+                    if (!battleManager.IsReleaseSkillHasteLogic)
                     {
                         if (_target.Owner.OverwriteSpeedDataCount > 0)
                         {
@@ -135,7 +135,7 @@ namespace Elements
                             }
                         }
 
-                    }                    
+                    }
                     break;
             }
 

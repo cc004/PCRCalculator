@@ -4499,7 +4499,8 @@ namespace Elements.Battle
         }
 
         public bool _IsReleasedKnightEnhance = true;
-        public bool _IsNefeiBugFix = false;
+        public bool IsReleaseSkillHasteLogic = true;
+        public bool _IsNefeiBugFix = MainManager.Instance.PlayerSetting.IsNefeiBugFix;
         public Dictionary<int, long> UnitTalentFormationBonusDictionary { get => GuildManager.Instance.UnitTalentFormationBonusDictionary; }
 
         /// <summary>

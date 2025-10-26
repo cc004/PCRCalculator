@@ -10261,7 +10261,7 @@ MonoBehaviour:
   RBValueText: {fileID: 1262470496}
   RBTPValueText: {fileID: 1076017670}
   ShowTextPrefab: {fileID: 0}
-  IsReleaseSkillHasteLogic: {fileID: 988897723}
+  IsNefeiBugFix: {fileID: 988897723}
 --- !u!1 &245927546
 GameObject:
   m_ObjectHideFlags: 0
@@ -15840,7 +15840,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u4F7F\u7528\u65B0\u7248\u884C\u52A8\u901F\u5EA6"
+  m_Text: "\u4FEE\u590D\u6D85\u5983"
 --- !u!222 &348602775
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -46448,7 +46448,7 @@ GameObject:
   - component: {fileID: 988897722}
   - component: {fileID: 988897723}
   m_Layer: 5
-  m_Name: speed
+  m_Name: niefei
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46523,7 +46523,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &991623762
 GameObject:
   m_ObjectHideFlags: 0

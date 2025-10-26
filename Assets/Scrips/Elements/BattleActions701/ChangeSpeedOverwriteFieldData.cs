@@ -30,18 +30,18 @@ namespace Elements
 			this.alreadyExecedTargetCount.TryGetValue(owner, out num);
 			num++;
 			this.alreadyExecedTargetCount[owner] = num;
-			if (num != 1)
-			{
-				return;
-			}
-			if (PCRCaculator.MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
-				owner.AddOverwriteAbnormalState(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
-			else
-				owner.AddOverwriteAbnormalStateOld(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
-		}
+            if (num != 1)
+            {
+                return;
+            }
+            if (BattleManager.IsReleaseSkillHasteLogic)
+                owner.AddOverwriteAbnormalState(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
+            else
+                owner.AddOverwriteAbnormalStateOld(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
+        }
 
-		// Token: 0x06003D7D RID: 15741 RVA: 0x00101680 File Offset: 0x00101680
-		public override void OnExit(BasePartsData _parts, UnitCtrl _source)
+        // Token: 0x06003D7D RID: 15741 RVA: 0x00101680 File Offset: 0x00101680
+        public override void OnExit(BasePartsData _parts, UnitCtrl _source)
 		{
 			base.OnExit(_parts, _source);
 			UnitCtrl owner = _parts.Owner;
@@ -53,14 +53,14 @@ namespace Elements
 			{
 				return;
 			}
-			if (PCRCaculator.MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
-				owner.RemoveOverwriteAbnormalState(this.ActionCounter);
-			else
-				owner.RemoveOverwriteAbnormalStateOld(this.ActionCounter);
-		}
+            if (BattleManager.IsReleaseSkillHasteLogic)
+                owner.RemoveOverwriteAbnormalState(this.ActionCounter);
+            else
+                owner.RemoveOverwriteAbnormalStateOld(this.ActionCounter);
+        }
 
-		// Token: 0x06003D7E RID: 15742 RVA: 0x001016D0 File Offset: 0x001016D0
-		public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState, bool _strict)
+        // Token: 0x06003D7E RID: 15742 RVA: 0x001016D0 File Offset: 0x001016D0
+        public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState, bool _strict)
 		{
 			base.ResetTarget(_unit, _abnormalState, _strict);
 			if (_strict)
@@ -88,16 +88,16 @@ namespace Elements
 				}
 			}
 			for (int j = 0; j < list.Count; j++)
-			{
-				BasePartsData basePartsData = list[j];
-				if (base.TargetList.Contains(basePartsData))
-				{
-					if (MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
-						TargetList.Remove(basePartsData);
-					this.OnExit(basePartsData, _unit);
-				}
-			}
-		}
+            {
+                BasePartsData basePartsData = list[j];
+                if (base.TargetList.Contains(basePartsData))
+                {
+                    if (BattleManager.IsReleaseSkillHasteLogic)
+                        TargetList.Remove(basePartsData);
+                    this.OnExit(basePartsData, _unit);
+                }
+            }
+        }
 
 		// Token: 0x06003D7F RID: 15743 RVA: 0x0010176C File Offset: 0x0010176C
 		public ChangeSpeedOverwriteFieldData()
