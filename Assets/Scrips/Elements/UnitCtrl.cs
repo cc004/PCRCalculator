@@ -9312,13 +9312,13 @@ this.updateCurColor();
             if (debuffDamageUpDataList.Count > 0)
             {
                 var t = GetDebuffDamageUpValue(); // temp logic
-                                                  // TODO check whether attack field suit it
-                // if no, move this logic to UpdateSlipDamage
-                if (_damageData.OverrideDamageLimit != -1)
-                {
-                    a = a.Min(_damageData.OverrideDamageLimit);
-                    _damageData.OverrideDamageLimit = -1;
-                }
+                //                                   // TODO check whether attack field suit it
+                // // if no, move this logic to UpdateSlipDamage
+                // if (_damageData.OverrideDamageLimit != -1)
+                // {
+                //     a = a.Min(_damageData.OverrideDamageLimit);
+                //     _damageData.OverrideDamageLimit = -1;
+                // }
                 a *= t;
             }
             bool flag1 = false;
