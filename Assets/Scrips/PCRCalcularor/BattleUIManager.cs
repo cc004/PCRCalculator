@@ -136,8 +136,8 @@ namespace PCRCaculator.Battle
             {
                 _Update += _Update_1;
             }
-            _Update += _UpdateFPSCount;
-            timeScaleSlider.value = GuildManager.Instance?.calSlider?.value ?? 1;
+            _Update += _UpdateFPSCount; 
+            timeScaleSlider.value = (int)(Math.Log(GuildManager.Instance.SettingData.calSpeed, 2) + 3);
             inputActions = new Dictionary<KeyCode, Action>
             {
                 { KeyCode.RightArrow, StepButton }, // 方向右键

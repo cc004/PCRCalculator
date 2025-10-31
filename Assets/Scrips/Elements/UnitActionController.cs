@@ -540,7 +540,7 @@ namespace Elements
             for (int index = 0; index < _skill.ActionParameters.Count; ++index)
                 _skill.ActionParameters[index].Initialize(Owner);
         }
-        private void actionStartFirstProcess(Skill _skill, out bool _hasNoTarget)
+        private void actionStartFirstProcess(Skill _skill, out bool _hasNoTarget, bool _resetActionTriggerOnly)
         {
             //IL_0064: Unknown result type (might be due to invalid IL or missing references)
             //IL_017a: Unknown result type (might be due to invalid IL or missing references)
@@ -588,6 +588,11 @@ namespace Elements
             for (int i = 0; i < _skill.ActionParameters.Count; i++)
             {
                 ActionParameter actionParameter = _skill.ActionParameters[i];
+
+                if (_resetActionTriggerOnly && !actionParameter.NoDelayExecByTriggerOnly)
+                {
+                    continue;
+                }
                 actionParameter.IdOffsetDictionary = new Dictionary<BasePartsData, long>();
                 actionParameter.CancelByIfForAll = false;
                 actionParameter.AdditionalValue = null;
@@ -666,10 +671,9 @@ namespace Elements
             }
         }
 
-
         public void ExecExSkill(Skill _skill)
         {
-            actionStartFirstProcess(_skill, out var _);
+            actionStartFirstProcess(_skill, out var _, false);
             _skill.ReadySkill();
             _skill.AweValue = Owner.CalcAweValue(false, false);
             for (int i = 0; i < _skill.ActionParameters.Count; i++)
@@ -687,6 +691,115 @@ namespace Elements
                 }
             }
         }
+
+        // RVA: 0x35B5C08 Offset: 0x35B5C08 VA: 0x35B5C08
+        // TODO use in enchant trigger action
+        // public void ExecSkillWithTargetId(Skill _skill, int _actionId) { } 
+
+        // RVA: 0x35B5F28 Offset: 0x35B5F28 VA: 0x35B5F28
+        public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        {
+            bool hasNoTarget = false;
+            actionStartFirstProcess(_skill, out hasNoTarget, battleManager._IsNefeiBugFix);
+            _skill.ReadySkill();
+            _skill.AweValue = Owner.CalcAweValue(false, false);
+
+            for (int i = 0; i < _actionList.Count; i++)
+            {
+                ActionParameter actionParameter = _actionList[i];
+                actionParameter.ReadyAction(Owner, this, _skill);
+                if ((_skill.HasParentIndexes.Contains(i) && !actionParameter.ReferencedByReflection) || actionParameter.ReferencedByEffect)
+                {
+                    continue;
+                }
+                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                {
+                    if (!_targetParts.Owner.IsStealth && !_targetParts.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                    {
+                        actionParameter.AppendTargetNum(_targetParts.Owner, 0);
+                        ExecAction(actionParameter, _skill, _targetParts, 0, 0f, true);
+                    }
+                }
+                else
+                {
+                    foreach (var target in actionParameter.TargetList)
+                    {
+                        actionParameter.AppendTargetNum(target.Owner, 0);
+                        ExecAction(actionParameter, _skill, target, 0, 0f, true);
+                    }
+                }
+            }
+        }
+
+        // RVA: 0x35B62E0 Offset: 0x35B62E0 VA: 0x35B62E0
+        public void ExecSkillWithTargetParts(Skill _skill, BasePartsData _parts)
+        {
+            bool hasNoTarget = false;
+            actionStartFirstProcess(_skill, out hasNoTarget, false);
+
+            if (_skill == null)
+                return;
+                
+            _skill.ReadySkill();
+
+            _skill.AweValue = _parts.Owner.CalcAweValue(false, false);
+            
+            foreach (var actionParam in _skill.ActionParameters)
+            {
+                actionParam.ReadyAction(_parts.Owner, this, _skill);
+                
+                if (actionParam.ActionType == eActionType.IF_FOR_ALL) 
+                {
+                    if (actionParam.TargetAssignment == eTargetAssignment.OTHER_SIDE) 
+                    {
+                        var owner = _parts.Owner;
+                        actionParam.AppendTargetNum(owner, 0);
+                        ExecAction(actionParam, _skill, _parts, 0, 0f, true);
+                    }
+                    else
+                    {
+                        foreach (var targetPart in actionParam.TargetList)
+                        {
+                            var targetOwner = targetPart.Owner;
+                            actionParam.AppendTargetNum(targetOwner, 0);
+                            ExecAction(actionParam, _skill, targetPart, 0, 0f, true);
+                        }
+                    }
+                }
+            }
+            
+            for (int i = 0; i < _skill.ActionParameters.Count; i++)
+            {
+                var actionParam = _skill.ActionParameters[i];
+                
+                if (actionParam.ActionType == eActionType.IF_FOR_ALL || actionParam.CancelByIfForAll)
+                    continue;
+                    
+                bool isParentAction = _skill.HasParentIndexes?.Contains(i) ?? false;
+                
+                if (!isParentAction && !actionParam.ReferencedByReflection && !actionParam.ReferencedByEffect)
+                {
+                    if (actionParam.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                    {
+                        var targetAbnormal = _parts.Owner;
+                        if (!_parts.Owner.IsStealth && !targetAbnormal.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                        {
+                            actionParam.AppendTargetNum(_parts.Owner, 0);
+                            ExecAction(actionParam, _skill, _parts, 0, 0f, true);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var targetPart in actionParam.TargetList)
+                        {
+                            var targetOwner = targetPart.Owner;
+                            actionParam.AppendTargetNum(targetOwner, 0);
+                            ExecAction(actionParam, _skill, targetPart, 0, 0f, true);
+                        }
+                    }
+                }
+            }
+        }        
 
         private void createActionValue(
           MasterSkillData.SkillData skillParameter,
@@ -808,7 +921,7 @@ namespace Elements
             }
 
             Skill skill = skillDictionary[skillId];
-            actionStartFirstProcess(skill, out var _hasNoTarget);
+            actionStartFirstProcess(skill, out var _hasNoTarget, false);
             bool flag = false;
             List<int> hasParentIndexes = skill.HasParentIndexes;
             if (skill.BlackOutTime > 0f)
@@ -889,7 +1002,7 @@ namespace Elements
             {
                 ActionParameter actionParameter2 = skill.ActionParameters[l];
                 actionParameter2.ReadyAction(Owner, this, skill);
-                if ((!hasParentIndexes.Contains(l) || actionParameter2.ReferencedByReflection) && !actionParameter2.ReferencedByEffect)
+                if ((!hasParentIndexes.Contains(l) || actionParameter2.ReferencedByReflection) && !actionParameter2.ReferencedByEffect && !actionParameter2.IgnoreTriggerCausedByTrigger) // TODO temp fix find real logic
                 {
                     ExecUnitActionWithDelay(actionParameter2, skill, _first: true, _boneCount: true);
                 }

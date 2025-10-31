@@ -161,7 +161,7 @@ namespace Elements
 
     public class SealData
 	{
-		public Dictionary<int, SealBuffDebuffData> SealBuffDebuffDataDictionary { get; set; }
+		public Dictionary<int, SealBuffDebuffData> SealBuffDebuffDataDictionary { get; set; } = new Dictionary<int, SealBuffDebuffData>();
 		public bool IsEtherealization { get; set; }
 
 		public SkillEffectCtrl Effect { get; set; }
@@ -224,6 +224,10 @@ namespace Elements
 			}
 			enableSealIdList.Add(currentSealId);
 			Count++;
+			foreach (var sealBuffDebuffData in SealBuffDebuffDataDictionary.Values)
+			{
+				sealBuffDebuffData.UpdateValue(GetCurrentCount());
+			}
 			if (DisplayCount)
 			{
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());
@@ -259,6 +263,10 @@ namespace Elements
 			}
 			enableSealIdList.Remove(_sealId);
 			Count--;
+			foreach (var sealBuffDebuffData in SealBuffDebuffDataDictionary.Values)
+			{
+				sealBuffDebuffData.UpdateValue(GetCurrentCount());
+			}
 			if (DisplayCount)
 			{
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());

@@ -23,7 +23,7 @@ public class StatusPanel : MonoBehaviour
     private void UnitStatus()
     {
         var enemyUnits = MyGameCtrl.Instance.enemyUnitCtrl;
-        List<PartsData> bossPartsList = UnitCtrl.Instance.BossPartsListForBattle;
+        List<PartsData> bossPartsList = enemyUnits[0].BossPartsListForBattle;
         var playerUnits = MyGameCtrl.Instance.playerUnitCtrl;
 
         ClearCells();

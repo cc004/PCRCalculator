@@ -105,6 +105,22 @@ namespace Elements
         public void AddOverwriteAbnormalState(int _counter, OverwriteAbnormalStateData _data)
         {
             this.overwriteSpeedData.Add(_counter, _data);
+            UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
+            this.SetAbnormalState(_data.Source, abnormalState, 9999f, _data.ActionParameter, _data.Skill, _data.EffectValue, 0f, false, false, 1f, true);
+            if (abnormalState == UnitCtrl.eAbnormalState.HASTE && !BattleUtil.LessThanOrApproximately(this.CalcAbnormalStateSpeed(), 1f))
+            {
+                this.SetBuffParam(UnitCtrl.BuffParamKind.NUM, UnitCtrl.BuffParamKind.NUM, new Dictionary<BasePartsData, LongWithEx>
+                {
+                    {
+                        _data.TargetParts,
+                        0
+                    }
+                }, 0.5f, _data.Skill.SkillId, _data.Source, true, eEffectType.COMMON, true, false, false, 0);
+            }
+        }
+        public void AddOverwriteAbnormalStateOld(int _counter, OverwriteAbnormalStateData _data)
+        {
+            this.overwriteSpeedData.Add(_counter, _data);
             int num = this.overwriteSpeedData.Keys.Max();
             if (_counter != num)
             {
@@ -113,6 +129,18 @@ namespace Elements
             this.activeOverwriteAbnormalState(_data);
         }
         public void RemoveOverwriteAbnormalState(int _counter)
+        {
+            Dictionary<int, OverwriteAbnormalStateData>.KeyCollection keys = this.overwriteSpeedData.Keys;
+            if (keys.Count == 0)
+            {
+                return;
+            }
+            OverwriteAbnormalStateData overwriteAbnormalStateData = this.overwriteSpeedData[_counter];
+            this.overwriteSpeedData.Remove(_counter);
+            UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(overwriteAbnormalStateData.AbnormalState);
+            DisableAbnormalStateById(abnormalState, overwriteAbnormalStateData.ActionParameter.ActionId, false);
+        }
+        public void RemoveOverwriteAbnormalStateOld(int _counter)
         {
             Dictionary<int, OverwriteAbnormalStateData>.KeyCollection keys = this.overwriteSpeedData.Keys;
             if (keys.Count == 0)
@@ -140,11 +168,11 @@ namespace Elements
         private void activeOverwriteAbnormalState(OverwriteAbnormalStateData _data)
         {
             UnitCtrl.eAbnormalState abnormalState = UnitCtrl.GetAbnormalState(_data.AbnormalState);
-            if (MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
+            if (battleManager.IsReleaseSkillHasteLogic)
             {
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.HASTE, out var list1) && list1 != null && list1.Count > 0)
                 {
-                    foreach(var index in list1)
+                    foreach (var index in list1)
                     {
                         button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[index]);
                     }
@@ -152,7 +180,7 @@ namespace Elements
                 }
                 if (overlapAbnormalStateIndexList.TryGetValue(eAbnormalState.SLOW, out var list2) && list2 != null && list2.Count > 0)
                 {
-                    foreach(var index in list2)
+                    foreach (var index in list2)
                     {
                         button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[index]);
                     }
@@ -1435,11 +1463,7 @@ namespace Elements
         public UnitParameter UnitParameter { get; set; }
 
         public bool IsOther { get; set; }
-        public bool IsBonusEnemy // TODO check what is this and where set
-        {
-            get;
-            set;
-        }
+        public bool IsBonusEnemy { get; set; }
         public bool IsPlayerUnit => !IsOther;// == battleManager.BJKKBMOLHDH;
 
         public bool JoyFlag { get; set; }
@@ -1648,6 +1672,8 @@ namespace Elements
             get;
             set;
         }
+        public Action<DamageData, ActionParameter> OnDamageForExecToSource { get; set; }
+
         public Action OnDamageForUIShake { set; get; }
 
         public bool IsOnDamageCharge { get; set; }
@@ -3211,6 +3237,22 @@ this.updateCurColor();
             unitActionController.ExecActionOnStart();
         }
 
+        // public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        public void ExecSkillWithTargetPartsAndActionList(
+          Skill _skill,
+          BasePartsData _targetParts,
+          List<ActionParameter> _actionList)
+        {
+            unitActionController.ExecSkillWithTargetPartsAndActionList(_skill, _targetParts, _actionList);
+        }
+
+        public void ExecSkillWithTargetParts(
+            Skill _skill,
+            BasePartsData _parts)
+        {
+            unitActionController.ExecSkillWithTargetParts(_skill, _parts);
+        }
+
         public void ExecActionOnWaveStart() => unitActionController.ExecActionOnWaveStart();
 
         public float GetDodgeRate(long _accuracy)
@@ -3377,6 +3419,11 @@ this.updateCurColor();
 
         public void WaveStartProcess(bool _first)
         {
+            if (IsBonusEnemy) // temp fix for bonus enemy position
+            {
+                resetPosForEnemyUnit(RespawnPos);
+                return;
+            }
             ApplyPassiveSkill(_first, true);
             resetActionPatternAndCastTime();
             if (IsOther)
@@ -4802,14 +4849,6 @@ this.updateCurColor();
 
             m_abnormalState[_abnormalState] = true;
 
-            // if (CanOverlapAbnormalState(
-            //         _abnormalState,
-            //         battleManager._IsReleaseSkillHasteLogic,
-            //         ))
-            // {
-            //     this.UpdateEffectForSpeedAbnormalState(true);
-            // }
-
             return newIndex;
         }
 
@@ -4921,7 +4960,7 @@ this.updateCurColor();
                 {
                     if (IsDead)
                         return;
-                    if (CanOverlapAbnormalState(_abnormalState, MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic))
+                    if (CanOverlapAbnormalState(_abnormalState))
                     {
                         if (!BattleManager.Instance.skipping && button != null)
                         {
@@ -5071,14 +5110,14 @@ this.updateCurColor();
             return false;
         }
 
-        public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState, bool _isReleaseSkillHasteLogic)
+        public static bool CanOverlapAbnormalState(eAbnormalState _abnormalState)
         {
             if ((uint)(_abnormalState - 65) <= 1u)
             {
                 return true;
             } else if (_abnormalState == eAbnormalState.SLOW || _abnormalState == eAbnormalState.HASTE)
             {
-                return _isReleaseSkillHasteLogic;
+                return true;
             }
             return false;
         }
@@ -5100,10 +5139,22 @@ this.updateCurColor();
                     break;
                 }
             }
+
             overlapAbnormalStateIndexList[_abnormalState].Remove(currentBehaviourIndex);
             overlapAbnormalStateData[currentBehaviourIndex].enable = false;
+            var disableBySwitch = overlapAbnormalStateData[currentBehaviourIndex].DisableBySwitch;
             overlapAbnormalStateData.Remove(currentBehaviourIndex);
+
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
+
+            if (!m_abnormalState[_abnormalState] && !disableBySwitch)
+            {
+                battleManager.RestartAbnormalStateField(this, _abnormalState, false);
+            }
+            else if (disableBySwitch)
+            {
+                battleManager.RestartAbnormalStateField(this, _abnormalState, true);
+            }
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
             {
@@ -5168,17 +5219,7 @@ this.updateCurColor();
         public double CalcAbnormalStateSpeed()
         {
             double num = 1.0;
-            if (MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic)
-            {
-                num = getSpeed();
-            }
-            else
-            {
-                if (IsAbnormalState(eAbnormalState.SLOW) || IsAbnormalState(eAbnormalState.HASTE))
-                {
-                    num = abnormalStateCategoryDataDictionary[eAbnormalStateCategory.SPEED].MainValue;
-                }
-            }
+            num = getSpeed();
             return Math.Max(0.0, num + calcOverlapSpeed());
         }
         private double calcOverlapSpeed()
@@ -5327,7 +5368,7 @@ this.updateCurColor();
         }*/
         public void DisableAbnormalStateById(eAbnormalState _abnormalState, int _actionId, bool _isReleasedByDamage)
         {
-            if (CanOverlapAbnormalState(_abnormalState, MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic))
+            if (CanOverlapAbnormalState(_abnormalState))
             {
                 List<int> list = overlapAbnormalStateIndexList[_abnormalState];
                 for (int num = list.Count - 1; num >= 0; num--)
@@ -5336,6 +5377,11 @@ this.updateCurColor();
                     AbnormalStateCategoryData abnormalStateCategoryData = overlapAbnormalStateData[key];
                     if (abnormalStateCategoryData.enable && abnormalStateCategoryData.ActionId == _actionId)
                     {
+                        if (_abnormalState == eAbnormalState.SLOW)
+                            button?.SetAbnormalIcons(this, eStateIconType.SLOW, false, extraKey: overlapAbnormalStateData[key]);
+                        else if (_abnormalState == eAbnormalState.HASTE)
+                            button?.SetAbnormalIcons(this, eStateIconType.HASTE, false, extraKey: overlapAbnormalStateData[key]);
+
                         overlapAbnormalStateData[key].IsReleasedByDamage = _isReleasedByDamage;
                         list.RemoveAt(num);
                     }
@@ -5820,7 +5866,7 @@ this.updateCurColor();
             CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory]);
             if (_enable || _switch)
                 return;
-            battleManager.RestartAbnormalStateField(this, _abnormalState);
+            battleManager.RestartAbnormalStateField(this, _abnormalState, false);
         }
 
         private void shiftAbnormalColor()
@@ -8709,6 +8755,23 @@ this.updateCurColor();
 
         public BasePartsData DummyPartsData { get; set; }
 
+        // RVA: 0x315027C Offset: 0x315027C VA: 0x315027C
+        public BasePartsData GetIndexSmallestParts()
+        {
+            if (!IsPartsBoss)
+                return DummyPartsData;
+            List<PartsData> all = BossPartsListForBattle.FindAll(e => e.GetTargetable());
+            // PartsData partsData1 = all[0];
+            // for (int index = 0; index < all.Count; ++index)
+            // {
+            //     PartsData partsData2 = all[index];
+            //     if (partsData2.Index < partsData1.Index)
+            //         partsData1 = partsData2;
+            // }
+            return all.OrderBy(p => p.Index).FirstOrDefault();
+        }
+
+
         public BasePartsData GetFirstParts(bool _owner = false, float _basePos = 0.0f)
         {
             if (!IsPartsBoss || _owner)
@@ -9012,7 +9075,14 @@ this.updateCurColor();
             else _damageData.critVar = 0f;
 
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
-                _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple,callBack,_damageData.CriticalRate, out bool isHit);
+                _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple, _actionId, callBack, out bool isHit);
+            if (_skill != null && isHit && _byAttack)
+            {
+                var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
+                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                    OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
+            }
+
             if (_damageData.Target is PartsData)
             {
                 if (!_damageData.IsSlipDamage)
@@ -9196,10 +9266,6 @@ this.updateCurColor();
             }
         }
 
-
-        // RVA: 0x270ECDC Offset: 0x270ECDC VA: 0x270ECDC
-        // public double TryApplyAllUnitDamageSeal(bool _enemySide, UnitCtrl _target, UnitCtrl _effectTarget, ActionParameter _actionParameter) { }
-
         private static readonly WaitForSeconds LARGE_NUM_SHOW_TIME = new WaitForSeconds(0.2f);
         public LongWithEx SetDamageImpl(
           DamageData _damageData,
@@ -9213,8 +9279,8 @@ this.updateCurColor();
           bool _noMotion,
           Func<int, double, int> _upperLimitFunc,
           double _energyChargeMultiple,
+          int _actionId,
           Action<string> callBack,
-          float criticalRate,
           out bool isHit)
         {
             isHit = true;
@@ -9246,13 +9312,13 @@ this.updateCurColor();
             if (debuffDamageUpDataList.Count > 0)
             {
                 var t = GetDebuffDamageUpValue(); // temp logic
-                                                  // TODO check whether attack field suit it
-                // if no, move this logic to UpdateSlipDamage
-                if (_damageData.OverrideDamageLimit != -1)
-                {
-                    a = a.Min(_damageData.OverrideDamageLimit);
-                    _damageData.OverrideDamageLimit = -1;
-                }
+                //                                   // TODO check whether attack field suit it
+                // // if no, move this logic to UpdateSlipDamage
+                // if (_damageData.OverrideDamageLimit != -1)
+                // {
+                //     a = a.Min(_damageData.OverrideDamageLimit);
+                //     _damageData.OverrideDamageLimit = -1;
+                // }
                 a *= t;
             }
             bool flag1 = false;
@@ -9295,7 +9361,25 @@ this.updateCurColor();
 
             if (_byAttack && !_damageData.IgnoreStrikeBackAndAllUnitDamageCutTrigger)
             {
-                // TODO TryApplyAllUnitDamageSeal
+                var savedSkill = _skill;
+                var effectTarget = this.unitActionController;
+                bool enemySide = IsOther;
+                var target = _damageData.Source;
+                
+                var actionParameters = _skill.ActionParameters;
+                
+                var foundActionParam = actionParameters.Find(ap => ap.ActionId == _actionId);
+                
+                double damageCutRate = battleManager.TryApplyAllUnitDamageSeal(
+                    enemySide,
+                    target,
+                    effectTarget.Owner,
+                    foundActionParam);
+                
+                a *= 1f - damageCutRate;
+                b *= 1f - damageCutRate; 
+                
+                _skill = savedSkill;
             }
 
             

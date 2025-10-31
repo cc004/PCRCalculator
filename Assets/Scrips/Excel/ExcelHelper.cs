@@ -984,7 +984,7 @@ namespace ExcelHelper
                 int[] lineColor = new int[3] { 151, 71, 6 };
                 worksheet0.Cells[1, 12, 1, 13].Merge = true;
                 worksheet0.Cells[1, 12].Value = "v" + Application.version;
-                worksheet0.Cells[1, 14].Value = MainManager.Instance.PlayerSetting.IsReleaseSkillHasteLogic ? "新版加速" : "旧版加速";
+                worksheet0.Cells[1, 14].Value = MainManager.Instance.PlayerSetting.IsNefeiBugFix ? "新版涅妃" : "旧版涅妃";
                 worksheet0.Cells[1, 15].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
                 worksheet0.Cells[2, 12, 2, 13].Merge = true;
                 worksheet0.Cells[2, 12].Value = "角色数据版本";
@@ -1755,7 +1755,7 @@ namespace ExcelHelper
 
         public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit, int widthCount,int hightCount)
         {
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID || UNITY_EDITOR_OSX
             return null;
 #else
             using (var image = (new MemoryStream(imageBytes)))

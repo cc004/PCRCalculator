@@ -10,6 +10,8 @@ namespace Elements
 {
   public class AbnormalStateCategoryData
   {
+    public bool DisableBySwitch; // TODO find where set
+    public UnitCtrl.eAbnormalState SwitchingAbnormalState; // TODO find where set
     public UnitCtrl.eAbnormalState CurrentAbnormalState;
     public bool enable;
     public DoubleWithEx MainValue;

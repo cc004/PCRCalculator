@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Org.BouncyCastle.Crypto.Engines;
+using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,14 +19,26 @@ namespace PCRCaculator
         public Vector3 startPosition;
         public Vector3 addPosition;
         public Vector3 perferbScale;
-
+        private bool isEditing;
         private List<AddedPlayerData> players = new List<AddedPlayerData>();
         private List<GameObject> selectButtons = new List<GameObject>();
         private int waitDeletePlayerPos;//等待删除的玩家
         private int attackplayerPos;//战斗对手的序号
+        private int editPlayerPos;//战斗对手的序号
+        private GuildSettingData SettingData => GuildManager.Instance.SettingData;
+        public Slider calSlider;
+        public Text calSettingTexts;
         private void Awake()
         {
             Instance = this;
+            calSlider.value = (int)(Math.Log(SettingData.calSpeed, 2) + 3);
+        }
+        public void OnCalSliderDraged()
+        {
+            int scaleRate = Mathf.RoundToInt(calSlider.value);
+            SettingData.calSpeed = (int)Mathf.Pow(2, scaleRate - 3);
+            calSettingTexts.text = "x" + SettingData.calSpeed;
+            GuildManager.Instance.SaveDataToJson();
         }
         /// <summary>
         /// 开始战斗
@@ -66,7 +80,14 @@ namespace PCRCaculator
         /// </summary>
         public void AddPlayerButton()
         {
+            isEditing = false;
             ChoosePannelManager.Instance.CallChooseBack(2);
+        }
+        public void EditButton(int pos)
+        {
+            isEditing = true;
+            editPlayerPos = pos;
+            ChoosePannelManager.Instance.CallChooseBack(5, players[pos - 2]);
         }
         /// <summary>
         /// 对战记录按钮
@@ -82,6 +103,7 @@ namespace PCRCaculator
         public void AttackButton(int id)
         {
             attackplayerPos = id;
+            isEditing = false;
             ChoosePannelManager.Instance.CallChooseBack(1, players[id - 2]);
             //Debug.LogError("收到战斗请求：id=" + id);
         }
@@ -102,7 +124,15 @@ namespace PCRCaculator
         /// <param name="addedPlayerData"></param>
         public void FinishAddingNewPlayer(AddedPlayerData addedPlayerData)
         {
-            players.Add(addedPlayerData);
+            if (isEditing)
+            {
+                players[editPlayerPos - 2] = addedPlayerData;
+                isEditing = false;
+            }
+            else
+            {
+                players.Add(addedPlayerData);
+            }
             Refresh(false);
             SaveDataToJson();
         }

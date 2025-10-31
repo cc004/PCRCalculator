@@ -45,5 +45,9 @@ namespace PCRCaculator
         {
             JJCManager.Instance.DeleteButton(pos);
         }
+        public void EditButton()
+        {
+            JJCManager.Instance.EditButton(pos);
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace Elements
         private MainManager mainManager;
         private BattleManager staticBattleManager;
         public Dictionary<int, UnitCtrl> playerUnitCtrlDic = new Dictionary<int, UnitCtrl>();
-        public Dictionary<int, UnitCtrl> enemyUnitCtrlDic = new Dictionary<int, UnitCtrl>();
+        // public Dictionary<int, UnitCtrl> enemyUnitCtrlDic = new Dictionary<int, UnitCtrl>();
 
         public bool IsGAUbMode;
         public bool isGAEvaluateFinished;
@@ -243,7 +243,7 @@ namespace Elements
             playerUnitCtrl.Clear();
             enemyUnitCtrl.Clear();
             playerUnitCtrlDic.Clear();
-            enemyUnitCtrlDic.Clear();
+            // enemyUnitCtrlDic.Clear();
             allUnitCtrlDataDic.Clear();
             IsUnitCreated = false;
             finishCount = 0;
@@ -341,7 +341,7 @@ namespace Elements
             if (tempData.isGuildBattle)
                 SetBattleSpeed(tempData.SettingData.calSpeed);
             else
-                SetBattleSpeed(1);
+                SetBattleSpeed(GuildManager.StaticsettingData.calSpeed);
             BattleUIManager.Instance.SetTalentBonus();
         }
         public static void SetSummonUI(UnitCtrl summon)
@@ -407,7 +407,7 @@ namespace Elements
             //Elements.BattleUnitBaseSpineController sa = SkeletonAnimation.NewSpineGameObject<Elements.BattleUnitBaseSpineController>(dataAsset);
             //sa.gameObject.name = unitid.ToString();
             battleSpineController.Initialize(false);
-            UnitCtrl unitCtrl = isplayer ? playerUnitCtrlDic[unitid] : enemyUnitCtrlDic[unitid];
+            UnitCtrl unitCtrl = isplayer ? playerUnitCtrlDic[unitid] : enemyUnitCtrl[idx];
             //unitCtrl.IsOther = !isplayer;
             unitCtrl.unitData = data;
             battleSpineController.gameObject.transform.SetParent(unitCtrl.transform.TargetTransform, false);
@@ -467,7 +467,7 @@ namespace Elements
                         else
                         {
                             enemyUnitCtrl.Add(unitCtrl);
-                            enemyUnitCtrlDic.Add(unitid, unitCtrl);
+                            // enemyUnitCtrlDic.Add(unitid, unitCtrl);
                         }
                         CreateUnitSpine(data,idx, isplayer, BattleDefine.GetUnitRespawnPos(idx, !isplayer), null);
                     }
@@ -517,7 +517,10 @@ namespace Elements
             else
             {
                 enemyUnitCtrl.Add(unitCtrl);
-                enemyUnitCtrlDic.Add(unitId, unitCtrl);
+                // if (!enemyUnitCtrlDic.ContainsKey(unitId))
+                    // enemyUnitCtrlDic.Add(unitId, unitCtrl);
+                // else
+                    // Debug.LogWarning($"敌人单位ID重复添加：{unitId} 可能是环境buff");
             }
             if (tempData.isGuildBattle && !isplayer)
             {

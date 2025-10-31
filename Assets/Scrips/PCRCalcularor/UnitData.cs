@@ -1197,18 +1197,23 @@ namespace PCRCaculator
             int rarity = unitData.rarity;
             bool isUnitEquip = unitData.uniqueEqLv > 0;
             bool isUnitEquip2 = unitData.uniqueEq2Lv >= 0;
-            int[] li = new int[4] { UB, skill_1, skill_2, EXskill };
-            if (rarity >= 5) { li[3] = EXskill_ev; }
-            if (rarity == 6 && UB_ev != 0) { li[0] = UB_ev; }
+            List<int> skills = new List<int> { UB, skill_1, skill_2, EXskill };
+
+            if (rarity >= 5) { skills[3] = EXskill_ev; }
+            if (rarity == 6 && UB_ev != 0) { skills[0] = UB_ev; }
             if (isUnitEquip)
             {
-                li[1] = skill_1_ev == 0 ? li[1] : skill_1_ev;
+                skills[1] = skill_1_ev == 0 ? skills[1] : skill_1_ev;
             }
             if (isUnitEquip2)
             {
-                li[2] = skill_2_ev == 0 ? li[2] : skill_2_ev;
+                skills[2] = skill_2_ev == 0 ? skills[2] : skill_2_ev;
             }
-            return li;
+
+            if (SPskill_1 > 0) skills.Add(SPskill_1);
+            if (SPskill_2 > 0) skills.Add(SPskill_2);
+
+            return skills.ToArray();
         }
         public int[] GetFullSkillList()
         {
@@ -2276,8 +2281,8 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 301;
-        public int playerProcess = 80;
+        public int playerLevel = 307;
+        public int playerProcess = 82;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 310;
         //public float bodyWidth = 100;
@@ -2287,7 +2292,7 @@ namespace PCRCaculator
         public bool useDMMpath = false;
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
-        public bool IsReleaseSkillHasteLogic = true;
+        public bool IsNefeiBugFix = false;
         public int maxTPUpValue = 250;//TP上限
         public Dictionary<int, int> talentLevel = new();
         public Dictionary<int, int> talentSkill = new();

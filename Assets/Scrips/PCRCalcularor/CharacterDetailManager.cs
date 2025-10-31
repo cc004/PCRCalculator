@@ -17,6 +17,7 @@ namespace PCRCaculator
         public List<Stars> equipmentStars;
         //public List<Toggle> toggles;
         public GameObject parent;
+        public GameObject skillParent;
         public List<TextMeshProUGUI> detailSetTexts;
         public List<Slider> detailSetSliders;
         public List<TextMeshProUGUI> equipmentLevelTexts;
@@ -50,6 +51,10 @@ namespace PCRCaculator
             unitId = id;
             Refresh();
         }
+        public void ExitButton()
+        {
+            Destroy(gameObject);
+        }
         public void Next(bool next)
         {
             int nextid = CharacterManager.Instance.showUnitIDs.FindIndex(a => a.Equals(unitId));
@@ -74,18 +79,18 @@ namespace PCRCaculator
                 }
                 data = MainManager.Instance.unitDataDic[unitId];
                 if (spine != null) { Destroy(spine); spine = null; }
-                LoadSpine(unitId);
+                LoadSpine(unitId,data.rarity);
                 SetDetails();
                 SetSilders(data);
                 SetSkills();
-                SetSkillAnimationPage(skillAnimationDropDown.value);
+                // SetSkillAnimationPage(skillAnimationDropDown.value);
             //}
             //catch(System.Exception e)
             //{
             //    MainManager.Instance.WindowConfigMessage("<color=#FF0000>出现BUG：" + e.Message + "</color>", null, null);
             //}
         }
-        private void LoadSpine(int unitid)
+        private void LoadSpine(int unitid, int rarity = 3)
         {
             try
             {
@@ -93,7 +98,7 @@ namespace PCRCaculator
                 //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + unitid + "/" + unitid + "_SkeletonData");
                 //if (dataAsset == null)
                 //{
-                     dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(unitid, 3 /* force use 3x skin */), 0.01f, true);
+                     dataAsset = SpineCreator.Instance.Createskeletondata(UnitUtility.GetSkinId(unitid, rarity), 0.01f, true);
                 //}
                 if (dataAsset == null)
                 {
@@ -137,15 +142,15 @@ namespace PCRCaculator
                 {
                     equip_path = "equipments/icon_equipment_invalid_" + equipmentid;
                 }*/
-                Sprite im = ABExTool.GetSprites(data.equipLevel[i] == -1? ABExTool.SpriteType.装备碎片:ABExTool.SpriteType.装备图标, equipmentid);
-                if (im != null) { equipmentImages[i].sprite = im; }
-                else { equipmentImages[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.装备图标, 999999); }
-                int maxStar = 0;
-                if (MainManager.Instance.EquipmentDic.ContainsKey(equipmentid))
-                {
-                    maxStar = MainManager.Instance.EquipmentDic[equipmentid].GetMaxLevel();
-                }
-                equipmentStars[i].SetStars(data.equipLevel[i], maxStar);
+                // Sprite im = ABExTool.GetSprites(data.equipLevel[i] == -1? ABExTool.SpriteType.装备碎片:ABExTool.SpriteType.装备图标, equipmentid);
+                // if (im != null) { equipmentImages[i].sprite = im; }
+                // else { equipmentImages[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.装备图标, 999999); }
+                // int maxStar = 0;
+                // if (MainManager.Instance.EquipmentDic.ContainsKey(equipmentid))
+                // {
+                //     maxStar = MainManager.Instance.EquipmentDic[equipmentid].GetMaxLevel();
+                // }
+                // equipmentStars[i].SetStars(data.equipLevel[i], maxStar);
             }
             if (MainManager.Instance.UnitName_cn.ContainsKey(unitId))
             {
@@ -251,16 +256,6 @@ namespace PCRCaculator
         private void SetSkills()
         {
             skilllist = un.GetSkillList(data);
-            for (int i = 0; i < 4; i++)
-            {
-                //string path = "skills/icon_skill_" + MainManager.Instance.SkillDataDic[skilllist[i]].icon;
-                //Sprite im = MainManager.LoadSourceSprite(path);
-                Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[skilllist[i]].icon);
-                if (im != null)
-                {
-                    skillImages[i].sprite = im;
-                }
-            }
             skillDetailTexts[0].text = "" + un.detailData.searchAreaWidth;
             skillDetailTexts[1].text = "" + un.detailData.normalAtkCastTime;
             string begin = "";
@@ -287,6 +282,8 @@ namespace PCRCaculator
                 return $"技能{skillid2}";
 
             }
+            if (skillid == 2001) { return "<color=#DE8234>SP1</color>"; }
+            if (skillid == 2002) { return "<color=#DE8234>SP2</color>"; }
             return "ERROR!";
         }
         /// <summary>
@@ -352,17 +349,26 @@ namespace PCRCaculator
         /// 技能图标按钮
         /// </summary>
         /// <param name="buttonId">按钮序号</param>
-        public void SkillButton(int buttonId)
+        public void SkillButton()
         {
-            GameObject a = Instantiate(skillDetailPerferb);
-            a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform);
-            a.GetComponent<RectTransform>().offsetMax = new Vector2();
-            a.GetComponent<RectTransform>().offsetMin = new Vector2();
-            a.GetComponent<Transform>().localScale = new Vector3(1, 1, 1);
-            a.GetComponent<SkillDetailButton>().SetDetails(skillImages[buttonId].sprite,
-                skilllist[buttonId],
-                data,
-                buttonId);
+            foreach (Transform child in skillParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            for (int i = 0; i < skilllist.Length; i++)
+            {
+                if (MainManager.Instance.SkillDataDic.Count > 0)
+                {
+                    Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[skilllist[i]].icon);
+                    skillImages[i].sprite = im;
+                    GameObject a = Instantiate(skillDetailPerferb);
+                    a.transform.SetParent(skillParent.transform);
+                    a.GetComponent<SkillDetailButton>().SetDetails(skillImages[i].sprite,
+                        skilllist[i],
+                        data,
+                        i);
+                }
+            }
         }
         public void LoadButton()
         {
@@ -400,7 +406,7 @@ namespace PCRCaculator
         }
         public void OnDropDownChanged()
         {
-            SetSkillAnimationPage(skillAnimationDropDown.value);
+            // SetSkillAnimationPage(skillAnimationDropDown.value);
         }
         public void PlayButton()
         {

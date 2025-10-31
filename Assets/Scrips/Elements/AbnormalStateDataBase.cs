@@ -122,7 +122,7 @@ namespace Elements.Battle
             this.skillEffect.SetSortOrderBack();
         }*/
 
-        public virtual void ResetTarget(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL)
+        public virtual void ResetTarget(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL, bool _strict)
         {
         }
 

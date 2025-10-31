@@ -26,7 +26,7 @@ namespace Elements
 
     public long OverrideDamageLimit { get; set; } = -1;
 
-    public bool IgnoreStrikeBackAndAllUnitDamageCutTrigger { get; set; }
+    public bool IgnoreStrikeBackAndAllUnitDamageCutTrigger { get; set; } // TODO check where set
     public bool IgnoreLogBarrier { get; set; }
 
     public LongWithEx LogBarrierExpectedDamage { get; set; }

@@ -251,6 +251,10 @@ namespace Elements.Battle
         public Dictionary<int, int> EnvironmentCounterDic { get; set; }
 
         public int CurrentEnvironmentId { get; set; }
+        private Dictionary<eStateIconType, AllUnitSealDamageCutData> unitAllUnitSealDamageCutDataDic { get; set; } = new Dictionary<eStateIconType, AllUnitSealDamageCutData>();
+        private int allUnitSealDamageCutCounter { get; set; }
+        private Dictionary<eStateIconType, AllUnitSealDamageCutData> enemyAllUnitSealDamageCutDataDic { get; set; } = new Dictionary<eStateIconType, AllUnitSealDamageCutData>();
+
 
         public int FICLPNJNOEP { get; private set; } // CurrentEnemyPoint
 
@@ -1784,6 +1788,78 @@ namespace Elements.Battle
             PFDAEFDOBIP.StartField();
         }
 
+        // RVA: 0x2FE0F04 Offset: 0x2FE0F04 VA: 0x2FE0F04 Slot: 328
+        public void ExecAllUnitSealDamageCut(AllUnitSealDamageCutData _data, bool _enemySide)
+        {
+            _data.Priority = this.allUnitSealDamageCutCounter;
+            this.allUnitSealDamageCutCounter++;
+
+            var dict = _enemySide ? enemyAllUnitSealDamageCutDataDic : unitAllUnitSealDamageCutDataDic;
+
+            var iconType = _data.IconType;
+            if (dict.ContainsKey(iconType))
+            {
+                var existingData = dict[iconType];
+                if (existingData != null)
+                {
+                    existingData.Clear();
+                }
+            }
+            dict[iconType] = _data;
+            _data.Start();
+        }
+
+        // RVA: 0x2FE1090 Offset: 0x2FE1090 VA: 0x2FE1090
+        public double TryApplyAllUnitDamageSeal(bool _enemySide, UnitCtrl _target, UnitCtrl _effectTarget, ActionParameter _actionParameter)
+        {
+            double allSealDamageCutValueForCountZero = 0.0;
+            if (_actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+            {
+                var sealDictionary = _enemySide ? enemyAllUnitSealDamageCutDataDic : unitAllUnitSealDamageCutDataDic;
+                if (sealDictionary.Count == 0)
+                    return 0.0;
+                var execValueDic = _actionParameter.AllSealDamageCutExecValueDic; // should where clean
+                if (execValueDic.TryGetValue(_effectTarget, out double existingValue))
+                {
+                    return existingValue;
+                }
+                allSealDamageCutValueForCountZero = _actionParameter.AllSealDamageCutValueForCountZero;
+
+                if (allSealDamageCutValueForCountZero == -1.0)
+                {
+                    var orderedSealData = sealDictionary.OrderBy(kvp => kvp.Value.Priority);
+
+                    foreach(var kvp in orderedSealData)
+                    {
+                        var sealCutData = kvp.Value;
+                        if (sealCutData == null || sealCutData.Source == null)
+                            continue;
+
+                        var sealData = sealCutData.Source.SealDictionary[sealCutData.IconType];
+                        if (sealData == null)
+                            continue;
+
+                        if (sealData.GetCurrentCount() >= 1)
+                        {
+                            allSealDamageCutValueForCountZero = sealCutData.DamageCutRate;
+                            
+                            if (sealData.GetCurrentCount() == 1)
+                            {
+                                _actionParameter.AllSealDamageCutValueForCountZero = allSealDamageCutValueForCountZero;
+                            }
+
+                            sealData.RemoveSeal(1, true);
+                            sealCutData.Exec(_target, _effectTarget);
+
+                            execValueDic[_effectTarget] = allSealDamageCutValueForCountZero;
+                            break;
+                        }
+                    }
+                }
+            }
+            return allSealDamageCutValueForCountZero;
+        }
+
         // RVA: 0x2E1358C Offset: 0x2E1358C VA: 0x2E1358C Slot: 320
         public void ExecEnvironment(EnvironmentData env, bool isEnemySide)
         {
@@ -1856,14 +1932,15 @@ namespace Elements.Battle
             }
         }
 
-        public void RestartAbnormalStateField(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL)
+        public void RestartAbnormalStateField(UnitCtrl FNHGFDNICFG, UnitCtrl.eAbnormalState GMDFAELOLFL, bool _strict)
         {
             Dictionary<int, List<AbnormalStateDataBase>>.Enumerator enumerator = FieldDataDictionary.GetEnumerator();
+            QueueUpdateSkillTarget();
             while (enumerator.MoveNext())
             {
                 List<AbnormalStateDataBase> plfcllhldooList = FieldDataDictionary[enumerator.Current.Key];
                 for (int index = 0; index < plfcllhldooList.Count; ++index)
-                    plfcllhldooList[index].ResetTarget(FNHGFDNICFG, GMDFAELOLFL);
+                    plfcllhldooList[index].ResetTarget(FNHGFDNICFG, GMDFAELOLFL, _strict);
             }
         }
 
@@ -3960,6 +4037,9 @@ namespace Elements.Battle
             SetBlackoutTimeZero();
             blackoutTimeCounter = 0;
             SetStarted(false);
+            unitAllUnitSealDamageCutDataDic.Clear();
+            allUnitSealDamageCutCounter = 0;
+            enemyAllUnitSealDamageCutDataDic.Clear();
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             FieldDataDictionary.Clear();
             EnvironmentCounterDic.Clear();
@@ -4197,6 +4277,8 @@ namespace Elements.Battle
             for (int index = 0; index < (tempData.extra_effect_cnt); ++index)
             {
                 (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsOther = true;
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsBonusEnemy = true;
+                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].WaveStartProcess(true);
             }
             //battleManager.battleProcessor.SetupHpAndEnergy();
             // ISSUE: explicit non-virtual call
@@ -4417,6 +4499,8 @@ namespace Elements.Battle
         }
 
         public bool _IsReleasedKnightEnhance = true;
+        public bool IsReleaseSkillHasteLogic = true;
+        public bool _IsNefeiBugFix = MainManager.Instance.PlayerSetting.IsNefeiBugFix;
         public Dictionary<int, long> UnitTalentFormationBonusDictionary { get => GuildManager.Instance.UnitTalentFormationBonusDictionary; }
 
         /// <summary>

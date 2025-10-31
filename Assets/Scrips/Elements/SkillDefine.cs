@@ -731,6 +731,14 @@ namespace Elements
             {
                 eActionType.SLIP_DAMAGE_UP,
                 typeof(SlipDamageUpAction)
+            },
+            {
+                eActionType.ALL_UNIT_SEAL_DAMAGE_CUT,
+                typeof(AllUnitSealDamageCutAction)
+            },
+            {
+                eActionType.SEAL_BUFF_DEBUFF,
+                typeof(SealBuffDebuffAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
