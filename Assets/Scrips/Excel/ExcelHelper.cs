@@ -396,6 +396,18 @@ namespace ExcelHelper
                 return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
             }
         }
+        public static bool KdExportEnabled
+        {
+            get
+            {
+                if (!File.Exists(Application.persistentDataPath + "/kd"))
+                    return false;
+                string file = Application.persistentDataPath + "/kd";
+                string actualHash = CalculateMD5(file);
+                const string expectedHash = "5608643a90f8385f0a42f0550da28b58";
+                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+            }
+        }
         public static bool PyExportEnabled
         {
             get
@@ -1278,12 +1290,13 @@ namespace ExcelHelper
 
                 lineNum++;
                 lineNum++;
+                int kdLineNum = lineNum;
                 worksheet1.Cells[lineNum, 1, lineNum ,5].Merge = true;
                 worksheet1.Cells[lineNum, 1].Style.Font.Size = 16;
                 worksheet1.Cells[lineNum, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet1.Cells[lineNum, 1].Value = "角色UB时间";
                 lineNum++;
-                for(int i = 0; i < playerDatas.playrCharacters.Count; i++)
+                for (int i = 0; i < playerDatas.playrCharacters.Count; i++)
                 {
                     worksheet1.Cells[lineNum, 1 + i].Value = playerDatas.playrCharacters[i].GetUnitName();
                 }
@@ -1305,6 +1318,113 @@ namespace ExcelHelper
                     }
                     count0++;
                     lineNum++;
+                }
+                if (KdExportEnabled)
+                {
+                    worksheet1.Cells[kdLineNum, 8, kdLineNum, 12].Merge = true;
+                    worksheet1.Cells[kdLineNum, 8].Style.Font.Size = 16;
+                    worksheet1.Cells[kdLineNum, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet1.Cells[kdLineNum, 8].Value = "刀损表";
+                    kdLineNum++;
+                    string[] kdHeadNames = new string[4] { "秒数", "帧数", "总伤", "预估总伤" };
+                    for (int i = 0; i < kdHeadNames.Length; i++)
+                    {
+                        worksheet1.Cells[kdLineNum, i + 8].Value = kdHeadNames[i];
+                    }
+                    kdLineNum++;
+                    double totalUBDamage = 0;
+                    bool bossDead = false;
+
+                    for (int i = 21; i <= MyGameCtrl.Instance.tempData.SettingData.limitTime; i++)
+                    {
+                        int frame = i * 60 - 2;
+
+                        if (!bossDead && TimelineData.allUnitHPDic.Count > 0)
+                        {
+                            var hpDataList = TimelineData.allUnitHPDic.First().Value;
+                            if (hpDataList.Count > 0)
+                            {
+                                ValueChangeData currentData = hpDataList.FindLast(data => data.xValue <= frame);
+                                if (currentData != null && currentData.yValue <= 0)
+                                {
+                                    bossDead = true;
+                                }
+                            }
+                        }
+
+                        // 秒数
+                        worksheet1.Cells[kdLineNum, 8].Value = i;
+                        // 帧数
+                        worksheet1.Cells[kdLineNum, 9].Value = frame;
+
+                        // 总伤
+                        string totalDamageText = "0w";
+                        if (TimelineData.allUnitHPDic.Count > 0)
+                        {
+                            var hpDataList = TimelineData.allUnitHPDic.First().Value;
+                            if (hpDataList.Count > 0)
+                            {
+                                ValueChangeData currentData = hpDataList.FindLast(data => data.xValue <= frame);
+                                double totalDamage = currentData != null ? currentData.hp - currentData.yValue : 0;
+                                totalDamageText = Math.Round(totalDamage / 10000.0) + "w";
+                            }
+                        }
+                        worksheet1.Cells[kdLineNum, 10].Value = totalDamageText;
+
+                        // 剩余UB
+                        List<string> combinedTexts = new List<string>();
+                        totalUBDamage = 0;
+
+                        foreach (var unitTPData in TimelineData.allUnitTPDic.Skip(1))
+                        {
+                            int unitId = unitTPData.Key;
+                            var tpDataList = unitTPData.Value;
+
+                            if (tpDataList.Count > 0)
+                            {
+                                ValueChangeData currentTPData = tpDataList.FindLast(data => data.xValue <= frame);
+                                if (currentTPData != null && currentTPData.yValue >= 1000)
+                                {
+                                    if (TimelineData.uBDetails != null)
+                                    {
+                                        var ubDetail = TimelineData.uBDetails.Find(ub => ub != null && ub.unitData != null && ub.unitData.unitId == unitId && ub.UBTime > frame);
+                                        string unitName = MainManager.Instance.GetUnitNickName(unitId);
+                                        if (ubDetail != null)
+                                        {
+                                            string damageText = Math.Round(ubDetail.totalDamage / 10000.0) + "w";
+                                            combinedTexts.Add($"{damageText}({unitName})");
+                                            totalUBDamage += ubDetail.totalDamage;
+                                        }
+                                        else
+                                        {
+                                            combinedTexts.Add($"无({unitName})");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        string remainingDamageText = string.Join(" + ", combinedTexts);
+
+                        // 预估总伤 = 总伤 + 剩余UB
+                        double currentTotalDamage = 0;
+                        if (double.TryParse(totalDamageText.Replace("w", ""), out double damageValue))
+                        {
+                            currentTotalDamage = damageValue * 10000;
+                        }
+                        double combinedDamage = currentTotalDamage + totalUBDamage;
+                        string estimatedTotalDamage = Math.Round(combinedDamage / 10000.0) + "w";
+
+                        worksheet1.Cells[kdLineNum, 11].Value = string.IsNullOrEmpty(remainingDamageText) ?
+                            $"{estimatedTotalDamage}" :
+                            $"{estimatedTotalDamage}={totalDamageText}+{remainingDamageText}";
+
+                        kdLineNum++;
+
+                        if (bossDead)
+                        {
+                            break;
+                        }
+                    }
                 }
                 ExcelWorksheet worksheet2 = package.Workbook.Worksheets.Add("技能循环");
                 lineNum = 1;
