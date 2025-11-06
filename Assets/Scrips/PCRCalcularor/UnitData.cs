@@ -761,7 +761,7 @@ namespace PCRCaculator
                         exEquip[i] = validEquip.Value != null ? validEquip.Key : 0;
                         if (validEquip.Value != null)
                         {
-                            exEquipLevel[i] = 5;
+                            exEquipLevel[i] = exEquip[i] == 4106402 ? 3 : 5; // 4106402为世界弓
                         }
                     }
                 }
@@ -2313,7 +2313,7 @@ namespace PCRCaculator
             { 110, 4110401 },
             { 201, 4201401 },
             { 202, 4202401 },
-            { 203, 4203303 },
+            { 203, 4203401 },
             { 204, 4204401 },
             { 301, 4301401 },
             { 302, 4302401 },
