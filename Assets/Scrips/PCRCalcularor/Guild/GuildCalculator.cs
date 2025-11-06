@@ -1107,7 +1107,7 @@ namespace PCRCaculator.Guild
             else if (backTime > 0)
             {
                 string prefix = boss[0].enemyId / 100000000 == 4 ? (BattleResult == eBattleResult.WIN ? "-返" : "-剩") : "-剩";
-                fileName += $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                fileName += $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
             }
             return fileName;
         }

@@ -167,7 +167,7 @@ namespace Elements
                 return (long)Math.Sqrt(Math.Max(0, (s2 - s * s / N) / N));
             }
         }
-        public long Probability(Func<long, bool> predict)
+        public float Probability(Func<long, bool> predict)
         {
             var N = GuildManager.StaticsettingData.n2;
             int s = 0;
@@ -176,7 +176,7 @@ namespace Elements
                 SetState(rndd.Next());
                 if (predict(Emulate(rndd.Next()))) ++s;
             }
-            return s / N;
+            return (float)s / N;
         }
 
         public static implicit operator long(LongWithEx self) => self.value;
