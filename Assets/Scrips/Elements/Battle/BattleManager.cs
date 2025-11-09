@@ -644,6 +644,8 @@ namespace Elements.Battle
         public bool skipping = false;
         public bool skipUB = false;
 
+        public Dictionary<int, Dictionary<int, bool>> IsSkillReady = new Dictionary<int, Dictionary<int, bool>>();
+
         private void updateFrame()
         {
             if (battleFinished) return;
@@ -742,6 +744,16 @@ namespace Elements.Battle
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
             isUpdateFrameExecuted = true;
+
+            var logicFrameCount = BattleHeaderController.CurrentFrameCount;
+            foreach(var unit in UnitList)
+            {
+                if (!IsSkillReady.ContainsKey(logicFrameCount))
+                {
+                    IsSkillReady[logicFrameCount] = new Dictionary<int, bool>();
+                }
+                IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
+            }
 
             if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {
@@ -3998,6 +4010,7 @@ namespace Elements.Battle
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
             SetStarted(false);
+            IsSkillReady.Clear();
             activeActionIds.Clear();
             effectUpdateList.Clear();
             isExtraEffectCalled.Clear();
