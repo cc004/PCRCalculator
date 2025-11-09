@@ -209,7 +209,7 @@ namespace Elements
                     {
                         var filterUnit = new HashSet<UnitCtrl>();
                         int filterType = (ActionDetail1 == 2000 ? 1 : 2);
-                        for (int index = 0; index < TargetList.Count; ++index)
+                        for (int index = 0; index < TargetList.Count && index < TargetNum; ++index)
                         {
                             if (TargetList[index].Owner.AtkType == filterType)
                                 filterUnit.Add(TargetList[index].Owner);

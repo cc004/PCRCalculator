@@ -89,6 +89,7 @@ namespace PCRCaculator.Guild
         public List<Sprite> resultSprite;
         public List<int> PlayerIds => playerIds;
         public List<int> BossId => bossId;
+        public Button KnifeDamageButton;
         private void Awake()
         {
             Instance = this;
@@ -197,7 +198,14 @@ namespace PCRCaculator.Guild
             {
                 guildPageUI.SetActive(false);
             }
-
+            if (ExcelHelper.ExcelHelper.KdExportEnabled)
+            {
+                KnifeDamageButton.SetActive(true);
+            }
+            else
+            {
+                KnifeDamageButton.SetActive(false);
+            }
             RefreshTotalDamage(false, 0, false, 0, 0);
             CurrentBossText.text = MainManager.Instance.GuildBattleData.SettingData.GetCurrentBossDes();
             currentSeedText.text = "随机数种子：" + MyGameCtrl.Instance.CurrentSeedForSave;
@@ -845,7 +853,7 @@ namespace PCRCaculator.Guild
                 string prefix = BattleResult == eBattleResult.WIN? "胜利：": "失败：";
                 resultBg.color = BattleResult == eBattleResult.WIN ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
                 prefix += IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
-                detail = $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                detail = $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
                 backTimeText.SetActive(true);
                 backTimeText.text = $"{detail}";
             }
@@ -919,19 +927,7 @@ namespace PCRCaculator.Guild
 
             try
             {
-
-                GuildTimelineData timelineData = new GuildTimelineData(MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup(), MyGameCtrl.Instance.CurrentSeedForSave, allUnitStateChangeDic,
-                    allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
-                {
-                    UBExecTime = CreateUBExecTimeData(),
-                    exceptDamage = Mathf.RoundToInt(expectedDamage / 10000),
-                    backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
-                    charImages = BattleUIManager.Instance.GetCharactersImage(),
-                    //string fileName = CreateExcelName();
-                    timeLineName = CreateExcelName(),
-                    uBDetails = CreateUBDetailList(),
-                    detail = detail,
-                };
+                GuildTimelineData timelineData = CreateTimeLineData();
                 ExcelHelper.ExcelHelper.OutputGuildTimeLine(timelineData, fileName);
                 MainManager.Instance.WindowConfigMessage("成功！", null);
             }
@@ -945,6 +941,21 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("发生错误：" + a.Message, null);
             }
 
+        }
+        public GuildTimelineData CreateTimeLineData()
+        {
+            return new GuildTimelineData(MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup(), MyGameCtrl.Instance.CurrentSeedForSave, allUnitStateChangeDic,
+                allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
+            {
+                UBExecTime = CreateUBExecTimeData(),
+                exceptDamage = Mathf.RoundToInt(expectedDamage / 10000),
+                backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
+                charImages = BattleUIManager.Instance.GetCharactersImage(),
+                //string fileName = CreateExcelName();
+                timeLineName = CreateExcelName(),
+                uBDetails = CreateUBDetailList(),
+                detail = detail,
+            };
         }
         public List<List<float>> CreateUBExecTimeData()
         {
@@ -1096,7 +1107,7 @@ namespace PCRCaculator.Guild
             else if (backTime > 0)
             {
                 string prefix = boss[0].enemyId / 100000000 == 4 ? (BattleResult == eBattleResult.WIN ? "-返" : "-剩") : "-剩";
-                fileName += $"{prefix}{backTime}s-{boss.Average(b => b.Hp.Probability(x => x <= 0f)):P0}";
+                fileName += $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
             }
             return fileName;
         }
@@ -1472,18 +1483,7 @@ namespace PCRCaculator.Guild
             }
             ExcelPackage src = new ExcelPackage(new FileInfo(file));
 
-            GuildTimelineData timelineData = new GuildTimelineData(MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup(), MyGameCtrl.Instance.CurrentSeedForSave, allUnitStateChangeDic,
-                allUnitAbnormalStateDic, allUnitHPDic, allUnitTPDic, allUnitSkillExecDic, playerUnitDamageDic, bossDefChangeDic, bossMgcDefChangeDic, AllRandomDataList)
-            {
-                UBExecTime = CreateUBExecTimeData(),
-                exceptDamage = Mathf.RoundToInt(expectedDamage / 10000),
-                backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
-                charImages = BattleUIManager.Instance.GetCharactersImage(),
-                //string fileName = CreateExcelName();
-                timeLineName = CreateExcelName(),
-                uBDetails = CreateUBDetailList(),
-                detail = detail,
-            };
+            GuildTimelineData timelineData = CreateTimeLineData();
 
             string fileName = CurrentBossText.text + "-" + CreateExcelName();
 

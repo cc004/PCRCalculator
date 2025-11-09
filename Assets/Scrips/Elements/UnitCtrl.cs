@@ -9704,7 +9704,7 @@ this.updateCurColor();
                         break;
                 }
             }*/
-            DoubleWithEx _overRecoverValue = 0;
+            LongWithEx _overRecoverValue = 0;
             if (_damageData.ActionType != eActionType.INHIBIT_HEAL && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
             var num6 = BattleUtil.DoubleToLong(_fDamage);
@@ -9713,7 +9713,7 @@ this.updateCurColor();
             long hp = (long)Hp;
             if (!IsDamageIgnore(_energyAdd))
             {
-                _hp = (long)((DoubleWithEx)Hp - ((DoubleWithEx)num6 - _overRecoverValue.Max(0)));
+                _hp = (Hp - (num6 - _overRecoverValue.Max(0)));
             }
             if (_onDamageHit != null & flag2)
                 _onDamageHit(num6);
@@ -10004,7 +10004,7 @@ this.updateCurColor();
         }
 
         public ProbEvent lastBarrier;
-        private void execBarrier(DamageData _damageData, ref DoubleWithEx _fDamage, ref DoubleWithEx _overRecoverValue)
+        private void execBarrier(DamageData _damageData, ref DoubleWithEx _fDamage, ref LongWithEx _overRecoverValue)
         {
             //FloatWithEx _fDamage = __fDamage;
             if (IsAbnormalState(eAbnormalState.GUARD_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
@@ -10072,7 +10072,7 @@ this.updateCurColor();
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num1 > 0.0)
                 {
-                    _overRecoverValue += setRecoveryAndGetOverRecovery((int)(float)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor();
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)(float)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
@@ -10087,7 +10087,7 @@ this.updateCurColor();
                 else
                 {
                     var num2 = BattleUtil.DoubleToInt(_fDamage);
-                    _overRecoverValue += setRecoveryAndGetOverRecovery((int)num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor();
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)num2;
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
@@ -10105,7 +10105,7 @@ this.updateCurColor();
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue;
                 if ((double)num1 > 0.0)
                 {
-                    _overRecoverValue += setRecoveryAndGetOverRecovery(BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source).Floor();
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery(BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source).Floor());
                     EnableAbnormalState(eAbnormalState.DRAIN_MGC, false);
                     _fDamage = num1;
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
@@ -10120,7 +10120,7 @@ this.updateCurColor();
                 else
                 {
                     var num2 = BattleUtil.DoubleToInt(_fDamage);
-                    _overRecoverValue += setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source).Floor();
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source).Floor());
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= num2;
                     _fDamage = 0.0f;
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
@@ -10196,7 +10196,7 @@ this.updateCurColor();
                     .MainValue;
                 if ((double) num3 > 0.0)
                 {
-                    _overRecoverValue += setRecoveryAndGetOverRecovery(
+                    _overRecoverValue += (LongWithEx)setRecoveryAndGetOverRecovery(
                         BattleUtil.DoubleToInt(
                             abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH]
                                 .MainValue), this, _damageData.Target,
@@ -10215,9 +10215,9 @@ this.updateCurColor();
                 else
                 {
                     var num1 = BattleUtil.DoubleToInt(_fDamage);
-                    _overRecoverValue += setRecoveryAndGetOverRecovery(num1, this, _damageData.Target,
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery(num1, this, _damageData.Target,
                         _damageData.DamageType == DamageData.eDamageType.MGC,
-                        abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source).Floor();
+                        abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source).Floor());
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -=
                         num1;
                     _fDamage = 0.0f;
