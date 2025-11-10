@@ -11,6 +11,7 @@ using PCRCaculator.SQL;
 using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json;
 
 namespace Elements
 {
@@ -24,6 +25,7 @@ namespace Elements
         public GameObject prefab2;
         public GameObject battleUnitPrefab;
         public GameObject firearmPrefab;
+        private BattleSimulationServer battleServer;
         //public GameObject emptyObject;
 
 
@@ -61,6 +63,23 @@ namespace Elements
             
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
+        }
+
+        private void OnStartServerButtonClick()
+        {
+            if (battleServer == null)
+            {
+                var serverObject = new GameObject("BattleSimulationServer");
+                serverObject.transform.parent = transform;
+                battleServer = serverObject.AddComponent<BattleSimulationServer>();
+                Debug.Log("HTTP服务器已启动");
+            }
+            else
+            {
+                Destroy(battleServer.gameObject);
+                battleServer = null;
+                Debug.Log("HTTP服务器已停止");
+            }
         }
 
         public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
@@ -244,6 +263,92 @@ namespace Elements
             enemyUnitCtrl.Clear();
             playerUnitCtrlDic.Clear();
             // enemyUnitCtrlDic.Clear();
+            allUnitCtrlDataDic.Clear();
+            IsUnitCreated = false;
+            finishCount = 0;
+            unitCount.Clear();
+            BattleHeaderController.Instance.ReStart();
+            BattleUIManager.Instance.ReStart();
+            staticBattleManager.Init(this);
+            if (IsSemanMode)
+            {
+                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
+            }
+            else
+            {
+                BattleManager.Instance.semanubmanager.SetUbExec(null);
+                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+            }
+        }
+
+        // Start battle using parameters from server request, do not rely on MainManager
+        public void StartByServer(Elements.Battle.BattleSimulationRequest req)
+        {
+            bool rebuild = true;
+            if (rebuild)
+            {
+                // Only use the minimal parameters provided by the HTTP request
+                IsAutoMode = req.IsAutoMode;
+                IsSetMode = req.IsSetMode;
+                IsSemanMode = req.IsSemanMode;
+
+                tempData = new TempData();
+
+                // Players: assume request provides PCRCaculator.UnitData list
+                tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
+
+                // UB exec lists
+                tempData.UBExecTimeList = req.UBExecTimeList ?? new List<List<float>>();
+                tempData.SemanUBExecTimeList = req.SemanUBExecTimeList ?? new List<List<int>>();
+
+                if (req.IsGuildBattle)
+                {
+                    // Guild enemies provided as EnemyData list
+                    tempData.guildEnemy = req.GuildEnemyList ?? new List<EnemyData>();
+
+                    // Minimal SettingData required by downstream code
+                    var settingData = new GuildSettingData(true);
+                    // If caller provided try count in Settings, use it; otherwise default kept
+                    if (req.Settings != null)
+                    {
+                        settingData.UBTryingCount = req.Settings.UBTryingCount;
+                        settingData.calSpeed = Mathf.Max(1, (int)req.Settings.CalSpeed);
+                    }
+
+                    tempData.SettingData = settingData;
+                    tempData.isGuildBattle = true;
+                    tempData.isGuildEnemyViolent = tempData.SettingData.GetCurrentPlayerGroup().isViolent;
+                    tempData.tryCount = tempData.SettingData.UBTryingCount;
+                    tempData.randomData = tempData.SettingData.GetCurrentRandomData();
+                    tempData.skipping = true; // all battles are skip
+
+                    // Fill enemyList from guildEnemy
+                    tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
+
+                    // Create unit parameters with group's log barrier setting
+                    tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
+                }
+                else
+                {
+                    // Non guild: directly use provided enemy list
+                    tempData.enemyList = req.EnemyList ?? new List<PCRCaculator.UnitData>();
+                    tempData.skipping = true;
+                    tempData.CreateAllUnitParameters();
+                }
+            }
+
+            foreach (Transform child in unitParent)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach (Transform child in enemyParent)
+            {
+                Destroy(child.gameObject);
+            }
+            playerUnitCtrl.Clear();
+            enemyUnitCtrl.Clear();
+            playerUnitCtrlDic.Clear();
             allUnitCtrlDataDic.Clear();
             IsUnitCreated = false;
             finishCount = 0;
