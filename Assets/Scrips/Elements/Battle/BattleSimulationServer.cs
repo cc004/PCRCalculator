@@ -98,9 +98,8 @@ namespace Elements.Battle
         private Thread listenerThread;
         private Thread queueProcessorThread;
         private bool isRunning = false;
-        public int port = 8080;  // 改为 public 以支持命令行设置
+        public int port = 8080;
         public Text conentText;
-        public bool autoStart = false;  // 是否自动启动
 
         // 异步队列系统
         private Queue<BattleTask> battleQueue = new Queue<BattleTask>();
@@ -108,45 +107,9 @@ namespace Elements.Battle
         private object queueLock = new object();
         private bool isProcessing = false;
 
-        void Awake()
-        {
-            // 检查命令行参数或环境变量
-            CheckAutoStart();
-        }
-
         void OnEnable()
         {
-            if (autoStart)
-            {
-                StartServer();
-            }
-        }
-
-        private void CheckAutoStart()
-        {
-            // 检查命令行参数
-            string[] args = System.Environment.GetCommandLineArgs();
-            if (args.Any(arg => arg.ToLower() == "-server" || arg.ToLower() == "--server"))
-            {
-                autoStart = true;
-                Debug.Log("检测到 -server 参数，将自动启动服务器");
-            }
-
-            // 检查环境变量
-            string envServer = System.Environment.GetEnvironmentVariable("PCR_SERVER_MODE");
-            if (!string.IsNullOrEmpty(envServer) && envServer.ToLower() == "true")
-            {
-                autoStart = true;
-                Debug.Log("检测到 PCR_SERVER_MODE 环境变量，将自动启动服务器");
-            }
-
-            // 检查端口设置
-            string envPort = System.Environment.GetEnvironmentVariable("PCR_SERVER_PORT");
-            if (!string.IsNullOrEmpty(envPort) && int.TryParse(envPort, out int envPortValue))
-            {
-                port = envPortValue;
-                Debug.Log($"通过环境变量设置服务器端口: {envPortValue}");
-            }
+            StartServer();
         }
 
         void OnDisable()
@@ -160,9 +123,11 @@ namespace Elements.Battle
 
             try
             {
+                Debug.Log($"[BattleSimulationServer] 正在创建 HttpListener，端口: {port}");
                 httpListener = new HttpListener();
                 httpListener.Prefixes.Add($"http://localhost:{port}/");
                 httpListener.Start();
+                Debug.Log("[BattleSimulationServer] HttpListener 已启动");
                 
                 isRunning = true;
                 listenerThread = new Thread(ListenForRequests);
@@ -172,11 +137,11 @@ namespace Elements.Battle
                 queueProcessorThread = new Thread(ProcessQueue);
                 queueProcessorThread.Start();
                 
-                Debug.Log($"HTTP服务器已启动，监听端口: {port}");
+                Debug.Log($"[BattleSimulationServer] ✓ HTTP服务器已成功启动，监听端口: {port}");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"启动HTTP服务器失败: {ex.Message}");
+                Debug.LogError($"[BattleSimulationServer] ✗ 启动HTTP服务器失败: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
@@ -224,24 +189,38 @@ namespace Elements.Battle
 
         private void HandleRequest(HttpListenerContext context)
         {
+            string path = context.Request.Url.AbsolutePath;
+            string method = context.Request.HttpMethod;
+            Debug.Log($"[BattleSimulationServer] 收到请求: {method} {path}");
+            
+            if (!MainManager.Instance.LoadFinished)
+            {
+                Debug.LogWarning("[BattleSimulationServer] MainManager 尚未加载完成，返回 503");
+                SendResponse(context, 503, JsonConvert.SerializeObject(new 
+                { 
+                    Success = false, 
+                    Message = "服务器尚未准备好，请稍后再试。" 
+                }));
+                return;
+            }
             try
             {
-                string path = context.Request.Url.AbsolutePath;
-                string method = context.Request.HttpMethod;
-
                 // POST /simulate - 提交战斗请求
                 if (method == "POST" && path == "/simulate")
                 {
+                    Debug.Log("[BattleSimulationServer] 处理提交战斗请求...");
                     HandleSubmitBattle(context);
                 }
                 // GET /result/{uid} - 查询战斗结果
                 else if (method == "GET" && path.StartsWith("/result/"))
                 {
                     string uid = path.Substring("/result/".Length);
+                    Debug.Log($"[BattleSimulationServer] 查询战斗结果: UID={uid}");
                     HandleQueryBattle(context, uid);
                 }
                 else
                 {
+                    Debug.LogWarning($"[BattleSimulationServer] 未知的请求路径: {method} {path}");
                     SendResponse(context, 404, JsonConvert.SerializeObject(new 
                     { 
                         Success = false, 
@@ -251,6 +230,7 @@ namespace Elements.Battle
             }
             catch (Exception ex)
             {
+                Debug.LogError($"[BattleSimulationServer] 请求处理异常: {ex.Message}\n{ex.StackTrace}");
                 SendResponse(context, 500, JsonConvert.SerializeObject(new 
                 { 
                     Success = false, 
@@ -289,6 +269,7 @@ namespace Elements.Battle
                 {
                     battleQueue.Enqueue(task);
                     battleTasks[uid] = task;
+                    Debug.Log($"[BattleSimulationServer] 任务已加入队列，当前队列长度: {battleQueue.Count}");
                 }
 
                 // 更新 UI
@@ -315,10 +296,12 @@ namespace Elements.Battle
                     Uid = uid
                 };
 
+                Debug.Log($"[BattleSimulationServer] ✓ 战斗请求已成功加入队列，UID: {uid}");
                 SendResponse(context, 200, JsonConvert.SerializeObject(response));
             }
             catch (Exception ex)
             {
+                Debug.LogError($"[BattleSimulationServer] ✗ 提交战斗失败: {ex.Message}\n{ex.StackTrace}");
                 SendResponse(context, 500, JsonConvert.SerializeObject(new BattleSubmitResponse
                 {
                     Success = false,
@@ -408,25 +391,32 @@ namespace Elements.Battle
                         task = battleQueue.Dequeue();
                         task.Status = BattleStatus.Processing;
                         isProcessing = true;
+                        Debug.Log($"[BattleSimulationServer] 从队列取出任务: UID={task.Uid}，剩余队列: {battleQueue.Count}");
                     }
                 }
 
                 if (task != null)
                 {
+                    Debug.Log($"[BattleSimulationServer] 开始处理战斗: UID={task.Uid}");
                     ProcessBattle(task);
                     isProcessing = false;
+                    Debug.Log($"[BattleSimulationServer] 战斗处理完成: UID={task.Uid}");
                 }
                 else
                 {
                     Thread.Sleep(100);
                 }
             }
+            
+            Debug.Log("[BattleSimulationServer] 队列处理线程已停止");
         }
 
         private void ProcessBattle(BattleTask task)
         {
             try
             {
+                Debug.Log($"[BattleSimulationServer] ProcessBattle 开始: UID={task.Uid}");
+                
                 // 更新 UI
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
@@ -448,7 +438,7 @@ namespace Elements.Battle
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError($"StartByServer 失败: {ex.Message}");
+                        Debug.LogError($"[BattleSimulationServer] StartByServer 失败: {ex.Message}\n{ex.StackTrace}");
                         MyGameCtrl.Instance.isBattleFinish = true;
                         task.Status = BattleStatus.Failed;
                         task.ErrorMessage = ex.Message;
@@ -464,12 +454,15 @@ namespace Elements.Battle
                 // 如果已经标记为失败，直接返回
                 if (task.Status == BattleStatus.Failed)
                 {
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗已标记为失败: {task.ErrorMessage}");
                     return;
                 }
 
                 // 获取战斗结果
                 try
                 {
+                    Debug.Log($"[BattleSimulationServer] 开始获取战斗结果...");
+                    
                     long totalDamage = 0;
                     int battleFrames = 0;
                     int currentSeed = 0;
@@ -497,6 +490,7 @@ namespace Elements.Battle
                     };
 
                     task.Status = BattleStatus.Completed;
+                    Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}");
 
                     // 更新 UI 日志
                     UnityMainThreadDispatcher.Instance().Enqueue(() => {
@@ -512,6 +506,7 @@ namespace Elements.Battle
                 }
                 catch (Exception ex)
                 {
+                    Debug.LogError($"[BattleSimulationServer] ✗ 获取战斗结果失败: {ex.Message}\n{ex.StackTrace}");
                     task.Status = BattleStatus.Failed;
                     task.ErrorMessage = $"获取战斗结果失败: {ex.Message}";
                     
@@ -529,9 +524,9 @@ namespace Elements.Battle
             }
             catch (Exception ex)
             {
+                Debug.LogError($"[BattleSimulationServer] ✗ ProcessBattle 异常: {ex.Message}\n{ex.StackTrace}");
                 task.Status = BattleStatus.Failed;
                 task.ErrorMessage = $"处理战斗失败: {ex.Message}";
-                Debug.LogError($"ProcessBattle 异常: {ex.Message}");
             }
         }
 

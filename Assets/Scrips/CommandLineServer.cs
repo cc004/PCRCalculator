@@ -14,7 +14,7 @@ namespace PCRCaculator
     /// </summary>
     public class CommandLineServer : MonoBehaviour
     {
-        private static bool serverMode = false;
+        public static bool serverMode = false;
         private static int serverPort = 8080;
         private static string targetScene = "BattleScene";
 
@@ -28,18 +28,9 @@ namespace PCRCaculator
             {
                 Debug.Log("检测到服务器模式，准备启动战斗模拟服务器...");
                 
-                // 如果不在目标场景，则加载场景
-                if (SceneManager.GetActiveScene().name != targetScene)
-                {
-                    Debug.Log($"正在加载场景: {targetScene}");
-                    SceneManager.sceneLoaded += OnSceneLoaded;
-                    SceneManager.LoadScene(targetScene);
-                }
-                else
-                {
-                    // 已经在目标场景，直接启动
-                    StartServerInScene();
-                }
+                // 创建一个协调器对象来等待 MainManager 加载完成
+                var coordinator = new GameObject("ServerCoordinator");
+                coordinator.AddComponent<ServerLoadCoordinator>();
             }
         }
 
@@ -112,30 +103,31 @@ namespace PCRCaculator
         {
             try
             {
-                // 查找场景中的 BattleSimulationServer
-                var server = FindObjectOfType<BattleSimulationServer>();
+                // 查找所有 Canvas，然后在其中查找 Server 子对象
+                var allCanvases = GameObject.FindObjectsOfType<Canvas>();
+                Debug.Log($"场景中找到 {allCanvases.Length} 个 Canvas");
                 
-                if (server == null)
+                Transform serverObject = null;
+                foreach (var canvas in allCanvases)
                 {
-                    Debug.LogWarning("场景中未找到 BattleSimulationServer，正在创建...");
-                    var serverObj = new GameObject("BattleSimulationServer");
-                    server = serverObj.AddComponent<BattleSimulationServer>();
+                    var server = canvas.transform.Find("Server");
+                    if (server != null)
+                    {
+                        serverObject = server;
+                        Debug.Log($"在 Canvas '{canvas.name}' 中找到 Server 对象");
+                        break;
+                    }
                 }
 
-                // 设置端口（如果服务器支持）
-                // server.port = serverPort; // 如果你想支持动态端口
+                if (serverObject == null)
+                {
+                    Debug.LogError("未在任何 Canvas 中找到名为 'Server' 的 GameObject");
+                    return;
+                }
 
-                // 确保服务器已启动
-                if (server != null)
-                {
-                    server.StartServer();
-                    Debug.Log($"战斗模拟服务器已在端口 {serverPort} 上启动");
-                    Debug.Log("服务器正在运行，按 Ctrl+C 停止");
-                }
-                else
-                {
-                    Debug.LogError("无法创建 BattleSimulationServer");
-                }
+                // 激活 server GameObject（会自动触发 OnEnable 启动服务器）
+                serverObject.gameObject.SetActive(true);
+                Debug.Log($"已激活 {serverObject.parent.name}/Server GameObject，服务器将在端口 {serverPort} 上启动");
             }
             catch (Exception ex)
             {
@@ -149,6 +141,43 @@ namespace PCRCaculator
             Debug.Log("通过 StartServer 方法启动服务器");
             serverMode = true;
             OnRuntimeInitialize();
+        }
+
+        // 服务器加载协调器 - 等待 MainManager 加载完成后再切换场景
+        private class ServerLoadCoordinator : MonoBehaviour
+        {
+            private void Start()
+            {
+                StartCoroutine(WaitForMainManagerAndLoadScene());
+            }
+
+            private System.Collections.IEnumerator WaitForMainManagerAndLoadScene()
+            {
+                Debug.Log("[ServerLoadCoordinator] 等待 MainManager.Instance.LoadFinished...");
+                
+                // 等待 MainManager.Instance 存在且 LoadFinished 为 true
+                while (MainManager.Instance == null || !MainManager.Instance.LoadFinished)
+                {
+                    yield return new UnityEngine.WaitForSeconds(0.1f);
+                }
+                
+                Debug.Log("[ServerLoadCoordinator] MainManager 加载完成");
+                
+                // 如果不在目标场景，则加载场景
+                if (SceneManager.GetActiveScene().name != targetScene)
+                {
+                    Debug.Log($"[ServerLoadCoordinator] 正在加载场景: {targetScene}");
+                    SceneManager.sceneLoaded += OnSceneLoaded;
+                    SceneManager.LoadScene(targetScene);
+                }
+                else
+                {
+                    Debug.Log("[ServerLoadCoordinator] 已在目标场景，直接启动服务器");
+                    // 已经在目标场景，直接启动
+                    StartServerInScene();
+                    Destroy(gameObject);
+                }
+            }
         }
 
         // 延迟启动组件

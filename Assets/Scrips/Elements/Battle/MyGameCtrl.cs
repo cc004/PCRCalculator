@@ -112,20 +112,24 @@ namespace Elements
             return null;
         }
 
-        
+
         private void Start()
         {
             isBattleFinish = false;
             staticBattleManager = BattleManager.Instance;
+            mainManager = MainManager.Instance;
+            tempData = new TempData();
+            if (CommandLineServer.serverMode)
+            {
+                return;
+            }
             if (MainManager.Instance == null)
             {
                 return;
             }
-            mainManager = MainManager.Instance;
             IsAutoMode = mainManager.isAutoMode;
             IsSetMode = mainManager.isSetMode;
             IsSemanMode = mainManager.isSemanMode;
-            tempData = new TempData();
             tempData.playerList = mainManager.PlayerDataForBattle;
             if (mainManager.IsGuildBattle)
             {
