@@ -5385,7 +5385,7 @@ namespace Elements.Battle
                 // TODO enemy & unit enhance info 
                 // may be ex+
 
-                unitCtrl.Initialize(parameter,unitData_my, flag ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
+                unitCtrl.Initialize(parameter,unitData_my, flag && MyGameCtrl.Instance.tempData.isGuildBattle ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.unitData.PrefabId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?
