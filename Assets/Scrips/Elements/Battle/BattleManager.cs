@@ -4495,7 +4495,7 @@ namespace Elements.Battle
 
             }
 
-            if (ExcelHelper.ExcelHelper.AsmExportEnabled && MainManager.Instance.IsGuildBattle)
+            if (ExcelHelper.ExcelHelper.AsmExportEnabled && tempData.isGuildBattle)
             {
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();

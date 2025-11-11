@@ -10,6 +10,7 @@ using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace Elements.Battle
 {
@@ -22,13 +23,15 @@ namespace Elements.Battle
 
     public class BattleSimulationResponse
     {
+        public List<PCRCaculator.UnitData> PlayerList { get; set; }
+        public List<PCRCaculator.UnitData> EnemyList { get; set; }
         public bool Success { get; set; }
         public string Message { get; set; }
-        public int TotalDamage { get; set; }
+        public long TotalDamage { get; set; }
         public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }
-        public BattleResult Result { get; set; }
+        public eBattleResult Result { get; set; }
     }
 
     [Serializable]
@@ -36,9 +39,7 @@ namespace Elements.Battle
     {
         public bool UseFixedRandomSeed { get; set; }
         public int RandomSeed { get; set; }
-        public float CalSpeed { get; set; } = 1.0f;
         public bool UseLogBarrierNew { get; set; }
-        public bool IsViolent { get; set; }
         public int UBTryingCount { get; set; } = 30;
     }
 
@@ -51,10 +52,10 @@ namespace Elements.Battle
         public List<List<float>> UBExecTimeList { get; set; }
         public List<List<int>> SemanUBExecTimeList { get; set; }
         public GuildBattleSettingData Settings { get; set; } = new GuildBattleSettingData();
+        public bool ToMaxUnitAttr { get; set; }
         public bool IsAutoMode { get; set; }
         public bool IsSetMode { get; set; }
         public bool IsSemanMode { get; set; }
-        public int StopFrame { get; set; } = -1;
         public bool IsGuildBattle { get; set; } = true;
     }
 
@@ -65,7 +66,6 @@ namespace Elements.Battle
         private bool isRunning = false;
         private int port = 8080;
         private bool simulationInProgress = false;
-        private BattleSimulationResponse currentResult = null;
         public Text conentText;
 
         void OnEnable()
@@ -167,101 +167,100 @@ namespace Elements.Battle
                 }
 
                 var battleRequest = JsonConvert.DeserializeObject<BattleSimulationRequest>(requestBody);
-                
-                // 在主线程中执行战斗模拟
+
+                simulationInProgress = true;
+
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
-                        simulationInProgress = true;
-                        currentResult = null;
+                        var player_name = battleRequest.PlayerList.Select(u => u.GetUnitName()).ToList();
+                        var enemy_name = battleRequest.EnemyList.Select(u => u.GetUnitName()).ToList();
+                        conentText.text += "Processing: " +
+                                          string.Join(", ", player_name) + " vs. " +
+                                          string.Join(", ", enemy_name) + "\n";
+                    }
+                    catch { }
+                });
 
-                        // 直接使用 MyGameCtrl 提供的 StartByServer，不依赖 MainManager
+                // 按照 GAUBOptimization.cs 的方式：在主线程中调用 StartByServer，然后在后台线程等待
+                MyGameCtrl.Instance.isBattleFinish = false;
+                UnityMainThreadDispatcher.Instance().Enqueue(() => {
+                    try
+                    {
                         MyGameCtrl.Instance.StartByServer(battleRequest);
-
-                        // 添加战斗结果监听
-                        StartCoroutine(WaitForBattleResult(context));
                     }
                     catch (Exception ex)
                     {
-                        simulationInProgress = false;
-                        SendResponse(context, 500, JsonConvert.SerializeObject(new BattleSimulationResponse 
-                        { 
-                            Success = false, 
-                            Message = $"战斗模拟失败: {ex.Message}" 
-                        }));
+                        Debug.LogError($"StartByServer 失败: {ex.Message}");
+                        MyGameCtrl.Instance.isBattleFinish = true;
                     }
                 });
+
+                // 在后台线程中等待战斗完成
+                while (!MyGameCtrl.Instance.isBattleFinish)
+                {
+                    Thread.Sleep(100);
+                }
+
+                // 获取战斗结果
+                try
+                {
+                    long totalDamage = 0;
+                    int battleFrames = 0;
+                    int currentSeed = 0;
+                    eBattleResult battleResult = eBattleResult.LOSE;
+
+                    battleResult = BattleManager.Instance.battleResult;
+                    totalDamage = GuildCalculator.Instance.GetTotalDamage();
+                    battleFrames = BattleHeaderController.CurrentFrameCount;
+                    currentSeed = MyGameCtrl.Instance.CurrentSeedForSave;
+
+                    var result = new BattleSimulationResponse
+                    {
+                        PlayerList = MyGameCtrl.Instance.tempData.playerList,
+                        EnemyList = MyGameCtrl.Instance.tempData.enemyList,
+                        Success = true,
+                        Message = "战斗模拟完成",
+                        TotalDamage = totalDamage,
+                        BattleFrames = battleFrames,
+                        CurrentSeed = currentSeed,
+                        Result = battleResult
+                    };
+
+                    var resultJson = JsonConvert.SerializeObject(result);
+                    
+                    // 更新 UI 日志（在主线程）
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => {
+                        try
+                        {
+                            conentText.text += $"Battle Result: {battleResult}, Total Damage: {totalDamage}, Frames: {battleFrames}, Seed: {currentSeed}\n";
+                        }
+                        catch { }
+                    });
+
+                    SendResponse(context, 200, resultJson);
+                }
+                catch (Exception ex)
+                {
+                    SendResponse(context, 500, JsonConvert.SerializeObject(new BattleSimulationResponse 
+                    { 
+                        Success = false, 
+                        Message = $"获取战斗结果失败: {ex.Message}" 
+                    }));
+                }
+                finally
+                {
+                    simulationInProgress = false;
+                }
             }
             catch (Exception ex)
             {
+                simulationInProgress = false;
                 SendResponse(context, 500, JsonConvert.SerializeObject(new BattleSimulationResponse 
                 { 
                     Success = false, 
                     Message = $"请求处理失败: {ex.Message}" 
                 }));
-            }
-        }
-
-        private System.Collections.IEnumerator WaitForBattleResult(HttpListenerContext context)
-        {
-            // 等待战斗完成
-            while (GuildCalculator.Instance == null || !GuildCalculator.Instance.isFinishCalc)
-            {
-                yield return new WaitForSeconds(0.1f);
-            }
-
-            // 等待一帧以确保所有数据都已更新
-            yield return new WaitForEndOfFrame();
-
-            try
-            {
-                var calculator = GuildCalculator.Instance;
-                var eResult = calculator.BattleResult; // eBattleResult
-
-                // map to our BattleResult
-                BattleResult mappedResult = BattleResult.TimeOver;
-                switch (eResult)
-                {
-                    case Elements.eBattleResult.WIN:
-                        mappedResult = BattleResult.Victory;
-                        break;
-                    case Elements.eBattleResult.LOSE:
-                        mappedResult = BattleResult.Lose;
-                        break;
-                    case Elements.eBattleResult.TIME_OVER:
-                        mappedResult = BattleResult.TimeOver;
-                        break;
-                    default:
-                        mappedResult = BattleResult.TimeOver;
-                        break;
-                }
-
-                var remainingSeconds = MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - BattleHeaderController.CurrentFrameCount;
-
-                var result = new BattleSimulationResponse
-                {
-                    Success = true,
-                    Message = "战斗模拟完成",
-                    TotalDamage = (int)calculator.GetTotalDamage(),
-                    BattleFrames = BattleHeaderController.CurrentFrameCount,
-                    RemainingTime = remainingSeconds,
-                    CurrentSeed = MyGameCtrl.Instance.CurrentSeedForSave,
-                    Result = mappedResult
-                };
-
-                SendResponse(context, 200, JsonConvert.SerializeObject(result));
-            }
-            catch (Exception ex)
-            {
-                SendResponse(context, 500, JsonConvert.SerializeObject(new BattleSimulationResponse 
-                { 
-                    Success = false, 
-                    Message = $"获取战斗结果失败: {ex.Message}" 
-                }));
-            }
-            finally
-            {
-                simulationInProgress = false;
             }
         }
 

@@ -603,24 +603,10 @@ namespace PCRCaculator
             }
             OnSliderDraged();
         }
-        private void SetMaxLoveForUnit(UnitData unitData)
-        {
-            if (MainManager.Instance.UnitStoryEffectDic2.TryGetValue(unitData.unitId, out var effectUnitList))
-            {
-                foreach (int effectUnitId in effectUnitList)
-                {
-                    if (MainManager.Instance.UnitStoryEffectDic2.ContainsKey(effectUnitId) &&
-                        MainManager.Instance.UnitRarityDic.TryGetValue(effectUnitId, out var unitRarityData))
-                    {
-                        unitData.playLoveDic[effectUnitId] = unitRarityData.GetMaxLoveLevel();
-                    }
-                }
-            }
-        }
         public void SetSelectedUnitSecondMax()
         {
             playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn, equip_second_full: true);
-            SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
+            playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
             RefreshSettingPage();
             MainManager.Instance.WindowMessage("成功！");
@@ -628,7 +614,7 @@ namespace PCRCaculator
         public void SetSelectedUnitMax()
         {
             playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
-            SetMaxLoveForUnit(playerData.playrCharacters[selectedCharacterId_setting]);
+            playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
             RefreshSettingPage();
             MainManager.Instance.WindowMessage("成功！");
@@ -638,7 +624,7 @@ namespace PCRCaculator
             foreach (UnitData a in playerData.playrCharacters)
             {
                 a.SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
-                SetMaxLoveForUnit(a);
+                a.SetMaxLove();
             }
             RefreshSettingValues();
             RefreshSettingPage();

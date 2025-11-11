@@ -115,6 +115,7 @@ namespace Elements
         
         private void Start()
         {
+            isBattleFinish = false;
             staticBattleManager = BattleManager.Instance;
             if (MainManager.Instance == null)
             {
@@ -193,6 +194,7 @@ namespace Elements
         
         public void ReStart(bool rebuild = true)
         {
+            isBattleFinish = false;
             if (rebuild)
             {
                 IsAutoMode = mainManager.isAutoMode;
@@ -285,57 +287,47 @@ namespace Elements
         // Start battle using parameters from server request, do not rely on MainManager
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
-            bool rebuild = true;
-            if (rebuild)
+            isBattleFinish = false;
+            // Only use the minimal parameters provided by the HTTP request
+            IsAutoMode = req.IsAutoMode;
+            IsSetMode = req.IsSetMode;
+            IsSemanMode = req.IsSemanMode;
+
+            tempData = new TempData();
+
+            // Players: assume request provides PCRCaculator.UnitData list
+            tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
+
+            if (req.ToMaxUnitAttr)
             {
-                // Only use the minimal parameters provided by the HTTP request
-                IsAutoMode = req.IsAutoMode;
-                IsSetMode = req.IsSetMode;
-                IsSemanMode = req.IsSemanMode;
-
-                tempData = new TempData();
-
-                // Players: assume request provides PCRCaculator.UnitData list
-                tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
-
-                // UB exec lists
-                tempData.UBExecTimeList = req.UBExecTimeList ?? new List<List<float>>();
-                tempData.SemanUBExecTimeList = req.SemanUBExecTimeList ?? new List<List<int>>();
-
-                if (req.IsGuildBattle)
+                foreach (var player in tempData.playerList)
                 {
-                    // Guild enemies provided as EnemyData list
-                    tempData.guildEnemy = req.GuildEnemyList ?? new List<EnemyData>();
+                    player.SetMax(is_guild_boss: req.IsGuildBattle);
+                    player.SetMaxLove();
+                }
+            }
 
-                    // Minimal SettingData required by downstream code
-                    var settingData = new GuildSettingData(true);
-                    // If caller provided try count in Settings, use it; otherwise default kept
-                    if (req.Settings != null)
+            tempData.skipping = true;
+
+            if (req.IsGuildBattle)
+            {
+                throw new NotImplementedException("Guild battle via HTTP not implemented yet");
+            }
+            else
+            {
+                // Non guild: directly use provided enemy list
+                tempData.enemyList = req.EnemyList ?? new List<PCRCaculator.UnitData>();
+
+                if (req.ToMaxUnitAttr)
+                {
+                    foreach (var enemy in tempData.enemyList)
                     {
-                        settingData.UBTryingCount = req.Settings.UBTryingCount;
-                        settingData.calSpeed = Mathf.Max(1, (int)req.Settings.CalSpeed);
+                        enemy.SetMax(is_guild_boss: false);
+                        enemy.SetMaxLove();
                     }
-
-                    tempData.SettingData = settingData;
-                    tempData.isGuildBattle = true;
-                    tempData.isGuildEnemyViolent = tempData.SettingData.GetCurrentPlayerGroup().isViolent;
-                    tempData.tryCount = tempData.SettingData.UBTryingCount;
-                    tempData.randomData = tempData.SettingData.GetCurrentRandomData();
-                    tempData.skipping = true; // all battles are skip
-
-                    // Fill enemyList from guildEnemy
-                    tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
-
-                    // Create unit parameters with group's log barrier setting
-                    tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
                 }
-                else
-                {
-                    // Non guild: directly use provided enemy list
-                    tempData.enemyList = req.EnemyList ?? new List<PCRCaculator.UnitData>();
-                    tempData.skipping = true;
-                    tempData.CreateAllUnitParameters();
-                }
+
+                tempData.CreateAllUnitParameters();
             }
 
             foreach (Transform child in unitParent)
@@ -356,15 +348,22 @@ namespace Elements
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
             staticBattleManager.Init(this);
-            if (IsSemanMode)
+            if (req.IsGuildBattle)
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
-                BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
+                if (IsSemanMode)
+                {
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
+                }
+                else
+                {
+                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                }
             }
             else
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(null);
-                BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                BattleManager.Instance.semanubmanager.Disable();
             }
         }
 
@@ -847,6 +846,8 @@ namespace Elements
             }
 
         }*/
+
+        public bool isBattleFinish = false;
         public void OnBattleFinished(int result)//1-lose,2-timeover
         {
             if (IsGAUbMode)
@@ -870,6 +871,7 @@ namespace Elements
             {
                 GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
             }
+            isBattleFinish = true;
         }
         private IEnumerator BackToTitle()
         {
