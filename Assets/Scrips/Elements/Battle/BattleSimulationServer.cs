@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
+using UnityEngine.UI;
 
 namespace Elements.Battle
 {
@@ -65,13 +66,14 @@ namespace Elements.Battle
         private int port = 8080;
         private bool simulationInProgress = false;
         private BattleSimulationResponse currentResult = null;
+        public Text conentText;
 
-        void Start()
+        void OnEnable()
         {
             StartServer();
         }
 
-        void OnDestroy()
+        void OnDisable()
         {
             StopServer();
         }
