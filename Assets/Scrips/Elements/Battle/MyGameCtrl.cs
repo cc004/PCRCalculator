@@ -392,6 +392,7 @@ namespace Elements
         {
             finishCount = 0;
             int idx = 0;
+            extraEffectEnemyUnitCtrl.Clear();
             if (tempData.isGuildBattle)
             {
                 foreach (var enemy in tempData.guildEnemy)
@@ -402,7 +403,6 @@ namespace Elements
                 }
 
                 int ed = enemyUnitCtrl.Count - tempData.extra_effect_cnt;
-                extraEffectEnemyUnitCtrl.Clear();
                 for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
                 {
                     enemyUnitCtrl[i].UnitName = $"环境Buff{extraEffectEnemyUnitCtrl.Count + 1}";
