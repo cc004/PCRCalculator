@@ -694,7 +694,28 @@ namespace Elements
 
         // RVA: 0x35B5C08 Offset: 0x35B5C08 VA: 0x35B5C08
         // TODO use in enchant trigger action
-        // public void ExecSkillWithTargetId(Skill _skill, int _actionId) { } 
+        public void ExecSkillWithTargetId(Skill _skill, int _actionId)
+        {
+            bool hasNoTarget = false;
+            actionStartFirstProcess(_skill, out hasNoTarget, true);
+            _skill.ReadySkill();
+            _skill.AweValue = Owner.CalcAweValue(false, false);
+            for(int i = 0; i < _skill.ActionParameters.Count; i++)
+            {
+                ActionParameter actionParameter = _skill.ActionParameters[i];
+                actionParameter.ReadyAction(Owner, this, _skill);
+                if (!(_skill.HasParentIndexes.Contains(i) || actionParameter.ReferencedByReflection)
+                && !actionParameter.ReferencedByEffect
+                && actionParameter.ActionId == _actionId)
+                {
+                    foreach (var target in actionParameter.TargetList)
+                    {
+                        actionParameter.AppendTargetNum(target.Owner, 0);
+                        ExecAction(actionParameter, _skill, target, 0, 0f, true);
+                    }
+                }
+            }
+        } 
 
         // RVA: 0x35B5F28 Offset: 0x35B5F28 VA: 0x35B5F28
         public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)

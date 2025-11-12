@@ -54,6 +54,9 @@ namespace Elements
 
         public float TargetWidth { get; set; }
 
+        public bool TriggerCall { get; set; }
+
+
         public DirectionType Direction { get; set; }
 
         public float Position { get; set; }

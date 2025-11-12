@@ -289,6 +289,7 @@ namespace Elements
         public Action<UnitCtrl> OnDieForZeroHp;
         public Action<UnitCtrl> OnDieFadeOutEnd;
         public Action<UnitCtrl> EnergyChange;
+        public Action OnSetBuffForEnchantTrigger;
         public OnDamageDelegate OnDamage;
         public Action OnActiveUnableState;
         public Action OnActiveCharmState;
@@ -3237,7 +3238,13 @@ this.updateCurColor();
             unitActionController.ExecActionOnStart();
         }
 
-        // public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        public void ExecSkillWithTargetId(
+            Skill _skill,
+            int _targetId)
+        {
+            unitActionController.ExecSkillWithTargetId(_skill, _targetId);
+        }
+
         public void ExecSkillWithTargetPartsAndActionList(
           Skill _skill,
           BasePartsData _targetParts,
@@ -7231,6 +7238,7 @@ this.updateCurColor();
                     {
                         ++buffCounter;
                         execPassiveSeal(PassiveSealAction.ePassiveTiming.BUFF);
+                        OnSetBuffForEnchantTrigger?.Invoke();
                     }
                     else
                     {

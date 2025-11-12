@@ -739,6 +739,10 @@ namespace Elements
             {
                 eActionType.SEAL_BUFF_DEBUFF,
                 typeof(SealBuffDebuffAction)
+            },
+            {
+                eActionType.ENCHANT_TRIGGER,
+                typeof(EnchantTriggerAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
