@@ -1663,7 +1663,10 @@ namespace Elements
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 if (!battleManager.skipping)
-                    Owner.UIManager.LogMessage("执行技能" + skill.SkillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
+                {
+                    var skillName = string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName;
+                    Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
+                }
 
                 var detail = action.GetSkillDetail(Owner);
                 if (!string.IsNullOrEmpty(detail))
