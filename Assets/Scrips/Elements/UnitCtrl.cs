@@ -9412,15 +9412,12 @@ this.updateCurColor();
                     else
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
-                    if (TotalDamageForLogBarrier > allLogBarrierStartValue)
-                    {
-                        long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
-                        var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                            execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
-                        a *= t;
-                        b *= t;
-                        TotalDamageForLogBarrier *= t;
-                    }
+                    long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
+                    var tt = _damageData.TotalDamageForLogBarrier.Select(x =>
+                        execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
+                    a *= tt;
+                    b *= tt;
+                    TotalDamageForLogBarrier *= tt;
                     if (_damageData.ActionType == eActionType.ATTACK)
                     {
                         if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
