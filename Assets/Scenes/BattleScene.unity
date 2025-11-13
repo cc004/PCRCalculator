@@ -7241,7 +7241,7 @@ RectTransform:
   - {fileID: 1492714136}
   - {fileID: 1280598767}
   m_Father: {fileID: 824908701}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -20672,7 +20672,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &730419724
 RectTransform:
   m_ObjectHideFlags: 0
@@ -23494,8 +23494,8 @@ RectTransform:
   - {fileID: 1508324151}
   - {fileID: 381073873}
   - {fileID: 1793497625}
-  - {fileID: 274833009}
   - {fileID: 842247280}
+  - {fileID: 274833009}
   m_Father: {fileID: 1975853015}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -24674,7 +24674,7 @@ RectTransform:
   m_Children:
   - {fileID: 1869581948}
   m_Father: {fileID: 824908701}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -50298,6 +50298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd88b20eabe6145c5bbf01ace1d8cc6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  port: 8080
   conentText: {fileID: 1466807911}
 --- !u!1 &1734497552
 GameObject:
@@ -60108,6 +60109,7 @@ MonoBehaviour:
   ForceAutoMode: 0
   stopFrameText: {fileID: 0}
   stopFrame: 0
+  isBattleFinish: 0
 --- !u!4 &2080290837
 Transform:
   m_ObjectHideFlags: 0
@@ -62577,6 +62579,7 @@ MonoBehaviour:
   ForceAutoMode: 0
   stopFrameText: {fileID: 1707544265}
   stopFrame: 0
+  isBattleFinish: 0
 --- !u!114 &2763608784199375567
 MonoBehaviour:
   m_ObjectHideFlags: 0

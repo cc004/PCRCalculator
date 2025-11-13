@@ -388,48 +388,64 @@ namespace ExcelHelper
         {
             get
             {
-                if (!File.Exists("asm"))
-                    return false;
-                string file = Application.streamingAssetsPath + "/../../asm";
-                string actualHash = CalculateMD5(file);
+                string file1 = "asm";
+                string file2 = Application.persistentDataPath + "/asm";
                 const string expectedHash = "7031736DBAE9868C928FE7ACDCF3C5D4";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file1))
+                    return CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file2))
+                    return CalculateMD5(file2).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                return false;
             }
         }
         public static bool KdExportEnabled
         {
             get
             {
-                if (!File.Exists(Application.persistentDataPath + "/kd"))
-                    return false;
                 string file = Application.persistentDataPath + "/kd";
-                string actualHash = CalculateMD5(file);
                 const string expectedHash = "5608643a90f8385f0a42f0550da28b58";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file))
+                    return CalculateMD5(file).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                return false;
             }
         }
         public static bool PyExportEnabled
         {
             get
             {
-                if (!File.Exists("atl"))
-                    return false;
-                string file = Application.streamingAssetsPath + "/../../atl";
-                string actualHash = CalculateMD5(file);
+                string file1 = "atl";
+                string file2 = Application.streamingAssetsPath + "/../../atl";
                 const string expectedHash = "E689182E06404CEFD75F65F7AFF5103B";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file1) && CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                if (File.Exists(file2) && CalculateMD5(file2).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                return false;
             }
         }
         public static bool Py2ExportEnabled
         {
             get
             {
-                if (!File.Exists("atl6"))
-                    return false;
-                string file = Application.streamingAssetsPath + "/../../atl6";
-                string actualHash = CalculateMD5(file);
+                string file1 = "atl6";
+                string file2 = Application.streamingAssetsPath + "/../../atl6";
                 const string expectedHash = "998EFFEF9948561EEC4D625D261534B2";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file1) && CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                if (File.Exists(file2) && CalculateMD5(file2).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                return false;
             }
         }
 
