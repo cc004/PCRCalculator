@@ -5156,7 +5156,7 @@ this.updateCurColor();
 
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
 
-            if (_abnormalState == eAbnormalState.HASTE || _abnormalState == eAbnormalState.SLOW || !m_abnormalState[_abnormalState] && !disableBySwitch) // TODO temp fix
+            if (((_abnormalState == eAbnormalState.HASTE || _abnormalState == eAbnormalState.SLOW) && OverwriteSpeedDataCount == 0) || !m_abnormalState[_abnormalState] && !disableBySwitch) // TODO temp fix
             {
                 battleManager.RestartAbnormalStateField(this, _abnormalState, false);
             }
