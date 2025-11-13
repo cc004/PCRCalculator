@@ -21,8 +21,10 @@ namespace PCRCaculator
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void OnRuntimeInitialize()
         {
-            // 检查命令行参数
+            #if UNITY_SERVER
+
             ParseCommandLineArgs();
+
 
             if (serverMode)
             {
@@ -32,6 +34,8 @@ namespace PCRCaculator
                 var coordinator = new GameObject("ServerCoordinator");
                 coordinator.AddComponent<ServerLoadCoordinator>();
             }
+
+            #endif
         }
 
         private static void ParseCommandLineArgs()
