@@ -4300,7 +4300,7 @@ namespace Elements.Battle
                 // ISSUE: explicit non-virtual call
                 UnitCtrl unitCtrl = (battleManager.UnitList)[index];
                 unitCtrl.WaveStartProcess(true);
-                if (unitCtrl.IdleOnly)
+                if (unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                     unitCtrl.SetState(UnitCtrl.ActionState.IDLE);
                 else
                     unitCtrl.SetState(UnitCtrl.ActionState.WALK);
@@ -4328,7 +4328,7 @@ namespace Elements.Battle
                 UnitCtrl unitCtrl = (battleManager.EnemyList)[index];
                 if (unitCtrl.StartStateIsWalk)
                 {
-                    if (unitCtrl.IdleOnly)
+                    if (unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                         unitCtrl.SetState(UnitCtrl.ActionState.IDLE);
                     else
                         unitCtrl.SetState(UnitCtrl.ActionState.WALK);

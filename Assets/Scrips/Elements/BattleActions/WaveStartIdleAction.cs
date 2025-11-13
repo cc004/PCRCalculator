@@ -28,7 +28,7 @@ namespace Elements
       }
       else
       {
-        _source.IdleOnly = true;
+        _source.WaveStartIdle = true;
         _source.transform.SetLocalPosX((float) ((_source.IsOther ? -1.0 : 1.0) * -1400.0));
         _source.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, 0.0f);
         _sourceActionController.AppendCoroutine(updateIdle(_source), ePauseType.SYSTEM, _source);
@@ -60,7 +60,7 @@ namespace Elements
 label_4:
       _source.IsMoveSpeedForceZero = false;
       _source.SetLeftDirection(_source.IsOther);
-      _source.IdleOnly = false;
+      _source.WaveStartIdle = false;
       _source.SetState(UnitCtrl.ActionState.WALK);
     }
 
