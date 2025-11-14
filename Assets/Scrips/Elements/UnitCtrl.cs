@@ -9423,43 +9423,40 @@ this.updateCurColor();
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
-                    var tt = _damageData.TotalDamageForLogBarrier.Select(x =>
+                    var tt = TotalDamageForLogBarrier.Select(x =>
                         execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
                     a *= tt;
                     b *= tt;
                     TotalDamageForLogBarrier *= tt;
-                    if (_damageData.ActionType == eActionType.ATTACK)
+                    if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
                     {
-                        if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
-                        {
-                            double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
-                            double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
-                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
-                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
-                            a *= t;
-                            b *= t;
-                            TotalDamageForLogBarrier *= t;
-                        }
-                        else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
-                        {
-                            double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
-                            double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
-                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
-                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
-                            a *= t;
-                            b *= t;
-                            TotalDamageForLogBarrier *= t;
-                        }
-                        if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
-                        {
-                            double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
-                            double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
-                            DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
-                                execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
-                            a *= t;
-                            b *= t;
-                            TotalDamageForLogBarrier *= t;
-                        }
+                        double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
+                        double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
+                        DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
+                            execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                        a *= t;
+                        b *= t;
+                        TotalDamageForLogBarrier *= t;
+                    }
+                    else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
+                    {
+                        double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
+                        double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
+                        DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
+                            execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                        a *= t;
+                        b *= t;
+                        TotalDamageForLogBarrier *= t;
+                    }
+                    if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
+                    {
+                        double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
+                        double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
+                        DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
+                            execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+                        a *= t;
+                        b *= t;
+                        TotalDamageForLogBarrier *= t;
                     }
                 }
             }
