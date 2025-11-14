@@ -5152,17 +5152,19 @@ this.updateCurColor();
             overlapAbnormalStateIndexList[_abnormalState].Remove(currentBehaviourIndex);
             overlapAbnormalStateData[currentBehaviourIndex].enable = false;
             var disableBySwitch = overlapAbnormalStateData[currentBehaviourIndex].DisableBySwitch;
+            // var switchAbnormalState = overlapAbnormalStateData[currentBehaviourIndex].SwitchAbnormalState;
+
             overlapAbnormalStateData.Remove(currentBehaviourIndex);
 
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
 
-            if (((_abnormalState == eAbnormalState.HASTE || _abnormalState == eAbnormalState.SLOW) && OverwriteSpeedDataCount == 0) || !m_abnormalState[_abnormalState] && !disableBySwitch) // TODO temp fix
+            if ((!m_abnormalState[_abnormalState] || time < _effectTime) && !disableBySwitch) // TODO here sync with bcr fix
             {
                 battleManager.RestartAbnormalStateField(this, _abnormalState, false);
             }
             else if (disableBySwitch)
             {
-                battleManager.RestartAbnormalStateField(this, _abnormalState, true);
+                battleManager.RestartAbnormalStateField(this, _abnormalState, true); // TODO replace _abnormalState with switchAbnormalState
             }
             /*
             if (_abnormalState == eAbnormalState.SLOW_OVERLAP || _abnormalState == eAbnormalState.HASTE_OVERLAP)
