@@ -289,6 +289,7 @@ namespace Elements
         public Action<UnitCtrl> OnDieForZeroHp;
         public Action<UnitCtrl> OnDieFadeOutEnd;
         public Action<UnitCtrl> EnergyChange;
+        public Action OnSetBuffForEnchantTrigger;
         public OnDamageDelegate OnDamage;
         public Action OnActiveUnableState;
         public Action OnActiveCharmState;
@@ -1437,6 +1438,8 @@ namespace Elements
         public eUnitRespawnPos RespawnPos { get; set; }
 
         public eUnitRespawnPos SummonRespawnPos { get; set; }
+
+        public bool WaveStartIdle { get; set; } // TODO find where use
 
         public bool IdleOnly
         {
@@ -3237,7 +3240,13 @@ this.updateCurColor();
             unitActionController.ExecActionOnStart();
         }
 
-        // public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        public void ExecSkillWithTargetId(
+            Skill _skill,
+            int _targetId)
+        {
+            unitActionController.ExecSkillWithTargetId(_skill, _targetId);
+        }
+
         public void ExecSkillWithTargetPartsAndActionList(
           Skill _skill,
           BasePartsData _targetParts,
@@ -5147,7 +5156,7 @@ this.updateCurColor();
 
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
 
-            if (!m_abnormalState[_abnormalState] && !disableBySwitch)
+            if (((_abnormalState == eAbnormalState.HASTE || _abnormalState == eAbnormalState.SLOW) && OverwriteSpeedDataCount == 0) || !m_abnormalState[_abnormalState] && !disableBySwitch) // TODO temp fix
             {
                 battleManager.RestartAbnormalStateField(this, _abnormalState, false);
             }
@@ -7231,6 +7240,7 @@ this.updateCurColor();
                     {
                         ++buffCounter;
                         execPassiveSeal(PassiveSealAction.ePassiveTiming.BUFF);
+                        OnSetBuffForEnchantTrigger?.Invoke();
                     }
                     else
                     {
@@ -9412,15 +9422,12 @@ this.updateCurColor();
                     else
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
-                    if (TotalDamageForLogBarrier > allLogBarrierStartValue)
-                    {
-                        long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
-                        var t = _damageData.TotalDamageForLogBarrier.Select(x =>
-                            execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
-                        a *= t;
-                        b *= t;
-                        TotalDamageForLogBarrier *= t;
-                    }
+                    long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
+                    var tt = _damageData.TotalDamageForLogBarrier.Select(x =>
+                        execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
+                    a *= tt;
+                    b *= tt;
+                    TotalDamageForLogBarrier *= tt;
                     if (_damageData.ActionType == eActionType.ATTACK)
                     {
                         if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
@@ -12357,6 +12364,17 @@ this.updateCurColor();
             }
         }
 
+        public bool IsStartActionForExtraEffect { get; set; } // TODO find where use
+
+        private void changeStateIdleFromWalk()
+        {
+            isRunForCatchUp = false;
+            if (!IsBoss && !IsBonusEnemy && !IsStartActionForExtraEffect)
+                IsStartActionForExtraEffect = true;
+            SetState(ActionState.IDLE);
+        }
+
+
         private IEnumerator updateWalk(int coroutineId)
         {
             UnitCtrl unitCtrl = this;
@@ -12370,13 +12388,12 @@ this.updateCurColor();
                     case ActionState.DIE:
                         unitCtrl.isRunForCatchUp = false;
                         yield break;
-                    default:
+                    default: // judgeWalkEnd
                         if (!unitCtrl.IsConfusionOrConvert())
                         {
-                            if (unitCtrl.TargetEnemyList.Count > 0 || unitCtrl.IdleOnly)
+                            if (unitCtrl.TargetEnemyList.Count > 0 || unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                             {
-                                unitCtrl.isRunForCatchUp = false;
-                                unitCtrl.SetState(ActionState.IDLE);
+                                unitCtrl.changeStateIdleFromWalk();
                                 yield break;
                             }
                         }
@@ -12391,12 +12408,11 @@ this.updateCurColor();
                             }
                             if (num == 1)
                             {
-                                unitCtrl.isRunForCatchUp = false;
-                                unitCtrl.SetState(ActionState.IDLE);
+                                unitCtrl.changeStateIdleFromWalk();
                                 yield break;
                             }
 
-                            if (unitCtrl.targetPlayerList.Count > 1 || unitCtrl.IdleOnly)
+                            if (unitCtrl.targetPlayerList.Count > 1 || unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                             {
                                 unitCtrl.SetState(ActionState.IDLE);
                                 yield break;
@@ -12557,7 +12573,7 @@ this.updateCurColor();
 
                     //if (unitCtrl.IdleOnly && unitCtrl.EnemyPoint != 0 && unitCtrl.battleManager.FICLPNJNOEP >= (int)HatsuneUtility.GetHatsuneSpecialBattle().purpose_count)
                     //    unitCtrl.SetState(UnitCtrl.ActionState.DIE);
-                    if (unitCtrl.IdleOnly)
+                    if (unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                     {
                         if (unitCtrl.CurrentState != ActionState.IDLE)
                         {

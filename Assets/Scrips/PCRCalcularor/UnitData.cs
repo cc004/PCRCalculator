@@ -700,6 +700,21 @@ namespace PCRCaculator
             uniqueEq2Lv = uniqueeq2lv;
         }
 
+        public void SetMaxLove()
+        {
+            if (MainManager.Instance.UnitStoryEffectDic2.TryGetValue(unitId, out var effectUnitList))
+            {
+                foreach (int effectUnitId in effectUnitList)
+                {
+                    if (MainManager.Instance.UnitStoryEffectDic2.ContainsKey(effectUnitId) &&
+                        MainManager.Instance.UnitRarityDic.TryGetValue(effectUnitId, out var unitRarityData))
+                    {
+                        playLoveDic[effectUnitId] = unitRarityData.GetMaxLoveLevel();
+                    }
+                }
+            }
+        }
+
         public void SetMax(bool is_guild_boss = true, bool ex_equip_full = true, bool equip_second_full = false)
         {
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))

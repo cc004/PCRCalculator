@@ -11,6 +11,7 @@ using PCRCaculator.SQL;
 using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json;
 
 namespace Elements
 {
@@ -24,6 +25,7 @@ namespace Elements
         public GameObject prefab2;
         public GameObject battleUnitPrefab;
         public GameObject firearmPrefab;
+        private BattleSimulationServer battleServer;
         //public GameObject emptyObject;
 
 
@@ -63,6 +65,23 @@ namespace Elements
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
 
+        private void OnStartServerButtonClick()
+        {
+            if (battleServer == null)
+            {
+                var serverObject = new GameObject("BattleSimulationServer");
+                serverObject.transform.parent = transform;
+                battleServer = serverObject.AddComponent<BattleSimulationServer>();
+                Debug.Log("HTTP服务器已启动");
+            }
+            else
+            {
+                Destroy(battleServer.gameObject);
+                battleServer = null;
+                Debug.Log("HTTP服务器已停止");
+            }
+        }
+
         public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
         {
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
@@ -93,19 +112,24 @@ namespace Elements
             return null;
         }
 
-        
+
         private void Start()
         {
+            isBattleFinish = false;
             staticBattleManager = BattleManager.Instance;
+            mainManager = MainManager.Instance;
+            tempData = new TempData();
+            if (CommandLineServer.serverMode)
+            {
+                return;
+            }
             if (MainManager.Instance == null)
             {
                 return;
             }
-            mainManager = MainManager.Instance;
             IsAutoMode = mainManager.isAutoMode;
             IsSetMode = mainManager.isSetMode;
             IsSemanMode = mainManager.isSemanMode;
-            tempData = new TempData();
             tempData.playerList = mainManager.PlayerDataForBattle;
             if (mainManager.IsGuildBattle)
             {
@@ -174,6 +198,7 @@ namespace Elements
         
         public void ReStart(bool rebuild = true)
         {
+            isBattleFinish = false;
             if (rebuild)
             {
                 IsAutoMode = mainManager.isAutoMode;
@@ -263,6 +288,89 @@ namespace Elements
             }
         }
 
+        // Start battle using parameters from server request, do not rely on MainManager
+        public void StartByServer(Elements.Battle.BattleSimulationRequest req)
+        {
+            isBattleFinish = false;
+            // Only use the minimal parameters provided by the HTTP request
+            IsAutoMode = req.IsAutoMode;
+            IsSetMode = req.IsSetMode;
+            IsSemanMode = req.IsSemanMode;
+
+            tempData = new TempData();
+
+            // Players: assume request provides PCRCaculator.UnitData list
+            tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
+
+            if (req.ToMaxUnitAttr)
+            {
+                foreach (var player in tempData.playerList)
+                {
+                    player.SetMax(is_guild_boss: req.IsGuildBattle);
+                    player.SetMaxLove();
+                }
+            }
+
+            tempData.skipping = true;
+
+            if (req.IsGuildBattle)
+            {
+                throw new NotImplementedException("Guild battle via HTTP not implemented yet");
+            }
+            else
+            {
+                // Non guild: directly use provided enemy list
+                tempData.enemyList = req.EnemyList ?? new List<PCRCaculator.UnitData>();
+
+                if (req.ToMaxUnitAttr)
+                {
+                    foreach (var enemy in tempData.enemyList)
+                    {
+                        enemy.SetMax(is_guild_boss: false);
+                        enemy.SetMaxLove();
+                    }
+                }
+
+                tempData.CreateAllUnitParameters();
+            }
+
+            foreach (Transform child in unitParent)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach (Transform child in enemyParent)
+            {
+                Destroy(child.gameObject);
+            }
+            playerUnitCtrl.Clear();
+            enemyUnitCtrl.Clear();
+            playerUnitCtrlDic.Clear();
+            allUnitCtrlDataDic.Clear();
+            IsUnitCreated = false;
+            finishCount = 0;
+            unitCount.Clear();
+            BattleHeaderController.Instance.ReStart();
+            BattleUIManager.Instance.ReStart();
+            staticBattleManager.Init(this);
+            if (req.IsGuildBattle)
+            {
+                if (IsSemanMode)
+                {
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
+                }
+                else
+                {
+                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
+                }
+            }
+            else
+            {
+                BattleManager.Instance.semanubmanager.Disable();
+            }
+        }
+
         public void Initialize()//由GameManager的init调用，生成己方战斗小人
         {
             finishCount = 0;
@@ -284,6 +392,7 @@ namespace Elements
         {
             finishCount = 0;
             int idx = 0;
+            extraEffectEnemyUnitCtrl.Clear();
             if (tempData.isGuildBattle)
             {
                 foreach (var enemy in tempData.guildEnemy)
@@ -294,7 +403,6 @@ namespace Elements
                 }
 
                 int ed = enemyUnitCtrl.Count - tempData.extra_effect_cnt;
-                extraEffectEnemyUnitCtrl.Clear();
                 for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
                 {
                     enemyUnitCtrl[i].UnitName = $"环境Buff{extraEffectEnemyUnitCtrl.Count + 1}";
@@ -431,7 +539,7 @@ namespace Elements
             //battleProcessor.AddUnitSkillUseCount(ref unitCtrl.SkillUseCount, pPararm.MasterData.PrefabId);
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
-            unitCtrl.Initialize(unitParameter, unitData, isplayer ? MainManager.Instance.TeamEnhanceData : null, false, true); // TODO hush add _teamEnhanceParameter
+            unitCtrl.Initialize(unitParameter, unitData, isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null, false, true); // TODO hush add _teamEnhanceParameter
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
             //if (!IsAutoMode && isplayer)
@@ -742,6 +850,8 @@ namespace Elements
             }
 
         }*/
+
+        public bool isBattleFinish = false;
         public void OnBattleFinished(int result)//1-lose,2-timeover
         {
             if (IsGAUbMode)
@@ -765,6 +875,7 @@ namespace Elements
             {
                 GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
             }
+            isBattleFinish = true;
         }
         private IEnumerator BackToTitle()
         {

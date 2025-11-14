@@ -388,48 +388,64 @@ namespace ExcelHelper
         {
             get
             {
-                if (!File.Exists("asm"))
-                    return false;
-                string file = Application.streamingAssetsPath + "/../../asm";
-                string actualHash = CalculateMD5(file);
+                string file1 = "asm";
+                string file2 = Application.persistentDataPath + "/asm";
                 const string expectedHash = "7031736DBAE9868C928FE7ACDCF3C5D4";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file1))
+                    return CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file2))
+                    return CalculateMD5(file2).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                return false;
             }
         }
         public static bool KdExportEnabled
         {
             get
             {
-                if (!File.Exists(Application.persistentDataPath + "/kd"))
-                    return false;
                 string file = Application.persistentDataPath + "/kd";
-                string actualHash = CalculateMD5(file);
                 const string expectedHash = "5608643a90f8385f0a42f0550da28b58";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file))
+                    return CalculateMD5(file).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                return false;
             }
         }
         public static bool PyExportEnabled
         {
             get
             {
-                if (!File.Exists("atl"))
-                    return false;
-                string file = Application.streamingAssetsPath + "/../../atl";
-                string actualHash = CalculateMD5(file);
+                string file1 = "atl";
+                string file2 = Application.streamingAssetsPath + "/../../atl";
                 const string expectedHash = "E689182E06404CEFD75F65F7AFF5103B";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file1) && CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                if (File.Exists(file2) && CalculateMD5(file2).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                return false;
             }
         }
         public static bool Py2ExportEnabled
         {
             get
             {
-                if (!File.Exists("atl6"))
-                    return false;
-                string file = Application.streamingAssetsPath + "/../../atl6";
-                string actualHash = CalculateMD5(file);
+                string file1 = "atl6";
+                string file2 = Application.streamingAssetsPath + "/../../atl6";
                 const string expectedHash = "998EFFEF9948561EEC4D625D261534B2";
-                return actualHash.Equals(expectedHash, StringComparison.OrdinalIgnoreCase);
+
+                if (File.Exists(file1) && CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                if (File.Exists(file2) && CalculateMD5(file2).Equals(expectedHash, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                return false;
             }
         }
 
@@ -1333,23 +1349,15 @@ namespace ExcelHelper
                     }
                     kdLineNum++;
                     double totalUBDamage = 0;
-                    bool bossDead = false;
 
-                    for (int i = 21; i <= MyGameCtrl.Instance.tempData.SettingData.limitTime; i++)
+                    for (int i = MyGameCtrl.Instance.tempData.SettingData.limitTime; i >= 21; i--)
                     {
                         int frame = i * 60 - 2;
+                        bool dead = false;
 
-                        if (!bossDead && TimelineData.allUnitHPDic.Count > 0)
+                        if (TimelineData.allUnitHPDic.Count == 0)
                         {
-                            var hpDataList = TimelineData.allUnitHPDic.First().Value;
-                            if (hpDataList.Count > 0)
-                            {
-                                ValueChangeData currentData = hpDataList.FindLast(data => data.xValue <= frame);
-                                if (currentData != null && currentData.yValue <= 0)
-                                {
-                                    bossDead = true;
-                                }
-                            }
+                            dead = true;
                         }
 
                         // 秒数
@@ -1364,26 +1372,25 @@ namespace ExcelHelper
                             var hpDataList = TimelineData.allUnitHPDic.First().Value;
                             if (hpDataList.Count > 0)
                             {
+                                ValueChangeData initialHp = hpDataList[0];
                                 ValueChangeData currentData = hpDataList.FindLast(data => data.xValue <= frame);
-                                double totalDamage = currentData != null ? currentData.hp - currentData.yValue : 0;
+                                double totalDamage = currentData != null ? initialHp.yValue - currentData.yValue : 0;
                                 totalDamageText = Math.Round(totalDamage / 10000.0) + "w";
                             }
                         }
-                        worksheet1.Cells[kdLineNum, 10].Value = totalDamageText;
+                        worksheet1.Cells[kdLineNum, 10].Value = dead ? "/" : totalDamageText;
 
                         // 剩余UB
                         List<string> combinedTexts = new List<string>();
                         totalUBDamage = 0;
 
-                        foreach (var unitTPData in TimelineData.allUnitTPDic.Skip(1))
+                        if (BattleManager.Instance.IsSkillReady.ContainsKey(frame))
                         {
-                            int unitId = unitTPData.Key;
-                            var tpDataList = unitTPData.Value;
-
-                            if (tpDataList.Count > 0)
+                            foreach (var unit in BattleManager.Instance.IsSkillReady[frame])
                             {
-                                ValueChangeData currentTPData = tpDataList.FindLast(data => data.xValue <= frame);
-                                if (currentTPData != null && currentTPData.yValue >= 1000)
+                                var unitId = unit.Key;
+                                var isSkillReady = unit.Value;
+                                if (isSkillReady)
                                 {
                                     if (TimelineData.uBDetails != null)
                                     {
@@ -1414,16 +1421,12 @@ namespace ExcelHelper
                         double combinedDamage = currentTotalDamage + totalUBDamage;
                         string estimatedTotalDamage = Math.Round(combinedDamage / 10000.0) + "w";
 
-                        worksheet1.Cells[kdLineNum, 11].Value = string.IsNullOrEmpty(remainingDamageText) ?
+                        worksheet1.Cells[kdLineNum, 11].Value = dead ? "/" : string.IsNullOrEmpty(remainingDamageText) ?
                             $"{estimatedTotalDamage}" :
                             $"{estimatedTotalDamage}={totalDamageText}+{remainingDamageText}";
 
                         kdLineNum++;
 
-                        if (bossDead)
-                        {
-                            break;
-                        }
                     }
                 }
                 ExcelWorksheet worksheet2 = package.Workbook.Worksheets.Add("技能循环");

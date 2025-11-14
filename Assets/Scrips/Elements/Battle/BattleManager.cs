@@ -644,6 +644,8 @@ namespace Elements.Battle
         public bool skipping = false;
         public bool skipUB = false;
 
+        public Dictionary<int, Dictionary<int, bool>> IsSkillReady = new Dictionary<int, Dictionary<int, bool>>();
+
         private void updateFrame()
         {
             if (battleFinished) return;
@@ -742,6 +744,16 @@ namespace Elements.Battle
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
             isUpdateFrameExecuted = true;
+
+            var logicFrameCount = BattleHeaderController.CurrentFrameCount;
+            foreach(var unit in UnitList)
+            {
+                if (!IsSkillReady.ContainsKey(logicFrameCount))
+                {
+                    IsSkillReady[logicFrameCount] = new Dictionary<int, bool>();
+                }
+                IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
+            }
 
             if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {
@@ -3998,6 +4010,7 @@ namespace Elements.Battle
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
             SetStarted(false);
+            IsSkillReady.Clear();
             activeActionIds.Clear();
             effectUpdateList.Clear();
             isExtraEffectCalled.Clear();
@@ -4287,7 +4300,7 @@ namespace Elements.Battle
                 // ISSUE: explicit non-virtual call
                 UnitCtrl unitCtrl = (battleManager.UnitList)[index];
                 unitCtrl.WaveStartProcess(true);
-                if (unitCtrl.IdleOnly)
+                if (unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                     unitCtrl.SetState(UnitCtrl.ActionState.IDLE);
                 else
                     unitCtrl.SetState(UnitCtrl.ActionState.WALK);
@@ -4315,7 +4328,7 @@ namespace Elements.Battle
                 UnitCtrl unitCtrl = (battleManager.EnemyList)[index];
                 if (unitCtrl.StartStateIsWalk)
                 {
-                    if (unitCtrl.IdleOnly)
+                    if (unitCtrl.IdleOnly || unitCtrl.WaveStartIdle)
                         unitCtrl.SetState(UnitCtrl.ActionState.IDLE);
                     else
                         unitCtrl.SetState(UnitCtrl.ActionState.WALK);
@@ -4468,7 +4481,7 @@ namespace Elements.Battle
             }
             try
             {
-                var start_tp = GuildManager.Instance.IsDungeonBoss ? "1,1,1,1,1" : GuildManager.Instance.SettingData.start_tp;
+                var start_tp = tempData.isGuildBattle && GuildManager.Instance.IsDungeonBoss ? "1,1,1,1,1" : GuildManager.Instance.SettingData.start_tp;
                 var st = start_tp.Split(',').Select(float.Parse).ToArray();
                 int up = Math.Min(st.Length, battleManager.UnitList.Count);
                 for (int i = 0; i < up; i++)
@@ -4482,7 +4495,7 @@ namespace Elements.Battle
 
             }
 
-            if (ExcelHelper.ExcelHelper.AsmExportEnabled && MainManager.Instance.IsGuildBattle)
+            if (ExcelHelper.ExcelHelper.AsmExportEnabled && tempData.isGuildBattle)
             {
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();
@@ -5372,7 +5385,7 @@ namespace Elements.Battle
                 // TODO enemy & unit enhance info 
                 // may be ex+
 
-                unitCtrl.Initialize(parameter,unitData_my, flag ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
+                unitCtrl.Initialize(parameter,unitData_my, flag && MyGameCtrl.Instance.tempData.isGuildBattle ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.unitData.PrefabId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?

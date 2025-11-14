@@ -5,6 +5,7 @@ using PCRCaculator.Guild;
 using System.Linq;
 using System;
 using PCRCaculator;
+using Elements.Battle;
 
 public class KnifeDamagePanel : MonoBehaviour
 {
@@ -35,30 +36,23 @@ public class KnifeDamagePanel : MonoBehaviour
 
     private void GenerateTimeline()
     {
-        bool firstIteration = true;
-        for (int i = 21; i <= GuildManager.Instance.SettingData.limitTime; i++)
+        for (int i = GuildManager.Instance.SettingData.limitTime; i >= 21; i--)
         {
-            int frame = i * 60 -2;
+            bool dead = false;
 
-            if (firstIteration && TimelineData.allUnitHPDic.Count > 0)
+            if (TimelineData.allUnitHPDic.Count == 0)
             {
-                var hpDataList = TimelineData.allUnitHPDic.First().Value;
-                if (hpDataList.Count > 0)
-                {
-                    ValueChangeData currentData = hpDataList.FindLast(data => data.xValue <= frame);
-                    if (firstIteration && currentData != null && currentData.yValue <= 0)
-                    {
-                        firstIteration = false;
-                    }
-                }
-            }
-            else
-            {
-                break;
+                dead = true;
             }
 
             GameObject cell = Instantiate(KnifeDamageCell, transform);
-            SetCellText(cell, CreateContent(i));
+            var content = CreateContent(i);
+            if (dead)
+            {
+                content[2] = "/";
+                content[3] = "/";
+            }
+            SetCellText(cell, content);
             cells.Add(cell);
         }
         RestoreScrollPosition(0f);
@@ -68,7 +62,7 @@ public class KnifeDamagePanel : MonoBehaviour
     {
         string[] content = new string[6];
         int seconds = i;
-        int frame = seconds * 60;
+        int frame = seconds * 60 - 2;
         content[0] = seconds.ToString();
         content[1] = frame.ToString();
         content[2] = TotalDamgeText(frame);
@@ -88,8 +82,9 @@ public class KnifeDamagePanel : MonoBehaviour
             var hpDataList = TimelineData.allUnitHPDic.First().Value;
             if (hpDataList.Count > 0)
             {
+                ValueChangeData initialHp = hpDataList[0];
                 ValueChangeData currentData = hpDataList.FindLast(data => data.xValue <= frame);
-                double totalDamage = currentData != null ? currentData.hp - currentData.yValue : 0;
+                double totalDamage = currentData != null ? initialHp.yValue - currentData.yValue : 0;
                 return Math.Round(totalDamage / 10000.0) + "w";
             }
             else
@@ -106,31 +101,30 @@ public class KnifeDamagePanel : MonoBehaviour
     {
         List<string> combinedTexts = new List<string>();
         totalUBDamage = 0;
-
-        foreach (var unitTPData in TimelineData.allUnitTPDic.Skip(1))
+        if (BattleManager.Instance.IsSkillReady == null || !BattleManager.Instance.IsSkillReady.ContainsKey(frame))
         {
-            int unitId = unitTPData.Key;
-            var tpDataList = unitTPData.Value;
+            return "";
+        }
 
-            if (tpDataList.Count > 0)
+        foreach(var unit in BattleManager.Instance.IsSkillReady[frame])
+        {
+            var unitId = unit.Key;
+            var isSkillReady = unit.Value;
+            if (isSkillReady)
             {
-                ValueChangeData currentTPData = tpDataList.FindLast(data => data.xValue <= frame);
-                if (currentTPData != null && currentTPData.yValue >= 1000)
+                if (TimelineData.uBDetails != null)
                 {
-                    if (TimelineData.uBDetails != null)
+                    var ubDetail = TimelineData.uBDetails.Find(ub => ub != null && ub.unitData != null && ub.unitData.unitId == unitId && ub.UBTime > frame);
+                    string unitName = MainManager.Instance.GetUnitNickName(unitId);
+                    if (ubDetail != null)
                     {
-                        var ubDetail = TimelineData.uBDetails.Find(ub => ub != null && ub.unitData != null && ub.unitData.unitId == unitId && ub.UBTime > frame);
-                        string unitName = MainManager.Instance.GetUnitNickName(unitId);
-                        if (ubDetail != null)
-                        {
-                            string damageText = Math.Round(ubDetail.totalDamage / 10000.0) + "w";
-                            combinedTexts.Add($"{damageText}(<color=#FF0000>{unitName}</color>)");
-                            totalUBDamage += ubDetail.totalDamage;
-                        }
-                        else
-                        {
-                            combinedTexts.Add($"无(<color=#FF0000>{unitName}</color>)");
-                        }
+                        string damageText = Math.Round(ubDetail.totalDamage / 10000.0) + "w";
+                        combinedTexts.Add($"{damageText}(<color=#FF0000>{unitName}</color>)");
+                        totalUBDamage += ubDetail.totalDamage;
+                    }
+                    else
+                    {
+                        combinedTexts.Add($"无(<color=#FF0000>{unitName}</color>)");
                     }
                 }
             }

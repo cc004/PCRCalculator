@@ -56,7 +56,7 @@ namespace Elements
                     {
                         var def = TargetList[index].GetDefZero();
                         var mdef = TargetList[index].GetMagicDefZero();
-                        if (def < mdef)
+                        if (def < mdef || def == mdef && DamageType == DamageData.eDamageType.ATK)
                             realDamageType = DamageData.eDamageType.ATK;
                         else
                             realDamageType = DamageData.eDamageType.MGC;
