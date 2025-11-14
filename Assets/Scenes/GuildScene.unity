@@ -10261,7 +10261,7 @@ MonoBehaviour:
   RBValueText: {fileID: 1262470496}
   RBTPValueText: {fileID: 1076017670}
   ShowTextPrefab: {fileID: 0}
-  IsNefeiBugFix: {fileID: 988897723}
+  IsNiefeiBugFix: {fileID: 988897723}
 --- !u!1 &245927546
 GameObject:
   m_ObjectHideFlags: 0
