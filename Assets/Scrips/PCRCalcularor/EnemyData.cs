@@ -29,11 +29,12 @@ namespace PCRCaculator
         public EnemySkillData skillData;
         public UnitData CreateUnitData()
         {
-            return new UnitData(unit_id, rarity, detailData.prefab_id)
+            return new UnitData(unit_id)
             {
                 enemyid = enemy_id,
                 rarity = rarity,
                 PrefabId = detailData.prefab_id,
+                rank = promotion_level,
             };
         }
         public EnemyData Copy()
