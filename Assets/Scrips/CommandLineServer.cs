@@ -130,6 +130,7 @@ namespace PCRCaculator
                 }
 
                 // 激活 server GameObject（会自动触发 OnEnable 启动服务器）
+                serverObject.GetComponent<BattleSimulationServer>().port = serverPort;
                 serverObject.gameObject.SetActive(true);
                 Debug.Log($"已激活 {serverObject.parent.name}/Server GameObject，服务器将在端口 {serverPort} 上启动");
             }
