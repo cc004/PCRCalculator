@@ -9318,6 +9318,13 @@ this.updateCurColor();
                 isHit = false;
                 return 0;
             }
+            if (IsAbnormalState(eAbnormalState.MAGIC_DODGE) && _damageData.DamageType == DamageData.eDamageType.MGC)
+            {
+                SetMissAtk(_damageData.Source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION, _parts: _damageData.Target);
+                callBack?.Invoke("伤害无效，目标处于魔法闪避状态");
+                isHit = false;
+                return 0;
+            }
             DoubleWithEx a = (DoubleWithEx)_damageData.Damage;
             double num1 = 2f * _damageData.CriticalDamageRate;
             a *= 1 + (num1 - 1) * _damageData.critVar;
@@ -9336,12 +9343,14 @@ this.updateCurColor();
             bool flag1 = false;
             if (_damageData.ActionType == eActionType.ATTACK)
             {
-                if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
-                    flag1 = true;
-                else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
-                    flag1 = true;
-                else if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
-                    flag1 = true;
+                flag1 = true;
+                // it seems always true when attack in 10.7.1
+                // if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
+                //     flag1 = true;
+                // else if (_damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.LOG_MGC_BARRIR))
+                //     flag1 = true;
+                // else if (IsAbnormalState(eAbnormalState.LOG_ALL_BARRIR))
+                //     flag1 = true;
             }
 
             DoubleWithEx b = a;
