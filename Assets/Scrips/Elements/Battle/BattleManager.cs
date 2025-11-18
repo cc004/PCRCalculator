@@ -4095,7 +4095,8 @@ namespace Elements.Battle
             // battleManager.playCameraPos0 = battleManager.playCamera.transform.position;
             battleManager.tempRandomState = UnityEngine.Random.state;
             //int seed = 666;//battleManager.battleProcessor.GetSeed();
-            int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
+            // int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
+            int seed = new System.Random().Next();
             if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
