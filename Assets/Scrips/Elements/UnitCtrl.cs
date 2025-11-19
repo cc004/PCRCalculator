@@ -13547,6 +13547,7 @@ this.updateCurColor();
                      battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY) && !StandByDone || 
                      battleManager.IsSpecialBattle && battleManager.ActionStartTimeCounter > 0.0 || 
                      battleManager.LOGNEDLPEIJ || 
+                     battleManager.IsTalentBonusEffectPlaying ||
                      skillTargetList.Count == 0 || 
                      battleManager.GameState != eBattleGameState.PLAY || 
                      !battleManager.GetAdvPlayed() || 

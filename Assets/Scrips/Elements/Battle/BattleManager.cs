@@ -394,6 +394,7 @@ namespace Elements.Battle
             set;
         }
         public bool LOGNEDLPEIJ { get; set; }
+        public bool IsTalentBonusEffectPlaying { get; set; }
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
 
@@ -743,6 +744,7 @@ namespace Elements.Battle
             scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
+            IsTalentBonusEffectPlaying = false;
             isUpdateFrameExecuted = true;
 
             var logicFrameCount = BattleHeaderController.CurrentFrameCount;
@@ -4073,7 +4075,7 @@ namespace Elements.Battle
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             Resources.UnloadUnusedAssets();
             LKLFFOFDCHK = false;
-            GPFLCBONNMK = false;
+            allStandByDone = false;
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             // ISSUE: object of a compiler-generated type is created
@@ -4939,22 +4941,28 @@ namespace Elements.Battle
 
         private bool LKLFFOFDCHK { get; set; }
 
-        private bool GPFLCBONNMK { get; set; }
+        private bool allStandByDone { get; set; }
 
         public int LAMHAIODABF { get; set; }
 
         public bool GetAdvPlayed() => LKLFFOFDCHK;
 
-        public void CallbackStanbyDone(UnitCtrl FNHGFDNICFG)
+        public void CallbackStanbyDone(UnitCtrl _unit)
         {
-            if (GPFLCBONNMK)
+            if (allStandByDone)
                 return;
             for (int index = 0; index < UnitList.Count; ++index)
             {
                 if (!UnitList[index].StandByDone)
                     return;
             }
-            GPFLCBONNMK = true;
+            allStandByDone = true;
+            if (tempData.isGuildBattle) // hasTalentFormationBonus
+            {
+                IsPausingEffectSkippedInThisFrame = true;
+                IsTalentBonusEffectPlaying = true;
+            }
+
             PlayStory(() => LKLFFOFDCHK = true, 
                 0,//this.battleProcessor.GetNextWaveStartStoryId(), 
                 false);
