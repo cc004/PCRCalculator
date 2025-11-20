@@ -8793,11 +8793,6 @@ this.updateCurColor();
             }
         }
 
-        private static T FindObjectOfType<T>()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool IsPartsBoss => BossPartsList.Count > 0;
 
         public BasePartsData DummyPartsData { get; set; }

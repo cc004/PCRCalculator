@@ -70,7 +70,7 @@ public class Object
     {
         return obj == null;
     }
-    public T FindObjectOfType<T>()
+    public static T FindObjectOfType<T>()
     {
         throw new NotImplementedException();
     }
