@@ -180,7 +180,7 @@ namespace PCRCaculator.Guild
             { 7, 501011003 },
             { 8, 501011004 },
         };
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
 
@@ -188,7 +188,7 @@ namespace PCRCaculator.Guild
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
             LoadAddedPlayerData();
         }
-        private void Start()
+        public void Start()
         {
             if (!isLightStart)
             {
@@ -233,7 +233,9 @@ namespace PCRCaculator.Guild
                 textContent = "/" + textContent;
             }
             textContent = textContent.Replace("\n", "").Replace("\r", "");
+#if UNITY_5_3_OR_NEWER
             GUIUtility.systemCopyBuffer = textContent;
+#endif
             MainManager.Instance.WindowMessage("文本已复制并添加到末尾");
             SettingInputs[11].text += textContent.Replace("\n", "").Replace("\r", "");
         }
@@ -1610,6 +1612,7 @@ namespace PCRCaculator.Guild
 
         IEnumerator DownSprite(string url)
         {
+#if UNITY_5_3_OR_NEWER
             var uri = new System.Uri(Path.Combine(url));
             UnityWebRequest www = UnityWebRequest.Get(uri);
             DownloadHandlerTexture texDl = new DownloadHandlerTexture(true);
@@ -1628,6 +1631,9 @@ namespace PCRCaculator.Guild
                 Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
                 backgroundImage.sprite = sprite;
             }
+#else
+            yield return null;
+#endif
         }
         public void SelectImage()
         {

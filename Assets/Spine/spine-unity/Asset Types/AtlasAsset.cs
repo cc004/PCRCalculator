@@ -17,7 +17,7 @@ namespace Spine.Unity
 
 		public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Material[] materials, bool initialize)
 		{
-			AtlasAsset atlasAsset = CreateInstance<AtlasAsset>();
+			AtlasAsset atlasAsset = new AtlasAsset();
 			atlasAsset.Reset();
 			atlasAsset.atlasFile = atlasText;
 			atlasAsset.materials = materials;
@@ -28,8 +28,9 @@ namespace Spine.Unity
 			return atlasAsset;
 		}
 
-		public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize)
+        public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize)
 		{
+#if UNITY_5_3_OR_NEWER
 			string[] array = atlasText.text.Replace("\r", "").Split('\n');
 			List<string> list = new List<string>();
 			for (int i = 0; i < array.Length - 1; i++)
@@ -63,16 +64,23 @@ namespace Spine.Unity
 				throw new ArgumentException("Could not find matching atlas page in the texture array.");
 			}
 			return CreateRuntimeInstance(atlasText, array2, initialize);
-		}
+#else
+            return CreateRuntimeInstance(atlasText, Array.Empty<Material>(), initialize);
+#endif
+        }
 
-		public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize)
+        public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize)
 		{
+#if UNITY_5_3_OR_NEWER
 			if (shader == null)
 			{
 				shader = Shader.Find("Spine/Skeleton");
 			}
 			Material materialPropertySource = new Material(shader);
-			return CreateRuntimeInstance(atlasText, textures, materialPropertySource, initialize);
+            return CreateRuntimeInstance(atlasText, textures, materialPropertySource, initialize);
+#else
+			return CreateRuntimeInstance(atlasText, textures, default(Material), initialize);
+#endif
 		}
 
 		private void Reset()
@@ -87,6 +95,7 @@ namespace Spine.Unity
 
 		public virtual Atlas GetAtlas()
 		{
+#if UNITY_5_3_OR_NEWER
 			if (atlasFile == null)
 			{
 				Clear();
@@ -111,6 +120,10 @@ namespace Spine.Unity
 			{
 				return null;
 			}
+#else
+            atlas = new Atlas(new StringReader(atlasFile.text), "", new MaterialsTextureLoader());
+            return atlas;
+#endif
 		}
 
 		public Mesh GenerateMesh(string name, Mesh mesh, out Material material, float scale = 0.01f)
@@ -169,11 +182,11 @@ namespace Spine.Unity
 					array2[3] = new Vector2(u2, v);
 				}
 				mesh.triangles = new int[0];
-				mesh.vertices = array;
+                mesh.vertices = array;
 				mesh.uv = array2;
 				mesh.colors = colors;
 				mesh.triangles = triangles;
-				mesh.RecalculateNormals();
+                mesh.RecalculateNormals();
 				mesh.RecalculateBounds();
 				material = (Material)atlasRegion.page.rendererObject;
 			}

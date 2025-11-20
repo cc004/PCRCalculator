@@ -7,6 +7,8 @@ Library
 MemoryCaptures
 Builds/MacOS
 .vs
+bin/
+obj/
 
 # 忽略特定文件
 PCRCAlculator.sln
@@ -19,6 +21,7 @@ Assets/Resources/BillingMode.json
 
 # 忽略所有 .csproj 文件
 *.csproj
+!PCRCalculatorServer/PCRCalculatorServer.csproj
 
 # 忽略 UserSettings 目录及其内容
 UserSettings/

@@ -59,17 +59,6 @@ namespace Elements
             var t = keyList;
             keyList = keyListOther;
             keyListOther = t;
-            /*
-           foreach (UnitCtrl key in CoroutineDataDictionary.Keys)
-          {
-            if (!keyList.Contains(key))
-              keyList.Add(key);
-          }
-          for (int index = keyList.Count - 1; index >= 0; --index)
-          {
-            if (!CoroutineDataDictionary.ContainsKey(keyList[index]))
-              keyList.RemoveAt(index);
-          }*/
         }
         for (int index = 0; index < keyList.Count; ++index)
         {

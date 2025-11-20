@@ -81,9 +81,9 @@ namespace Elements.Battle
         [SerializeField]
         private Transform enemyParentTransform;
         [SerializeField]
-        private Camera playCamera;
+        public Camera playCamera;
         [SerializeField]
-        private Transform bgTransform;
+        public Transform bgTransform;
         [SerializeField]
         private float energyGainValueSkillFront;
         [SerializeField]
@@ -543,7 +543,7 @@ namespace Elements.Battle
         private Stopwatch stopWatch = new Stopwatch();
         private bool battleFinishedProcessed = false;
 
-        private void Update()
+        public void Update()
         {
             if (battleFinished){
                 if (!battleFinishedProcessed){
@@ -3446,7 +3446,7 @@ namespace Elements.Battle
 
         public bool BOEDFIHEEOL => isValid;
 
-        private void Awake()
+        public void Awake()
         {
             // preload fxsk bundles
             foreach (var pair in ABExTool.mgrCharacter.registries)
@@ -4258,12 +4258,13 @@ namespace Elements.Battle
             //while (!(battleManager.UnitUiCtrl).IsUnitCreated)
             //    yield return (object)null;
             MyGameCtrl.Instance.Initialize();
+            /*
             while (!MyGameCtrl.Instance.IsUnitCreated)
             {
                 yield return null;
-            }
+            }*/
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
-            yield return battleManager.InitializeEnemyFirst();
+            battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
             battleManager.sortAndSetPositionOneWave(battleManager.currentEnemyUnitCtrlDictionary);
@@ -4466,7 +4467,9 @@ namespace Elements.Battle
             //    ManagerSingleton<ViewManager>.Instance.IsSnsBattlePause = false;
             //}
             yield return null;
+#if UNITY_5_3_OR_NEWER
             gameCtrl.SetUI();
+#endif
 
             try
             {
@@ -4475,7 +4478,9 @@ namespace Elements.Battle
                 for (int i = 0; i < up; i++)
                 {
                     battleManager.UnitList[i].Hp = (LongWithEx)((LongWithEx)battleManager.UnitList[i].MaxHp * sh[i]);
+#if UNITY_5_3_OR_NEWER
                     battleManager.UnitList[i].unitUI.SetHP(sh[i]);
+#endif
                 }
             }
             catch (Exception e)
@@ -4490,7 +4495,9 @@ namespace Elements.Battle
                 for (int i = 0; i < up; i++)
                 {
                     battleManager.UnitList[i].energy = UnitDefine.MAX_ENERGY * st[i];
+#if UNITY_5_3_OR_NEWER
                     battleManager.UnitList[i].unitUI.SetTP(st[i]);
+#endif
                 }
             }
             catch (Exception e)
@@ -4614,7 +4621,7 @@ namespace Elements.Battle
                 UnitCtrl.InitializeExAndFreeSkill(CNBJIKBCFIC[index].UniqueData, DPLDGBDGLDK, OFEBCDLGGGL, null);
         }
 
-        private IEnumerator InitializeEnemyFirst()
+        private void InitializeEnemyFirst()
         {
             //int count = this.tempData.enemyList.Count;
             int count = 1;
@@ -4632,8 +4639,6 @@ namespace Elements.Battle
                 //this.loadEnemy(i, () => { isCallbackCalled = true; });
                 MyGameCtrl.Instance.LoadEnemy(() => { isCallbackCalled = true; });
                 // ISSUE: reference to a compiler-generated field
-                while (!isCallbackCalled)
-                    yield return null;
                 allWaveEnemyUnitCtrlListArray[0] = MyGameCtrl.Instance.enemyUnitCtrl;
                 //modnipfemjd = (BattleManager.MODNIPFEMJD) null;
             }
@@ -5666,6 +5671,11 @@ namespace Elements.Battle
                     return value * Math.Max(0, upper - Math.Max(lower, promotionLevel - 1));
                 })
                 .Aggregate(1.0, (val, reduction) => val - reduction);
+        }
+
+        internal void SetSkillExeScreenActive(UnitCtrl unit, object black)
+        {
+            throw new NotImplementedException();
         }
     }
 }

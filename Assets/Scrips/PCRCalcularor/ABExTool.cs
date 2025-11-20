@@ -544,6 +544,7 @@ namespace PCRCaculator
         public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4}
         public static Sprite GetSprites(SpriteType type, int id)
         {
+#if UNITY_5_3_OR_NEWER
             string assetName = "";
             switch (type)
             {
@@ -576,9 +577,12 @@ namespace PCRCaculator
             else
             {
                 sprite = Resources.Load<Sprite>("pictures/"+id + "_" + (int)type);
-            }
-            spriteDic.Add(assetName, sprite);
+        }
+        spriteDic.Add(assetName, sprite);
             return sprite;
+#else
+            return null;
+#endif
 
         }
         public static GameObject LoadUnitPrefab(int unitid)

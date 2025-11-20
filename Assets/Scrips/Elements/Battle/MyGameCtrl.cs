@@ -57,7 +57,7 @@ namespace Elements
 
         private const float SPINE_SCALE = 0.01f;
 
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
             
@@ -113,7 +113,7 @@ namespace Elements
         }
 
 
-        private void Start()
+        public void Start()
         {
             isBattleFinish = false;
             staticBattleManager = BattleManager.Instance;
@@ -611,8 +611,10 @@ namespace Elements
             }
             b.transform.SetParent(isplayer?unitParent:enemyParent);
             b.name = "rotate_center";
-
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
+#if !UNITY_5_3_OR_NEWER
+            unitCtrl.Awake();
+#endif
             //gameObject.name = "rotate_center";
             // ISSUE: reference to a compiler-generated field
             unitCtrl.RotateCenter = b.transform;
@@ -710,8 +712,10 @@ namespace Elements
             SpineResourceSet resourceSet = new SpineResourceSet(info, prefabID, 0, 0);
             resourceSet.Skelton = dataAsset;
             battleSpineController.Create(resourceSet);
+#if UNITY_5_3_OR_NEWER
             if (!BattleManager.Instance.skipping)
                 SetSummonUI(summonUnitCtrl);
+#endif
             _callback?.Invoke(battleSpineController);
             if (!BattleManager.Instance.skipping)
                 GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);

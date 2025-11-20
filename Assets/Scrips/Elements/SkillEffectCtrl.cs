@@ -561,11 +561,13 @@ namespace Elements
 
         public virtual void ResetParameter(GameObject _prefab, int _skinID = 0, bool _isShadow = false)
         {
+#if UNITY_5_3_OR_NEWER
             if (_skinID != 0)
             {
                 for (int index = 0; index < textureChangeParticles.Count; ++index)
                     textureChangeParticles[index].ParticleSystemRenderer.material.mainTexture = textureChangeParticles[index].TextureAndSkinIdList.Find(e => e.SkinId == _skinID).Texture;
             }
+#endif
             /*if (this.battleManager.IsDefenceReplayMode)
             {
                 for (int index = 0; index < this.defenceModeTextureSetting.Count; ++index)

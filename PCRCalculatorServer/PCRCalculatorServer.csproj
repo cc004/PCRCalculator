@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="../Assets/Scrips/**/*.cs" />
+		<Compile Include="../Assets/Spine/spine-csharp/**/*.cs" />
+		<Compile Include="../Assets/Spine/spine-unity/Asset Types/AtlasAsset.cs" />
+		<Compile Include="../Assets/Spine/spine-unity/Asset Types/SkeletonDataAsset.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/Battle/GAUBOptimization.cs" />
+		<Compile Remove="../Assets/Scrips/Cute/Application01.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/cute/PABCCELMCAJ.cs" />
+		<Compile Remove="../Assets/Scrips/CommandLineServer.cs" />
+		<Compile Remove="../Assets/Scrips/LoginTool.cs" />
+		<Compile Remove="../Assets/Scrips/PCRCalcularor/AndroidTool.cs" />
+		<Compile Remove="../Assets/Scrips/PCRCalcularor/UpdateTool/CheckUpdate.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/TeamSkillNodeInfo.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/TalentSkillNodeInfo.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="../Assets/StreamingAssets/**/*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Data/StreamingAssets/%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</Content>
+		<None Remove="classdata.tpk" />
+		<Content Include="../Assets/Plugins/x64/sqlite3.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>sqlite3.dll</Link>
+		</Content>
+		<Content Include="classdata.tpk">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="AssetsTools.NET" Version="3.0.2" />
+	  <PackageReference Include="EPPlus" Version="7.7.3" />
+	  <PackageReference Include="ExcelDataReader" Version="3.8.0" />
+	  <PackageReference Include="ExcelDataReader.DataSet" Version="3.8.0" />
+	  <PackageReference Include="GeneticSharp" Version="3.1.4" />
+	  <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+	  <PackageReference Include="Mono.Data.Sqlite" Version="1.0.61" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	  <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+	  <PackageReference Include="TinyPinyin" Version="1.1.0" />
+	</ItemGroup>
+
+</Project>

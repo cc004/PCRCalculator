@@ -116,7 +116,7 @@ namespace PCRCaculator.Battle
         private Dictionary<KeyCode, int> keyToValue;
         public GameObject PlayerEnvironmentUI;
         public GameObject EnemyEnvironmentUI;
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
             /*if (MainManager.Instance.UseNewBattleSystem)
@@ -129,7 +129,7 @@ namespace PCRCaculator.Battle
             }*/
 
         }
-        private void Start()
+        public void Start()
         {
             m_LastUpdateShowTime = Time.realtimeSinceStartup;
             if(myGameCtrl != null)
@@ -310,6 +310,7 @@ namespace PCRCaculator.Battle
             string logtext = $"({fpsCount}/{BattleManager.Instance.FrameCount}){word}\n";
             debugStrList.Add(logtext);
             //sw.WriteLine(logtext);
+#if UNITY_5_3_OR_NEWER
             Text debugText = debugText1;//= isOther ? debugText2 : debugText1;
             ScrollRect scrollRect = scrollRect1;//isOther ? scrollRect2 : scrollRect1;
             int overText = debugText.text.Length - maxTextLength;
@@ -340,6 +341,9 @@ namespace PCRCaculator.Battle
             }
             debugText.text += logtext;
             scrollRect.verticalNormalizedPosition = 0;
+#else
+            Console.Write(logtext);
+#endif
             if (logMessageType == eLogMessageType.ERROR)
             {
 #if UNITY_EDITOR
@@ -859,6 +863,7 @@ namespace PCRCaculator.Battle
 
         public IEnumerator CaptureByUI(RectTransform UIRect,int extendValue=0)
         {
+#if UNITY_5_3_OR_NEWER
             //等待帧画面渲染结束
             yield return new WaitForEndOfFrame();
 
@@ -878,6 +883,9 @@ namespace PCRCaculator.Battle
             byte[] bytes = tex.EncodeToPNG();
             //保存
             imageSaved.Add(bytes);
+#else
+            yield return null;
+#endif
         }
         public IEnumerator AutoSaveImage()
         {
@@ -917,6 +925,7 @@ namespace PCRCaculator.Battle
         //将RenderTexture保存成一张png图片  
         public byte[] SaveRenderTexture(RenderTexture rt)
         {
+#if UNITY_5_3_OR_NEWER
             RenderTexture prev = RenderTexture.active;
             RenderTexture.active = rt;
             Texture2D png = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
@@ -927,6 +936,9 @@ namespace PCRCaculator.Battle
             png = null;
             RenderTexture.active = prev;
             return bytes;
+#else
+            return null;
+#endif
 
         }
         public List<byte[]> GetCharactersImage()

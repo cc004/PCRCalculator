@@ -2108,7 +2108,7 @@ this.updateCurColor();
                         this.SetEnableColor();
                 }*/
 
-                private void Awake()
+        public void Awake()
         {
             OnAwake();
             TimeToDie = false;
@@ -2744,6 +2744,7 @@ this.updateCurColor();
                 }*/
                 if (skin.GetAttachment(slotIndex, name) is BoundingBoxAttachment attachment)
                 {
+#if UNITY_5_3_OR_NEWER
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, gameObject, false);
                     ColliderCenter = (polygonCollider2D.bounds.center - transform.position) / 2;
                     ColliderSize = polygonCollider2D.bounds.size / 2;
@@ -2752,6 +2753,31 @@ this.updateCurColor();
 
                     Destroy(polygonCollider2D);
                     Destroy(gameObject.GetComponent<Rigidbody2D>());
+#else
+                    Vector2[] vertices = attachment.GetLocalVertices(slot, null);
+
+                    // 计算 AABB：找出 min/max
+                    float minX = float.MaxValue, minY = float.MaxValue;
+                    float maxX = float.MinValue, maxY = float.MinValue;
+
+                    foreach (var v in vertices)
+                    {
+                        if (v.x < minX) minX = v.x;
+                        if (v.y < minY) minY = v.y;
+                        if (v.x > maxX) maxX = v.x;
+                        if (v.y > maxY) maxY = v.y;
+                    }
+
+                    // 得到包围盒
+                    Vector2 boundsCenter = new Vector2((minX + maxX) / 2, (minY + maxY) / 2);
+                    Vector2 boundsSize = new Vector2(maxX - minX, maxY - minY);
+
+                    // 用 transform.position 修正（如果需要）
+                    ColliderCenter = (boundsCenter - (Vector2)transform.position) / 2;
+                    ColliderSize = boundsSize / 2;
+                    float coSize2 = ColliderSize.x / transform.lossyScale.x;
+                    BodyWidth = coSize2 + BossBodyWidthOffset;
+#endif
                 }
 
             }
@@ -4359,7 +4385,9 @@ this.updateCurColor();
         public void IndicateSkillName(string _skillName) 
         {
             if(_skillName == "" || _skillName == null) { return; }
+#if UNITY_5_3_OR_NEWER
             UIManager.ShowSkillName(_skillName, gameObject.transform);
+#endif
         }// => this.lifeGauge.IndicateSkillName(_skillName);
 
         //public List<PrefabWithTime> GetDieEffects() => this.dieEffects;
@@ -8763,6 +8791,11 @@ this.updateCurColor();
             }
         }
 
+        private static T FindObjectOfType<T>()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsPartsBoss => BossPartsList.Count > 0;
 
         public BasePartsData DummyPartsData { get; set; }
@@ -10254,6 +10287,7 @@ this.updateCurColor();
           bool _critical,
           long _damage)
         {
+#if UNITY_5_3_OR_NEWER
             if (((!(battleManager != null) ? 0 : (_damage >= 0 ? 1 : 0)) & (_hasEffect ? 1 : 0)) == 0)
                 return;
             eDamageType damageType = (eDamageType)(int)_damageData.DamageType;
@@ -10262,6 +10296,7 @@ this.updateCurColor();
             //eDamageEffctTypeDetail key = (UnityEngine.Object)_damageData.Source == (UnityEngine.Object)null || _damageData.Source.IsLeftDir == !this.battleManager.IsDefenceReplayMode ? (_critical ? eDamageEffctTypeDetail.UNIT_CRITICAL : eDamageEffctTypeDetail.UNIT) : (_critical ? eDamageEffctTypeDetail.ENEMY_CRITICAL : eDamageEffctTypeDetail.ENEMY);
             //GameObject _pPrefab = this.battleManager.AMPANMGEBBM[_damageData.DamegeEffectType][key];
             //this.CreateDamageNumEffect(_damage, _pPrefab, true, _critical, _skill, _damageData.DamageNumMagic || _damageData.DamageType == DamageData.eDamageType.MGC, _damageData.Source, _damageData.DamageSoundType, _damageData.Target, _damageData.DamegeNumScale);
+#endif
         }
 
         /*public DamageEffectCtrl CreateDamageNumEffect(
@@ -10354,7 +10389,9 @@ this.updateCurColor();
             this.sortOffsetResetTimer = 0.6f;
             ++this.hitEffectSortOffset;
             damageEffectCtrlBase.SetSortOrder((this.IsFront ? 11500 : 0) + 11250 + this.hitEffectSortOffset);*/
+#if UNITY_5_3_OR_NEWER
             UIManager.SetMissEffect(gameObject.transform.position,_type == eDamageEffectType.NORMAL?1:2);
+#endif
         }
 
         /*public void ShowHitEffect(
@@ -10493,10 +10530,12 @@ this.updateCurColor();
                 }
                 else
                 {
+#if UNITY_5_3_OR_NEWER
                     if (_useNumberEffect && !battleManager.skipping)
                     {
                         UIManager.SetHealNumber(gameObject.transform.position, (int)_value);
                     }   //this.createHealNumEffect(_value, _target);
+#endif
                     if (!_isEffect)
                         return;
                     //_target.RecoveryEffect(_source, false, this.battleEffectPool, _isRegenerate);

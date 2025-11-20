@@ -1129,6 +1129,7 @@ namespace PCRCaculator
 
             if (filePath.Contains("jar:file:")) // Android
             {
+#if UNITY_5_3_OR_NEWER
                 using (UnityWebRequest www = UnityWebRequest.Get(filePath))
                 {
                     yield return www.SendWebRequest();
@@ -1141,6 +1142,9 @@ namespace PCRCaculator
 
                     jsonString = www.downloadHandler.text;
                 }
+#else
+                yield return null;
+#endif
             }
             else //PC
             {

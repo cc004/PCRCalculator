@@ -27,7 +27,7 @@ namespace Elements
 
         internal CharacterPageButton unitUI;
         private CharacterBuffUIController unitBuffUI;
-        private BattleUIManager uIManager;
+        private BattleUIManager uIManager => BattleUIManager.Instance;
         public PCRCaculator.UnitData unitData;
         public UnitParameter unitParameter;
         public string UnitName = "", UnitNameEx = "";
@@ -60,7 +60,6 @@ namespace Elements
 
         public void SetUI(CharacterPageButton ui, CharacterBuffUIController buffui)
         {
-            uIManager = BattleUIManager.Instance;
             unitUI = ui;
             unitUI.SetButton(this);
             unitBuffUI = buffui;
@@ -73,7 +72,6 @@ namespace Elements
         }
         public void SetUIForSuommon()
         {
-            uIManager = BattleUIManager.Instance;
         }
         [ContextMenu("生成unitCtrl.json文件")]
         public void SaveUnitCtrlData()

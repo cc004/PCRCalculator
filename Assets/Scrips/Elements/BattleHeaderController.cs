@@ -20,12 +20,12 @@ namespace Elements
             CurrentFrameCount = 0;
             IsPaused = false;
         }
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
             CurrentFrameCount = 0;
         }
-        private void OnDestroy()
+        public void OnDestroy()
         {
             Instance = null;
             CurrentFrameCount = 0;

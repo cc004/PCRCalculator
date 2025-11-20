@@ -178,10 +178,12 @@ namespace Elements
 
         public static explicit operator LongWithEx(DoubleWithEx x) {
             // 判断是否接近整数
+#if UNITY_5_3_OR_NEWER
             Assert.IsTrue(Math.Abs(x.value - Math.Round(x.value)) < 1e-8);
             Assert.IsTrue(Math.Abs(x.avg - Math.Round(x.avg)) < 1e-8);
             Assert.IsTrue(Math.Abs(x.min - Math.Round(x.min)) < 1e-8);
             Assert.IsTrue(Math.Abs(x.max - Math.Round(x.max)) < 1e-8);
+#endif
             return new LongWithEx((long)x.value, (long)x.avg, (long)x.min, (long)x.max,
                 x.root == null ? null : (hash => (long)x.root(hash)))
             {

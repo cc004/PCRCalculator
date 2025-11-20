@@ -1,31 +1,32 @@
+using Elements;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
+using PCRApi.CN;
+using PCRCaculator.Calc;
+using PCRCaculator.Guild;
+using PCRCaculator.SQL;
+using PCRCaculator.Update;
+using PCRCalcularor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using OfficeOpenXml;
-using PCRApi.CN;
-using PCRCaculator.Calc;
-using PCRCaculator.Guild;
-using PCRCaculator.SQL;
-using PCRCalcularor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 using Object = UnityEngine.Object;
-using PCRCaculator.Update;
-using UnityEngine.Networking;
-using System.Reflection;
-using Elements;
 namespace PCRCaculator
 {
     public class MainManager : MonoBehaviour
@@ -48,7 +49,6 @@ namespace PCRCaculator
         public bool UseNewBattleSystem = true;
         public bool useJapanData {get => Version.useJP;}
         public bool useVerification;
-        public LoginTool loginTool;
 
         public DatabaseCache databaseCache = new DatabaseCache();
 
@@ -206,7 +206,7 @@ namespace PCRCaculator
         private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
         private const string Url2 = "https://l3-prod-all-gs-gzlj.bilibiligame.net/source_ini/get_maintenance_status?format=json";
         public string truthVersion;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -245,7 +245,7 @@ namespace PCRCaculator
 
         public VersionData Version;
 
-        private void Start()
+        public void Start()
         {
             LoadFinished = false;
             try
@@ -266,10 +266,6 @@ namespace PCRCaculator
                 ABExTool.persistentDataPath = Application.persistentDataPath;
                 ABExTool.dataPath = Application.dataPath;
 
-                if (useVerification)
-                {
-                    loginTool?.gameObject.SetActive(true);
-                }
 #if PLATFORM_ANDROID
                 var dir = Application.persistentDataPath + "/AB";
 #else
@@ -295,8 +291,8 @@ namespace PCRCaculator
             }
             catch (Exception e)
             {
-                Debugtext.text += e.Message;
                 Debug.LogError(e.ToString());
+                Debugtext.text += e.Message;
             }
 
             //CharacterManager = CharacterManager.Instance;
@@ -406,6 +402,7 @@ namespace PCRCaculator
                 {
                     abStopwatch.Stop();
                     Debug.LogError($"AB资源初始化失败");
+                    Debug.LogError(ex.ToString());
                     try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
                     SaveManager.Save(new VersionData());
                     return;
@@ -725,7 +722,7 @@ namespace PCRCaculator
 
                 LoadFinished = true;
                 CreateShowUnitIDS();
-                wait.Close();
+                wait?.Close();
                 
                 // 计时结束并输出
                 stopwatch.Stop();
@@ -832,11 +829,16 @@ namespace PCRCaculator
         }
         public void WindowConfigMessage(string word, SystemWindowMessage.configDelegate configDelegate, SystemWindowMessage.configDelegate cancelDelegate = null)
         {
+#if UNITY_5_3_OR_NEWER
             GameObject a = Instantiate(SystemWindowMessagePerferb);
             a.transform.SetParent(LatestUIback.transform, false);
             a.transform.localPosition = new Vector3();
             a.transform.localScale = new Vector3(1, 1, 1);
             a.GetComponent<SystemWindowMessage>().SetWindowMassage(word, configDelegate, cancelDelegate);
+#else
+            Console.WriteLine(word);
+            configDelegate?.Invoke();
+#endif
         }
         public SystemWindowMessage WindowAsyncMessage(string word, SystemWindowMessage.configDelegate configDelegate = null, SystemWindowMessage.configDelegate cancelDelegate = null)
         {
@@ -1048,6 +1050,7 @@ namespace PCRCaculator
         }
         private void CopyDataInAndraid()
         {
+#if UNITY_5_3_OR_NEWER
             if (PlayerPrefs.HasKey("Copyed"))
             {
                 return;
@@ -1055,6 +1058,7 @@ namespace PCRCaculator
             DirectoryCopy(Application.streamingAssetsPath, Application.persistentDataPath);
             PlayerPrefs.SetInt("Copyed", 1);
             PlayerPrefs.Save();
+#endif
         }
         public void DirectoryCopy(string sourceDirectory, string targetDirectory)
         {
@@ -1095,6 +1099,7 @@ namespace PCRCaculator
             a.GetComponent<RectTransform>().offsetMax = new Vector2(5, 5);
             a.GetComponent<RectTransform>().offsetMin = new Vector2(-5, -5);
 
+#if UNITY_5_3_OR_NEWER
             //yield return new WaitForSeconds(1.5f);
             var async = SceneManager.LoadSceneAsync("BattleScene");
             async.allowSceneActivation = true;
@@ -1102,6 +1107,9 @@ namespace PCRCaculator
             {
                 yield return null;
             }
+#else
+            yield return null;
+#endif
         }
         public void SaveAllUnitFriearmData()
         {
@@ -1145,11 +1153,16 @@ namespace PCRCaculator
 
         public WaitUI OpenWaitUI()
         {
+#if UNITY_5_3_OR_NEWER
             GameObject p = Instantiate(LoadingPagePrefab, GameObject.Find("Canvas")?.transform);
             return p.GetComponent<WaitUI>();
+#else
+            return null;
+#endif
         }
         public static Sprite LoadSourceSprite(string relativePath)
         {
+#if UNITY_5_3_OR_NEWER
             if (Instance.spriteCacheDic.ContainsKey(relativePath))
             {
                 return Instance.spriteCacheDic[relativePath];
@@ -1173,6 +1186,9 @@ namespace PCRCaculator
 
             //用加载得到的资源对象，实例化游戏对象，实现游戏物体的动态加载
             return tmpsprite;
+#else
+            return null;
+#endif
         }
         /// <summary>
         /// DES加密字符串
@@ -1271,7 +1287,7 @@ namespace PCRCaculator
         {
             return ExtraEffectUnitGroupDic.ContainsKey(groupId) ? ExtraEffectUnitGroupDic[groupId] : null;
         }
-
+#if UNITY_5_3_OR_NEWER
         public async Task SendPostRequestAsync2(Action onComplete)
         {
             const string app_ver = "10.7.1"; // change this when the app version changes
@@ -1375,7 +1391,77 @@ namespace PCRCaculator
             // 等待任务完成
             await tcs.Task;
         }
+#else
+        public async Task SendPostRequestAsync(Action onComplete)
+        {
+            const string app_ver = "10.7.1";
+            var httpClient = new HttpClient();
+
+            // 构造 POST Body
+            var jsonBody = "{\"viewer_id\": \"0\"}";
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            // 添加 Headers
+            content.Headers.ContentType.CharSet = "UTF-8";
+
+            var request = new HttpRequestMessage(HttpMethod.Post, Url2)
+            {
+                Content = content
+            };
+
+            request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip");
+            request.Headers.TryAddWithoutValidation("User-Agent", "Dalvik/2.1.0 (Linux, U, Android 5.1.1, PCRT00 Build/LMY48Z)");
+            request.Headers.TryAddWithoutValidation("X-Unity-Version", "2021.3.20f1c1");
+            request.Headers.TryAddWithoutValidation("APP-VER", app_ver);
+            request.Headers.TryAddWithoutValidation("BATTLE-LOGIC-VERSION", "4");
+            request.Headers.TryAddWithoutValidation("DEVICE", "2");
+            request.Headers.TryAddWithoutValidation("DEVICE-NAME", "OPPO PCRT00");
+            request.Headers.TryAddWithoutValidation("EXCEL-VER", "1.0.0");
+            request.Headers.TryAddWithoutValidation("GRAPHICS-DEVICE-NAME", "Adreno (TM) 640");
+            request.Headers.TryAddWithoutValidation("IP-ADDRESS", "10.0.2.15");
+            request.Headers.TryAddWithoutValidation("LOCALE", "CN");
+            request.Headers.TryAddWithoutValidation("PLATFORM", "2");
+            request.Headers.TryAddWithoutValidation("PLATFORM-ID", "2");
+            request.Headers.TryAddWithoutValidation("CHANNEL-ID", "1");
+            request.Headers.TryAddWithoutValidation("RES-KEY", "ab00a0a6dd915a052a2ef7fd649083e5");
+            request.Headers.TryAddWithoutValidation("RES-VER", "10002200");
+
+            try
+            {
+                var responseMessage = await httpClient.SendAsync(request);
+                var raw = await responseMessage.Content.ReadAsStringAsync();
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    Debug.LogError($"请求失败: {responseMessage.StatusCode}");
+                    truthVersion = "获取失败（重试）";
+                }
+                else
+                {
+                    try
+                    {
+                        var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
+                        truthVersion = response?.data?.manifest_ver ?? "获取失败（重试）";
+                    }
+                    catch
+                    {
+                        truthVersion = "获取失败（重试）";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"请求异常: {ex}");
+                truthVersion = "获取失败（重试）";
+            }
+            finally
+            {
+                onComplete?.Invoke();
+            }
+        }
+#endif
     }
+
     public class UnitData_other
     {
         public string name = "未定义";

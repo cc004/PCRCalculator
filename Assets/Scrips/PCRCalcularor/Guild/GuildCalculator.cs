@@ -90,7 +90,7 @@ namespace PCRCaculator.Guild
         public List<int> PlayerIds => playerIds;
         public List<int> BossId => bossId;
         public Button KnifeDamageButton;
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
         }
@@ -100,6 +100,7 @@ namespace PCRCaculator.Guild
         }
         private void Update()
         {
+#if UNITY_5_3_OR_NEWER
             // 检测鼠标滚轮输入
             if (skillScrollRect.gameObject.activeInHierarchy && 
                 RectTransformUtility.RectangleContainsScreenPoint(
@@ -116,6 +117,7 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
+#endif
         }
 
         private void ZoomScrollRect(float delta)
@@ -631,6 +633,7 @@ namespace PCRCaculator.Guild
 
         private void AddLine()
         {
+#if UNITY_5_3_OR_NEWER
             var serie = lineChart.AddSerie<Line>();
             serie.lineType = LineType.StepEnd;
             serie.lineStyle.width = .5f;
@@ -645,6 +648,7 @@ namespace PCRCaculator.Guild
             };
 
             serie.areaZero = 100 - serie.index;
+#endif
         }
 
         private const float PREFAB_SCALE = 35f / 38;
@@ -711,10 +715,12 @@ namespace PCRCaculator.Guild
                 colorIdx = skillGroupColors.Count - 1;
             }
             */
+#if UNITY_5_3_OR_NEWER
             var color = lineChart.theme.GetColor(colorIdx);
             color = Color.Lerp(color, Color.white, .7f);
 
             guildSkill.Initialize(Name, color/*skillGroupColors[colorIdx]*/);
+#endif
             skillGroupPrefabDic.Add(unitid, guildSkill);
 
             skillGroupList.Add(unitid);

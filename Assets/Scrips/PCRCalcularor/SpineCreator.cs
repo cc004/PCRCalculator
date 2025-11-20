@@ -11,7 +11,7 @@ namespace PCRCaculator
         public static SpineCreator Instance;
         public Material spineMaterial;
         //public Texture2D texture;
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
         }
@@ -20,13 +20,14 @@ namespace PCRCaculator
             int prefabOverride = -1)
         {
             //int skinID = prefabID >= 200000 ? prefabID : prefabID + 30;
-            Texture2D texture = new Texture2D(0, 0);
             var p = p0 ?? "spine_sdnormal_" + skinID + ".unity3d";
-            if (prefabOverride != -1) p = "spine_sdnormal_" + prefabOverride + ".unity3d";
             string ab_atlas = p;
-            
+            if (prefabOverride != -1) p = "spine_sdnormal_" + prefabOverride + ".unity3d";
             try
             {
+#if UNITY_5_3_OR_NEWER
+            Texture2D texture = new Texture2D(0, 0);
+            
                 //if (useAB)
                 //{
                     texture = ABExTool.GetAssetBundleByName<Texture2D>(p, (skinName ?? $"{(prefabOverride != -1 ? prefabOverride : skinID)}") + ".png");
@@ -47,9 +48,12 @@ namespace PCRCaculator
                     tempMateral.mainTexture.name = "force_override";//skinID.ToString();
                 tempMateral.mainTextureScale = new Vector2(1, 1);
                 tempMateral.mainTextureOffset = Vector2.zero;
-                //string path_atlas = Application.streamingAssetsPath + "/Datas/Unit/" + prefabID + "/" + skinID + ".atlas.txt";
-                //string path_skel = Application.streamingAssetsPath + "/Datas/Unit/" + prefabID + "/" + prefabID + ".skel.bytes";
-                TextAsset atlas;
+#else
+                Material tempMateral = null;
+#endif
+            //string path_atlas = Application.streamingAssetsPath + "/Datas/Unit/" + prefabID + "/" + skinID + ".atlas.txt";
+            //string path_skel = Application.streamingAssetsPath + "/Datas/Unit/" + prefabID + "/" + prefabID + ".skel.bytes";
+            TextAsset atlas;
                 //if (useAB)
                 //{
                     atlas = ABExTool.GetAssetBundleByName<TextAsset>(ab_atlas, (skinName ?? $"{(prefabOverride != -1 ? prefabOverride : skinID)}") + ".atlas.txt");
