@@ -19,7 +19,7 @@ namespace UnityEngine
             }
             catch
             {
-                Console.WriteLine($"www impl: failed to read file: " + url);
+                // Console.WriteLine($"www impl: failed to read file: " + url);
             }
         }
 

@@ -571,7 +571,7 @@ namespace UnityEngine
             internal double duration;
         }
     }
-    public class ParticleSystemRenderer
+    public class ParticleSystemRenderer : MonoBehaviour
     {
     }
     public class MissingReferenceException : Exception { }

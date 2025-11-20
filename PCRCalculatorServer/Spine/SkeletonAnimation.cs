@@ -132,7 +132,8 @@ namespace Spine.Unity
 
 		public void VisualUpdate()
         {
-            if (valid && vistualUpdateQueued)
+#if UNITY_5_3_OR_NEWER
+			if (valid && vistualUpdateQueued)
 			{
 				state.Apply(skeleton);
                 if (_UpdateLocal != null)
@@ -158,6 +159,7 @@ namespace Spine.Unity
                 base.LateUpdate();
                 lateUpdateQueued = false;
 			}
+#endif
         }
 
         public override void LateUpdate()

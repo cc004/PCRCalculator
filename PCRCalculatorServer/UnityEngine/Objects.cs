@@ -3,8 +3,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Numerics;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -27,65 +29,9 @@ public class Object
         set => m_Name = value;
     }
 
-    private static object Instantiate(object original, Dictionary<object, object> context)
-    {
-        if (original == null) return null;
-
-        var type = original.GetType();
-        object result;
-
-        if (type.IsPrimitive || type.IsEnum || type == typeof(string) || type == typeof(byte[]))
-            return original;
-
-        if (original is UnityEngine.Object)
-        {
-            if (context.TryGetValue(original, out var val))
-                return val;
-            result = Activator.CreateInstance(type);
-            context[original] = result;
-        }
-        else
-            result = Activator.CreateInstance(type);
-
-        foreach (var field in type.GetAllSerializedFields())
-        {
-            var fieldType = field.FieldType;
-
-            var src = field.GetValue(original);
-
-            if (fieldType.IsGenericType &&
-                fieldType.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                var newList = (IList)Activator.CreateInstance(fieldType);
-                var srcList = (IList)src;
-
-                foreach (var item in srcList)
-                    newList.Add(Instantiate(item, context));
-
-                field.SetValue(result, newList);
-            }
-            else if (fieldType.IsArray)
-            {
-                var srcList = (Array)src;
-                var newList = Array.CreateInstance(fieldType.GetElementType(), srcList.Length);
-
-                for (var i = 0; i < srcList.Length; ++i)
-                    newList.SetValue(Instantiate(srcList.GetValue(i), context), i);
-
-                field.SetValue(result, newList);
-            }
-            else
-            {
-                field.SetValue(result, Instantiate(src, context));
-            }
-        }
-
-        return result;
-    }
-
     public static UnityEngine.GameObject Instantiate(UnityEngine.GameObject original)
     {
-        return Instantiate(original, new Dictionary<object, object>()) as GameObject;
+        return IlEmitInstantiator.Instantiate(original) as GameObject;
     }
 
     public static GameObject Instantiate(UnityEngine.GameObject original, Transform parent, bool worldPositionStays = false)

@@ -71,7 +71,11 @@ public class Transform : Component, IEnumerable
         set => m_LocalScale = value;
     }
 
-    public struct Matrix4x4 { public float m00; }
+    public struct Matrix4x4
+    {
+        public float m00;
+    }
+
     public Matrix4x4 localToWorldMatrix = new Matrix4x4
     {
         m00 = 1.0f,

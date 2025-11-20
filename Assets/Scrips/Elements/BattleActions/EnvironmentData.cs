@@ -193,7 +193,9 @@ namespace Elements
             //     skillEffect.SetTimeToDie(true);
             // }
             // SetEnvironmentUI();
+#if UNITY_5_3_OR_NEWER
             BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true, SourceUnit.IsPlayerUnit);
+#endif
         }
 
         public void OnEnter(BasePartsData parts)
@@ -349,7 +351,10 @@ namespace Elements
 
             // skillEffect.InvokeInternalNameCall();
             // skillEffect.InvokeInternalInterfaceCall();
-            BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true, SourceUnit.IsPlayerUnit);
+
+#if UNITY_5_3_OR_NEWER
+                BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true, SourceUnit.IsPlayerUnit);
+#endif
         }
 
         public void UpdateEnvironmentCallback(BasePartsData unit)

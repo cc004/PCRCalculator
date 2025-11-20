@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-    public class Color
+    public struct Color
     {
         internal static Color white;
         internal static Color gray;

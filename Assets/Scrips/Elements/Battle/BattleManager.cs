@@ -541,7 +541,7 @@ namespace Elements.Battle
         private bool spacePressed = false;
 
         private Stopwatch stopWatch = new Stopwatch();
-        private bool battleFinishedProcessed = false;
+        public bool battleFinishedProcessed = false;
 
         public void Update()
         {
@@ -616,9 +616,13 @@ namespace Elements.Battle
                     deltaTimeAccumulated -= DeltaTime_60fps;
 
                     // UnityEngine.Debug.LogError(stopWatch.ElapsedMilliseconds);
+                    // Console.WriteLine($"{FrameCount} {GameState}");
                 }
+#if UNITY_5_3_OR_NEWER
                 while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
-
+#else
+                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && GameState == eBattleGameState.PLAY)) ;
+#endif
                 while (FrameCount < targetFrameCount && !IsFramePause)
                 {
                     updateFrame();
@@ -748,6 +752,7 @@ namespace Elements.Battle
             isUpdateFrameExecuted = true;
 
             var logicFrameCount = BattleHeaderController.CurrentFrameCount;
+#if UNITY_5_3_OR_NEWER
             foreach(var unit in UnitList)
             {
                 if (!IsSkillReady.ContainsKey(logicFrameCount))
@@ -756,6 +761,7 @@ namespace Elements.Battle
                 }
                 IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
             }
+#endif
 
             if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {
@@ -3448,12 +3454,14 @@ namespace Elements.Battle
 
         public void Awake()
         {
+#if UNITY_5_3_OR_NEWER
             // preload fxsk bundles
             foreach (var pair in ABExTool.mgrCharacter.registries)
             {
                 if (!pair.Key.StartsWith("a/all_fxsk_")) continue;
                 ABExTool.TryGetAssetBundleByName(pair.Key.Split("/")[1], false);
             }
+#endif
 
             Instance = this;
             isValid = true;

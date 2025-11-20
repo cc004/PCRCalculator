@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using PCRCaculator;
 using static SQLite4Unity3d.SQLite3;
 
 namespace UnityEngine
@@ -54,41 +55,7 @@ namespace UnityEngine
                 pathMap = map,
                 name = info["m_Name"].AsString
             };
-
-            var dependencies = new List<AssetBundle>();
-            dependencies.Add(result);
-
-            var cabCache = new Dictionary<string, AssetBundle>();
-
-            foreach (var val in info["m_Dependencies"]["Array"])
-            {
-                var depName = val.AsString;
-                if (loadedBundle.TryGetValue(depName, out var ab))
-                {
-                    cabCache[$"archive:/{ab.impl.name}/{ab.impl.name}"] = ab;
-                }
-                else
-                {
-                    Console.WriteLine($"assetbundle loader: dependency {depName} not found for bundle {result.name}");
-                }
-            }
-
             loadedBundle[result.name] = result;
-            foreach (var ext in result.impl.file.Metadata.Externals)
-            {
-                if (cabCache.TryGetValue(ext.PathName, out var val))
-                {
-                    dependencies.Add(val);
-                }
-                else
-                {
-                    // Console.WriteLine($"assetbundle loader: external {ext.PathName} not found for bundle {result.name}");
-                    dependencies.Add(null);
-                }
-            }
-
-            result.dependencies = dependencies.ToArray();
-
             return result;
         }
 
@@ -102,8 +69,55 @@ namespace UnityEngine
         }
 
         private AssetBundle[] dependencies;
+
+        private void LoadDeps()
+        {
+            if (this.dependencies != null) return;
+
+
+            var dependencies = new List<AssetBundle>();
+            dependencies.Add(this);
+
+            var cabCache = new Dictionary<string, AssetBundle>();
+
+            var info = am.GetBaseField(impl, impl.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+
+            foreach (var val in info["m_Dependencies"]["Array"])
+            {
+                var depName = val.AsString;
+                if (loadedBundle.TryGetValue(depName, out var ab))
+                {
+                    cabCache[$"archive:/{ab.impl.name}/{ab.impl.name}"] = ab;
+                }
+                else
+                {
+                    ab = ABExTool.TryGetAssetBundleByName(depName, false);
+                    if (ab == null)
+                        Console.WriteLine($"assetbundle loader: dependency {depName} not found for bundle {name}");
+                    else
+                        cabCache[$"archive:/{ab.impl.name}/{ab.impl.name}"] = ab;
+                }
+            }
+
+            foreach (var ext in impl.file.Metadata.Externals)
+            {
+                if (cabCache.TryGetValue(ext.PathName, out var val))
+                {
+                    dependencies.Add(val);
+                }
+                else
+                {
+                    // Console.WriteLine($"assetbundle loader: external {ext.PathName} not found for bundle {result.name}");
+                    dependencies.Add(null);
+                }
+            }
+
+            this.dependencies = dependencies.ToArray();
+
+        }
         internal T LoadAsset<T>(string path_0) where T : Object
         {
+            LoadDeps();
             return ObjectManager.Deserialize<T>(pathMap[path_0].Single(), this);
         }
 
@@ -189,6 +203,18 @@ namespace UnityEngine
                             if (fields.TryGetValue(name, out var val))
                                 field.SetValue(obj, val.AsInt);
                         };
+                    else if (fieldType == typeof(float))
+                        result += (obj, fields, resolver) =>
+                        {
+                            if (fields.TryGetValue(name, out var val))
+                                field.SetValue(obj, val.AsFloat);
+                        };
+                    else if (fieldType == typeof(double))
+                        result += (obj, fields, resolver) =>
+                        {
+                            if (fields.TryGetValue(name, out var val))
+                                field.SetValue(obj, val.AsDouble);
+                        };
                     else if (fieldType == typeof(bool))
                         result += (obj, fields, resolver) =>
                         {
@@ -201,6 +227,19 @@ namespace UnityEngine
                             if (fields.TryGetValue(name, out var val))
                                 field.SetValue(obj, val.AsByteArray);
                         };
+                    else if (fieldType.IsEnum)
+                    {
+                        Type underlying = Enum.GetUnderlyingType(fieldType);
+                        result += (obj, fields, resolver) =>
+                        {
+                            if (fields.TryGetValue(name, out var val))
+                            {
+                                object raw = Convert.ChangeType(val.AsLong, underlying);
+                                field.SetValue(obj, raw);
+                            }
+                        };
+
+                    }
                     else if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
                     {
                         var elementType = fieldType.GenericTypeArguments[0];
@@ -281,11 +320,15 @@ namespace UnityEngine
                 {
                     Type GetTypeFromMonoscript(AssetTypeValueField root)
                     {
-                        root = am.GetBaseField(context.dependencies[root["m_FileID"].AsLong].impl, root["m_PathID"].AsLong);
+                        if (root["m_PathID"].AsLong == 0) return typeof(MonoBehaviour);
+
+                        var fileId = root["m_FileID"].AsLong;
+                        root = am.GetBaseField((fileId == 0 ? context : context.dependencies[fileId]).impl,
+                            root["m_PathID"].AsLong);
                         var scriptType = root["m_Namespace"].AsString + "." + root["m_ClassName"].AsString;
                         var typeInst = Type.GetType(scriptType);
-                        if (typeInst == null)
-                            Console.WriteLine("script type load failed: " + scriptType);
+                        //  if (typeInst == null)
+                        //     Console.WriteLine("script type load failed: " + scriptType);
                         return typeInst;
                     }
 
@@ -296,7 +339,10 @@ namespace UnityEngine
                         "MonoBehaviour" => GetTypeFromMonoscript(field["m_Script"]),
                         "Transform" => typeof(Transform),
                         "TextAsset" => typeof(TextAsset),
-                        _ => type
+                        "ParticleSystem" => typeof(ParticleSystem),
+                        "ParticleSystemRenderer" => typeof(ParticleSystemRenderer),
+                        "Animator" => typeof(Animator),
+                        _ => throw new NotImplementedException()
                     };
                     if (type == null)
                     {
@@ -318,7 +364,7 @@ namespace UnityEngine
                     DeserializeSingle(pair.root, pair.obj, (p, type) =>
                     {
                         if (p.pathId == 0) return null;
-                        var ctx = t.dependencies[p.fileId];
+                        var ctx = p.fileId == 0 ? t : t.dependencies[p.fileId];
                         if (pool.TryGetValue((ctx.name, p.pathId), out var val)) return val;
 
                         return EnqueueObject(ctx, p.pathId, type);

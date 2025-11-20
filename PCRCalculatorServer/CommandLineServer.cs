@@ -32,6 +32,7 @@ public class CommandLineServer : MonoBehaviour
         {
             unitParent = new(),
             enemyParent = new(),
+            firearmPrefab = new ()
         }.Awake();
         new BattleHeaderController().Awake();
         new BattleUIManager()
@@ -81,44 +82,55 @@ public class CommandLineServer : MonoBehaviour
 
         var watch = new Stopwatch();
         var times = 0;
+        var i = 0;
+        var unit = MainManager.Instance.UnitRarityDic.Keys.ToArray();
+        watch.Start();
+        long last = 0;
+
+        long s = 0;
 
         for (;;)
         {
             BattleManager.Instance.enabled = false;
             BattleManager.Instance.battleFinished = false;
-
+            BattleManager.Instance.battleFinishedProcessed = false;
+            
             MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
             {
                 PlayerList = [
-                    new PCRCaculator.UnitData(100101, 200, 3, 20),
-                    new PCRCaculator.UnitData(100201, 200, 3, 20),
-                    new PCRCaculator.UnitData(100301, 200, 3, 20),
-                    new PCRCaculator.UnitData(100401, 200, 3, 20),
-                    new PCRCaculator.UnitData(100501, 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 0], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 1], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 2], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 3], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 4], 200, 3, 20),
                 ],
                 EnemyList = [
-                    new PCRCaculator.UnitData(100601, 200, 3, 20),
-                    new PCRCaculator.UnitData(100701, 200, 3, 20),
-                    new PCRCaculator.UnitData(100801, 200, 3, 20),
-                    new PCRCaculator.UnitData(100901, 200, 3, 20),
-                    new PCRCaculator.UnitData(101001, 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 5], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 6], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 7], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 8], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 9], 200, 3, 20),
                 ],
                 IsGuildBattle = false,
             });
-
             ++times;
-            if (times == 1) watch.Start();
 
-            while (!BattleManager.Instance.battleFinished)
-                CoroutineRunner.Update();
+            BattleManager.Instance.skipping = true;
 
-            Console.WriteLine("模拟结果：");
-            foreach (var unit in BattleManager.Instance.UnitList.Concat(BattleManager.Instance.EnemyList))
+            while (!BattleManager.Instance.battleFinishedProcessed)
             {
-                Console.WriteLine($"{unit.UnitName} HP = {(long)unit.Hp}");
+                CoroutineRunner.Update();
             }
-            if (times > 1)
-                Console.WriteLine($"平均时间：{watch.ElapsedMilliseconds / (times - 1)}ms");
+            /*
+            Console.WriteLine("模拟结果：");
+            foreach (var u in BattleManager.Instance.UnitList.Concat(BattleManager.Instance.EnemyList))
+            {
+                Console.WriteLine($"{u.UnitName} HP = {(long)u.Hp}");
+            }*/
+            var now = watch.ElapsedMilliseconds;
+            s += BattleManager.Instance.FrameCount;
+            Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount} frames 模拟时间：{now - last}ms 模拟速度 {s * 1000 / now} fps");
+            last = now;
         }
 
 

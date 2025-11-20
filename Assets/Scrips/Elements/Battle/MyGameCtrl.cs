@@ -676,6 +676,9 @@ namespace Elements
             b.transform.SetParent(unitParent);
             b.name = unitid + "(clone)";
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
+#if !UNITY_5_3_OR_NEWER
+            unitCtrl.Awake();
+#endif
             unitCount.TryGetValue(unitid, out var val);
             unitCount[unitid] = val + 1;
             unitCtrl.UnitName = mainManager.GetUnitNickName(unitid) + $"[召唤物{val+1}]";

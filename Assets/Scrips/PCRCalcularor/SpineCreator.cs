@@ -1,7 +1,8 @@
-﻿using System;
-using System.IO;
-using PCR_cysp2skel;
+﻿using PCR_cysp2skel;
+using Spine;
 using Spine.Unity;
+using System;
+using System.IO;
 using UnityEngine;
 
 namespace PCRCaculator
@@ -15,10 +16,16 @@ namespace PCRCaculator
         {
             Instance = this;
         }
-
+#if !UNITY_5_3_OR_NEWER
+        private static Dictionary<(int, float, bool ,string, string, int), SkeletonDataAsset> _skeletonCache = new(); // 缓存skeletondata加速，unity端并非瓶颈 不适用
+#endif
         public SkeletonDataAsset Createskeletondata(int skinID, float scale = 0.5f, bool useAB = false, string p0 = null, string skinName = null,
             int prefabOverride = -1)
         {
+#if !UNITY_5_3_OR_NEWER
+            var cacheKey = (skinID, scale, useAB, p0, skinName, prefabOverride);
+            if (_skeletonCache.TryGetValue(cacheKey, out var val)) return val;
+#endif
             //int skinID = prefabID >= 200000 ? prefabID : prefabID + 30;
             var p = p0 ?? "spine_sdnormal_" + skinID + ".unity3d";
             string ab_atlas = p;
@@ -77,6 +84,7 @@ namespace PCRCaculator
                     ? SkeletonDataAsset.CreateRuntimeInstance(ABExTool.GetAssetBundleByName<TextAsset>(p0, ".skel").bytes, skelName, atlasAsset, true, scale)
                     : SkeletonDataAsset.CreateRuntimeInstance(MainTransClass.GetUnitSkelBytes(skinID - skinID / 10 % 10 * 10, atlasAsset), skelName, atlasAsset, true, scale);
                 //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonData); // Spawn a new SkeletonAnimation GameObject.
+                _skeletonCache[cacheKey] = skeletonData;
                 return skeletonData;
             }
 #if UNITY_EDITOR

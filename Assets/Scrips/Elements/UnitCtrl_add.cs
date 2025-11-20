@@ -28,7 +28,11 @@ namespace Elements
         internal CharacterPageButton unitUI;
         private CharacterBuffUIController unitBuffUI;
         private BattleUIManager uIManager => BattleUIManager.Instance;
+#if UNITY_5_3_OR_NEWER
         public PCRCaculator.UnitData unitData;
+#else
+        public PCRCaculator.UnitData unitData = new();
+#endif
         public UnitParameter unitParameter;
         public string UnitName = "", UnitNameEx = "";
         public int posIdx;//0-4

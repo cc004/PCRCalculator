@@ -4378,7 +4378,7 @@ this.updateCurColor();
             SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
                 NoSkipOnTPChanged?.Invoke(UnitId,Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
-            if(uIManager!=null)
+            if(!battleManager.skipping && uIManager != null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
 
@@ -5312,7 +5312,9 @@ this.updateCurColor();
             stateCategoryData.ShowsIcon = _showsIconAfterSwitch;
             EnableAbnormalState(abnormalState, true);
             stateCategoryData.CurrentAbnormalState = abnormalState;
+#if UNITY_5_3_OR_NEWER
             StartCoroutine(waitRefreshAbnormalStateUI(abnormalState));
+#endif
             /*for (int index = 0; index < stateCategoryData.Effects.Count; ++index)
             {
                 if ((UnityEngine.Object)stateCategoryData.Effects[index].RightEffect != (UnityEngine.Object)null)

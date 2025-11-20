@@ -71,8 +71,9 @@ namespace Elements
                 this.initializeSkillEffect();
                 break;
             }*/
+#if UNITY_5_3_OR_NEWER
             BattleUIManager.Instance.StartFieldEffect(this);
-
+#endif
             base.StartField();
         }
 
