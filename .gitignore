@@ -21,6 +21,7 @@ Assets/Resources/BillingMode.json
 
 # 忽略所有 .csproj 文件
 *.csproj
+*.csproj.user
 !PCRCalculatorServer/PCRCalculatorServer.csproj
 
 # 忽略 UserSettings 目录及其内容
