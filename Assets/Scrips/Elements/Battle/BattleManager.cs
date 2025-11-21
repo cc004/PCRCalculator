@@ -642,7 +642,7 @@ namespace Elements.Battle
             }
 
             eof:
-            return;//unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate());
+            unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate());
         }
 
         public bool stepping = false;
