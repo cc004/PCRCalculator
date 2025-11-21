@@ -491,7 +491,11 @@ namespace Elements.Battle
                 // 如果已经标记为失败，直接返回
                 if (task.Status == BattleStatus.Failed)
                 {
-                    Debug.LogWarning($"[BattleSimulationServer] 战斗已标记为失败: {task.ErrorMessage}");
+                    var playerList = MyGameCtrl.Instance.tempData.playerList;
+                    var enemyList = MyGameCtrl.Instance.tempData.enemyList;
+                    var player_name = string.Join(", ", playerList?.Select(u => u.GetUnitName()) ?? new List<string>());
+                    var enemy_name = string.Join(", ", enemyList?.Select(u => u.GetUnitName()) ?? new List<string>());
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗 {player_name} vs {enemy_name} 已标记为失败: {task.ErrorMessage}");
                     return;
                 }
 
