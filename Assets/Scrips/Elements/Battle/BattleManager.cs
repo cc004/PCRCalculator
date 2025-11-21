@@ -5694,10 +5694,5 @@ namespace Elements.Battle
                 })
                 .Aggregate(1.0, (val, reduction) => val - reduction);
         }
-
-        internal void SetSkillExeScreenActive(UnitCtrl unit, object black)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
