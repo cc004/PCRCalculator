@@ -48,7 +48,7 @@ namespace UnityEngine
                 case PlatformID.Win32Windows:
                     // Windows: %APPDATA%\[CompanyName]\[ProductName]
                     return Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low",
                         companyName,
                         productName);
 
