@@ -137,30 +137,35 @@ public class CommandLineServer : MonoBehaviour
                 BattleManager.Instance.enabled = false;
                 BattleManager.Instance.battleFinished = false;
                 BattleManager.Instance.battleFinishedProcessed = false;
-                
+
                 MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
                 {
                     PlayerList = [
-                        new PCRCaculator.UnitData(unit[i + 0], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 1], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 2], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 3], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 4], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(100701, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(104601, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(113401, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(110301, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(101801, 200, 3, 20).Max(),
                     ],
                     EnemyList = [
-                        new PCRCaculator.UnitData(unit[i + 5], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 6], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 7], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 8], 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(unit[i + 9], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(106601, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(101101, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(112201, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(129001, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(100801, 200, 3, 20).Max(),
                     ],
                     IsGuildBattle = false,
                     IsAutoMode = true
                 });
+                var seed = 1714804813;
+                MyGameCtrl.Instance.tempData.randomData = new();
+                MyGameCtrl.Instance.tempData.randomData.RandomSeed = seed;
+                Console.WriteLine("seed: " + seed);
+                /*
 
                 MyGameCtrl.Instance.tempData.randomData = new();
                 MyGameCtrl.Instance.tempData.randomData.RandomSeed = 1128444592;
-
+                */
                 ++times;
 
                 MyGameCtrl.Instance.tempData.skipping = true;

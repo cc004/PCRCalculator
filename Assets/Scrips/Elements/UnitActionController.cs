@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Cute;
 using Elements.Battle;
@@ -15,6 +16,7 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using Spine;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Elements
 {
@@ -2437,6 +2439,7 @@ namespace Elements
                 Func<BasePartsDataEx, DoubleWithEx> getter)
             {
                 if (_actionParameter.TargetNum != 1) return;
+                if (_actionParameter.TargetList.Count == 0) return;
                 var nth = _actionParameter.TargetNth;
                 var tgt = targetList[Math.Min(lst.Count - 1, nth)];
                 var tgth = tgt.GetHashCode();
