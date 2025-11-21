@@ -6,10 +6,12 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -26,9 +28,13 @@ public static class UnitDataExtension
 }
 public class CommandLineServer : MonoBehaviour
 {
-    public static bool serverMode = true;
+    public static bool serverMode = false;
     private static int serverPort = 8080;
     private static string targetScene = "BattleScene";
+    
+    // 用于优雅关闭的信号
+    private static readonly CancellationTokenSource shutdownTokenSource = new CancellationTokenSource();
+    private static readonly ManualResetEvent serverReadyEvent = new ManualResetEvent(false);
 
     public static void Main(string[] args)
     {
@@ -110,56 +116,73 @@ public class CommandLineServer : MonoBehaviour
 
         long s = 0, s2 = 0;
 
-        for (;;)
+        if (serverMode)
         {
-            BattleManager.Instance.enabled = false;
-            BattleManager.Instance.battleFinished = false;
-            BattleManager.Instance.battleFinishedProcessed = false;
+            new BattleSimulationServer().Awake();
+            BattleSimulationServer.Instance.port = serverPort;
+            BattleSimulationServer.Instance.StartServer();
+            Debug.Log($"服务器模式已启动，监听端口 {serverPort}");
             
-            MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
+            serverReadyEvent.Set();
+            shutdownTokenSource.Token.WaitHandle.WaitOne();
+            
+            // 优雅关闭
+            Debug.Log("服务器正在关闭...");
+            BattleSimulationServer.Instance.StopServer();
+        }
+        else
+        {
+            for (;;)
             {
-                PlayerList = [
-                    new PCRCaculator.UnitData(unit[i + 0], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 1], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 2], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 3], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 4], 200, 3, 20).Max(),
-                ],
-                EnemyList = [
-                    new PCRCaculator.UnitData(unit[i + 5], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 6], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 7], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 8], 200, 3, 20).Max(),
-                    new PCRCaculator.UnitData(unit[i + 9], 200, 3, 20).Max(),
-                ],
-                IsGuildBattle = false,
-                IsAutoMode = true
-            });
+                BattleManager.Instance.enabled = false;
+                BattleManager.Instance.battleFinished = false;
+                BattleManager.Instance.battleFinishedProcessed = false;
+                
+                MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
+                {
+                    PlayerList = [
+                        new PCRCaculator.UnitData(unit[i + 0], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 1], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 2], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 3], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 4], 200, 3, 20).Max(),
+                    ],
+                    EnemyList = [
+                        new PCRCaculator.UnitData(unit[i + 5], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 6], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 7], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 8], 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(unit[i + 9], 200, 3, 20).Max(),
+                    ],
+                    IsGuildBattle = false,
+                    IsAutoMode = true
+                });
 
-            MyGameCtrl.Instance.tempData.randomData = new();
-            MyGameCtrl.Instance.tempData.randomData.RandomSeed = 1128444592;
+                MyGameCtrl.Instance.tempData.randomData = new();
+                MyGameCtrl.Instance.tempData.randomData.RandomSeed = 1128444592;
 
-            ++times;
+                ++times;
 
-            MyGameCtrl.Instance.tempData.skipping = true;
-            BattleManager.Instance.skipping = true;
+                MyGameCtrl.Instance.tempData.skipping = true;
+                BattleManager.Instance.skipping = true;
 
-            while (!BattleManager.Instance.battleFinishedProcessed)
-            {
-                CoroutineRunner.Update();
+                while (!BattleManager.Instance.battleFinishedProcessed)
+                {
+                    CoroutineRunner.Update();
+                }
+                /*
+                Console.WriteLine("模拟结果：");
+                foreach (var u in BattleManager.Instance.UnitList.Concat(BattleManager.Instance.EnemyList))
+                {
+                    Console.WriteLine($"{u.UnitName} HP = {(long)u.Hp}");
+                }*/
+                var now = watch.ElapsedMilliseconds;
+                s += BattleManager.Instance.FrameCount;
+                s2 += BattleHeaderController.CurrentFrameCount;
+                Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
+                                $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps");
+                last = now;
             }
-            /*
-            Console.WriteLine("模拟结果：");
-            foreach (var u in BattleManager.Instance.UnitList.Concat(BattleManager.Instance.EnemyList))
-            {
-                Console.WriteLine($"{u.UnitName} HP = {(long)u.Hp}");
-            }*/
-            var now = watch.ElapsedMilliseconds;
-            s += BattleManager.Instance.FrameCount;
-            s2 += BattleHeaderController.CurrentFrameCount;
-            Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
-                              $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps");
-            last = now;
         }
 
 
@@ -218,4 +241,12 @@ public class CommandLineServer : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 触发服务器关闭信号（可从其他线程调用）
+    /// </summary>
+    public static void RequestShutdown()
+    {
+        Debug.Log("收到关闭请求");
+        shutdownTokenSource.Cancel();
+    }
 }

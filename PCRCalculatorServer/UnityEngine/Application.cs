@@ -67,6 +67,7 @@ namespace UnityEngine
                         // Linux
                         return Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                            "unity3d",
                             companyName,
                             productName);
                     }

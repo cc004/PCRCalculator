@@ -94,6 +94,7 @@ namespace Elements.Battle
 
     public class BattleSimulationServer : MonoBehaviour
     {
+        public static BattleSimulationServer Instance;
         private HttpListener httpListener;
         private Thread listenerThread;
         private Thread queueProcessorThread;
@@ -107,6 +108,18 @@ namespace Elements.Battle
         private object queueLock = new object();
         private bool isProcessing = false;
 
+        public void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
         void OnEnable()
         {
             StartServer();
@@ -273,6 +286,7 @@ namespace Elements.Battle
                 }
 
                 // 更新 UI
+                #if UNITY_5_3_OR_NEWER 
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -287,6 +301,7 @@ namespace Elements.Battle
                     }
                     catch { }
                 });
+                #endif
 
                 // 返回 UID
                 var response = new BattleSubmitResponse
@@ -418,6 +433,7 @@ namespace Elements.Battle
                 Debug.Log($"[BattleSimulationServer] ProcessBattle 开始: UID={task.Uid}");
                 
                 // 更新 UI
+                #if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -428,9 +444,11 @@ namespace Elements.Battle
                     }
                     catch { }
                 });
+                #endif
 
                 // 按照 GAUBOptimization.cs 的方式：在主线程中调用 StartByServer，然后在后台线程等待
                 MyGameCtrl.Instance.isBattleFinish = false;
+                #if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -450,6 +468,25 @@ namespace Elements.Battle
                 {
                     Thread.Sleep(100);
                 }
+                #else
+                try
+                {
+                    BattleManager.Instance.enabled = false;
+                    BattleManager.Instance.battleFinished = false;
+                    BattleManager.Instance.battleFinishedProcessed = false;
+                    MyGameCtrl.Instance.StartByServer(task.Request);
+                    while (!MyGameCtrl.Instance.isBattleFinish)
+                    {
+                        UnityEngine.CoroutineRunner.Update();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[BattleSimulationServer] StartByServer 失败: {ex.Message}\n{ex.StackTrace}");
+                    task.Status = BattleStatus.Failed;
+                    task.ErrorMessage = ex.Message;
+                }
+                #endif
 
                 // 如果已经标记为失败，直接返回
                 if (task.Status == BattleStatus.Failed)
@@ -490,9 +527,9 @@ namespace Elements.Battle
                     };
 
                     task.Status = BattleStatus.Completed;
-                    Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}");
+                    Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}, Seed={currentSeed}");
 
-                    // 更新 UI 日志
+                    #if UNITY_5_3_OR_NEWER
                     UnityMainThreadDispatcher.Instance().Enqueue(() => {
                         try
                         {
@@ -503,6 +540,7 @@ namespace Elements.Battle
                         }
                         catch { }
                     });
+                    #endif
                 }
                 catch (Exception ex)
                 {
@@ -510,6 +548,7 @@ namespace Elements.Battle
                     task.Status = BattleStatus.Failed;
                     task.ErrorMessage = $"获取战斗结果失败: {ex.Message}";
                     
+                    #if UNITY_5_3_OR_NEWER 
                     UnityMainThreadDispatcher.Instance().Enqueue(() => {
                         try
                         {
@@ -520,6 +559,7 @@ namespace Elements.Battle
                         }
                         catch { }
                     });
+                    #endif
                 }
             }
             catch (Exception ex)

@@ -119,10 +119,14 @@ namespace Elements
             staticBattleManager = BattleManager.Instance;
             mainManager = MainManager.Instance;
             tempData = new TempData();
+            #if UNITY_5_3_OR_NEWER
             if (CommandLineServer.serverMode)
             {
                 return;
             }
+            #else
+                return;
+            #endif
             if (MainManager.Instance == null)
             {
                 return;
