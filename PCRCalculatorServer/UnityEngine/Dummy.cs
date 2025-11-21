@@ -67,7 +67,8 @@ namespace UnityEngine
     }
     public class Bounds
     {
-        private Vector3 m_Center, m_Extent;
+        [SerializeField] private Vector3 m_Center;
+        [SerializeField] private Vector3 m_Extent;
 
         internal Vector3 center
         {

@@ -84,12 +84,12 @@ namespace Elements.Battle
         public Camera playCamera;
         [SerializeField]
         public Transform bgTransform;
+
+        [SerializeField] private float energyGainValueSkillFront = 90;
         [SerializeField]
-        private float energyGainValueSkillFront;
+        private float energyGainValueSkillMiddle = 90;
         [SerializeField]
-        private float energyGainValueSkillMiddle;
-        [SerializeField]
-        private float energyGainValueSkillBack;
+        private float energyGainValueSkillBack = 90;
         [SerializeField]
         private float energyStackValueDefeat = 200;//300f;
         [SerializeField]
@@ -642,7 +642,7 @@ namespace Elements.Battle
             }
 
             eof:
-            unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate());
+            return;//unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate());
         }
 
         public bool stepping = false;
@@ -4107,6 +4107,7 @@ namespace Elements.Battle
             //int seed = 666;//battleManager.battleProcessor.GetSeed();
             // int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
             int seed = new System.Random().Next();
+#if UNITY_5_3_OR_NEWER
             if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
@@ -4119,7 +4120,20 @@ namespace Elements.Battle
                 //UnityRandom.InitState(seed);
                 gameCtrl.CurrentSeedForSave = seed;
             }
-
+#else
+            if (tempData.randomData != null && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
+            {
+                UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
+                //UnityRandom.InitState(tempData.randomData.RandomSeed);
+                gameCtrl.CurrentSeedForSave = tempData.randomData.RandomSeed;
+            }
+            else
+            {
+                UnityEngine.Random.InitState(seed);
+                //UnityRandom.InitState(seed);
+                gameCtrl.CurrentSeedForSave = seed;
+            }
+#endif
             /*
             // start calc exp
 

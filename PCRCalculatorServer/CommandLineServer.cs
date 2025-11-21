@@ -13,7 +13,17 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using UnitData = PCRCaculator.UnitData;
 
+public static class UnitDataExtension
+{
+    public static UnitData Max(this UnitData data)
+    {
+        data.SetMax();
+        data.SetMaxLove();
+        return data;
+    }
+}
 public class CommandLineServer : MonoBehaviour
 {
     public static bool serverMode = true;
@@ -28,10 +38,20 @@ public class CommandLineServer : MonoBehaviour
         new SpineCreator().Awake();
         new BaseBackManager().Awake();
         new MainManager().Awake();
+        const float parentScale = 1 / 540f;
+        const float parentOffset = 5000f * parentScale;
         new MyGameCtrl()
         {
-            unitParent = new(),
-            enemyParent = new(),
+            unitParent = new()
+            {
+                localScale = parentScale * Vector3.one,
+                localPosition = new Vector3(0, parentOffset, 0)
+            },
+            enemyParent = new()
+            {
+                localScale = parentScale * Vector3.one,
+                localPosition = new Vector3(0, parentOffset, 0)
+            },
             firearmPrefab = new ()
         }.Awake();
         new BattleHeaderController().Awake();
@@ -54,11 +74,12 @@ public class CommandLineServer : MonoBehaviour
         while (!MainManager.Instance.LoadFinished)
             Thread.Sleep(0);
 
+        var a = ABExTool.TryGetAssetBundleByName("bdl_battlemanager.unity3d", false);
         new BattleManager()
         {
             gameObject = new(),
             playCamera = new(),
-            bgTransform = new(),
+            bgTransform = new()
         }.Awake();
         BattleUIManager.Instance.Start();
 
@@ -87,7 +108,7 @@ public class CommandLineServer : MonoBehaviour
         watch.Start();
         long last = 0;
 
-        long s = 0;
+        long s = 0, s2 = 0;
 
         for (;;)
         {
@@ -98,23 +119,29 @@ public class CommandLineServer : MonoBehaviour
             MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
             {
                 PlayerList = [
-                    new PCRCaculator.UnitData(unit[i + 0], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 1], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 2], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 3], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 4], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 0], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 1], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 2], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 3], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 4], 200, 3, 20).Max(),
                 ],
                 EnemyList = [
-                    new PCRCaculator.UnitData(unit[i + 5], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 6], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 7], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 8], 200, 3, 20),
-                    new PCRCaculator.UnitData(unit[i + 9], 200, 3, 20),
+                    new PCRCaculator.UnitData(unit[i + 5], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 6], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 7], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 8], 200, 3, 20).Max(),
+                    new PCRCaculator.UnitData(unit[i + 9], 200, 3, 20).Max(),
                 ],
                 IsGuildBattle = false,
+                IsAutoMode = true
             });
+
+            MyGameCtrl.Instance.tempData.randomData = new();
+            MyGameCtrl.Instance.tempData.randomData.RandomSeed = 1128444592;
+
             ++times;
 
+            MyGameCtrl.Instance.tempData.skipping = true;
             BattleManager.Instance.skipping = true;
 
             while (!BattleManager.Instance.battleFinishedProcessed)
@@ -129,7 +156,9 @@ public class CommandLineServer : MonoBehaviour
             }*/
             var now = watch.ElapsedMilliseconds;
             s += BattleManager.Instance.FrameCount;
-            Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount} frames 模拟时间：{now - last}ms 模拟速度 {s * 1000 / now} fps");
+            s2 += BattleHeaderController.CurrentFrameCount;
+            Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
+                              $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps");
             last = now;
         }
 

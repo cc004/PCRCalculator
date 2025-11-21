@@ -302,6 +302,11 @@ namespace Elements
             // Players: assume request provides PCRCaculator.UnitData list
             tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
 
+            tempData.playerList = tempData.playerList
+                .OrderBy(u => mainManager.UnitRarityDic[u.unitId].detailData.searchAreaWidth)
+                .ThenBy(u => u.unitId)
+                .ToList();
+
             if (req.ToMaxUnitAttr)
             {
                 foreach (var player in tempData.playerList)
@@ -321,6 +326,11 @@ namespace Elements
             {
                 // Non guild: directly use provided enemy list
                 tempData.enemyList = req.EnemyList ?? new List<PCRCaculator.UnitData>();
+
+                tempData.enemyList = tempData.enemyList
+                    .OrderBy(u => mainManager.UnitRarityDic[u.unitId].detailData.searchAreaWidth)
+                    .ThenBy(u => u.unitId)
+                    .ToList();
 
                 if (req.ToMaxUnitAttr)
                 {

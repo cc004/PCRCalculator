@@ -1,5 +1,6 @@
 ﻿// UnityEngine.Transform
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -25,7 +26,15 @@ public class Transform : Component, IEnumerable
     [SerializeField]
     private Transform m_Father;
 
-    public Vector3 position { get; set; }
+    public Vector3 position
+    {
+        get => parent == null ? localPosition : parent.position + Vector3.Scale(localPosition, parent.lossyScale);
+        set => localPosition = parent == null ? value : new Vector3(
+            (value.x - parent.position.x) / parent.lossyScale.x,
+            (value.y - parent.position.y) / parent.lossyScale.y,
+            (value.z - parent.position.z) / parent.lossyScale.z
+        );
+    }
 
     public Vector3 localPosition
     {
@@ -76,9 +85,9 @@ public class Transform : Component, IEnumerable
         public float m00;
     }
 
-    public Matrix4x4 localToWorldMatrix = new Matrix4x4
+    public Matrix4x4 localToWorldMatrix => new Matrix4x4
     {
-        m00 = 1.0f,
+        m00 = lossyScale.x,
     };
 
     public Transform parent
@@ -89,7 +98,7 @@ public class Transform : Component, IEnumerable
 
     public int childCount => m_Children.Count;
 
-    public Vector3 lossyScale { get; } = Vector3.one;
+    public Vector3 lossyScale => parent == null ? localScale : Vector3.Scale(localScale, parent.lossyScale);
 
     public void SetParent(Transform parent, bool worldPositionStays = true)
     {

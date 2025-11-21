@@ -2773,8 +2773,8 @@ this.updateCurColor();
                     Vector2 boundsSize = new Vector2(maxX - minX, maxY - minY);
 
                     // 用 transform.position 修正（如果需要）
-                    ColliderCenter = (boundsCenter - (Vector2)transform.position) / 2;
-                    ColliderSize = boundsSize / 2;
+                    ColliderCenter = Vector3.Scale(boundsCenter, transform.lossyScale) / 2;
+                    ColliderSize = Vector2.Scale(boundsSize, transform.lossyScale) / 2;
                     float coSize2 = ColliderSize.x / transform.lossyScale.x;
                     BodyWidth = coSize2 + BossBodyWidthOffset;
 #endif
@@ -10668,7 +10668,9 @@ this.updateCurColor();
                 component.SetPosition(this.GetFirstParts(true), Vector3.up * 0.1f * (float)this.energyHealComboCount, 1f);
                 component.SetSortOrder((this.IsFront ? 11500 : 0) + 11250);
                 component.SetDamageText(((int)num).ToString(), eDamageEffectColor.BLUE);*/
+#if UNITY_5_3_OR_NEWER
                 UIManager.SetEnergyNumber(gameObject.transform.position, (int)num);
+#endif
             }
             SetEnergy(Energy + num, _setEnergyType, _source);
             //if (!_hasEffect || _effectType != eEffectType.COMMON)

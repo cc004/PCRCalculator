@@ -243,41 +243,80 @@ namespace UnityEngine
                     else if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
                     {
                         var elementType = fieldType.GenericTypeArguments[0];
-                        result += (obj, fields, resolver) =>
+                        if (elementType.IsValueType)
                         {
-                            if (fields.TryGetValue(name, out var val))
+                            result += (obj, fields, resolver) =>
                             {
-                                var result = (IList)Activator.CreateInstance(fieldType);
-                                foreach (var child in val["Array"].Children)
+                                if (fields.TryGetValue(name, out var val))
                                 {
-                                    var o = Activator.CreateInstance(elementType);
-                                    DeserializeSingle(child, o, resolver);
-                                    result.Add(o);
-                                }
+                                    var result = (IList)Activator.CreateInstance(fieldType);
+                                    foreach (var child in val["Array"].Children)
+                                    {
+                                        result.Add(DeserializePrimitive(child, elementType));
+                                    }
 
-                                field.SetValue(obj, result);
-                            }
-                        };
+                                    field.SetValue(obj, result);
+                                }
+                            };
+                        }
+                        else
+                        {
+                            result += (obj, fields, resolver) =>
+                            {
+                                if (fields.TryGetValue(name, out var val))
+                                {
+                                    var result = (IList)Activator.CreateInstance(fieldType);
+                                    foreach (var child in val["Array"].Children)
+                                    {
+                                        var o = Activator.CreateInstance(elementType);
+                                        DeserializeSingle(child, o, resolver);
+                                        result.Add(o);
+                                    }
+
+                                    field.SetValue(obj, result);
+                                }
+                            };
+                        }
                     }
                     else if (fieldType.IsArray)
                     {
                         var elementType = fieldType.GetElementType();
-                        result += (obj, fields, resolver) =>
+                        if (elementType.IsValueType)
                         {
-                            if (fields.TryGetValue(name, out var val))
+                            result += (obj, fields, resolver) =>
                             {
-                                var arr = val["Array"].Children;
-                                var result = Array.CreateInstance(elementType, arr.Count);
-                                for (var i = 0; i < arr.Count; i++)
+                                if (fields.TryGetValue(name, out var val))
                                 {
-                                    var o = Activator.CreateInstance(elementType);
-                                    DeserializeSingle(arr[i], o, resolver);
-                                    result.SetValue(o, i);
-                                }
+                                    var arr = val["Array"].Children;
+                                    var result = Array.CreateInstance(elementType, arr.Count);
+                                    for (var i = 0; i < arr.Count; i++)
+                                    {
+                                        result.SetValue(DeserializePrimitive(arr[i], elementType), i);
+                                    }
 
-                                field.SetValue(obj, result);
-                            }
-                        };
+                                    field.SetValue(obj, result);
+                                }
+                            };
+                        }
+                        else
+                        {
+                            result += (obj, fields, resolver) =>
+                            {
+                                if (fields.TryGetValue(name, out var val))
+                                {
+                                    var arr = val["Array"].Children;
+                                    var result = Array.CreateInstance(elementType, arr.Count);
+                                    for (var i = 0; i < arr.Count; i++)
+                                    {
+                                        var o = Activator.CreateInstance(elementType);
+                                        DeserializeSingle(arr[i], o, resolver);
+                                        result.SetValue(o, i);
+                                    }
+
+                                    field.SetValue(obj, result);
+                                }
+                            };
+                        }
                     }
                     else if (fieldType.IsSubclassOf(typeof(UnityEngine.Object)))
                     {
@@ -304,6 +343,41 @@ namespace UnityEngine
                 }
 
                 return result;
+            }
+
+            private static object DeserializePrimitive(AssetTypeValueField child, Type elementType)
+            {
+                if (elementType == typeof(int))
+                    return child.AsInt;
+                if (elementType == typeof(uint))
+                    return child.AsUInt;
+                if (elementType == typeof(long))
+                    return child.AsLong;
+                if (elementType == typeof(ulong))
+                    return child.AsULong;
+                if (elementType == typeof(short))
+                    return child.AsShort;
+                if (elementType == typeof(ushort))
+                    return child.AsUShort;
+                if (elementType == typeof(byte))
+                    return child.AsByte;
+                if (elementType == typeof(sbyte))
+                    return child.AsSByte;
+                if (elementType == typeof(float))
+                    return child.AsFloat;
+                if (elementType == typeof(double))
+                    return child.AsDouble;
+                if (elementType == typeof(bool))
+                    return child.AsBool;
+                if (elementType == typeof(string))
+                    return child.AsString;
+                if (elementType.IsEnum)
+                {
+                    Type underlying = Enum.GetUnderlyingType(elementType);
+                    object raw = Convert.ChangeType(child.AsLong, underlying);
+                    return Enum.ToObject(elementType, raw);
+                }
+                throw new NotImplementedException();
             }
 
             private static void DeserializeSingle(AssetTypeValueField root, object result, Func<(long fileId, long pathId), Type, object> resolver)

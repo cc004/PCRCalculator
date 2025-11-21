@@ -84,7 +84,9 @@ namespace PCRCaculator
                     ? SkeletonDataAsset.CreateRuntimeInstance(ABExTool.GetAssetBundleByName<TextAsset>(p0, ".skel").bytes, skelName, atlasAsset, true, scale)
                     : SkeletonDataAsset.CreateRuntimeInstance(MainTransClass.GetUnitSkelBytes(skinID - skinID / 10 % 10 * 10, atlasAsset), skelName, atlasAsset, true, scale);
                 //var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonData); // Spawn a new SkeletonAnimation GameObject.
+#if !UNITY_5_3_OR_NEWER
                 _skeletonCache[cacheKey] = skeletonData;
+#endif
                 return skeletonData;
             }
 #if UNITY_EDITOR

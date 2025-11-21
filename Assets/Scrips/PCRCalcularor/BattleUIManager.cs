@@ -446,7 +446,9 @@ namespace PCRCaculator.Battle
             SetToggle.isOn = gameCtrl.IsSetMode;
             if (!myGameCtrl.tempData.isGuildBattle)
             {
+#if !UNITY_EDITOR
                 debugBack.SetActive(false);
+#endif
                 // backGroundImage.sprite = jjcBackGround;
             }
             StartCoroutine(AutoSaveImage2());
