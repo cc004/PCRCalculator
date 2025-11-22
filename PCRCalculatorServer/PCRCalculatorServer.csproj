@@ -29,12 +29,16 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Data/StreamingAssets/%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</Content>
+		<None Remove="request.json" />
 		<Content Include="../Assets/Plugins/x64/sqlite3.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>sqlite3.dll</Link>
 		</Content>
 		<Content Include="classdata.tpk">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="request.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<None Update="runtimeconfig.template.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

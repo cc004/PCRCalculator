@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using UnitData = PCRCaculator.UnitData;
@@ -140,21 +141,12 @@ public class CommandLineServer : MonoBehaviour
                 BattleManager.Instance.battleFinished = false;
                 BattleManager.Instance.battleFinishedProcessed = false;
 
-                MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
-                {
-                    PlayerList = [
-                        new PCRCaculator.UnitData(170101, 200, 3, 20).Max(),
-                    ],
-                    EnemyList = [
-                        new PCRCaculator.UnitData(170201, 200, 3, 20).Max(),
-                    ],
-                    IsGuildBattle = false,
-                    IsAutoMode = true
-                });
+                MyGameCtrl.Instance.StartByServer(JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request.json")));
+                /*
                 var seed = 1714804813;
                 MyGameCtrl.Instance.tempData.randomData = new();
                 MyGameCtrl.Instance.tempData.randomData.RandomSeed = seed;
-                Console.WriteLine("seed: " + seed);
+                Console.WriteLine("seed: " + seed);*/
                 /*
 
                 MyGameCtrl.Instance.tempData.randomData = new();

@@ -419,13 +419,11 @@ namespace Elements
                         }
                         if (timer >= _value && _source.CurrentState == UnitCtrl.ActionState.IDLE)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
-                            yield break;
+                            break;
                         }
                         if (_source.ToadDatas.Count > 0)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
-                            yield break;
+                            break;
                         }
                         break;
                     case eModeChangeType.ENERGY:
@@ -437,13 +435,11 @@ namespace Elements
                         }
                         if (_source.ToadDatas.Count > 0)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
-                            yield break;
+                            break;
                         }
                         if (_source.CurrentState == UnitCtrl.ActionState.IDLE && endFlag)
                         {
-                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
-                            yield break;
+                            break;
                         }
                         break;
                 }
@@ -459,6 +455,9 @@ namespace Elements
                 }
                 yield return null;
             }
+
+            if (_sourceActionController.IsCancelModeChangeByTrigger) // XXX: 临时修复
+                yield break;
             modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
         }
 

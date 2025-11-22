@@ -499,6 +499,7 @@ namespace Elements.Battle
                     var player_name = string.Join(", ", playerList?.Select(u => u.GetUnitName()) ?? new List<string>());
                     var enemy_name = string.Join(", ", enemyList?.Select(u => u.GetUnitName()) ?? new List<string>());
                     Debug.LogWarning($"[BattleSimulationServer] 战斗 {player_name} vs {enemy_name} 已标记为失败: {task.ErrorMessage}");
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
                     return;
                 }
 
