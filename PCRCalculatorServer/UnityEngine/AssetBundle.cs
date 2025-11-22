@@ -439,6 +439,7 @@ namespace UnityEngine
                     {
                         if (p.pathId == 0) return null;
                         var ctx = p.fileId == 0 ? t : t.dependencies[p.fileId];
+                        if (ctx == null) return null;
                         if (pool.TryGetValue((ctx.name, p.pathId), out var val)) return val;
 
                         return EnqueueObject(ctx, p.pathId, type);

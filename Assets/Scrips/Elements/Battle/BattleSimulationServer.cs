@@ -107,6 +107,7 @@ namespace Elements.Battle
         private Dictionary<string, BattleTask> battleTasks = new Dictionary<string, BattleTask>();
         private object queueLock = new object();
         private bool isProcessing = false;
+        public string host = "localhost";
 
         public void Awake()
         {
@@ -138,7 +139,7 @@ namespace Elements.Battle
             {
                 Debug.Log($"[BattleSimulationServer] 正在创建 HttpListener，端口: {port}");
                 httpListener = new HttpListener();
-                httpListener.Prefixes.Add($"http://localhost:{port}/");
+                httpListener.Prefixes.Add($"http://{host}:{port}/");
                 httpListener.Start();
                 Debug.Log("[BattleSimulationServer] HttpListener 已启动");
                 

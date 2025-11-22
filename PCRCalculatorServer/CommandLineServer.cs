@@ -30,6 +30,7 @@ public class CommandLineServer : MonoBehaviour
 {
     public static bool serverMode = false;
     private static int serverPort = 8080;
+    private static string serverHost = "localhost";
     private static string targetScene = "BattleScene";
     
     // 用于优雅关闭的信号
@@ -120,8 +121,9 @@ public class CommandLineServer : MonoBehaviour
         {
             new BattleSimulationServer().Awake();
             BattleSimulationServer.Instance.port = serverPort;
+            BattleSimulationServer.Instance.host = serverHost;
             BattleSimulationServer.Instance.StartServer();
-            Debug.Log($"服务器模式已启动，监听端口 {serverPort}");
+            Debug.Log($"服务器模式已启动，监听 http://{serverHost}:{serverPort}/");
             
             serverReadyEvent.Set();
             shutdownTokenSource.Token.WaitHandle.WaitOne();
@@ -141,18 +143,10 @@ public class CommandLineServer : MonoBehaviour
                 MyGameCtrl.Instance.StartByServer(new BattleSimulationRequest
                 {
                     PlayerList = [
-                        new PCRCaculator.UnitData(100701, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(104601, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(113401, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(110301, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(101801, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(170101, 200, 3, 20).Max(),
                     ],
                     EnemyList = [
-                        new PCRCaculator.UnitData(106601, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(101101, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(112201, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(129001, 200, 3, 20).Max(),
-                        new PCRCaculator.UnitData(100801, 200, 3, 20).Max(),
+                        new PCRCaculator.UnitData(170201, 200, 3, 20).Max(),
                     ],
                     IsGuildBattle = false,
                     IsAutoMode = true
@@ -214,6 +208,17 @@ public class CommandLineServer : MonoBehaviour
                     {
                         serverPort = port;
                         Debug.Log($"服务器端口设置为: {port}");
+                        i++; // 跳过下一个参数
+                    }
+                    break;
+
+                case "-host":
+                case "--host":
+                    if (i + 1 < args.Length)
+                    {
+                        var host = args[i + 1];
+                        serverHost = host;
+                        Debug.Log($"服务器绑定域名设置为: {host}");
                         i++; // 跳过下一个参数
                     }
                     break;
