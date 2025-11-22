@@ -232,6 +232,12 @@ namespace Elements.Battle
                     Debug.Log($"[BattleSimulationServer] 查询战斗结果: UID={uid}");
                     HandleQueryBattle(context, uid);
                 }
+                // GET /playerdata - 获取练度数据
+                else if (method == "GET" && path == "/playerdata")
+                {
+                    Debug.Log("[BattleSimulationServer] 获取练度数据请求");
+                    HandleGetPlayerData(context);
+                }
                 else
                 {
                     Debug.LogWarning($"[BattleSimulationServer] 未知的请求路径: {method} {path}");
@@ -389,6 +395,44 @@ namespace Elements.Battle
                     Success = false,
                     Message = $"查询失败: {ex.Message}",
                     Status = BattleStatus.Failed
+                }));
+            }
+        }
+
+        private void HandleGetPlayerData(HttpListenerContext context)
+        {
+            try
+            {
+                var guildManager = GuildManager.Instance;
+                var playerSetting = MainManager.Instance.PlayerSetting;
+
+                var response = new
+                {
+                    Success = true,
+                    PlayerLevel = playerSetting.playerLevel,
+                    PlayerRank = playerSetting.ProcessStr(),
+                    PlayerUniqueEqLv = playerSetting.maxUniqueEqLv,
+                    TalentLevel = guildManager.GetTalentLevelDescription(),
+                    TalentSkill = guildManager.GetFinalTalentSkillNodeDescription(),
+                    TeamSkill = guildManager.GetFinalTeamSkillNodeDescription(),
+                    Message = "成功获取练度数据"
+                };
+
+                SendResponse(context, 200, JsonConvert.SerializeObject(response));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BattleSimulationServer] 获取练度数据失败: {ex.Message}\n{ex.StackTrace}");
+                SendResponse(context, 500, JsonConvert.SerializeObject(new
+                {
+                    Success = false,
+                    PlayerLevel = 0,
+                    PlayerRank = (string)null,
+                    PlayerUniqueEqLv = 0,
+                    TalentLevel = (string)null,
+                    TalentSkill = (string)null,
+                    TeamSkill = (string)null,
+                    Message = $"获取练度数据失败: {ex.Message}"
                 }));
             }
         }

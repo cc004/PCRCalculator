@@ -115,6 +115,7 @@ namespace PCRCaculator.Guild
         public Toggle UseFixedRandomSeed;
         public InputField RandomSeedTalent;
         public Toggle UseFixedRandomSeedTalent;
+        public string[] TalentNames = { "火", "水", "风", "光", "暗" };
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
         public List<Text> TalentTexts;
@@ -1728,6 +1729,17 @@ namespace PCRCaculator.Guild
                 }
             }
         }
+        public string GetTalentLevelDescription()
+        {
+            var talentLevel = SettingData.GetCurrentPlayerGroup().talentLevel;
+            string description = $"{TalentNames[0]}{talentLevel.GetValueOrDefault(1, 0)}，" +
+                               $"{TalentNames[1]}{talentLevel.GetValueOrDefault(2, 0)}，" +
+                               $"{TalentNames[2]}{talentLevel.GetValueOrDefault(3, 0)}，" +
+                               $"{TalentNames[3]}{talentLevel.GetValueOrDefault(4, 0)}，" +
+                               $"{TalentNames[4]}{talentLevel.GetValueOrDefault(5, 0)}";
+
+            return description;
+        }
         public string GetFinalTalentSkillNodeDescription()
         {
             var talentSkill = SettingData.GetCurrentPlayerGroup().talentSkill;
@@ -1765,7 +1777,7 @@ namespace PCRCaculator.Guild
                 .Where(node => NodeDataDict.ContainsKey(node.Key))
                 .OrderByDescending(node => node.Key)
                 .First();
-            
+
             if (!NodeDataDict.TryGetValue(targetNode.Key, out TalentSkillNode nodeData))
                 return "无";
 
@@ -1803,7 +1815,6 @@ namespace PCRCaculator.Guild
             // 计算在合流点之后的节点数量
             int lastConfluenceNodeId = precedingConfluenceNodes.FirstOrDefault()?.node_id ?? 0;
 
-            // 修改这里：我们需要统计的是合流点之后到目标节点之间所有被强化过的节点
             var enhancedNodes = NodeDataDict.Values
                 .Where(n => n.page_num == pageNum &&
                            n.node_id >= lastConfluenceNodeId &&
@@ -1839,7 +1850,6 @@ namespace PCRCaculator.Guild
         public void GetTalentFormationBonusDescription()
         {
             CalcTalentFormationBonus();
-            string[] elementNames = { "火", "水", "风", "光", "暗" };
 
             foreach (var bonusObj in TalentBonus)
             {
@@ -1876,7 +1886,7 @@ namespace PCRCaculator.Guild
                 if (text != null)
                 {
                     // bonusValue是万分比，所以需要除以100得到百分比值
-                    text.text = elementNames[elementType-1] + (bonusValue / 100) + "%";
+                    text.text = TalentNames[elementType-1] + (bonusValue / 100) + "%";
                 }
             }
         }
