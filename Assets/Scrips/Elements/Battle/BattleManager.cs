@@ -133,6 +133,7 @@ namespace Elements.Battle
         private float startRemainTime;
 
         private bool isPauseTimeLimit;
+
         public bool IsPlayCutin;
         public float BattleStartPos = 560f;
         private int noneVoiceCount;
@@ -159,7 +160,7 @@ namespace Elements.Battle
         private float blackoutTime;
         private float blackoutTimeCounter;
         private float fadeoutDuration = 0.5f;
-        private Action onEndFadeOut;
+        public Action onEndFadeOut;
         /*[SerializeField]
         private UITexture skillExeScreenTexture;*/
         private float startalpha;
@@ -621,7 +622,9 @@ namespace Elements.Battle
 #if UNITY_5_3_OR_NEWER
                 while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
 #else
-                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && GameState == eBattleGameState.PLAY)) ;
+                while (
+                    (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps) ||
+                     (skipping || skipUB) && GameState == eBattleGameState.PLAY)) ;
 #endif
                 while (FrameCount < targetFrameCount && !IsFramePause)
                 {
@@ -2367,7 +2370,9 @@ namespace Elements.Battle
         private void finishBattle(eBattleResult currentBattleResult)
         {
             battleFinished = true;
+#if UNITY_5_3_OR_NEWER
             skipping = false;
+#endif
             /*if (BattleHeaderController.Instance.IsPaused && this.dialogManager.IsUse(eDialogId.BATTLE_MENU))
                 this.dialogManager.ForceCloseOne(eDialogId.BATTLE_MENU);*/
             UnityEngine.Random.state = tempRandomState;

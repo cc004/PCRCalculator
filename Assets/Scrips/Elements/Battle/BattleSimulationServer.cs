@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Net;
 using System.Threading;
 using UnityEngine;
@@ -476,9 +477,9 @@ namespace Elements.Battle
             try
             {
                 Debug.Log($"[BattleSimulationServer] ProcessBattle 开始: UID={task.Uid}");
-                
+
                 // 更新 UI
-                #if UNITY_5_3_OR_NEWER
+#if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -489,11 +490,11 @@ namespace Elements.Battle
                     }
                     catch { }
                 });
-                #endif
+#endif
 
                 // 按照 GAUBOptimization.cs 的方式：在主线程中调用 StartByServer，然后在后台线程等待
+#if UNITY_5_3_OR_NEWER
                 MyGameCtrl.Instance.isBattleFinish = false;
-                #if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -513,7 +514,7 @@ namespace Elements.Battle
                 {
                     Thread.Sleep(100);
                 }
-                #else
+#else
                 try
                 {
                     BattleManager.Instance.enabled = false;
@@ -522,6 +523,19 @@ namespace Elements.Battle
                     MyGameCtrl.Instance.StartByServer(task.Request);
                     MyGameCtrl.Instance.tempData.skipping = true;
                     BattleManager.Instance.skipping = true;
+
+                    IEnumerator UpdateBattleManager()
+                    {
+                        for (; ; )
+                        {
+                            if (BattleManager.Instance.enabled)
+                                BattleManager.Instance.Update();
+                            yield return null;
+                        }
+                    }
+
+                    CoroutineRunner.AppendCoroutine(UpdateBattleManager());
+
                     while (!MyGameCtrl.Instance.isBattleFinish)
                     {
                         UnityEngine.CoroutineRunner.Update();
@@ -533,6 +547,18 @@ namespace Elements.Battle
                     task.Status = BattleStatus.Failed;
                     task.ErrorMessage = ex.Message;
                 }
+
+                if (!MyGameCtrl.Instance.isBattleFinish)
+                {
+                    BattleManager.Instance.CoroutineManager.ClearAll();
+                    BattleManager.Instance.onEndFadeOut = (System.Action)null;
+                    BattleManager.Instance.battleFinishedProcessed = true;
+                    MyGameCtrl.Instance.OnBattleFinished(1);
+                }
+
+                UnityEngine.CoroutineRunner.pending.Clear();
+                UnityEngine.CoroutineRunner.running.Clear();
+
                 #endif
 
                 // 如果已经标记为失败，直接返回

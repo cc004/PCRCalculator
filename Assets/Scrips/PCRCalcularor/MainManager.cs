@@ -822,10 +822,14 @@ namespace PCRCaculator
         }
         public void WindowMessage(string word)
         {
+#if UNITY_5_3_OR_NEWER
             if (windowmassageIE == null)
             {
                 windowmassageIE = StartCoroutine(WindowMessage_start(word));
             }
+#else
+            Console.WriteLine(word);
+#endif
         }
         public void WindowConfigMessage(string word, SystemWindowMessage.configDelegate configDelegate, SystemWindowMessage.configDelegate cancelDelegate = null)
         {

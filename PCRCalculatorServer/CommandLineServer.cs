@@ -97,18 +97,6 @@ public class CommandLineServer : MonoBehaviour
 
         MyGameCtrl.Instance.Start();
 
-        IEnumerator UpdateBattleManager()
-        {
-            for (;;)
-            {
-                if (BattleManager.Instance.enabled)
-                    BattleManager.Instance.Update();
-                yield return null;
-            }
-        }
-
-        CoroutineRunner.AppendCoroutine(UpdateBattleManager());
-
         var watch = new Stopwatch();
         var times = 0;
         var i = 0;
@@ -157,10 +145,26 @@ public class CommandLineServer : MonoBehaviour
                 MyGameCtrl.Instance.tempData.skipping = true;
                 BattleManager.Instance.skipping = true;
 
+                IEnumerator UpdateBattleManager()
+                {
+                    for (; ; )
+                    {
+                        if (BattleManager.Instance.enabled)
+                            BattleManager.Instance.Update();
+                        yield return null;
+                    }
+                }
+
+                CoroutineRunner.AppendCoroutine(UpdateBattleManager());
+
                 while (!BattleManager.Instance.battleFinishedProcessed)
                 {
                     CoroutineRunner.Update();
                 }
+
+                CoroutineRunner.running.Clear();
+                CoroutineRunner.pending.Clear();
+
                 /*
                 Console.WriteLine("模拟结果：");
                 foreach (var u in BattleManager.Instance.UnitList.Concat(BattleManager.Instance.EnemyList))

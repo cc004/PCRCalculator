@@ -179,6 +179,7 @@ namespace Elements
             else
                 owner.PlayAnime(eSpineCharacterAnimeId.IDLE, owner.MotionPrefix);
 
+#if UNITY_5_3_OR_NEWER
             if (battleManager.skipping) goto nomovie;
             for (int i = 0; i < 120;)
             {
@@ -192,7 +193,7 @@ namespace Elements
             }
 
             nomovie:
-            
+#endif
             if (_movieIndex == 1)
                 battleManager.CAOHLDNADPB = false;
             if (_callback == null)
