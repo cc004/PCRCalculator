@@ -529,8 +529,8 @@ namespace Elements.Battle
                     BattleManager.Instance.battleFinished = false;
                     BattleManager.Instance.battleFinishedProcessed = false;
                     MyGameCtrl.Instance.StartByServer(task.Request);
-                    MyGameCtrl.Instance.tempData.skipping = true;
-                    BattleManager.Instance.skipping = true;
+                    // MyGameCtrl.Instance.tempData.skipping = true;
+                    // BattleManager.Instance.skipping = true;
 
                     IEnumerator UpdateBattleManager()
                     {

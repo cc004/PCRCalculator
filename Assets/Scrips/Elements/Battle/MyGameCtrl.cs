@@ -356,8 +356,7 @@ namespace Elements
                 }
             }
 
-            tempData.skipping = false;
-            BattleManager.Instance.skipping = false;
+            tempData.skipping = true;
 
             if (req.IsGuildBattle)
             {
