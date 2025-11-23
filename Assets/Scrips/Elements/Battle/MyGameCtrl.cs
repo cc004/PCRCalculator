@@ -356,12 +356,14 @@ namespace Elements
                 }
             }
 
-            tempData.skipping = true;
+            tempData.skipping = false;
+            BattleManager.Instance.skipping = false;
 
             if (req.IsGuildBattle)
             {
                 tempData.guildEnemy = new List<EnemyData>();
                 int isTalentQuest = req.IsTalentQuest ? 1 : 0;
+                // GuildManager.Instance.setSelectedBossEnemyids(req.GuildEnemyList);
                 foreach (var selectedBossEnemyid in req.GuildEnemyList)
                 {
                     EnemyData enemyData = GuildManager.Instance.GetEnemyDataByID(selectedBossEnemyid, false, isTalentQuest);
@@ -823,8 +825,10 @@ namespace Elements
                 SetSummonUI(summonUnitCtrl);
 #endif
             _callback?.Invoke(battleSpineController);
+#if UNITY_5_3_OR_NEWER
             if (!BattleManager.Instance.skipping)
                 GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);
+#endif
 
         }
         public static void CreateModeChangeSpine(eSpineType _spineType,

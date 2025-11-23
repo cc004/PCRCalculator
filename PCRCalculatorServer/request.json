@@ -478,10 +478,10 @@
         ]
     ],
     "Settings": {
-        "UseFixedRandomSeed": false,
-        "RandomSeed": 0,
-        "UseLogBarrierNew": false,
-        "UBTryingCount": 30
+        "UseFixedRandomSeed": true,
+        "RandomSeed": 666,
+        "UseLogBarrierNew": true,
+        "UBTryingCount": 9999
     },
     "TalentSkillLevels": {
         "1": 290,
@@ -628,8 +628,6 @@
         "1": 1,
         "17": 1
     },
-    "Seed": 666,
-    "UseFixedSeed": true,
     "TalentFullInfo": true,
     "IsTalentQuest": false,
     "ToMaxUnitAttr": false,

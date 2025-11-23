@@ -98,6 +98,14 @@ namespace PCRCaculator.Guild
             }
         }
         private int[] selectedBossEnemyids => SettingData?.GetCurrentPlayerGroup()?.selectedEnemyIDs ?? new int[1]{0};
+        public void setSelectedBossEnemyids(List<int> enemyids)
+        {
+            var group = SettingData.GetCurrentPlayerGroup();
+            if (group != null)
+            {
+                group.selectedEnemyIDs = enemyids.ToArray();
+            }
+        }
         private bool isEditingUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
         private static string[] guildTurn = new string[5] { "一阶段", "二阶段", "三阶段", "四阶段", "五阶段", };
@@ -167,7 +175,15 @@ namespace PCRCaculator.Guild
         }
         public bool IsGuildBoss { get => (selectedBossEnemyids[0] / 100000000) == 4; }
         public bool IsTalentQuestBoss { get => selectedBossEnemyids[0] / 100000000 == 8; }
+        public bool IsTalentQuestBossId(int id)
+        {
+            return id / 100000000 == 8;
+        }
         public bool IsDungeonBoss { get => dungeonEnemy.ContainsValue(selectedBossEnemyids[0]); }
+        public bool IsDungeonBossId(int id)
+        {
+            return dungeonEnemy.ContainsValue(id);
+        }
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
         {
@@ -1900,7 +1916,7 @@ namespace PCRCaculator.Guild
         /// <summary>
         /// 计算当前编队的天赋阵型加成
         /// </summary>
-        public void CalcTalentFormationBonus()
+        public void CalcTalentFormationBonus(bool isBattle = false)
         {
             // 如果未开启"骑士增强"功能，则直接返回
             // if (!_IsReleasedKnightEnhance)
@@ -1911,6 +1927,10 @@ namespace PCRCaculator.Guild
             // List<int> talentIds = new List<int>();
             // 遍历当前我方编队中的所有单位
             var unitList = SettingData.GetCurrentPlayerGroup().playerData.playrCharacters;
+            if (isBattle)
+            {
+                unitList = MyGameCtrl.Instance.tempData.playerList;
+            }
             for (int i = 1; i <= 5; i++)
             {
                 talentCountDict[i] = 0;
@@ -1948,20 +1968,22 @@ namespace PCRCaculator.Guild
                 int count = pair.Value;
 
                 long bonus = 0;
-                bonus = GetTalentBonusPermyriad(talentId, count);
+                bonus = GetTalentBonusPermyriad(talentId, count, isBattle);
                 if (UnitTalentFormationBonusDictionary != null)
                 {
                     UnitTalentFormationBonusDictionary[talentId] = bonus;
                 }
             }
         }
-        public long GetTalentBonusPermyriad(int talentId, int count) // present
+        public long GetTalentBonusPermyriad(int talentId, int count, bool isBattle = false) // present
         {
-            var formationData = IsTalentQuestBoss
+            var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
+            var formationData = IsTalentQuestBossId(bossId)
                 ? (MainManager.Instance.TalentFormationDic.TryGetValue(TalentQuestWaveGroupId, out var talentData) ? talentData : null)
                 : MainManager.Instance.TalentFormationDic.TryGetValue(selectedBossEnemyids[0], out var bossData)
                     ? bossData
                     : MainManager.Instance.TalentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
+            // Debug.Log($"GetTalentBonusPermyriad: talentId={talentId}, count={count}, formationData={(formationData != null ? "found" : "null")}");
             return count > 0 && formationData != null ? formationData.formation_bonus_values[talentId - 1][count-1] : 0;
         }
         public void ExtraEffectButton()

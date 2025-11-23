@@ -146,8 +146,8 @@ public class CommandLineServer : MonoBehaviour
                 */
                 ++times;
 
-                MyGameCtrl.Instance.tempData.skipping = true;
-                BattleManager.Instance.skipping = true;
+                MyGameCtrl.Instance.tempData.skipping = false;
+                BattleManager.Instance.skipping = false;
 
                 IEnumerator UpdateBattleManager()
                 {
@@ -179,8 +179,9 @@ public class CommandLineServer : MonoBehaviour
                 s += BattleManager.Instance.FrameCount;
                 s2 += BattleHeaderController.CurrentFrameCount;
                 Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
-                                $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps");
+                                $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps 总伤害: {GuildCalculator.Instance.GetTotalDamage()}");
                 last = now;
+                break;
             }
         }
 
