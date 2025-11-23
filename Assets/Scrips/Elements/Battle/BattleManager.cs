@@ -3158,7 +3158,7 @@ namespace Elements.Battle
 
         private bool isAllActionsCompleted { get; set; }
 
-        private ACIIMEDNDDJ NBLLPKDOANI { get; set; }
+        private eIgnoreAllActionDoneState ignoreAllActionDoneCoroutineState { get; set; }
 
         public void CallbackActionEnd(long activeActionId)
         {
@@ -3293,9 +3293,9 @@ namespace Elements.Battle
             if (activeActionIds.Count > 0)
             {
                 isAllActionDone = false;
-                if (NBLLPKDOANI == ACIIMEDNDDJ.NOT_RUNNING)
+                if (ignoreAllActionDoneCoroutineState == eIgnoreAllActionDoneState.NOT_RUNNING)
                 {
-                    NBLLPKDOANI = ACIIMEDNDDJ.RUNNING;
+                    ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.RUNNING;
                     StartCoroutine(updateIgnoreAllActionDoneCounter());
                 }
             }
@@ -3328,7 +3328,7 @@ namespace Elements.Battle
             while (true)
             {
                 timer -= Time.deltaTime;
-                if (NBLLPKDOANI != ACIIMEDNDDJ.STOP_PULSE)
+                if (ignoreAllActionDoneCoroutineState != eIgnoreAllActionDoneState.STOP_PULSE)
                 {
                     if (timer >= 0.0)
                         yield return null;
@@ -3338,12 +3338,12 @@ namespace Elements.Battle
                 else
                     break;
             }
-            NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
+            ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
             yield break;
         label_4:
             isAllActionsCompleted = true;
             CallbackActionEnd(activeActionIds.Count == 0 ? 0L : activeActionIds.First());
-            NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
+            ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
         }
 
         /*public void UekOnDeadLastUnit(UnitCtrl FNHGFDNICFG, int MACAPGACEFI)
@@ -3387,8 +3387,8 @@ namespace Elements.Battle
 
         private void finishWave(bool GIMAJHFCKNE)
         {
-            if (NBLLPKDOANI == ACIIMEDNDDJ.RUNNING)
-                NBLLPKDOANI = ACIIMEDNDDJ.STOP_PULSE;
+            if (ignoreAllActionDoneCoroutineState == eIgnoreAllActionDoneState.RUNNING)
+                ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.STOP_PULSE;
             isAllActionsCompleted = false;
             for (int index = 0; index < UnitList.Count; ++index)
             {
@@ -4017,7 +4017,8 @@ namespace Elements.Battle
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
-            
+            ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
+
             GameState = eBattleGameState.PLAY;
             StartCoroutine(coroutineStartProcess(gameCtrl));
         }
@@ -5664,7 +5665,7 @@ namespace Elements.Battle
     Coroutine FGOJJGIFFFJ.Elements\u002EBattle\u002EIBattleManagerForBaseBattleProcessor\u002EStartCoroutine(
       IEnumerator LJBCBFFGDDK) => this.StartCoroutine(LJBCBFFGDDK);
       */
-        private enum ACIIMEDNDDJ
+        private enum eIgnoreAllActionDoneState
         {
             NOT_RUNNING,
             RUNNING,
