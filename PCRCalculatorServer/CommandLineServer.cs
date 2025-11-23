@@ -149,6 +149,8 @@ public class CommandLineServer : MonoBehaviour
                 MyGameCtrl.Instance.tempData.skipping = false;
                 BattleManager.Instance.skipping = false;
 
+                MyGameCtrl.Instance.tempData.skipping = BattleManager.Instance.skipping = true;
+
                 IEnumerator UpdateBattleManager()
                 {
                     for (; ; )

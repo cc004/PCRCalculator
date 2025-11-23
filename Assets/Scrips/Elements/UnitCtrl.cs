@@ -9831,7 +9831,7 @@ this.updateCurColor();
                         }
                     }
                 }
-
+                /*
                 if (flag3)
                 {
                     static IEnumerator moveParticle()
@@ -9856,7 +9856,7 @@ this.updateCurColor();
                             StartCoroutine(playLargeUBEffect());
                             break;
                     }
-                }
+                }*/
             }
             /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
             {
@@ -10739,7 +10739,7 @@ this.updateCurColor();
             {
                 do
                 {
-                    while (battleManager.IsPlayingPrincessMovie || battleManager.isPrincessFormSkill)
+                    while (battleManager.IsPrincessSkillMovieRunning || battleManager.isPrincessFormSkill)
                         yield return null;
                     if (_changeScaleId != changeScaleId)
                     {

@@ -399,11 +399,11 @@ namespace Elements.Battle
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
 
-        public bool IsPlayingPrincessMovie { get; set; }
+        public bool IsPrincessSkillMovieRunning { get; set; }
 
-        public bool CAOHLDNADPB { get; set; }
+        public bool IsPrincessSkillMovieFirstHalfRunning { get; set; }
 
-        public bool BFKPGHCBBKM { get; set; }
+        public bool IsPrincessSkillRunning { get; set; }
 
         private bool ANHHNJFCMDB => BattleCategory == eBattleCategory.ARENA || BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY;
 
@@ -589,7 +589,7 @@ namespace Elements.Battle
                 cutinSkipTimeAccumulated += Time.deltaTime;
             for (; cutinSkipTimeAccumulated >= (double)DeltaTime_60fps; cutinSkipTimeAccumulated -= DeltaTime_60fps)
                 CoroutineManager.NoDialogUpdate();
-            if (IsPlayingPrincessMovie)
+            if (IsPrincessSkillMovieRunning)
             {/*
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());*/
@@ -612,7 +612,7 @@ namespace Elements.Battle
 
                     if (IsFramePause || !(deltaTimeAccumulated >= 0.0) && !skipping && !skipUB)
                         break;
-                    
+
                     updateFrame();
                     deltaTimeAccumulated -= DeltaTime_60fps;
 
@@ -620,16 +620,16 @@ namespace Elements.Battle
                     // Console.WriteLine($"{FrameCount} {GameState}");
                 }
 #if UNITY_5_3_OR_NEWER
-                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
+                while (!IsPrincessSkillMovieRunning && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
 #else
                 while (
-                    (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps) ||
-                     (skipping || skipUB) && GameState == eBattleGameState.PLAY)) ;
+                    (!IsPrincessSkillMovieRunning && (deltaTimeAccumulated >= (double)DeltaTime_60fps) ||
+                     (skipping || skipUB) && GameState == eBattleGameState.PLAY && !IsPrincessSkillMovieRunning)) ;
 #endif
                 while (FrameCount < targetFrameCount && !IsFramePause)
                 {
                     updateFrame();
-                    if (IsPlayingPrincessMovie)
+                    if (IsPrincessSkillMovieRunning)
                         break;
                 }
 
