@@ -77,6 +77,7 @@ public class CommandLineServer : MonoBehaviour
 
         GuildManager.Instance.SettingData.start_hp = "1,1,1,1,1";
         GuildManager.Instance.SettingData.start_tp = "0,0,0,0,0";
+            
 
         MainManager.Instance.Start();
         while (!MainManager.Instance.LoadFinished)
@@ -90,6 +91,9 @@ public class CommandLineServer : MonoBehaviour
             bgTransform = new()
         }.Awake();
         BattleUIManager.Instance.Start();
+        new TalentLevelManager().Awake();
+        new TalentSkillTreeManager().Awake();
+        new TeamSkillTreeManager().Awake();
 
         MyGameCtrl.Instance.playerUnitCtrl = new List<UnitCtrl>();
         MyGameCtrl.Instance.enemyUnitCtrl = new List<UnitCtrl>();

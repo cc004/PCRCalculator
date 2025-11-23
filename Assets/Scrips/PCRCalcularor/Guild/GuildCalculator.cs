@@ -255,11 +255,7 @@ namespace PCRCaculator.Guild
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
             b.NoSkipOnChangeState += AppendChangeState;
-            if (b.enemyId > 0 && !b.IsSummon)
-            {
-                b.NoSkipOnDamage2 += RefreshTotalDamage;
-            }
-            else if (isPlayer)
+            if (isPlayer)
             {
                 playerUnitDamageDic.Add(b.UnitId, new List<ValueChangeData> { new ValueChangeData(0, 0) });
             }
@@ -755,6 +751,13 @@ namespace PCRCaculator.Guild
                 }
 
             }
+        }
+
+        public void ClearTotalDamage()
+        {
+            totalDamage = 0;
+            totalDamageCriEX = 0;
+            totalDamageExcept = 0;
         }
 
         public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, LongWithEx exvalue)

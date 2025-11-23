@@ -741,9 +741,15 @@ namespace PCRCaculator.Guild
             battleData.SettingData = SettingData;
             MainManager.Instance.ChangeSceneToBalttle(battleData);
         }
-        private EnemyData GetEnemyDataByID(int enemy_id)
+        public EnemyData GetEnemyDataByID(int enemy_id, bool useChangedData = true, int isTalentQuest = -1)
         {
-            return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : IsTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] : EnemyDataDic[enemy_id];
+            var dict_data = isTalentQuest == 0 ? EnemyDataDic[enemy_id] 
+                : isTalentQuest == 1 
+                    ? TalentQuestEnemyParameterDic[enemy_id] 
+                    : IsTalentQuestBoss 
+                        ? TalentQuestEnemyParameterDic[enemy_id] 
+                        : EnemyDataDic[enemy_id];
+            return useChangedData && SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : dict_data;
         }
         /*private bool CheckDataIsReady(int month)
         {
@@ -1731,7 +1737,8 @@ namespace PCRCaculator.Guild
         }
         public string GetTalentLevelDescription()
         {
-            var talentLevel = SettingData.GetCurrentPlayerGroup().talentLevel;
+            // var talentLevel = SettingData.GetCurrentPlayerGroup().talentLevel;
+            var talentLevel = MainManager.Instance.teamEnhanceData.talentLevelParameter;
             string description = $"{TalentNames[0]}{talentLevel.GetValueOrDefault(1, 0)}，" +
                                $"{TalentNames[1]}{talentLevel.GetValueOrDefault(2, 0)}，" +
                                $"{TalentNames[2]}{talentLevel.GetValueOrDefault(3, 0)}，" +
@@ -1981,7 +1988,7 @@ namespace PCRCaculator.Guild
 
         public string start_hp, start_tp;
         public int n1 = 1000, n2 = 10000;
-        public List<GuildPlayerGroupData> guildPlayerGroupDatas;
+        public List<GuildPlayerGroupData> guildPlayerGroupDatas = new List<GuildPlayerGroupData>();
 
         public Dictionary<int, UnitAttackPattern> changedEnemyAttackPatternDic = new Dictionary<int, UnitAttackPattern>();
         public Dictionary<int, EnemyData> changedEnemyDataDic;

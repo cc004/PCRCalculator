@@ -56,6 +56,9 @@ namespace Elements.Battle
         public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }
+        public string TalentLevel { get; set; }
+        public string TalentSkill { get; set; }
+        public string TeamSkill { get; set; }
         public eBattleResult Result { get; set; }
     }
 
@@ -82,10 +85,17 @@ namespace Elements.Battle
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         // 如果要进行工会战，请提供 EnemyData 列表
-        public List<PCRCaculator.EnemyData> GuildEnemyList { get; set; }
+        public List<int> GuildEnemyList { get; set; }
         public List<List<float>> UBExecTimeList { get; set; }
         public List<List<int>> SemanUBExecTimeList { get; set; }
         public GuildBattleSettingData Settings { get; set; } = new GuildBattleSettingData();
+        public Dictionary<int, int> TalentSkillLevels { get; set; }
+        public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
+        public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
+        public int Seed { get; set; }
+        public bool UseFixedSeed { get; set; }
+        public bool TalentFullInfo { get; set; }
+        public bool IsTalentQuest { get; set; }
         public bool ToMaxUnitAttr { get; set; }
         public bool IsAutoMode { get; set; }
         public bool IsSetMode { get; set; }
@@ -601,6 +611,9 @@ namespace Elements.Battle
                         TotalDamage = totalDamage,
                         BattleFrames = battleFrames,
                         CurrentSeed = currentSeed,
+                        TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
+                        TalentSkill = GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
+                        TeamSkill = GuildManager.Instance.GetFinalTeamSkillNodeDescription(),
                         Result = battleResult
                     };
 

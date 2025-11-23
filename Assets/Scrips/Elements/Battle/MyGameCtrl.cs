@@ -301,10 +301,46 @@ namespace Elements
             IsSetMode = req.IsSetMode;
             IsSemanMode = req.IsSemanMode;
 
+            if (req.TalentSkillLevels is not null)
+            {
+                mainManager.TeamEnhanceData.SetTalentLevels(req.TalentSkillLevels);
+            }
+            if (req.TalentFullInfo)
+            {
+                if (req.TalentSkillNodeLevels is not null)
+                {
+                    TalentSkillTreeManager.Instance.SetSkillLevels(req.TalentSkillNodeLevels);
+                    TalentSkillTreeManager.Instance.UpdateTalentInfoData();
+                }
+                if (req.MasterSkillNodeLevels is not null)
+                {
+                    TeamSkillTreeManager.Instance.SetSkillLevels(req.MasterSkillNodeLevels);
+                    TeamSkillTreeManager.Instance.UpdateTalentInfoData();
+                }
+            }
+            else
+            {
+                if (req.TalentSkillNodeLevels is not null)
+                {
+                    foreach (var node in req.TalentSkillNodeLevels)
+                    {
+                        TalentSkillTreeManager.Instance.EnhanceSkill(node.Key, node.Value);
+                    }
+                }
+                if (req.MasterSkillNodeLevels is not null)
+                {
+                    foreach (var node in req.MasterSkillNodeLevels)
+                    {
+                        TeamSkillTreeManager.Instance.EnhanceSkill(node.Key, node.Value);
+                    }
+                }
+            }
+
             tempData = new TempData();
 
             // Players: assume request provides PCRCaculator.UnitData list
             tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
+            tempData.isGuildBattle = req.IsGuildBattle;
 
             tempData.playerList = tempData.playerList
                 .OrderBy(u => mainManager.UnitRarityDic[u.unitId].detailData.searchAreaWidth)
@@ -324,7 +360,58 @@ namespace Elements
 
             if (req.IsGuildBattle)
             {
-                throw new NotImplementedException("Guild battle via HTTP not implemented yet");
+                tempData.guildEnemy = new List<EnemyData>();
+                int isTalentQuest = req.IsTalentQuest ? 1 : 0;
+                foreach (var selectedBossEnemyid in req.GuildEnemyList)
+                {
+                    EnemyData enemyData = GuildManager.Instance.GetEnemyDataByID(selectedBossEnemyid, false, isTalentQuest);
+                    if(GuildManager.Instance.EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+                    {
+                        tempData.mParts = value;
+                        tempData.MPartsDataDic = new Dictionary<int, EnemyData>();
+                        Action<int> action = a =>
+                        {
+                            if (a != 0)
+                            {
+                                tempData.MPartsDataDic.Add(a, GuildManager.Instance.GetEnemyDataByID(a, false, isTalentQuest));                        
+                            }
+                        };
+                        action(value.child_enemy_parameter_1);
+                        action(value.child_enemy_parameter_2);
+                        action(value.child_enemy_parameter_3);
+                        action(value.child_enemy_parameter_4);
+                        action(value.child_enemy_parameter_5);
+
+                    }
+                    tempData.guildEnemy.Add(enemyData);
+                }
+                tempData.extra_effect_cnt = 0;
+                var extra_data = GetExtraEffectEnemyData(tempData);
+                if (extra_data != null)
+                {
+                    foreach (var enemy in extra_data.enemy_ids)
+                    {
+                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else
+                            Debug.LogError("找不到增援敌人ID " + enemy);
+                    }
+                }
+                tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
+                tempData.UBExecTimeList = req.UBExecTimeList;
+                tempData.SemanUBExecTimeList = req.SemanUBExecTimeList;
+                // tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
+                tempData.tryCount = req.Settings.UBTryingCount;
+                tempData.SettingData = new();
+                tempData.CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType.FullBarrier);
             }
             else
             {
@@ -347,6 +434,10 @@ namespace Elements
 
                 tempData.CreateAllUnitParameters();
             }
+
+            tempData.randomData = new();
+            tempData.randomData.RandomSeed = req.Settings.RandomSeed;
+            tempData.randomData.UseFixedRandomSeed = req.Settings.UseFixedRandomSeed;
 
             foreach (Transform child in unitParent)
             {
@@ -457,9 +548,7 @@ namespace Elements
             if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
                 GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl.ToList());
-                BattleManager.Instance.semanubmanager.SetUnitCallBack(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
             }
-
             if (tempData.isGuildBattle)
                 SetBattleSpeed(tempData.SettingData.calSpeed);
             else
@@ -894,7 +983,9 @@ namespace Elements
             }
             else if (tempData.isGuildBattle)
             {
+                #if UNITY_5_3_OR_NEWER
                 GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
+                #endif
             }
             isBattleFinish = true;
         }

@@ -14,7 +14,7 @@ namespace PCRCaculator
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
         }

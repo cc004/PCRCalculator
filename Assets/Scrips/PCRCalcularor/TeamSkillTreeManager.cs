@@ -35,7 +35,7 @@ namespace PCRCaculator
         private const float SPACING_Y = 80f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -480,6 +480,15 @@ namespace PCRCaculator
             if (global) MainManager.Instance.PlayerSetting.teamSkill = activeSkills; //公共
             PlayerGroup.teamSkill = activeSkills; //队内
             GuildManager.Instance.SaveDataToJson();
+        }
+
+        public void SetSkillLevels(Dictionary<int, int> newSkillLevels)
+        {
+            skillLevels.Clear();
+            foreach (var kvp in newSkillLevels)
+            {
+                skillLevels[kvp.Key] = kvp.Value;
+            }
         }
     }
 }

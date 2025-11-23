@@ -40,7 +40,7 @@ namespace PCRCaculator
         private const float SPACING_Y = 80f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -371,7 +371,7 @@ namespace PCRCaculator
             return icon;
         }
 
-        private int GetMaxSkillLevel(int nodeId)
+        public int GetMaxSkillLevel(int nodeId)
         {
             if (nodeId == 0 || !NodeDataDict.TryGetValue(nodeId, out TalentSkillNode node) || node.enhance_level_ids == null)
                 return 0;
@@ -556,6 +556,14 @@ namespace PCRCaculator
             if (global) MainManager.Instance.PlayerSetting.talentSkill = activeSkills; //公共
             PlayerGroup.talentSkill = activeSkills; //队内
             GuildManager.Instance.SaveDataToJson();
+        }
+        public void SetSkillLevels(Dictionary<int, int> newSkillLevels)
+        {
+            skillLevels.Clear();
+            foreach (var kvp in newSkillLevels)
+            {
+                skillLevels[kvp.Key] = kvp.Value;
+            }
         }
     }
 }
