@@ -2855,6 +2855,10 @@ this.updateCurColor();
                     conditionExSkillDictionary.Add(exSkillConditionDatum.Key, new List<ExSkillData> { exSkillData });
                 }
             }
+            if (enemyId > 0 && !IsSummon)
+            {
+                OnDamage2 += GuildCalculator.Instance.RefreshTotalDamage;
+            }
 
             // TODO where is position?
             var teamEnhanceParameter = _teamEnhanceParameter;
@@ -9940,7 +9944,7 @@ this.updateCurColor();
 
             }
 
-            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((double)num6 * (1 - 1/num1)), num6);
+            OnDamage2?.Invoke(_byAttack, num6, _critical, (long)((double)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, num6, _critical);
             OnDamageForLoopRepeat.Call(num6);
             OnDamageForDivision.Call(_byAttack, Math.Min(hp, num6), _critical);

@@ -18,7 +18,7 @@ using PCRCaculator;
 using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.Video;
-using Debug = System.Diagnostics.Debug;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 //using Elements.Data;
 //using Elements.Uek;
@@ -4497,7 +4497,13 @@ namespace Elements.Battle
             yield return null;
 #if UNITY_5_3_OR_NEWER
             gameCtrl.SetUI();
+#else
+            GuildCalculator.Instance.ClearTotalDamage();
 #endif
+            if (tempData.isGuildBattle)
+            {
+                BattleManager.Instance.semanubmanager.SetUnitCallBack(gameCtrl.playerUnitCtrl.ToList(), gameCtrl.enemyUnitCtrl[0]);
+            }
 
             try
             {

@@ -77,7 +77,7 @@ namespace Elements.Battle
         public bool UseFixedRandomSeed { get; set; }
         public int RandomSeed { get; set; }
         public bool UseLogBarrierNew { get; set; }
-        public int UBTryingCount { get; set; } = 30;
+        public int UBTryingCount { get; set; } = 9999;
     }
 
     public class BattleSimulationRequest
@@ -92,8 +92,6 @@ namespace Elements.Battle
         public Dictionary<int, int> TalentSkillLevels { get; set; }
         public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
-        public int Seed { get; set; }
-        public bool UseFixedSeed { get; set; }
         public bool TalentFullInfo { get; set; }
         public bool IsTalentQuest { get; set; }
         public bool ToMaxUnitAttr { get; set; }
