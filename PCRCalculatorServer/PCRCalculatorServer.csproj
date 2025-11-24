@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+	  <DefineConstants>DONT_USE_EX;NO_CRIT_EVENT</DefineConstants>
   </PropertyGroup>
 
 	<ItemGroup>

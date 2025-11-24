@@ -429,6 +429,7 @@ namespace Elements
 
         public string GetSkillDetail(UnitCtrl owner)
         {
+#if UNITY_5_3_OR_NEWER
             if (MasterData == null) return null;
             var param = ActionParameterSerializer.Actions.ActionParameter.type(MasterData.action_type);
             param.init(owner.IsOther, MasterData.action_id, DepenedActionId, MasterData.class_id,  MasterData.action_type, MasterData.action_detail_1,
@@ -441,6 +442,9 @@ namespace Elements
             {
                 atk = owner.Atk, magicStr = owner.MagicStr
             });
+#else
+            return string.Empty;
+#endif
         }
     }
 }

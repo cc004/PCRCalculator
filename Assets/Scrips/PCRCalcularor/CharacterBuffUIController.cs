@@ -111,7 +111,11 @@ namespace PCRCaculator.Battle
             {
                 try
                 {
+#if DONT_USE_EX
+                    posText.text = $"{owner2.GetInfo()}\n{(float)(owner2.Hp) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy) / UnitDefine.MAX_ENERGY:P2}";
+#else
                     posText.text = $"{owner2.GetInfo()}\n{(float)(owner2.Hp ?? 0f) / Mathf.Max(1, owner2.MaxHp):P2}\n{(float)(owner2.Energy ?? 0f) / UnitDefine.MAX_ENERGY:P2}";
+#endif
                 }
                 catch
                 {

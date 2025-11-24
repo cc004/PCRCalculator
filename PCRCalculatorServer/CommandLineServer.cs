@@ -183,7 +183,6 @@ public class CommandLineServer : MonoBehaviour
                 Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
                                 $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps 总伤害: {GuildCalculator.Instance.GetTotalDamage()}");
                 last = now;
-                break;
             }
         }
 

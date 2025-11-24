@@ -17,8 +17,10 @@ namespace Assets.Scrips
         public class AdditionalData
         {
             public string comment;
+#if !DONT_USE_EX
             public IWithEx data;
             public Func<IWithEx> getter;
+#endif
             public Func<bool> condition;
         }
         
@@ -63,6 +65,7 @@ namespace Assets.Scrips
                     {
                         comment = comment,
                         condition = () => BattleHeaderController.CurrentFrameCount == frame,
+#if !DONT_USE_EX
                         getter = prop switch
                         {
                             "tp" => () => mgr.UnitList.Concat(mgr.EnemyList)
@@ -71,6 +74,7 @@ namespace Assets.Scrips
                                 .Single(u => u.UnitId == unit).Hp,
                             _ => () => new DoubleWithEx(0)
                         }
+#endif
                     });
                 }
             }
@@ -904,8 +908,10 @@ namespace Assets.Scrips
             variables["cur_lframe"] = BattleHeaderController.CurrentFrameCount;
             var n = pc.Count;
             var removing = new List<int>();
+#if !DONT_USE_EX
             foreach (var data in additionalData.Where(data => data.condition()))
                 data.data = data.getter();
+#endif
             for (var i = 0; i < n; ++i)
             {
                 try

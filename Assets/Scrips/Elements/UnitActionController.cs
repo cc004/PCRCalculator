@@ -1478,11 +1478,11 @@ namespace Elements
             // temporary fix for log barrier skill
             if (_action is LogBarrierAction)
                 _action.ExecTime = new[] { 0f };
-            for (int _num = 0; _num < _action.ExecTime.Length; ++_num)
-            {
-                if (_boneCount)
-                    _action.AppendTargetNum(_target.Owner, _num);
-            }
+            if (_boneCount)
+                for (int _num = 0; _num < _action.ExecTime.Length; ++_num)
+                {
+                        _action.AppendTargetNum(_target.Owner, _num);
+                }
             float time = _first ? _starttime + _skill.CutInSkipTime : _starttime;
             long[] ids = new long[_action.ExecTime.Length];
             for (int i = 0; i < _action.ExecTime.Length; ++i)
@@ -1550,7 +1550,7 @@ namespace Elements
             }
             
             var _valueDictionary = action.PrepareActionValue(Owner); // TODO may be right: source
-            
+
             bool _last = action.JudgeLastAndNotExeced(target.Owner, num);
             bool _targetOneParts = action.AlreadyExecedData[target.Owner][num].TargetPartsNumber == 1;
             /*if (!target.ResistStatus(action.ActionType, action.ActionDetail1, this.Owner, _last, _targetOneParts, target) && action.JudgeIsAlreadyExeced(target.Owner, num))

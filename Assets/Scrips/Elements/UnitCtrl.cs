@@ -4909,8 +4909,10 @@ this.updateCurColor();
         {
             if (battleManager.GameState != eBattleGameState.PLAY)
                 return;
+#if !DONT_USE_EX
             _value = _value ?? 0f;
             _value2 = _value2 ?? 0f;
+#endif
             AbnormalStateEffectPrefabData abnormalEffectData = _action?.CreateAbnormalEffectData();
             if (_action != null && _action.AbnormalStateFieldAction != null)
                 _action.AbnormalStateFieldAction.TargetAbnormalState = _abnormalState;
@@ -9757,6 +9759,7 @@ this.updateCurColor();
             if (_damageData.ActionType != eActionType.INHIBIT_HEAL && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
             var num6 = BattleUtil.DoubleToLong(_fDamage);
+
             bool flag2 = (long)Hp > 0L;
             long num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)Hp;
@@ -9920,7 +9923,6 @@ this.updateCurColor();
             }*/
             if (OnDamage != null)
                 OnDamage(_byAttack, num6, _critical);
-
 
             if (!battleManager.skipping)
             {
@@ -13579,6 +13581,8 @@ this.updateCurColor();
         {
             get
             {
+                if (!((double)Energy >= 1000.0)) return false;
+
                 if ((battleManager.BattleCategory == eBattleCategory.DUNGEON ||
                      battleManager.BattleCategory == eBattleCategory.TOWER ||
                      battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL ||
@@ -13612,8 +13616,8 @@ this.updateCurColor();
                         (!IsDead && CurrentState != ActionState.DIE) &&
                         (!IsConfusionOrConvert() && (long) Hp > 0L &&
                          (!isAwakeMotion && !unitActionController.DisableUBByModeChange))) &&
-                       ((double) Energy >= 1000.0 && SkillLevels[UnionBurstSkillId] != 0 &&
-                        !GetIsReduceEnergy()) && battleManager.LAMHAIODABF == 0;
+                       SkillLevels[UnionBurstSkillId] != 0 &&
+                       !GetIsReduceEnergy() && battleManager.LAMHAIODABF == 0;
                 //return this.ToadDatas.Count <= 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.UB_SILENCE) && (this.CurrentState != UnitCtrl.ActionState.SKILL_1 || this.unitActionController.Skill1IsChargeTime) && (!this.IsUnableActionState() && this.CurrentState != UnitCtrl.ActionState.DAMAGE && (this.UnionBurstSkillId != 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE))) && (!this.IsDead && this.CurrentState != UnitCtrl.ActionState.DIE && (!this.IsConfusionOrConvert() && (long)this.Hp > 0L) && (!this.isAwakeMotion && !this.unitActionController.DisableUBByModeChange && ((double)this.Energy >= 1000.0 && this.SkillLevels[this.UnionBurstSkillId] != 0))) && !this.GetIsReduceEnergy() && this.battleManager.LAMHAIODABF == 0;
             }
         }
@@ -13709,11 +13713,6 @@ this.updateCurColor();
         }
         public bool IsAutoOrUbExecTrying()
         {
-            // Debug.Log($"frame = {battleManager.FrameCount} unit = {this.UnitId}, recast = {this.m_fCastTimer}");
-            //if (this.IsUbExecTrying && (!this.battleManager.UnitUiCtrl.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())
-            if (IsUbExecTrying && (!MyGameCtrl.Instance.IsAutoMode || CurrentState != ActionState.IDLE) && JudgeSkillReadyAndIsMyTurn())
-                //battleManager.SetOnlyAutoClearFlag(false);
-                battleManager.DisableAutoClear();
             if (IsUbExecTrying)
                 return true;
             if (pressing) return true;

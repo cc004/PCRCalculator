@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
@@ -11,6 +12,168 @@ using Elements;
 
 namespace Elements
 {
+#if DONT_USE_EX
+    public struct LongWithEx : IComparable<LongWithEx>, IEquatable<LongWithEx>
+    {
+        private long value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal LongWithEx(long value = 0)
+        {
+            this.value = value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long Emulate(int hash) => value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetState(int seed)
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LongWithEx Select(Func<long, long> selector, string select)
+        {
+            return selector(this);
+        }
+
+        public long Expect
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return value; }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long Expected(int N)
+        {
+            return value;
+        }
+
+        public long Stddev
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float Probability(Func<long, bool> predict)
+        {
+            return predict(value) ? 1 : 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator long(LongWithEx self) => self.value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator LongWithEx(long x) =>
+            new LongWithEx(x);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator DoubleWithEx(LongWithEx x) =>
+            new DoubleWithEx(x.value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LongWithEx Max(long f)
+        {
+            return Math.Max(value, f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LongWithEx Min(long f)
+        {
+            return Math.Min(value, f);
+        }
+
+        public override string ToString() => ((long)this).ToString();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LongWithEx Abs() => Math.Abs(value);
+
+        public int CompareTo(LongWithEx other) => ((long)this).CompareTo(other);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static LongWithEx operator +(LongWithEx a, LongWithEx b) => a.value + b.value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static LongWithEx operator -(LongWithEx a, LongWithEx b) => a.value - b.value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static LongWithEx operator *(LongWithEx a, LongWithEx b) => a.value * b.value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
+        public static DoubleWithEx operator /(LongWithEx a, LongWithEx b) => a.value / b.value;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(LongWithEx a, LongWithEx b) => !a.Equals(b);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator +(LongWithEx a, double b) => (DoubleWithEx)a + b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator +(double a, LongWithEx b) => a + (DoubleWithEx)b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator +(LongWithEx a, float b) => (DoubleWithEx)a + b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator +(float a, LongWithEx b) => a + (DoubleWithEx)b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator -(LongWithEx a, double b) => (DoubleWithEx)a - b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator -(double a, LongWithEx b) => a - (DoubleWithEx)b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator -(LongWithEx a, float b) => (DoubleWithEx)a - b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator -(float a, LongWithEx b) => a - (DoubleWithEx)b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator *(LongWithEx a, double b) => (DoubleWithEx)a * b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator *(double a, LongWithEx b) => a * (DoubleWithEx)b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator *(LongWithEx a, float b) => (DoubleWithEx)a * b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator *(float a, LongWithEx b) => a * (DoubleWithEx)b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator /(LongWithEx a, double b) => (DoubleWithEx)a / b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator /(double a, LongWithEx b) => a / (DoubleWithEx)b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator /(LongWithEx a, float b) => (DoubleWithEx)a / b;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleWithEx operator /(float a, LongWithEx b) => a / (DoubleWithEx)b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(LongWithEx other)
+        {
+            return value.Equals(other.value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is LongWithEx other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LongWithEx ZeroCapForHp()
+        {
+            return value > 0 ? this : 0;
+        }
+
+        public string ToExpression(int hash)
+        {
+            return string.Empty;
+        }
+
+        private int ToExpression(StringBuilder sb, int hash, int num = 0)
+        {
+            return num;
+        }
+    }
+#else
     public class LongWithEx : IComparable<LongWithEx>, IEquatable<LongWithEx>, IWithEx
     {
         private bool pure => min == max;
@@ -322,4 +485,5 @@ namespace Elements
             return num;
         }
     }
+#endif
 }

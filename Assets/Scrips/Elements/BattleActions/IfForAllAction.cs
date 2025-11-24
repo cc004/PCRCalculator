@@ -90,7 +90,9 @@ namespace Elements
             bool flag = false;
             if (ActionDetail1 == 1000)
                 return;
-            DoubleWithEx prob = null;
+
+            DoubleWithEx? prob = null;
+
             switch ((eIfType)ActionDetail1)
             {
                 case eIfType.STOP:
@@ -290,6 +292,18 @@ namespace Elements
                     positiveAction.ActionType == negativeAction.ActionType &&
                     positiveAction.ActionChildrenIndexes.Count == 0 && negativeAction.ActionChildrenIndexes.Count == 0)
                 {
+#if DONT_USE_EX
+                    if (positiveAction != null)
+                    {
+                        positiveAction.oppositeAction = negativeAction;
+                        positiveAction.oppositeActionProb = 1 - prob.Value; // assert (float)prob == 1
+                    }
+                    if (negativeAction != null)
+                    {
+                        negativeAction.oppositeAction = positiveAction;
+                        negativeAction.oppositeActionProb = prob.Value; // assert (float)prob == 0
+                    }
+#else
                     if (positiveAction != null)
                     {
                         positiveAction.oppositeAction = negativeAction;
@@ -300,10 +314,11 @@ namespace Elements
                         negativeAction.oppositeAction = positiveAction;
                         negativeAction.oppositeActionProb = prob; // assert (float)prob == 0
                     }
-                    
+#endif
+
                     // for now, whether we cancel the positive action or the negative action should've have
                     // the same effect, so we can execute the non-null action to ensure our calculation is correct.
-                    
+
                     // when the only action is cancelled
                     if ((flag ? ActionDetail2 : ActionDetail3) == 0)
                         // revert the branch

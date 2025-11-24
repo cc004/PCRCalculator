@@ -1420,8 +1420,10 @@ namespace PCRCaculator.Guild
 
                         if (BattleManager.Instance.scriptMgr != null)
                         {
+#if !DONT_USE_EX
                             foreach (var data in BattleManager.Instance.scriptMgr.additionalData)
                                 sw.WriteLine($"{data.comment}: {data.data?.ToExpression(rnd.Next())}");
+#endif
                         }
                     }
                 }
