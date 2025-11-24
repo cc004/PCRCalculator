@@ -84,7 +84,44 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
             }
         }
     }
-    
+
+    [MenuItem("PCRTools/下载全部角色数据")]
+    public static void DownloadAllUnitFiles()
+    {
+        var regexes = new (string, bool)[]
+        {
+            (@"a/all_battleunit_1\d\d\d\d\d(_\d*)?\.unity3d", true),
+            (@"a/all_battleunitprefab_1\d\d\d\d\d(_\d*)?\.unity3d", true),
+            (@"a/all_fxsk_\d\d\d\d\.unity3d", true),
+            (@"a/icon_icon_skill_.*\.unity3d", true),
+            (@"a/spine_1\d\d\d\d\d(_\d*)?\.cysp\.unity3d", true),
+            (@"a/spine_4\d\d\d\d\d(_\d*)?\.cysp\.unity3d", true),
+            (@"a/spine_sdmodechange_1\d\d\d31.unity3d", true),
+            (@"a/spine_sdmodechange_4\d\d\d\d\d(_\d*)?\.unity3d", true),
+            (@"a/spine_sdnormal_1\d\d\d31.unity3d", true),
+            (@"a/spine_sdnormal_1\d\d\d61.unity3d", true),
+            (@"a/spine_sdnormal_4\d\d\d\d\d(_\d*)?\.unity3d", true),
+            (@"a/unit_icon_unit_1\d\d\d31\.unity3d", true),
+            (@"a/unit_icon_unit_1\d\d\d61\.unity3d", true),
+        };
+
+        ABExTool.StaticInitialize().Wait();
+        var client = new HttpClient();
+
+        foreach (var (reg, useNew) in regexes)
+        {
+            foreach (var (mgr, content) in ABExTool.CacheAllFiles(new Regex(reg), !useNew))
+            {
+                var filePath = ABExTool.persistentDataPath + "/.ABExt2/jp10055800/" + content.url.Split('/').Last();
+                if (File.Exists(filePath)) continue;
+                Debug.Log($"resolving: {content.url}");
+                var resp = mgr.ResolveFile(content.url);
+                File.WriteAllBytes(filePath,
+                    resp);
+            }
+        }
+    }
+
     [MenuItem("PCRTools/生成技能时间数据到txt")]
     public static void CreateUnitTimeDic()
     {

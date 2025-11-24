@@ -63542,7 +63542,7 @@ MonoBehaviour:
   LatestSkillVoiceTime: -0.5
   IsPausingEffectSkippedInThisFrame: 0
   ActionStartTimeCounter: 0
-  isReleaseSlipDamageLogBarrier: 0
+  isReleaseSlipDamageLogBarrier: 1
   allLogBarrierStartValue: 10000000
   allLogBarrierEffectValue: 100000
   princessFormMoviePlayer: {fileID: 1992102222}

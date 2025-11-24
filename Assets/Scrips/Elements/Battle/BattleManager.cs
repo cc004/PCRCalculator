@@ -394,6 +394,7 @@ namespace Elements.Battle
             set;
         }
         public bool LOGNEDLPEIJ { get; set; }
+        public bool IsTalentBonusEffectPlaying { get; set; }
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
 
@@ -743,6 +744,7 @@ namespace Elements.Battle
             scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
+            IsTalentBonusEffectPlaying = false;
             isUpdateFrameExecuted = true;
 
             var logicFrameCount = BattleHeaderController.CurrentFrameCount;
@@ -4073,7 +4075,7 @@ namespace Elements.Battle
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             Resources.UnloadUnusedAssets();
             LKLFFOFDCHK = false;
-            GPFLCBONNMK = false;
+            allStandByDone = false;
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             // ISSUE: object of a compiler-generated type is created
@@ -4095,7 +4097,8 @@ namespace Elements.Battle
             // battleManager.playCameraPos0 = battleManager.playCamera.transform.position;
             battleManager.tempRandomState = UnityEngine.Random.state;
             //int seed = 666;//battleManager.battleProcessor.GetSeed();
-            int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
+            // int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
+            int seed = new System.Random().Next();
             if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
@@ -4513,7 +4516,6 @@ namespace Elements.Battle
 
         public bool _IsReleasedKnightEnhance = true;
         public bool IsReleaseSkillHasteLogic = true;
-        public bool _IsNefeiBugFix = MainManager.Instance.PlayerSetting.IsNefeiBugFix;
         public Dictionary<int, long> UnitTalentFormationBonusDictionary { get => GuildManager.Instance.UnitTalentFormationBonusDictionary; }
 
         /// <summary>
@@ -4939,22 +4941,28 @@ namespace Elements.Battle
 
         private bool LKLFFOFDCHK { get; set; }
 
-        private bool GPFLCBONNMK { get; set; }
+        private bool allStandByDone { get; set; }
 
         public int LAMHAIODABF { get; set; }
 
         public bool GetAdvPlayed() => LKLFFOFDCHK;
 
-        public void CallbackStanbyDone(UnitCtrl FNHGFDNICFG)
+        public void CallbackStanbyDone(UnitCtrl _unit)
         {
-            if (GPFLCBONNMK)
+            if (allStandByDone)
                 return;
             for (int index = 0; index < UnitList.Count; ++index)
             {
                 if (!UnitList[index].StandByDone)
                     return;
             }
-            GPFLCBONNMK = true;
+            allStandByDone = true;
+            if (tempData.isGuildBattle) // hasTalentFormationBonus
+            {
+                IsPausingEffectSkippedInThisFrame = true;
+                IsTalentBonusEffectPlaying = true;
+            }
+
             PlayStory(() => LKLFFOFDCHK = true, 
                 0,//this.battleProcessor.GetNextWaveStartStoryId(), 
                 false);
