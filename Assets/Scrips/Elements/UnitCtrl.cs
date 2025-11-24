@@ -2609,6 +2609,7 @@ this.updateCurColor();
             StartAtk = (long)Mathf.RoundToInt(baseData.Atk);
             StartMagicStr = (long)Mathf.RoundToInt(baseData.Magic_str);
             StartMagicDef = (long)Mathf.RoundToInt(baseData.Magic_def);
+            StartMaxHP = StartHpWithoutPassive = (long)Mathf.RoundToInt(baseData.RealHp);
 
             var baseHp = (long)Mathf.RoundToInt(baseData.Hp);
             DefForDamagedEnergy = StartDef;
@@ -2633,20 +2634,20 @@ this.updateCurColor();
                 var data = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup();
                 if (MyGameCtrl.Instance.tempData.isGuildEnemyViolent)
                 {
-                    MaxHp = StartMaxHP = StartHpWithoutPassive = MaxHpAfterPassive = (long)baseData.RealHp;
+                    MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = MaxHp / 2 - 1;
                 }
                 else if (MyGameCtrl.Instance.tempData.isGuildBattle && data.usePlayerSettingHP && data.playerSetingHP > 0)
                 {
-                    MaxHp = StartMaxHP = StartHpWithoutPassive = MaxHpAfterPassive = (long)baseData.RealHp;
+                    MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = data.playerSetingHP;
                 }
                 else
-                    Hp = (long)(MaxHp = StartMaxHP = StartHpWithoutPassive = MaxHpAfterPassive = (long)baseData.RealHp);
+                    Hp = (long)(MaxHp = MaxHpAfterPassive = (long)baseData.RealHp);
                 useLogBarrier = data.useLogBarrierNew;
             }
             else
-                Hp = (long)(MaxHp = StartMaxHP = StartHpWithoutPassive = MaxHpAfterPassive = (long)baseData.RealHp);
+                Hp = (long)(MaxHp = MaxHpAfterPassive = (long)baseData.RealHp);
 
             /*if (IsBoss && group.isSpecialBoss && (group.specialBossID == 666666 || group.specialBossID == 666667))
             {
