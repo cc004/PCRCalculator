@@ -4092,6 +4092,7 @@ namespace Elements.Battle
             allStandByDone = false;
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
+            skipping = tempData.skipping;
             // ISSUE: object of a compiler-generated type is created
             // ISSUE: variable of a compiler-generated type
             //BattleManager.FDEDCCJJGHM fdedccjjghm = new BattleManager.FDEDCCJJGHM();
@@ -4544,7 +4545,6 @@ namespace Elements.Battle
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();
             }
-            battleManager.skipping = tempData.skipping;
             RestFrameCount();
             stopWatch.Restart();
             battleFinishedProcessed = false;
