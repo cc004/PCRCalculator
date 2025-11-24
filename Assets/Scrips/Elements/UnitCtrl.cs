@@ -7100,9 +7100,10 @@ this.updateCurColor();
         {
             if (_kind == BuffParamKind.MAX_HP)
             {
+                /*
                 if (maxHpDebufCounter == 0)
                 {
-                    /*if (maxHpDebufEffectRight == null)
+                    if (maxHpDebufEffectRight == null)
                     {
                         maxHpDebufEffectRight = createMaxHpDebufEffect(_left: false);
                         maxHpDebufEffectLeft = createMaxHpDebufEffect(_left: true);
@@ -7114,43 +7115,53 @@ this.updateCurColor();
                     else
                     {
                         maxHpDebufEffectLeft.SetActive(_isActive: false);
-                    }*/
-                }
+                    }
+                }*/
                 maxHpDebufCounter++;
             }
             EnableBuffParam(_kind, _value, true, _source, _isBuff, _additional, _isShowIcon, _maxTime);
             float time = 0.0f;
-            bool flag2;
             while (true)
             {
                 if (!isStopBuffDebuffEffectTimer)
                 {
                     time += DeltaTimeForPause;
                 }
+                /*
                 if (time > 1f)
                 {
                     buffDebuffSkilIds.Remove(_skillId);
-                }
-                bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
+                }*/
+                /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
                 flag2 = _despelable && flag;
-                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)
+                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
+                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || _buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) && _despelable)
                 {
                     break;
                 }
                 yield return null;
             }
-            buffDebuffSkilIds.Remove(_skillId);
+            /*
+            // buffDebuffSkilIds.Remove(_skillId);
             if (_bonusId != 0 && (long)Hp > 0)
             {
                 //battleManager.DeleteBonusIcon(_bonusId);
-            }
-            if (time >= _maxTime || flag2 || IdleOnly || _kind != BuffParamKind.MAX_HP)
+            }*/
+            /*
+             * break 必然有 time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2
+             * 原来：time >= _maxTime || flag2 || IdleOnly || _kind != BuffParamKind.MAX_HP
+             * 更改为: _kind != BuffParamKind.MAX_HP || !((long)Hp <= 0)
+             */
+            if (_kind != BuffParamKind.MAX_HP || !((long)Hp <= 0))
+            // if (time >= _maxTime || flag2 || IdleOnly || _kind != BuffParamKind.MAX_HP)
             {
                 EnableBuffParam(_kind, _value, _enable: false, _source, _isBuff, _additional, _isShowIcon, _maxTime);
             }
             else
             {
+#if !REDUCE_ANALYSE
                 OnChangeState.Call(this, eStateIconType.DEBUFF_MAX_HP, ADIFIOLCOPN: false);
+#endif
                 MaxHp = MaxHpAfterPassive;
             }
             if (_kind == BuffParamKind.MAX_HP)
@@ -7239,6 +7250,10 @@ this.updateCurColor();
             {
                 return;
             }
+
+#if REDUCE_ANALYSE
+            if (_kind != BuffParamKind.NUM)
+#else
             eStateIconType eStateIconType2 = eStateIconType.NONE;
 			if (_showsIcon)
 			{
@@ -7276,6 +7291,7 @@ this.updateCurColor();
             button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)
+#endif
             {
                 if (_enable)
                 {
