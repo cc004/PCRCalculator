@@ -38,7 +38,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, Action<string> action)
+          ValueDictionary _valueDictionary, Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             if (ActionDetail2 != 0)
@@ -252,7 +252,7 @@ namespace Elements
           UnitCtrl _source,
           BasePartsData _target,
           UnitActionController _sourceActionController,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => new Vector3((float)((_source.IsLeftDir ? 1.0 : -1.0) * ((double)_valueDictionary[eValueNumber.VALUE_1] + Math.Sign(_valueDictionary[eValueNumber.VALUE_1]) * (_target.GetBodyWidth() / 2.0 + _source.BodyWidth / 2.0))), 0.0f, 0.0f);
+          ValueDictionary _valueDictionary) => new Vector3((float)((_source.IsLeftDir ? 1.0 : -1.0) * ((double)_valueDictionary[eValueNumber.VALUE_1] + Math.Sign(_valueDictionary[eValueNumber.VALUE_1]) * (_target.GetBodyWidth() / 2.0 + _source.BodyWidth / 2.0))), 0.0f, 0.0f);
 
         private enum eMoveType
         {

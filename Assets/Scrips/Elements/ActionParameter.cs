@@ -71,7 +71,7 @@ namespace Elements
 
         public List<BasePartsData> TargetList { get; set; }
 
-        public Dictionary<eValueNumber, DoubleWithEx> Value { get; set; }
+        public ValueDictionary Value { get; set; }
 
         public float[] ExecTime { get; set; }
 
@@ -146,11 +146,11 @@ namespace Elements
         public Dictionary<BasePartsData, LongWithEx> TotalDamageDictionary { get; set; } =
             new Dictionary<BasePartsData, LongWithEx>();
 
-        public Dictionary<eValueNumber, DoubleWithEx> AdditionalValue { get; set; }
+        public ValueDictionary AdditionalValue { get; set; }
 
-        public Dictionary<eValueNumber, DoubleWithEx> MultipleValue { get; set; }
+        public ValueDictionary MultipleValue { get; set; }
 
-        public Dictionary<eValueNumber, DoubleWithEx> DivideValue { get; set; }
+        public ValueDictionary DivideValue { get; set; }
 
         public MasterSkillAction.SkillAction MasterData { get; set; }
 
@@ -227,7 +227,7 @@ namespace Elements
             Skill _skill,
             float _starttime,
             Dictionary<int, bool> _enabledChildAction,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+            ValueDictionary _valueDictionary,
             Action<string> callBack = null)
         {
             ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction,
@@ -246,7 +246,7 @@ namespace Elements
             Skill _skill,
             float _starttime,
             Dictionary<int, bool> _enabledChildAction,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+            ValueDictionary _valueDictionary)
 
         {
         }
@@ -362,25 +362,26 @@ namespace Elements
 
         public ProbEvent relatedEvent;
 
-        public Dictionary<eValueNumber, DoubleWithEx> oppositeValue = new Dictionary<eValueNumber, DoubleWithEx>();
+        public ValueDictionary oppositeValue = new ValueDictionary();
 
-        public Dictionary<eValueNumber, DoubleWithEx> PrepareActionValue(UnitCtrl _owner)
+        public ValueDictionary PrepareActionValue(UnitCtrl _owner)
         {
 
-            Dictionary<eValueNumber, DoubleWithEx> additionalValue = AdditionalValue;
-            Dictionary<eValueNumber, DoubleWithEx> multipleValue = MultipleValue;
-            Dictionary<eValueNumber, DoubleWithEx> divideValue = DivideValue;
+            ValueDictionary additionalValue = AdditionalValue;
+            ValueDictionary multipleValue = MultipleValue;
+            ValueDictionary divideValue = DivideValue;
             Func<ActionParameter, eValueNumber, DoubleWithEx> func = (_action, _type) =>
             {
                 DoubleWithEx num1 = 0.0;
-                if (additionalValue != null && additionalValue.ContainsKey(_type))
-                    num1 = additionalValue[_type];
+                if (additionalValue != null && additionalValue.TryGetValue(_type, out var value))
+                    num1 = value;
                 DoubleWithEx num2 = 1.0;
-                if (multipleValue != null && multipleValue.ContainsKey(_type))
-                    num2 = multipleValue[_type];
+                if (multipleValue != null && multipleValue.TryGetValue(_type, out var value1))
+                    num2 = value1;
                 DoubleWithEx num3 = 1;
-                if (divideValue != null && divideValue.ContainsKey(_type) && (double) divideValue[_type] != 0.0)
-                    num3 = divideValue[_type];
+                if (divideValue != null && divideValue.TryGetValue(_type, out var value2))
+                    if ((double) value2 != 0.0)
+                        num3 = value2;
                 DoubleWithEx num4 = 0.0;
                 // _action.Value.TryGetValue(_type, out num4);
                 num4 = _action.GetActionBaseValue(_owner, _type);
@@ -390,38 +391,14 @@ namespace Elements
                 var opp = oppositeValue.TryGetValue(_type, out var val) ? val : 0;
                 return result * (1 - oppositeActionProb) + opp * oppositeActionProb;
             };
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary =
-                new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer())
-                {
-                    {
-                        eValueNumber.VALUE_1,
-                        func(this, eValueNumber.VALUE_1)
-                    },
-                    {
-                        eValueNumber.VALUE_2,
-                        func(this, eValueNumber.VALUE_2)
-                    },
-                    {
-                        eValueNumber.VALUE_3,
-                        func(this, eValueNumber.VALUE_3)
-                    },
-                    {
-                        eValueNumber.VALUE_4,
-                        func(this, eValueNumber.VALUE_4)
-                    },
-                    {
-                        eValueNumber.VALUE_5,
-                        func(this, eValueNumber.VALUE_5)
-                    },
-                    {
-                        eValueNumber.VALUE_6,
-                        func(this, eValueNumber.VALUE_6)
-                    },
-                    {
-                        eValueNumber.VALUE_7,
-                        func(this, eValueNumber.VALUE_7)
-                    }
-                };
+            ValueDictionary _valueDictionary = new ValueDictionary();
+            _valueDictionary.Add(eValueNumber.VALUE_1, func(this, eValueNumber.VALUE_1));
+            _valueDictionary.Add(eValueNumber.VALUE_2, func(this, eValueNumber.VALUE_2));
+            _valueDictionary.Add(eValueNumber.VALUE_3, func(this, eValueNumber.VALUE_3));
+            _valueDictionary.Add(eValueNumber.VALUE_4, func(this, eValueNumber.VALUE_4));
+            _valueDictionary.Add(eValueNumber.VALUE_5, func(this, eValueNumber.VALUE_5));
+            _valueDictionary.Add(eValueNumber.VALUE_6, func(this, eValueNumber.VALUE_6));
+            _valueDictionary.Add(eValueNumber.VALUE_7, func(this, eValueNumber.VALUE_7));
             return _valueDictionary;
         }
 

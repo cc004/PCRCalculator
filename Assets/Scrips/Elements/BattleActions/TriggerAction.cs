@@ -247,6 +247,7 @@ namespace Elements
                                  battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE))
                                 return;
 
+#if !NO_PROB_EVENT
                             GuildCalculator.Instance.dmglist.Add(new ProbEvent
                             {
                                 unit = _source.UnitNameEx,
@@ -255,8 +256,10 @@ namespace Elements
                                 description = $"({BattleHeaderController.CurrentFrameCount}){_source.UnitNameEx}的第{parts.Index}个部位提前break",
                                 isProb = true
                             });
+#endif
                             return;
                         }
+#if !NO_PROB_EVENT
                         GuildCalculator.Instance.dmglist.Add(new ProbEvent
                         {
                             unit = _source.UnitNameEx,
@@ -265,6 +268,7 @@ namespace Elements
                             description = $"({BattleHeaderController.CurrentFrameCount}){_source.UnitNameEx}的第{parts.Index}个部位未break",
                             isProb = true
                         });
+#endif
                         _source.AppendBreakLog(parts.BreakSource);
                         parts.IsBreak = true;
                         parts.OnBreak.Call();
@@ -500,7 +504,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+          ValueDictionary _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             eTriggerType actionDetail = (eTriggerType)base.ActionDetail1;

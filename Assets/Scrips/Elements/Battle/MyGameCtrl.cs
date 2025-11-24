@@ -566,7 +566,9 @@ namespace Elements
         }
         public void SetTimeCount(float LastTimeFloat)
         {
+#if !REDUCE_ANALYSE
             BattleUIManager.Instance.UpdateTimeCount(LastTimeFloat);
+#endif
         }
         public void SetBattleSpeed(float speed)
         {
@@ -986,9 +988,9 @@ namespace Elements
             }
             else if (tempData.isGuildBattle)
             {
-                #if UNITY_5_3_OR_NEWER
+#if UNITY_5_3_OR_NEWER
                 GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
-                #endif
+#endif
             }
             isBattleFinish = true;
         }

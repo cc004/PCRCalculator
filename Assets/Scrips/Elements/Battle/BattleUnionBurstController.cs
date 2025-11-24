@@ -158,6 +158,7 @@ namespace Elements.Battle
                         enemyCtrl.energyjudged = true;
                         var e = enemyCtrl.Energy;
 
+#if !NO_PROB_EVENT
                         GuildCalculator.Instance.dmglist.Add(new ProbEvent
                         {
                             unit = enemyCtrl.UnitNameEx,
@@ -165,6 +166,7 @@ namespace Elements.Battle
                             exp = hash => $"{e.ToExpression(hash)} >= 1000",
                             description = $"({BattleHeaderController.CurrentFrameCount}){enemyCtrl.UnitNameEx}的UB提前开出"
                         });
+#endif
                     }
                     continue;
                 }

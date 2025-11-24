@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using PCRCaculator.Guild;
 using UnityEngine;
@@ -14,9 +15,11 @@ using UnityEngine.Assertions;
 namespace Elements
 {
 #if DONT_USE_EX
+    [StructLayout(LayoutKind.Explicit)]
     public struct DoubleWithEx : IComparable<DoubleWithEx>, IEquatable<DoubleWithEx>
     {
-        private double value;
+        [FieldOffset(0)]
+        private readonly double value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DoubleWithEx(double value = 0.0)

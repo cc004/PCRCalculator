@@ -84,7 +84,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictinary)
+          ValueDictionary _valueDictinary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
             bool flag = false;
@@ -245,6 +245,7 @@ namespace Elements
                         var bound = ActionDetail1 % 100 / 100.0;
                         prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
 
+#if !NO_PROB_EVENT
                         if (flag)
                             GuildCalculator.Instance.dmglist.Add(new ProbEvent()
                             {
@@ -263,7 +264,7 @@ namespace Elements
                                 exp = hash => $"{now.ToExpression(hash)} < {bound}",
                                 description = $"({BattleHeaderController.CurrentFrameCount})对角色{_target.Owner.UnitNameEx}血量判定条件分歧失败（实际大于等于{bound}）"
                             });
-
+#endif
                         break;
                     }
                     else if (ActionDetail1 > 700)

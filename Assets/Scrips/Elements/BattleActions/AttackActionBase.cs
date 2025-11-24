@@ -61,7 +61,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+          ValueDictionary _valueDictionary)
         {
         }
 
@@ -200,7 +200,7 @@ namespace Elements
           UnitCtrl _source,
           BasePartsData _target,
           int _num,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           eAttackType _actionDetail1,
           bool _isCritical,
           Skill _skill,
@@ -328,7 +328,7 @@ namespace Elements
             }
             return damageData;
         }
-        private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
+        private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk)
         {
             var num = _valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3];
             num *= _target.Owner.GetDebuffDamageUpValue();
@@ -362,7 +362,7 @@ namespace Elements
             return num3;
         }
 
-        private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
+        private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk)
         {
             LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
@@ -382,7 +382,7 @@ namespace Elements
             return num;
         }
 
-        protected virtual double getCriticalDamageRate(Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => 1f;
+        protected virtual double getCriticalDamageRate(ValueDictionary _valueDictionary) => 1f;
 
         public override void SetLevel(float _level)
         {

@@ -1,21 +1,24 @@
-﻿using System;
+﻿using Elements;
+using PCRCaculator.Guild;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
-using PCRCaculator.Guild;
 using UnityEngine;
 using Random = System.Random;
-using Elements;
 
 namespace Elements
 {
 #if DONT_USE_EX
+    [StructLayout(LayoutKind.Explicit)]
     public struct LongWithEx : IComparable<LongWithEx>, IEquatable<LongWithEx>
     {
-        private long value;
+        [FieldOffset(0)]
+        private readonly long value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal LongWithEx(long value = 0)

@@ -146,7 +146,7 @@ public class CommandLineServer : MonoBehaviour
                 */
                 ++times;
 
-                MyGameCtrl.Instance.tempData.skipping = false;
+                MyGameCtrl.Instance.tempData.skipping = true;
 
                 IEnumerator UpdateBattleManager()
                 {
