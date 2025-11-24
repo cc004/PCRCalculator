@@ -59,6 +59,7 @@ namespace Elements.Battle
         public string TalentLevel { get; set; }
         public string TalentSkill { get; set; }
         public string TeamSkill { get; set; }
+        public List<int> SemanUBNum { get; set; }
         public eBattleResult Result { get; set; }
     }
 
@@ -568,6 +569,7 @@ namespace Elements.Battle
                 UnityEngine.CoroutineRunner.running.Clear();
 
                 #endif
+                // Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
 
                 // 如果已经标记为失败，直接返回
                 if (task.Status == BattleStatus.Failed)
@@ -614,6 +616,11 @@ namespace Elements.Battle
                         TeamSkill = GuildManager.Instance.GetFinalTeamSkillNodeDescription(),
                         Result = battleResult
                     };
+
+                    if (task.Request.IsGuildBattle && task.Request.IsSemanMode)
+                    {
+                        task.Result.SemanUBNum = BattleManager.Instance.semanubmanager.UBNums;
+                    }
 
                     task.Status = BattleStatus.Completed;
                     Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}, Seed={currentSeed}");

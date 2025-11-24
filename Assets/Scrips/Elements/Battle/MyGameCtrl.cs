@@ -460,7 +460,7 @@ namespace Elements
             staticBattleManager.Init(this);
             if (req.IsGuildBattle)
             {
-                if (IsSemanMode)
+                if (req.IsSemanMode)
                 {
                     BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
                     BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
