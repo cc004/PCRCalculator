@@ -412,6 +412,7 @@ namespace Elements
                 // tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                 tempData.tryCount = req.Settings.UBTryingCount;
                 tempData.SettingData = new();
+                tempData.SettingData.limitTime = req.BattleTime;
                 tempData.CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType.FullBarrier);
             }
             else
