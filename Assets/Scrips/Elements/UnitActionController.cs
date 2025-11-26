@@ -1572,7 +1572,8 @@ namespace Elements
             actionExecData.actionID = action.ActionId;
             actionExecData.unitid = Owner.UnitId;
             actionExecData.actionType = action.ActionType.GetDescription();
-            actionExecData.targetNames = new List<string> { target.Owner.UnitName };
+            actionExecData.targetNames = new List<string> { currentTarget.Owner.UnitName };
+
             if (exec)
             {
                 if (_protectedTarget != null)
@@ -1660,12 +1661,14 @@ namespace Elements
                     }
                 }
 
+                actionExecData.targetNames = new List<string> { currentTarget.Owner.UnitName };
+
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 if (!battleManager.skipping)
                 {
                     var skillName = string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName;
-                    Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
+                    Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + currentTarget.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
                 }
 
                 var detail = action.GetSkillDetail(Owner);
@@ -1701,7 +1704,7 @@ namespace Elements
             //change end
             if (action.ActionType == eActionType.REFLEXIVE)
                 return;
-            if (!action.HitOnceDic.ContainsKey(target))
+            if (!action.HitOnceDic.ContainsKey(currentTarget))
             {
                 ExecChildrenAction(action, skill, currentTarget, num, starttime, dictionary, _execChildNoFrame, finalProtectedTarget);
             }
@@ -1711,14 +1714,14 @@ namespace Elements
                     return;
 
                 if (action.ActionChildrenIndexes.Count > 0 &&
-                    action.HitOnceProbDic.TryGetValue(target, out var val) && val != null)
+                    action.HitOnceProbDic.TryGetValue(currentTarget, out var val) && val != null)
                 {
                     var children = string.Join(",",
                         action.ActionChildrenIndexes.Select(id => skill.ActionParameters[id]));
-                    val.description += $"(可能影响到技能{children}的执行，原定{(action.HitOnceDic[target] ? "执行" : "未执行")})";
+                    val.description += $"(可能影响到技能{children}的执行，原定{(action.HitOnceDic[currentTarget] ? "执行" : "未执行")})";
                 }
-                
-                if (action.HitOnceDic[target])
+
+                if (action.HitOnceDic[currentTarget])
                 {
                     ExecChildrenAction(action, skill, currentTarget, num, starttime, dictionary, _execChildNoFrame, finalProtectedTarget);
                 }
