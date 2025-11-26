@@ -29,6 +29,7 @@ public sealed class GameObject : UnityEngine.Object
         set => m_IsActive = value;
     }
 
+    [Serializable]
     private class ComponentPair
     {
         public Component component;

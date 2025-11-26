@@ -18,7 +18,7 @@ namespace UnityEngine
 
             foreach (var field in type.GetFields(flags))
             {
-                if (field.IsPublic || Attribute.IsDefined(field, typeof(SerializeField)))
+                if (field.IsPublic && !Attribute.IsDefined(field, typeof(NonSerializedAttribute)) || Attribute.IsDefined(field, typeof(SerializeField)))
                     yield return field;
             }
 

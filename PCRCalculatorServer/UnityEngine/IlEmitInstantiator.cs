@@ -7,7 +7,24 @@ namespace UnityEngine;
 
 public static class IlEmitInstantiator
 {
-    private static Dictionary<object, DynamicMethod> instantiator = new Dictionary<object, DynamicMethod>();
+    private static Dictionary<object, Func<GameObject>> instantiator = new ();
+    private static Dictionary<object, int> objectIndex = new();
+    private static List<object> objectCache = new();
+    
+    private static object GetObject(int idx) => objectCache[idx];
+    private static void EmitCachedObject(ILGenerator il, object o)
+    {
+        if (!objectIndex.TryGetValue(o, out var idx))
+        {
+            idx = objectCache.Count;
+            objectCache.Add(o);
+            objectIndex.Add(o, idx);
+        }
+
+        il.Emit(OpCodes.Ldc_I4, idx);
+        il.Emit(OpCodes.Call, typeof(IlEmitInstantiator).GetMethod("GetObject", BindingFlags.NonPublic | BindingFlags.Static));
+    }
+
     // 递归版本
     private static void EmitValueInternal(ILGenerator il, object o, Type t, Dictionary<object, LocalBuilder> context)
     {
@@ -208,6 +225,13 @@ public static class IlEmitInstantiator
         }
         else
         {
+            if (!t.IsSubclassOf(typeof(UnityEngine.Object)) &&
+                t.GetCustomAttribute<System.SerializableAttribute>() == null)
+            {
+                EmitCachedObject(il, o);
+                return;
+            }
+
             LocalBuilder local = il.DeclareLocal(t);
 
             // ---------- 引用类型（深拷贝） ----------
@@ -247,19 +271,19 @@ public static class IlEmitInstantiator
         EmitValueInternal(il, o, o.GetType(), new Dictionary<object, LocalBuilder>());
     }
 
-    private static DynamicMethod BuildObjectInstantiator(object original)
+    private static Func<GameObject> BuildObjectInstantiator(GameObject original)
     {
-        var dm = new DynamicMethod("ObjectInstantiator_" + Guid.NewGuid(), typeof(object), Type.EmptyTypes, true);
+        var dm = new DynamicMethod("ObjectInstantiator_" + Guid.NewGuid(), typeof(GameObject), Type.EmptyTypes, true);
 
         var il = dm.GetILGenerator();
 
         EmitValue(il, original);
         il.Emit(OpCodes.Ret);
 
-        return dm;
+        return dm.CreateDelegate<Func<GameObject>>();
     }
 
-    public static object Instantiate(object original)
+    public static GameObject Instantiate(GameObject original)
     {
         if (original == null) return null;
         if (!instantiator.TryGetValue(original, out var val))
@@ -268,6 +292,6 @@ public static class IlEmitInstantiator
             instantiator[original] = val;
         }
 
-        return val.Invoke(null, []);
+        return val();
     }
 }

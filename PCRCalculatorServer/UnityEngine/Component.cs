@@ -10,6 +10,7 @@ using UnityEngine.Internal;
 using UnityEngine.Scripting;
 
 namespace UnityEngine;
+
 [RequiredByNativeCode]
 public class Component : UnityEngine.Object
 {
