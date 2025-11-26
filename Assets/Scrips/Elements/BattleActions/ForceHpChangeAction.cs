@@ -74,7 +74,7 @@ namespace Elements
         private void recoverTarget(UnitCtrl _source, BasePartsData _target, int _hpDiff)
         {
             int num = Mathf.Min(_hpDiff, (int)(_target.Owner.MaxHp - (long)_target.Owner.Hp));
-            _target.Owner.SetRecovery(num, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _target: _target);
+            _target.Owner.SetRecovery(num, 0, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _target: _target);
         }
     }
 }

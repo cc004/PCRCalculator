@@ -241,11 +241,11 @@ namespace Elements
                     else if (ActionDetail1 > 900)
                     {
                         flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
-                        var now = _target.Owner.Hp / _target.Owner.MaxHp;
-                        var bound = ActionDetail1 % 100 / 100.0;
-                        prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
 
 #if !NO_PROB_EVENT
+                        var now = (DoubleWithEx)_target.Owner.Hp / _target.Owner.MaxHp;
+                        var bound = ActionDetail1 % 100 / 100.0;
+                        prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
                         if (flag)
                             GuildCalculator.Instance.dmglist.Add(new ProbEvent()
                             {

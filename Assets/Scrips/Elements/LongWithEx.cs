@@ -101,7 +101,7 @@ namespace Elements
         public static LongWithEx operator *(LongWithEx a, LongWithEx b) => a.value * b.value;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
-        public static DoubleWithEx operator /(LongWithEx a, LongWithEx b) => a.value / b.value;
+        public static LongWithEx operator /(LongWithEx a, LongWithEx b) => a.value / b.value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
@@ -387,7 +387,11 @@ namespace Elements
             return Op(a, b, (x, y) => x * y, "mul");
         }
 
-        public static DoubleWithEx operator /(LongWithEx a, LongWithEx b) => (DoubleWithEx)a / (DoubleWithEx)b;
+        public static LongWithEx operator /(LongWithEx a, LongWithEx b)
+        {
+            if (b.StrictlyEquals(1)) return a;
+            return Op(a, b, (x, y) => x / y, "div");
+        }
 
         public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
         public static bool operator !=(LongWithEx a, LongWithEx b) => !a.Equals(b);

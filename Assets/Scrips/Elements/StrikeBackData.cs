@@ -70,7 +70,7 @@ namespace Elements
         case eStrikeBackType.PHYSICAL_DRAIN:
         case eStrikeBackType.MAGIC_DRAIN:
         case eStrikeBackType.BOTH_DRAIN:
-          _source.SetRecovery(_recovery, UnitCtrl.eInhibitHealType.PHYSICS, _source);
+          _source.SetRecovery(_recovery, 0, UnitCtrl.eInhibitHealType.PHYSICS, _source);
           break;
       }
 

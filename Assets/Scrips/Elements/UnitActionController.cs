@@ -2514,11 +2514,11 @@ namespace Elements
                     break;
                 case PriorityPattern.HP_ASC:
                     QuickSort(targetList, UnitCtrl.CompareLifeAsc);
-                    AddProbEvent(UnitCtrl.CompareLifeAsc, u => u.Hp / u.MaxHp);
+                    AddProbEvent(UnitCtrl.CompareLifeAsc, u => (DoubleWithEx)u.Hp / u.MaxHp);
                     break;
                 case PriorityPattern.HP_DEC:
                     QuickSort(targetList, UnitCtrl.CompareLifeDec);
-                    AddProbEvent(UnitCtrl.CompareLifeDec, u => u.Hp / u.MaxHp);
+                    AddProbEvent(UnitCtrl.CompareLifeDec, u => (DoubleWithEx)u.Hp / u.MaxHp);
                     break;
                 case PriorityPattern.OWNER:
                     targetList.Clear();
