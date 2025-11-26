@@ -387,7 +387,11 @@ namespace Elements
             return Op(a, b, (x, y) => x * y, "mul");
         }
 
-        public static LongWithEx operator /(LongWithEx a, LongWithEx b) => a / b;
+        public static LongWithEx operator /(LongWithEx a, LongWithEx b)
+        {
+            if (b.StrictlyEquals(1)) return a;
+            return Op(a, b, (x, y) => x / y, "div");
+        }
 
         public static bool operator ==(LongWithEx a, LongWithEx b) => a.Equals(b);
         public static bool operator !=(LongWithEx a, LongWithEx b) => !a.Equals(b);
