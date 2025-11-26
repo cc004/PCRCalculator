@@ -70,7 +70,7 @@ public unsafe class ValueDictionary
 
     public ValueDictionary()
     {
-        poolOffset = (poolOffset & 0xffff) + 1;
+        poolOffset = (poolOffset + 1) & 0xffff;
         container = _pool + poolOffset;
         Clear();
     }
