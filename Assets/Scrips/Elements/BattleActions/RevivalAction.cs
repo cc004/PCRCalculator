@@ -42,7 +42,7 @@ namespace Elements
       switch ((eRevivalType) ActionDetail1)
       {
         case eRevivalType.NORMAL:
-                    _target.Owner.SetRecovery((long)(_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_2]), UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _isRevival: true, _useNumberEffect: (ActionDetail2 == 1));
+                    _target.Owner.SetRecovery((long)(_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_2]), 0, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _isRevival: true, _useNumberEffect: (ActionDetail2 == 1));
                     break;
         case eRevivalType.PHOENIX:
           _sourceActionController.AppendCoroutine(updateRevival(_skill, (int) _valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_2], _target.Owner, (float)_valueDictionary[eValueNumber.VALUE_4], _source, _sourceActionController), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
@@ -69,7 +69,7 @@ namespace Elements
         if (revivalAction.revivalEnd || revivalAction.battleManager.GameState != eBattleGameState.PLAY)
         {
           if (revivalAction.battleManager.GameState != eBattleGameState.PLAY)
-            _target.SetRecovery((int) (_value2 * (double) (long) _target.MaxHp), UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isRevival: true);
+            _target.SetRecovery((int) (_value2 * (double) (long) _target.MaxHp), 0, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isRevival: true);
           revivalAction.revivalEnd = false;
           _source.PlayAnime(_skill.AnimId, _skill.SkillNum, 2, _isLoop: false);
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);
@@ -80,7 +80,7 @@ namespace Elements
         if (_time < 0.0)
         {
           if (revivalAction.battleManager.GameState == eBattleGameState.PLAY)
-            _target.SetRecovery((int) (_target.MaxHp * (double) _value2), UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isRevival: true);
+            _target.SetRecovery((int) (_target.MaxHp * (double) _value2), 0, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isRevival: true);
           revivalAction.revivalEnd = true;
           _source.HasUnDeadTime = (double) revivalAction.Value[eValueNumber.VALUE_1] != 0.0;
           _source.UnDeadTimeHitCount = 0;

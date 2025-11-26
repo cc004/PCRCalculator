@@ -6124,7 +6124,7 @@ this.updateCurColor();
                 if (time > 1f || BattleUtil.Approximately(time, 1f))
                 {
                     AbnormalStateCategoryData abnormalStateCategoryData = abnormalStateCategoryDataDictionary[category];
-                    SetRecovery((int)abnormalStateCategoryData.MainValue, ((int)abnormalStateCategoryData.SubValue != 1) ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, abnormalStateCategoryData.Source, GetHealDownValue(abnormalStateCategoryData.Source), _isEffect: true, _isRevival: false, _isUnionBurstLifeSteal: false, _isRegenerate: true, _useNumberEffect: true, null, _releaseToad: true);
+                    SetRecovery((int)abnormalStateCategoryData.MainValue, 0, ((int)abnormalStateCategoryData.SubValue != 1) ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, abnormalStateCategoryData.Source, GetHealDownValue(abnormalStateCategoryData.Source), _isEffect: true, _isRevival: false, _isUnionBurstLifeSteal: false, _isRegenerate: true, _useNumberEffect: true, null, _releaseToad: true);
                     time = 0f;
                 }
             }
@@ -7839,7 +7839,7 @@ this.updateCurColor();
                     KnightGuardData data = knightGuardData2;
                     if (!flag) _hp = Hp.Max(0);
                     flag = true;
-                    DMFGKJIEEBF += () => SetRecovery(data.Value, data.InhibitHealType, this, _isRevival: true);
+                    DMFGKJIEEBF += () => SetRecovery(data.Value, 0, data.InhibitHealType, this, _isRevival: true);
                     if (data.ExecEffectData != null)
                     {
                         /*NormalSkillEffect execEffectData = data.ExecEffectData;
@@ -8708,7 +8708,7 @@ this.updateCurColor();
                         if (_first && !IsClanBattleOrSekaiEnemy)
                         {
                             MaxHp = calculatePassiveSkillValue(MaxHp, _passiveActionKV).ToLongWithEx();
-                            Hp = (Hp / StartMaxHP * MaxHp).ToLongWithEx();
+                            Hp = ((DoubleWithEx)Hp / StartMaxHP * MaxHp).ToLongWithEx();
                         }
                         continue;
                     case eParamType.ATK:
@@ -9169,14 +9169,25 @@ this.updateCurColor();
             if (_damageData.Source != null && _damageData.ActionType != eActionType.DESTROY && _damageData.ActionType != eActionType.ATTACK_FIELD && (_skill == null || _skill.IsLifeStealEnabled))
             {
                 long lifeSteal = _damageData.LifeSteal;
-                if (_skill != null)
-                    lifeSteal += _skill.LifeSteal;
+                long skillLifeSteal = 0;
+                bool flag3 = _skill != null && (_damageData.ActionType == eActionType.ATTACK || _damageData.ActionType == eActionType.RATIO_DAMAGE || _damageData.ActionType == eActionType.UPPER_LIMIT_ATTACK);
+                if (flag3)
+				{
+					skillLifeSteal = _skill.LifeSteal;
+					lifeSteal += skillLifeSteal;
+				}
                 if (lifeSteal > 0)
                 {
                     var num2 = num1 * lifeSteal / (lifeSteal + Level + 100);
+                    var num3 = 0;
                     if (num2 != 0)
                     {   //_damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
-                        _damageData.Source.SetRecovery(BattleUtil.DoubleToLongReverseTruncate(num2), _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
+                        if (flag3)
+                        {
+                            num3 = BattleUtil.DoubleToIntReverseTruncate((double)num2 * (double)skillLifeSteal / (double)(_damageData.LifeSteal + skillLifeSteal));
+                            num2 = BattleUtil.DoubleToIntReverseTruncate((double)num2 * (double)_damageData.LifeSteal / (double)(_damageData.LifeSteal + skillLifeSteal));
+                        }
+                        _damageData.Source.SetRecovery(num2, num3, _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
                     }
                 }
             }
@@ -10516,13 +10527,13 @@ this.updateCurColor();
           UnitCtrl _healSource)
         {
             var num = Hp + _value - MaxHp;
-            SetRecovery(_value, _isMagic ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _source, GetHealDownValue(_healSource), _target: _target);
+            SetRecovery(_value, 0, _isMagic ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _source, GetHealDownValue(_healSource), _target: _target);
             return (DoubleWithEx)num;
         }
 
         public void SetRecovery(
           LongWithEx _value,
-        //   long _valueSkillLifeSteal,
+          LongWithEx _valueSkillLifeSteal,
           eInhibitHealType _inhibitHealType,
           UnitCtrl _source,
           double _healDownValue = 1f,
@@ -10552,6 +10563,7 @@ this.updateCurColor();
             }
 
             _value = BattleUtil.DoubleToInt(_healDownValue * (1f - num) * _value);
+            _valueSkillLifeSteal = BattleUtil.DoubleToInt(_healDownValue * (1f - num) * (double)_valueSkillLifeSteal);
 
             if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL) && _inhibitHealType != eInhibitHealType.NO_EFFECT)
             {
@@ -10560,7 +10572,7 @@ this.updateCurColor();
                 DamageData _damageData = new DamageData
                 {
                     Target = GetFirstParts((bool)(Object)this),
-                    Damage = BattleUtil.DoubleToInt(GetAbnormalStateMainValue(eAbnormalStateCategory.INHIBIT_HEAL) * _value),
+                    Damage = BattleUtil.DoubleToInt(GetAbnormalStateMainValue(eAbnormalStateCategory.INHIBIT_HEAL) * (double)(_value + _valueSkillLifeSteal)),
                     DamageType = DamageData.eDamageType.NONE,
                     Source = abnormalStateCategoryDataDictionary[eAbnormalStateCategory.INHIBIT_HEAL].Source,
                     DamageNumMagic = _inhibitHealType == eInhibitHealType.MAGIC,
@@ -10576,6 +10588,7 @@ this.updateCurColor();
             {
                 if (_releaseToad && ToadDatas.Count > 0 && ToadDatas[0].ReleaseByHeal)
                     ToadDatas[0].Enable = false;
+                _value += _valueSkillLifeSteal;
                 Hp = (Hp + _value);
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
