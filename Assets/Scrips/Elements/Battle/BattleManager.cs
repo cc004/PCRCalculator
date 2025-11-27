@@ -1866,9 +1866,10 @@ namespace Elements.Battle
                             sealCutData.Exec(_target, _effectTarget);
 
                             execValueDic[_effectTarget] = allSealDamageCutValueForCountZero;
-                            break;
+                            return allSealDamageCutValueForCountZero;
                         }
                     }
+                    return 0;
                 }
             }
             return allSealDamageCutValueForCountZero;
