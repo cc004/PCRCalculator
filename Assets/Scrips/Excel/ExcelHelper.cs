@@ -1349,6 +1349,7 @@ namespace ExcelHelper
                     }
                     kdLineNum++;
                     double totalUBDamage = 0;
+                    double globalTotalDamage = TimelineData.totalDamage;
 
                     for (int i = MyGameCtrl.Instance.tempData.SettingData.limitTime; i >= 21; i--)
                     {
@@ -1419,7 +1420,8 @@ namespace ExcelHelper
                             currentTotalDamage = damageValue * 10000;
                         }
                         double combinedDamage = currentTotalDamage + totalUBDamage;
-                        string estimatedTotalDamage = Math.Round(combinedDamage / 10000.0) + "w";
+                        double present = 100.0 * combinedDamage / globalTotalDamage;
+                        string estimatedTotalDamage = $"({present:F2}%)" + Math.Round(combinedDamage / 10000.0) + "w";
 
                         worksheet1.Cells[kdLineNum, 11].Value = dead ? "/" : string.IsNullOrEmpty(remainingDamageText) ?
                             $"{estimatedTotalDamage}" :
