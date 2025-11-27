@@ -781,7 +781,7 @@ namespace PCRCaculator
             {
                 playerSetting = new PlayerSetting();
                 playerSetting.playerProcess = 84;
-                playerSetting.playerLevel = 314;
+                playerSetting.playerLevel = 313;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
