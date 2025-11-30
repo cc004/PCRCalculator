@@ -690,7 +690,6 @@ namespace PCRCaculator.Guild
             var group = SettingData.GetCurrentPlayerGroup();
             group.selectedEnemyIDs = toggles_ChooseType[0].isOn ? enemyId : specialEnemyid;
             group.isSpecialBoss = false;//!isGuildBoss;
-            group.bossType = BossType;//!isGuildBoss;
             group.talentQuestMap = dropdowns_ChooseTalentQuestBoss[0].value;
             group.talentQuestArea = dropdowns_ChooseTalentQuestBoss[1].value;
             group.talentQuestIndex = dropdowns_ChooseTalentQuestBoss[2].value;
@@ -843,8 +842,8 @@ namespace PCRCaculator.Guild
         private EnemyData GetEnemyDataByID(int enemy_id)
         {
             return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data :
-                   BossType == 8 ? TalentQuestEnemyParameterDic[enemy_id] :
-                   BossType == 9 ? AbyssEnemyParameterDic[enemy_id] :
+                   IsTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] :
+                   IsAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
                    EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
@@ -877,7 +876,7 @@ namespace PCRCaculator.Guild
                 toggles_ChooseBoss[0].isOn = true;
             else
                 toggles_ChooseBoss[1].isOn = true;
-            switch (data.bossType)
+            switch (BossType)
             {
                 case 8:
                     toggles_ChooseType[1].isOn = true;
@@ -931,7 +930,7 @@ namespace PCRCaculator.Guild
 
             // 从数据表中找到匹配quest_id的数据
             List<object> battleEffects = new List<object>();
-            if (BossType == 8)
+            if (IsTalentQuestBoss)
             {
                 battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
                     .Values
@@ -940,7 +939,7 @@ namespace PCRCaculator.Guild
                     .Cast<object>()
                     .ToList();
             }
-            else if (BossType == 9)
+            else if (IsAbyssBoss)
             {
                 battleEffects = MainManager.Instance.AbyssBattleEffectDic
                     .Values
@@ -982,7 +981,7 @@ namespace PCRCaculator.Guild
         public void UpdateTooglesChooseType()
         {
             var data = SettingData.GetCurrentPlayerGroup();
-            switch (data.bossType)
+            switch (BossType)
             {
                 case 8:
                     toggles_ChooseType[1].isOn = true;
@@ -1008,7 +1007,8 @@ namespace PCRCaculator.Guild
             }*/
             // toggles_ChooseType[1].isOn = IsTalentQuestBoss;
             // toggles_ChooseType[0].isOn = isGuildBoss;
-            bool isTalentOrAbyssBoss = data.bossType == 8 || data.bossType == 9;
+            WaveGroupId = data.waveGroupId;
+            bool isTalentOrAbyssBoss = IsTalentQuestBoss || IsAbyssBoss;
             BossObject.SetActive(!isTalentOrAbyssBoss);
             TalentBossObject.SetActive(isTalentOrAbyssBoss);
 
@@ -1045,12 +1045,18 @@ namespace PCRCaculator.Guild
             SemanModeToggle.isOn = data.useSemanMode;
             timeLineTexts[0].text = data.timeLineData.DataName;
             timeLineTexts[1].text = data.timeLineData.GetDescribe();
-            dropdowns_ChooseTalentQuestBoss[0].value = data.talentQuestMap;
-            dropdowns_ChooseTalentQuestBoss[1].value = data.talentQuestArea;
-            dropdowns_ChooseTalentQuestBoss[2].value = data.talentQuestIndex;
-            dropdowns_ChooseAbyssBoss[0].value = data.abyssMonth;
-            dropdowns_ChooseAbyssBoss[1].value = data.abyssEnemyNum;
-            dropdowns_ChooseAbyssBoss[2].value = data.abyssTurn;
+            if(IsTalentQuestBoss)
+            {
+                dropdowns_ChooseTalentQuestBoss[0].value = data.talentQuestMap;
+                dropdowns_ChooseTalentQuestBoss[1].value = data.talentQuestArea;
+                dropdowns_ChooseTalentQuestBoss[2].value = data.talentQuestIndex;
+            }
+            else if (IsAbyssBoss)
+            {
+                dropdowns_ChooseAbyssBoss[0].value = data.abyssMonth;
+                dropdowns_ChooseAbyssBoss[1].value = data.abyssEnemyNum;
+                dropdowns_ChooseAbyssBoss[2].value = data.abyssTurn;
+            }
             if (data.currentGuildMonth < 1000) data.currentGuildMonth += 1024;
             if (data.currentGuildMonth < 1024) data.currentGuildMonth += 24;
 
@@ -1088,20 +1094,21 @@ namespace PCRCaculator.Guild
                 {
                     TalentQuestBossPictures[i].gameObject.SetActive(false);
                 }
+                SetBattleEffectPictures();
             }
             else
             {
                 bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
             }
             bossDetailTexts[0].text = data.isSpecialBoss ? "自定义" :
-                                     (data.bossType == 8 ? dropdowns_ChooseTalentQuestBoss[0].options[dropdowns_ChooseTalentQuestBoss[0].value].text :
-                                     (data.bossType == 9 ? dropdowns_ChooseAbyssBoss[0].options[dropdowns_ChooseAbyssBoss[0].value].text :
+                                     (IsTalentQuestBoss ? dropdowns_ChooseTalentQuestBoss[0].options[dropdowns_ChooseTalentQuestBoss[0].value].text :
+                                     (IsAbyssBoss ? dropdowns_ChooseAbyssBoss[0].options[dropdowns_ChooseAbyssBoss[0].value].text :
                                      EnemyDataDic[selectedBossEnemyids[0]].name)); string str = "";
             if (data.isSpecialBoss)
             {
                 str = "--";
             }
-            else if (data.bossType == 8)
+            else if (isTalentOrAbyssBoss)
             {
                 str = "";
             }
@@ -1155,11 +1162,11 @@ namespace PCRCaculator.Guild
                 currentHPinput.text = " " + data.playerSetingHP;
             }
             bossDetailTexts[2].text = data.isViolent ? "狂暴" : (data.usePlayerSettingHP ? "自定义HP" : "--");
-            if (data.bossType == 8)
+            if (IsTalentQuestBoss)
             {
                 TalentQuestBossText.text = $"{dropdowns_ChooseTalentQuestBoss[0].options[dropdowns_ChooseTalentQuestBoss[0].value].text} {dropdowns_ChooseTalentQuestBoss[1].value + 1}-{dropdowns_ChooseTalentQuestBoss[2].value + 1}";
             }
-            else if (data.bossType == 9)
+            else if (IsAbyssBoss)
             {
                 TalentQuestBossText.text = $"{dropdowns_ChooseAbyssBoss[0].options[dropdowns_ChooseAbyssBoss[0].value].text} {dropdowns_ChooseAbyssBoss[1].options[dropdowns_ChooseAbyssBoss[1].value].text}-{dropdowns_ChooseAbyssBoss[2].options[dropdowns_ChooseAbyssBoss[2].value].text}";
             }
@@ -1167,10 +1174,6 @@ namespace PCRCaculator.Guild
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
             usePlayerSettingHP.isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
-            if (data.bossType == 8 || data.bossType == 9)
-            {
-                SetBattleEffectPictures();
-            }
             UpdateWeaknessSprites();
             if (selectedBossEnemyids[0] > 0)
             {
@@ -2262,7 +2265,7 @@ namespace PCRCaculator.Guild
         {
             string des = "";
             var data = GetCurrentPlayerGroup();
-            if (data.bossType == 8)
+            if (data.selectedEnemyIDs[0] / 100000000 == 8)
             {
                 des += data.talentQuestMap switch
                 {
@@ -2275,7 +2278,7 @@ namespace PCRCaculator.Guild
                 };
                 des += $"{data.talentQuestArea}-{data.talentQuestIndex}";
             }
-            else if (data.bossType == 9)
+            else if (data.selectedEnemyIDs[0] / 100000000 == 9)
             {
                 des += $"{data.abyssEnemyNum}";
                 des += data.abyssTurn switch
@@ -2330,7 +2333,6 @@ namespace PCRCaculator.Guild
         public bool usePlayerSettingHP;
         public long playerSetingHP;
         public LogBarrierType useLogBarrierNew;
-        public int bossType;
         public int talentQuestMap;
         public int talentQuestArea;
         public int talentQuestIndex;

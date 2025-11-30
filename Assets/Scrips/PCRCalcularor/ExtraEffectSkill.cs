@@ -19,7 +19,7 @@ namespace PCRCaculator
 
             // 从数据表中找到匹配quest_id的数据
             List<object> battleEffects = new List<object>();
-            if (GuildManager.Instance.BossType == 8)
+            if (GuildManager.Instance.IsTalentQuestBoss)
             {
                 battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
                     .Values
@@ -28,7 +28,7 @@ namespace PCRCaculator
                     .Cast<object>()
                     .ToList();
             }
-            else if (GuildManager.Instance.BossType == 9)
+            else if (GuildManager.Instance.IsAbyssBoss)
             {
                 battleEffects = MainManager.Instance.AbyssBattleEffectDic
                     .Values
