@@ -2081,7 +2081,7 @@ namespace PCRCaculator.Guild
         }
         public long GetTalentBonusPermyriad(int talentId, int count) // present
         {
-            var formationData = IsTalentQuestBoss
+            var formationData = IsTalentQuestBoss || IsAbyssBoss
                 ? (MainManager.Instance.TalentFormationDic.TryGetValue(WaveGroupId, out var talentData) ? talentData : null)
                 : MainManager.Instance.TalentFormationDic.TryGetValue(selectedBossEnemyids[0], out var bossData)
                     ? bossData
