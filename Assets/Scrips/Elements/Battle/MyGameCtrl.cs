@@ -87,7 +87,13 @@ namespace Elements
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
             int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;
             int content_type = 0;
-            if (enemy_id >= 800000000)
+            if (enemy_id >= 900000000)
+            {
+                var kind = enemy_id / 1000 % 10;
+                content_type =  kind == 0 ? (int)eBattleCategory.ABYSS_BATTLE : (int)eBattleCategory.ABYSS_BOSS_BATTLE;
+                enemy_id = _tempData.waveGroupId; // TODO move in tempData
+            }
+            else if (enemy_id >= 800000000)
             {
                 content_type = (int)eBattleCategory.TALENT_QUEST;
                 enemy_id = _tempData.waveGroupId; // TODO move in tempData
