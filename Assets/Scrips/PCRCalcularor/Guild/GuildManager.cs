@@ -1168,7 +1168,7 @@ namespace PCRCaculator.Guild
             }
             else if (IsAbyssBoss)
             {
-                TalentQuestBossText.text = $"{dropdowns_ChooseAbyssBoss[0].options[dropdowns_ChooseAbyssBoss[0].value].text} {dropdowns_ChooseAbyssBoss[1].options[dropdowns_ChooseAbyssBoss[1].value].text}-{dropdowns_ChooseAbyssBoss[2].options[dropdowns_ChooseAbyssBoss[2].value].text}";
+                TalentQuestBossText.text = $"{dropdowns_ChooseAbyssBoss[0].options[dropdowns_ChooseAbyssBoss[0].value].text} {dropdowns_ChooseAbyssBoss[2].options[dropdowns_ChooseAbyssBoss[2].value].text}{dropdowns_ChooseAbyssBoss[1].value}";
             }
             bossDetailTexts[3].text = $"{guildMonthNames[(data.currentGuildMonth - 1000 + 11) % 12]}" + $"\n<size=10>({data.currentGuildMonth})</size>";
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
@@ -2280,7 +2280,7 @@ namespace PCRCaculator.Guild
             }
             else if (data.selectedEnemyIDs[0] / 100000000 == 9)
             {
-                des += $"{data.abyssEnemyNum}";
+                des += $"{data.abyssMonth + 1}-";
                 des += data.abyssTurn switch
                 {
                     0 => "N",
@@ -2289,6 +2289,7 @@ namespace PCRCaculator.Guild
                     3 => "EX",
                     _ => data.abyssTurn,
                 };
+                des += $"{data.abyssEnemyNum}";
             }
             else
             {
