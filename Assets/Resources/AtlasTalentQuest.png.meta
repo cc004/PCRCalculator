@@ -369,7 +369,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss_damage_cut
+      name: 18
       rect:
         serializedVersion: 2
         x: 132
@@ -1794,6 +1794,7 @@ TextureImporter:
       15: -289901491
       16: -919737227
       17: 779109508
+      18: -1624380152
       19: -264932425
       2: -438482552
       21: -1794796925
@@ -1854,7 +1855,6 @@ TextureImporter:
       AtlasTalentQuest_77: -759194298
       AtlasTalentQuest_8: 1232919559
       boss_atk_up: 1158485177
-      boss_damage_cut: -1624380152
       boss_def_lower_limit: 1456415224
       boss_def_up: 561708996
       boss_haste: -674558318

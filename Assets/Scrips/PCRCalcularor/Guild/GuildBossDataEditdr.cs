@@ -171,7 +171,9 @@ namespace PCRCaculator.Guild
         {
             baseBack.SetActive(true);
             this.enemyId = enemyId;
-            EnemyData enemyData = GuildManager.Instance.IsTalentQuestBoss ? GuildManager.TalentQuestEnemyParameterDic[enemyId] : GuildManager.EnemyDataDic[enemyId]; ;
+            EnemyData enemyData = GuildManager.Instance.BossType == 8 ? GuildManager.TalentQuestEnemyParameterDic[enemyId] :
+                                  GuildManager.Instance.BossType == 9 ? GuildManager.AbyssEnemyParameterDic[enemyId] :
+                                  GuildManager.EnemyDataDic[enemyId];
             if (GuildManager.Instance.SettingData.changedEnemyDataDic.ContainsKey(enemyId))
             {
                 enemyData = GuildManager.Instance.SettingData.changedEnemyDataDic[enemyId];

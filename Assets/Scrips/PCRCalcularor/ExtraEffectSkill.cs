@@ -15,14 +15,28 @@ namespace PCRCaculator
         void OnEnable()
         {
             // 计算quest_id值
-            int questId = GuildManager.Instance.TalentQuestWaveGroupId / 10;
+            int questId = GuildManager.Instance.WaveGroupId / 10;
 
             // 从数据表中找到匹配quest_id的数据
-            var battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
-                .Values
-                .Where(x => x.quest_id == questId)
-                .OrderBy(x => x.id)
-                .ToList();
+            List<object> battleEffects = new List<object>();
+            if (GuildManager.Instance.BossType == 8)
+            {
+                battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
+            else if (GuildManager.Instance.BossType == 9)
+            {
+                battleEffects = MainManager.Instance.AbyssBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
 
             // 加载精灵图集
             var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
@@ -37,12 +51,18 @@ namespace PCRCaculator
                 if (detailComponent != null && i < battleEffects.Count)
                 {
                     var effectData = battleEffects[i];
-                    if (sprites.ContainsKey(effectData.icon_name.ToString()))
+                    // 使用dynamic简化类型处理
+                    dynamic dynamicEffect = effectData;
+                    string iconName = dynamicEffect.icon_name;
+                    string effectName = dynamicEffect.effect_name;
+                    string description = dynamicEffect.description;
+
+                    if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
                     {
-                        detailComponent.Icon.sprite = sprites[effectData.icon_name.ToString()];
+                        detailComponent.Icon.sprite = sprites[iconName];
                         detailComponent.Icon.gameObject.SetActive(true);
-                        detailComponent.nameText.text = effectData.effect_name;
-                        detailComponent.describeText.text = effectData.description;
+                        detailComponent.nameText.text = effectName;
+                        detailComponent.describeText.text = description;
                     }
                     else
                     {
