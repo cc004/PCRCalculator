@@ -637,7 +637,7 @@ namespace PCRCaculator
 
                                         Task.Run(() => databaseCache.skillDataDic.Override2With(dbTool3.Dic3)),
                                         Task.Run(() => databaseCache.skillActionDic.Override2With(dbTool3.Dic4)),
-                                        Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
+                                        // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
                                         // Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
                                         // Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
                                         // Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
