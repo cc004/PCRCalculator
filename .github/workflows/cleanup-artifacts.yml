@@ -9,6 +9,10 @@ on:
     branches:
       - '**'  # 所有分支
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
