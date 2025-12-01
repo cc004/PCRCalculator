@@ -2,8 +2,12 @@ name: Cleanup Artifacts
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 * * * *" # 每小时执行一次，可自行修改
+  push:
+    branches:
+      - '**'  # 所有分支
+  pull_request:
+    branches:
+      - '**'  # 所有分支
 
 jobs:
   cleanup:
