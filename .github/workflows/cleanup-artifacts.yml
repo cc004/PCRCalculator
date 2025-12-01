@@ -30,7 +30,7 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
-            const quotaBytes = 500 * 1024 * 1024; // 免费仓库的 500MB 配额
+            const quotaBytes = 1024 * 1024 * 1024; // 免费仓库的 500MB 配额
 
             // --- 获取所有 artifacts ---
             let artifacts = [];
