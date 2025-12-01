@@ -390,6 +390,11 @@ namespace PCRCaculator
                 if (!value2)
                     return;
             }
+            if (stayTime >= 90 && BattleUIManager.Instance.ShowBuffDic.TryGetValue(eStateIconType.EVERLAST_BUFF, out bool value3))
+            {
+                if (!value3)
+                    return;
+            }
 
             extraKey = extraKey ?? describe;
             if (enable)
