@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-#if UNITY_5_3_OR_NEWER || !DONT_USE_EX
+#if UNITY_5_3_OR_NEWER || !DONT_USE_EX || ENABLE_THREADING
 public class ValueDictionary
 {
     public readonly DoubleWithEx[] Values = new DoubleWithEx[7];

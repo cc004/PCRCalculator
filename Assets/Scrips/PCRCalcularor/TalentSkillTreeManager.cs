@@ -10,6 +10,9 @@ namespace PCRCaculator
 {
     public class TalentSkillTreeManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static TalentSkillTreeManager Instance;
         public GameObject talentSkillPrefab;
         public RectTransform skillTreeContainer;

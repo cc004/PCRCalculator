@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-	  <DefineConstants>DONT_USE_EX;NO_CRIT_EVENT;NO_PROB_EVENT;REDUCE_ANALYSE</DefineConstants>
+	  <DefineConstants>DONT_USE_EX;NO_CRIT_EVENT;NO_PROB_EVENT;REDUCE_ANALYSE;ENABLE_THREADING</DefineConstants>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -30,7 +30,6 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Data/StreamingAssets/%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</Content>
-		<None Remove="request.json" />
 		<Content Include="../Assets/Plugins/x64/sqlite3.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>sqlite3.dll</Link>
@@ -38,8 +37,11 @@
 		<Content Include="classdata.tpk">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="request.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<Content Include="request1.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="request2.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<None Update="runtimeconfig.template.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

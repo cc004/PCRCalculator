@@ -1,6 +1,8 @@
 ﻿using Elements;
 using Elements.Battle;
+using Newtonsoft.Json;
 using OfficeOpenXml;
+using Org.BouncyCastle.Asn1.Ocsp;
 using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
@@ -13,7 +15,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using UnitData = PCRCaculator.UnitData;
@@ -38,10 +39,67 @@ public class CommandLineServer : MonoBehaviour
     private static readonly CancellationTokenSource shutdownTokenSource = new CancellationTokenSource();
     private static readonly ManualResetEvent serverReadyEvent = new ManualResetEvent(false);
 
+    private static int working;
+
     public static void Main(string[] args)
     {
 
         ParseCommandLineArgs();
+#if ENABLE_THREADING
+        if (serverMode)
+        {
+            new BattleSimulationServer().Awake();
+            BattleSimulationServer.Instance.port = serverPort;
+            BattleSimulationServer.Instance.host = serverHost;
+            BattleSimulationServer.Instance.StartServer();
+            Debug.Log($"服务器模式已启动，监听 http://{serverHost}:{serverPort}/");
+
+            serverReadyEvent.Set();
+            shutdownTokenSource.Token.WaitHandle.WaitOne();
+
+            // 优雅关闭
+            Debug.Log("服务器正在关闭...");
+            BattleSimulationServer.Instance.StopServer();
+        }
+        else
+        {
+            var controller = new ThreadController(Environment.ProcessorCount);
+
+            var requests = new[]
+            {
+                JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request1.json")),
+                JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request2.json")),
+            };
+
+            long s = 0, s2 = 0;
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            void Callback()
+            {
+                --working;
+                s += BattleManager.Instance.FrameCount;
+                s2 += BattleHeaderController.CurrentFrameCount;
+                var now = sw.ElapsedMilliseconds;
+                Console.WriteLine(
+                    $"[Thread #{Thread.CurrentThread.ManagedThreadId}]" +
+                    $"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
+                    $"总伤害: {GuildCalculator.Instance.GetTotalDamage()} 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps ");
+            }
+
+            for (;;)
+                foreach (var request in requests)
+                {
+                    ++working;
+                    controller.DispatchTask(request, Callback, null);
+                    while (working > 100)
+                    {
+                        Thread.Sleep(0);
+                    }
+                }
+        }
+#else
 
         new SpineCreator().Awake();
         new BaseBackManager().Awake();
@@ -83,7 +141,6 @@ public class CommandLineServer : MonoBehaviour
         while (!MainManager.Instance.LoadFinished)
             Thread.Sleep(0);
 
-        var a = ABExTool.TryGetAssetBundleByName("bdl_battlemanager.unity3d", false);
         new BattleManager()
         {
             gameObject = new(),
@@ -182,7 +239,7 @@ public class CommandLineServer : MonoBehaviour
                 last = now;
             }
         }
-
+#endif
 
 
     }

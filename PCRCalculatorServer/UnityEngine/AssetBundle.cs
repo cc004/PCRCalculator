@@ -25,7 +25,9 @@ namespace UnityEngine
         private string name;
 
         private static Dictionary<string, AssetBundle> loadedBundle = new Dictionary<string, AssetBundle>();
-
+#if ENABLE_THREADING
+        private static object loaderLock = new();
+#endif
         static AssetBundle()
         {
             am.LoadClassPackage("classdata.tpk");
@@ -34,29 +36,37 @@ namespace UnityEngine
 
         internal static AssetBundle LoadFromMemory(byte[] bytes)
         {
-            if (bytes == null) return null;
-            var bunInst = am.LoadBundleFile(new MemoryStream(bytes), Guid.NewGuid().ToString());
-            var impl = am.LoadAssetsFileFromBundle(bunInst, 0, false);
-            var info = am.GetBaseField(impl, impl.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
-            var container = info["m_Container"]["Array"];
-            var map = new Dictionary<string, List<long>>();
-            foreach (var pair in container)
+#if ENABLE_THREADING
+            lock (loaderLock)
             {
-                var path = pair["first"].AsString;
-                var pathId = pair["second"]["asset"]["m_PathID"].AsLong;
-                if (!map.ContainsKey(path))
-                    map[path] = new List<long>();
-                map[path].Add(pathId);
+#endif
+                if (bytes == null) return null;
+                var bunInst = am.LoadBundleFile(new MemoryStream(bytes), Guid.NewGuid().ToString());
+                var impl = am.LoadAssetsFileFromBundle(bunInst, 0, false);
+                var info = am.GetBaseField(impl, impl.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+                var container = info["m_Container"]["Array"];
+                var map = new Dictionary<string, List<long>>();
+                foreach (var pair in container)
+                {
+                    var path = pair["first"].AsString;
+                    var pathId = pair["second"]["asset"]["m_PathID"].AsLong;
+                    if (!map.ContainsKey(path))
+                        map[path] = new List<long>();
+                    map[path].Add(pathId);
+                }
+
+                var result = new AssetBundle()
+                {
+                    impl = impl,
+                    pathMap = map,
+                    name = info["m_Name"].AsString
+                };
+                loadedBundle[result.name] = result;
+                return result;
+
+#if ENABLE_THREADING
             }
-            
-            var result = new AssetBundle()
-            {
-                impl = impl,
-                pathMap = map,
-                name = info["m_Name"].AsString
-            };
-            loadedBundle[result.name] = result;
-            return result;
+#endif
         }
 
         internal static void UnloadAllAssetBundles(bool v)
@@ -117,8 +127,16 @@ namespace UnityEngine
         }
         internal T LoadAsset<T>(string path_0) where T : Object
         {
-            LoadDeps();
-            return ObjectManager.Deserialize<T>(pathMap[path_0].Single(), this);
+
+#if ENABLE_THREADING
+            lock (loaderLock)
+            {
+#endif
+                LoadDeps();
+                return ObjectManager.Deserialize<T>(pathMap[path_0].Single(), this);
+#if ENABLE_THREADING
+            }
+#endif
         }
 
         internal void Unload(bool v)
@@ -430,6 +448,7 @@ namespace UnityEngine
                     return obj;
                 }
 
+                if (pool.TryGetValue((context.name, rootPath), out var v)) return v as T;
                 var result = EnqueueObject(context, rootPath, typeof(T));
 
                 while (deserializeQueue.TryDequeue(out var pair))

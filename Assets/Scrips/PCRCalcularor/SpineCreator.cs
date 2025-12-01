@@ -17,7 +17,7 @@ namespace PCRCaculator
             Instance = this;
         }
 #if !UNITY_5_3_OR_NEWER
-        private static Dictionary<(int, float, bool ,string, string, int), SkeletonDataAsset> _skeletonCache = new(); // 缓存skeletondata加速，unity端并非瓶颈 不适用
+        private static ConcurrentCache<(int, float, bool ,string, string, int), SkeletonDataAsset> _skeletonCache = new(); // 缓存skeletondata加速，unity端并非瓶颈 不适用
 #endif
         public SkeletonDataAsset Createskeletondata(int skinID, float scale = 0.5f, bool useAB = false, string p0 = null, string skinName = null,
             int prefabOverride = -1)

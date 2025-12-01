@@ -34,12 +34,20 @@ namespace Elements
         public List<Skill> MainSkillEvolutionList;
         public List<Skill> SubUnionBurstList;
         public Skill Annihilation;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+#else
         //private static Yggdrasil<UnitActionController> staticSingletonTree;
         private static BattleManager staticBattleManager;
+#endif
 
         private IBattleCameraEffectForUnitActionController battleCameraEffect;
         //private static BMIOELFOCPE staticBattleCameraEffect;
+#if ENABLE_THREADING
+        private BattleEffectPoolInterface staticBattleEffectPool;
+#else
         private static BattleEffectPoolInterface staticBattleEffectPool;
+#endif
         //private static JFJNEHKINFI staticBattleTimeScale;
         public const long ACTION_ID_OFFSET = 100;
         private const int ACTION_ID_OFFSET_FOR_CHARA_ID = 10000;
@@ -84,15 +92,6 @@ namespace Elements
         private BattleEffectPoolInterface battleEffectPool => staticBattleEffectPool;
 
         public List<PrincessSkillMovieData> GetPrincessFormMovieData(int _skillId) => skillDictionary[_skillId].PrincessSkillMovieDataList;
-
-        public static void StaticRelease()
-        {
-            //UnitstaticSingletonTree = (Yggdrasil<UnitActionController>) null;
-            staticBattleManager = null;
-            //UnitstaticBattleCameraEffect = (BMIOELFOCPE) null;
-            staticBattleEffectPool = null;
-            //UnitstaticBattleTimeScale = (JFJNEHKINFI) null;
-        }
 
         private void OnDestroy()
         {

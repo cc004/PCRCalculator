@@ -284,7 +284,11 @@ namespace Elements
         private static BattleLogIntreface staticBattleLog;
         //private static INADFELJLMH staticBattleCameraEffect = (INADFELJLMH)null;
         //private static BattleEffectPoolInterface staticBattleEffectPool = (BattleEffectPoolInterface)null;
+#if ENABLE_THREADING
+        private BattleSpeedInterface staticBattleTimeScale;
+#else
         private static BattleSpeedInterface staticBattleTimeScale;
+#endif
         private float resultMoveDistance;
         public Action<UnitCtrl> OnDieForZeroHp;
         public Action<UnitCtrl> OnDieFadeOutEnd;
@@ -307,7 +311,11 @@ namespace Elements
         public List<int> SubUnionBurstIdList = new List<int>();
         public List<eSpineCharacterAnimeId> TreasureAnimeIdList = new List<eSpineCharacterAnimeId>();
         private bool isDeadBySetCurrentHp;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+#else
         private static BattleManager staticBattleManager;
+#endif
         private List<ExSkillData> startExSkillList = new List<ExSkillData>();
         private Dictionary<eExSkillCondition, List<ExSkillData>> conditionExSkillDictionary = new Dictionary<eExSkillCondition, List<ExSkillData>>();
 
@@ -2071,11 +2079,9 @@ namespace Elements
         public static void StaticRelease()
         {
             //UnitCtrl.staticSingletonTree = (Yggdrasil<UnitCtrl>)null;
-            staticBattleManager = null;
             staticBattleLog = null;
             //UnitCtrl.staticBattleCameraEffect = (INADFELJLMH)null;
             //UnitCtrl.staticBattleEffectPool = (BattleEffectPoolInterface)null;
-            staticBattleTimeScale = null;
         }
 
         private bool judgeRarity6() => Rarity == 6;
@@ -8591,7 +8597,7 @@ this.updateCurColor();
                     break;
             }*/
         }
-
+#if !ENABLE_THREADING
         private static void initializePassiveActionAllByEnemy(
           MasterSkillAction.SkillAction _actionData,
           int _level,
@@ -8609,7 +8615,6 @@ this.updateCurColor();
                     break;
             }
         }
-
         private static void initializePassiveActionAllByUnit(
           MasterSkillAction.SkillAction _actionData,
           int _level,
@@ -8627,6 +8632,7 @@ this.updateCurColor();
                     break;
             }
         }
+#endif
 
         private static void initializePassiveActionOwner(
           MasterSkillAction.SkillAction _actionData,
@@ -8799,6 +8805,7 @@ this.updateCurColor();
           KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
 
         public List<PartsData> BossPartsListForBattle { get; set; }
+        /*
         private static UnitCtrl _instance;
 
         public static UnitCtrl Instance
@@ -8818,7 +8825,7 @@ this.updateCurColor();
                 }
                 return _instance;
             }
-        }
+        }*/
 
         public bool IsPartsBoss => BossPartsList.Count > 0;
 

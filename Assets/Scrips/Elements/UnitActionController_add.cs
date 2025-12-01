@@ -131,7 +131,7 @@ namespace Elements
             */
         }
 
-        private static Dictionary<int, FirearmCtrlData> cache = new Dictionary<int, FirearmCtrlData>();
+        private static ConcurrentCache<int, FirearmCtrlData> cache = new ();
 
         private static void SetPrefabDataBySkillid(int skillid, FirearmCtrlData data)
         {
@@ -182,189 +182,7 @@ namespace Elements
                 //return new FirearmCtrlData();
             }
         }
-        private void CalcDelayByPhysice(ActionParameter action, Skill _skill, int targetmotion, bool first = false, bool _skipCutIn = false,
-          bool _isFirearmEndEffect = false,
-          bool _modeChangeEndEffect = false)
-        {
-            for (int i = 0; i < _skill.SkillEffects.Count; i++)
-            {
-                NormalSkillEffect _skilleffect = _skill.SkillEffects[i];
-                float time = first ? _skill.CutInSkipTime : 0.0f;
-                int generateEffectCount = 0;
-                float[] execTime = _skilleffect.ExecTime;
-                switch (_skilleffect.EffectBehavior)
-                {
-                    case eEffectBehavior.NORMAL:
-                    case eEffectBehavior.FIREARM:
-                    case eEffectBehavior.WORLD_POS_CENTER:
-                    case eEffectBehavior.TARGET_CENTER:
-                    case eEffectBehavior.SKILL_AREA_RANDOM:
-                        generateEffectCount = execTime.Length;
-                        break;
-                    case eEffectBehavior.SERIES:
-                    case eEffectBehavior.SERIES_FIREARM:
-                        generateEffectCount = _skilleffect.TargetAction.TargetList.Count;
-                        break;
-                }
-                bool[] execed = new bool[generateEffectCount];
-                for (int execTimeIndex = 0; execTimeIndex < generateEffectCount; ++execTimeIndex)
-                {
-                    float waitTime = 0.0f;
-                    if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK || !UseDefaultDelay || (_skilleffect.EffectBehavior != eEffectBehavior.FIREARM || !BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(Owner.WeaponMotionType, out waitTime)))
-                        waitTime = execTime.Length - 1 >= execTimeIndex ? execTime[execTimeIndex] : (execTime.Length < 2 ? execTime[0] : (execTime[execTime.Length - 1] - execTime[execTime.Length - 2]) * (execTimeIndex - execTime.Length + 1) + execTime[execTime.Length - 1]);
-                    if (!execed[execTimeIndex])
-                    {
-                        float startTime = 0.0f;
-                        if (!_skipCutIn || waitTime <= (double)_skill.CutInSkipTime && !BattleUtil.Approximately(waitTime, _skill.CutInSkipTime))
-                        {
-                            if (!_skipCutIn && waitTime < (double)_skill.CutInSkipTime && !_isFirearmEndEffect)
-                            {
-                                if (_skilleffect.PlayWithCutIn && Owner.PlayCutInFlag && Owner.MovieId != 0)
-                                    startTime = _skill.CutInSkipTime - waitTime;
-                                else
-                                    continue;
-                            }
-                            /*do
-                            {
-                                yield return (object)null;
-                                time += this.battleManager.DeltaTime_60fps;
-                                if (_skill.Cancel || !this.Owner.gameObject.activeSelf || _modeChangeEndEffect && this.Owner.IsUnableActionState())
-                                    yield break;
-                            }
-                            while ((double)waitTime > (double)time);*/
-                            time += Mathf.CeilToInt(waitTime / battleManager.DeltaTime_60fps) * battleManager.DeltaTime_60fps;
-                            execed[execTimeIndex] = true;
-                            BasePartsData _firearmEndTarget = null;
-                            if (_skilleffect.EffectBehavior == eEffectBehavior.FIREARM || _skilleffect.EffectBehavior == eEffectBehavior.SERIES_FIREARM)
-                            {
-                                switch (_skilleffect.FireArmEndTarget)
-                                {
-                                    case eEffectTarget.OWNER:
-                                        _firearmEndTarget = Owner.GetFirstParts(true);
-                                        break;
-                                    case eEffectTarget.ALL_TARGET:
-                                        _firearmEndTarget = _skilleffect.TargetAction.TargetList[execTimeIndex];
-                                        break;
-                                    case eEffectTarget.FORWARD_TARGET:
-                                    case eEffectTarget.BACK_TARGET:
-                                        bool flag1 = _skilleffect.FireArmEndTarget == eEffectTarget.FORWARD_TARGET == !Owner.IsOther;
-                                        List<BasePartsData> basePartsDataList1 = new List<BasePartsData>(_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
-                                        basePartsDataList1.Sort(((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x)));
-                                        if (basePartsDataList1.Count == 0)
-                                        {
-                                            //yield break;
-                                            return;
-                                        }
-                                        else
-                                        {
-                                            _firearmEndTarget = basePartsDataList1[flag1 ? 0 : basePartsDataList1.Count - 1];
-                                            break;
-                                        }
-                                }
-                            }
-                            switch (_skilleffect.EffectBehavior)
-                            {
-                                case eEffectBehavior.NORMAL:
-                                case eEffectBehavior.SERIES:
-                                case eEffectBehavior.SKILL_AREA_RANDOM:
-                                    continue;
-                            }
 
-                            if (_skilleffect.TargetActionId == action.ActionId ||
-                            action.ActionId % 1000 == 0 && _skilleffect.TargetAction == action ||
-                            _skilleffect.FireActionId == action.ActionId)//!MyGameCtrl.Instance.ignoreEffects)
-                            {
-                                /*switch (_skilleffect.EffectTarget)
-                                {
-                                    case eEffectTarget.OWNER:
-                                        this.createNormalEffectPrefab(_skilleffect, _skill, this.Owner.GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex, _modeChangeEndEffect);
-                                        continue;
-                                    case eEffectTarget.ALL_TARGET:
-                                        switch (_skilleffect.EffectBehavior)
-                                        {
-                                            case eEffectBehavior.SERIES:
-                                            case eEffectBehavior.SERIES_FIREARM:
-                                                this.createNormalEffectPrefab(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[execTimeIndex], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
-                                                continue;
-                                            default:
-                                                int index1 = 0;
-                                                for (int count = _skilleffect.TargetAction.TargetList.Count; index1 < count && index1 < _skilleffect.TargetAction.TargetNum; ++index1)
-                                                    this.createNormalEffectPrefab(_skilleffect, _skill, _skilleffect.TargetAction.TargetList[index1], _firearmEndTarget, index1 == 0, startTime, _skipCutIn, execTimeIndex);
-                                                continue;
-                                        }
-                                    case eEffectTarget.FORWARD_TARGET:
-                                    case eEffectTarget.BACK_TARGET:
-                                        bool flag2 = _skilleffect.EffectTarget == eEffectTarget.FORWARD_TARGET == !this.Owner.IsOther;
-                                        List<BasePartsData> basePartsDataList2 = new List<BasePartsData>((IEnumerable<BasePartsData>)_skilleffect.TargetAction.TargetList.GetRange(0, Mathf.Min(_skilleffect.TargetAction.TargetNum, _skilleffect.TargetAction.TargetList.Count)));
-                                        basePartsDataList2.Sort(((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x)));
-                                        if (basePartsDataList2.Count != 0)
-                                        {
-                                            this.createNormalEffectPrefab(_skilleffect, _skill, basePartsDataList2[flag2 ? 0 : basePartsDataList2.Count - 1], _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
-                                            continue;
-                                        }
-                                        continue;
-                                    case eEffectTarget.ALL_OTHER:
-                                        List<UnitCtrl> unitCtrlList1 = this.Owner.IsOther ? this.battleManager.UnitList : this.battleManager.EnemyList;
-                                        for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
-                                        {
-                                            if ((long)unitCtrlList1[index2].Hp != 0L)
-                                                this.createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
-                                        }
-                                        continue;
-                                    case eEffectTarget.ALL_UNIT_EXCEPT_OWNER:
-                                        List<UnitCtrl> unitCtrlList2 = this.Owner.IsOther ? this.battleManager.EnemyList : this.battleManager.UnitList;
-                                        for (int index2 = 0; index2 < unitCtrlList2.Count; ++index2)
-                                        {
-                                            if ((UnityEngine.Object)unitCtrlList2[index2] != (UnityEngine.Object)this.Owner && !unitCtrlList2[index2].IsDead)
-                                                this.createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList2[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
-                                        }
-                                        continue;
-                                    default:
-                                        continue;
-                                }*/
-                                CalcFirearmDelay(_skill, waitTime);
-                            }
-
-                        }
-                    }
-                }
-            }
-            action.ReferencedByEffect = false;
-
-        }
-        private void CalcFirearmDelay(Skill _skill, float waitTime)
-        {
-            foreach (ActionParameter action in _skill.ActionParameters)
-            {
-                if (action.ReferencedByEffect)
-                {
-                    FirearmCtrlData firearmCtrlData = GetPrefabDataBySkillid(_skill.SkillId);
-                    if (firearmCtrlData.ignoreFirearm)
-                    {
-                        action.ExecTime = new float[1] { firearmCtrlData.fixedExecTime };
-                    }
-                    else
-                    {
-                        float MoveRate = firearmCtrlData.MoveRate;
-                        float delay = firearmCtrlData.MoveType == (int)eMoveTypes.LINEAR ? 0.2f / MoveRate : firearmCtrlData.HitDelay;
-                        float speedDelay = 1.0f / MoveRate;
-                        float allDelay = waitTime + speedDelay + delay;
-                        if (action.ExecTime.Length == 0)
-                        {
-                            action.ExecTime = new[] { allDelay };
-                            action.ActionExecTimeList = new List<ActionExecTime>();
-                            action.ActionExecTimeList.Add(new ActionExecTime { Time = allDelay, Weight = 1 });
-                            action.ActionWeightSum = 1;
-                        }
-                        else
-                        {
-                            action.ExecTime[0] += allDelay;
-                        }
-                    }
-                    action.ReferencedByEffect = false;
-                }
-            }
-        }
         [ContextMenu("生成json文件")]
         public void SaveDataToJson()
         {
@@ -513,122 +331,6 @@ namespace Elements
                 foreach (var endEffect in skillEffect.FireArmEndEffects)
                     GetFirearmCtrlDatas_0(endEffect, list);
             }
-        }
-        private void CalcDelayByPhysice(ActionParameter action, Skill skill, int targetmotion, bool first)
-        {
-            for (int i = 0; i < skill.SkillEffects.Count; i++)
-            {
-                NormalSkillEffect _skilleffect = skill.SkillEffects[i];
-                float time = first ? skill.CutInSkipTime : 0.0f;
-                int generateEffectCount = 0;
-                float[] execTime = _skilleffect.ExecTime;
-                switch (_skilleffect.EffectBehavior)
-                {
-                    case eEffectBehavior.NORMAL:
-                    case eEffectBehavior.FIREARM:
-                    case eEffectBehavior.WORLD_POS_CENTER:
-                    case eEffectBehavior.TARGET_CENTER:
-                    case eEffectBehavior.SKILL_AREA_RANDOM:
-                        generateEffectCount = execTime.Length;
-                        break;
-                    case eEffectBehavior.SERIES:
-                    case eEffectBehavior.SERIES_FIREARM:
-                        generateEffectCount = _skilleffect.TargetAction.TargetList.Count;
-                        break;
-                }
-                bool[] execed = new bool[generateEffectCount];
-
-                if (_skilleffect.TargetActionId == action.ActionId ||
-                    action.ActionId % 1000 == 0 && _skilleffect.TargetAction == action ||
-                    _skilleffect.FireActionId == action.ActionId)
-                {
-                    switch (_skilleffect.EffectBehavior)
-                    {
-                        case eEffectBehavior.NORMAL:
-                        case eEffectBehavior.SERIES:
-                        case eEffectBehavior.SKILL_AREA_RANDOM:
-                            continue;
-                    }
-                    if (_skilleffect.TargetMotionIndex == targetmotion)
-                    {
-                        if (action.TargetList.Count <= 0)
-                        {
-                            continue;
-                        }
-                        float waitTime_5_7 = 0;
-                        float[] execTime_5_4 = _skilleffect.ExecTime;
-                        bool k = true;
-                        if (skill.AnimId != eSpineCharacterAnimeId.ATTACK || !UseDefaultDelay || _skilleffect.EffectBehavior == eEffectBehavior.FIREARM)
-                        {
-                            k = false;
-                        }
-                        if (k)
-                        {
-                            if (!BattleDefine.WEAPON_EFFECT_DELAY_DIC.TryGetValue(Owner.WeaponMotionType, out waitTime_5_7))
-                            {
-                                //简化
-                                waitTime_5_7 = execTime_5_4[0];
-                            }
-                        }
-                        else
-                        {
-                            waitTime_5_7 = execTime_5_4[0];
-                        }
-                        //Elements.FirearmCtrlData firearmCtrlData = skillEffect.PrefabData;
-                        FirearmCtrlData firearmCtrlData;
-                        try
-                        {
-                            firearmCtrlData = _skilleffect.PrefabData;
-                        }
-                        catch
-                        {
-                            firearmCtrlData = GetPrefabDataBySkillid(skill.SkillId);
-                        }
-
-                        if (firearmCtrlData.ignoreFirearm)
-                        {
-                            action.ExecTime = new float[1] { firearmCtrlData.fixedExecTime };
-                        }
-                        else
-                        {
-                            float MoveRate = firearmCtrlData.MoveRate;
-                            float delay = firearmCtrlData.MoveType == (int)eMoveTypes.LINEAR ? 0.2f / MoveRate : firearmCtrlData.HitDelay;
-                            float speedDelay = 0;
-                            switch ((eMoveTypes)(int)firearmCtrlData.MoveType)
-                            {
-                                case eMoveTypes.LINEAR:
-                                case eMoveTypes.HORIZONTAL:
-                                    speedDelay = 1.0f / MoveRate;
-                                    break;
-                                case eMoveTypes.PARABORIC:
-                                case eMoveTypes.PARABORIC_ROTATE:
-                                    speedDelay = firearmCtrlData.duration;
-                                    break;
-                            }
-
-                            float allDelay = waitTime_5_7 + speedDelay + delay + skill.CutInSkipTime;
-                            if (action.ExecTime.Length == 0)
-                            {
-                                action.ExecTime = new[] { allDelay };
-                                action.ActionExecTimeList = new List<ActionExecTime>();
-                                action.ActionExecTimeList.Add(new ActionExecTime { Time = allDelay, Weight = 1 });
-                                action.ActionWeightSum = 1;
-                            }
-                            else
-                            {
-                                action.ExecTime[0] += allDelay;
-                            }
-                        }
-                    }
-                }
-
-            }
-            action.ReferencedByEffect = false;
-
-        }
-        private void CalcDelayByPhysice2(ActionParameter action, Skill skill, int targetmotion, bool first)
-        {
-            CreateNormalPrefabWithTargetMotion2(skill, targetmotion, first);
         }
         public void CreateNormalPrefabWithTargetMotion2(
   Skill _skill,
@@ -833,6 +535,7 @@ namespace Elements
                     var prefab = Owner.IsLeftDir || Owner.IsForceLeftDirOrPartsBoss ? _skillEffect.PrefabLeft : _skillEffect.Prefab;
                     var firearmCtrl = battleManager.GetFirearmCtrl2FromPool(Owner, prefab == null ? "null" : prefab.name);
                     firearmCtrl.SetPossitionAppearanceType(_skillEffect, _target, Owner, _skill);
+#if UNITY_5_3_OR_NEWER
                     try
                     {
                         firearmCtrl.data = prefab
@@ -845,6 +548,11 @@ namespace Elements
                         Debug.LogError($"警告：弹道{_skill.SkillId}加载失败{e}，使用旧版弹道可能会导致偏差");
                         firearmCtrl.data = GetPrefabDataBySkillid(_skill.SkillId);
                     }
+#else
+                    firearmCtrl.data = prefab
+                        .GetComponent<FirearmCtrl>().GetPrefabData();
+                    firearmCtrl.position += firearmCtrl.data.initialPosition;
+#endif
                     List<ActionParameter> _actions = new List<ActionParameter>();
                     if (_skillEffect.FireActionId != -1 & actionStart)
                         _actions.Add(_skillEffect.FireAction);

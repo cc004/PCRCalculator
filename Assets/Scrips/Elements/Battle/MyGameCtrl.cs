@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using Elements.Battle;
 using PCRCaculator;
@@ -12,11 +13,15 @@ using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json;
+using Debug = UnityEngine.Debug;
 
 namespace Elements
 {
     public class MyGameCtrl : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static MyGameCtrl Instance;
         public Transform unitParent;
         public Transform enemyParent;
@@ -646,6 +651,7 @@ namespace Elements
             //battleProcessor.AddUnitSkillUseCount(ref unitCtrl.SkillUseCount, pPararm.MasterData.PrefabId);
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
+
             unitCtrl.Initialize(unitParameter, unitData, isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null, false, true); // TODO hush add _teamEnhanceParameter
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
@@ -711,7 +717,7 @@ namespace Elements
             GameObject prefab = ABExTool.LoadUnitPrefab(prefabId);
             GameObject b;
             if (prefab != null)
-                b = Instantiate(ABExTool.LoadUnitPrefab(prefabId));
+                b = Instantiate(prefab);
             else
             {
                 b = Instantiate(battleUnitPrefab);
@@ -719,6 +725,7 @@ namespace Elements
             b.transform.SetParent(isplayer?unitParent:enemyParent);
             b.name = "rotate_center";
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
+
 #if !UNITY_5_3_OR_NEWER
             unitCtrl.Awake();
 #endif

@@ -11,8 +11,12 @@ namespace Elements
 {
   public class UbAbnormalData : ISingletonField
   {
-    //private static Yggdrasil<UbAbnormalData> staticSingletonTree;
-    private static BattleManager staticBattleManager;
+#if ENABLE_THREADING
+      private BattleManager staticBattleManager;
+#else
+        //private static Yggdrasil<UbAbnormalData> staticSingletonTree;
+      private static BattleManager staticBattleManager;
+#endif
 
     public UnitCtrl.eAbnormalState AbnormalState { get; set; }
 

@@ -13,7 +13,13 @@ namespace Elements
 {
     public class BattleHeaderController : MonoBehaviour // : SingletonMonoBehaviour<BattleHeaderController>, ISingletonField
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static BattleHeaderController Instance;
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static int CurrentFrameCount;
         public void ReStart()
         {

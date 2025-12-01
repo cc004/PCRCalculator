@@ -19,6 +19,9 @@ namespace PCRCaculator.Guild
 {
     public class GuildManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static GuildManager Instance;
         //public TextAsset enemyDataDicTxt;
         public List<CharacterPageButton> charactersUI;
@@ -84,7 +87,9 @@ namespace PCRCaculator.Guild
         //private List<AddedPlayerData> addedPlayerDatas;
         //private Dictionary<int, MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, MasterEnemyMParts.EnemyMParts>();
         public GuildSettingData SettingData => StaticsettingData;
-
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         private static GuildSettingData staticsettingData;
         public static GuildSettingData StaticsettingData
         {
@@ -1754,7 +1759,11 @@ namespace PCRCaculator.Guild
         public string GetTalentLevelDescription()
         {
             // var talentLevel = SettingData.GetCurrentPlayerGroup().talentLevel;
+#if ENABLE_THREADING
+            var talentLevel = MainManager.Instance.TeamEnhanceData.talentLevelParameter;
+#else
             var talentLevel = MainManager.Instance.teamEnhanceData.talentLevelParameter;
+#endif
             string description = $"{TalentNames[0]}{talentLevel.GetValueOrDefault(1, 0)}，" +
                                $"{TalentNames[1]}{talentLevel.GetValueOrDefault(2, 0)}，" +
                                $"{TalentNames[2]}{talentLevel.GetValueOrDefault(3, 0)}，" +

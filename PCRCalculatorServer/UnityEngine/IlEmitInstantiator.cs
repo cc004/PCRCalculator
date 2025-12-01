@@ -7,23 +7,7 @@ namespace UnityEngine;
 
 public static class IlEmitInstantiator
 {
-    private static Dictionary<object, Func<GameObject>> instantiator = new ();
-    private static Dictionary<object, int> objectIndex = new();
-    private static List<object> objectCache = new();
-    
-    private static object GetObject(int idx) => objectCache[idx];
-    private static void EmitCachedObject(ILGenerator il, object o)
-    {
-        if (!objectIndex.TryGetValue(o, out var idx))
-        {
-            idx = objectCache.Count;
-            objectCache.Add(o);
-            objectIndex.Add(o, idx);
-        }
-
-        il.Emit(OpCodes.Ldc_I4, idx);
-        il.Emit(OpCodes.Call, typeof(IlEmitInstantiator).GetMethod("GetObject", BindingFlags.NonPublic | BindingFlags.Static));
-    }
+    private static ConcurrentCache<object, Func<GameObject>> instantiator = new ();
 
     // 递归版本
     private static void EmitValueInternal(ILGenerator il, object o, Type t, Dictionary<object, LocalBuilder> context)
@@ -225,13 +209,6 @@ public static class IlEmitInstantiator
         }
         else
         {
-            if (!t.IsSubclassOf(typeof(UnityEngine.Object)) &&
-                t.GetCustomAttribute<System.SerializableAttribute>() == null)
-            {
-                EmitCachedObject(il, o);
-                return;
-            }
-
             LocalBuilder local = il.DeclareLocal(t);
 
             // ---------- 引用类型（深拷贝） ----------
@@ -291,7 +268,7 @@ public static class IlEmitInstantiator
             val = BuildObjectInstantiator(original);
             instantiator[original] = val;
         }
-
-        return val();
+        lock (val)
+            return val();
     }
 }

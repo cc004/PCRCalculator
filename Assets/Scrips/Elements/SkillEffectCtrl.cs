@@ -52,7 +52,11 @@ namespace Elements
         private static readonly string LAYER_NAME = "Default";
         private const int SORT_ORDER_BOUNDARY = 1000;
         //private static Yggdrasil<SkillEffectCtrl> staticSingletonTree = (Yggdrasil<SkillEffectCtrl>) null;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;// = BattleManager.Instance;
+#else
         private static BattleManager staticBattleManager;// = BattleManager.Instance;
+#endif
 
         public bool IsAura { get; set; }
 
@@ -87,12 +91,6 @@ namespace Elements
         protected BattleManager battleManager => staticBattleManager;
 
         // public static void StaticInitSingletonTree() => SkillEffectCtrl.staticSingletonTree = (Yggdrasil<SkillEffectCtrl>) null;
-
-        public static void StaticRelease()
-        {
-            //SkillEffectCtrl.staticSingletonTree = (Yggdrasil<SkillEffectCtrl>) null;
-            staticBattleManager = null;
-        }
 
         private void Awake() => awakeImpl();
 

@@ -342,7 +342,11 @@ namespace PCRCaculator.Battle
             debugText.text += logtext;
             scrollRect.verticalNormalizedPosition = 0;
 #else
+#if ENABLE_THREADING
+            Console.Write($"[Thread #{Thread.CurrentThread.ManagedThreadId}] " + logtext);
+#else
             Console.Write(logtext);
+#endif
 #endif
             if (logMessageType == eLogMessageType.ERROR)
             {

@@ -120,7 +120,12 @@ namespace PCRCaculator
         public bool forceAutoMode;
         public bool isSetMode;
         public bool isSemanMode;
+#if ENABLE_THREADING
+        [ThreadStatic]
+        public static TeamEnhanceParameter teamEnhanceData;
+#else
         public TeamEnhanceParameter teamEnhanceData;
+#endif
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
         
         // 优化：添加数据缓存字典，避免重复计算

@@ -54,6 +54,9 @@ namespace Elements.Battle
         public static int randomCounter;
         public AutoubManager ubmanager = new AutoubManager();
         public SemanUbManager semanubmanager = new SemanUbManager();
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static BattleManager Instance;
         public const int POST_RESULT_TYPE_LOSE = 0;
         public const int POST_RESULT_TYPE_RESIGN = 1;
@@ -996,7 +999,9 @@ namespace Elements.Battle
                 return;
             effectUpdateList.Remove(FJOPFIJMADE);
         }
+
         public static Action<RandomData> OnCallRandom;        
+
         //public static float Random(float Min, float Max) => (float)BattleManager.Random((int)((double)Min * 1000.0), (int)((double)Max * 1000.0)) / 1000f;
         public static float Random(float Min, float Max, RandomData data)
         {

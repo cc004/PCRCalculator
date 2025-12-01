@@ -36,6 +36,9 @@ namespace PCRCaculator.Guild
     }
     public class GuildCalculator : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static GuildCalculator Instance;
         // public const float deltaXforChat = 1 / 5400.0f;
         public Dictionary<int, List<UnitStateChangeData>> allUnitStateChangeDic;

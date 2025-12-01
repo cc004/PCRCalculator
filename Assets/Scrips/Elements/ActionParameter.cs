@@ -28,9 +28,15 @@ namespace Elements
         public string sortinfo;
 
         //private static Yggdrasil<ActionParameter> staticSingletonTree;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+        private BattleEffectPoolInterface staticBattleEffectPool;
+        private BattleLogIntreface staticBattleLog;
+#else
         private static BattleManager staticBattleManager;
         private static BattleEffectPoolInterface staticBattleEffectPool;
         private static BattleLogIntreface staticBattleLog;
+#endif
         public eActionType ActionType;
         public OnActionEndDelegate OnActionEnd;
         public bool IsSearchAndSorted;
@@ -166,14 +172,6 @@ namespace Elements
 
 
         public BasePartsData ProtectedParts { get; set; }
-
-        public static void StaticRelease()
-        {
-            //ActionParameter.staticSingletonTree = (Yggdrasil<ActionParameter>) null;
-            staticBattleManager = null;
-            staticBattleEffectPool = null;
-            staticBattleLog = null;
-        }
 
         public ActionParameter()
         {

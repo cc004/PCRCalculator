@@ -104,7 +104,7 @@ namespace Elements
 #endif
         }
 #if !UNITY_5_3_OR_NEWER
-        private static List<CoroutineDataBase> toUpdate = new();
+        private List<CoroutineDataBase> toUpdate = new();
 #endif
     }
 }

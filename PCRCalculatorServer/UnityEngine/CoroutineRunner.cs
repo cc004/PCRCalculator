@@ -7,11 +7,23 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-    public static class CoroutineRunner
+    public class CoroutineRunner
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static List<IEnumerator> running = new List<IEnumerator>();
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static List<IEnumerator> pending = new List<IEnumerator>();
-
+#if ENABLE_THREADING
+        public static void Initialize()
+        {
+            running = new();
+            pending = new();
+        }
+#endif
         public static void AppendCoroutine(IEnumerator routine)
         {
             pending.Add(routine);

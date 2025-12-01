@@ -26,7 +26,11 @@ namespace Elements
         private const eShader pauseActionShader = eShader.VERTEX_COLOR_SEPARETE_GRAY_SCALE;
         private bool isIndependentBattleSync;
         //private static Yggdrasil<BattleSpineController> staticSingletonTree;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+#else
         private static BattleManager staticBattleManager;
+#endif
         public bool quickNotActive = true;
 
         public UnitCtrl Owner { get; set; }

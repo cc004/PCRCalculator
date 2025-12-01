@@ -8,6 +8,9 @@ namespace PCRCaculator
     public class TalentLevelManager : MonoBehaviour
     {
         public event System.Action OnTalentLevelChanged;
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static TalentLevelManager Instance;
         private bool loadSliderEvents = false;
         public List<Slider> talentLevelSliders;

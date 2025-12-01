@@ -462,6 +462,14 @@ namespace PCRCaculator
                     yield return (m, pair.Value);
         }
 
+#if ENABLE_THREADING
+        private static object loadBundleLock = new();
+        public static AssetBundle TryGetAssetBundleByNameWithLock(string fullname, bool useOldManifest)
+        {
+            lock (loadBundleLock)
+                return TryGetAssetBundleByName(fullname, useOldManifest);
+        }
+#endif
         public static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
         {
             if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
@@ -477,7 +485,11 @@ namespace PCRCaculator
             path = Application.persistentDataPath + $"/AB/{mgr.SubFolder}/";
 #else
             var www = new WWW("file://" + path);
-            while (!www.isDone) { Thread.Sleep(0); }
+            while (!www.isDone)
+            {
+                Thread.Sleep(0);
+            }
+
             path = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
 #endif
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
@@ -491,8 +503,13 @@ namespace PCRCaculator
                     var bytes = mgr.ResolveFile("a/" + fullname);
                     if (bytes != null) File.WriteAllBytes(path, bytes);
                 }
+
                 www = new WWW("file://" + path);
-                while (!www.isDone) { Thread.Sleep(0); }
+                while (!www.isDone)
+                {
+                    Thread.Sleep(0);
+                }
+
                 asset = www.assetBundle;
             }
 
@@ -501,8 +518,8 @@ namespace PCRCaculator
             return asset;
         }
 
-        private static Dictionary<(Type, string, string, bool), object>
-            GetAssetBundleByNameCache = new Dictionary<(Type, string, string, bool), object>();
+        private static ConcurrentCache<(Type, string, string, bool), object>
+            GetAssetBundleByNameCache = new ConcurrentCache<(Type, string, string, bool), object>();
 
         public static string persistentDataPath;
 
@@ -513,7 +530,11 @@ namespace PCRCaculator
             var key = (typeof(T), fullname, fit, useOldManifest);
             if (GetAssetBundleByNameCache.TryGetValue(key, out var val))
                 return (T)val;
+#if ENABLE_THREADING
+            var asset = TryGetAssetBundleByNameWithLock(fullname, useOldManifest);
+#else
             var asset = TryGetAssetBundleByName(fullname, useOldManifest);
+#endif
             T result = default;
             if (asset != null)
             {
@@ -529,7 +550,11 @@ namespace PCRCaculator
         }
         public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
+#if ENABLE_THREADING
+            var asset = TryGetAssetBundleByNameWithLock(fullname, useOldManifest);
+#else
             var asset = TryGetAssetBundleByName(fullname, useOldManifest);
+#endif
             List<T> result = new List<T>();
             if (asset != null)
             {
@@ -585,19 +610,28 @@ namespace PCRCaculator
 #endif
 
         }
+
+        private static ConcurrentCache<int, GameObject> prefabCache = new ConcurrentCache<int, GameObject>();
         public static GameObject LoadUnitPrefab(int unitid)
         {
+            if (prefabCache.TryGetValue(unitid, out var val)) return val;
             //if (unitid >= 200000 && unitid <= 299999)
             //    unitid = (int)(unitid / 100) * 100;
             // preload battleunit
+#if ENABLE_THREADING
+            if (TryGetAssetBundleByNameWithLock("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
+                TryGetAssetBundleByNameWithLock("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
+#else
             if (TryGetAssetBundleByName("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
                 TryGetAssetBundleByName("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
+#endif
             GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab", unitid > 200000);
             /*if(a==null)
             {
                 unitid = (int)(unitid / 100) * 100;
                 a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + unitid + ".unity3d", "prefab");
             }*/
+            prefabCache[unitid] = a;
             return a;
         }
         public static int GetPrefabId(int unitid)
