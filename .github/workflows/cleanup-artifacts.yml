@@ -13,34 +13,32 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Run cleanup
+      - name: Cleanup old artifacts
         uses: actions/github-script@v7
         env:
-          TOKEN: ${{ secrets.ACTIONS_STORAGE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
-            const axios = require('axios');
-
-            // GitHub API
-            const api = axios.create({
-              baseURL: 'https://api.github.com',
-              headers: {
-                Authorization: `token ${process.env.TOKEN}`,
-                'X-GitHub-Api-Version': '2022-11-28'
-              }
-            });
-
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
-            // 获取全部 artifacts（最多 1000）
+            const quotaBytes = 500 * 1024 * 1024; // 免费仓库的 500MB 配额
+
+            // --- 获取所有 artifacts ---
             let artifacts = [];
             let page = 1;
 
             while (true) {
-              const res = await api.get(`/repos/${owner}/${repo}/actions/artifacts?per_page=100&page=${page}`);
+              const res = await github.rest.actions.listArtifactsForRepo({
+                owner,
+                repo,
+                per_page: 100,
+                page
+              });
+
               artifacts = artifacts.concat(res.data.artifacts);
-              if (res.data.artifacts.length < 100) break;
+
+              if (res.data.artifacts.length < 100) break; // 无更多分页
               page++;
             }
 
@@ -49,15 +47,11 @@ jobs:
               return;
             }
 
-            // 计算总大小（单位 Bytes）
-            const totalSize = artifacts.reduce((acc, a) => acc + a.size_in_bytes, 0);
+            // --- 计算已用空间 ---
+            const totalSize = artifacts.reduce((sum, a) => sum + a.size_in_bytes, 0);
+            const usedPercent = (totalSize / quotaBytes) * 100;
 
             console.log(`Total artifact size: ${(totalSize/1024/1024).toFixed(2)} MB`);
-
-            // GitHub 免费计划默认 500MB
-            const quotaBytes = 500 * 1024 * 1024;
-
-            const usedPercent = (totalSize / quotaBytes) * 100;
             console.log(`Used: ${usedPercent.toFixed(2)}%`);
 
             if (usedPercent < 70) {
@@ -65,24 +59,30 @@ jobs:
               return;
             }
 
-            console.log("Usage > 70%. Start cleanup...");
+            console.log("Usage > 70%. Start deleting...");
 
-            // 按创建时间排序，越旧越先删
+            // --- 按创建时间从旧到新排序 ---
             artifacts.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
             let currentSize = totalSize;
 
+            // --- 删除直到占用 < 50% ---
             for (const art of artifacts) {
-              if ((currentSize / quotaBytes) * 100 <= 50) {
-                console.log("Usage now < 50%. Stop cleanup.");
+              const percentNow = (currentSize / quotaBytes) * 100;
+              if (percentNow <= 50) {
+                console.log(`Current usage ${percentNow.toFixed(2)}% < 50%. Stop.`);
                 break;
               }
 
-              console.log(`Deleting: ${art.name} (${(art.size_in_bytes/1024/1024).toFixed(2)} MB)`);
+              console.log(`Deleting ${art.name} (${(art.size_in_bytes/1024/1024).toFixed(2)} MB)`);
 
-              await api.delete(`/repos/${owner}/${repo}/actions/artifacts/${art.id}`);
+              await github.rest.actions.deleteArtifact({
+                owner,
+                repo,
+                artifact_id: art.id
+              });
 
               currentSize -= art.size_in_bytes;
             }
 
-            console.log(`Final usage: ${((currentSize / quotaBytes) * 100).toFixed(2)}%`);
+            console.log(`Cleanup complete. Final usage: ${((currentSize / quotaBytes) * 100).toFixed(2)}%`);
