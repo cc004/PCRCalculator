@@ -1,0 +1,84 @@
+name: Cleanup Artifacts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *" # 每小时执行一次，可自行修改
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run cleanup
+        uses: actions/github-script@v7
+        env:
+          TOKEN: ${{ secrets.ACTIONS_STORAGE_TOKEN }}
+        with:
+          script: |
+            const axios = require('axios');
+
+            // GitHub API
+            const api = axios.create({
+              baseURL: 'https://api.github.com',
+              headers: {
+                Authorization: `token ${process.env.TOKEN}`,
+                'X-GitHub-Api-Version': '2022-11-28'
+              }
+            });
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // 获取全部 artifacts（最多 1000）
+            let artifacts = [];
+            let page = 1;
+
+            while (true) {
+              const res = await api.get(`/repos/${owner}/${repo}/actions/artifacts?per_page=100&page=${page}`);
+              artifacts = artifacts.concat(res.data.artifacts);
+              if (res.data.artifacts.length < 100) break;
+              page++;
+            }
+
+            if (artifacts.length === 0) {
+              console.log("No artifacts found.");
+              return;
+            }
+
+            // 计算总大小（单位 Bytes）
+            const totalSize = artifacts.reduce((acc, a) => acc + a.size_in_bytes, 0);
+
+            console.log(`Total artifact size: ${(totalSize/1024/1024).toFixed(2)} MB`);
+
+            // GitHub 免费计划默认 500MB
+            const quotaBytes = 500 * 1024 * 1024;
+
+            const usedPercent = (totalSize / quotaBytes) * 100;
+            console.log(`Used: ${usedPercent.toFixed(2)}%`);
+
+            if (usedPercent < 70) {
+              console.log("Usage < 70%. No cleanup needed.");
+              return;
+            }
+
+            console.log("Usage > 70%. Start cleanup...");
+
+            // 按创建时间排序，越旧越先删
+            artifacts.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+            let currentSize = totalSize;
+
+            for (const art of artifacts) {
+              if ((currentSize / quotaBytes) * 100 <= 50) {
+                console.log("Usage now < 50%. Stop cleanup.");
+                break;
+              }
+
+              console.log(`Deleting: ${art.name} (${(art.size_in_bytes/1024/1024).toFixed(2)} MB)`);
+
+              await api.delete(`/repos/${owner}/${repo}/actions/artifacts/${art.id}`);
+
+              currentSize -= art.size_in_bytes;
+            }
+
+            console.log(`Final usage: ${((currentSize / quotaBytes) * 100).toFixed(2)}%`);
