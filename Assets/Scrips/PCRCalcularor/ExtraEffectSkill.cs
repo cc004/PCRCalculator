@@ -38,35 +38,39 @@ namespace PCRCaculator
                     .ToList();
             }
 
-            // 加载精灵图集
-            var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
-                .ToDictionary(x => x.name, x => x);
-
-            // 按顺序设置TalentQuestBattleEffectPictures的图片
-            for (int i = 0; i < battleEffects.Count; i++)
+            if (battleEffects.Count > 0)
             {
-                GameObject a = Instantiate(extraDetailPrefab);
-                a.transform.SetParent(Content);
-                ExtraEffecDetail detailComponent = a.GetComponent<ExtraEffecDetail>();
-                if (detailComponent != null && i < battleEffects.Count)
-                {
-                    var effectData = battleEffects[i];
-                    // 使用dynamic简化类型处理
-                    dynamic dynamicEffect = effectData;
-                    string iconName = dynamicEffect.icon_name;
-                    string effectName = dynamicEffect.effect_name;
-                    string description = dynamicEffect.description;
+                var firstEffect = battleEffects[0];
+                var iconProperty = firstEffect.GetType().GetProperty("icon_name");
+                var effectProperty = firstEffect.GetType().GetProperty("effect_name");
+                var descProperty = firstEffect.GetType().GetProperty("description");
 
-                    if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
+                // 加载精灵图集
+                var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
+                    .ToDictionary(x => x.name, x => x);
+
+                // 按顺序设置TalentQuestBattleEffectPictures的图片
+                foreach (var effectData in battleEffects)
+                {
+                    GameObject a = Instantiate(extraDetailPrefab, Content, false);
+                    ExtraEffecDetail detailComponent = a.GetComponent<ExtraEffecDetail>();
+                    if (detailComponent != null)
                     {
-                        detailComponent.Icon.sprite = sprites[iconName];
-                        detailComponent.Icon.gameObject.SetActive(true);
-                        detailComponent.nameText.text = effectName;
-                        detailComponent.describeText.text = description;
-                    }
-                    else
-                    {
-                        detailComponent.Icon.gameObject.SetActive(false);
+                        string iconName = iconProperty != null ? iconProperty.GetValue(effectData)?.ToString() : "";
+                        string effectName = effectProperty != null ? effectProperty.GetValue(effectData)?.ToString() : "";
+                        string description = descProperty != null ? descProperty.GetValue(effectData)?.ToString() : "";
+
+                        if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
+                        {
+                            detailComponent.Icon.sprite = sprites[iconName];
+                            detailComponent.Icon.gameObject.SetActive(true);
+                            detailComponent.nameText.text = effectName ?? "";
+                            detailComponent.describeText.text = description ?? "";
+                        }
+                        else
+                        {
+                            detailComponent.Icon.gameObject.SetActive(false);
+                        }
                     }
                 }
             }

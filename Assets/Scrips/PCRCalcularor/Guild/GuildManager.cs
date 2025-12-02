@@ -661,7 +661,6 @@ namespace PCRCaculator.Guild
             if (toggles_ChooseType[0].isOn)
             {
                 //int month = dropdowns_ChooseBoss[2].value;
-                WaveGroupId = 0;
                 int clanBattleID = GetClanBattleID();
                 int month = clanBattleID - 1000;
                 SettingData.GetCurrentPlayerGroup().currentGuildMonth = GetClanBattleID();
@@ -980,7 +979,6 @@ namespace PCRCaculator.Guild
         }
         public void UpdateTooglesChooseType()
         {
-            var data = SettingData.GetCurrentPlayerGroup();
             switch (BossType)
             {
                 case 8:
