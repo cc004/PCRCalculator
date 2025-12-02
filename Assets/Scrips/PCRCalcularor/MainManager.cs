@@ -1445,6 +1445,39 @@ namespace PCRCaculator
                 return result;
             }
         }
+        public long MaxDamage
+        {
+            get
+            {
+                if (resultDatas.Count == 0)
+                    return 0;
+
+                long max = resultDatas[0].currentDamage;
+                for (int i = 1; i < resultDatas.Count; i++)
+                {
+                    if (resultDatas[i].currentDamage > max)
+                        max = resultDatas[i].currentDamage;
+                }
+                return max;
+            }
+        }
+
+        public long MinDamage
+        {
+            get
+            {
+                if (resultDatas.Count == 0)
+                    return 0;
+
+                long min = resultDatas[0].currentDamage;
+                for (int i = 1; i < resultDatas.Count; i++)
+                {
+                    if (resultDatas[i].currentDamage < min)
+                        min = resultDatas[i].currentDamage;
+                }
+                return min;
+            }
+        }
         public void Reset()
         {
             isCalculating = false;

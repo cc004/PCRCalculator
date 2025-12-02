@@ -959,8 +959,8 @@ namespace PCRCaculator.Guild
                 if (i < battleEffects.Count)
                 {
                     var effectData = battleEffects[i];
-                    dynamic dynamicEffect = effectData;
-                    string iconName = dynamicEffect.icon_name;
+                    var iconProperty = effectData.GetType().GetProperty("icon_name");
+                    string iconName = (string)iconProperty.GetValue(effectData);
 
                     if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
                     {
