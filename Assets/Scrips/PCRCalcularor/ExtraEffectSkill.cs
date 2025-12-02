@@ -52,7 +52,8 @@ namespace PCRCaculator
                 // 按顺序设置TalentQuestBattleEffectPictures的图片
                 foreach (var effectData in battleEffects)
                 {
-                    GameObject a = Instantiate(extraDetailPrefab, Content, false);
+                    GameObject a = Instantiate(extraDetailPrefab);
+                    a.transform.SetParent(Content);
                     ExtraEffecDetail detailComponent = a.GetComponent<ExtraEffecDetail>();
                     if (detailComponent != null)
                     {
