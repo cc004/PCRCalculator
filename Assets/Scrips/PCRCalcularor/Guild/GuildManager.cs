@@ -1005,7 +1005,6 @@ namespace PCRCaculator.Guild
             }*/
             // toggles_ChooseType[1].isOn = IsTalentQuestBoss;
             // toggles_ChooseType[0].isOn = isGuildBoss;
-            WaveGroupId = data.waveGroupId;
             bool isTalentOrAbyssBoss = IsTalentQuestBoss || IsAbyssBoss;
             BossObject.SetActive(!isTalentOrAbyssBoss);
             TalentBossObject.SetActive(isTalentOrAbyssBoss);
@@ -1032,8 +1031,6 @@ namespace PCRCaculator.Guild
                     TalentTexts[i].text = "无";
                 }
             }
-            TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
-            TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
             if (data.UBExecTimeData?.Count >= 6)
                 UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             if (data.SemanUBExecTimeData?.Count >= 6)
@@ -1043,18 +1040,22 @@ namespace PCRCaculator.Guild
             SemanModeToggle.isOn = data.useSemanMode;
             timeLineTexts[0].text = data.timeLineData.DataName;
             timeLineTexts[1].text = data.timeLineData.GetDescribe();
-            if(IsTalentQuestBoss)
+            if (IsTalentQuestBoss)
             {
                 dropdowns_ChooseTalentQuestBoss[0].value = data.talentQuestMap;
                 dropdowns_ChooseTalentQuestBoss[1].value = data.talentQuestArea;
                 dropdowns_ChooseTalentQuestBoss[2].value = data.talentQuestIndex;
+                data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
             }
             else if (IsAbyssBoss)
             {
                 dropdowns_ChooseAbyssBoss[0].value = data.abyssMonth;
                 dropdowns_ChooseAbyssBoss[1].value = data.abyssEnemyNum;
                 dropdowns_ChooseAbyssBoss[2].value = data.abyssTurn;
+                data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
             }
+            TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
+            TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
             if (data.currentGuildMonth < 1000) data.currentGuildMonth += 1024;
             if (data.currentGuildMonth < 1024) data.currentGuildMonth += 24;
 
