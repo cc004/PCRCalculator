@@ -1,5 +1,7 @@
 ﻿using Elements;
 using Elements.Battle;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -56,6 +58,10 @@ public class CommandLineServer : MonoBehaviour
         {
             RuntimeHelpers.RunClassConstructor(typeof(ApiController).TypeHandle);
             Host.CreateDefaultBuilder(args)
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton(new ServerOptions { DebugMode = debugMode });
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseUrls($"http://{serverHost}:{serverPort}/").UseStartup<Startup>();
@@ -70,6 +76,14 @@ public class CommandLineServer : MonoBehaviour
                 JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request1.json")),
                 JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request2.json")),
             };
+
+            if (debugMode)
+            {
+                foreach (var request in requests)
+                {
+                    request.IsSkipping = false;
+                }
+            }
 
             long s = 0, s2 = 0;
 

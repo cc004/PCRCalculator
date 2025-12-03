@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -17,10 +18,29 @@ namespace PCRCalculatorServer
     public class ApiController : Controller
     {
         private static readonly ThreadController controller = new(Environment.ProcessorCount);
+        private static readonly JsonSerializerOptions DebugJsonOptions = new()
+        {
+            IncludeFields = true,
+            WriteIndented = true
+        };
+        private readonly ServerOptions serverOptions;
+
+        public ApiController(ServerOptions serverOptions)
+        {
+            this.serverOptions = serverOptions ?? throw new ArgumentNullException(nameof(serverOptions));
+        }
 
         [HttpPost("/simulate")]
         public async Task<BattleSimulationResponse[]> Simulate(BattleSimulationRequest[] battleRequest)
         {
+            if (serverOptions.DebugMode)
+            {
+                foreach (var request in battleRequest)
+                {
+                    request.IsSkipping = false;
+                }
+            }
+
             using var sema = new Semaphore(0, battleRequest.Length);
 
             var response = new BattleSimulationResponse[battleRequest.Length];
@@ -81,6 +101,12 @@ namespace PCRCalculatorServer
                 }
             }
 
+            if (serverOptions.DebugMode)
+            {
+                foreach (var req in battleRequest)
+                    Debug.Log($"[BattleSimulationServer] 战斗请求：{JsonSerializer.Serialize(req, DebugJsonOptions)}");
+            }
+
             for (var i = 0; i < battleRequest.Length; ++i)
             {
                 var i2 = i;
@@ -108,8 +134,13 @@ namespace PCRCalculatorServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IncludeFields = true;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                    options.JsonSerializerOptions.DictionaryKeyPolicy = null;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

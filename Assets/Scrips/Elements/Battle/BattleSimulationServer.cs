@@ -46,6 +46,7 @@ namespace Elements.Battle
         public BattleSimulationResponse Result { get; set; }  // 如果完成，返回结果
     }
 
+    [Serializable]
     public class BattleSimulationResponse
     {
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
@@ -81,6 +82,7 @@ namespace Elements.Battle
         public int UBTryingCount { get; set; } = 9999;
     }
 
+    [Serializable]
     public class BattleSimulationRequest
     {
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
