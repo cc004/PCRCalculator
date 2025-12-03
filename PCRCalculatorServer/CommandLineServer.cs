@@ -31,6 +31,9 @@ public static class UnitDataExtension
 public class CommandLineServer : MonoBehaviour
 {
     public static bool serverMode = false;
+    public static bool debugMode = false;
+    public static bool batchMode = false;
+    public static string excelPath = "";
     private static int serverPort = 8080;
     private static string serverHost = "localhost";
     private static string targetScene = "BattleScene";
@@ -51,6 +54,7 @@ public class CommandLineServer : MonoBehaviour
             new BattleSimulationServer().Awake();
             BattleSimulationServer.Instance.port = serverPort;
             BattleSimulationServer.Instance.host = serverHost;
+            BattleSimulationServer.Instance.debugMode = debugMode;
             BattleSimulationServer.Instance.StartServer();
             Debug.Log($"服务器模式已启动，监听 http://{serverHost}:{serverPort}/");
 
@@ -172,6 +176,7 @@ public class CommandLineServer : MonoBehaviour
             new BattleSimulationServer().Awake();
             BattleSimulationServer.Instance.port = serverPort;
             BattleSimulationServer.Instance.host = serverHost;
+            BattleSimulationServer.Instance.debugMode = debugMode;
             BattleSimulationServer.Instance.StartServer();
             Debug.Log($"服务器模式已启动，监听 http://{serverHost}:{serverPort}/");
             
@@ -181,6 +186,10 @@ public class CommandLineServer : MonoBehaviour
             // 优雅关闭
             Debug.Log("服务器正在关闭...");
             BattleSimulationServer.Instance.StopServer();
+        }
+        else if (batchMode)
+        {
+            
         }
         else
         {
@@ -203,7 +212,7 @@ public class CommandLineServer : MonoBehaviour
                 */
                 ++times;
 
-                MyGameCtrl.Instance.tempData.skipping = true;
+                MyGameCtrl.Instance.tempData.skipping = debugMode ? false : true;
 
                 IEnumerator UpdateBattleManager()
                 {
@@ -237,6 +246,8 @@ public class CommandLineServer : MonoBehaviour
                 Console.WriteLine($"总帧数：{BattleManager.Instance.FrameCount}/{BattleHeaderController.CurrentFrameCount} frames " +
                                 $"模拟时间：{now - last}ms 模拟速度 {s * 1000 / now}/{s2 * 1000 / now} fps 总伤害: {GuildCalculator.Instance.GetTotalDamage()}");
                 last = now;
+                if (debugMode)
+                    break;
             }
         }
 #endif
@@ -252,6 +263,18 @@ public class CommandLineServer : MonoBehaviour
         {
             switch (args[i].ToLower())
             {
+                case "-batch":
+                case "--batch":
+                    batchMode = true;
+                    Debug.Log("批处理模式已启用");
+                    break;
+                
+                case "-path":
+                case "--path":
+                    excelPath = args[i + 1];
+                    ++ i;
+                    break;
+
                 case "-server":
                 case "--server":
                     serverMode = true;
@@ -278,6 +301,12 @@ public class CommandLineServer : MonoBehaviour
                         i++; // 跳过下一个参数
                     }
                     break;
+                
+                case "-debug":
+                case "--debug":
+                    debugMode = true;
+                    Debug.Log("调试模式已启用");
+                    break;
 
                 case "-scene":
                 case "--scene":
@@ -289,21 +318,6 @@ public class CommandLineServer : MonoBehaviour
                     }
                     break;
             }
-        }
-
-        // 也可以通过环境变量控制
-        string envServer = Environment.GetEnvironmentVariable("PCR_SERVER_MODE");
-        if (!string.IsNullOrEmpty(envServer) && envServer.ToLower() == "true")
-        {
-            serverMode = true;
-            Debug.Log("通过环境变量启用服务器模式");
-        }
-
-        string envPort = Environment.GetEnvironmentVariable("PCR_SERVER_PORT");
-        if (!string.IsNullOrEmpty(envPort) && int.TryParse(envPort, out int envPortValue))
-        {
-            serverPort = envPortValue;
-            Debug.Log($"通过环境变量设置服务器端口: {envPortValue}");
         }
     }
 

@@ -361,7 +361,7 @@ namespace Elements
                 }
             }
 
-            tempData.skipping = true;
+            tempData.skipping = req.IsSkipping;
 
             if (req.IsGuildBattle)
             {

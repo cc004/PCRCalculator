@@ -124,7 +124,7 @@ public class ThreadController : IDisposable
 
             MyGameCtrl.Instance.StartByServer(request);
 
-            MyGameCtrl.Instance.tempData.skipping = true;
+            // MyGameCtrl.Instance.tempData.skipping = request.IsSkipping;
 
             IEnumerator UpdateBattleManager()
             {
