@@ -30,7 +30,9 @@ namespace Elements
         public GameObject prefab2;
         public GameObject battleUnitPrefab;
         public GameObject firearmPrefab;
+#if UNITY_5_3_OR_NEWER
         private BattleSimulationServer battleServer;
+#endif
         //public GameObject emptyObject;
 
 
@@ -69,7 +71,7 @@ namespace Elements
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
-
+#if UNITY_5_3_OR_NEWER
         private void OnStartServerButtonClick()
         {
             if (battleServer == null)
@@ -86,7 +88,7 @@ namespace Elements
                 Debug.Log("HTTP服务器已停止");
             }
         }
-
+#endif
         public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
         {
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
@@ -124,14 +126,14 @@ namespace Elements
             staticBattleManager = BattleManager.Instance;
             mainManager = MainManager.Instance;
             tempData = new TempData();
-            #if UNITY_5_3_OR_NEWER
+#if UNITY_5_3_OR_NEWER
             if (CommandLineServer.serverMode)
             {
                 return;
             }
-            #else
+#else
                 return;
-            #endif
+#endif
             if (MainManager.Instance == null)
             {
                 return;

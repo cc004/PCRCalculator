@@ -104,6 +104,7 @@ namespace Elements.Battle
         public bool IsSkipping { get; set; } = true;
     }
 
+#if UNITY_5_3_OR_NEWER
     public class BattleSimulationServer : MonoBehaviour
     {
         public static BattleSimulationServer Instance;
@@ -312,7 +313,7 @@ namespace Elements.Battle
                 }
 
                 // 更新 UI
-                #if UNITY_5_3_OR_NEWER 
+#if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -327,7 +328,7 @@ namespace Elements.Battle
                     }
                     catch { }
                 });
-                #endif
+#endif
 
                 // 返回 UID
                 var response = new BattleSubmitResponse
@@ -662,7 +663,7 @@ namespace Elements.Battle
                 UnityEngine.CoroutineRunner.pending.Clear();
                 UnityEngine.CoroutineRunner.running.Clear();
 
-                #endif
+#endif
                 if (debugMode)
                     Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
 
@@ -710,4 +711,5 @@ namespace Elements.Battle
             }
         }
     }
+#endif
 }

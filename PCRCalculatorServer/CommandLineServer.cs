@@ -6,12 +6,14 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
+using PCRCalculatorServer;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,24 +48,18 @@ public class CommandLineServer : MonoBehaviour
 
     public static void Main(string[] args)
     {
-
+        var exeDir = AppContext.BaseDirectory;
+        Directory.SetCurrentDirectory(exeDir);
         ParseCommandLineArgs();
 #if ENABLE_THREADING
         if (serverMode)
         {
-            new BattleSimulationServer().Awake();
-            BattleSimulationServer.Instance.port = serverPort;
-            BattleSimulationServer.Instance.host = serverHost;
-            BattleSimulationServer.Instance.debugMode = debugMode;
-            BattleSimulationServer.Instance.StartServer();
-            Debug.Log($"服务器模式已启动，监听 http://{serverHost}:{serverPort}/");
-
-            serverReadyEvent.Set();
-            shutdownTokenSource.Token.WaitHandle.WaitOne();
-
-            // 优雅关闭
-            Debug.Log("服务器正在关闭...");
-            BattleSimulationServer.Instance.StopServer();
+            RuntimeHelpers.RunClassConstructor(typeof(ApiController).TypeHandle);
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseUrls($"http://{serverHost}:{serverPort}/").UseStartup<Startup>();
+                }).Build().Run();
         }
         else
         {
