@@ -101,6 +101,7 @@ namespace Elements.Battle
         public bool IsSetMode { get; set; }
         public bool IsSemanMode { get; set; }
         public bool IsGuildBattle { get; set; } = true;
+        public bool IsSkipping { get; set; } = true;
     }
 
     public class BattleSimulationServer : MonoBehaviour
@@ -110,6 +111,7 @@ namespace Elements.Battle
         private Thread listenerThread;
         private Thread queueProcessorThread;
         private bool isRunning = false;
+        public bool debugMode = false;
         public int port = 8080;
         public Text conentText;
 
@@ -285,6 +287,8 @@ namespace Elements.Battle
                 }
 
                 var battleRequest = JsonConvert.DeserializeObject<BattleSimulationRequest>(requestBody);
+                if (debugMode)
+                    battleRequest.IsSkipping = false;
                 
                 // 生成 UID
                 string uid = GenerateUid();
@@ -657,8 +661,10 @@ namespace Elements.Battle
 
                 UnityEngine.CoroutineRunner.pending.Clear();
                 UnityEngine.CoroutineRunner.running.Clear();
-#endif
-                // Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
+
+                #endif
+                if (debugMode)
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
 
                 // 如果已经标记为失败，直接返回
                 if (task.Status == BattleStatus.Failed)
