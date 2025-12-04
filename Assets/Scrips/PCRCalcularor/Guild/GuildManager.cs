@@ -2137,10 +2137,10 @@ namespace PCRCaculator.Guild
             var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
             var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId)
                 ? (MainManager.Instance.TalentFormationDic.TryGetValue(WaveGroupId, out var talentData) ? talentData : null)
-                : MainManager.Instance.TalentFormationDic.TryGetValue(selectedBossEnemyids[0], out var bossData)
+                : MainManager.Instance.TalentFormationDic.TryGetValue(bossId, out var bossData)
                     ? bossData
                     : MainManager.Instance.TalentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
-            // Debug.Log($"GetTalentBonusPermyriad: talentId={talentId}, count={count}, formationData={(formationData != null ? "found" : "null")}");
+            // Debug.Log($"GetTalentBonusPermyriad: talentId={talentId}, count={count}, formationData={formationData.formation_bonus_values[talentId - 1][count-1]}");
             return count > 0 && formationData != null ? formationData.formation_bonus_values[talentId - 1][count-1] : 0;
         }
         public void ExtraEffectButton()
