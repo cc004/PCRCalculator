@@ -82,6 +82,13 @@ namespace PCRCaculator
         public int wave_group_id;
         public List<int> enemy_ids = new();
     }
+    [Serializable]
+    public class AbyssWaveGroupData
+    {
+        public int id;
+        public int wave_group_id;
+        public List<int> enemy_ids = new();
+    }
     /*[Serializable]
     public class EnemyAttackPattern
     {

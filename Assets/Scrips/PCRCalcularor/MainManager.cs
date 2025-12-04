@@ -63,6 +63,7 @@ namespace PCRCaculator
             public Dictionary<int, Dictionary<int, promotion_bonus>> rbs = new Dictionary<int, Dictionary<int, promotion_bonus>>();
             public List<EReduction> ereductionTable = new List<EReduction>();
             public Dictionary<int, talent_quest_battle_effect> talentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
+            public Dictionary<int, abyss_battle_effect> abyssBattleEffectDic = new Dictionary<int, abyss_battle_effect>();
             public Dictionary<int, extra_effect_data> extraEffectDataDic = new Dictionary<int, extra_effect_data>();
             public Dictionary<int, talentFormationData> talentFormationDic = new Dictionary<int, talentFormationData>();
             public Dictionary<int, int[]> weaknessDic = new Dictionary<int, int[]>();//角色的弱点列表
@@ -78,6 +79,7 @@ namespace PCRCaculator
             public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
             public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
             public Dictionary<int, TalentQuestWaveGroupData> talentQuestWaveGroupDataDic = new Dictionary<int, TalentQuestWaveGroupData>();
+            public Dictionary<int, AbyssWaveGroupData> abyssWaveGroupDataDic = new Dictionary<int, AbyssWaveGroupData>();
             public Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
             public Dictionary<int, int> unitStoryLoveDic = new Dictionary<int, int>();
@@ -88,6 +90,7 @@ namespace PCRCaculator
             public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas = new Dictionary<int, Guild.GuildEnemyData>();
             public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips = new Dictionary<int, Dictionary<int, ex_equipment_data>[]>();
             public Dictionary<int, EnemyData> talentQuestEnemyParameterDic = new Dictionary<int, EnemyData>();
+            public Dictionary<int, EnemyData> abyssEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, unit_role_data> UnitRoleDataDic = new();
             public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic = new();
             public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic = new();
@@ -140,6 +143,7 @@ namespace PCRCaculator
         public Dictionary<int, Dictionary<int, promotion_bonus>> Rbs { get => databaseCache.rbs; }
         public List<EReduction> EreductionTable { get => databaseCache.ereductionTable; }
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get => databaseCache.talentQuestBattleEffectDic; }
+        public Dictionary<int, abyss_battle_effect> AbyssBattleEffectDic { get => databaseCache.abyssBattleEffectDic; }
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get => databaseCache.extraEffectDataDic; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get => databaseCache.talentFormationDic; }
         public Dictionary<int, int[]> WeaknessDic { get => databaseCache.weaknessDic; }  // 角色的弱点列表
@@ -155,6 +159,7 @@ namespace PCRCaculator
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic { get => databaseCache.uniqueEquipment2DataDic; }  // 角色专武2字典
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic { get => databaseCache.uniqueEquipmentDataDic; }  // 角色专武字典
         public Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
+        public Dictionary<int, AbyssWaveGroupData> AbyssWaveGroupDataDic { get => databaseCache.abyssWaveGroupDataDic; }
         public Dictionary<int, EnemyData> EnemyDataDic { get => databaseCache.enemyDataDic; }
         public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => databaseCache.enemyMPartsDic; }
         public Dictionary<int, int> UnitStoryLoveDic { get => databaseCache.unitStoryLoveDic; }
@@ -165,6 +170,7 @@ namespace PCRCaculator
         public Dictionary<int, Guild.GuildEnemyData> GuildEnemyDatas { get => databaseCache.guildEnemyDatas; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> UnitExEquips { get => databaseCache.unitExEquips; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get => databaseCache.talentQuestEnemyParameterDic; }
+        public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get => databaseCache.abyssEnemyParameterDic; }
         public Dictionary<int, unit_role_data> UnitRoleDataDic { get => databaseCache.UnitRoleDataDic; }
         public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get => databaseCache.UnitRoleMasteryIdDic; }
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get => databaseCache.UnitRoleSlotDataDic; }
@@ -238,8 +244,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10055800;
-            public long BossVersionJP = 10055800;
+            public long CharacterVersionJP = 10057100;
+            public long BossVersionJP = 10057100;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -503,7 +509,9 @@ namespace PCRCaculator
                                 //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                                 databaseCache.enemyDataDic = dbTool.Dic2;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
+                                databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic;
                                 databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
+                                databaseCache.abyssWaveGroupDataDic = dbTool.AbyssWaveGroupDataDic;
                                 databaseCache.uniqueEquipmentDataDic = dbTool2.Dic9;
                                 databaseCache.uniqueEquipment2DataDic = dbTool2.Dic92;
                                 databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic;
@@ -515,6 +523,7 @@ namespace PCRCaculator
                                 databaseCache.talentFormationDic = dbTool.TalentFormationDic;
                                 databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
+                                databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic;
                                 databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;
                                 databaseCache.UnitRoleMasteryIdDic = dbTool.UnitRoleMasteryIdDic;
                                 databaseCache.UnitRoleSlotDataDic = dbTool.UnitRoleSlotDataDic;
@@ -576,7 +585,8 @@ namespace PCRCaculator
                                     Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
                                     Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
-                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic))
+                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic)),
+                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic))
                                 );
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
@@ -609,7 +619,8 @@ namespace PCRCaculator
                                             Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                             Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                             Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2)),
-                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic))
+                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
+                                            Task.Run(() => databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic))
                                         );
                                 // }
                                 // else
@@ -628,11 +639,12 @@ namespace PCRCaculator
 
                                         Task.Run(() => databaseCache.skillDataDic.Override2With(dbTool3.Dic3)),
                                         Task.Run(() => databaseCache.skillActionDic.Override2With(dbTool3.Dic4)),
-                                        Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
+                                        // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
                                         // Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
                                         // Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
                                         // Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
                                         Task.Run(() => databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic)),
+                                        Task.Run(() => databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic)),
                                         Task.Run(() => databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic)),
                                         Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic))
                                     );
@@ -782,8 +794,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 82;
-                playerSetting.playerLevel = 307;
+                playerSetting.playerProcess = 84;
+                playerSetting.playerLevel = 313;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
@@ -996,6 +1008,8 @@ namespace PCRCaculator
                 return data2.name;
             if (TalentQuestEnemyParameterDic.TryGetValue(unitid, out var data3))
                 return data3.name;
+            if (AbyssEnemyParameterDic.TryGetValue(unitid, out var data4))
+                return data4.name;
             if (unitid >= 200000)
                 return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
@@ -1524,6 +1538,39 @@ namespace PCRCaculator
                 if (resultDatas.Count > 0)
                     result /= resultDatas.Count;
                 return result;
+            }
+        }
+        public long MaxDamage
+        {
+            get
+            {
+                if (resultDatas.Count == 0)
+                    return 0;
+
+                long max = resultDatas[0].currentDamage;
+                for (int i = 1; i < resultDatas.Count; i++)
+                {
+                    if (resultDatas[i].currentDamage > max)
+                        max = resultDatas[i].currentDamage;
+                }
+                return max;
+            }
+        }
+
+        public long MinDamage
+        {
+            get
+            {
+                if (resultDatas.Count == 0)
+                    return 0;
+
+                long min = resultDatas[0].currentDamage;
+                for (int i = 1; i < resultDatas.Count; i++)
+                {
+                    if (resultDatas[i].currentDamage < min)
+                        min = resultDatas[i].currentDamage;
+                }
+                return min;
             }
         }
         public void Reset()

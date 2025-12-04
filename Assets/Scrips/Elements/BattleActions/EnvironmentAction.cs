@@ -35,6 +35,7 @@ namespace Elements
                 if (child == null)
                     continue;
 
+                child.IsEnvironmentAbnormalState = true;
                 this.targetActions.Add(child);
             }
         }

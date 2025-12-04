@@ -962,6 +962,7 @@ namespace PCRCaculator.Guild
                 UBExecTime = CreateUBExecTimeData(),
                 exceptDamage = Mathf.RoundToInt(expectedDamage / 10000),
                 backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
+                totalDamage = totalDamage,
                 charImages = BattleUIManager.Instance.GetCharactersImage(),
                 //string fileName = CreateExcelName();
                 timeLineName = CreateExcelName(),
@@ -1857,6 +1858,7 @@ namespace PCRCaculator.Guild
         public List<List<float>> UBExecTime = new List<List<float>>();
         [JsonIgnore]
         public List<RandomData> AllRandomList = new List<RandomData>();
+        public long totalDamage;
         public int exceptDamage;
         public int backDamage;
         [JsonIgnore]

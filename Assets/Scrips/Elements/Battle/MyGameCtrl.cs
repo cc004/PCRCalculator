@@ -94,10 +94,16 @@ namespace Elements
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
             int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;
             int content_type = 0;
-            if (enemy_id >= 800000000)
+            if (enemy_id >= 900000000)
+            {
+                var kind = enemy_id / 1000 % 10;
+                content_type =  kind == 0 ? (int)eBattleCategory.ABYSS_BATTLE : (int)eBattleCategory.ABYSS_BOSS_BATTLE;
+                enemy_id = _tempData.waveGroupId; // TODO move in tempData
+            }
+            else if (enemy_id >= 800000000)
             {
                 content_type = (int)eBattleCategory.TALENT_QUEST;
-                enemy_id = GuildManager.Instance.TalentQuestWaveGroupId; // TODO move in tempData
+                enemy_id = _tempData.waveGroupId; // TODO move in tempData
             }
             else if (enemy_id >= 500000000)
             {
@@ -146,6 +152,7 @@ namespace Elements
             {
                 tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
                 tempData.extra_effect_cnt = 0;
+                tempData.waveGroupId = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().waveGroupId;
                 var extra_data = GetExtraEffectEnemyData(tempData);
                 if (extra_data != null)
                 {
@@ -159,6 +166,11 @@ namespace Elements
                         else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
                         {
                             tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
                         else
@@ -220,6 +232,8 @@ namespace Elements
                 if (mainManager.IsGuildBattle)
                 {
                     tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
+                    
+                    tempData.waveGroupId = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().waveGroupId;
 
                     var extra_data = GetExtraEffectEnemyData(tempData);
                     if (extra_data != null)
@@ -240,6 +254,13 @@ namespace Elements
                                 if (!tempData.guildEnemy.Contains(GuildManager.TalentQuestEnemyParameterDic[enemy]))
                                 {
                                     tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                                }
+                            }
+                            else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
+                            {
+                                if (!tempData.guildEnemy.Contains(GuildManager.AbyssEnemyParameterDic[enemy]))
+                                {
+                                    tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
                                 }
                             }
                             else
@@ -1038,13 +1059,14 @@ namespace Elements
         public Dictionary<int, BaseData> playerUnitBaseDataDic;
         public GuildRandomData randomData;
         public bool skipping;
+        public int waveGroupId;
 
         public void CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {
             AllUnitParameters = new List<List<UnitParameter>>();
             PlayerParameters = new List<UnitParameter>();
             EnemyParameters = new List<UnitParameter>();
-            foreach(PCRCaculator.UnitData unitData in playerList)
+            foreach (PCRCaculator.UnitData unitData in playerList)
             {
                 UnitParameter parameter = CreateUnitParameter(unitData);
                 PlayerParameters.Add(parameter);
@@ -1061,7 +1083,7 @@ namespace Elements
             {
                 foreach (var enemy in guildEnemy)
                 {
-                    UnitParameter parameter = CreateUnitParameter(enemy,useLogBarrier);
+                    UnitParameter parameter = CreateUnitParameter(enemy, useLogBarrier);
                     EnemyParameters.Add(parameter);
                 }
             }
