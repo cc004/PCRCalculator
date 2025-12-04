@@ -54,6 +54,7 @@ public class ThreadController : IDisposable
             try
             {
                 Simulate(request);
+                callback();
             }
             catch (Exception e)
             {
@@ -62,8 +63,6 @@ public class ThreadController : IDisposable
                 else
                     Console.WriteLine(e);
             }
-
-            callback();
         }
     }
     private static void ThreadInit()
@@ -147,10 +146,7 @@ public class ThreadController : IDisposable
         {
             if (!MyGameCtrl.Instance.isBattleFinish)
             {
-                BattleManager.Instance.CoroutineManager.ClearAll();
-                BattleManager.Instance.onEndFadeOut = (System.Action)null;
-                BattleManager.Instance.battleFinishedProcessed = true;
-                MyGameCtrl.Instance.OnBattleFinished(1);
+                BattleManager.Instance.DoCleaning(1);
             }
 
             UnityEngine.CoroutineRunner.pending.Clear();

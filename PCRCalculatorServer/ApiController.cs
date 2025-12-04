@@ -59,6 +59,8 @@ namespace PCRCalculatorServer
 
                     var battleResult = BattleManager.Instance.battleResult;
 
+                    Console.WriteLine(battleResult);
+
                     var totalDamage = GuildCalculator.Instance.GetTotalDamage();
 
                     var battleFrames = BattleHeaderController.CurrentFrameCount;

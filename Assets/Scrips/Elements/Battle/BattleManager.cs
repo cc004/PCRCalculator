@@ -547,14 +547,20 @@ namespace Elements.Battle
         private Stopwatch stopWatch = new Stopwatch();
         public bool battleFinishedProcessed = false;
 
+        public void DoCleaning(int result)
+        {
+            CoroutineManager.ClearAll();
+            onEndFadeOut = (System.Action)null;
+            battleFinishedProcessed = true;
+            MyGameCtrl.Instance.OnBattleFinished(result);
+            battleCameraEffect.ClearShake();
+        }
+
         public void Update()
         {
             if (battleFinished){
                 if (!battleFinishedProcessed){
-                    CoroutineManager.ClearAll();
-                    onEndFadeOut = (System.Action)null;
-                    battleFinishedProcessed = true;
-                    MyGameCtrl.Instance.OnBattleFinished((int)battleResult);
+                    DoCleaning((int)battleResult);
                 }
                 return;
             } 

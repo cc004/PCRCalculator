@@ -815,7 +815,7 @@ namespace Elements
         {
             Object.Destroy(obj);
         }
-
+#if UNITY_5_3_OR_NEWER
         ~FirearmCtrl2()
         {
             try
@@ -827,7 +827,7 @@ namespace Elements
 
             }
         }
-
+#endif
         public void ResetParam()
         {
             IsPlaying = true;
