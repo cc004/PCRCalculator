@@ -1,6 +1,7 @@
 ﻿using Elements;
 using Elements.Battle;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Ocsp;
 using PCRCaculator;
 using PCRCaculator.Guild;
 using System;
@@ -48,6 +49,7 @@ namespace PCRCalculatorServer
             void OnException(Exception ex)
             {
                 Debug.LogError($"[BattleSimulationServer] StartByServer 失败: {ex.Message}\n{ex.StackTrace}");
+                sema.Release();
             }
 
             void OnFinish(int index)
@@ -55,11 +57,7 @@ namespace PCRCalculatorServer
                 // 获取战斗结果
                 try
                 {
-                    Debug.Log($"[BattleSimulationServer] 开始获取战斗结果...");
-
                     var battleResult = BattleManager.Instance.battleResult;
-
-                    Console.WriteLine(battleResult);
 
                     var totalDamage = GuildCalculator.Instance.GetTotalDamage();
 

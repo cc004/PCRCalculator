@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PCRCalculatorServer": {
+      "commandName": "Project",
+      "commandLineArgs": "--server --port 23333"
+    }
+  }
+}

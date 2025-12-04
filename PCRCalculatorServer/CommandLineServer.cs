@@ -69,7 +69,7 @@ public class CommandLineServer : MonoBehaviour
         }
         else
         {
-            var controller = new ThreadController(Environment.ProcessorCount);
+            var controller = new ThreadController(1);
 
             var requests = new[]
             {

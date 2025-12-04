@@ -1510,15 +1510,16 @@ namespace Elements
                 break;
             label_17:
                 ExecAction(_action, _skill, _target, i, time, false, _protectedTarget, false);
-                if ((_action.ActionType != eActionType.CONTINUOUS_ATTACK || _action.ActionDetail1 != 3) && (_action.ActionType != eActionType.MODE_CHANGE || _action.ActionDetail1 == 3))
+                if ((_action.ActionType != eActionType.CONTINUOUS_ATTACK || _action.ActionDetail1 != 3) &&
+                    (_action.ActionType != eActionType.MODE_CHANGE || _action.ActionDetail1 == 3))
                 {
                     _target.Owner.ActionsTargetOnMe.Remove(actionIndivisualId);
                     battleManager.CallbackActionEnd(actionIndivisualId);
+
                 }
-                else if (_action.IdOffsetDictionary.ContainsKey(_target))
-                    _action.IdOffsetDictionary[_target] = ids[i];
                 else
-                    _action.IdOffsetDictionary.Add(_target, ids[i]);
+                    _action.IdOffsetDictionary[_target] = ids[i];
+
                 if (i == _action.ExecTime.Length - 1 && _action.OnActionEnd != null && (_action.ActionType != eActionType.CONTINUOUS_ATTACK && _action.ActionType != eActionType.MOVE))
                     _action.OnActionEnd();
             }

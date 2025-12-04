@@ -410,6 +410,8 @@ namespace Elements
             }
             while (true)
             {
+                if (_sourceActionController.IsCancelModeChangeByTrigger)
+                    yield break;
                 switch (_type)
                 {
                     case eModeChangeType.TIME:
@@ -419,11 +421,13 @@ namespace Elements
                         }
                         if (timer >= _value && _source.CurrentState == UnitCtrl.ActionState.IDLE)
                         {
-                            break;
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
+                            yield break;
                         }
                         if (_source.ToadDatas.Count > 0)
                         {
-                            break;
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
+                            yield break;
                         }
                         break;
                     case eModeChangeType.ENERGY:
@@ -435,11 +439,13 @@ namespace Elements
                         }
                         if (_source.ToadDatas.Count > 0)
                         {
-                            break;
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
+                            yield break;
                         }
                         if (_source.CurrentState == UnitCtrl.ActionState.IDLE && endFlag)
                         {
-                            break;
+                            modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
+                            yield break;
                         }
                         break;
                 }
@@ -456,8 +462,6 @@ namespace Elements
                 yield return null;
             }
 
-            if (_sourceActionController.IsCancelModeChangeByTrigger) // XXX: 临时修复
-                yield break;
             modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
         }
 
@@ -469,6 +473,9 @@ namespace Elements
           UnitActionController _sourceUnitActionController,
           eAdditionalAbnormalType additionalAbnormalType)
         {
+            if (_sourceUnitActionController.IsCancelModeChangeByTrigger)
+                return;
+
             // 清除特殊状态（无法操作/魅惑）
             _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = false;
 

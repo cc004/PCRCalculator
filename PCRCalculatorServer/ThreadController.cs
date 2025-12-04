@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,6 +54,7 @@ public class ThreadController : IDisposable
         {
             try
             {
+                // Debug.Log($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(request)}");
                 Simulate(request);
                 callback();
             }
@@ -137,9 +139,16 @@ public class ThreadController : IDisposable
 
             CoroutineRunner.AppendCoroutine(UpdateBattleManager());
 
+            // var sw = new Stopwatch();
+            // sw.Start();
             while (!BattleManager.Instance.battleFinishedProcessed)
             {
                 CoroutineRunner.Update();
+                /*if (sw.ElapsedMilliseconds > 10000)
+                {
+                    Console.WriteLine("battle stuck detected, request = " + JsonConvert.SerializeObject(request));
+                    Environment.Exit(0);
+                }*/
             }
         }
         finally
