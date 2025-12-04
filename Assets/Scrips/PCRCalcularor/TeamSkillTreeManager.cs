@@ -14,6 +14,7 @@ namespace PCRCaculator
         public GameObject talentSkillPrefab;
         public RectTransform skillTreeContainer;
         public ScrollRect scrollRect;
+        public InputField masterPointInput;
         private Dictionary<int, TeamSkillNode> NodeDataDict => MainManager.Instance.TeamSkillNodeDic;
         private Dictionary<int, TeamSkillEnhanceData> enhanceDataDict;
         private Dictionary<int, List<int>> nodeChildrenDict;
@@ -60,6 +61,8 @@ namespace PCRCaculator
             skillLevels = PlayerGroup.teamSkill;
             UpdateAllNodeUI();
             UpdateTalentInfoData();
+            SetupMasterPointInput();
+
         }
         public void ReLoad()
         {
@@ -85,7 +88,53 @@ namespace PCRCaculator
             BuildNodeRelationships();
             UpdateTalentInfoData();
         }
-
+        private void SetupMasterPointInput()
+        {
+            if (masterPointInput != null)
+            {
+                masterPointInput.onValueChanged.AddListener(OnMasterPointInputChanged);
+                UpdateMasterPointInput();
+            }
+        }
+        private void OnMasterPointInputChanged(string value)
+        {
+            if (int.TryParse(value, out int node_id))
+            {
+                int maxNodeId = NodeDataDict.Keys.Max();
+                if (node_id < maxNodeId && node_id > 0)
+                {
+                    EnhanceSkill(node_id, 1);
+                }
+                else if (node_id == 0)
+                {
+                    EnhanceSkill(1, 0);
+                }
+                else
+                {
+                    UpdateMasterPointInput();
+                }
+            }
+        }
+        private int GetMasterNodeId()
+        {
+            if (skillLevels.Count > 0)
+            {
+                var enhanceSkills = skillLevels.Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
+                if (enhanceSkills.Any())
+                {
+                    return enhanceSkills.Max();
+                }
+            }
+            return 0;
+        }
+        public void UpdateMasterPointInput()
+        {
+            if (masterPointInput != null)
+            {
+                int masterNodeId = GetMasterNodeId();
+                masterPointInput.text = masterNodeId.ToString();
+            }
+        }
         private void BuildNodeRelationships()
         {
             nodeChildrenDict = new Dictionary<int, List<int>>();
@@ -361,6 +410,7 @@ namespace PCRCaculator
                 }
                 UpdateAllNodeUI();
                 UpdateTalentInfoData();
+                UpdateMasterPointInput();
             }
             finally
             {
