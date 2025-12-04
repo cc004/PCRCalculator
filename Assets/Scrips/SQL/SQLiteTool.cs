@@ -324,7 +324,6 @@ namespace PCRCaculator.SQL
         private Dictionary<int, unit_enemy_data> dic1;
         private Dictionary<int, equipment_enhance_rate> dic2;
         private Dictionary<int, wave_group_data> waveDic;
-
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
         public Dictionary<int, unit_talent[]> TalentDic { get; private set; }
@@ -333,10 +332,11 @@ namespace PCRCaculator.SQL
         public Dictionary<int, int[]> WeaknessDic { get; private set; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get; private set; }
         public Dictionary<int, EnemyData> Dic2 { get; private set; }
+        public Dictionary<int, WaveGroupDataBase> SecretDungeonWaveGroupDataDic { get; private set; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get; private set; }
-        public Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic { get; private set; }
+        public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get; private set; }
         public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get; private set; }
-        public Dictionary<int, AbyssWaveGroupData> AbyssWaveGroupDataDic { get; private set; }
+        public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
         public Dictionary<int, UnitAttackPattern> Dic5 { get; private set; }
@@ -465,9 +465,54 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => TalentFormationDic = GetTalentFormationData()));
             tasks.Add(
-                Task.Run(() => TalentQuestWaveGroupDataDic = GetTalentQuestWaveGroupDataDic()));
+                Task.Run(() => SecretDungeonWaveGroupDataDic = GetWaveGroupDataDic<wave_group_data>(
+                    data => data.id,
+                    data => data.wave_group_id,
+                    (data, index) =>
+                    {
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    }).Where(w => w.Value.id / 100000 == 5020).ToDictionary(w => w.Key, w => w.Value)));
             tasks.Add(
-                Task.Run(() => AbyssWaveGroupDataDic = GetAbyssWaveGroupDataDic()));
+                Task.Run(() => TalentQuestWaveGroupDataDic = GetWaveGroupDataDic<talent_quest_wave_group_data>(
+                    data => data.id,
+                    data => data.wave_group_id,
+                    (data, index) =>
+                    {
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    })
+                ));
+            tasks.Add(
+                Task.Run(() => AbyssWaveGroupDataDic = GetWaveGroupDataDic<abyss_wave_group_data>(
+                    data => data.id,
+                    data => data.wave_group_id,
+                    (data, index) =>
+                    {
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    })));
             tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
@@ -550,7 +595,7 @@ namespace PCRCaculator.SQL
                 var subStatusesData = GetDatas<ex_equipment_sub_status>();
                 var subStatuses = subStatusesData != null ?
                     subStatusesData.GroupBy(x => x.group_id)
-                    .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values)): new Dictionary<int, Dictionary<int, int[]>>();
+                    .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values)) : new Dictionary<int, Dictionary<int, int[]>>();
 
                 var categories = GetDatas<ex_equipment_data>()
                     // .Where(x => x.clan_battle_equip_flag)
@@ -931,33 +976,6 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-        private Dictionary<int, TalentQuestWaveGroupData> GetTalentQuestWaveGroupDataDic()
-        {
-            Dictionary<int, TalentQuestWaveGroupData> dic = new Dictionary<int, TalentQuestWaveGroupData>();
-
-            var list = GetDatas<talent_quest_wave_group_data>();
-            if (list is not null)
-            {
-                foreach (var data in list)
-                {
-                    TalentQuestWaveGroupData waveGroupData = new TalentQuestWaveGroupData();
-                    waveGroupData.id = data.id;
-                    waveGroupData.wave_group_id = data.wave_group_id;
-
-                    // 添加所有enemy_id到enemy_ids列表中，忽略值为0的enemy_id
-                    waveGroupData.enemy_ids = new List<int>();
-                    if (data.enemy_id_1 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_1);
-                    if (data.enemy_id_2 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_2);
-                    if (data.enemy_id_3 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_3);
-                    if (data.enemy_id_4 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_4);
-                    if (data.enemy_id_5 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_5);
-
-                    dic.Add(waveGroupData.id, waveGroupData);
-                }
-            }
-
-            return dic;
-        }
         private Dictionary<int, EnemyData> GetAbyssEnemyDataDic()
         {
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
@@ -1031,26 +1049,26 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-        private Dictionary<int, AbyssWaveGroupData> GetAbyssWaveGroupDataDic()
+        private Dictionary<int, WaveGroupDataBase> GetWaveGroupDataDic<T>(Func<T, int> getId, Func<T, int> getWaveGroupId, Func<T, int, int> getEnemyId) where T : class, new()
         {
-            Dictionary<int, AbyssWaveGroupData> dic = new Dictionary<int, AbyssWaveGroupData>();
+            Dictionary<int, WaveGroupDataBase> dic = new Dictionary<int, WaveGroupDataBase>();
 
-            var list = GetDatas<abyss_wave_group_data>();
+            var list = GetDatas<T>();
             if (list is not null)
             {
                 foreach (var data in list)
                 {
-                    AbyssWaveGroupData waveGroupData = new AbyssWaveGroupData();
-                    waveGroupData.id = data.id;
-                    waveGroupData.wave_group_id = data.wave_group_id;
+                    WaveGroupDataBase waveGroupData = new WaveGroupDataBase();
+                    waveGroupData.id = getId(data);
+                    waveGroupData.wave_group_id = getWaveGroupId(data);
 
                     // 添加所有enemy_id到enemy_ids列表中，忽略值为0的enemy_id
                     waveGroupData.enemy_ids = new List<int>();
-                    if (data.enemy_id_1 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_1);
-                    if (data.enemy_id_2 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_2);
-                    if (data.enemy_id_3 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_3);
-                    if (data.enemy_id_4 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_4);
-                    if (data.enemy_id_5 != 0) waveGroupData.enemy_ids.Add(data.enemy_id_5);
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        int enemyId = getEnemyId(data, i);
+                        if (enemyId != 0) waveGroupData.enemy_ids.Add(enemyId);
+                    }
 
                     dic.Add(waveGroupData.id, waveGroupData);
                 }
