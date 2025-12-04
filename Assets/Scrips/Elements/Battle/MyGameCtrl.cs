@@ -438,7 +438,7 @@ namespace Elements
                 tempData.UBExecTimeList = req.UBExecTimeList;
                 tempData.SemanUBExecTimeList = req.SemanUBExecTimeList;
                 // tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
-                tempData.tryCount = req.Settings.UBTryingCount;
+                tempData.tryCount = 9999;
                 tempData.SettingData = new();
                 tempData.SettingData.limitTime = req.BattleTime;
                 tempData.CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType.FullBarrier);
@@ -465,9 +465,7 @@ namespace Elements
                 tempData.CreateAllUnitParameters();
             }
 
-            tempData.randomData = new();
-            tempData.randomData.RandomSeed = req.Settings.RandomSeed;
-            tempData.randomData.UseFixedRandomSeed = req.Settings.UseFixedRandomSeed;
+            tempData.randomData = req.Settings;
 
             foreach (Transform child in unitParent)
             {

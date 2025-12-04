@@ -74,15 +74,6 @@ namespace Elements.Battle
     }
 
     [Serializable]
-    public class GuildBattleSettingData
-    {
-        public bool UseFixedRandomSeed { get; set; }
-        public int RandomSeed { get; set; }
-        public bool UseLogBarrierNew { get; set; }
-        public int UBTryingCount { get; set; } = 9999;
-    }
-
-    [Serializable]
     public class BattleSimulationRequest
     {
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
@@ -91,7 +82,7 @@ namespace Elements.Battle
         public List<int> GuildEnemyList { get; set; }
         public List<List<float>> UBExecTimeList { get; set; }
         public List<List<int>> SemanUBExecTimeList { get; set; }
-        public GuildBattleSettingData Settings { get; set; } = new GuildBattleSettingData();
+        public GuildRandomData Settings { get; set; } = new GuildRandomData();
         public Dictionary<int, int> TalentSkillLevels { get; set; }
         public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }

@@ -2179,7 +2179,7 @@ namespace PCRCaculator.Guild
         public int FPSforAnimation = 60;
         public bool calcSpineAnimation = true;
         public int UBTryingCount = 9999;
-        public bool UseFixedRandomSeed = true;
+        // public bool UseFixedRandomSeed = true;
 
         /*public int RandomSeed = 666;
         public bool ForceNoCritical_player;
