@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
 using Assets.Scrips;
 using Cute;
 using PCRCaculator;
@@ -12,7 +13,10 @@ using PCRCaculator.Guild;
 //using Elements.Uek;
 using PCRCaculator.SQL;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Video;
