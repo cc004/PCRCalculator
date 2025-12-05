@@ -115,7 +115,7 @@ public class ThreadController : IDisposable
         CoroutineRunner.Initialize();
     }
 
-    [ThreadStatic] private static Stopwatch watch;
+    //[ThreadStatic] private static Stopwatch watch;
 
     private static void Simulate(BattleSimulationRequest request)
     {
@@ -140,18 +140,18 @@ public class ThreadController : IDisposable
             }
 
             CoroutineRunner.AppendCoroutine(UpdateBattleManager());
-
+            /*
             watch ??= new Stopwatch();
             watch.Restart();
-
+            */
             while (!BattleManager.Instance.battleFinishedProcessed)
             {
-                CoroutineRunner.Update();
+                CoroutineRunner.Update();/*
                 if (watch.ElapsedMilliseconds > 10000)
                 {
                     Console.WriteLine("battle stuck detected, request = " + JsonConvert.SerializeObject(request));
                     throw new Exception();
-                }
+                }*/
             }
         }
         finally

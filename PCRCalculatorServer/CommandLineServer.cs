@@ -53,6 +53,11 @@ public class CommandLineServer : MonoBehaviour
         var exeDir = AppContext.BaseDirectory;
         Directory.SetCurrentDirectory(exeDir);
         ParseCommandLineArgs();
+        if (Debugger.IsAttached)
+        {
+            debugMode = true;
+            Debug.Log("检测到调试器附加，调试模式已启用");
+        }
 #if ENABLE_THREADING
         if (serverMode)
         {
