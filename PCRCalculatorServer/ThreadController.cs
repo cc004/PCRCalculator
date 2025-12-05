@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -115,6 +116,8 @@ public class ThreadController : IDisposable
         CoroutineRunner.Initialize();
     }
 
+    //[ThreadStatic] private static Stopwatch watch;
+
     private static void Simulate(BattleSimulationRequest request)
     {
         try
@@ -138,16 +141,17 @@ public class ThreadController : IDisposable
             }
 
             CoroutineRunner.AppendCoroutine(UpdateBattleManager());
-
-            // var sw = new Stopwatch();
-            // sw.Start();
+            /*
+            watch ??= new Stopwatch();
+            watch.Restart();
+            */
             while (!BattleManager.Instance.battleFinishedProcessed)
             {
-                CoroutineRunner.Update();
-                /*if (sw.ElapsedMilliseconds > 10000)
+                CoroutineRunner.Update();/*
+                if (watch.ElapsedMilliseconds > 10000)
                 {
                     Console.WriteLine("battle stuck detected, request = " + JsonConvert.SerializeObject(request));
-                    Environment.Exit(0);
+                    throw new Exception();
                 }*/
             }
         }

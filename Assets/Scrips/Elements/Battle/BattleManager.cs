@@ -5,25 +5,22 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System;
+using Assets.Scrips;
+using Cute;
+using PCRCaculator;
+using PCRCaculator.Guild;
+//using Elements.Data;
+//using Elements.Uek;
+using PCRCaculator.SQL;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Assets.Scrips;
-using Cute;
-
-using PCRCaculator;
-using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.Video;
-using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
-//using Elements.Data;
-//using Elements.Uek;
-using Elements;
-using PCRCaculator.SQL;
 
 //using UnityStandardAssets.ImageEffects;
 
@@ -34,7 +31,7 @@ namespace Elements.Battle
         bool _Update();
     }
 
-    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController
+    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time
     {
         private int skillTargetCacheKey = Environment.TickCount;
 

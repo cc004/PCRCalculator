@@ -14,11 +14,13 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using UnitData = PCRCaculator.UnitData;
@@ -53,6 +55,11 @@ public class CommandLineServer : MonoBehaviour
         var exeDir = AppContext.BaseDirectory;
         Directory.SetCurrentDirectory(exeDir);
         ParseCommandLineArgs();
+        if (Debugger.IsAttached)
+        {
+            debugMode = true;
+            Debug.Log("检测到调试器附加，调试模式已启用");
+        }
 #if ENABLE_THREADING
         if (serverMode)
         {

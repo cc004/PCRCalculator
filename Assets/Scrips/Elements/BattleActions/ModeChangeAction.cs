@@ -244,7 +244,7 @@ namespace Elements
                 var partKey = _source.GetFirstParts(true, 0f);
                 if (IdOffsetDictionary.TryGetValue(partKey, out long offset))
                 {
-                    _source.ActionsTargetOnMe.Remove(offset + 100 * ActionId);
+                    _source.ActionsTargetOnMe.Remove(offset + 100L * ActionId);
                 }
             }
 
@@ -254,7 +254,7 @@ namespace Elements
                 var partKey = _source.GetFirstParts(true, 0f);
                 if (IdOffsetDictionary.TryGetValue(partKey, out long offset))
                 {
-                    long param = offset + 100 * ActionId;
+                    long param = offset + 100L * ActionId;
                     bm.CallbackActionEnd(param);
                 }
             }
