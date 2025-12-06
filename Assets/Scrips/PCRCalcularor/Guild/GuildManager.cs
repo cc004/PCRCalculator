@@ -1075,8 +1075,7 @@ namespace PCRCaculator.Guild
             {
                 playerData = SettingData.addedPlayerDatas[SettingData.currentPlayerGroupNum];
             }*/
-            // toggles_ChooseType[1].isOn = IsTalentQuestBoss;
-            // toggles_ChooseType[0].isOn = isGuildBoss;
+            UpdateTooglesChooseType();
             bool isMuiltBoss = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss;
             BossObject.SetActive(!isMuiltBoss);
             TalentBossObject.SetActive(isMuiltBoss);
@@ -1264,7 +1263,7 @@ namespace PCRCaculator.Guild
             }
             else if (selectedBossEnemyids[0] / 100000 == 5020)
             {
-                TalentQuestBossText.text = $"SP地下城 第{data.dungeonMonth + 1}期 D{data.dungeonDay + 1}-{data.dungeonFloor + 8}";
+                TalentQuestBossText.text = $"特别地下城 第{data.dungeonMonth + 1}期 D{data.dungeonDay + 1}-{data.dungeonFloor + 8}";
             }
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
@@ -2371,7 +2370,7 @@ namespace PCRCaculator.Guild
                     4 => "暗",
                     _ => data.talentQuestMap,
                 };
-                des += $"{data.talentQuestArea}-{data.talentQuestIndex}";
+                des += $"{data.talentQuestArea + 1}-{data.talentQuestIndex + 1}";
             }
             else if (data.selectedEnemyIDs[0] / 100000000 == 9)
             {
