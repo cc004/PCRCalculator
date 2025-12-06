@@ -7442,7 +7442,7 @@ this.updateCurColor();
 
         public int CompareRight(BasePartsData _a, BasePartsData _b) => _b.GetPosition().x.CompareTo(_a.GetPosition().x);
 
-        public int CompareLifeAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((long)_a.Owner.Hp / (float)(long)_a.Owner.MaxHp, (long)_b.Owner.Hp / (float)(long)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeAsc(_a, _b);
+        public int CompareLifeAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / (DoubleWithEx)_a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / (DoubleWithEx)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeAsc(_a, _b);
 
         public int CompareLifeValueAscSameLeft(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? CompareLeft(_a, _b) : CompareLifeValueAsc(_a, _b);
 
@@ -7452,7 +7452,7 @@ this.updateCurColor();
 
         public int CompareEnergyAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? CompareDistanceAsc(_a, _b) : CompareEnergyAsc(_a, _b);
 
-        public int CompareLifeDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((long)_a.Owner.Hp / (float)(long)_a.Owner.MaxHp, (long)_b.Owner.Hp / (float)(long)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeDec(_a, _b);
+        public int CompareLifeDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / (DoubleWithEx)_a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / (DoubleWithEx)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeDec(_a, _b);
 
         public int CompareLifeValueDecSameLeft(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? CompareLeft(_a, _b) : CompareLifeValueDec(_a, _b);
 
@@ -7498,9 +7498,9 @@ this.updateCurColor();
 
         public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
 
-        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)a.Owner.Hp / (double)a.Owner.MaxHp).CompareTo((long)b.Owner.Hp / (double)b.Owner.MaxHp) : 1);
+        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((DoubleWithEx)a.Owner.Hp / (DoubleWithEx)a.Owner.MaxHp).CompareTo((DoubleWithEx)b.Owner.Hp / (DoubleWithEx)b.Owner.MaxHp) : 1);
 
-        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)b.Owner.Hp / (double)b.Owner.MaxHp).CompareTo((long)a.Owner.Hp / (double)a.Owner.MaxHp) : -1);
+        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((DoubleWithEx)b.Owner.Hp / (DoubleWithEx)b.Owner.MaxHp).CompareTo((DoubleWithEx)a.Owner.Hp / (DoubleWithEx)a.Owner.MaxHp) : -1);
 
         public static int CompareAtkAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZero().CompareTo(b.GetAtkZero()) : 1);
 
@@ -7514,9 +7514,9 @@ this.updateCurColor();
 
         public static int CompareEnergyDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Energy.Emulate(hash).CompareTo(a.Energy.Emulate(hash)) : -1);
 
-        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / (double)a.MaxHp).CompareTo(b.Hp.Emulate(hash) / (double)b.MaxHp) : 1);
+        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / (DoubleWithEx)a.MaxHp).CompareTo(b.Hp.Emulate(hash) / (DoubleWithEx)b.MaxHp) : 1);
 
-        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / (double)b.MaxHp).CompareTo(a.Hp.Emulate(hash) / (double)a.MaxHp) : -1);
+        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / (DoubleWithEx)b.MaxHp).CompareTo(a.Hp.Emulate(hash) / (DoubleWithEx)a.MaxHp) : -1);
 
         public static int CompareAtkAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZeroEx.Emulate(hash).CompareTo(b.GetAtkZeroEx.Emulate(hash)) : 1);
 
@@ -14303,7 +14303,7 @@ this.updateCurColor();
 
         public int CompareHpAscSameLeft(BasePartsData _a, BasePartsData _b)
         {
-            if (BattleUtil.Approximately(_a.Owner.Hp / _a.Owner.MaxHp, _b.Owner.Hp / _b.Owner.MaxHp))
+            if (BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / _a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / _b.Owner.MaxHp))
             {
                 return this.CompareLeft(_a, _b);
             }
@@ -14318,7 +14318,7 @@ this.updateCurColor();
         // Token: 0x06003958 RID: 14680 RVA: 0x000EB24C File Offset: 0x000EB24C
         public int CompareHpAscSameRight(BasePartsData _a, BasePartsData _b)
         {
-            if (BattleUtil.Approximately(_a.Owner.Hp / _a.Owner.MaxHp, _b.Owner.Hp / _b.Owner.MaxHp))
+            if (BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / _a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / _b.Owner.MaxHp))
             {
                 return this.CompareRight(_a, _b);
             }
