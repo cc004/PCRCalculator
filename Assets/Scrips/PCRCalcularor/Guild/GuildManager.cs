@@ -214,6 +214,10 @@ namespace PCRCaculator.Guild
         {
             return id / 100000000 == 9;
         }
+        public bool IsDungeonBossId(int Id)
+        {
+            return Id / 100000000 == 5;
+        }
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
         {

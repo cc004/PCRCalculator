@@ -257,6 +257,7 @@ namespace PCRCaculator
         }
         private void UpdatePageButtons()
         {
+            #if UNITY_2017_2_OR_NEWER
             // 清除现有的页码按钮
             if (pageButtonContainer != null && pageButtonPrefab != null)
             {
@@ -299,6 +300,7 @@ namespace PCRCaculator
 
                 LayoutRebuilder.ForceRebuildLayoutImmediate(pageButtonContainer);
             }
+            #endif
         }
         public void GoToPage(int pageNumber)
         {
