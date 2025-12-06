@@ -95,6 +95,8 @@ namespace Elements.Battle
         public bool IsSemanMode { get; set; }
         public bool IsGuildBattle { get; set; } = true;
         public bool IsSkipping { get; set; } = true;
+        public int WaveGroupId { get; set; } = 0;
+        public List<bool> SetToggles { get; set; }
     }
 
 #if UNITY_5_3_OR_NEWER

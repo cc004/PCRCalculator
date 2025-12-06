@@ -866,14 +866,14 @@ namespace PCRCaculator.Guild
             battleData.SettingData = SettingData;
             MainManager.Instance.ChangeSceneToBalttle(battleData);
         }
-        public EnemyData GetEnemyDataByID(int enemy_id, bool useChangedData = true, int isTalentQuest = -1) // TODO change selectedBossEnemyids to parameter
+        public EnemyData GetEnemyDataByID(int enemy_id, bool useChangedData = true, int boss_id = -1)
         {
-            var dict_data = isTalentQuest == 0 ? EnemyDataDic[enemy_id] 
-                : isTalentQuest == 1 
-                    ? TalentQuestEnemyParameterDic[enemy_id] 
-                    : IsTalentQuestBoss 
+            bool isTalentQuestBoss = boss_id == -1 ? IsTalentQuestBoss : IsTalentQuestBossId(boss_id);
+            bool isAbyssBoss = boss_id == -1 ? IsAbyssBoss : IsAbyssBossId(boss_id);
+
+            var dict_data = isTalentQuestBoss 
                         ? TalentQuestEnemyParameterDic[enemy_id] 
-                        : IsAbyssBoss ?  AbyssEnemyParameterDic[enemy_id] : 
+                        : isAbyssBoss ? AbyssEnemyParameterDic[enemy_id] : 
                         EnemyDataDic[enemy_id];
             return useChangedData && SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data : dict_data;
         }
@@ -2135,8 +2135,9 @@ namespace PCRCaculator.Guild
         public long GetTalentBonusPermyriad(int talentId, int count, bool isBattle = false) // present
         {
             var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
+            var waveGroupId = isBattle ? MyGameCtrl.Instance.tempData.waveGroupId : WaveGroupId;
             var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId)
-                ? (MainManager.Instance.TalentFormationDic.TryGetValue(WaveGroupId, out var talentData) ? talentData : null)
+                ? (MainManager.Instance.TalentFormationDic.TryGetValue(waveGroupId, out var talentData) ? talentData : null)
                 : MainManager.Instance.TalentFormationDic.TryGetValue(bossId, out var bossData)
                     ? bossData
                     : MainManager.Instance.TalentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
