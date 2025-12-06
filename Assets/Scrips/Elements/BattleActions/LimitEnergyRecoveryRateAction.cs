@@ -42,7 +42,7 @@ namespace Elements
         _target.Owner.LimitEnergyRecoveryRateData = limitData;
 
         if (!disableIcon)
-          _target.Owner.NoSkipOnChangeAbnormalState(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
+          _target.Owner.NoSkipOnChangeAbnormalState?.Invoke(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
         limitData.StartTimer(_target.Owner);
       }
       else

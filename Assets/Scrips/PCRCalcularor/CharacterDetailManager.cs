@@ -361,8 +361,7 @@ namespace PCRCaculator
                 {
                     Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[skilllist[i]].icon);
                     skillImages[i].sprite = im;
-                    GameObject a = Instantiate(skillDetailPerferb);
-                    a.transform.SetParent(skillParent.transform);
+                    GameObject a = Instantiate(skillDetailPerferb, skillParent.transform, false);
                     a.GetComponent<SkillDetailButton>().SetDetails(skillImages[i].sprite,
                         skilllist[i],
                         data,

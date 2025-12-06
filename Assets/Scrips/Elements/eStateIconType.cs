@@ -513,6 +513,8 @@ namespace Elements
         [Description("重叠加速\n花凛513机娘")]
 	    SPEED_OVERLAP,
 	    // Token: 0x04008861 RID: 34913
+        [Description("永续BUFF")]
+        EVERLAST_BUFF = 100000,
 	    INVALID_VALUE = -1,
 	}
 }

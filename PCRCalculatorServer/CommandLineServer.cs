@@ -76,7 +76,7 @@ public class CommandLineServer : MonoBehaviour
         }
         else
         {
-            var controller = new ThreadController(1);
+            var controller = new ThreadController(Debugger.IsAttached ? 1 : Environment.ProcessorCount);
 
             var requests = new[]
             {

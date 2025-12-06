@@ -4912,7 +4912,9 @@ this.updateCurColor();
           bool _reduceEnergy = false,
           bool _isDamageRelease = false,
           double _reduceEnergyRate = 1f,
-          bool _showsIcon = true)
+          bool _showsIcon = true,
+          bool _isEnvironmentAbnormalState = false, 
+          bool _isIgnoreDebuffImmune = false)
         {
             if (battleManager.GameState != eBattleGameState.PLAY)
                 return;
@@ -5057,6 +5059,7 @@ this.updateCurColor();
                     stateCategoryData.ShowsIcon = _showsIcon;
                     stateCategoryData.ActionDetail1 = _action?.ActionDetail1 ?? 0;
                     stateCategoryData.ActionDetail2 = _action?.ActionDetail2 ?? 0;
+                    stateCategoryData.IsEnvironmentAbnormalState = _isEnvironmentAbnormalState;
 
                     if (_action != null)
                         stateCategoryData.EnergyChargeMultiple = _action.EnergyChargeMultiple;
@@ -6282,25 +6285,25 @@ this.updateCurColor();
             }
             eAbnormalStateCategory abnormalStateCategory = GetAbnormalStateCategory(_abnormalState);
             AbnormalStateCategoryData categoryData = abnormalStateCategoryDataDictionary[abnormalStateCategory];
-            int num = 0;
+            LongWithEx num = 0;
             switch (categoryData.ActionDetail2) 
             {
                 case 0:
-                    num = (int)categoryData.MainValue;
+                    num = BattleUtil.DoubleToLong(categoryData.MainValue);
                     break;
                 case 1:
-                    num = (int)((int)categoryData.MainValue / 100f * (float)this.MaxHp);
+                    num = BattleUtil.DoubleToLong(categoryData.MainValue / 100.0 * this.MaxHp);
                     break;
                 case 2:
-                    num = (int)((int)categoryData.MainValue / 100f * (float)this.Hp);
+                    num = BattleUtil.DoubleToLong(categoryData.MainValue / 100.0 * (DoubleWithEx)this.Hp);
                     break;
                 case 3:
-                    num = (int)((int)categoryData.MainValue / 100f * (float)this.StartMaxHP);
+                    num = BattleUtil.DoubleToLong(categoryData.MainValue / 100.0 * this.StartMaxHP);
                     break;
             }
             if (categoryData.ActionDetail2 != 0)
             {
-                num = Mathf.Min(num, (int)categoryData.SubValue);
+                num = Math.Min(num, (long)categoryData.SubValue);
             }
             DamageData damageData = new DamageData
             {
@@ -6311,7 +6314,7 @@ this.updateCurColor();
                 DamageSoundType = DamageData.eDamageSoundType.SLIP,
                 IsSlipDamage = true,
                 ActionType = eActionType.DAMAGE_BY_ATTACK,
-                TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther,
+                TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther || categoryData.IsEnvironmentAbnormalState,
                 ExecAbsorber = delegate (int _damage)
                 {
                     if (_damage > categoryData.AbsorberValue)
