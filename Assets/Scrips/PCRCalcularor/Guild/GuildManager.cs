@@ -620,7 +620,7 @@ namespace PCRCaculator.Guild
         {
             int firstOption = dropdowns_ChooseSecretDungeonBoss[0].value + 1;
             int secondOption = dropdowns_ChooseSecretDungeonBoss[1].value + 1;
-            int thirdOption = dropdowns_ChooseSecretDungeonBoss[2].value + 1;
+            int thirdOption = dropdowns_ChooseSecretDungeonBoss[2].value + 3;
 
             // 构造wave_group_id
             // 格式: 5020 + firstOption(第5-6位) + secondOption(第7位) + thirdOption(第8位) + 1(最后1位)
@@ -1264,7 +1264,7 @@ namespace PCRCaculator.Guild
             }
             else if (selectedBossEnemyids[0] / 100000 == 5020)
             {
-                TalentQuestBossText.text = $"SP地下城 第{data.dungeonMonth + 1}期 D{data.dungeonDay + 1}-{data.dungeonFloor + 6}";
+                TalentQuestBossText.text = $"SP地下城 第{data.dungeonMonth + 1}期 D{data.dungeonDay + 1}-{data.dungeonFloor + 8}";
             }
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
@@ -2389,7 +2389,7 @@ namespace PCRCaculator.Guild
             else if (data.selectedEnemyIDs[0] / 100000 == 5020)
             {
                 des += $"D{data.dungeonDay + 1}-";
-                des += $"{data.dungeonFloor + 6}";
+                des += $"{data.dungeonFloor + 8}";
             }
             else
             {

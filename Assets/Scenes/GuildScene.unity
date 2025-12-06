@@ -79596,7 +79596,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "6\u5C42"
+  m_Text: "8\u5C42"
 --- !u!222 &1503023082
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -103230,7 +103230,6 @@ MonoBehaviour:
   skillTreeContainer: {fileID: 2137132171}
   scrollRect: {fileID: 949470894}
   pageNumb: 1
-  PageText: {fileID: 0}
   pageButtonContainer: {fileID: 750346216}
   pageButtonPrefab: {fileID: 420059791137939085, guid: b98273b96a108cf489ae237d1a3901af,
     type: 3}
@@ -112068,10 +112067,6 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: "6\u5C42"
-      m_Image: {fileID: 0}
-    - m_Text: "7\u5C42"
-      m_Image: {fileID: 0}
     - m_Text: "8\u5C42"
       m_Image: {fileID: 0}
     - m_Text: "9\u5C42"
