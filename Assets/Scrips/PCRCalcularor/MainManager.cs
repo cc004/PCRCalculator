@@ -79,8 +79,9 @@ namespace PCRCaculator
             public Dictionary<int, TalentSkillNode> talentSkillNodeDic = new Dictionary<int, TalentSkillNode>();
             public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
             public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
-            public Dictionary<int, TalentQuestWaveGroupData> talentQuestWaveGroupDataDic = new Dictionary<int, TalentQuestWaveGroupData>();
-            public Dictionary<int, AbyssWaveGroupData> abyssWaveGroupDataDic = new Dictionary<int, AbyssWaveGroupData>();
+            public Dictionary<int, WaveGroupDataBase> secretDungeonWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
+            public Dictionary<int, WaveGroupDataBase> talentQuestWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
+            public Dictionary<int, WaveGroupDataBase> abyssWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
             public Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
             public Dictionary<int, int> unitStoryLoveDic = new Dictionary<int, int>();
@@ -159,8 +160,9 @@ namespace PCRCaculator
         public Dictionary<int, TalentSkillNode> TalentSkillNodeDic { get => databaseCache.talentSkillNodeDic; }
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic { get => databaseCache.uniqueEquipment2DataDic; }  // 角色专武2字典
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic { get => databaseCache.uniqueEquipmentDataDic; }  // 角色专武字典
-        public Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
-        public Dictionary<int, AbyssWaveGroupData> AbyssWaveGroupDataDic { get => databaseCache.abyssWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> SecretDungeonWaveGroupDataDic { get => databaseCache.secretDungeonWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get => databaseCache.abyssWaveGroupDataDic; }
         public Dictionary<int, EnemyData> EnemyDataDic { get => databaseCache.enemyDataDic; }
         public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => databaseCache.enemyMPartsDic; }
         public Dictionary<int, int> UnitStoryLoveDic { get => databaseCache.unitStoryLoveDic; }
@@ -511,6 +513,7 @@ namespace PCRCaculator
                                 databaseCache.enemyDataDic = dbTool.Dic2;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
                                 databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic;
+                                databaseCache.secretDungeonWaveGroupDataDic = dbTool.SecretDungeonWaveGroupDataDic;
                                 databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
                                 databaseCache.abyssWaveGroupDataDic = dbTool.AbyssWaveGroupDataDic;
                                 databaseCache.uniqueEquipmentDataDic = dbTool2.Dic9;

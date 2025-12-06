@@ -97,7 +97,7 @@ namespace Elements
             if (enemy_id >= 900000000)
             {
                 var kind = enemy_id / 1000 % 10;
-                content_type =  kind == 0 ? (int)eBattleCategory.ABYSS_BATTLE : (int)eBattleCategory.ABYSS_BOSS_BATTLE;
+                content_type = kind == 0 ? (int)eBattleCategory.ABYSS_BATTLE : (int)eBattleCategory.ABYSS_BOSS_BATTLE;
                 enemy_id = _tempData.waveGroupId; // TODO move in tempData
             }
             else if (enemy_id >= 800000000)
@@ -117,7 +117,7 @@ namespace Elements
             foreach (var i in extra_effect_enemy.Keys)
             {
                 var extraEffect = extra_effect_enemy[i];
-                if (extraEffect != null && (extraEffect.target_value_1 == enemy_id || extraEffect.extra_effect_id == enemy_id) && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
+                if (extraEffect != null && (extraEffect.target_value_1 == enemy_id || extraEffect.extra_effect_id == enemy_id || extraEffect.extra_effect_id == _tempData.waveGroupId) && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
                 {
                     return extraEffect;
                 }

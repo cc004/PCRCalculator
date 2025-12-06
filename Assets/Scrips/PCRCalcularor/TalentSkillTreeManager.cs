@@ -19,10 +19,8 @@ namespace PCRCaculator
         public RectTransform skillTreeContainer;
         public ScrollRect scrollRect;
         public int pageNumb = 1;
-        public Button prePageButton;
-        public Button nextPageButton;
-        public Text PageText;
-
+        public RectTransform pageButtonContainer;
+        public GameObject pageButtonPrefab;
         private Dictionary<int, TalentSkillNode> NodeDataDict => MainManager.Instance.TalentSkillNodeDic;
         private Dictionary<int, TalentSkillEnhanceData> enhanceDataDict;
         public Dictionary<int, List<int>> nodeChildrenDict;
@@ -62,7 +60,7 @@ namespace PCRCaculator
         {
             BuildSkillTree();
             SetScrollViewToBottom();
-            UpdatePageText();
+            UpdatePageButtons();
         }
         void OnEnable()
         {
@@ -257,10 +255,60 @@ namespace PCRCaculator
                 .Where(n => n.page_num > 0)
                 .Max(n => n.page_num);
         }
-        private void UpdatePageText()
+        private void UpdatePageButtons()
+        {
+            // 清除现有的页码按钮
+            if (pageButtonContainer != null && pageButtonPrefab != null)
+            {
+                foreach (Transform child in pageButtonContainer)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                int totalPages = GetTotalPages();
+                ToggleGroup toggleGroup = pageButtonContainer.GetComponent<ToggleGroup>();
+                if (toggleGroup == null)
+                {
+                    toggleGroup = pageButtonContainer.gameObject.AddComponent<ToggleGroup>();
+                }
+
+                // 创建新的页码切换按钮
+                for (int i = 1; i <= totalPages; i++)
+                {
+                    GameObject pageToggleObj = Instantiate(pageButtonPrefab, pageButtonContainer);
+                    Toggle pageToggle = pageToggleObj.GetComponent<Toggle>();
+                    Text buttonText = pageToggleObj.GetComponentInChildren<Text>();
+
+                    int pageNumber = i;
+                    pageToggle.onValueChanged.AddListener((isOn) =>
+                    {
+                        if (isOn) GoToPage(pageNumber);
+                    });
+
+                    if (buttonText != null)
+                    {
+                        buttonText.text = pageNumber.ToString();
+                    }
+
+                    pageToggle.group = toggleGroup;
+
+                    // 设置当前页为选中状态
+                    pageToggle.isOn = pageNumber == pageNumb;
+
+                }
+
+                LayoutRebuilder.ForceRebuildLayoutImmediate(pageButtonContainer);
+            }
+        }
+        public void GoToPage(int pageNumber)
         {
             int totalPages = GetTotalPages();
-            PageText.text = $"{pageNumb}/{totalPages}";
+            if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber != pageNumb)
+            {
+                pageNumb = pageNumber;
+                BuildSkillTree();
+                UpdatePageButtons();
+            }
         }
         private void BuildSkillTree()
         {
@@ -477,25 +525,6 @@ namespace PCRCaculator
         public int GetSkillLevel(int nodeId)
         {
             return nodeId > 0 && skillLevels.TryGetValue(nodeId, out int level) ? level : 0;
-        }
-        public void PrePage()
-        {
-            if (pageNumb > 1)
-            {
-                pageNumb--;
-                BuildSkillTree();
-                UpdatePageText();
-            }
-        }
-        public void NextPage()
-        {
-            int totalPages = GetTotalPages();
-            if (pageNumb < totalPages)
-            {
-                pageNumb++;
-                BuildSkillTree();
-                UpdatePageText();
-            }
         }
         public Dictionary<int, int> GetActiveTalentSkills()
         {

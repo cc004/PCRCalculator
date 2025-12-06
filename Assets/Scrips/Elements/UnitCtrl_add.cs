@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Elements.Battle;
 using Newtonsoft.Json;
 using PCRCaculator;
 using PCRCaculator.Battle;
@@ -336,6 +337,57 @@ namespace Elements
             var res = string.Empty;
             res = new[] { critPoint, globalCritPoint }.Where(c => c?.frame >= frame - 8).Distinct()
                 .OrderByDescending(c => c.frame).FirstOrDefault()?.ToString(frame);
+            if (res == "AUTO" && !IsOther)
+            {
+                int idx = battleManager.UnitList.IndexOf(this);
+                bool isFakeAuto = false;
+                List<string> res2 = new List<string>();
+                for (int i = 0; i < idx; ++ i)
+                {
+                    var uc = battleManager.UnitList[i];
+                    if (uc.IsSkillReady && uc.CurrentState == ActionState.IDLE)
+                    {
+                        isFakeAuto = true;
+                        res2.Add(uc.UnitNameEx);
+                    }
+                }
+                if (isFakeAuto)
+                {
+                    res = "假AUTO(" + string.Join(",", res2) + "待机)";
+                }
+                else{
+                    int tolerance = 114514;
+                    int toggle = 0;
+                    string desc = "";
+                    for(int i = 0; i < battleManager.UnitList.Count; ++ i)
+                    {
+                        var uc = battleManager.UnitList[i];
+                        if (i != idx && !uc.IsSkillReady)
+                            continue;
+                        if (i != idx && uc.CurrentState == ActionState.IDLE)
+                        {
+                            tolerance = 0;
+                            desc = $"{uc.UnitNameEx}待机";
+                        }
+                        else
+                        {
+                            var last = i == idx ? GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId].LastOrDefault(e => e.currentFrameCount < frame)
+                                : GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId].LastOrDefault();
+                            if (battleManager.IsSkillReady[last.currentFrameCount][uc.UnitId])
+                            {
+                                tolerance = Math.Min(tolerance, battleManager.FrameCount - last.realFrameCount);
+                                if (toggle < last.currentFrameCount)
+                                {
+                                    toggle = last.currentFrameCount;
+                                    desc = $"{uc.UnitNameEx} {last.changStateTo}后开";
+                                }
+                            }
+                        }
+                    }
+                    if (tolerance != 114514)
+                        res = $"AUTO({desc}，容错{tolerance}帧)";
+                }
+            }
             if (!string.IsNullOrEmpty(res)) return res;
             return critPoint?.ToString(BattleHeaderController.CurrentFrameCount) + "    " + globalCritPoint?.ToString(BattleHeaderController.CurrentFrameCount);
         }

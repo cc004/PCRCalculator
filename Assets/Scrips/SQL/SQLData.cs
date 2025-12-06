@@ -54,8 +54,13 @@ namespace PCRCaculator.SQL
     }
     public class wave_group_data
     {
+        public int id { get; set; }
         public int wave_group_id { get; set; }
         public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
     }
     public class clan_battle_2_map_data
     {
