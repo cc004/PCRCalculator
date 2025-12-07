@@ -319,6 +319,7 @@ namespace PCRCaculator.Guild
                         changStateTo = actionState,
                         currentFrameCount = frameCount,
                         realFrameCount = BattleManager.Instance.FrameCount,
+                        describe = describe,
                         operation = actionState == UnitCtrl.ActionState.SKILL_1 ? ctrl.GetCurrentOp() : null,
                         variant = variant
                     };
