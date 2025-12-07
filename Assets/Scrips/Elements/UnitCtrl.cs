@@ -11186,7 +11186,7 @@ this.updateCurColor();
 
         public void SetState(ActionState _state, int _nextSkillId = 0, int _skillId = 0, bool _quiet = false)
         {
-            string des = _state == ActionState.SKILL ? (unitActionController.skillDictionary.TryGetValue(_skillId,out var value)?value.SkillName:"UnknownSkill") : "";
+            string des = _state == ActionState.SKILL ? (unitActionController.skillDictionary.TryGetValue(_skillId,out var value)?value.SkillName:"UnknownSkill") : _state == ActionState.ATK ? "普攻" : _state.ToString();
             SemanOnChangeState?.Invoke(UnitId, _state);
             if (!battleManager.skipping)
             {

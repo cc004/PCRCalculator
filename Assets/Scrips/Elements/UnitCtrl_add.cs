@@ -362,22 +362,43 @@ namespace Elements
                         var uc = battleManager.UnitList[i];
                         if (i != idx && !uc.IsSkillReady)
                             continue;
-                        if (i != idx && uc.CurrentState == ActionState.IDLE)
+                        if (i != idx && uc.CurrentState == ActionState.IDLE && frame > 0 && battleManager.IsSkillReady[frame - 1][uc.UnitId])
                         {
                             tolerance = 0;
                             desc = $"{uc.UnitNameEx}待机";
                         }
                         else
                         {
-                            var last = i == idx ? GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId].LastOrDefault(e => e.currentFrameCount < frame)
-                                : GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId].LastOrDefault();
-                            if (battleManager.IsSkillReady[last.currentFrameCount][uc.UnitId])
+                            var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
+
+                            var result = list
+                                .Select((e, index) => new { e, index })     // 带上 index
+                                .Where(x =>
+                                    i == idx
+                                        ? x.e.currentFrameCount < frame && x.e.changStateTo == ActionState.IDLE
+                                        : x.e.changStateTo == ActionState.IDLE
+                                )
+                                .LastOrDefault();
+
+                            UnitStateChangeData? last = result?.e;
+                            UnitStateChangeData? next = (result != null && result.index + 1 < list.Count)
+                                ? list[result.index + 1]
+                                : null;
+                            
+                            int lframe = last?.currentFrameCount ?? 0;
+                            int rframe = next?.currentFrameCount ?? 5400;
+
+                            bool flag = Enumerable
+                                        .Range(lframe, rframe - lframe)
+                                        .Any(i => battleManager.IsSkillReady[i][uc.UnitId]);
+                            
+                            if (flag && next != null)
                             {
-                                tolerance = Math.Min(tolerance, battleManager.FrameCount - last.realFrameCount);
-                                if (toggle < last.currentFrameCount)
+                                tolerance = Math.Min(tolerance, battleManager.FrameCount - next?.realFrameCount ?? 0);
+                                if (toggle < (next?.currentFrameCount ?? 0))
                                 {
-                                    toggle = last.currentFrameCount;
-                                    desc = $"{uc.UnitNameEx} {last.changStateTo}后开";
+                                    toggle = next?.currentFrameCount ?? 0;
+                                    desc = $"{uc.UnitNameEx} {next?.describe}后开";
                                 }
                             }
                         }
