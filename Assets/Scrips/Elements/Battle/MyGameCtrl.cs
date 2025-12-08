@@ -432,6 +432,11 @@ namespace Elements
                             tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
+                        else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
                         else
                             Debug.LogError("找不到增援敌人ID " + enemy);
                     }
