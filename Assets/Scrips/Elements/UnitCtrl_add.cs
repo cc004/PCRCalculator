@@ -365,6 +365,7 @@ namespace Elements
                         if (i != idx && uc.CurrentState == ActionState.IDLE && frame > 0 && battleManager.IsSkillReady[frame - 1][uc.UnitId])
                         {
                             tolerance = 0;
+                            toggle = frame - 1;
                             desc = $"{uc.UnitNameEx}待机";
                         }
                         else
@@ -403,8 +404,33 @@ namespace Elements
                             }
                         }
                     }
-                    if (tolerance != 114514)
-                        res = $"AUTO({desc}，容错{tolerance}帧)";
+                    if (tolerance != 114514){
+                        bool have_ub = false;
+                        int last_ub_frame = 0;
+                        string last_ub_unit = "";
+                        for(int i = 0; i < battleManager.UnitList.Count; ++ i)
+                        {
+                            var uc = battleManager.UnitList[i];
+                            var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
+                            var result = list
+                                .Where(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
+                                )
+                                .LastOrDefault();
+                            if (!result.Equals(default(UnitStateChangeData)))
+                            {
+                                have_ub = true;
+                                if (result.realFrameCount > last_ub_frame)
+                                {
+                                    last_ub_frame = result.realFrameCount;
+                                    last_ub_unit = uc.UnitNameEx;
+                                }
+                            }
+                        }
+                        if (!have_ub)
+                            res = $"AUTO({desc}，容错{tolerance}帧)";
+                        else
+                            res = $"AUTO({desc}，可在{last_ub_unit}UB中开，容错{tolerance}帧)";
+                    }
                 }
             }
             if (!string.IsNullOrEmpty(res)) return res;
