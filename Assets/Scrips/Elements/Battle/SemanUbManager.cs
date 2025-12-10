@@ -159,13 +159,26 @@ namespace Elements.Battle
                     }
                 }
 
-                int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
-                if (trigger >= 10 || lastDelay >= 10)
+                if (last.skillId != 1 && last.skillId != 9)
                 {
-                    // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                    return delay;
+                    int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION) - 1;
+                    if (trigger >= 100 || lastDelay >= 10)
+                    {
+                        // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                        return delay;
+                    }
+                    return 20000 + last.waitUnit * 1000 + trigger * 10 + lastDelay;
                 }
-                return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
+                else
+                {
+                    int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
+                    if (trigger >= 10 || lastDelay >= 10)
+                    {
+                        // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                        return delay;
+                    }
+                    return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
+                }
             }
 
             public void Clear()
