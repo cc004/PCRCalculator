@@ -12,27 +12,36 @@ namespace PCRCaculator
     {
         public Text timesText;
         public Text averageDamageText;
+        public Text maxDamageText;
+        public Text minDamageText;
         public Text buttonText;
         public ScrollEx scroll;
         public AutoCalculatorData calculatorData;
         public InputField count;
-        public Text resultCalText;
+        public Text win;
+        public Text lose;
+        public Text timeout;
         public void Init(AutoCalculatorData data)
         {
             calculatorData = data;
-            timesText.text = data.execedTime + "/" + data.execTime;
-            averageDamageText.text = data.Average + "";
+            timesText.text = "【次数】" + data.execedTime + "/" + data.execTime;
+            averageDamageText.text = "【平均】" + data.Average;
+            maxDamageText.text = "【最高】" + data.MaxDamage;
+            minDamageText.text = "【最低】" + data.MinDamage;
             var winCount = calculatorData.resultDatas.Count(r => r.BattleResult == Elements.eBattleResult.WIN);
             var loseCount = calculatorData.resultDatas.Count(r => r.BattleResult == Elements.eBattleResult.LOSE);
             var timeoutCount = calculatorData.resultDatas.Count(r => r.BattleResult == Elements.eBattleResult.TIME_OVER);
-            resultCalText.text = $"【胜利{winCount}次】【失败{loseCount}次】【超时{timeoutCount}次】";
-            buttonText.text = (data.isCalculating&&!data.isCanceled&&!data.isFinish) ? "取消" : "开始新的计算";
+            win.text = $"<color=#4F9F6C>【胜利】：{winCount}次</color>";
+            lose.text = $"<color=#C64E51>【失败】：{loseCount}次</color>";
+            timeout.text = $"<color=#5EA5C6>【超时】：{timeoutCount}次</color>";
+            buttonText.text = (data.isCalculating && !data.isCanceled && !data.isFinish) ? "取消" : "开始批量计算";
             scroll.ClearAll();
-            foreach (var d in data.resultDatas)
+            // 仅实例化可见区数量，按需重绑
+            var datas = data.resultDatas;
+            scroll.EnableVirtualization(datas.Count, (idx, go) =>
             {
-                scroll.CreatePrefab(a => a.GetComponent<AutoCalculatorPrefab>().Init(d));
-            }
-            scroll.AutoFit();
+                go.GetComponent<AutoCalculatorPrefab>().Init(datas[idx]);
+            }, bufferRows: 15);
         }
         public void ButtonPress()
         {
