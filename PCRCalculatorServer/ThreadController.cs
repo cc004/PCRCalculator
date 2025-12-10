@@ -40,7 +40,7 @@ public class ThreadController : IDisposable
             Thread.Sleep(0);
 
         for (var i = 0; i < workerNum; ++i)
-            new Thread(WorkerTask).Start();
+            new Thread(WorkerTask, 5 * 1024 * 1024).Start();
     }
 
     public void DispatchTask(BattleSimulationRequest request, Action callback, Action<Exception> callbackFailed)
