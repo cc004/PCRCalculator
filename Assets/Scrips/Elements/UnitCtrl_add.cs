@@ -399,7 +399,7 @@ namespace Elements
                                 if (toggle < (next?.currentFrameCount ?? 0))
                                 {
                                     toggle = next?.currentFrameCount ?? 0;
-                                    desc = $"{uc.UnitNameEx} {next?.describe}后开";
+                                    desc = $"{uc.UnitNameEx} {next?.describe}";
                                 }
                             }
                         }
@@ -426,10 +426,29 @@ namespace Elements
                                 }
                             }
                         }
+                        for(int i = 0; i < battleManager.EnemyList.Count; ++ i)
+                        {
+                            var uc = battleManager.EnemyList[i];
+                            var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
+                            var result = list
+                                .Where(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
+                                )
+                                .LastOrDefault();
+                            if (!result.Equals(default(UnitStateChangeData)))
+                            {
+                                have_ub = true;
+                                if (result.realFrameCount > last_ub_frame)
+                                {
+                                    last_ub_frame = result.realFrameCount;
+                                    last_ub_unit = uc.UnitNameEx;
+                                }
+                            }
+                        }
+
                         if (!have_ub)
-                            res = $"AUTO({desc}，容错{tolerance}帧)";
+                            res = $"AUTO({desc}后开，容错{tolerance}帧)";
                         else
-                            res = $"AUTO({desc}，可在{last_ub_unit}UB中开，容错{tolerance}帧)";
+                            res = $"AUTO({last_ub_unit}UB中开，不得早于{desc}，容错{tolerance}帧)";
                     }
                 }
             }
