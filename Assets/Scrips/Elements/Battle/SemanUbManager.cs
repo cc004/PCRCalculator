@@ -18,24 +18,27 @@ namespace Elements.Battle
         private bool ubMod;
         public enum Action
         {
+            NO_UB = -1,
             COUNTDOWN = 0,
             WAIT_TP_FULL = 1,
             WAIT_UNIT_ACTION = 2,
-            NO_UB = 4,
+            WAIT_UNIT_EXEC = 3, // ignore what skill, exclude ub
+            WAIT_EXEC = 4, // ignore who skill, exclude ub
+            WAIT_UB = 5, // ignore who, only ub
         }
 
-        private class UbRecord
+        public class UbRecord
         {
-            private bool skillReady { 
+            public bool skillReady
+            {
                 get
                 {
                     return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
                 }
             }
-
-            private int delay = 0;
-            private int unitId = 0;
-            private List<UbStatus> history = new List<UbStatus>();
+            public int delay = 0;
+            public int unitId = 0;
+            public List<UbStatus> history = new List<UbStatus>();
             private SemanUbManager parent;
 
             public UbRecord(SemanUbManager parent, int unitId)
@@ -73,7 +76,7 @@ namespace Elements.Battle
                     }
                 }
             }
-            
+
             public void OnSkillCallBack(int unitPos, int skillId)
             {
                 if (!skillReady) return;
@@ -104,7 +107,7 @@ namespace Elements.Battle
             public int GetUbNumber(int unitId)
             {
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || 
+                if (history.Count == 0 ||
                 (delay == 0 && history.Count(h => h.skillId == 1) == 0)) // set and not after other ub
                 {
                     return delay;
@@ -143,7 +146,7 @@ namespace Elements.Battle
                     // self skill
                     h => h.waitUnit == unitId, 
                     // anyway
-                    h => true, 
+                    h => true,
                 };
 
                 foreach (var condition in conditions)
@@ -215,7 +218,10 @@ namespace Elements.Battle
             public void OnSkillCallBack(int unitPos, int skillId)
             {
                 if (!skillReady) return;
-                if (action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && this.skillId == skillId && lastUpdateFrame < BattleHeaderController.CurrentFrameCount)
+                if (lastUpdateFrame < BattleHeaderController.CurrentFrameCount && (
+                    action == Action.WAIT_EXEC || (waitUnit == unitPos &&
+                    (action == Action.WAIT_UNIT_EXEC || (action == Action.WAIT_UNIT_ACTION && this.skillId == skillId))
+                    )))
                 {
                     trigger--;
                     lastUpdateFrame = BattleHeaderController.CurrentFrameCount;
@@ -240,7 +246,10 @@ namespace Elements.Battle
             public void OnChangeStateCallBack(int unitPos, ActionState state)
             {
                 if (!skillReady) return;
-                if (action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && parent.State2Id.ContainsKey(state) && skillId == parent.State2Id[state])
+                if ((action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && parent.State2Id.ContainsKey(state) && skillId == parent.State2Id[state]) ||
+                    (state == ActionState.SKILL_1 && action == Action.WAIT_UB)
+                    // (state == ActionState.SKILL_1 && (action == Action.WAIT_UB || action == Action.WAIT_EXEC))
+                )
                 {
                     trigger--;
                     if (trigger < 0)
@@ -254,7 +263,16 @@ namespace Elements.Battle
         public UbStatus GetUbStatus(int unitId, int num) // xxxxx
         {
             int op = num / 10000;
-            if (op == 0)
+            if (num < 0)
+            {
+                return new UbStatus(this)
+                {
+                    action = Action.NO_UB,
+                    unitId = unitId,
+                    delay = 0
+                };
+            }
+            else if (op == 0)
             {
                 return new UbStatus(this)
                 {
@@ -280,14 +298,47 @@ namespace Elements.Battle
                     delay = delay
                 };
             }
-            else // >= 20000
+            else if (op == 2)
             {
+                int unitPos = num / 1000 % 10;
+                int trigger = num / 10 % 100;
+                int delay = num % 10;
                 return new UbStatus(this)
                 {
-                    action = Action.NO_UB,
+                    action = Action.WAIT_UNIT_EXEC,
                     unitId = unitId,
-                    delay = 0
+                    waitUnit = unitPos,
+                    trigger = trigger,
+                    delay = delay
                 };
+            }
+            else if (op == 3)
+            {
+                int trigger = num / 100 % 100;
+                int delay = num % 100;
+                return new UbStatus(this)
+                {
+                    action = Action.WAIT_EXEC,
+                    unitId = unitId,
+                    trigger = trigger,
+                    delay = delay
+                };
+            }
+            else if (op == 4)
+            {
+                int trigger = num / 100 % 100;
+                int delay = num % 100;
+                return new UbStatus(this)
+                {
+                    action = Action.WAIT_UB,
+                    unitId = unitId,
+                    trigger = trigger,
+                    delay = delay
+                };
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid operation code: {op}");
             }
         }
 
@@ -476,7 +527,7 @@ namespace Elements.Battle
             {
                 var ub = new List<int>(seman)
                 {
-                    30000
+                    -1
                 };
                 ret.Add(ub);
             }
