@@ -575,8 +575,8 @@ namespace PCRCaculator.Guild
             int thirdOption = dropdowns_ChooseAbyssBoss[2].value + 1;
 
             // 构造wave_group_id
-            // 格式: 9240 + firstOption(第5位) + secondOption(第6位)  + thirdOption(第7位) + 00(最后2位)
-            string waveGroupIdStr = $"9240{7 + firstOption}{secondOption}{thirdOption}00";
+            // 格式: 924 + firstOption(第4-5位) + secondOption(第6位) + thirdOption(第7位) + 00(最后2位)
+            string waveGroupIdStr = $"924{7 + firstOption:D2}{secondOption}{thirdOption}00";
 
             if (int.TryParse(waveGroupIdStr, out int waveGroupId))
             {
