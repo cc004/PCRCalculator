@@ -321,10 +321,12 @@ namespace Elements
             }
         }
 
+        public long TotalMagicBuff = 0;
         // Start battle using parameters from server request, do not rely on MainManager
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
+            TotalMagicBuff = 0;
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;

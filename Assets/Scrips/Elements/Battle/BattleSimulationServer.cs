@@ -54,6 +54,7 @@ namespace Elements.Battle
         public bool Success { get; set; }
         public string Message { get; set; }
         public long TotalDamage { get; set; }
+        public long TotalMagicBuff { get; set; }
         public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }

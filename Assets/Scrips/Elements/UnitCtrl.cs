@@ -7058,6 +7058,11 @@ this.updateCurColor();
 #if !REDUCE_ANALYSE
             action?.Invoke("对目标添加" + _kind.GetDescription() + (_isBuff ? "BUFF" : "DEBUFF") + ",值" + valueStr + "持续时间" + _time + "秒");
 #endif
+            if (_kind == BuffParamKind.MAGIC_STR && !IsOther && !IsSummonOrPhantom)
+            {
+                MyGameCtrl.Instance.TotalMagicBuff += (long)_value.Values.Sum(v => v);
+            }
+
             BuffDebuffCoroutineDataSet _cr = new BuffDebuffCoroutineDataSet();
             _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
             // TODO fill _cr Enable EnvironmentId

@@ -79,6 +79,7 @@ namespace PCRCalculatorServer
                         Success = true,
                         Message = "战斗模拟完成",
                         TotalDamage = totalDamage,
+                        TotalMagicBuff = MyGameCtrl.Instance.TotalMagicBuff,
                         BattleFrames = battleFrames,
                         CurrentSeed = currentSeed,
                         TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
