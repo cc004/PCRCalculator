@@ -358,6 +358,7 @@ namespace Elements
                 else{
                     int tolerance = 114514;
                     int toggle = 0;
+                    List<string> idle_unit_name = new List<string>();
                     string desc = "";
                     for(int i = 0; i < battleManager.UnitList.Count; ++ i)
                     {
@@ -369,6 +370,7 @@ namespace Elements
                             tolerance = 0;
                             toggle = frame - 1;
                             desc = $"{uc.UnitNameEx}待机";
+                            idle_unit_name.Append(uc.UnitNameEx);
                         }
                         else
                         {
@@ -376,12 +378,11 @@ namespace Elements
 
                             var result = list
                                 .Select((e, index) => new { e, index })     // 带上 index
-                                .Where(x =>
+                                .LastOrDefault(x =>
                                     i == idx
                                         ? x.e.currentFrameCount < frame && x.e.changStateTo == ActionState.IDLE
                                         : x.e.changStateTo == ActionState.IDLE
-                                )
-                                .LastOrDefault();
+                                );
 
                             UnitStateChangeData? last = result?.e;
                             UnitStateChangeData? next = (result != null && result.index + 1 < list.Count)
@@ -406,7 +407,13 @@ namespace Elements
                             }
                         }
                     }
-                    if (tolerance != 114514){
+                    if (idle_unit_name.Count > 0)
+                    {
+                        desc += string.Join(",", idle_unit_name);
+                        res = $"AUTO({desc}待机，容错{tolerance}帧)";
+                    }
+                    else if (tolerance != 114514)
+                    {
                         bool have_ub = false;
                         int last_ub_frame = 0;
                         string last_ub_unit = "";
@@ -415,9 +422,8 @@ namespace Elements
                             var uc = battleManager.UnitList[i];
                             var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
                             var result = list
-                                .Where(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
-                                )
-                                .LastOrDefault();
+                                .LastOrDefault(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
+                                );
                             if (!result.Equals(default(UnitStateChangeData)))
                             {
                                 have_ub = true;
@@ -433,9 +439,8 @@ namespace Elements
                             var uc = battleManager.EnemyList[i];
                             var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
                             var result = list
-                                .Where(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
-                                )
-                                .LastOrDefault();
+                                .LastOrDefault(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
+                                );
                             if (!result.Equals(default(UnitStateChangeData)))
                             {
                                 have_ub = true;
