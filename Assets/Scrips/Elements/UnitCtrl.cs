@@ -273,7 +273,7 @@ namespace Elements
         private Transform bottomTransform;
         private bool m_bPause;
         private int m_sSortOrder;
-        private UnitActionController unitActionController;
+        public UnitActionController unitActionController;
         //private int hitEffectSortOffset;
         //private float sortOffsetResetTimer = 0.6f;
         //private IAutoLogic[] mainUnionBurstAutoLogics;
@@ -9306,6 +9306,7 @@ this.updateCurColor();
                 isHit = false;
                 return 0;
             }
+            bool isNoDamageByResist = false;
             //if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.SHIELD && this.IsBoss)
             //    this.battleManager.SubstructEnemyPoint(1);
             execPassiveSeal(PassiveSealAction.ePassiveTiming.DAMAGED);
@@ -9523,7 +9524,7 @@ this.updateCurColor();
                     _damageData.Target,
                     _damageData.TargetIncludeMyTeam,
                     _damageData.IgnoreTalentBonusForRatioSlip,
-                    out bool isNoDamageByResist
+                    out isNoDamageByResist
                 );
                 a *= talentDamageRate;
                 b *= talentDamageRate;
@@ -9613,12 +9614,11 @@ this.updateCurColor();
                     }
                 }
             }*/
-            // if (tuple != null && !isNoDamageByResist)
-            if (tuple != null)
+            if (tuple != null && !isNoDamageByResist)
             {
                 StrikeBackData strikeBack = tuple.Item1;
                 List<StrikeBackData> strikeBackList = tuple.Item2;
-                strikeBack.Exec(_damageData.Source, this, (int)BattleUtil.DoubleToInt(num5), delegate
+                strikeBack.Exec(_damageData.Source, this, BattleUtil.DoubleToLong(num5), delegate
                 {
                     strikeBackList.Remove(strikeBack);
                     NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
@@ -9685,7 +9685,9 @@ this.updateCurColor();
                 return 0;
             }
 
-            var _fDamage = num5.Max(1);
+            var _fDamage = num5;
+            if (!isNoDamageByResist)
+                _fDamage = num5.Max(1);
             /*if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && this.battleManager.KIHOGJBONDH != 0 && this.IsBoss)
             { 
                 int PBAANIPPIGL = BattleUtil.FloatToInt(_fDamage);
@@ -9900,7 +9902,7 @@ this.updateCurColor();
                 string des;
                 //var prob = Hp.Probability(x => x <= 0f);
 
-                des = "受到来自" + (_damageData.Source == null ? "???" : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
+                des = "受到来自" + (_damageData.Source == null ? _damageData.StrikeBackSource == null ? "???" : _damageData.StrikeBackSource.UnitName : _damageData.Source.UnitName) + "的<color=#FF0000>" + num6 + (_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害");
                 if (_damageData.Target?.Owner?.IsPartsBoss ?? false)
                 {
                     des = $"<color=#8040FF>部位{_damageData.Target.Index}</color>" + des;
