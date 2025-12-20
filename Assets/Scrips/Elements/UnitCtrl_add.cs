@@ -356,34 +356,105 @@ namespace Elements
                 else{
                     int tolerance = 114514;
                     int toggle = 0;
+                    List<string> idle_unit_name = new List<string>();
                     string desc = "";
                     for(int i = 0; i < battleManager.UnitList.Count; ++ i)
                     {
                         var uc = battleManager.UnitList[i];
                         if (i != idx && !uc.IsSkillReady)
                             continue;
-                        if (i != idx && uc.CurrentState == ActionState.IDLE)
+                        if (i != idx && uc.CurrentState == ActionState.IDLE && frame > 0 && battleManager.IsSkillReady[frame - 1][uc.UnitId])
                         {
                             tolerance = 0;
+                            toggle = frame - 1;
                             desc = $"{uc.UnitNameEx}待机";
+                            idle_unit_name.Append(uc.UnitNameEx);
                         }
                         else
                         {
-                            var last = i == idx ? GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId].LastOrDefault(e => e.currentFrameCount < frame)
-                                : GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId].LastOrDefault();
-                            if (battleManager.IsSkillReady[last.currentFrameCount][uc.UnitId])
+                            var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
+
+                            var result = list
+                                .Select((e, index) => new { e, index })     // 带上 index
+                                .LastOrDefault(x =>
+                                    i == idx
+                                        ? x.e.currentFrameCount < frame && x.e.changStateTo == ActionState.IDLE
+                                        : x.e.changStateTo == ActionState.IDLE
+                                );
+
+                            UnitStateChangeData? last = result?.e;
+                            UnitStateChangeData? next = (result != null && result.index + 1 < list.Count)
+                                ? list[result.index + 1]
+                                : null;
+                            
+                            int lframe = last?.currentFrameCount ?? 0;
+                            int rframe = next?.currentFrameCount ?? 5400;
+
+                            bool flag = Enumerable
+                                        .Range(lframe, rframe - lframe)
+                                        .Any(i => battleManager.IsSkillReady[i][uc.UnitId]);
+                            
+                            if (flag && next != null)
                             {
-                                tolerance = Math.Min(tolerance, battleManager.FrameCount - last.realFrameCount);
-                                if (toggle < last.currentFrameCount)
+                                tolerance = Math.Min(tolerance, battleManager.FrameCount - next?.realFrameCount ?? 0);
+                                if (toggle < (next?.currentFrameCount ?? 0))
                                 {
-                                    toggle = last.currentFrameCount;
-                                    desc = $"{uc.UnitNameEx} {last.changStateTo}后开";
+                                    toggle = next?.currentFrameCount ?? 0;
+                                    desc = $"{uc.UnitNameEx} {next?.describe}";
                                 }
                             }
                         }
                     }
-                    if (tolerance != 114514)
-                        res = $"AUTO({desc}，容错{tolerance}帧)";
+                    if (idle_unit_name.Count > 0)
+                    {
+                        desc += string.Join(",", idle_unit_name);
+                        res = $"AUTO({desc}待机，容错{tolerance}帧)";
+                    }
+                    else if (tolerance != 114514)
+                    {
+                        bool have_ub = false;
+                        int last_ub_frame = 0;
+                        string last_ub_unit = "";
+                        for(int i = 0; i < battleManager.UnitList.Count; ++ i)
+                        {
+                            var uc = battleManager.UnitList[i];
+                            var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
+                            var result = list
+                                .LastOrDefault(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
+                                );
+                            if (!result.Equals(default(UnitStateChangeData)))
+                            {
+                                have_ub = true;
+                                if (result.realFrameCount > last_ub_frame)
+                                {
+                                    last_ub_frame = result.realFrameCount;
+                                    last_ub_unit = uc.UnitNameEx;
+                                }
+                            }
+                        }
+                        for(int i = 0; i < battleManager.EnemyList.Count; ++ i)
+                        {
+                            var uc = battleManager.EnemyList[i];
+                            var list = GuildCalculator.Instance.allUnitStateChangeDic[uc.UnitId];
+                            var result = list
+                                .LastOrDefault(e => e.currentFrameCount >= toggle && e.changStateTo == ActionState.SKILL_1
+                                );
+                            if (!result.Equals(default(UnitStateChangeData)))
+                            {
+                                have_ub = true;
+                                if (result.realFrameCount > last_ub_frame)
+                                {
+                                    last_ub_frame = result.realFrameCount;
+                                    last_ub_unit = uc.UnitNameEx;
+                                }
+                            }
+                        }
+
+                        if (!have_ub)
+                            res = $"AUTO({desc}后开，容错{tolerance}帧)";
+                        else
+                            res = $"AUTO({last_ub_unit}UB中开，不得早于{desc}，容错{tolerance}帧)";
+                    }
                 }
             }
             if (!string.IsNullOrEmpty(res)) return res;
