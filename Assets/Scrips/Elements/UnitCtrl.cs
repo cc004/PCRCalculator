@@ -7252,6 +7252,7 @@ this.updateCurColor();
                     {
                         debuffCounterDictionary[_kind]++;
                         ++debuffCounter;
+                        execPassiveSeal(PassiveSealAction.ePassiveTiming.DEBUFF);
                     }
                 }
                 else if (_isBuff)
@@ -7951,6 +7952,15 @@ this.updateCurColor();
 					{
 						unitCtrl = passiveSealData.Source;
 					}
+                    else if (passiveSealData.SealTarget == PassiveSealAction.eSealTarget.TARGET)
+                    {
+                        unitCtrl = passiveSealData.Target;
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogError($"Unknown SealTarget: {passiveSealData.SealTarget}");
+                        continue;
+                    }
 					eStateIconType targetStateIcon = passiveSealData.TargetStateIcon;
 					if (!unitCtrl.SealDictionary.ContainsKey(targetStateIcon))
 					{
