@@ -1626,11 +1626,11 @@ namespace Elements
                                 // action.ActionType);
 
                                 currentTarget = ownerUnit.ProtectionTargetData.ProtectionParts;
-                                // skill.ProtectParts[target] = currentTarget;
+                                skill.ProtectParts[target] = currentTarget;
                                 action.ProtectedParts = currentTarget;
                                 action.SkipAppendIsAlreadyExeced = true;
                                 hasProtected = false;
-                                finalProtectedTarget = currentTarget;
+                                finalProtectedTarget = target;
 
                                 // if (target.Owner != null && target.Owner.ProtectionSourceData != null)
                                 // {

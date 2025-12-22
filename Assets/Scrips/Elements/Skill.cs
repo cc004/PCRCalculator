@@ -147,6 +147,7 @@ namespace Elements
         {
             TotalDamage = 0;
             DamagedPartsList.Clear();
+            ProtectParts.Clear();
             for (int index1 = 0; index1 < SkillEffects.Count; ++index1)
             {
                 NormalSkillEffect skillEffect = SkillEffects[index1];
