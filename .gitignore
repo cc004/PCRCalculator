@@ -29,3 +29,9 @@ UserSettings/
 Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
 Packages/packages-lock.json
 Packages/manifest.json
+
+# 服务端
+Data/
+server/
+
+*.db

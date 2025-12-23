@@ -31,7 +31,7 @@ namespace UnityEngine
 #endif
         static AssetBundle()
         {
-            am.LoadClassPackage("classdata.tpk");
+            am.LoadClassPackage(Path.Combine(AppContext.BaseDirectory, "classdata.tpk"));
             am.LoadClassDatabaseFromPackage("2021.3.21f1");
         }
 

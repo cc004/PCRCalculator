@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Elements;
 using Elements.Battle;
 using Newtonsoft.Json;
@@ -823,12 +824,8 @@ namespace PCRCaculator.Guild
             MyGameCtrl.Instance.ReStart();
         }
 
-        private void StartCalButton(bool skipping)
+        public GuildBattleData GetBattleData(bool skipping)
         {
-            /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
-            {
-                return;
-            }*/
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
             battleData.skipping = skipping;
@@ -837,7 +834,7 @@ namespace PCRCaculator.Guild
             foreach (var selectedBossEnemyid in selectedBossEnemyids)
             {
                 EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
-                if(EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+                if (EnemyMPartsDic.TryGetValue(enemyData.enemy_id, out var value))
                 {
                     battleData.mParts = value;
                     battleData.MPartsDataDic = new Dictionary<int, EnemyData>();
@@ -845,7 +842,7 @@ namespace PCRCaculator.Guild
                     {
                         if (a != 0)
                         {
-                            battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));                        
+                            battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));
                         }
                     };
                     action(value.child_enemy_parameter_1);
@@ -864,7 +861,15 @@ namespace PCRCaculator.Guild
             battleData.isSemanMode = SemanModeToggle.isOn;
             battleData.stopFrame = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             battleData.SettingData = SettingData;
-            MainManager.Instance.ChangeSceneToBalttle(battleData);
+            return battleData;
+        }
+        private void StartCalButton(bool skipping)
+        {
+            /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
+            {
+                return;
+            }*/
+            MainManager.Instance.ChangeSceneToBalttle(GetBattleData(skipping));
         }
         public EnemyData GetEnemyDataByID(int enemy_id, bool useChangedData = true, int isTalentQuest = -1) // TODO change selectedBossEnemyids to parameter
         {
@@ -1624,18 +1629,46 @@ namespace PCRCaculator.Guild
                 EnemyDataDic.Add(666667, enemyData2);
             }
         }
+
+        public AutoCalculate autoCalculate;
+
         public void OpenAutoCalculatePage()
         {
             GameObject a = Instantiate(autoCalculatePagePrefab);
             a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
-            AutoCalculate autoCalculate = a.GetComponent<AutoCalculate>();
+            autoCalculate = a.GetComponent<AutoCalculate>();
             autoCalculate.Init(MainManager.Instance.AutoCalculatorData);
         }
+
         public void StartAutoCalculate()
         {
             // StartCoroutine(AutoCalculate());
             StartCalButton(true);
         }
+
+        public static RemoteSimulator simulator;
+
+        private IEnumerator WaitRemoteCalculation()
+        {
+            const int EXEC_ONCE = 10;
+            while (!MainManager.Instance.AutoCalculatorData.isFinish)
+            {
+                var request = simulator.Simulate(EXEC_ONCE);
+
+                while (!request.IsCompleted)
+                    yield return null;
+
+                foreach (var item in request.Result)
+                {
+                    item.OnceResult.id = MainManager.Instance.AutoCalculatorData.resultDatas.Count;
+                    MainManager.Instance.AutoCalculatorData.resultDatas.Add(
+                        item.OnceResult);
+                }
+                autoCalculate.Init(MainManager.Instance.AutoCalculatorData);
+            }
+            MainManager.Instance.AutoCalculatorData.isCalculating = false;
+        }
+
         public void StartAutoCalculateByButton(int time)
         {
             if (time <= 1)
@@ -1646,7 +1679,17 @@ namespace PCRCaculator.Guild
             MainManager.Instance.AutoCalculatorData.Reset();
             MainManager.Instance.AutoCalculatorData.execTime = time;
             MainManager.Instance.AutoCalculatorData.isCalculating = true;
-            StartAutoCalculate();
+            if (MainManager.Instance.AutoCalculatorData.useRemote)
+            {
+                if (simulator != null) simulator.Dispose();
+                simulator = new RemoteSimulator();
+                simulator.CreateRequest();
+                this.StartCoroutine(WaitRemoteCalculation());
+            }
+            else
+            {
+                StartAutoCalculate();
+            }
         }
         // private IEnumerator AutoCalculate()
         // {

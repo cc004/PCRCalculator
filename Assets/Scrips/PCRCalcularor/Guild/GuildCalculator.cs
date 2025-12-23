@@ -76,12 +76,12 @@ namespace PCRCaculator.Guild
         private readonly Dictionary<int, UnitStateChangeData> allUnitLastStateDic = new Dictionary<int, UnitStateChangeData>();
         private readonly List<int> playerIds = new List<int>();
         private List<int> bossId = new List<int>();
-        private List<UnitCtrl> players;
+        public List<UnitCtrl> players;
         private List<UnitCtrl> boss;
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
-        private long totalDamage;
-        private long totalDamageCriEX;
-        private LongWithEx totalDamageExcept = 0;
+        public long totalDamage;
+        public long totalDamageCriEX;
+        public LongWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
         public eBattleResult BattleResult => BattleManager.Instance.battleResult;
         public Text seedText;

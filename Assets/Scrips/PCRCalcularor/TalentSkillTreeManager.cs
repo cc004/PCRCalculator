@@ -29,7 +29,7 @@ namespace PCRCaculator
         private Dictionary<int, TalentSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
-        private Dictionary<int, int> skillLevels = new Dictionary<int, int>();
+        public Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
     {

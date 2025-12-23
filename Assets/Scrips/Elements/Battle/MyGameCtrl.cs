@@ -89,7 +89,7 @@ namespace Elements
             }
         }
 #endif
-        public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
+        public static extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
         {
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
             int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;

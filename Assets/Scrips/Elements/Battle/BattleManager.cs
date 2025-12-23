@@ -3774,7 +3774,7 @@ namespace Elements.Battle
             //             return CreateBonusEnemyDatas(extraEffect, _timing);
             //         }
             //     }
-            var data = MyGameCtrl.Instance.GetExtraEffectEnemyData(tempData);
+            var data = MyGameCtrl.GetExtraEffectEnemyData(tempData);
             if (data != null)
             {
                 return CreateBonusEnemyDatas(data, _timing);

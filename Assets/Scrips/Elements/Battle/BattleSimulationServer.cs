@@ -62,6 +62,7 @@ namespace Elements.Battle
         public string TeamSkill { get; set; }
         public List<int> SemanUBNum { get; set; }
         public eBattleResult Result { get; set; }
+        public OnceResultData OnceResult { get; set; }
     }
 
     public class BattleTask
@@ -95,6 +96,7 @@ namespace Elements.Battle
         public bool IsSemanMode { get; set; }
         public bool IsGuildBattle { get; set; } = true;
         public bool IsSkipping { get; set; } = true;
+        public bool NeedOnceResult { get; set; }
     }
 
 #if UNITY_5_3_OR_NEWER
