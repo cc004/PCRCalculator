@@ -1,61 +1,240 @@
 {
   "PlayerList": [
     {
-      "unitId": 100201,
-      "love": 114514,
-      "love2": 12,
-      "PrefabId": 100201,
       "enemyid": 0,
-      "level": 307,
+      "level": 323,
       "rarity": 6,
       "rank": 33,
-      "equipLevel": [
-        -1,
-        5,
-        -1,
-        5,
-        -1,
-        5
-      ],
-      "skillLevel": [
-        307,
-        307,
-        307,
-        307
-      ],
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
       "playLoveDic": {
-        "100201": 12,
-        "108801": 12,
-        "180201": 8,
-        "115601": 8,
-        "122601": 8,
-        "128901": 8
+        "105201": 12,
+        "115801": 8
       },
-      "uniqueEqLv": 310,
+      "uniqueEqLv": 320,
       "uniqueEq2Lv": -1,
-      "exEquip": [
-        4110351,
-        4203351,
-        4305351
-      ],
-      "exEquipLevel": [
-        5,
-        5,
-        5
-      ],
+      "exEquip": [ 4108401, 4202401, 4302401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
       "exEquipSubs": {},
-      "name": null
+      "unitId": 105201,
+      "love": 114514,
+      "love2": 12,
+      "PrefabId": 105201
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 6,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 1, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "105701": 12,
+        "125501": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": -1,
+      "exEquip": [ 4101401, 4201401, 4301401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 105701,
+      "love": 114514,
+      "love2": 12,
+      "PrefabId": 170301
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 5,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "110301": 8,
+        "102801": 12,
+        "114501": 8,
+        "180901": 8,
+        "127501": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": 5,
+      "exEquip": [ 4101401, 4201401, 4301401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 110301,
+      "love": 114514,
+      "love2": 8,
+      "PrefabId": 110301
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 6,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "101801": 12,
+        "110101": 8,
+        "119001": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": -1,
+      "exEquip": [ 4109401, 4204401, 4305401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 101801,
+      "love": 114514,
+      "love2": 12,
+      "PrefabId": 101801
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 5,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "180601": 8,
+        "106001": 12,
+        "112001": 8,
+        "107801": 12,
+        "121101": 8,
+        "127201": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": -1,
+      "exEquip": [ 4109401, 4204401, 4304401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 180601,
+      "love": 114514,
+      "love2": 8,
+      "PrefabId": 180601
     }
   ],
-  "EnemyList": null,
-  "GuildEnemyList": [
-    401311102
+  "EnemyList": [
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 6,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "100701": 12,
+        "108201": 8,
+        "119901": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": -1,
+      "exEquip": [ 4108401, 4201401, 4302401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 100701,
+      "love": 114514,
+      "love2": 12,
+      "PrefabId": 100701
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 6,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "103401": 12,
+        "114601": 8,
+        "122201": 8,
+        "126801": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": -1,
+      "exEquip": [ 4102402, 4201401, 4303401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 103401,
+      "love": 114514,
+      "love2": 12,
+      "PrefabId": 103401
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 5,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "108101": 8,
+        "103101": 12,
+        "122001": 8,
+        "127101": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": 5,
+      "exEquip": [ 4105402, 4201401, 4303401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 108101,
+      "love": 114514,
+      "love2": 8,
+      "PrefabId": 108101
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 5,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "107701": 8,
+        "102501": 12,
+        "112101": 8,
+        "130801": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": 5,
+      "exEquip": [ 4110401, 4203303, 4305401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 107701,
+      "love": 114514,
+      "love2": 8,
+      "PrefabId": 107701
+    },
+    {
+      "enemyid": 0,
+      "level": 323,
+      "rarity": 5,
+      "rank": 33,
+      "equipLevel": [ -1, 5, 5, 5, 5, 5 ],
+      "skillLevel": [ 323, 323, 323, 323 ],
+      "playLoveDic": {
+        "108301": 8,
+        "105001": 12,
+        "121401": 8
+      },
+      "uniqueEqLv": 320,
+      "uniqueEq2Lv": 5,
+      "exEquip": [ 4109401, 4204401, 4304401 ],
+      "exEquipLevel": [ 5, 5, 5 ],
+      "exEquipSubs": {},
+      "unitId": 108301,
+      "love": 114514,
+      "love2": 8,
+      "PrefabId": 108301
+    }
   ],
+  "GuildEnemyList": [],
   "UBExecTimeList": [],
   "SemanUBExecTimeList": [],
   "Settings": {
-    "DataName": "\u9ED8\u8BA4\u4E16\u754C\u7EBF",
-    "UseFixedRandomSeed": true,
+    "DataName": "Ĭ��������",
+    "UseFixedRandomSeed": false,
     "RandomSeed": 666,
     "ForceNoCritical_player": false,
     "ForceNoCritical_enemy": false,
@@ -64,17 +243,16 @@
     "ForceCritical_player": false,
     "randomSpecialDatas": []
   },
-  "TalentSkillLevels": {},
-  "TalentSkillNodeLevels": {},
-  "MasterSkillNodeLevels": {},
+  "TalentSkillLevels": null,
+  "TalentSkillNodeLevels": null,
+  "MasterSkillNodeLevels": null,
   "BattleTime": 90,
-  "TalentFullInfo": true,
+  "TalentFullInfo": false,
   "IsTalentQuest": false,
-  "ToMaxUnitAttr": false,
-  "IsAutoMode": false,
+  "ToMaxUnitAttr": true,
+  "IsAutoMode": true,
   "IsSetMode": false,
   "IsSemanMode": false,
-  "IsGuildBattle": true,
-  "IsSkipping": false,
-  "NeedOnceResult": true
+  "IsGuildBattle": false,
+  "IsSkipping": true
 }

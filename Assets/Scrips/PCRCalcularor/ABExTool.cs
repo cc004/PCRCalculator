@@ -1,16 +1,22 @@
-﻿using System;
+﻿using AssetsTools.NET.Extra;
+using Mono.Data.Sqlite;
+using Org.BouncyCastle.Utilities;
+using PCRApi;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Mono.Data.Sqlite;
-using PCRApi;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 namespace PCRCaculator
@@ -470,6 +476,46 @@ namespace PCRCaculator
                 return TryGetAssetBundleByName(fullname, useOldManifest);
         }
 #endif
+#if UNITY_5_3_OR_NEWER
+        private static AssetsManager am = new AssetsManager();
+        private static HashSet<string> loadedDep = new HashSet<string>();
+
+        private static void LoadDependency(string path, byte[] raw, AssetManager mgr)
+        {
+            if (raw == null) return;
+            if (loadedDep.Contains(path)) return;
+            loadedDep.Add(path);
+
+            using var ms = new MemoryStream(raw);
+            var ab = am.LoadBundleFile(ms, path);
+            var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
+            var info = am.GetBaseField(assetsFileInstance, 
+                assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+
+            var bundlePath = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
+
+            foreach (var val in info["m_Dependencies"]["Array"])
+            {
+                var depName = val.AsString;
+                var file = bundlePath + path;
+                if (File.Exists(file))
+                {
+                    LoadDependency(depName, File.ReadAllBytes(file), mgr);
+                }
+                else
+                {
+                    Debug.Log($"resolving asset bundle dependency: {path} => {depName}");
+                    var bytes = mgr.ResolveFile("a/" + depName);
+                    if (bytes != null) File.WriteAllBytes(file, bytes);
+                    LoadDependency(depName, bytes, mgr);
+                }
+            }
+        }
+#else
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void LoadDependency(string path, byte[] raw, AssetManager mgr) { }
+#endif
+
         public static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
         {
             if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
@@ -495,6 +541,8 @@ namespace PCRCaculator
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             path += fullname;
 
+            LoadDependency(fullname, www.bytes, mgr);
+
             var asset = www.getAssetBundle();
             if (asset == null)
             {
@@ -509,6 +557,8 @@ namespace PCRCaculator
                 {
                     Thread.Sleep(0);
                 }
+
+                LoadDependency(fullname, www.bytes, mgr);
 
                 asset = www.assetBundle;
             }

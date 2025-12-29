@@ -62,7 +62,7 @@ public class CommandLineServer : MonoBehaviour
         ParseCommandLineArgs();
         if (Debugger.IsAttached)
         {
-            debugMode = true;
+            // debugMode = true;
             Debug.Log("检测到调试器附加，调试模式已启用");
         }
 #if ENABLE_THREADING
@@ -83,7 +83,7 @@ public class CommandLineServer : MonoBehaviour
         }
         else
         {
-            var controller = new ThreadController(Debugger.IsAttached ? 1 : Environment.ProcessorCount);
+            var controller = new ThreadController(Environment.ProcessorCount);
 
             var requests = new[]
             {
