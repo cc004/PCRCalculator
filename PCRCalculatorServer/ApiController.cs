@@ -72,6 +72,43 @@ namespace PCRCalculatorServer
                     var playerList = MyGameCtrl.Instance.tempData.playerList;
                     var enemyList = MyGameCtrl.Instance.tempData.enemyList;
 
+                    OnceResultData onceResult = null;
+
+                    if (battleRequest[index].NeedOnceResult)
+                    {
+                        var BattleResult = GuildCalculator.Instance.BattleResult;
+
+                        List<string> errorList = new List<string>();
+                        List<List<float>> ubExecTime = GuildCalculator.Instance.CreateUBExecTimeData();
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if (ubExecTime.Count > i && MyGameCtrl.Instance.tempData.UBExecTimeList.Count > i)
+                            {
+                                if (MyGameCtrl.Instance.tempData.UBExecTimeList[i].Count != ubExecTime[i].Count)
+                                {
+                                    errorList.Add(GuildCalculator.Instance.players[i].UnitName + "的某个UB释放失败！");
+                                }
+                            }
+                        }
+                        var currentFrame = BattleHeaderController.CurrentFrameCount;
+                        int additionalTime = (BattleResult == eBattleResult.WIN && true) ? 20 : 0;
+                        var backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
+                        string prefix = true ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
+                        var detail = $"{prefix}{backTime}s";
+                        onceResult = new OnceResultData
+                        {
+                            id = 0,
+                            exceptDamage = GuildCalculator.Instance.totalDamageExcept.Expect,
+                            criticalEX = GuildCalculator.Instance.totalDamageCriEX,
+                            currentDamage = totalDamage,
+                            randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,
+                            backTime = backTime,
+                            backTimeText = detail,
+                            warnings = errorList,
+                            BattleResult = BattleResult,
+                        };
+                    }
+
                     response[index] = new BattleSimulationResponse
                     {
                         PlayerList = playerList,
@@ -85,7 +122,8 @@ namespace PCRCalculatorServer
                         TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
                         TalentSkill = GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
                         TeamSkill = GuildManager.Instance.GetFinalTeamSkillNodeDescription(),
-                        Result = battleResult
+                        Result = battleResult,
+                        OnceResult = onceResult
                     };
 
                     if (battleRequest[index].IsGuildBattle && battleRequest[index].IsSemanMode)
@@ -93,8 +131,7 @@ namespace PCRCalculatorServer
                         response[index].SemanUBNum = BattleManager.Instance.semanubmanager.UBNums;
                     }
 
-                    Debug.Log(
-                        $"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}, Seed={currentSeed}");
+                    // Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}, Seed={currentSeed}");
 
                 }
                 catch (Exception ex)

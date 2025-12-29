@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using UnitData = PCRCaculator.UnitData;
@@ -52,8 +53,12 @@ public class CommandLineServer : MonoBehaviour
 
     public static void Main(string[] args)
     {
-        var exeDir = AppContext.BaseDirectory;
-        Directory.SetCurrentDirectory(exeDir);
+        if (Debugger.IsAttached)
+        {
+            var exeDir = AppContext.BaseDirectory;
+            Directory.SetCurrentDirectory(exeDir);
+        }
+
         ParseCommandLineArgs();
         if (Debugger.IsAttached)
         {
@@ -64,7 +69,9 @@ public class CommandLineServer : MonoBehaviour
         if (serverMode)
         {
             RuntimeHelpers.RunClassConstructor(typeof(ApiController).TypeHandle);
+
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(logger => logger.SetMinimumLevel(debugMode ? LogLevel.Information : LogLevel.Error))
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton(new ServerOptions { DebugMode = debugMode });

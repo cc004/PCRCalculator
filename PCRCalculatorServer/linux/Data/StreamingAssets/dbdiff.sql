@@ -1,6 +1,0 @@
-UPDATE 'skill_action' SET action_detail_2 = 0 WHERE action_id = 107100101;
-INSERT OR IGNORE INTO "main"."unit_ex_equipment_slot" ("unit_id", "slot_category_1", "slot_category_2", "slot_category_3") VALUES (170101, 101, 201, 301);
-INSERT OR IGNORE INTO "main"."unit_ex_equipment_slot" ("unit_id", "slot_category_1", "slot_category_2", "slot_category_3") VALUES (170201, 104, 201, 303);
-INSERT OR IGNORE INTO "promotion_bonus" SELECT 118501 as "unit_id", "promotion_level", "hp", "atk", "magic_str", "def", "magic_def", "physical_critical", "magic_critical", "wave_hp_recovery", "wave_energy_recovery", "dodge", "physical_penetrate", "magic_penetrate", "life_steal", "hp_recovery_rate", "energy_recovery_rate", "energy_reduce_rate", "accuracy" FROM "promotion_bonus" WHERE "unit_id" == 100201;
-INSERT OR IGNORE INTO "promotion_bonus" SELECT 180901 as "unit_id", "promotion_level", "hp", "atk", "magic_str", "def", "magic_def", "physical_critical", "magic_critical", "wave_hp_recovery", "wave_energy_recovery", "dodge", "physical_penetrate", "magic_penetrate", "life_steal", "hp_recovery_rate", "energy_recovery_rate", "energy_reduce_rate", "accuracy" FROM "promotion_bonus" WHERE "unit_id" == 180101;
-UPDATE "main"."clan_battle_2_map_data" SET "clan_battle_id" = "clan_battle_id" - 1 WHERE "clan_battle_id" > 1062;

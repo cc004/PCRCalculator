@@ -63,6 +63,7 @@ namespace Elements.Battle
         public string TeamSkill { get; set; }
         public List<int> SemanUBNum { get; set; }
         public eBattleResult Result { get; set; }
+        public OnceResultData OnceResult { get; set; }
     }
 
     public class BattleTask
@@ -98,6 +99,7 @@ namespace Elements.Battle
         public bool IsSkipping { get; set; } = true;
         public int WaveGroupId { get; set; } = 0;
         public List<bool> SetToggles { get; set; }
+        public bool NeedOnceResult { get; set; }
     }
 
 #if UNITY_5_3_OR_NEWER

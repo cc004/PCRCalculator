@@ -1521,6 +1521,7 @@ namespace PCRCaculator
     }
     public class AutoCalculatorData
     {
+        public bool useRemote = true;
         public bool isCalculating;
         public bool isPaues;
         public bool isCanceled;
@@ -1587,17 +1588,18 @@ namespace PCRCaculator
             isConfig = false;
         }
     }
+    [Serializable]
     public class OnceResultData
     {
-        public int id;
-        public int randomSeed;
-        public long currentDamage;
-        public long criticalEX;
-        public long exceptDamage;
-        public int backTime;
-        public string backTimeText;
-        public List<string> warnings = new List<string>();
-        public eBattleResult BattleResult;
+        public int id { get; set; }
+        public int randomSeed { get; set; }
+        public long currentDamage { get; set; }
+        public long criticalEX { get; set; }
+        public long exceptDamage { get; set; }
+        public int backTime { get; set; }
+        public string backTimeText { get; set; }
+        public List<string> warnings { get; set; } = new List<string>();
+        public eBattleResult BattleResult { get; set; }
 
         public string GetDetail()
         {
