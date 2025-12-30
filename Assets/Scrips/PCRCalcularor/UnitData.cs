@@ -946,7 +946,7 @@ namespace PCRCaculator
 
             if (uniqueEq2Lv >= 0)
             {
-                result += "/" + GetUniqueEq2LvDescribe();
+                result += " / " + GetUniqueEq2LvDescribe();
             }
 
             return result;
