@@ -1117,6 +1117,10 @@ namespace Elements
                 }
                 else if (battleManager.DecoyEnemy != null)
                     basePartsData = battleManager.DecoyEnemy.GetFirstParts(_basePos: Owner.transform.position.x);
+                if (Owner.IsTauntState() && !Owner.IsConfusionOrConvert())
+                {
+                    basePartsData = Owner.TauntSource;
+                }
                 //2022/09/05改
                 if (basePartsData != null && !basePartsData.Owner.IsDead && !basePartsData.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY) && isInActionTargetArea(_skill, _action, _basePosition, _considerBodyWidth, basePartsData))
                 {

@@ -927,8 +927,16 @@ namespace Elements
                 UnitCtrl.eAbnormalState.WORLD_LIGHTNING,
                 new AbnormalConstData
                 {
-                    IconType = eStateIconType.WORLD_LIGHTNING, // TODO fix icon
+                    IconType = eStateIconType.WORLD_LIGHTNING,
                     IsBuff = true
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.TAUNT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.TAUNT,
+                    IsBuff = false
                 }
             },
         };
@@ -3741,11 +3749,23 @@ this.updateCurColor();
             return false;
         }
 
+        public bool IsTauntState()
+        {
+            return IsAbnormalState(eAbnormalState.TAUNT);
+        }
+
+        public BasePartsData GetTauntSource()
+        {
+            if (!IsTauntState())
+                return null;
+            return TauntSource;
+        }
+
         private IEnumerator updateAttackTarget()
         {
             while (true)
             {
-                updateAttackTargetImpl();
+                updateAttackTargetImpl(GetTauntSource());
                 yield return null;
             }
         }
@@ -3753,7 +3773,7 @@ this.updateCurColor();
         private float lastSearchDistance = -1f;
         private float lastSearchDistanceForSkillReady = -1f;
 
-        private void updateAttackTargetImpl()
+        public void updateAttackTargetImpl(BasePartsData _tauntSource)
         {
             List<UnitCtrl> unitCtrlList1 = IsOther ? battleManager.UnitList : battleManager.EnemyList;
             float _distance = SearchAreaSize;
@@ -3780,6 +3800,16 @@ this.updateCurColor();
             var t1 = TargetEnemyList.ToList();
             var t2 = targetPlayerList.ToList();
             */
+
+            if (_tauntSource != null)
+            {
+                IsTauntSourceInSearchArea = judgeFrontAreaTarget(_tauntSource.Owner, _distance);
+            }
+            else
+            {
+                IsTauntSourceInSearchArea = false;
+            }
+
             TargetEnemyList.Clear();
             targetPlayerList.Clear();
 
@@ -6977,6 +7007,10 @@ this.updateCurColor();
         private int buffCounter { get; set; }
 
         private int debuffCounter { get; set; }
+
+        public BasePartsData TauntSource { get; set; }
+        public List<UnitCtrl> TauntTargetList { get; set; } = new List<UnitCtrl>();
+        bool IsTauntSourceInSearchArea { get; set; }
 
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
@@ -12823,7 +12857,7 @@ this.updateCurColor();
                                 yield return null;
                             else if ((float)unitCtrl.m_fCastTimer <= 0f && unitCtrl.attackPatternDictionary != null)
                             {
-                                unitCtrl.updateAttackTargetImpl();
+                                unitCtrl.updateAttackTargetImpl(GetTauntSource());
                                 if (unitCtrl.judgeStateIsWalk())
                                 {
                                     yield break;
@@ -12880,12 +12914,20 @@ this.updateCurColor();
         {
             if (!IsConfusionOrConvert())
             {
-                if (TargetEnemyList.Count <= 0)
+                if (IsTauntState())
                 {
-                    isRunForCatchUp = true;
-                    SetState(ActionState.WALK);
-                    return true;
+                    if (IsTauntSourceInSearchArea)
+                    {
+                        return false;
+                    }
                 }
+                else if (TargetEnemyList.Count > 0)
+                {
+                    return false;
+                }
+                isRunForCatchUp = true;
+                SetState(ActionState.WALK);
+                return true;
             }
             else
             {
@@ -14090,16 +14132,21 @@ this.updateCurColor();
             TP_REGENERATION2 = 60,
             SPEED_OVERLAP = 61,
             SPY = 62,
-            // Token: 0x04002829 RID: 10281
-            ENERGY_DAMAGE_REDUCE,
-            // Token: 0x0400282A RID: 10282
-            BLACK_FRAME,
-            FLIGHT,
-            ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY,
-            WORLD_LIGHTNING,
-            NUM,
+            ENERGY_DAMAGE_REDUCE = 63,
+            BLACK_FRAME = 64,
+            FLIGHT = 65,
+            ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY = 66,
+            TAUNT = 67,
+            WORLD_LIGHTNING = 68,
+            MAGIC_DODGE = 69,
+            HP_LOWER_LIMIT = 70,
+            CHAINED_ACN = 71,
+            PUPPET = 72,
+            DISABLE_HEAL = 73,
+            RATIO_SLIP = 74,
+            NUM = 75,
             TOP = 0,
-            END = NUM
+            END = 74,
         }
         public class eAbnormalStateCategory_DictComparer : IEqualityComparer<eAbnormalStateCategory>
         {

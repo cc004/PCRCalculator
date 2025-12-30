@@ -1907,6 +1907,7 @@ namespace PCRCaculator.Guild
         public int ownerID;
         public int targetID;
         public int actionID;
+        //21-嘲讽
         //20-恐惧判定
         //19-次数黑暗判定
         //18-清BUFF判定??
