@@ -66,7 +66,7 @@ namespace PCRCaculator
                             tempData.extra_effect_cnt++;
                         }
                         else
-                            UnityEngine.Debug.LogError("找不到增援敌人ID " + enemy);
+                            UnityEngine.Debug.LogError("鎵句笉鍒板鎻存晫浜篒D " + enemy);
                     }
                 }
                 request.GuildEnemyList = tempData.guildEnemy
