@@ -118,7 +118,7 @@ namespace PCRCaculator
 
         private List<UnitData> playerDataForBattle;
         private List<UnitData> enemyDataForBattle;
-        private bool isGuildBattle;
+        // private bool isGuildBattle;
         public GuildBattleData guildBattleData;
         public bool isAutoMode;
         public bool forceAutoMode;
@@ -193,7 +193,7 @@ namespace PCRCaculator
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
         public Dictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => allUnitSkillTimeDataDic; }
-        public bool IsGuildBattle { get => isGuildBattle; }
+        public bool IsGuildBattle = true;
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
         public List<UnitData> EnemyDataForBattle { get => enemyDataForBattle; }
         // public bool IsAutoMode { get => isAutoMode;}
@@ -930,7 +930,7 @@ namespace PCRCaculator
             }
             playerDataForBattle = d1;
             enemyDataForBattle = other.playrCharacters;
-            isGuildBattle = false;
+            IsGuildBattle = false;
             this.isAutoMode = isAutoMode;
             this.forceAutoMode = forceAutoMode;
             this.isSetMode = false;
@@ -949,7 +949,7 @@ namespace PCRCaculator
         public void ChangeSceneToBalttle(GuildBattleData data)
         {
             playerDataForBattle = data.players.playrCharacters;
-            isGuildBattle = true;
+            IsGuildBattle = true;
             isAutoMode = data.isAutoMode;
             isSetMode = data.isSetMode;
             isSemanMode = data.isSemanMode;

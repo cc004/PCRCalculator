@@ -1618,6 +1618,7 @@ namespace PCRCaculator.Guild
         }
         public void SwitchScene()
         {
+            MainManager.Instance.IsGuildBattle = false;
             SceneManager.LoadScene("BeginScene");
         }
         public void CopyButon()
