@@ -66,6 +66,8 @@ namespace PCRCaculator.Guild
         public List<Slider> SettingSliders;
         public List<Text> SettingTexts;
         public List<Toggle> SettingToggles;
+        public List<Toggle> SemanSkillToggles;
+        public List<Toggle> SemanUBToggles;
         public List<InputField> SettingInputs;
 
         public List<Text> calSettingTexts;
@@ -1325,6 +1327,8 @@ namespace PCRCaculator.Guild
             SettingTexts[2].text = SettingData.UBTryingCount + "";
             SettingToggles[0].isOn = SettingData.calcSpineAnimation;
             SettingToggles[0].interactable = true; //SettingData.calSpeed == 1;
+            SemanSkillToggles[SettingData.SemanSkillOn].isOn = true;
+            SemanUBToggles[SettingData.SemanUBOn].isOn = true;
             /*SettingInputs[0].text = SettingData.RandomSeed + "";
             SettingToggles[2].isOn = SettingData.UseFixedRandomSeed;
             SettingToggles[3].isOn = SettingData.ForceNoCritical_player;
@@ -1362,6 +1366,8 @@ namespace PCRCaculator.Guild
             SettingData.FPSforAnimation = (int)SettingSliders[1].value * 10;
             SettingData.calcSpineAnimation = SettingToggles[0].isOn;
             SettingData.UBTryingCount = (int)SettingSliders[2].value > 18 ? 9999 : (int)SettingSliders[2].value * 10;
+            SettingData.SemanSkillOn = SemanSkillToggles.FindIndex(t => t.isOn);
+            SettingData.SemanUBOn = SemanUBToggles.FindIndex(t => t.isOn);
             //SettingData.UseFixedRandomSeed = SettingToggles[2].isOn;
             try
             {
@@ -2323,6 +2329,8 @@ namespace PCRCaculator.Guild
         public int FPSforAnimation = 60;
         public bool calcSpineAnimation = true;
         public int UBTryingCount = 9999;
+        public int SemanSkillOn = 0;
+        public int SemanUBOn = 0;
         // public bool UseFixedRandomSeed = true;
 
         /*public int RandomSeed = 666;

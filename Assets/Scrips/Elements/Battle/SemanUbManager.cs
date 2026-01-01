@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PCRCaculator.Guild;
 using static Elements.UnitCtrl;
 
 namespace Elements.Battle
@@ -37,7 +38,15 @@ namespace Elements.Battle
                     return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
                 }
             }
+            public bool IsIdle
+            {
+                get
+                {
+                    return unitId < parent.players.Count && parent.players[unitId].CurrentState == ActionState.IDLE;
+                }
+            }
             public int delay = 0;
+            public int no_idle_delay = 0;
             public int unitId = 0;
             public List<UbStatus> history = new List<UbStatus>();
             private SemanUbManager parent;
@@ -102,6 +111,10 @@ namespace Elements.Battle
                         ub.delay++;
                     }
                     delay++;
+                    if (!IsIdle)
+                    {
+                        no_idle_delay++;
+                    }
                 }
             }
 
@@ -160,17 +173,9 @@ namespace Elements.Battle
                     }
                 }
 
-                if (last.skillId != 1 && last.skillId != 9)
-                {
-                    int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION) - 1;
-                    if (trigger >= 100 || lastDelay >= 10)
-                    {
-                        // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                        return delay;
-                    }
-                    return 20000 + last.waitUnit * 1000 + trigger * 10 + lastDelay;
-                }
-                else
+                if (last.skillId == 9 || // auto
+                    last.skillId == 1 && GuildManager.Instance.SemanUBToggles[0].isOn ||
+                    last.skillId != 1 && GuildManager.Instance.SemanSkillToggles[1].isOn)
                 {
                     int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
                     if (trigger >= 10 || lastDelay >= 10)
@@ -180,11 +185,57 @@ namespace Elements.Battle
                     }
                     return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
                 }
+                else if (last.skillId == 1 && GuildManager.Instance.SemanUBToggles[1].isOn)
+                {
+                    int trigger = history.Where(h => h.skillId == last.skillId).Select(x => x.frame).ToHashSet().Count() - 1;
+                    if (trigger >= 100 || lastDelay >= 100)
+                    {
+                        // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                        return delay;
+                    }
+                    return 40000 + trigger * 100 + lastDelay;
+                }
+                else // skill
+                {
+                    if (GuildManager.Instance.SemanSkillToggles[0].isOn)
+                    {
+                        return delay;
+                    }
+                    else if (GuildManager.Instance.SemanSkillToggles[2].isOn)
+                    {
+                        int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION) - 1;
+                        if (trigger >= 100 || lastDelay >= 10)
+                        {
+                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                            return delay;
+                        }
+                        return 20000 + last.waitUnit * 1000 + trigger * 10 + lastDelay;
+                    }
+                    else if (GuildManager.Instance.SemanSkillToggles[3].isOn)
+                    {
+                        int trigger = history.Where(h => h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION).Select(x => x.frame).ToHashSet().Count() - 1;
+                        if (trigger >= 100 || lastDelay >= 100)
+                        {
+                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                            return delay;
+                        }
+                        return 30000 + trigger * 100 + lastDelay;
+                    }
+                    else //if (GuildManager.Instance.SemanSkillToggles[3].isOn)
+                    {
+                        if (IsIdle)
+                        {
+                            return delay;
+                        }
+                        return 50000 + no_idle_delay;
+                    }
+                }
             }
 
             public void Clear()
             {
                 delay = 0;
+                no_idle_delay = 0;
                 history.Clear();
             }
 
