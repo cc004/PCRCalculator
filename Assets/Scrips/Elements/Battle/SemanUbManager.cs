@@ -25,6 +25,7 @@ namespace Elements.Battle
             WAIT_UNIT_EXEC = 3, // ignore what skill, exclude ub
             WAIT_EXEC = 4, // ignore who skill, exclude ub
             WAIT_UB = 5, // ignore who, only ub
+            COUNTDOWN_EXCLUDE_IDLE = 6, // countdown but exclude idle
         }
 
         public class UbRecord
@@ -205,6 +206,14 @@ namespace Elements.Battle
                     return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
                 }
             }
+
+            public bool IsIdle
+            {
+                get
+                {
+                    return unitId < parent.players.Count && parent.players[unitId].CurrentState == ActionState.IDLE;
+                }
+            }
             public int unitId { get; set; }
             public int waitUnit { get; set; }
             public int skillId { get; set; } // 0: attack, 1: ub, 2: skill1, 3: skill2, ..., 9: auto
@@ -247,13 +256,13 @@ namespace Elements.Battle
 
             public void ProcessFrame()
             {
-                if (skillReady && action == Action.COUNTDOWN)
+                if (skillReady && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle))
                     delay--;
             }
 
             public bool IsUbExec()
             {
-                return skillReady && action == Action.COUNTDOWN && delay <= 0;
+                return skillReady && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle) && delay <= 0;
             }
 
             public void OnChangeStateCallBack(int unitPos, ActionState state)
@@ -346,6 +355,17 @@ namespace Elements.Battle
                     action = Action.WAIT_UB,
                     unitId = unitId,
                     trigger = trigger,
+                    delay = delay
+                };
+            }
+            else if (op == 5)
+            {
+                int delay = num % 10000;
+                return new UbStatus(this)
+                {
+                    action = Action.COUNTDOWN_EXCLUDE_IDLE,
+                    unitId = unitId,
+                    trigger = 0,
                     delay = delay
                 };
             }
