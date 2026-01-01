@@ -83,7 +83,7 @@ namespace PCRCaculator.Battle
 
         public RenderTexture screenShootTx;
         public CharacterPageButton screenshootBt;
-
+        public EquipmentPageIcon screenshootEx;
         public float DamageRandomScale;
         public float DamageScale;
 
@@ -106,6 +106,7 @@ namespace PCRCaculator.Battle
         private int[] UBButtonState = new int[5] { 0, 0, 0, 0, 0 };
 
         private List<byte[]> imageSaved = new List<byte[]>();
+        public List<byte[]> imageSaved2 = new List<byte[]>(); //ex装备图标
 
         public Dictionary<Elements.eStateIconType, bool> ShowBuffDic => MainManager.Instance.PlayerSetting.ShowBuffDic;
         public GameObject battleStatus;
@@ -176,6 +177,7 @@ namespace PCRCaculator.Battle
             }
             debugStrList.Clear();
             imageSaved.Clear();
+            imageSaved2.Clear();
             timeScaleSlider.value = GuildManager.Instance.calSlider.value;
         }
         private HashSet<KeyCode> pressedKeys = new HashSet<KeyCode>();
@@ -912,7 +914,21 @@ namespace PCRCaculator.Battle
             yield return new WaitForEndOfFrame();
             byte[] bytes2 = SaveRenderTexture(screenShootTx);
             imageSaved.Add(bytes2);
-
+            yield return null;
+            screenshootEx.SetActive(true);
+            for (int i = 0; i < myGameCtrl.tempData.playerList.Count; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    screenshootEx.SetExEquipmentIcon(myGameCtrl.tempData.playerList[i].exEquip[j], myGameCtrl.tempData.playerList[i].exEquipLevel[j], j);
+                    yield return null;
+                    yield return new WaitForEndOfFrame();
+                    byte[] equipBytes = SaveRenderTexture(screenShootTx);
+                    imageSaved2.Add(equipBytes); // 保存到imageSaved2
+                    yield return null;
+                }
+            }
+            screenshootEx.SetActive(false);
         }
         //将RenderTexture保存成一张png图片  
         public byte[] SaveRenderTexture(RenderTexture rt)
@@ -933,6 +949,10 @@ namespace PCRCaculator.Battle
         {
             return imageSaved;
         }
+        // public List<byte[]> GetExequipImage()
+        // {
+        //     return imageSaved2;
+        // }
         public void SetBUFFUIShowButton()
         {
             if (!BattleHeaderController.Instance.GetIsPause())

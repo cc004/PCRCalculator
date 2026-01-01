@@ -16,6 +16,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Style;
 using PCRCaculator;
+using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using SFB;
 using TMPro;
@@ -1000,50 +1001,74 @@ autopcr.setOffset(2, 0); # offset calibration
                 worksheet0.Cells[3, 2, 5, 2].Merge = true;
                 worksheet0.MySetValue(3, 2, TimelineData.exceptDamage + "w", 14, blod: true, fontColor: new int[3] { 26, 36, 242 }, backColor: backColotInt_1);
                 worksheet0.InsertImage(TimelineData.charImages.Last(), 2, 1, false, 1, 3);
-                worksheet0.MySetValue(6, 2, "等级", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(7, 2, "RANK", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(8, 2, "专1/专2", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(9, 2, "星级", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(10, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(11, 2, "属性等级", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(12, 2, "属性技能", blod: true, backColor: backColotInt_2);
-                worksheet0.MySetValue(13, 2, "大师技能", blod: true, backColor: backColotInt_2);
-                int currentLineNum = 14;
+                int currentLineNum = 5;
+                int titleCurrentLineNum = 6;
+
+                if (!GuildManager.Instance.IsGuildBoss)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        worksheet0.Cells[titleCurrentLineNum + i * 3, 2, titleCurrentLineNum + 2 + i * 3, 2].Merge = true;
+                    }
+                    worksheet0.MySetValue(6, 2, "EX武器", blod: true, backColor: backColotInt_2);
+                    worksheet0.MySetValue(9, 2, "EX防具", blod: true, backColor: backColotInt_2);
+                    worksheet0.MySetValue(12, 2, "EX饰品", blod: true, backColor: backColotInt_2);
+                    titleCurrentLineNum+=9;
+                }
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "等级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "RANK", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "专1/专2", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "星级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "属性等级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "属性技能", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "大师技能", blod: true, backColor: backColotInt_2);
                 if (MainManager.Instance.UnitRoleDataDic.Count > 0)
                 {
-                    worksheet0.Cells[currentLineNum, 2, currentLineNum +1, 2].Merge = true;
-                    worksheet0.MySetValue(currentLineNum, 2, "职阶专精", blod: true, backColor: backColotInt_2);
-                    worksheet0.MySetValue(currentLineNum, 3, GuildManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
+                    worksheet0.Cells[titleCurrentLineNum, 2, titleCurrentLineNum + 1, 2].Merge = true;
+                    worksheet0.MySetValue(titleCurrentLineNum, 2, "职阶专精", blod: true, backColor: backColotInt_2);
                 }
                 int count = 0;
                 foreach (UnitData unitData in playerDatas.playrCharacters)
                 {
-                    worksheet0.Cells[3, 7-count, 5, 7-count].Merge = true;
+                    worksheet0.Cells[3, 7 - count, 5, 7 - count].Merge = true;
                     worksheet0.MySetValue(3, 7 - count, unitData.GetUnitName(), backColor: backColotInt_1);
-                    worksheet0.InsertImage(TimelineData.charImages[count], 2, 6 - count , false,1,3);
-                    worksheet0.MySetValue(6, 7 - count, unitData.GetLevelDescribe(), backColor: backColotInt_1);
-                    worksheet0.MySetValue(7, 7 - count, unitData.GetRankDescribe(), backColor: backColotInt_1);
-                    worksheet0.MySetValue(8, 7 - count, unitData.GetUniqueEqsDescribe(), backColor: backColotInt_1);
-                    worksheet0.MySetValue(9, 7 - count, unitData.rarity , backColor: backColotInt_1);
-                    worksheet0.MySetValue(10, 7 - count, unitData.GetExEquipDescribe(), backColor: backColotInt_1);
-                    worksheet0.MySetValue(11, 7 - count, unitData.TalentLevelDescribe(), backColor: backColotInt_1);
-                    worksheet0.MySetValue(11, 7 - count, unitData.TalentLevelDescribe(), backColor: backColotInt_1);
+                    worksheet0.InsertImage(TimelineData.charImages[count], 2, 6 - count, false, 1, 3);
+                    if (!GuildManager.Instance.IsGuildBoss)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            worksheet0.InsertImage(BattleUIManager.Instance.imageSaved2[i + count * 3], currentLineNum + i * 3, 6 - count, false, 1, 3);
+                        }
+                        currentLineNum += 9;
+                    }
+                    worksheet0.MySetValue(currentLineNum + 1, 7 - count, unitData.GetLevelDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(currentLineNum + 2, 7 - count, unitData.GetRankDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(currentLineNum + 3, 7 - count, unitData.GetUniqueEqsDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(currentLineNum + 4, 7 - count, unitData.rarity, backColor: backColotInt_1);
+                    worksheet0.MySetValue(currentLineNum + 5, 7 - count, unitData.GetExEquipDescribe(), backColor: backColotInt_1);
+                    worksheet0.MySetValue(currentLineNum + 6, 7 - count, unitData.TalentLevelDescribe(), backColor: backColotInt_1);
                     if (MainManager.Instance.UnitRoleDataDic.Count > 0)
                     {
-                        worksheet0.MySetValue(currentLineNum, 7 - count, unitData.RoleMasteryDescribe(), backColor: backColotInt_1);
-                        worksheet0.Cells[currentLineNum, 7 - count, currentLineNum + 1, 7 - count].Merge = true;
-                        worksheet0.Cells[currentLineNum, 7 - count].Style.WrapText = true;
+                        worksheet0.MySetValue(currentLineNum + 9, 7 - count, unitData.RoleMasteryDescribe(), backColor: backColotInt_1);
+                        worksheet0.Cells[currentLineNum + 9, 7 - count, currentLineNum + 10, 7 - count].Merge = true;
+                        worksheet0.Cells[currentLineNum + 9, 7 - count].Style.WrapText = true;
                     }
                     count++;
+                    currentLineNum = 5;
                 }
+                currentLineNum += 16;
+                
+                worksheet0.Cells[currentLineNum, 3, currentLineNum, 7].Merge = true;
+                worksheet0.MySetValue(currentLineNum, 3, GuildManager.Instance.GetFinalTalentSkillNodeDescription(), backColor: backColotInt_1);
+                currentLineNum++;
+                worksheet0.Cells[currentLineNum, 3, currentLineNum, 7].Merge = true;
+                worksheet0.MySetValue(currentLineNum, 3, GuildManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
+                currentLineNum++;
                 if (MainManager.Instance.UnitRoleDataDic.Count > 0)
                 {
                     currentLineNum += 2;
                 }
-                worksheet0.Cells[12, 3, 12, 7].Merge = true;
-                worksheet0.Cells[13, 3, 13, 7].Merge = true;
-                worksheet0.MySetValue(12, 3, GuildManager.Instance.GetFinalTalentSkillNodeDescription(), backColor: backColotInt_1);
-                worksheet0.MySetValue(13, 3,GuildManager.Instance.GetFinalTeamSkillNodeDescription(), backColor: backColotInt_1);
 
                 worksheet0.Cells[3, 8, 3, 10].Merge = true;
                 worksheet0.MySetValue(3, 8, "备注", blod: true, backColor: backColotInt_2);

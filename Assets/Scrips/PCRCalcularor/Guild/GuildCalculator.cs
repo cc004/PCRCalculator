@@ -953,6 +953,7 @@ namespace PCRCaculator.Guild
                 backDamage = Mathf.RoundToInt((totalDamage - totalDamageCriEX) / 10000),
                 totalDamage = totalDamage,
                 charImages = BattleUIManager.Instance.GetCharactersImage(),
+                // exequipImages = BattleUIManager.Instance.GetExequipImage(),
                 //string fileName = CreateExcelName();
                 timeLineName = CreateExcelName(),
                 uBDetails = CreateUBDetailList(),
@@ -1850,6 +1851,7 @@ namespace PCRCaculator.Guild
         public int backDamage;
         [JsonIgnore]
         public List<byte[]> charImages;
+        public List<byte[]> exequipImages;
         public string timeLineName;
         public string detail;
         [JsonIgnore]
