@@ -47,6 +47,7 @@ namespace PCRCaculator
         }
         public void SwitchScene()
         {
+            MainManager.Instance.IsGuildBattle = true;
             SceneManager.LoadScene("GuildScene");
         }
     }

@@ -50,7 +50,8 @@ namespace Elements
     public enum ePassiveTiming
     {
       BUFF = 1,
-      DAMAGED = 2
+      DAMAGED = 2,
+      DEBUFF = 3,
     }
 
     public enum eSealTarget

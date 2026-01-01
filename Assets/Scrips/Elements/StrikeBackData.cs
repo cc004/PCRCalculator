@@ -18,9 +18,11 @@ namespace Elements
 
     public eStrikeBackType StrikeBackType { get; set; }
 
-    public int Damage { get; set; }
+    public LongWithEx Damage { get; set; }
 
     public EnchantStrikeBackAction.eStrikeBackEffectType EffectType { get; set; }
+
+    public ActionParameter TargetAction { get; set; }
 
     public int ActionId { get; set; }
 
@@ -34,9 +36,14 @@ namespace Elements
 
     public Skill Skill { get; set; }
 
+    public UnitCtrl Source { get; set; }
+
+    public bool IsEnvironmentAbnormalState { get; set; }
+
+
     //public StrikeBackData() => this.battleEffectPool = (BattleEffectPoolInterface) StrikeBackData.SINGLETON_TREE.Get<BattleEffectPool>();
 
-    public void Exec(UnitCtrl _target, UnitCtrl _source, int _recovery, Action _callback)
+    public void Exec(UnitCtrl _target, UnitCtrl _source, LongWithEx _recovery, Action _callback)
     {
       Execed = true;
       if (_target.CurrentState == UnitCtrl.ActionState.SKILL_1)
@@ -52,18 +59,54 @@ namespace Elements
       _callback.Call();
     }
 
-    private void execImpl(UnitCtrl _target, UnitCtrl _source, int _recovery, Action _callback)
+    private void execImpl(UnitCtrl _target, UnitCtrl _source, LongWithEx _recovery, Action _callback)
     {
       IsDieing = true;
-      DamageData _damageData = new DamageData
+      bool flag = false; // use in effect, ignore
+      if (!_target.IsStealth)
       {
-        Target = _target.GetFirstParts(true),
-        Damage = (long) Damage,
-        DamageType = DamageData.eDamageType.NONE,
-        ActionType = eActionType.ENCHANT_STRIKE_BACK,
-        TargetIncludeMyTeam = _target.IsOther == _source.IsOther
-      };
-      _target.SetDamage(_damageData, false, ActionId);
+        if (Damage > 0)
+        {
+          DamageData _damageData = new DamageData
+          {
+            Target = _target.GetFirstParts(true),
+            Damage = (long) Damage,
+            DamageType = DamageData.eDamageType.NONE,
+            ActionType = eActionType.ENCHANT_STRIKE_BACK,
+            TargetIncludeMyTeam = _target.IsOther == _source.IsOther || IsEnvironmentAbnormalState,
+            StrikeBackSource = _source,
+            CriticalRate = 0.0f,
+          };
+          _target.SetDamage(_damageData, false, ActionId);
+        }
+        if (TargetAction != null)
+        {
+          if (Source.IsDead || Source.IdleOnly)
+          {
+            flag = true;
+          }
+          else
+          {
+            flag = false;
+            var part = _target.GetIndexSmallestParts();
+            TargetAction.ReadyAction(Source, Source.unitActionController, Skill);
+            if (part.Owner.IsSummonOrPhantom)
+            {
+              TargetAction.AppendTargetNum(part.Owner, 0);
+            }
+            if (!TargetAction.IsAppendTargetNum(part.Owner))
+            {
+              TargetAction.AppendTargetNum(part.Owner, 0);
+            }
+            Source.unitActionController.ExecAction(
+              TargetAction, 
+              Skill,
+              part,
+              0,
+              0.0f);
+          }
+        }
+      }
       //CircleEffectController skillEffect = this.DataSet.SkillEffect as CircleEffectController;
       switch (StrikeBackType)
       {
