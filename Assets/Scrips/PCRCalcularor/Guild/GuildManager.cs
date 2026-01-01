@@ -207,6 +207,10 @@ namespace PCRCaculator.Guild
         public bool IsDungeonBoss { get => BossType == 5; }
         public bool IsTalentQuestBoss { get => BossType == 8; }
         public bool IsAbyssBoss { get => BossType == 9; }
+        public bool IsGuildBossId(int id)
+        {
+            return id / 100000000 == 4;
+        }
         public bool IsTalentQuestBossId(int id)
         {
             return id / 100000000 == 8;

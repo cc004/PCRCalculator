@@ -605,7 +605,8 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitSecondMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn, equip_second_full: true);
+            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn, equip_second_full: true);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
             RefreshSettingPage();
@@ -613,7 +614,8 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
+            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
             RefreshSettingPage();
@@ -621,9 +623,10 @@ namespace PCRCaculator
         }
         public void SetAllUnitMax()
         {
+            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
             foreach (UnitData a in playerData.playrCharacters)
             {
-                a.SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
+                a.SetMax(battleMode, isSetMaxExEquip.isOn);
                 a.SetMaxLove();
             }
             RefreshSettingValues();

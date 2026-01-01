@@ -3335,10 +3335,12 @@ this.updateCurColor();
                 //{
                 //    unitAttackPattern = new MasterUnitAttackPattern.UnitAttackPattern(loop_start: 1, loop_end: 1, atk_pattern_1: 1001);
                 //}
+                #if UNITY_5_3_OR_NEWER
                 if(MainManager.Instance.IsGuildBattle && MainManager.Instance.GuildBattleData.SettingData.changedEnemyAttackPatternDic.TryGetValue(_attackPatternId,out UnitAttackPattern data2))
                 {
                     unitAttackPattern = new MasterUnitAttackPattern.UnitAttackPattern(data2);
                 }
+                #endif
             }
             else
             {

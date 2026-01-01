@@ -383,7 +383,7 @@ namespace Elements
             {
                 foreach (var player in tempData.playerList)
                 {
-                    player.SetMax(is_guild_boss: req.IsGuildBattle);
+                    player.SetMax(battle_mode: req.IsGuildBattle ? GuildManager.Instance.IsGuildBossId(req.GuildEnemyList[0]) ? 0 : 1 : 2);
                     player.SetMaxLove();
                 }
             }
@@ -466,7 +466,7 @@ namespace Elements
                 {
                     foreach (var enemy in tempData.enemyList)
                     {
-                        enemy.SetMax(is_guild_boss: false);
+                        enemy.SetMax(battle_mode: 2); // only in jjc 
                         enemy.SetMaxLove();
                     }
                 }
