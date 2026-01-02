@@ -337,6 +337,8 @@ namespace PCRCaculator.SQL
         public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get; private set; }
         public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get; private set; }
+        public Dictionary<int, EnemyData> MirageEnemyParameterDic { get; private set; }
+        public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
         public Dictionary<int, UnitAttackPattern> Dic5 { get; private set; }
@@ -363,6 +365,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get; private set; }
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get; private set; }
         public Dictionary<int, abyss_battle_effect> AbyssBattleEffectDic { get; private set; }
+        public Dictionary<int, mirage_battle_effect> MirageBattleEffectDic { get; private set; }
         public Dictionary<int, unit_role_data> UnitRoleDataDic { get; private set; }
         public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get; private set; }
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get; private set; }
@@ -458,6 +461,9 @@ namespace PCRCaculator.SQL
                 Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
                 .ContinueWith(_ => AbyssEnemyParameterDic = GetAbyssEnemyDataDic()));
             tasks.Add(
+                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
+                .ContinueWith(_ => MirageEnemyParameterDic = GetMirageEnemyDataDic()));
+            tasks.Add(
                 Task.WhenAll(enemyTalentWeaknessTask, talentWeaknessTask)
                     .ContinueWith(_ => WeaknessDic = GetWeaknessDict()));
             tasks.Add(
@@ -514,6 +520,22 @@ namespace PCRCaculator.SQL
                         };
                     })));
             tasks.Add(
+            Task.Run(() => MirageWaveGroupDataDic = GetWaveGroupDataDic<mirage_wave_group_data>(
+                data => data.wave_group_id,
+                data => data.wave_group_id,
+                (data, index) =>
+                {
+                    return index switch
+                    {
+                        1 => data.enemy_id_1,
+                        2 => data.enemy_id_2,
+                        3 => data.enemy_id_3,
+                        4 => data.enemy_id_4,
+                        5 => data.enemy_id_5,
+                        _ => 0,
+                    };
+                })));
+            tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
                 Task.Run(() => Dic4 = GetSkillActionDic()));
@@ -561,6 +583,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => TalentQuestBattleEffectDic = GetDatasDic<talent_quest_battle_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => AbyssBattleEffectDic = GetDatasDic<abyss_battle_effect>(a => a.id)));
+            tasks.Add(
+                Task.Run(() => MirageBattleEffectDic = GetDatasDic<mirage_battle_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => UnitRoleMasteryIdDic = GetDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
             tasks.Add(
@@ -982,6 +1006,79 @@ namespace PCRCaculator.SQL
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
             var list = GetDatas<abyss_enemy_parameter>();
+            if (list is not null)
+            {
+                int idx = 0;
+                foreach (var dd in list)
+                {
+                    EnemyData e = new EnemyData();
+                    e.enemy_id = dd.enemy_id;
+                    e.unit_id = dd.unit_id;
+                    e.name = dd.name;
+                    e.level = dd.level;
+                    e.rarity = dd.rarity;
+                    e.promotion_level = dd.promotion_level;
+                    e.baseData = dd.GetBaseData();
+                    e.union_burst_level = dd.union_burst_level;
+                    e.main_skill_lvs = new List<int>
+                {
+                    dd.main_skill_lv_1,dd.main_skill_lv_2,dd.main_skill_lv_3,dd.main_skill_lv_4,
+                    dd.main_skill_lv_5,dd.main_skill_lv_6,dd.main_skill_lv_7,dd.main_skill_lv_8,
+                    dd.main_skill_lv_9,dd.main_skill_lv_10
+                };
+                    e.ex_skill_lvs = new List<int>
+                {
+                    dd.ex_skill_lv_1,dd.ex_skill_lv_2,dd.ex_skill_lv_3,dd.ex_skill_lv_4,dd.ex_skill_lv_5,
+                };
+                    e.resist_status_id = dd.resist_status_id;
+                    e.resist_variation_id = dd.resist_variation_id;
+                    e.unique_equipment_flag_1 = dd.unique_equipment_flag_1;
+                    e.break_durability = dd.break_durability;
+                    e.virtual_hp = dd.virtual_hp;
+                    EnemyDetailData detailData = new EnemyDetailData();
+                    unit_enemy_data tp2 = dic1[dd.unit_id];
+                    detailData.unit_id = tp2.unit_id;
+                    detailData.unit_name = tp2.unit_name;
+                    detailData.prefab_id = tp2.prefab_id;
+                    detailData.motion_type = tp2.motion_type;
+                    detailData.se_type = tp2.se_type;
+                    detailData.move_speed = tp2.move_speed;
+                    detailData.search_area_width = tp2.search_area_width;
+                    detailData.atk_type = tp2.atk_type;
+                    detailData.normal_atk_cast_time = tp2.normal_atk_cast_time;
+                    detailData.cutin = tp2.cutin;
+                    detailData.visual_change_flag = tp2.visual_change_flag;
+                    detailData.comment = tp2.comment;
+                    e.detailData = detailData;
+                    EnemySkillData skillData = new EnemySkillData();
+
+                    if (!unitSkillDataDic.ContainsKey(e.unit_id) || !unitAttackPatternDic.ContainsKey(e.unit_id)) continue;
+
+                    var skList = unitSkillDataDic[e.unit_id];//GetDatas<unit_skill_data>(a => a.unit_id == e.unit_id)[0];
+                    skillData.UB = skList.union_burst;
+                    skillData.raw_data = skList;
+                    skillData.MainSkills = skList.GetMainSkillIDs();
+                    skillData.enemyAttackPatterns = new List<UnitAttackPattern>();
+                    var list0 = unitAttackPatternDic[e.unit_id];//GetDatas<unit_attack_pattern>(a=>a.unit_id == e.unit_id);
+                    foreach (var dd3 in list0)
+                    {
+                        UnitAttackPattern attackPattern = new UnitAttackPattern(dd3.pattern_id, dd3.unit_id, dd3.loop_start, dd3.loop_end, dd3.GetAllPatterns().ToArray());
+                        skillData.enemyAttackPatterns.Add(attackPattern);
+                    }
+                    e.skillData = skillData;
+
+                    dic.Add(e.enemy_id, e);
+                    idx++;
+                }
+            }
+            return dic;
+        }
+        private Dictionary<int, EnemyData> GetMirageEnemyDataDic()
+        {
+            Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
+            //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
+
+            var list = GetDatas<mirage_enemy_parameter>();
             if (list is not null)
             {
                 int idx = 0;

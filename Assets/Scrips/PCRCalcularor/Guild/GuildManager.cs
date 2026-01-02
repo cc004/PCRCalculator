@@ -47,7 +47,8 @@ namespace PCRCaculator.Guild
         public List<Dropdown> dropdowns_ChooseTalentQuestBoss;
         public List<Dropdown> dropdowns_ChooseAbyssBoss;
         public List<Dropdown> dropdowns_ChooseSecretDungeonBoss;
-        public Image bossImage_ChooseBoss;
+        public List<Dropdown> dropdowns_ChooseMirageBoss;
+        public List<Image> bossImage_ChooseBoss;
         public List<Toggle> toggles_ChooseBoss;
         public Toggle usePlayerSettingHP;
         public InputField currentHPinput;
@@ -183,6 +184,20 @@ namespace PCRCaculator.Guild
                 return MainManager.Instance.AbyssWaveGroupDataDic;
             }
         }
+        public static Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic
+        {
+            get
+            {
+                return MainManager.Instance.MirageWaveGroupDataDic;
+            }
+        }
+        public static Dictionary<int, EnemyData> MirageEnemyParameterDic
+        {
+            get
+            {
+                return MainManager.Instance.MirageEnemyParameterDic;
+            }
+        }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> EnemyMPartsDic
         {
             get => MainManager.Instance.EnemyMPartsDic;
@@ -190,6 +205,7 @@ namespace PCRCaculator.Guild
         public int BossType => selectedBossEnemyids[0] / 100000000;
         public bool IsGuildBoss { get => BossType == 4; }
         public bool IsDungeonBoss { get => BossType == 5; }
+        public bool IsMirageBoss { get => BossType == 7; }
         public bool IsTalentQuestBoss { get => BossType == 8; }
         public bool IsAbyssBoss { get => BossType == 9; }
         public Dropdown dungeonDropdown;
@@ -436,9 +452,11 @@ namespace PCRCaculator.Guild
                     enemyid_0 = guildEnemyDatas[GetClanBattleID()].enemyIds[0][dropdowns_ChooseBoss[0].value];
                     //Path = "GuildEnemy/icon_unit_" + enemyDataDic[enemyid_0].unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                    bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
-
-
+                    for (int i = 0; i < 5; i++)
+                    {
+                        bossImage_ChooseBoss[0].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[enemyid_0].unit_id);
+                        bossImage_ChooseBoss[i].SetActive(i == 0);
+                    }
                 }
                 else
                 {
@@ -484,7 +502,7 @@ namespace PCRCaculator.Guild
 
             // 构造wave_group_id
             // 格式: 8 + firstOption(第2位) + 001(第3-5位固定) + secondOption-1*10 + thirdOption(第5-7位) + 1(最后1位)
-            string waveGroupIdStr = $"8{firstOption}001{(secondOption - 1)*10 + thirdOption:D3}1";
+            string waveGroupIdStr = $"8{firstOption}001{(secondOption - 1) * 10 + thirdOption:D3}1";
 
             if (int.TryParse(waveGroupIdStr, out int waveGroupId))
             {
@@ -492,13 +510,7 @@ namespace PCRCaculator.Guild
                 var matchingData = TalentQuestWaveGroupDataDic?.Values
                     .FirstOrDefault(data => data.wave_group_id == waveGroupId);
                 specialEnemyid = matchingData.enemy_ids.ToArray();
-                var enemyData = TalentQuestEnemyParameterDic[specialEnemyid[0]];
-                int prefabId = enemyData.detailData.prefab_id;
-                if (enemyData.detailData.visual_change_flag == 1)
-                {
-                    prefabId += enemyData.rarity * 10;
-                }
-                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
+                SetBossImages(specialEnemyid, TalentQuestEnemyParameterDic);
             }
             else
             {
@@ -584,13 +596,7 @@ namespace PCRCaculator.Guild
                 var matchingData = AbyssWaveGroupDataDic?.Values
                     .FirstOrDefault(data => data.wave_group_id == waveGroupId);
                 specialEnemyid = matchingData.enemy_ids.ToArray();
-                var enemyData = AbyssEnemyParameterDic[specialEnemyid[0]];
-                int prefabId = enemyData.detailData.prefab_id;
-                if (enemyData.detailData.visual_change_flag == 1)
-                {
-                    prefabId += enemyData.rarity * 10;
-                }
-                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
+                SetBossImages(specialEnemyid, AbyssEnemyParameterDic);
             }
             else
             {
@@ -632,13 +638,70 @@ namespace PCRCaculator.Guild
                 var matchingData = SecretDungeonWaveGroupDataDic?.Values
                     .FirstOrDefault(data => data.wave_group_id == waveGroupId);
                 specialEnemyid = matchingData.enemy_ids.ToArray();
-                var enemyData = EnemyDataDic[specialEnemyid[0]];
-                int prefabId = enemyData.detailData.prefab_id;
-                if (enemyData.detailData.visual_change_flag == 1)
+                SetBossImages(specialEnemyid, EnemyDataDic);
+            }
+            else
+            {
+                Debug.LogError($"无法解析wave_group_id字符串: {waveGroupIdStr}");
+            }
+        }
+        public void UpdateMirageDropdownOptions()
+        {
+            Dropdown floorDropdown = dropdowns_ChooseMirageBoss[1];
+            floorDropdown.ClearOptions();
+
+            List<string> floorDropdownOptions = new List<string>();
+
+            if (MirageWaveGroupDataDic != null)
+            {
+                int selectedFirstOption = dropdowns_ChooseMirageBoss[0].value;
+                int targetPrefix;
+
+                // 根据dropdowns_ChooseMirageBoss[0]的值确定目标前缀
+                if (selectedFirstOption == 0)
                 {
-                    prefabId += enemyData.rarity * 10;
+                    targetPrefix = 7500;
                 }
-                bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
+                else
+                {
+                    targetPrefix = 7600 + selectedFirstOption;
+                }
+
+                // 筛选符合条件的wave_group_id
+                var optionCount = MirageWaveGroupDataDic.Values
+                    .Where(data => data.wave_group_id / 100000 == targetPrefix)
+                    .ToList().Count;
+
+                for (int i = 1; i <= optionCount; i++)
+                {
+                    floorDropdownOptions.Add($"第{i}层");
+                }
+            }
+
+            floorDropdown.AddOptions(floorDropdownOptions);
+        }
+        public void OnChooseMirageDropDownChanged()
+        {
+            int firstOption = dropdowns_ChooseMirageBoss[0].value;
+            int secondOption = dropdowns_ChooseMirageBoss[1].value + 1;
+            string waveGroupIdStr = "";
+            if (firstOption == 0)
+            {
+                waveGroupIdStr += $"75";
+            }
+            else
+            {
+                waveGroupIdStr += $"76";
+            }
+            waveGroupIdStr += $"{firstOption:D2}00{secondOption:D2}1";
+
+            if (int.TryParse(waveGroupIdStr, out int waveGroupId))
+            {
+                WaveGroupId = waveGroupId;
+                var matchingData = MirageWaveGroupDataDic?.Values
+                    .FirstOrDefault(data => data.wave_group_id == waveGroupId);
+                specialEnemyid = matchingData.enemy_ids.ToArray();
+                SetBossImages(specialEnemyid, MirageEnemyParameterDic);
             }
             else
             {
@@ -700,8 +763,9 @@ namespace PCRCaculator.Guild
                 {
                     //string Path = "GuildEnemy/icon_unit_" + data.unit_id;
                     //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                    bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, data.unit_id);
+                    // bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, data.unit_id);
                     specialEnemyid = bossid;
+                    SetBossImages(specialEnemyid, EnemyDataDic);
                 }
                 else
                 {
@@ -738,6 +802,10 @@ namespace PCRCaculator.Guild
                 {
                     OnChooseAbyssDropDownChanged();
                 }
+                else if (toggles_ChooseType[4].isOn)
+                {
+                    OnChooseMirageDropDownChanged();
+                }
                 enemyId = specialEnemyid;
             }
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
@@ -754,12 +822,35 @@ namespace PCRCaculator.Guild
             group.dungeonMonth = dropdowns_ChooseSecretDungeonBoss[0].value;
             group.dungeonDay = dropdowns_ChooseSecretDungeonBoss[1].value;
             group.dungeonFloor = dropdowns_ChooseSecretDungeonBoss[2].value;
+            group.mirageArea = dropdowns_ChooseMirageBoss[0].value;
+            group.mirageFloor = dropdowns_ChooseMirageBoss[1].value;
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
             group.waveGroupId = WaveGroupId;
             SaveDataToJson();
             Refresh();
+        }
+        private void SetBossImages(int[] enemyIds, Dictionary<int, EnemyData> enemyDataDic)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (i < enemyIds.Length)
+                {
+                    var enemyData = enemyDataDic[enemyIds[i]];
+                    int prefabId = enemyData.detailData.prefab_id;
+                    if (enemyData.detailData.visual_change_flag == 1)
+                    {
+                        prefabId += enemyData.rarity * 10;
+                    }
+                    bossImage_ChooseBoss[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
+                    bossImage_ChooseBoss[i].SetActive(i <= enemyIds.Length);
+                }
+                else
+                {
+                    bossImage_ChooseBoss[i].SetActive(false);
+                }
+            }
         }
         public int GetGuildBossID(int clanBattleID, int num, int turn)
         {
@@ -902,6 +993,7 @@ namespace PCRCaculator.Guild
             return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data :
                    IsTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] :
                    IsAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
+                   IsMirageBoss ? MirageEnemyParameterDic[enemy_id] :
                    EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
@@ -921,6 +1013,10 @@ namespace PCRCaculator.Guild
             RefreshCharacterGroupToggle();
             CreateMonthDropDown();
             var data = SettingData.GetCurrentPlayerGroup();
+            if (MirageWaveGroupDataDic == null || MirageWaveGroupDataDic.Count == 0)
+            {
+                toggles_ChooseType[4].SetActive(false);
+            }
             SetChooseBossDropDown(data.currentGuildMonth);
             //dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
@@ -935,6 +1031,8 @@ namespace PCRCaculator.Guild
             dropdowns_ChooseSecretDungeonBoss[0].value = data.dungeonMonth;
             dropdowns_ChooseSecretDungeonBoss[1].value = data.dungeonDay;
             dropdowns_ChooseSecretDungeonBoss[2].value = data.dungeonFloor;
+            dropdowns_ChooseMirageBoss[0].value = data.mirageArea;
+            dropdowns_ChooseMirageBoss[1].value = data.mirageFloor;
             //toggles_ChooseBoss.isOn = SettingData.isViolent;
             if (data.isViolent)
                 toggles_ChooseBoss[0].isOn = true;
@@ -950,6 +1048,9 @@ namespace PCRCaculator.Guild
                     break;
                 case 5:
                     toggles_ChooseType[3].isOn = true;
+                    break;
+                case 7:
+                    toggles_ChooseType[4].isOn = true;
                     break;
             }
             //FinishChooseBossButton();
@@ -1015,6 +1116,15 @@ namespace PCRCaculator.Guild
                     .Cast<object>()
                     .ToList();
             }
+            else if (IsMirageBoss)
+            {
+                battleEffects = MainManager.Instance.MirageBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
 
             // 加载精灵图集
             var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
@@ -1061,6 +1171,10 @@ namespace PCRCaculator.Guild
                     toggles_ChooseType[3].isOn = true;
                     OnChooseSecretDungeonDropDownChanged();
                     break;
+                case 7:
+                    toggles_ChooseType[4].isOn = true;
+                    OnChooseMirageDropDownChanged();
+                    break;
                 default:
                     toggles_ChooseType[0].isOn = true;
                     OnChooseBossDropDownChanged();
@@ -1076,7 +1190,7 @@ namespace PCRCaculator.Guild
                 playerData = SettingData.addedPlayerDatas[SettingData.currentPlayerGroupNum];
             }*/
             UpdateTooglesChooseType();
-            bool isMuiltBoss = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss;
+            bool isMuiltBoss = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss;
             BossObject.SetActive(!isMuiltBoss);
             TalentBossObject.SetActive(isMuiltBoss);
 
@@ -1129,7 +1243,12 @@ namespace PCRCaculator.Guild
                 dropdowns_ChooseSecretDungeonBoss[1].value = data.dungeonDay;
                 dropdowns_ChooseSecretDungeonBoss[2].value = data.dungeonFloor;
             }
-            if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss)
+            else if (IsMirageBoss)
+            {
+                dropdowns_ChooseMirageBoss[0].value = data.mirageArea;
+                dropdowns_ChooseMirageBoss[1].value = data.mirageFloor;
+            }
+            if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss)
             {
                 data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
             }
@@ -1163,7 +1282,10 @@ namespace PCRCaculator.Guild
                         {
                             enemyParam = EnemyDataDic[selectedBossEnemyids[i]];
                         }
-
+                        else if (IsMirageBoss && MirageEnemyParameterDic != null && MirageEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
+                        {
+                            enemyParam = MirageEnemyParameterDic[selectedBossEnemyids[i]];
+                        }
                         if (enemyParam != null)
                         {
                             prefab_id = enemyParam.detailData.prefab_id;
@@ -1194,7 +1316,8 @@ namespace PCRCaculator.Guild
             bossDetailTexts[0].text = data.isSpecialBoss ? "自定义" :
                                      (IsTalentQuestBoss ? dropdowns_ChooseTalentQuestBoss[0].options[dropdowns_ChooseTalentQuestBoss[0].value].text :
                                      (IsAbyssBoss ? dropdowns_ChooseAbyssBoss[0].options[dropdowns_ChooseAbyssBoss[0].value].text :
-                                     EnemyDataDic[selectedBossEnemyids[0]].name)); string str = "";
+                                     (IsMirageBoss ? dropdowns_ChooseMirageBoss[0].options[dropdowns_ChooseMirageBoss[0].value].text :
+                                     EnemyDataDic[selectedBossEnemyids[0]].name)));
             if (data.isSpecialBoss)
             {
                 bossDetailTexts[1].text = "--";
@@ -1264,6 +1387,10 @@ namespace PCRCaculator.Guild
             else if (selectedBossEnemyids[0] / 100000 == 5020)
             {
                 TalentQuestBossText.text = $"特别地下城 第{data.dungeonMonth + 1}期 D{data.dungeonDay + 1}-{data.dungeonFloor + 8}";
+            }
+            else if (IsMirageBoss)
+            {
+                TalentQuestBossText.text = $"{dropdowns_ChooseMirageBoss[0].options[dropdowns_ChooseMirageBoss[0].value].text} {dropdowns_ChooseMirageBoss[1].options[dropdowns_ChooseMirageBoss[1].value].text}";
             }
             RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
             UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
@@ -2391,6 +2518,18 @@ namespace PCRCaculator.Guild
                 des += $"D{data.dungeonDay + 1}-";
                 des += $"{data.dungeonFloor + 8}";
             }
+            else if (data.selectedEnemyIDs[0] / 100000000 == 7)
+            {
+                des += data.mirageArea switch
+                {
+                    0 => "日常",
+                    1 => "霸瞳",
+                    2 => "赞恩",
+                    3 => "弥勒",
+                    _ => data.mirageArea,
+                };
+                des += $"{data.mirageFloor + 1}";
+            }
             else
             {
                 des += (char)('A' + data.currentTurn - 1);
@@ -2443,6 +2582,8 @@ namespace PCRCaculator.Guild
         public int abyssMonth;
         public int abyssEnemyNum;
         public int abyssTurn;
+        public int mirageArea;
+        public int mirageFloor;
         public int waveGroupId;
 
         public enum LogBarrierType

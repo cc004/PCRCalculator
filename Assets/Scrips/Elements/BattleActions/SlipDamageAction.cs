@@ -134,7 +134,9 @@ namespace Elements
       HEX,
       COMPENSATION,
       POISON2,
-      CURSE2
+      CURSE2,
+      BLACK_FRAME,
+      WORLD_LIGHTNING
     }
 
     private class eSlipDamageType_DictComparer : IEqualityComparer<eSlipDamageType>

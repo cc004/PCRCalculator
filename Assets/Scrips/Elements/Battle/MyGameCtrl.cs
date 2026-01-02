@@ -98,6 +98,14 @@ namespace Elements
                 content_type = (int)eBattleCategory.TALENT_QUEST;
                 enemy_id = _tempData.waveGroupId; // TODO move in tempData
             }
+            else if (enemy_id >= 760000000)
+            {
+                content_type = (int)eBattleCategory.MIRAGE_NEMESIS;
+            }
+            else if (enemy_id >= 750000000)
+            {
+                content_type = (int)eBattleCategory.MIRAGE_FLOOR_QUEST;
+            }
             else if (enemy_id >= 500000000)
             {
                 content_type = (int)eBattleCategory.DUNGEON;
@@ -160,6 +168,11 @@ namespace Elements
                         else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
                         {
                             tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
                         else
