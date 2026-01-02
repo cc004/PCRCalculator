@@ -2641,6 +2641,10 @@ this.updateCurColor();
                 {
                     MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = data.playerSetingHP;
+                } else if (baseData.RealHp != baseData.Hp)
+                {
+                    MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
+                    Hp = (long)baseData.Hp;
                 }
                 else
                     Hp = (long)(MaxHp = MaxHpAfterPassive = (long)baseData.RealHp);
