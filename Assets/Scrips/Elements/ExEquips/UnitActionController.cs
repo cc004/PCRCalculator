@@ -70,6 +70,91 @@ namespace Elements
             return actionParameter;
         }
 
+        // RVA: 0x21A78B0 Offset: 0x21A78B0 VA: 0x21A78B0
+        private ActionParameter createExEquipActionParameter(MasterSkillAction.SkillAction _action, object _exSkillScriptable, ExSkillData _exSkillData)
+        {
+            ActionParameter actionParameter = Activator.CreateInstance(SkillDefine.SkillActionTypeDictionary[(eActionType)(ushort)_action.action_type]) as ActionParameter;
+            actionParameter.TargetSort = (PriorityPattern)(int)_action.target_type;
+            actionParameter.TargetNth = _action.target_number;
+            actionParameter.TargetNum = _action.target_count;
+            actionParameter.TargetWidth = (((int)_action.target_range <= 0) ? Owner.SearchAreaSize : ((float)(int)_action.target_range));
+            actionParameter.ActionType = (eActionType)(ushort)_action.action_type;
+            actionParameter.ActionDetail1 = _action.action_detail_1;
+            actionParameter.ActionDetail2 = _action.action_detail_2;
+            actionParameter.ActionDetail3 = _action.action_detail_3;
+            actionParameter.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer());
+            actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)_action.action_value_1);
+            actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)_action.action_value_2);
+            actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)_action.action_value_3);
+            actionParameter.Value.Add(eValueNumber.VALUE_4, (float)(double)_action.action_value_4);
+            actionParameter.Value.Add(eValueNumber.VALUE_5, (float)(double)_action.action_value_5);
+            actionParameter.Value.Add(eValueNumber.VALUE_6, (float)(double)_action.action_value_6);
+            actionParameter.Value.Add(eValueNumber.VALUE_7, (float)(double)_action.action_value_7);
+            actionParameter.MasterData = _action;
+            actionParameter.ActionEffectList = new List<NormalSkillEffect>();
+            actionParameter.ActionExecTimeList = new List<ActionExecTime>
+            {
+                new ActionExecTime
+                {
+                    Weight = 1f,
+                    DamageNumType = eDamageEffectType.NORMAL
+                }
+            };
+            actionParameter.ActionWeightSum = 1f;
+            actionParameter.ExecTime = new float[1];
+            
+            // if (_exSkillScriptable != null)
+            // {
+            //     var scriptable = _exSkillScriptable as ExSkillScriptable;
+            //     if (scriptable != null)
+            //     {
+            //         actionParameter.KnockAnimationCurve = scriptable.KnockAnimationCurve;
+            //         actionParameter.KnockDownAnimationCurve = scriptable.KnockDownAnimationCurve;
+            //         actionParameter.EffectType = scriptable.EffectType;
+            //     }
+            // }
+
+            actionParameter.DepenedActionId = _action.DependActionId;
+            actionParameter.ActionId = _action.action_id;
+            actionParameter.TargetList = new List<BasePartsData>();
+            actionParameter.ActionChildrenIndexes = new List<int>();
+            actionParameter.TargetAssignment = (eTargetAssignment)(int)_action.target_assignment;
+            actionParameter.Direction = (DirectionType)(int)_action.target_area;
+
+            if (actionParameter.ActionType == eActionType.EX_START_PASSIVE)
+            {
+                if (_exSkillData != null && _exSkillData.ExSkillConditionData != null)
+                {
+                    _exSkillData.ExSkillConditionData.Add(eExSkillCondition.START, new ExConditionPassiveData());
+                }
+            }
+            else if (actionParameter.ActionType == eActionType.EX_CONDITION_PASSIVE)
+            {
+                float coolTime = (float)actionParameter.Value[eValueNumber.VALUE_4];
+                if (coolTime > 0f)
+                {
+                    if (_exSkillData != null)
+                    {
+                        _exSkillData.UseCoolTime = true;
+                    }
+                }
+
+                if (_exSkillData != null && _exSkillData.ExSkillConditionData != null)
+                {
+                    _exSkillData.ExSkillConditionData.Add((eExSkillCondition)actionParameter.ActionDetail1, new ExConditionPassiveData
+                    {
+                        EffectType = (ExConditionPassiveData.eEffectType)actionParameter.ActionDetail2,
+                        HitRate = (float)((float)actionParameter.Value[eValueNumber.VALUE_1] + actionParameter.Value[eValueNumber.VALUE_2] * (float)(int)Owner.Level),
+                        Value = actionParameter.Value[eValueNumber.VALUE_3],
+                        CoolTime = coolTime,
+                        IconType = (eStateIconType)(int)actionParameter.Value[eValueNumber.VALUE_5]
+                    });
+                }
+            }
+            return actionParameter;
+        }
+
+
         public Skill CreateExSkill(int _id, object _exSkillScriptable, ExSkillData _exSkillData)
         {
             Skill skill = new Skill();
@@ -81,7 +166,7 @@ namespace Elements
 
             foreach (var action in skillData.ActionDataList)
             {
-                skill.ActionParameters.Add(createActionParameter(action, _exSkillScriptable, _exSkillData)); // TODO change to createExEquipActionParameter
+                skill.ActionParameters.Add(createExEquipActionParameter(action, _exSkillScriptable, _exSkillData));
                 skill.ActionParameters[skill.ActionParameters.Count - 1].IsExEquipSkillAction = true; // temporary fix
             }
 

@@ -1439,7 +1439,7 @@ namespace Elements
 
         public eUnitRespawnPos SummonRespawnPos { get; set; }
 
-        public bool WaveStartIdle { get; set; } // TODO find where use
+        public bool WaveStartIdle { get; set; }
 
         public bool IdleOnly
         {
@@ -2014,9 +2014,9 @@ namespace Elements
 
         public long AbnormalStateDodgeResistZero => Math.Min(2000000000, Math.Max(0, AbnormalStateDodgeResist));
 
-        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance)); // TODO check use
+        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance));
 
-        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance)); // TODO sealbuffdebuff action
+        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance));
 
         public long DebuffEnhanceZero => Math.Min(2000000000, Math.Max(0, DebuffEnhance));
 

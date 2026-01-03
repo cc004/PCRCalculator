@@ -693,7 +693,6 @@ namespace Elements
         }
 
         // RVA: 0x35B5C08 Offset: 0x35B5C08 VA: 0x35B5C08
-        // TODO use in enchant trigger action
         public void ExecSkillWithTargetId(Skill _skill, int _actionId)
         {
             bool hasNoTarget = false;
