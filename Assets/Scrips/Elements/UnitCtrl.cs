@@ -4926,6 +4926,8 @@ this.updateCurColor();
                     case eAbnormalState.WORLD_LIGHTNING:
                     case eAbnormalState.POISON2:
                     case eAbnormalState.CURSE2:
+                    case eAbnormalState.BLACK_FRAME:
+                    case eAbnormalState.RATIO_SLIP:
                         OnSlipDamage.Call();
                         break;
                     case eAbnormalState.CONVERT:
