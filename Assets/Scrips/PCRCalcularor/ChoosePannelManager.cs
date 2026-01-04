@@ -995,12 +995,23 @@ namespace PCRCaculator
                         for (int i = 0; i < subItems.Length; i++)
                         {
                             var subItem = subItems[i];
-                            var statusKeys = exEquipData.status.Keys.Select(k =>
+                            int typeIndex = 0;
+                            var statusKeys = exEquipData.status.Keys.Select((k, index) =>
                             {
-                                if (k is Enum enumKey)
+                                if (k is eParamType enumKey)
                                 {
+                                    //饰品攻击其余贯通
+                                    bool isAtkType = enumKey == eParamType.MAGIC_ATK || enumKey == eParamType.ATK;
+                                    bool isPenetrateType = enumKey == eParamType.PHYSICAL_PENETRATE || enumKey == eParamType.MAGIC_PENETRATE;
+
+                                    if ((exEquipData.category > 300 && isAtkType) || (exEquipData.category <= 300 && isPenetrateType))
+                                    {
+                                        typeIndex = index;
+                                    }
+
                                     return enumKey.GetDescription();
                                 }
+
                                 return k.ToString();
                             }).ToList();
                             subItem.typeOption.SetActive(true);
@@ -1015,7 +1026,7 @@ namespace PCRCaculator
                             {
                                 UpdateValueOptions(equipIndex, subItemIndex);
                             });
-                            subItem.typeOption.value = exEquipData.category > 300 ? 1 : statusKeys.Count - 1; //饰品物攻其余贯通
+                            subItem.typeOption.value = typeIndex;
                         }
                     }
                     else
