@@ -541,7 +541,7 @@ namespace PCRCaculator
             }
             return result;
         }
-        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4}
+        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4,EX装备=5,EX装备类型=6 }
         public static Sprite GetSprites(SpriteType type, int id)
         {
             string assetName = "";
@@ -561,6 +561,12 @@ namespace PCRCaculator
                     break;
                 case SpriteType.技能图标:
                     assetName = "icon_icon_skill_" + id + ".unity3d";
+                    break;
+                case SpriteType.EX装备:
+                    assetName = "icon_icon_extra_equip_" + id + ".unity3d";
+                    break;
+                case SpriteType.EX装备类型:
+                    assetName = "icon_icon_extra_equip_category_" + id + ".unity3d";
                     break;
             }
             if (spriteDic.TryGetValue(assetName, out Sprite value))

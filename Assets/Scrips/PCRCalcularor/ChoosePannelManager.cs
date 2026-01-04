@@ -35,7 +35,7 @@ namespace PCRCaculator
                 };
                 equip_id = data.ex_equipment_id;
                 text = $"{color}-{data.name}";
-                image = Resources.Load<Sprite>($"extraequip/icon_extra_equip_{equip_id}");
+                image = ABExTool.GetSprites(ABExTool.SpriteType.EX装备, equip_id);
             }
 
             private ExEquipOption()
@@ -1015,6 +1015,7 @@ namespace PCRCaculator
                             {
                                 UpdateValueOptions(equipIndex, subItemIndex);
                             });
+                            subItem.typeOption.value = exEquipData.category > 300 ? 1 : statusKeys.Count - 1; //饰品物攻其余贯通
                         }
                     }
                     else
@@ -1104,6 +1105,7 @@ namespace PCRCaculator
 
                                 subItem.valueOption.ClearOptions();
                                 subItem.valueOption.AddOptions(valueOptions);
+                                subItem.valueOption.value = valueOptions.Count - 1;//默认最大值
                             }
                         }
                     }

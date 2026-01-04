@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Elements;
 using TMPro;
 using UnityEngine;
@@ -48,9 +49,9 @@ namespace PCRCaculator
                 numText.gameObject.SetActive(false);
             }
         }
-        public void SetExEquipmentIcon(int equipmentid, int exlevel, int j = 0)
+        public void SetExEquipmentIcon(int unitId, int equipmentid, int exlevel, int j = 0)
         {
-            Sprite loadedSprite = Resources.Load<Sprite>($"extraequip/icon_extra_equip_{equipmentid}");
+            Sprite loadedSprite = ABExTool.GetSprites(ABExTool.SpriteType.EX装备, equipmentid);
             if (loadedSprite != null)
             {
                 equipmentIcon.sprite = loadedSprite;
@@ -61,7 +62,8 @@ namespace PCRCaculator
             else
             {
                 // 如果找不到指定的装备图标，则使用默认图标
-                Sprite defaultSprite = Resources.Load<Sprite>($"extraequip/icon_extra_equip_category_{j + 1}01");
+                int category = MainManager.Instance.UnitExEquips[unitId][j].FirstOrDefault().Value.category;
+                Sprite defaultSprite = ABExTool.GetSprites(ABExTool.SpriteType.EX装备类型, category);
                 equipmentIcon.sprite = defaultSprite;
                 levelIcon.SetActive(false);
             }
