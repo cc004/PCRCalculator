@@ -16,7 +16,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using SFB;
-using UnityEngine.TestTools.Constraints;
 namespace PCRCaculator.Guild
 {
     public class GuildManager : MonoBehaviour
@@ -241,6 +240,10 @@ namespace PCRCaculator.Guild
         public bool IsDungeonBossId(int Id)
         {
             return Id / 100000000 == 5;
+        }
+        public bool IsMirageBossId(int Id)
+        {
+            return Id / 100000000 == 7;
         }
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()

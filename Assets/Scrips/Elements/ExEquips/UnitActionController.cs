@@ -82,7 +82,7 @@ namespace Elements
             actionParameter.ActionDetail1 = _action.action_detail_1;
             actionParameter.ActionDetail2 = _action.action_detail_2;
             actionParameter.ActionDetail3 = _action.action_detail_3;
-            actionParameter.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer());
+            actionParameter.Value = new ValueDictionary();
             actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)_action.action_value_1);
             actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)_action.action_value_2);
             actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)_action.action_value_3);

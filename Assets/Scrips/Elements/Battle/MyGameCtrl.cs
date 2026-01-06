@@ -419,7 +419,7 @@ namespace Elements
                         {
                             if (a != 0)
                             {
-                                tempData.MPartsDataDic.Add(a, GuildManager.Instance.GetEnemyDataByID(a, false, boss_id: enemyid_0));                        
+                                tempData.MPartsDataDic.Add(a, GuildManager.Instance.GetEnemyDataByID(a, boss_id: enemyid_0));                        
                             }
                         };
                         action(value.child_enemy_parameter_1);
