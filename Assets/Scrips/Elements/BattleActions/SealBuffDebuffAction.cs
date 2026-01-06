@@ -98,6 +98,36 @@ namespace Elements
             sealBuffDebuffData.UpdateValue(displayCount);
             sealBuffDebuffData.StartTimer();
         }
+        public override DoubleWithEx GetActionBaseValue(UnitCtrl _source, eValueNumber _type)
+        {
+            // 默认值
+            DoubleWithEx value = 0.0;
+
+            Value.TryGetValue(_type, out value);
+
+            if (_type != eValueNumber.VALUE_2)
+                return value;
+
+            UnitCtrl.BuffParamKind paramKind = BuffDebuffAction.GetChangeParamKind(ActionDetail1);
+
+            if (!BuffDebuffAction.BUFF_DEBUFF_ENHANCE_TARGET_TYPE.Contains(paramKind))
+                return value;
+
+            if (IsExEquipSkillAction)
+                return value;
+
+            long enhanceZero = 0;
+            if (_source != null)
+            {
+                if (ActionDetail1 % 10 != 1)
+                    enhanceZero = _source.BuffEnhanceZero;
+                else
+                    enhanceZero = _source.DebuffEnhanceZero;
+            }
+
+            double rate = enhanceZero / 10000.0 + 1.0;
+            return value * rate;
+        }
 
         // RVA: 0x3107ED0 Offset: 0x3107ED0 VA: 0x3107ED0 Slot: 9
         public override void SetLevel(float _level)

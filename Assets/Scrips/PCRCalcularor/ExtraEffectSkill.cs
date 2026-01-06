@@ -37,7 +37,15 @@ namespace PCRCaculator
                     .Cast<object>()
                     .ToList();
             }
-
+            else if (GuildManager.Instance.IsMirageBoss)
+            {
+                battleEffects = MainManager.Instance.MirageBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
             if (battleEffects.Count > 0)
             {
                 var firstEffect = battleEffects[0];

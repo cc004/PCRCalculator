@@ -19,7 +19,9 @@ namespace ActionParameterSerializer.Actions
             HEX,
             COMPENSATION,
             POISON2,
-            CURSE2
+            CURSE2,
+            BLACK_FRAME,
+            WORLD_LIGHTNING
         }
 
         public override string localizedDetail(int level, Property property)

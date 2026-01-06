@@ -957,7 +957,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_40
+      name: 33
       rect:
         serializedVersion: 2
         x: 389
@@ -1804,6 +1804,7 @@ TextureImporter:
       25: 1424385556
       26: -673246404
       3: 91483858
+      33: -1896570772
       34: -845522429
       4: -891424294
       5: -1571883520
@@ -1825,7 +1826,6 @@ TextureImporter:
       AtlasTalentQuest_33: -777977200
       AtlasTalentQuest_35: 708209630
       AtlasTalentQuest_37: 749299852
-      AtlasTalentQuest_40: -1896570772
       AtlasTalentQuest_46: 1360805372
       AtlasTalentQuest_49: -1646420635
       AtlasTalentQuest_5: -756623791

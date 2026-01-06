@@ -109,7 +109,7 @@ namespace PCRApi
         public void DownloadChildren(string urlroot)
         {
             if (IsAssets) return;
-
+            if (url == "manifest/mre2_assetmanifest") return; //佐贺僵尸联动活动报错
             children = FromUrl(urlroot, url, @class);
         }
 

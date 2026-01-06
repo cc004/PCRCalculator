@@ -749,5 +749,7 @@
   "s_hp_asc_without_owner": "除自身以外当前HP%s低的",
   "hp_asc_without_owner": "除自身以外当前HP最低的",
   "all_slip_damage_up": "使自身受到的所有异常伤害变为原来的 [%1$s] 倍，异常伤害最大值为 [%2$s]，持续时间 [%3$s] 秒。",
-  "special_slip_damage_up": "使自身受到的 [%1$s] 异常伤害变为原来的 [%2$s] 倍，异常伤害最大值为 [%3$s]，持续时间 [%4$s] 秒。"
+  "special_slip_damage_up": "使自身受到的 [%1$s] 异常伤害变为原来的 [%2$s] 倍，异常伤害最大值为 [%3$s]，持续时间 [%4$s] 秒。",
+  "recover_tp_by_damage_divided_by_s1": "由此造成的受击TP变为原来的 [%1$s] %。",
+  "Reduce_s1_percent_damage_taken_from_sealed_attacks_for_s2_sec_up_to_s3_times_by_sealing_s4_actions": "追加 [%3%s] 个标记，每当我方单位受到伤害时，消耗一个标记，并且伤害减少 [%1$s%%]，持续时间 [%2$s] 秒，并执行动作 [%4$s] 。"
 }

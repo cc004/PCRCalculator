@@ -935,7 +935,7 @@ namespace PCRCaculator.Battle
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    screenshootEx.SetExEquipmentIcon(myGameCtrl.tempData.playerList[i].exEquip[j], myGameCtrl.tempData.playerList[i].exEquipLevel[j], j);
+                    screenshootEx.SetExEquipmentIcon(myGameCtrl.tempData.playerList[i].unitId, myGameCtrl.tempData.playerList[i].exEquip[j], myGameCtrl.tempData.playerList[i].exEquipLevel[j], j);
                     yield return null;
                     yield return new WaitForEndOfFrame();
                     byte[] equipBytes = SaveRenderTexture(screenShootTx);

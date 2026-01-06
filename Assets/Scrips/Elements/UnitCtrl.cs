@@ -1455,7 +1455,7 @@ namespace Elements
 
         public eUnitRespawnPos SummonRespawnPos { get; set; }
 
-        public bool WaveStartIdle { get; set; } // TODO find where use
+        public bool WaveStartIdle { get; set; }
 
         public bool IdleOnly
         {
@@ -2030,9 +2030,9 @@ namespace Elements
 
         public long AbnormalStateDodgeResistZero => Math.Min(2000000000, Math.Max(0, AbnormalStateDodgeResist));
 
-        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance)); // TODO check use
+        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance));
 
-        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance)); // TODO sealbuffdebuff action
+        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance));
 
         public long DebuffEnhanceZero => Math.Min(2000000000, Math.Max(0, DebuffEnhance));
 
@@ -2655,6 +2655,10 @@ this.updateCurColor();
                 {
                     MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = data.playerSetingHP;
+                } else if (baseData.RealHp != baseData.Hp)
+                {
+                    MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
+                    Hp = (long)baseData.Hp;
                 }
                 else
                     Hp = (long)(MaxHp = MaxHpAfterPassive = (long)baseData.RealHp);
@@ -4994,6 +4998,8 @@ this.updateCurColor();
                     case eAbnormalState.WORLD_LIGHTNING:
                     case eAbnormalState.POISON2:
                     case eAbnormalState.CURSE2:
+                    case eAbnormalState.BLACK_FRAME:
+                    case eAbnormalState.RATIO_SLIP:
                         OnSlipDamage.Call();
                         break;
                     case eAbnormalState.CONVERT:

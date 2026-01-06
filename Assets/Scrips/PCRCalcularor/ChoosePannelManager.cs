@@ -35,7 +35,7 @@ namespace PCRCaculator
                 };
                 equip_id = data.ex_equipment_id;
                 text = $"{color}-{data.name}";
-                image = Resources.Load<Sprite>($"extraequip/icon_extra_equip_{equip_id}");
+                image = ABExTool.GetSprites(ABExTool.SpriteType.EX装备, equip_id);
             }
 
             private ExEquipOption()
@@ -998,12 +998,23 @@ namespace PCRCaculator
                         for (int i = 0; i < subItems.Length; i++)
                         {
                             var subItem = subItems[i];
-                            var statusKeys = exEquipData.status.Keys.Select(k =>
+                            int typeIndex = 0;
+                            var statusKeys = exEquipData.status.Keys.Select((k, index) =>
                             {
-                                if (k is Enum enumKey)
+                                if (k is eParamType enumKey)
                                 {
+                                    //饰品攻击其余贯通
+                                    bool isAtkType = enumKey == eParamType.MAGIC_ATK || enumKey == eParamType.ATK;
+                                    bool isPenetrateType = enumKey == eParamType.PHYSICAL_PENETRATE || enumKey == eParamType.MAGIC_PENETRATE;
+
+                                    if ((exEquipData.category > 300 && isAtkType) || (exEquipData.category <= 300 && isPenetrateType))
+                                    {
+                                        typeIndex = index;
+                                    }
+
                                     return enumKey.GetDescription();
                                 }
+
                                 return k.ToString();
                             }).ToList();
                             subItem.typeOption.SetActive(true);
@@ -1018,6 +1029,7 @@ namespace PCRCaculator
                             {
                                 UpdateValueOptions(equipIndex, subItemIndex);
                             });
+                            subItem.typeOption.value = typeIndex;
                         }
                     }
                     else
@@ -1107,6 +1119,7 @@ namespace PCRCaculator
 
                                 subItem.valueOption.ClearOptions();
                                 subItem.valueOption.AddOptions(valueOptions);
+                                subItem.valueOption.value = valueOptions.Count - 1;//默认最大值
                             }
                         }
                     }

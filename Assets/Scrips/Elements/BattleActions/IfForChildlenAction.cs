@@ -146,6 +146,14 @@ namespace Elements
                         flag = _target.Owner.SealDictionary.ContainsKey(eStateIconType) && ((_valueDictinary[eValueNumber.VALUE_3] != 0f) ? ((float)_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() >= _valueDictinary[eValueNumber.VALUE_3]) : (_target.Owner.SealDictionary[eStateIconType].GetCurrentCount() > 0));
                         break;
                     }
+                    else if (ActionDetail1 >= 4000)
+                    {
+                        int talent_id = ActionDetail1 - 4000;
+                        if (_target.Owner.TalentIds.Contains(talent_id))
+                        {
+                            flag = true;
+                        }
+                    }
                     else if ((ActionDetail1 & ~1) == 2000)
                     {
                         var filterUnit = new HashSet<UnitCtrl>();
@@ -176,7 +184,7 @@ namespace Elements
                         flag = _target.Owner.IsAbnormalState(abnormalState);
                         break;
                     }
-                    if (ActionDetail1 > 900)
+                    else if (ActionDetail1 > 900)
                     {
                         flag = (long)_target.Owner.Hp / (double)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
 
@@ -205,7 +213,7 @@ namespace Elements
 #endif
                         break;
                     }
-                    if (ActionDetail1 > 700)
+                    else if (ActionDetail1 > 700)
                     {
                         flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner)).Count == ActionDetail1 - 700;
                         break;
