@@ -34,7 +34,8 @@ namespace PCRCaculator
                     _ => "未知"
                 };
                 equip_id = data.ex_equipment_id;
-                text = $"{color}-{data.name}";
+                var name = MainManager.Instance.databaseCache.exEquipmentName_cn.TryGetValue(equip_id, out var cnName) ? cnName : data.name;
+                text = $"{color}-{name}";
                 image = ABExTool.GetSprites(ABExTool.SpriteType.EX装备, equip_id);
             }
 

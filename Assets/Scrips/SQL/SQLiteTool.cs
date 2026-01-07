@@ -350,6 +350,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, unique_equip_enhance_rate[]> Dic9 { get; private set; }
         public Dictionary<int, unique_equip_enhance_rate[]> Dic92 { get; private set; }
         public Dictionary<int, string> Dic10 { get; private set; }
+        public Dictionary<int, string> ExEquipmentName_cn { get; private set; }
         public Dictionary<int, string[]> Dic11 { get; private set; }
         public Dictionary<int, string> Dic12 { get; private set; }
         public List<EReduction> eReductions { get; private set; }
@@ -555,6 +556,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => Pair = GetUnitStoryData()));
             tasks.Add(
                 Task.Run(() => Dic10 = GetUnitName_cn()));
+            tasks.Add(
+                Task.Run(() => ExEquipmentName_cn = GetExEquipmentName_cn()));
             tasks.Add(
                 Task.Run(() => Dic11 = GetSkillName_cn()));
             tasks.Add(
@@ -1260,6 +1263,16 @@ namespace PCRCaculator.SQL
             }
         }
 
+        private Dictionary<int, string> GetExEquipmentName_cn()
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            var list = GetDatas<ex_equipment_data>();
+            foreach (var dd in list)
+            {
+                dic.Add(dd.ex_equipment_id, dd.name);
+            }
+            return dic;
+        }
         private Dictionary<int, string> GetUnitName_cn()
         {
             Dictionary<int, string> dic = new Dictionary<int, string>();

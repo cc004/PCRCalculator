@@ -71,6 +71,7 @@ namespace PCRCaculator
             public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
             public Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
             public Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
+            public Dictionary<int, string> exEquipmentName_cn = new Dictionary<int, string>();//Ex装备中文名字
             public Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
             public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();
             public Dictionary<int, TeamSkillEnhanceData> teamSkillEnhanceDataDic = new Dictionary<int, TeamSkillEnhanceData>();
@@ -540,6 +541,7 @@ namespace PCRCaculator
                                 databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool.UnitRoleMasterySlotEnhanceDataDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10;
+                                databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn;
                                 databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11;
                                 databaseCache.skillActionDescribe_cn = dbTool3.Dic12;
 
@@ -588,9 +590,10 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() =>
                                     {
-                                        // var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
-                                        // databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
-                                        databaseCache.unitExEquips.OverrideWith(dbTool3.unitExEquips);
+                                        var jita = dbTool3.unitExEquips[170101];
+                                        var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
+                                        databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
+                                        databaseCache.unitExEquips[170301] = jita;
                                     }),
                                     Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
