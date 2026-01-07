@@ -1545,19 +1545,19 @@ autopcr.setOffset(2, 0); # offset calibration
                     //detailAlong = 1;
                     //detailBlong = 2;
                     worksheet3.Cells[lineNum, 1].Value = "逻辑帧";
-                    worksheet3.Cells[lineNum, 2].Value = "渲染帧";
-                    worksheet3.Cells[lineNum, 3, lineNum, 3 + charLong0 - 1].Merge = true;
-                    worksheet3.Cells[lineNum, 3].Value = enemyData.detailData.unit_name;
-                    worksheet3.Cells[lineNum, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    // worksheet3.Cells[lineNum, 2].Value = "渲染帧";
+                    worksheet3.Cells[lineNum, 2, lineNum, 2 + charLong0 - 1].Merge = true;
+                    worksheet3.Cells[lineNum, 2].Value = enemyData.detailData.unit_name;
+                    worksheet3.Cells[lineNum, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     if (detailType < 4||detailType==6)
                     {
                         for (int i = 0; i < 5; i++)
                         {
                             if (i < playerDatas.playrCharacters.Count)
                             {
-                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1), lineNum, 3 + charLong0 * (i + 2) - 1].Merge = true;
-                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
-                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1), lineNum, 2 + charLong0 * (i + 2) - 1].Merge = true;
+                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
+                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             }
                         }
                     }
@@ -1566,13 +1566,13 @@ autopcr.setOffset(2, 0); # offset calibration
                     int currentFream0 = 0;
                     foreach (var timeData in timedata)
                     {
-                        int pos = 3 + charLong0 * timeData.idx;
+                        int pos = 2 + charLong0 * timeData.idx;
                         //if (timeData.frame != currentFream0)
                         //{
                             lineNum++;
                             currentFream0 = timeData.frame;
                             worksheet3.Cells[lineNum, 1].Value = timeData.frame;
-                            worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
+                            // worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
                         //}
                         //worksheet2.Cells[lineNum, pos].Value = timeData.describeA;//.Replace(/<[^>] +>/ g, "");
                         worksheet3.Cells[lineNum, pos].Value = (detailType==2||detailType==6)?timeData.valueA:timeData.valueB;
