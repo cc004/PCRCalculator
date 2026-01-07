@@ -65,6 +65,7 @@ namespace PCRCaculator
             public Dictionary<int, talent_quest_battle_effect> talentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
             public Dictionary<int, abyss_battle_effect> abyssBattleEffectDic = new Dictionary<int, abyss_battle_effect>();
             public Dictionary<int, mirage_battle_effect> mirageBattleEffectDic = new Dictionary<int, mirage_battle_effect>();
+            public Dictionary<int, mirage_nemesis_area> mirageNemesisAreaDic = new Dictionary<int, mirage_nemesis_area>();
             public Dictionary<int, extra_effect_data> extraEffectDataDic = new Dictionary<int, extra_effect_data>();
             public Dictionary<int, talentFormationData> talentFormationDic = new Dictionary<int, talentFormationData>();
             public Dictionary<int, int[]> weaknessDic = new Dictionary<int, int[]>();//角色的弱点列表
@@ -145,6 +146,7 @@ namespace PCRCaculator
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get => databaseCache.talentQuestBattleEffectDic; }
         public Dictionary<int, abyss_battle_effect> AbyssBattleEffectDic { get => databaseCache.abyssBattleEffectDic; }
         public Dictionary<int, mirage_battle_effect> MirageBattleEffectDic { get => databaseCache.mirageBattleEffectDic; }
+        public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get => databaseCache.mirageNemesisAreaDic; }
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get => databaseCache.extraEffectDataDic; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get => databaseCache.talentFormationDic; }
         public Dictionary<int, int[]> WeaknessDic { get => databaseCache.weaknessDic; }  // 角色的弱点列表
@@ -535,6 +537,7 @@ namespace PCRCaculator
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
                                 databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic;
                                 databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic;
+                                databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic;
                                 databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;
                                 databaseCache.UnitRoleMasteryIdDic = dbTool.UnitRoleMasteryIdDic;
                                 databaseCache.UnitRoleSlotDataDic = dbTool.UnitRoleSlotDataDic;
@@ -599,8 +602,8 @@ namespace PCRCaculator
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
                                     Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
                                     Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic)),
-                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic))
-                                    // Task.Run(() => databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic))//等国服db
+                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic)),
+                                    Task.Run(() => databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic))
                                 );
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
@@ -662,7 +665,8 @@ namespace PCRCaculator
                                         Task.Run(() => databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic)),
                                         Task.Run(() => databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic)),
                                         Task.Run(() => databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic)),
-                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic))
+                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic)),
+                                        Task.Run(() => databaseCache.mirageNemesisAreaDic.Override2With(dbTool3.MirageNemesisAreaDic))
                                     );
                                 // }
                             });

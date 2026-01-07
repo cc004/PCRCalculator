@@ -372,7 +372,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get; private set; }
         public Dictionary<int, unit_role_mastery_enhance_data[]> UnitRoleMasteryEnhanceDataDic { get; private set; }
         public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic { get; private set; }
-
+        public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
         {
@@ -588,6 +588,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => AbyssBattleEffectDic = GetDatasDic<abyss_battle_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => MirageBattleEffectDic = GetDatasDic<mirage_battle_effect>(a => a.id)));
+            tasks.Add(
+                Task.Run(() => MirageNemesisAreaDic = GetDatasDic<mirage_nemesis_area>(a => a.nemesis_id)));
             tasks.Add(
                 Task.Run(() => UnitRoleMasteryIdDic = GetDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
             tasks.Add(

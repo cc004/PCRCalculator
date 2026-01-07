@@ -10,6 +10,7 @@ using SQLite4Unity3d;
 using PCRCaculator.Guild;
 using Elements;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using PCRCalcularor;
 
 namespace PCRCaculator.SQL
 {
@@ -1136,6 +1137,19 @@ namespace PCRCaculator.SQL
             };
         }
     }
+    public class mirage_nemesis_area : DbBaseData, IOverride2<mirage_nemesis_area>
+    {
+
+        public int nemesis_id { get; set; }
+        public int condition_story_id { get; set; }
+        public string nemesis_area_name { get; set; }
+        public void Override2With(mirage_nemesis_area other)
+        {
+            other.nemesis_id = nemesis_id;
+            other.condition_story_id = condition_story_id;
+            other.nemesis_area_name = nemesis_area_name;
+        }
+    }
     public class mirage_wave_group_data : DbBaseData
     {
         public int wave_group_id { get; set; }
@@ -1145,13 +1159,20 @@ namespace PCRCaculator.SQL
         public int enemy_id_4 { get; set; }
         public int enemy_id_5 { get; set; }
     }
-    public class mirage_battle_effect : DbBaseData
+    public class mirage_battle_effect : DbBaseData, IOverride2<mirage_battle_effect>
     {
         public int id { get; set; }
         public int quest_id { get; set; }
         public string icon_name { get; set; }
         public string effect_name { get; set; }
         public string description { get; set; }
+
+        public void Override2With(mirage_battle_effect other)
+        {
+            other.icon_name = icon_name;
+            other.effect_name = effect_name;
+            other.description = description;
+        }
     }
     public class mirage_enemy_parameter
     {
