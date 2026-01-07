@@ -528,6 +528,10 @@ namespace Elements
                 skinID = 170361;
                 unitid2 = 170301;
             }
+            if (unitid > 300000 && unitid < 400000)
+            {
+                skinID = ABExTool.GetPrefabId(unitid);
+            }
             if (unitid > 600000 && unitid < 700000)
             {
                 unitid2 = data.PrefabId;
