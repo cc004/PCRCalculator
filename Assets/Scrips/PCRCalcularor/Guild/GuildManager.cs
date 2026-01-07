@@ -33,7 +33,7 @@ namespace PCRCaculator.Guild
         public Text characterGroupPageText;
         public List<Text> timeLineTexts;
 
-    public GameObject characterDetailPage;
+        public GameObject characterDetailPage;
         public GameObject characterDetailPageChild;
         public CharacterPageButton characterDetailButton;
         public Action execTimeButtonAction;

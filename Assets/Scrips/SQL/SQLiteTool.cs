@@ -866,10 +866,12 @@ namespace PCRCaculator.SQL
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
-            var list = GetDatas<enemy_parameter>(a => a.enemy_id >= 400000000 && a.enemy_id <= 600000000);
+            var list = GetDatas<enemy_parameter>(a => a.enemy_id >= 400000000 && a.enemy_id <= 620000000);
             int idx = 0;
             foreach (var dd in list)
             {
+                if (!dic1.ContainsKey(dd.unit_id))
+                    continue;
                 EnemyData e = new EnemyData();
                 e.enemy_id = dd.enemy_id;
                 e.unit_id = dd.unit_id;
