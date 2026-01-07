@@ -334,8 +334,8 @@ namespace PCRCaculator
 
                         // 处理基础加成
                         var present = isRateParam ?
-                            Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) :
-                            (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                            (equip.levelMax > 0 ? Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) : Math.Ceiling(d)) :
+                            (int)(equip.levelMax > 0 ? Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) : Math.Ceiling(d));
 
                         if (isRateParam)
                         {
