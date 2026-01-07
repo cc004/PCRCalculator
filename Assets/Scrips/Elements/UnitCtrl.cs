@@ -908,6 +908,14 @@ namespace Elements
                 }
             },
             {
+                UnitCtrl.eAbnormalState.CRYSTALIZE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CRYSTALIZE,
+                    IsBuff = false
+                }
+            },
+            {
                 UnitCtrl.eAbnormalState.FLIGHT,
                 new AbnormalConstData
                 {
