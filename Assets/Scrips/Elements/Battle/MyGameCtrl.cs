@@ -98,6 +98,14 @@ namespace Elements
                 content_type = (int)eBattleCategory.TALENT_QUEST;
                 enemy_id = _tempData.waveGroupId; // TODO move in tempData
             }
+            else if (enemy_id >= 760000000)
+            {
+                content_type = (int)eBattleCategory.MIRAGE_NEMESIS;
+            }
+            else if (enemy_id >= 750000000)
+            {
+                content_type = (int)eBattleCategory.MIRAGE_FLOOR_QUEST;
+            }
             else if (enemy_id >= 500000000)
             {
                 content_type = (int)eBattleCategory.DUNGEON;
@@ -160,6 +168,11 @@ namespace Elements
                         else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
                         {
                             tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
                         else
@@ -236,7 +249,6 @@ namespace Elements
                                 {
                                     tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
                                 }
-
                             }
                             else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
                             {
@@ -250,6 +262,13 @@ namespace Elements
                                 if (!tempData.guildEnemy.Contains(GuildManager.AbyssEnemyParameterDic[enemy]))
                                 {
                                     tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
+                                }
+                            }
+                            else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
+                            {
+                                if (!tempData.guildEnemy.Contains(GuildManager.MirageEnemyParameterDic[enemy]))
+                                {
+                                    tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
                                 }
                             }
                             else
@@ -515,6 +534,10 @@ namespace Elements
                 skinID = 170361;
                 unitid2 = 170301;
             }
+            if (unitid > 300000 && unitid < 400000)
+            {
+                skinID = ABExTool.GetPrefabId(unitid);
+            }
             if (unitid > 600000 && unitid < 700000)
             {
                 unitid2 = data.PrefabId;
@@ -685,7 +708,12 @@ namespace Elements
             int unitid = summonData.SummonId;
             int prefab = ABExTool.GetPrefabId(unitid);
             if (unitid >= 999999)
-                unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+            {
+                if (GuildManager.EnemyDataDic.ContainsKey(unitid))
+                    unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+                else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
+            }
             var a = ABExTool.LoadUnitPrefab(prefab);
             if (a == null)
             {
@@ -717,7 +745,12 @@ namespace Elements
             int unitid = summonData.SummonId;
             int prefabID = ABExTool.GetPrefabId(unitid);
             if (unitid >= 999999)
-                unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+            {
+                if (GuildManager.EnemyDataDic.ContainsKey(unitid))
+                    unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+                else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
+            }
             //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
             //if (dataAsset == null)

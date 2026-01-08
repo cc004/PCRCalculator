@@ -908,6 +908,14 @@ namespace Elements
                 }
             },
             {
+                UnitCtrl.eAbnormalState.CRYSTALIZE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CRYSTALIZE,
+                    IsBuff = false
+                }
+            },
+            {
                 UnitCtrl.eAbnormalState.FLIGHT,
                 new AbnormalConstData
                 {
@@ -1439,7 +1447,7 @@ namespace Elements
 
         public eUnitRespawnPos SummonRespawnPos { get; set; }
 
-        public bool WaveStartIdle { get; set; } // TODO find where use
+        public bool WaveStartIdle { get; set; }
 
         public bool IdleOnly
         {
@@ -2014,9 +2022,9 @@ namespace Elements
 
         public long AbnormalStateDodgeResistZero => Math.Min(2000000000, Math.Max(0, AbnormalStateDodgeResist));
 
-        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance)); // TODO check use
+        public long AdditionalAttackEnhanceZero => Math.Min(2000000000, Math.Max(0, AdditionalAttackEnhance));
 
-        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance)); // TODO sealbuffdebuff action
+        public long BuffEnhanceZero => Math.Min(2000000000, Math.Max(0, BuffEnhance));
 
         public long DebuffEnhanceZero => Math.Min(2000000000, Math.Max(0, DebuffEnhance));
 
@@ -2641,6 +2649,10 @@ this.updateCurColor();
                 {
                     MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
                     Hp = data.playerSetingHP;
+                } else if (baseData.RealHp != baseData.Hp)
+                {
+                    MaxHp = MaxHpAfterPassive = (long)baseData.RealHp;
+                    Hp = (long)baseData.Hp;
                 }
                 else
                     Hp = (long)(MaxHp = MaxHpAfterPassive = (long)baseData.RealHp);
@@ -4922,6 +4934,8 @@ this.updateCurColor();
                     case eAbnormalState.WORLD_LIGHTNING:
                     case eAbnormalState.POISON2:
                     case eAbnormalState.CURSE2:
+                    case eAbnormalState.BLACK_FRAME:
+                    case eAbnormalState.RATIO_SLIP:
                         OnSlipDamage.Call();
                         break;
                     case eAbnormalState.CONVERT:
@@ -7252,6 +7266,7 @@ this.updateCurColor();
                     {
                         debuffCounterDictionary[_kind]++;
                         ++debuffCounter;
+                        execPassiveSeal(PassiveSealAction.ePassiveTiming.DEBUFF);
                     }
                 }
                 else if (_isBuff)
@@ -7951,6 +7966,15 @@ this.updateCurColor();
 					{
 						unitCtrl = passiveSealData.Source;
 					}
+                    else if (passiveSealData.SealTarget == PassiveSealAction.eSealTarget.TARGET)
+                    {
+                        unitCtrl = passiveSealData.Target;
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogError($"Unknown SealTarget: {passiveSealData.SealTarget}");
+                        continue;
+                    }
 					eStateIconType targetStateIcon = passiveSealData.TargetStateIcon;
 					if (!unitCtrl.SealDictionary.ContainsKey(targetStateIcon))
 					{

@@ -303,8 +303,8 @@ namespace Elements
         [Description("固定物理白甲")]
         ADDITIONAL_BUFF_PHYSICAL_DEF = 101,
         // Token: 0x04008841 RID: 34881
-        // [Description("CRYSTALIZE\n结晶\n愤怒军团的兰法")]
-        // CRYSTALIZE = 102,
+        [Description("结晶\n愤怒军团的兰法")]
+        CRYSTALIZE = 102,
         // Token: 0x04008842 RID: 34882
         [Description("伤害限制")]
         DAMAGE_LIMIT = 103,
@@ -453,8 +453,8 @@ namespace Elements
         HAOYU = 170,
         [Description("PSI风暴\n水美空")]
         PSIFENGBAO = 171,
-        [Description("日食\n水龙妈")]
         TAUNT = 172,
+        [Description("日食\n水龙妈")]
         RISHI = 173,
         [Description("鬼化\n水蕾姆")]
         GUIHUA = 177,

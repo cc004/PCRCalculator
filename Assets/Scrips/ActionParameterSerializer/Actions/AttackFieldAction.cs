@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace ActionParameterSerializer.Actions
 {
@@ -40,30 +41,38 @@ namespace ActionParameterSerializer.Actions
         public
             override string localizedDetail(int level, Property property)
         {
+            StringBuilder str = new StringBuilder();
             switch (fieldType)
             {
                 case FieldType.repeat:
                     if (targetParameter.targetType == TargetType.absolute)
                     {
-                        return Utils.JavaFormat(Utils.GetString("Summon_a_field_of_radius_d1_to_deal_s2_s3_damage_per_second_for_s4_sec_to_s5"),
+                        str.Append(Utils.JavaFormat(Utils.GetString("Summon_a_field_of_radius_d1_to_deal_s2_s3_damage_per_second_for_s4_sec_to_s5"),
                             (int)actionValue7.value,
                             buildExpression(level, property),
                             damageClass.description(),
                             buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property),
-                            targetParameter.buildTargetClause());
+                            targetParameter.buildTargetClause()));
                     }
                     else
                     {
-                        return Utils.JavaFormat(Utils.GetString("Summon_a_field_of_radius_d1_at_position_of_s2_to_deal_s3_s4_damage_per_second_for_s5_sec"),
+                        str.Append(Utils.JavaFormat(Utils.GetString("Summon_a_field_of_radius_d1_at_position_of_s2_to_deal_s3_s4_damage_per_second_for_s5_sec"),
                             (int)actionValue7.value,
                             targetParameter.buildTargetClause(),
                             buildExpression(level, property),
                             damageClass.description(),
-                            buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
+                            buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)));
                     }
+                    break;
                 default:
-                    return base.localizedDetail(level, property);
+                    str.Append(base.localizedDetail(level, property));
+                    break;
             }
+            if (actionDetail3 != 0)
+            {
+                str.Append(Utils.JavaFormat(Utils.GetString("recover_tp_by_damage_divided_by_s1"), 100 - actionDetail3));
+            }
+            return str.ToString();
         }
     }
 }

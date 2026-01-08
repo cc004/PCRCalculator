@@ -63,6 +63,10 @@ namespace ActionParameterSerializer.Actions
             {
                 str.Append(Utils.JavaFormat(Utils.GetString("This_damage_ignores_s1_s2_defense"), actionValue7.value, damageClass.description()));
             }
+            if (actionDetail3 != 0)
+            {
+                str.Append(Utils.JavaFormat(Utils.GetString("recover_tp_by_damage_divided_by_s1"), 100 - actionDetail3));
+            }
             return str.ToString();
         }
     }

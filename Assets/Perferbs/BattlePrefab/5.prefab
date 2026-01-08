@@ -385,8 +385,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6.5, y: 28.7}
-  m_SizeDelta: {x: 120, y: 40}
+  m_AnchoredPosition: {x: 0.75002, y: 28.7}
+  m_SizeDelta: {x: 149, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4939596736158201514
 CanvasRenderer:
@@ -1439,6 +1439,7 @@ MonoBehaviour:
   buffUIAddPos: {x: 0, y: 28, z: 0}
   skillUI: {fileID: 8786621906362684975}
   ScreenShotTrans: {fileID: 7887101408863250748}
+  characterDetailManager: {fileID: 0}
 --- !u!114 &6859556095711658517
 MonoBehaviour:
   m_ObjectHideFlags: 0
