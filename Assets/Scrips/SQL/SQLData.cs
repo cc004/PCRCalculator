@@ -1060,6 +1060,16 @@ namespace PCRCaculator.SQL
         public int enhance_value_1 { get; set; }
         public int enhance_value_2 { get; set; }
     }
+    public class abyss_quest_data : DbBaseData
+    {
+        public int abyss_id { get; set; }
+        public int wave_group_id { get; set; }
+    }
+    public class abyss_boss_data : DbBaseData
+    {
+        public int abyss_id { get; set; }
+        public int wave_group_id { get; set; }
+    }
     public class abyss_wave_group_data : DbBaseData
     {
         public int id { get; set; }

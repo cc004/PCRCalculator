@@ -344,6 +344,8 @@ namespace PCRCaculator.SQL
         public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get; private set; }
         public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get; private set; }
+        public Dictionary<int, int> AbyssQuestFilterDic { get; private set; }
+        public Dictionary<int, int> AbyssBossFilterDic { get; private set; }
         public Dictionary<int, EnemyData> MirageEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
@@ -593,6 +595,10 @@ namespace PCRCaculator.SQL
                 Task.Run(() => TalentQuestBattleEffectDic = GetDatasDic<talent_quest_battle_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => AbyssBattleEffectDic = GetDatasDic<abyss_battle_effect>(a => a.id)));
+            tasks.Add(
+                Task.Run(() => AbyssQuestFilterDic = GetAbyssQuestFilteredDic()));
+            tasks.Add(
+                Task.Run(() => AbyssBossFilterDic = GetAbyssBossFilteredDic()));
             tasks.Add(
                 Task.Run(() => MirageBattleEffectDic = GetDatasDic<mirage_battle_effect>(a => a.id)));
             tasks.Add(
@@ -1711,6 +1717,45 @@ namespace PCRCaculator.SQL
             }
 
             return UnitRoleMasterySlotEnhanceDataDic;
+        }
+
+        private Dictionary<int, int> GetAbyssQuestFilteredDic()
+        {
+            var abyssQuestDataList = GetDatas<abyss_quest_data>();
+
+            if (abyssQuestDataList == null || !abyssQuestDataList.Any())
+                return new Dictionary<int, int>();
+
+            return abyssQuestDataList
+                .GroupBy(x => x.abyss_id)
+                .Where(g =>
+                {
+                    var prefixes = g.Select(x => x.wave_group_id / 10000 * 10000) // 筛选wave_group_id前5个数字
+                                   .Distinct()
+                                   .Take(2)
+                                   .ToList();
+                    return prefixes.Count == 1;
+                })
+                .ToDictionary(g => g.Key, g => g.First().wave_group_id / 10000 * 10000);
+        }
+        private Dictionary<int, int> GetAbyssBossFilteredDic()
+        {
+            var abyssBossDataList = GetDatas<abyss_boss_data>();
+
+            if (abyssBossDataList == null || !abyssBossDataList.Any())
+                return new Dictionary<int, int>();
+
+            return abyssBossDataList
+                .GroupBy(x => x.abyss_id)
+                .Where(g =>
+                {
+                    var prefixes = g.Select(x => x.wave_group_id / 10000 * 10000)
+                                   .Distinct()
+                                   .Take(2)
+                                   .ToList();
+                    return prefixes.Count == 1;
+                })
+                .ToDictionary(g => g.Key, g => g.First().wave_group_id / 10000 * 10000);
         }
     }
 }

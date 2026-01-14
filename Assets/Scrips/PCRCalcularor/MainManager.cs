@@ -65,6 +65,8 @@ namespace PCRCaculator
             public List<EReduction> ereductionTable = new List<EReduction>();
             public Dictionary<int, talent_quest_battle_effect> talentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
             public Dictionary<int, abyss_battle_effect> abyssBattleEffectDic = new Dictionary<int, abyss_battle_effect>();
+            public Dictionary<int, int> abyssQuestFilterDic = new Dictionary<int, int>();
+            public Dictionary<int, int> abyssBossFilterDic = new Dictionary<int, int>();
             public Dictionary<int, mirage_battle_effect> mirageBattleEffectDic = new Dictionary<int, mirage_battle_effect>();
             public Dictionary<int, mirage_nemesis_area> mirageNemesisAreaDic = new Dictionary<int, mirage_nemesis_area>();
             public Dictionary<int, extra_effect_data> extraEffectDataDic = new Dictionary<int, extra_effect_data>();
@@ -151,6 +153,8 @@ namespace PCRCaculator
         public List<EReduction> EreductionTable { get => databaseCache.ereductionTable; }
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get => databaseCache.talentQuestBattleEffectDic; }
         public Dictionary<int, abyss_battle_effect> AbyssBattleEffectDic { get => databaseCache.abyssBattleEffectDic; }
+        public Dictionary<int, int> AbyssQuestFilterDic { get => databaseCache.abyssQuestFilterDic; }
+        public Dictionary<int, int> AbyssBossFilterDic { get => databaseCache.abyssBossFilterDic; }
         public Dictionary<int, mirage_battle_effect> MirageBattleEffectDic { get => databaseCache.mirageBattleEffectDic; }
         public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get => databaseCache.mirageNemesisAreaDic; }
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get => databaseCache.extraEffectDataDic; }
@@ -539,6 +543,8 @@ namespace PCRCaculator
                                 databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
                                 databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic;
+                                databaseCache.abyssQuestFilterDic = dbTool.AbyssQuestFilterDic;
+                                databaseCache.abyssBossFilterDic = dbTool.AbyssBossFilterDic;
                                 databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic;
                                 databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic;
                                 databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;

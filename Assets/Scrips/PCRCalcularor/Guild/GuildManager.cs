@@ -201,6 +201,20 @@ namespace PCRCaculator.Guild
                 return MainManager.Instance.AbyssWaveGroupDataDic;
             }
         }
+        public static Dictionary<int, int> AbyssQuestFilterDic
+        {
+            get
+            {
+                return MainManager.Instance.AbyssQuestFilterDic;
+            }
+        }
+        public static Dictionary<int, int> AbyssBossFilterDic
+        {
+            get
+            {
+                return MainManager.Instance.AbyssBossFilterDic;
+            }
+        }
         public static Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic
         {
             get
@@ -625,21 +639,39 @@ namespace PCRCaculator.Guild
             int secondOption = dropdowns_ChooseAbyssBoss[1].value;
             int thirdOption = dropdowns_ChooseAbyssBoss[2].value + 1;
 
-            // 构造wave_group_id
-            // 格式: 924 + firstOption(第4-5位) + secondOption(第6位) + thirdOption(第7位) + 00(最后2位)
-            string waveGroupIdStr = $"924{7 + firstOption:D2}{secondOption}{thirdOption}00";
-
-            if (int.TryParse(waveGroupIdStr, out int waveGroupId))
+            Dictionary<int, int> sourceDic;
+            if (secondOption == 0)
             {
-                WaveGroupId = waveGroupId;
-                var matchingData = AbyssWaveGroupDataDic?.Values
-                    .FirstOrDefault(data => data.wave_group_id == waveGroupId);
+                // 当 firstOption 为 0 时，使用 AbyssQuestFilterDic
+                sourceDic = AbyssQuestFilterDic;
+            }
+            else
+            {
+                // 当 firstOption 大于 0 时，使用 AbyssBossFilterDic
+                sourceDic = AbyssBossFilterDic;
+            }
+            var sortedAbyssIds = sourceDic.Keys
+                .OrderBy(x => x)
+                .ToArray();
+
+            int selectedAbyssId = sortedAbyssIds[firstOption];
+            int abyssWaveGroupIdPrefix = sourceDic[selectedAbyssId];
+
+            // 构造wave_group_id
+            // 格式: abyssWaveGroupIdPrefix(第1-5位) + secondOption(第6位) + thirdOption(第7位) + 00(最后2位)
+            int waveGroupId = abyssWaveGroupIdPrefix + secondOption * 1000 + thirdOption * 100;
+
+            WaveGroupId = waveGroupId;
+            var matchingData = AbyssWaveGroupDataDic?.Values
+                .FirstOrDefault(data => data.wave_group_id == waveGroupId);
+            if (matchingData != null)
+            {
                 specialEnemyid = matchingData.enemy_ids.ToArray();
                 SetBossImages(specialEnemyid, AbyssEnemyParameterDic);
             }
             else
             {
-                Debug.LogError($"无法解析wave_group_id字符串: {waveGroupIdStr}");
+                Debug.LogError($"未找到匹配的wave group数据: {waveGroupId}");
             }
         }
         public void UpdateSecretDungeonFirstDropdownOptions()
