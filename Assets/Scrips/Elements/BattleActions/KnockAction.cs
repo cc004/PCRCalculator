@@ -17,6 +17,8 @@ namespace Elements
         private const float HEIGHT = 300f;
         private List<BasePartsData> unitListForSort = new List<BasePartsData>();
 
+        public Dictionary<int, List<UnitCtrl>> DisableKnockBackUnitList { get; set; }
+
         public override void ExecAction(
           UnitCtrl _source,
           BasePartsData _target,
@@ -31,6 +33,12 @@ namespace Elements
             if (_target.Owner.ModeChangeUnableStateBarrier)
             {
                 action($"处于MODECHANGE状态，击退无效!");
+                return;
+            }
+            // TODO DisableKnockBackUnitList logic
+            if (_target.Owner.OnSetCrowndControlForLoopTriggerListCall())
+            {
+                action($"目标处于行动不能，击飞，拉拽免疫效果，击退无效!");
                 return;
             }
             AppendIsAlreadyExeced(_target.Owner, _num);

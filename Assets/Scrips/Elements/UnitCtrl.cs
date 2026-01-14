@@ -1657,6 +1657,8 @@ namespace Elements
 
         public Action OnDodge { get; set; }
 
+        public List<Func<bool>> OnSetCrowndControlForLoopTriggerList { get; set; } = new List<Func<bool>>();
+
         public Action<bool, long, bool> OnDamageForLoopTrigger { get; set; }
 
         public Action<long> OnDamageForLoopRepeat { get; set; }
@@ -7786,6 +7788,17 @@ this.updateCurColor();
                 yield return null;
             }
         }
+
+        public bool OnSetCrowndControlForLoopTriggerListCall()
+        {
+            bool ret = false;
+            foreach(var action in OnSetCrowndControlForLoopTriggerList)
+            {
+                ret |= action.Invoke();
+            }
+            return ret;
+        }
+
 
         public double CalcAweValue(bool _isUnionBurst, bool _isAttack)
         {
