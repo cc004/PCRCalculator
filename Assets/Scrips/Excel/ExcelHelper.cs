@@ -1314,6 +1314,7 @@ autopcr.setOffset(2, 0); # offset calibration
                     worksheet1.Cells[kdLineNum, 8].Style.Font.Size = 16;
                     worksheet1.Cells[kdLineNum, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheet1.Cells[kdLineNum, 8].Value = "刀损表";
+                    int kdNum = kdLineNum;
                     kdLineNum++;
                     string[] kdHeadNames = new string[4] { "秒数", "帧数", "总伤", "预估总伤" };
                     for (int i = 0; i < kdHeadNames.Length; i++)
@@ -1323,7 +1324,7 @@ autopcr.setOffset(2, 0); # offset calibration
                     kdLineNum++;
                     double totalUBDamage = 0;
                     double globalTotalDamage = TimelineData.totalDamage;
-
+                    string mergeDamageText = "";
                     for (int i = MyGameCtrl.Instance.tempData.SettingData.limitTime; i >= 21; i--)
                     {
                         int frame = i * 60 - 2;
@@ -1357,7 +1358,6 @@ autopcr.setOffset(2, 0); # offset calibration
                         // 剩余UB
                         List<string> combinedTexts = new List<string>();
                         totalUBDamage = 0;
-
                         if (BattleManager.Instance.IsSkillReady.ContainsKey(frame))
                         {
                             foreach (var unit in BattleManager.Instance.IsSkillReady[frame])
@@ -1394,14 +1394,17 @@ autopcr.setOffset(2, 0); # offset calibration
                         }
                         double combinedDamage = currentTotalDamage + totalUBDamage;
                         double present = 100.0 * combinedDamage / globalTotalDamage;
-                        string estimatedTotalDamage = $"({present:F2}%)" + Math.Round(combinedDamage / 10000.0) + "w";
+                        string combinedDamageText = Math.Round(combinedDamage / 10000.0) + "w";
 
-                        worksheet1.Cells[kdLineNum, 11].Value = dead ? "/" : string.IsNullOrEmpty(remainingDamageText) ?
-                            $"{estimatedTotalDamage}" :
-                            $"{estimatedTotalDamage}={totalDamageText}+{remainingDamageText}";
+                        string estimatedTotalDamage = dead ? "/" : string.IsNullOrEmpty(remainingDamageText) ?
+                            $"{combinedDamageText}" :
+                            $"{combinedDamageText}={totalDamageText}+{remainingDamageText}"; ;
 
+                        mergeDamageText += mergeDamageText == "" ? $"{i}秒={combinedDamageText}" : $"、{i}秒={estimatedTotalDamage}";
+
+                        worksheet1.Cells[kdNum, 13].Value = mergeDamageText;
+                        worksheet1.Cells[kdLineNum, 11].Value = $"({present:F2}%){estimatedTotalDamage}";
                         kdLineNum++;
-
                     }
                 }
                 ExcelWorksheet worksheet2 = package.Workbook.Worksheets.Add("技能循环");
@@ -1545,19 +1548,19 @@ autopcr.setOffset(2, 0); # offset calibration
                     //detailAlong = 1;
                     //detailBlong = 2;
                     worksheet3.Cells[lineNum, 1].Value = "逻辑帧";
-                    worksheet3.Cells[lineNum, 2].Value = "渲染帧";
-                    worksheet3.Cells[lineNum, 3, lineNum, 3 + charLong0 - 1].Merge = true;
-                    worksheet3.Cells[lineNum, 3].Value = enemyData.detailData.unit_name;
-                    worksheet3.Cells[lineNum, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    // worksheet3.Cells[lineNum, 2].Value = "渲染帧";
+                    worksheet3.Cells[lineNum, 2, lineNum, 2 + charLong0 - 1].Merge = true;
+                    worksheet3.Cells[lineNum, 2].Value = enemyData.detailData.unit_name;
+                    worksheet3.Cells[lineNum, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     if (detailType < 4||detailType==6)
                     {
                         for (int i = 0; i < 5; i++)
                         {
                             if (i < playerDatas.playrCharacters.Count)
                             {
-                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1), lineNum, 3 + charLong0 * (i + 2) - 1].Merge = true;
-                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
-                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1), lineNum, 2 + charLong0 * (i + 2) - 1].Merge = true;
+                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
+                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             }
                         }
                     }
@@ -1566,13 +1569,13 @@ autopcr.setOffset(2, 0); # offset calibration
                     int currentFream0 = 0;
                     foreach (var timeData in timedata)
                     {
-                        int pos = 3 + charLong0 * timeData.idx;
+                        int pos = 2 + charLong0 * timeData.idx;
                         //if (timeData.frame != currentFream0)
                         //{
                             lineNum++;
                             currentFream0 = timeData.frame;
                             worksheet3.Cells[lineNum, 1].Value = timeData.frame;
-                            worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
+                            // worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
                         //}
                         //worksheet2.Cells[lineNum, pos].Value = timeData.describeA;//.Replace(/<[^>] +>/ g, "");
                         worksheet3.Cells[lineNum, pos].Value = (detailType==2||detailType==6)?timeData.valueA:timeData.valueB;

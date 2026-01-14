@@ -334,8 +334,8 @@ namespace PCRCaculator
 
                         // 处理基础加成
                         var present = isRateParam ?
-                            Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) :
-                            (int)Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax));
+                            (equip.levelMax > 0 ? Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) : Math.Ceiling(d)) :
+                            (int)(equip.levelMax > 0 ? Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) : Math.Ceiling(d));
 
                         if (isRateParam)
                         {
@@ -2316,8 +2316,8 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 313;
-        public int playerProcess = 84;
+        public int playerLevel = 316;
+        public int playerProcess = 85;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 320;
         //public float bodyWidth = 100;

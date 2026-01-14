@@ -37,7 +37,7 @@ namespace PCRCaculator.Guild
         public Text characterGroupPageText;
         public List<Text> timeLineTexts;
 
-    public GameObject characterDetailPage;
+        public GameObject characterDetailPage;
         public GameObject characterDetailPageChild;
         public CharacterPageButton characterDetailButton;
         public Action execTimeButtonAction;
@@ -684,6 +684,27 @@ namespace PCRCaculator.Guild
                 Debug.LogError($"无法解析wave_group_id字符串: {waveGroupIdStr}");
             }
         }
+        public void UpdateMirageAreaDropdownOptions()
+        {
+            Dropdown dropdown = dropdowns_ChooseMirageBoss[0];
+            if (dropdown == null) return;
+            dropdown.ClearOptions();
+
+            List<string> options = new()
+            {
+                "追忆战日常"
+            };
+
+            if (MainManager.Instance.MirageNemesisAreaDic != null)
+            {
+                foreach (var kvp in MainManager.Instance.MirageNemesisAreaDic.OrderBy(x => x.Key))
+                {
+                    options.Add(kvp.Value.nemesis_area_name);
+                }
+            }
+
+            dropdown.AddOptions(options);
+        }
         public void UpdateMirageDropdownOptions()
         {
             Dropdown floorDropdown = dropdowns_ChooseMirageBoss[1];
@@ -1064,6 +1085,7 @@ namespace PCRCaculator.Guild
             {
                 toggles_ChooseType[4].SetActive(false);
             }
+            UpdateMirageAreaDropdownOptions();
             SetChooseBossDropDown(data.currentGuildMonth);
             //dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;

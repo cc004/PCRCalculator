@@ -303,8 +303,8 @@ namespace Elements
         [Description("固定物理白甲")]
         ADDITIONAL_BUFF_PHYSICAL_DEF = 101,
         // Token: 0x04008841 RID: 34881
-        // [Description("CRYSTALIZE\n结晶\n愤怒军团的兰法")]
-        // CRYSTALIZE = 102,
+        [Description("结晶\n愤怒军团的兰法")]
+        CRYSTALIZE = 102,
         // Token: 0x04008842 RID: 34882
         [Description("伤害限制")]
         DAMAGE_LIMIT = 103,

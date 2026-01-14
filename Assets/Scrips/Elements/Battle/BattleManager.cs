@@ -5423,7 +5423,7 @@ namespace Elements.Battle
                 {
                     //parameter = UnitUtility.CreateUnitParameterFromEnemyParameter(this._summonData.SummonId);
                     //Debug.LogError("特殊召唤物鸽了！");
-                    EnemyData enemyData = GuildManager.EnemyDataDic[_summonData.SummonId];
+                    EnemyData enemyData = GuildManager.EnemyDataDic.ContainsKey(_summonData.SummonId) ? GuildManager.EnemyDataDic[_summonData.SummonId] : GuildManager.MirageEnemyParameterDic[_summonData.SummonId];
                     unitData_my = enemyData.CreateUnitData();
                     parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
                 }

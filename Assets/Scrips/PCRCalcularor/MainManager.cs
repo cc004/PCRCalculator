@@ -66,12 +66,14 @@ namespace PCRCaculator
             public Dictionary<int, talent_quest_battle_effect> talentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
             public Dictionary<int, abyss_battle_effect> abyssBattleEffectDic = new Dictionary<int, abyss_battle_effect>();
             public Dictionary<int, mirage_battle_effect> mirageBattleEffectDic = new Dictionary<int, mirage_battle_effect>();
+            public Dictionary<int, mirage_nemesis_area> mirageNemesisAreaDic = new Dictionary<int, mirage_nemesis_area>();
             public Dictionary<int, extra_effect_data> extraEffectDataDic = new Dictionary<int, extra_effect_data>();
             public Dictionary<int, talentFormationData> talentFormationDic = new Dictionary<int, talentFormationData>();
             public Dictionary<int, int[]> weaknessDic = new Dictionary<int, int[]>();//角色的弱点列表
             public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
             public Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
             public Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
+            public Dictionary<int, string> exEquipmentName_cn = new Dictionary<int, string>();//Ex装备中文名字
             public Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
             public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();
             public Dictionary<int, TeamSkillEnhanceData> teamSkillEnhanceDataDic = new Dictionary<int, TeamSkillEnhanceData>();
@@ -150,6 +152,7 @@ namespace PCRCaculator
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get => databaseCache.talentQuestBattleEffectDic; }
         public Dictionary<int, abyss_battle_effect> AbyssBattleEffectDic { get => databaseCache.abyssBattleEffectDic; }
         public Dictionary<int, mirage_battle_effect> MirageBattleEffectDic { get => databaseCache.mirageBattleEffectDic; }
+        public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get => databaseCache.mirageNemesisAreaDic; }
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get => databaseCache.extraEffectDataDic; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get => databaseCache.talentFormationDic; }
         public Dictionary<int, int[]> WeaknessDic { get => databaseCache.weaknessDic; }  // 角色的弱点列表
@@ -253,8 +256,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10057100;
-            public long BossVersionJP = 10057100;
+            public long CharacterVersionJP = 10058000;
+            public long BossVersionJP = 10058000;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -537,12 +540,14 @@ namespace PCRCaculator
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
                                 databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic;
                                 databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic;
+                                databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic;
                                 databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;
                                 databaseCache.UnitRoleMasteryIdDic = dbTool.UnitRoleMasteryIdDic;
                                 databaseCache.UnitRoleSlotDataDic = dbTool.UnitRoleSlotDataDic;
                                 databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool.UnitRoleMasterySlotEnhanceDataDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10;
+                                databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn;
                                 databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11;
                                 databaseCache.skillActionDescribe_cn = dbTool3.Dic12;
 
@@ -591,16 +596,17 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() =>
                                     {
-                                        // var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
-                                        // databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
-                                        databaseCache.unitExEquips.OverrideWith(dbTool3.unitExEquips);
+                                        var jita = dbTool3.unitExEquips[170101];
+                                        var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
+                                        databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
+                                        databaseCache.unitExEquips[170301] = jita;
                                     }),
                                     Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
                                     Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
                                     Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic)),
-                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic))
-                                    // Task.Run(() => databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic))//等国服db
+                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic)),
+                                    Task.Run(() => databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic))
                                 );
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
@@ -662,7 +668,8 @@ namespace PCRCaculator
                                         Task.Run(() => databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic)),
                                         Task.Run(() => databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic)),
                                         Task.Run(() => databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic)),
-                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic))
+                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic)),
+                                        Task.Run(() => databaseCache.mirageNemesisAreaDic.Override2With(dbTool3.MirageNemesisAreaDic))
                                     );
                                 // }
                             });
@@ -810,8 +817,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 84;
-                playerSetting.playerLevel = 313;
+                playerSetting.playerProcess = 85;
+                playerSetting.playerLevel = 316;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";

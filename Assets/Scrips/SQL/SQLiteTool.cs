@@ -357,6 +357,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, unique_equip_enhance_rate[]> Dic9 { get; private set; }
         public Dictionary<int, unique_equip_enhance_rate[]> Dic92 { get; private set; }
         public Dictionary<int, string> Dic10 { get; private set; }
+        public Dictionary<int, string> ExEquipmentName_cn { get; private set; }
         public Dictionary<int, string[]> Dic11 { get; private set; }
         public Dictionary<int, string> Dic12 { get; private set; }
         public List<EReduction> eReductions { get; private set; }
@@ -378,7 +379,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get; private set; }
         public Dictionary<int, unit_role_mastery_enhance_data[]> UnitRoleMasteryEnhanceDataDic { get; private set; }
         public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic { get; private set; }
-
+        public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
         {
@@ -563,6 +564,8 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => Dic10 = GetUnitName_cn()));
             tasks.Add(
+                Task.Run(() => ExEquipmentName_cn = GetExEquipmentName_cn()));
+            tasks.Add(
                 Task.Run(() => Dic11 = GetSkillName_cn()));
             tasks.Add(
                 Task.Run(() => Dic12 = GetSkillActionDes_cn()));
@@ -592,6 +595,8 @@ namespace PCRCaculator.SQL
                 Task.Run(() => AbyssBattleEffectDic = GetDatasDic<abyss_battle_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => MirageBattleEffectDic = GetDatasDic<mirage_battle_effect>(a => a.id)));
+            tasks.Add(
+                Task.Run(() => MirageNemesisAreaDic = GetDatasDic<mirage_nemesis_area>(a => a.nemesis_id)));
             tasks.Add(
                 Task.Run(() => UnitRoleMasteryIdDic = GetDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
             tasks.Add(
@@ -868,10 +873,12 @@ namespace PCRCaculator.SQL
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
-            var list = GetDatas<enemy_parameter>(a => a.enemy_id >= 400000000 && a.enemy_id <= 600000000);
+            var list = GetDatas<enemy_parameter>(a => a.enemy_id >= 400000000 && a.enemy_id <= 620000000);
             int idx = 0;
             foreach (var dd in list)
             {
+                if (!dic1.ContainsKey(dd.unit_id))
+                    continue;
                 EnemyData e = new EnemyData();
                 e.enemy_id = dd.enemy_id;
                 e.unit_id = dd.unit_id;
@@ -1267,6 +1274,16 @@ namespace PCRCaculator.SQL
             }
         }
 
+        private Dictionary<int, string> GetExEquipmentName_cn()
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            var list = GetDatas<ex_equipment_data>();
+            foreach (var dd in list)
+            {
+                dic.Add(dd.ex_equipment_id, dd.name);
+            }
+            return dic;
+        }
         private Dictionary<int, string> GetUnitName_cn()
         {
             Dictionary<int, string> dic = new Dictionary<int, string>();
