@@ -933,7 +933,7 @@ namespace PCRCaculator.Guild
                     int prefabId = enemyData.detailData.prefab_id;
                     if (enemyData.detailData.visual_change_flag == 1)
                     {
-                        prefabId += enemyData.rarity * 10;
+                        prefabId = enemyData.rarity > 5 ? prefabId + 60 : prefabId + 30;
                     }
                     bossImage_ChooseBoss[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
                     bossImage_ChooseBoss[i].SetActive(i <= enemyIds.Length);
