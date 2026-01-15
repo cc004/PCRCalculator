@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Cute;
 using Elements.Battle;
@@ -15,6 +16,7 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using Spine;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Elements
 {
@@ -32,12 +34,20 @@ namespace Elements
         public List<Skill> MainSkillEvolutionList;
         public List<Skill> SubUnionBurstList;
         public Skill Annihilation;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+#else
         //private static Yggdrasil<UnitActionController> staticSingletonTree;
         private static BattleManager staticBattleManager;
+#endif
 
         private IBattleCameraEffectForUnitActionController battleCameraEffect;
         //private static BMIOELFOCPE staticBattleCameraEffect;
+#if ENABLE_THREADING
+        private BattleEffectPoolInterface staticBattleEffectPool;
+#else
         private static BattleEffectPoolInterface staticBattleEffectPool;
+#endif
         //private static JFJNEHKINFI staticBattleTimeScale;
         public const long ACTION_ID_OFFSET = 100;
         private const int ACTION_ID_OFFSET_FOR_CHARA_ID = 10000;
@@ -82,15 +92,6 @@ namespace Elements
         private BattleEffectPoolInterface battleEffectPool => staticBattleEffectPool;
 
         public List<PrincessSkillMovieData> GetPrincessFormMovieData(int _skillId) => skillDictionary[_skillId].PrincessSkillMovieDataList;
-
-        public static void StaticRelease()
-        {
-            //UnitstaticSingletonTree = (Yggdrasil<UnitActionController>) null;
-            staticBattleManager = null;
-            //UnitstaticBattleCameraEffect = (BMIOELFOCPE) null;
-            staticBattleEffectPool = null;
-            //UnitstaticBattleTimeScale = (JFJNEHKINFI) null;
-        }
 
         private void OnDestroy()
         {
@@ -140,17 +141,9 @@ namespace Elements
             attackAction.TargetWidth = Owner.SearchAreaSize;
             attackAction.Direction = DirectionType.FRONT;
             attackAction.ActionType = eActionType.ATTACK;
-            attackAction.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer())
-      {
-        {
-          eValueNumber.VALUE_1,
-          0.0
-        },
-        {
-          eValueNumber.VALUE_3,
-          1.0
-        }
-      };
+            attackAction.Value = new ValueDictionary();
+            attackAction.Value.Add(eValueNumber.VALUE_1, 0.0);
+            attackAction.Value.Add(eValueNumber.VALUE_3, 1.0);
             attackAction.ActionDetail1 = _owner.AtkType;
             float num = 0.0f;
             if (UseDefaultDelay && BattleDefine.WEAPON_HIT_DELAY_DIC.TryGetValue(_initializeAttackOnly ? _seOwner.WeaponMotionType : Owner.WeaponMotionType, out num))
@@ -693,7 +686,6 @@ namespace Elements
         }
 
         // RVA: 0x35B5C08 Offset: 0x35B5C08 VA: 0x35B5C08
-        // TODO use in enchant trigger action
         public void ExecSkillWithTargetId(Skill _skill, int _actionId)
         {
             bool hasNoTarget = false;
@@ -841,7 +833,7 @@ namespace Elements
             actionParameter.ActionDetail1 = actionParam.action_detail_1;
             actionParameter.ActionDetail2 = actionParam.action_detail_2;
             actionParameter.ActionDetail3 = actionParam.action_detail_3;
-            actionParameter.Value = new Dictionary<eValueNumber, DoubleWithEx>(new eValueNumber_DictComparer());
+            actionParameter.Value = new ValueDictionary();
             actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)actionParam.action_value_1);
             actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)actionParam.action_value_2);
             actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)actionParam.action_value_3);
@@ -1047,6 +1039,7 @@ namespace Elements
             if (skillId == Owner.UnionBurstSkillId)
             {
                 skillExecData.energy = Owner.lastEnergyBeforeUB;
+#if !NO_PROB_EVENT
                 var e = Owner.lastEnergyBeforeUB;
                 GuildCalculator.Instance.dmglist.Add(new ProbEvent
                 {
@@ -1055,6 +1048,7 @@ namespace Elements
                     exp = hash => $"{e.ToExpression(hash)} < 1000",
                     description = $"({BattleHeaderController.CurrentFrameCount}){Owner.UnitNameEx}的UB没开出"
                 });
+#endif
             }
             else
             {
@@ -1065,12 +1059,14 @@ namespace Elements
                 Owner.NoSkipOnStartAction?.Invoke(Owner.UnitId, skillExecData);
             Owner.AppendStartSkill(skillId);
             //end added Scripts
+#if !REDUCE_ANALYSE
             Owner.lastCritPoint = new UnitCtrl.CritPoint
             {
                 description = $"{skill.SkillName}唱名",
                 description2 = $"{skill.SkillName}唱名",
                 priority = UnitCtrl.eCritPointPriority.StartSkill,
             };
+#endif
             return true;
         }
         private void searchAndSortTarget(
@@ -1120,6 +1116,10 @@ namespace Elements
                 }
                 else if (battleManager.DecoyEnemy != null)
                     basePartsData = battleManager.DecoyEnemy.GetFirstParts(_basePos: Owner.transform.position.x);
+                if (Owner.IsTauntState() && !Owner.IsConfusionOrConvert())
+                {
+                    basePartsData = Owner.TauntSource;
+                }
                 //2022/09/05改
                 if (basePartsData != null && !basePartsData.Owner.IsDead && !basePartsData.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY) && isInActionTargetArea(_skill, _action, _basePosition, _considerBodyWidth, basePartsData))
                 {
@@ -1476,11 +1476,11 @@ namespace Elements
             // temporary fix for log barrier skill
             if (_action is LogBarrierAction)
                 _action.ExecTime = new[] { 0f };
-            for (int _num = 0; _num < _action.ExecTime.Length; ++_num)
-            {
-                if (_boneCount)
-                    _action.AppendTargetNum(_target.Owner, _num);
-            }
+            if (_boneCount)
+                for (int _num = 0; _num < _action.ExecTime.Length; ++_num)
+                {
+                        _action.AppendTargetNum(_target.Owner, _num);
+                }
             float time = _first ? _starttime + _skill.CutInSkipTime : _starttime;
             long[] ids = new long[_action.ExecTime.Length];
             for (int i = 0; i < _action.ExecTime.Length; ++i)
@@ -1513,15 +1513,16 @@ namespace Elements
                 break;
             label_17:
                 ExecAction(_action, _skill, _target, i, time, false, _protectedTarget, false);
-                if ((_action.ActionType != eActionType.CONTINUOUS_ATTACK || _action.ActionDetail1 != 3) && (_action.ActionType != eActionType.MODE_CHANGE || _action.ActionDetail1 == 3))
+                if ((_action.ActionType != eActionType.CONTINUOUS_ATTACK || _action.ActionDetail1 != 3) &&
+                    (_action.ActionType != eActionType.MODE_CHANGE || _action.ActionDetail1 == 3))
                 {
                     _target.Owner.ActionsTargetOnMe.Remove(actionIndivisualId);
                     battleManager.CallbackActionEnd(actionIndivisualId);
+
                 }
-                else if (_action.IdOffsetDictionary.ContainsKey(_target))
-                    _action.IdOffsetDictionary[_target] = ids[i];
                 else
-                    _action.IdOffsetDictionary.Add(_target, ids[i]);
+                    _action.IdOffsetDictionary[_target] = ids[i];
+
                 if (i == _action.ExecTime.Length - 1 && _action.OnActionEnd != null && (_action.ActionType != eActionType.CONTINUOUS_ATTACK && _action.ActionType != eActionType.MOVE))
                     _action.OnActionEnd();
             }
@@ -1548,7 +1549,7 @@ namespace Elements
             }
             
             var _valueDictionary = action.PrepareActionValue(Owner); // TODO may be right: source
-            
+
             bool _last = action.JudgeLastAndNotExeced(target.Owner, num);
             bool _targetOneParts = action.AlreadyExecedData[target.Owner][num].TargetPartsNumber == 1;
             /*if (!target.ResistStatus(action.ActionType, action.ActionDetail1, this.Owner, _last, _targetOneParts, target) && action.JudgeIsAlreadyExeced(target.Owner, num))
@@ -1566,13 +1567,15 @@ namespace Elements
             bool hasProtected = _protectedTarget != null;
             bool isResisted = target.ResistStatus(action.ActionType, actionDetail, Owner, _last, _targetOneParts, target);
             bool exec = !isResisted && (hasProtected || action.JudgeIsAlreadyExeced(target.Owner, num));
+#if !REDUCE_ANALYSE
             UnitActionExecData actionExecData = new UnitActionExecData();
             actionExecData.execTime = BattleHeaderController.CurrentFrameCount;
             actionExecData.describe = action.sortinfo;//"执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
             actionExecData.actionID = action.ActionId;
             actionExecData.unitid = Owner.UnitId;
             actionExecData.actionType = action.ActionType.GetDescription();
-            actionExecData.targetNames = new List<string> { target.Owner.UnitName };
+            actionExecData.targetNames = new List<string> { currentTarget.Owner.UnitName };
+#endif
             if (exec)
             {
                 if (_protectedTarget != null)
@@ -1625,11 +1628,11 @@ namespace Elements
                                 // action.ActionType);
 
                                 currentTarget = ownerUnit.ProtectionTargetData.ProtectionParts;
-                                // skill.ProtectParts[target] = currentTarget;
+                                skill.ProtectParts[target] = currentTarget;
                                 action.ProtectedParts = currentTarget;
                                 action.SkipAppendIsAlreadyExeced = true;
                                 hasProtected = false;
-                                finalProtectedTarget = currentTarget;
+                                finalProtectedTarget = target;
 
                                 // if (target.Owner != null && target.Owner.ProtectionSourceData != null)
                                 // {
@@ -1659,49 +1662,62 @@ namespace Elements
                     {
                     }
                 }
+#if !REDUCE_ANALYSE
+                actionExecData.targetNames = new List<string> { currentTarget.Owner.UnitName };
+#endif
 
                 int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
                 int index2 = skill.ActionParameters.Count;
                 if (!battleManager.skipping)
                 {
                     var skillName = string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName;
-                    Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + target.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
+                    Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + currentTarget.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
                 }
 
+#if !REDUCE_ANALYSE
                 var detail = action.GetSkillDetail(Owner);
                 if (!string.IsNullOrEmpty(detail))
                     actionExecData.describe += $"<color=#c080ff><size=8>{detail}\n</size></color>";
-
+#endif
                 action.PreExecAction();
                 action.ExecAction(Owner, currentTarget, num, this, skill, starttime, dictionary, 
-                    _valueDictionary,a=> 
-                { 
+                    _valueDictionary,a=>
+                    {
+#if !REDUCE_ANALYSE
                     actionExecData.describe += a;
                     //if (b > 0)
                     //    actionExecData.damageList.Add(b);
+#endif
                 });
                 action.SkipAppendIsAlreadyExeced = false;
             }
             else
             {
+#if !REDUCE_ANALYSE
                 actionExecData.describe = "执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
+#endif
             }
+#if !REDUCE_ANALYSE
             actionExecData.result = isResisted ? UnitActionExecData.ActionState.MISS : UnitActionExecData.ActionState.NORMAL;
+#endif
             Owner.SemanOnExecAction?.Invoke(Owner.UnitId, skill.SkillId);
+#if !REDUCE_ANALYSE
             if (!Owner.battleManager.skipping)
                 Owner.NoSkipOnExecAction?.Invoke(Owner.UnitId, skill.SkillId, actionExecData);
             var a = skill.ActionParameters.Count(ap => ap.ActionType == action.ActionType);
             var b = skill.ActionParameters.Where(ap => ap.ActionType == action.ActionType).TakeWhile(ap => ap != action).Count();
+
             Owner.lastCritPoint = new UnitCtrl.CritPoint
             {
                 description = $"{skill.SkillName}的{(a == 1 ? "" : $"第{b}个")}{action.ActionType.GetDescription()}执行",
                 description2 = (skill.SkillId == 1 ? Owner.UnitNameEx : string.Empty) + (string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName),
                 priority = UnitCtrl.eCritPointPriority.ExecAction
             };
+#endif
             //change end
             if (action.ActionType == eActionType.REFLEXIVE)
                 return;
-            if (!action.HitOnceDic.ContainsKey(target))
+            if (!action.HitOnceDic.ContainsKey(currentTarget))
             {
                 ExecChildrenAction(action, skill, currentTarget, num, starttime, dictionary, _execChildNoFrame, finalProtectedTarget);
             }
@@ -1710,15 +1726,16 @@ namespace Elements
                 if (num != action.ExecTime.Length - 1)
                     return;
 
+#if !REDUCE_ANALYSE
                 if (action.ActionChildrenIndexes.Count > 0 &&
-                    action.HitOnceProbDic.TryGetValue(target, out var val) && val != null)
+                    action.HitOnceProbDic.TryGetValue(currentTarget, out var val) && val != null)
                 {
                     var children = string.Join(",",
                         action.ActionChildrenIndexes.Select(id => skill.ActionParameters[id]));
-                    val.description += $"(可能影响到技能{children}的执行，原定{(action.HitOnceDic[target] ? "执行" : "未执行")})";
+                    val.description += $"(可能影响到技能{children}的执行，原定{(action.HitOnceDic[currentTarget] ? "执行" : "未执行")})";
                 }
-                
-                if (action.HitOnceDic[target])
+#endif
+                if (action.HitOnceDic[currentTarget])
                 {
                     ExecChildrenAction(action, skill, currentTarget, num, starttime, dictionary, _execChildNoFrame, finalProtectedTarget);
                 }
@@ -2401,6 +2418,13 @@ namespace Elements
 
             void QuickSort(List<BasePartsData> _array, Func<BasePartsData, BasePartsData, int> _compare)
             {
+#if REDUCE_ANALYSE
+                if (_array.Count == 0)
+                    return;
+                UnitCtrl.FunctionalComparer<BasePartsData> instance = UnitCtrl.FunctionalComparer<BasePartsData>.Instance;
+                instance.SetComparer(_compare);
+                UnitCtrl.quickSortImpl(_array, 0, _array.Count - 1, instance);
+#else
                 _actionParameter.sortinfo = "";
                 var str = $"对{skill.SkillName}({_actionParameter.ActionId % 100 + 1}/{skill.ActionParameters.Count})进行排序：\n" +
                     $"{string.Join("\n", _array.Select(p => p == null ? "null" : selector(p)).ToArray())}";
@@ -2419,6 +2443,7 @@ namespace Elements
                     Owner.UIManager.LogMessage(str, eLogMessageType.EXEC_ACTION, Owner);
                     Owner.UIManager.LogMessage(str2, eLogMessageType.EXEC_ACTION, Owner);
                 }
+#endif
             }
 
             List<BasePartsData> targetList = _actionParameter.TargetList;
@@ -2436,7 +2461,9 @@ namespace Elements
             void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare,
                 Func<BasePartsDataEx, DoubleWithEx> getter)
             {
+#if !NO_PROB_EVENT
                 if (_actionParameter.TargetNum != 1) return;
+                if (_actionParameter.TargetList.Count == 0) return;
                 var nth = _actionParameter.TargetNth;
                 var tgt = targetList[Math.Min(lst.Count - 1, nth)];
                 var tgth = tgt.GetHashCode();
@@ -2462,6 +2489,7 @@ namespace Elements
                 };
                 _actionParameter.relatedEvent = evt;
                 GuildCalculator.Instance.dmglist.Add(evt);
+#endif
             }
 
             switch (_actionParameter.TargetSort)
@@ -2492,11 +2520,11 @@ namespace Elements
                     break;
                 case PriorityPattern.HP_ASC:
                     QuickSort(targetList, UnitCtrl.CompareLifeAsc);
-                    AddProbEvent(UnitCtrl.CompareLifeAsc, u => u.Hp / u.MaxHp);
+                    AddProbEvent(UnitCtrl.CompareLifeAsc, u => (DoubleWithEx)u.Hp / u.MaxHp);
                     break;
                 case PriorityPattern.HP_DEC:
                     QuickSort(targetList, UnitCtrl.CompareLifeDec);
-                    AddProbEvent(UnitCtrl.CompareLifeDec, u => u.Hp / u.MaxHp);
+                    AddProbEvent(UnitCtrl.CompareLifeDec, u => (DoubleWithEx)u.Hp / u.MaxHp);
                     break;
                 case PriorityPattern.OWNER:
                     targetList.Clear();

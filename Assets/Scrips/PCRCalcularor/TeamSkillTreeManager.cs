@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,17 +11,21 @@ namespace PCRCaculator
 {
     public class TeamSkillTreeManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static TeamSkillTreeManager Instance;
         public GameObject talentSkillPrefab;
         public RectTransform skillTreeContainer;
         public ScrollRect scrollRect;
+        public InputField masterPointInput;
         private Dictionary<int, TeamSkillNode> NodeDataDict => MainManager.Instance.TeamSkillNodeDic;
         private Dictionary<int, TeamSkillEnhanceData> enhanceDataDict;
         private Dictionary<int, List<int>> nodeChildrenDict;
         private Dictionary<int, TeamSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
-        private Dictionary<int, int> skillLevels = new Dictionary<int, int>();
+        public Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
     {
@@ -35,7 +40,7 @@ namespace PCRCaculator
         private const float SPACING_Y = 80f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -60,6 +65,8 @@ namespace PCRCaculator
             skillLevels = PlayerGroup.teamSkill;
             UpdateAllNodeUI();
             UpdateTalentInfoData();
+            SetupMasterPointInput();
+
         }
         public void ReLoad()
         {
@@ -85,7 +92,53 @@ namespace PCRCaculator
             BuildNodeRelationships();
             UpdateTalentInfoData();
         }
-
+        private void SetupMasterPointInput()
+        {
+            if (masterPointInput != null)
+            {
+                masterPointInput.onValueChanged.AddListener(OnMasterPointInputChanged);
+                UpdateMasterPointInput();
+            }
+        }
+        private void OnMasterPointInputChanged(string value)
+        {
+            if (int.TryParse(value, out int node_id))
+            {
+                int maxNodeId = NodeDataDict.Keys.Max();
+                if (node_id < maxNodeId && node_id > 0)
+                {
+                    EnhanceSkill(node_id, 1);
+                }
+                else if (node_id == 0)
+                {
+                    EnhanceSkill(1, 0);
+                }
+                else
+                {
+                    UpdateMasterPointInput();
+                }
+            }
+        }
+        private int GetMasterNodeId()
+        {
+            if (skillLevels.Count > 0)
+            {
+                var enhanceSkills = skillLevels.Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
+                if (enhanceSkills.Any())
+                {
+                    return enhanceSkills.Max();
+                }
+            }
+            return 0;
+        }
+        public void UpdateMasterPointInput()
+        {
+            if (masterPointInput != null)
+            {
+                int masterNodeId = GetMasterNodeId();
+                masterPointInput.text = masterNodeId.ToString();
+            }
+        }
         private void BuildNodeRelationships()
         {
             nodeChildrenDict = new Dictionary<int, List<int>>();
@@ -361,6 +414,7 @@ namespace PCRCaculator
                 }
                 UpdateAllNodeUI();
                 UpdateTalentInfoData();
+                UpdateMasterPointInput();
             }
             finally
             {
@@ -480,6 +534,15 @@ namespace PCRCaculator
             if (global) MainManager.Instance.PlayerSetting.teamSkill = activeSkills; //公共
             PlayerGroup.teamSkill = activeSkills; //队内
             GuildManager.Instance.SaveDataToJson();
+        }
+
+        public void SetSkillLevels(Dictionary<int, int> newSkillLevels)
+        {
+            skillLevels.Clear();
+            foreach (var kvp in newSkillLevels)
+            {
+                skillLevels[kvp.Key] = kvp.Value;
+            }
         }
     }
 }

@@ -76,7 +76,7 @@ namespace PCRCaculator
         public List<UnitAttackPattern> enemyAttackPatterns = new List<UnitAttackPattern>();
     }
     [Serializable]
-    public class TalentQuestWaveGroupData
+    public class WaveGroupDataBase
     {
         public int id;
         public int wave_group_id;

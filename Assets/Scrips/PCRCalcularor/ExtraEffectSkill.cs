@@ -15,38 +15,71 @@ namespace PCRCaculator
         void OnEnable()
         {
             // 计算quest_id值
-            int questId = GuildManager.Instance.TalentQuestWaveGroupId / 10;
+            int questId = GuildManager.Instance.WaveGroupId / 10;
 
             // 从数据表中找到匹配quest_id的数据
-            var battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
-                .Values
-                .Where(x => x.quest_id == questId)
-                .OrderBy(x => x.id)
-                .ToList();
-
-            // 加载精灵图集
-            var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
-                .ToDictionary(x => x.name, x => x);
-
-            // 按顺序设置TalentQuestBattleEffectPictures的图片
-            for (int i = 0; i < battleEffects.Count; i++)
+            List<object> battleEffects = new List<object>();
+            if (GuildManager.Instance.IsTalentQuestBoss)
             {
-                GameObject a = Instantiate(extraDetailPrefab);
-                a.transform.SetParent(Content);
-                ExtraEffecDetail detailComponent = a.GetComponent<ExtraEffecDetail>();
-                if (detailComponent != null && i < battleEffects.Count)
+                battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
+            else if (GuildManager.Instance.IsAbyssBoss)
+            {
+                battleEffects = MainManager.Instance.AbyssBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
+            else if (GuildManager.Instance.IsMirageBoss)
+            {
+                battleEffects = MainManager.Instance.MirageBattleEffectDic
+                    .Values
+                    .Where(x => x.quest_id == questId)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
+            if (battleEffects.Count > 0)
+            {
+                var firstEffect = battleEffects[0];
+                var iconProperty = firstEffect.GetType().GetProperty("icon_name");
+                var effectProperty = firstEffect.GetType().GetProperty("effect_name");
+                var descProperty = firstEffect.GetType().GetProperty("description");
+
+                // 加载精灵图集
+                var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
+                    .ToDictionary(x => x.name, x => x);
+
+                // 按顺序设置TalentQuestBattleEffectPictures的图片
+                foreach (var effectData in battleEffects)
                 {
-                    var effectData = battleEffects[i];
-                    if (sprites.ContainsKey(effectData.icon_name.ToString()))
+                    GameObject a = Instantiate(extraDetailPrefab);
+                    a.transform.SetParent(Content);
+                    ExtraEffecDetail detailComponent = a.GetComponent<ExtraEffecDetail>();
+                    if (detailComponent != null)
                     {
-                        detailComponent.Icon.sprite = sprites[effectData.icon_name.ToString()];
-                        detailComponent.Icon.gameObject.SetActive(true);
-                        detailComponent.nameText.text = effectData.effect_name;
-                        detailComponent.describeText.text = effectData.description;
-                    }
-                    else
-                    {
-                        detailComponent.Icon.gameObject.SetActive(false);
+                        string iconName = iconProperty != null ? iconProperty.GetValue(effectData)?.ToString() : "";
+                        string effectName = effectProperty != null ? effectProperty.GetValue(effectData)?.ToString() : "";
+                        string description = descProperty != null ? descProperty.GetValue(effectData)?.ToString() : "";
+
+                        if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
+                        {
+                            detailComponent.Icon.sprite = sprites[iconName];
+                            detailComponent.Icon.gameObject.SetActive(true);
+                            detailComponent.nameText.text = effectName ?? "";
+                            detailComponent.describeText.text = description ?? "";
+                        }
+                        else
+                        {
+                            detailComponent.Icon.gameObject.SetActive(false);
+                        }
                     }
                 }
             }

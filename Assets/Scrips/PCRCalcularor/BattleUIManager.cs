@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Elements;
 using Elements.Battle;
 using UnityEngine;
@@ -83,7 +84,7 @@ namespace PCRCaculator.Battle
 
         public RenderTexture screenShootTx;
         public CharacterPageButton screenshootBt;
-
+        public EquipmentPageIcon screenshootEx;
         public float DamageRandomScale;
         public float DamageScale;
 
@@ -106,6 +107,7 @@ namespace PCRCaculator.Battle
         private int[] UBButtonState = new int[5] { 0, 0, 0, 0, 0 };
 
         private List<byte[]> imageSaved = new List<byte[]>();
+        public List<byte[]> imageSaved2 = new List<byte[]>(); //ex装备图标
 
         public Dictionary<Elements.eStateIconType, bool> ShowBuffDic => MainManager.Instance.PlayerSetting.ShowBuffDic;
         public GameObject battleStatus;
@@ -116,7 +118,7 @@ namespace PCRCaculator.Battle
         private Dictionary<KeyCode, int> keyToValue;
         public GameObject PlayerEnvironmentUI;
         public GameObject EnemyEnvironmentUI;
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
             /*if (MainManager.Instance.UseNewBattleSystem)
@@ -129,7 +131,7 @@ namespace PCRCaculator.Battle
             }*/
 
         }
-        private void Start()
+        public void Start()
         {
             m_LastUpdateShowTime = Time.realtimeSinceStartup;
             if(myGameCtrl != null)
@@ -176,6 +178,7 @@ namespace PCRCaculator.Battle
             }
             debugStrList.Clear();
             imageSaved.Clear();
+            imageSaved2.Clear();
             timeScaleSlider.value = GuildManager.Instance.calSlider.value;
         }
         private HashSet<KeyCode> pressedKeys = new HashSet<KeyCode>();
@@ -310,6 +313,7 @@ namespace PCRCaculator.Battle
             string logtext = $"({fpsCount}/{BattleManager.Instance.FrameCount}){word}\n";
             debugStrList.Add(logtext);
             //sw.WriteLine(logtext);
+#if UNITY_5_3_OR_NEWER
             Text debugText = debugText1;//= isOther ? debugText2 : debugText1;
             ScrollRect scrollRect = scrollRect1;//isOther ? scrollRect2 : scrollRect1;
             int overText = debugText.text.Length - maxTextLength;
@@ -340,6 +344,13 @@ namespace PCRCaculator.Battle
             }
             debugText.text += logtext;
             scrollRect.verticalNormalizedPosition = 0;
+#else
+#if ENABLE_THREADING
+            Console.Write($"[Thread #{Thread.CurrentThread.ManagedThreadId}] " + logtext);
+#else
+            Console.Write(logtext);
+#endif
+#endif
             if (logMessageType == eLogMessageType.ERROR)
             {
 #if UNITY_EDITOR
@@ -442,7 +453,9 @@ namespace PCRCaculator.Battle
             SetToggle.isOn = gameCtrl.IsSetMode;
             if (!myGameCtrl.tempData.isGuildBattle)
             {
+#if !UNITY_EDITOR
                 debugBack.SetActive(false);
+#endif
                 // backGroundImage.sprite = jjcBackGround;
             }
             StartCoroutine(AutoSaveImage2());
@@ -859,6 +872,7 @@ namespace PCRCaculator.Battle
 
         public IEnumerator CaptureByUI(RectTransform UIRect,int extendValue=0)
         {
+#if UNITY_5_3_OR_NEWER
             //等待帧画面渲染结束
             yield return new WaitForEndOfFrame();
 
@@ -878,6 +892,9 @@ namespace PCRCaculator.Battle
             byte[] bytes = tex.EncodeToPNG();
             //保存
             imageSaved.Add(bytes);
+#else
+            yield return null;
+#endif
         }
         public IEnumerator AutoSaveImage()
         {
@@ -912,11 +929,26 @@ namespace PCRCaculator.Battle
             yield return new WaitForEndOfFrame();
             byte[] bytes2 = SaveRenderTexture(screenShootTx);
             imageSaved.Add(bytes2);
-
+            yield return null;
+            screenshootEx.SetActive(true);
+            for (int i = 0; i < myGameCtrl.tempData.playerList.Count; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    screenshootEx.SetExEquipmentIcon(myGameCtrl.tempData.playerList[i].unitId, myGameCtrl.tempData.playerList[i].exEquip[j], myGameCtrl.tempData.playerList[i].exEquipLevel[j], j);
+                    yield return null;
+                    yield return new WaitForEndOfFrame();
+                    byte[] equipBytes = SaveRenderTexture(screenShootTx);
+                    imageSaved2.Add(equipBytes); // 保存到imageSaved2
+                    yield return null;
+                }
+            }
+            screenshootEx.SetActive(false);
         }
         //将RenderTexture保存成一张png图片  
         public byte[] SaveRenderTexture(RenderTexture rt)
         {
+#if UNITY_5_3_OR_NEWER
             RenderTexture prev = RenderTexture.active;
             RenderTexture.active = rt;
             Texture2D png = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
@@ -927,12 +959,19 @@ namespace PCRCaculator.Battle
             png = null;
             RenderTexture.active = prev;
             return bytes;
+#else
+            return null;
+#endif
 
         }
         public List<byte[]> GetCharactersImage()
         {
             return imageSaved;
         }
+        // public List<byte[]> GetExequipImage()
+        // {
+        //     return imageSaved2;
+        // }
         public void SetBUFFUIShowButton()
         {
             if (!BattleHeaderController.Instance.GetIsPause())

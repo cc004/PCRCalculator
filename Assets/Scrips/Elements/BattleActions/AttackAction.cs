@@ -30,7 +30,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           Action<string> action = null)
         {
             /*if (BattleHeaderController.CurrentFrameCount == 4846 && _source.UnitId == 107101)
@@ -248,7 +248,7 @@ namespace Elements
             //_target.ShowHitEffect(_source.ToadDatas.Count > 0 ? _skill.WeaponType : _source.WeaponSeType, _skill, _source.IsLeftDir);
         }
 
-        protected override double getCriticalDamageRate(Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : _valueDictionary[eValueNumber.VALUE_6];
+        protected override double getCriticalDamageRate(ValueDictionary _valueDictionary) => _valueDictionary[eValueNumber.VALUE_6] == 0.0 ? 1f : _valueDictionary[eValueNumber.VALUE_6];
 
         public override void SetLevel(float _level)
         {
@@ -256,7 +256,7 @@ namespace Elements
             Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
             Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
-        protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
+        protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
         {
             DamageData damageData = base.createDamageData(_source, _target, _num, _valueDictionary, _actionDetail1, _isCritical, _skill, _actionTypeForSource, _isPhysicalForTarget);
             int num = (int)_valueDictionary[eValueNumber.VALUE_7];

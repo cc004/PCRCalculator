@@ -64,12 +64,12 @@ namespace Elements
                 }
                 else
                 {
-                    battleManager.IsPlayingPrincessMovie = true;
+                    battleManager.IsPrincessSkillMovieRunning = true;
                     if (current == 1)
-                        battleManager.CAOHLDNADPB = true;
+                        battleManager.IsPrincessSkillMovieFirstHalfRunning = true;
                     playPrincessFormMovie(current, _princessSkillMovieDatas, () =>
                     {
-                        battleManager.IsPlayingPrincessMovie = false;
+                        battleManager.IsPrincessSkillMovieRunning = false;
                         if (!owner.GetCurrentSpineCtrl().IsAnimation(spineCharacterAnimeId, current, _index3: owner.MotionPrefix))
                         {
                             this.finishSkill();
@@ -94,7 +94,7 @@ namespace Elements
         }
         private void finishSkill()
         {
-            battleManager.BFKPGHCBBKM = false;
+            battleManager.IsPrincessSkillRunning = false;
             //this.movieManager.SetMirrorMode(false);
             battleManager.SetBlackoutTimeZero();
             owner.SkillEndProcess();
@@ -179,6 +179,7 @@ namespace Elements
             else
                 owner.PlayAnime(eSpineCharacterAnimeId.IDLE, owner.MotionPrefix);
 
+#if UNITY_5_3_OR_NEWER
             if (battleManager.skipping) goto nomovie;
             for (int i = 0; i < 120;)
             {
@@ -192,9 +193,9 @@ namespace Elements
             }
 
             nomovie:
-            
+#endif
             if (_movieIndex == 1)
-                battleManager.CAOHLDNADPB = false;
+                battleManager.IsPrincessSkillMovieFirstHalfRunning = false;
             if (_callback == null)
                 yield break;
             _callback.Call();
@@ -221,7 +222,7 @@ namespace Elements
                     currentSpineCtrl.RealUpdate();
                     currentSpineCtrl.RealLateUpdate();
                     if (_movieIndex == 1)
-                        battleManager.CAOHLDNADPB = false;
+                        battleManager.IsPrincessSkillMovieFirstHalfRunning = false;
                     if (_callback == null)
                         break;
                 }
@@ -237,7 +238,7 @@ namespace Elements
 
         public void Prepare()
         {
-            battleManager.BFKPGHCBBKM = true;
+            battleManager.IsPrincessSkillRunning = true;
             bool flag = !forceNormalSD && owner.IsShadow;
             currentMovieType = !battleTimeScale.IsSpeedQuadruple ? (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW : eMovieType.PRINCESS_FORM_SKILL_NORMAL) : (flag ? eMovieType.PRINCESS_FORM_SKILL_SHADOW_4X : eMovieType.PRINCESS_FORM_SKILL_NORMAL_4X);
             //this.movieManager.Load(this.currentMovieType, (long) this.owner.UnionBurstSkillId, _movieIndex: 1L);
@@ -333,7 +334,7 @@ namespace Elements
 
         public void Pause(bool _pause)
         {
-            if (!battleManager.IsPlayingPrincessMovie)
+            if (!battleManager.IsPrincessSkillMovieRunning)
                 return;
             //this.movieManager.Pause(this.currentMovieType, this.currentMovieId, _pause, this.currentMovieIndex);
         }

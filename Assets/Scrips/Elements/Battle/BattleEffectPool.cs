@@ -28,7 +28,7 @@ namespace Elements.Battle
             SkillEffectCtrl component;
             if (!effectDictionary.ContainsKey(effectPrefab.name))
             {
-                component = Object.Instantiate(effectPrefab).GetComponent<SkillEffectCtrl>();
+                component = UnityEngine.Object.Instantiate(effectPrefab).GetComponent<SkillEffectCtrl>();
                 List<SkillEffectCtrl> skillEffectCtrlList = new List<SkillEffectCtrl>
                 {
           component
@@ -48,7 +48,7 @@ namespace Elements.Battle
                         return skillEffectCtrl;
                     }
                 }
-                component = Object.Instantiate(effectPrefab).GetComponent<SkillEffectCtrl>();
+                component = UnityEngine.Object.Instantiate(effectPrefab).GetComponent<SkillEffectCtrl>();
                 effect.Add(component);
             }
             component.ResetParameter(effectPrefab, source != null ? UnitUtility.GetSkinId(source.SoundUnitId, source.SDSkin) : 0, _isShadow);

@@ -31,7 +31,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+      ValueDictionary _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       if (_target.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_DAMAGE_MOTION))
@@ -74,7 +74,7 @@ namespace Elements
         private void recoverTarget(UnitCtrl _source, BasePartsData _target, int _hpDiff)
         {
             int num = Mathf.Min(_hpDiff, (int)(_target.Owner.MaxHp - (long)_target.Owner.Hp));
-            _target.Owner.SetRecovery(num, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _target: _target);
+            _target.Owner.SetRecovery(num, 0, UnitCtrl.eInhibitHealType.NO_EFFECT, _source, _isEffect: (EffectType == eEffectType.COMMON), _target: _target);
         }
     }
 }

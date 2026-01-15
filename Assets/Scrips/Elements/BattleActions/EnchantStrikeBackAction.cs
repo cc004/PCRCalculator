@@ -12,12 +12,18 @@ namespace Elements
 {
     public class EnchantStrikeBackAction : ActionParameter
     {
+
+      	private ActionParameter targetAction { get; set; }
+
         public override void ExecActionOnStart(
           Skill _skill,
           UnitCtrl _source,
           UnitActionController _sourceActionController)
         {
             base.ExecActionOnStart(_skill, _source, _sourceActionController);
+            targetAction = _skill.ActionParameters.Find(ap => ap.ActionId == this.ActionDetail3);
+            if (targetAction != null)
+              targetAction.IgnoreTriggerCausedByTrigger = true;
             /*switch (this.ActionDetail2)
             {
               case 1:
@@ -32,6 +38,16 @@ namespace Elements
             }*/
         }
 
+        public override void ReadyAction(
+          UnitCtrl _source,
+          UnitActionController _sourceActionController,
+          Skill _skill)
+        {
+            base.ReadyAction(_source, _sourceActionController, _skill);
+            if (targetAction != null)
+              targetAction.CancelByIfForAll = true;
+        }
+
         public override void ExecAction(
           UnitCtrl _source,
           BasePartsData _target,
@@ -40,7 +56,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+          ValueDictionary _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
@@ -102,10 +118,13 @@ namespace Elements
                 StrikeBackData strikeBackData = new StrikeBackData
                 {
                     StrikeBackType = (StrikeBackData.eStrikeBackType)ActionDetail1,
-                    Damage = (int)_valueDictionary[eValueNumber.VALUE_1],
+                    Damage = BattleUtil.DoubleToLong(_valueDictionary[eValueNumber.VALUE_1]),
                     EffectType = (eStrikeBackEffectType)ActionDetail2,
                     ActionEffectList = ActionEffectList,
-                    Skill = _skill
+                    Skill = _skill,
+                    Source = _source,
+                    IsEnvironmentAbnormalState = IsEnvironmentAbnormalState,
+                    TargetAction = targetAction
                 };
                 strikeBackData.DataSet = strikeBackDataSet;
                 strikeBackDataSet.DataList.Add(strikeBackData);
@@ -126,6 +145,7 @@ namespace Elements
             TOY = 1,
             OMEME = 2,
             OMEME_PLUS = 3,
+            LIGHT_SHIELD = 4,
         }
 
         public class eStrikeBackEffectType_DictComparer : IEqualityComparer<eStrikeBackEffectType>

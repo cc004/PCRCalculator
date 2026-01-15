@@ -197,6 +197,8 @@ namespace Elements
 
         public int LimitNum;
 
+        public bool UseCoolTime; // 0x44
+
         public Dictionary<eExSkillCondition, ExConditionPassiveData> ExSkillConditionData { get; private set; } = new Dictionary<eExSkillCondition, ExConditionPassiveData>();
 
 
@@ -205,7 +207,8 @@ namespace Elements
             owner = _owner;
             //exSkillScriptable = ManagerSingleton<ResourceManager>.Instance.LoadResourceImmediately(eResourceId.EQUIPMANT_SKILL, _id) as ExSkillScriptable;
             skill = _actionController.CreateExSkill(_id, null, this);
-            _battleManager.AppendCoroutine(updateCoolTime(_battleManager), ePauseType.SYSTEM);
+            if (UseCoolTime)
+                _battleManager.AppendCoroutine(updateCoolTime(_battleManager), ePauseType.SYSTEM);
         }
 
         private IEnumerator updateCoolTime(BattleManager _battleManager)

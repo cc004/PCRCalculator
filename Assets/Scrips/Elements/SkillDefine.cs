@@ -743,6 +743,10 @@ namespace Elements
             {
                 eActionType.ENCHANT_TRIGGER,
                 typeof(EnchantTriggerAction)
+            },
+            {
+                eActionType.TAUNT,
+                typeof(TauntAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>

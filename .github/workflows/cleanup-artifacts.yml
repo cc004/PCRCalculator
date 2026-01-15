@@ -1,0 +1,96 @@
+name: Cleanup Artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'  # 所有分支
+  pull_request:
+    branches:
+      - '**'  # 所有分支
+
+concurrency:
+  group: cleanup-artifacts
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup old artifacts
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const quotaBytes = 1024 * 1024 * 1024; // 免费仓库的 500MB 配额
+
+            // --- 获取所有 artifacts ---
+            let artifacts = [];
+            let page = 1;
+
+            while (true) {
+              const res = await github.rest.actions.listArtifactsForRepo({
+                owner,
+                repo,
+                per_page: 100,
+                page
+              });
+
+              artifacts = artifacts.concat(res.data.artifacts);
+
+              if (res.data.artifacts.length < 100) break; // 无更多分页
+              page++;
+            }
+
+            if (artifacts.length === 0) {
+              console.log("No artifacts found.");
+              return;
+            }
+
+            // --- 计算已用空间 ---
+            const totalSize = artifacts.reduce((sum, a) => sum + a.size_in_bytes, 0);
+            const usedPercent = (totalSize / quotaBytes) * 100;
+
+            console.log(`Total artifact size: ${(totalSize/1024/1024).toFixed(2)} MB`);
+            console.log(`Used: ${usedPercent.toFixed(2)}%`);
+
+            if (usedPercent < 70) {
+              console.log("Usage < 70%. No cleanup needed.");
+              return;
+            }
+
+            console.log("Usage > 70%. Start deleting...");
+
+            // --- 按创建时间从旧到新排序 ---
+            artifacts.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+            let currentSize = totalSize;
+
+            // --- 删除直到占用 < 50% ---
+            for (const art of artifacts) {
+              const percentNow = (currentSize / quotaBytes) * 100;
+              if (percentNow <= 50) {
+                console.log(`Current usage ${percentNow.toFixed(2)}% < 50%. Stop.`);
+                break;
+              }
+
+              console.log(`Deleting ${art.name} (${(art.size_in_bytes/1024/1024).toFixed(2)} MB)`);
+
+              await github.rest.actions.deleteArtifact({
+                owner,
+                repo,
+                artifact_id: art.id
+              });
+
+              currentSize -= art.size_in_bytes;
+            }
+
+            console.log(`Cleanup complete. Final usage: ${((currentSize / quotaBytes) * 100).toFixed(2)}%`);

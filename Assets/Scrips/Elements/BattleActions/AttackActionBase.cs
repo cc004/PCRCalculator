@@ -4,11 +4,12 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
-using System;
-using System.Collections.Generic;
 using Cute;
 using Elements.Battle;
 using PCRCaculator.Guild;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Elements
@@ -60,7 +61,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+          ValueDictionary _valueDictionary)
         {
         }
 
@@ -199,7 +200,7 @@ namespace Elements
           UnitCtrl _source,
           BasePartsData _target,
           int _num,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           eAttackType _actionDetail1,
           bool _isCritical,
           Skill _skill,
@@ -282,7 +283,7 @@ namespace Elements
                 DefPenetrate = (_isPhysicalForTarget ? _source.PhysicalPenetrateZero : _source.MagicPenetrateZero),
                 LifeSteal = (_source.IsPartsBoss ? parts.GetLifeStealZero() : ((int)_source.LifeStealZero)),
                 CriticalDamageRate = criticalDamageRate,
-                TargetIncludeMyTeam = TargetAssignment != eTargetAssignment.OTHER_SIDE || IsEnvironmentAbnormalState, // TODO IsEnvironmentAbnormalState to find where set
+                TargetIncludeMyTeam = TargetAssignment != eTargetAssignment.OTHER_SIDE || IsEnvironmentAbnormalState,
                 ActionType = _actionType,
                 IsAlwaysChargeEnegry = IsAlwaysChargeEnegry
             };
@@ -327,7 +328,7 @@ namespace Elements
             }
             return damageData;
         }
-        private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
+        private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk)
         {
             var num = _valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3];
             num *= _target.Owner.GetDebuffDamageUpValue();
@@ -361,7 +362,7 @@ namespace Elements
             return num3;
         }
 
-        private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, LongWithEx _atk)
+        private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk)
         {
             LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
@@ -381,7 +382,7 @@ namespace Elements
             return num;
         }
 
-        protected virtual double getCriticalDamageRate(Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => 1f;
+        protected virtual double getCriticalDamageRate(ValueDictionary _valueDictionary) => 1f;
 
         public override void SetLevel(float _level)
         {

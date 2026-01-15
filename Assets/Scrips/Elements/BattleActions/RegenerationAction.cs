@@ -42,7 +42,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -60,7 +60,7 @@ namespace Elements
             Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
             Value[eValueNumber.VALUE_5] = (float)(MasterData.action_value_5 + MasterData.action_value_6 * _level);
         }
-        private long calculateHealValue(UnitCtrl _source, long _statusValue, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+        private long calculateHealValue(UnitCtrl _source, long _statusValue, ValueDictionary _valueDictionary)
         {
             switch (base.ActionDetail2)
             {

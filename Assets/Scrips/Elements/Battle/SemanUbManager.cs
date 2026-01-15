@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PCRCaculator.Guild;
 using static Elements.UnitCtrl;
 
 namespace Elements.Battle
 {
     public class SemanUbManager
     {
-        static private List<UnitCtrl> players;
+        private List<UnitCtrl> players;
 
-        static private Dictionary<ActionState, int> State2Id = new Dictionary<ActionState, int>
+        private Dictionary<ActionState, int> State2Id = new Dictionary<ActionState, int>
         {
             // { ActionState.ATK, 0 },
             { ActionState.SKILL_1, 1 },
@@ -18,26 +19,41 @@ namespace Elements.Battle
         private bool ubMod;
         public enum Action
         {
+            NO_UB = -1,
             COUNTDOWN = 0,
             WAIT_TP_FULL = 1,
             WAIT_UNIT_ACTION = 2,
-            NO_UB = 4,
+            WAIT_UNIT_EXEC = 3, // ignore what skill, exclude ub
+            WAIT_EXEC = 4, // ignore who skill, exclude ub
+            WAIT_UB = 5, // ignore who, only ub
+            COUNTDOWN_EXCLUDE_IDLE = 6, // countdown but exclude idle
         }
 
         public class UbRecord
         {
-            public bool skillReady { 
+            public bool skillReady
+            {
                 get
                 {
-                    return unitId < SemanUbManager.players.Count && SemanUbManager.players[unitId].IsSkillReady;
+                    return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
+                }
+            }
+            public bool IsIdle
+            {
+                get
+                {
+                    return unitId < parent.players.Count && parent.players[unitId].CurrentState == ActionState.IDLE;
                 }
             }
             public int delay = 0;
+            public int no_idle_delay = 0;
             public int unitId = 0;
             public List<UbStatus> history = new List<UbStatus>();
+            private SemanUbManager parent;
 
-            public UbRecord(int unitId)
+            public UbRecord(SemanUbManager parent, int unitId)
             {
+                this.parent = parent;
                 this.unitId = unitId;
             }
 
@@ -55,13 +71,13 @@ namespace Elements.Battle
             public void OnChangeStateCallBack(int unitPos, ActionState state)
             {
                 if (!skillReady) return;
-                if (SemanUbManager.State2Id.ContainsKey(state))
+                if (parent.State2Id.ContainsKey(state))
                 {
-                    var stateId = SemanUbManager.State2Id[state];
+                    var stateId = parent.State2Id[state];
                     var frame = BattleHeaderController.CurrentFrameCount;
-                    if (history.Count == 0 || history.Last().frame < frame || history.Last().waitUnit != unitPos || history.Last().skillId != stateId)
+                    if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == stateId) == 0)
                     {
-                        history.Add(new UbStatus
+                        history.Add(new UbStatus(parent)
                         {
                             waitUnit = unitPos,
                             skillId = stateId,
@@ -70,14 +86,14 @@ namespace Elements.Battle
                     }
                 }
             }
-            
+
             public void OnSkillCallBack(int unitPos, int skillId)
             {
                 if (!skillReady) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || history.Last().frame < frame || history.Last().waitUnit != unitPos || history.Last().skillId != skillId)
+                if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == skillId) == 0)
                 {
-                    history.Add(new UbStatus
+                    history.Add(new UbStatus(parent)
                     {
                         waitUnit = unitPos,
                         skillId = skillId,
@@ -95,13 +111,17 @@ namespace Elements.Battle
                         ub.delay++;
                     }
                     delay++;
+                    if (!IsIdle)
+                    {
+                        no_idle_delay++;
+                    }
                 }
             }
 
             public int GetUbNumber(int unitId)
             {
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || 
+                if (history.Count == 0 ||
                 (delay == 0 && history.Count(h => h.skillId == 1) == 0)) // set and not after other ub
                 {
                     return delay;
@@ -140,7 +160,7 @@ namespace Elements.Battle
                     // self skill
                     h => h.waitUnit == unitId, 
                     // anyway
-                    h => true, 
+                    h => true,
                 };
 
                 foreach (var condition in conditions)
@@ -153,18 +173,69 @@ namespace Elements.Battle
                     }
                 }
 
-                int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
-                if (trigger >= 10 || lastDelay >= 10)
+                if (last.skillId == 9 || // auto
+                    last.skillId == 1 && GuildManager.Instance.SemanUBToggles[0].isOn ||
+                    last.skillId != 1 && GuildManager.Instance.SemanSkillToggles[1].isOn)
                 {
-                    // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                    return delay;
+                    int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
+                    if (trigger >= 10 || lastDelay >= 10)
+                    {
+                        // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                        return delay;
+                    }
+                    return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
                 }
-                return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
+                else if (last.skillId == 1 && GuildManager.Instance.SemanUBToggles[1].isOn)
+                {
+                    int trigger = history.Where(h => h.skillId == last.skillId).Select(x => x.frame).ToHashSet().Count() - 1;
+                    if (trigger >= 100 || lastDelay >= 100)
+                    {
+                        // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                        return delay;
+                    }
+                    return 40000 + trigger * 100 + lastDelay;
+                }
+                else // skill
+                {
+                    if (GuildManager.Instance.SemanSkillToggles[0].isOn)
+                    {
+                        return delay;
+                    }
+                    else if (GuildManager.Instance.SemanSkillToggles[2].isOn)
+                    {
+                        int trigger = history.Count(h => h.waitUnit == last.waitUnit && h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION) - 1;
+                        if (trigger >= 100 || lastDelay >= 10)
+                        {
+                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                            return delay;
+                        }
+                        return 20000 + last.waitUnit * 1000 + trigger * 10 + lastDelay;
+                    }
+                    else if (GuildManager.Instance.SemanSkillToggles[3].isOn)
+                    {
+                        int trigger = history.Where(h => h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION).Select(x => x.frame).ToHashSet().Count() - 1;
+                        if (trigger >= 100 || lastDelay >= 100)
+                        {
+                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
+                            return delay;
+                        }
+                        return 30000 + trigger * 100 + lastDelay;
+                    }
+                    else //if (GuildManager.Instance.SemanSkillToggles[3].isOn)
+                    {
+                        if (IsIdle)
+                        {
+                            return delay;
+                        }
+                        return 50000 + no_idle_delay;
+                    }
+                }
             }
 
             public void Clear()
             {
                 delay = 0;
+                no_idle_delay = 0;
                 history.Clear();
             }
 
@@ -172,11 +243,26 @@ namespace Elements.Battle
 
         public class UbStatus
         {
+            public SemanUbManager parent;
+
+            public UbStatus(SemanUbManager parent)
+            {
+                this.parent = parent;
+            }
+
             public Action action { get; set; }
             public bool skillReady { 
                 get
                 {
-                    return unitId < SemanUbManager.players.Count && SemanUbManager.players[unitId].IsSkillReady;
+                    return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
+                }
+            }
+
+            public bool IsIdle
+            {
+                get
+                {
+                    return unitId < parent.players.Count && parent.players[unitId].CurrentState == ActionState.IDLE;
                 }
             }
             public int unitId { get; set; }
@@ -205,7 +291,10 @@ namespace Elements.Battle
             public void OnSkillCallBack(int unitPos, int skillId)
             {
                 if (!skillReady) return;
-                if (action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && this.skillId == skillId && lastUpdateFrame < BattleHeaderController.CurrentFrameCount)
+                if (lastUpdateFrame < BattleHeaderController.CurrentFrameCount && (
+                    action == Action.WAIT_EXEC || (waitUnit == unitPos &&
+                    (action == Action.WAIT_UNIT_EXEC || (action == Action.WAIT_UNIT_ACTION && this.skillId == skillId))
+                    )))
                 {
                     trigger--;
                     lastUpdateFrame = BattleHeaderController.CurrentFrameCount;
@@ -218,19 +307,22 @@ namespace Elements.Battle
 
             public void ProcessFrame()
             {
-                if (skillReady && action == Action.COUNTDOWN)
+                if (skillReady && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle))
                     delay--;
             }
 
             public bool IsUbExec()
             {
-                return skillReady && action == Action.COUNTDOWN && delay <= 0;
+                return skillReady && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle) && delay <= 0;
             }
 
             public void OnChangeStateCallBack(int unitPos, ActionState state)
             {
                 if (!skillReady) return;
-                if (action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && State2Id.ContainsKey(state) && skillId == State2Id[state])
+                if ((action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && parent.State2Id.ContainsKey(state) && skillId == parent.State2Id[state]) ||
+                    (state == ActionState.SKILL_1 && action == Action.WAIT_UB)
+                    // (state == ActionState.SKILL_1 && (action == Action.WAIT_UB || action == Action.WAIT_EXEC))
+                )
                 {
                     trigger--;
                     if (trigger < 0)
@@ -244,9 +336,18 @@ namespace Elements.Battle
         public UbStatus GetUbStatus(int unitId, int num) // xxxxx
         {
             int op = num / 10000;
-            if (op == 0)
+            if (num < 0)
             {
-                return new UbStatus
+                return new UbStatus(this)
+                {
+                    action = Action.NO_UB,
+                    unitId = unitId,
+                    delay = 0
+                };
+            }
+            else if (op == 0)
+            {
+                return new UbStatus(this)
                 {
                     action = Action.COUNTDOWN,
                     unitId = unitId,
@@ -260,7 +361,7 @@ namespace Elements.Battle
                 int skillId = num / 100 % 10;
                 int trigger = num / 10 % 10;
                 int delay = num % 10;
-                return new UbStatus
+                return new UbStatus(this)
                 {
                     action = Action.WAIT_UNIT_ACTION,
                     unitId = unitId,
@@ -270,14 +371,58 @@ namespace Elements.Battle
                     delay = delay
                 };
             }
-            else // >= 20000
+            else if (op == 2)
             {
-                return new UbStatus
+                int unitPos = num / 1000 % 10;
+                int trigger = num / 10 % 100;
+                int delay = num % 10;
+                return new UbStatus(this)
                 {
-                    action = Action.NO_UB,
+                    action = Action.WAIT_UNIT_EXEC,
                     unitId = unitId,
-                    delay = 0
+                    waitUnit = unitPos,
+                    trigger = trigger,
+                    delay = delay
                 };
+            }
+            else if (op == 3)
+            {
+                int trigger = num / 100 % 100;
+                int delay = num % 100;
+                return new UbStatus(this)
+                {
+                    action = Action.WAIT_EXEC,
+                    unitId = unitId,
+                    trigger = trigger,
+                    delay = delay
+                };
+            }
+            else if (op == 4)
+            {
+                int trigger = num / 100 % 100;
+                int delay = num % 100;
+                return new UbStatus(this)
+                {
+                    action = Action.WAIT_UB,
+                    unitId = unitId,
+                    trigger = trigger,
+                    delay = delay
+                };
+            }
+            else if (op == 5)
+            {
+                int delay = num % 10000;
+                return new UbStatus(this)
+                {
+                    action = Action.COUNTDOWN_EXCLUDE_IDLE,
+                    unitId = unitId,
+                    trigger = 0,
+                    delay = delay
+                };
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid operation code: {op}");
             }
         }
 
@@ -300,11 +445,11 @@ namespace Elements.Battle
             if (ublists == null || ublists.Count == 0)
             {
                 auto2seman = new List<UbRecord>() {
-                    new UbRecord(unitId: 0),
-                    new UbRecord(unitId: 1),
-                    new UbRecord(unitId: 2),
-                    new UbRecord(unitId: 3),
-                    new UbRecord(unitId: 4),
+                    new UbRecord(this, unitId: 0),
+                    new UbRecord(this, unitId: 1),
+                    new UbRecord(this, unitId: 2),
+                    new UbRecord(this, unitId: 3),
+                    new UbRecord(this, unitId: 4),
                 };
                 auto2semanAll = new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
                 return;
@@ -445,7 +590,7 @@ namespace Elements.Battle
         public void SetUnitCallBack(List<UnitCtrl> players, UnitCtrl boss)
         {
             if (!enable) return;
-            SemanUbManager.players = players;
+            this.players = players;
             for (int i = 0; i < players.Count; i++)
             {
                 int localIndex = i;
@@ -466,7 +611,7 @@ namespace Elements.Battle
             {
                 var ub = new List<int>(seman)
                 {
-                    30000
+                    -1
                 };
                 ret.Add(ub);
             }

@@ -19,7 +19,7 @@ namespace Elements
         }
 
         // RVA: 0x3107728 Offset: 0x3107728 VA: 0x3107728 Slot: 8
-        public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary, Action<string> action = null)
+        public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, ValueDictionary _valueDictionary, Action<string> action = null)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary, action);
 
@@ -97,6 +97,36 @@ namespace Elements
 
             sealBuffDebuffData.UpdateValue(displayCount);
             sealBuffDebuffData.StartTimer();
+        }
+        public override DoubleWithEx GetActionBaseValue(UnitCtrl _source, eValueNumber _type)
+        {
+            // 默认值
+            DoubleWithEx value = 0.0;
+
+            Value.TryGetValue(_type, out value);
+
+            if (_type != eValueNumber.VALUE_2)
+                return value;
+
+            UnitCtrl.BuffParamKind paramKind = BuffDebuffAction.GetChangeParamKind(ActionDetail1);
+
+            if (!BuffDebuffAction.BUFF_DEBUFF_ENHANCE_TARGET_TYPE.Contains(paramKind))
+                return value;
+
+            if (IsExEquipSkillAction)
+                return value;
+
+            long enhanceZero = 0;
+            if (_source != null)
+            {
+                if (ActionDetail1 % 10 != 1)
+                    enhanceZero = _source.BuffEnhanceZero;
+                else
+                    enhanceZero = _source.DebuffEnhanceZero;
+            }
+
+            double rate = enhanceZero / 10000.0 + 1.0;
+            return value * rate;
         }
 
         // RVA: 0x3107ED0 Offset: 0x3107ED0 VA: 0x3107ED0 Slot: 9

@@ -31,16 +31,16 @@ namespace Elements
 			}
 		};
 
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, ValueDictionary _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			if (ActionDetail3 != 0)
                 EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
 			double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
-			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0)) < pp || ActionDetail1 == (int)eSlipDamageType.WORLD_LIGHTNING) // TODO add world lighting hit
+			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0)) < pp)
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);
-				_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)base.ActionDetail1], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], (float)_valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f);
+				_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)base.ActionDetail1], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], (float)_valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _isEnvironmentAbnormalState: IsEnvironmentAbnormalState);
 				return;
 			}
 			ActionExecedData actionExecedData = base.AlreadyExecedData[_target.Owner][_num];

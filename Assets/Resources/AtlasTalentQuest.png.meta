@@ -369,7 +369,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss_damage_cut
+      name: 18
       rect:
         serializedVersion: 2
         x: 132
@@ -957,7 +957,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_40
+      name: 33
       rect:
         serializedVersion: 2
         x: 389
@@ -1794,6 +1794,7 @@ TextureImporter:
       15: -289901491
       16: -919737227
       17: 779109508
+      18: -1624380152
       19: -264932425
       2: -438482552
       21: -1794796925
@@ -1803,6 +1804,7 @@ TextureImporter:
       25: 1424385556
       26: -673246404
       3: 91483858
+      33: -1896570772
       34: -845522429
       4: -891424294
       5: -1571883520
@@ -1824,7 +1826,6 @@ TextureImporter:
       AtlasTalentQuest_33: -777977200
       AtlasTalentQuest_35: 708209630
       AtlasTalentQuest_37: 749299852
-      AtlasTalentQuest_40: -1896570772
       AtlasTalentQuest_46: 1360805372
       AtlasTalentQuest_49: -1646420635
       AtlasTalentQuest_5: -756623791
@@ -1854,7 +1855,6 @@ TextureImporter:
       AtlasTalentQuest_77: -759194298
       AtlasTalentQuest_8: 1232919559
       boss_atk_up: 1158485177
-      boss_damage_cut: -1624380152
       boss_def_lower_limit: 1456415224
       boss_def_up: 561708996
       boss_haste: -674558318

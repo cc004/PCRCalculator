@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace ActionParameterSerializer.Actions
 {
     public class RatioDamageAction : ActionParameter
@@ -29,20 +31,30 @@ namespace ActionParameterSerializer.Actions
             {
                 r = Utils.JavaFormat("(%s)", r);
             }
+            StringBuilder str = new StringBuilder();
             switch (hptype)
             {
                 case HPtype.max:
-                    return Utils.JavaFormat(Utils.GetString("Deal_damage_equal_to_s1_of_target_max_HP_to_s2"),
-                        r, targetParameter.buildTargetClause());
+                    str.Append(Utils.JavaFormat(Utils.GetString("Deal_damage_equal_to_s1_of_target_max_HP_to_s2"),
+                        r, targetParameter.buildTargetClause()));
+                    break;
                 case HPtype.current:
-                    return Utils.JavaFormat(Utils.GetString("Deal_damage_equal_to_s1_of_target_current_HP_to_s2"),
-                        r, targetParameter.buildTargetClause());
+                    str.Append(Utils.JavaFormat(Utils.GetString("Deal_damage_equal_to_s1_of_target_current_HP_to_s2"),
+                        r, targetParameter.buildTargetClause()));
+                    break;
                 case HPtype.originalMax:
-                    return Utils.JavaFormat(Utils.GetString("Deal_damage_equal_to_s1_of_targets_original_max_HP_to_s2"),
-                        r, targetParameter.buildTargetClause());
+                    str.Append(Utils.JavaFormat(Utils.GetString("Deal_damage_equal_to_s1_of_targets_original_max_HP_to_s2"),
+                        r, targetParameter.buildTargetClause()));
+                    break;
                 default:
-                    return base.localizedDetail(level, property);
+                    str.Append(base.localizedDetail(level, property));
+                    break;
             }
+            if (actionDetail3 != 0)
+            {
+                str.Append(Utils.JavaFormat(Utils.GetString("recover_tp_by_damage_divided_by_s1"), 100 - actionDetail3));
+            }
+            return str.ToString();
         }
     }
 }

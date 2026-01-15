@@ -142,7 +142,9 @@ public class KnifeDamagePanel : MonoBehaviour
 
         // 计算总伤害（当前伤害 + UB伤害）
         double combinedDamage = currentTotalDamage + totalUBDamage;
-        return $"<color=#6600CC>{Math.Round(combinedDamage / 10000.0) + "w"}</color>";
+        long totalDamage = TimelineData.totalDamage;
+        double present = 100.0 * combinedDamage / totalDamage;
+        return $" ({present:F2}%) <color=#6600CC>{Math.Round(combinedDamage / 10000.0) + "w"}</color>";
     }
 
     private void SetCellText(GameObject cell, string[] content)

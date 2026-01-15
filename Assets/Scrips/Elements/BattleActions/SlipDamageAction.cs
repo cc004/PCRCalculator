@@ -38,14 +38,26 @@ namespace Elements
         eSlipDamageType.COMPENSATION,
         UnitCtrl.eAbnormalState.COMPENSATION
       },
-            {
-                eSlipDamageType.POISON2,
-                UnitCtrl.eAbnormalState.POISON2
-            },
-            {
-                eSlipDamageType.CURSE2,
-                UnitCtrl.eAbnormalState.CURSE2
-            }
+      {
+          eSlipDamageType.POISON2,
+          UnitCtrl.eAbnormalState.POISON2
+      },
+      {
+          eSlipDamageType.CURSE2,
+          UnitCtrl.eAbnormalState.CURSE2
+      },
+      {
+          eSlipDamageType.BLACK_FRAME,
+          UnitCtrl.eAbnormalState.BLACK_FRAME
+      },
+      // {
+      //     eSlipDamageType.WORLD_LIGHTNING,
+      //     UnitCtrl.eAbnormalState.WORLD_LIGHTNING
+      // },
+      {
+          eSlipDamageType.RATIO,
+          UnitCtrl.eAbnormalState.RATIO_SLIP
+      }
     };
     private enum eCancelTriggerType
     {
@@ -65,7 +77,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+      ValueDictionary _valueDictionary,
       Action<string> callback)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -134,7 +146,11 @@ namespace Elements
       HEX,
       COMPENSATION,
       POISON2,
-      CURSE2
+      CURSE2,
+      BLACK_FRAME,
+      WORLD_LIGHTNING,
+
+      RATIO,
     }
 
     private class eSlipDamageType_DictComparer : IEqualityComparer<eSlipDamageType>

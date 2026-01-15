@@ -15,7 +15,11 @@ namespace Elements.Battle
 {
     public class AbnormalStateDataBase : ISingletonField
     {
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+#else
         private static BattleManager staticBattleManager;
+#endif
         private const float FIELD_INTERVAL = 1f;
         //protected SkillEffectCtrl skillEffect;
         //private static Yggdrasil<AbnormalStateDataBase> staticSingletonTree;

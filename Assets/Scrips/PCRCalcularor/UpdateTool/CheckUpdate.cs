@@ -381,6 +381,7 @@ namespace PCRCaculator.Update
             Debug.Log($"成功生成{ver}/{as1}/{asold}!");*/
         }
     }
+
     public static class Log
     {
         public static Action<string, Color> LogAction;

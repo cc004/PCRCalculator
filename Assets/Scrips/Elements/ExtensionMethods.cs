@@ -560,31 +560,6 @@ namespace Elements
       _self.PlayReverse();
     }*/
 
-    public static void SetParentWithChangeLayer(
-      this Transform _self,
-      Transform _parent,
-      bool _worldPositionStays = true)
-    {
-      _self.SetParent(_parent, _worldPositionStays);
-      _self.ChangeChildObjectLayer(_parent.gameObject.layer);
-    }
-
-    public static void ChangeChildObjectLayer(this Transform _self, int _layer)
-    {
-      _self.gameObject.layer = _layer;
-      recursivChildObjectLayer(_self, _layer);
-    }
-
-    private static void recursivChildObjectLayer(Transform _transform, int _layer)
-    {
-      for (int index = 0; index < _transform.childCount; ++index)
-      {
-        Transform child = _transform.GetChild(index);
-        child.gameObject.layer = _layer;
-        recursivChildObjectLayer(child, _layer);
-      }
-    }
-
     [Conditional("UNITY_EDITOR")]
     public static void setGameObjectNameForEditor(this GameObject currentObj, string objName)
     {

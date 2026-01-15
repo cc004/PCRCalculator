@@ -33,6 +33,8 @@ namespace Elements
 
     public bool IsReleasedByDamage { get; set; }
 
+    public bool IsEnvironmentAbnormalState { get; set; }
+
     public int AbsorberValue { get; set; }
 
     public Skill Skill { get; set; }

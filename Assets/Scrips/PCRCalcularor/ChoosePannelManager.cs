@@ -34,8 +34,9 @@ namespace PCRCaculator
                     _ => "未知"
                 };
                 equip_id = data.ex_equipment_id;
-                text = $"{color}-{data.name}";
-                image = Resources.Load<Sprite>($"extraequip/icon_extra_equip_{equip_id}");
+                var name = MainManager.Instance.databaseCache.exEquipmentName_cn.TryGetValue(equip_id, out var cnName) ? cnName : data.name;
+                text = $"{color}-{name}";
+                image = ABExTool.GetSprites(ABExTool.SpriteType.EX装备, equip_id);
             }
 
             private ExEquipOption()
@@ -605,7 +606,8 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitSecondMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn, equip_second_full: true);
+            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn, equip_second_full: true);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
             RefreshSettingPage();
@@ -613,7 +615,8 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitMax()
         {
-            playerData.playrCharacters[selectedCharacterId_setting].SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
+            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
             RefreshSettingPage();
@@ -621,9 +624,10 @@ namespace PCRCaculator
         }
         public void SetAllUnitMax()
         {
+            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
             foreach (UnitData a in playerData.playrCharacters)
             {
-                a.SetMax(GuildManager.Instance.IsGuildBoss, isSetMaxExEquip.isOn);
+                a.SetMax(battleMode, isSetMaxExEquip.isOn);
                 a.SetMaxLove();
             }
             RefreshSettingValues();
@@ -995,12 +999,23 @@ namespace PCRCaculator
                         for (int i = 0; i < subItems.Length; i++)
                         {
                             var subItem = subItems[i];
-                            var statusKeys = exEquipData.status.Keys.Select(k =>
+                            int typeIndex = 0;
+                            var statusKeys = exEquipData.status.Keys.Select((k, index) =>
                             {
-                                if (k is Enum enumKey)
+                                if (k is eParamType enumKey)
                                 {
+                                    //饰品攻击其余贯通
+                                    bool isAtkType = enumKey == eParamType.MAGIC_ATK || enumKey == eParamType.ATK;
+                                    bool isPenetrateType = enumKey == eParamType.PHYSICAL_PENETRATE || enumKey == eParamType.MAGIC_PENETRATE;
+
+                                    if ((exEquipData.category > 300 && isAtkType) || (exEquipData.category <= 300 && isPenetrateType))
+                                    {
+                                        typeIndex = index;
+                                    }
+
                                     return enumKey.GetDescription();
                                 }
+
                                 return k.ToString();
                             }).ToList();
                             subItem.typeOption.SetActive(true);
@@ -1015,6 +1030,7 @@ namespace PCRCaculator
                             {
                                 UpdateValueOptions(equipIndex, subItemIndex);
                             });
+                            subItem.typeOption.value = typeIndex;
                         }
                     }
                     else
@@ -1104,6 +1120,7 @@ namespace PCRCaculator
 
                                 subItem.valueOption.ClearOptions();
                                 subItem.valueOption.AddOptions(valueOptions);
+                                subItem.valueOption.value = valueOptions.Count - 1;//默认最大值
                             }
                         }
                     }
@@ -1129,6 +1146,7 @@ namespace PCRCaculator
 
             if (filePath.Contains("jar:file:")) // Android
             {
+#if UNITY_5_3_OR_NEWER
                 using (UnityWebRequest www = UnityWebRequest.Get(filePath))
                 {
                     yield return www.SendWebRequest();
@@ -1141,6 +1159,9 @@ namespace PCRCaculator
 
                     jsonString = www.downloadHandler.text;
                 }
+#else
+                yield return null;
+#endif
             }
             else //PC
             {

@@ -30,7 +30,7 @@ namespace PCRCaculator
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
         private bool isLoading;
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
         }

@@ -853,6 +853,8 @@ namespace PCRCaculator.Battle
         NUM = 1000,
         [Description("0")]
         SPEED_OVERLAP,
+        [Description("永续BUFF")]
+        EVERLAST_BUFF = 100000,
         [Description("0")]
         INVALID_VALUE = -1,
 

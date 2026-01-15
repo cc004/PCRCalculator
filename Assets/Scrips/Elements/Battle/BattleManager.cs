@@ -5,25 +5,22 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System;
+using Assets.Scrips;
+using Cute;
+using PCRCaculator;
+using PCRCaculator.Guild;
+//using Elements.Data;
+//using Elements.Uek;
+using PCRCaculator.SQL;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Assets.Scrips;
-using Cute;
-
-using PCRCaculator;
-using PCRCaculator.Guild;
 using UnityEngine;
 using UnityEngine.Video;
-using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
-//using Elements.Data;
-//using Elements.Uek;
-using Elements;
-using PCRCaculator.SQL;
 
 //using UnityStandardAssets.ImageEffects;
 
@@ -34,7 +31,7 @@ namespace Elements.Battle
         bool _Update();
     }
 
-    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time, BattleManagerForActionController
+    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time
     {
         private int skillTargetCacheKey = Environment.TickCount;
 
@@ -54,6 +51,9 @@ namespace Elements.Battle
         public static int randomCounter;
         public AutoubManager ubmanager = new AutoubManager();
         public SemanUbManager semanubmanager = new SemanUbManager();
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static BattleManager Instance;
         public const int POST_RESULT_TYPE_LOSE = 0;
         public const int POST_RESULT_TYPE_RESIGN = 1;
@@ -81,15 +81,15 @@ namespace Elements.Battle
         [SerializeField]
         private Transform enemyParentTransform;
         [SerializeField]
-        private Camera playCamera;
+        public Camera playCamera;
         [SerializeField]
-        private Transform bgTransform;
+        public Transform bgTransform;
+
+        [SerializeField] private float energyGainValueSkillFront = 90;
         [SerializeField]
-        private float energyGainValueSkillFront;
+        private float energyGainValueSkillMiddle = 90;
         [SerializeField]
-        private float energyGainValueSkillMiddle;
-        [SerializeField]
-        private float energyGainValueSkillBack;
+        private float energyGainValueSkillBack = 90;
         [SerializeField]
         private float energyStackValueDefeat = 200;//300f;
         [SerializeField]
@@ -133,6 +133,7 @@ namespace Elements.Battle
         private float startRemainTime;
 
         private bool isPauseTimeLimit;
+
         public bool IsPlayCutin;
         public float BattleStartPos = 560f;
         private int noneVoiceCount;
@@ -159,7 +160,7 @@ namespace Elements.Battle
         private float blackoutTime;
         private float blackoutTimeCounter;
         private float fadeoutDuration = 0.5f;
-        private Action onEndFadeOut;
+        public Action onEndFadeOut;
         /*[SerializeField]
         private UITexture skillExeScreenTexture;*/
         private float startalpha;
@@ -398,11 +399,11 @@ namespace Elements.Battle
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
 
-        public bool IsPlayingPrincessMovie { get; set; }
+        public bool IsPrincessSkillMovieRunning { get; set; }
 
-        public bool CAOHLDNADPB { get; set; }
+        public bool IsPrincessSkillMovieFirstHalfRunning { get; set; }
 
-        public bool BFKPGHCBBKM { get; set; }
+        public bool IsPrincessSkillRunning { get; set; }
 
         private bool ANHHNJFCMDB => BattleCategory == eBattleCategory.ARENA || BattleCategory == eBattleCategory.ARENA_REPLAY || BattleCategory == eBattleCategory.GRAND_ARENA || BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY;
 
@@ -541,16 +542,22 @@ namespace Elements.Battle
         private bool spacePressed = false;
 
         private Stopwatch stopWatch = new Stopwatch();
-        private bool battleFinishedProcessed = false;
+        public bool battleFinishedProcessed = false;
 
-        private void Update()
+        public void DoCleaning(int result)
+        {
+            CoroutineManager.ClearAll();
+            onEndFadeOut = (System.Action)null;
+            battleFinishedProcessed = true;
+            MyGameCtrl.Instance.OnBattleFinished(result);
+            battleCameraEffect.ClearShake();
+        }
+
+        public void Update()
         {
             if (battleFinished){
                 if (!battleFinishedProcessed){
-                    CoroutineManager.ClearAll();
-                    onEndFadeOut = (System.Action)null;
-                    battleFinishedProcessed = true;
-                    MyGameCtrl.Instance.OnBattleFinished((int)battleResult);
+                    DoCleaning((int)battleResult);
                 }
                 return;
             } 
@@ -588,7 +595,7 @@ namespace Elements.Battle
                 cutinSkipTimeAccumulated += Time.deltaTime;
             for (; cutinSkipTimeAccumulated >= (double)DeltaTime_60fps; cutinSkipTimeAccumulated -= DeltaTime_60fps)
                 CoroutineManager.NoDialogUpdate();
-            if (IsPlayingPrincessMovie)
+            if (IsPrincessSkillMovieRunning)
             {/*
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());*/
@@ -611,18 +618,24 @@ namespace Elements.Battle
 
                     if (IsFramePause || !(deltaTimeAccumulated >= 0.0) && !skipping && !skipUB)
                         break;
-                    
+
                     updateFrame();
                     deltaTimeAccumulated -= DeltaTime_60fps;
 
                     // UnityEngine.Debug.LogError(stopWatch.ElapsedMilliseconds);
+                    // Console.WriteLine($"{FrameCount} {GameState}");
                 }
-                while (!IsPlayingPrincessMovie && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
-
+#if UNITY_5_3_OR_NEWER
+                while (!IsPrincessSkillMovieRunning && (deltaTimeAccumulated >= (double)DeltaTime_60fps || (skipping || skipUB) && stopWatch.ElapsedMilliseconds < 1000));
+#else
+                while (
+                    (!IsPrincessSkillMovieRunning && (deltaTimeAccumulated >= (double)DeltaTime_60fps) ||
+                     (skipping || skipUB) && GameState == eBattleGameState.PLAY && !IsPrincessSkillMovieRunning)) ;
+#endif
                 while (FrameCount < targetFrameCount && !IsFramePause)
                 {
                     updateFrame();
-                    if (IsPlayingPrincessMovie)
+                    if (IsPrincessSkillMovieRunning)
                         break;
                 }
 
@@ -748,6 +761,7 @@ namespace Elements.Battle
             isUpdateFrameExecuted = true;
 
             var logicFrameCount = BattleHeaderController.CurrentFrameCount;
+#if UNITY_5_3_OR_NEWER
             foreach(var unit in UnitList)
             {
                 if (!IsSkillReady.ContainsKey(logicFrameCount))
@@ -756,6 +770,7 @@ namespace Elements.Battle
                 }
                 IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
             }
+#endif
 
             if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {
@@ -987,7 +1002,9 @@ namespace Elements.Battle
                 return;
             effectUpdateList.Remove(FJOPFIJMADE);
         }
+
         public static Action<RandomData> OnCallRandom;        
+
         //public static float Random(float Min, float Max) => (float)BattleManager.Random((int)((double)Min * 1000.0), (int)((double)Max * 1000.0)) / 1000f;
         public static float Random(float Min, float Max, RandomData data)
         {
@@ -1866,9 +1883,10 @@ namespace Elements.Battle
                             sealCutData.Exec(_target, _effectTarget);
 
                             execValueDic[_effectTarget] = allSealDamageCutValueForCountZero;
-                            break;
+                            return allSealDamageCutValueForCountZero;
                         }
                     }
+                    return 0;
                 }
             }
             return allSealDamageCutValueForCountZero;
@@ -2361,7 +2379,9 @@ namespace Elements.Battle
         private void finishBattle(eBattleResult currentBattleResult)
         {
             battleFinished = true;
+#if UNITY_5_3_OR_NEWER
             skipping = false;
+#endif
             /*if (BattleHeaderController.Instance.IsPaused && this.dialogManager.IsUse(eDialogId.BATTLE_MENU))
                 this.dialogManager.ForceCloseOne(eDialogId.BATTLE_MENU);*/
             UnityEngine.Random.state = tempRandomState;
@@ -3147,7 +3167,7 @@ namespace Elements.Battle
 
         private bool isAllActionsCompleted { get; set; }
 
-        private ACIIMEDNDDJ NBLLPKDOANI { get; set; }
+        private eIgnoreAllActionDoneState ignoreAllActionDoneCoroutineState { get; set; }
 
         public void CallbackActionEnd(long activeActionId)
         {
@@ -3282,9 +3302,9 @@ namespace Elements.Battle
             if (activeActionIds.Count > 0)
             {
                 isAllActionDone = false;
-                if (NBLLPKDOANI == ACIIMEDNDDJ.NOT_RUNNING)
+                if (ignoreAllActionDoneCoroutineState == eIgnoreAllActionDoneState.NOT_RUNNING)
                 {
-                    NBLLPKDOANI = ACIIMEDNDDJ.RUNNING;
+                    ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.RUNNING;
                     StartCoroutine(updateIgnoreAllActionDoneCounter());
                 }
             }
@@ -3317,7 +3337,7 @@ namespace Elements.Battle
             while (true)
             {
                 timer -= Time.deltaTime;
-                if (NBLLPKDOANI != ACIIMEDNDDJ.STOP_PULSE)
+                if (ignoreAllActionDoneCoroutineState != eIgnoreAllActionDoneState.STOP_PULSE)
                 {
                     if (timer >= 0.0)
                         yield return null;
@@ -3327,12 +3347,12 @@ namespace Elements.Battle
                 else
                     break;
             }
-            NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
+            ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
             yield break;
         label_4:
             isAllActionsCompleted = true;
             CallbackActionEnd(activeActionIds.Count == 0 ? 0L : activeActionIds.First());
-            NBLLPKDOANI = ACIIMEDNDDJ.NOT_RUNNING;
+            ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
         }
 
         /*public void UekOnDeadLastUnit(UnitCtrl FNHGFDNICFG, int MACAPGACEFI)
@@ -3376,8 +3396,8 @@ namespace Elements.Battle
 
         private void finishWave(bool GIMAJHFCKNE)
         {
-            if (NBLLPKDOANI == ACIIMEDNDDJ.RUNNING)
-                NBLLPKDOANI = ACIIMEDNDDJ.STOP_PULSE;
+            if (ignoreAllActionDoneCoroutineState == eIgnoreAllActionDoneState.RUNNING)
+                ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.STOP_PULSE;
             isAllActionsCompleted = false;
             for (int index = 0; index < UnitList.Count; ++index)
             {
@@ -3446,14 +3466,16 @@ namespace Elements.Battle
 
         public bool BOEDFIHEEOL => isValid;
 
-        private void Awake()
+        public void Awake()
         {
+#if UNITY_5_3_OR_NEWER
             // preload fxsk bundles
             foreach (var pair in ABExTool.mgrCharacter.registries)
             {
                 if (!pair.Key.StartsWith("a/all_fxsk_")) continue;
                 ABExTool.TryGetAssetBundleByName(pair.Key.Split("/")[1], false);
             }
+#endif
 
             Instance = this;
             isValid = true;
@@ -3752,7 +3774,7 @@ namespace Elements.Battle
             //             return CreateBonusEnemyDatas(extraEffect, _timing);
             //         }
             //     }
-            var data = MyGameCtrl.Instance.GetExtraEffectEnemyData(tempData);
+            var data = MyGameCtrl.GetExtraEffectEnemyData(tempData);
             if (data != null)
             {
                 return CreateBonusEnemyDatas(data, _timing);
@@ -4004,7 +4026,8 @@ namespace Elements.Battle
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
-            
+            ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
+
             GameState = eBattleGameState.PLAY;
             StartCoroutine(coroutineStartProcess(gameCtrl));
         }
@@ -4045,6 +4068,8 @@ namespace Elements.Battle
             {
                 unit.DestroyAndCoroutineRemove();
             }
+            DecoyUnit = null;
+            DecoyEnemy = null;
             LPBCBINDJLJ.Clear();
             NOMJJDDCBAN.Clear();
             LNMLGGPGEIG = null;
@@ -4078,6 +4103,7 @@ namespace Elements.Battle
             allStandByDone = false;
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
+            skipping = tempData.skipping;
             // ISSUE: object of a compiler-generated type is created
             // ISSUE: variable of a compiler-generated type
             //BattleManager.FDEDCCJJGHM fdedccjjghm = new BattleManager.FDEDCCJJGHM();
@@ -4099,6 +4125,7 @@ namespace Elements.Battle
             //int seed = 666;//battleManager.battleProcessor.GetSeed();
             // int seed =(int)(Mathf.Sin(Time.realtimeSinceStartup) * 99999f);
             int seed = new System.Random().Next();
+#if UNITY_5_3_OR_NEWER
             if (tempData.isGuildBattle && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
             {
                 UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
@@ -4111,7 +4138,20 @@ namespace Elements.Battle
                 //UnityRandom.InitState(seed);
                 gameCtrl.CurrentSeedForSave = seed;
             }
-
+#else
+            if (tempData.randomData != null && tempData.randomData.UseFixedRandomSeed && !MainManager.Instance.AutoCalculatorData.isCalculating)
+            {
+                UnityEngine.Random.InitState(tempData.randomData.RandomSeed);
+                //UnityRandom.InitState(tempData.randomData.RandomSeed);
+                gameCtrl.CurrentSeedForSave = tempData.randomData.RandomSeed;
+            }
+            else
+            {
+                UnityEngine.Random.InitState(seed);
+                //UnityRandom.InitState(seed);
+                gameCtrl.CurrentSeedForSave = seed;
+            }
+#endif
             /*
             // start calc exp
 
@@ -4258,12 +4298,13 @@ namespace Elements.Battle
             //while (!(battleManager.UnitUiCtrl).IsUnitCreated)
             //    yield return (object)null;
             MyGameCtrl.Instance.Initialize();
+            /*
             while (!MyGameCtrl.Instance.IsUnitCreated)
             {
                 yield return null;
-            }
+            }*/
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
-            yield return battleManager.InitializeEnemyFirst();
+            battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
             battleManager.sortAndSetPositionOneWave(battleManager.currentEnemyUnitCtrlDictionary);
@@ -4278,7 +4319,7 @@ namespace Elements.Battle
             }*/
             battleManager.setupEnemyProcess();
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            if (IsBossBattle) { BossUnit = EnemyList[0]; GuildManager.Instance.CalcTalentFormationBonus(); }
+            if (IsBossBattle) { BossUnit = EnemyList[0]; GuildManager.Instance.CalcTalentFormationBonus(true); }
             foreach(var unit in UnitList)
             {
                 unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
@@ -4466,7 +4507,15 @@ namespace Elements.Battle
             //    ManagerSingleton<ViewManager>.Instance.IsSnsBattlePause = false;
             //}
             yield return null;
+#if UNITY_5_3_OR_NEWER
             gameCtrl.SetUI();
+#else
+            GuildCalculator.Instance.ClearTotalDamage();
+#endif
+            if (tempData.isGuildBattle)
+            {
+                BattleManager.Instance.semanubmanager.SetUnitCallBack(gameCtrl.playerUnitCtrl.ToList(), gameCtrl.enemyUnitCtrl[0]);
+            }
 
             try
             {
@@ -4475,7 +4524,9 @@ namespace Elements.Battle
                 for (int i = 0; i < up; i++)
                 {
                     battleManager.UnitList[i].Hp = (LongWithEx)((LongWithEx)battleManager.UnitList[i].MaxHp * sh[i]);
+#if UNITY_5_3_OR_NEWER
                     battleManager.UnitList[i].unitUI.SetHP(sh[i]);
+#endif
                 }
             }
             catch (Exception e)
@@ -4484,13 +4535,15 @@ namespace Elements.Battle
             }
             try
             {
-                var start_tp = tempData.isGuildBattle && GuildManager.Instance.IsDungeonBoss ? "1,1,1,1,1" : GuildManager.Instance.SettingData.start_tp;
+                var start_tp = tempData.isGuildBattle && GuildManager.Instance.IsDungeonBossId(tempData.guildEnemy[0].enemy_id) ? "1,1,1,1,1" : GuildManager.Instance.SettingData.start_tp;
                 var st = start_tp.Split(',').Select(float.Parse).ToArray();
                 int up = Math.Min(st.Length, battleManager.UnitList.Count);
                 for (int i = 0; i < up; i++)
                 {
                     battleManager.UnitList[i].energy = UnitDefine.MAX_ENERGY * st[i];
+#if UNITY_5_3_OR_NEWER
                     battleManager.UnitList[i].unitUI.SetTP(st[i]);
+#endif
                 }
             }
             catch (Exception e)
@@ -4503,7 +4556,6 @@ namespace Elements.Battle
                 scriptMgr = new ScriptManager(this);
                 scriptMgr.ParseScript();
             }
-            battleManager.skipping = tempData.skipping;
             RestFrameCount();
             stopWatch.Restart();
             battleFinishedProcessed = false;
@@ -4614,7 +4666,7 @@ namespace Elements.Battle
                 UnitCtrl.InitializeExAndFreeSkill(CNBJIKBCFIC[index].UniqueData, DPLDGBDGLDK, OFEBCDLGGGL, null);
         }
 
-        private IEnumerator InitializeEnemyFirst()
+        private void InitializeEnemyFirst()
         {
             //int count = this.tempData.enemyList.Count;
             int count = 1;
@@ -4632,8 +4684,6 @@ namespace Elements.Battle
                 //this.loadEnemy(i, () => { isCallbackCalled = true; });
                 MyGameCtrl.Instance.LoadEnemy(() => { isCallbackCalled = true; });
                 // ISSUE: reference to a compiler-generated field
-                while (!isCallbackCalled)
-                    yield return null;
                 allWaveEnemyUnitCtrlListArray[0] = MyGameCtrl.Instance.enemyUnitCtrl;
                 //modnipfemjd = (BattleManager.MODNIPFEMJD) null;
             }
@@ -5375,7 +5425,7 @@ namespace Elements.Battle
                 {
                     //parameter = UnitUtility.CreateUnitParameterFromEnemyParameter(this._summonData.SummonId);
                     //Debug.LogError("特殊召唤物鸽了！");
-                    EnemyData enemyData = GuildManager.EnemyDataDic[_summonData.SummonId];
+                    EnemyData enemyData = GuildManager.EnemyDataDic.ContainsKey(_summonData.SummonId) ? GuildManager.EnemyDataDic[_summonData.SummonId] : GuildManager.MirageEnemyParameterDic[_summonData.SummonId];
                     unitData_my = enemyData.CreateUnitData();
                     parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
                 }
@@ -5632,7 +5682,7 @@ namespace Elements.Battle
     Coroutine FGOJJGIFFFJ.Elements\u002EBattle\u002EIBattleManagerForBaseBattleProcessor\u002EStartCoroutine(
       IEnumerator LJBCBFFGDDK) => this.StartCoroutine(LJBCBFFGDDK);
       */
-        private enum ACIIMEDNDDJ
+        private enum eIgnoreAllActionDoneState
         {
             NOT_RUNNING,
             RUNNING,

@@ -1,16 +1,22 @@
-﻿using System;
+﻿using AssetsTools.NET.Extra;
+using Mono.Data.Sqlite;
+using Org.BouncyCastle.Utilities;
+using PCRApi;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Mono.Data.Sqlite;
-using PCRApi;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 namespace PCRCaculator
@@ -462,6 +468,54 @@ namespace PCRCaculator
                     yield return (m, pair.Value);
         }
 
+#if ENABLE_THREADING
+        private static object loadBundleLock = new();
+        public static AssetBundle TryGetAssetBundleByNameWithLock(string fullname, bool useOldManifest)
+        {
+            lock (loadBundleLock)
+                return TryGetAssetBundleByName(fullname, useOldManifest);
+        }
+#endif
+#if UNITY_5_3_OR_NEWER
+        private static AssetsManager am = new AssetsManager();
+        private static HashSet<string> loadedDep = new HashSet<string>();
+
+        private static void LoadDependency(string path, byte[] raw, AssetManager mgr)
+        {
+            if (raw == null) return;
+            if (loadedDep.Contains(path)) return;
+            loadedDep.Add(path);
+
+            using var ms = new MemoryStream(raw);
+            var ab = am.LoadBundleFile(ms, path);
+            var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
+            var info = am.GetBaseField(assetsFileInstance, 
+                assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+
+            var bundlePath = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
+
+            foreach (var val in info["m_Dependencies"]["Array"])
+            {
+                var depName = val.AsString;
+                var file = bundlePath + path;
+                if (File.Exists(file))
+                {
+                    LoadDependency(depName, File.ReadAllBytes(file), mgr);
+                }
+                else
+                {
+                    Debug.Log($"resolving asset bundle dependency: {path} => {depName}");
+                    var bytes = mgr.ResolveFile("a/" + depName);
+                    if (bytes != null) File.WriteAllBytes(file, bytes);
+                    LoadDependency(depName, bytes, mgr);
+                }
+            }
+        }
+#else
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void LoadDependency(string path, byte[] raw, AssetManager mgr) { }
+#endif
+
         public static AssetBundle TryGetAssetBundleByName(string fullname, bool useOldManifest)
         {
             if (AssetBundleDic.TryGetValue(fullname, out var val)) return val;
@@ -477,11 +531,17 @@ namespace PCRCaculator
             path = Application.persistentDataPath + $"/AB/{mgr.SubFolder}/";
 #else
             var www = new WWW("file://" + path);
-            while (!www.isDone) { Thread.Sleep(0); }
+            while (!www.isDone)
+            {
+                Thread.Sleep(0);
+            }
+
             path = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
 #endif
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             path += fullname;
+
+            LoadDependency(fullname, www.bytes, mgr);
 
             var asset = www.getAssetBundle();
             if (asset == null)
@@ -491,8 +551,15 @@ namespace PCRCaculator
                     var bytes = mgr.ResolveFile("a/" + fullname);
                     if (bytes != null) File.WriteAllBytes(path, bytes);
                 }
+
                 www = new WWW("file://" + path);
-                while (!www.isDone) { Thread.Sleep(0); }
+                while (!www.isDone)
+                {
+                    Thread.Sleep(0);
+                }
+
+                LoadDependency(fullname, www.bytes, mgr);
+
                 asset = www.assetBundle;
             }
 
@@ -501,8 +568,8 @@ namespace PCRCaculator
             return asset;
         }
 
-        private static Dictionary<(Type, string, string, bool), object>
-            GetAssetBundleByNameCache = new Dictionary<(Type, string, string, bool), object>();
+        private static ConcurrentCache<(Type, string, string, bool), object>
+            GetAssetBundleByNameCache = new ConcurrentCache<(Type, string, string, bool), object>();
 
         public static string persistentDataPath;
 
@@ -513,7 +580,11 @@ namespace PCRCaculator
             var key = (typeof(T), fullname, fit, useOldManifest);
             if (GetAssetBundleByNameCache.TryGetValue(key, out var val))
                 return (T)val;
+#if ENABLE_THREADING
+            var asset = TryGetAssetBundleByNameWithLock(fullname, useOldManifest);
+#else
             var asset = TryGetAssetBundleByName(fullname, useOldManifest);
+#endif
             T result = default;
             if (asset != null)
             {
@@ -529,7 +600,11 @@ namespace PCRCaculator
         }
         public static List<T> GetAllAssetBundleByName<T>(string fullname, string fit = "", bool useOldManifest = false) where T : Object
         {
+#if ENABLE_THREADING
+            var asset = TryGetAssetBundleByNameWithLock(fullname, useOldManifest);
+#else
             var asset = TryGetAssetBundleByName(fullname, useOldManifest);
+#endif
             List<T> result = new List<T>();
             if (asset != null)
             {
@@ -541,9 +616,10 @@ namespace PCRCaculator
             }
             return result;
         }
-        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4}
+        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4,EX装备=5,EX装备类型=6 }
         public static Sprite GetSprites(SpriteType type, int id)
         {
+#if UNITY_5_3_OR_NEWER
             string assetName = "";
             switch (type)
             {
@@ -562,6 +638,12 @@ namespace PCRCaculator
                 case SpriteType.技能图标:
                     assetName = "icon_icon_skill_" + id + ".unity3d";
                     break;
+                case SpriteType.EX装备:
+                    assetName = "icon_icon_extra_equip_" + id + ".unity3d";
+                    break;
+                case SpriteType.EX装备类型:
+                    assetName = "icon_icon_extra_equip_category_" + id + ".unity3d";
+                    break;
             }
             if (spriteDic.TryGetValue(assetName, out Sprite value))
             {
@@ -576,24 +658,36 @@ namespace PCRCaculator
             else
             {
                 sprite = Resources.Load<Sprite>("pictures/"+id + "_" + (int)type);
-            }
-            spriteDic.Add(assetName, sprite);
+        }
+        spriteDic.Add(assetName, sprite);
             return sprite;
+#else
+            return null;
+#endif
 
         }
+
+        private static ConcurrentCache<int, GameObject> prefabCache = new ConcurrentCache<int, GameObject>();
         public static GameObject LoadUnitPrefab(int unitid)
         {
+            if (prefabCache.TryGetValue(unitid, out var val)) return val;
             //if (unitid >= 200000 && unitid <= 299999)
             //    unitid = (int)(unitid / 100) * 100;
             // preload battleunit
+#if ENABLE_THREADING
+            if (TryGetAssetBundleByNameWithLock("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
+                TryGetAssetBundleByNameWithLock("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
+#else
             if (TryGetAssetBundleByName("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
                 TryGetAssetBundleByName("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
+#endif
             GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab", unitid > 200000);
             /*if(a==null)
             {
                 unitid = (int)(unitid / 100) * 100;
                 a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + unitid + ".unity3d", "prefab");
             }*/
+            prefabCache[unitid] = a;
             return a;
         }
         public static int GetPrefabId(int unitid)
@@ -609,6 +703,10 @@ namespace PCRCaculator
             else if (MainManager.Instance.EnemyDataDic.TryGetValue(unitid, out var enemy))
             {
                 return enemy.detailData.prefab_id;
+            }
+            else if (MainManager.Instance.MirageEnemyParameterDic.TryGetValue(unitid, out var mirageEnemy))
+            {
+                return mirageEnemy.detailData.prefab_id;
             }
             return unitid;
         }

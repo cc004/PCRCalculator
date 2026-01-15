@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+	  <DefineConstants>DONT_USE_EX;NO_CRIT_EVENT;NO_PROB_EVENT;REDUCE_ANALYSE;ENABLE_THREADING</DefineConstants>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="../Assets/Scrips/**/*.cs" />
+		<Compile Include="../Assets/Spine/spine-csharp/**/*.cs" />
+		<Compile Include="../Assets/Spine/spine-unity/Asset Types/AtlasAsset.cs" />
+		<Compile Include="../Assets/Spine/spine-unity/Asset Types/SkeletonDataAsset.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/Battle/GAUBOptimization.cs" />
+		<Compile Remove="../Assets/Scrips/Cute/Application01.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/cute/PABCCELMCAJ.cs" />
+		<Compile Remove="../Assets/Scrips/CommandLineServer.cs" />
+		<Compile Remove="../Assets/Scrips/LoginTool.cs" />
+		<Compile Remove="../Assets/Scrips/PCRCalcularor/AndroidTool.cs" />
+		<Compile Remove="../Assets/Scrips/PCRCalcularor/UpdateTool/CheckUpdate.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/TeamSkillNodeInfo.cs" />
+		<Compile Remove="../Assets/Scrips/Elements/TalentSkillNodeInfo.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../Assets/StreamingAssets/**/*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Data/StreamingAssets/%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</None>
+		<None Include="../Assets/Plugins/x64/sqlite3.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>sqlite3.dll</Link>
+		</None>
+		<None Include="classdata.tpk">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="request1.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="request2.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="runtimeconfig.template.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	
+</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="AssetsTools.NET" Version="3.0.2" />
+	  <PackageReference Include="EPPlus" Version="7.7.3" />
+	  <PackageReference Include="ExcelDataReader" Version="3.8.0" />
+	  <PackageReference Include="ExcelDataReader.DataSet" Version="3.8.0" />
+	  <PackageReference Include="GeneticSharp" Version="3.1.4" />
+	  <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+	  <PackageReference Include="Mono.Data.Sqlite" Version="1.0.61" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	  <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+	  <PackageReference Include="TinyPinyin" Version="1.1.0" />
+	</ItemGroup>
+
+</Project>

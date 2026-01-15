@@ -193,6 +193,8 @@ namespace ActionParameterSerializer.Actions
                     return new IfContainsUnitGroupAction();
                 case 110:
                     return new SlipDamageUpAction();
+                case 114:
+                    return new AllUnitSealDamageCutAction();
                 /*
                 case 901:
                     return new ExStartPassiveAction();

@@ -53,10 +53,10 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+          ValueDictionary _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            Dictionary<eValueNumber, DoubleWithEx> _addValue = new Dictionary<eValueNumber, DoubleWithEx>();
+            ValueDictionary _addValue = new ValueDictionary();
             eValueNumber eValueNumber = (eValueNumber)(ActionDetail2 - 1);
             _addValue.Add(eValueNumber, 0.0f);
             createValue(_source, _skill, _valueDictionary, _addValue, eValueNumber, _target);
@@ -142,8 +142,8 @@ namespace Elements
         protected virtual void createValue(
       UnitCtrl _source,
       Skill _skill,
-      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
-      Dictionary<eValueNumber, DoubleWithEx> _addValue,
+      ValueDictionary _valueDictionary,
+      ValueDictionary _addValue,
       eValueNumber _evalue,
       BasePartsData _target)
         {
@@ -287,19 +287,19 @@ namespace Elements
         }
 
 
-        protected virtual void setValue(Dictionary<eValueNumber, DoubleWithEx> _value, ActionParameter _action)
+        protected virtual void setValue(ValueDictionary _value, ActionParameter _action)
         {
         }
 
         protected virtual DoubleWithEx calcDamageValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
         protected virtual DoubleWithEx calcHpValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
-        protected virtual DoubleWithEx calcMaxHpValue(UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+        protected virtual DoubleWithEx calcMaxHpValue(UnitCtrl _source, ValueDictionary _valueDictionary)
         {
             return 0f;
         }

@@ -103,12 +103,14 @@ namespace PCRCaculator.Guild
 
         private void AddLineSerie(string title = null, LineType? lineType = null)
         {
+#if UNITY_5_3_OR_NEWER
             var serie = chart.AddSerie<Line>();
             if (title != null)
                 serie.serieName = title;
             serie.lineStyle.width = 1f;
             if (lineType != null)
                 serie.lineType = lineType.Value;
+#endif
         }
         
         private void DrawData(List<ValueChangeData>[] data, LineType type, string[] serieTitle)

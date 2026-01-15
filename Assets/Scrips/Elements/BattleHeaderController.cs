@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
 using System.Collections.Generic;
 using Elements.Battle;
 using UnityEngine;
@@ -13,19 +14,25 @@ namespace Elements
 {
     public class BattleHeaderController : MonoBehaviour // : SingletonMonoBehaviour<BattleHeaderController>, ISingletonField
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static BattleHeaderController Instance;
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static int CurrentFrameCount;
         public void ReStart()
         {
             CurrentFrameCount = 0;
             IsPaused = false;
         }
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
             CurrentFrameCount = 0;
         }
-        private void OnDestroy()
+        public void OnDestroy()
         {
             Instance = null;
             CurrentFrameCount = 0;

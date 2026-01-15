@@ -390,6 +390,11 @@ namespace PCRCaculator
                 if (!value2)
                     return;
             }
+            if (stayTime >= 90 && BattleUIManager.Instance.ShowBuffDic.TryGetValue(eStateIconType.EVERLAST_BUFF, out bool value3))
+            {
+                if (!value3)
+                    return;
+            }
 
             extraKey = extraKey ?? describe;
             if (enable)
@@ -448,12 +453,14 @@ namespace PCRCaculator
         }
         private void HandleRightClick(int unitId)
         {
+#if UNITY_5_3_OR_NEWER
             if (characterDetailManager != null)
             {
                 CharacterDetailManager a = Instantiate(characterDetailManager);
                 a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
                 a.SetId(unitId);
             }
+#endif
         }
         public void ShowContinousPress(bool show)
         {

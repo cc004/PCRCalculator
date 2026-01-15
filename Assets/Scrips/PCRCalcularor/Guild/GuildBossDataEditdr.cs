@@ -12,6 +12,7 @@ namespace PCRCaculator.Guild
     {
         public GameObject baseBack;
         public InputField inputField_HP;
+        public InputField inputField_currentHP;//自定义血量
         public InputField inputField_lv;
         public InputField inputField_def;
         public InputField inputField_def_mg;
@@ -88,6 +89,7 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("HP只能输入整数，请不要用科学计数法。", null);
                 return;
             }
+            newEnemyData.baseData.Hp = long.Parse(inputField_currentHP.text);
             newEnemyData.level = int.Parse(inputField_lv.text);
             newEnemyData.baseData.Def = int.Parse(inputField_def.text);
             newEnemyData.baseData.Magic_def = int.Parse(inputField_def_mg.text);
@@ -171,13 +173,17 @@ namespace PCRCaculator.Guild
         {
             baseBack.SetActive(true);
             this.enemyId = enemyId;
-            EnemyData enemyData = GuildManager.Instance.IsTalentQuestBoss ? GuildManager.TalentQuestEnemyParameterDic[enemyId] : GuildManager.EnemyDataDic[enemyId]; ;
+            EnemyData enemyData = GuildManager.Instance.IsTalentQuestBoss ? GuildManager.TalentQuestEnemyParameterDic[enemyId] :
+                                  GuildManager.Instance.IsAbyssBoss ? GuildManager.AbyssEnemyParameterDic[enemyId] :
+                                  GuildManager.Instance.IsMirageBoss ? GuildManager.MirageEnemyParameterDic[enemyId] :
+                                  GuildManager.EnemyDataDic[enemyId];
             if (GuildManager.Instance.SettingData.changedEnemyDataDic.ContainsKey(enemyId))
             {
                 enemyData = GuildManager.Instance.SettingData.changedEnemyDataDic[enemyId];
             }
             this.enemyData = enemyData;
             unit_id = enemyData.unit_id;
+            inputField_currentHP.text = "" + (long)enemyData.baseData.Hp;
             inputField_HP.text = "" + enemyData.baseData.RealHp;
             inputField_lv.text = "" + enemyData.level;
             inputField_def.text = "" + Mathf.RoundToInt(enemyData.baseData.Def);

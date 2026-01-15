@@ -1,31 +1,33 @@
+using Elements;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
+using PCRApi.CN;
+using PCRCaculator.Calc;
+using PCRCaculator.Guild;
+using PCRCaculator.SQL;
+using PCRCaculator.Update;
+using PCRCalcularor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using OfficeOpenXml;
-using PCRApi.CN;
-using PCRCaculator.Calc;
-using PCRCaculator.Guild;
-using PCRCaculator.SQL;
-using PCRCalcularor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 using Object = UnityEngine.Object;
-using PCRCaculator.Update;
-using UnityEngine.Networking;
-using System.Reflection;
-using Elements;
 namespace PCRCaculator
 {
     public class MainManager : MonoBehaviour
@@ -48,7 +50,6 @@ namespace PCRCaculator
         public bool UseNewBattleSystem = true;
         public bool useJapanData {get => Version.useJP;}
         public bool useVerification;
-        public LoginTool loginTool;
 
         public DatabaseCache databaseCache = new DatabaseCache();
 
@@ -63,12 +64,16 @@ namespace PCRCaculator
             public Dictionary<int, Dictionary<int, promotion_bonus>> rbs = new Dictionary<int, Dictionary<int, promotion_bonus>>();
             public List<EReduction> ereductionTable = new List<EReduction>();
             public Dictionary<int, talent_quest_battle_effect> talentQuestBattleEffectDic = new Dictionary<int, talent_quest_battle_effect>();
+            public Dictionary<int, abyss_battle_effect> abyssBattleEffectDic = new Dictionary<int, abyss_battle_effect>();
+            public Dictionary<int, mirage_battle_effect> mirageBattleEffectDic = new Dictionary<int, mirage_battle_effect>();
+            public Dictionary<int, mirage_nemesis_area> mirageNemesisAreaDic = new Dictionary<int, mirage_nemesis_area>();
             public Dictionary<int, extra_effect_data> extraEffectDataDic = new Dictionary<int, extra_effect_data>();
             public Dictionary<int, talentFormationData> talentFormationDic = new Dictionary<int, talentFormationData>();
             public Dictionary<int, int[]> weaknessDic = new Dictionary<int, int[]>();//角色的弱点列表
             public Dictionary<int, string> skillActionDescribe_cn = new Dictionary<int, string>();//技能片段中文描述
             public Dictionary<int, string[]> skillNameAndDescribe_cn = new Dictionary<int, string[]>();//技能中文名字和描述
             public Dictionary<int, string> unitName_cn = new Dictionary<int, string>();//角色中文名字
+            public Dictionary<int, string> exEquipmentName_cn = new Dictionary<int, string>();//Ex装备中文名字
             public Dictionary<int, List<int>> unitStoryEffectDic2 = new Dictionary<int, List<int>>();//角色的马甲列表
             public Dictionary<int, param_type> paramTypeDic = new Dictionary<int, param_type>();
             public Dictionary<int, TeamSkillEnhanceData> teamSkillEnhanceDataDic = new Dictionary<int, TeamSkillEnhanceData>();
@@ -77,7 +82,10 @@ namespace PCRCaculator
             public Dictionary<int, TalentSkillNode> talentSkillNodeDic = new Dictionary<int, TalentSkillNode>();
             public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipment2DataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武2字典
             public Dictionary<int, unique_equip_enhance_rate[]> uniqueEquipmentDataDic = new Dictionary<int, unique_equip_enhance_rate[]>();//角色专武字典
-            public Dictionary<int, TalentQuestWaveGroupData> talentQuestWaveGroupDataDic = new Dictionary<int, TalentQuestWaveGroupData>();
+            public Dictionary<int, WaveGroupDataBase> secretDungeonWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
+            public Dictionary<int, WaveGroupDataBase> talentQuestWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
+            public Dictionary<int, WaveGroupDataBase> abyssWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
+            public Dictionary<int, WaveGroupDataBase> mirageWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
             public Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
             public Dictionary<int, int> unitStoryLoveDic = new Dictionary<int, int>();
@@ -88,6 +96,8 @@ namespace PCRCaculator
             public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas = new Dictionary<int, Guild.GuildEnemyData>();
             public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips = new Dictionary<int, Dictionary<int, ex_equipment_data>[]>();
             public Dictionary<int, EnemyData> talentQuestEnemyParameterDic = new Dictionary<int, EnemyData>();
+            public Dictionary<int, EnemyData> abyssEnemyParameterDic = new Dictionary<int, EnemyData>();
+            public Dictionary<int, EnemyData> mirageEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, unit_role_data> UnitRoleDataDic = new();
             public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic = new();
             public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic = new();
@@ -114,13 +124,18 @@ namespace PCRCaculator
 
         private List<UnitData> playerDataForBattle;
         private List<UnitData> enemyDataForBattle;
-        private bool isGuildBattle;
+        // private bool isGuildBattle;
         public GuildBattleData guildBattleData;
         public bool isAutoMode;
         public bool forceAutoMode;
         public bool isSetMode;
         public bool isSemanMode;
+#if ENABLE_THREADING
+        [ThreadStatic]
+        public static TeamEnhanceParameter teamEnhanceData;
+#else
         public TeamEnhanceParameter teamEnhanceData;
+#endif
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
         
         // 优化：添加数据缓存字典，避免重复计算
@@ -135,6 +150,9 @@ namespace PCRCaculator
         public Dictionary<int, Dictionary<int, promotion_bonus>> Rbs { get => databaseCache.rbs; }
         public List<EReduction> EreductionTable { get => databaseCache.ereductionTable; }
         public Dictionary<int, talent_quest_battle_effect> TalentQuestBattleEffectDic { get => databaseCache.talentQuestBattleEffectDic; }
+        public Dictionary<int, abyss_battle_effect> AbyssBattleEffectDic { get => databaseCache.abyssBattleEffectDic; }
+        public Dictionary<int, mirage_battle_effect> MirageBattleEffectDic { get => databaseCache.mirageBattleEffectDic; }
+        public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get => databaseCache.mirageNemesisAreaDic; }
         public Dictionary<int, extra_effect_data> ExtraEffectDataDic { get => databaseCache.extraEffectDataDic; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get => databaseCache.talentFormationDic; }
         public Dictionary<int, int[]> WeaknessDic { get => databaseCache.weaknessDic; }  // 角色的弱点列表
@@ -149,7 +167,10 @@ namespace PCRCaculator
         public Dictionary<int, TalentSkillNode> TalentSkillNodeDic { get => databaseCache.talentSkillNodeDic; }
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipment2DataDic { get => databaseCache.uniqueEquipment2DataDic; }  // 角色专武2字典
         public Dictionary<int, unique_equip_enhance_rate[]> UniqueEquipmentDataDic { get => databaseCache.uniqueEquipmentDataDic; }  // 角色专武字典
-        public Dictionary<int, TalentQuestWaveGroupData> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> SecretDungeonWaveGroupDataDic { get => databaseCache.secretDungeonWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get => databaseCache.abyssWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get => databaseCache.mirageWaveGroupDataDic; }
         public Dictionary<int, EnemyData> EnemyDataDic { get => databaseCache.enemyDataDic; }
         public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => databaseCache.enemyMPartsDic; }
         public Dictionary<int, int> UnitStoryLoveDic { get => databaseCache.unitStoryLoveDic; }
@@ -160,6 +181,8 @@ namespace PCRCaculator
         public Dictionary<int, Guild.GuildEnemyData> GuildEnemyDatas { get => databaseCache.guildEnemyDatas; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> UnitExEquips { get => databaseCache.unitExEquips; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get => databaseCache.talentQuestEnemyParameterDic; }
+        public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get => databaseCache.abyssEnemyParameterDic; }
+        public Dictionary<int, EnemyData> MirageEnemyParameterDic { get => databaseCache.mirageEnemyParameterDic; }
         public Dictionary<int, unit_role_data> UnitRoleDataDic { get => databaseCache.UnitRoleDataDic; }
         public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get => databaseCache.UnitRoleMasteryIdDic; }
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get => databaseCache.UnitRoleSlotDataDic; }
@@ -185,7 +208,7 @@ namespace PCRCaculator
         public CharacterManager CharacterManager { get => CharacterManager.Instance; set => characterManager = value; }
         public AdventureManager BattleManager { get => AdventureManager.Instance; set => battleManager = value; }
         public Dictionary<int, UnitSkillTimeData> AllUnitSkillTimeDataDic { get => allUnitSkillTimeDataDic; }
-        public bool IsGuildBattle { get => isGuildBattle; }
+        public bool IsGuildBattle = true;
         public List<UnitData> PlayerDataForBattle { get => playerDataForBattle; }
         public List<UnitData> EnemyDataForBattle { get => enemyDataForBattle; }
         // public bool IsAutoMode { get => isAutoMode;}
@@ -206,7 +229,7 @@ namespace PCRCaculator
         private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
         private const string Url2 = "https://l3-prod-all-gs-gzlj.bilibiligame.net/source_ini/get_maintenance_status?format=json";
         public string truthVersion;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -233,8 +256,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10055800;
-            public long BossVersionJP = 10055800;
+            public long CharacterVersionJP = 10058000;
+            public long BossVersionJP = 10058000;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -245,7 +268,7 @@ namespace PCRCaculator
 
         public VersionData Version;
 
-        private void Start()
+        public void Start()
         {
             LoadFinished = false;
             try
@@ -266,10 +289,6 @@ namespace PCRCaculator
                 ABExTool.persistentDataPath = Application.persistentDataPath;
                 ABExTool.dataPath = Application.dataPath;
 
-                if (useVerification)
-                {
-                    loginTool?.gameObject.SetActive(true);
-                }
 #if PLATFORM_ANDROID
                 var dir = Application.persistentDataPath + "/AB";
 #else
@@ -295,8 +314,8 @@ namespace PCRCaculator
             }
             catch (Exception e)
             {
-                Debugtext.text += e.Message;
                 Debug.LogError(e.ToString());
+                Debugtext.text += e.Message;
             }
 
             //CharacterManager = CharacterManager.Instance;
@@ -406,6 +425,7 @@ namespace PCRCaculator
                 {
                     abStopwatch.Stop();
                     Debug.LogError($"AB资源初始化失败");
+                    Debug.LogError(ex.ToString());
                     try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
                     SaveManager.Save(new VersionData());
                     return;
@@ -501,7 +521,12 @@ namespace PCRCaculator
                                 //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
                                 databaseCache.enemyDataDic = dbTool.Dic2;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
+                                databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic;
+                                databaseCache.mirageEnemyParameterDic = dbTool.MirageEnemyParameterDic;
+                                databaseCache.secretDungeonWaveGroupDataDic = dbTool.SecretDungeonWaveGroupDataDic;
                                 databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
+                                databaseCache.abyssWaveGroupDataDic = dbTool.AbyssWaveGroupDataDic;
+                                databaseCache.mirageWaveGroupDataDic = dbTool.MirageWaveGroupDataDic;
                                 databaseCache.uniqueEquipmentDataDic = dbTool2.Dic9;
                                 databaseCache.uniqueEquipment2DataDic = dbTool2.Dic92;
                                 databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic;
@@ -513,12 +538,16 @@ namespace PCRCaculator
                                 databaseCache.talentFormationDic = dbTool.TalentFormationDic;
                                 databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
                                 databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
+                                databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic;
+                                databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic;
+                                databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic;
                                 databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;
                                 databaseCache.UnitRoleMasteryIdDic = dbTool.UnitRoleMasteryIdDic;
                                 databaseCache.UnitRoleSlotDataDic = dbTool.UnitRoleSlotDataDic;
                                 databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool.UnitRoleMasterySlotEnhanceDataDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10;
+                                databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn;
                                 databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11;
                                 databaseCache.skillActionDescribe_cn = dbTool3.Dic12;
 
@@ -567,14 +596,17 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() =>
                                     {
-                                        // var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
-                                        // databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
-                                        databaseCache.unitExEquips.OverrideWith(dbTool3.unitExEquips);
+                                        var jita = dbTool3.unitExEquips[170101];
+                                        var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
+                                        databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
+                                        databaseCache.unitExEquips[170301] = jita;
                                     }),
                                     Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
                                     Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
                                     Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
-                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic))
+                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic)),
+                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic)),
+                                    Task.Run(() => databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic))
                                 );
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
@@ -607,7 +639,9 @@ namespace PCRCaculator
                                             Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
                                             Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
                                             Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2)),
-                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic))
+                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
+                                            Task.Run(() => databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic)),
+                                            Task.Run(() => databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic))
                                         );
                                 // }
                                 // else
@@ -626,13 +660,16 @@ namespace PCRCaculator
 
                                         Task.Run(() => databaseCache.skillDataDic.Override2With(dbTool3.Dic3)),
                                         Task.Run(() => databaseCache.skillActionDic.Override2With(dbTool3.Dic4)),
-                                        Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
+                                        // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
                                         // Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
                                         // Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
                                         // Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
                                         Task.Run(() => databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic)),
+                                        Task.Run(() => databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic)),
+                                        Task.Run(() => databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic)),
                                         Task.Run(() => databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic)),
-                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic))
+                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic)),
+                                        Task.Run(() => databaseCache.mirageNemesisAreaDic.Override2With(dbTool3.MirageNemesisAreaDic))
                                     );
                                 // }
                             });
@@ -725,7 +762,7 @@ namespace PCRCaculator
 
                 LoadFinished = true;
                 CreateShowUnitIDS();
-                wait.Close();
+                wait?.Close();
                 
                 // 计时结束并输出
                 stopwatch.Stop();
@@ -780,8 +817,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 82;
-                playerSetting.playerLevel = 307;
+                playerSetting.playerProcess = 85;
+                playerSetting.playerLevel = 316;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
@@ -825,18 +862,27 @@ namespace PCRCaculator
         }
         public void WindowMessage(string word)
         {
+#if UNITY_5_3_OR_NEWER
             if (windowmassageIE == null)
             {
                 windowmassageIE = StartCoroutine(WindowMessage_start(word));
             }
+#else
+            Console.WriteLine(word);
+#endif
         }
         public void WindowConfigMessage(string word, SystemWindowMessage.configDelegate configDelegate, SystemWindowMessage.configDelegate cancelDelegate = null)
         {
+#if UNITY_5_3_OR_NEWER
             GameObject a = Instantiate(SystemWindowMessagePerferb);
             a.transform.SetParent(LatestUIback.transform, false);
             a.transform.localPosition = new Vector3();
             a.transform.localScale = new Vector3(1, 1, 1);
             a.GetComponent<SystemWindowMessage>().SetWindowMassage(word, configDelegate, cancelDelegate);
+#else
+            Console.WriteLine(word);
+            configDelegate?.Invoke();
+#endif
         }
         public SystemWindowMessage WindowAsyncMessage(string word, SystemWindowMessage.configDelegate configDelegate = null, SystemWindowMessage.configDelegate cancelDelegate = null)
         {
@@ -915,7 +961,7 @@ namespace PCRCaculator
             }
             playerDataForBattle = d1;
             enemyDataForBattle = other.playrCharacters;
-            isGuildBattle = false;
+            IsGuildBattle = false;
             this.isAutoMode = isAutoMode;
             this.forceAutoMode = forceAutoMode;
             this.isSetMode = false;
@@ -934,7 +980,7 @@ namespace PCRCaculator
         public void ChangeSceneToBalttle(GuildBattleData data)
         {
             playerDataForBattle = data.players.playrCharacters;
-            isGuildBattle = true;
+            IsGuildBattle = true;
             isAutoMode = data.isAutoMode;
             isSetMode = data.isSetMode;
             isSemanMode = data.isSemanMode;
@@ -985,6 +1031,10 @@ namespace PCRCaculator
                 return data2.name;
             if (TalentQuestEnemyParameterDic.TryGetValue(unitid, out var data3))
                 return data3.name;
+            if (AbyssEnemyParameterDic.TryGetValue(unitid, out var data4))
+                return data4.name;
+            if (MirageEnemyParameterDic.TryGetValue(unitid, out var data5))
+                return data5.name;
             if (unitid >= 200000)
                 return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
@@ -1048,6 +1098,7 @@ namespace PCRCaculator
         }
         private void CopyDataInAndraid()
         {
+#if UNITY_5_3_OR_NEWER
             if (PlayerPrefs.HasKey("Copyed"))
             {
                 return;
@@ -1055,6 +1106,7 @@ namespace PCRCaculator
             DirectoryCopy(Application.streamingAssetsPath, Application.persistentDataPath);
             PlayerPrefs.SetInt("Copyed", 1);
             PlayerPrefs.Save();
+#endif
         }
         public void DirectoryCopy(string sourceDirectory, string targetDirectory)
         {
@@ -1095,6 +1147,7 @@ namespace PCRCaculator
             a.GetComponent<RectTransform>().offsetMax = new Vector2(5, 5);
             a.GetComponent<RectTransform>().offsetMin = new Vector2(-5, -5);
 
+#if UNITY_5_3_OR_NEWER
             //yield return new WaitForSeconds(1.5f);
             var async = SceneManager.LoadSceneAsync("BattleScene");
             async.allowSceneActivation = true;
@@ -1102,6 +1155,9 @@ namespace PCRCaculator
             {
                 yield return null;
             }
+#else
+            yield return null;
+#endif
         }
         public void SaveAllUnitFriearmData()
         {
@@ -1145,11 +1201,16 @@ namespace PCRCaculator
 
         public WaitUI OpenWaitUI()
         {
+#if UNITY_5_3_OR_NEWER
             GameObject p = Instantiate(LoadingPagePrefab, GameObject.Find("Canvas")?.transform);
             return p.GetComponent<WaitUI>();
+#else
+            return null;
+#endif
         }
         public static Sprite LoadSourceSprite(string relativePath)
         {
+#if UNITY_5_3_OR_NEWER
             if (Instance.spriteCacheDic.ContainsKey(relativePath))
             {
                 return Instance.spriteCacheDic[relativePath];
@@ -1173,6 +1234,9 @@ namespace PCRCaculator
 
             //用加载得到的资源对象，实例化游戏对象，实现游戏物体的动态加载
             return tmpsprite;
+#else
+            return null;
+#endif
         }
         /// <summary>
         /// DES加密字符串
@@ -1271,7 +1335,7 @@ namespace PCRCaculator
         {
             return ExtraEffectUnitGroupDic.ContainsKey(groupId) ? ExtraEffectUnitGroupDic[groupId] : null;
         }
-
+#if UNITY_5_3_OR_NEWER
         public async Task SendPostRequestAsync2(Action onComplete)
         {
             const string app_ver = "10.7.1"; // change this when the app version changes
@@ -1375,7 +1439,77 @@ namespace PCRCaculator
             // 等待任务完成
             await tcs.Task;
         }
+#else
+        public async Task SendPostRequestAsync(Action onComplete)
+        {
+            const string app_ver = "10.7.1";
+            var httpClient = new HttpClient();
+
+            // 构造 POST Body
+            var jsonBody = "{\"viewer_id\": \"0\"}";
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            // 添加 Headers
+            content.Headers.ContentType.CharSet = "UTF-8";
+
+            var request = new HttpRequestMessage(HttpMethod.Post, Url2)
+            {
+                Content = content
+            };
+
+            request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip");
+            request.Headers.TryAddWithoutValidation("User-Agent", "Dalvik/2.1.0 (Linux, U, Android 5.1.1, PCRT00 Build/LMY48Z)");
+            request.Headers.TryAddWithoutValidation("X-Unity-Version", "2021.3.20f1c1");
+            request.Headers.TryAddWithoutValidation("APP-VER", app_ver);
+            request.Headers.TryAddWithoutValidation("BATTLE-LOGIC-VERSION", "4");
+            request.Headers.TryAddWithoutValidation("DEVICE", "2");
+            request.Headers.TryAddWithoutValidation("DEVICE-NAME", "OPPO PCRT00");
+            request.Headers.TryAddWithoutValidation("EXCEL-VER", "1.0.0");
+            request.Headers.TryAddWithoutValidation("GRAPHICS-DEVICE-NAME", "Adreno (TM) 640");
+            request.Headers.TryAddWithoutValidation("IP-ADDRESS", "10.0.2.15");
+            request.Headers.TryAddWithoutValidation("LOCALE", "CN");
+            request.Headers.TryAddWithoutValidation("PLATFORM", "2");
+            request.Headers.TryAddWithoutValidation("PLATFORM-ID", "2");
+            request.Headers.TryAddWithoutValidation("CHANNEL-ID", "1");
+            request.Headers.TryAddWithoutValidation("RES-KEY", "ab00a0a6dd915a052a2ef7fd649083e5");
+            request.Headers.TryAddWithoutValidation("RES-VER", "10002200");
+
+            try
+            {
+                var responseMessage = await httpClient.SendAsync(request);
+                var raw = await responseMessage.Content.ReadAsStringAsync();
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    Debug.LogError($"请求失败: {responseMessage.StatusCode}");
+                    truthVersion = "获取失败（重试）";
+                }
+                else
+                {
+                    try
+                    {
+                        var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
+                        truthVersion = response?.data?.manifest_ver ?? "获取失败（重试）";
+                    }
+                    catch
+                    {
+                        truthVersion = "获取失败（重试）";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"请求异常: {ex}");
+                truthVersion = "获取失败（重试）";
+            }
+            finally
+            {
+                onComplete?.Invoke();
+            }
+        }
+#endif
     }
+
     public class UnitData_other
     {
         public string name = "未定义";
@@ -1408,6 +1542,7 @@ namespace PCRCaculator
     }
     public class AutoCalculatorData
     {
+        public bool useRemote = true;
         public bool isCalculating;
         public bool isPaues;
         public bool isCanceled;
@@ -1431,6 +1566,39 @@ namespace PCRCaculator
                 return result;
             }
         }
+        public long MaxDamage
+        {
+            get
+            {
+                if (resultDatas.Count == 0)
+                    return 0;
+
+                long max = resultDatas[0].currentDamage;
+                for (int i = 1; i < resultDatas.Count; i++)
+                {
+                    if (resultDatas[i].currentDamage > max)
+                        max = resultDatas[i].currentDamage;
+                }
+                return max;
+            }
+        }
+
+        public long MinDamage
+        {
+            get
+            {
+                if (resultDatas.Count == 0)
+                    return 0;
+
+                long min = resultDatas[0].currentDamage;
+                for (int i = 1; i < resultDatas.Count; i++)
+                {
+                    if (resultDatas[i].currentDamage < min)
+                        min = resultDatas[i].currentDamage;
+                }
+                return min;
+            }
+        }
         public void Reset()
         {
             isCalculating = false;
@@ -1441,17 +1609,18 @@ namespace PCRCaculator
             isConfig = false;
         }
     }
+    [Serializable]
     public class OnceResultData
     {
-        public int id;
-        public int randomSeed;
-        public long currentDamage;
-        public long criticalEX;
-        public long exceptDamage;
-        public int backTime;
-        public string backTimeText;
-        public List<string> warnings = new List<string>();
-        public eBattleResult BattleResult;
+        public int id { get; set; }
+        public int randomSeed { get; set; }
+        public long currentDamage { get; set; }
+        public long criticalEX { get; set; }
+        public long exceptDamage { get; set; }
+        public int backTime { get; set; }
+        public string backTimeText { get; set; }
+        public List<string> warnings { get; set; } = new List<string>();
+        public eBattleResult BattleResult { get; set; }
 
         public string GetDetail()
         {

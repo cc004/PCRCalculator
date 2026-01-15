@@ -103,8 +103,10 @@ namespace Elements
                     //add
                     Action<string> action0 = a =>
                     {
+#if !REDUCE_ANALYSE
                         string msg = "(" + BattleHeaderController.CurrentFrameCount + ")目标：" + owner.UnitName + a + "\n";
                         onExec?.Invoke(msg);
+#endif
                     };
                     //end add
                     owner.SetDamage(_damageData, false, actionId, _skill: _skill, _noMotion: true, _energyChargeMultiple: ((float)energyChargeMultiple), callBack: action0);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace ActionParameterSerializer.Actions
 {
@@ -41,11 +42,17 @@ namespace ActionParameterSerializer.Actions
                 dmg = Utils.JavaFormat(" [%1$s] ", dmg);
             }
 
-            return Utils.JavaFormat(Utils.GetString("s1_will_be_applied_the_s2_once_they_take_any_actions_will_take_s3_damage_every_second_lasted_4s_seconds"),
+            StringBuilder str = new StringBuilder();
+            str.Append(Utils.JavaFormat(Utils.GetString("s1_will_be_applied_the_s2_once_they_take_any_actions_will_take_s3_damage_every_second_lasted_4s_seconds"),
                 targetParameter.buildTargetClause(),
                 ailment.description(),
                 dmg,
-                buildExpression(level, durationValues, RoundingMode.HALF_UP, property));
+                buildExpression(level, durationValues, RoundingMode.HALF_UP, property)));
+            if (actionDetail3 != 0)
+            {
+                str.Append(Utils.JavaFormat(Utils.GetString("recover_tp_by_damage_divided_by_s1"), 100 - actionDetail3));
+            }
+            return str.ToString();
         }
     }
 }

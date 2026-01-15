@@ -17,6 +17,8 @@ namespace Elements
         private const float HEIGHT = 300f;
         private List<BasePartsData> unitListForSort = new List<BasePartsData>();
 
+        public Dictionary<int, List<UnitCtrl>> DisableKnockBackUnitList { get; set; }
+
         public override void ExecAction(
           UnitCtrl _source,
           BasePartsData _target,
@@ -25,12 +27,18 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,Action<string> action)
+          ValueDictionary _valueDictionary,Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             if (_target.Owner.ModeChangeUnableStateBarrier)
             {
                 action($"处于MODECHANGE状态，击退无效!");
+                return;
+            }
+            // TODO DisableKnockBackUnitList logic
+            if (_target.Owner.OnSetCrowndControlForLoopTriggerListCall())
+            {
+                action($"目标处于行动不能，击飞，拉拽免疫效果，击退无效!");
                 return;
             }
             AppendIsAlreadyExeced(_target.Owner, _num);
@@ -152,7 +160,7 @@ namespace Elements
             float a = (float)((_target.transform.localPosition.x > (double)_source.transform.localPosition.x ? 1.0 : -1.0) * (_target.IsBoss ? 0.0 : (double)Value[eValueNumber.VALUE_1]));
             return a <= 0.0 ? Mathf.Max(a, -BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x) : Mathf.Min(a, BattleDefine.BATTLE_FIELD_SIZE - _target.transform.localPosition.x);
         }
-        private float getKnockValueForGiveValue(UnitCtrl _target, UnitCtrl _source, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+        private float getKnockValueForGiveValue(UnitCtrl _target, UnitCtrl _source, ValueDictionary _valueDictionary)
         {
             float num = ((_target.transform.localPosition.x > _source.transform.localPosition.x) ? 1f : (-1f)) * (_target.IsBoss ? 0f : (float)_valueDictionary[eValueNumber.VALUE_1]);
             if (num > 0f)
@@ -192,7 +200,7 @@ namespace Elements
             double duration = Math.Max(Math.Abs(num) / base.Value[eValueNumber.VALUE_3], base.battleManager.DeltaTime_60fps);
             _sourceActionController.AppendCoroutine(updateKnockBackCoroutine(_target, _source, (float)num, (float)duration), ePauseType.IGNORE_BLACK_OUT);
         }
-        private void startKnockbackForGiveValue(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, Dictionary<eValueNumber, DoubleWithEx>, float> _func, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+        private void startKnockbackForGiveValue(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, ValueDictionary, float> _func, ValueDictionary _valueDictionary)
         {
             float num = _func(_target, _source, _valueDictionary);
             float num2 = (float)_valueDictionary[eValueNumber.VALUE_3];

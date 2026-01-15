@@ -4,6 +4,7 @@ using System;
 using UnityEngine.Networking;
 using System.Collections;
 using Newtonsoft.Json;
+
 namespace PCRCaculator.Update
 {
     public class UpdateManager : MonoBehaviour

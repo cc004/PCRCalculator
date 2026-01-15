@@ -22,6 +22,7 @@ namespace PCRCaculator
             if (enhanceSlider != null)
                 enhanceSlider.onValueChanged.AddListener(OnEnhanceValueChanged);
         }
+
         public void SetNodeData(int currentLevel, int maxLevel, string value)
         {
             isUpdatingSlider = true;

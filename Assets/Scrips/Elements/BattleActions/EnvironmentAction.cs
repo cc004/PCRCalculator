@@ -35,6 +35,7 @@ namespace Elements
                 if (child == null)
                     continue;
 
+                child.IsEnvironmentAbnormalState = true;
                 this.targetActions.Add(child);
             }
         }
@@ -66,7 +67,7 @@ namespace Elements
         Skill skill,
         float starttime,
         Dictionary<int, bool> enabledChildAction,
-        Dictionary<eValueNumber, DoubleWithEx> valueDictionary)
+        ValueDictionary valueDictionary)
         {
             // SkillEffectCtrl wrapper = null;
             // if (this.ActionEffectList != null && this.ActionEffectList.Count > 0)

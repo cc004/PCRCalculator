@@ -38,7 +38,6 @@ namespace Elements
           get => this.colorShader.Depth;
           set => this.colorShader.Depth = value;
         }*/
-
         public Color CurColor;
         /*{
           get => this.colorShader.CurColor;
