@@ -42,6 +42,8 @@ namespace Elements
         public List<UnitCtrl> enemyUnitCtrl;
         public List<UnitCtrl> extraEffectEnemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
+        
+        public BattleStatistics BattleStats = new BattleStatistics(); 
 
         private int finishCount;
         private MainManager mainManager;
@@ -320,6 +322,8 @@ namespace Elements
             playerUnitCtrl.Clear();
             enemyUnitCtrl.Clear();
             playerUnitCtrlDic.Clear();
+            
+            BattleStats.Reset(); 
             // enemyUnitCtrlDic.Clear();
             allUnitCtrlDataDic.Clear();
             IsUnitCreated = false;
@@ -340,12 +344,12 @@ namespace Elements
             }
         }
 
-        public long TotalMagicBuff = 0;
         // Start battle using parameters from server request, do not rely on MainManager
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
-            TotalMagicBuff = 0;
+            BattleStats.IsEnabled = req.CalcStats;
+            BattleStats.Reset();
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;
