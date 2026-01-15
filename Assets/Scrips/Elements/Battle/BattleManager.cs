@@ -4068,6 +4068,8 @@ namespace Elements.Battle
             {
                 unit.DestroyAndCoroutineRemove();
             }
+            DecoyUnit = null;
+            DecoyEnemy = null;
             LPBCBINDJLJ.Clear();
             NOMJJDDCBAN.Clear();
             LNMLGGPGEIG = null;
