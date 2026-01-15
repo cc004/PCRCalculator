@@ -4447,11 +4447,7 @@ this.updateCurColor();
                 // 只有增加才算获取 (消耗UB导致的减少不算)
                 if (diff > 0)
                 {
-                    if (!MyGameCtrl.Instance.PlayerTpGainedDic.ContainsKey(UnitId))
-                    {
-                        MyGameCtrl.Instance.PlayerTpGainedDic.Add(UnitId, 0);
-                    }
-                    MyGameCtrl.Instance.PlayerTpGainedDic[UnitId] += diff;
+                    MyGameCtrl.Instance.BattleStats.AddPlayerTp(UnitId, diff);
                 }
             }
 
@@ -7137,22 +7133,22 @@ this.updateCurColor();
             // 1. 魔法攻击 Buff (己方)
             if (_kind == BuffParamKind.MAGIC_STR && !IsOther && !IsSummonOrPhantom)
             {
-                MyGameCtrl.Instance.TotalMagicBuff += (long)_value.Values.Sum(v => v);
+                MyGameCtrl.Instance.BattleStats.AddMagicBuff((long)_value.Values.Sum(v => v));
             }
             // 2. 物理攻击 Buff (己方)
             else if (_kind == BuffParamKind.ATK && !IsOther && !IsSummonOrPhantom)
             {
-                MyGameCtrl.Instance.TotalPhysicsBuff += (long)_value.Values.Sum(v => v);
+                MyGameCtrl.Instance.BattleStats.AddPhysicsBuff((long)_value.Values.Sum(v => v));
             }
             // 3. 物理防御 Debuff (通常施加在敌人身上，所以判断 IsOther)
             else if (_kind == BuffParamKind.DEF && IsOther && !IsSummonOrPhantom)
             {
-                MyGameCtrl.Instance.TotalPhysicsDebuff += (long)_value.Values.Sum(v => v);
+                MyGameCtrl.Instance.BattleStats.AddPhysicsDebuff((long)_value.Values.Sum(v => v));
             }
             // 4. 魔法防御 Debuff (施加在敌人身上)
             else if (_kind == BuffParamKind.MAGIC_DEF && IsOther && !IsSummonOrPhantom)
             {
-                MyGameCtrl.Instance.TotalMagicDebuff += (long)_value.Values.Sum(v => v);
+                MyGameCtrl.Instance.BattleStats.AddMagicDebuff((long)_value.Values.Sum(v => v));
             }
 
             BuffDebuffCoroutineDataSet _cr = new BuffDebuffCoroutineDataSet();

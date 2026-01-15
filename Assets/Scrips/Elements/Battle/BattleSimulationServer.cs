@@ -47,19 +47,24 @@ namespace Elements.Battle
     }
 
     [Serializable]
+    public class BattleStatsData
+    {
+        public long TotalDamage { get; set; }
+        public long TotalMagicBuff { get; set; }
+        public long TotalPhysicsBuff { get; set; }
+        public long TotalMagicDebuff { get; set; }
+        public long TotalPhysicsDebuff { get; set; }
+        public Dictionary<int, long> PlayerTpGained { get; set; }
+    }
+
+    [Serializable]
     public class BattleSimulationResponse
     {
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         public bool Success { get; set; }
         public string Message { get; set; }
-        public long TotalDamage { get; set; }
-        public long TotalMagicBuff { get; set; }
-        public long TotalPhysicsBuff { get; set; }
-        public long TotalMagicDebuff { get; set; }
-        public long TotalPhysicsDebuff { get; set; }
-        // [新增] 返回TP获取统计
-        public Dictionary<int, long> PlayerTpGained { get; set; } 
+        public BattleStatsData Stats { get; set; }
         public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }
@@ -83,6 +88,7 @@ namespace Elements.Battle
     [Serializable]
     public class BattleSimulationRequest
     {
+        public bool CalcStats { get; set; } = false;
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         // 如果要进行工会战，请提供 EnemyData 列表
@@ -108,7 +114,7 @@ namespace Elements.Battle
     }
 
 #if UNITY_5_3_OR_NEWER
-    public class BattleSimulationServer : MonoBehaviour
+    public class BattleSimulationServer : MonoBehaviour // no use
     {
         public static BattleSimulationServer Instance;
         private HttpListener httpListener;
@@ -534,7 +540,6 @@ namespace Elements.Battle
                             EnemyList = enemyList,
                             Success = true,
                             Message = "战斗模拟完成",
-                            TotalDamage = totalDamage,
                             BattleFrames = battleFrames,
                             CurrentSeed = currentSeed,
                             TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
