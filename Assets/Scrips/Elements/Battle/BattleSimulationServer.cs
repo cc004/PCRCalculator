@@ -55,6 +55,11 @@ namespace Elements.Battle
         public string Message { get; set; }
         public long TotalDamage { get; set; }
         public long TotalMagicBuff { get; set; }
+        public long TotalPhysicsBuff { get; set; }
+        public long TotalMagicDebuff { get; set; }
+        public long TotalPhysicsDebuff { get; set; }
+        // [新增] 返回TP获取统计
+        public Dictionary<int, long> PlayerTpGained { get; set; } 
         public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }

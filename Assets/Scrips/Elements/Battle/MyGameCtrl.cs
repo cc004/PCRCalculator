@@ -42,6 +42,8 @@ namespace Elements
         public List<UnitCtrl> enemyUnitCtrl;
         public List<UnitCtrl> extraEffectEnemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
+        // [新增] 用于统计TP获取
+        public Dictionary<int, long> PlayerTpGainedDic = new Dictionary<int, long>(); 
 
         private int finishCount;
         private MainManager mainManager;
@@ -320,6 +322,8 @@ namespace Elements
             playerUnitCtrl.Clear();
             enemyUnitCtrl.Clear();
             playerUnitCtrlDic.Clear();
+            // [新增] 清空TP统计
+            PlayerTpGainedDic.Clear(); 
             // enemyUnitCtrlDic.Clear();
             allUnitCtrlDataDic.Clear();
             IsUnitCreated = false;
@@ -341,11 +345,19 @@ namespace Elements
         }
 
         public long TotalMagicBuff = 0;
+        public long TotalPhysicsBuff = 0;
+        public long TotalMagicDebuff = 0;
+        public long TotalPhysicsDebuff = 0;
         // Start battle using parameters from server request, do not rely on MainManager
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
             TotalMagicBuff = 0;
+            TotalPhysicsBuff = 0;
+            TotalMagicDebuff = 0;
+            TotalPhysicsDebuff = 0;
+            // [新增] 清空TP统计
+            PlayerTpGainedDic.Clear();
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;
