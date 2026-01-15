@@ -11,8 +11,12 @@ namespace Elements
 {
   public class UbAbnormalData : ISingletonField
   {
-    //private static Yggdrasil<UbAbnormalData> staticSingletonTree;
-    private static BattleManager staticBattleManager;
+#if ENABLE_THREADING
+      private BattleManager staticBattleManager;
+#else
+        //private static Yggdrasil<UbAbnormalData> staticSingletonTree;
+      private static BattleManager staticBattleManager;
+#endif
 
     public UnitCtrl.eAbnormalState AbnormalState { get; set; }
 
@@ -48,7 +52,11 @@ namespace Elements
             {
                 this.Timer = 0f;
                 SealData unableStateGuardData = _target.UnableStateGuardData;
-                if (this.Source.IsOther != _target.IsOther && ChangeSpeedAction.IsUnableAbnormalState(this.AbnormalState) && unableStateGuardData != null && unableStateGuardData.GetCurrentCount() > 0 && !_target.IsNoDamageMotion() && !_target.IsAbnormalState(UnitCtrl.eAbnormalState.NO_ABNORMAL))
+                if (this.Source.IsOther != _target.IsOther && UnitCtrl.IsUnableAbnormalState(this.AbnormalState) && _target.OnSetCrowndControlForLoopTriggerListCall())
+                {
+                  return;
+                }
+                if (this.Source.IsOther != _target.IsOther && UnitCtrl.IsUnableAbnormalState(this.AbnormalState) && unableStateGuardData != null && unableStateGuardData.GetCurrentCount() > 0 && !_target.IsNoDamageMotion() && !_target.IsAbnormalState(UnitCtrl.eAbnormalState.NO_ABNORMAL))
                 {
                     if (unableStateGuardData.DisplayCount)
                     {

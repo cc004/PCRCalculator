@@ -36,6 +36,9 @@ namespace PCRCaculator.Guild
     }
     public class GuildCalculator : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static GuildCalculator Instance;
         // public const float deltaXforChat = 1 / 5400.0f;
         public Dictionary<int, List<UnitStateChangeData>> allUnitStateChangeDic;
@@ -73,12 +76,12 @@ namespace PCRCaculator.Guild
         private readonly Dictionary<int, UnitStateChangeData> allUnitLastStateDic = new Dictionary<int, UnitStateChangeData>();
         private readonly List<int> playerIds = new List<int>();
         private List<int> bossId = new List<int>();
-        private List<UnitCtrl> players;
+        public List<UnitCtrl> players;
         private List<UnitCtrl> boss;
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
-        private long totalDamage;
-        private long totalDamageCriEX;
-        private LongWithEx totalDamageExcept = 0;
+        public long totalDamage;
+        public long totalDamageCriEX;
+        public LongWithEx totalDamageExcept = 0;
         public bool isFinishCalc;
         public eBattleResult BattleResult => BattleManager.Instance.battleResult;
         public Text seedText;
@@ -90,7 +93,7 @@ namespace PCRCaculator.Guild
         public List<int> PlayerIds => playerIds;
         public List<int> BossId => bossId;
         public Button KnifeDamageButton;
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
         }
@@ -100,6 +103,7 @@ namespace PCRCaculator.Guild
         }
         private void Update()
         {
+#if UNITY_5_3_OR_NEWER
             // 检测鼠标滚轮输入
             if (skillScrollRect.gameObject.activeInHierarchy && 
                 RectTransformUtility.RectangleContainsScreenPoint(
@@ -116,6 +120,7 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
+#endif
         }
 
         private void ZoomScrollRect(float delta)
@@ -253,11 +258,7 @@ namespace PCRCaculator.Guild
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
             b.NoSkipOnChangeState += AppendChangeState;
-            if (b.enemyId > 0 && !b.IsSummon)
-            {
-                b.NoSkipOnDamage2 += RefreshTotalDamage;
-            }
-            else if (isPlayer)
+            if (isPlayer)
             {
                 playerUnitDamageDic.Add(b.UnitId, new List<ValueChangeData> { new ValueChangeData(0, 0) });
             }
@@ -632,6 +633,7 @@ namespace PCRCaculator.Guild
 
         private void AddLine()
         {
+#if UNITY_5_3_OR_NEWER
             var serie = lineChart.AddSerie<Line>();
             serie.lineType = LineType.StepEnd;
             serie.lineStyle.width = .5f;
@@ -646,6 +648,7 @@ namespace PCRCaculator.Guild
             };
 
             serie.areaZero = 100 - serie.index;
+#endif
         }
 
         private const float PREFAB_SCALE = 35f / 38;
@@ -712,10 +715,12 @@ namespace PCRCaculator.Guild
                 colorIdx = skillGroupColors.Count - 1;
             }
             */
+#if UNITY_5_3_OR_NEWER
             var color = lineChart.theme.GetColor(colorIdx);
             color = Color.Lerp(color, Color.white, .7f);
 
             guildSkill.Initialize(Name, color/*skillGroupColors[colorIdx]*/);
+#endif
             skillGroupPrefabDic.Add(unitid, guildSkill);
 
             skillGroupList.Add(unitid);
@@ -750,6 +755,13 @@ namespace PCRCaculator.Guild
                 }
 
             }
+        }
+
+        public void ClearTotalDamage()
+        {
+            totalDamage = 0;
+            totalDamageCriEX = 0;
+            totalDamageExcept = 0;
         }
 
         public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, LongWithEx exvalue)
@@ -1414,8 +1426,10 @@ namespace PCRCaculator.Guild
 
                         if (BattleManager.Instance.scriptMgr != null)
                         {
+#if !DONT_USE_EX
                             foreach (var data in BattleManager.Instance.scriptMgr.additionalData)
                                 sw.WriteLine($"{data.comment}: {data.data?.ToExpression(rnd.Next())}");
+#endif
                         }
                     }
                 }
@@ -1895,6 +1909,7 @@ namespace PCRCaculator.Guild
         public int ownerID;
         public int targetID;
         public int actionID;
+        //21-嘲讽
         //20-恐惧判定
         //19-次数黑暗判定
         //18-清BUFF判定??

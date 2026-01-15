@@ -92,6 +92,7 @@ namespace PCRCaculator.SQL
                 //打开数据库
                 dbConnection.Open();
                 var trans = dbConnection.BeginTransaction();
+#if UNITY_5_3_OR_NEWER
                 var num = UnsafeNativeMethods.sqlite3_exec((dbConnection._sql as Mono.Data.Sqlite.SQLite3)!._sql,
                     SqliteConvert.ToUTF8(sql),
                     IntPtr.Zero, IntPtr.Zero, out var intPtr);
@@ -101,6 +102,12 @@ namespace PCRCaculator.SQL
                     string onljihpignl = (intPtr == IntPtr.Zero) ? "" : Marshal.PtrToStringAnsi(intPtr);
                     throw new Exception(onljihpignl);
                 }
+#else
+                new Mono.Data.Sqlite.SqliteCommand(dbConnection)
+                {
+                    CommandText = sql
+                }.ExecuteNonQuery();
+#endif
 
                 trans.Commit();
 

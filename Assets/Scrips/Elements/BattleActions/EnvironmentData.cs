@@ -8,10 +8,6 @@ namespace Elements
 {
     public class EnvironmentData : ISingletonField
     {
-        // private static SingletonTree<EnvironmentData> staticSingletonTree;
-        private static BattleManager staticBattleManager;
-        // private static Battle.IBattleEffectPool staticBattleEffectPool;
-
         public Skill Skill { get; set; }
         public UnitCtrl SourceUnit { get; set; }
         public int EnvironmentType { get; set; }
@@ -32,7 +28,7 @@ namespace Elements
         private Action<BasePartsData> _timerCallback;
 
         // public Battle.IBattleEffectPool battleEffectPool => staticBattleEffectPool;
-        public BattleManager battleManager => staticBattleManager;
+        public BattleManager battleManager => BattleManager.Instance;
 
         public void SetTimerCallback(Action<BasePartsData> callback)
         {
@@ -44,17 +40,9 @@ namespace Elements
             timer = 0.0f;
         }
 
-        public static void StaticRelease()
-        {
-            // staticSingletonTree = null;
-            staticBattleManager = null;
-            // staticBattleEffectPool = null;
-        }
-
         public EnvironmentData()
         {
             TargetActions = new List<ActionParameter>();
-            staticBattleManager = BattleManager.Instance;
         }
 
         public void StartEnvironment()
@@ -193,7 +181,9 @@ namespace Elements
             //     skillEffect.SetTimeToDie(true);
             // }
             // SetEnvironmentUI();
+#if UNITY_5_3_OR_NEWER
             BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true, SourceUnit.IsPlayerUnit);
+#endif
         }
 
         public void OnEnter(BasePartsData parts)
@@ -349,7 +339,10 @@ namespace Elements
 
             // skillEffect.InvokeInternalNameCall();
             // skillEffect.InvokeInternalInterfaceCall();
-            BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true, SourceUnit.IsPlayerUnit);
+
+#if UNITY_5_3_OR_NEWER
+                BattleUIManager.Instance.SetEnvironmentUI(this.EnvironmentType, true, SourceUnit.IsPlayerUnit);
+#endif
         }
 
         public void UpdateEnvironmentCallback(BasePartsData unit)

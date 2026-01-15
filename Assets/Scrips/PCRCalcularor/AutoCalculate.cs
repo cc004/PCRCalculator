@@ -21,6 +21,7 @@ namespace PCRCaculator
         public Text win;
         public Text lose;
         public Text timeout;
+        public Toggle useRemote;
         public void Init(AutoCalculatorData data)
         {
             calculatorData = data;
@@ -113,6 +114,7 @@ namespace PCRCaculator
         private void StartNew_0(string input)
         {
             int num = int.Parse(input, NumberStyles.Any);
+            MainManager.Instance.AutoCalculatorData.useRemote = useRemote.isOn;
             GuildManager.Instance.StartAutoCalculateByButton(num);
         }
 

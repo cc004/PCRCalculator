@@ -55,7 +55,7 @@ namespace Spine.Unity
 
 		public static SkeletonDataAsset CreateRuntimeInstance(TextAsset skeletonDataFile, AtlasAsset[] atlasAssets, bool initialize, float scale = 0.01f)
 		{
-			SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
+			SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
 			skeletonDataAsset.Clear();
 			skeletonDataAsset.skeletonJSON = skeletonDataFile;
 			skeletonDataAsset.atlasAssets = atlasAssets;
@@ -68,7 +68,7 @@ namespace Spine.Unity
 		}
         public static SkeletonDataAsset CreateRuntimeInstance(byte[] skeletonDataBytes, string name, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f)
         {
-            SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();
+            SkeletonDataAsset skeletonDataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             skeletonDataAsset.Clear();
             skeletonDataAsset.skeletonJSON = new TextAsset("default");
             skeletonDataAsset.skeletonJSON.name = name;
@@ -82,6 +82,7 @@ namespace Spine.Unity
 
             return skeletonDataAsset;
 		}
+
         public static SkeletonDataAsset CreateRuntimeInstance(SkeletonData skeletonData, string name, AtlasAsset atlasAsset, bool initialize, float scale = 0.01f)
         {
             SkeletonDataAsset skeletonDataAsset = CreateInstance<SkeletonDataAsset>();

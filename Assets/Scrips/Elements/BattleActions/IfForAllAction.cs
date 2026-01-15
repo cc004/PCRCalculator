@@ -84,13 +84,15 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictinary)
+          ValueDictionary _valueDictinary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictinary);
             bool flag = false;
             if (ActionDetail1 == 1000)
                 return;
-            DoubleWithEx prob = null;
+
+            DoubleWithEx? prob = null;
+
             switch ((eIfType)ActionDetail1)
             {
                 case eIfType.STOP:
@@ -247,10 +249,11 @@ namespace Elements
                     else if (ActionDetail1 > 900)
                     {
                         flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
-                        var now = _target.Owner.Hp / _target.Owner.MaxHp;
+
+#if !NO_PROB_EVENT
+                        var now = (DoubleWithEx)_target.Owner.Hp / _target.Owner.MaxHp;
                         var bound = ActionDetail1 % 100 / 100.0;
                         prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
-
                         if (flag)
                             GuildCalculator.Instance.dmglist.Add(new ProbEvent()
                             {
@@ -269,7 +272,7 @@ namespace Elements
                                 exp = hash => $"{now.ToExpression(hash)} < {bound}",
                                 description = $"({BattleHeaderController.CurrentFrameCount})对角色{_target.Owner.UnitNameEx}血量判定条件分歧失败（实际大于等于{bound}）"
                             });
-
+#endif
                         break;
                     }
                     else if (ActionDetail1 > 700)
@@ -298,6 +301,18 @@ namespace Elements
                     positiveAction.ActionType == negativeAction.ActionType &&
                     positiveAction.ActionChildrenIndexes.Count == 0 && negativeAction.ActionChildrenIndexes.Count == 0)
                 {
+#if DONT_USE_EX
+                    if (positiveAction != null)
+                    {
+                        positiveAction.oppositeAction = negativeAction;
+                        positiveAction.oppositeActionProb = 1 - prob.Value; // assert (float)prob == 1
+                    }
+                    if (negativeAction != null)
+                    {
+                        negativeAction.oppositeAction = positiveAction;
+                        negativeAction.oppositeActionProb = prob.Value; // assert (float)prob == 0
+                    }
+#else
                     if (positiveAction != null)
                     {
                         positiveAction.oppositeAction = negativeAction;
@@ -308,10 +323,11 @@ namespace Elements
                         negativeAction.oppositeAction = positiveAction;
                         negativeAction.oppositeActionProb = prob; // assert (float)prob == 0
                     }
-                    
+#endif
+
                     // for now, whether we cancel the positive action or the negative action should've have
                     // the same effect, so we can execute the non-null action to ensure our calculation is correct.
-                    
+
                     // when the only action is cancelled
                     if ((flag ? ActionDetail2 : ActionDetail3) == 0)
                         // revert the branch

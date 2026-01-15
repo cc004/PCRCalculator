@@ -453,12 +453,14 @@ namespace PCRCaculator
         }
         private void HandleRightClick(int unitId)
         {
+#if UNITY_5_3_OR_NEWER
             if (characterDetailManager != null)
             {
                 CharacterDetailManager a = Instantiate(characterDetailManager);
                 a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
                 a.SetId(unitId);
             }
+#endif
         }
         public void ShowContinousPress(bool show)
         {

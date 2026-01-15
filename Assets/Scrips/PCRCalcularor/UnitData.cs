@@ -715,7 +715,10 @@ namespace PCRCaculator
             }
         }
 
-        public void SetMax(bool is_guild_boss = true, bool ex_equip_full = true, bool equip_second_full = false)
+        /*
+        battle_mode: 0-会战, 1-普通, 2-jjc
+        */
+        public void SetMax(int battle_mode = 0, bool ex_equip_full = true, bool equip_second_full = false)
         {
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
@@ -749,7 +752,7 @@ namespace PCRCaculator
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
                 MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp);
                 //会战ex装备
-                if (is_guild_boss && ex_equip_full)
+                if (battle_mode == 0 && ex_equip_full)
                 {
                     for (int i = 0; i < 3; i++)
                     {
@@ -764,10 +767,10 @@ namespace PCRCaculator
                         }
                     }
                 }
-                else if (!is_guild_boss && ex_equip_full)
+                else if (battle_mode != 0 && ex_equip_full)
                 {
                     
-                    var equipSource = (!MainManager.Instance.IsGuildBattle &&
+                    var equipSource = (battle_mode == 2 &&
                                       playerSetting.UnitExEquipDefault.TryGetValue(unitId, out int[] unitDefaultExEquip))
                                       ? unitDefaultExEquip
                                       : null;

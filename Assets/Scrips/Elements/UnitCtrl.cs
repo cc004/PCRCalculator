@@ -284,7 +284,11 @@ namespace Elements
         private static BattleLogIntreface staticBattleLog;
         //private static INADFELJLMH staticBattleCameraEffect = (INADFELJLMH)null;
         //private static BattleEffectPoolInterface staticBattleEffectPool = (BattleEffectPoolInterface)null;
+#if ENABLE_THREADING
+        private BattleSpeedInterface staticBattleTimeScale;
+#else
         private static BattleSpeedInterface staticBattleTimeScale;
+#endif
         private float resultMoveDistance;
         public Action<UnitCtrl> OnDieForZeroHp;
         public Action<UnitCtrl> OnDieFadeOutEnd;
@@ -307,7 +311,11 @@ namespace Elements
         public List<int> SubUnionBurstIdList = new List<int>();
         public List<eSpineCharacterAnimeId> TreasureAnimeIdList = new List<eSpineCharacterAnimeId>();
         private bool isDeadBySetCurrentHp;
+#if ENABLE_THREADING
+        private BattleManager staticBattleManager;
+#else
         private static BattleManager staticBattleManager;
+#endif
         private List<ExSkillData> startExSkillList = new List<ExSkillData>();
         private Dictionary<eExSkillCondition, List<ExSkillData>> conditionExSkillDictionary = new Dictionary<eExSkillCondition, List<ExSkillData>>();
 
@@ -927,8 +935,16 @@ namespace Elements
                 UnitCtrl.eAbnormalState.WORLD_LIGHTNING,
                 new AbnormalConstData
                 {
-                    IconType = eStateIconType.WORLD_LIGHTNING, // TODO fix icon
+                    IconType = eStateIconType.WORLD_LIGHTNING,
                     IsBuff = true
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.TAUNT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.TAUNT,
+                    IsBuff = false
                 }
             },
         };
@@ -1649,6 +1665,8 @@ namespace Elements
 
         public Action OnDodge { get; set; }
 
+        public List<Func<bool>> OnSetCrowndControlForLoopTriggerList { get; set; } = new List<Func<bool>>();
+
         public Action<bool, long, bool> OnDamageForLoopTrigger { get; set; }
 
         public Action<long> OnDamageForLoopRepeat { get; set; }
@@ -2079,11 +2097,9 @@ namespace Elements
         public static void StaticRelease()
         {
             //UnitCtrl.staticSingletonTree = (Yggdrasil<UnitCtrl>)null;
-            staticBattleManager = null;
             staticBattleLog = null;
             //UnitCtrl.staticBattleCameraEffect = (INADFELJLMH)null;
             //UnitCtrl.staticBattleEffectPool = (BattleEffectPoolInterface)null;
-            staticBattleTimeScale = null;
         }
 
         private bool judgeRarity6() => Rarity == 6;
@@ -2116,7 +2132,7 @@ this.updateCurColor();
                         this.SetEnableColor();
                 }*/
 
-                private void Awake()
+        public void Awake()
         {
             OnAwake();
             TimeToDie = false;
@@ -2757,6 +2773,7 @@ this.updateCurColor();
                 }*/
                 if (skin.GetAttachment(slotIndex, name) is BoundingBoxAttachment attachment)
                 {
+#if UNITY_5_3_OR_NEWER
                     PolygonCollider2D polygonCollider2D = SkeletonUtility.AddBoundingBoxAsComponent(attachment, slot, gameObject, false);
                     ColliderCenter = (polygonCollider2D.bounds.center - transform.position) / 2;
                     ColliderSize = polygonCollider2D.bounds.size / 2;
@@ -2765,6 +2782,31 @@ this.updateCurColor();
 
                     Destroy(polygonCollider2D);
                     Destroy(gameObject.GetComponent<Rigidbody2D>());
+#else
+                    Vector2[] vertices = attachment.GetLocalVertices(slot, null);
+
+                    // 计算 AABB：找出 min/max
+                    float minX = float.MaxValue, minY = float.MaxValue;
+                    float maxX = float.MinValue, maxY = float.MinValue;
+
+                    foreach (var v in vertices)
+                    {
+                        if (v.x < minX) minX = v.x;
+                        if (v.y < minY) minY = v.y;
+                        if (v.x > maxX) maxX = v.x;
+                        if (v.y > maxY) maxY = v.y;
+                    }
+
+                    // 得到包围盒
+                    Vector2 boundsCenter = new Vector2((minX + maxX) / 2, (minY + maxY) / 2);
+                    Vector2 boundsSize = new Vector2(maxX - minX, maxY - minY);
+
+                    // 用 transform.position 修正（如果需要）
+                    ColliderCenter = Vector3.Scale(boundsCenter, transform.lossyScale) / 2;
+                    ColliderSize = Vector2.Scale(boundsSize, transform.lossyScale) / 2;
+                    float coSize2 = ColliderSize.x / transform.lossyScale.x;
+                    BodyWidth = coSize2 + BossBodyWidthOffset;
+#endif
                 }
 
             }
@@ -2841,6 +2883,10 @@ this.updateCurColor();
                     }
                     conditionExSkillDictionary.Add(exSkillConditionDatum.Key, new List<ExSkillData> { exSkillData });
                 }
+            }
+            if (enemyId > 0 && !IsSummon)
+            {
+                OnDamage2 += GuildCalculator.Instance.RefreshTotalDamage;
             }
 
             // TODO where is position?
@@ -3303,10 +3349,12 @@ this.updateCurColor();
                 //{
                 //    unitAttackPattern = new MasterUnitAttackPattern.UnitAttackPattern(loop_start: 1, loop_end: 1, atk_pattern_1: 1001);
                 //}
+                #if UNITY_5_3_OR_NEWER
                 if(MainManager.Instance.IsGuildBattle && MainManager.Instance.GuildBattleData.SettingData.changedEnemyAttackPatternDic.TryGetValue(_attackPatternId,out UnitAttackPattern data2))
                 {
                     unitAttackPattern = new MasterUnitAttackPattern.UnitAttackPattern(data2);
                 }
+                #endif
             }
             else
             {
@@ -3717,11 +3765,23 @@ this.updateCurColor();
             return false;
         }
 
+        public bool IsTauntState()
+        {
+            return IsAbnormalState(eAbnormalState.TAUNT);
+        }
+
+        public BasePartsData GetTauntSource()
+        {
+            if (!IsTauntState())
+                return null;
+            return TauntSource;
+        }
+
         private IEnumerator updateAttackTarget()
         {
             while (true)
             {
-                updateAttackTargetImpl();
+                updateAttackTargetImpl(GetTauntSource());
                 yield return null;
             }
         }
@@ -3729,7 +3789,7 @@ this.updateCurColor();
         private float lastSearchDistance = -1f;
         private float lastSearchDistanceForSkillReady = -1f;
 
-        private void updateAttackTargetImpl()
+        public void updateAttackTargetImpl(BasePartsData _tauntSource)
         {
             List<UnitCtrl> unitCtrlList1 = IsOther ? battleManager.UnitList : battleManager.EnemyList;
             float _distance = SearchAreaSize;
@@ -3756,6 +3816,16 @@ this.updateCurColor();
             var t1 = TargetEnemyList.ToList();
             var t2 = targetPlayerList.ToList();
             */
+
+            if (_tauntSource != null)
+            {
+                IsTauntSourceInSearchArea = judgeFrontAreaTarget(_tauntSource.Owner, _distance);
+            }
+            else
+            {
+                IsTauntSourceInSearchArea = false;
+            }
+
             TargetEnemyList.Clear();
             targetPlayerList.Clear();
 
@@ -4361,18 +4431,40 @@ this.updateCurColor();
             UnitCtrl JELADBAMFKH = unitCtrl1;
             UnitCtrl LIMEKPEENOB = unitCtrl2;
             battleLog.AppendBattleLog(eBattleLogType.SET_ENERGY, HLIKLPNIOKJ, 0L, KDCBJHCMAOH, 0, 0, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
+
+            // 1. 记录修改前的 TP
+            DoubleWithEx oldEnergy = Energy;
+
+            // 2. 执行赋值 (Setter 会自动处理 0~1000 的限制)
+            Energy = energy;
+
+            // 3. 统计逻辑：只统计己方角色(非召唤物)，且只统计正向增长
+            if (!IsOther && !IsSummonOrPhantom && MyGameCtrl.Instance != null)
+            {
+                // 计算实际增加量 (新值 - 旧值)
+                long diff = (long)(Energy - oldEnergy);
+                
+                // 只有增加才算获取 (消耗UB导致的减少不算)
+                if (diff > 0)
+                {
+                    MyGameCtrl.Instance.BattleStats.AddPlayerTp(UnitId, diff);
+                }
+            }
+
             Energy = energy;
             SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
                 NoSkipOnTPChanged?.Invoke(UnitId,Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
-            if(uIManager!=null)
+            if(!battleManager.skipping && uIManager != null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
 
         public void IndicateSkillName(string _skillName) 
         {
             if(_skillName == "" || _skillName == null) { return; }
+#if UNITY_5_3_OR_NEWER
             UIManager.ShowSkillName(_skillName, gameObject.transform);
+#endif
         }// => this.lifeGauge.IndicateSkillName(_skillName);
 
         //public List<PrefabWithTime> GetDieEffects() => this.dieEffects;
@@ -4892,8 +4984,10 @@ this.updateCurColor();
         {
             if (battleManager.GameState != eBattleGameState.PLAY)
                 return;
+#if !DONT_USE_EX
             _value = _value ?? 0f;
             _value2 = _value2 ?? 0f;
+#endif
             AbnormalStateEffectPrefabData abnormalEffectData = _action?.CreateAbnormalEffectData();
             if (_action != null && _action.AbnormalStateFieldAction != null)
                 _action.AbnormalStateFieldAction.TargetAbnormalState = _abnormalState;
@@ -5302,7 +5396,9 @@ this.updateCurColor();
             stateCategoryData.ShowsIcon = _showsIconAfterSwitch;
             EnableAbnormalState(abnormalState, true);
             stateCategoryData.CurrentAbnormalState = abnormalState;
+#if UNITY_5_3_OR_NEWER
             StartCoroutine(waitRefreshAbnormalStateUI(abnormalState));
+#endif
             /*for (int index = 0; index < stateCategoryData.Effects.Count; ++index)
             {
                 if ((UnityEngine.Object)stateCategoryData.Effects[index].RightEffect != (UnityEngine.Object)null)
@@ -6105,7 +6201,7 @@ this.updateCurColor();
                 if (time > 1f || BattleUtil.Approximately(time, 1f))
                 {
                     AbnormalStateCategoryData abnormalStateCategoryData = abnormalStateCategoryDataDictionary[category];
-                    SetRecovery((int)abnormalStateCategoryData.MainValue, ((int)abnormalStateCategoryData.SubValue != 1) ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, abnormalStateCategoryData.Source, GetHealDownValue(abnormalStateCategoryData.Source), _isEffect: true, _isRevival: false, _isUnionBurstLifeSteal: false, _isRegenerate: true, _useNumberEffect: true, null, _releaseToad: true);
+                    SetRecovery((int)abnormalStateCategoryData.MainValue, 0, ((int)abnormalStateCategoryData.SubValue != 1) ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, abnormalStateCategoryData.Source, GetHealDownValue(abnormalStateCategoryData.Source), _isEffect: true, _isRevival: false, _isUnionBurstLifeSteal: false, _isRegenerate: true, _useNumberEffect: true, null, _releaseToad: true);
                     time = 0f;
                 }
             }
@@ -6950,6 +7046,10 @@ this.updateCurColor();
 
         private int debuffCounter { get; set; }
 
+        public BasePartsData TauntSource { get; set; }
+        public List<UnitCtrl> TauntTargetList { get; set; } = new List<UnitCtrl>();
+        bool IsTauntSourceInSearchArea { get; set; }
+
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
         public Dictionary<BuffParamKind, LongWithEx> AdditionalBuffDictionary { get; set; } = new Dictionary<BuffParamKind, LongWithEx>();
@@ -7009,7 +7109,9 @@ this.updateCurColor();
             if (!_isBuff && IsAbnormalState(eAbnormalState.NO_DEBUF))
             {
                 SetMissAtk(_source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION);
+#if !REDUCE_ANALYSE
                 action?.Invoke("MISS");
+#endif
                 return;
             }
             if (!_isBuff && _value.All((KeyValuePair<BasePartsData, LongWithEx> _val) => (float)_val.Key.GetDebuffResistPercent(_resistMissCheckParamKind) == 100f))
@@ -7025,7 +7127,30 @@ this.updateCurColor();
             {
                 valueStr += i + ",";
             }
+#if !REDUCE_ANALYSE
             action?.Invoke("对目标添加" + _kind.GetDescription() + (_isBuff ? "BUFF" : "DEBUFF") + ",值" + valueStr + "持续时间" + _time + "秒");
+#endif
+            // 1. 魔法攻击 Buff (己方)
+            if (_kind == BuffParamKind.MAGIC_STR && !IsOther && !IsSummonOrPhantom)
+            {
+                MyGameCtrl.Instance.BattleStats.AddMagicBuff((long)_value.Values.Sum(v => v));
+            }
+            // 2. 物理攻击 Buff (己方)
+            else if (_kind == BuffParamKind.ATK && !IsOther && !IsSummonOrPhantom)
+            {
+                MyGameCtrl.Instance.BattleStats.AddPhysicsBuff((long)_value.Values.Sum(v => v));
+            }
+            // 3. 物理防御 Debuff (通常施加在敌人身上，所以判断 IsOther)
+            else if (_kind == BuffParamKind.DEF && IsOther && !IsSummonOrPhantom)
+            {
+                MyGameCtrl.Instance.BattleStats.AddPhysicsDebuff((long)_value.Values.Sum(v => v));
+            }
+            // 4. 魔法防御 Debuff (施加在敌人身上)
+            else if (_kind == BuffParamKind.MAGIC_DEF && IsOther && !IsSummonOrPhantom)
+            {
+                MyGameCtrl.Instance.BattleStats.AddMagicDebuff((long)_value.Values.Sum(v => v));
+            }
+
             BuffDebuffCoroutineDataSet _cr = new BuffDebuffCoroutineDataSet();
             _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
             // TODO fill _cr Enable EnvironmentId
@@ -7077,9 +7202,10 @@ this.updateCurColor();
         {
             if (_kind == BuffParamKind.MAX_HP)
             {
+                /*
                 if (maxHpDebufCounter == 0)
                 {
-                    /*if (maxHpDebufEffectRight == null)
+                    if (maxHpDebufEffectRight == null)
                     {
                         maxHpDebufEffectRight = createMaxHpDebufEffect(_left: false);
                         maxHpDebufEffectLeft = createMaxHpDebufEffect(_left: true);
@@ -7091,43 +7217,53 @@ this.updateCurColor();
                     else
                     {
                         maxHpDebufEffectLeft.SetActive(_isActive: false);
-                    }*/
-                }
+                    }
+                }*/
                 maxHpDebufCounter++;
             }
             EnableBuffParam(_kind, _value, true, _source, _isBuff, _additional, _isShowIcon, _maxTime);
             float time = 0.0f;
-            bool flag2;
             while (true)
             {
                 if (!isStopBuffDebuffEffectTimer)
                 {
                     time += DeltaTimeForPause;
                 }
+                /*
                 if (time > 1f)
                 {
                     buffDebuffSkilIds.Remove(_skillId);
-                }
-                bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
+                }*/
+                /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
                 flag2 = _despelable && flag;
-                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)
+                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
+                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || _buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) && _despelable)
                 {
                     break;
                 }
                 yield return null;
             }
-            buffDebuffSkilIds.Remove(_skillId);
+            /*
+            // buffDebuffSkilIds.Remove(_skillId);
             if (_bonusId != 0 && (long)Hp > 0)
             {
                 //battleManager.DeleteBonusIcon(_bonusId);
-            }
-            if (time >= _maxTime || flag2 || IdleOnly || _kind != BuffParamKind.MAX_HP)
+            }*/
+            /*
+             * break 必然有 time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2
+             * 原来：time >= _maxTime || flag2 || IdleOnly || _kind != BuffParamKind.MAX_HP
+             * 更改为: _kind != BuffParamKind.MAX_HP || !((long)Hp <= 0)
+             */
+            if (_kind != BuffParamKind.MAX_HP || !((long)Hp <= 0))
+            // if (time >= _maxTime || flag2 || IdleOnly || _kind != BuffParamKind.MAX_HP)
             {
                 EnableBuffParam(_kind, _value, _enable: false, _source, _isBuff, _additional, _isShowIcon, _maxTime);
             }
             else
             {
+#if !REDUCE_ANALYSE
                 OnChangeState.Call(this, eStateIconType.DEBUFF_MAX_HP, ADIFIOLCOPN: false);
+#endif
                 MaxHp = MaxHpAfterPassive;
             }
             if (_kind == BuffParamKind.MAX_HP)
@@ -7216,6 +7352,10 @@ this.updateCurColor();
             {
                 return;
             }
+
+#if REDUCE_ANALYSE
+            if (_kind != BuffParamKind.NUM)
+#else
             eStateIconType eStateIconType2 = eStateIconType.NONE;
 			if (_showsIcon)
 			{
@@ -7253,6 +7393,7 @@ this.updateCurColor();
             button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)
+#endif
             {
                 if (_enable)
                 {
@@ -7395,7 +7536,7 @@ this.updateCurColor();
 
         public int CompareRight(BasePartsData _a, BasePartsData _b) => _b.GetPosition().x.CompareTo(_a.GetPosition().x);
 
-        public int CompareLifeAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((long)_a.Owner.Hp / (float)(long)_a.Owner.MaxHp, (long)_b.Owner.Hp / (float)(long)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeAsc(_a, _b);
+        public int CompareLifeAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / (DoubleWithEx)_a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / (DoubleWithEx)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeAsc(_a, _b);
 
         public int CompareLifeValueAscSameLeft(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? CompareLeft(_a, _b) : CompareLifeValueAsc(_a, _b);
 
@@ -7405,7 +7546,7 @@ this.updateCurColor();
 
         public int CompareEnergyAscNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately(_a.Owner.Energy, _b.Owner.Energy) ? CompareDistanceAsc(_a, _b) : CompareEnergyAsc(_a, _b);
 
-        public int CompareLifeDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((long)_a.Owner.Hp / (float)(long)_a.Owner.MaxHp, (long)_b.Owner.Hp / (float)(long)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeDec(_a, _b);
+        public int CompareLifeDecNear(BasePartsData _a, BasePartsData _b) => BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / (DoubleWithEx)_a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / (DoubleWithEx)_b.Owner.MaxHp) ? CompareDistanceAsc(_a, _b) : CompareLifeDec(_a, _b);
 
         public int CompareLifeValueDecSameLeft(BasePartsData _a, BasePartsData _b) => (long)_a.Owner.Hp == (long)_b.Owner.Hp ? CompareLeft(_a, _b) : CompareLifeValueDec(_a, _b);
 
@@ -7451,9 +7592,9 @@ this.updateCurColor();
 
         public static int CompareEnergyDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Owner.Energy.CompareTo(a.Owner.Energy) : -1);
 
-        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)a.Owner.Hp / (double)a.Owner.MaxHp).CompareTo((long)b.Owner.Hp / (double)b.Owner.MaxHp) : 1);
+        public static int CompareLifeAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((DoubleWithEx)a.Owner.Hp / (DoubleWithEx)a.Owner.MaxHp).CompareTo((DoubleWithEx)b.Owner.Hp / (DoubleWithEx)b.Owner.MaxHp) : 1);
 
-        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((long)b.Owner.Hp / (double)b.Owner.MaxHp).CompareTo((long)a.Owner.Hp / (double)a.Owner.MaxHp) : -1);
+        public static int CompareLifeDec(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? ((DoubleWithEx)b.Owner.Hp / (DoubleWithEx)b.Owner.MaxHp).CompareTo((DoubleWithEx)a.Owner.Hp / (DoubleWithEx)a.Owner.MaxHp) : -1);
 
         public static int CompareAtkAsc(BasePartsData a, BasePartsData b) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZero().CompareTo(b.GetAtkZero()) : 1);
 
@@ -7467,9 +7608,9 @@ this.updateCurColor();
 
         public static int CompareEnergyDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? b.Energy.Emulate(hash).CompareTo(a.Energy.Emulate(hash)) : -1);
 
-        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / (double)a.MaxHp).CompareTo(b.Hp.Emulate(hash) / (double)b.MaxHp) : 1);
+        public static int CompareLifeAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (a.Hp.Emulate(hash) / (DoubleWithEx)a.MaxHp).CompareTo(b.Hp.Emulate(hash) / (DoubleWithEx)b.MaxHp) : 1);
 
-        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / (double)b.MaxHp).CompareTo(a.Hp.Emulate(hash) / (double)a.MaxHp) : -1);
+        public static int CompareLifeDec(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? (b.Hp.Emulate(hash) / (DoubleWithEx)b.MaxHp).CompareTo(a.Hp.Emulate(hash) / (DoubleWithEx)a.MaxHp) : -1);
 
         public static int CompareAtkAsc(BasePartsDataEx a, BasePartsDataEx b, int hash) => a == null ? (b != null ? -1 : 0) : (b != null ? a.GetAtkZeroEx.Emulate(hash).CompareTo(b.GetAtkZeroEx.Emulate(hash)) : 1);
 
@@ -7692,6 +7833,17 @@ this.updateCurColor();
             }
         }
 
+        public bool OnSetCrowndControlForLoopTriggerListCall()
+        {
+            bool ret = false;
+            foreach(var action in OnSetCrowndControlForLoopTriggerList)
+            {
+                ret |= action.Invoke();
+            }
+            return ret;
+        }
+
+
         public double CalcAweValue(bool _isUnionBurst, bool _isAttack)
         {
             double a = 1f;
@@ -7801,7 +7953,7 @@ this.updateCurColor();
                     KnightGuardData data = knightGuardData2;
                     if (!flag) _hp = Hp.Max(0);
                     flag = true;
-                    DMFGKJIEEBF += () => SetRecovery(data.Value, data.InhibitHealType, this, _isRevival: true);
+                    DMFGKJIEEBF += () => SetRecovery(data.Value, 0, data.InhibitHealType, this, _isRevival: true);
                     if (data.ExecEffectData != null)
                     {
                         /*NormalSkillEffect execEffectData = data.ExecEffectData;
@@ -8562,7 +8714,7 @@ this.updateCurColor();
                     break;
             }*/
         }
-
+#if !ENABLE_THREADING
         private static void initializePassiveActionAllByEnemy(
           MasterSkillAction.SkillAction _actionData,
           int _level,
@@ -8580,7 +8732,6 @@ this.updateCurColor();
                     break;
             }
         }
-
         private static void initializePassiveActionAllByUnit(
           MasterSkillAction.SkillAction _actionData,
           int _level,
@@ -8598,6 +8749,7 @@ this.updateCurColor();
                     break;
             }
         }
+#endif
 
         private static void initializePassiveActionOwner(
           MasterSkillAction.SkillAction _actionData,
@@ -8679,7 +8831,7 @@ this.updateCurColor();
                         if (_first && !IsClanBattleOrSekaiEnemy)
                         {
                             MaxHp = calculatePassiveSkillValue(MaxHp, _passiveActionKV).ToLongWithEx();
-                            Hp = (Hp / StartMaxHP * MaxHp).ToLongWithEx();
+                            Hp = ((DoubleWithEx)Hp / StartMaxHP * MaxHp).ToLongWithEx();
                         }
                         continue;
                     case eParamType.ATK:
@@ -8770,6 +8922,7 @@ this.updateCurColor();
           KeyValuePair<eParamType, PassiveActionValue> _passiveActionKV) => (_value * (_passiveActionKV.Value.Percentage + 100.0) / 100.0) + _passiveActionKV.Value.Value;
 
         public List<PartsData> BossPartsListForBattle { get; set; }
+        /*
         private static UnitCtrl _instance;
 
         public static UnitCtrl Instance
@@ -8789,7 +8942,7 @@ this.updateCurColor();
                 }
                 return _instance;
             }
-        }
+        }*/
 
         public bool IsPartsBoss => BossPartsList.Count > 0;
 
@@ -9140,14 +9293,25 @@ this.updateCurColor();
             if (_damageData.Source != null && _damageData.ActionType != eActionType.DESTROY && _damageData.ActionType != eActionType.ATTACK_FIELD && (_skill == null || _skill.IsLifeStealEnabled))
             {
                 long lifeSteal = _damageData.LifeSteal;
-                if (_skill != null)
-                    lifeSteal += _skill.LifeSteal;
+                long skillLifeSteal = 0;
+                bool flag3 = _skill != null && (_damageData.ActionType == eActionType.ATTACK || _damageData.ActionType == eActionType.RATIO_DAMAGE || _damageData.ActionType == eActionType.UPPER_LIMIT_ATTACK);
+                if (flag3)
+				{
+					skillLifeSteal = _skill.LifeSteal;
+					lifeSteal += skillLifeSteal;
+				}
                 if (lifeSteal > 0)
                 {
                     var num2 = num1 * lifeSteal / (lifeSteal + Level + 100);
+                    var num3 = 0;
                     if (num2 != 0)
                     {   //_damageData.Source.SetRecovery(num2, _damageData.DamageType == DamageData.eDamageType.MGC ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, _damageData.Source, false, _isUnionBurstLifeSteal: this.battleManager.BlackOutUnitList.Contains(_damageData.Source));
-                        _damageData.Source.SetRecovery(BattleUtil.DoubleToLongReverseTruncate(num2), _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
+                        if (flag3)
+                        {
+                            num3 = BattleUtil.DoubleToIntReverseTruncate((double)num2 * (double)skillLifeSteal / (double)(_damageData.LifeSteal + skillLifeSteal));
+                            num2 = BattleUtil.DoubleToIntReverseTruncate((double)num2 * (double)_damageData.LifeSteal / (double)(_damageData.LifeSteal + skillLifeSteal));
+                        }
+                        _damageData.Source.SetRecovery(num2, num3, _damageData.DamageType == DamageData.eDamageType.MGC ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _damageData.Source, GetHealDownValue(_damageData.Source), false, _isUnionBurstLifeSteal: battleManager.BlackOutUnitList.Contains(_damageData.Source));
                     }
                 }
             }
@@ -9326,7 +9490,9 @@ this.updateCurColor();
             isHit = true;
             if (IdleOnly || IsDivisionSourceForDamage && !_damageData.IsDivisionDamage)
             {
+#if !REDUCE_ANALYSE
                 callBack?.Invoke("伤害无效,目标不是可攻击状态");
+#endif
                 isHit = false;
                 return 0;
             }
@@ -9336,21 +9502,29 @@ this.updateCurColor();
             execPassiveSeal(PassiveSealAction.ePassiveTiming.DAMAGED);
             if (IsNoDamageMotion())
             {
+#if !REDUCE_ANALYSE
                 callBack?.Invoke("伤害无效，目标处于无敌状态");
+#endif
                 isHit = false;
                 return 0;
             }
             if (IsAbnormalState(eAbnormalState.PHYSICS_DODGE) && _damageData.DamageType == DamageData.eDamageType.ATK)
             {
                 SetMissAtk(_damageData.Source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION, _parts: _damageData.Target);
+
+#if !REDUCE_ANALYSE
                 callBack?.Invoke("伤害无效，目标处于物理闪避状态");
+#endif
                 isHit = false;
                 return 0;
             }
             if (IsAbnormalState(eAbnormalState.MAGIC_DODGE) && _damageData.DamageType == DamageData.eDamageType.MGC)
             {
                 SetMissAtk(_damageData.Source, eMissLogType.DODGE_BY_NO_DAMAGE_MOTION, _parts: _damageData.Target);
+
+#if !REDUCE_ANALYSE
                 callBack?.Invoke("伤害无效，目标处于魔法闪避状态");
+#endif
                 isHit = false;
                 return 0;
             }
@@ -9463,8 +9637,12 @@ this.updateCurColor();
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
+#if DONT_USE_EX
+                    var tt = execBarrier(TotalDamageForLogBarrier, allLogBarrierEffectValue, allLogBarrierStartValue);
+#else
                     var tt = TotalDamageForLogBarrier.Select(x =>
                         execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
+#endif
                     a *= tt;
                     b *= tt;
                     TotalDamageForLogBarrier *= tt;
@@ -9472,8 +9650,12 @@ this.updateCurColor();
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                         double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
+#if DONT_USE_EX
+                        var t = execBarrier(TotalDamageForLogBarrier, abnormalStateMainValue, abnormalStateSubValue);
+#else
                         DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
                             execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+#endif
                         a *= t;
                         b *= t;
                         TotalDamageForLogBarrier *= t;
@@ -9482,8 +9664,12 @@ this.updateCurColor();
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                         double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
+#if DONT_USE_EX
+                        var t = execBarrier(TotalDamageForLogBarrier, abnormalStateMainValue, abnormalStateSubValue);
+#else
                         DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
                             execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+#endif
                         a *= t;
                         b *= t;
                         TotalDamageForLogBarrier *= t;
@@ -9492,8 +9678,12 @@ this.updateCurColor();
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                         double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
+#if DONT_USE_EX
+                        var t = execBarrier(TotalDamageForLogBarrier, abnormalStateMainValue, abnormalStateSubValue);
+#else
                         DoubleWithEx t = TotalDamageForLogBarrier.Select(x =>
                             execBarrier(x, abnormalStateMainValue, abnormalStateSubValue), $"barrier:{abnormalStateMainValue}:{abnormalStateSubValue}");
+#endif
                         a *= t;
                         b *= t;
                         TotalDamageForLogBarrier *= t;
@@ -9583,7 +9773,9 @@ this.updateCurColor();
             if (CurrentState == ActionState.DIE)
             {
                 //this.createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.FloatToInt(num5));
+#if !REDUCE_ANALYSE
                 callBack?.Invoke("伤害无效，目标已经死了");
+#endif
                 return 0;
             }
             
@@ -9645,7 +9837,9 @@ this.updateCurColor();
                 strikeBack.Exec(_damageData.Source, this, BattleUtil.DoubleToLong(num5), delegate
                 {
                     strikeBackList.Remove(strikeBack);
+#if !REDUCE_ANALYSE
                     NoSkipOnChangeAbnormalState?.Invoke(this, eStateIconType.STRIKE_BACK, false, 90, "反击中");
+#endif
                 });
                 OnChangeState.Call(this, eStateIconType.STRIKE_BACK, ADIFIOLCOPN: false);
                 return 0L;
@@ -9705,7 +9899,9 @@ this.updateCurColor();
             {
                 if (!battleManager.skipping)
                     createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, BattleUtil.DoubleToLong(num5));
+#if !REDUCE_ANALYSE
                 callBack?.Invoke("伤害无效，因为伤害为负数");
+#endif
                 return 0;
             }
 
@@ -9753,6 +9949,7 @@ this.updateCurColor();
             if (_damageData.ActionType != eActionType.INHIBIT_HEAL && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
                 this.execBarrier(_damageData, ref _fDamage, ref _overRecoverValue);
             var num6 = BattleUtil.DoubleToLong(_fDamage);
+
             bool flag2 = (long)Hp > 0L;
             long num7 = (long)Hp > MaxHp * 0.200000002980232 ? 1 : 0;
             long hp = (long)Hp;
@@ -9769,6 +9966,7 @@ this.updateCurColor();
             
             if (!IsBoss)
             {
+#if !NO_PROB_EVENT
                 if (Hp > 0)
                     GuildCalculator.Instance.dmglist.Add(new ProbEvent
                     {
@@ -9787,6 +9985,7 @@ this.updateCurColor();
                         description = $"({BattleHeaderController.CurrentFrameCount})没被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}打死"
                     });
                 }
+#endif
             }
             else
                 GuildCalculator.Instance.bossValues.Add((BattleHeaderController.CurrentFrameCount, Hp));
@@ -9827,7 +10026,7 @@ this.updateCurColor();
                         }
                     }
                 }
-
+                /*
                 if (flag3)
                 {
                     static IEnumerator moveParticle()
@@ -9852,7 +10051,7 @@ this.updateCurColor();
                             StartCoroutine(playLargeUBEffect());
                             break;
                     }
-                }
+                }*/
             }
             /*if ((UnityEngine.Object)this.lifeGauge != (UnityEngine.Object)null)
             {
@@ -9917,7 +10116,6 @@ this.updateCurColor();
             if (OnDamage != null)
                 OnDamage(_byAttack, num6, _critical);
 
-
             if (!battleManager.skipping)
             {
                 float NormalizedHP = (float)(Hp / (double)MaxHp);
@@ -9940,7 +10138,7 @@ this.updateCurColor();
 
             }
 
-            NoSkipOnDamage2?.Invoke(_byAttack, num6, _critical, (long)((double)num6 * (1 - 1/num1)), num6);
+            OnDamage2?.Invoke(_byAttack, num6, _critical, (long)((double)num6 * (1 - 1/num1)), num6);
             OnDamageForLoopTrigger.Call(_byAttack, num6, _critical);
             OnDamageForLoopRepeat.Call(num6);
             OnDamageForDivision.Call(_byAttack, Math.Min(hp, num6), _critical);
@@ -9989,11 +10187,12 @@ this.updateCurColor();
                         
                 }
             }
-
+#if !REDUCE_ANALYSE
             string describe =
                 $"对目标{((_damageData.Target?.Owner?.IsPartsBoss ?? false) ? $"<color=#8040FF>部位{_damageData.Target.Index}</color>" : "")}造成<color=#FF0000>{num6}{(_critical ? "</color>点<color=#FFEB00>暴击</color>伤害" : "</color>点伤害")}";
 
             callBack?.Invoke(describe);
+#endif
             return num6;
         }
         private bool IsDamageIgnore(bool _energyAdd)
@@ -10059,6 +10258,7 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_ATK, false);
                     _fDamage = num;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10067,11 +10267,13 @@ this.updateCurColor();
                         exp = hash => $"{num.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
+#endif
                 }
                 else
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= BattleUtil.DoubleToInt(_fDamage);
                     _fDamage = 0.0f;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10080,6 +10282,7 @@ this.updateCurColor();
                         exp = hash => $"{num.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
+#endif
                 }
             }
             if (IsAbnormalState(eAbnormalState.GUARD_MGC) && _damageData.DamageType == DamageData.eDamageType.MGC)
@@ -10089,6 +10292,7 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_MGC, false);
                     _fDamage = num;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10097,11 +10301,13 @@ this.updateCurColor();
                         exp = hash => $"{num.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
+#endif
                 }
                 else
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= BattleUtil.DoubleToInt(_fDamage);
                     _fDamage = 0.0f;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10110,6 +10316,7 @@ this.updateCurColor();
                         exp = hash => $"{num.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
+#endif
                 }
             }
             if (IsAbnormalState(eAbnormalState.DRAIN_ATK) && _damageData.DamageType == DamageData.eDamageType.ATK)
@@ -10120,6 +10327,7 @@ this.updateCurColor();
                     _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)(float)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10128,6 +10336,7 @@ this.updateCurColor();
                         exp = hash => $"{num1.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
+#endif
                 }
                 else
                 {
@@ -10135,6 +10344,7 @@ this.updateCurColor();
                     _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue -= (float)num2;
                     _fDamage = 0.0f;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10143,6 +10353,7 @@ this.updateCurColor();
                         exp = hash => $"{num1.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
+#endif
                 }
             }
             if (IsAbnormalState(eAbnormalState.DRAIN_MGC) && _damageData.DamageType == DamageData.eDamageType.MGC)
@@ -10153,6 +10364,7 @@ this.updateCurColor();
                     _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery(BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source).Floor());
                     EnableAbnormalState(eAbnormalState.DRAIN_MGC, false);
                     _fDamage = num1;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10161,6 +10373,7 @@ this.updateCurColor();
                         exp = hash => $"{num1.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
+#endif
                 }
                 else
                 {
@@ -10168,6 +10381,7 @@ this.updateCurColor();
                     _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery(num2, this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].Source).Floor());
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_MGK].MainValue -= num2;
                     _fDamage = 0.0f;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10176,6 +10390,7 @@ this.updateCurColor();
                         exp = hash => $"{num1.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
+#endif
                 }
             }
             if (IsAbnormalState(eAbnormalState.GUARD_BOTH) && _damageData.ActionType != eActionType.DESTROY)
@@ -10185,6 +10400,7 @@ this.updateCurColor();
                 {
                     EnableAbnormalState(eAbnormalState.GUARD_BOTH, false);
                     _fDamage = num;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10193,11 +10409,13 @@ this.updateCurColor();
                         exp = hash => $"{num.ToExpression(hash)} <= 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
+#endif
                 }
                 else
                 {
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -= BattleUtil.DoubleToInt(_fDamage);
                     _fDamage = 0.0f;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10206,6 +10424,7 @@ this.updateCurColor();
                         exp = hash => $"{num.ToExpression(hash)} > 0",
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
+#endif
                 }
             }
 
@@ -10249,6 +10468,7 @@ this.updateCurColor();
                         abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].Source).Floor();
                     EnableAbnormalState(eAbnormalState.DRAIN_BOTH, false);
                     _fDamage = num3;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10256,6 +10476,7 @@ this.updateCurColor();
                         predict = hash => num3.Emulate(hash) <= 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}穿盾（实际未穿盾）"
                     });
+#endif
                 }
                 else
                 {
@@ -10266,6 +10487,7 @@ this.updateCurColor();
                     abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_BOTH].MainValue -=
                         num1;
                     _fDamage = 0.0f;
+#if !NO_PROB_EVENT
                     GuildCalculator.Instance.dmglist.Add(lastBarrier = new ProbEvent
                     {
                         isProb = true,
@@ -10273,6 +10495,7 @@ this.updateCurColor();
                         predict = hash => num3.Emulate(hash) > 0f,
                         description = $"({BattleHeaderController.CurrentFrameCount})被{(_damageData.Source != null ? $"{_damageData.Source.UnitNameEx}的" + $"{(_damageData.Source.CurrentSkillId == 1 ? "普攻" : $"{_damageData.Source.unitActionController.skillDictionary[_damageData.Source.CurrentSkillId].SkillName}技能({_damageData.Source.CurrentSkillId})")}" : "领域")}未穿盾（实际穿盾）"
                     });
+#endif
                 }
             }
         }
@@ -10284,6 +10507,7 @@ this.updateCurColor();
           bool _critical,
           long _damage)
         {
+#if UNITY_5_3_OR_NEWER
             if (((!(battleManager != null) ? 0 : (_damage >= 0 ? 1 : 0)) & (_hasEffect ? 1 : 0)) == 0)
                 return;
             eDamageType damageType = (eDamageType)(int)_damageData.DamageType;
@@ -10292,6 +10516,7 @@ this.updateCurColor();
             //eDamageEffctTypeDetail key = (UnityEngine.Object)_damageData.Source == (UnityEngine.Object)null || _damageData.Source.IsLeftDir == !this.battleManager.IsDefenceReplayMode ? (_critical ? eDamageEffctTypeDetail.UNIT_CRITICAL : eDamageEffctTypeDetail.UNIT) : (_critical ? eDamageEffctTypeDetail.ENEMY_CRITICAL : eDamageEffctTypeDetail.ENEMY);
             //GameObject _pPrefab = this.battleManager.AMPANMGEBBM[_damageData.DamegeEffectType][key];
             //this.CreateDamageNumEffect(_damage, _pPrefab, true, _critical, _skill, _damageData.DamageNumMagic || _damageData.DamageType == DamageData.eDamageType.MGC, _damageData.Source, _damageData.DamageSoundType, _damageData.Target, _damageData.DamegeNumScale);
+#endif
         }
 
         /*public DamageEffectCtrl CreateDamageNumEffect(
@@ -10384,7 +10609,9 @@ this.updateCurColor();
             this.sortOffsetResetTimer = 0.6f;
             ++this.hitEffectSortOffset;
             damageEffectCtrlBase.SetSortOrder((this.IsFront ? 11500 : 0) + 11250 + this.hitEffectSortOffset);*/
+#if UNITY_5_3_OR_NEWER
             UIManager.SetMissEffect(gameObject.transform.position,_type == eDamageEffectType.NORMAL?1:2);
+#endif
         }
 
         /*public void ShowHitEffect(
@@ -10426,13 +10653,13 @@ this.updateCurColor();
           UnitCtrl _healSource)
         {
             var num = Hp + _value - MaxHp;
-            SetRecovery(_value, _isMagic ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _source, GetHealDownValue(_healSource), _target: _target);
+            SetRecovery(_value, 0, _isMagic ? eInhibitHealType.MAGIC : eInhibitHealType.PHYSICS, _source, GetHealDownValue(_healSource), _target: _target);
             return (DoubleWithEx)num;
         }
 
         public void SetRecovery(
           LongWithEx _value,
-        //   long _valueSkillLifeSteal,
+          LongWithEx _valueSkillLifeSteal,
           eInhibitHealType _inhibitHealType,
           UnitCtrl _source,
           double _healDownValue = 1f,
@@ -10462,6 +10689,7 @@ this.updateCurColor();
             }
 
             _value = BattleUtil.DoubleToInt(_healDownValue * (1f - num) * _value);
+            _valueSkillLifeSteal = BattleUtil.DoubleToInt(_healDownValue * (1f - num) * (double)_valueSkillLifeSteal);
 
             if (IsAbnormalState(eAbnormalState.INHIBIT_HEAL) && _inhibitHealType != eInhibitHealType.NO_EFFECT)
             {
@@ -10470,7 +10698,7 @@ this.updateCurColor();
                 DamageData _damageData = new DamageData
                 {
                     Target = GetFirstParts((bool)(Object)this),
-                    Damage = BattleUtil.DoubleToInt(GetAbnormalStateMainValue(eAbnormalStateCategory.INHIBIT_HEAL) * _value),
+                    Damage = BattleUtil.DoubleToInt(GetAbnormalStateMainValue(eAbnormalStateCategory.INHIBIT_HEAL) * (double)(_value + _valueSkillLifeSteal)),
                     DamageType = DamageData.eDamageType.NONE,
                     Source = abnormalStateCategoryDataDictionary[eAbnormalStateCategory.INHIBIT_HEAL].Source,
                     DamageNumMagic = _inhibitHealType == eInhibitHealType.MAGIC,
@@ -10486,6 +10714,7 @@ this.updateCurColor();
             {
                 if (_releaseToad && ToadDatas.Count > 0 && ToadDatas[0].ReleaseByHeal)
                     ToadDatas[0].Enable = false;
+                _value += _valueSkillLifeSteal;
                 Hp = (Hp + _value);
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
@@ -10513,20 +10742,24 @@ this.updateCurColor();
                 float NormalizedHP = (float)(Hp / (double)MaxHp);
                 /*
                 this.OnLifeAmmountChange.Call<float>(NormalizedHP);*/
+#if !REDUCE_ANALYSE
                 string des = $"目标HP回复<color=#54FF4F>{_value}</color>点，当前HP: {Hp}";
                 action?.Invoke(des);
                 uIManager?.LogMessage(des, eLogMessageType.HP_RECOVERY, _source);
                 NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+#endif
                 if (_isUnionBurstLifeSteal)
                 {
                     unionburstLifeStealNum += (long)_value;
                 }
                 else
                 {
+#if UNITY_5_3_OR_NEWER
                     if (_useNumberEffect && !battleManager.skipping)
                     {
                         UIManager.SetHealNumber(gameObject.transform.position, (int)_value);
                     }   //this.createHealNumEffect(_value, _target);
+#endif
                     if (!_isEffect)
                         return;
                     //_target.RecoveryEffect(_source, false, this.battleEffectPool, _isRegenerate);
@@ -10662,7 +10895,9 @@ this.updateCurColor();
                 component.SetPosition(this.GetFirstParts(true), Vector3.up * 0.1f * (float)this.energyHealComboCount, 1f);
                 component.SetSortOrder((this.IsFront ? 11500 : 0) + 11250);
                 component.SetDamageText(((int)num).ToString(), eDamageEffectColor.BLUE);*/
+#if UNITY_5_3_OR_NEWER
                 UIManager.SetEnergyNumber(gameObject.transform.position, (int)num);
+#endif
             }
             SetEnergy(Energy + num, _setEnergyType, _source);
             //if (!_hasEffect || _effectType != eEffectType.COMMON)
@@ -10727,7 +10962,7 @@ this.updateCurColor();
             {
                 do
                 {
-                    while (battleManager.IsPlayingPrincessMovie || battleManager.isPrincessFormSkill)
+                    while (battleManager.IsPrincessSkillMovieRunning || battleManager.isPrincessFormSkill)
                         yield return null;
                     if (_changeScaleId != changeScaleId)
                     {
@@ -11614,13 +11849,14 @@ this.updateCurColor();
                 AppendCoroutine(updateSkill1(), ePauseType.SYSTEM, this);
             else
                 SetState(ActionState.IDLE);
-
+#if !REDUCE_ANALYSE
             lastCritPoint = new CritPoint
             {
                 description = $"{UnitNameEx}释放ub",
                 description2 = $"{UnitNameEx}ub后",
                 priority = eCritPointPriority.StartSkill
             };
+#endif
         }
 
         private void playUbVoiceWithDelay() { }// => this.playVoiceDataList(!this.battleTimeScale.SpeedUpFlag ? (!this.PlayCutInFlag ? this.NormalSkillVoiceDelay : this.NormalSkillVoiceDelayWithCutIn) : (!this.PlayCutInFlag ? this.SpeedUpSkillVoiceDelay : this.SpeedUpSkillVoiceDelayWithCutIn), 100);
@@ -12698,7 +12934,7 @@ this.updateCurColor();
                                 yield return null;
                             else if ((float)unitCtrl.m_fCastTimer <= 0f && unitCtrl.attackPatternDictionary != null)
                             {
-                                unitCtrl.updateAttackTargetImpl();
+                                unitCtrl.updateAttackTargetImpl(GetTauntSource());
                                 if (unitCtrl.judgeStateIsWalk())
                                 {
                                     yield break;
@@ -12755,12 +12991,20 @@ this.updateCurColor();
         {
             if (!IsConfusionOrConvert())
             {
-                if (TargetEnemyList.Count <= 0)
+                if (IsTauntState())
                 {
-                    isRunForCatchUp = true;
-                    SetState(ActionState.WALK);
-                    return true;
+                    if (IsTauntSourceInSearchArea)
+                    {
+                        return false;
+                    }
                 }
+                else if (TargetEnemyList.Count > 0)
+                {
+                    return false;
+                }
+                isRunForCatchUp = true;
+                SetState(ActionState.WALK);
+                return true;
             }
             else
             {
@@ -13567,6 +13811,8 @@ this.updateCurColor();
         {
             get
             {
+                if (!((double)Energy >= 1000.0)) return false;
+
                 if ((battleManager.BattleCategory == eBattleCategory.DUNGEON ||
                      battleManager.BattleCategory == eBattleCategory.TOWER ||
                      battleManager.BattleCategory == eBattleCategory.TOWER_REHEARSAL ||
@@ -13600,8 +13846,8 @@ this.updateCurColor();
                         (!IsDead && CurrentState != ActionState.DIE) &&
                         (!IsConfusionOrConvert() && (long) Hp > 0L &&
                          (!isAwakeMotion && !unitActionController.DisableUBByModeChange))) &&
-                       ((double) Energy >= 1000.0 && SkillLevels[UnionBurstSkillId] != 0 &&
-                        !GetIsReduceEnergy()) && battleManager.LAMHAIODABF == 0;
+                       SkillLevels[UnionBurstSkillId] != 0 &&
+                       !GetIsReduceEnergy() && battleManager.LAMHAIODABF == 0;
                 //return this.ToadDatas.Count <= 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.UB_SILENCE) && (this.CurrentState != UnitCtrl.ActionState.SKILL_1 || this.unitActionController.Skill1IsChargeTime) && (!this.IsUnableActionState() && this.CurrentState != UnitCtrl.ActionState.DAMAGE && (this.UnionBurstSkillId != 0 && !this.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE))) && (!this.IsDead && this.CurrentState != UnitCtrl.ActionState.DIE && (!this.IsConfusionOrConvert() && (long)this.Hp > 0L) && (!this.isAwakeMotion && !this.unitActionController.DisableUBByModeChange && ((double)this.Energy >= 1000.0 && this.SkillLevels[this.UnionBurstSkillId] != 0))) && !this.GetIsReduceEnergy() && this.battleManager.LAMHAIODABF == 0;
             }
         }
@@ -13697,11 +13943,6 @@ this.updateCurColor();
         }
         public bool IsAutoOrUbExecTrying()
         {
-            // Debug.Log($"frame = {battleManager.FrameCount} unit = {this.UnitId}, recast = {this.m_fCastTimer}");
-            //if (this.IsUbExecTrying && (!this.battleManager.UnitUiCtrl.IsAutoMode || this.CurrentState != UnitCtrl.ActionState.IDLE) && this.JudgeSkillReadyAndIsMyTurn())
-            if (IsUbExecTrying && (!MyGameCtrl.Instance.IsAutoMode || CurrentState != ActionState.IDLE) && JudgeSkillReadyAndIsMyTurn())
-                //battleManager.SetOnlyAutoClearFlag(false);
-                battleManager.DisableAutoClear();
             if (IsUbExecTrying)
                 return true;
             if (pressing) return true;
@@ -13968,16 +14209,21 @@ this.updateCurColor();
             TP_REGENERATION2 = 60,
             SPEED_OVERLAP = 61,
             SPY = 62,
-            // Token: 0x04002829 RID: 10281
-            ENERGY_DAMAGE_REDUCE,
-            // Token: 0x0400282A RID: 10282
-            BLACK_FRAME,
-            FLIGHT,
-            ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY,
-            WORLD_LIGHTNING,
-            NUM,
+            ENERGY_DAMAGE_REDUCE = 63,
+            BLACK_FRAME = 64,
+            FLIGHT = 65,
+            ACCUMULATIVE_DAMAGE_FOR_ALL_ENEMY = 66,
+            TAUNT = 67,
+            WORLD_LIGHTNING = 68,
+            MAGIC_DODGE = 69,
+            HP_LOWER_LIMIT = 70,
+            CHAINED_ACN = 71,
+            PUPPET = 72,
+            DISABLE_HEAL = 73,
+            RATIO_SLIP = 74,
+            NUM = 75,
             TOP = 0,
-            END = NUM
+            END = 74,
         }
         public class eAbnormalStateCategory_DictComparer : IEqualityComparer<eAbnormalStateCategory>
         {
@@ -14186,7 +14432,7 @@ this.updateCurColor();
 
         public int CompareHpAscSameLeft(BasePartsData _a, BasePartsData _b)
         {
-            if (BattleUtil.Approximately(_a.Owner.Hp / _a.Owner.MaxHp, _b.Owner.Hp / _b.Owner.MaxHp))
+            if (BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / _a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / _b.Owner.MaxHp))
             {
                 return this.CompareLeft(_a, _b);
             }
@@ -14201,7 +14447,7 @@ this.updateCurColor();
         // Token: 0x06003958 RID: 14680 RVA: 0x000EB24C File Offset: 0x000EB24C
         public int CompareHpAscSameRight(BasePartsData _a, BasePartsData _b)
         {
-            if (BattleUtil.Approximately(_a.Owner.Hp / _a.Owner.MaxHp, _b.Owner.Hp / _b.Owner.MaxHp))
+            if (BattleUtil.Approximately((DoubleWithEx)_a.Owner.Hp / _a.Owner.MaxHp, (DoubleWithEx)_b.Owner.Hp / _b.Owner.MaxHp))
             {
                 return this.CompareRight(_a, _b);
             }

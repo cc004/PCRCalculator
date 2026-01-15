@@ -8,7 +8,7 @@ namespace Elements
     public class ChangeSpeedOverwriteFieldAction : ActionParameter
 	{
 		// Token: 0x06003D80 RID: 15744 RVA: 0x00101774 File Offset: 0x00101774
-		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, ValueDictionary _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			GameObject uniqueEffectPrefab = null;

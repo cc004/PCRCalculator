@@ -67,7 +67,7 @@ namespace Elements
         Skill skill,
         float starttime,
         Dictionary<int, bool> enabledChildAction,
-        Dictionary<eValueNumber, DoubleWithEx> valueDictionary)
+        ValueDictionary valueDictionary)
         {
             // SkillEffectCtrl wrapper = null;
             // if (this.ActionEffectList != null && this.ActionEffectList.Count > 0)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,6 +11,9 @@ namespace PCRCaculator
 {
     public class TalentSkillTreeManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static TalentSkillTreeManager Instance;
         public GameObject talentSkillPrefab;
         public RectTransform skillTreeContainer;
@@ -23,7 +27,7 @@ namespace PCRCaculator
         private Dictionary<int, TalentSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
-        private Dictionary<int, int> skillLevels = new Dictionary<int, int>();
+        public Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
     {
@@ -38,7 +42,7 @@ namespace PCRCaculator
         private const float SPACING_Y = 80f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -253,6 +257,7 @@ namespace PCRCaculator
         }
         private void UpdatePageButtons()
         {
+            #if UNITY_2017_2_OR_NEWER
             // 清除现有的页码按钮
             if (pageButtonContainer != null && pageButtonPrefab != null)
             {
@@ -295,6 +300,7 @@ namespace PCRCaculator
 
                 LayoutRebuilder.ForceRebuildLayoutImmediate(pageButtonContainer);
             }
+            #endif
         }
         public void GoToPage(int pageNumber)
         {
@@ -419,7 +425,7 @@ namespace PCRCaculator
             return icon;
         }
 
-        private int GetMaxSkillLevel(int nodeId)
+        public int GetMaxSkillLevel(int nodeId)
         {
             if (nodeId == 0 || !NodeDataDict.TryGetValue(nodeId, out TalentSkillNode node) || node.enhance_level_ids == null)
                 return 0;
@@ -585,6 +591,14 @@ namespace PCRCaculator
             if (global) MainManager.Instance.PlayerSetting.talentSkill = activeSkills; //公共
             PlayerGroup.talentSkill = activeSkills; //队内
             GuildManager.Instance.SaveDataToJson();
+        }
+        public void SetSkillLevels(Dictionary<int, int> newSkillLevels)
+        {
+            skillLevels.Clear();
+            foreach (var kvp in newSkillLevels)
+            {
+                skillLevels[kvp.Key] = kvp.Value;
+            }
         }
     }
 }

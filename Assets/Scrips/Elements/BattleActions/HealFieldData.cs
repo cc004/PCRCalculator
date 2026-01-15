@@ -39,7 +39,7 @@ namespace Elements
     {
       int index = 0;
       for (int count = TargetList.Count; index < count; ++index)
-                TargetList[index].Owner.SetRecovery((int)Value, IsMagic ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, TargetList[index].Owner, UnitCtrl.GetHealDownValue(PPOJKIDHGNJ), _target: TargetList[index], _releaseToad: true);
+                TargetList[index].Owner.SetRecovery((int)Value, 0, IsMagic ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, TargetList[index].Owner, UnitCtrl.GetHealDownValue(PPOJKIDHGNJ), _target: TargetList[index], _releaseToad: true);
 
             //this.TargetList[index].Owner.SetRecovery((int) this.Value, this.IsMagic ? UnitCtrl.eInhibitHealType.MAGIC : UnitCtrl.eInhibitHealType.PHYSICS, this.TargetList[index].Owner, _target: this.TargetList[index]);
     }

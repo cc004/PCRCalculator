@@ -29,7 +29,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           System.Action<string> action)
         {
             if ((long)_target.Owner.Hp <= 0L)

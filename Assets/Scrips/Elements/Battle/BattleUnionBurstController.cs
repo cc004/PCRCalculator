@@ -20,7 +20,8 @@ namespace Elements.Battle
             if (battleManager.GetIsPlayCutin() || battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
                 return;
             bool flag = false;
-            
+
+#if !NO_CRIT_EVENT
             foreach (var unitCtrl in battleManager.UnitList)
             {
                 unitCtrl.skillReleased = false;
@@ -107,6 +108,40 @@ namespace Elements.Battle
                     }
                 }
             }*/
+#else
+            foreach (var unitCtrl in battleManager.UnitList)
+            {
+                if (unitCtrl.UnionBurstSkillId != 0)
+                    unitCtrl.UpdateSkillTarget();
+                else
+                    continue;
+
+                if (unitCtrl.JudgeSkillReadyAndIsMyTurn() && unitCtrl.IsAutoOrUbExecTrying())
+                {
+                    unitCtrl.SetDirectionAuto();
+                    unitCtrl.UpdateSkillTarget();
+                    if (unitCtrl.JudgeSkillReadyAndIsMyTurn() && unitCtrl.IsAutoOrUbExecTrying())
+                    {
+                        unitCtrl.skillReleased = true;
+                        battleManager.ChargeSkillTurn = eChargeSkillTurn.PLAYER;
+
+                        battleManager.HBDACBKGHIK = unitCtrl;
+                        unitCtrl.StartCutIn();
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+
+            foreach (var unitCtrl in battleManager.UnitList)
+            {
+                unitCtrl.IsUbExecTrying = false;
+            }
+
+            if (flag)
+                return;
+            TryExecEnemyUnionBurst();
+#endif
         }
         public void TryExecEnemyUnionBurst()
         {
@@ -123,6 +158,7 @@ namespace Elements.Battle
                         enemyCtrl.energyjudged = true;
                         var e = enemyCtrl.Energy;
 
+#if !NO_PROB_EVENT
                         GuildCalculator.Instance.dmglist.Add(new ProbEvent
                         {
                             unit = enemyCtrl.UnitNameEx,
@@ -130,6 +166,7 @@ namespace Elements.Battle
                             exp = hash => $"{e.ToExpression(hash)} >= 1000",
                             description = $"({BattleHeaderController.CurrentFrameCount}){enemyCtrl.UnitNameEx}的UB提前开出"
                         });
+#endif
                     }
                     continue;
                 }

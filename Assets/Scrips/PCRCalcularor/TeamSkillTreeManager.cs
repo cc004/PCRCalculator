@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,6 +11,9 @@ namespace PCRCaculator
 {
     public class TeamSkillTreeManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static TeamSkillTreeManager Instance;
         public GameObject talentSkillPrefab;
         public RectTransform skillTreeContainer;
@@ -21,7 +25,7 @@ namespace PCRCaculator
         private Dictionary<int, TeamSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
-        private Dictionary<int, int> skillLevels = new Dictionary<int, int>();
+        public Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
     {
@@ -36,7 +40,7 @@ namespace PCRCaculator
         private const float SPACING_Y = 80f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -530,6 +534,15 @@ namespace PCRCaculator
             if (global) MainManager.Instance.PlayerSetting.teamSkill = activeSkills; //公共
             PlayerGroup.teamSkill = activeSkills; //队内
             GuildManager.Instance.SaveDataToJson();
+        }
+
+        public void SetSkillLevels(Dictionary<int, int> newSkillLevels)
+        {
+            skillLevels.Clear();
+            foreach (var kvp in newSkillLevels)
+            {
+                skillLevels[kvp.Key] = kvp.Value;
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +9,16 @@ namespace PCRCaculator
     public class TalentLevelManager : MonoBehaviour
     {
         public event System.Action OnTalentLevelChanged;
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static TalentLevelManager Instance;
         private bool loadSliderEvents = false;
         public List<Slider> talentLevelSliders;
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
         }

@@ -32,7 +32,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+      ValueDictionary _valueDictionary,
       Action<string> action = null)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -57,7 +57,7 @@ namespace Elements
       long num3 = (long)((int)(num1 * ((_source.IsPartsBoss ? parts.GetHpRecoverRateZero() : (double)(int)_source.HpRecoveryRateZero) + 100.0) * (healEnhance + 10000.0) / 100.0 / 10000.0) / ExecTime.Length * (double)_skill.AweValue);
 
       //_target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, this.EffectType == eEffectType.COMMON, _target: _target,action:action);
-      _target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
+      _target.Owner.SetRecovery(num3, 0, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
 
     }
 

@@ -15,19 +15,19 @@ namespace Elements
 
         protected override DoubleWithEx calcDamageValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => ((float)_source.MaxHp - _source.Hp) * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => ((float)_source.MaxHp - _source.Hp) * _valueDictionary[eValueNumber.VALUE_2];
 
         protected override DoubleWithEx calcHpValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => (DoubleWithEx)_source.Hp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => (DoubleWithEx)_source.Hp * _valueDictionary[eValueNumber.VALUE_2];
 
         protected override DoubleWithEx calcMaxHpValue(
             UnitCtrl _source,
-            Dictionary<eValueNumber, DoubleWithEx> _valueDictionary) => _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => _source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
 
         protected override void setValue(
-      Dictionary<eValueNumber, DoubleWithEx> _value,
+      ValueDictionary _value,
       ActionParameter _action)
         {
             base.setValue(_value, _action);
@@ -36,8 +36,8 @@ namespace Elements
         protected override void createValue(
   UnitCtrl _source,
   Skill _skill,
-  Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
-  Dictionary<eValueNumber, DoubleWithEx> _addValue,
+  ValueDictionary _valueDictionary,
+  ValueDictionary _addValue,
   eValueNumber _evalue,
   BasePartsData _target)
         {

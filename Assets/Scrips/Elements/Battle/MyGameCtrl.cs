@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using Elements.Battle;
 using PCRCaculator;
@@ -12,11 +13,15 @@ using Spine.Unity;
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json;
+using Debug = UnityEngine.Debug;
 
 namespace Elements
 {
     public class MyGameCtrl : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static MyGameCtrl Instance;
         public Transform unitParent;
         public Transform enemyParent;
@@ -25,7 +30,9 @@ namespace Elements
         public GameObject prefab2;
         public GameObject battleUnitPrefab;
         public GameObject firearmPrefab;
+#if UNITY_5_3_OR_NEWER
         private BattleSimulationServer battleServer;
+#endif
         //public GameObject emptyObject;
 
 
@@ -35,6 +42,8 @@ namespace Elements
         public List<UnitCtrl> enemyUnitCtrl;
         public List<UnitCtrl> extraEffectEnemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
+        
+        public BattleStatistics BattleStats = new BattleStatistics(); 
 
         private int finishCount;
         private MainManager mainManager;
@@ -57,14 +66,14 @@ namespace Elements
 
         private const float SPINE_SCALE = 0.01f;
 
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
             
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
-
+#if UNITY_5_3_OR_NEWER
         private void OnStartServerButtonClick()
         {
             if (battleServer == null)
@@ -81,8 +90,8 @@ namespace Elements
                 Debug.Log("HTTP服务器已停止");
             }
         }
-
-        public extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
+#endif
+        public static extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
         {
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
             int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;
@@ -127,16 +136,20 @@ namespace Elements
         }
 
 
-        private void Start()
+        public void Start()
         {
             isBattleFinish = false;
             staticBattleManager = BattleManager.Instance;
             mainManager = MainManager.Instance;
             tempData = new TempData();
+#if UNITY_5_3_OR_NEWER
             if (CommandLineServer.serverMode)
             {
                 return;
             }
+#else
+                return;
+#endif
             if (MainManager.Instance == null)
             {
                 return;
@@ -202,6 +215,7 @@ namespace Elements
             }
             unitCount.Clear();
             BattleManager.Instance.Init(this);
+
             if (mainManager.IsGuildBattle)
             {
                 if (IsSemanMode)
@@ -308,6 +322,8 @@ namespace Elements
             playerUnitCtrl.Clear();
             enemyUnitCtrl.Clear();
             playerUnitCtrlDic.Clear();
+            
+            BattleStats.Reset(); 
             // enemyUnitCtrlDic.Clear();
             allUnitCtrlDataDic.Clear();
             IsUnitCreated = false;
@@ -332,47 +348,156 @@ namespace Elements
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
+            BattleStats.IsEnabled = req.CalcStats;
+            BattleStats.Reset();
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;
             IsSemanMode = req.IsSemanMode;
 
+            if (req.TalentSkillLevels is not null)
+            {
+                mainManager.TeamEnhanceData.SetTalentLevels(req.TalentSkillLevels);
+            }
+            if (req.TalentFullInfo)
+            {
+                if (req.TalentSkillNodeLevels is not null)
+                {
+                    TalentSkillTreeManager.Instance.SetSkillLevels(req.TalentSkillNodeLevels);
+                    TalentSkillTreeManager.Instance.UpdateTalentInfoData();
+                }
+                if (req.MasterSkillNodeLevels is not null)
+                {
+                    TeamSkillTreeManager.Instance.SetSkillLevels(req.MasterSkillNodeLevels);
+                    TeamSkillTreeManager.Instance.UpdateTalentInfoData();
+                }
+            }
+            else
+            {
+                if (req.TalentSkillNodeLevels is not null)
+                {
+                    foreach (var node in req.TalentSkillNodeLevels)
+                    {
+                        TalentSkillTreeManager.Instance.EnhanceSkill(node.Key, node.Value);
+                    }
+                }
+                if (req.MasterSkillNodeLevels is not null)
+                {
+                    foreach (var node in req.MasterSkillNodeLevels)
+                    {
+                        TeamSkillTreeManager.Instance.EnhanceSkill(node.Key, node.Value);
+                    }
+                }
+            }
+
             tempData = new TempData();
 
             // Players: assume request provides PCRCaculator.UnitData list
             tempData.playerList = req.PlayerList ?? new List<PCRCaculator.UnitData>();
+            tempData.isGuildBattle = req.IsGuildBattle;
+            tempData.waveGroupId = req.WaveGroupId;
+
+            tempData.playerList = tempData.playerList
+                .OrderBy(u => mainManager.UnitRarityDic[u.unitId].detailData.searchAreaWidth)
+                .ThenBy(u => u.unitId)
+                .ToList();
 
             if (req.ToMaxUnitAttr)
             {
                 foreach (var player in tempData.playerList)
                 {
-                    player.SetMax(is_guild_boss: req.IsGuildBattle);
+                    player.SetMax(battle_mode: req.IsGuildBattle ? GuildManager.Instance.IsGuildBossId(req.GuildEnemyList[0]) ? 0 : 1 : 2);
                     player.SetMaxLove();
                 }
             }
 
-            tempData.skipping = true;
+            tempData.skipping = req.IsSkipping;
 
             if (req.IsGuildBattle)
             {
-                throw new NotImplementedException("Guild battle via HTTP not implemented yet");
+                tempData.guildEnemy = new List<EnemyData>();
+                // GuildManager.Instance.setSelectedBossEnemyids(req.GuildEnemyList);
+                int enemyid_0 = req.GuildEnemyList.Count > 0 ? req.GuildEnemyList[0] : 0;
+                foreach (var selectedBossEnemyid in req.GuildEnemyList)
+                {
+                    EnemyData enemyData = GuildManager.Instance.GetEnemyDataByID(selectedBossEnemyid, boss_id: enemyid_0);
+                    if(GuildManager.Instance.EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+                    {
+                        tempData.mParts = value;
+                        tempData.MPartsDataDic = new Dictionary<int, EnemyData>();
+                        Action<int> action = a =>
+                        {
+                            if (a != 0)
+                            {
+                                tempData.MPartsDataDic.Add(a, GuildManager.Instance.GetEnemyDataByID(a, boss_id: enemyid_0));                        
+                            }
+                        };
+                        action(value.child_enemy_parameter_1);
+                        action(value.child_enemy_parameter_2);
+                        action(value.child_enemy_parameter_3);
+                        action(value.child_enemy_parameter_4);
+                        action(value.child_enemy_parameter_5);
+
+                    }
+                    tempData.guildEnemy.Add(enemyData);
+                }
+                tempData.extra_effect_cnt = 0;
+                var extra_data = GetExtraEffectEnemyData(tempData);
+                if (extra_data != null)
+                {
+                    foreach (var enemy in extra_data.enemy_ids)
+                    {
+                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else
+                            Debug.LogError("找不到增援敌人ID " + enemy);
+                    }
+                }
+                tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
+                tempData.UBExecTimeList = req.UBExecTimeList;
+                tempData.SemanUBExecTimeList = req.SemanUBExecTimeList;
+                // tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
+                tempData.tryCount = 9999;
+                tempData.SettingData = new();
+                tempData.SettingData.limitTime = req.BattleTime;
+                tempData.CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType.FullBarrier);
             }
             else
             {
                 // Non guild: directly use provided enemy list
                 tempData.enemyList = req.EnemyList ?? new List<PCRCaculator.UnitData>();
 
+                tempData.enemyList = tempData.enemyList
+                    .OrderBy(u => mainManager.UnitRarityDic[u.unitId].detailData.searchAreaWidth)
+                    .ThenBy(u => u.unitId)
+                    .ToList();
+
                 if (req.ToMaxUnitAttr)
                 {
                     foreach (var enemy in tempData.enemyList)
                     {
-                        enemy.SetMax(is_guild_boss: false);
+                        enemy.SetMax(battle_mode: 2); // only in jjc 
                         enemy.SetMaxLove();
                     }
                 }
 
                 tempData.CreateAllUnitParameters();
             }
+
+            tempData.randomData = req.Settings;
 
             foreach (Transform child in unitParent)
             {
@@ -392,9 +517,23 @@ namespace Elements
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
             staticBattleManager.Init(this);
+
             if (req.IsGuildBattle)
             {
-                if (IsSemanMode)
+                if (IsSetMode)
+                {
+                    foreach(var unit in playerUnitCtrl)
+                        unit.pressing = true;
+                }
+                else if (req.SetToggles?.Count > 0)
+                {
+                    for (int i = 0; i < playerUnitCtrl.Count && i < req.SetToggles.Count; i++)
+                    {
+                        playerUnitCtrl[i].pressing = req.SetToggles[i];
+                    }
+                }
+
+                if (req.IsSemanMode)
                 {
                     BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
                     BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
@@ -483,9 +622,7 @@ namespace Elements
             if (tempData.isGuildBattle && GuildCalculator.Instance != null)
             {
                 GuildCalculator.Instance.Initialize(playerUnitCtrl.ToList(), enemyUnitCtrl.ToList());
-                BattleManager.Instance.semanubmanager.SetUnitCallBack(playerUnitCtrl.ToList(), enemyUnitCtrl[0]);
             }
-
             if (tempData.isGuildBattle)
                 SetBattleSpeed(tempData.SettingData.calSpeed);
             else
@@ -502,7 +639,9 @@ namespace Elements
         }
         public void SetTimeCount(float LastTimeFloat)
         {
+#if !REDUCE_ANALYSE
             BattleUIManager.Instance.UpdateTimeCount(LastTimeFloat);
+#endif
         }
         public void SetBattleSpeed(float speed)
         {
@@ -583,6 +722,7 @@ namespace Elements
             //battleProcessor.AddUnitSkillUseCount(ref unitCtrl.SkillUseCount, pPararm.MasterData.PrefabId);
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
+
             unitCtrl.Initialize(unitParameter, unitData, isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null, false, true); // TODO hush add _teamEnhanceParameter
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
@@ -648,15 +788,18 @@ namespace Elements
             GameObject prefab = ABExTool.LoadUnitPrefab(prefabId);
             GameObject b;
             if (prefab != null)
-                b = Instantiate(ABExTool.LoadUnitPrefab(prefabId));
+                b = Instantiate(prefab);
             else
             {
                 b = Instantiate(battleUnitPrefab);
             }
             b.transform.SetParent(isplayer?unitParent:enemyParent);
             b.name = "rotate_center";
-
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
+
+#if !UNITY_5_3_OR_NEWER
+            unitCtrl.Awake();
+#endif
             //gameObject.name = "rotate_center";
             // ISSUE: reference to a compiler-generated field
             unitCtrl.RotateCenter = b.transform;
@@ -723,6 +866,9 @@ namespace Elements
             b.transform.SetParent(unitParent);
             b.name = unitid + "(clone)";
             UnitCtrl unitCtrl = b.GetComponent<UnitCtrl>();
+#if !UNITY_5_3_OR_NEWER
+            unitCtrl.Awake();
+#endif
             unitCount.TryGetValue(unitid, out var val);
             unitCount[unitid] = val + 1;
             unitCtrl.UnitName = mainManager.GetUnitNickName(unitid) + $"[召唤物{val+1}]";
@@ -764,11 +910,15 @@ namespace Elements
             SpineResourceSet resourceSet = new SpineResourceSet(info, prefabID, 0, 0);
             resourceSet.Skelton = dataAsset;
             battleSpineController.Create(resourceSet);
+#if UNITY_5_3_OR_NEWER
             if (!BattleManager.Instance.skipping)
                 SetSummonUI(summonUnitCtrl);
+#endif
             _callback?.Invoke(battleSpineController);
+#if UNITY_5_3_OR_NEWER
             if (!BattleManager.Instance.skipping)
                 GuildCalculator.Instance.AddSummonUnit(summonUnitCtrl);
+#endif
 
         }
         public static void CreateModeChangeSpine(eSpineType _spineType,
@@ -927,7 +1077,9 @@ namespace Elements
             }
             else if (tempData.isGuildBattle)
             {
+#if UNITY_5_3_OR_NEWER
                 GuildCalculator.Instance.OnBattleFinished(result, BattleHeaderController.CurrentFrameCount);
+#endif
             }
             isBattleFinish = true;
         }

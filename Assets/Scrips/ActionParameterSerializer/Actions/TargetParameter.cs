@@ -79,6 +79,20 @@ namespace ActionParameterSerializer.Actions
 
         public string buildTargetClause()
         {
+            var clause = _buildTargetClause();
+            if (direction == DirectionType.ALL_INCLUDE_FLIGHT || direction == DirectionType.FRONT_INCLUDE_FLIGHT || direction == DirectionType.FRONT_AND_BACK_INCLUDE_FLIGHT)
+            {
+                clause += $"({Utils.JavaFormat(Utils.GetString("including_flight_units"))})";
+            }
+            else if (direction == DirectionType.ALL_WITHOUT_SUMMON || direction == DirectionType.FRONT_WITHOUT_SUMMON || direction == DirectionType.FRONT_AND_BACK_WITHOUT_SUMMON)
+            {
+                clause += $"({Utils.JavaFormat(Utils.GetString("excluding_summon_units"))})";
+            }
+            return clause;
+        }
+
+        public string _buildTargetClause()
+        {
             if (hasDependAction())
             {
                 if (dependAction.parameter.actionType == ActionType.damage)

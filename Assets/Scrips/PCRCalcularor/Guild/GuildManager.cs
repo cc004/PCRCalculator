@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Elements;
 using Elements.Battle;
 using Newtonsoft.Json;
@@ -19,6 +20,9 @@ namespace PCRCaculator.Guild
 {
     public class GuildManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static GuildManager Instance;
         //public TextAsset enemyDataDicTxt;
         public List<CharacterPageButton> charactersUI;
@@ -63,6 +67,8 @@ namespace PCRCaculator.Guild
         public List<Slider> SettingSliders;
         public List<Text> SettingTexts;
         public List<Toggle> SettingToggles;
+        public List<Toggle> SemanSkillToggles;
+        public List<Toggle> SemanUBToggles;
         public List<InputField> SettingInputs;
 
         public List<Text> calSettingTexts;
@@ -87,7 +93,9 @@ namespace PCRCaculator.Guild
         //private List<AddedPlayerData> addedPlayerDatas;
         //private Dictionary<int, MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, MasterEnemyMParts.EnemyMParts>();
         public GuildSettingData SettingData => StaticsettingData;
-
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         private static GuildSettingData staticsettingData;
         public static GuildSettingData StaticsettingData
         {
@@ -101,6 +109,14 @@ namespace PCRCaculator.Guild
             }
         }
         private int[] selectedBossEnemyids => SettingData?.GetCurrentPlayerGroup()?.selectedEnemyIDs ?? new int[1]{0};
+        public void setSelectedBossEnemyids(List<int> enemyids)
+        {
+            var group = SettingData.GetCurrentPlayerGroup();
+            if (group != null)
+            {
+                group.selectedEnemyIDs = enemyids.ToArray();
+            }
+        }
         private bool isEditingUBTime;
         private static string[] guildMonthNames = new string[12] { "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座" };
         private static string[] guildTurn = new string[5] { "一阶段", "二阶段", "三阶段", "四阶段", "五阶段", };
@@ -118,6 +134,7 @@ namespace PCRCaculator.Guild
         public Toggle UseFixedRandomSeed;
         public InputField RandomSeedTalent;
         public Toggle UseFixedRandomSeedTalent;
+        public string[] TalentNames = { "火", "水", "风", "光", "暗" };
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
         public List<Text> TalentTexts;
@@ -208,6 +225,26 @@ namespace PCRCaculator.Guild
         public bool IsMirageBoss { get => BossType == 7; }
         public bool IsTalentQuestBoss { get => BossType == 8; }
         public bool IsAbyssBoss { get => BossType == 9; }
+        public bool IsGuildBossId(int id)
+        {
+            return id / 100000000 == 4;
+        }
+        public bool IsTalentQuestBossId(int id)
+        {
+            return id / 100000000 == 8;
+        }
+        public bool IsAbyssBossId(int id)
+        {
+            return id / 100000000 == 9;
+        }
+        public bool IsDungeonBossId(int Id)
+        {
+            return Id / 100000000 == 5;
+        }
+        public bool IsMirageBossId(int Id)
+        {
+            return Id / 100000000 == 7;
+        }
         public Dropdown dungeonDropdown;
         private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
         {
@@ -221,7 +258,7 @@ namespace PCRCaculator.Guild
             { 7, 501011003 },
             { 8, 501011004 },
         };
-        private void Awake()
+        public void Awake()
         {
             Instance = this;
 
@@ -229,7 +266,7 @@ namespace PCRCaculator.Guild
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
             LoadAddedPlayerData();
         }
-        private void Start()
+        public void Start()
         {
             if (!isLightStart)
             {
@@ -274,7 +311,9 @@ namespace PCRCaculator.Guild
                 textContent = "/" + textContent;
             }
             textContent = textContent.Replace("\n", "").Replace("\r", "");
+#if UNITY_5_3_OR_NEWER
             GUIUtility.systemCopyBuffer = textContent;
+#endif
             MainManager.Instance.WindowMessage("文本已复制并添加到末尾");
             SettingInputs[11].text += textContent.Replace("\n", "").Replace("\r", "");
         }
@@ -966,12 +1005,8 @@ namespace PCRCaculator.Guild
             MyGameCtrl.Instance.ReStart();
         }
 
-        private void StartCalButton(bool skipping)
+        public GuildBattleData GetBattleData(bool skipping)
         {
-            /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
-            {
-                return;
-            }*/
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
             battleData.skipping = skipping;
@@ -980,7 +1015,7 @@ namespace PCRCaculator.Guild
             foreach (var selectedBossEnemyid in selectedBossEnemyids)
             {
                 EnemyData enemyData = GetEnemyDataByID(selectedBossEnemyid);
-                if(EnemyMPartsDic.TryGetValue(enemyData.enemy_id,out var value))
+                if (EnemyMPartsDic.TryGetValue(enemyData.enemy_id, out var value))
                 {
                     battleData.mParts = value;
                     battleData.MPartsDataDic = new Dictionary<int, EnemyData>();
@@ -988,7 +1023,7 @@ namespace PCRCaculator.Guild
                     {
                         if (a != 0)
                         {
-                            battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));                        
+                            battleData.MPartsDataDic.Add(a, GetEnemyDataByID(a));
                         }
                     };
                     action(value.child_enemy_parameter_1);
@@ -1007,14 +1042,26 @@ namespace PCRCaculator.Guild
             battleData.isSemanMode = SemanModeToggle.isOn;
             battleData.stopFrame = int.TryParse(SettingInputs[8].text, out var val) ? val : -1;
             battleData.SettingData = SettingData;
-            MainManager.Instance.ChangeSceneToBalttle(battleData);
+            return battleData;
         }
-        private EnemyData GetEnemyDataByID(int enemy_id)
+        private void StartCalButton(bool skipping)
         {
+            /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
+            {
+                return;
+            }*/
+            MainManager.Instance.ChangeSceneToBalttle(GetBattleData(skipping));
+        }
+        public EnemyData GetEnemyDataByID(int enemy_id, int boss_id = -1)
+        {
+            bool isTalentQuestBoss = boss_id == -1 ? IsTalentQuestBoss : IsTalentQuestBossId(boss_id);
+            bool isAbyssBoss = boss_id == -1 ? IsAbyssBoss : IsAbyssBossId(boss_id);
+            bool isMirageBoss = boss_id == -1 ? IsMirageBoss : IsMirageBossId(boss_id);
+
             return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data :
-                   IsTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] :
-                   IsAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
-                   IsMirageBoss ? MirageEnemyParameterDic[enemy_id] :
+                   isTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] :
+                   isAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
+                   isMirageBoss ? MirageEnemyParameterDic[enemy_id] :
                    EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
@@ -1433,6 +1480,8 @@ namespace PCRCaculator.Guild
             SettingTexts[2].text = SettingData.UBTryingCount + "";
             SettingToggles[0].isOn = SettingData.calcSpineAnimation;
             SettingToggles[0].interactable = true; //SettingData.calSpeed == 1;
+            SemanSkillToggles[SettingData.SemanSkillOn].isOn = true;
+            SemanUBToggles[SettingData.SemanUBOn].isOn = true;
             /*SettingInputs[0].text = SettingData.RandomSeed + "";
             SettingToggles[2].isOn = SettingData.UseFixedRandomSeed;
             SettingToggles[3].isOn = SettingData.ForceNoCritical_player;
@@ -1470,6 +1519,8 @@ namespace PCRCaculator.Guild
             SettingData.FPSforAnimation = (int)SettingSliders[1].value * 10;
             SettingData.calcSpineAnimation = SettingToggles[0].isOn;
             SettingData.UBTryingCount = (int)SettingSliders[2].value > 18 ? 9999 : (int)SettingSliders[2].value * 10;
+            SettingData.SemanSkillOn = SemanSkillToggles.FindIndex(t => t.isOn);
+            SettingData.SemanUBOn = SemanUBToggles.FindIndex(t => t.isOn);
             //SettingData.UseFixedRandomSeed = SettingToggles[2].isOn;
             try
             {
@@ -1837,18 +1888,46 @@ namespace PCRCaculator.Guild
                 EnemyDataDic.Add(666667, enemyData2);
             }
         }
+
+        public AutoCalculate autoCalculate;
+
         public void OpenAutoCalculatePage()
         {
             GameObject a = Instantiate(autoCalculatePagePrefab);
             a.transform.SetParent(BaseBackManager.Instance.latestUIback.transform, false);
-            AutoCalculate autoCalculate = a.GetComponent<AutoCalculate>();
+            autoCalculate = a.GetComponent<AutoCalculate>();
             autoCalculate.Init(MainManager.Instance.AutoCalculatorData);
         }
+
         public void StartAutoCalculate()
         {
             // StartCoroutine(AutoCalculate());
             StartCalButton(true);
         }
+
+        public static RemoteSimulator simulator;
+
+        private IEnumerator WaitRemoteCalculation()
+        {
+            const int EXEC_ONCE = 10;
+            while (!MainManager.Instance.AutoCalculatorData.isFinish)
+            {
+                var request = simulator.Simulate(EXEC_ONCE);
+
+                while (!request.IsCompleted)
+                    yield return null;
+
+                foreach (var item in request.Result)
+                {
+                    item.OnceResult.id = MainManager.Instance.AutoCalculatorData.resultDatas.Count;
+                    MainManager.Instance.AutoCalculatorData.resultDatas.Add(
+                        item.OnceResult);
+                }
+                autoCalculate.Init(MainManager.Instance.AutoCalculatorData);
+            }
+            MainManager.Instance.AutoCalculatorData.isCalculating = false;
+        }
+
         public void StartAutoCalculateByButton(int time)
         {
             if (time <= 1)
@@ -1859,7 +1938,17 @@ namespace PCRCaculator.Guild
             MainManager.Instance.AutoCalculatorData.Reset();
             MainManager.Instance.AutoCalculatorData.execTime = time;
             MainManager.Instance.AutoCalculatorData.isCalculating = true;
-            StartAutoCalculate();
+            if (MainManager.Instance.AutoCalculatorData.useRemote)
+            {
+                if (simulator != null) simulator.Dispose();
+                simulator = new RemoteSimulator();
+                simulator.CreateRequest();
+                this.StartCoroutine(WaitRemoteCalculation());
+            }
+            else
+            {
+                StartAutoCalculate();
+            }
         }
         // private IEnumerator AutoCalculate()
         // {
@@ -2001,6 +2090,7 @@ namespace PCRCaculator.Guild
 
         IEnumerator DownSprite(string url)
         {
+#if UNITY_5_3_OR_NEWER
             var uri = new System.Uri(Path.Combine(url));
             UnityWebRequest www = UnityWebRequest.Get(uri);
             DownloadHandlerTexture texDl = new DownloadHandlerTexture(true);
@@ -2019,6 +2109,9 @@ namespace PCRCaculator.Guild
                 Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
                 backgroundImage.sprite = sprite;
             }
+#else
+            yield return null;
+#endif
         }
         public void SelectImage()
         {
@@ -2113,6 +2206,22 @@ namespace PCRCaculator.Guild
                 }
             }
         }
+        public string GetTalentLevelDescription()
+        {
+            // var talentLevel = SettingData.GetCurrentPlayerGroup().talentLevel;
+#if ENABLE_THREADING
+            var talentLevel = MainManager.Instance.TeamEnhanceData.talentLevelParameter;
+#else
+            var talentLevel = MainManager.Instance.teamEnhanceData.talentLevelParameter;
+#endif
+            string description = $"{TalentNames[0]}{talentLevel.GetValueOrDefault(1, 0)}，" +
+                               $"{TalentNames[1]}{talentLevel.GetValueOrDefault(2, 0)}，" +
+                               $"{TalentNames[2]}{talentLevel.GetValueOrDefault(3, 0)}，" +
+                               $"{TalentNames[3]}{talentLevel.GetValueOrDefault(4, 0)}，" +
+                               $"{TalentNames[4]}{talentLevel.GetValueOrDefault(5, 0)}";
+
+            return description;
+        }
         public string GetFinalTalentSkillNodeDescription()
         {
             var talentSkill = SettingData.GetCurrentPlayerGroup().talentSkill;
@@ -2150,7 +2259,7 @@ namespace PCRCaculator.Guild
                 .Where(node => NodeDataDict.ContainsKey(node.Key))
                 .OrderByDescending(node => node.Key)
                 .First();
-            
+
             if (!NodeDataDict.TryGetValue(targetNode.Key, out TalentSkillNode nodeData))
                 return "无";
 
@@ -2188,7 +2297,6 @@ namespace PCRCaculator.Guild
             // 计算在合流点之后的节点数量
             int lastConfluenceNodeId = precedingConfluenceNodes.FirstOrDefault()?.node_id ?? 0;
 
-            // 修改这里：我们需要统计的是合流点之后到目标节点之间所有被强化过的节点
             var enhancedNodes = NodeDataDict.Values
                 .Where(n => n.page_num == pageNum &&
                            n.node_id >= lastConfluenceNodeId &&
@@ -2224,7 +2332,6 @@ namespace PCRCaculator.Guild
         public void GetTalentFormationBonusDescription()
         {
             CalcTalentFormationBonus();
-            string[] elementNames = { "火", "水", "风", "光", "暗" };
 
             foreach (var bonusObj in TalentBonus)
             {
@@ -2261,14 +2368,14 @@ namespace PCRCaculator.Guild
                 if (text != null)
                 {
                     // bonusValue是万分比，所以需要除以100得到百分比值
-                    text.text = elementNames[elementType-1] + (bonusValue / 100) + "%";
+                    text.text = TalentNames[elementType-1] + (bonusValue / 100) + "%";
                 }
             }
         }
         /// <summary>
         /// 计算当前编队的天赋阵型加成
         /// </summary>
-        public void CalcTalentFormationBonus()
+        public void CalcTalentFormationBonus(bool isBattle = false)
         {
             // 如果未开启"骑士增强"功能，则直接返回
             // if (!_IsReleasedKnightEnhance)
@@ -2279,6 +2386,10 @@ namespace PCRCaculator.Guild
             // List<int> talentIds = new List<int>();
             // 遍历当前我方编队中的所有单位
             var unitList = SettingData.GetCurrentPlayerGroup().playerData.playrCharacters;
+            if (isBattle)
+            {
+                unitList = MyGameCtrl.Instance.tempData.playerList;
+            }
             for (int i = 1; i <= 5; i++)
             {
                 talentCountDict[i] = 0;
@@ -2316,20 +2427,23 @@ namespace PCRCaculator.Guild
                 int count = pair.Value;
 
                 long bonus = 0;
-                bonus = GetTalentBonusPermyriad(talentId, count);
+                bonus = GetTalentBonusPermyriad(talentId, count, isBattle);
                 if (UnitTalentFormationBonusDictionary != null)
                 {
                     UnitTalentFormationBonusDictionary[talentId] = bonus;
                 }
             }
         }
-        public long GetTalentBonusPermyriad(int talentId, int count) // present
+        public long GetTalentBonusPermyriad(int talentId, int count, bool isBattle = false) // present
         {
-            var formationData = IsTalentQuestBoss || IsAbyssBoss
-                ? (MainManager.Instance.TalentFormationDic.TryGetValue(WaveGroupId, out var talentData) ? talentData : null)
-                : MainManager.Instance.TalentFormationDic.TryGetValue(selectedBossEnemyids[0], out var bossData)
+            var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
+            var waveGroupId = isBattle ? MyGameCtrl.Instance.tempData.waveGroupId : WaveGroupId;
+            var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId)
+                ? (MainManager.Instance.TalentFormationDic.TryGetValue(waveGroupId, out var talentData) ? talentData : null)
+                : MainManager.Instance.TalentFormationDic.TryGetValue(bossId, out var bossData)
                     ? bossData
                     : MainManager.Instance.TalentFormationDic.TryGetValue(1, out var defaultData) ? defaultData : null;
+            // Debug.Log($"GetTalentBonusPermyriad: talentId={talentId}, count={count}, formationData={formationData.formation_bonus_values[talentId - 1][count-1]}");
             return count > 0 && formationData != null ? formationData.formation_bonus_values[talentId - 1][count-1] : 0;
         }
         public void ExtraEffectButton()
@@ -2356,7 +2470,7 @@ namespace PCRCaculator.Guild
 
         public string start_hp, start_tp;
         public int n1 = 1000, n2 = 10000;
-        public List<GuildPlayerGroupData> guildPlayerGroupDatas;
+        public List<GuildPlayerGroupData> guildPlayerGroupDatas = new List<GuildPlayerGroupData>();
 
         public Dictionary<int, UnitAttackPattern> changedEnemyAttackPatternDic = new Dictionary<int, UnitAttackPattern>();
         public Dictionary<int, EnemyData> changedEnemyDataDic;
@@ -2368,7 +2482,9 @@ namespace PCRCaculator.Guild
         public int FPSforAnimation = 60;
         public bool calcSpineAnimation = true;
         public int UBTryingCount = 9999;
-        public bool UseFixedRandomSeed = true;
+        public int SemanSkillOn = 0;
+        public int SemanUBOn = 0;
+        // public bool UseFixedRandomSeed = true;
 
         /*public int RandomSeed = 666;
         public bool ForceNoCritical_player;

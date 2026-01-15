@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Elements
 {
@@ -10,6 +12,8 @@ namespace Elements
         private const int SUCCESS_MOTION = 2;
 
         private bool triggerSuccess { get; set; }
+
+        private bool disableCrowdControl { get; set; }
 
         private float duration { get; set; }
 
@@ -28,16 +32,29 @@ namespace Elements
             if (ActionDetail3 != 0)
                 actionParameter2 = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail3);
             eTriggerType actionDetail = (eTriggerType)base.ActionDetail1;
-            if (actionDetail != eTriggerType.DAMAGED)
+            if (actionDetail == eTriggerType.DAMAGED)
             {
-                return;
+                _source.OnDamageForLoopTrigger = (_byAttack, _damage, _critical) =>
+                {
+                    if (!_byAttack)
+                        return;
+                    triggerSuccess = true;
+                };
             }
-            _source.OnDamageForLoopTrigger = (_byAttack, _damage, _critical) =>
-      {
-          if (!_byAttack)
-              return;
-          triggerSuccess = true;
-      };
+            else if (actionDetail == eTriggerType.CROWD_CONTROL)
+            {
+                _source.OnSetCrowndControlForLoopTriggerList.Add(() =>
+                {
+                    if (!disableCrowdControl)
+                    {
+                        if (triggerSuccess)
+                            return false;
+                        triggerSuccess = true;
+                        disableCrowdControl = true;
+                    }
+                    return true;
+                }); // TODO no found where clean
+            }
         }
 
         public override void ReadyAction(
@@ -61,7 +78,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+          ValueDictionary _valueDictionary)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             triggerSuccess = false;
@@ -142,6 +159,7 @@ namespace Elements
                 }
                 yield return null;
             }
+            disableCrowdControl = false;
         }
 
         private bool isActionCancel(
@@ -176,6 +194,7 @@ namespace Elements
             DEAD = 4,
             CRITICAL_DAMAGED = 5,
             CRITICAL_DAMAGED_WITH_SUMMON = 6,
+            CROWD_CONTROL = 14
         }
     }
 }

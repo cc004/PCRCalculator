@@ -49,7 +49,7 @@ namespace Elements
       Skill _skill,
       float _startTime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+      ValueDictionary _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _startTime, _enabledChildAction, _valueDictionary);
       int defeatCount = 0;

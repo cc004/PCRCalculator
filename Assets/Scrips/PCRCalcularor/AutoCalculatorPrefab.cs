@@ -36,7 +36,9 @@ namespace PCRCaculator
         }
         public void CopySeedButton()
         {
+            #if UNITY_2017_2_OR_NEWER
             GUIUtility.systemCopyBuffer = $"{resultData.randomSeed}";
+            #endif
             MainManager.Instance.WindowMessage("已复制种子到剪贴板");
         }
         public void DetailButton()

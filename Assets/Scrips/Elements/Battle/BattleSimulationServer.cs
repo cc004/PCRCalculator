@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Net;
 using System.Threading;
 using UnityEngine;
@@ -45,17 +46,34 @@ namespace Elements.Battle
         public BattleSimulationResponse Result { get; set; }  // 如果完成，返回结果
     }
 
+    [Serializable]
+    public class BattleStatsData
+    {
+        public long TotalDamage { get; set; }
+        public long TotalMagicBuff { get; set; }
+        public long TotalPhysicsBuff { get; set; }
+        public long TotalMagicDebuff { get; set; }
+        public long TotalPhysicsDebuff { get; set; }
+        public Dictionary<int, long> PlayerTpGained { get; set; }
+    }
+
+    [Serializable]
     public class BattleSimulationResponse
     {
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         public bool Success { get; set; }
         public string Message { get; set; }
-        public long TotalDamage { get; set; }
+        public BattleStatsData Stats { get; set; }
         public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }
+        public string TalentLevel { get; set; }
+        public string TalentSkill { get; set; }
+        public string TeamSkill { get; set; }
+        public List<int> SemanUBNum { get; set; }
         public eBattleResult Result { get; set; }
+        public OnceResultData OnceResult { get; set; }
     }
 
     public class BattleTask
@@ -68,36 +86,42 @@ namespace Elements.Battle
     }
 
     [Serializable]
-    public class GuildBattleSettingData
-    {
-        public bool UseFixedRandomSeed { get; set; }
-        public int RandomSeed { get; set; }
-        public bool UseLogBarrierNew { get; set; }
-        public int UBTryingCount { get; set; } = 30;
-    }
-
     public class BattleSimulationRequest
     {
+        public bool CalcStats { get; set; } = false;
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         // 如果要进行工会战，请提供 EnemyData 列表
-        public List<PCRCaculator.EnemyData> GuildEnemyList { get; set; }
+        public List<int> GuildEnemyList { get; set; }
         public List<List<float>> UBExecTimeList { get; set; }
         public List<List<int>> SemanUBExecTimeList { get; set; }
-        public GuildBattleSettingData Settings { get; set; } = new GuildBattleSettingData();
+        public GuildRandomData Settings { get; set; } = new GuildRandomData();
+        public Dictionary<int, int> TalentSkillLevels { get; set; }
+        public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
+        public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
+        public int BattleTime { get; set; } = 90;
+        public bool TalentFullInfo { get; set; }
+        public bool IsTalentQuest { get; set; }
         public bool ToMaxUnitAttr { get; set; }
         public bool IsAutoMode { get; set; }
         public bool IsSetMode { get; set; }
         public bool IsSemanMode { get; set; }
         public bool IsGuildBattle { get; set; } = true;
+        public bool IsSkipping { get; set; } = true;
+        public int WaveGroupId { get; set; } = 0;
+        public List<bool> SetToggles { get; set; }
+        public bool NeedOnceResult { get; set; }
     }
 
-    public class BattleSimulationServer : MonoBehaviour
+#if UNITY_5_3_OR_NEWER
+    public class BattleSimulationServer : MonoBehaviour // no use
     {
+        public static BattleSimulationServer Instance;
         private HttpListener httpListener;
         private Thread listenerThread;
         private Thread queueProcessorThread;
         private bool isRunning = false;
+        public bool debugMode = false;
         public int port = 8080;
         public Text conentText;
 
@@ -106,7 +130,20 @@ namespace Elements.Battle
         private Dictionary<string, BattleTask> battleTasks = new Dictionary<string, BattleTask>();
         private object queueLock = new object();
         private bool isProcessing = false;
+        public string host = "localhost";
 
+        public void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
         void OnEnable()
         {
             StartServer();
@@ -117,6 +154,10 @@ namespace Elements.Battle
             StopServer();
         }
 
+#if ENABLE_THREADING
+        private ThreadController controller = new(Environment.ProcessorCount);
+#endif
+
         public void StartServer()
         {
             if (isRunning) return;
@@ -125,7 +166,7 @@ namespace Elements.Battle
             {
                 Debug.Log($"[BattleSimulationServer] 正在创建 HttpListener，端口: {port}");
                 httpListener = new HttpListener();
-                httpListener.Prefixes.Add($"http://localhost:{port}/");
+                httpListener.Prefixes.Add($"http://{host}:{port}/");
                 httpListener.Start();
                 Debug.Log("[BattleSimulationServer] HttpListener 已启动");
                 
@@ -218,6 +259,12 @@ namespace Elements.Battle
                     Debug.Log($"[BattleSimulationServer] 查询战斗结果: UID={uid}");
                     HandleQueryBattle(context, uid);
                 }
+                // GET /playerdata - 获取练度数据
+                else if (method == "GET" && path == "/playerdata")
+                {
+                    Debug.Log("[BattleSimulationServer] 获取练度数据请求");
+                    HandleGetPlayerData(context);
+                }
                 else
                 {
                     Debug.LogWarning($"[BattleSimulationServer] 未知的请求路径: {method} {path}");
@@ -250,6 +297,8 @@ namespace Elements.Battle
                 }
 
                 var battleRequest = JsonConvert.DeserializeObject<BattleSimulationRequest>(requestBody);
+                if (debugMode)
+                    battleRequest.IsSkipping = false;
                 
                 // 生成 UID
                 string uid = GenerateUid();
@@ -273,6 +322,7 @@ namespace Elements.Battle
                 }
 
                 // 更新 UI
+#if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -287,6 +337,7 @@ namespace Elements.Battle
                     }
                     catch { }
                 });
+#endif
 
                 // 返回 UID
                 var response = new BattleSubmitResponse
@@ -377,6 +428,44 @@ namespace Elements.Battle
             }
         }
 
+        private void HandleGetPlayerData(HttpListenerContext context)
+        {
+            try
+            {
+                var guildManager = GuildManager.Instance;
+                var playerSetting = MainManager.Instance.PlayerSetting;
+
+                var response = new
+                {
+                    Success = true,
+                    PlayerLevel = playerSetting.playerLevel,
+                    PlayerRank = playerSetting.ProcessStr(),
+                    PlayerUniqueEqLv = playerSetting.maxUniqueEqLv,
+                    TalentLevel = guildManager.GetTalentLevelDescription(),
+                    TalentSkill = guildManager.GetFinalTalentSkillNodeDescription(),
+                    TeamSkill = guildManager.GetFinalTeamSkillNodeDescription(),
+                    Message = "成功获取练度数据"
+                };
+
+                SendResponse(context, 200, JsonConvert.SerializeObject(response));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BattleSimulationServer] 获取练度数据失败: {ex.Message}\n{ex.StackTrace}");
+                SendResponse(context, 500, JsonConvert.SerializeObject(new
+                {
+                    Success = false,
+                    PlayerLevel = 0,
+                    PlayerRank = (string)null,
+                    PlayerUniqueEqLv = 0,
+                    TalentLevel = (string)null,
+                    TalentSkill = (string)null,
+                    TeamSkill = (string)null,
+                    Message = $"获取练度数据失败: {ex.Message}"
+                }));
+            }
+        }
+
         private void ProcessQueue()
         {
             while (isRunning)
@@ -416,8 +505,96 @@ namespace Elements.Battle
             try
             {
                 Debug.Log($"[BattleSimulationServer] ProcessBattle 开始: UID={task.Uid}");
-                
+
+                void OnException(Exception ex)
+                {
+                    Debug.LogError($"[BattleSimulationServer] StartByServer 失败: {ex.Message}\n{ex.StackTrace}");
+                    task.Status = BattleStatus.Failed;
+                    task.ErrorMessage = ex.Message;
+                }
+
+                void OnFinish()
+                {
+                    // 获取战斗结果
+                    try
+                    {
+                        Debug.Log($"[BattleSimulationServer] 开始获取战斗结果...");
+
+                        long totalDamage = 0;
+                        int battleFrames = 0;
+                        int currentSeed = 0;
+
+                        var battleResult = BattleManager.Instance.battleResult;
+
+                        totalDamage = GuildCalculator.Instance.GetTotalDamage();
+
+                        battleFrames = BattleHeaderController.CurrentFrameCount;
+
+                        currentSeed = MyGameCtrl.Instance.CurrentSeedForSave;
+                        var playerList = MyGameCtrl.Instance.tempData.playerList;
+                        var enemyList = MyGameCtrl.Instance.tempData.enemyList;
+
+                        task.Result = new BattleSimulationResponse
+                        {
+                            PlayerList = playerList,
+                            EnemyList = enemyList,
+                            Success = true,
+                            Message = "战斗模拟完成",
+                            BattleFrames = battleFrames,
+                            CurrentSeed = currentSeed,
+                            TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
+                            TalentSkill = GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
+                            TeamSkill = GuildManager.Instance.GetFinalTeamSkillNodeDescription(),
+                            Result = battleResult
+                        };
+
+                        if (task.Request.IsGuildBattle && task.Request.IsSemanMode)
+                        {
+                            task.Result.SemanUBNum = BattleManager.Instance.semanubmanager.UBNums;
+                        }
+
+                        task.Status = BattleStatus.Completed;
+                        Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}, Seed={currentSeed}");
+
+#if UNITY_5_3_OR_NEWER
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => {
+                        try
+                        {
+                            if (conentText != null)
+                            {
+                                conentText.text += $"[{task.Uid}] Completed: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}\n";
+                            }
+                        }
+                        catch { }
+                    });
+#endif
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"[BattleSimulationServer] ✗ 获取战斗结果失败: {ex.Message}\n{ex.StackTrace}");
+                        task.Status = BattleStatus.Failed;
+                        task.ErrorMessage = $"获取战斗结果失败: {ex.Message}";
+
+#if UNITY_5_3_OR_NEWER
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => {
+                        try
+                        {
+                            if (conentText != null)
+                            {
+                                conentText.text += $"[{task.Uid}] Failed: {task.ErrorMessage}\n";
+                            }
+                        }
+                        catch { }
+                    });
+#endif
+                    }
+                }
+
+#if ENABLE_THREADING
+                controller.DispatchTask(task.Request, OnFinish, OnException);
+#else
                 // 更新 UI
+#if UNITY_5_3_OR_NEWER
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
                     {
@@ -428,8 +605,10 @@ namespace Elements.Battle
                     }
                     catch { }
                 });
+#endif
 
                 // 按照 GAUBOptimization.cs 的方式：在主线程中调用 StartByServer，然后在后台线程等待
+#if UNITY_5_3_OR_NEWER
                 MyGameCtrl.Instance.isBattleFinish = false;
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
                     try
@@ -450,77 +629,66 @@ namespace Elements.Battle
                 {
                     Thread.Sleep(100);
                 }
+#else
+                try
+                {
+                    BattleManager.Instance.enabled = false;
+                    BattleManager.Instance.battleFinished = false;
+                    BattleManager.Instance.battleFinishedProcessed = false;
+                    MyGameCtrl.Instance.StartByServer(task.Request);
+                    // MyGameCtrl.Instance.tempData.skipping = true;
+                    // BattleManager.Instance.skipping = true;
+
+                    IEnumerator UpdateBattleManager()
+                    {
+                        for (; ; )
+                        {
+                            if (BattleManager.Instance.enabled)
+                                BattleManager.Instance.Update();
+                            yield return null;
+                        }
+                    }
+
+                    CoroutineRunner.AppendCoroutine(UpdateBattleManager());
+
+                    while (!MyGameCtrl.Instance.isBattleFinish)
+                    {
+                        UnityEngine.CoroutineRunner.Update();
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+
+                if (!MyGameCtrl.Instance.isBattleFinish)
+                {
+                    BattleManager.Instance.CoroutineManager.ClearAll();
+                    BattleManager.Instance.onEndFadeOut = (System.Action)null;
+                    BattleManager.Instance.battleFinishedProcessed = true;
+                    MyGameCtrl.Instance.OnBattleFinished(1);
+                }
+
+                UnityEngine.CoroutineRunner.pending.Clear();
+                UnityEngine.CoroutineRunner.running.Clear();
+
+#endif
+                if (debugMode)
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
 
                 // 如果已经标记为失败，直接返回
                 if (task.Status == BattleStatus.Failed)
                 {
-                    Debug.LogWarning($"[BattleSimulationServer] 战斗已标记为失败: {task.ErrorMessage}");
+                    var playerList = MyGameCtrl.Instance.tempData.playerList;
+                    var enemyList = MyGameCtrl.Instance.tempData.enemyList;
+                    var player_name = string.Join(", ", playerList?.Select(u => u.GetUnitName()) ?? new List<string>());
+                    var enemy_name = string.Join(", ", enemyList?.Select(u => u.GetUnitName()) ?? new List<string>());
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗 {player_name} vs {enemy_name} 已标记为失败: {task.ErrorMessage}");
+                    Debug.LogWarning($"[BattleSimulationServer] 战斗请求：{JsonConvert.SerializeObject(task.Request)}");
                     return;
                 }
 
-                // 获取战斗结果
-                try
-                {
-                    Debug.Log($"[BattleSimulationServer] 开始获取战斗结果...");
-                    
-                    long totalDamage = 0;
-                    int battleFrames = 0;
-                    int currentSeed = 0;
-
-                    var battleResult = BattleManager.Instance.battleResult;
-                    
-                    totalDamage = GuildCalculator.Instance.GetTotalDamage();
-                    
-                    battleFrames = BattleHeaderController.CurrentFrameCount;
-                    
-                    currentSeed = MyGameCtrl.Instance.CurrentSeedForSave;
-                    var playerList = MyGameCtrl.Instance.tempData.playerList;
-                    var enemyList = MyGameCtrl.Instance.tempData.enemyList;
-
-                    task.Result = new BattleSimulationResponse
-                    {
-                        PlayerList = playerList,
-                        EnemyList = enemyList,
-                        Success = true,
-                        Message = "战斗模拟完成",
-                        TotalDamage = totalDamage,
-                        BattleFrames = battleFrames,
-                        CurrentSeed = currentSeed,
-                        Result = battleResult
-                    };
-
-                    task.Status = BattleStatus.Completed;
-                    Debug.Log($"[BattleSimulationServer] ✓ 战斗结果获取成功: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}");
-
-                    // 更新 UI 日志
-                    UnityMainThreadDispatcher.Instance().Enqueue(() => {
-                        try
-                        {
-                            if (conentText != null)
-                            {
-                                conentText.text += $"[{task.Uid}] Completed: Result={battleResult}, Damage={totalDamage}, Frames={battleFrames}\n";
-                            }
-                        }
-                        catch { }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"[BattleSimulationServer] ✗ 获取战斗结果失败: {ex.Message}\n{ex.StackTrace}");
-                    task.Status = BattleStatus.Failed;
-                    task.ErrorMessage = $"获取战斗结果失败: {ex.Message}";
-                    
-                    UnityMainThreadDispatcher.Instance().Enqueue(() => {
-                        try
-                        {
-                            if (conentText != null)
-                            {
-                                conentText.text += $"[{task.Uid}] Failed: {task.ErrorMessage}\n";
-                            }
-                        }
-                        catch { }
-                    });
-                }
+                OnFinish();
+#endif
             }
             catch (Exception ex)
             {
@@ -551,4 +719,5 @@ namespace Elements.Battle
             }
         }
     }
+#endif
 }

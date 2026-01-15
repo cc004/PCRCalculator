@@ -88,7 +88,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -151,7 +151,12 @@ namespace Elements
             UnitCtrl owner = _target.Owner;
             var flag = false;
             SealData unableStateGuardData = owner.UnableStateGuardData;
-            if (_source.IsOther != owner.IsOther && ChangeSpeedAction.IsUnableAbnormalState(abnormalState) && unableStateGuardData != null && unableStateGuardData.GetCurrentCount() > 0 && !owner.IsNoDamageMotion() && !owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_ABNORMAL))
+            if (_source.IsOther != _target.Owner.IsOther && UnitCtrl.IsUnableAbnormalState(abnormalState) && _target.Owner.OnSetCrowndControlForLoopTriggerListCall())
+            {
+                action($"目标处于行动不能，击飞，拉拽免疫效果，技能无效!");
+                return;
+            }
+            if (_source.IsOther != owner.IsOther && UnitCtrl.IsUnableAbnormalState(abnormalState) && unableStateGuardData != null && unableStateGuardData.GetCurrentCount() > 0 && !owner.IsNoDamageMotion() && !owner.IsAbnormalState(UnitCtrl.eAbnormalState.NO_ABNORMAL))
             {
                 if (unableStateGuardData.DisplayCount)
                 {

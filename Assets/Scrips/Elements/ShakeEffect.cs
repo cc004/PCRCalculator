@@ -72,7 +72,7 @@ namespace Elements
       if (numberOfShake1 != numberOfShake2 && ShakeType == ShakeType.RANDOM)
           //Rotation = Random.Range(0.0f, 360f);
       {
-          Random.Range(0.0f, 360f);
+          Random.Range(0, 360);
           ++Battle.BattleManager.randomCounter;
       }
       //CurrentShakePos = new Vector3(CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Cos((float) (Rotation / 180.0 * 3.14159274101257)), CurrentAmplutude * Mathf.Sin((float) (curVal * 2.0 * 3.14159274101257) * timer) * Mathf.Sin((float) (Rotation / 180.0 * 3.14159274101257)), 0.0f);

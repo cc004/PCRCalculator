@@ -19,7 +19,7 @@ namespace Elements
     }
 
     // RVA: 0x280785C Offset: 0x280785C VA: 0x280785C Slot: 8
-    public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+    public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, ValueDictionary _valueDictionary)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 
@@ -42,7 +42,7 @@ namespace Elements
         _target.Owner.LimitEnergyRecoveryRateData = limitData;
 
         if (!disableIcon)
-          _target.Owner.NoSkipOnChangeAbnormalState(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
+          _target.Owner.NoSkipOnChangeAbnormalState?.Invoke(_target.Owner, (eStateIconType)150, true, limitData.Timer, limitData.Value.ToString());
         limitData.StartTimer(_target.Owner);
       }
       else

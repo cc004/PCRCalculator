@@ -100,7 +100,7 @@ namespace Elements
           Skill _skill,
           float _starttime,
           Dictionary<int, bool> _enabledChildAction,
-          Dictionary<eValueNumber, DoubleWithEx> _valueDictionary,
+          ValueDictionary _valueDictionary,
           System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
@@ -244,7 +244,7 @@ namespace Elements
                 var partKey = _source.GetFirstParts(true, 0f);
                 if (IdOffsetDictionary.TryGetValue(partKey, out long offset))
                 {
-                    _source.ActionsTargetOnMe.Remove(offset + 100 * ActionId);
+                    _source.ActionsTargetOnMe.Remove(offset + 100L * ActionId);
                 }
             }
 
@@ -254,7 +254,7 @@ namespace Elements
                 var partKey = _source.GetFirstParts(true, 0f);
                 if (IdOffsetDictionary.TryGetValue(partKey, out long offset))
                 {
-                    long param = offset + 100 * ActionId;
+                    long param = offset + 100L * ActionId;
                     bm.CallbackActionEnd(param);
                 }
             }
@@ -410,6 +410,8 @@ namespace Elements
             }
             while (true)
             {
+                if (_sourceActionController.IsCancelModeChangeByTrigger)
+                    yield break;
                 switch (_type)
                 {
                     case eModeChangeType.TIME:
@@ -459,6 +461,7 @@ namespace Elements
                 }
                 yield return null;
             }
+
             modeChangeEnd(_skill, _action, _source, _sourceActionController, _additionalAbnormalType);
         }
 
@@ -470,6 +473,9 @@ namespace Elements
           UnitActionController _sourceUnitActionController,
           eAdditionalAbnormalType additionalAbnormalType)
         {
+            if (_sourceUnitActionController.IsCancelModeChangeByTrigger)
+                return;
+
             // 清除特殊状态（无法操作/魅惑）
             _source.IsReduceEnergyDictionary[UnitCtrl.eReduceEnergyType.MODE_CHANGE] = false;
 

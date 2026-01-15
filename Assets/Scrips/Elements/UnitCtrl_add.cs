@@ -28,8 +28,12 @@ namespace Elements
 
         internal CharacterPageButton unitUI;
         private CharacterBuffUIController unitBuffUI;
-        private BattleUIManager uIManager;
+        private BattleUIManager uIManager => BattleUIManager.Instance;
+#if UNITY_5_3_OR_NEWER
         public PCRCaculator.UnitData unitData;
+#else
+        public PCRCaculator.UnitData unitData = new();
+#endif
         public UnitParameter unitParameter;
         public string UnitName = "", UnitNameEx = "";
         public int posIdx;//0-4
@@ -44,7 +48,7 @@ namespace Elements
         public Action<int, int, UnitActionExecData> NoSkipOnExecAction;
         public Action<int, int> SemanOnExecAction;
         public Action<int, int, long, int> NoSkipOnDamage;
-        public Action<bool, long, bool, long, LongWithEx> NoSkipOnDamage2;
+        public Action<bool, long, bool, long, LongWithEx> OnDamage2;
         public Action<int, int, LongWithEx, int,string> NoSkipOnBaseValueChanged;
         public Action<UnitCtrl, eStateIconType, bool,double,string> NoSkipOnChangeAbnormalState;
         public CharacterPageButton button;
@@ -61,7 +65,6 @@ namespace Elements
 
         public void SetUI(CharacterPageButton ui, CharacterBuffUIController buffui)
         {
-            uIManager = BattleUIManager.Instance;
             unitUI = ui;
             unitUI.SetButton(this);
             unitBuffUI = buffui;
@@ -74,7 +77,6 @@ namespace Elements
         }
         public void SetUIForSuommon()
         {
-            uIManager = BattleUIManager.Instance;
         }
         [ContextMenu("生成unitCtrl.json文件")]
         public void SaveUnitCtrlData()

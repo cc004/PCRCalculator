@@ -35,7 +35,7 @@ namespace Elements
       Skill _skill,
       float _starttime,
       Dictionary<int, bool> _enabledChildAction,
-      Dictionary<eValueNumber, DoubleWithEx> _valueDictionary)
+      ValueDictionary _valueDictionary)
     {
       if (!_source.SkillExecCountDictionary.ContainsKey(ActionDetail1))
         _source.SkillExecCountDictionary.Add(ActionDetail1, 0);

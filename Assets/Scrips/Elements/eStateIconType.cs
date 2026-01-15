@@ -453,6 +453,7 @@ namespace Elements
         HAOYU = 170,
         [Description("PSI风暴\n水美空")]
         PSIFENGBAO = 171,
+        [Description("执着\n涅比亚")]
         TAUNT = 172,
         [Description("日食\n水龙妈")]
         RISHI = 173,
