@@ -48,7 +48,8 @@ namespace Elements
                     EffectMaxCount = _valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_5, out var maxCountVal)
                         ? (double.IsPositiveInfinity(maxCountVal) ? int.MinValue : (int)maxCountVal)
                         : 0,
-                    EffectDuration = _valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_6, out var durationVal) ? (float)durationVal : 0f
+                    EffectDuration = _valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_6, out var durationVal) ? (float)durationVal : 0f,
+                    Source = _source,
                 };
 
                 _source.ProtectionSourceData = protectionData;
