@@ -194,6 +194,9 @@ namespace Elements
                 case eIfType.BARRIER:
                     flag = _target.Owner.IsBarrierState();
                     break;
+                case eIfType.TARGET_HP:
+                    flag = _target.Owner.Hp == _target.Owner.MaxHp;
+                    break;
                 default:
                     if (ActionDetail1 < 100)
                     {
@@ -248,11 +251,10 @@ namespace Elements
                     }
                     else if (ActionDetail1 > 900)
                     {
-                        flag = (long)_target.Owner.Hp / (double)(long)_target.Owner.MaxHp < ActionDetail1 % 100 / 100.0;
-
-#if !NO_PROB_EVENT
                         var now = (DoubleWithEx)_target.Owner.Hp / _target.Owner.MaxHp;
                         var bound = ActionDetail1 % 100 / 100.0;
+                        flag = now < bound;
+#if !NO_PROB_EVENT
                         prob = now.Select(x => x < bound ? 1 : 0, $"lt,{bound}");
                         if (flag)
                             GuildCalculator.Instance.dmglist.Add(new ProbEvent()
