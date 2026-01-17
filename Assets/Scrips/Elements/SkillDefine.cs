@@ -748,10 +748,14 @@ namespace Elements
                 eActionType.TAUNT,
                 typeof(TauntAction)
             },
-          {
+            {
                 eActionType.ENCHANT_PROTECT,
                 typeof(EnchantProtectAction)
-          }
+            },
+            {
+                eActionType.AUTO_REVIVAL,
+                typeof(AutoRevivalAction)
+            }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
         {

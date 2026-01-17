@@ -66,9 +66,6 @@ namespace Elements
         { 
             base.SetLevel(_level);
 
-            if (MasterData == null || Value == null)
-                return;
-
             double v1 = MasterData.action_value_1;
             double v2 = MasterData.action_value_2;
             float value1 = (float)(v1 + v2 * _level);

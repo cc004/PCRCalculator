@@ -283,7 +283,7 @@ namespace PCRCaculator.Guild
             try
             {
                 if (unitid >= 700000 && allUnitStateChangeDic.ContainsKey(unitid)) { return; }
-                if (allUnitLastStateDic[unitid].changStateTo != actionState)
+                if (true || allUnitLastStateDic[unitid].changStateTo != actionState)
                 {
                     if (actionState == UnitCtrl.ActionState.IDLE)
                     {

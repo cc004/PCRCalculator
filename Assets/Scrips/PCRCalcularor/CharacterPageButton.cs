@@ -58,6 +58,7 @@ namespace PCRCaculator
             battleBuffUIDic = new Dictionary<eStateIconType, BattleBuffUI>();
         public System.Action<int> OnRightClick;
         private int currentUnitId;
+        private bool dead = false;
         public CharacterDetailManager characterDetailManager;
 
         public void Awake()
@@ -298,9 +299,13 @@ namespace PCRCaculator
         {
             HPSlider.value = normalizedHPRate;
             hpPercent.text = $"{(int)(10000 * normalizedHPRate) / 10000f:P2}";
-            if (normalizedHPRate <= 0)
+            if (normalizedHPRate <= 0 && !dead)
             {
                 SetDie();
+            }
+            else if (normalizedHPRate > 0 && dead)
+            {
+                SetAlive();
             }
         }
         public void SetMaxHP(float normalizedMaxHPRate)
@@ -325,6 +330,7 @@ namespace PCRCaculator
         {
             characterImage.color = Color.white;
             backImage.color = Color.white;
+            dead = false;
             stars.SetStarColor(Color.white);
         }
     
@@ -332,7 +338,8 @@ namespace PCRCaculator
         {
             characterImage.color = grayColor;
             backImage.color = grayColor;
-            TPSlider.value = 0;
+            dead = true;
+            // TPSlider.value = 0;
             stars.SetStarColor(grayColor);
         }
 

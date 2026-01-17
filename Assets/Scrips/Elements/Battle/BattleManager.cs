@@ -1815,7 +1815,7 @@ namespace Elements.Battle
                 {
           PFDAEFDOBIP
         });
-            PFDAEFDOBIP.ALFDJACNNCL = PFDAEFDOBIP.LCHLGLAFJED == eFieldTargetType.ENEMY ? EnemyList : UnitList;
+            PFDAEFDOBIP.AllTargetList = PFDAEFDOBIP.FieldTargetType == eFieldTargetType.ENEMY ? EnemyList : UnitList;
             PFDAEFDOBIP.StartField();
         }
 
@@ -1976,7 +1976,24 @@ namespace Elements.Battle
             }
         }
 
-        public bool ExistsField(int FieldDataId, bool isOther) => FieldDataDictionary.ContainsKey(FieldDataId) && FieldDataDictionary[FieldDataId].FindIndex(a => a.isPlaying && a.PPOJKIDHGNJ.IsOther == isOther) != -1;
+        // RVA: 0x2834938 Offset: 0x2834938 VA: 0x2834938 Slot: 367
+        public void UpdateAbnormalStateField()
+        {
+            foreach (var field in FieldDataDictionary)
+            {
+                foreach (var data in field.Value)
+                {
+                    if (data is AbnormalStateFieldData abnormalStateField)
+                    {
+                        abnormalStateField.CallUpdateTarget();
+                    }
+                }
+            }
+            
+        }
+
+
+        public bool ExistsField(int FieldDataId, bool isOther) => FieldDataDictionary.ContainsKey(FieldDataId) && FieldDataDictionary[FieldDataId].FindIndex(a => a.Enable && a.Source.IsOther == isOther) != -1;
 
         //public AEIBKBBBIHG GetBattleCameraEffectForBattleProcessor() => (AEIBKBBBIHG)this.battleCameraEffect;
 

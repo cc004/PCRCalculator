@@ -64,7 +64,7 @@ namespace Elements
 					{
 						val *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
 					}
-					owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, val, ChargeType == eChargeType.INCREASE, base.PPOJKIDHGNJ);
+					owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, val, ChargeType == eChargeType.INCREASE, base.Source);
 					list.Add(owner);
 				}
 			}
@@ -97,22 +97,22 @@ namespace Elements
 			}
 			ChargeEnergyFieldData pFDAEFDOBIP = new ChargeEnergyFieldData
 			{
-				KNLCAOOKHPP = eFieldType.HEAL,
+				FildType = eFieldType.HEAL,
 				ChargeType = actionDetail,
-				HKDBJHAIOMB = eFieldExecType.REPEAT,
+				ExecType = eFieldExecType.REPEAT,
 				StayTime = (float)_valueDictionary[eValueNumber.VALUE_3],
 				CenterX = _target.GetLocalPosition().x + base.Position,
 				Size = (float)_valueDictionary[eValueNumber.VALUE_5],
-				LCHLGLAFJED = ((_source.IsOther == (actionDetail == ChargeEnergyFieldData.eChargeType.INCREASE)) ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER),
-				EGEPDDJBILL = ((_skill.BlackOutTime > 0f) ? _source : null),
+				FieldTargetType = ((_source.IsOther == (actionDetail == ChargeEnergyFieldData.eChargeType.INCREASE)) ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER),
+				PauseTarget = ((_skill.BlackOutTime > 0f) ? _source : null),
 				FieldEffectType = (ChargeEnergyFieldData.eFieldEffectType)base.ActionDetail3,
 				TargetList = new List<BasePartsData>(),
 				TargetSet = new HashSet<BasePartsData>(),
 				Value = num,
-				PPOJKIDHGNJ = _source,
-				PMHDBOJMEAD = _skill,
-				HGMNJJBLJIO = uniqueEffectPrefab,
-				LALMMFAOJDP = uniqueEffectPrefabLeft
+				Source = _source,
+				Skill = _skill,
+				UniqueEffectPrefab = uniqueEffectPrefab,
+				UniqueEffectPrefabLeft = uniqueEffectPrefabLeft
 			};
 			pFDAEFDOBIP.Cache();
             base.battleManager.ExecField(pFDAEFDOBIP, base.ActionId);

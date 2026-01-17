@@ -66,11 +66,11 @@ namespace Elements
                     {
                         case DamageData.eDamageType.ATK:
                             receiveDamagePrecent = (float)TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)PPOJKIDHGNJ.PhysicalDamageUpPercentOrMin / 100f; 
+                            damageUpPrecent = (float)Source.PhysicalDamageUpPercentOrMin / 100f; 
                             break;
                         case DamageData.eDamageType.MGC:
                             receiveDamagePrecent = (float)TargetList[index].Owner.MagicReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)PPOJKIDHGNJ.MagicDamageUpPercentOrMin / 100f;
+                            damageUpPrecent = (float)Source.MagicDamageUpPercentOrMin / 100f;
                             break;
                     }
 
@@ -78,9 +78,9 @@ namespace Elements
                     damageData.Target = TargetList[index];
                     damageData.Damage = BattleUtil.DoubleToLong(Value * receiveDamagePrecent * damageUpPrecent);
                     damageData.DamageType = realDamageType;
-                    damageData.Source = PPOJKIDHGNJ;
+                    damageData.Source = Source;
                     damageData.ActionType = eActionType.ATTACK_FIELD;
-                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == PPOJKIDHGNJ.IsOther; // yes it has
+                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == Source.IsOther; // yes it has
                     damageData.ExecAbsorber = _damage =>
                     {
                         if (_damage > AbsorberValue)
@@ -96,7 +96,7 @@ namespace Elements
                     };
                     UnitCtrl owner = TargetList[index].Owner;
                     DamageData _damageData = damageData;
-                    Skill pmhdbojmead = PMHDBOJMEAD;
+                    Skill pmhdbojmead = Skill;
                     int actionId = ActionId;
                     Skill _skill = pmhdbojmead;
                     double energyChargeMultiple = EnergyChargeMultiple;

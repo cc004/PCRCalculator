@@ -321,7 +321,7 @@ namespace Elements
 
         private bool startSkillExeced;
         private Dictionary<eAbnormalState, bool> m_abnormalState = new Dictionary<eAbnormalState, bool>(new eAbnormalState_DictComparer());
-        private Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData> abnormalStateCategoryDataDictionary = new Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData>(new eAbnormalStateCategory_DictComparer());
+        public Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData> abnormalStateCategoryDataDictionary = new Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData>(new eAbnormalStateCategory_DictComparer());
         private int overlapAbnormalStateCount;
         private Dictionary<eAbnormalState, List<int>> overlapAbnormalStateIndexList = new Dictionary<eAbnormalState, List<int>>
         {
@@ -4873,6 +4873,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.WORLD_LIGHTNING:
                     result = UnitCtrl.eAbnormalStateCategory.WORLD_LIGHTNING;
                     break;
+                default:
+                    Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
+                    break;
             }
             return result;
         }
@@ -5524,11 +5527,12 @@ this.updateCurColor();
         }
 
 
-        private void EnableAbnormalState(
+        public void EnableAbnormalState(
           eAbnormalState _abnormalState,
           bool _enable,
           bool _reduceEnergy = false,
-          bool _switch = false
+          bool _switch = false,
+          bool _skipRestartField = false
           //bool nobreak = false,
            // bool _switch_On = false
             )
@@ -7691,7 +7695,12 @@ this.updateCurColor();
 
         private Dictionary<eStateIconType, List<KnightGuardData>> knightGuardDatas { get; set; } = new Dictionary<eStateIconType, List<KnightGuardData>>();
 
+        // private Dictionary<eStateIconType, GutsData> gutsDictionary { get; set; }
+
         private IEnumerator knightGuardCoroutine { get; set; }
+
+        public AutoRevivalData AutoRevivalData { get; set; }
+        public bool IsUnbeatableForAutoRevival { get; set; }
 
         private Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>> passiveSealDictionary { get; set; } = new Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>>();
 
@@ -9436,6 +9445,22 @@ this.updateCurColor();
             return (long)num1;
         }
 
+        public bool ExecGuts() // TODO implement gutsaction only use in 804100501 boss
+        {
+            // bool triggered = false;
+            // foreach (var guts in gutsDictionary.Values)
+            // {
+            //     if (guts.IsEnable)
+            //     {
+            //         triggered = true;
+            //         guts.Exec();
+            //     }
+            // }
+            // return triggered;
+            return false;
+        }
+
+
         // RVA: 0x2846CBC Offset: 0x2846CBC VA: 0x2846CBC
         private void applySealByReceiveDamage(eActionType _actionType, LongWithEx _damage)
         {
@@ -9992,15 +10017,26 @@ this.updateCurColor();
 
             if (Hp <= 0)
             {
-                if (IsTough || ExecKnightGuard())
+                if (IsTough)
                 {
                     if (Hp <= 0)
                         Hp = 1;
                 }
                 else
                 {
-                    Hp = _hp;
-                    _hp = _hp.ZeroCapForHp();
+                    bool trigger = ExecKnightGuard();
+                    if (_damageData.ActionType != eActionType.INHIBIT_HEAL)
+                        trigger |= ExecGuts();
+                    trigger |= AutoRevivalData.TryExec();
+                    if (trigger)
+                    {
+                        Hp = 1;
+                    }
+                    else
+                    {
+                        Hp = _hp;
+                        _hp = _hp.ZeroCapForHp();
+                    }
                 }
             }
             else
@@ -10662,6 +10698,8 @@ this.updateCurColor();
           LongWithEx _valueSkillLifeSteal,
           eInhibitHealType _inhibitHealType,
           UnitCtrl _source,
+          // bool _isLifeSteal,
+          // Skill _skill,
           double _healDownValue = 1f,
           bool _isEffect = true,
           bool _isRevival = false,
