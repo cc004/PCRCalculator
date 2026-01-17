@@ -6491,13 +6491,12 @@ this.updateCurColor();
 
         public bool IsAbnormalState(eAbnormalState abnormalState) => m_abnormalState[abnormalState];
 
+
         public bool IsNoDamageMotion()
         {
-            if (!IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION))
-            {
-                return IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION2);
-            }
-            return true;
+            return IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION) ||
+                IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION2) ||
+                IsUnbeatableForAutoRevival;
         }
         //public bool IsConfusionOrConvert() => m_abnormalState[eAbnormalState.CONFUSION] || m_abnormalState[eAbnormalState.CONVERT];
         public bool IsConfusionOrConvert()
@@ -7703,7 +7702,7 @@ this.updateCurColor();
         private IEnumerator knightGuardCoroutine { get; set; }
 
         public AutoRevivalData AutoRevivalData { get; set; }
-        public bool IsUnbeatableForAutoRevival { get; set; } // TODO find where use
+        public bool IsUnbeatableForAutoRevival { get; set; }
 
         private Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>> passiveSealDictionary { get; set; } = new Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>>();
 
@@ -13887,7 +13886,7 @@ this.updateCurColor();
                             return false;
                         break;
                 }*/
-                return ToadDatas.Count <= 0 && !IsAbnormalState(eAbnormalState.UB_SILENCE) &&
+                return ToadDatas.Count <= 0 && !IsAbnormalState(eAbnormalState.UB_SILENCE) && !IsUnbeatableForAutoRevival &&
                        !UbIsDisableByChangePattern &&
                        ((CurrentState != ActionState.SKILL_1 ||
                          unitActionController.Skill1IsChargeTime) &&
