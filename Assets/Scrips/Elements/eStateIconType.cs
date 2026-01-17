@@ -277,7 +277,7 @@ namespace Elements
         [Description("圣夜的光辉\n圣哈")]
         AKINO_CHRISTMAS = 92,
         // Token: 0x04008838 RID: 34872
-        // NPC_STUN = 93,
+        NPC_STUN = 93,
         // Token: 0x04008839 RID: 34873
         [Description("爆伤抗性BUFF")]
         BUFF_RECEIVE_CRITICAL_DAMAGE = 94,

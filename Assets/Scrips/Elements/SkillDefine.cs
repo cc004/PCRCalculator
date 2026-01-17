@@ -755,7 +755,11 @@ namespace Elements
             {
                 eActionType.AUTO_REVIVAL,
                 typeof(AutoRevivalAction)
-            }
+            },
+            {
+                eActionType.DAMAGE_CUT_FOR_SPECIAL_NULLIFICATION,
+                typeof(DamageCutForSpecialNullificationAction)
+            },
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
         {

@@ -811,14 +811,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
-            // {
-            //     eAbnormalState.NPC_STUN,
-            //     new AbnormalConstData
-            //     {
-            //         IconType = eStateIconType.NPC_STUN,
-            //         IsBuff = false
-            //     }
-            // },
+            {
+                eAbnormalState.NPC_STUN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NPC_STUN,
+                    IsBuff = false
+                }
+            },
             {
                 eAbnormalState.DECREASE_HEAL,
                 new AbnormalConstData
@@ -7054,6 +7054,9 @@ this.updateCurColor();
         public List<UnitCtrl> TauntTargetList { get; set; } = new List<UnitCtrl>();
         bool IsTauntSourceInSearchArea { get; set; }
 
+        public DamageCutForSpecialNullificationData DamageCutForSpecialNullificationData { get; set; }
+
+
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
         public Dictionary<BuffParamKind, LongWithEx> AdditionalBuffDictionary { get; set; } = new Dictionary<BuffParamKind, LongWithEx>();
@@ -7700,7 +7703,7 @@ this.updateCurColor();
         private IEnumerator knightGuardCoroutine { get; set; }
 
         public AutoRevivalData AutoRevivalData { get; set; }
-        public bool IsUnbeatableForAutoRevival { get; set; }
+        public bool IsUnbeatableForAutoRevival { get; set; } // TODO find where use
 
         private Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>> passiveSealDictionary { get; set; } = new Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>>();
 
@@ -9583,6 +9586,8 @@ this.updateCurColor();
 
             DoubleWithEx b = a;
 
+            bool ignore_damage_cut_action = SkillDefine.IGNORE_DAMAGE_CUT_ACTION.Contains(_damageData.ActionType);
+
             if (flag1)
             {
                 a = (DoubleWithEx)_damageData.LogBarrierExpectedDamage;
@@ -9601,7 +9606,7 @@ this.updateCurColor();
                 b *= 1f - num2;
             }
 
-            if (!SkillDefine.IGNORE_DAMAGE_CUT_ACTION.Contains(_damageData.ActionType) && IsAbnormalState(eAbnormalState.CUT_ALL_DAMAGE))
+            if (!ignore_damage_cut_action && IsAbnormalState(eAbnormalState.CUT_ALL_DAMAGE))
             {
                 double num2 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_ALL_DAMAGE) / 100f;
                 a *= 1f - num2;
@@ -9610,6 +9615,7 @@ this.updateCurColor();
 
             if (_byAttack && !_damageData.IgnoreStrikeBackAndAllUnitDamageCutTrigger)
             {
+                bool save_ignore_damage_cut_action = ignore_damage_cut_action;
                 var savedSkill = _skill;
                 var effectTarget = this.unitActionController;
                 bool enemySide = IsOther;
@@ -9629,12 +9635,18 @@ this.updateCurColor();
                 b *= 1f - damageCutRate; 
                 
                 _skill = savedSkill;
+                ignore_damage_cut_action = save_ignore_damage_cut_action;
             }
 
+            if (DamageCutForSpecialNullificationData != null && !ignore_damage_cut_action)
+            {
+                double damageCutRate = DamageCutForSpecialNullificationData.GetDamageCutValue(_damageData.DamageType);
+                a *= 1f - damageCutRate;
+                b *= 1f - damageCutRate;
+            }
             
             Tuple<StrikeBackData, List<StrikeBackData>> tuple =  searchStrikeBack(_damageData);
 
-            // TODO DamageCutForSpecialNullificationData unknown
 
             // 属性
             double execBarrier(double total, double main, double sub)
