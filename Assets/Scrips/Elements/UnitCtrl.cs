@@ -4874,7 +4874,8 @@ this.updateCurColor();
                     result = UnitCtrl.eAbnormalStateCategory.WORLD_LIGHTNING;
                     break;
                 default:
-                    Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
+                    if (abnormalState != UnitCtrl.eAbnormalState.NONE)
+                        Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
                     break;
             }
             return result;
@@ -10038,7 +10039,7 @@ this.updateCurColor();
                     bool trigger = ExecKnightGuard();
                     if (_damageData.ActionType != eActionType.INHIBIT_HEAL)
                         trigger |= ExecGuts();
-                    trigger |= AutoRevivalData.TryExec();
+                    trigger |= AutoRevivalData?.TryExec() ?? false;
                     if (trigger)
                     {
                         Hp = 1;
