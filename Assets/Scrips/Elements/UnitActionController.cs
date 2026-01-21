@@ -713,7 +713,7 @@ namespace Elements
         public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
         {
             bool hasNoTarget = false;
-            actionStartFirstProcess(_skill, out hasNoTarget, MainManager.Instance.PlayerSetting.IsNiefeiBugFix);
+            actionStartFirstProcess(_skill, out hasNoTarget, true);
             _skill.ReadySkill();
             _skill.AweValue = Owner.CalcAweValue(false, false);
 

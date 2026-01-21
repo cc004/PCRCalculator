@@ -2327,7 +2327,6 @@ namespace PCRCaculator
         public bool useDMMpath = false;
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
-        public bool IsNiefeiBugFix = false;
         public int maxTPUpValue = 250;//TP上限
         public Dictionary<int, int> talentLevel = new();
         public Dictionary<int, int> talentSkill = new();
