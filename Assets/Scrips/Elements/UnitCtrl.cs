@@ -14546,6 +14546,25 @@ this.updateCurColor();
             }
             return num;
         }
+        public int CompareMagicStrDecSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareMagicStrDec(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareLeft(_a, _b);
+            }
+            return num;
+        }
+        public int CompareMagicStrDecSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareMagicStrDec(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return num;
+        }
+
         public Dictionary<int, AttackSealDataForAllEnemy> AttackSealDataDictionary { get; set; } = new Dictionary<int, AttackSealDataForAllEnemy>();
 
     }

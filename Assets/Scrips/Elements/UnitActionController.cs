@@ -7,7 +7,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Cute;
 using Elements.Battle;
@@ -2205,7 +2204,41 @@ namespace Elements
                 case PriorityPattern.ENERGY_ASC_BACK_WITHOUT_OWNER:
                 case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
                 case PriorityPattern.HP_ASC_WITHOUT_OWNER:
+                case PriorityPattern.MAGIC_STR_DEC_WITHOUT_OWNER_FORWARD:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner);
+                    break;
+                case PriorityPattern.FLIGHT_ONLY:
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT));
+                    break;
+                default:
+                    var target_type = (PriorityPattern)((int)actionParameter.TargetSort / 1000 * 1000);
+                    switch (target_type)
+                    {
+                        case PriorityPattern.NEAR_WITHOUT_TARGET_ABNORMAL_STATE:
+                        case PriorityPattern.FAR_WITHOUT_TARGET_ABNORMAL_STATE:
+                            unitCtrlList3 = unitCtrlList3.FindAll(
+                                e => e.IsAbnormalState((UnitCtrl.eAbnormalState)((int)actionParameter.TargetSort % 1000)));
+                            break;
+                        case PriorityPattern.NEAR_SEAL_ENCHANTED:
+                            eStateIconType seal_icon = (eStateIconType)((int)actionParameter.TargetSort % 1000);
+                            unitCtrlList3 = unitCtrlList3.FindAll(
+                                e => e.SealDictionary != null &&
+                                e.SealDictionary.ContainsKey(seal_icon) && 
+                                e.SealDictionary[seal_icon].GetCurrentCount() > 0);
+                            break;
+                        case PriorityPattern.NEAR_TALENT:
+                            unitCtrlList3 = unitCtrlList3.FindAll(e => e.TalentIds != null && 
+                            e.TalentIds.Contains((int)actionParameter.TargetSort % 1000));
+                            break;
+                        case PriorityPattern.NEAR_TALENT_WITHOUT_OWNER:
+                            unitCtrlList3 = unitCtrlList3.FindAll(e => e.TalentIds != null && 
+                            e.TalentIds.Contains((int)actionParameter.TargetSort % 1000) && 
+                            e != Owner);
+                            break;
+                        default:
+                            // Debug.LogWarning((object)("Unknown TargetSort: " + actionParameter.TargetSort.ToString()));
+                            break;
+                    }
                     break;
             }
             float num = actionParameter.TargetWidth;
@@ -2674,8 +2707,38 @@ namespace Elements
                         new Comparison<BasePartsData>(this.Owner.CompareMagicDefAscSameLeft),
                         new Comparison<BasePartsData>(this.Owner.CompareMagicDefAscSameRight));
                     break;
+                case PriorityPattern.FLIGHT_ONLY:
+                    this.sortTargetPosition(targetList,
+                        _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE,
+                        new Comparison<BasePartsData>(this.Owner.CompareLeft),
+                        new Comparison<BasePartsData>(this.Owner.CompareRight));
+                    break;
+                case PriorityPattern.MAGIC_STR_DEC_WITHOUT_OWNER_FORWARD:
+                    this.sortTargetPosition(targetList,
+                        _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE,
+                        new Comparison<BasePartsData>(this.Owner.CompareMagicStrDecSameLeft),
+                        new Comparison<BasePartsData>(this.Owner.CompareMagicStrDecSameRight));
+                    break;
                 default:
-                    targetList.Sort(Owner.CompareDistanceAsc);
+                    var target_sort = (PriorityPattern)((int)_actionParameter.TargetSort / 1000 * 1000);
+                    switch (target_sort)
+                    {
+                        case PriorityPattern.NEAR_WITHOUT_TARGET_ABNORMAL_STATE:
+                        case PriorityPattern.NEAR_SEAL_ENCHANTED:
+                        case PriorityPattern.NEAR_TALENT:
+                        case PriorityPattern.NEAR_TALENT_WITHOUT_OWNER:
+                            Owner.BaseX = _baseTransform.position.x;
+                            targetList.Sort(Owner.CompareDistanceAsc);
+                            break;
+                        case PriorityPattern.FAR_WITHOUT_TARGET_ABNORMAL_STATE:
+                            Owner.BaseX = _baseTransform.position.x;
+                            targetList.Sort(Owner.CompareDistanceDec);
+                            break;
+                        default:
+                            targetList.Sort(Owner.CompareDistanceAsc);
+                            Debug.LogWarning((object)("Unknown TargetSort: " + _actionParameter.TargetSort.ToString()));
+                            break;
+                    }
                     break;
             }
             switch (_actionParameter.TargetSort)
