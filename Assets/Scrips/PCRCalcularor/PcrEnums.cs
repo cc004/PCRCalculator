@@ -4,6 +4,19 @@ using UnityEngine;
 
 namespace PCRCaculator.Battle
 {
+    public enum Talent
+    {
+        [Description("火属性")]
+        FIRE = 1,
+        [Description("水属性")]
+        WATER = 2,
+        [Description("风属性")]
+        WIND = 3,
+        [Description("光属性")]
+        LIGHT = 4,
+        [Description("暗属性")]
+        DARK = 5
+    }
     public enum BuffParamKind
     {
         [Description("攻击")]

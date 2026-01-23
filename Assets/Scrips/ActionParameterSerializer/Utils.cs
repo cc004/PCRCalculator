@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
+using PCRCaculator.Battle;
 namespace ActionParameterSerializer
 {
     public class Property
@@ -566,7 +567,26 @@ namespace ActionParameterSerializer
                     return Utils.JavaFormat(Utils.GetString("the_lowest_DEF"));
                 case TargetType.magicDefAscForward:
                     return Utils.JavaFormat(Utils.GetString("the_lowest_Magic_DEF"));
+                case TargetType.flightOnly:
+                    return Utils.JavaFormat(Utils.GetString("flight_only"));
                 default:
+                    var target_type = (TargetType)((int)type / 1000 * 1000);
+                    var target_val = (int)type % 1000;
+                    switch (target_type)
+                    {
+                        case TargetType.NEAR_WITHOUT_TARGET_ABNORMAL_STATE:
+                            return Utils.JavaFormat(Utils.GetString("near_without_s_abnormal_state"), ((eAbnormalState)target_val).description());
+                        case TargetType.FAR_WITHOUT_TARGET_ABNORMAL_STATE:
+                            return Utils.JavaFormat(Utils.GetString("far_without_s_abnormal_state"), ((eAbnormalState)target_val).description());
+                        case TargetType.NEAR_SEAL_ENCHANTED:
+                            return Utils.JavaFormat(Utils.GetString("near_with_s_sealed_state"), ((eStateIconType)target_val).description());
+                        case TargetType.NEAR_TALENT:
+                            return Utils.JavaFormat(Utils.GetString("near_with_s_talent_state"), ((Talent)target_val).description());
+                        case TargetType.NEAR_TALENT_WITHOUT_OWNER:
+                            return Utils.JavaFormat(Utils.GetString("near_with_s_talent_without_owner"), ((Talent)target_val).description());
+                        default:
+                            break;
+                    }
                     return Utils.JavaFormat(((Enum)type).description());
             }
         }
