@@ -697,6 +697,64 @@ namespace Elements.Battle
             if (_canUpdateTime)
             {
                 BattleLeftTime -= DeltaTime_60fps;
+
+                if (MyGameCtrl.Instance.BattleStats.IsEnabled)
+                {
+                    // 1. 获取 Boss 单位
+                    var boss = BossUnit; 
+                    
+                    if (boss != null && !boss.IsDead)
+                    {
+                        double currentFrameTotalPhyScore = 0;
+                        double currentFrameTotalMagScore = 0;
+
+                        // 获取 Boss 当前的防御力 (包含 Debuff)
+                        // DefZero 属性已经计算了 (Base + Buff/Debuff).Max(0)
+                        long bossCurDef = boss.DefZero; 
+                        long bossCurMagicDef = boss.MagicDefZero;
+
+                        // 2. 遍历我方角色，计算 "伤害期望"
+                        for (int i = 0; i < UnitList.Count; i++)
+                        {
+                            var unit = UnitList[i];
+                            if (unit != null && !unit.IsDead && unit.Hp > 0)
+                            {
+                                // --- 核心逻辑 ---
+
+                                // B. 区分物理和魔法角色计算
+                                if (unit.AtkType == 1) // 1 = 物理
+                                {
+                                    // 计算有效防御 = Max(0, Boss防御 - 角色穿透)
+                                    // PhysicalPenetrateZero 获取的是面板穿透
+                                    long effectiveDef = Math.Max(0, bossCurDef - unit.PhysicalPenetrateZero);
+                                    
+                                    // 分母
+                                    double defFactor = 1.0 + (double)effectiveDef / 100.0;
+                                    
+                                    // 分子：攻击力
+                                    double score = ((double)unit.AtkZero) / defFactor;
+                                    
+                                    currentFrameTotalPhyScore += score;
+                                }
+                                else // 2 = 魔法
+                                {
+                                    long effectiveDef = Math.Max(0, bossCurMagicDef - unit.MagicPenetrateZero);
+                                    double defFactor = 1.0 + (double)effectiveDef / 100.0;
+                                    double score = ((double)unit.MagicStrZero) / defFactor;
+                                    
+                                    currentFrameTotalMagScore += score;
+                                }
+                            }
+                        }
+
+                        // 3. 将这一帧的"期望伤害总和"累加到统计数据中
+                        MyGameCtrl.Instance.BattleStats.AccumulateFrameStats(
+                            currentFrameTotalPhyScore, 
+                            currentFrameTotalMagScore
+                        );
+                    }
+                }
+
                 semanubmanager.ProcessFrame();
                 BattleHeaderController.CurrentFrameCount++;
                 BattleHeaderController.Instance.SetRestTime(BattleLeftTime);

@@ -54,6 +54,8 @@ namespace Elements.Battle
         public long TotalPhysicsBuff { get; set; }
         public long TotalMagicDebuff { get; set; }
         public long TotalPhysicsDebuff { get; set; }
+        public double ScorePhysicsExpectation { get; set; }
+        public double ScoreMagicExpectation { get; set; }
         public Dictionary<int, long> PlayerTpGained { get; set; }
     }
 
