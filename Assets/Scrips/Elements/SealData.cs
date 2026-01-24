@@ -106,7 +106,7 @@ namespace Elements
 				isPositive,
 				Source,
 				deltaCount);
-
+			
 			currentSealCount = _count;
 		}
 
@@ -228,6 +228,7 @@ namespace Elements
 			{
 				sealBuffDebuffData.UpdateValue(GetCurrentCount());
 			}
+			_target.SemanOnEventCallback?.Invoke(_target.UnitId, eSemanEvent.SEAL);
 			if (DisplayCount)
 			{
 				_target.OnChangeStateNum.Call(_target, _iconType, GetCurrentCount());

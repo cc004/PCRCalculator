@@ -2736,7 +2736,7 @@ namespace Elements
                             break;
                         default:
                             targetList.Sort(Owner.CompareDistanceAsc);
-                            Debug.LogWarning((object)("Unknown TargetSort: " + _actionParameter.TargetSort.ToString()));
+                            // Debug.LogWarning((object)("Unknown TargetSort: " + _actionParameter.TargetSort.ToString()));
                             break;
                     }
                     break;

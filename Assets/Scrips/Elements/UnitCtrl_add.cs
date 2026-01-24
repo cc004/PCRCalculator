@@ -39,6 +39,7 @@ namespace Elements
         public int posIdx;//0-4
         public Action<int,ActionState, int,string, UnitCtrl> NoSkipOnChangeState;
         public Action<int,ActionState> SemanOnChangeState;
+        public Action<int,eSemanEvent> SemanOnEventCallback;
         public Action<int, UnitAbnormalStateChangeData, int> NoSkipOnAbnormalStateChange;
         public Action<int,long, long, long, int,string, UnitCtrl> NoSkipOnLifeChanged;
         public Action<int,double, int,string> NoSkipOnTPChanged;

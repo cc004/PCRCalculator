@@ -8,7 +8,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -4448,6 +4447,7 @@ this.updateCurColor();
                 if (diff > 0)
                 {
                     MyGameCtrl.Instance.BattleStats.AddPlayerTp(UnitId, diff);
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.TP_GAIN);
                 }
             }
 
@@ -5991,6 +5991,10 @@ this.updateCurColor();
 
             eStateIconType iDAFJHFJKOL = (abnormalStateCategoryData.ShowsIcon ? ABNORMAL_CONST_DATA[_abnormalState].IconType : eStateIconType.NONE);
             OnChangeState.Call(this, iDAFJHFJKOL, _enable);
+
+            // lanly: both enable or disable will invoke, to separate ?
+            SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.ABNORMAL);
+
             NoSkipOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[_abnormalState].IconType,
                 _enable, abnormalStateCategoryDataDictionary[abnormalStateCategory].Duration, describe);
             CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory]);
@@ -7397,6 +7401,8 @@ this.updateCurColor();
             stateChangeData.isBuff = true;
             stateChangeData.BUFF_Type = _kind;
             NoSkipOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
+            // lanly: both enable or disable will invoke, to separate ?
+            SemanOnEventCallback?.Invoke(UnitId, _isBuff ? eSemanEvent.BUFF : eSemanEvent.DEBUFF);
             button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)
@@ -9348,6 +9354,13 @@ this.updateCurColor();
             UnitCtrl JELADBAMFKH = source1;
             UnitCtrl LIMEKPEENOB = unitCtrl1;
             battleLog.AppendBattleLog(eBattleLogType.SET_DAMAGE, HLIKLPNIOKJ, KGNFLOPBOMB, hp, 0, OJHBHHCOAGK, PFLDDMLAICG, PNJFIOPGCIC, JELADBAMFKH, LIMEKPEENOB);
+
+            SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.DAMAGE);
+            if (_damageData.StrikeBackSource != null)
+                _damageData.StrikeBackSource.SemanOnEventCallback?.Invoke(_damageData.StrikeBackSource.UnitId, eSemanEvent.ATTACK);
+            else if (_damageData.Source != null)
+                _damageData.Source.SemanOnEventCallback?.Invoke(_damageData.Source.UnitId, eSemanEvent.ATTACK);
+
             if (_skill != null && _damageData.Source != null && _skill.SkillId == _damageData.Source.UnionBurstSkillId)
             {
                 if (_byAttack)
@@ -11570,15 +11583,18 @@ this.updateCurColor();
             switch (_state)
             {
                 case ActionState.IDLE:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.IDLE);
                     setStateIdle();
                     break;
                 case ActionState.ATK:
                     setStateAttack();
                     break;
                 case ActionState.SKILL_1:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.UB);
                     setStateSkill1();
                     break;
                 case ActionState.SKILL:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.SKILL);
                     setStateSkill(_skillId);
                     break;
                 case ActionState.WALK:
