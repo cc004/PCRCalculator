@@ -7364,6 +7364,7 @@ this.updateCurColor();
                 return;
             }
 
+            SemanOnEventCallback?.Invoke(UnitId, _isBuff ? eSemanEvent.BUFF : eSemanEvent.DEBUFF);
 #if REDUCE_ANALYSE
             if (_kind != BuffParamKind.NUM)
 #else
@@ -7402,7 +7403,6 @@ this.updateCurColor();
             stateChangeData.BUFF_Type = _kind;
             NoSkipOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
             // lanly: both enable or disable will invoke, to separate ?
-            SemanOnEventCallback?.Invoke(UnitId, _isBuff ? eSemanEvent.BUFF : eSemanEvent.DEBUFF);
             button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)

@@ -540,7 +540,8 @@ namespace Elements
                 }
                 else
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    // BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.semanubmanager.Disable();
                     BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
                 }
             }
