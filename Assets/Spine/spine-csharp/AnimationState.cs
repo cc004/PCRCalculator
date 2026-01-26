@@ -37,6 +37,7 @@ namespace Spine
 		private bool animationsChanged;
 
 		private float timeScale = 1f;
+		private bool suppressEvents;
 
 		public AnimationStateData Data => data;
 
@@ -51,6 +52,18 @@ namespace Spine
 			set
 			{
 				timeScale = value;
+			}
+		}
+
+		public bool SuppressEvents
+		{
+			get
+			{
+				return suppressEvents;
+			}
+			set
+			{
+				suppressEvents = value;
 			}
 		}
 
@@ -237,12 +250,18 @@ namespace Spine
 						}
 					}
 				}
-				QueueEvents(trackEntry, animationTime);
+				if (!suppressEvents)
+				{
+					QueueEvents(trackEntry, animationTime);
+				}
 				exposedList.Clear(clearArray: false);
 				trackEntry.nextAnimationLast = animationTime;
 				trackEntry.nextTrackLast = trackEntry.trackTime;
 			}
-			queue.Drain();
+			if (!suppressEvents)
+			{
+				queue.Drain();
+			}
 			return result;
 		}
 

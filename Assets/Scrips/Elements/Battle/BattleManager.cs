@@ -651,7 +651,7 @@ namespace Elements.Battle
             }
 
             eof:
-            unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate());
+            unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate(true, suppress_events: true, force_late_update: true));
         }
 
         public bool stepping = false;
@@ -804,14 +804,14 @@ namespace Elements.Battle
             if (FrameCount != 0 && (EnemyList != null && !callStartCutIn() && !IsPausingEffectSkippedInThisFrame))
                 CoroutineManager._Update();
 
-            foreach (var spineCtrl in unitSpineControllerList)
-            {
-                spineCtrl.RealUpdate();
-                spineCtrl.RealLateUpdate();
-            }
-            /*
-            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealUpdate());
-            unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.RealLateUpdate());*/
+            // foreach (var spineCtrl in unitSpineControllerList)
+            // {
+            //     spineCtrl.RealUpdate();
+            //     spineCtrl.RealLateUpdate();
+            // }
+            unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
+            if (!skipping && !skipUB)
+                unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
             scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
