@@ -10055,7 +10055,8 @@ this.updateCurColor();
                     trigger |= AutoRevivalData?.TryExec() ?? false;
                     if (trigger)
                     {
-                        Hp = 1;
+                        if (Hp <= 0)
+                            Hp = 1;
                     }
                     else
                     {
