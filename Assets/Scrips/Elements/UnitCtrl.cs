@@ -11587,6 +11587,7 @@ this.updateCurColor();
                     setStateIdle();
                     break;
                 case ActionState.ATK:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.SKILL);
                     setStateAttack();
                     break;
                 case ActionState.SKILL_1:

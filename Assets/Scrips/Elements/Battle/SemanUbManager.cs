@@ -92,7 +92,7 @@ namespace Elements.Battle
             {
                 if (!skillReady) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == eventId && h.action == Action.WAIT_UNIT_EVENT) == 0)
+                if (history.Count == 0 || history.Last().frame < frame || eventId == (int)eSemanEvent.UB || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == eventId && h.action == Action.WAIT_UNIT_EVENT) == 0)
                 {
                     history.Add(new UbStatus(parent)
                     {
@@ -209,7 +209,10 @@ namespace Elements.Battle
                     }
                     else if (GuildManager.Instance.SemanSkillToggles[6].isOn)
                     {
-                        int trigger = t_history.Where(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT).Select(x => x.frame).ToHashSet().Count() - 1;
+                        int no_ub_trigger = t_history.Where(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
+                        int ub_trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
+                        int trigger = no_ub_trigger + ub_trigger - 1;
+
                         if (trigger >= 100 || lastDelay >= 100)
                         {
                             // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
@@ -219,7 +222,10 @@ namespace Elements.Battle
                     }
                     else if (GuildManager.Instance.SemanSkillToggles[7].isOn)
                     {
-                        int trigger = t_history.Where(h => h.action == Action.WAIT_UNIT_EVENT).Select(x => x.frame).ToHashSet().Count() - 1;
+                        int no_ub_trigger = t_history.Where(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
+                        int ub_trigger = t_history.Count(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
+                        int trigger = no_ub_trigger + ub_trigger - 1;
+
                         if (trigger >= 1000 || lastDelay >= 100)
                         {
                             // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
@@ -360,14 +366,16 @@ namespace Elements.Battle
             public void OnEventCallback(int unitPos, int eventId)
             {
                 if (!skillReady) return;
-                if (lastUpdateFrame < BattleHeaderController.CurrentFrameCount && 
+                if (
+                    (lastUpdateFrame < BattleHeaderController.CurrentFrameCount || eventId == (int)eSemanEvent.UB) && 
                 (action == Action.WAIT_UNIT_EVENT && waitUnit == unitPos && skillId == eventId ||
                 (action == Action.WAIT_UNIT_ANY_EVENT && waitUnit == unitPos) ||
                 (action == Action.WAIT_EVENT))
                 )
                 {
                     trigger--;
-                    lastUpdateFrame = BattleHeaderController.CurrentFrameCount;
+                    if (eventId != (int)eSemanEvent.UB)
+                        lastUpdateFrame = BattleHeaderController.CurrentFrameCount;
                     if (trigger < 0)
                     {
                         action = Action.COUNTDOWN;
