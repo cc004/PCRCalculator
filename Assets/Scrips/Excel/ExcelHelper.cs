@@ -20,6 +20,7 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using SFB;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using Application = UnityEngine.Application;
 using Color = System.Drawing.Color;
@@ -1057,6 +1058,9 @@ autopcr.setOffset(2, 0); # offset calibration
                         currentLineNum = currentLineNum = MainManager.Instance.UnitRoleDataDic.Count > 0 ? 15:13;
                         for (int i = 0; i < 3; i++)
                         {
+                            worksheet0.Cells[currentLineNum + 1 + i * 3, 7 - count, currentLineNum + 3 + i * 3, 7 - count].Merge = true;
+                            worksheet0.MySetValue(currentLineNum + 1 + i * 3, 7 - count, unitData.GetExEquipName(i), backColor: backColotInt_1);
+                            worksheet0.Cells[currentLineNum + 1 + i * 3, 7 - count].Style.WrapText = true;
                             worksheet0.InsertImage(BattleUIManager.Instance.imageSaved2[i + count * 3], currentLineNum + i * 3, 6 - count, false, 1, 3);
                         }
                     }
