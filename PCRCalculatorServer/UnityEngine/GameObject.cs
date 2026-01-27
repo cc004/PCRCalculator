@@ -18,7 +18,7 @@ namespace UnityEngine;
 
 public sealed class GameObject : UnityEngine.Object
 {
-    [SerializeField] private bool m_IsActive;
+    [SerializeField] private bool m_IsActive = true;
     [SerializeField] private List<ComponentPair> m_Component = new();
 
     public Transform transform => GetComponent<Transform>() ?? AddComponent<Transform>();

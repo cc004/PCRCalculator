@@ -9,8 +9,7 @@ namespace UnityEngine;
 
 public class Behaviour : Component
 {
-    [SerializeField]
-    private bool m_Enabled;
+    [SerializeField] private bool m_Enabled = true;
     public bool enabled
     {
 

@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.IO;
 using Cute;
 using Elements.Battle;
 using Spine;
@@ -185,7 +186,7 @@ namespace Elements
         }
 
         public void LightUpdate(float deltaTime)
-		{
+        {
 			if (valid)
 			{
 				deltaTime *= timeScale;

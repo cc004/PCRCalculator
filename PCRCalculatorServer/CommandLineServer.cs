@@ -83,12 +83,12 @@ public class CommandLineServer : MonoBehaviour
         }
         else
         {
+            // var controller = new ThreadController(1);
             var controller = new ThreadController(Environment.ProcessorCount);
 
             var requests = new[]
             {
                 JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request1.json")),
-                JsonConvert.DeserializeObject<BattleSimulationRequest>(File.ReadAllText("request2.json")),
             };
 
             if (debugMode)
