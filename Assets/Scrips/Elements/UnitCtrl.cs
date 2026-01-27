@@ -4873,6 +4873,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.WORLD_LIGHTNING:
                     result = UnitCtrl.eAbnormalStateCategory.WORLD_LIGHTNING;
                     break;
+                case UnitCtrl.eAbnormalState.FLIGHT:
+                    result = UnitCtrl.eAbnormalStateCategory.FLIGHT;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
