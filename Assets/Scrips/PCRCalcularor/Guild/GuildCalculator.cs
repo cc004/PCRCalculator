@@ -1053,6 +1053,7 @@ namespace PCRCaculator.Guild
                             description = tm.operation ?? string.Empty
                         };
                         ValueChangeData changeData = null;
+                        long totalDamage = 0;
                         foreach (int bossId in BossId)
                         {
                             if (allUnitHPDic.ContainsKey(bossId) && allUnitHPDic[bossId] != null)
@@ -1063,7 +1064,6 @@ namespace PCRCaculator.Guild
                                 {
                                     detail.Damage = changeData.damage;
                                     detail.Critical = changeData.describe.Contains("暴击");
-                                    long totalDamage = 0;
                                     foreach (var data in allUnitHPDic[bossId])
                                     {
                                         if (data.id == changeData.id)
@@ -1072,7 +1072,6 @@ namespace PCRCaculator.Guild
                                             detail.totalDamage = totalDamage;
                                         }
                                     }
-                                    break;
                                 }
                             }
                         }
