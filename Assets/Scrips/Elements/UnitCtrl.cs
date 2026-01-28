@@ -4876,6 +4876,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.FLIGHT:
                     result = UnitCtrl.eAbnormalStateCategory.FLIGHT;
                     break;
+                case UnitCtrl.eAbnormalState.TAUNT:
+                    result = UnitCtrl.eAbnormalStateCategory.TAUNT;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
