@@ -810,18 +810,6 @@ namespace PCRCaculator.Guild
               }
             };
 
-            if (!BattleManager.Instance.skipping)
-            {
-                action(MyGameCtrl.Instance.playerUnitCtrl);
-                action(MyGameCtrl.Instance.enemyUnitCtrl);
-#if UNITY_5_3_OR_NEWER && !UNITY_ANDROID
-                GuildTimelineData timelineData = CreateTimeLineData();
-                string fileName = CurrentBossText.text + "-" + CreateExcelName() + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                FileInfo newFile = new("save/" + fileName + ".xlsx");
-                ExcelHelper.ExcelHelper.CreateAutoSaveExcel(timelineData, newFile);
-                Debug.Log("自动保存成功：" + newFile.FullName);
-#endif
-            }
             /*
             foreach (var pair in skillGroupPrefabDic)
             {
@@ -887,6 +875,20 @@ namespace PCRCaculator.Guild
             seedText.text = $"种子：{MyGameCtrl.Instance.CurrentSeedForSave}";
             totalDamageText.text = damageStr;
             basedmg.text = totalDamageCriEX.ToString();
+
+            //自动存档
+            if (!BattleManager.Instance.skipping)
+            {
+                action(MyGameCtrl.Instance.playerUnitCtrl);
+                action(MyGameCtrl.Instance.enemyUnitCtrl);
+#if UNITY_5_3_OR_NEWER && !UNITY_ANDROID
+                GuildTimelineData timelineData = CreateTimeLineData();
+                string fileName = CurrentBossText.text + "-" + CreateExcelName() + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                FileInfo newFile = new("save/" + fileName + ".xlsx");
+                ExcelHelper.ExcelHelper.CreateAutoSaveExcel(timelineData, newFile);
+                Debug.Log("自动保存成功：" + newFile.FullName);
+#endif
+            }
         }
 
         public long expectedDamage;
