@@ -9,6 +9,7 @@ Builds/MacOS
 .vs
 bin/
 obj/
+save/
 
 # 忽略特定文件
 PCRCAlculator.sln

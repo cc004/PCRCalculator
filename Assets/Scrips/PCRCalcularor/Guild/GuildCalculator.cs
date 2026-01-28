@@ -814,6 +814,13 @@ namespace PCRCaculator.Guild
             {
                 action(MyGameCtrl.Instance.playerUnitCtrl);
                 action(MyGameCtrl.Instance.enemyUnitCtrl);
+#if UNITY_5_3_OR_NEWER && !UNITY_ANDROID
+                GuildTimelineData timelineData = CreateTimeLineData();
+                string fileName = CurrentBossText.text + "-" + CreateExcelName() + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                FileInfo newFile = new("save/" + fileName + ".xlsx");
+                ExcelHelper.ExcelHelper.CreateAutoSaveExcel(timelineData, newFile);
+                Debug.Log("自动保存成功：" + newFile.FullName);
+#endif
             }
             /*
             foreach (var pair in skillGroupPrefabDic)
@@ -863,7 +870,7 @@ namespace PCRCaculator.Guild
             else if (backTime > 0)
             {
                 resultBg.SetActive(true);
-                string prefix = BattleResult == eBattleResult.WIN? "胜利：": "失败：";
+                string prefix = BattleResult == eBattleResult.WIN ? "胜利：" : "失败：";
                 resultBg.color = BattleResult == eBattleResult.WIN ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
                 prefix += IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
                 detail = $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
