@@ -88,6 +88,7 @@ namespace PCRCaculator.Guild
         public Text backTimeText;
         public Image resultBg;
         private int backTime;
+        private string bossProbability;
         private bool IsGuildBoss => boss[0].enemyId / 100000000 == 4;
         public List<Sprite> resultSprite;
         public List<int> PlayerIds => playerIds;
@@ -861,7 +862,8 @@ namespace PCRCaculator.Guild
                 string prefix = BattleResult == eBattleResult.WIN ? "胜利：" : "失败：";
                 resultBg.color = BattleResult == eBattleResult.WIN ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
                 prefix += IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
-                detail = $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
+                bossProbability = $"{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
+                detail = $"{prefix}{backTime}s-{bossProbability}";
                 backTimeText.SetActive(true);
                 backTimeText.text = $"{detail}";
             }
@@ -882,7 +884,7 @@ namespace PCRCaculator.Guild
                 action(MyGameCtrl.Instance.playerUnitCtrl);
                 action(MyGameCtrl.Instance.enemyUnitCtrl);
 #if UNITY_5_3_OR_NEWER && !UNITY_ANDROID
-                GuildTimelineData timelineData = CreateTimeLineData();
+                GuildTimelineData timelineData = CreateAutoSaveData();
                 string fileName = CurrentBossText.text + "-" + CreateExcelName() + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 FileInfo newFile = new("save/" + fileName + ".xlsx");
                 ExcelHelper.ExcelHelper.CreateAutoSaveExcel(timelineData, newFile);
@@ -979,6 +981,13 @@ namespace PCRCaculator.Guild
                 timeLineName = CreateExcelName(),
                 uBDetails = CreateUBDetailList(),
                 detail = detail,
+            };
+        }
+        public GuildTimelineData CreateAutoSaveData()
+        {
+            return new GuildTimelineData(MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup(), MyGameCtrl.Instance.CurrentSeedForSave)
+            {
+                UBExecTime = CreateUBExecTimeData(),
             };
         }
         public List<List<float>> CreateUBExecTimeData()
@@ -1130,7 +1139,7 @@ namespace PCRCaculator.Guild
             else if (backTime > 0)
             {
                 string prefix = boss[0].enemyId / 100000000 == 4 ? (BattleResult == eBattleResult.WIN ? "-返" : "-剩") : "-剩";
-                fileName += $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
+                fileName += $"{prefix}{bossProbability}";
             }
             return fileName;
         }
@@ -1896,6 +1905,11 @@ namespace PCRCaculator.Guild
             this.bossDefChangeDic = bossDefChangeDic;
             this.bossMgcDefChangeDic = bossMgcDefChangeDic;
             AllRandomList = allRandomList;
+        }
+        public GuildTimelineData(GuildPlayerGroupData playerGroupData, int seed)
+        {
+            currentRandomSeed = seed;
+            this.playerGroupData = playerGroupData;
         }
     }
     public class UBDetail
