@@ -465,6 +465,7 @@ namespace Elements
                         else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
                         {
                             tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
                         }
                         else
                             Debug.LogError("找不到增援敌人ID " + enemy);
