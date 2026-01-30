@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.IO;
 using Cute;
 using Elements.Battle;
 using Spine;
@@ -184,12 +185,27 @@ namespace Elements
             RealLateUpdate();
         }
 
-        public void RealUpdate()
+        public void LightUpdate(float deltaTime)
+        {
+			if (valid)
+			{
+				deltaTime *= timeScale;
+				skeleton.Update(deltaTime);
+				state.Update(deltaTime);
+				state.LightApply(skeleton);
+			}
+		}
+
+        public void RealUpdate(bool light=false)
         {
             if (!isActiveAndEnabled)
                 return;
-            if (battleManager != null)
-                Update(IsConstantVelocity ? battleManager.DeltaTime_60fps / Time.timeScale : battleManager.DeltaTime_60fps);
+            if (battleManager != null){
+                if (light)
+                    LightUpdate(IsConstantVelocity ? battleManager.DeltaTime_60fps / Time.timeScale : battleManager.DeltaTime_60fps);
+                else
+                    Update(IsConstantVelocity ? battleManager.DeltaTime_60fps / Time.timeScale : battleManager.DeltaTime_60fps);
+            }
             else 
              base.Update();
         }

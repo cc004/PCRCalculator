@@ -17,6 +17,7 @@ namespace Elements
         private readonly List<eActionType> NoneEffectActionList; 
         public float Timer; 
 
+        public UnitCtrl Source { get; set; }
         public eStateIconType IconType { get; set; }
         public bool Enable { get; set; }
         public int Counter { get; set; }
@@ -27,6 +28,7 @@ namespace Elements
         public int EffectMaxCount { get; set; }
         public float EffectDuration { get; set; }
         private int effectCounter { get; set; }
+        public bool IsEnchantProtect { get; set; }
         public bool HasCountLimit { get => Counter != -1; }
 
         public void StartTimer() 

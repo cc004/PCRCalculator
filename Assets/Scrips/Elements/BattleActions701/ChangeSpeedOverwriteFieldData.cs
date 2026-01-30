@@ -35,9 +35,9 @@ namespace Elements
                 return;
             }
             if (BattleManager.IsReleaseSkillHasteLogic)
-                owner.AddOverwriteAbnormalState(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
+                owner.AddOverwriteAbnormalState(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.Source, base.Skill, this.ActionParameter, this.AbnormalState, this.EffectValue));
             else
-                owner.AddOverwriteAbnormalStateOld(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.PPOJKIDHGNJ, base.PMHDBOJMEAD, this.ActionParameter, this.AbnormalState, this.EffectValue));
+                owner.AddOverwriteAbnormalStateOld(this.ActionCounter, new OverwriteAbnormalStateData(_parts, base.Source, base.Skill, this.ActionParameter, this.AbnormalState, this.EffectValue));
         }
 
         // Token: 0x06003D7D RID: 15741 RVA: 0x00101680 File Offset: 0x00101680

@@ -754,5 +754,15 @@
   "recover_tp_by_damage_divided_by_s1": "由此造成的受击TP变为原来的 [%1$s] %。",
   "Reduce_s1_percent_damage_taken_from_sealed_attacks_for_s2_sec_up_to_s3_times_by_sealing_s4_actions": "追加 [%3%s] 个标记，每当我方单位受到伤害时，消耗一个标记，并且伤害减少 [%1$s%%]，持续时间 [%2$s] 秒，并执行动作 [%4$s] 。",
   "including_flight_units": "包括飞行角色",
-  "excluding_summon_units": "召唤物,分身除外"
+  "excluding_summon_units": "召唤物，分身除外",
+  "auto_revival_action": "使%s进入 [幻化] 状态",
+  "auto_revival_heal": "并恢复 [%s] HP",
+  "auto_revival_unbeatable": "且自身进入 [无法被击中] 状态，持续到技能结束",
+  "flight_only": "仅飞行角色",
+  "near_without_s_abnormal_state": "不处于 [%s] 异常状态的最近",
+  "far_without_s_abnormal_state": "不处于 [%s] 异常状态的最远",
+  "near_with_s_sealed_state": "拥有 [%s] 标记的最近",
+  "near_with_s_talent_state": "拥有 [%s] 属性的最近",
+  "near_with_s_talent_without_owner": "除自身以外拥有 [%s] 属性的最近"
+
 }

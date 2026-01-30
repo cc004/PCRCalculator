@@ -26,17 +26,18 @@ namespace Elements.Battle
         //private static BattleEffectPoolInterface staticBattleEffectPool;
         private const float BASE_EFFECT_SIZE = 350f;
 
-        public eFieldType KNLCAOOKHPP { get; set; }
+        public eFieldType FildType { get; set; }
 
-        public bool isPlaying { get; private set; }
+        public bool Enable { get; private set; }
 
-        public eFieldExecType HKDBJHAIOMB { get; set; }
+        public eFieldExecType ExecType { get; set; }
 
         public float StayTime { get; set; }
 
         public float CenterX { get; set; }
 
         public float Size { get; set; }
+
 
         public float Left, Right;
 
@@ -46,31 +47,33 @@ namespace Elements.Battle
             Right = CenterX + Size;
         }
 
-        public eFieldTargetType LCHLGLAFJED { get; set; }
+        public eFieldTargetType FieldTargetType { get; set; }
 
         public List<BasePartsData> TargetList { get; set; }
         public HashSet<BasePartsData> TargetSet { get; set; } = new HashSet<BasePartsData>();
 
-        public List<UnitCtrl> ALFDJACNNCL { get; set; }
+        public List<UnitCtrl> AllTargetList { get; set; }
 
         protected BattleManager BattleManager => staticBattleManager;
 
-        public UnitCtrl EGEPDDJBILL { get; set; }
+        public UnitCtrl PauseTarget { get; set; }
 
-        public Skill PMHDBOJMEAD { get; set; }
+        public Skill Skill { get; set; }
 
-        public UnitCtrl PPOJKIDHGNJ { get; set; }
+        public UnitCtrl Source { get; set; }
 
         protected int fieldIndex { get; set; }
 
         //protected BattleEffectPoolInterface IPEGKPHMBBN => AbnormalStateDataBase.staticBattleEffectPool;
 
-        public GameObject HGMNJJBLJIO { get; set; }
+        public GameObject UniqueEffectPrefab { get; set; }
 
-        public GameObject LALMMFAOJDP { get; set; }
+        public GameObject UniqueEffectPrefabLeft { get; set; }
 
         public Action<string> onExec;
-        private bool AHABEPKMKJJ { get; set; }
+        public int TargetTalentId { get; set; } // TODO find where set
+        private bool stopFlag { get; set; }
+        public bool IsTargetAbnormalStateBuff { get; set; } // TODO find where set
 
         /*public static void StaticRelease()
         {
@@ -110,7 +113,7 @@ namespace Elements.Battle
             //  this.BGAGEJBMAMH.AppendEffect(this.skillEffect, this.EGEPDDJBILL, false);
             //this.BattleManager.AppendCoroutine(this.Update(), ePauseType.SYSTEM, this.EGEPDDJBILL);
             // fix ub field bug
-            BattleManager.AppendCoroutine(Update(), ePauseType.SYSTEM, EGEPDDJBILL);
+            BattleManager.AppendCoroutine(Update(), ePauseType.SYSTEM, PauseTarget);
             fieldIndex = ++BattleManager.MCLFFJEFMIF;
         }
 
@@ -133,41 +136,27 @@ namespace Elements.Battle
         protected virtual int getClearedIndex(UnitCtrl FNHGFDNICFG) => 0;
 
         protected float remaining;
-        
+
         private int skillTargetCacheKey = -1;
 
         public IEnumerator Update()
         {
             float time = 0.0f;
             float intervalCount = 0.0f;
-            isPlaying = true;
+            Enable = true;
             remaining = StayTime;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域开始");
-            
+
             while (true)
             {
                 //if (plfcllhldoo.BattleManager.GetBlackOutUnitLength() == 0 && (UnityEngine.Object) plfcllhldoo.skillEffect != (UnityEngine.Object) null)
                 //  plfcllhldoo.skillEffect.SetSortOrderBack();
                 if (BattleManager.Instance.PositionChanged(ref skillTargetCacheKey))
                 {
-                    int index1 = 0;
-                    for (int count = ALFDJACNNCL.Count; index1 < count; ++index1)
-                    {
-                        // ISSUE: reference to a compiler-generated method
-                        UnitCtrl unitCtrl = ALFDJACNNCL[index1];
-                        if (!unitCtrl.IsPartsBoss)
-                        {
-                            Updateb__83_0(unitCtrl.GetFirstParts());
-                        }
-                        else
-                        {
-                            for (int index2 = 0; index2 < unitCtrl.BossPartsListForBattle.Count; ++index2)
-                                Updateb__83_0(unitCtrl.BossPartsListForBattle[index2]);
-                        }
-                    }
+                    updateTarget();
                 }
 
-                if (HKDBJHAIOMB == eFieldExecType.REPEAT)
+                if (ExecType == eFieldExecType.REPEAT)
                 {
                     if (BattleManager.GetBlackOutUnitLength() == 0)
                         intervalCount += BattleManager.DeltaTime_60fps;
@@ -187,7 +176,7 @@ namespace Elements.Battle
                 //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域加时"+);
                 eBattleGameState mmbmbjnnacg = BattleManager.GameState;
                 if (time <= StayTime && mmbmbjnnacg != eBattleGameState.NEXT_WAVE_PROCESS &&
-                    (mmbmbjnnacg != eBattleGameState.WAIT_WAVE_END && !AHABEPKMKJJ))
+                    (mmbmbjnnacg != eBattleGameState.WAIT_WAVE_END && !stopFlag))
                     yield return null;
                 else
                     break;
@@ -195,8 +184,8 @@ namespace Elements.Battle
             }
 
             for (int index = TargetList.Count - 1; index >= 0; --index)
-                OnExit(TargetList[index], PPOJKIDHGNJ);
-            isPlaying = false;
+                OnExit(TargetList[index], Source);
+            Enable = false;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "领域结束!");
             /*if ((UnityEngine.Object) plfcllhldoo.skillEffect != (UnityEngine.Object) null)
             {
@@ -228,7 +217,7 @@ namespace Elements.Battle
                 if (owner.IsSummonOrPhantom && owner.IdleOnly || owner.IsStealth ||
                     getClearedIndex(owner) >= fieldIndex || owner.IsDead)
                 {
-                    OnExit(target, PPOJKIDHGNJ);
+                    OnExit(target, Source);
                 }
                 else
                 {
@@ -237,7 +226,7 @@ namespace Elements.Battle
                           posx >= Left || BattleUtil.Approximately(posx, Right) ||
                           BattleUtil.Approximately(posx, Left)))
                     {
-                        OnExit(target, PPOJKIDHGNJ);
+                        OnExit(target, Source);
                     }
                 }
             }
@@ -250,7 +239,11 @@ namespace Elements.Battle
                     posx >= Left || BattleUtil.Approximately(posx, Right) ||
                     BattleUtil.Approximately(posx, Left))
                 {
-                    OnEnter(target, PPOJKIDHGNJ);
+                    if (TargetTalentId != 0 && !owner.TalentIds.Contains(TargetTalentId))
+                        return;
+                    if (!judgeWorking(owner))
+                        return;
+                    OnEnter(target, Source);
                 }
             }
             /*
@@ -330,7 +323,12 @@ namespace Elements.Battle
         {
             if (!judgeStopTarget(OAHLOGOLMHD, MOBKHPNMEDM))
                 return;
-            AHABEPKMKJJ = true;
+            stopFlag = true;
+        }
+
+        protected virtual bool judgeWorking(UnitCtrl _unit)
+        {
+            return true;
         }
 
         private bool judgeStopTarget(eTargetAssignment OAHLOGOLMHD, bool MOBKHPNMEDM)
@@ -338,14 +336,34 @@ namespace Elements.Battle
             switch (OAHLOGOLMHD)
             {
                 case eTargetAssignment.OTHER_SIDE:
-                    return LCHLGLAFJED == eFieldTargetType.PLAYER == MOBKHPNMEDM;
+                    return FieldTargetType == eFieldTargetType.PLAYER == MOBKHPNMEDM;
                 case eTargetAssignment.OWNER_SITE:
-                    return LCHLGLAFJED == eFieldTargetType.PLAYER == !MOBKHPNMEDM;
+                    return FieldTargetType == eFieldTargetType.PLAYER == !MOBKHPNMEDM;
                 case eTargetAssignment.ALL:
                     return true;
                 default:
                     return false;
             }
         }
+
+        // RVA: 0x2925DC8 Offset: 0x2925DC8 VA: 0x2925DC8
+        protected void updateTarget()
+        {
+            foreach (var target in AllTargetList)
+            {
+                if (target.IsPartsBoss)
+                {
+                    foreach (var part in target.BossPartsListForBattle)
+                    {
+                        Updateb__83_0(part);
+                    }
+                }
+                else
+                {
+                    Updateb__83_0(target.GetFirstParts());
+                }
+            }
+        }
+
     }
 }

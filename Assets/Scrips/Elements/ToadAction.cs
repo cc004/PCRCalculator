@@ -40,6 +40,11 @@ namespace Elements
     {
             /*if (_target.Owner.IsDead)
               return;
+            if (_target.Owner.IsUnbeatableForAutoRevival())
+            {
+              _target.Owner.DebugLog("目标处于行动不能免疫效果，变青蛙无效!");
+              return;
+            }
             if (_target.Owner.ToadDatas.Count > 0)
             {
               ToadData toadData = _target.Owner.ToadDatas[0];

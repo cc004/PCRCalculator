@@ -48,7 +48,8 @@ namespace Elements
                     EffectMaxCount = _valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_5, out var maxCountVal)
                         ? (double.IsPositiveInfinity(maxCountVal) ? int.MinValue : (int)maxCountVal)
                         : 0,
-                    EffectDuration = _valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_6, out var durationVal) ? (float)durationVal : 0f
+                    EffectDuration = _valueDictionary != null && _valueDictionary.TryGetValue(eValueNumber.VALUE_6, out var durationVal) ? (float)durationVal : 0f,
+                    Source = _source,
                 };
 
                 _source.ProtectionSourceData = protectionData;
@@ -64,9 +65,6 @@ namespace Elements
         public override void SetLevel(float _level) 
         { 
             base.SetLevel(_level);
-
-            if (MasterData == null || Value == null)
-                return;
 
             double v1 = MasterData.action_value_1;
             double v2 = MasterData.action_value_2;

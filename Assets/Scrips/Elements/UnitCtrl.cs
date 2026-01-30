@@ -8,7 +8,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -321,7 +320,7 @@ namespace Elements
 
         private bool startSkillExeced;
         private Dictionary<eAbnormalState, bool> m_abnormalState = new Dictionary<eAbnormalState, bool>(new eAbnormalState_DictComparer());
-        private Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData> abnormalStateCategoryDataDictionary = new Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData>(new eAbnormalStateCategory_DictComparer());
+        public Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData> abnormalStateCategoryDataDictionary = new Dictionary<eAbnormalStateCategory, AbnormalStateCategoryData>(new eAbnormalStateCategory_DictComparer());
         private int overlapAbnormalStateCount;
         private Dictionary<eAbnormalState, List<int>> overlapAbnormalStateIndexList = new Dictionary<eAbnormalState, List<int>>
         {
@@ -811,14 +810,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
-            // {
-            //     eAbnormalState.NPC_STUN,
-            //     new AbnormalConstData
-            //     {
-            //         IconType = eStateIconType.NPC_STUN,
-            //         IsBuff = false
-            //     }
-            // },
+            {
+                eAbnormalState.NPC_STUN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NPC_STUN,
+                    IsBuff = false
+                }
+            },
             {
                 eAbnormalState.DECREASE_HEAL,
                 new AbnormalConstData
@@ -4448,6 +4447,7 @@ this.updateCurColor();
                 if (diff > 0)
                 {
                     MyGameCtrl.Instance.BattleStats.AddPlayerTp(UnitId, diff);
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.TP_GAIN);
                 }
             }
 
@@ -4872,6 +4872,16 @@ this.updateCurColor();
                     break;
                 case UnitCtrl.eAbnormalState.WORLD_LIGHTNING:
                     result = UnitCtrl.eAbnormalStateCategory.WORLD_LIGHTNING;
+                    break;
+                case UnitCtrl.eAbnormalState.FLIGHT:
+                    result = UnitCtrl.eAbnormalStateCategory.FLIGHT;
+                    break;
+                case UnitCtrl.eAbnormalState.TAUNT:
+                    result = UnitCtrl.eAbnormalStateCategory.TAUNT;
+                    break;
+                default:
+                    if (abnormalState != UnitCtrl.eAbnormalState.NONE)
+                        Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
                     break;
             }
             return result;
@@ -5524,11 +5534,12 @@ this.updateCurColor();
         }
 
 
-        private void EnableAbnormalState(
+        public void EnableAbnormalState(
           eAbnormalState _abnormalState,
           bool _enable,
           bool _reduceEnergy = false,
-          bool _switch = false
+          bool _switch = false,
+          bool _skipRestartField = false
           //bool nobreak = false,
            // bool _switch_On = false
             )
@@ -5986,6 +5997,10 @@ this.updateCurColor();
 
             eStateIconType iDAFJHFJKOL = (abnormalStateCategoryData.ShowsIcon ? ABNORMAL_CONST_DATA[_abnormalState].IconType : eStateIconType.NONE);
             OnChangeState.Call(this, iDAFJHFJKOL, _enable);
+
+            // lanly: both enable or disable will invoke, to separate ?
+            SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.ABNORMAL);
+
             NoSkipOnChangeAbnormalState?.Invoke(this, ABNORMAL_CONST_DATA[_abnormalState].IconType,
                 _enable, abnormalStateCategoryDataDictionary[abnormalStateCategory].Duration, describe);
             CallBackAbnormalStateChanged(abnormalStateCategoryDataDictionary[abnormalStateCategory]);
@@ -6487,13 +6502,12 @@ this.updateCurColor();
 
         public bool IsAbnormalState(eAbnormalState abnormalState) => m_abnormalState[abnormalState];
 
+
         public bool IsNoDamageMotion()
         {
-            if (!IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION))
-            {
-                return IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION2);
-            }
-            return true;
+            return IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION) ||
+                IsAbnormalState(eAbnormalState.NO_DAMAGE_MOTION2) ||
+                IsUnbeatableForAutoRevival;
         }
         //public bool IsConfusionOrConvert() => m_abnormalState[eAbnormalState.CONFUSION] || m_abnormalState[eAbnormalState.CONVERT];
         public bool IsConfusionOrConvert()
@@ -7050,6 +7064,9 @@ this.updateCurColor();
         public List<UnitCtrl> TauntTargetList { get; set; } = new List<UnitCtrl>();
         bool IsTauntSourceInSearchArea { get; set; }
 
+        public DamageCutForSpecialNullificationData DamageCutForSpecialNullificationData { get; set; }
+
+
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
         public Dictionary<BuffParamKind, LongWithEx> AdditionalBuffDictionary { get; set; } = new Dictionary<BuffParamKind, LongWithEx>();
@@ -7353,6 +7370,7 @@ this.updateCurColor();
                 return;
             }
 
+            SemanOnEventCallback?.Invoke(UnitId, _isBuff ? eSemanEvent.BUFF : eSemanEvent.DEBUFF);
 #if REDUCE_ANALYSE
             if (_kind != BuffParamKind.NUM)
 #else
@@ -7390,6 +7408,7 @@ this.updateCurColor();
             stateChangeData.isBuff = true;
             stateChangeData.BUFF_Type = _kind;
             NoSkipOnAbnormalStateChange?.Invoke(UnitId, stateChangeData, BattleHeaderController.CurrentFrameCount);
+            // lanly: both enable or disable will invoke, to separate ?
             button?.SetAbnormalIcons(this, IDAFJHFJKOL, _enable,buffTime,des, extraKey);
             ///finish add
             if (IDAFJHFJKOL != eStateIconType.NONE)
@@ -7691,7 +7710,12 @@ this.updateCurColor();
 
         private Dictionary<eStateIconType, List<KnightGuardData>> knightGuardDatas { get; set; } = new Dictionary<eStateIconType, List<KnightGuardData>>();
 
+        // private Dictionary<eStateIconType, GutsData> gutsDictionary { get; set; }
+
         private IEnumerator knightGuardCoroutine { get; set; }
+
+        public AutoRevivalData AutoRevivalData { get; set; }
+        public bool IsUnbeatableForAutoRevival { get; set; }
 
         private Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>> passiveSealDictionary { get; set; } = new Dictionary<PassiveSealAction.ePassiveTiming, List<PassiveSealData>>();
 
@@ -9336,6 +9360,13 @@ this.updateCurColor();
             UnitCtrl JELADBAMFKH = source1;
             UnitCtrl LIMEKPEENOB = unitCtrl1;
             battleLog.AppendBattleLog(eBattleLogType.SET_DAMAGE, HLIKLPNIOKJ, KGNFLOPBOMB, hp, 0, OJHBHHCOAGK, PFLDDMLAICG, PNJFIOPGCIC, JELADBAMFKH, LIMEKPEENOB);
+
+            SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.DAMAGE);
+            if (_damageData.StrikeBackSource != null)
+                _damageData.StrikeBackSource.SemanOnEventCallback?.Invoke(_damageData.StrikeBackSource.UnitId, eSemanEvent.ATTACK);
+            else if (_damageData.Source != null)
+                _damageData.Source.SemanOnEventCallback?.Invoke(_damageData.Source.UnitId, eSemanEvent.ATTACK);
+
             if (_skill != null && _damageData.Source != null && _skill.SkillId == _damageData.Source.UnionBurstSkillId)
             {
                 if (_byAttack)
@@ -9435,6 +9466,22 @@ this.updateCurColor();
             }
             return (long)num1;
         }
+
+        public bool ExecGuts() // TODO implement gutsaction only use in 804100501 boss
+        {
+            // bool triggered = false;
+            // foreach (var guts in gutsDictionary.Values)
+            // {
+            //     if (guts.IsEnable)
+            //     {
+            //         triggered = true;
+            //         guts.Exec();
+            //     }
+            // }
+            // return triggered;
+            return false;
+        }
+
 
         // RVA: 0x2846CBC Offset: 0x2846CBC VA: 0x2846CBC
         private void applySealByReceiveDamage(eActionType _actionType, LongWithEx _damage)
@@ -9558,6 +9605,8 @@ this.updateCurColor();
 
             DoubleWithEx b = a;
 
+            bool ignore_damage_cut_action = SkillDefine.IGNORE_DAMAGE_CUT_ACTION.Contains(_damageData.ActionType);
+
             if (flag1)
             {
                 a = (DoubleWithEx)_damageData.LogBarrierExpectedDamage;
@@ -9576,7 +9625,7 @@ this.updateCurColor();
                 b *= 1f - num2;
             }
 
-            if (!SkillDefine.IGNORE_DAMAGE_CUT_ACTION.Contains(_damageData.ActionType) && IsAbnormalState(eAbnormalState.CUT_ALL_DAMAGE))
+            if (!ignore_damage_cut_action && IsAbnormalState(eAbnormalState.CUT_ALL_DAMAGE))
             {
                 double num2 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_ALL_DAMAGE) / 100f;
                 a *= 1f - num2;
@@ -9585,6 +9634,7 @@ this.updateCurColor();
 
             if (_byAttack && !_damageData.IgnoreStrikeBackAndAllUnitDamageCutTrigger)
             {
+                bool save_ignore_damage_cut_action = ignore_damage_cut_action;
                 var savedSkill = _skill;
                 var effectTarget = this.unitActionController;
                 bool enemySide = IsOther;
@@ -9604,12 +9654,18 @@ this.updateCurColor();
                 b *= 1f - damageCutRate; 
                 
                 _skill = savedSkill;
+                ignore_damage_cut_action = save_ignore_damage_cut_action;
             }
 
+            if (DamageCutForSpecialNullificationData != null && !ignore_damage_cut_action)
+            {
+                double damageCutRate = DamageCutForSpecialNullificationData.GetDamageCutValue(_damageData.DamageType);
+                a *= 1f - damageCutRate;
+                b *= 1f - damageCutRate;
+            }
             
             Tuple<StrikeBackData, List<StrikeBackData>> tuple =  searchStrikeBack(_damageData);
 
-            // TODO DamageCutForSpecialNullificationData unknown
 
             // 属性
             double execBarrier(double total, double main, double sub)
@@ -9992,15 +10048,27 @@ this.updateCurColor();
 
             if (Hp <= 0)
             {
-                if (IsTough || ExecKnightGuard())
+                if (IsTough)
                 {
                     if (Hp <= 0)
                         Hp = 1;
                 }
                 else
                 {
-                    Hp = _hp;
-                    _hp = _hp.ZeroCapForHp();
+                    bool trigger = ExecKnightGuard();
+                    if (_damageData.ActionType != eActionType.INHIBIT_HEAL)
+                        trigger |= ExecGuts();
+                    trigger |= AutoRevivalData?.TryExec() ?? false;
+                    if (trigger)
+                    {
+                        if (Hp <= 0)
+                            Hp = 1;
+                    }
+                    else
+                    {
+                        Hp = _hp;
+                        _hp = _hp.ZeroCapForHp();
+                    }
                 }
             }
             else
@@ -10662,6 +10730,8 @@ this.updateCurColor();
           LongWithEx _valueSkillLifeSteal,
           eInhibitHealType _inhibitHealType,
           UnitCtrl _source,
+          // bool _isLifeSteal,
+          // Skill _skill,
           double _healDownValue = 1f,
           bool _isEffect = true,
           bool _isRevival = false,
@@ -11470,8 +11540,11 @@ this.updateCurColor();
             {
                 PlayAndSetUpMultiTarget(_isFirst: true);
             }
-            battleManager.StartExtraEffect(BattleDefine.eExtraEffectExecTiming.ALL_UNIT_ACTION);
-            battleManager.StartExtraEffect(IsOther ? BattleDefine.eExtraEffectExecTiming.ENEMY_ACTION : BattleDefine.eExtraEffectExecTiming.MY_TEAM_ACTION);
+            if (IsBoss && GameStartDone || IsStartActionForExtraEffect)
+            {
+                battleManager.StartExtraEffect(BattleDefine.eExtraEffectExecTiming.ALL_UNIT_ACTION);
+                battleManager.StartExtraEffect(IsOther ? BattleDefine.eExtraEffectExecTiming.ENEMY_ACTION : BattleDefine.eExtraEffectExecTiming.MY_TEAM_ACTION);
+            }
             if (IsPartsBoss)
                 battleManager.LOGNEDLPEIJ = false;
             if (_state != ActionState.IDLE && _state != ActionState.WALK)
@@ -11517,15 +11590,19 @@ this.updateCurColor();
             switch (_state)
             {
                 case ActionState.IDLE:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.IDLE);
                     setStateIdle();
                     break;
                 case ActionState.ATK:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.SKILL);
                     setStateAttack();
                     break;
                 case ActionState.SKILL_1:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.UB);
                     setStateSkill1();
                     break;
                 case ActionState.SKILL:
+                    SemanOnEventCallback?.Invoke(UnitId, eSemanEvent.SKILL);
                     setStateSkill(_skillId);
                     break;
                 case ActionState.WALK:
@@ -13837,7 +13914,7 @@ this.updateCurColor();
                             return false;
                         break;
                 }*/
-                return ToadDatas.Count <= 0 && !IsAbnormalState(eAbnormalState.UB_SILENCE) &&
+                return ToadDatas.Count <= 0 && !IsAbnormalState(eAbnormalState.UB_SILENCE) && !IsUnbeatableForAutoRevival &&
                        !UbIsDisableByChangePattern &&
                        ((CurrentState != ActionState.SKILL_1 ||
                          unitActionController.Skill1IsChargeTime) &&
@@ -14496,6 +14573,25 @@ this.updateCurColor();
             }
             return num;
         }
+        public int CompareMagicStrDecSameLeft(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareMagicStrDec(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareLeft(_a, _b);
+            }
+            return num;
+        }
+        public int CompareMagicStrDecSameRight(BasePartsData _a, BasePartsData _b)
+        {
+            int num = UnitCtrl.CompareMagicStrDec(_a, _b);
+            if (num == 0)
+            {
+                return this.CompareRight(_a, _b);
+            }
+            return num;
+        }
+
         public Dictionary<int, AttackSealDataForAllEnemy> AttackSealDataDictionary { get; set; } = new Dictionary<int, AttackSealDataForAllEnemy>();
 
     }

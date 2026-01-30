@@ -83,7 +83,7 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             triggerSuccess = false;
             duration = (float)_valueDictionary[eValueNumber.VALUE_4];
-            _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
+            _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _source); // 10.8.0 fix
         }
 
         private IEnumerator updateStartMotion(
@@ -97,7 +97,7 @@ namespace Elements
                 {
                     _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 1, false);
                     _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, _isLoop: true);
-                    _sourceActionController.AppendCoroutine(updateLoopMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
+                    _sourceActionController.AppendCoroutine(updateLoopMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _source); // 10.8.0 fix
                     break;
                 }
                 yield return null;

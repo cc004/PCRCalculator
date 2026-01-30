@@ -132,11 +132,21 @@ namespace Spine.Unity
         private bool vistualUpdateQueued;
         private bool lateUpdateQueued;
 
-		public void VisualUpdate()
+		public void VisualUpdate(bool force_update = false, bool suppress_events = false, bool force_late_update = false)
         {
-            if (valid && vistualUpdateQueued)
+            if (valid && (vistualUpdateQueued || force_update))
 			{
+				bool prevSuppressEvents = false;
+				if (state != null)
+				{
+					prevSuppressEvents = state.SuppressEvents;
+					state.SuppressEvents = suppress_events;
+				}
 				state.Apply(skeleton);
+				if (state != null)
+				{
+					state.SuppressEvents = prevSuppressEvents;
+				}
                 if (_UpdateLocal != null)
                 {
                     _UpdateLocal(this);
@@ -155,7 +165,7 @@ namespace Spine.Unity
                 vistualUpdateQueued = false;
             }
 
-            if (valid && lateUpdateQueued)
+            if (valid && (lateUpdateQueued || force_late_update))
             {
                 base.LateUpdate();
                 lateUpdateQueued = false;

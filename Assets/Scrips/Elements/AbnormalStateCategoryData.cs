@@ -22,7 +22,7 @@ namespace Elements
     public int ActionId;
     public double EnergyChargeMultiple = 1f;
     public bool ShowsIcon = true;
-
+    public eActionType ActionType { get; set; }
     public double SubValue { get; set; }
 
     public double EnergyReduceRate { get; set; }

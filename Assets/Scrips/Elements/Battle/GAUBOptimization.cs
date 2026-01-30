@@ -125,22 +125,41 @@ namespace Elements.Battle
     public class SemanUBChromosome : ChromosomeBase
     {
         public static List<List<int>> useValue = new List<List<int>>();
+
+        public static readonly int[][] autoValue = new int[][]
+        {
+            new int[] {
+                10900,
+            },
+            new int[] {
+                11900,
+            },
+            new int[] {
+                12900,
+            },
+            new int[] {
+                13900,
+            },
+            new int[] {
+                14900,
+            },
+        };
         public static readonly int[][] setValue = new int[][]
         {
             new int[] {
-                0, 10900, 11100, 12100, 13100, 14100, 15100, 
+                0, 11100, 12100, 13100, 14100, 15100, 
             },
             new int[] {
-                0, 10100, 11900, 12100, 13100, 14100, 15100, 
+                0, 10100, 12100, 13100, 14100, 15100, 
             },
             new int[] {
-                0, 10100, 11100, 12900, 13100, 14100, 15100, 
+                0, 10100, 11100, 13100, 14100, 15100, 
             },
             new int[] {
-                0, 10100, 11100, 12100, 13900, 14100, 15100, 
+                0, 10100, 11100, 12100, 14100, 15100, 
             },
             new int[] {
-                0, 10100, 11100, 12100, 13100, 14900, 15100, 
+                0, 10100, 11100, 12100, 13100, 15100, 
             },
         };
 
@@ -392,7 +411,8 @@ namespace Elements.Battle
         public InputField tpDemand;
         public List<InputField> fixUb;
         public List<TMP_InputField> DIYSemanUb;
-        public Toggle considerUB;
+        public Toggle considerSet;
+        public Toggle considerAuto;
         public Toggle considerSkill;
         public Toggle considerAll;
         public ToggleGroup fitnessToggleGroup;
@@ -465,9 +485,13 @@ namespace Elements.Battle
                 {
                     SemanUBChromosome.useValue[i].Clear();
                 }
-                if (considerUB.isOn)
+                if (considerSet.isOn)
                 {
                     SemanUBChromosome.useValue[i].AddRange(SemanUBChromosome.setValue[i]);
+                }
+                if (considerAuto.isOn)
+                {
+                    SemanUBChromosome.useValue[i].AddRange(SemanUBChromosome.autoValue[i]);
                 }
                 if (considerSkill.isOn)
                 {

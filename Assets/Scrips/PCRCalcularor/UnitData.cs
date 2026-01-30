@@ -971,6 +971,26 @@ namespace PCRCaculator
             }
             return string.Join("/", result);
         }
+        public string GetExEquipName(int equipIndex)
+        {
+            if (equipIndex < 0 || equipIndex >= exEquip.Length)
+                return "";
+
+            int equip_id = exEquip[equipIndex];
+
+            // 尝试从中文名称缓存中获取装备名称，如果找不到则使用默认名称
+            if (MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var equipDataArray) &&
+                equipDataArray.Length > equipIndex &&
+                equipDataArray[equipIndex].ContainsKey(equip_id))
+            {
+                var data = equipDataArray[equipIndex][equip_id];
+                var name = MainManager.Instance.databaseCache.exEquipmentName_cn.TryGetValue(equip_id, out var cnName) ? cnName : data.name;
+                return name;
+            }
+
+            // 如果以上方式获取不到，则返回空字符串或默认值
+            return "";
+        }
         public string GetLevelDescribe()
         {
             string result = "" + level;
@@ -2316,10 +2336,10 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 316;
-        public int playerProcess = 85;
+        public int playerLevel = 325;
+        public int playerProcess = 88;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 320;
+        public int maxUniqueEqLv = 330;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
@@ -2327,7 +2347,6 @@ namespace PCRCaculator
         public bool useDMMpath = false;
         public string dmmPath = "";
         public bool ignoreLogBarrierCritical = false;
-        public bool IsNiefeiBugFix = false;
         public int maxTPUpValue = 250;//TP上限
         public Dictionary<int, int> talentLevel = new();
         public Dictionary<int, int> talentSkill = new();

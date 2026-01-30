@@ -41,6 +41,11 @@ namespace Elements
                 action($"目标处于行动不能，击飞，拉拽免疫效果，击退无效!");
                 return;
             }
+            if (_target.Owner.IsUnbeatableForAutoRevival)
+            {
+                action($"目标处于复活的无敌状态，击退无效!");
+                return;
+            }
             AppendIsAlreadyExeced(_target.Owner, _num);
             switch (ActionDetail1)
             {

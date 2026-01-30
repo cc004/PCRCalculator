@@ -44,8 +44,8 @@ public class TimelinePanel : MonoBehaviour
     {
         string[] content = new string[6];
         int seconds = GuildManager.Instance.SettingData.limitTime - detail.UBTime / 60;
-        content[0] = seconds.ToString();
-        content[1] = detail.UBTime.ToString();
+        content[0] = detail.UBTime.ToString();
+        content[1] = seconds.ToString();
 
         if (detail.unitData != null)
         {

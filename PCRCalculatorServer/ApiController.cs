@@ -122,6 +122,8 @@ namespace PCRCalculatorServer
                             TotalPhysicsBuff = MyGameCtrl.Instance.BattleStats.TotalPhysicsBuff,
                             TotalMagicDebuff = MyGameCtrl.Instance.BattleStats.TotalMagicDebuff,
                             TotalPhysicsDebuff = MyGameCtrl.Instance.BattleStats.TotalPhysicsDebuff,
+                            ScorePhysicsExpectation = MyGameCtrl.Instance.BattleStats.ScorePhysicsExpectation,
+                            ScoreMagicExpectation = MyGameCtrl.Instance.BattleStats.ScoreMagicExpectation,
                             PlayerTpGained = new Dictionary<int, long>(MyGameCtrl.Instance.BattleStats.PlayerTpGainedDic)
                         } : null,
                         BattleFrames = battleFrames,

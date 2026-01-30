@@ -462,6 +462,11 @@ namespace Elements
                             tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
+                        else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
                         else
                             Debug.LogError("找不到增援敌人ID " + enemy);
                     }
@@ -540,7 +545,8 @@ namespace Elements
                 }
                 else
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    // BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.semanubmanager.Disable();
                     BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
                 }
             }

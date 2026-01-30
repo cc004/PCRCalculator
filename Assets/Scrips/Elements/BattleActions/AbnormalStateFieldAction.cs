@@ -15,6 +15,7 @@ namespace Elements
     private ActionParameter targetAction;
 
     public UnitCtrl.eAbnormalState TargetAbnormalState { get; set; }
+    public bool IsTargetAbnormalStateBuff { get; set; } // TODO find where set
 
     public override void ExecActionOnStart(
       Skill _skill,
@@ -55,21 +56,22 @@ namespace Elements
         gameObject2 = ActionEffectList[0].PrefabLeft;
       }
       AbnormalStateFieldData abnormalStateFieldData = new AbnormalStateFieldData();
-      abnormalStateFieldData.KNLCAOOKHPP = eFieldType.HEAL;
-      abnormalStateFieldData.HKDBJHAIOMB = eFieldExecType.NORMAL;
+      abnormalStateFieldData.FildType = eFieldType.HEAL;
+      abnormalStateFieldData.ExecType = eFieldExecType.NORMAL;
       abnormalStateFieldData.StayTime = (float)_valueDictionary[eValueNumber.VALUE_1];
       abnormalStateFieldData.CenterX = _target.GetLocalPosition().x + Position;
       abnormalStateFieldData.Size = (float)_valueDictionary[eValueNumber.VALUE_3];
-      abnormalStateFieldData.EGEPDDJBILL = _skill.BlackOutTime > 0.0 ? _source : null;
+      abnormalStateFieldData.PauseTarget = _skill.BlackOutTime > 0.0 ? _source : null;
       abnormalStateFieldData.TargetList = new List<BasePartsData>();
             abnormalStateFieldData.TargetSet = new HashSet<BasePartsData>();
-            abnormalStateFieldData.PPOJKIDHGNJ = _source;
-      abnormalStateFieldData.HGMNJJBLJIO = gameObject1;
-      abnormalStateFieldData.LALMMFAOJDP = gameObject2;
+            abnormalStateFieldData.Source = _source;
+      abnormalStateFieldData.UniqueEffectPrefab = gameObject1;
+      abnormalStateFieldData.UniqueEffectPrefabLeft = gameObject2;
       abnormalStateFieldData.TargetAction = targetAction;
       abnormalStateFieldData.SourceActionController = _sourceActionController;
-      abnormalStateFieldData.LCHLGLAFJED = _source.IsOther ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
-      abnormalStateFieldData.PMHDBOJMEAD = _skill;
+      abnormalStateFieldData.FieldTargetType = _source.IsOther ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
+      abnormalStateFieldData.Skill = _skill;
+      abnormalStateFieldData.IsTargetAbnormalStateBuff = IsTargetAbnormalStateBuff;
       abnormalStateFieldData.Cache();
             //add scripts
             string describe = "展开中心为" + abnormalStateFieldData.CenterX +"，大小为" + abnormalStateFieldData.Size + "的领域";

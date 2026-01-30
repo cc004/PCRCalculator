@@ -22,23 +22,23 @@ namespace Elements
 			base.battleManager.AddChangeSpeedOverwriteFieldCounter();
 			ChangeSpeedOverwriteFieldData pfdaefdobip = new ChangeSpeedOverwriteFieldData
 			{
-				KNLCAOOKHPP = eFieldType.HEAL,
-				HKDBJHAIOMB = eFieldExecType.NORMAL,
+				FildType = eFieldType.HEAL,
+				ExecType = eFieldExecType.NORMAL,
 				StayTime = (float)_valueDictionary[eValueNumber.VALUE_3],
 				CenterX = _target.GetLocalPosition().x + base.Position,
 				Size = (float)_valueDictionary[eValueNumber.VALUE_5],
-				LCHLGLAFJED = ((_source.IsOther == (eOverwriteAbnormalState == UnitCtrl.eOverwriteAbnormalState.HASTE)) ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER),
-				EGEPDDJBILL = ((_skill.BlackOutTime > 0f) ? _source : null),
+				FieldTargetType = ((_source.IsOther == (eOverwriteAbnormalState == UnitCtrl.eOverwriteAbnormalState.HASTE)) ? eFieldTargetType.ENEMY : eFieldTargetType.PLAYER),
+				PauseTarget = ((_skill.BlackOutTime > 0f) ? _source : null),
 				AbnormalState = eOverwriteAbnormalState,
 				TargetList = new List<BasePartsData>(),
                 TargetSet = new HashSet<BasePartsData>(),
                 EffectValue = (float)base.Value[eValueNumber.VALUE_1],
-				PPOJKIDHGNJ = _source,
-				PMHDBOJMEAD = _skill,
+				Source = _source,
+				Skill = _skill,
 				ActionParameter = this,
 				ActionCounter = base.battleManager.CJJBDIJPHJE,
-				HGMNJJBLJIO = uniqueEffectPrefab,
-				LALMMFAOJDP = uniqueEffectPrefabLeft,
+				UniqueEffectPrefab = uniqueEffectPrefab,
+				UniqueEffectPrefabLeft = uniqueEffectPrefabLeft,
 				IsShowUniqueEffect = (base.ActionDetail2 == 1)
 			};
 			base.battleManager.ExecField(pfdaefdobip, base.ActionId);

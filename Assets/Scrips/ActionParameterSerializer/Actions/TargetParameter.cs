@@ -418,10 +418,18 @@ namespace ActionParameterSerializer.Actions
         energyAscBackWithoutOwner = 41,
         parentTargetParts = 42,
         atkDecForwardWithoutOwner = 43,
-        hpAscWithoutOwner,
-        atkDefAscForward,
-        magicDefAscForward,
-        flightOnly
+        hpAscWithoutOwner = 44,
+        atkDefAscForward = 45,
+        magicDefAscForward = 46,
+        flightOnly = 47,
+        MAGIC_STR_DEC_WITHOUT_OWNER_FORWARD = 50,
+        ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA = 51,
+        NEAR_WITHOUT_TARGET_ABNORMAL_STATE = 11000,
+        FAR_WITHOUT_TARGET_ABNORMAL_STATE = 12000,
+        NEAR_SEAL_ENCHANTED = 13000,
+        NEAR_TALENT = 14000,
+        NEAR_TALENT_WITHOUT_OWNER = 15000,
+
     }
 
     public enum DirectionType

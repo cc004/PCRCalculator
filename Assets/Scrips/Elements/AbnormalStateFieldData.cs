@@ -14,6 +14,7 @@ namespace Elements
 
     public UnitActionController SourceActionController { get; set; }
 
+
     public override void StartField()
     {
       /*if ((Object) this.HGMNJJBLJIO != (Object) null)
@@ -26,6 +27,15 @@ namespace Elements
 
     public override void OnRepeat()
     {
+    }
+
+    protected override bool judgeWorking(UnitCtrl _unit)
+    {
+      if (IsTargetAbnormalStateBuff)
+        return true;
+      if (_unit.ModeChangeUnableStateBarrier)
+        return false;
+      return _unit.IsNoDamageMotion();
     }
 
     public override void OnExit(BasePartsData _parts, UnitCtrl _source)
@@ -45,7 +55,7 @@ namespace Elements
       base.OnEnter(_parts, _source);
       if (_parts.Owner.IsSummonOrPhantom)
         TargetAction.AppendTargetNum(_parts.Owner, 0);
-      SourceActionController.ExecAction(TargetAction, PMHDBOJMEAD, _parts, 0, 0.0f);
+      SourceActionController.ExecAction(TargetAction, Skill, _parts, 0, 0.0f);
     }
 
     public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState, bool _strict)
@@ -76,5 +86,12 @@ namespace Elements
         }
       }
     }
+
+    public void CallUpdateTarget()
+    {
+      if (Enable)
+        updateTarget();
+    }
+
   }
 }

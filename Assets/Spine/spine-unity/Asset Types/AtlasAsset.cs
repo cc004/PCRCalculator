@@ -17,7 +17,11 @@ namespace Spine.Unity
 
 		public static AtlasAsset CreateRuntimeInstance(TextAsset atlasText, Material[] materials, bool initialize)
 		{
+#if UNITY_5_3_OR_NEWER
+			AtlasAsset atlasAsset = ScriptableObject.CreateInstance<AtlasAsset>();
+#else
 			AtlasAsset atlasAsset = new AtlasAsset();
+#endif
 			atlasAsset.Reset();
 			atlasAsset.atlasFile = atlasText;
 			atlasAsset.materials = materials;
