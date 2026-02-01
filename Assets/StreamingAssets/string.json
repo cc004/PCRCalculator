@@ -763,6 +763,7 @@
   "far_without_s_abnormal_state": "不处于 [%s] 异常状态的最远",
   "near_with_s_sealed_state": "拥有 [%s] 标记的最近",
   "near_with_s_talent_state": "拥有 [%s] 属性的最近",
-  "near_with_s_talent_without_owner": "除自身以外拥有 [%s] 属性的最近"
+  "near_with_s_talent_without_owner": "除自身以外拥有 [%s] 属性的最近",
+  "etherealization_s1_with_s2_seal_by_s3_unit": "在 [%1$s] 拥有 [%2$s] 标记的情况下，进入 [虚化] 状态，无法被 %3$s 敌人锁定，若我方所有人都处于 [虚化] 或 [隐秘] 状态，则解除 [虚化] 和 [隐蔽] 状态。"
 
 }
