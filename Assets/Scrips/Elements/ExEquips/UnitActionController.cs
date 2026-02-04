@@ -144,6 +144,7 @@ namespace Elements
                     _exSkillData.ExSkillConditionData.Add((eExSkillCondition)actionParameter.ActionDetail1, new ExConditionPassiveData
                     {
                         EffectType = (ExConditionPassiveData.eEffectType)actionParameter.ActionDetail2,
+                        LimitNum = actionParameter.ActionDetail3,
                         HitRate = (float)((float)actionParameter.Value[eValueNumber.VALUE_1] + actionParameter.Value[eValueNumber.VALUE_2] * (float)(int)Owner.Level),
                         Value = actionParameter.Value[eValueNumber.VALUE_3],
                         CoolTime = coolTime,

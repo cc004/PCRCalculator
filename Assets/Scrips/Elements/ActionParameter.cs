@@ -335,8 +335,11 @@ namespace Elements
                 ++AlreadyExecedData[_target][_num].TargetPartsNumber;
         }
 
-        public void AppendIsAlreadyExeced(UnitCtrl _target, int _num) =>
-            AlreadyExecedData[_target][_num].AlreadyExeced = true;
+        public void AppendIsAlreadyExeced(UnitCtrl _target, int _num)
+        {
+            if (!SkipAppendIsAlreadyExeced)
+                AlreadyExecedData[_target][_num].AlreadyExeced = true;
+        }
 
         public bool JudgeLastAndNotExeced(UnitCtrl _target, int _num)
         {

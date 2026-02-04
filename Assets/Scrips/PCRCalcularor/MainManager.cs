@@ -260,8 +260,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10058000;
-            public long BossVersionJP = 10058000;
+            public long CharacterVersionJP = 10061500;
+            public long BossVersionJP = 10060200;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -823,8 +823,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 85;
-                playerSetting.playerLevel = 316;
+                playerSetting.playerProcess = 88;
+                playerSetting.playerLevel = 325;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
@@ -1344,7 +1344,7 @@ namespace PCRCaculator
 #if UNITY_5_3_OR_NEWER
         public async Task SendPostRequestAsync2(Action onComplete)
         {
-            const string app_ver = "10.7.1"; // change this when the app version changes
+            const string app_ver = "11.4.0"; // change this when the app version changes
             using UnityWebRequest www = new UnityWebRequest(Url2, UnityWebRequest.kHttpVerbPOST);
             byte[] postData = System.Text.Encoding.UTF8.GetBytes("{\"viewer_id\": \"0\"}");
 

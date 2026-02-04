@@ -88,6 +88,7 @@ namespace PCRCaculator.Guild
         public Text backTimeText;
         public Image resultBg;
         private int backTime;
+        private string bossProbability;
         private bool IsGuildBoss => boss[0].enemyId / 100000000 == 4;
         public List<Sprite> resultSprite;
         public List<int> PlayerIds => playerIds;
@@ -810,11 +811,6 @@ namespace PCRCaculator.Guild
               }
             };
 
-            if (!BattleManager.Instance.skipping)
-            {
-                action(MyGameCtrl.Instance.playerUnitCtrl);
-                action(MyGameCtrl.Instance.enemyUnitCtrl);
-            }
             /*
             foreach (var pair in skillGroupPrefabDic)
             {
@@ -863,10 +859,11 @@ namespace PCRCaculator.Guild
             else if (backTime > 0)
             {
                 resultBg.SetActive(true);
-                string prefix = BattleResult == eBattleResult.WIN? "胜利：": "失败：";
+                string prefix = BattleResult == eBattleResult.WIN ? "胜利：" : "失败：";
                 resultBg.color = BattleResult == eBattleResult.WIN ? new Color(0x4F / 255f, 0x9F / 255f, 0x6C / 255f) : new Color(0xC6 / 255f, 0x4E / 255f, 0x51 / 255f);
                 prefix += IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
-                detail = $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
+                bossProbability = $"{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
+                detail = $"{prefix}{backTime}s-{bossProbability}";
                 backTimeText.SetActive(true);
                 backTimeText.text = $"{detail}";
             }
@@ -880,6 +877,20 @@ namespace PCRCaculator.Guild
             seedText.text = $"种子：{MyGameCtrl.Instance.CurrentSeedForSave}";
             totalDamageText.text = damageStr;
             basedmg.text = totalDamageCriEX.ToString();
+
+            //自动存档
+            if (!BattleManager.Instance.skipping)
+            {
+                action(MyGameCtrl.Instance.playerUnitCtrl);
+                action(MyGameCtrl.Instance.enemyUnitCtrl);
+#if UNITY_5_3_OR_NEWER && !UNITY_ANDROID
+                GuildTimelineData timelineData = CreateAutoSaveData();
+                string fileName = CurrentBossText.text + "-" + CreateExcelName() + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                FileInfo newFile = new("save/" + fileName + ".xlsx");
+                ExcelHelper.ExcelHelper.CreateAutoSaveExcel(timelineData, newFile);
+                Debug.Log("自动保存成功：" + newFile.FullName);
+#endif
+            }
         }
 
         public long expectedDamage;
@@ -972,6 +983,13 @@ namespace PCRCaculator.Guild
                 detail = detail,
             };
         }
+        public GuildTimelineData CreateAutoSaveData()
+        {
+            return new GuildTimelineData(MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup(), MyGameCtrl.Instance.CurrentSeedForSave)
+            {
+                UBExecTime = CreateUBExecTimeData(),
+            };
+        }
         public List<List<float>> CreateUBExecTimeData()
         {
             /*
@@ -1053,6 +1071,7 @@ namespace PCRCaculator.Guild
                             description = tm.operation ?? string.Empty
                         };
                         ValueChangeData changeData = null;
+                        long totalDamage = 0;
                         foreach (int bossId in BossId)
                         {
                             if (allUnitHPDic.ContainsKey(bossId) && allUnitHPDic[bossId] != null)
@@ -1063,7 +1082,6 @@ namespace PCRCaculator.Guild
                                 {
                                     detail.Damage = changeData.damage;
                                     detail.Critical = changeData.describe.Contains("暴击");
-                                    long totalDamage = 0;
                                     foreach (var data in allUnitHPDic[bossId])
                                     {
                                         if (data.id == changeData.id)
@@ -1072,7 +1090,6 @@ namespace PCRCaculator.Guild
                                             detail.totalDamage = totalDamage;
                                         }
                                     }
-                                    break;
                                 }
                             }
                         }
@@ -1122,7 +1139,7 @@ namespace PCRCaculator.Guild
             else if (backTime > 0)
             {
                 string prefix = boss[0].enemyId / 100000000 == 4 ? (BattleResult == eBattleResult.WIN ? "-返" : "-剩") : "-剩";
-                fileName += $"{prefix}{backTime}s-{boss.Aggregate(1f, (acc, b) => acc * b.Hp.Probability(x => x <= 0f)):P0}";
+                fileName += $"{prefix}{bossProbability}";
             }
             return fileName;
         }
@@ -1888,6 +1905,11 @@ namespace PCRCaculator.Guild
             this.bossDefChangeDic = bossDefChangeDic;
             this.bossMgcDefChangeDic = bossMgcDefChangeDic;
             AllRandomList = allRandomList;
+        }
+        public GuildTimelineData(GuildPlayerGroupData playerGroupData, int seed)
+        {
+            currentRandomSeed = seed;
+            this.playerGroupData = playerGroupData;
         }
     }
     public class UBDetail

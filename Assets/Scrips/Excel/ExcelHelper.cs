@@ -20,6 +20,7 @@ using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using SFB;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using Application = UnityEngine.Application;
 using Color = System.Drawing.Color;
@@ -1057,6 +1058,9 @@ autopcr.setOffset(2, 0); # offset calibration
                         currentLineNum = currentLineNum = MainManager.Instance.UnitRoleDataDic.Count > 0 ? 15:13;
                         for (int i = 0; i < 3; i++)
                         {
+                            worksheet0.Cells[currentLineNum + 1 + i * 3, 7 - count, currentLineNum + 3 + i * 3, 7 - count].Merge = true;
+                            worksheet0.MySetValue(currentLineNum + 1 + i * 3, 7 - count, unitData.GetExEquipName(i), backColor: backColotInt_1);
+                            worksheet0.Cells[currentLineNum + 1 + i * 3, 7 - count].Style.WrapText = true;
                             worksheet0.InsertImage(BattleUIManager.Instance.imageSaved2[i + count * 3], currentLineNum + i * 3, 6 - count, false, 1, 3);
                         }
                     }
@@ -1896,38 +1900,27 @@ autopcr.setOffset(2, 0); # offset calibration
             return null;
 #endif
         }
-        /*
-        /// <summary>
-        /// 获取自适应调整后的图片尺寸
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="cellColumnWidthInPix"></param>
-        /// <param name="cellRowHeightInPix"></param>
-        /// <returns>item1:调整后的图片宽度; item2:调整后的图片高度</returns>
-        /// 
-        private static Tuple<int, int> GetAdjustImageSize(Image image, int cellColumnWidthInPix, int cellRowHeightInPix)
+        public static void CreateAutoSaveExcel(GuildTimelineData timelineData, FileInfo newFile)
         {
-            int imageWidthInPix = image.Width;
-            int imageHeightInPix = image.Height;
-            //调整图片尺寸,适应单元格
-            int adjustImageWidthInPix;
-            int adjustImageHeightInPix;
-            if (imageHeightInPix * cellColumnWidthInPix > imageWidthInPix * cellRowHeightInPix)
+            TimelineData = timelineData;
+            using (ExcelPackage package = new ExcelPackage(newFile))
             {
-                //图片高度固定,宽度自适应
-                adjustImageHeightInPix = cellRowHeightInPix;
-                double ratio = (1.0) * adjustImageHeightInPix / imageHeightInPix;
-                adjustImageWidthInPix = (int)(imageWidthInPix * ratio);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("savePage");
+                int lineNum = 1;
+                worksheet.Cells[lineNum, 1, lineNum, 20].Merge = true;
+                worksheet.Cells[lineNum, 1].Style.Font.Size = 16;
+                worksheet.Cells[lineNum, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[lineNum, 1].Value = "存档数据页，请勿修改此页面的任何数据，否则无法导入！";
+                lineNum++;
+                string TimeLineDataStr = JsonConvert.SerializeObject(TimelineData);
+                string hideData = MainManager.EncryptDES(TimeLineDataStr);
+                worksheet.Cells[lineNum, 1, lineNum, 20].Merge = true;
+                worksheet.Cells[lineNum, 1].Style.Font.Size = 12;
+                worksheet.Cells[lineNum, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[lineNum, 1].Value = hideData;
+                package.Save();
             }
-            else
-            {
-                //图片宽度固定,高度自适应
-                adjustImageWidthInPix = cellColumnWidthInPix;
-                double ratio = (1.0) * adjustImageWidthInPix / imageWidthInPix;
-                adjustImageHeightInPix = (int)(imageHeightInPix * ratio);
-            }
-            return new Tuple<int, int>(adjustImageWidthInPix, adjustImageHeightInPix);
-        }*/
+        }
     }
     public struct TimeLineDataA
     {

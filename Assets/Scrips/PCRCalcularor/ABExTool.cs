@@ -493,6 +493,9 @@ namespace PCRCaculator
                 assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
 
             var bundlePath = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
+#if UNITY_ANDROID
+            bundlePath = persistentDataPath + $"/AB/{mgr.SubFolder}/";
+#endif
 
             foreach (var val in info["m_Dependencies"]["Array"])
             {

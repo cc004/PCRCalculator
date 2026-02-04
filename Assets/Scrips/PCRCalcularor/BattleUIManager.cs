@@ -310,7 +310,8 @@ namespace PCRCaculator.Battle
             {
                 fpsCount = BattleHeaderController.CurrentFrameCount;
             }
-            string logtext = $"({fpsCount}/{BattleManager.Instance.FrameCount}){word}\n";
+            // string logtext = $"({fpsCount}/{BattleManager.Instance.FrameCount}){word}\n";
+            string logtext = $"({fpsCount}){word}\n";
             debugStrList.Add(logtext);
             //sw.WriteLine(logtext);
 #if UNITY_5_3_OR_NEWER
