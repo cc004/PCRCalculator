@@ -726,7 +726,7 @@ namespace Elements
                 }
                 if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                 {
-                    if (!_targetParts.Owner.IsStealth && !_targetParts.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                    if (!_targetParts.Owner.IsStealth && !_targetParts.Owner.IsSpyOrEtherialization(Owner))
                     {
                         actionParameter.AppendTargetNum(_targetParts.Owner, 0);
                         ExecAction(actionParameter, _skill, _targetParts, 0, 0f, true);
@@ -794,7 +794,7 @@ namespace Elements
                     if (actionParam.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                     {
                         var targetAbnormal = _parts.Owner;
-                        if (!_parts.Owner.IsStealth && !targetAbnormal.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                        if (!_parts.Owner.IsStealth && !targetAbnormal.IsSpyOrEtherialization(Owner))
                         {
                             actionParam.AppendTargetNum(_parts.Owner, 0);
                             ExecAction(actionParam, _skill, _parts, 0, 0f, true);
@@ -1120,7 +1120,7 @@ namespace Elements
                     basePartsData = Owner.TauntSource;
                 }
                 //2022/09/05改
-                if (basePartsData != null && !basePartsData.Owner.IsDead && !basePartsData.Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SPY) && isInActionTargetArea(_skill, _action, _basePosition, _considerBodyWidth, basePartsData))
+                if (basePartsData != null && !basePartsData.Owner.IsDead && !basePartsData.Owner.IsSpyOrEtherialization(this.Owner) && isInActionTargetArea(_skill, _action, _basePosition, _considerBodyWidth, basePartsData))
                 {
                     //if ((double)Mathf.Abs(basePartsData.GetLocalPosition().x - this.transform.localPosition.x) <= (double)_action.TargetWidth + (double)basePartsData.GetBodyWidth() / 2.0 + (double)this.Owner.BodyWidth / 2.0)
                     //if (Mathf.Abs(basePartsData.GetLocalPosition().x - transform.localPosition.x) <= _action.TargetWidth + basePartsData.GetBodyWidth() / 2.0 + Owner.BodyWidth / 2.0)
@@ -1964,7 +1964,7 @@ namespace Elements
                                     List<UnitCtrl> unitCtrlList1 = Owner.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                                     for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
                                     {
-                                        if ((long)unitCtrlList1[index2].Hp != 0L)
+                                        if ((long)unitCtrlList1[index2].Hp != 0L && !unitCtrlList1[index2].JudgeIsEtherialization(Owner))
                                             createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                     }
                                     continue;
@@ -1972,7 +1972,7 @@ namespace Elements
                                     List<UnitCtrl> unitCtrlList2 = Owner.IsOther ? battleManager.EnemyList : battleManager.UnitList;
                                     for (int index2 = 0; index2 < unitCtrlList2.Count; ++index2)
                                     {
-                                        if (unitCtrlList2[index2] != Owner && !unitCtrlList2[index2].IsDead)
+                                        if (unitCtrlList2[index2] != Owner && !unitCtrlList2[index2].IsDead && !unitCtrlList2[index2].JudgeIsEtherialization(Owner))
                                             createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList2[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                     }
                                     continue;
@@ -2391,7 +2391,7 @@ namespace Elements
         }*/
         private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
         {
-            if (!_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
+            if (!_unitCtrl.JudgeIsEtherializationConsiderDebuffImmune(_unitCtrl, _actionParameter) && !_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
             {
                 if (_actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE && _actionParameter.TargetNum == 1)
                 {

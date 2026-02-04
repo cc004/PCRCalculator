@@ -223,6 +223,7 @@ namespace Elements
 				enableSealIdList = new List<int>();
 			}
 			enableSealIdList.Add(currentSealId);
+			OnAddAction?.Invoke(currentSealId, Count == 0);
 			Count++;
 			foreach (var sealBuffDebuffData in SealBuffDebuffDataDictionary.Values)
 			{
@@ -264,6 +265,7 @@ namespace Elements
 			}
 			enableSealIdList.Remove(_sealId);
 			Count--;
+			OnRemoveAction?.Invoke(_sealId, Count == 0);
 			foreach (var sealBuffDebuffData in SealBuffDebuffDataDictionary.Values)
 			{
 				sealBuffDebuffData.UpdateValue(GetCurrentCount());

@@ -195,6 +195,10 @@ namespace ActionParameterSerializer.Actions
                     return new SlipDamageUpAction();
                 case 114:
                     return new AllUnitSealDamageCutAction();
+                case 124:
+                    return new EnchantProtectAction();
+                case 125:
+                    return new EtherealizationAction();
                 /*
                 case 901:
                     return new ExStartPassiveAction();

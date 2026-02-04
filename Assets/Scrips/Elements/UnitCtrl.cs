@@ -3734,14 +3734,14 @@ this.updateCurColor();
                 var _b1 = (float)(-_distance - num);
                 var _b2 = (float)(num);
                 return (_a >= _b1 && _a <= _b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2))) &&
-                    (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth);
+                    (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth && !_target.JudgeIsEtherialization(this));
             }
             else
             {
                 var _b1 = (float)(- num);
                 var _b2 = (float)( _distance + num);
                 return (_a >= _b1 && _a <= _b2 || (BattleUtil.Approximately(_a, _b1) || BattleUtil.Approximately(_a, _b2))) &&
-                    (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth);
+                    (!_target.IsDead && (long)_target.Hp > 0L || _target.HasUnDeadTime) && (!_target.IsPhantom && !_target.IsStealth && !_target.JudgeIsEtherialization(this));
             }
         }
 
@@ -3784,6 +3784,56 @@ this.updateCurColor();
                 yield return null;
             }
         }
+
+        // RVA: 0x35DE7B0 Offset: 0x35DE7B0 VA: 0x35DE7B0
+        public bool IsEtherealization()
+        {
+            return EtherealizationPhysicalCount > 0 || EtherealizationMagicCount > 0 || EtherealizationBothCount > 0;
+        }
+
+        // RVA: 0x35DE5BC Offset: 0x35DE5BC VA: 0x35DE5BC
+        public bool IsSpyOrEtherialization(UnitCtrl _source)
+        {
+            return IsAbnormalState(eAbnormalState.SPY) || JudgeIsEtherialization(_source);
+        }
+
+        // RVA: 0x35DE640 Offset: 0x35DE640 VA: 0x35DE640
+        public bool JudgeIsEtherialization(UnitCtrl _source)
+        {
+            if (_source.IsOther == IsOther || _source.IsBonusEnemy)
+                return false;
+            if (EtherealizationBothCount > 0)
+                return true;
+            if (_source.AtkType == 1 && EtherealizationPhysicalCount > 0)
+                return true;
+            if (_source.AtkType == 2 && EtherealizationMagicCount > 0)
+                return true;
+            return false;
+        }
+
+        // RVA: 0x35DE70C Offset: 0x35DE70C VA: 0x35DE70C
+        public bool JudgeIsEtherializationConsiderDebuffImmune(UnitCtrl _source, ActionParameter _actionParameter)
+        {
+            return !_actionParameter.IsIgnoreDebuffImmune() && JudgeIsEtherialization(_source);
+        }
+
+        // RVA: 0x35DE838 Offset: 0x35DE838 VA: 0x35DE838
+        public void AddEtherealizationCount(EtherealizationAction.eTargetAttackType _targetAttackType)
+        {
+            switch (_targetAttackType)
+            {
+                case EtherealizationAction.eTargetAttackType.PHYSICAL:
+                    EtherealizationPhysicalCount ++;
+                    break;
+                case EtherealizationAction.eTargetAttackType.MAGIC:
+                    EtherealizationMagicCount ++;
+                    break;
+                case EtherealizationAction.eTargetAttackType.BOTH:
+                    EtherealizationBothCount ++;
+                    break;
+            }
+        }
+
 
         private float lastSearchDistance = -1f;
         private float lastSearchDistanceForSkillReady = -1f;
@@ -4074,7 +4124,7 @@ this.updateCurColor();
             for (int index1 = 0; index1 < unitCtrlList.Count; ++index1)
             {
                 UnitCtrl unitCtrl = unitCtrlList[index1];
-                if (!unitCtrl.IsPhantom && !unitCtrl.IsDead && (!(unitCtrl == this) && (long)unitCtrl.Hp != 0L) && !unitCtrl.IsStealth)
+                if (!unitCtrl.IsPhantom && !unitCtrl.IsDead && (!(unitCtrl == this) && (long)unitCtrl.Hp != 0L) && !unitCtrl.IsStealth && !unitCtrl.IsSpyOrEtherialization(this))
                 {
                     if (!unitCtrl.IsPartsBoss)
                     {
@@ -7056,6 +7106,8 @@ this.updateCurColor();
 
         private int clearedDebuffIndex { get; set; }
 
+        private Dictionary<int, int> BuffDebuffTypeIndex { get; set; } = new Dictionary<int, int>();
+
         private int buffCounter { get; set; }
 
         private int debuffCounter { get; set; }
@@ -7185,7 +7237,19 @@ this.updateCurColor();
         public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
 
-        // Elements.UnitCtrl
+        public void CancelStatusUpBuff()
+		{
+			clearedBuffIndex = buffDebuffIndex;
+			dispelBuffDebuffImmediately();
+		}
+
+		public void CancelBuffDebuffType(int _buffDebuffCancelType)
+		{
+			BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
+			dispelBuffDebuffImmediately();
+		}
+
+
         private void dispelBuffDebuffImmediately()
         {
             isStopBuffDebuffEffectTimer = true;
@@ -7203,6 +7267,14 @@ this.updateCurColor();
                 item.DispelImmediately(this);
             }
         }
+
+        private int getBuffDebuffParamValue(BuffParamKind _kind, bool _isBuff, bool _additional)
+		{
+			int num = (_additional ? 1000 : 0);
+			int num2 = (int)_kind * 10;
+			int num3 = ((!_isBuff) ? 1 : 0);
+			return num + num2 + num3;
+		}
 
         private IEnumerator UpdateBuffParam(
           BuffParamKind _kind,
@@ -7254,7 +7326,11 @@ this.updateCurColor();
                 /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
                 flag2 = _despelable && flag;
                 if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
-                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || _buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) && _despelable)
+                BuffDebuffTypeIndex.TryGetValue(getBuffDebuffParamValue(_kind, _isBuff, _additional), out var value);
+                if (time >= _maxTime 
+                || IdleOnly 
+                || (long)Hp <= 0 
+                || (_buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) || _buffDebuffId <= value) && _despelable)
                 {
                     break;
                 }
@@ -7713,6 +7789,10 @@ this.updateCurColor();
         // private Dictionary<eStateIconType, GutsData> gutsDictionary { get; set; }
 
         private IEnumerator knightGuardCoroutine { get; set; }
+
+        public int EtherealizationPhysicalCount { get; set; }
+        public int EtherealizationMagicCount { get; set; }
+        public int EtherealizationBothCount { get; set; }
 
         public AutoRevivalData AutoRevivalData { get; set; }
         public bool IsUnbeatableForAutoRevival { get; set; }
@@ -12754,7 +12834,7 @@ this.updateCurColor();
                             List<UnitCtrl> unitCtrlList = unitCtrl.IsOther ? unitCtrl.battleManager.EnemyList : unitCtrl.battleManager.UnitList;
                             for (int index = 0; index < unitCtrlList.Count; ++index)
                             {
-                                if (!unitCtrlList[index].IsDead)
+                                if (!unitCtrlList[index].IsDead && !unitCtrlList[index].IsStealth && !unitCtrlList[index].isRevivaling && !unitCtrlList[index].IsSpyOrEtherialization(this))
                                     ++num;
                             }
                             if (num == 1)
@@ -12771,7 +12851,7 @@ this.updateCurColor();
                         }
                         List<UnitCtrl> unitCtrlList1 = unitCtrl.IsOther ? unitCtrl.battleManager.UnitList : unitCtrl.battleManager.EnemyList;
                         bool flag1 = unitCtrlList1.FindIndex(e => (long)e.Hp > 0L) == -1;
-                        bool flag2 = unitCtrlList1.TrueForAll(e => e.IsStealth || (long)e.Hp == 0L);
+                        bool flag2 = unitCtrlList1.TrueForAll(e => e.IsStealth || (long)e.Hp == 0L || e.IsSpyOrEtherialization(this));
                         if (unitCtrl.battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
                         {
                             flag1 = false;
@@ -13090,7 +13170,7 @@ this.updateCurColor();
                 for (int index = 0; index < targetPlayerList.Count; ++index)
                 {
                     UnitCtrl unitCtrl = targetPlayerList[index];
-                    if (!unitCtrl.IsDead && unitCtrl != this)
+                    if (!unitCtrl.IsDead && unitCtrl != this && !unitCtrl.IsStealth && !unitCtrl.isRevivaling && !unitCtrl.IsSpyOrEtherialization(this))
                         flag = false;
                 }
                 int num = 0;

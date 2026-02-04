@@ -64,6 +64,11 @@ namespace ActionParameterSerializer.Actions
                     trueClause = Utils.JavaFormat(Utils.GetString("use_d1_to_s2_in_state_of_ID_d3"),
                         actionDetail2 % 10, targetParameter.buildTargetClause(true), (int)actionValue3.value);
                 }
+                else if (actionDetail1 == 900)
+                {
+                    trueClause = Utils.JavaFormat(Utils.GetString("use_d1_if_s2_HP_is_full"),
+                        actionDetail2 % 10, targetParameter.buildTargetClause(true));
+                }
                 else if (actionDetail1 >= 901 && actionDetail1 < 1000)
                 {
                     trueClause = Utils.JavaFormat(Utils.GetString("use_d1_if_s2_HP_is_below_d3"),

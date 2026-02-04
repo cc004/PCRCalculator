@@ -1448,7 +1448,7 @@ namespace PCRCaculator
 #else
         public async Task SendPostRequestAsync(Action onComplete)
         {
-            const string app_ver = "10.7.1";
+            const string app_ver = "11.4.0";
             var httpClient = new HttpClient();
 
             // 构造 POST Body

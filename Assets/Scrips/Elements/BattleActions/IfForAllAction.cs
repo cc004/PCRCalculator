@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using ActionParameterSerializer.Actions;
 using Elements.Battle;
 using PCRCaculator.Guild;
+using PCRCaculator.SQL;
 
 namespace Elements
 {
@@ -11,7 +13,16 @@ namespace Elements
         public const int IF_DIGIT = 100;
         public const int IF_DIGIT_COUNT = 10;
 
-        public static bool JudgeCountableUnit(UnitCtrl _unit) => (long)_unit.Hp != 0L && !_unit.IsStealth;
+        // public static bool JudgeCountableUnit(UnitCtrl _unit) => (long)_unit.Hp != 0L && !_unit.IsStealth;
+        public static bool JudgeCountableUnit(UnitCtrl _unit, UnitCtrl _source, eTargetAssignment _targetAssignment) 
+        {
+            bool flag = false;
+            if (_targetAssignment == eTargetAssignment.OTHER_SIDE)
+            {
+                flag = _unit.GetIsProtected();
+            }
+            return _unit.Hp != 0 && !_unit.IsStealth && !flag && !_unit.JudgeIsEtherialization(_source);
+        }
 
         public override void ExecActionOnStart(
           Skill _skill,
@@ -140,7 +151,7 @@ namespace Elements
                     break;
                 case eIfType.ALONE:
                     List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
-                    flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long)e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth).Count == 1;
+                    flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long)e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth && !e.JudgeIsEtherialization(_source)).Count == 1;
                     break;
                 case eIfType.BREAK:
                     if (_target.Owner.IsPartsBoss)
@@ -156,7 +167,7 @@ namespace Elements
                     }
                     break;
                 case eIfType.UNIT_ID:
-                    flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner)).Exists(e => e.Owner.SoundUnitId == (double)_valueDictinary[eValueNumber.VALUE_3]);
+                    flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner, _source, TargetAssignment)).Exists(e => e.Owner.SoundUnitId == (double)_valueDictinary[eValueNumber.VALUE_3]);
                     break;
                 case eIfType.SEAL_COUNT:
                     {
@@ -279,7 +290,7 @@ namespace Elements
                     }
                     else if (ActionDetail1 > 700)
                     {
-                        flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner)).Count == ActionDetail1 - 700;
+                        flag = TargetList.FindAll(e => JudgeCountableUnit(e.Owner, _source, TargetAssignment)).Count == ActionDetail1 - 700;
                         break;
                     }
                     /*if (ActionDetail1 > 600)
