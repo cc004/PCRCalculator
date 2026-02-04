@@ -1417,15 +1417,17 @@ namespace Elements
 
         public bool MainSkill1Evolved { get; set; }
 
-        //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? battleManager.DeltaTime_60fps : 0.0f;
+        //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? BattleManager.DeltaTime_60fps : 0.0f;
 
+        public bool FlagDeltaTimeForPause =>
+            PlayingNoCutinMotion || !battleManager.IsPausingEffectSkippedInThisFrame && !m_bPause;
         public float DeltaTimeForPause
         {
             get
             {
                 if (PlayingNoCutinMotion)
                 {
-                    return battleManager.DeltaTime_60fps;
+                    return BattleManager.DeltaTime_60fps;
                 }
                 if (battleManager == null)
                 {
@@ -1437,7 +1439,7 @@ namespace Elements
                 }
                 if (!m_bPause)
                 {
-                    return battleManager.DeltaTime_60fps;
+                    return BattleManager.DeltaTime_60fps;
                 }
                 return 0f;
             }
@@ -3537,7 +3539,7 @@ this.updateCurColor();
                     //XX: force make up for part boss additional 1 frame
                     if (battleManager.BossUnit.IsPartsBoss)
                     {
-                        m_fCastTimer += battleManager.DeltaTime_60fps;
+                        m_fCastTimer += BattleManager.DeltaTime_60fps;
                     }*/
                     break;
             }
@@ -3943,13 +3945,13 @@ this.updateCurColor();
             }
             if (UnionBurstCoolDownTime > 0f && battleManager.GetBlackOutUnitLength() == 0)
             {
-                UnionBurstCoolDownTime -= battleManager.DeltaTime_60fps;
+                UnionBurstCoolDownTime -= BattleManager.DeltaTime_60fps;
             }            
             /*else
             {
                 if ((double)this.sortOffsetResetTimer <= 0.0)
                     return;
-                this.sortOffsetResetTimer -= this.battleManager.DeltaTime_60fps;
+                this.sortOffsetResetTimer -= BattleManager.DeltaTime_60fps;
                 if ((double)this.sortOffsetResetTimer > 0.0)
                     return;
                 this.hitEffectSortOffset = 0;
@@ -4245,8 +4247,8 @@ this.updateCurColor();
                     float time = 0.0f;
                     while (true)
                     {
-                        time += unitCtrl.battleManager.DeltaTime_60fps;
-                        unitCtrl.transform.localPosition += v * unitCtrl.battleManager.DeltaTime_60fps;
+                        time += BattleManager.DeltaTime_60fps;
+                        unitCtrl.transform.localPosition += v * BattleManager.DeltaTime_60fps;
                         if (time <= (double)duration)
                             yield return null;
                         else
@@ -6925,7 +6927,7 @@ this.updateCurColor();
             if (!_event.Data.Name.Contains("move"))
                 return;
             float num1 = (float)_event.Int;
-            float _duration = _event.Float * this.battleManager.DeltaTime_60fps;
+            float _duration = _event.Float * BattleManager.DeltaTime_60fps;
             if ((double)num1 == 0.0 || (double)_duration == 0.0)
                 return;
             float num2 = this.battleCameraEffect.orthographicSize / 1.15f;
@@ -7000,7 +7002,7 @@ this.updateCurColor();
         {
             UnitCtrl unitCtrl = this;
             float num = _distance / _duration;
-            float deltaTime = unitCtrl.battleManager.DeltaTime_60fps;
+            float deltaTime = BattleManager.DeltaTime_60fps;
             float deltaPosX = num * deltaTime;
             float remainTime = _duration;
             float realMovedDistance = 0.0f;
@@ -7236,19 +7238,12 @@ this.updateCurColor();
             float time = 0.0f;
             while (true)
             {
-                if (!isStopBuffDebuffEffectTimer)
+                if (!isStopBuffDebuffEffectTimer && FlagDeltaTimeForPause)
                 {
-                    time += DeltaTimeForPause;
+                    if ((time += BattleManager.DeltaTime_60fps) > _maxTime)
+                        break;
                 }
-                /*
-                if (time > 1f)
-                {
-                    buffDebuffSkilIds.Remove(_skillId);
-                }*/
-                /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
-                flag2 = _despelable && flag;
-                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
-                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || _buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) && _despelable)
+                if (IdleOnly || (long)Hp <= 0 || _buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) && _despelable)
                 {
                     break;
                 }
@@ -9028,7 +9023,7 @@ this.updateCurColor();
                     yield break;
                 }
 
-                _data.BreakTime -= battleManager.DeltaTime_60fps;
+                _data.BreakTime -= BattleManager.DeltaTime_60fps;
                 yield return null;
             }
             _data.BreakTime = 0.0f;
@@ -11033,7 +11028,7 @@ this.updateCurColor();
                         yield break;
                     }
 
-                    timer += battleManager.DeltaTime_60fps;
+                    timer += BattleManager.DeltaTime_60fps;
                     if (timer < currentData.Time - (double)currentData.Duration)
                     {
                         if (timer >= (double)_startTime)
@@ -11041,7 +11036,7 @@ this.updateCurColor();
                     }
                     else if (timer < (double)currentData.Time)
                     {
-                        float curVal = currentEasing.GetCurVal(battleManager.DeltaTime_60fps);
+                        float curVal = currentEasing.GetCurVal(BattleManager.DeltaTime_60fps);
                         GetCurrentSpineCtrl().transform.localScale = _defaultScale * curVal;
                     }
                     else
@@ -11070,7 +11065,7 @@ this.updateCurColor();
                     break;
                 }
                 yield return null;
-                timer += battleManager.DeltaTime_60fps;
+                timer += BattleManager.DeltaTime_60fps;
             }
         }
 
@@ -11222,7 +11217,7 @@ this.updateCurColor();
             ChangeSortOrderData currentData = _changeSortOrderDatas[currentIndex];
             while (_thisId == changeSortOrderId)
             {
-                timer += battleManager.DeltaTime_60fps;
+                timer += BattleManager.DeltaTime_60fps;
                 if (timer < (double)currentData.Time)
                 {
                     yield return null;
@@ -12493,7 +12488,7 @@ this.updateCurColor();
                         {
                             uIManager?.LogMessage($"由于被技能{string.Join("\n", ActionsTargetOnMe)}、{FirearmCtrlsOnMe.Count}个弹射物与{KnockBackEnableCount}个击退效果锁定，不会立即死亡", eLogMessageType.OTHER, this);
                         }
-                        time += battleManager.DeltaTime_60fps;
+                        time += BattleManager.DeltaTime_60fps;
                         if (time > 10.0)
                         {
                             bool flag = false;
@@ -12935,7 +12930,7 @@ this.updateCurColor();
                                 if (!unitCtrl.IsOther)
                                     unitCtrl.battleManager.LPBCBINDJLJ.Add(unitCtrl);
                             }
-                            fAlpha -= unitCtrl.battleManager.DeltaTime_60fps;
+                            fAlpha -= BattleManager.DeltaTime_60fps;
                             if (fAlpha <= 0.0 || BattleUtil.Approximately(fAlpha, 0.0f))
                             {
                                 if (unitCtrl.OnDieFadeOutEnd != null && unitCtrl.OnDeadForRevival == null)
@@ -13131,13 +13126,13 @@ this.updateCurColor();
                         currentSpineCtrl.AnimationName = str;
                         currentSpineCtrl.state.TimeScale = 1f;
                         TrackEntry current2 = currentSpineCtrl.state.GetCurrent(0);
-                        current2.lastTime = battleManager.DeltaTime_60fps;
-                        current2.time = battleManager.DeltaTime_60fps;
-                        current2.animationLast = battleManager.DeltaTime_60fps;
-                        //current2.animationLast = this.battleManager.DeltaTime_60fps;
-                        //current2.animationStart = this.battleManager.DeltaTime_60fps;
+                        current2.lastTime = BattleManager.DeltaTime_60fps;
+                        current2.time = BattleManager.DeltaTime_60fps;
+                        current2.animationLast = BattleManager.DeltaTime_60fps;
+                        //current2.animationLast = BattleManager.DeltaTime_60fps;
+                        //current2.animationStart = BattleManager.DeltaTime_60fps;
 
-                        current2.nextAnimationLast = battleManager.DeltaTime_60fps;
+                        current2.nextAnimationLast = BattleManager.DeltaTime_60fps;
                         if (_pauseStopState)
                         {
                             current2.lastTime = currentSpineCtrl.StopStateTime;
@@ -13431,7 +13426,7 @@ this.updateCurColor();
             bool[] effectCreated = new bool[_data.Count];
             while (true)
             {
-                time += _ignorePause ? unitCtrl.battleManager.DeltaTime_60fps : unitCtrl.DeltaTimeForPause;
+                time += _ignorePause ? BattleManager.DeltaTime_60fps : unitCtrl.DeltaTimeForPause;
                 int index = 0;
                 for (int count = _data.Count; index < count; ++index)
                 {
@@ -13518,7 +13513,7 @@ this.updateCurColor();
             float time = 0.0f;
             while (true)
             {
-                time += _ignorePause ? GEDLBPMPOKB.battleManager.DeltaTime_60fps : GEDLBPMPOKB.DeltaTimeForPause;
+                time += _ignorePause ? BattleManager.DeltaTime_60fps : GEDLBPMPOKB.DeltaTimeForPause;
                 if ((double)time <= (double)shake.StartTime)
                     yield return (object)null;
                 else
@@ -13591,7 +13586,7 @@ this.updateCurColor();
             float alpha = 1f;
             while (alpha > 0.0)
             {
-                alpha -= unitCtrl.battleManager.DeltaTime_60fps;
+                alpha -= BattleManager.DeltaTime_60fps;
                 unitCtrl.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, alpha);
                 yield return null;
             }
@@ -13617,7 +13612,7 @@ this.updateCurColor();
             float deltaTimeAccumulated = 0.0f;
             while (true)
             {
-                for (deltaTimeAccumulated += Time.deltaTime; deltaTimeAccumulated > 0.0 & _isTimeOver; deltaTimeAccumulated -= battleManager.DeltaTime_60fps)
+                for (deltaTimeAccumulated += Time.deltaTime; deltaTimeAccumulated > 0.0 & _isTimeOver; deltaTimeAccumulated -= BattleManager.DeltaTime_60fps)
                 {
                     unitSpineController.RealUpdate();
                     unitSpineController.RealLateUpdate();

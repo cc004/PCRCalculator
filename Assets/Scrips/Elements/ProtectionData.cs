@@ -58,7 +58,7 @@ namespace Elements
             Enable = true;
             while (Enable && Timer > 0f)
             {
-                Timer -= BattleManager.Instance.DeltaTime_60fps;
+                Timer -= BattleManager.DeltaTime_60fps;
                 yield return null;
             }
             Enable = false;

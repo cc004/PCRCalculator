@@ -426,7 +426,7 @@ namespace Elements
                         do
                         {
                             yield return null;
-                            time += battleManager.DeltaTime_60fps;
+                            time += BattleManager.DeltaTime_60fps;
                             if (_skill.Cancel || !Owner.gameObject.activeSelf || _modeChangeEndEffect && Owner.IsUnableActionState())
                                 yield break;
                         }
@@ -650,7 +650,7 @@ namespace Elements
             {
                 while (true)
                 {
-                    time += battleManager.DeltaTime_60fps;
+                    time += BattleManager.DeltaTime_60fps;
                     if (!_skill.Cancel)
                     {
                         if (_delay > (double)time)
@@ -954,7 +954,7 @@ namespace Elements
                     yield return null;
                     continue;
                 }
-                float deltaTime = battleManager.DeltaTime_60fps;
+                float deltaTime = BattleManager.DeltaTime_60fps;
                 if (hitFlag)
                 {
                     hitTimer += deltaTime;

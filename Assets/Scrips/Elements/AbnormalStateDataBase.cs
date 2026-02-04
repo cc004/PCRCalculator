@@ -200,7 +200,7 @@ namespace Elements.Battle
                 float endDuration = fieldEffect.EndDuration;
                 while ((double) endDuration > 0.0)
                 {
-                  endDuration -= plfcllhldoo.BattleManager.DeltaTime_60fps;
+                  endDuration -= BattleManager.DeltaTime_60fps;
                   yield return (object) null;
                 }
                 plfcllhldoo.skillEffect.SetTimeToDie(true);

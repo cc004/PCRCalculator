@@ -171,7 +171,7 @@ namespace Elements
       float timer = 1f;
       while (!(_skillName != lifeGaugeController.skillNameLabel.text))
       {
-        timer -= lifeGaugeController.battleManager.DeltaTime_60fps;
+        timer -= BattleManager.DeltaTime_60fps;
         if ((double) timer < 0.0 || lifeGaugeController.owner.IsFront && lifeGaugeController.battleManager.BlackOutUnitList.Count != 0)
         {
           lifeGaugeController.skillNameBalloon.gameObject.SetActive(false);

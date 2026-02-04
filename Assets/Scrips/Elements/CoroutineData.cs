@@ -5,6 +5,7 @@
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Elements
 {
@@ -21,7 +22,8 @@ namespace Elements
 
         public void Init(List<UnitCtrl> _blackOutUnitList) => blackOutUnitList = _blackOutUnitList;
 
-        public override void Update()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public new void Update()
         {
 #if UNITY_5_3_OR_NEWER
             if (blackOutUnitList.Count != 0)
@@ -85,11 +87,10 @@ namespace Elements
             {
                 for (int index = blackOutUnitList.Count - 1; index >= 0; --index)
                 {
+                    if (blackOutUnitList.Count <= index - 1) continue;
                     CoroutineDataBase coroutineDataBase = null;
                     if (CoroutineDataDictionary.TryGetValue(blackOutUnitList[index], out coroutineDataBase))
                         coroutineDataBase.Update();
-                    while (blackOutUnitList.Count <= index - 1)
-                        --index;
                 }
             }
             else

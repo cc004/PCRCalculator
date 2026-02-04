@@ -1448,7 +1448,7 @@ namespace PCRCaculator
 #else
         public async Task SendPostRequestAsync(Action onComplete)
         {
-            const string app_ver = "10.7.1";
+            const string app_ver = "99.9.9";
             var httpClient = new HttpClient();
 
             // 构造 POST Body
@@ -1485,22 +1485,17 @@ namespace PCRCaculator
                 var responseMessage = await httpClient.SendAsync(request);
                 var raw = await responseMessage.Content.ReadAsStringAsync();
 
+
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    Debug.LogError($"请求失败: {responseMessage.StatusCode}");
-                    truthVersion = "获取失败（重试）";
+                    throw new Exception("bad status code: " + responseMessage.StatusCode);
                 }
                 else
                 {
-                    try
-                    {
-                        var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
-                        truthVersion = response?.data?.manifest_ver ?? "获取失败（重试）";
-                    }
-                    catch
-                    {
-                        truthVersion = "获取失败（重试）";
-                    }
+                    var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
+                    truthVersion = response.data.manifest_ver;
+
+                    if (truthVersion == null) throw new Exception("manifest ver is null, resp: " + raw);
                 }
             }
             catch (Exception ex)

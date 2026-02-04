@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -202,7 +203,7 @@ namespace Elements
         private void startKnockBack(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, DoubleWithEx> _func)
         {
             double num = _func(_target, _source);
-            double duration = Math.Max(Math.Abs(num) / base.Value[eValueNumber.VALUE_3], base.battleManager.DeltaTime_60fps);
+            double duration = Math.Max(Math.Abs(num) / base.Value[eValueNumber.VALUE_3], BattleManager.DeltaTime_60fps);
             _sourceActionController.AppendCoroutine(updateKnockBackCoroutine(_target, _source, (float)num, (float)duration), ePauseType.IGNORE_BLACK_OUT);
         }
         private void startKnockbackForGiveValue(UnitActionController _sourceActionController, UnitCtrl _target, UnitCtrl _source, Func<UnitCtrl, UnitCtrl, ValueDictionary, float> _func, ValueDictionary _valueDictionary)
@@ -252,7 +253,7 @@ namespace Elements
             float start = _target.transform.localPosition.x;
             float knockValue = _func(_target, _source);
             float time = 0.0f;
-            float duration = Mathf.Max(Mathf.Abs(knockValue) / (float)knockAction.Value[eValueNumber.VALUE_3], knockAction.battleManager.DeltaTime_60fps);
+            float duration = Mathf.Max(Mathf.Abs(knockValue) / (float)knockAction.Value[eValueNumber.VALUE_3], BattleManager.DeltaTime_60fps);
             ++_target.KnockBackEnableCount;
             Vector3 localPosition;
             while (true)
@@ -260,7 +261,7 @@ namespace Elements
                 localPosition = _target.transform.localPosition;
                 localPosition.x = start + knockValue * knockAction.KnockAnimationCurve.Evaluate(time / duration);
                 _target.transform.localPosition = localPosition;
-                time += knockAction.battleManager.DeltaTime_60fps;
+                time += BattleManager.DeltaTime_60fps;
                 if (time <= (double)duration)
                     yield return null;
                 else
@@ -284,7 +285,7 @@ namespace Elements
             while (duration > (double)time)
             {
                 Vector3 localPosition = _target.transform.localPosition;
-                time += knockAction.battleManager.DeltaTime_60fps;
+                time += BattleManager.DeltaTime_60fps;
                 if (time > (double)duration)
                     time = duration;
                 localPosition.y = start + knockValue * knockAction.KnockAnimationCurve.Evaluate(time / duration);
@@ -297,7 +298,7 @@ namespace Elements
             while (duration > (double)time)
             {
                 Vector3 localPosition = _target.transform.localPosition;
-                time += knockAction.battleManager.DeltaTime_60fps;
+                time += BattleManager.DeltaTime_60fps;
                 if (time > (double)duration)
                     time = duration;
                 localPosition.y = start - knockValue * knockAction.KnockDownAnimationCurve.Evaluate(time / duration);
@@ -320,9 +321,9 @@ namespace Elements
             do
             {
                 yield return null;
-                time += knockAction.battleManager.DeltaTime_60fps;
-                float y = time >= (double)halfDuration ? easingDownY.GetCurVal(knockAction.battleManager.DeltaTime_60fps) : easingUpY.GetCurVal(knockAction.battleManager.DeltaTime_60fps);
-                _target.transform.localPosition = new Vector3(easingX.GetCurVal(knockAction.battleManager.DeltaTime_60fps), y);
+                time += BattleManager.DeltaTime_60fps;
+                float y = time >= (double)halfDuration ? easingDownY.GetCurVal(BattleManager.DeltaTime_60fps) : easingUpY.GetCurVal(BattleManager.DeltaTime_60fps);
+                _target.transform.localPosition = new Vector3(easingX.GetCurVal(BattleManager.DeltaTime_60fps), y);
             }
             while (time <= 0.5);
         }

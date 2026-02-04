@@ -140,7 +140,7 @@ namespace Elements
       DivisionAction divisionAction = this;
       while (true)
       {
-        _startTime -= divisionAction.battleManager.DeltaTime_60fps;
+        _startTime -= BattleManager.DeltaTime_60fps;
         if (_startTime >= 0.0)
           yield return null;
         else

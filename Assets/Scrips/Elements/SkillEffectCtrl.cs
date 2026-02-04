@@ -384,7 +384,7 @@ namespace Elements
                         if (!(skillEffectCtrl is FirearmCtrl))
                             skillEffectCtrl.timeToDie = true;
                     }
-                    time += skillEffectCtrl.battleManager.DeltaTime_60fps;
+                    time += BattleManager.DeltaTime_60fps;
                 }
                 while (time < (double)skillEffectCtrl.particle.main.duration);
                 skillEffectCtrl.OnEffectEnd?.Invoke(skillEffectCtrl);

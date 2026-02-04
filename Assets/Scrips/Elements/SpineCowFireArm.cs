@@ -131,7 +131,7 @@ namespace Elements
       float time = 0.0f;
       while (true)
       {
-        time += spineCowFireArm.battleManager.DeltaTime_60fps;
+        time += BattleManager.DeltaTime_60fps;
         if (spineCowFireArm.unitSpineController.IsPlayAnimeBattle)
         {
           if ((double) time > 0.300000011920929 && !effectCreated)

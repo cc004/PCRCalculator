@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -134,7 +135,7 @@ namespace Elements
                     _sourceActionController.AppendCoroutine(loopTriggerAction.updateEndMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _source);
                     break;
                 }
-                timer -= loopTriggerAction.battleManager.DeltaTime_60fps;
+                timer -= BattleManager.DeltaTime_60fps;
                 if (timer < 0.0)
                 {
                     _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 3);

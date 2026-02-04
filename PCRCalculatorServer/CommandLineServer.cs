@@ -53,7 +53,7 @@ public class CommandLineServer : MonoBehaviour
 
     public static void Main(string[] args)
     {
-        if (Debugger.IsAttached)
+        if (!Directory.Exists("Data"))
         {
             var exeDir = AppContext.BaseDirectory;
             Directory.SetCurrentDirectory(exeDir);
@@ -83,8 +83,8 @@ public class CommandLineServer : MonoBehaviour
         }
         else
         {
-            // var controller = new ThreadController(1);
-            var controller = new ThreadController(Environment.ProcessorCount);
+            var controller = new ThreadController(1);
+            // var controller = new ThreadController(Environment.ProcessorCount);
 
             var requests = new[]
             {
