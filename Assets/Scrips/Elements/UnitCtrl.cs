@@ -1473,6 +1473,10 @@ namespace Elements
             {
                 battleManager.QueueUpdateSkillTarget();
                 _idleOnly = value;
+                if (value)
+                {
+                    clearHistoryBuffNoMatter();
+                }
             }
         }
 
@@ -1846,7 +1850,13 @@ namespace Elements
             internal protected set
             {
                 if ((long)value > 0 ^ (long)_hp > 0)
+                {
                     battleManager.QueueUpdateSkillTarget();
+                    if ((long)value <= 0)
+                    {
+                        clearHistoryBuffNoMatter();
+                    }
+                }
                 _hp = value;
                 if (!battleManager.skipping)
                     OnLifeAmmountChange?.Invoke(LifeAmount);
@@ -7223,7 +7233,10 @@ this.updateCurColor();
             }
 
             BuffDebuffCoroutineDataSet _cr = new BuffDebuffCoroutineDataSet();
-            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
+            var idx = ++buffDebuffIndex;
+            var dispelled = IdleOnly || (long)Hp < 0;
+            buffDebuffFlag.Add((short) ((_isBuff ? 2 : 0) | (_despelable ? 4 : 0) | (_additional ? 8 : 0) | (dispelled ? 1 : 0) | (int)_kind << 4));
+            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, idx, _isBuff, _additional, _isShowIcon, _bonusId);
             // TODO fill _cr Enable EnvironmentId
 
             buffDebuffCoroutineList.Add(_cr);
@@ -7234,20 +7247,75 @@ this.updateCurColor();
 
         }
 
+        /// <summary>
+        /// bit0: dispelled bit1: isbuff bit2: dispelable bit3: additional bit4~16: kind
+        /// </summary>
+        private List<short> buffDebuffFlag = new List<short>(capacity: 4096)
+        {
+            -1 // note that buff debuff index starts at 1
+        };
+
         private bool isStopBuffDebuffEffectTimer;
 
         public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
 
+        private void clearHistoryBuff()
+        {
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+            {
+                var flag = buffDebuffFlag[i];
+                if ((flag & 0b111) == 0b110) // buff && dispelable && !dispelled
+                    buffDebuffFlag[i] = (short)(flag | 1); // dispelled
+            }
+        }
+
+        private void clearHistoryDebuff()
+        {
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+            {
+                var flag = buffDebuffFlag[i];
+                if ((flag & 0b111) == 0b010) // !buff && dispelable && !dispelled
+                    buffDebuffFlag[i] = (short)(flag | 1); // dispelled
+            }
+
+        }
+
+        private void clearHistoryBuffNoMatter()
+        {
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+                buffDebuffFlag[i] |= 1; // dispelled
+        }
+
         public void CancelStatusUpBuff()
-		{
-			clearedBuffIndex = buffDebuffIndex;
+        {
+            clearHistoryBuff();
 			dispelBuffDebuffImmediately();
 		}
 
-		public void CancelBuffDebuffType(int _buffDebuffCancelType)
-		{
-			BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
+        private int getBuffDebuffParamValue(BuffParamKind _kind, bool _isBuff, bool _additional)
+        {
+            int num = (_additional ? 1000 : 0);
+            int num2 = (int)_kind * 10;
+            int num3 = ((!_isBuff) ? 1 : 0);
+            return num + num2 + num3;
+        }
+
+        public void CancelBuffDebuffType(int _buffDebuffCancelType)
+        {
+            int _isBuff = (1 - (_buffDebuffCancelType & 1)) << 1; // 2 if buff, 0 if debuff
+            int _additional = _buffDebuffCancelType >= 1000 ? 8 : 0; // 8 if additonal
+            int _kind = (_buffDebuffCancelType / 10 % 100) << 4;
+
+            int flag = (_kind | _additional | _isBuff | 4); // 4: dispelable, 0: !dispelled
+
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+            {
+                var f = buffDebuffFlag[i];
+                if (f == flag)
+                    buffDebuffFlag[i] = (short)(f | 1);
+            }
+            BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
 			dispelBuffDebuffImmediately();
 		}
 
@@ -7269,14 +7337,6 @@ this.updateCurColor();
                 item.DispelImmediately(this);
             }
         }
-
-        private int getBuffDebuffParamValue(BuffParamKind _kind, bool _isBuff, bool _additional)
-		{
-			int num = (_additional ? 1000 : 0);
-			int num2 = (int)_kind * 10;
-			int num3 = ((!_isBuff) ? 1 : 0);
-			return num + num2 + num3;
-		}
 
         private IEnumerator UpdateBuffParam(
           BuffParamKind _kind,
@@ -7330,14 +7390,8 @@ this.updateCurColor();
                 /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
                 flag2 = _despelable && flag;
                 if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
-                ;
-                if (IdleOnly 
-                || (long)Hp <= 0 
-                || (_buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) ||
-                    BuffDebuffTypeIndex.TryGetValue(buffId, out var value) && _buffDebuffId <= value) && _despelable)
-                {
+                if ((buffDebuffFlag[_buffDebuffId] & 1) != 0)
                     break;
-                }
                 yield return null;
             }
             /*
@@ -7379,12 +7433,12 @@ this.updateCurColor();
             //this.createBuffDebuffClearEffect(_isBuff, _prefabData);
             if (_isBuff)
             {
-                clearedBuffIndex = buffDebuffIndex;
+                clearHistoryBuff();
                 ClearedBuffFieldIndex = battleManager.MCLFFJEFMIF;
             }
             else
             {
-                clearedDebuffIndex = buffDebuffIndex;
+                clearHistoryDebuff();
                 ClearedDebuffFieldIndex = battleManager.MCLFFJEFMIF;
             }
 
