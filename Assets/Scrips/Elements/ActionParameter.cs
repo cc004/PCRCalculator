@@ -349,6 +349,13 @@ namespace Elements
                    actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
         }
 
+        // RVA: 0x354BC2C Offset: 0x354BC2C VA: 0x354BC2C Slot: 11
+        public virtual bool IsIgnoreDebuffImmune() // TODO forceChangeSpeed action(no implement) return true
+        {
+            return false;
+        }
+
+
         // RVA: 0x27C95C0 Offset: 0x27C95C0 VA: 0x27C95C0 Slot: 12
         public virtual DoubleWithEx GetActionBaseValue(UnitCtrl _source, eValueNumber _type)
         {

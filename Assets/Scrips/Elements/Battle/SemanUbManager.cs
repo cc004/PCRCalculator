@@ -111,12 +111,13 @@ namespace Elements.Battle
                 {
                     var stateId = parent.State2Id[state];
                     var frame = BattleHeaderController.CurrentFrameCount;
-                    if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == stateId) == 0)
+                    if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.action != Action.WAIT_UNIT_EVENT && h.frame == frame && h.waitUnit == unitPos && h.skillId == stateId) == 0)
                     {
                         history.Add(new UbStatus(parent)
                         {
                             waitUnit = unitPos,
                             skillId = stateId,
+                            action = Action.WAIT_UNIT_ACTION,
                             frame = frame
                         });
                     }
@@ -127,7 +128,7 @@ namespace Elements.Battle
             {
                 if (!skillReady) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == skillId) == 0)
+                if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.action != Action.WAIT_UNIT_EVENT && h.frame == frame && h.waitUnit == unitPos && h.skillId == skillId) == 0)
                 {
                     history.Add(new UbStatus(parent)
                     {

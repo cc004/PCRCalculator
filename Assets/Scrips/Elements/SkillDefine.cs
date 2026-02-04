@@ -760,6 +760,10 @@ namespace Elements
                 eActionType.DAMAGE_CUT_FOR_SPECIAL_NULLIFICATION,
                 typeof(DamageCutForSpecialNullificationAction)
             },
+            {
+                eActionType.ETHEREALIZATION,
+                typeof(EtherealizationAction)
+            },
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
         {

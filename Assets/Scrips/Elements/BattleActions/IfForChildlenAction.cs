@@ -94,7 +94,7 @@ namespace Elements
                     break;
                 case eIfType.ALONE:
                     List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
-                    flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long)e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth).Count == 1;
+                    flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long)e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth && !e.JudgeIsEtherialization(_source)).Count == 1;
                     break;
                 case eIfType.BREAK:
                     if (_target.Owner.IsPartsBoss)
@@ -110,7 +110,7 @@ namespace Elements
                     }
                     break;
                 case eIfType.UNIT_ID:
-                    flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner)).Exists(e => e.Owner.UnitId == (double)_valueDictinary[eValueNumber.VALUE_3]);
+                    flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner, _source, TargetAssignment)).Exists(e => e.Owner.UnitId == (double)_valueDictinary[eValueNumber.VALUE_3]);
                     break;
                 case eIfType.CRITICAL:
                     flag = _skill.CriticalPartsList.Contains(_target);
@@ -215,7 +215,7 @@ namespace Elements
                     }
                     else if (ActionDetail1 > 700)
                     {
-                        flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner)).Count == ActionDetail1 - 700;
+                        flag = TargetList.FindAll(e => IfForAllAction.JudgeCountableUnit(e.Owner, _source, TargetAssignment)).Count == ActionDetail1 - 700;
                         break;
                     }
                     /*if (ActionDetail1 > 600)

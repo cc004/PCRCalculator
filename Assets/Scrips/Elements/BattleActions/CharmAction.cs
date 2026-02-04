@@ -76,6 +76,11 @@ namespace Elements
             Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
         }
 
+        public override bool IsIgnoreDebuffImmune()
+        {
+            return BattleUtil.Approximately(Value[eValueNumber.VALUE_6], 1.0) ? true : false;
+        }
+
         private enum eEffectType
         {
             CONVERT,

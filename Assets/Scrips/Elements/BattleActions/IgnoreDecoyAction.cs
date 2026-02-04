@@ -13,5 +13,10 @@ namespace Elements
       foreach (int actionChildrenIndex in ActionChildrenIndexes)
         _skill.ActionParameters[actionChildrenIndex].IgnoreDecoy = true;
     }
+
+    public override bool IsIgnoreDebuffImmune()
+    {
+        return ActionDetail2 == 1;
+    }
   }
 }

@@ -2358,6 +2358,53 @@ namespace Elements.Battle
             //this.AppendCoroutine(this.cameraSizeUpdate(FNHGFDNICFG), ePauseType.NO_DIALOG);
         }
 
+        // RVA: 0x345A444 Offset: 0x345A444 VA: 0x345A444 Slot: 328
+        public void StartAllUnitEtherealizationCheck(UnitCtrl _source)
+        {
+            AppendCoroutine(allUnitEtherealizationCheckUpdate(_source), ePauseType.SYSTEM);
+        }
+        // RVA: 0x345A4C4 Offset: 0x345A4C4 VA: 0x345A4C4
+        private IEnumerator allUnitEtherealizationCheckUpdate(UnitCtrl _source)
+        {
+            while(_source.IsEtherealization())
+            {
+                AllUnitEtherealizationCheck(_source.IsOther);
+                yield return null;
+            }
+
+        }
+
+        // RVA: 0x345A59C Offset: 0x345A59C VA: 0x345A59C
+        public void AllUnitEtherealizationCheck(bool _isOther)
+        {
+            var units = _isOther ? EnemyList : UnitList;
+            foreach(var unit in units)
+            {
+                if (!unit.IsStealth)
+                {
+                    if (unit.Hp != 0) // lanly: why not >0 ?
+                    {
+                        if (!unit.IsEtherealization() && !unit.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            foreach(var unit in units)
+            {
+                // iterate seal data
+                foreach (var kv in unit.SealDictionary)
+                {
+                    SealData sealData = kv.Value;
+                    if (sealData.IsEtherealization)
+                        sealData.RemoveSeal(sealData.Count, true);
+                }
+                unit.DispelAbnormalState(UnitCtrl.eAbnormalState.SPY);
+            }
+        }
+
         /*private IEnumerator cameraSizeUpdate(UnitCtrl FNHGFDNICFG)
         {
             float time = 0.2f;
