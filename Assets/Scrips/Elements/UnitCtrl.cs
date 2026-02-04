@@ -7106,6 +7106,8 @@ this.updateCurColor();
 
         private int clearedDebuffIndex { get; set; }
 
+        private Dictionary<int, int> BuffDebuffTypeIndex { get; set; } = new Dictionary<int, int>();
+
         private int buffCounter { get; set; }
 
         private int debuffCounter { get; set; }
@@ -7235,7 +7237,19 @@ this.updateCurColor();
         public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
 
-        // Elements.UnitCtrl
+        public void CancelStatusUpBuff()
+		{
+			clearedBuffIndex = buffDebuffIndex;
+			dispelBuffDebuffImmediately();
+		}
+
+		public void CancelBuffDebuffType(int _buffDebuffCancelType)
+		{
+			BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
+			dispelBuffDebuffImmediately();
+		}
+
+
         private void dispelBuffDebuffImmediately()
         {
             isStopBuffDebuffEffectTimer = true;
@@ -7253,6 +7267,14 @@ this.updateCurColor();
                 item.DispelImmediately(this);
             }
         }
+
+        private int getBuffDebuffParamValue(BuffParamKind _kind, bool _isBuff, bool _additional)
+		{
+			int num = (_additional ? 1000 : 0);
+			int num2 = (int)_kind * 10;
+			int num3 = ((!_isBuff) ? 1 : 0);
+			return num + num2 + num3;
+		}
 
         private IEnumerator UpdateBuffParam(
           BuffParamKind _kind,
@@ -7304,7 +7326,11 @@ this.updateCurColor();
                 /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
                 flag2 = _despelable && flag;
                 if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
-                if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || _buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) && _despelable)
+                BuffDebuffTypeIndex.TryGetValue(getBuffDebuffParamValue(_kind, _isBuff, _additional), out var value);
+                if (time >= _maxTime 
+                || IdleOnly 
+                || (long)Hp <= 0 
+                || (_buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) || _buffDebuffId <= value) && _despelable)
                 {
                     break;
                 }

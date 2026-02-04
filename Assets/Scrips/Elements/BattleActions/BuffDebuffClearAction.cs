@@ -1,17 +1,32 @@
 ﻿using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Guild;
+using UnityEngine;
 
 namespace Elements
 {
 	public class BuffDebuffClearAction : ActionParameter
 	{
 		private const float CLEAR_SUCCESS_RATE_BASE = 100f;
+		private List<int> BuffDebuffCancelType = new List<int>();
+
 
 		public override void ExecActionOnStart(
 		  Skill _skill,
 		  UnitCtrl _source,
-		  UnitActionController _sourceActionController) => base.ExecActionOnStart(_skill, _source, _sourceActionController);
+		  UnitActionController _sourceActionController)
+		  {
+			base.ExecActionOnStart(_skill, _source, _sourceActionController);
+			if (base.ActionDetail1 == 20)
+			{
+				BuffDebuffCancelType.Add((int)base.Value[eValueNumber.VALUE_4]);
+				BuffDebuffCancelType.Add((int)base.Value[eValueNumber.VALUE_5]);
+				BuffDebuffCancelType.Add((int)base.Value[eValueNumber.VALUE_6]);
+				BuffDebuffCancelType.Add((int)base.Value[eValueNumber.VALUE_7]);
+				BuffDebuffCancelType.RemoveAll((int buffParam) => buffParam == 0);
+			}
+
+		  }
 
 		public override void ExecAction(
 		  UnitCtrl _source,
@@ -39,15 +54,18 @@ namespace Elements
 			else
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);
-				switch (base.ActionDetail1)
+				switch ((eDetail1Type)base.ActionDetail1)
 				{
-					case 1:
+					case eDetail1Type.BUFF:
 						_target.Owner.DespeleBuffDebuff(_isBuff: true, CreateAbnormalEffectData());
 						break;
-					case 2:
+					case eDetail1Type.DEBUFF:
 						_target.Owner.DespeleBuffDebuff(_isBuff: false, CreateAbnormalEffectData());
 						break;
-					case 10:
+					case eDetail1Type.STATUS_UP_CLEAR:
+						_target.Owner.CancelStatusUpBuff();
+						break;
+					case eDetail1Type.ALL_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK);
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC);
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH);
@@ -55,43 +73,47 @@ namespace Elements
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK);
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC);
 						break;
-					case 11:
+					case eDetail1Type.GUARD_ATK_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK);
 						break;
-					case 12:
+					case eDetail1Type.GUARD_MGC_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC);
 						break;
-					case 13:
+					case eDetail1Type.DRAIN_ATK_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK);
 						break;
-					case 14:
+					case eDetail1Type.DRAIN_MGC_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC);
 						break;
-					case 15:
+					case eDetail1Type.GUARD_BOTH_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH);
 						break;
-					case 16:
+					case eDetail1Type.DRAIN_BOTH_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_BOTH);
 						break;
-					case 17:
+					case eDetail1Type.ALL_ATK_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_ATK);
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_ATK);
 						break;
-					case 18:
+					case eDetail1Type.ALL_MGC_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_MGC);
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_MGC);
 						break;
-					case 19:
+					case eDetail1Type.ALL_BOTH_BARRIER:
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.GUARD_BOTH);
 						_target.Owner.DispelAbnormalState(UnitCtrl.eAbnormalState.DRAIN_BOTH);
 						break;
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
-					case 8:
-					case 9:
+					case eDetail1Type.BUFF_DEBUFF_TYPE:
+					{
+						for (int i = 0; i < BuffDebuffCancelType.Count; i++)
+						{
+							_target.Owner.CancelBuffDebuffType(BuffDebuffCancelType[i]);
+						}
+						break;
+					}
+
+					default:
+						Debug.LogError("未対応のBuffDebuffClearActionの詳細1タイプです ActionId:" + ActionId + " Detail1:" + ActionDetail1);
 						break;
 				}
 			}
@@ -107,16 +129,19 @@ namespace Elements
 		{
 			BUFF = 1,
 			DEBUFF = 2,
+			STATUS_UP_CLEAR = 3,
 			ALL_BARRIER = 10,
 			GUARD_ATK_BARRIER = 11,
 			GUARD_MGC_BARRIER = 12,
 			DRAIN_ATK_BARRIER = 13,
 			DRAIN_MGC_BARRIER = 14,
-			GUARD_BOTH_BARRIER = 0xF,
-			DRAIN_BOTH_BARRIER = 0x10,
+			GUARD_BOTH_BARRIER = 15,
+			DRAIN_BOTH_BARRIER = 16,
 			ALL_ATK_BARRIER = 17,
 			ALL_MGC_BARRIER = 18,
-			ALL_BOTH_BARRIER = 19
+			ALL_BOTH_BARRIER = 19,
+			BUFF_DEBUFF_TYPE = 20
+
 		}
 	}
 }
