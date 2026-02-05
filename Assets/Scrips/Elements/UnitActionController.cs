@@ -2391,7 +2391,7 @@ namespace Elements
         }*/
         private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
         {
-            if (!_unitCtrl.JudgeIsEtherializationConsiderDebuffImmune(_unitCtrl, _actionParameter) && !_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
+            if (!_unitCtrl.JudgeIsEtherializationConsiderDebuffImmune(this.Owner, _actionParameter) && !_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
             {
                 if (_actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE && _actionParameter.TargetNum == 1)
                 {
