@@ -294,6 +294,7 @@ namespace Elements
         public Action<UnitCtrl> EnergyChange;
         public Action OnSetBuffForEnchantTrigger;
         public OnDamageDelegate OnDamage;
+        public Action OnGiveCriticalDamage;
         public Action OnActiveUnableState;
         public Action OnActiveCharmState;
         public Action OnSlipDamage;
@@ -7173,6 +7174,8 @@ this.updateCurColor();
           bool _additional,
           bool _isShowIcon,
           int _bonusId = 0,
+          int _environmentId = -1, // TODO implement
+          bool _triggerCall = true, // TODO implement
           Action<string> action = null)
         {
             if (!_isBuff && IsAbnormalState(eAbnormalState.NO_DEBUF))
@@ -7439,6 +7442,7 @@ this.updateCurColor();
           bool _additional,
           bool _showsIcon = true,
           float buffTime = 0,
+          bool _triggerCall = true, // TODO implement
           object extraKey = null)
         {
             if (_value.Values.All((LongWithEx _val) => _val == 0))
@@ -9373,11 +9377,16 @@ this.updateCurColor();
 
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
                 _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple, _actionId, callBack, out bool isHit);
+            var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
             if (_skill != null && isHit && _byAttack)
             {
-                var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
                 if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                     OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
+            }
+            if (_skill != null && _critical && num1 > 0)
+            {
+                if (actionParameter.TargetAssignment != eTargetAssignment.OWNER_SITE && actionParameter.TriggerCall)
+                    _damageData.Source.OnGiveCriticalDamage?.Invoke();
             }
 
             if (_damageData.Target is PartsData)
@@ -10261,8 +10270,7 @@ this.updateCurColor();
                     this.OnLifeAmmountChange.Call<float>(NormalizedHP);
                 }
             }*/
-            if (OnDamage != null)
-                OnDamage(_byAttack, num6, _critical);
+            OnDamage?.Invoke(_byAttack, num6, _critical);
 
             if (!battleManager.skipping)
             {

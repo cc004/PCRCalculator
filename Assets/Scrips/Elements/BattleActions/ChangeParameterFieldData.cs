@@ -29,6 +29,7 @@ namespace Elements
 
         protected override int getClearedIndex(UnitCtrl _unit) => !IsBuff ? _unit.ClearedDebuffFieldIndex : _unit.ClearedBuffFieldIndex;
         public bool ShowsIcon = true;
+        public bool TriggerCall = true; // TODO implement
 
         public void DispelImmediately(UnitCtrl _unit)
         {

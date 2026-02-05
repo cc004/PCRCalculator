@@ -238,7 +238,7 @@ namespace Elements
                 dictionary.Add(_target.Owner.DummyPartsData, BuffDebuffAction.CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (BuffDebuffAction.eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, _isDebuf));
             //_target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, dictionary, 0.0f, 0, null, true, eEffectType.COMMON, !_isDebuf, false);
             _target.Owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, changeParamKind, dictionary, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !_isDebuf, _additional: false, _isShowIcon: false);
-            _target.Owner.EnableBuffParam(changeParamKind, dictionary, _enable: true, _source, !_isDebuf, _additional: false);
+            _target.Owner.EnableBuffParam(changeParamKind, dictionary, _enable: true, _source, !_isDebuf, _additional: false, _triggerCall: TriggerCall);
 
             //_target.Owner.EnableBuffParam(changeParamKind, dictionary, true, _source, !_isDebuf, false, 90);
             if (ActionDetail2 == 1)
