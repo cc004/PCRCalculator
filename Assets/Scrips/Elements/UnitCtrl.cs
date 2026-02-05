@@ -3318,7 +3318,10 @@ this.updateCurColor();
             Skill _skill,
             BasePartsData _parts)
         {
+            int back_upCurrentSkillId = CurrentSkillId;
+            CurrentSkillId = _skill.SkillId;
             unitActionController.ExecSkillWithTargetParts(_skill, _parts);
+            CurrentSkillId = back_upCurrentSkillId;
         }
 
         public void ExecActionOnWaveStart() => unitActionController.ExecActionOnWaveStart();
