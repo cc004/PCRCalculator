@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -126,7 +127,7 @@ namespace Elements
             float timer = _duration;
             while (timer > 0.0)
             {
-                timer -= stealthAction.battleManager.DeltaTime_60fps;
+                timer -= BattleManager.DeltaTime_60fps;
                 yield return null;
             }
             _target.IsStealth = false;

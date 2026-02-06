@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -130,7 +131,7 @@ namespace Elements
                     };
                     while (true)
                     {
-                        timer += damageChargeAction.battleManager.DeltaTime_60fps;
+                        timer += BattleManager.DeltaTime_60fps;
                         if (!damageChargeAction.isActionCancel(_source, _sourceActionController, _skill))
                         {
                             if ((long)_source.Hp > 0L)

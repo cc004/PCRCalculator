@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Spine
@@ -34,8 +35,7 @@ namespace Spine
 
 		private readonly ExposedList<TrackEntry> mixingTo = new ExposedList<TrackEntry>();
 
-		private bool animationsChanged;
-
+        private bool animationsChanged;
 		private float timeScale = 1f;
 		private bool suppressEvents;
 
@@ -265,18 +265,8 @@ namespace Spine
 			return result;
 		}
 
-		public bool LightApply(Skeleton skeleton)
+		public void LightApply(Skeleton skeleton)
 		{
-			if (skeleton == null)
-			{
-				throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
-			}
-			if (animationsChanged)
-			{
-				AnimationsChanged();
-			}
-			ExposedList<Event> exposedList = events;
-			bool result = false;
 			TrackEntry[] items = tracks.Items;
 			int i = 0;
 			for (int count = tracks.Count; i < count; i++)
@@ -284,16 +274,39 @@ namespace Spine
 				TrackEntry trackEntry = items[i];
 				if (trackEntry != null && !(trackEntry.delay > 0f))
 				{
-					result = true;
-					float animationTime = trackEntry.AnimationTime;
-					QueueEvents(trackEntry, animationTime);
-					exposedList.Clear(clearArray: false);
+					float animationTime;
+
+                    if (trackEntry.loop)
+                    {
+                        float num_ = trackEntry.animationEnd - trackEntry.animationStart;
+                        if (num_ == 0f)
+                        {
+                            animationTime = trackEntry.animationStart;
+                        }
+                        else
+                            animationTime = trackEntry.trackTime % num_ + trackEntry.animationStart;
+
+                        float num = trackEntry.animationEnd - trackEntry.animationStart;
+                        float num2 = trackEntry.trackLast % num;
+
+                        if (num2 > trackEntry.trackTime % num)
+                        {
+                            OnComplete(trackEntry);
+                        }
+                    }
+                    else
+                    {
+                        animationTime = Math.Min(trackEntry.trackTime + trackEntry.animationStart, trackEntry.animationEnd);
+
+                        if (trackEntry.trackTime + trackEntry.animationStart >= trackEntry.animationEnd && trackEntry.animationLast < trackEntry.animationEnd)
+                        {
+                            OnComplete(trackEntry);
+                        }
+                    }
 					trackEntry.nextAnimationLast = animationTime;
 					trackEntry.nextTrackLast = trackEntry.trackTime;
 				}
 			}
-			queue.Drain();
-			return result;
 		}
 
 		private float ApplyMixingFrom(TrackEntry to, Skeleton skeleton, MixPose currentPose)

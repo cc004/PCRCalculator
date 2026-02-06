@@ -121,11 +121,11 @@ namespace Elements
 
     protected override void EntryCallBack()
     {
-      startEndDelegate = _animationState => IsPlayAnime = false;
-      state.Complete += startEndDelegate;
+      // startEndDelegate = _animationState => IsPlayAnime = false;
+      // state.Complete += startEndDelegate;
       startStartDelegate = _animationState =>
       {
-          IsPlayAnime = true;
+          // IsPlayAnime = true;
           AnimeName = AnimationName;
       };
       state.Start += startStartDelegate;

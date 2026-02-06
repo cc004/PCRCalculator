@@ -75,7 +75,7 @@ namespace Elements
       do
       {
         yield return null;
-        Timer -= battleManager.DeltaTime_60fps;
+        Timer -= BattleManager.DeltaTime_60fps;
       }
       while (Timer >= 0.0 && !_target.IsDead);
       //this.Effect.SetTimeToDie(true);

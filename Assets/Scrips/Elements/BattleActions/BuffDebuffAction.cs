@@ -17,7 +17,7 @@ namespace Elements
         private const int UNDESPELABLE_NUMBER = 2;
         private const int DETAIL_DIGIT = 10;
         private const int DETAIL_DEBUFF = 1;
-        public int ENVIRONMENTID { get; set; }
+        public int EnvironmentId { get; set; } // TODO implement
 
 
         public override void ExecActionOnStart(
@@ -48,7 +48,7 @@ namespace Elements
                 //_source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, getIsAdditional(),90);
 
                 _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
-                _source.EnableBuffParam(buffParamKind, buffParam, _enable: true, _source, !isDebuff, getIsAdditional());
+                _source.EnableBuffParam(buffParamKind, buffParam, _enable: true, _source, !isDebuff, getIsAdditional(), _triggerCall: TriggerCall);
 
             };
             partsData.OnBreakEnd += () =>
@@ -96,7 +96,7 @@ namespace Elements
                 dictionary.Add(_target.Owner.DummyPartsData, CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
             bool despelable = _valueDictionary[eValueNumber.VALUE_7] != 2f;
             //_target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
-            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, action);
+            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, EnvironmentId, TriggerCall, action);
 
         }
 

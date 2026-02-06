@@ -12,7 +12,7 @@ namespace Elements.Battle
 {
   public class BattleSpeedManager :  BattleSpeedInterface
   {
-    private BattleManager_Time battleManager;
+    private BattleManager battleManager;
     private float baseTimeScale = 1f;
     private Dictionary<UnitCtrl, bool> slowStopFlagDic = new Dictionary<UnitCtrl, bool>();
     private bool speedupFlag;
@@ -70,7 +70,7 @@ namespace Elements.Battle
       }
     }
 
-    public BattleSpeedManager(BattleManager_Time KHPJAFEGFBO) => battleManager = KHPJAFEGFBO;
+    public BattleSpeedManager(BattleManager KHPJAFEGFBO) => battleManager = KHPJAFEGFBO;
 
     public void SetBaseTimeScale(float EGAMDNELEIL) => baseTimeScale = EGAMDNELEIL;
 
@@ -107,7 +107,7 @@ namespace Elements.Battle
       float time = Time;
       while (true)
       {
-        time += battleManager.DeltaTime_60fps;
+        time += BattleManager.DeltaTime_60fps;
         if (time <= (double) SlowEffect.StartDelay)
           yield return null;
         else
@@ -125,8 +125,8 @@ namespace Elements.Battle
       time = 0.0f;
       while (!slowStopFlagDic[Source])
       {
-        time += battleManager.DeltaTime_60fps;
-        baseTimeScale = SlowEffect.StartEasing.GetCurVal(battleManager.DeltaTime_60fps);
+        time += BattleManager.DeltaTime_60fps;
+        baseTimeScale = SlowEffect.StartEasing.GetCurVal(BattleManager.DeltaTime_60fps);
                 UnityEngine.Time.timeScale = (speedupFlag ? speedUpRate : 1f) * BaseTimeScale;
         if (time <= (double) SlowEffect.StartDuration)
         {
@@ -137,7 +137,7 @@ namespace Elements.Battle
           time = 0.0f;
           while (!slowStopFlagDic[Source])
           {
-            time += battleManager.DeltaTime_60fps;
+            time += BattleManager.DeltaTime_60fps;
             if (time <= (double) SlowEffect.Duration)
             {
               yield return null;
@@ -147,8 +147,8 @@ namespace Elements.Battle
               time = 0.0f;
               while (!slowStopFlagDic[Source])
               {
-                time += battleManager.DeltaTime_60fps;
-                baseTimeScale = SlowEffect.EndEasing.GetCurVal(battleManager.DeltaTime_60fps);
+                time += BattleManager.DeltaTime_60fps;
+                baseTimeScale = SlowEffect.EndEasing.GetCurVal(BattleManager.DeltaTime_60fps);
                                 UnityEngine.Time.timeScale = (speedupFlag ? speedUpRate : 1f) * BaseTimeScale;
                 if (time <= (double) SlowEffect.EndDuration)
                 {

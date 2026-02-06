@@ -80,8 +80,11 @@ namespace Elements
         private Action<int, bool> createOnAddSeal(EtherealizationAction.eTargetAttackType _targetAttackType, UnitCtrl _target)
         {
             return (int _id, bool _zeroToOne) => {
-                _target.AddEtherealizationCount(_targetAttackType);
-                battleManager.StartAllUnitEtherealizationCheck(_target);
+                if (_zeroToOne)
+                {
+                    _target.AddEtherealizationCount(_targetAttackType);
+                    battleManager.StartAllUnitEtherealizationCheck(_target);
+                }
             };
         }
 

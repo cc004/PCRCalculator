@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Cute;
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -195,7 +196,7 @@ namespace Elements
                 }
                 else
                 {
-                    float fnhfjlaenpf = firearmCtrl.battleManager.DeltaTime_60fps;
+                    float fnhfjlaenpf = BattleManager.DeltaTime_60fps;
                     if (hitFlag)
                     {
                         hitTimer += fnhfjlaenpf;

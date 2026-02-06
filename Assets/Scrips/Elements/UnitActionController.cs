@@ -1187,7 +1187,7 @@ namespace Elements
                 {
                     if (!BattleHeaderController.Instance.IsPaused)
                         deltaTimeAccumulated += Time.deltaTime;
-                    for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= battleManager.DeltaTime_60fps)
+                    for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= BattleManager.DeltaTime_60fps)
                     {
                         if (!battleManager.BlackoutUnitTargetList.Contains(Owner))
                         {
@@ -1251,7 +1251,7 @@ namespace Elements
             Owner.GetCurrentSpineCtrl().state.TimeScale = 1f;
             while (_annihilationId == Owner.AnnihilationId)
             {
-                for (float num = 0.0f + Time.deltaTime; num > 0.0; num -= battleManager.DeltaTime_60fps)
+                for (float num = 0.0f + Time.deltaTime; num > 0.0; num -= BattleManager.DeltaTime_60fps)
                 {
                     battleCameraEffect.UpdateShake();
                     if (!unitSpineController.IsPlayAnime)
@@ -1382,7 +1382,7 @@ namespace Elements
             yield return null;
             //if (!SingletonMonoBehaviour<BattleHeaderController>.Instance.IsPaused)
             deltaTimeAccumulated += Time.deltaTime;
-            for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= battleManager.DeltaTime_60fps)
+            for (; deltaTimeAccumulated > 0.0; deltaTimeAccumulated -= BattleManager.DeltaTime_60fps)
             {
                 if (!_coroutine.MoveNext())
                     yield break;
@@ -1494,7 +1494,7 @@ namespace Elements
                 float waitTime = _action.ExecTime[i];
                 while (true)
                 {
-                    time += battleManager.DeltaTime_60fps;
+                    time += BattleManager.DeltaTime_60fps;
                     if (_ignoreCancel || !_skill.Cancel && !_action.CancelByIfForAll)
                     {
                         if (waitTime > (double)time && (_action.ActionType != eActionType.TRIGER || _action.ActionDetail1 != 4))
@@ -1897,7 +1897,7 @@ namespace Elements
                         do
                         {
                             yield return null;
-                            time += battleManager.DeltaTime_60fps;
+                            time += BattleManager.DeltaTime_60fps;
                             if (_skill.Cancel || !Owner.gameObject.activeSelf || _modeChangeEndEffect && Owner.IsUnableActionState())
                                 yield break;
                         }
@@ -1997,7 +1997,7 @@ namespace Elements
           {
             while (true)
             {
-              time += battleManager.DeltaTime_60fps;
+              time += BattleManager.DeltaTime_60fps;
               if (!_skill.Cancel)
               {
                 if (_delay > (double) time)
@@ -2391,7 +2391,7 @@ namespace Elements
         }*/
         private bool judgeIsTarget(UnitCtrl _unitCtrl, ActionParameter _actionParameter)
         {
-            if (!_unitCtrl.JudgeIsEtherializationConsiderDebuffImmune(_unitCtrl, _actionParameter) && !_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
+            if (!_unitCtrl.JudgeIsEtherializationConsiderDebuffImmune(this.Owner, _actionParameter) && !_unitCtrl.IsStealth && (!_unitCtrl.IsPhantom || _actionParameter.TargetSort == PriorityPattern.OWN_SUMMON_RANDOM) && ((!_unitCtrl.IsDead && (long)_unitCtrl.Hp > 0) || _unitCtrl.HasUnDeadTime) && (_actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE || Owner != _unitCtrl))
             {
                 if (_actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE && _actionParameter.TargetNum == 1)
                 {

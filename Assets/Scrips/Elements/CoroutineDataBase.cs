@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Elements
 {
@@ -23,7 +24,8 @@ namespace Elements
       CoroutineList.Clear();
     }
 
-    public virtual void Update()
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Update()
     { 
       if (CoroutineList.Count <= 0)
         return;

@@ -20,7 +20,8 @@ namespace Elements
 
 		private enum eTriggerType // TypeDefIndex: 18904
 		{
-			SET_BUFF = 1
+			SET_BUFF = 1,
+			GIVE_CRITICAL = 2,
 		}
 
 
@@ -89,15 +90,13 @@ namespace Elements
 
 			int effexecLimitNum = BattleUtil.DoubleToInt(_valueDictionary[eValueNumber.VALUE_3]);
 
-			// 当触发类型为设置增益时，针对目标拥有者启动效果
-			if ((eTriggerType)ActionDetail1 == eTriggerType.SET_BUFF)
+			Action nxtAction = () =>
 			{
-				Action nxtAction = () =>
-				{
-					startEffect(_source);
-					_source.ExecSkillWithTargetId(_skill, ActionDetail2);
-				};
-				_target.Owner.OnSetBuffForEnchantTrigger += () =>
+				startEffect(_source);
+				_source.ExecSkillWithTargetId(_skill, ActionDetail2);
+			};
+
+			Action callback = () =>
 				{
 					if (!judgeSilenceOrToad(_source))
 					{
@@ -113,6 +112,19 @@ namespace Elements
 						}
 					}
 				};
+
+			// 当触发类型为设置增益时，针对目标拥有者启动效果
+			if ((eTriggerType)ActionDetail1 == eTriggerType.SET_BUFF)
+			{
+				_target.Owner.OnSetBuffForEnchantTrigger += callback;
+			}
+			else if ((eTriggerType)ActionDetail1 == eTriggerType.GIVE_CRITICAL)
+			{
+				_target.Owner.OnGiveCriticalDamage += callback;
+			}
+			else
+			{
+				Debug.Log("EnchantTriggerAction: Unknown Trigger Type " + ActionDetail1);
 			}
 		}
 

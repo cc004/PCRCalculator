@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -87,7 +88,7 @@ namespace Elements
         }
         else
         {
-          timer -= countDownAction.battleManager.DeltaTime_60fps;
+          timer -= BattleManager.DeltaTime_60fps;
           //_countDownEffect.SetDamageText((int) timer);
           yield return null;
         }
@@ -119,7 +120,7 @@ namespace Elements
       float time = _endEffect.Time;
       while ((double) time > 0.0)
       {
-        time -= countDownAction.battleManager.DeltaTime_60fps;
+        time -= BattleManager.DeltaTime_60fps;
         yield return (object) null;
       }
       GameObject MDOJNMEMHLN = _target.IsLeftDir ? _endEffect.PrefabLeft : _endEffect.Prefab;

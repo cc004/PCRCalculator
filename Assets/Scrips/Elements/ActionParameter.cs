@@ -60,7 +60,7 @@ namespace Elements
 
         public float TargetWidth { get; set; }
 
-        public bool TriggerCall { get; set; }
+        public bool TriggerCall { get; set; } = true;
 
 
         public DirectionType Direction { get; set; }
