@@ -199,6 +199,11 @@ namespace PCRApi
             registries.Clear();
 
             var file = GetManifestJson();
+
+            var poolPath = $"{ABExTool.persistentDataPath}/Pool";
+            if (!Directory.Exists(poolPath))
+                Directory.CreateDirectory(poolPath);
+            
             try
             {
                 registries = JsonConvert.DeserializeObject<Dictionary<string, Content>>(File.ReadAllText(file));
@@ -227,7 +232,20 @@ namespace PCRApi
             if (registries.TryGetValue(path, out var content))
             {
                 Debug.Log($"resolving file {path}");
-                return content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}");
+
+                var cacheFile = $"{ABExTool.persistentDataPath}/Pool/{content.MD5}";
+
+                if (File.Exists(cacheFile))
+                {
+                    var bytes = File.ReadAllBytes(cacheFile);
+                    Debug.Log($"file {path} loaded from cache");
+                    return bytes;
+                }
+
+                var raw = content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}");
+                File.WriteAllBytes(cacheFile, raw);
+
+                return raw;
             }
             return null;
         }
