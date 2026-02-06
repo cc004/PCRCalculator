@@ -5334,7 +5334,7 @@ this.updateCurColor();
 
             m_abnormalState[_abnormalState] = overlapAbnormalStateIndexList[_abnormalState].Count > 0;
 
-            if ((!m_abnormalState[_abnormalState] || time < _effectTime) && !disableBySwitch) // TODO here sync with bcr fix
+            if (!m_abnormalState[_abnormalState] && !disableBySwitch)
             {
                 battleManager.RestartAbnormalStateField(this, _abnormalState, false);
             }
