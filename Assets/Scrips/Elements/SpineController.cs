@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
@@ -29,8 +30,16 @@ namespace Elements
 
         public string DefaultSkinName => DefaultSkin == null ? "" : DefaultSkin.Name;
 
-        public bool IsPlayAnime { get; protected set; }
+        // public bool IsPlayAnime { get; protected set; }
 
+        public bool IsPlayAnime
+        {
+            get
+            {
+                var track = state.Tracks.Items[0];
+                return track.IsComplete;
+            }
+        }
         public string AnimeName { get; protected set; }
 
         /*public int Depth
@@ -91,7 +100,7 @@ namespace Elements
         public virtual void Create(SkeletonDataAsset _createSkeletonDataAsset)
         {
             //this.spineManager = ManagerSingleton<SpineManager>.Instance;
-            IsPlayAnime = false;
+            // IsPlayAnime = false;
             AnimeName = "";
             EntryCallBack();
             //this.ChangeSkeletonDataAsset(_createSkeletonDataAsset);
@@ -174,13 +183,13 @@ namespace Elements
 
         public void StopAnime(int _trackIndex)
         {
-            IsPlayAnime = false;
+            // IsPlayAnime = false;
             state.ClearTrack(_trackIndex);
         }
 
         public void StopAnimeAll()
         {
-            IsPlayAnime = false;
+            // IsPlayAnime = false;
             state.ClearTracks();
         }
 
@@ -198,16 +207,17 @@ namespace Elements
 
         protected virtual void EntryCallBack()
         {
+            /*
             startEndDelegate = _animationState =>
             {
                 if (!(_animationState.Animation.Name == AnimationName))
                     return;
                 IsPlayAnime = false;
             };
-            state.Complete += startEndDelegate;
+            state.Complete += startEndDelegate;*/
             startStartDelegate = _animationState =>
             {
-                IsPlayAnime = true;
+                // IsPlayAnime = true;
                 AnimeName = AnimationName;
             };
             state.Start += startStartDelegate;

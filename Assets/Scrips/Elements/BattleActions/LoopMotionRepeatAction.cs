@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -113,7 +114,7 @@ namespace Elements
       float repeatTimer = 0.0f;
       while (!motionRepeatAction.isActionCancel(_source, _sourceActionController, _skill))
       {
-        repeatTimer -= motionRepeatAction.battleManager.DeltaTime_60fps;
+        repeatTimer -= BattleManager.DeltaTime_60fps;
         if (repeatTimer < 0.0 && !motionRepeatAction.cancelAction)
         {
           repeatTimer = motionRepeatAction.repeatTime;
@@ -146,7 +147,7 @@ namespace Elements
           motionRepeatAction.isLoopMotion = false;
           break;
         }
-        timer -= motionRepeatAction.battleManager.DeltaTime_60fps;
+        timer -= BattleManager.DeltaTime_60fps;
         if (timer < 0.0)
         {
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);

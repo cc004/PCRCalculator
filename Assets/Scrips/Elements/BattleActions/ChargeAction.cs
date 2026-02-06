@@ -1,6 +1,7 @@
 ﻿
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 
 namespace Elements
 {
@@ -66,11 +67,11 @@ namespace Elements
           switch ((eChargeActionType) chargeAction.ActionDetail1)
           {
             case eChargeActionType.TAP:
-              timer += chargeAction.battleManager.DeltaTime_60fps;
+              timer += BattleManager.DeltaTime_60fps;
               if (chargeAction.battleManager.BattleCategory == eBattleCategory.ARENA || chargeAction.battleManager.BattleCategory == eBattleCategory.ARENA_REPLAY || (chargeAction.battleManager.BattleCategory == eBattleCategory.GRAND_ARENA || chargeAction.battleManager.BattleCategory == eBattleCategory.GRAND_ARENA_REPLAY) || chargeAction.battleManager.BattleCategory == eBattleCategory.FRIEND)
                 additionalValue[targetValue] = chargeAction.Value[eValueNumber.VALUE_1] * chargeAction.Value[eValueNumber.VALUE_3];
               else
-                additionalValue[targetValue] += chargeAction.battleManager.DeltaTime_60fps * chargeAction.Value[eValueNumber.VALUE_1];
+                additionalValue[targetValue] += BattleManager.DeltaTime_60fps * chargeAction.Value[eValueNumber.VALUE_1];
               if (timer > (double) chargeAction.Value[eValueNumber.VALUE_3] || !_sourceActionController.Skill1Charging)
                 goto label_14;
               else

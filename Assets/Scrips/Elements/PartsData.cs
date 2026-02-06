@@ -485,13 +485,13 @@ namespace Elements
             //float time = 1.12f;
             /*while ((double)time > 0.0)
             {
-                time -= partsData.battleManager.DeltaTime_60fps;.0
+                time -= BattleManager.DeltaTime_60fps;.0
                 yield return (object)null;
             }*/
             RecoverTime = 1.12f;
             while (RecoverTime > 0.0)
             {
-                RecoverTime -= partsData.battleManager.DeltaTime_60fps;
+                RecoverTime -= BattleManager.DeltaTime_60fps;
                 yield return null;
             }
             RecoverTime = 1.12f;

@@ -1418,15 +1418,17 @@ namespace Elements
 
         public bool MainSkill1Evolved { get; set; }
 
-        //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? battleManager.DeltaTime_60fps : 0.0f;
+        //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? BattleManager.DeltaTime_60fps : 0.0f;
 
+        public bool FlagDeltaTimeForPause =>
+            PlayingNoCutinMotion || !battleManager.IsPausingEffectSkippedInThisFrame && !m_bPause;
         public float DeltaTimeForPause
         {
             get
             {
                 if (PlayingNoCutinMotion)
                 {
-                    return battleManager.DeltaTime_60fps;
+                    return BattleManager.DeltaTime_60fps;
                 }
                 if (battleManager == null)
                 {
@@ -1438,7 +1440,7 @@ namespace Elements
                 }
                 if (!m_bPause)
                 {
-                    return battleManager.DeltaTime_60fps;
+                    return BattleManager.DeltaTime_60fps;
                 }
                 return 0f;
             }
@@ -1472,6 +1474,10 @@ namespace Elements
             {
                 battleManager.QueueUpdateSkillTarget();
                 _idleOnly = value;
+                if (value)
+                {
+                    clearHistoryBuffNoMatter();
+                }
             }
         }
 
@@ -1845,7 +1851,13 @@ namespace Elements
             internal protected set
             {
                 if ((long)value > 0 ^ (long)_hp > 0)
+                {
                     battleManager.QueueUpdateSkillTarget();
+                    if ((long)value <= 0)
+                    {
+                        clearHistoryBuffNoMatter();
+                    }
+                }
                 _hp = value;
                 if (!battleManager.skipping)
                     OnLifeAmmountChange?.Invoke(LifeAmount);
@@ -3541,7 +3553,7 @@ this.updateCurColor();
                     //XX: force make up for part boss additional 1 frame
                     if (battleManager.BossUnit.IsPartsBoss)
                     {
-                        m_fCastTimer += battleManager.DeltaTime_60fps;
+                        m_fCastTimer += BattleManager.DeltaTime_60fps;
                     }*/
                     break;
             }
@@ -3997,13 +4009,13 @@ this.updateCurColor();
             }
             if (UnionBurstCoolDownTime > 0f && battleManager.GetBlackOutUnitLength() == 0)
             {
-                UnionBurstCoolDownTime -= battleManager.DeltaTime_60fps;
+                UnionBurstCoolDownTime -= BattleManager.DeltaTime_60fps;
             }            
             /*else
             {
                 if ((double)this.sortOffsetResetTimer <= 0.0)
                     return;
-                this.sortOffsetResetTimer -= this.battleManager.DeltaTime_60fps;
+                this.sortOffsetResetTimer -= BattleManager.DeltaTime_60fps;
                 if ((double)this.sortOffsetResetTimer > 0.0)
                     return;
                 this.hitEffectSortOffset = 0;
@@ -4299,8 +4311,8 @@ this.updateCurColor();
                     float time = 0.0f;
                     while (true)
                     {
-                        time += unitCtrl.battleManager.DeltaTime_60fps;
-                        unitCtrl.transform.localPosition += v * unitCtrl.battleManager.DeltaTime_60fps;
+                        time += BattleManager.DeltaTime_60fps;
+                        unitCtrl.transform.localPosition += v * BattleManager.DeltaTime_60fps;
                         if (time <= (double)duration)
                             yield return null;
                         else
@@ -6985,7 +6997,7 @@ this.updateCurColor();
             if (!_event.Data.Name.Contains("move"))
                 return;
             float num1 = (float)_event.Int;
-            float _duration = _event.Float * this.battleManager.DeltaTime_60fps;
+            float _duration = _event.Float * BattleManager.DeltaTime_60fps;
             if ((double)num1 == 0.0 || (double)_duration == 0.0)
                 return;
             float num2 = this.battleCameraEffect.orthographicSize / 1.15f;
@@ -7060,7 +7072,7 @@ this.updateCurColor();
         {
             UnitCtrl unitCtrl = this;
             float num = _distance / _duration;
-            float deltaTime = unitCtrl.battleManager.DeltaTime_60fps;
+            float deltaTime = BattleManager.DeltaTime_60fps;
             float deltaPosX = num * deltaTime;
             float remainTime = _duration;
             float realMovedDistance = 0.0f;
@@ -7227,7 +7239,10 @@ this.updateCurColor();
             }
 
             BuffDebuffCoroutineDataSet _cr = new BuffDebuffCoroutineDataSet();
-            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, ++buffDebuffIndex, _isBuff, _additional, _isShowIcon, _bonusId);
+            var idx = ++buffDebuffIndex;
+            var dispelled = IdleOnly || (long)Hp < 0;
+            buffDebuffFlag.Add((short) ((_isBuff ? 2 : 0) | (_despelable ? 4 : 0) | (_additional ? 8 : 0) | (dispelled ? 1 : 0) | (int)_kind << 4));
+            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, idx, _isBuff, _additional, _isShowIcon, _bonusId);
             // TODO fill _cr Enable EnvironmentId
 
             buffDebuffCoroutineList.Add(_cr);
@@ -7238,20 +7253,75 @@ this.updateCurColor();
 
         }
 
+        /// <summary>
+        /// bit0: dispelled bit1: isbuff bit2: dispelable bit3: additional bit4~16: kind
+        /// </summary>
+        private List<short> buffDebuffFlag = new List<short>(capacity: 4096)
+        {
+            -1 // note that buff debuff index starts at 1
+        };
+
         private bool isStopBuffDebuffEffectTimer;
 
         public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
 
+        private void clearHistoryBuff()
+        {
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+            {
+                var flag = buffDebuffFlag[i];
+                if ((flag & 0b111) == 0b110) // buff && dispelable && !dispelled
+                    buffDebuffFlag[i] = (short)(flag | 1); // dispelled
+            }
+        }
+
+        private void clearHistoryDebuff()
+        {
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+            {
+                var flag = buffDebuffFlag[i];
+                if ((flag & 0b111) == 0b010) // !buff && dispelable && !dispelled
+                    buffDebuffFlag[i] = (short)(flag | 1); // dispelled
+            }
+
+        }
+
+        private void clearHistoryBuffNoMatter()
+        {
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+                buffDebuffFlag[i] |= 1; // dispelled
+        }
+
         public void CancelStatusUpBuff()
-		{
-			clearedBuffIndex = buffDebuffIndex;
+        {
+            clearHistoryBuff();
 			dispelBuffDebuffImmediately();
 		}
 
-		public void CancelBuffDebuffType(int _buffDebuffCancelType)
-		{
-			BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
+        private int getBuffDebuffParamValue(BuffParamKind _kind, bool _isBuff, bool _additional)
+        {
+            int num = (_additional ? 1000 : 0);
+            int num2 = (int)_kind * 10;
+            int num3 = ((!_isBuff) ? 1 : 0);
+            return num + num2 + num3;
+        }
+
+        public void CancelBuffDebuffType(int _buffDebuffCancelType)
+        {
+            int _isBuff = (1 - (_buffDebuffCancelType & 1)) << 1; // 2 if buff, 0 if debuff
+            int _additional = _buffDebuffCancelType >= 1000 ? 8 : 0; // 8 if additonal
+            int _kind = (_buffDebuffCancelType / 10 % 100) << 4;
+
+            int flag = (_kind | _additional | _isBuff | 4); // 4: dispelable, 0: !dispelled
+
+            for (int i = 1; i <= buffDebuffIndex; ++i)
+            {
+                var f = buffDebuffFlag[i];
+                if (f == flag)
+                    buffDebuffFlag[i] = (short)(f | 1);
+            }
+            BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
 			dispelBuffDebuffImmediately();
 		}
 
@@ -7273,14 +7343,6 @@ this.updateCurColor();
                 item.DispelImmediately(this);
             }
         }
-
-        private int getBuffDebuffParamValue(BuffParamKind _kind, bool _isBuff, bool _additional)
-		{
-			int num = (_additional ? 1000 : 0);
-			int num2 = (int)_kind * 10;
-			int num3 = ((!_isBuff) ? 1 : 0);
-			return num + num2 + num3;
-		}
 
         private IEnumerator UpdateBuffParam(
           BuffParamKind _kind,
@@ -7318,11 +7380,13 @@ this.updateCurColor();
             }
             EnableBuffParam(_kind, _value, true, _source, _isBuff, _additional, _isShowIcon, _maxTime);
             float time = 0.0f;
+            var buffId = getBuffDebuffParamValue(_kind, _isBuff, _additional);
             while (true)
             {
-                if (!isStopBuffDebuffEffectTimer)
+                if (!isStopBuffDebuffEffectTimer && FlagDeltaTimeForPause)
                 {
-                    time += DeltaTimeForPause;
+                    if ((time += BattleManager.DeltaTime_60fps) > _maxTime)
+                        break;
                 }
                 /*
                 if (time > 1f)
@@ -7332,14 +7396,8 @@ this.updateCurColor();
                 /* bool flag = (_isBuff ? (_buffDebuffId <= clearedBuffIndex) : (_buffDebuffId <= clearedDebuffIndex));
                 flag2 = _despelable && flag;
                 if (time >= _maxTime || IdleOnly || (long)Hp <= 0 || flag2)*/
-                BuffDebuffTypeIndex.TryGetValue(getBuffDebuffParamValue(_kind, _isBuff, _additional), out var value);
-                if (time >= _maxTime 
-                || IdleOnly 
-                || (long)Hp <= 0 
-                || (_buffDebuffId <= (_isBuff ? clearedBuffIndex : clearedDebuffIndex) || _buffDebuffId <= value) && _despelable)
-                {
+                if ((buffDebuffFlag[_buffDebuffId] & 1) != 0)
                     break;
-                }
                 yield return null;
             }
             /*
@@ -7381,12 +7439,12 @@ this.updateCurColor();
             //this.createBuffDebuffClearEffect(_isBuff, _prefabData);
             if (_isBuff)
             {
-                clearedBuffIndex = buffDebuffIndex;
+                clearHistoryBuff();
                 ClearedBuffFieldIndex = battleManager.MCLFFJEFMIF;
             }
             else
             {
-                clearedDebuffIndex = buffDebuffIndex;
+                clearHistoryDebuff();
                 ClearedDebuffFieldIndex = battleManager.MCLFFJEFMIF;
             }
 
@@ -9121,7 +9179,7 @@ this.updateCurColor();
                     yield break;
                 }
 
-                _data.BreakTime -= battleManager.DeltaTime_60fps;
+                _data.BreakTime -= BattleManager.DeltaTime_60fps;
                 yield return null;
             }
             _data.BreakTime = 0.0f;
@@ -11130,7 +11188,7 @@ this.updateCurColor();
                         yield break;
                     }
 
-                    timer += battleManager.DeltaTime_60fps;
+                    timer += BattleManager.DeltaTime_60fps;
                     if (timer < currentData.Time - (double)currentData.Duration)
                     {
                         if (timer >= (double)_startTime)
@@ -11138,7 +11196,7 @@ this.updateCurColor();
                     }
                     else if (timer < (double)currentData.Time)
                     {
-                        float curVal = currentEasing.GetCurVal(battleManager.DeltaTime_60fps);
+                        float curVal = currentEasing.GetCurVal(BattleManager.DeltaTime_60fps);
                         GetCurrentSpineCtrl().transform.localScale = _defaultScale * curVal;
                     }
                     else
@@ -11167,7 +11225,7 @@ this.updateCurColor();
                     break;
                 }
                 yield return null;
-                timer += battleManager.DeltaTime_60fps;
+                timer += BattleManager.DeltaTime_60fps;
             }
         }
 
@@ -11319,7 +11377,7 @@ this.updateCurColor();
             ChangeSortOrderData currentData = _changeSortOrderDatas[currentIndex];
             while (_thisId == changeSortOrderId)
             {
-                timer += battleManager.DeltaTime_60fps;
+                timer += BattleManager.DeltaTime_60fps;
                 if (timer < (double)currentData.Time)
                 {
                     yield return null;
@@ -12590,7 +12648,7 @@ this.updateCurColor();
                         {
                             uIManager?.LogMessage($"由于被技能{string.Join("\n", ActionsTargetOnMe)}、{FirearmCtrlsOnMe.Count}个弹射物与{KnockBackEnableCount}个击退效果锁定，不会立即死亡", eLogMessageType.OTHER, this);
                         }
-                        time += battleManager.DeltaTime_60fps;
+                        time += BattleManager.DeltaTime_60fps;
                         if (time > 10.0)
                         {
                             bool flag = false;
@@ -13032,7 +13090,7 @@ this.updateCurColor();
                                 if (!unitCtrl.IsOther)
                                     unitCtrl.battleManager.LPBCBINDJLJ.Add(unitCtrl);
                             }
-                            fAlpha -= unitCtrl.battleManager.DeltaTime_60fps;
+                            fAlpha -= BattleManager.DeltaTime_60fps;
                             if (fAlpha <= 0.0 || BattleUtil.Approximately(fAlpha, 0.0f))
                             {
                                 if (unitCtrl.OnDieFadeOutEnd != null && unitCtrl.OnDeadForRevival == null)
@@ -13228,13 +13286,13 @@ this.updateCurColor();
                         currentSpineCtrl.AnimationName = str;
                         currentSpineCtrl.state.TimeScale = 1f;
                         TrackEntry current2 = currentSpineCtrl.state.GetCurrent(0);
-                        current2.lastTime = battleManager.DeltaTime_60fps;
-                        current2.time = battleManager.DeltaTime_60fps;
-                        current2.animationLast = battleManager.DeltaTime_60fps;
-                        //current2.animationLast = this.battleManager.DeltaTime_60fps;
-                        //current2.animationStart = this.battleManager.DeltaTime_60fps;
+                        current2.lastTime = BattleManager.DeltaTime_60fps;
+                        current2.time = BattleManager.DeltaTime_60fps;
+                        current2.animationLast = BattleManager.DeltaTime_60fps;
+                        //current2.animationLast = BattleManager.DeltaTime_60fps;
+                        //current2.animationStart = BattleManager.DeltaTime_60fps;
 
-                        current2.nextAnimationLast = battleManager.DeltaTime_60fps;
+                        current2.nextAnimationLast = BattleManager.DeltaTime_60fps;
                         if (_pauseStopState)
                         {
                             current2.lastTime = currentSpineCtrl.StopStateTime;
@@ -13528,7 +13586,7 @@ this.updateCurColor();
             bool[] effectCreated = new bool[_data.Count];
             while (true)
             {
-                time += _ignorePause ? unitCtrl.battleManager.DeltaTime_60fps : unitCtrl.DeltaTimeForPause;
+                time += _ignorePause ? BattleManager.DeltaTime_60fps : unitCtrl.DeltaTimeForPause;
                 int index = 0;
                 for (int count = _data.Count; index < count; ++index)
                 {
@@ -13615,7 +13673,7 @@ this.updateCurColor();
             float time = 0.0f;
             while (true)
             {
-                time += _ignorePause ? GEDLBPMPOKB.battleManager.DeltaTime_60fps : GEDLBPMPOKB.DeltaTimeForPause;
+                time += _ignorePause ? BattleManager.DeltaTime_60fps : GEDLBPMPOKB.DeltaTimeForPause;
                 if ((double)time <= (double)shake.StartTime)
                     yield return (object)null;
                 else
@@ -13688,7 +13746,7 @@ this.updateCurColor();
             float alpha = 1f;
             while (alpha > 0.0)
             {
-                alpha -= unitCtrl.battleManager.DeltaTime_60fps;
+                alpha -= BattleManager.DeltaTime_60fps;
                 unitCtrl.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, alpha);
                 yield return null;
             }
@@ -13714,7 +13772,7 @@ this.updateCurColor();
             float deltaTimeAccumulated = 0.0f;
             while (true)
             {
-                for (deltaTimeAccumulated += Time.deltaTime; deltaTimeAccumulated > 0.0 & _isTimeOver; deltaTimeAccumulated -= battleManager.DeltaTime_60fps)
+                for (deltaTimeAccumulated += Time.deltaTime; deltaTimeAccumulated > 0.0 & _isTimeOver; deltaTimeAccumulated -= BattleManager.DeltaTime_60fps)
                 {
                     unitSpineController.RealUpdate();
                     unitSpineController.RealLateUpdate();

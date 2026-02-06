@@ -31,7 +31,7 @@ namespace Elements.Battle
         bool _Update();
     }
 
-    public class BattleManager : MonoBehaviour, ISingletonField, BattleManager_Time
+    public class BattleManager : MonoBehaviour, ISingletonField
     {
         private int skillTargetCacheKey = Environment.TickCount;
 
@@ -316,8 +316,9 @@ namespace Elements.Battle
 
         public int FameRate { get; private set; }
 
-        public float DeltaTime_60fps { get; private set; }
+        // public float DeltaTime_60fps { get; private set; }
 
+        public const float DeltaTime_60fps = 1 / 60f;
         public bool GetIsPlayCutin() => IsPlayCutin;
 
         public HashSet<long> activeActionIds { get; private set; }
@@ -809,9 +810,9 @@ namespace Elements.Battle
             //     spineCtrl.RealUpdate();
             //     spineCtrl.RealLateUpdate();
             // }
-            unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
-            if (!skipping && !skipUB)
-                unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
+            // unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
+            // if (!skipping && !skipUB)
+            //    unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
             scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
@@ -2820,7 +2821,7 @@ namespace Elements.Battle
              while (true)
              {
                  // ISSUE: explicit non-virtual call
-                 time += (battleManager.DeltaTime_60fps);
+                 time += (BattleManager.DeltaTime_60fps);
                  if ((double)time <= 0.600000023841858)
                      yield return (object)null;
                  else
@@ -3666,7 +3667,7 @@ namespace Elements.Battle
             BattleLogEnable = true;// !TutorialManager.IsStartTutorial && this.battleProcessor.GetBattleLogEnable(this.BattleLogEnable);
             FameRate = 60;// this.battleProcessor.GetFrameRate();
             IsDefenceReplayMode = false;// this.battleProcessor.GetIsDefenceReplayMode();
-            DeltaTime_60fps = 1 / 60f;//0.0166666675f;
+            // DeltaTime_60fps = 1 / 60f;//0.0166666675f;
             UnitCtrl.DamageFlashFrame = 8;
             UnitCtrl.FlashDelayFrame = 0;
             CoroutineManager = gameObject.AddComponent<CoroutineManager>();
@@ -5246,7 +5247,7 @@ namespace Elements.Battle
             while ((double)timer > 0.0)
             {
                 // ISSUE: explicit non-virtual call
-                timer -= (battleManager.DeltaTime_60fps);
+                timer -= (BattleManager.DeltaTime_60fps);
                 yield return (object)null;
             }
            // ISSUE: explicit non-virtual call
@@ -5357,7 +5358,7 @@ namespace Elements.Battle
             {
                 // ISSUE: explicit non-virtual call
                 // ISSUE: explicit non-virtual call
-                if ((double)(battleManager.JJCJONPDGIM) * (double)(battleManager.DeltaTime_60fps) > (double)timeLineData[index].Time)
+                if ((double)(battleManager.JJCJONPDGIM) * (double)(BattleManager.DeltaTime_60fps) > (double)timeLineData[index].Time)
                 {
                     battleManager.execTimeLineData(timeLineData[index]);
                     ++index;

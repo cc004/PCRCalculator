@@ -28,7 +28,7 @@ namespace Elements
         { 
             while (Enable && Timer > 0f)
             {
-                Timer -= _owner != null ? _owner.DeltaTimeForPause : BattleManager.Instance.DeltaTime_60fps;
+                Timer -= _owner != null ? _owner.DeltaTimeForPause : BattleManager.DeltaTime_60fps;
                 yield return null;
             }
             Timer = 0f;

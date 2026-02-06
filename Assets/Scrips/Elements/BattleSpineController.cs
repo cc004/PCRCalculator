@@ -202,9 +202,9 @@ namespace Elements
                 return;
             if (battleManager != null){
                 if (light)
-                    LightUpdate(IsConstantVelocity ? battleManager.DeltaTime_60fps / Time.timeScale : battleManager.DeltaTime_60fps);
+                    LightUpdate(IsConstantVelocity ? BattleManager.DeltaTime_60fps / Time.timeScale : BattleManager.DeltaTime_60fps);
                 else
-                    Update(IsConstantVelocity ? battleManager.DeltaTime_60fps / Time.timeScale : battleManager.DeltaTime_60fps);
+                    Update(IsConstantVelocity ? BattleManager.DeltaTime_60fps / Time.timeScale : BattleManager.DeltaTime_60fps);
             }
             else 
              base.Update();
@@ -307,7 +307,7 @@ namespace Elements
         private IEnumerator updateAnime(float _startTime, float _endTime, int _thisId)
         {
             BattleSpineController battleSpineController = this;
-            float deltaTime = battleSpineController.battleManager != null ? battleSpineController.battleManager.DeltaTime_60fps : 0.03333334f;
+            float deltaTime = battleSpineController.battleManager != null ? BattleManager.DeltaTime_60fps : 0.03333334f;
             float time = _startTime;
             bool callDamageEvent = battleSpineController.Owner != null && battleSpineController.AnimationName == battleSpineController.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, battleSpineController.Owner.MotionPrefix);
             while (battleSpineController.startedCoroutineId == _thisId)

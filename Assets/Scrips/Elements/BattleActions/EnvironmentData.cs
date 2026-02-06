@@ -129,7 +129,7 @@ namespace Elements
                 // 等待一帧
                 yield return null;
 
-                timer += battleManager.DeltaTime_60fps;
+                timer += BattleManager.DeltaTime_60fps;
             }
         }
 

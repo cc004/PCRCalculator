@@ -10,7 +10,7 @@ namespace Elements.Battle
 {
   public interface BattleManager_Time
   {
-    float DeltaTime_60fps { get; }
+    // float DeltaTime_60fps { get; }
 
     void AppendCoroutine(IEnumerator PGEADNDHDIL, ePauseType MHPJECIHDDL, UnitCtrl GEDLBPMPOKB);
 

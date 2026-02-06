@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Elements.Battle;
 using UnityEngine;
 
 namespace Elements
@@ -128,7 +129,7 @@ namespace Elements
             float startPosx = sourceTransform.localPosition.x;
             while (true)
             {
-                sourceTransform.localPosition += new Vector3((!_source.IsLeftDir ? _speed : -_speed) * moveAction.battleManager.DeltaTime_60fps, 0.0f, 0.0f);
+                sourceTransform.localPosition += new Vector3((!_source.IsLeftDir ? _speed : -_speed) * BattleManager.DeltaTime_60fps, 0.0f, 0.0f);
                 if (Mathf.Abs(startPosx - sourceTransform.localPosition.x) < (double)_distance)
                     yield return null;
                 else
@@ -155,7 +156,7 @@ namespace Elements
             bool isUnionBurst = _skill.SkillId == _source.UnionBurstSkillId;
             while (!_source.IsCancelActionState(isUnionBurst) && (isUnionBurst || !_source.IsUnableActionState()))
             {
-                sourceTransform.localPosition += new Vector3((!isRight ? -_sub : _sub) * moveAction.battleManager.DeltaTime_60fps, 0.0f, 0.0f);
+                sourceTransform.localPosition += new Vector3((!isRight ? -_sub : _sub) * BattleManager.DeltaTime_60fps, 0.0f, 0.0f);
                 if ((_target.GetLocalPosition().x - (double)sourceTransform.localPosition.x) * (isRight ? 1.0 : -1.0) <= _main)
                 {
                     _sourceUnitActionController.MoveEnd = true;
@@ -210,7 +211,7 @@ namespace Elements
             bool isRight = sourceTransform.localPosition.x < (double)_skill.OwnerReturnPosition.x;
             while (true)
             {
-                sourceTransform.localPosition += new Vector3((!isRight ? -_velocity : _velocity) * moveAction.battleManager.DeltaTime_60fps, 0.0f, 0.0f);
+                sourceTransform.localPosition += new Vector3((!isRight ? -_velocity : _velocity) * BattleManager.DeltaTime_60fps, 0.0f, 0.0f);
                 if ((_skill.OwnerReturnPosition.x - (double)sourceTransform.localPosition.x) * (isRight ? 1.0 : -1.0) >= 0.0 && !BattleUtil.Approximately(_skill.OwnerReturnPosition.x, sourceTransform.localPosition.x))
                     yield return null;
                 else

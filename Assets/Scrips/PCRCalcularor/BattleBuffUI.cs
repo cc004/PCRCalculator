@@ -39,7 +39,7 @@ namespace PCRCaculator.Battle
             while (!BattleManager.Instance.battleFinished && !BattleManager.Instance.skipping)
             {
                 int currentFrame = BattleHeaderController.CurrentFrameCount;
-                var pass = (currentFrame - startFrame) * BattleManager.Instance.DeltaTime_60fps;
+                var pass = (currentFrame - startFrame) * BattleManager.DeltaTime_60fps;
                 if (Elements.BattleUtil.LessThanOrApproximately(pass, stayTime))
                 {
                     float v = pass / stayTime;

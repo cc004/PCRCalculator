@@ -147,7 +147,7 @@ namespace Elements
       while (true)
       {
         spineFireArm.transform.position = Vector3.Lerp(spineFireArm.FireTarget.GetBottomTransformPosition() + spineFireArm.targetPosition, spineFireArm.owner.BottomTransform.position, time / spineFireArm.moveDuration);
-        time -= spineFireArm.battleManager.DeltaTime_60fps;
+        time -= BattleManager.DeltaTime_60fps;
         if ((double) spineFireArm.moveDuration - (double) time > (double) spineFireArm.sortChangeTime && !sortChanged)
         {
           sortChanged = true;
