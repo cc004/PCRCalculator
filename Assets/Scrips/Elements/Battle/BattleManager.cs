@@ -810,9 +810,11 @@ namespace Elements.Battle
             //     spineCtrl.RealUpdate();
             //     spineCtrl.RealLateUpdate();
             // }
-            // unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
-            // if (!skipping && !skipUB)
-            //    unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
+#if UNITY_5_3_OR_NEWER
+            unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
+            if (!skipping && !skipUB)
+               unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
+#endif
             scriptMgr?.Update();
             battleUnionBurstController.TryExecUnionBurst();
             IsPausingEffectSkippedInThisFrame = false;
