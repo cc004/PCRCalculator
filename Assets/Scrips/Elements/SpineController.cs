@@ -37,7 +37,7 @@ namespace Elements
             get
             {
                 var track = state.Tracks.Items[0];
-                return track.IsComplete;
+                return !track.IsComplete;
             }
         }
         public string AnimeName { get; protected set; }
