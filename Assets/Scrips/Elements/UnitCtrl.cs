@@ -7281,7 +7281,7 @@ this.updateCurColor();
             for (int i = 1; i <= buffDebuffIndex; ++i)
             {
                 var flag = buffDebuffFlag[i];
-                if ((flag & 0b111) == 0b010) // !buff && dispelable && !dispelled
+                if ((flag & 0b111) == 0b100) // !buff && dispelable && !dispelled
                     buffDebuffFlag[i] = (short)(flag | 1); // dispelled
             }
 
@@ -7311,7 +7311,7 @@ this.updateCurColor();
         {
             int _isBuff = (1 - (_buffDebuffCancelType & 1)) << 1; // 2 if buff, 0 if debuff
             int _additional = _buffDebuffCancelType >= 1000 ? 8 : 0; // 8 if additonal
-            int _kind = (_buffDebuffCancelType / 10 % 100) << 4;
+            int _kind = (_buffDebuffCancelType / 10 % 100) << 4; // TODO MAX_HP=100 handle error, correct it when error occurs
 
             int flag = (_kind | _additional | _isBuff | 4); // 4: dispelable, 0: !dispelled
 
@@ -10216,8 +10216,8 @@ this.updateCurColor();
                     }
                     else
                     {
-                        Hp = _hp;
-                        _hp = _hp.ZeroCapForHp();
+                        // Hp = _hp;
+                        Hp = _hp.ZeroCapForHp();
                     }
                 }
             }
