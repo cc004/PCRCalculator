@@ -645,14 +645,20 @@ namespace Elements.Battle
                 else if (!isToPauseOnFrameEnd && isToResumeOnFrameEnd)
                     GamePause(false);
                 if (isUpdateFrameExecuted)
+#if UNITY_5_3_OR_NEWER
                     goto eof;
+#else 
+                    return;
+#endif
                 /*
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());*/
             }
 
+#if UNITY_5_3_OR_NEWER
             eof:
             unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate(true, suppress_events: true, force_late_update: true));
+#endif
         }
 
         public bool stepping = false;
@@ -810,8 +816,8 @@ namespace Elements.Battle
             //     spineCtrl.RealUpdate();
             //     spineCtrl.RealLateUpdate();
             // }
-#if UNITY_5_3_OR_NEWER
             unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
+#if UNITY_5_3_OR_NEWER
             if (!skipping && !skipUB)
                unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
 #endif

@@ -190,9 +190,13 @@ namespace Elements
 			if (valid)
 			{
 				deltaTime *= timeScale;
+#if UNITY_5_3_OR_NEWER
 				skeleton.Update(deltaTime);
+#endif
 				state.Update(deltaTime);
+#if UNITY_5_3_OR_NEWER
 				state.LightApply(skeleton);
+#endif
 			}
 		}
 
