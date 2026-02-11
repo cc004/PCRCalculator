@@ -14522,6 +14522,9 @@ this.updateCurColor();
         public class FunctionalComparer<T> : IComparer<T>
         {
             private Func<T, T, int> comparer;
+#if !UNITY_5_3_OR_NEWER
+            [ThreadStatic]
+#endif
             public static FunctionalComparer<T> Instance;
 
             public FunctionalComparer(Func<T, T, int> _comparer) => comparer = _comparer;
