@@ -88,7 +88,6 @@ namespace PCRCaculator.Battle
         public float DamageRandomScale;
         public float DamageScale;
 
-        private long fpsCount;
         private float timeCount;
         private MyGameCtrl myGameCtrl=> MyGameCtrl.Instance;
         private float guildTotalDamage;
@@ -306,6 +305,7 @@ namespace PCRCaculator.Battle
         //private static StreamWriter sw = new StreamWriter(File.OpenWrite("logmessage.txt")){AutoFlush = true};
         public void LogMessage(string word, eLogMessageType logMessageType, bool isOther)
         {
+            long fpsCount = 0;
             if (myGameCtrl != null)
             {
                 fpsCount = BattleHeaderController.CurrentFrameCount;
