@@ -87,7 +87,7 @@ namespace Elements
             {
                 for (int index = blackOutUnitList.Count - 1; index >= 0; --index)
                 {
-                    if (blackOutUnitList.Count <= index - 1) continue;
+                    if (blackOutUnitList.Count <= index) continue;
                     CoroutineDataBase coroutineDataBase = null;
                     if (CoroutineDataDictionary.TryGetValue(blackOutUnitList[index], out coroutineDataBase))
                         coroutineDataBase.Update();

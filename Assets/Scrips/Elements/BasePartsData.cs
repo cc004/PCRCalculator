@@ -501,7 +501,9 @@ namespace Elements
       UnitCtrl _source,
       bool _last,
       bool _targetOneParts,
-      BasePartsData _target)
+      BasePartsData _target,
+      Skill _skill // DIY add
+      )
         {
             if (!abnormalResistStatusDictionary.ContainsKey(_actionType))
             {
@@ -510,8 +512,15 @@ namespace Elements
             Dictionary<int, int> dictionary = abnormalResistStatusDictionary[_actionType];
             if (dictionary.ContainsKey(-1))
                 _detail1 = -1;
-            if (!dictionary.ContainsKey(_detail1) || BattleManager.Random(0.0f, 1f, 
-                    new RandomData(_source,_target.Owner, (int)_actionType, 9, dictionary[_detail1] / 100.0f)) >= dictionary[_detail1] / 100.0)
+            if (!dictionary.ContainsKey(_detail1))
+                return false;
+            var prob = dictionary[_detail1] / 100.0f;
+            var num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, (int)_actionType, 9, prob));
+            if (dictionary[_detail1] != 100 && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, _actionType, BattleHeaderController.CurrentFrameCount, out float fix))
+            {
+                num = fix;
+            }
+            if (num >= prob)
                 return false;
             if (_last)
             {

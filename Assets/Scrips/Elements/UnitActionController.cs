@@ -1564,7 +1564,7 @@ namespace Elements
             int actionDetail = (action.ActionType != eActionType.BLIND) ?  action.ActionDetail1 : action.ActionDetail2;
 
             bool hasProtected = _protectedTarget != null;
-            bool isResisted = target.ResistStatus(action.ActionType, actionDetail, Owner, _last, _targetOneParts, target);
+            bool isResisted = target.ResistStatus(action.ActionType, actionDetail, Owner, _last, _targetOneParts, target, skill);
             bool exec = !isResisted && (hasProtected || action.JudgeIsAlreadyExeced(target.Owner, num));
 #if !REDUCE_ANALYSE
             UnitActionExecData actionExecData = new UnitActionExecData();
