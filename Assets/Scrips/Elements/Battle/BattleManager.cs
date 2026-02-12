@@ -196,7 +196,7 @@ namespace Elements.Battle
         //private ISingletonNodeForInstanceEditing battleManagerNode;
         private bool isValid = true;
         //private StoryBattleData storyBattleDataPrefab;
-        public bool isReleaseSlipDamageLogBarrier; // 0x501
+        public bool isReleaseSlipDamageLogBarrier = true; // 0x501
 
         public long allLogBarrierStartValue = 10000000; 
         public long allLogBarrierEffectValue = 100000; // 0x4E8
@@ -4450,7 +4450,9 @@ namespace Elements.Battle
             }*/
             battleManager.setupEnemyProcess();
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            if (IsBossBattle) { BossUnit = EnemyList[0]; GuildManager.Instance.CalcTalentFormationBonus(true); }
+            if (IsBossBattle) 
+                BossUnit = EnemyList[0];
+            GuildManager.Instance.CalcTalentFormationBonus(true); 
             foreach(var unit in UnitList)
             {
                 unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
