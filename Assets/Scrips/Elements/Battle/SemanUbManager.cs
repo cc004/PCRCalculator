@@ -157,6 +157,9 @@ namespace Elements.Battle
 
             public int GetUbNumber(int unitId)
             {
+#if !UNITY_5_3_OR_NEWER
+                return 0;
+#endif
                 // any of 5 6 7 on
                 bool use_fifth = GuildManager.Instance.SemanSkillToggles.Where((t, i) => i >= 5).Any(t => t.isOn);
 

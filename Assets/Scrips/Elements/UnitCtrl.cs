@@ -9438,16 +9438,19 @@ this.updateCurColor();
 
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
                 _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple, _actionId, callBack, out bool isHit);
-            var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
-            if (_skill != null && isHit && _byAttack)
+            if (_skill != null)
             {
-                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
-                    OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
-            }
-            if (_skill != null && _critical && num1 > 0)
-            {
-                if (actionParameter.TargetAssignment != eTargetAssignment.OWNER_SITE && actionParameter.TriggerCall)
-                    _damageData.Source.OnGiveCriticalDamage?.Invoke();
+                var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
+                if (isHit && _byAttack)
+                {
+                    if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                        OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
+                }
+                if (_critical && num1 > 0)
+                {
+                    if (actionParameter.TargetAssignment != eTargetAssignment.OWNER_SITE && actionParameter.TriggerCall)
+                        _damageData.Source.OnGiveCriticalDamage?.Invoke();
+                }
             }
 
             if (_damageData.Target is PartsData)
