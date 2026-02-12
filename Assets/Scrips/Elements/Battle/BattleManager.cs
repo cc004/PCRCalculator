@@ -196,7 +196,7 @@ namespace Elements.Battle
         //private ISingletonNodeForInstanceEditing battleManagerNode;
         private bool isValid = true;
         //private StoryBattleData storyBattleDataPrefab;
-        public bool isReleaseSlipDamageLogBarrier; // 0x501
+        public bool isReleaseSlipDamageLogBarrier = true; // 0x501
 
         public long allLogBarrierStartValue = 10000000; 
         public long allLogBarrierEffectValue = 100000; // 0x4E8
@@ -390,12 +390,12 @@ namespace Elements.Battle
         //public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
 
         //public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
-        public int KAOHIMNBPOK//多目标初始化相关
+        public int CountIsNotPartsBossReady//多目标初始化相关
         {
             get;
             set;
         }
-        public bool LOGNEDLPEIJ { get; set; }
+        // public bool LOGNEDLPEIJ { get; set; }
         public bool IsTalentBonusEffectPlaying { get; set; }
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
@@ -645,14 +645,20 @@ namespace Elements.Battle
                 else if (!isToPauseOnFrameEnd && isToResumeOnFrameEnd)
                     GamePause(false);
                 if (isUpdateFrameExecuted)
+#if UNITY_5_3_OR_NEWER
                     goto eof;
+#else 
+                    return;
+#endif
                 /*
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.UpdateIndependentBattleSync());
                 unitSpineControllerList.ForEach(ACFHIKDFIOJ => ACFHIKDFIOJ.LateUpdateIndependentBattleSync());*/
             }
 
+#if UNITY_5_3_OR_NEWER
             eof:
             unitSpineControllerList.ForEach(unitSpineController => unitSpineController.VisualUpdate(true, suppress_events: true, force_late_update: true));
+#endif
         }
 
         public bool stepping = false;
@@ -810,8 +816,8 @@ namespace Elements.Battle
             //     spineCtrl.RealUpdate();
             //     spineCtrl.RealLateUpdate();
             // }
-#if UNITY_5_3_OR_NEWER
             unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
+#if UNITY_5_3_OR_NEWER
             if (!skipping && !skipUB)
                unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
 #endif
@@ -4444,7 +4450,9 @@ namespace Elements.Battle
             }*/
             battleManager.setupEnemyProcess();
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            if (IsBossBattle) { BossUnit = EnemyList[0]; GuildManager.Instance.CalcTalentFormationBonus(true); }
+            if (IsBossBattle) 
+                BossUnit = EnemyList[0];
+            GuildManager.Instance.CalcTalentFormationBonus(true); 
             foreach(var unit in UnitList)
             {
                 unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);

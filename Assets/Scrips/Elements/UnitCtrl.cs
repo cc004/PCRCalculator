@@ -2518,8 +2518,8 @@ this.updateCurColor();
                     bossParts.SetBattleManager(battleManager);
                     BossPartsListForBattle.Add(bossParts);
                 }
-                battleManager.LOGNEDLPEIJ = true;
-                battleManager.KAOHIMNBPOK++;
+                // battleManager.LOGNEDLPEIJ = true;
+                battleManager.CountIsNotPartsBossReady++;
                 isNotPartsBossReady = true;
             }
             else
@@ -9438,16 +9438,19 @@ this.updateCurColor();
 
             var num1 = SetDamageImpl(_damageData, _byAttack, _onDamageHit, _hasEffect, _skill, _energyAdd, 
                 _critical, _onDefeat, _noMotion, _upperLimitFunc, _energyChargeMultiple, _actionId, callBack, out bool isHit);
-            var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
-            if (_skill != null && isHit && _byAttack)
+            if (_skill != null)
             {
-                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
-                    OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
-            }
-            if (_skill != null && _critical && num1 > 0)
-            {
-                if (actionParameter.TargetAssignment != eTargetAssignment.OWNER_SITE && actionParameter.TriggerCall)
-                    _damageData.Source.OnGiveCriticalDamage?.Invoke();
+                var actionParameter = _skill.ActionParameters.Find((ActionParameter x) => x.ActionId == _actionId);
+                if (isHit && _byAttack)
+                {
+                    if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                        OnDamageForExecToSource?.Invoke(_damageData, actionParameter);
+                }
+                if (_critical && num1 > 0)
+                {
+                    if (actionParameter.TargetAssignment != eTargetAssignment.OWNER_SITE && actionParameter.TriggerCall)
+                        _damageData.Source.OnGiveCriticalDamage?.Invoke();
+                }
             }
 
             if (_damageData.Target is PartsData)
@@ -11640,7 +11643,7 @@ this.updateCurColor();
         public Action<float> OnUpdateWhenIdle { get; set; }
 
         public Action OnBreakAll { get; set; }
-        public bool OnBreakAllCallWhenGameStartDone
+        public bool IsOnBreakAllCallWhenGameStartDone
         {
             get;
             set;
@@ -11694,8 +11697,57 @@ this.updateCurColor();
                 battleManager.StartExtraEffect(BattleDefine.eExtraEffectExecTiming.ALL_UNIT_ACTION);
                 battleManager.StartExtraEffect(IsOther ? BattleDefine.eExtraEffectExecTiming.ENEMY_ACTION : BattleDefine.eExtraEffectExecTiming.MY_TEAM_ACTION);
             }
-            if (IsPartsBoss)
-                battleManager.LOGNEDLPEIJ = false;
+            var flag = false;
+            if (IsPartsBoss && GameStartDone && isNotPartsBossReady)
+			{
+				isNotPartsBossReady = false;
+				if (IsOnBreakAllCallWhenGameStartDone)
+				{
+					flag = true;
+					IsOnBreakAllCallWhenGameStartDone = false;
+				}
+				battleManager.CountIsNotPartsBossReady--;
+			}
+            else
+            {
+                IsOnBreakAllCallWhenGameStartDone = false;
+            }
+            // if (IsBoss && GameStartDone && MultiBossPartsData != null && MultiBossPartsData.MultiTargetCursor == (Object)null)
+            // {
+			// 	tryPlayMultiBossAppear();
+			// 	battleManager.KAOHIMNBPOK--;
+			// 	isNotPartsBossReady = false;
+			// 	ResourceManager instance = ManagerSingleton<ResourceManager>.Instance;
+			// 	MultiTargetCursor cursor = null;
+			// 	if (isMultiBossDestructionTarget(UnitId))
+			// 	{
+			// 		cursor = instance.InstantiateAndGetComponent<MultiTargetCursor>(eResourceId.ANIM_MULTI_TARGET_CURSOR_LEADER, ((Component)battleManager.OFMPGBKBOPM).transform, 0L);
+			// 	}
+			// 	else
+			// 	{
+			// 		cursor = instance.InstantiateAndGetComponent<MultiTargetCursor>(UseTargetCursorOver ? eResourceId.ANIM_MULTI_TARGET_CURSOR_OVER : eResourceId.ANIM_MULTI_TARGET_CURSOR, ((Component)battleManager.OFMPGBKBOPM).transform, 0L);
+			// 	}
+			// 	PartsData multiBossPartsData = MultiBossPartsData;
+			// 	((Component)cursor).transform.position = multiBossPartsData.GetBottomTransformPosition();
+			// 	cursor.Panel.sortingOrder = (IsFront ? 11500 : 0) + 690;
+			// 	multiBossPartsData.MultiTargetCursor = cursor;
+			// 	battleManager.AppendCoroutine(multiBossPartsData.TrackBottomCoroutine(_topBack: true), ePauseType.SYSTEM, this);
+			// 	if (multiBossPartsData.IsBreak)
+			// 	{
+			// 		AppendBreakLog(multiBossPartsData.BreakSource);
+			// 		multiBossPartsData.OnBreak.Call();
+			// 		multiBossPartsData.SetBreak(_enable: true, ((Component)battleManager.OFMPGBKBOPM).transform, _displayEffect: true);
+			// 		AppendCoroutine(UpdateBreak(multiBossPartsData.BreakTime, multiBossPartsData), ePauseType.SYSTEM);
+			// 	}
+			// 	OnIsFrontFalse = (Action)Delegate.Combine(OnIsFrontFalse, (Action)delegate
+			// 	{
+			// 		cursor.Panel.sortingOrder = 690;
+			// 	});
+			// }
+
+
+            // if (IsPartsBoss)
+            //     battleManager.LOGNEDLPEIJ = false;
             if (_state != ActionState.IDLE && _state != ActionState.WALK)
             {
                 CancelByConvert = false;
@@ -11777,6 +11829,10 @@ this.updateCurColor();
                     AppendCoroutine(updateGameStart(), ePauseType.SYSTEM);
                     break;
             }
+            if (flag)
+			{
+				OnBreakAll.Call();
+			}
         }
         
         public void PlayAndSetUpMultiTarget(bool _isFirst)
@@ -13147,14 +13203,10 @@ this.updateCurColor();
                             if ((unitCtrl.battleManager.ActionStartTimeCounter <= 0f || unitCtrl.IsOther ? (!unitCtrl.ToadRelease ? 1 : 0) : 0) != 0)
                             {
                                 unitCtrl.m_fCastTimer = unitCtrl.m_fCastTimer - unitCtrl.DeltaTimeForPause;
-                                if (unitCtrl.m_fCastTimer < 0.1 && unitCtrl.UnitNameEx.Contains("凯"))
-                                {
-
-                                }
                                 if (!battleManager.skipping)
                                     NoSkipOnSkillCD?.Invoke(m_fCastTimer);
                             }
-                            if (unitCtrl.battleManager.LOGNEDLPEIJ)
+                            if (unitCtrl.battleManager.CountIsNotPartsBossReady > 0)
                                 yield return null;
                             else if (unitCtrl.ToadRelease)
                                 yield return null;
@@ -14048,7 +14100,7 @@ this.updateCurColor();
                      battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER ||
                      battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY) && !StandByDone || 
                      battleManager.IsSpecialBattle && battleManager.ActionStartTimeCounter > 0.0 || 
-                     battleManager.LOGNEDLPEIJ || 
+                     battleManager.CountIsNotPartsBossReady > 0 || 
                      battleManager.IsTalentBonusEffectPlaying ||
                      skillTargetList.Count == 0 || 
                      battleManager.GameState != eBattleGameState.PLAY || 
@@ -14093,7 +14145,7 @@ this.updateCurColor();
                         : (battleManager.BattleCategory == eBattleCategory.TOWER_CLOISTER_REPLAY ? 1 : 0)) != 0 &&
                     !StandByDone || battleManager.IsSpecialBattle &&
                     battleManager.ActionStartTimeCounter > 0.0 ||
-                    (battleManager.LOGNEDLPEIJ || skillTargetList.Count == 0 || (battleManager.GameState != eBattleGameState.PLAY || !battleManager.GetAdvPlayed())) || ModeChangeEnd)
+                    (battleManager.CountIsNotPartsBossReady > 0 || skillTargetList.Count == 0 || (battleManager.GameState != eBattleGameState.PLAY || !battleManager.GetAdvPlayed())) || ModeChangeEnd)
                     return false;
                 /*switch (this.battleManager.GetPurpose())
                 {

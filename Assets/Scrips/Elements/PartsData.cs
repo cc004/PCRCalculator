@@ -385,7 +385,7 @@ namespace Elements
                 {
                     if (base.Owner.IsBoss && !base.Owner.GameStartDone)
                     {
-                        base.Owner.OnBreakAllCallWhenGameStartDone = true;
+                        base.Owner.IsOnBreakAllCallWhenGameStartDone = true;
                     }
                     else
                     {
