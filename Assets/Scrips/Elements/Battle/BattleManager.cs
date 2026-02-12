@@ -390,12 +390,12 @@ namespace Elements.Battle
         //public bool GetOnlyAutoClearFlag() => OnlyAutoClearFlag;
 
         //public void SetOnlyAutoClearFlag(bool IJLDFEJCCMO) => OnlyAutoClearFlag = IJLDFEJCCMO;
-        public int KAOHIMNBPOK//多目标初始化相关
+        public int CountIsNotPartsBossReady//多目标初始化相关
         {
             get;
             set;
         }
-        public bool LOGNEDLPEIJ { get; set; }
+        // public bool LOGNEDLPEIJ { get; set; }
         public bool IsTalentBonusEffectPlaying { get; set; }
 
         private bool FELHBMBCMPD => BattleCategory == eBattleCategory.DUNGEON;
