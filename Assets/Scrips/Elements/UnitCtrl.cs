@@ -947,6 +947,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
+            {
+                UnitCtrl.eAbnormalState.RATIO_SLIP,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.RATIO_SLIP,
+                    IsBuff = false
+                }
+            }
         };
 
         // Token: 0x040026C0 RID: 9920
@@ -7101,7 +7109,7 @@ this.updateCurColor();
 
         public ReduceDamageByHigherDefData ReduceDamageByHigherDefData { get; set; }
 
-        // public ConvertDamageOverTimeData ConvertDamageOverTimeData { get; set; }
+        public ConvertDamageOverTimeData ConvertDamageOverTimeData { get; set; }
 
         private int buffDebuffIndex { get; set; }
 
@@ -10065,41 +10073,14 @@ this.updateCurColor();
             if (_skill != null && _damageData.ActionType == eActionType.ATTACK)
                 num5 *= _skill.AweValue;
             
-            // TODO ConvertDamageOverTimeData 
-            /*
-              ConvertDamageOverTimeData_k__BackingField = v175->fields._ConvertDamageOverTimeData_k__BackingField;
-  v177 = Elements_SkillDefine_TypeInfo;
-  if ( !Elements_SkillDefine_TypeInfo->_2.cctor_finished )
-  {
-    j__il2cpp_runtime_class_init_0(*(float *)&AweValue_k__BackingField);
-    v177 = Elements_SkillDefine_TypeInfo;
-  }
-  battleManager_k__BackingField = (__int64)v177->static_fields->CONVERT_DAMEGE_OVER_TIME_TARGET_ACTION;
-  if ( !battleManager_k__BackingField )
-    goto LABEL_487;
-  v178 = System_Collections_Generic_List_Int32Enum___Contains(
-           (System_Collections_Generic_List_T__o *)battleManager_k__BackingField,
-           damageData->fields._ActionType_k__BackingField,
-           (const MethodInfo_3A76194 *)Method_System_Collections_Generic_List_eActionType__Contains__);
-  if ( ConvertDamageOverTimeData_k__BackingField )
-  {
-    v180 = !v178;
-    if ( !ConvertDamageOverTimeData_k__BackingField->fields._Enable_k__BackingField )
-      v180 = 1;
-    if ( ((v180 | v68) & 1) == 0 )
-    {
-      DamageCutValue_k__BackingField = ConvertDamageOverTimeData_k__BackingField->fields._DamageCutValue_k__BackingField;
-      v133 = v133 * (1.0 - DamageCutValue_k__BackingField);
-      v182 = DamageCutValue_k__BackingField * v130;
-      v130 = v130 - v182;
-      dDamage[0] = v130;
-      v183 = Elements_BattleUtil__DoubleToLong(
-               v182 / (double)ConvertDamageOverTimeData_k__BackingField->fields._NumberOfDamage_k__BackingField,
-               0LL);
-      Elements_Battle_Core_ConvertDamageOverTimeData__AddDamage(ConvertDamageOverTimeData_k__BackingField, v183, 0LL);
-    }
-  }
-*/
+            if (ConvertDamageOverTimeData != null && ConvertDamageOverTimeData.Enable && !ignore_damage_cut_action && SkillDefine.CONVERT_DAMAGE_OVER_TIME_TARGET_ACTION.Contains(_damageData.ActionType))
+            {
+                double cutValue = ConvertDamageOverTimeData.DamageCutValue * num5;
+                b *= 1 - ConvertDamageOverTimeData.DamageCutValue;
+                num5 -= cutValue;
+                long dot = BattleUtil.DoubleToLong(cutValue / ConvertDamageOverTimeData.NumberOfDamage);
+                ConvertDamageOverTimeData.AddDamage(dot);
+            }
 
             if (_energyAdd)
             {

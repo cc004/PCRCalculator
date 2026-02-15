@@ -771,6 +771,10 @@ namespace Elements
             {
                 eActionType.EXTEND_SLIP_DAMAGE,
                 typeof(ExtendSlipDamageAction)
+            },
+            {
+                eActionType.CONVERT_DAMAGE_OVER_TIME,
+                typeof(ConvertDamageOverTimeAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
