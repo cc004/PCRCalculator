@@ -156,7 +156,17 @@ namespace Elements
 
                     if (!damageData.IgnoreDef)
                     {
-                        switch (damageData.DamageType)
+                        var damageType = damageData.DamageType;
+                        if (damageData.Target.Owner.ReduceDamageByHigherDefData != null && damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
+                        {
+                            var def = damageData.Target.GetDefZero();
+                            var magicDef = damageData.Target.GetMagicDefZero();
+                            if (def != magicDef)
+                            {
+                                damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                            }
+                        }
+                        switch (damageType)
                         {
                             case DamageData.eDamageType.ATK:
                                 var defZero = damageData.Target.GetDefZero();
@@ -186,7 +196,7 @@ namespace Elements
 
                         if (isDamagedEnergyCalculationChanged)
                         {
-                            switch (damageData.DamageType)
+                            switch (damageType)
                             {
                                 case DamageData.eDamageType.ATK:
                                     var defZero = damageData.Target.GetDefZeroForDamagedEnergy();

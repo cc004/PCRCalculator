@@ -7112,6 +7112,10 @@ this.updateCurColor();
             _self.SetActive(false);
         }
 
+        public ReduceDamageByHigherDefData ReduceDamageByHigherDefData { get; set; }
+
+        // public ConvertDamageOverTimeData ConvertDamageOverTimeData { get; set; }
+
         private int buffDebuffIndex { get; set; }
 
         private int clearedBuffIndex { get; set; }
@@ -9909,7 +9913,17 @@ this.updateCurColor();
             // TODO check order with log barrier
             if (!_damageData.IgnoreDef && !flag1)
             {
-                switch (_damageData.DamageType)
+                var damageType = _damageData.DamageType;
+                if (_damageData.Target.Owner.ReduceDamageByHigherDefData != null && _damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
+                {
+                    var def = _damageData.Target.GetDefZero();
+                    var magicDef = _damageData.Target.GetMagicDefZero();
+                    if (def != magicDef)
+                    {
+                        damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                    }
+                }
+                switch (damageType)
                 {
                     case DamageData.eDamageType.ATK:
                         var defZero = _damageData.Target.GetDefZero();
@@ -9924,7 +9938,7 @@ this.updateCurColor();
                 }
                 if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
                 {
-                    switch (_damageData.DamageType)
+                    switch (damageType)
                     {
                         case DamageData.eDamageType.ATK:
                             var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();

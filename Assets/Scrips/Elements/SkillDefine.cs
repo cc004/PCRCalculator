@@ -764,6 +764,10 @@ namespace Elements
                 eActionType.ETHEREALIZATION,
                 typeof(EtherealizationAction)
             },
+            {
+                eActionType.REDUCE_DAMAGE_BY_HIGHER_DEF,
+                typeof(ReduceDamageHigherDefAction)
+            }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
         {
