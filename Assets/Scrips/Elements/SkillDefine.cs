@@ -767,6 +767,10 @@ namespace Elements
             {
                 eActionType.REDUCE_DAMAGE_BY_HIGHER_DEF,
                 typeof(ReduceDamageHigherDefAction)
+            },
+            {
+                eActionType.EXTEND_SLIP_DAMAGE,
+                typeof(ExtendSlipDamageAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>

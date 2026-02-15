@@ -110,7 +110,8 @@ namespace Elements
         {
           targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)(long)targetOwner.Hp / (long)targetOwner.MaxHp);
         }
-        targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _valueDictionary[eValueNumber.VALUE_6] == 0f);
+        float slipDamageExtendValue = _target.Owner.GetSlipDamageExtendValue();
+        targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] * slipDamageExtendValue : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _valueDictionary[eValueNumber.VALUE_6] == 0f);
 
 
         callback?.Invoke("DOT伤害，参数1：" + (int)_valueDictionary[eValueNumber.VALUE_1] + "，参数2：" + (int)_valueDictionary[eValueNumber.VALUE_5]);

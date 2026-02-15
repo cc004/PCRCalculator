@@ -686,6 +686,11 @@ namespace PCRCaculator.Battle
 
             if (isActive)
             {
+                if (enyType >= buffDebuffIcons.Count)
+                {
+                    LogMessage("未设置" + ((eStateIconType)enyType).GetDescription() + "的环境Buff图标！", eLogMessageType.ERROR, false);
+                    return;
+                }
                 Sprite iconSprite = buffDebuffIcons[enyType];
                 Transform imageTransform = targetUI.transform.Find("Image");
                 Image imageComponent = imageTransform.GetComponent<Image>();

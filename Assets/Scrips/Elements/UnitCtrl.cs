@@ -6321,19 +6321,6 @@ this.updateCurColor();
             }
         }
 
-        // TODO implement ExtendSlipDamageData
-        // public ExtendSlipDamageData ExtendSlipDamageData { get; set; }
-        public float GetSlipDamageExtendValue()
-        {
-            // var extendSlipDamageData = ExtendSlipDamageData;
-            
-            // if (extendSlipDamageData != null && extendSlipDamageData.Enable)
-            // {
-            //     return extendSlipDamageData.ExtendValue;
-            // }
-            return 1.0f;
-        }
-
         private IEnumerator UpdateSlipDamage(eAbnormalState _abnormalState, int _slipDamageId)
         {
             eAbnormalStateCategory category = GetAbnormalStateCategory(_abnormalState);
@@ -7138,6 +7125,14 @@ this.updateCurColor();
 
         public DamageCutForSpecialNullificationData DamageCutForSpecialNullificationData { get; set; }
 
+        public ExtendSlipDamageData ExtendSlipDamageData { get; set; }
+
+        public float GetSlipDamageExtendValue()
+        {
+            if (ExtendSlipDamageData == null || !ExtendSlipDamageData.Enable)
+                return 1.0f;
+            return ExtendSlipDamageData.ExtendValue;
+        }
 
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
