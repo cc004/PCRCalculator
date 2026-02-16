@@ -1601,6 +1601,93 @@ autopcr.setOffset(2, 0); # offset calibration
                 MyAction0("Boss防御", "Boss防御变化", 4);
                 MyAction0("Boss魔防", "Boss魔防变化", 5);
                 MyAction0("角色伤害统计", "角色伤害统计", 6,1,1,0);
+                ExcelWorksheet worksheet6 = package.Workbook.Worksheets.Add("技能总伤");
+                worksheet6.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet6.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                lineNum = 1;
+                int roleCount = playerDatas.playrCharacters.Count;
+                int totalColumns = Math.Max(1, roleCount * 3);
+                worksheet6.Cells[lineNum, 1, lineNum, totalColumns].Merge = true;
+                worksheet6.Cells[lineNum, 1].Style.Font.Size = 16;
+                worksheet6.Cells[lineNum, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet6.Cells[lineNum, 1].Value = "角色技能总伤";
+                lineNum++;
+
+                Dictionary<int, List<UnitSkillExecData>> allSkillExecDic = TimelineData.allUnitSkillExecDic ?? new Dictionary<int, List<UnitSkillExecData>>();
+                Dictionary<int, List<ValueChangeData>> allHpDic = TimelineData.allUnitHPDic ?? new Dictionary<int, List<ValueChangeData>>();
+                Dictionary<int, List<UnitSkillExecData>> playerSkillMap = new Dictionary<int, List<UnitSkillExecData>>();
+                Dictionary<int, List<ValueChangeData>> damageBySource = allHpDic
+                    .Where(kv => kv.Value != null)
+                    .SelectMany(kv => kv.Value)
+                    .Where(d => d != null && d.damage > 0)
+                    .GroupBy(d => d.source)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(d => d.xValue).ToList());
+                int maxSkillRows = 0;
+                for (int i = 0; i < roleCount; i++)
+                {
+                    int unitId = playerDatas.playrCharacters[i].unitId;
+                    List<UnitSkillExecData> skillRows = allSkillExecDic.TryGetValue(unitId, out var rawSkills)
+                        ? rawSkills.OrderBy(s => s.startTime).ToList()
+                        : new List<UnitSkillExecData>();
+                    playerSkillMap[unitId] = skillRows;
+                    if (skillRows.Count > maxSkillRows)
+                    {
+                        maxSkillRows = skillRows.Count;
+                    }
+                }
+
+                for (int i = 0; i < roleCount; i++)
+                {
+                    int col = 1 + i * 3;
+                    worksheet6.Cells[lineNum, col, lineNum, col + 2].Merge = true;
+                    worksheet6.Cells[lineNum, col].Value = playerDatas.playrCharacters[i].GetUnitName();
+                    worksheet6.Cells[lineNum, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet6.Cells[lineNum + 1, col].Value = "帧数";
+                    worksheet6.Cells[lineNum + 1, col + 1].Value = "技能名";
+                    worksheet6.Cells[lineNum + 1, col + 2].Value = "总伤害";
+                    worksheet6.Column(col).Width = 10;
+                    worksheet6.Column(col + 1).Width = 24;
+                    worksheet6.Column(col + 2).Width = 14;
+                }
+                lineNum += 2;
+                for (int rowIndex = 0; rowIndex < maxSkillRows; rowIndex++)
+                {
+                    for (int i = 0; i < roleCount; i++)
+                    {
+                        int unitId = playerDatas.playrCharacters[i].unitId;
+                        if (!playerSkillMap.TryGetValue(unitId, out var skillRows) || rowIndex >= skillRows.Count)
+                        {
+                            continue;
+                        }
+
+                        UnitSkillExecData currentSkill = skillRows[rowIndex];
+                        int startFrame = currentSkill.startTime;
+                        int endFrame = rowIndex + 1 < skillRows.Count ? skillRows[rowIndex + 1].startTime : int.MaxValue;
+                        long totalDamage = 0;
+                        if (damageBySource.TryGetValue(unitId, out var sourceDamages))
+                        {
+                            bool hasSkillTag = sourceDamages.Any(d => d.skillId != 0);
+                            foreach (var damage in sourceDamages)
+                            {
+                                if (damage.xValue < startFrame || damage.xValue >= endFrame)
+                                {
+                                    continue;
+                                }
+
+                                if (!hasSkillTag || damage.skillId == currentSkill.skillID)
+                                {
+                                    totalDamage += damage.damage;
+                                }
+                            }
+                        }
+
+                        int col = 1 + i * 3;
+                        worksheet6.Cells[lineNum + rowIndex, col].Value = startFrame;
+                        worksheet6.Cells[lineNum + rowIndex, col + 1].Value =
+                            string.IsNullOrWhiteSpace(currentSkill.skillName) ? currentSkill.skillID.ToString() : currentSkill.skillName;
+                        worksheet6.Cells[lineNum + rowIndex, col + 2].Value = totalDamage;
+                    }
+                }
                 ExcelWorksheet worksheet4 = package.Workbook.Worksheets.Add("savePage");
                 lineNum = 1;
                 worksheet4.Cells[lineNum, 1, lineNum, 20].Merge = true;
