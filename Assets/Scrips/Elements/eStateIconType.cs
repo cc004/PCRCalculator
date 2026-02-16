@@ -504,8 +504,11 @@ namespace Elements
         MOYAN = 200,
         [Description("虚数\n原克")]
         XUSHU = 201,
+        [Description("比例伤害Dot\n")]
         RATIO_SLIP = 202,
+        [Description("调和状态\n")]
         REDUCE_DAMAGE_BY_HIGHER_DEF = 203,
+        [Description("部分伤害转Dot\n紫罗兰\n")]
         CONVERT_DAMAGE_OVER_TIME = 204,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,

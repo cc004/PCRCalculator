@@ -198,7 +198,8 @@ namespace Elements
                     }
                 }
                 //_target.Owner.SetAbnormalState(_source, abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, _valueDictionary[eValueNumber.VALUE_1], _isDamageRelease: (ActionDetail2 == 1));
-                _target.Owner.SetAbnormalState(_source, abnormalState, (base.AbnormalStateFieldAction == null) ?(float) _valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, num2, 0f, _reduceEnergy: false, base.ActionDetail2 == 1, 1f, _valueDictionary[eValueNumber.VALUE_5] == 0f);
+                float slipExtendValue = abnormalState == UnitCtrl.eAbnormalState.CRYSTALIZE ? _target.Owner.GetSlipDamageExtendValue() : 1.0f;
+                _target.Owner.SetAbnormalState(_source, abnormalState, (base.AbnormalStateFieldAction == null) ?(float) _valueDictionary[eValueNumber.VALUE_3] * slipExtendValue : 90f, this, _skill, num2, 0f, _reduceEnergy: false, base.ActionDetail2 == 1, 1f, _valueDictionary[eValueNumber.VALUE_5] == 0f);
 
                 string describe = ((eChangeSpeedType)ActionDetail1).GetDescription() + ",值" + _valueDictionary[eValueNumber.VALUE_1] + ",持续时间：" + _valueDictionary[eValueNumber.VALUE_3] + "秒";
 

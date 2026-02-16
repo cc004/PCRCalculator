@@ -77,6 +77,7 @@ namespace Elements
         private IEnumerator updateDamage()
         {
             float timer = 0;
+            float interval = Target.GetSlipDamageExtendValue();
             while(DamageList.Count > 0)
             {
                 if (Target.IsDead || Target.IdleOnly)
@@ -95,7 +96,7 @@ namespace Elements
                     };
                     Target.SetDamage(damageData, false, OwnerAction.ActionId, null, true, null, false, OwnerAction.OnDefeatEnemy, false, 1, 1, null, OwnerAction.EnergyChargeMultiple, OwnerAction.UsedChargeEnergyByReceiveDamage, null);
                     DamageList.RemoveAt(0);
-                    timer = Target.GetSlipDamageExtendValue();
+                    timer = interval;
                 }
                 yield return null;
             }

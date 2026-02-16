@@ -999,7 +999,12 @@ namespace Elements
             {
                 UnitCtrl.eAbnormalStateCategory.BLACK_FRAME,
                 0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.RATIO_SLIP,
+                0
             }
+
         };
 
         public Dictionary<eAbnormalState, Action<bool>> damageByBehaviourDictionary = new Dictionary<eAbnormalState, Action<bool>>();
@@ -4953,6 +4958,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.TAUNT:
                     result = UnitCtrl.eAbnormalStateCategory.TAUNT;
                     break;
+                case UnitCtrl.eAbnormalState.RATIO_SLIP:
+                    result = UnitCtrl.eAbnormalStateCategory.RATIO_SLIP;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
@@ -5961,6 +5969,7 @@ this.updateCurColor();
                 case eAbnormalState.COMPENSATION:
                 case eAbnormalState.POISON2:
                 case eAbnormalState.CURSE2:
+                case eAbnormalState.RATIO_SLIP:
                     if (_enable)
                     {
                         AppendCoroutine(UpdateSlipDamage(_abnormalState, ++slipDamageIdDictionary[abnormalStateCategory]), ePauseType.SYSTEM);

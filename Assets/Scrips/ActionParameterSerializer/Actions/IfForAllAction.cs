@@ -216,7 +216,7 @@ namespace ActionParameterSerializer.Actions
                 {
                     var env = (EnvironmentAction.EnvironmentType)(actionDetail1 - 3000);
                     falseClause = Utils.JavaFormat(Utils.GetString("use_d1_if_s2_environment_not_enabled"),
-                        actionDetail2 % 10, env.description());
+                        actionDetail3 % 10, env.description());
                 }
                 else if (actionDetail1 >= 1600)
                 {
