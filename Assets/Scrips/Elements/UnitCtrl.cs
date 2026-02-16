@@ -10350,7 +10350,7 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source, _skill?.SkillId ?? 0, _actionId);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
                 createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, num6);
                 NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, num6, BattleHeaderController.CurrentFrameCount);
@@ -10967,7 +10967,7 @@ this.updateCurColor();
                 string des = $"目标HP回复<color=#54FF4F>{_value}</color>点，当前HP: {Hp}";
                 action?.Invoke(des);
                 uIManager?.LogMessage(des, eLogMessageType.HP_RECOVERY, _source);
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source, 0, 0);
 #endif
                 if (_isUnionBurstLifeSteal)
                 {
