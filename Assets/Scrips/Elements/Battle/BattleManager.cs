@@ -4452,7 +4452,8 @@ namespace Elements.Battle
             battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
             if (IsBossBattle) 
                 BossUnit = EnemyList[0];
-            GuildManager.Instance.CalcTalentFormationBonus(true); 
+            if (tempData.isGuildBattle)
+                GuildManager.Instance.CalcTalentFormationBonus(true); 
             foreach(var unit in UnitList)
             {
                 unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
