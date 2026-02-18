@@ -32,6 +32,9 @@ namespace Elements
         public List<Skill> UnionBurstEvolutionList;
         public List<Skill> MainSkillEvolutionList;
         public List<Skill> SubUnionBurstList;
+        public List<Skill> MainSkillRevolutionList;
+        public List<Skill> SpecialSkillRevolutionList;
+
         public Skill Annihilation;
 #if ENABLE_THREADING
         private BattleManager staticBattleManager;
@@ -100,6 +103,8 @@ namespace Elements
             MainSkillList = null;
             SpecialSkillList = null;
             SpecialSkillEvolutionList = null;
+            MainSkillRevolutionList = null;
+            SpecialSkillRevolutionList = null;
             Owner = null;
             skillDictionary = null;
         }
@@ -247,6 +252,15 @@ namespace Elements
                     skillDictionary.Add(skillEvolutionIds1[index1], MainSkillEvolutionList[index1]);
                 }
             }
+            List<int> mainSkillRevolutionIds = skillData.MainSkillRevolutionIdList;
+            for (int index1 = 0; index1 < mainSkillRevolutionIds.Count; ++index1)
+            {
+                if (MainSkillRevolutionList != null && index1 < MainSkillRevolutionList.Count)
+                {
+                    MainSkillRevolutionList[index1].SkillNum = index1 + 1;
+                    skillDictionary.Add(mainSkillRevolutionIds[index1], MainSkillRevolutionList[index1]);
+                }
+            }
             List<int> spSkillIds = skillData.SpSkillIds;
             int index4 = 0;
             for (int count = spSkillIds.Count; index4 < count && spSkillIds[index4] != 0; ++index4)
@@ -263,6 +277,19 @@ namespace Elements
                 {
                     SpecialSkillEvolutionList[index1].SkillNum = index1 + 1;
                     skillDictionary.Add(key, SpecialSkillEvolutionList[index1]);
+                    Owner.SkillLevels[key] = Owner.Level;
+                }
+                else
+                    break;
+            }
+            List<int> spSkillRevolutionIds = skillData.SpecialSkillRevolutionIdList;
+            for (int index1 = 0; index1 < spSkillRevolutionIds.Count; ++index1)
+            {
+                int key = spSkillRevolutionIds[index1];
+                if (key != 0)
+                {
+                    SpecialSkillRevolutionList[index1].SkillNum = index1 + 1;
+                    skillDictionary.Add(key, SpecialSkillRevolutionList[index1]);
                     Owner.SkillLevels[key] = Owner.Level;
                 }
                 else

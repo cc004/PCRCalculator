@@ -52,12 +52,15 @@ namespace Elements
         public List<Skill> SpecialSkillEvolutionList;
         public List<Skill> UnionBurstEvolutionList;
         public List<Skill> MainSkillEvolutionList;
+        public List<Skill> MainSkillRevolutionList;
+        public List<Skill> SpecialSkillRevolutionList;
         public Skill Annihilation;
 
         public UnitActionControllerData2(ActionParameterOnPrefabDetail attackDetail,
             bool useDefaultDelay, Skill attack, List<Skill> unionBurstList, List<Skill> mainSkillList,
             List<Skill> specialSkillList, List<Skill> specialSkillEvList,
-            List<Skill> unionBurstEvolutionList, List<Skill> mainSkillEvolutionList, Skill annihilation)
+            List<Skill> unionBurstEvolutionList, List<Skill> mainSkillEvolutionList,
+            List<Skill> mainSkillRevolutionList, List<Skill> specialSkillRevolutionList, Skill annihilation)
         {
             AttackDetail = attackDetail;
             UseDefaultDelay = useDefaultDelay;
@@ -68,6 +71,8 @@ namespace Elements
             SpecialSkillEvolutionList = specialSkillEvList;
             UnionBurstEvolutionList = unionBurstEvolutionList;
             MainSkillEvolutionList = mainSkillEvolutionList;
+            MainSkillRevolutionList = mainSkillRevolutionList;
+            SpecialSkillRevolutionList = specialSkillRevolutionList;
             Annihilation = annihilation;
         }
     }

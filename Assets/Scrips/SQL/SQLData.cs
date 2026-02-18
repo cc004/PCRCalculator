@@ -299,9 +299,13 @@ namespace PCRCaculator.SQL
         public int sp_skill_5 { get; set; }
         public int union_burst_evolution { get; set; }
         public int main_skill_evolution_1 { get; set; }
+        public int main_skill_revolution_1 { get; set; }
         public int main_skill_evolution_2 { get; set; }
+        public int main_skill_revolution_2 { get; set; }
         public int sp_skill_evolution_1 { get; set; }
+        public int sp_skill_revolution_1 { get; set; }
         public int sp_skill_evolution_2 { get; set; }
+        public int sp_skill_revolution_2 { get; set; }
 
         public List<int> GetAllSkillIDs()
         {
@@ -321,18 +325,19 @@ namespace PCRCaculator.SQL
         }
         public List<int> GetMainSkillIDs()
         {
-            List<int> ids = new List<int>();
-            PropertyInfo[] pArray = typeof(unit_skill_data).GetProperties();
-            foreach (var p in pArray)
+            return new List<int>
             {
-                if (p.PropertyType == typeof(int) && p.Name.Contains("main_skill_"))
-                {
-                    int value = (int)(p.GetValue(this) ?? 0);
-                    ids.Add(value);
-                }
-            }
-
-            return ids;
+                main_skill_1,
+                main_skill_2,
+                main_skill_3,
+                main_skill_4,
+                main_skill_5,
+                main_skill_6,
+                main_skill_7,
+                main_skill_8,
+                main_skill_9,
+                main_skill_10
+            };
         }
     }
     public class skill_data
@@ -351,6 +356,19 @@ namespace PCRCaculator.SQL
         public int action_5 { get; set; }
         public int action_6 { get; set; }
         public int action_7 { get; set; }
+        public int action_8 { get; set; }
+        public int action_9 { get; set; }
+        public int action_10 { get; set; }
+        public int action_11 { get; set; }
+        public int action_12 { get; set; }
+        public int action_13 { get; set; }
+        public int action_14 { get; set; }
+        public int action_15 { get; set; }
+        public int action_16 { get; set; }
+        public int action_17 { get; set; }
+        public int action_18 { get; set; }
+        public int action_19 { get; set; }
+        public int action_20 { get; set; }
         public int depend_action_1 { get; set; }
         public int depend_action_2 { get; set; }
         public int depend_action_3 { get; set; }
@@ -358,58 +376,43 @@ namespace PCRCaculator.SQL
         public int depend_action_5 { get; set; }
         public int depend_action_6 { get; set; }
         public int depend_action_7 { get; set; }
-        public string description { get; set; }
-        public int icon_type { get; set; }
-        public virtual List<int> GetAllActionIDs()
-        {
-            List<int> ids = new List<int>
-            {
-                action_1,action_2,action_3,action_4,
-                action_5,action_6,action_7,0,0,0
-            };
-
-            return ids;
-        }
-        public virtual List<int> GetAllDependActionIDs()
-        {
-            List<int> ids = new List<int>
-            {
-                depend_action_1,depend_action_2,depend_action_3,depend_action_4,
-                depend_action_5,depend_action_6,depend_action_7,0,0,0
-            };
-
-            return ids;
-        }
-    }
-
-    [Table("skill_data")]
-    public class skill_data_new : skill_data
-    {
-        public int action_8 { get; set; }
-        public int action_9 { get; set; }
-        public int action_10 { get; set; }
         public int depend_action_8 { get; set; }
         public int depend_action_9 { get; set; }
         public int depend_action_10 { get; set; }
-
-        public override List<int> GetAllActionIDs()
+        public int depend_action_11 { get; set; }
+        public int depend_action_12 { get; set; }
+        public int depend_action_13 { get; set; }
+        public int depend_action_14 { get; set; }
+        public int depend_action_15 { get; set; }
+        public int depend_action_16 { get; set; }
+        public int depend_action_17 { get; set; }
+        public int depend_action_18 { get; set; }
+        public int depend_action_19 { get; set; }
+        public int depend_action_20 { get; set; }
+        public string description { get; set; }
+        public int icon_type { get; set; }
+        public List<int> GetAllActionIDs()
         {
             List<int> ids = new List<int>
             {
                 action_1,action_2,action_3,action_4,
                 action_5,action_6,action_7,action_8,
-                action_9,action_10,
+                action_9,action_10,action_11,action_12,
+                action_13,action_14,action_15,action_16,
+                action_17,action_18,action_19,action_20
             };
 
             return ids;
         }
-        public override List<int> GetAllDependActionIDs()
+        public List<int> GetAllDependActionIDs()
         {
             List<int> ids = new List<int>
             {
                 depend_action_1,depend_action_2,depend_action_3,depend_action_4,
                 depend_action_5,depend_action_6,depend_action_7,depend_action_8,
-                depend_action_9,depend_action_10
+                depend_action_9,depend_action_10,depend_action_11,depend_action_12,
+                depend_action_13,depend_action_14,depend_action_15,depend_action_16,
+                depend_action_17,depend_action_18,depend_action_19,depend_action_20
             };
 
             return ids;

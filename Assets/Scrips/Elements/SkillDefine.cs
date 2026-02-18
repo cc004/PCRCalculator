@@ -18,6 +18,14 @@ namespace Elements
         private const float NO_DISPLAY = 0.0f;
         private const float NO_VALUE_DISPLAY = -1f;
 
+        public enum eSkillEvolutionType
+        {
+          NORMAL = 0,
+          EVOLUTION = 1,
+          REVOLUTION = 2,
+        }
+
+
         public static readonly List<eActionType> TALENT_CONSIDER_DAMAGE_ACTION = new List<eActionType>
         {
             eActionType.ATTACK,

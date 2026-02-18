@@ -510,6 +510,17 @@ namespace Elements
         REDUCE_DAMAGE_BY_HIGHER_DEF = 203,
         [Description("部分伤害转Dot\n紫罗兰\n")]
         CONVERT_DAMAGE_OVER_TIME = 204,
+        REDUCTION_ATK_DAMAGE = 215,
+        REDUCTION_MGC_DAMAGE = 216,
+        REDUCTION_ALL_DAMAGE = 217,
+        TRANSCEND_DAMAGE = 218,
+        ALL_FEAR = 227,
+        BUFF_ENHANCE = 233,
+        DEBUFF_ENHANCE = 235,
+        ENERGY_DAMAGE_REDUCE_LIMIT = 246,
+        STACKABLE_SLIP = 248,
+        PHYSICAL_FOLLOW_UP = 249,
+        MAGIC_FOLLOW_UP = 250,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912

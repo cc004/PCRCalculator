@@ -124,8 +124,8 @@ namespace Elements
       protected int _ex_skill_evolution_4;
       protected int _ex_skill_5;
       protected int _ex_skill_evolution_5;
-            protected int _sp_union_burst;
-            protected int _sp_skill_1;
+      protected int _sp_union_burst;
+      protected int _sp_skill_1;
       protected int _sp_skill_2;
       protected int _sp_skill_3;
       protected int _sp_skill_4;
@@ -133,8 +133,12 @@ namespace Elements
       protected int _union_burst_evolution;
       protected int _main_skill_evolution_1;
       protected int _main_skill_evolution_2;
+      protected int _main_skill_revolution_1;
+      protected int _main_skill_revolution_2;
       protected int _sp_skill_evolution_1;
       protected int _sp_skill_evolution_2;
+      protected int _sp_skill_revolution_1;
+      protected int _sp_skill_revolution_2;
 
       public List<int> UnionBurstIds { get; set; }
 
@@ -151,13 +155,12 @@ namespace Elements
       public List<int> UnionBurstEvolutionIds { get; set; }
 
       public List<int> MainSkillEvolutionIds { get; set; }
-            public List<int> SubUnionBurstIds
-            {
-                get;
-                set;
-            }
+      public List<int> MainSkillRevolutionIdList { get; set; }
+      public List<int> SpecialSkillRevolutionIdList { get; set; }
 
-            public void SetUp()
+      public List<int> SubUnionBurstIds { get; set; }
+
+      public void SetUp()
       {
         UnionBurstIds = new List<int>();
         MainSkillIds = new List<int>();
@@ -166,8 +169,10 @@ namespace Elements
         SpSkillIds = new List<int>();
         UnionBurstEvolutionIds = new List<int>();
         MainSkillEvolutionIds = new List<int>();
+        MainSkillRevolutionIdList = new List<int>();
         SpSkillEvolutionIds = new List<int>();
-                SubUnionBurstIds = new List<int>();
+        SpecialSkillRevolutionIdList = new List<int>();
+        SubUnionBurstIds = new List<int>();
         UnionBurstIds.Add(union_burst);
         MainSkillIds.Add(main_skill_1);
         MainSkillIds.Add(main_skill_2);
@@ -197,10 +202,14 @@ namespace Elements
         UnionBurstEvolutionIds.Add(union_burst_evolution);
         MainSkillEvolutionIds.Add(main_skill_evolution_1);
         MainSkillEvolutionIds.Add(main_skill_evolution_2);
+        MainSkillRevolutionIdList.Add(main_skill_revolution_1);
+        MainSkillRevolutionIdList.Add(main_skill_revolution_2);
+        SpecialSkillRevolutionIdList.Add(sp_skill_revolution_1);
+        SpecialSkillRevolutionIdList.Add(sp_skill_revolution_2);
         SpSkillEvolutionIds.Add(sp_skill_evolution_1);
         SpSkillEvolutionIds.Add(sp_skill_evolution_2);
-                SubUnionBurstIds.Add(sp_union_burst);
-            }
+        SubUnionBurstIds.Add(sp_union_burst);
+      }
 
       public int unit_id => _unit_id;
 
@@ -245,8 +254,8 @@ namespace Elements
       public int ex_skill_5 => _ex_skill_5;
 
       public int ex_skill_evolution_5 => _ex_skill_evolution_5;
-            public int sp_union_burst => _sp_union_burst;
-            public int sp_skill_1 => _sp_skill_1;
+      public int sp_union_burst => _sp_union_burst;
+      public int sp_skill_1 => _sp_skill_1;
 
       public int sp_skill_2 => _sp_skill_2;
 
@@ -262,9 +271,15 @@ namespace Elements
 
       public int main_skill_evolution_2 => _main_skill_evolution_2;
 
+      public int main_skill_revolution_1 => _main_skill_revolution_1;
+      public int main_skill_revolution_2 => _main_skill_revolution_2;
+
       public int sp_skill_evolution_1 => _sp_skill_evolution_1;
 
       public int sp_skill_evolution_2 => _sp_skill_evolution_2;
+
+      public int sp_skill_revolution_1 => _sp_skill_revolution_1;
+      public int sp_skill_revolution_2 => _sp_skill_revolution_2;
 
       public UnitSkillData(
         int unit_id = 0,
@@ -297,8 +312,12 @@ namespace Elements
         int union_burst_evolution = 0,
         int main_skill_evolution_1 = 0,
         int main_skill_evolution_2 = 0,
+        int main_skill_revolution_1 = 0,  
+        int main_skill_revolution_2 = 0,
         int sp_skill_evolution_1 = 0,
         int sp_skill_evolution_2 = 0,
+        int sp_skill_revolution_1 = 0,
+        int sp_skill_revolution_2 = 0,
         int sp_union_burst = 0)
       {
         _unit_id = unit_id;
@@ -331,10 +350,14 @@ namespace Elements
         _union_burst_evolution = union_burst_evolution;
         _main_skill_evolution_1 = main_skill_evolution_1;
         _main_skill_evolution_2 = main_skill_evolution_2;
+        _main_skill_revolution_1 = main_skill_revolution_1;
+        _main_skill_revolution_2 = main_skill_revolution_2;
         _sp_skill_evolution_1 = sp_skill_evolution_1;
         _sp_skill_evolution_2 = sp_skill_evolution_2;
-                _sp_union_burst = sp_union_burst;
-                SetUp();
+        _sp_skill_revolution_1 = sp_skill_revolution_1;
+        _sp_skill_revolution_2 = sp_skill_revolution_2;
+        _sp_union_burst = sp_union_burst;
+        SetUp();
       }
     }
   }

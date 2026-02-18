@@ -307,7 +307,9 @@ namespace Elements
         public List<int> MainSkillIdList = new List<int>();
         public List<int> SpecialSkillIdList = new List<int>();
         public List<int> MainSkillEvolutionIdList = new List<int>();
+        public List<int> MainSkillRevolutionIdList = new List<int>();
         public List<int> SpecialSkillEvolutionIdList = new List<int>();
+        public List<int> SpecialSkillRevolutionIdList = new List<int>();
         public List<int> SubUnionBurstIdList = new List<int>();
         public List<eSpineCharacterAnimeId> TreasureAnimeIdList = new List<eSpineCharacterAnimeId>();
         private bool isDeadBySetCurrentHp;
@@ -1429,7 +1431,11 @@ namespace Elements
 
         public bool IsRecreated { get; set; }
 
-        public bool MainSkill1Evolved { get; set; }
+        // public bool MainSkill1Evolved { get; set; }
+
+        public SkillDefine.eSkillEvolutionType MainSkill1EvolutionType { get; set; }
+        public SkillDefine.eSkillEvolutionType MainSkill2EvolutionType { get; set; }
+
 
         //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? BattleManager.DeltaTime_60fps : 0.0f;
 
@@ -2248,8 +2254,10 @@ this.updateCurColor();
             this.animeIdDictionary = (Dictionary<int, eSpineCharacterAnimeId>)null;
             this.MainSkillIdList = (List<int>)null;
             this.MainSkillEvolutionIdList = (List<int>)null;
+            this.MainSkillRevolutionIdList = (List<int>)null;
             this.SpecialSkillIdList = (List<int>)null;
             this.SpecialSkillEvolutionIdList = (List<int>)null;
+            this.SpecialSkillRevolutionIdList = (List<int>)null;
             //this.soundManager = (SoundManager)null;
             this.m_abnormalState = (Dictionary<UnitCtrl.eAbnormalState, bool>)null;
             this.abnormalStateCategoryDataDictionary = (Dictionary<UnitCtrl.eAbnormalStateCategory, AbnormalStateCategoryData>)null;
@@ -2579,6 +2587,7 @@ this.updateCurColor();
             SetSkill(_data.SkillData.UnionBurstEvolutionIds, _data.UniqueData.UnionBurst, eSpineCharacterAnimeId.SKILL, false, _data);
             SetSkill(_data.SkillData.MainSkillIds, _data.UniqueData.MainSkill, eSpineCharacterAnimeId.SKILL, false, _data);
             SetSkill(_data.SkillData.MainSkillEvolutionIds, _data.UniqueData.MainSkill, eSpineCharacterAnimeId.SKILL, false, _data);
+            SetSkill(_data.SkillData.MainSkillRevolutionIdList, _data.UniqueData.MainSkill, eSpineCharacterAnimeId.SKILL, false, _data);
 
             List<SkillLevelInfo> skillLevelInfoList1 = new List<SkillLevelInfo>();
             for (int index = 0; index < _data.SkillData.SpSkillIds.Count; ++index)
@@ -2592,6 +2601,7 @@ this.updateCurColor();
             //action(_data.SkillData.SpSkillEvolutionIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true);
             SetSkill(_data.SkillData.SpSkillIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
             SetSkill(_data.SkillData.SpSkillEvolutionIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
+            SetSkill(_data.SkillData.SpecialSkillRevolutionIdList, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
             List<SkillLevelInfo> skillLevelInfoList2 = new List<SkillLevelInfo>();
             for (int index = 0; index < _data.SkillData.SubUnionBurstIds.Count; ++index)
             {
@@ -2604,7 +2614,9 @@ this.updateCurColor();
             MainSkillIdList = _data.SkillData.MainSkillIds;
             SpecialSkillIdList = _data.SkillData.SpSkillIds;
             SpecialSkillEvolutionIdList = _data.SkillData.SpSkillEvolutionIds;
+            SpecialSkillRevolutionIdList = _data.SkillData.SpecialSkillRevolutionIdList;
             MainSkillEvolutionIdList = _data.SkillData.MainSkillEvolutionIds;
+            MainSkillRevolutionIdList = _data.SkillData.MainSkillRevolutionIdList;
             SubUnionBurstIdList = _data.SkillData.SubUnionBurstIds;
             int burstEvolutionId = _data.SkillData.UnionBurstEvolutionIds[0];
             UnionBurstSkillId = burstEvolutionId == 0 || SkillLevels[burstEvolutionId] == 0 ? _data.SkillData.UnionBurstIds[0] : burstEvolutionId;
@@ -3406,32 +3418,53 @@ this.updateCurColor();
                             case 1:
                                 int index2 = pattern % 1000 - 1;
                                 int mainSkillId = _skillData.MainSkillIds[index2];
-                                int key1 = 0;
+                                int evolutionSkillId = 0;
                                 if (_skillData.MainSkillEvolutionIds.Count > index2)
-                                    key1 = _skillData.MainSkillEvolutionIds[index2];
-                                if (SkillLevels[mainSkillId] == 0 && (key1 == 0 || SkillLevels[key1] == 0))
+                                    evolutionSkillId = _skillData.MainSkillEvolutionIds[index2];
+                                int revolutionSkillId = 0;
+                                if (_skillData.MainSkillRevolutionIdList.Count > index2)
+                                    revolutionSkillId = _skillData.MainSkillRevolutionIdList[index2];
+                                if (SkillLevels[mainSkillId] == 0
+                                    && (evolutionSkillId == 0 || SkillLevels[evolutionSkillId] == 0)
+                                    && (revolutionSkillId == 0 || SkillLevels[revolutionSkillId] == 0))
                                 {
                                     intList1.Add(1);
                                     continue;
                                 }
-                                if (key1 != 0 && SkillLevels[key1] != 0)
+                                if (revolutionSkillId != 0 && SkillLevels[revolutionSkillId] != 0)
                                 {
-                                    intList1.Add(key1);
+                                    intList1.Add(revolutionSkillId);
+                                    continue;
+                                }
+                                if (evolutionSkillId != 0 && SkillLevels[evolutionSkillId] != 0)
+                                {
+                                    intList1.Add(evolutionSkillId);
                                     continue;
                                 }
                                 intList1.Add(mainSkillId);
                                 continue;
                             case 2:
                                 int index3 = pattern % 1000 - 1;
-                                int num = 0;
+                                int specialEvolutionSkillId = 0;
                                 if (_skillData.SpSkillEvolutionIds.Count > index3)
-                                    num = _skillData.SpSkillEvolutionIds[index3];
-                                int key2 = 0;
+                                    specialEvolutionSkillId = _skillData.SpSkillEvolutionIds[index3];
+                                int specialRevolutionSkillId = 0;
+                                if (_skillData.SpecialSkillRevolutionIdList.Count > index3)
+                                    specialRevolutionSkillId = _skillData.SpecialSkillRevolutionIdList[index3];
+                                int mainEvolutionSkillId = 0;
                                 if (_skillData.MainSkillEvolutionIds.Count > index3)
-                                    key2 = _skillData.MainSkillEvolutionIds[index3];
-                                if (num != 0 && key2 != 0 && SkillLevels[key2] != 0)
+                                    mainEvolutionSkillId = _skillData.MainSkillEvolutionIds[index3];
+                                int mainRevolutionSkillId = 0;
+                                if (_skillData.MainSkillRevolutionIdList.Count > index3)
+                                    mainRevolutionSkillId = _skillData.MainSkillRevolutionIdList[index3];
+                                if (specialRevolutionSkillId != 0 && mainRevolutionSkillId != 0 && SkillLevels[mainRevolutionSkillId] != 0)
                                 {
-                                    intList1.Add(num);
+                                    intList1.Add(specialRevolutionSkillId);
+                                    continue;
+                                }
+                                if (specialEvolutionSkillId != 0 && mainEvolutionSkillId != 0 && SkillLevels[mainEvolutionSkillId] != 0)
+                                {
+                                    intList1.Add(specialEvolutionSkillId);
                                     continue;
                                 }
                                 intList1.Add(_skillData.SpSkillIds[index3]);
@@ -3462,34 +3495,61 @@ this.updateCurColor();
                                 case 1:
                                     int index2 = pattern % 1000 - 1;
                                     int mainSkillId = _skillData.MainSkillIds[index2];
-                                    int key1 = 0;
+                                    int evolutionSkillId = 0;
                                     if (_skillData.MainSkillEvolutionIds.Count > index2)
-                                        key1 = _skillData.MainSkillEvolutionIds[index2];
-                                    if (SkillLevels[mainSkillId] == 0 && (key1 == 0 || SkillLevels[key1] == 0))
+                                        evolutionSkillId = _skillData.MainSkillEvolutionIds[index2];
+                                    int revolutionSkillId = 0;
+                                    if (_skillData.MainSkillRevolutionIdList.Count > index2)
+                                        revolutionSkillId = _skillData.MainSkillRevolutionIdList[index2];
+                                    if (SkillLevels[mainSkillId] == 0
+                                        && (evolutionSkillId == 0 || SkillLevels[evolutionSkillId] == 0)
+                                        && (revolutionSkillId == 0 || SkillLevels[revolutionSkillId] == 0))
                                     {
                                         intList2.Add(1);
                                         continue;
                                     }
-                                    if (key1 != 0 && SkillLevels[key1] != 0)
+                                    if (revolutionSkillId != 0 && SkillLevels[revolutionSkillId] != 0)
                                     {
                                         if (index2 == 0)
-                                            MainSkill1Evolved = true;
-                                        intList2.Add(key1);
+                                            MainSkill1EvolutionType = SkillDefine.eSkillEvolutionType.REVOLUTION;
+                                        else if (index2 == 1)
+                                            MainSkill2EvolutionType = SkillDefine.eSkillEvolutionType.REVOLUTION;
+                                        intList2.Add(revolutionSkillId);
+                                        continue;
+                                    }
+                                    if (evolutionSkillId != 0 && SkillLevels[evolutionSkillId] != 0)
+                                    {
+                                        if (index2 == 0)
+                                            MainSkill1EvolutionType = SkillDefine.eSkillEvolutionType.EVOLUTION;
+                                        else if (index2 == 1)
+                                            MainSkill2EvolutionType = SkillDefine.eSkillEvolutionType.EVOLUTION;
+                                        intList2.Add(evolutionSkillId);
                                         continue;
                                     }
                                     intList2.Add(mainSkillId);
                                     continue;
                                 case 2:
                                     int index3 = pattern % 1000 - 1;
-                                    int num = 0;
+                                    int specialEvolutionSkillId = 0;
                                     if (_skillData.SpSkillEvolutionIds.Count > index3)
-                                        num = _skillData.SpSkillEvolutionIds[index3];
-                                    int key2 = 0;
+                                        specialEvolutionSkillId = _skillData.SpSkillEvolutionIds[index3];
+                                    int specialRevolutionSkillId = 0;
+                                    if (_skillData.SpecialSkillRevolutionIdList.Count > index3)
+                                        specialRevolutionSkillId = _skillData.SpecialSkillRevolutionIdList[index3];
+                                    int mainEvolutionSkillId = 0;
                                     if (_skillData.MainSkillEvolutionIds.Count > index3)
-                                        key2 = _skillData.MainSkillEvolutionIds[index3];
-                                    if (num != 0 && key2 != 0 && SkillLevels[key2] != 0)
+                                        mainEvolutionSkillId = _skillData.MainSkillEvolutionIds[index3];
+                                    int mainRevolutionSkillId = 0;
+                                    if (_skillData.MainSkillRevolutionIdList.Count > index3)
+                                        mainRevolutionSkillId = _skillData.MainSkillRevolutionIdList[index3];
+                                    if (specialRevolutionSkillId != 0 && mainRevolutionSkillId != 0 && SkillLevels[mainRevolutionSkillId] != 0)
                                     {
-                                        intList2.Add(num);
+                                        intList2.Add(specialRevolutionSkillId);
+                                        continue;
+                                    }
+                                    if (specialEvolutionSkillId != 0 && mainEvolutionSkillId != 0 && SkillLevels[mainEvolutionSkillId] != 0)
+                                    {
+                                        intList2.Add(specialEvolutionSkillId);
                                         continue;
                                     }
                                     intList2.Add(_skillData.SpSkillIds[index3]);

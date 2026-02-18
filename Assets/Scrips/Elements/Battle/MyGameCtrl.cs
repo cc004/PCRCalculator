@@ -1161,6 +1161,7 @@ namespace Elements
             //int[] skillList = rarityData.GetFullSkillList();
             UnitSkillData skillData = rarityData.skillData;
             int[] skillLvEv = unitData.GetEvlotionSkillLv();
+            int[] skillLvEv2 = unitData.GetRevlotionSkillLv();
             UnitDetailData detailData = rarityData.detailData;
             return new UnitParameter(
                 new UnitData(
@@ -1180,7 +1181,9 @@ namespace Elements
                         new SkillLevelInfo(skillData.skill_1, unitData.rank < 2 ? 0 : unitData.skillLevel[1], 0), 
                         new SkillLevelInfo(skillData.skill_2, unitData.rank < 4 ? 0 : unitData.skillLevel[2], 0) ,
                         new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0), 
-                        new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0)
+                        new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0),
+                        new SkillLevelInfo(skillData.skill_1_rev, skillLvEv2[1], 0), 
+                        new SkillLevelInfo(skillData.skill_2_rev, skillLvEv2[2], 0)
                     },
                     new List<SkillLevelInfo> {
                         new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0)
@@ -1213,12 +1216,16 @@ namespace Elements
                     sp_skill_4: skillData.SPskill_4,
                     sp_skill_5: skillData.SPskill_5,
                     sp_skill_evolution_1:skillData.SPskill_1_ev,
+                    sp_skill_revolution_1: skillData.SPskill_1_rev,
                     sp_skill_evolution_2:skillData.SPskill_2_ev,
-                union_burst_evolution: skillData.UB_ev,
-                main_skill_evolution_1: skillData.skill_1_ev,
-                main_skill_evolution_2: skillData.skill_2_ev,
-                ex_skill_evolution_1: skillData.EXskill_ev,
-                sp_union_burst:skillData.SPUB)
+                    sp_skill_revolution_2: skillData.SPskill_2_rev,
+                    union_burst_evolution: skillData.UB_ev,
+                    main_skill_evolution_1: skillData.skill_1_ev,
+                    main_skill_revolution_1: skillData.skill_1_rev,
+                    main_skill_evolution_2: skillData.skill_2_ev,
+                    main_skill_revolution_2: skillData.skill_2_rev,
+                    ex_skill_evolution_1: skillData.EXskill_ev,
+                    sp_union_burst:skillData.SPUB)
 
                 ) ;
         }
@@ -1292,10 +1299,14 @@ namespace Elements
                     sp_skill_4: enemyData.skillData.raw_data.sp_skill_4,
                     sp_skill_5: enemyData.skillData.raw_data.sp_skill_5,
                     sp_skill_evolution_1: enemyData.skillData.raw_data.sp_skill_evolution_1,
+                    sp_skill_revolution_1: enemyData.skillData.raw_data.sp_skill_revolution_1,
                     sp_skill_evolution_2: enemyData.skillData.raw_data.sp_skill_evolution_2,
+                    sp_skill_revolution_2: enemyData.skillData.raw_data.sp_skill_revolution_2,
                     union_burst_evolution: enemyData.skillData.raw_data.union_burst_evolution,
                     main_skill_evolution_1: enemyData.skillData.raw_data.main_skill_evolution_1,
+                    main_skill_revolution_1: enemyData.skillData.raw_data.main_skill_revolution_1,
                     main_skill_evolution_2: enemyData.skillData.raw_data.main_skill_evolution_2,
+                    main_skill_revolution_2: enemyData.skillData.raw_data.main_skill_revolution_2,
                     ex_skill_evolution_1: enemyData.skillData.raw_data.ex_skill_evolution_1,
                     sp_union_burst: enemyData.skillData.raw_data.sp_union_burst)
                 , enemyData);
