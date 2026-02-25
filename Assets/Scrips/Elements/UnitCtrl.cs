@@ -2114,8 +2114,8 @@ namespace Elements
 
         public float EnegryAmount => (float)Energy / 1000f;
 
-        public float LifeAmount => (float)(long)Hp / (float)(long)MaxHpAfterPassive;
-        public float MaxLifeAmount => (float)(long)MaxHp / (float)MaxHpAfterPassive;
+        public float LifeAmount => (float)((double)Hp / (double)MaxHpAfterPassive);
+        public float MaxLifeAmount => (float)((double)MaxHp / (double)MaxHpAfterPassive);
 
         public Transform BottomTransform
         {
@@ -9602,7 +9602,7 @@ this.updateCurColor();
             {
                 if (_byAttack)
                     _damageData.Target.PassiveUbIsMagic = _damageData.DamageType == DamageData.eDamageType.MGC;
-                _damageData.Target.TotalDamage += (float)num1;
+                _damageData.Target.TotalDamage += num1;
             }
             if (_skill != null && num1 > 0L && !_skill.DamagedPartsList.Contains(_damageData.Target))
                 _skill.DamagedPartsList.Add(_damageData.Target);
@@ -10077,7 +10077,7 @@ this.updateCurColor();
             }
             
             if (_upperLimitFunc != null)
-                num5 = (float)_upperLimitFunc((int)BattleUtil.DoubleToLong(num5), _critical ? num1 : 1.0);
+                num5 = _upperLimitFunc((int)BattleUtil.DoubleToLong(num5), _critical ? num1 : 1.0);
             /*if (_damageData.Source != null && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
             {
                 foreach (KeyValuePair<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet> strikeBack1 in StrikeBackDictionary)
@@ -10605,7 +10605,7 @@ this.updateCurColor();
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num1 > 0.0)
                 {
-                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)(float)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
 #if !NO_PROB_EVENT

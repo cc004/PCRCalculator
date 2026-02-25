@@ -241,7 +241,7 @@ namespace Elements
 
                 case UnitCtrl.BuffParamKind.MAX_HP:
                     if (owner != null)
-                        baseStat = (float) owner.MaxHp;
+                        baseStat = (double) owner.MaxHp;
                     break;
 
                 default:
@@ -310,22 +310,22 @@ namespace Elements
                             f = (int)_target.Owner.StartAccuracy * num1;
                             break;
                         case UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE:
-                            f = (float)(int)_target.Owner.StartReceiveCriticalDamageRate * num1;
+                            f = (double)(int)_target.Owner.StartReceiveCriticalDamageRate * num1;
                             break;
                         case UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT:
-                            f = (float)(int)_target.Owner.StartPhysicalAndMagicReceiveDamagePercent * num1;
+                            f = (double)(int)_target.Owner.StartPhysicalAndMagicReceiveDamagePercent * num1;
                             break;
                         case UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT:
-                            f = (float)(int)_target.Owner.StartPhysicalReceiveDamagePercent * num1;
+                            f = (double)(int)_target.Owner.StartPhysicalReceiveDamagePercent * num1;
                             break;
                         case UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT:
-                            f = (float)(int)_target.Owner.StartMagicReceiveDamagePercent * num1;
+                            f = (double)(int)_target.Owner.StartMagicReceiveDamagePercent * num1;
                             break;
                         case UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT:
-                            f = (float)(int)_target.Owner.StartPhysicalDamageUpPercent * num1;
+                            f = (double)(int)_target.Owner.StartPhysicalDamageUpPercent * num1;
                             break;
                         case UnitCtrl.BuffParamKind.MAGIC_DAMAGE_UP_PERCENT:
-                            f = (float)(int)_target.Owner.StartMagicDamageUpPercent * num1;
+                            f = (double)(int)_target.Owner.StartMagicDamageUpPercent * num1;
                             break;
                         case UnitCtrl.BuffParamKind.MAX_HP:
                             f = (long)_target.Owner.StartMaxHP * num1;
@@ -361,8 +361,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
-            Value[eValueNumber.VALUE_4] = (float)(MasterData.action_value_4 + MasterData.action_value_5 * _level);
+            Value[eValueNumber.VALUE_2] = MasterData.action_value_2 + MasterData.action_value_3 * _level;
+            Value[eValueNumber.VALUE_4] = MasterData.action_value_4 + MasterData.action_value_5 * _level;
         }
 
         public enum eChangeParameterType

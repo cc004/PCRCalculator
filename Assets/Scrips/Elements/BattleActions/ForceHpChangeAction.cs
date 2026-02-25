@@ -46,7 +46,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (double) MasterData.action_value_1;
+      Value[eValueNumber.VALUE_1] = (double) MasterData.action_value_1;
     }
 
     private void damageTarget(

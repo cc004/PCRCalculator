@@ -49,7 +49,7 @@ namespace Elements
 
         public UnitCtrl Owner { get; set; }
 
-        public float TotalDamage { get; set; }
+        public LongWithEx TotalDamage { get; set; }
 
         protected BattleManager battleManager { get; set; }
 
@@ -205,11 +205,11 @@ namespace Elements
                 .Max();
         }
 
-        public bool JudgeShowTotalDamage() => UbAttackHitCount >= 2 && TotalDamage != 0.0;
+        public bool JudgeShowTotalDamage() => UbAttackHitCount >= 2 && TotalDamage != 0;
 
         public void ResetTotalDamage()
         {
-            TotalDamage = 0.0f;
+            TotalDamage = 0;
             UbAttackHitCount = 0;
         }
 

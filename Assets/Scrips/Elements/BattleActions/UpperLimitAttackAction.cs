@@ -45,13 +45,13 @@ namespace Elements
                 int actionDetail3 = base.ActionDetail3;
                 if (_damage > actionDetail3)
                 {
-                    _damage = (int)((float)actionDetail2 + (float)(actionDetail3 - actionDetail2) / _valueDictionary[eValueNumber.VALUE_5] + (float)(_damage - actionDetail3) / _valueDictionary[eValueNumber.VALUE_6]);
+                    _damage = (int)(actionDetail2 + (actionDetail3 - actionDetail2) / _valueDictionary[eValueNumber.VALUE_5] + (_damage - actionDetail3) / _valueDictionary[eValueNumber.VALUE_6]);
                 }
                 else if (_damage > actionDetail2)
                 {
-                    _damage = (int)((float)actionDetail2 + (float)(_damage - actionDetail2) / _valueDictionary[eValueNumber.VALUE_5]);
+                    _damage = (int)(actionDetail2 + (_damage - actionDetail2) / _valueDictionary[eValueNumber.VALUE_5]);
                 }
-                return (int)(_criticalRate * (float)Mathf.Min(_damage, (int)_valueDictionary[eValueNumber.VALUE_7]) * num);
+                return (int)(_criticalRate * Mathf.Min(_damage, (int)_valueDictionary[eValueNumber.VALUE_7]) * num);
             };
             if (flag)
             {

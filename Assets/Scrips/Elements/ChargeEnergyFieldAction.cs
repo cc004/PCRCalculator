@@ -57,7 +57,7 @@ namespace Elements
 			for (int count = base.TargetList.Count; i < count; i++)
 			{
 				UnitCtrl owner = base.TargetList[i].Owner;
-				if (!owner.IsDead && !((float)(long)owner.Hp <= 0f) && !list.Contains(owner))
+				if (!owner.IsDead && !((long)owner.Hp <= 0f) && !list.Contains(owner))
 				{
 					double val = Value;
 					if (owner.IsAbnormalState(UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE) && val < 0f)
@@ -121,8 +121,8 @@ namespace Elements
 		public override void SetLevel(float _level)
 		{
 			base.SetLevel(_level);
-			base.Value[eValueNumber.VALUE_1] = (float)((double)base.MasterData.action_value_1 + Math.Ceiling((double)base.MasterData.action_value_2 * (double)_level));
-			base.Value[eValueNumber.VALUE_3] = (float)((double)base.MasterData.action_value_3 + (double)base.MasterData.action_value_4 * (double)_level);
+			base.Value[eValueNumber.VALUE_1] = ((double)base.MasterData.action_value_1 + Math.Ceiling((double)base.MasterData.action_value_2 * (double)_level));
+			base.Value[eValueNumber.VALUE_3] = ((double)base.MasterData.action_value_3 + (double)base.MasterData.action_value_4 * (double)_level);
 		}
 	}
 }

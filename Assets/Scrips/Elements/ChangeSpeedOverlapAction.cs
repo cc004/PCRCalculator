@@ -70,8 +70,8 @@ namespace Elements
 		public override void SetLevel(float _level)
 		{
 			base.SetLevel(_level);
-			base.Value[eValueNumber.VALUE_1] = (float)((double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level);
-			base.Value[eValueNumber.VALUE_3] = (float)((double)base.MasterData.action_value_3 + (double)base.MasterData.action_value_4 * (double)_level);
+			base.Value[eValueNumber.VALUE_1] = ((double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level);
+			base.Value[eValueNumber.VALUE_3] = ((double)base.MasterData.action_value_3 + (double)base.MasterData.action_value_4 * (double)_level);
 		}
 	}
 }

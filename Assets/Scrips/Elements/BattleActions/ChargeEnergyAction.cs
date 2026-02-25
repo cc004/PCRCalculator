@@ -42,7 +42,7 @@ namespace Elements
           _energy = -_valueDictionary[eValueNumber.VALUE_1];
           break;
         case 3:
-          _energy = (float) ((double) _target.Owner.Energy * (double) _valueDictionary[eValueNumber.VALUE_1] / 100.0) - _target.Owner.Energy;
+          _energy = ((double) _target.Owner.Energy * (double) _valueDictionary[eValueNumber.VALUE_1] / 100.0) - _target.Owner.Energy;
           break;
       }
 
@@ -57,7 +57,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + Math.Ceiling(MasterData.action_value_2 * _level));
+      Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + Math.Ceiling(MasterData.action_value_2 * _level);
     }
   }
 }
