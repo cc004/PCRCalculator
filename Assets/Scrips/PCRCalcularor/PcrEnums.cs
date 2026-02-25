@@ -758,7 +758,7 @@ namespace PCRCaculator.Battle
         [Description("130")]
         MUIMI_ANNIVERSARY_CARVED_SEAL = 130,//513情谊的证明标记
         [Description("131")]
-        MISORA_CARVED_SEAL = 131,//美空标记
+        MISORA_CARVED_SEAL = 131,//美空超能力★充能
         [Description("132")]
         FLIGHT = 132,//飞行状态
         [Description("133")]
@@ -768,15 +768,15 @@ namespace PCRCaculator.Battle
         [Description("135")]
         JINIANG = 135,//机娘电池
         [Description("137")]
-        WORLD_LIGHTNING = 137,//莱莱界雷
+        WORLD_LIGHTNING = 137,//莱莱雷霆圣界
         [Description("139")]
         WOLF = 139,//狼牙咆哮
         [Description("140")]
-        HUODIAN = 140,//火电标记
+        YANWUYINJI = 140,//火电炎舞印记
         [Description("141")]
         DUOTIANSHI = 141,//可璃亚堕天使的加护
         [Description("142")]
-        ZAISHENG = 142,//ELS再生（不确定）
+        HUIGUIMEIGUI = 142,//ELS回归玫瑰
         [Description("143")]
         SHESHOUZUO = 143,//射手座D5标记
         [Description("145")]
@@ -788,28 +788,25 @@ namespace PCRCaculator.Battle
         [Description("153")]
         EWAIJIANSU = 153,//额外减速
         [Description("154")]
-        SLIP_DAMAGE_UP = 154,//毒伤提升
-
-        // 分割线,属性没实装应该用不到
-
+        SLIP_DAMAGE_UP = 154,//提升受到的持续伤害
         [Description("156")]
-        SHUIYOUNI = 156,//水优妮水祭的安宁
+        SHUIBIANDEANNING = 156,//水优妮水边的安宁
         [Description("157")]
         SHUIYUE = 157,//水华水月
         [Description("158")]
-        WANJUZHIHUA = 158,//银莲婉拒之花
+        JUJUEZHIHUA = 158,//银莲拒绝之花
         [Description("159")]
-        KABANJUN = 159,//库露露卡班君
+        BAOSHITUTU = 159,//库露露宝石兔兔
         [Description("160")]
-        NIANCHOU = 160,//水涅娅粘稠
+        NIANYE = 160,//水涅娅黏液
         [Description("161")]
         TIEQISHOUHU = 161,//涅妃铁气守护
         [Description("162")]
         FANGMOCHEN = 162,//涅妃防魔尘
         [Description("168")]
-        SOUHUI = 168,//六凶·魔蜘蒐輝
+        JIHUI = 168,//六凶·魔蜘集辉
         [Description("171")]
-        PSIFENGBAO = 171,//水美空PSI风暴
+        PSIFENGBAO = 171,//水美空超能力★风暴
         [Description("173")]
         RISHI = 173,//水龙妈日食
         [Description("175")]
@@ -837,17 +834,17 @@ namespace PCRCaculator.Battle
         [Description("189")]
         CHAHU = 189,//女仆茶壶
         [Description("190")]
-        LIANJIN = 190,//炼望炼金素材
+        LIANJINCAILIAO = 190,//炼望炼金材料
         [Description("191")]
         XIANGSHUI = 191,//炼望香水
         [Description("192")]
         TOULAN = 192,//龙妹偷懒的诱惑
         [Description("193")]
-        YOUJUNHUDUN = 193,//吹雪友军护盾
+        WOFANGPINGZHANG = 193,//吹雪我方屏障
         [Description("194")]
-        TOUZI = 194,//大和蛮贼骰子
+        BANDITOUZI = 194,//大和蛮贼骰子
         [Description("195")]
-        JIANCIDUNPAI = 195,//若菜尖刺盾牌
+        JIANCIFANGYU = 195,//若菜尖刺防御
         [Description("196")]
         EMOQINWEN = 196,//圣老师恶魔的亲吻
         [Description("197")]
@@ -857,9 +854,79 @@ namespace PCRCaculator.Battle
         [Description("199")]
         HUONIAO = 199,//春电火鸟
         [Description("200")]
-        MOYAN = 200,//美杜莎魔眼
+        MOYAN = 200,//梅杜莎魔眼
         [Description("201")]
         XUSHU = 201,//原克虚数
+        [Description("202")]
+        RATIO_SLIP = 202,//绝怠灵度\n紫罗兰
+        [Description("203")]
+        REDUCE_DAMAGE_BY_HIGHER_DEF = 203,//调和状态\n鹿妹/水els/sms
+        [Description("204")]
+        CONVERT_DAMAGE_OVER_TIME = 204,//紫罗兰污秽
+        [Description("205")]
+        LONGZHIGUOSHI = 205,//斑比龙之果实
+        [Description("207")]
+        JIHUO = 207,//紫罗兰忌火
+        [Description("208")]
+        FEICUIDEZANGGE = 208,//兰法翡翠的葬歌
+        [Description("209")]
+        XUTUO = 209,//苑虚脱
+        [Description("212")]
+        LIEFENG = 212,//烈风\n黎明界
+        [Description("213")]
+        SHIPO = 213,//识破\n黎明界
+        REDUCTION_ATK_DAMAGE = 215,
+        REDUCTION_MGC_DAMAGE = 216,
+        REDUCTION_ALL_DAMAGE = 217,
+        TRANSCEND_DAMAGE = 218,
+        [Description("219")]
+        RENNAI = 219,//忍耐\n华音
+        [Description("220")]
+        JIANYA = 220,//剑压\n彩羽
+        [Description("221")]
+        ZAILAIYIWANQUAN = 221,//再来一碗券\n水吃
+        [Description("222")]
+        JINGJIZHIGUAN = 222,//荆棘之冠\n彩羽
+        [Description("223")]
+        MOMOCENGCENG = 223,//磨磨蹭蹭\n水菲
+        [Description("224")]
+        SHUIDUNZHIYIN = 224,//水遁之印\n水扇
+        [Description("225")]
+        SALASALIYAWUBU = 225,//萨拉萨利亚舞步\n沙猫
+        [Description("226")]
+        FUHUOZHISI = 226,//赋活之丝\n蜘蛛
+        ALL_FEAR = 227,
+        [Description("228")]
+        MANALIUMAI = 228,//玛那流脉\n霸瞳皇帝
+        [Description("230")]
+        ZHENSHIDEZHIYIN = 230,//真实的指引\n修驴
+        BUFF_ENHANCE = 233,
+        DEBUFF_ENHANCE = 235,
+        [Description("236")]
+        ZHENCANGTIANTIANQUAN = 236,//珍藏甜甜圈\n纳娜
+        [Description("237")]
+        SHENGYEDEAIMU = 237,//圣夜的爱慕\n圣田
+        [Description("238")]
+        CAIDENGDAN = 238,//彩灯弹\n圣美空
+        [Description("239")]
+        JINHUACHAOYUE = 239,//进化超越\n大可
+        [Description("240")]
+        MINGHAIDEJIAHU = 240,//冥海的加护\n水紫
+        [Description("241")]
+        SHENJI = 241,//神机\n完莱
+        [Description("242")]
+        SHELUOYIN = 242,//蛇落印\n鬼妃
+        [Description("246")]
+        ENERGY_DAMAGE_REDUCE_LIMIT = 246, //妖精的指引\nyls
+        [Description("247")]
+        CHAIN = 247,//CHAIN\n姬塔
+        [Description("248")]
+        STACKABLE_SLIP = 248,//干杯\n黄骑
+        [Description("249")]
+        PHYSICAL_FOLLOW_UP = 249,//证据\n驴
+        MAGIC_FOLLOW_UP = 250,
+        [Description("251")]
+        CANGZHISUOLIAN = 251,//苍之锁链\n凛
         [Description("0")]
         EX_PASSIVE_1 = 999,
         [Description("0")]
