@@ -1034,6 +1034,8 @@ namespace Elements
 
         private int maxHpDebufCounter;
 
+        public int SlipDamageUpIconCounter { get; set; }
+
         public static readonly Dictionary<BuffParamKind, BuffDebuffConstData> BUFF_DEBUFF_ICON_DIC = new Dictionary<BuffParamKind, BuffDebuffConstData>(new BuffParamKind_DictComparer())
         {
             {
@@ -9895,6 +9897,62 @@ this.updateCurColor();
             
             Tuple<StrikeBackData, List<StrikeBackData>> tuple =  searchStrikeBack(_damageData);
 
+            if (!_damageData.IgnoreDef && !flag1)
+            {
+                var damageType = _damageData.DamageType;
+                if (_damageData.Target.Owner.ReduceDamageByHigherDefData != null && _damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
+                {
+                    var def = _damageData.Target.GetDefZero();
+                    var magicDef = _damageData.Target.GetMagicDefZero();
+                    if (def != magicDef)
+                    {
+                        damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                    }
+                }
+                switch (damageType)
+                {
+                    case DamageData.eDamageType.ATK:
+                        var defZero = _damageData.Target.GetDefZero();
+                        var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
+                        break;
+                    case DamageData.eDamageType.MGC:
+                        var magicDefZero = _damageData.Target.GetMagicDefZero();
+                        var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
+                        break;
+                }
+                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
+                {
+                    switch (damageType)
+                    {
+                        case DamageData.eDamageType.ATK:
+                            var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
+                            var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
+                            break;
+                        case DamageData.eDamageType.MGC:
+                            var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
+                            var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
+                            break;
+                    }
+                }
+                var unit = _damageData.Source;
+                if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
+                    unit = _damageData.StrikeBackSource;
+                var talentDamageRate = CalcTalentDamageRate(
+                    _damageData.ActionType,
+                    unit,
+                    _damageData.Target,
+                    _damageData.TargetIncludeMyTeam,
+                    _damageData.IgnoreTalentBonusForRatioSlip,
+                    out isNoDamageByResist
+                );
+                a *= talentDamageRate;
+                b *= talentDamageRate;
+            }
+
 
             // 属性
             double execBarrier(double total, double main, double sub)
@@ -9981,62 +10039,6 @@ this.updateCurColor();
                 OnDamageForUIShake.Call();
                 //if (!this.DisableFlash)
                 //    this.AppendCoroutine(this.setColorOffsetDefaultWithDelay(), ePauseType.NO_DIALOG);
-            }
-            // TODO check order with log barrier
-            if (!_damageData.IgnoreDef && !flag1)
-            {
-                var damageType = _damageData.DamageType;
-                if (_damageData.Target.Owner.ReduceDamageByHigherDefData != null && _damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
-                {
-                    var def = _damageData.Target.GetDefZero();
-                    var magicDef = _damageData.Target.GetMagicDefZero();
-                    if (def != magicDef)
-                    {
-                        damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
-                    }
-                }
-                switch (damageType)
-                {
-                    case DamageData.eDamageType.ATK:
-                        var defZero = _damageData.Target.GetDefZero();
-                        var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
-                        break;
-                    case DamageData.eDamageType.MGC:
-                        var magicDefZero = _damageData.Target.GetMagicDefZero();
-                        var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
-                        break;
-                }
-                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
-                {
-                    switch (damageType)
-                    {
-                        case DamageData.eDamageType.ATK:
-                            var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
-                            var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
-                            break;
-                        case DamageData.eDamageType.MGC:
-                            var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
-                            var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
-                            break;
-                    }
-                }
-                var unit = _damageData.Source;
-                if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
-                    unit = _damageData.StrikeBackSource;
-                var talentDamageRate = CalcTalentDamageRate(
-                    _damageData.ActionType,
-                    unit,
-                    _damageData.Target,
-                    _damageData.TargetIncludeMyTeam,
-                    _damageData.IgnoreTalentBonusForRatioSlip,
-                    out isNoDamageByResist
-                );
-                a *= talentDamageRate;
-                b *= talentDamageRate;
             }
 
             var num5 = a;

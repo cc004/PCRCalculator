@@ -24,17 +24,12 @@ namespace Elements
         {
             if (DisplayIcon)
             {
-                // var iconCounter = _owner.SlipDamageUpIconCounter;
-                // if (iconCounter == 0)
-                // {
-                    // set icon
-                    // Cute_EventExtension__Call_Int32Enum__bool_(
-                    // (System_Action_T1__T2__o *)ComponentAbnormal_k__BackingField->fields._OnChangeState_k__BackingField,
-                    // 154,
-                    // 1,
-                    // (const MethodInfo_33C9790 *)Method_Cute_EventExtension_Call_eStateIconType__bool___);
-                // }
-                // _owner.SlipDamageUpIconCounter = iconCounter + 1;
+                var iconCounter = _owner.SlipDamageUpIconCounter;
+                if (iconCounter == 0)
+                {
+                    _owner.OnChangeState(_owner, eStateIconType.SLIP_DAMAGE_UP, true);
+                }
+                _owner.SlipDamageUpIconCounter = iconCounter + 1;
             }
             _owner.AppendCoroutine(updateTimer(_owner), ePauseType.SYSTEM);
         }
@@ -53,10 +48,10 @@ namespace Elements
 
             if (DisplayIcon)
             {
-                // if (--_owner.SlipDamageUpIconCounter == 0)
-                // {
-                    // Cute.EventExtension.Call(_owner.OnChangeState, (eStateIconType)154, false);
-                // }
+                if (--_owner.SlipDamageUpIconCounter == 0)
+                {
+                    _owner.OnChangeState(_owner, eStateIconType.SLIP_DAMAGE_UP, false);
+                }
             }
         }
 
