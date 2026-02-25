@@ -7399,7 +7399,7 @@ this.updateCurColor();
                 if (f == flag)
                     buffDebuffFlag[i] = (short)(f | 1);
             }
-            BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
+            // BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
 			dispelBuffDebuffImmediately();
 		}
 
