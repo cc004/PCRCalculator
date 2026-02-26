@@ -854,7 +854,7 @@ namespace PCRCaculator.Battle
         [Description("199")]
         HUONIAO = 199,//春电火鸟
         [Description("200")]
-        MOYAN = 200,//梅杜莎魔眼
+        MOYAN = 200,//美杜莎魔眼
         [Description("201")]
         XUSHU = 201,//原克虚数
         [Description("202")]

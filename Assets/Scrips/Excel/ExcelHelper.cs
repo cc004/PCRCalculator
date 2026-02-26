@@ -392,7 +392,7 @@ namespace ExcelHelper
             {
                 string file1 = "asm";
                 string file2 = Application.persistentDataPath + "/asm";
-                const string expectedHash = "7031736DBAE9868C928FE7ACDCF3C5D4";
+                const string expectedHash = "45d17edf0e54c2ff1ab4bd708fa3201b";
 
                 if (File.Exists(file1))
                     return CalculateMD5(file1).Equals(expectedHash, StringComparison.OrdinalIgnoreCase);

@@ -502,7 +502,7 @@ namespace Elements
         WANGLINGQUTI = 198,
         [Description("火鸟\n春电")]
         HUONIAO = 199,
-        [Description("魔眼\n梅杜莎")]
+        [Description("魔眼\n美杜莎")]
         MOYAN = 200,
         [Description("虚数\n原克")]
         XUSHU = 201,
