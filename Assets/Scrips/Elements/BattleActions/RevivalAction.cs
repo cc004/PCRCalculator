@@ -21,7 +21,7 @@ namespace Elements
       base.ExecActionOnStart(_skill, _source, _sourceActionController);
       if (ActionDetail1 != 2)
         return;
-      Value[eValueNumber.VALUE_1] -= (float) _source.SkillUseCount[_skill.SkillId];
+      Value[eValueNumber.VALUE_1] -= _source.SkillUseCount[_skill.SkillId];
       if ((double) Value[eValueNumber.VALUE_1] != 0.0)
         return;
       _source.HasUnDeadTime = false;
@@ -99,8 +99,8 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+      Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + MasterData.action_value_2 * _level;
+      Value[eValueNumber.VALUE_3] = MasterData.action_value_3 + MasterData.action_value_4 * _level;
     }
 
     private enum eRevivalType

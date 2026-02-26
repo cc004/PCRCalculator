@@ -392,7 +392,7 @@ namespace PCRCaculator.Guild
                 allUnitAbnormalStateDic[unitid].Remove(changeData);
             }
         }
-        public void AppendChangeHP(int unitid, long currentHP, long hp, long damage, int frame, string describe, UnitCtrl source)
+        public void AppendChangeHP(int unitid, long currentHP, long hp, long damage, int frame, string describe, UnitCtrl source, int skillId, int actionId)
         {
             if (unitid >= 400000 && !allUnitHPDic.ContainsKey(unitid)) { return; }
             var sourceId = source?.UnitId ?? unitid;
@@ -402,6 +402,8 @@ namespace PCRCaculator.Guild
                 id = unit_state_id.ContainsKey(sourceId) ? unit_state_id[sourceId] : 0,
                 source= sourceId,
                 target = unitid,
+                skillId = skillId,
+                actionId = actionId,
             };
             allUnitHPDic[unitid].Add(valueData);
             if (!GuildManager.StaticsettingData.calcSpineAnimation && currentToggleId == 2)
@@ -793,7 +795,7 @@ namespace PCRCaculator.Guild
               {
                 int unitid = unitCtrl.UnitId;
                 AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
-                AppendChangeHP(unitid, unitCtrl.Hp, unitCtrl.MaxHp, unitCtrl.Hp, 5400, "时间耗尽", unitCtrl);
+                AppendChangeHP(unitid, unitCtrl.Hp, unitCtrl.MaxHp, unitCtrl.Hp, 5400, "时间耗尽", unitCtrl, 0, 0);
                 AppendChangeTP(unitid, unitCtrl.Energy, 5400, "时间耗尽");
                 if (allUnitAbnormalStateDic.TryGetValue(unitid, out var value))
                 {
@@ -1053,52 +1055,73 @@ namespace PCRCaculator.Guild
             //List<List<float>> UBTimes = CreateUBExecTimeData();
             for (int i = 0; i < 5; i++)
             {
-                if (i < PlayerIds.Count)
+                if (i >= PlayerIds.Count)
                 {
-                    foreach (UnitStateChangeData tm in allUnitStateChangeDic[PlayerIds[i]])
+                    continue;
+                }
+
+                int playerId = PlayerIds[i];
+                int ubSkillId = players[i].UnionBurstSkillId;
+                UnitData unitData = players[i].unitData;
+                List<UnitStateChangeData> ubStates = allUnitStateChangeDic[playerId]
+                    .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                    .OrderBy(state => state.currentFrameCount)
+                    .ThenBy(state => state.id)
+                    .ToList();
+
+                for (int ubIndex = 0; ubIndex < ubStates.Count; ubIndex++)
+                {
+                    UnitStateChangeData tm = ubStates[ubIndex];
+                    int nextUbFrame = ubIndex + 1 < ubStates.Count ? ubStates[ubIndex + 1].currentFrameCount : int.MaxValue;
+                    UBDetail detail = new UBDetail
                     {
-                        if (tm.changStateTo != UnitCtrl.ActionState.SKILL_1)
+                        unitData = unitData,
+                        sorting = tm.realFrameCount,
+                        UBTime = tm.currentFrameCount,
+                        description = tm.operation ?? string.Empty
+                    };
+                    ValueChangeData firstHit = null;
+                    long totalDamage = 0;
+                    foreach (int bossId in BossId)
+                    {
+                        if (!allUnitHPDic.TryGetValue(bossId, out var hpList) || hpList == null)
                         {
                             continue;
                         }
 
-                        UnitData unitData = players[i].unitData;
-                        UBDetail detail = new UBDetail
+                        List<ValueChangeData> ubDamages = hpList
+                            .Where(a =>
+                                a != null &&
+                                a.source == unitData.unitId &&
+                                a.damage > 0 &&
+                                (
+                                    (a.skillId == ubSkillId && a.xValue >= tm.currentFrameCount && a.xValue < nextUbFrame) ||
+                                    (a.skillId == 0 && a.id == tm.id)
+                                ))
+                            .ToList();
+                        if (ubDamages.Count == 0)
                         {
-                            unitData = unitData,
-                            sorting = tm.realFrameCount,
-                            UBTime = tm.currentFrameCount,
-                            description = tm.operation ?? string.Empty
-                        };
-                        ValueChangeData changeData = null;
-                        long totalDamage = 0;
-                        foreach (int bossId in BossId)
-                        {
-                            if (allUnitHPDic.ContainsKey(bossId) && allUnitHPDic[bossId] != null)
-                            {
-                                changeData = allUnitHPDic[bossId].Find(
-                                a => a.id == tm.id && a.source == unitData.unitId);
-                                if (changeData != null)
-                                {
-                                    detail.Damage = changeData.damage;
-                                    detail.Critical = changeData.describe.Contains("暴击");
-                                    foreach (var data in allUnitHPDic[bossId])
-                                    {
-                                        if (data.id == changeData.id)
-                                        {
-                                            totalDamage += data.damage;
-                                            detail.totalDamage = totalDamage;
-                                        }
-                                    }
-                                }
-                            }
+                            continue;
                         }
-                        if (changeData == null)
+
+                        if (firstHit == null)
                         {
-                            detail.Damage = 0;
+                            firstHit = ubDamages[0];
                         }
-                        uBDetails.Add(detail);
+                        totalDamage += ubDamages.Sum(a => a.damage);
                     }
+
+                    if (firstHit != null)
+                    {
+                        detail.Damage = firstHit.damage;
+                        detail.Critical = firstHit.describe?.Contains("暴击") == true;
+                        detail.totalDamage = totalDamage;
+                    }
+                    else
+                    {
+                        detail.Damage = 0;
+                    }
+                    uBDetails.Add(detail);
                 }
             }
             for (int i = 0; i < BossId.Count; i++)
@@ -1756,6 +1779,8 @@ namespace PCRCaculator.Guild
         public int id;
         public int source;
         public int target;
+        public int skillId;
+        public int actionId;
         public int realFrameCount;
         private const float XScale = 5400f;
         private double YScale => (hp == 0) ? UnitDefine.MAX_ENERGY : hp;

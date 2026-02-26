@@ -67,7 +67,7 @@ namespace Elements
 		public override void SetLevel(float _level)
 		{
 			base.SetLevel(_level);
-			base.Value[eValueNumber.VALUE_1] = (float)((double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level);
+			base.Value[eValueNumber.VALUE_1] = (double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level;
 		}
 
 		private IEnumerator updateSpy(UnitCtrl _target, List<UnitCtrl> _targetList) // TODO add Etherealization

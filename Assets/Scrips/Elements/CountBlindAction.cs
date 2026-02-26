@@ -61,7 +61,7 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_2] = (float) (MasterData.action_value_2 + MasterData.action_value_3 * _level);
+      Value[eValueNumber.VALUE_2] = (MasterData.action_value_2 + MasterData.action_value_3 * _level);
     }
 
     private enum eCountBlindType

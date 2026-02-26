@@ -4,6 +4,7 @@
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
 // Assembly location: D:\PCRCalculator\解包数据\逆向dll\Assembly-CSharp.dll
 
+using System;
 using System.Collections.Generic;
 using Elements.Battle;
 using PCRCaculator.Guild;
@@ -70,8 +71,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            base.Value[eValueNumber.VALUE_1] = Mathf.Max(0f, (float)((double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_4 * (double)_level));
-            Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
+            Value[eValueNumber.VALUE_1] = Math.Max(0, (double)MasterData.action_value_1 + (double)MasterData.action_value_4 * (double)_level);
+            Value[eValueNumber.VALUE_2] = MasterData.action_value_2 + MasterData.action_value_3 * _level;
         }
     }
 }

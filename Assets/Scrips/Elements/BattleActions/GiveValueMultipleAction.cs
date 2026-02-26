@@ -21,7 +21,7 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
+            Value[eValueNumber.VALUE_2] = MasterData.action_value_2 + MasterData.action_value_3 * _level;
         }
 
         protected override DoubleWithEx calcDamageValue(UnitCtrl _source, ValueDictionary _valueDictionary) => ((long)_source.MaxHp - (long)_source.Hp) / (double)(long)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];

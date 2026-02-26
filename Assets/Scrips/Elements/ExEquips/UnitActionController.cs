@@ -23,13 +23,13 @@ namespace Elements
             actionParameter.ActionDetail2 = _action.action_detail_2;
             actionParameter.ActionDetail3 = _action.action_detail_3;
             actionParameter.Value = new ValueDictionary();
-            actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)_action.action_value_1);
-            actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)_action.action_value_2);
-            actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)_action.action_value_3);
-            actionParameter.Value.Add(eValueNumber.VALUE_4, (float)(double)_action.action_value_4);
-            actionParameter.Value.Add(eValueNumber.VALUE_5, (float)(double)_action.action_value_5);
-            actionParameter.Value.Add(eValueNumber.VALUE_6, (float)(double)_action.action_value_6);
-            actionParameter.Value.Add(eValueNumber.VALUE_7, (float)(double)_action.action_value_7);
+            actionParameter.Value.Add(eValueNumber.VALUE_1, (double)_action.action_value_1);
+            actionParameter.Value.Add(eValueNumber.VALUE_2, (double)_action.action_value_2);
+            actionParameter.Value.Add(eValueNumber.VALUE_3, (double)_action.action_value_3);
+            actionParameter.Value.Add(eValueNumber.VALUE_4, (double)_action.action_value_4);
+            actionParameter.Value.Add(eValueNumber.VALUE_5, (double)_action.action_value_5);
+            actionParameter.Value.Add(eValueNumber.VALUE_6, (double)_action.action_value_6);
+            actionParameter.Value.Add(eValueNumber.VALUE_7, (double)_action.action_value_7);
             actionParameter.MasterData = _action;
             actionParameter.ActionEffectList = new List<NormalSkillEffect>();
             actionParameter.ActionExecTimeList = new List<ActionExecTime>
@@ -83,13 +83,13 @@ namespace Elements
             actionParameter.ActionDetail2 = _action.action_detail_2;
             actionParameter.ActionDetail3 = _action.action_detail_3;
             actionParameter.Value = new ValueDictionary();
-            actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)_action.action_value_1);
-            actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)_action.action_value_2);
-            actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)_action.action_value_3);
-            actionParameter.Value.Add(eValueNumber.VALUE_4, (float)(double)_action.action_value_4);
-            actionParameter.Value.Add(eValueNumber.VALUE_5, (float)(double)_action.action_value_5);
-            actionParameter.Value.Add(eValueNumber.VALUE_6, (float)(double)_action.action_value_6);
-            actionParameter.Value.Add(eValueNumber.VALUE_7, (float)(double)_action.action_value_7);
+            actionParameter.Value.Add(eValueNumber.VALUE_1, (double)_action.action_value_1);
+            actionParameter.Value.Add(eValueNumber.VALUE_2, (double)_action.action_value_2);
+            actionParameter.Value.Add(eValueNumber.VALUE_3, (double)_action.action_value_3);
+            actionParameter.Value.Add(eValueNumber.VALUE_4, (double)_action.action_value_4);
+            actionParameter.Value.Add(eValueNumber.VALUE_5, (double)_action.action_value_5);
+            actionParameter.Value.Add(eValueNumber.VALUE_6, (double)_action.action_value_6);
+            actionParameter.Value.Add(eValueNumber.VALUE_7, (double)_action.action_value_7);
             actionParameter.MasterData = _action;
             actionParameter.ActionEffectList = new List<NormalSkillEffect>();
             actionParameter.ActionExecTimeList = new List<ActionExecTime>

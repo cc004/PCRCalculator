@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cute;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace Elements
 			eChargeType eChargeType = chargeType;
 			if (eChargeType == eChargeType.INCREASE)
 			{
-				chargeValue = Mathf.Min(1000, (float)_valueDictionary[eValueNumber.VALUE_1]);
+				chargeValue = Math.Min(1000, _valueDictionary[eValueNumber.VALUE_1]);
 			}
 			targetUnit.ChargeEnergyByReceiveDamageDictionary[actionDetail] = delegate
 			{
@@ -55,7 +56,7 @@ namespace Elements
 		public override void SetLevel(float _level)
 		{
 			base.SetLevel(_level);
-			base.Value[eValueNumber.VALUE_1] = (float)((double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level);
+			base.Value[eValueNumber.VALUE_1] = (double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level;
 		}
 	}
 }

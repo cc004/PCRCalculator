@@ -156,15 +156,15 @@ namespace Elements
                     _addValue[_evalue] = calcDamageValue(_source, _valueDictionary);
                     break;
                 case 2:
-                    _addValue[_evalue] = (float)_skill.DefeatEnemyCount * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (double)_skill.DefeatEnemyCount * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 3:
                     break;
                 case 4:
-                    _addValue[_evalue] = (float)TargetList.Count * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (double)TargetList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 5:
-                    _addValue[_evalue] = (float)_skill.DamagedPartsList.Count * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (double)_skill.DamagedPartsList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 6:
                     _addValue[_evalue] = (DoubleWithEx)_skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
@@ -215,11 +215,11 @@ namespace Elements
                     break;
                 case 11:
                     List<UnitCtrl> _targetList1 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
-                    _addValue[_evalue] = (float)countUnitNumCompareX(_targetList1, parts, true) * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (double)countUnitNumCompareX(_targetList1, parts, true) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 12:
                     List<UnitCtrl> _targetList2 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
-                    _addValue[_evalue] = (float)countUnitNumCompareX(_targetList2, parts, false) * _valueDictionary[eValueNumber.VALUE_2];
+                    _addValue[_evalue] = (double)countUnitNumCompareX(_targetList2, parts, false) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case 13:
                     {
@@ -262,7 +262,7 @@ namespace Elements
                         SealData value = null;
                         if (_target.Owner.SealDictionary.TryGetValue(eStateIconType, out value))
                         {
-                            _addValue[_evalue] = (float)value.GetCurrentCount() * _valueDictionary[eValueNumber.VALUE_2];
+                            _addValue[_evalue] = value.GetCurrentCount() * _valueDictionary[eValueNumber.VALUE_2];
                         }
                     }
                     else if (_valueDictionary[eValueNumber.VALUE_1] > 100f)
@@ -270,7 +270,7 @@ namespace Elements
                         StrikeBackDataSet value2 = null;
                         if (_target.Owner.StrikeBackDictionary.TryGetValue((EnchantStrikeBackAction.eStrikeBackEffectType)((int)_valueDictionary[eValueNumber.VALUE_1] - 100), out value2))
                         {
-                            _addValue[_evalue] = (float)value2.DataList.Count * _valueDictionary[eValueNumber.VALUE_2];
+                            _addValue[_evalue] = (double)value2.DataList.Count * _valueDictionary[eValueNumber.VALUE_2];
                         }
                     }
                     else if (_valueDictionary[eValueNumber.VALUE_1] >= 20f)
@@ -278,7 +278,7 @@ namespace Elements
                         int key = (int)_valueDictionary[eValueNumber.VALUE_1] % 10;
                         if (_source.SkillExecCountDictionary.TryGetValue(key, out var value3))
                         {
-                            _addValue[_evalue] = (float)value3 * _valueDictionary[eValueNumber.VALUE_2];
+                            _addValue[_evalue] = (double)value3 * _valueDictionary[eValueNumber.VALUE_2];
                         }
                     }
 
@@ -293,11 +293,11 @@ namespace Elements
 
         protected virtual DoubleWithEx calcDamageValue(
             UnitCtrl _source,
-            ValueDictionary _valueDictionary) => ((float)_source.MaxHp - _source.Hp) / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => ((double)_source.MaxHp - _source.Hp) / (double)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
         protected virtual DoubleWithEx calcHpValue(
             UnitCtrl _source,
-            ValueDictionary _valueDictionary) => _source.Hp / (float)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => _source.Hp / (double)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
 
         protected virtual DoubleWithEx calcMaxHpValue(UnitCtrl _source, ValueDictionary _valueDictionary)
         {

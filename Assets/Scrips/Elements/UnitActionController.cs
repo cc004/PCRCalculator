@@ -32,6 +32,9 @@ namespace Elements
         public List<Skill> UnionBurstEvolutionList;
         public List<Skill> MainSkillEvolutionList;
         public List<Skill> SubUnionBurstList;
+        public List<Skill> MainSkillRevolutionList;
+        public List<Skill> SpecialSkillRevolutionList;
+
         public Skill Annihilation;
 #if ENABLE_THREADING
         private BattleManager staticBattleManager;
@@ -100,6 +103,8 @@ namespace Elements
             MainSkillList = null;
             SpecialSkillList = null;
             SpecialSkillEvolutionList = null;
+            MainSkillRevolutionList = null;
+            SpecialSkillRevolutionList = null;
             Owner = null;
             skillDictionary = null;
         }
@@ -247,6 +252,15 @@ namespace Elements
                     skillDictionary.Add(skillEvolutionIds1[index1], MainSkillEvolutionList[index1]);
                 }
             }
+            List<int> mainSkillRevolutionIds = skillData.MainSkillRevolutionIdList;
+            for (int index1 = 0; index1 < mainSkillRevolutionIds.Count; ++index1)
+            {
+                if (MainSkillRevolutionList != null && index1 < MainSkillRevolutionList.Count)
+                {
+                    MainSkillRevolutionList[index1].SkillNum = index1 + 1;
+                    skillDictionary.Add(mainSkillRevolutionIds[index1], MainSkillRevolutionList[index1]);
+                }
+            }
             List<int> spSkillIds = skillData.SpSkillIds;
             int index4 = 0;
             for (int count = spSkillIds.Count; index4 < count && spSkillIds[index4] != 0; ++index4)
@@ -263,6 +277,19 @@ namespace Elements
                 {
                     SpecialSkillEvolutionList[index1].SkillNum = index1 + 1;
                     skillDictionary.Add(key, SpecialSkillEvolutionList[index1]);
+                    Owner.SkillLevels[key] = Owner.Level;
+                }
+                else
+                    break;
+            }
+            List<int> spSkillRevolutionIds = skillData.SpecialSkillRevolutionIdList;
+            for (int index1 = 0; index1 < spSkillRevolutionIds.Count; ++index1)
+            {
+                int key = spSkillRevolutionIds[index1];
+                if (key != 0)
+                {
+                    SpecialSkillRevolutionList[index1].SkillNum = index1 + 1;
+                    skillDictionary.Add(key, SpecialSkillRevolutionList[index1]);
                     Owner.SkillLevels[key] = Owner.Level;
                 }
                 else
@@ -833,13 +860,13 @@ namespace Elements
             actionParameter.ActionDetail2 = actionParam.action_detail_2;
             actionParameter.ActionDetail3 = actionParam.action_detail_3;
             actionParameter.Value = new ValueDictionary();
-            actionParameter.Value.Add(eValueNumber.VALUE_1, (float)(double)actionParam.action_value_1);
-            actionParameter.Value.Add(eValueNumber.VALUE_2, (float)(double)actionParam.action_value_2);
-            actionParameter.Value.Add(eValueNumber.VALUE_3, (float)(double)actionParam.action_value_3);
-            actionParameter.Value.Add(eValueNumber.VALUE_4, (float)(double)actionParam.action_value_4);
-            actionParameter.Value.Add(eValueNumber.VALUE_5, (float)(double)actionParam.action_value_5);
-            actionParameter.Value.Add(eValueNumber.VALUE_6, (float)(double)actionParam.action_value_6);
-            actionParameter.Value.Add(eValueNumber.VALUE_7, (float)(double)actionParam.action_value_7);
+            actionParameter.Value.Add(eValueNumber.VALUE_1, (double)actionParam.action_value_1);
+            actionParameter.Value.Add(eValueNumber.VALUE_2, (double)actionParam.action_value_2);
+            actionParameter.Value.Add(eValueNumber.VALUE_3, (double)actionParam.action_value_3);
+            actionParameter.Value.Add(eValueNumber.VALUE_4, (double)actionParam.action_value_4);
+            actionParameter.Value.Add(eValueNumber.VALUE_5, (double)actionParam.action_value_5);
+            actionParameter.Value.Add(eValueNumber.VALUE_6, (double)actionParam.action_value_6);
+            actionParameter.Value.Add(eValueNumber.VALUE_7, (double)actionParam.action_value_7);
             actionParameter.MasterData = actionParam;
             int index1 = 0;
             if (actionCounter.ContainsKey(actionParameter.ActionType))
@@ -2418,7 +2445,7 @@ namespace Elements
                 case PriorityPattern.HP_DEC:
                 case PriorityPattern.HP_ASC_NEAR:
                 case PriorityPattern.HP_DEC_NEAR:
-                    selector = parts => $"{parts.Owner.UnitName}({(float)parts.Owner.Hp / parts.Owner.MaxHp:P2})";
+                    selector = parts => $"{parts.Owner.UnitName}({(double)parts.Owner.Hp / parts.Owner.MaxHp:P2})";
                     break;
                 case PriorityPattern.ENERGY_ASC:
                 case PriorityPattern.ENERGY_DEC:
@@ -2426,7 +2453,7 @@ namespace Elements
                 case PriorityPattern.ENERGY_ASC_NEAR:
                 case PriorityPattern.ENERGY_DEC_NEAR:
                 case PriorityPattern.ENERGY_DEC_NEAR_MAX_FORWARD:
-                    selector = parts => $"{parts.Owner.UnitName}({(float)parts.Owner.Energy / UnitDefine.MAX_ENERGY:P2})";
+                    selector = parts => $"{parts.Owner.UnitName}({(double)parts.Owner.Energy / UnitDefine.MAX_ENERGY:P2})";
                     break;
                 case PriorityPattern.ATK_ASC:
                 case PriorityPattern.ATK_DEC:

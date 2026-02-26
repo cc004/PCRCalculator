@@ -3,11 +3,11 @@ using System.ComponentModel;
 
 namespace Elements
 {
-	// Token: 0x02000EFA RID: 3834
-	public enum eStateIconType
-	{
+    // Token: 0x02000EFA RID: 3834
+    public enum eStateIconType
+    {
         // Token: 0x040087DD RID: 34781
-		[Description("关闭所有")]
+        [Description("关闭所有")]
         NONE = 0,
         // Token: 0x040087DE RID: 34782
         [Description("物攻BUFF")]
@@ -75,8 +75,8 @@ namespace Elements
         // Token: 0x040087F3 RID: 34803
         [Description("减速DEBUFF")]
         SLOW = 22,
-		// Token: 0x040087F4 RID: 34804
-		[Description("禁用UB")]
+        // Token: 0x040087F4 RID: 34804
+        [Description("禁用UB")]
         UB_DISABLE = 23,
         // Token: 0x040087F5 RID: 34805
         [Description("物理屏障")]
@@ -155,14 +155,14 @@ namespace Elements
         // Token: 0x0400880E RID: 34830
         [Description("混乱")]
         CONFUSION = 49,
-		// Token: 0x0400880F RID: 34831
-		[Description("英灵的加护\n安")]
+        // Token: 0x0400880F RID: 34831
+        [Description("英灵的加护\n安")]
         HEROIC_SPIRIT_SEAL = 50,
         // Token: 0x04008810 RID: 34832
         [Description("猛毒")]
         VENOM = 51,
-		// Token: 0x04008811 RID: 34833
-		[Description("闪避次数\n拉姆")]
+        // Token: 0x04008811 RID: 34833
+        [Description("闪避次数\n拉姆")]
         COUNT_BLIND = 52,
         // Token: 0x04008812 RID: 34834
         [Description("回复生命无效并造成伤害")]
@@ -170,23 +170,23 @@ namespace Elements
         // Token: 0x04008813 RID: 34835
         [Description("恐慌")]
         FEAR = 54,
-		// Token: 0x04008814 RID: 34836
-		// [Description("吸魂\n(非会战)")]
+        // Token: 0x04008814 RID: 34836
+        // [Description("吸魂\n(非会战)")]
         // SOUL_EAT = 56,
-		// Token: 0x04008815 RID: 34837
-		[Description("畏缩\n华哥")]
+        // Token: 0x04008815 RID: 34837
+        [Description("畏缩\n华哥")]
         CHLOE = 57,
-		// Token: 0x04008816 RID: 34838
-		// [Description("火焰果\n(非会战)")]
+        // Token: 0x04008816 RID: 34838
+        // [Description("火焰果\n(非会战)")]
         // FIRE_NUTS,
-		// Token: 0x04008817 RID: 34839
-		[Description("畏惧\n(非会战)")]
+        // Token: 0x04008817 RID: 34839
+        [Description("畏惧\n(非会战)")]
         AWE = 59,
-		// Token: 0x04008818 RID: 34840
-		[Description("朋友\n露娜")]
+        // Token: 0x04008818 RID: 34840
+        [Description("朋友\n露娜")]
         LUNA = 60,
-		// Token: 0x04008819 RID: 34841
-		[Description("硬币\n圣克")]
+        // Token: 0x04008819 RID: 34841
+        [Description("硬币\n圣克")]
         CHRISTINA = 61,
         // Token: 0x0400881A RID: 34842
         [Description("持续回复TP")]
@@ -379,35 +379,35 @@ namespace Elements
         // Token: 0x0400885A RID: 34906
         [Description("朦胧\n春月")]
         MITSUKI_NY_CARVED_SEAL = 127,
-	    // Token: 0x0400885B RID: 34907
-	    BLACK_FRAME = 128,
+        // Token: 0x0400885B RID: 34907
+        BLACK_FRAME = 128,
         // Token: 0x0400885C RID: 34908
         [Description("免疫行动不能状态")]
         UNABLE_STATE_GUARD = 129,
-	    // Token: 0x0400885D RID: 34909
+        // Token: 0x0400885D RID: 34909
         [Description("情谊的证明\n513")]
-	    MUIMI_ANNIVERSARY_CARVED_SEAL = 130,
+        MUIMI_ANNIVERSARY_CARVED_SEAL = 130,
         // Token: 0x0400885E RID: 34910
-        [Description("PSI★蓄力\n美空")]
+        [Description("超能力★充能\n美空")]
         MISORA_CARVED_SEAL = 131,
-	    [Description("飞行")]
-	    FLIGHT = 132,
-	    [Description("万象印记\n法鸡")]
+        [Description("飞行")]
+        FLIGHT = 132,
+        [Description("万象印记\n法鸡")]
         DJEETA_WITCH = 133,
-	    [Description("美貌\n礼雪")]
+        [Description("美貌\n礼雪")]
         LIXUE = 134,
         [Description("电池\n机娘")]
         JINIAN = 135,
-        [Description("莱莱界雷\n(受影响的物理角色)")]
+        [Description("雷霆圣界\n莱莱")]
         WORLD_LIGHTNING = 137,
         [Description("狼牙咆哮\n狼")]
         WOLF = 139,
-        [Description("标记\n火电")]
-        HUODIAN = 140,
+        [Description("炎舞印记\n火电")]
+        YANWUYINJI = 140,
         [Description("堕天使的加护\n可璃亚")]
         DUOTIANSHI = 141,
-        [Description("回归的蔷薇\nels")]
-        QiANGWEI = 142,
+        [Description("回归玫瑰\nels")]
+        HUIGUIMEIGUI = 142,
         [Description("射手座D5标记")]
         SHESHOUZUO = 143,
         [Description("噗吉靠垫\n圣锤")]
@@ -426,20 +426,20 @@ namespace Elements
         EWAIJIASU = 152,
         [Description("额外减速")]
         EWAIJIANSU = 153,
-        [Description("毒伤提升")]
+        [Description("提升受到的持续伤害")]
         SLIP_DAMAGE_UP = 154,
         [Description("特殊效果")]
         EXTRA_EFFECT = 155,
-        [Description("水祭的安宁\n水优妮")]
-        SHUIJIDEANNING = 156,
+        [Description("水边的安宁\n水优妮")]
+        SHUIBIANDEANNING = 156,
         [Description("水月\n水华")]
         SHUIYUE = 157,
-        [Description("婉拒之花\n银莲")]
-        WANJUZHIHUA = 158,
-        [Description("卡班君\n库露露")]
-        KABANJUN = 159,
-        [Description("粘稠\n水涅娅")]
-        NIANCHOU = 160,
+        [Description("拒绝之花\n银莲")]
+        JUJUEZHIHUA = 158,
+        [Description("宝石兔兔\n库露露")]
+        BAOSHITUTU = 159,
+        [Description("黏液\n水涅娅")]
+        NIANYE = 160,
         [Description("铁气守护\n涅妃")]
         TIEQISHOUHU = 161,
         [Description("雷云1\n非会战")]
@@ -447,11 +447,13 @@ namespace Elements
         UNABLE_STATE_GUARD_EXTRA_EFFECT = 165,
         CHAINED_ACN = 166,
         PUPPET = 167,
+        [Description("集辉\n六凶·魔蜘")]
+        JIHUI = 168,
         [Description("暴风\n非会战")]
         BAOFENG = 169,
         [Description("豪雨\n非会战")]
         HAOYU = 170,
-        [Description("PSI风暴\n水美空")]
+        [Description("超能力★风暴\n水美空")]
         PSIFENGBAO = 171,
         [Description("执着\n涅比亚")]
         TAUNT = 172,
@@ -480,18 +482,18 @@ namespace Elements
         REQINGDEHUASHU = 188,
         [Description("茶壶\n女仆")]
         CHAHU = 189,
-        [Description("炼金素材\n炼望")]
-        LIANJINSUCAI = 190,
+        [Description("炼金材料\n炼望")]
+        LIANJINCAILIAO = 190,
         [Description("香水\n炼望")]
         XIANGSHUI = 191,
         [Description("偷懒的诱惑\n龙妹")]
         TOULANDEYOUHUO = 192,
-        [Description("友军护盾\n吹雪")]
-        YOUJUNHUDUN = 193,
-        [Description("蛮贼骰子\n大和")]
-        MANZEITOUZI = 194,
-        [Description("尖刺盾牌\n若菜")]
-        JIANCIDUNPAI = 195,
+        [Description("我方屏障\n吹雪")]
+        WOFANGPINGZHANG = 193,
+        [Description("班迪骰子\n大和")]
+        BANDITOUZI = 194,
+        [Description("尖刺防御\n若菜")]
+        JIANCIFANGYU = 195,
         [Description("恶魔的亲吻\n圣老师")]
         EMOQINWEN = 196,
         [Description("水切噜")]
@@ -504,18 +506,85 @@ namespace Elements
         MOYAN = 200,
         [Description("虚数\n原克")]
         XUSHU = 201,
+        [Description("绝怠灵度\n紫罗兰")]
         RATIO_SLIP = 202,
+        [Description("调和状态\n鹿妹/水els/sms")]
         REDUCE_DAMAGE_BY_HIGHER_DEF = 203,
+        [Description("污秽\n紫罗兰")]
         CONVERT_DAMAGE_OVER_TIME = 204,
+        [Description("龙之果实\n斑比")]
+        LONGZHIGUOSHI = 205,
+        [Description("忌火\n紫罗兰")]
+        JIHUO = 207,
+        [Description("翡翠的葬歌\n兰法")]
+        FEICUIDEZANGGE = 208,
+        [Description("虚脱\n苑")]
+        XUTUO = 209,
+        // [Description("烈风\n黎明界")]
+        // LIEFENG = 212,
+        // [Description("识破\n黎明界")]
+        // SHIPO = 213,
+        REDUCTION_ATK_DAMAGE = 215,
+        REDUCTION_MGC_DAMAGE = 216,
+        REDUCTION_ALL_DAMAGE = 217,
+        TRANSCEND_DAMAGE = 218,
+        [Description("忍耐\n华音")]
+        RENNAI = 219,
+        [Description("剑压\n彩羽")]
+        JIANYA = 220,
+        [Description("再来一碗券\n水吃")]
+        ZAILAIYIWANQUAN = 221,
+        [Description("荆棘之冠\n彩羽")]
+        JINGJIZHIGUAN = 222,
+        [Description("磨磨蹭蹭\n水菲")]
+        MOMOCENGCENG = 223,
+        [Description("水遁之印\n水扇")]
+        SHUIDUNZHIYIN = 224,
+        [Description("萨拉萨利亚舞步\n沙猫")]
+        SALASALIYAWUBU = 225,
+        [Description("赋活之丝\n蜘蛛")]
+        FUHUOZHISI = 226,
+        ALL_FEAR = 227,
+        [Description("玛那流脉\n霸瞳皇帝")]
+        MANALIUMAI = 228,
+        [Description("真实的指引\n修驴")]
+        ZHENSHIDEZHIYIN = 230,
+        BUFF_ENHANCE = 233,
+        DEBUFF_ENHANCE = 235,
+        [Description("珍藏甜甜圈\n纳娜")]
+        ZHENCANGTIANTIANQUAN = 236,
+        [Description("圣夜的爱慕\n圣田")]
+        SHENGYEDEAIMU = 237,
+        [Description("彩灯弹\n圣美空")]
+        CAIDENGDAN = 238,
+        [Description("进化超越\n大可")]
+        JINHUACHAOYUE = 239,
+        [Description("冥海的加护\n水紫")]
+        MINGHAIDEJIAHU = 240,
+        [Description("神机\n完莱")]
+        SHENJI = 241,
+        [Description("蛇落印\n鬼妃")]
+        SHELUOYIN = 242,
+        [Description("妖精的指引\nyls")]
+        ENERGY_DAMAGE_REDUCE_LIMIT = 246,
+        [Description("CHAIN\n姬塔")]
+        CHAIN = 247,
+        [Description("干杯\n黄骑")]
+        STACKABLE_SLIP = 248,
+        [Description("证据\n驴")]
+        PHYSICAL_FOLLOW_UP = 249,
+        MAGIC_FOLLOW_UP = 250,
+        [Description("苍之锁链\n凛")]
+        CANGZHISUOLIAN = 251,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912
         NUM = 1000,
         [Description("重叠加速\n花凛513机娘")]
-	    SPEED_OVERLAP,
-	    // Token: 0x04008861 RID: 34913
+        SPEED_OVERLAP,
+        // Token: 0x04008861 RID: 34913
         [Description("永续BUFF")]
         EVERLAST_BUFF = 100000,
-	    INVALID_VALUE = -1,
-	}
+        INVALID_VALUE = -1,
+    }
 }

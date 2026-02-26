@@ -51,15 +51,7 @@ namespace Elements
         { 
             base.SetLevel(_level);
 
-            if (MasterData == null || Value == null)
-                return;
-
-            double actionValue1 = MasterData.action_value_1;
-            double actionValue2 = MasterData.action_value_2;
-
-            float v = (float)(actionValue1 + actionValue2 * _level);
-
-            Value[eValueNumber.VALUE_1] = v; 
+            Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + MasterData.action_value_2 * _level;
         }
     }
 

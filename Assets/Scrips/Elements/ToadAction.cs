@@ -211,6 +211,6 @@ namespace Elements
       }
     }
 
-    public override void SetLevel(float _level) => Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
+    public override void SetLevel(float _level) => Value[eValueNumber.VALUE_1] =  (MasterData.action_value_1 + MasterData.action_value_2 * _level);
   }
 }

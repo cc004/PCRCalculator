@@ -61,45 +61,47 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
             SkillEffectCtrl skillEffectCtrl1 = null;
-            //if (_target.Owner.StrikeBackDictionary.ContainsKey((EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2))
-            //  flag = !_target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect.IsPlaying;
-            //CircleEffectController effectController;
-            /*if (flag)
-            {
-              switch (this.ActionDetail2)
-              {
-                case 1:
-                  skillEffectCtrl1 = this.battleEffectPool.GetEffect(Singleton<LCEGKJFKOPD>.Instance.JPEFHMCPLJA);
-                  break;
-                case 2:
-                  skillEffectCtrl1 = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? Singleton<LCEGKJFKOPD>.Instance.PMKMBEKBDCI : Singleton<LCEGKJFKOPD>.Instance.CAPHKPABAHM);
-                  break;
-                case 3:
-                  skillEffectCtrl1 = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? Singleton<LCEGKJFKOPD>.Instance.PAFGPCHIIPJ : Singleton<LCEGKJFKOPD>.Instance.DEGHDMKCDBM);
-                  break;
-              }
-              skillEffectCtrl1.transform.parent = ExceptNGUIRoot.Transform;
-              skillEffectCtrl1.InitializeSort();
-              skillEffectCtrl1.PlaySe(_source.SoundUnitId, _source.IsLeftDir);
-              effectController = skillEffectCtrl1 as CircleEffectController;
-              SkillEffectCtrl skillEffectCtrl2 = skillEffectCtrl1;
-              NormalSkillEffect skillEffect = new NormalSkillEffect();
-              skillEffect.EffectTarget = eEffectTarget.ALL_TARGET;
-              skillEffect.TargetBone = eTargetBone.CENTER;
-              skillEffect.TrackType = effectController.FollowXY ? eTrackType.BONE : eTrackType.BOTTOM;
-              skillEffect.TrackDimension = effectController.FollowXY ? eTrackDimension.XY : eTrackDimension.NONE;
-              BasePartsData firstParts = _target.Owner.GetFirstParts(true);
-              UnitCtrl _owner = _source;
-              Skill skill = _skill;
-              skillEffectCtrl2.SetPossitionAppearanceType(skillEffect, firstParts, _owner, skill);
-              skillEffectCtrl1.ExecAppendCoroutine((double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
-              effectController.SetChildrenInactive();
-            }
-            else
-            {
-              skillEffectCtrl1 = _target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect;
-              effectController = skillEffectCtrl1 as CircleEffectController;
-            }*/
+            // CircleEffectController effectController = null;
+            // if (_target.Owner.StrikeBackDictionary.ContainsKey((EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2))
+            // {
+            //   bool flag = !_target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect.IsPlaying;
+            //   if (flag)
+            //   {
+            //     switch (this.ActionDetail2)
+            //     {
+            //     case 1:
+            //       skillEffectCtrl1 = this.battleEffectPool.GetEffect(Singleton<BattleResourceManager>.Instance.JPEFHMCPLJA);
+            //       break;
+            //     case 2:
+            //       skillEffectCtrl1 = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? Singleton<LCEGKJFKOPD>.Instance.PMKMBEKBDCI : Singleton<LCEGKJFKOPD>.Instance.CAPHKPABAHM);
+            //       break;
+            //     case 3:
+            //       skillEffectCtrl1 = this.battleEffectPool.GetEffect(_target.Owner.IsLeftDir ? Singleton<LCEGKJFKOPD>.Instance.PAFGPCHIIPJ : Singleton<LCEGKJFKOPD>.Instance.DEGHDMKCDBM);
+            //       break;
+            //     }
+            //   }
+            //   skillEffectCtrl1.transform.parent = ExceptNGUIRoot.Transform;
+            //   skillEffectCtrl1.InitializeSort();
+              // skillEffectCtrl1.PlaySe(_source.SoundUnitId, _source.IsLeftDir);
+              // effectController = skillEffectCtrl1 as CircleEffectController;
+              // SkillEffectCtrl skillEffectCtrl2 = skillEffectCtrl1;
+              // NormalSkillEffect skillEffect = new NormalSkillEffect();
+              // skillEffect.EffectTarget = eEffectTarget.ALL_TARGET;
+              // skillEffect.TargetBone = eTargetBone.CENTER;
+              // skillEffect.TrackType = effectController.FollowXY ? eTrackType.BONE : eTrackType.BOTTOM;
+              // skillEffect.TrackDimension = effectController.FollowXY ? eTrackDimension.XY : eTrackDimension.NONE;
+              // BasePartsData firstParts = _target.Owner.GetFirstParts(true);
+              // UnitCtrl _owner = _source;
+              // Skill skill = _skill;
+              // skillEffectCtrl2.SetPossitionAppearanceType(skillEffect, firstParts, _owner, skill);
+              // skillEffectCtrl1.ExecAppendCoroutine((double) _skill.BlackOutTime > 0.0 ? _source : (UnitCtrl) null);
+            //   effectController.SetChildrenInactive();
+            // }
+            // else
+            // {
+            //   skillEffectCtrl1 = _target.Owner.StrikeBackDictionary[(EnchantStrikeBackAction.eStrikeBackEffectType) this.ActionDetail2].SkillEffect;
+            //   effectController = skillEffectCtrl1 as CircleEffectController;
+            // }
             StrikeBackDataSet strikeBackDataSet = null;
             if (!_target.Owner.StrikeBackDictionary.TryGetValue((eStrikeBackEffectType)ActionDetail2, out strikeBackDataSet))
             {
@@ -110,7 +112,14 @@ namespace Elements
                 _target.Owner.StrikeBackDictionary.Add((eStrikeBackEffectType)ActionDetail2, strikeBackDataSet);
             }
             strikeBackDataSet.SkillEffect = skillEffectCtrl1;
-            int count = 5;// effectController.Children.Count;
+            // int count = effectController.Children.Count;
+            int count = 5;
+            if (_source.UnitId == 105601) // 流夏
+                count = 1;
+            else if (_source.UnitId == 109301) // 露
+                count = 5;
+            else if (_source.UnitId == 114501) // 圣电
+                count = 5;
             int number = Mathf.Min((int)_valueDictionary[eValueNumber.VALUE_3], count - strikeBackDataSet.DataList.Count);
             //effectController.AddEffect(number);
             for (int index = 0; index < number; ++index)
@@ -137,7 +146,7 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
+            Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + MasterData.action_value_2 * _level;
         }
 
         public enum eStrikeBackEffectType

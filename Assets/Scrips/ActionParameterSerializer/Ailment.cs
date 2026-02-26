@@ -42,6 +42,7 @@
             hex = 5,
             compensation = 6,
             world_lightning = 10,
+            raio_damage = 11,
             unknown = -1
         }
 

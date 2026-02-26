@@ -307,7 +307,9 @@ namespace Elements
         public List<int> MainSkillIdList = new List<int>();
         public List<int> SpecialSkillIdList = new List<int>();
         public List<int> MainSkillEvolutionIdList = new List<int>();
+        public List<int> MainSkillRevolutionIdList = new List<int>();
         public List<int> SpecialSkillEvolutionIdList = new List<int>();
+        public List<int> SpecialSkillRevolutionIdList = new List<int>();
         public List<int> SubUnionBurstIdList = new List<int>();
         public List<eSpineCharacterAnimeId> TreasureAnimeIdList = new List<eSpineCharacterAnimeId>();
         private bool isDeadBySetCurrentHp;
@@ -947,6 +949,14 @@ namespace Elements
                     IsBuff = false
                 }
             },
+            {
+                UnitCtrl.eAbnormalState.RATIO_SLIP,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.RATIO_SLIP,
+                    IsBuff = false
+                }
+            }
         };
 
         // Token: 0x040026C0 RID: 9920
@@ -991,7 +1001,12 @@ namespace Elements
             {
                 UnitCtrl.eAbnormalStateCategory.BLACK_FRAME,
                 0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.RATIO_SLIP,
+                0
             }
+
         };
 
         public Dictionary<eAbnormalState, Action<bool>> damageByBehaviourDictionary = new Dictionary<eAbnormalState, Action<bool>>();
@@ -1018,6 +1033,8 @@ namespace Elements
         private float scaleForGuest = 1f;
 
         private int maxHpDebufCounter;
+
+        public int SlipDamageUpIconCounter { get; set; }
 
         public static readonly Dictionary<BuffParamKind, BuffDebuffConstData> BUFF_DEBUFF_ICON_DIC = new Dictionary<BuffParamKind, BuffDebuffConstData>(new BuffParamKind_DictComparer())
         {
@@ -1416,7 +1433,11 @@ namespace Elements
 
         public bool IsRecreated { get; set; }
 
-        public bool MainSkill1Evolved { get; set; }
+        // public bool MainSkill1Evolved { get; set; }
+
+        public SkillDefine.eSkillEvolutionType MainSkill1EvolutionType { get; set; }
+        public SkillDefine.eSkillEvolutionType MainSkill2EvolutionType { get; set; }
+
 
         //public float DeltaTimeForPause => PlayingNoCutinMotion || !(battleManager == null) && !m_bPause ? BattleManager.DeltaTime_60fps : 0.0f;
 
@@ -2093,8 +2114,8 @@ namespace Elements
 
         public float EnegryAmount => (float)Energy / 1000f;
 
-        public float LifeAmount => (float)(long)Hp / (float)(long)MaxHpAfterPassive;
-        public float MaxLifeAmount => (float)(long)MaxHp / (float)MaxHpAfterPassive;
+        public float LifeAmount => (float)((double)Hp / (double)MaxHpAfterPassive);
+        public float MaxLifeAmount => (float)((double)MaxHp / (double)MaxHpAfterPassive);
 
         public Transform BottomTransform
         {
@@ -2235,8 +2256,10 @@ this.updateCurColor();
             this.animeIdDictionary = (Dictionary<int, eSpineCharacterAnimeId>)null;
             this.MainSkillIdList = (List<int>)null;
             this.MainSkillEvolutionIdList = (List<int>)null;
+            this.MainSkillRevolutionIdList = (List<int>)null;
             this.SpecialSkillIdList = (List<int>)null;
             this.SpecialSkillEvolutionIdList = (List<int>)null;
+            this.SpecialSkillRevolutionIdList = (List<int>)null;
             //this.soundManager = (SoundManager)null;
             this.m_abnormalState = (Dictionary<UnitCtrl.eAbnormalState, bool>)null;
             this.abnormalStateCategoryDataDictionary = (Dictionary<UnitCtrl.eAbnormalStateCategory, AbnormalStateCategoryData>)null;
@@ -2566,6 +2589,7 @@ this.updateCurColor();
             SetSkill(_data.SkillData.UnionBurstEvolutionIds, _data.UniqueData.UnionBurst, eSpineCharacterAnimeId.SKILL, false, _data);
             SetSkill(_data.SkillData.MainSkillIds, _data.UniqueData.MainSkill, eSpineCharacterAnimeId.SKILL, false, _data);
             SetSkill(_data.SkillData.MainSkillEvolutionIds, _data.UniqueData.MainSkill, eSpineCharacterAnimeId.SKILL, false, _data);
+            SetSkill(_data.SkillData.MainSkillRevolutionIdList, _data.UniqueData.MainSkill, eSpineCharacterAnimeId.SKILL, false, _data);
 
             List<SkillLevelInfo> skillLevelInfoList1 = new List<SkillLevelInfo>();
             for (int index = 0; index < _data.SkillData.SpSkillIds.Count; ++index)
@@ -2579,6 +2603,7 @@ this.updateCurColor();
             //action(_data.SkillData.SpSkillEvolutionIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true);
             SetSkill(_data.SkillData.SpSkillIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
             SetSkill(_data.SkillData.SpSkillEvolutionIds, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
+            SetSkill(_data.SkillData.SpecialSkillRevolutionIdList, skillLevelInfoList1, eSpineCharacterAnimeId.SPECIAL_SKILL, true, _data);
             List<SkillLevelInfo> skillLevelInfoList2 = new List<SkillLevelInfo>();
             for (int index = 0; index < _data.SkillData.SubUnionBurstIds.Count; ++index)
             {
@@ -2591,7 +2616,9 @@ this.updateCurColor();
             MainSkillIdList = _data.SkillData.MainSkillIds;
             SpecialSkillIdList = _data.SkillData.SpSkillIds;
             SpecialSkillEvolutionIdList = _data.SkillData.SpSkillEvolutionIds;
+            SpecialSkillRevolutionIdList = _data.SkillData.SpecialSkillRevolutionIdList;
             MainSkillEvolutionIdList = _data.SkillData.MainSkillEvolutionIds;
+            MainSkillRevolutionIdList = _data.SkillData.MainSkillRevolutionIdList;
             SubUnionBurstIdList = _data.SkillData.SubUnionBurstIds;
             int burstEvolutionId = _data.SkillData.UnionBurstEvolutionIds[0];
             UnionBurstSkillId = burstEvolutionId == 0 || SkillLevels[burstEvolutionId] == 0 ? _data.SkillData.UnionBurstIds[0] : burstEvolutionId;
@@ -3393,32 +3420,53 @@ this.updateCurColor();
                             case 1:
                                 int index2 = pattern % 1000 - 1;
                                 int mainSkillId = _skillData.MainSkillIds[index2];
-                                int key1 = 0;
+                                int evolutionSkillId = 0;
                                 if (_skillData.MainSkillEvolutionIds.Count > index2)
-                                    key1 = _skillData.MainSkillEvolutionIds[index2];
-                                if (SkillLevels[mainSkillId] == 0 && (key1 == 0 || SkillLevels[key1] == 0))
+                                    evolutionSkillId = _skillData.MainSkillEvolutionIds[index2];
+                                int revolutionSkillId = 0;
+                                if (_skillData.MainSkillRevolutionIdList.Count > index2)
+                                    revolutionSkillId = _skillData.MainSkillRevolutionIdList[index2];
+                                if (SkillLevels[mainSkillId] == 0
+                                    && (evolutionSkillId == 0 || SkillLevels[evolutionSkillId] == 0)
+                                    && (revolutionSkillId == 0 || SkillLevels[revolutionSkillId] == 0))
                                 {
                                     intList1.Add(1);
                                     continue;
                                 }
-                                if (key1 != 0 && SkillLevels[key1] != 0)
+                                if (revolutionSkillId != 0 && SkillLevels[revolutionSkillId] != 0)
                                 {
-                                    intList1.Add(key1);
+                                    intList1.Add(revolutionSkillId);
+                                    continue;
+                                }
+                                if (evolutionSkillId != 0 && SkillLevels[evolutionSkillId] != 0)
+                                {
+                                    intList1.Add(evolutionSkillId);
                                     continue;
                                 }
                                 intList1.Add(mainSkillId);
                                 continue;
                             case 2:
                                 int index3 = pattern % 1000 - 1;
-                                int num = 0;
+                                int specialEvolutionSkillId = 0;
                                 if (_skillData.SpSkillEvolutionIds.Count > index3)
-                                    num = _skillData.SpSkillEvolutionIds[index3];
-                                int key2 = 0;
+                                    specialEvolutionSkillId = _skillData.SpSkillEvolutionIds[index3];
+                                int specialRevolutionSkillId = 0;
+                                if (_skillData.SpecialSkillRevolutionIdList.Count > index3)
+                                    specialRevolutionSkillId = _skillData.SpecialSkillRevolutionIdList[index3];
+                                int mainEvolutionSkillId = 0;
                                 if (_skillData.MainSkillEvolutionIds.Count > index3)
-                                    key2 = _skillData.MainSkillEvolutionIds[index3];
-                                if (num != 0 && key2 != 0 && SkillLevels[key2] != 0)
+                                    mainEvolutionSkillId = _skillData.MainSkillEvolutionIds[index3];
+                                int mainRevolutionSkillId = 0;
+                                if (_skillData.MainSkillRevolutionIdList.Count > index3)
+                                    mainRevolutionSkillId = _skillData.MainSkillRevolutionIdList[index3];
+                                if (specialRevolutionSkillId != 0 && mainRevolutionSkillId != 0 && SkillLevels[mainRevolutionSkillId] != 0)
                                 {
-                                    intList1.Add(num);
+                                    intList1.Add(specialRevolutionSkillId);
+                                    continue;
+                                }
+                                if (specialEvolutionSkillId != 0 && mainEvolutionSkillId != 0 && SkillLevels[mainEvolutionSkillId] != 0)
+                                {
+                                    intList1.Add(specialEvolutionSkillId);
                                     continue;
                                 }
                                 intList1.Add(_skillData.SpSkillIds[index3]);
@@ -3449,34 +3497,61 @@ this.updateCurColor();
                                 case 1:
                                     int index2 = pattern % 1000 - 1;
                                     int mainSkillId = _skillData.MainSkillIds[index2];
-                                    int key1 = 0;
+                                    int evolutionSkillId = 0;
                                     if (_skillData.MainSkillEvolutionIds.Count > index2)
-                                        key1 = _skillData.MainSkillEvolutionIds[index2];
-                                    if (SkillLevels[mainSkillId] == 0 && (key1 == 0 || SkillLevels[key1] == 0))
+                                        evolutionSkillId = _skillData.MainSkillEvolutionIds[index2];
+                                    int revolutionSkillId = 0;
+                                    if (_skillData.MainSkillRevolutionIdList.Count > index2)
+                                        revolutionSkillId = _skillData.MainSkillRevolutionIdList[index2];
+                                    if (SkillLevels[mainSkillId] == 0
+                                        && (evolutionSkillId == 0 || SkillLevels[evolutionSkillId] == 0)
+                                        && (revolutionSkillId == 0 || SkillLevels[revolutionSkillId] == 0))
                                     {
                                         intList2.Add(1);
                                         continue;
                                     }
-                                    if (key1 != 0 && SkillLevels[key1] != 0)
+                                    if (revolutionSkillId != 0 && SkillLevels[revolutionSkillId] != 0)
                                     {
                                         if (index2 == 0)
-                                            MainSkill1Evolved = true;
-                                        intList2.Add(key1);
+                                            MainSkill1EvolutionType = SkillDefine.eSkillEvolutionType.REVOLUTION;
+                                        else if (index2 == 1)
+                                            MainSkill2EvolutionType = SkillDefine.eSkillEvolutionType.REVOLUTION;
+                                        intList2.Add(revolutionSkillId);
+                                        continue;
+                                    }
+                                    if (evolutionSkillId != 0 && SkillLevels[evolutionSkillId] != 0)
+                                    {
+                                        if (index2 == 0)
+                                            MainSkill1EvolutionType = SkillDefine.eSkillEvolutionType.EVOLUTION;
+                                        else if (index2 == 1)
+                                            MainSkill2EvolutionType = SkillDefine.eSkillEvolutionType.EVOLUTION;
+                                        intList2.Add(evolutionSkillId);
                                         continue;
                                     }
                                     intList2.Add(mainSkillId);
                                     continue;
                                 case 2:
                                     int index3 = pattern % 1000 - 1;
-                                    int num = 0;
+                                    int specialEvolutionSkillId = 0;
                                     if (_skillData.SpSkillEvolutionIds.Count > index3)
-                                        num = _skillData.SpSkillEvolutionIds[index3];
-                                    int key2 = 0;
+                                        specialEvolutionSkillId = _skillData.SpSkillEvolutionIds[index3];
+                                    int specialRevolutionSkillId = 0;
+                                    if (_skillData.SpecialSkillRevolutionIdList.Count > index3)
+                                        specialRevolutionSkillId = _skillData.SpecialSkillRevolutionIdList[index3];
+                                    int mainEvolutionSkillId = 0;
                                     if (_skillData.MainSkillEvolutionIds.Count > index3)
-                                        key2 = _skillData.MainSkillEvolutionIds[index3];
-                                    if (num != 0 && key2 != 0 && SkillLevels[key2] != 0)
+                                        mainEvolutionSkillId = _skillData.MainSkillEvolutionIds[index3];
+                                    int mainRevolutionSkillId = 0;
+                                    if (_skillData.MainSkillRevolutionIdList.Count > index3)
+                                        mainRevolutionSkillId = _skillData.MainSkillRevolutionIdList[index3];
+                                    if (specialRevolutionSkillId != 0 && mainRevolutionSkillId != 0 && SkillLevels[mainRevolutionSkillId] != 0)
                                     {
-                                        intList2.Add(num);
+                                        intList2.Add(specialRevolutionSkillId);
+                                        continue;
+                                    }
+                                    if (specialEvolutionSkillId != 0 && mainEvolutionSkillId != 0 && SkillLevels[mainEvolutionSkillId] != 0)
+                                    {
+                                        intList2.Add(specialEvolutionSkillId);
                                         continue;
                                     }
                                     intList2.Add(_skillData.SpSkillIds[index3]);
@@ -4945,6 +5020,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.TAUNT:
                     result = UnitCtrl.eAbnormalStateCategory.TAUNT;
                     break;
+                case UnitCtrl.eAbnormalState.RATIO_SLIP:
+                    result = UnitCtrl.eAbnormalStateCategory.RATIO_SLIP;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
@@ -5953,6 +6031,7 @@ this.updateCurColor();
                 case eAbnormalState.COMPENSATION:
                 case eAbnormalState.POISON2:
                 case eAbnormalState.CURSE2:
+                case eAbnormalState.RATIO_SLIP:
                     if (_enable)
                     {
                         AppendCoroutine(UpdateSlipDamage(_abnormalState, ++slipDamageIdDictionary[abnormalStateCategory]), ePauseType.SYSTEM);
@@ -6319,19 +6398,6 @@ this.updateCurColor();
                     time = 0f;
                 }
             }
-        }
-
-        // TODO implement ExtendSlipDamageData
-        // public ExtendSlipDamageData ExtendSlipDamageData { get; set; }
-        public float GetSlipDamageExtendValue()
-        {
-            // var extendSlipDamageData = ExtendSlipDamageData;
-            
-            // if (extendSlipDamageData != null && extendSlipDamageData.Enable)
-            // {
-            //     return extendSlipDamageData.ExtendValue;
-            // }
-            return 1.0f;
         }
 
         private IEnumerator UpdateSlipDamage(eAbnormalState _abnormalState, int _slipDamageId)
@@ -7112,6 +7178,10 @@ this.updateCurColor();
             _self.SetActive(false);
         }
 
+        public ReduceDamageByHigherDefData ReduceDamageByHigherDefData { get; set; }
+
+        public ConvertDamageOverTimeData ConvertDamageOverTimeData { get; set; }
+
         private int buffDebuffIndex { get; set; }
 
         private int clearedBuffIndex { get; set; }
@@ -7134,6 +7204,14 @@ this.updateCurColor();
 
         public DamageCutForSpecialNullificationData DamageCutForSpecialNullificationData { get; set; }
 
+        public ExtendSlipDamageData ExtendSlipDamageData { get; set; }
+
+        public float GetSlipDamageExtendValue()
+        {
+            if (ExtendSlipDamageData == null || !ExtendSlipDamageData.Enable)
+                return 1.0f;
+            return ExtendSlipDamageData.ExtendValue;
+        }
 
         private List<SkillEffectCtrl> buffDebuffEffectList { get; set; } = new List<SkillEffectCtrl>();
 
@@ -7321,7 +7399,7 @@ this.updateCurColor();
                 if (f == flag)
                     buffDebuffFlag[i] = (short)(f | 1);
             }
-            BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
+            // BuffDebuffTypeIndex[_buffDebuffCancelType] = buffDebuffIndex;
 			dispelBuffDebuffImmediately();
 		}
 
@@ -9524,7 +9602,7 @@ this.updateCurColor();
             {
                 if (_byAttack)
                     _damageData.Target.PassiveUbIsMagic = _damageData.DamageType == DamageData.eDamageType.MGC;
-                _damageData.Target.TotalDamage += (float)num1;
+                _damageData.Target.TotalDamage += num1;
             }
             if (_skill != null && num1 > 0L && !_skill.DamagedPartsList.Contains(_damageData.Target))
                 _skill.DamagedPartsList.Add(_damageData.Target);
@@ -9819,6 +9897,62 @@ this.updateCurColor();
             
             Tuple<StrikeBackData, List<StrikeBackData>> tuple =  searchStrikeBack(_damageData);
 
+            if (!_damageData.IgnoreDef && !flag1)
+            {
+                var damageType = _damageData.DamageType;
+                if (_damageData.Target.Owner.ReduceDamageByHigherDefData != null && _damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
+                {
+                    var def = _damageData.Target.GetDefZero();
+                    var magicDef = _damageData.Target.GetMagicDefZero();
+                    if (def != magicDef)
+                    {
+                        damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                    }
+                }
+                switch (damageType)
+                {
+                    case DamageData.eDamageType.ATK:
+                        var defZero = _damageData.Target.GetDefZero();
+                        var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
+                        break;
+                    case DamageData.eDamageType.MGC:
+                        var magicDefZero = _damageData.Target.GetMagicDefZero();
+                        var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
+                        break;
+                }
+                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
+                {
+                    switch (damageType)
+                    {
+                        case DamageData.eDamageType.ATK:
+                            var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
+                            var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
+                            break;
+                        case DamageData.eDamageType.MGC:
+                            var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
+                            var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
+                            break;
+                    }
+                }
+                var unit = _damageData.Source;
+                if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
+                    unit = _damageData.StrikeBackSource;
+                var talentDamageRate = CalcTalentDamageRate(
+                    _damageData.ActionType,
+                    unit,
+                    _damageData.Target,
+                    _damageData.TargetIncludeMyTeam,
+                    _damageData.IgnoreTalentBonusForRatioSlip,
+                    out isNoDamageByResist
+                );
+                a *= talentDamageRate;
+                b *= talentDamageRate;
+            }
+
 
             // 属性
             double execBarrier(double total, double main, double sub)
@@ -9906,52 +10040,6 @@ this.updateCurColor();
                 //if (!this.DisableFlash)
                 //    this.AppendCoroutine(this.setColorOffsetDefaultWithDelay(), ePauseType.NO_DIALOG);
             }
-            // TODO check order with log barrier
-            if (!_damageData.IgnoreDef && !flag1)
-            {
-                switch (_damageData.DamageType)
-                {
-                    case DamageData.eDamageType.ATK:
-                        var defZero = _damageData.Target.GetDefZero();
-                        var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
-                        break;
-                    case DamageData.eDamageType.MGC:
-                        var magicDefZero = _damageData.Target.GetMagicDefZero();
-                        var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
-                        break;
-                }
-                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
-                {
-                    switch (_damageData.DamageType)
-                    {
-                        case DamageData.eDamageType.ATK:
-                            var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
-                            var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
-                            break;
-                        case DamageData.eDamageType.MGC:
-                            var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
-                            var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
-                            break;
-                    }
-                }
-                var unit = _damageData.Source;
-                if (_damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK)
-                    unit = _damageData.StrikeBackSource;
-                var talentDamageRate = CalcTalentDamageRate(
-                    _damageData.ActionType,
-                    unit,
-                    _damageData.Target,
-                    _damageData.TargetIncludeMyTeam,
-                    _damageData.IgnoreTalentBonusForRatioSlip,
-                    out isNoDamageByResist
-                );
-                a *= talentDamageRate;
-                b *= talentDamageRate;
-            }
 
             var num5 = a;
             double OverrideDamageLimit = _damageData.OverrideDamageLimit;
@@ -9989,7 +10077,7 @@ this.updateCurColor();
             }
             
             if (_upperLimitFunc != null)
-                num5 = (float)_upperLimitFunc((int)BattleUtil.DoubleToLong(num5), _critical ? num1 : 1.0);
+                num5 = _upperLimitFunc((int)BattleUtil.DoubleToLong(num5), _critical ? num1 : 1.0);
             /*if (_damageData.Source != null && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
             {
                 foreach (KeyValuePair<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet> strikeBack1 in StrikeBackDictionary)
@@ -10056,41 +10144,14 @@ this.updateCurColor();
             if (_skill != null && _damageData.ActionType == eActionType.ATTACK)
                 num5 *= _skill.AweValue;
             
-            // TODO ConvertDamageOverTimeData 
-            /*
-              ConvertDamageOverTimeData_k__BackingField = v175->fields._ConvertDamageOverTimeData_k__BackingField;
-  v177 = Elements_SkillDefine_TypeInfo;
-  if ( !Elements_SkillDefine_TypeInfo->_2.cctor_finished )
-  {
-    j__il2cpp_runtime_class_init_0(*(float *)&AweValue_k__BackingField);
-    v177 = Elements_SkillDefine_TypeInfo;
-  }
-  battleManager_k__BackingField = (__int64)v177->static_fields->CONVERT_DAMEGE_OVER_TIME_TARGET_ACTION;
-  if ( !battleManager_k__BackingField )
-    goto LABEL_487;
-  v178 = System_Collections_Generic_List_Int32Enum___Contains(
-           (System_Collections_Generic_List_T__o *)battleManager_k__BackingField,
-           damageData->fields._ActionType_k__BackingField,
-           (const MethodInfo_3A76194 *)Method_System_Collections_Generic_List_eActionType__Contains__);
-  if ( ConvertDamageOverTimeData_k__BackingField )
-  {
-    v180 = !v178;
-    if ( !ConvertDamageOverTimeData_k__BackingField->fields._Enable_k__BackingField )
-      v180 = 1;
-    if ( ((v180 | v68) & 1) == 0 )
-    {
-      DamageCutValue_k__BackingField = ConvertDamageOverTimeData_k__BackingField->fields._DamageCutValue_k__BackingField;
-      v133 = v133 * (1.0 - DamageCutValue_k__BackingField);
-      v182 = DamageCutValue_k__BackingField * v130;
-      v130 = v130 - v182;
-      dDamage[0] = v130;
-      v183 = Elements_BattleUtil__DoubleToLong(
-               v182 / (double)ConvertDamageOverTimeData_k__BackingField->fields._NumberOfDamage_k__BackingField,
-               0LL);
-      Elements_Battle_Core_ConvertDamageOverTimeData__AddDamage(ConvertDamageOverTimeData_k__BackingField, v183, 0LL);
-    }
-  }
-*/
+            if (ConvertDamageOverTimeData != null && ConvertDamageOverTimeData.Enable && !ignore_damage_cut_action && SkillDefine.CONVERT_DAMAGE_OVER_TIME_TARGET_ACTION.Contains(_damageData.ActionType))
+            {
+                double cutValue = ConvertDamageOverTimeData.DamageCutValue * num5;
+                b *= 1 - ConvertDamageOverTimeData.DamageCutValue;
+                num5 -= cutValue;
+                long dot = BattleUtil.DoubleToLong(cutValue / ConvertDamageOverTimeData.NumberOfDamage);
+                ConvertDamageOverTimeData.AddDamage(dot);
+            }
 
             if (_energyAdd)
             {
@@ -10351,7 +10412,7 @@ this.updateCurColor();
                 }
                 des += $",剩余HP: {Hp}";
 
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp, MaxHp, num6, BattleHeaderController.CurrentFrameCount, des, _damageData.Source, _skill?.SkillId ?? 0, _actionId);
                 uIManager.LogMessage(des, eLogMessageType.GET_DAMAGE, this);
                 createDamageEffectFromSetDamageImpl(_damageData, _hasEffect, _skill, _critical, num6);
                 NoSkipOnDamage?.Invoke(UnitId, _damageData.Source == null ? 0 : _damageData.Source.UnitId, num6, BattleHeaderController.CurrentFrameCount);
@@ -10544,7 +10605,7 @@ this.updateCurColor();
                 var num1 = _fDamage - abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue;
                 if ((double)num1 > 0.0)
                 {
-                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)(float)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
+                    _overRecoverValue += (LongWithEx)(setRecoveryAndGetOverRecovery((int)BattleUtil.DoubleToInt(abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].MainValue), this, _damageData.Target, _damageData.DamageType == DamageData.eDamageType.MGC, abnormalStateCategoryDataDictionary[eAbnormalStateCategory.DAMAGE_RESISTANCE_ATK].Source).Floor());
                     EnableAbnormalState(eAbnormalState.DRAIN_ATK, false);
                     _fDamage = num1;
 #if !NO_PROB_EVENT
@@ -10968,7 +11029,7 @@ this.updateCurColor();
                 string des = $"目标HP回复<color=#54FF4F>{_value}</color>点，当前HP: {Hp}";
                 action?.Invoke(des);
                 uIManager?.LogMessage(des, eLogMessageType.HP_RECOVERY, _source);
-                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source);
+                NoSkipOnLifeChanged?.Invoke(UnitId, Hp,MaxHp,0, BattleHeaderController.CurrentFrameCount,des, _source, 0, 0);
 #endif
                 if (_isUnionBurstLifeSteal)
                 {

@@ -107,18 +107,7 @@ namespace Elements
         {
             base.SetLevel(level);
 
-            var master = this.MasterData;
-            if (master == null) return;
-
-            var valueDict = this.Value;
-            if (valueDict == null) return;
-
-            double baseValue = master.action_value_1;
-            double incrementValue = master.action_value_2;
-
-            float result = (float)(baseValue + incrementValue * level);
-
-            valueDict[(eValueNumber)0] = result;
+            Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + MasterData.action_value_2 * level;
         }
     }
 

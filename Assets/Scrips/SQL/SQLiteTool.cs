@@ -73,15 +73,16 @@ namespace PCRCaculator.SQL
                 }
             }
 
+            string dbPath = null;
             try
 
             {
 
 #if UNITY_ANDROID
-                    var dbPath =
+                    dbPath =
  Path.Combine(ABExTool.persistentDataPath, Path.GetFileNameWithoutExtension(path) + "_patch.db");
 #else
-                var dbPath = Path.GetTempFileName();
+                dbPath = Path.GetTempFileName();
 #endif
                 File.Copy(path, dbPath, true);
 
@@ -274,7 +275,7 @@ namespace PCRCaculator.SQL
             return null;
         }
 
-        private List<string> GetTableColumns(SqliteConnection dbConnection, string tableName)
+        protected List<string> GetTableColumns(SqliteConnection dbConnection, string tableName)
         {
             List<string> columns = new List<string>();
             using (var command = dbConnection.CreateCommand())
@@ -742,8 +743,10 @@ namespace PCRCaculator.SQL
                 skillData.UB_ev = sk.union_burst_evolution;
                 skillData.skill_1 = sk.main_skill_1;
                 skillData.skill_1_ev = sk.main_skill_evolution_1;
+                skillData.skill_1_rev = sk.main_skill_revolution_1;
                 skillData.skill_2 = sk.main_skill_2;
                 skillData.skill_2_ev = sk.main_skill_evolution_2;
+                skillData.skill_2_rev = sk.main_skill_revolution_2;
                 skillData.skill_3 = sk.main_skill_3;
                 skillData.skill_4 = sk.main_skill_4;
                 skillData.skill_5 = sk.main_skill_5;
@@ -764,8 +767,10 @@ namespace PCRCaculator.SQL
                 skillData.EXskill_ev5 = sk.ex_skill_evolution_5;
                 skillData.SPskill_1 = sk.sp_skill_1;
                 skillData.SPskill_1_ev = sk.sp_skill_evolution_1;
+                skillData.SPskill_1_rev = sk.sp_skill_revolution_1;
                 skillData.SPskill_2 = sk.sp_skill_2;
                 skillData.SPskill_2_ev = sk.sp_skill_evolution_2;
+                skillData.SPskill_2_rev = sk.sp_skill_revolution_2;
                 skillData.SPskill_3 = sk.sp_skill_3;
                 skillData.SPskill_4 = sk.sp_skill_4;
                 skillData.SPskill_5 = sk.sp_skill_5;
@@ -790,10 +795,9 @@ namespace PCRCaculator.SQL
         private Dictionary<int, SkillData> GetSkillDataDic()
         {
             Dictionary<int, SkillData> dic = new Dictionary<int, SkillData>();
-            skill_data[] list;
-            list = GetDatas<skill_data_new>();
+            skill_data[] list = GetDatas<skill_data>();
             if (list == null)
-                list = GetDatas<skill_data>();
+                return dic;
             foreach (var dd in list)
             {
                 SkillData sk = new SkillData(dd.skill_id, dd.name, dd.skill_type,

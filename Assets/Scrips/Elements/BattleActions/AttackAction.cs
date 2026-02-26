@@ -135,7 +135,7 @@ namespace Elements
                     criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.DoubleToLong(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
 
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
-                    if (_valueDictionary[eValueNumber.VALUE_5] == (float)(index + 1))
+                    if (_valueDictionary[eValueNumber.VALUE_5] == (double)(index + 1))
                     {
                         criticalData.critVar = 1.0;
                         criticalData.IsCritical = true;
@@ -156,7 +156,17 @@ namespace Elements
 
                     if (!damageData.IgnoreDef)
                     {
-                        switch (damageData.DamageType)
+                        var damageType = damageData.DamageType;
+                        if (damageData.Target.Owner.ReduceDamageByHigherDefData != null && damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
+                        {
+                            var def = damageData.Target.GetDefZero();
+                            var magicDef = damageData.Target.GetMagicDefZero();
+                            if (def != magicDef)
+                            {
+                                damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                            }
+                        }
+                        switch (damageType)
                         {
                             case DamageData.eDamageType.ATK:
                                 var defZero = damageData.Target.GetDefZero();
@@ -186,7 +196,7 @@ namespace Elements
 
                         if (isDamagedEnergyCalculationChanged)
                         {
-                            switch (damageData.DamageType)
+                            switch (damageType)
                             {
                                 case DamageData.eDamageType.ATK:
                                     var defZero = damageData.Target.GetDefZeroForDamagedEnergy();
@@ -253,8 +263,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            Value[eValueNumber.VALUE_1] = (float)(MasterData.action_value_1 + MasterData.action_value_2 * _level);
-            Value[eValueNumber.VALUE_3] = (float)(MasterData.action_value_3 + MasterData.action_value_4 * _level);
+            Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + MasterData.action_value_2 * _level;
+            Value[eValueNumber.VALUE_3] = MasterData.action_value_3 + MasterData.action_value_4 * _level;
         }
         protected override DamageData createDamageData(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, AttackActionBase.eAttackType _actionDetail1, bool _isCritical, Skill _skill, eActionType _actionTypeForSource, bool _isPhysicalForTarget)
         {

@@ -38,7 +38,7 @@ namespace Elements
       {
         healEnhance = _source.HealEnhanceZero;
       }
-      double num = ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : (float) (int) _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : (float) (int) _source.MagicStrZero);
+      double num = ActionDetail1 % 2 != 0 ? _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetAtkZero() : _source.AtkZero) : _valueDictionary[eValueNumber.VALUE_1] + _valueDictionary[eValueNumber.VALUE_3] * (_source.IsPartsBoss ? parts.GetMagicStrZero() : _source.MagicStrZero);
       num *= (healEnhance + 10000.0) / 10000.0;
       HealFieldData healFieldData = new HealFieldData();
       healFieldData.FildType = eFieldType.HEAL;
@@ -62,9 +62,9 @@ namespace Elements
     public override void SetLevel(float _level)
     {
       base.SetLevel(_level);
-      Value[eValueNumber.VALUE_1] = (float) (MasterData.action_value_1 + MasterData.action_value_2 * _level);
-      Value[eValueNumber.VALUE_3] = (float) (MasterData.action_value_3 + MasterData.action_value_4 * _level);
-      Value[eValueNumber.VALUE_5] = (float) (MasterData.action_value_5 + MasterData.action_value_6 * _level);
+      Value[eValueNumber.VALUE_1] = MasterData.action_value_1 + MasterData.action_value_2 * _level;
+      Value[eValueNumber.VALUE_3] = MasterData.action_value_3 + MasterData.action_value_4 * _level;
+      Value[eValueNumber.VALUE_5] = MasterData.action_value_5 + MasterData.action_value_6 * _level;
     }
   }
 }

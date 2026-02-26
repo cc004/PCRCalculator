@@ -15,7 +15,7 @@ namespace Elements
 
         protected override DoubleWithEx calcDamageValue(
             UnitCtrl _source,
-            ValueDictionary _valueDictionary) => ((float)_source.MaxHp - _source.Hp) * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => (DoubleWithEx)(_source.MaxHp - _source.Hp) * _valueDictionary[eValueNumber.VALUE_2];
 
         protected override DoubleWithEx calcHpValue(
             UnitCtrl _source,
@@ -50,8 +50,8 @@ namespace Elements
         public override void SetLevel(float _level)
         {
             base.SetLevel(_level);
-            Value[eValueNumber.VALUE_2] = (float)(MasterData.action_value_2 + MasterData.action_value_3 * _level);
-            Value[eValueNumber.VALUE_4] = (float)(MasterData.action_value_4 + MasterData.action_value_5 * _level);
+            Value[eValueNumber.VALUE_2] = MasterData.action_value_2 + MasterData.action_value_3 * _level;
+            Value[eValueNumber.VALUE_4] = MasterData.action_value_4 + MasterData.action_value_5 * _level;
 
         }
         private void createPositiveValue(Dictionary<eValueNumber, double> _addValue, eValueNumber _evalue)

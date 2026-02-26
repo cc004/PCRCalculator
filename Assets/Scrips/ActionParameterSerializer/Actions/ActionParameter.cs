@@ -199,6 +199,12 @@ namespace ActionParameterSerializer.Actions
                     return new EnchantProtectAction();
                 case 125:
                     return new EtherealizationAction();
+                case 128:
+                    return new ExtendSlipDamageAction();
+                case 129:
+                    return new ConvertDamageOverTimeAction();
+                case 130:
+                    return new ReduceDamageHigherDefAction();
                 /*
                 case 901:
                     return new ExStartPassiveAction();

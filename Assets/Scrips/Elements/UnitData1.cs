@@ -41,6 +41,10 @@ namespace Elements
 
         public List<EquipSlot> UniqueEquipSlot { get; private set; }
 
+        public int ConnectRank { get; set; }
+
+        public int ConnectRankLimit { get; set; }
+
         public UnitParam UnitParam { get; private set; }
 
         public StatusParamShort BonusParam { get; private set; }

@@ -90,7 +90,7 @@ namespace Elements
         {
             _source.SetDamage(new DamageData
             {
-                Damage = (long) (int) _damage,
+                Damage = (long) _damage,
                 IsDivisionDamage = true,
                 ActionType = eActionType.DIVISION
             }, false, 0, _hasEffect: false);

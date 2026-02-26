@@ -48,8 +48,8 @@ namespace Elements
 		public override void SetLevel(float _level)
 		{
 			base.SetLevel(_level);
-			base.Value[eValueNumber.VALUE_1] = (float)(base.MasterData.action_value_1 + (double)_level * base.MasterData.action_value_2);
-			base.Value[eValueNumber.VALUE_3] = (float)(base.MasterData.action_value_3 + (double)_level * base.MasterData.action_value_4);
+			base.Value[eValueNumber.VALUE_1] = base.MasterData.action_value_1 + (double)_level * base.MasterData.action_value_2;
+			base.Value[eValueNumber.VALUE_3] = base.MasterData.action_value_3 + (double)_level * base.MasterData.action_value_4;
 		}
 
 		// Token: 0x06003D82 RID: 15746 RVA: 0x00101950 File Offset: 0x00101950

@@ -339,6 +339,7 @@
   "Poison_s1_and_deal_s2_damage_per_second_for_s3_sec": "使%1$s中毒，每秒造成 [%2$s] 伤害，持续时间 [%3$s] 秒。",
   "Poison_s1_violently_and_deal_s2_damage_per_second_for_s3_sec": "使%1$s进入猛毒状态，每秒造成 [%2$s] 伤害，持续时间 [%3$s] 秒。",
   "s1_s2_and_deal_s3_damage_per_second_for_s4_sec": "使%2$s%1$s，每秒造成 [%3$s] 伤害，持续时间 [%4$s] 秒。",
+  "s1_and_deal_s2_present_damage_up_to_s3_per_second_for_s4_sec": "对%1$s每秒造成最大生命值的 [%2$s%] 伤害，最高伤害%3$s，持续时间 [%4$s] 秒。",
   "Silence_s1_with_s2_chance_for_s3_sec": "以 [%2$s%%] 的概率使%1$s进入沉默状态，持续时间 [%3$s] 秒。",
   "Blind_s1_with_s2_chance_for_s3_sec_physical_attack_has_d4_chance_to_miss": "以 [%2$s%%] 的概率使%1$s进入物理致盲状态，持续时间 [%3$s] 秒。对象进行物理攻击时有 [%4$s%%] 的概率miss。",
   "Move_Speed": "移动速度",
@@ -767,6 +768,8 @@
   "near_with_s_sealed_state": "拥有 [%s] 标记的最近",
   "near_with_s_talent_state": "拥有 [%s] 属性的最近",
   "near_with_s_talent_without_owner": "除自身以外拥有 [%s] 属性的最近",
-  "etherealization_s1_with_s2_seal_by_s3_unit": "在 [%1$s] 拥有 [%2$s] 标记的情况下，进入 [虚化] 状态，无法被 %3$s 敌人锁定，若我方所有人都处于 [虚化] 或 [隐秘] 状态，则解除 [虚化] 和 [隐蔽] 状态。"
-
+  "etherealization_s1_with_s2_seal_by_s3_unit": "在 [%1$s] 拥有 [%2$s] 标记的情况下，进入 [虚化] 状态，无法被 %3$s 敌人锁定，若我方所有人都处于 [虚化] 或 [隐秘] 状态，则解除 [虚化] 和 [隐蔽] 状态。",
+  "reduce_s1_damage_higher_def_by_s2_time": "使%1$s受到伤害时，按物理/魇法防御中较高的防御计算伤害，持续 [%2$s] 秒",
+  "convert_s1_s2_damages_to_s3_dot_in_s4_time": "使%1$s受到的 [%2$s%] 的伤害拆分成每秒1次，共 [%3$s] 次的持续伤害，效果持续 [%4$s] 秒，此伤害不给予受击TP。",
+  "extend_s1_slip_damage_last_and_interval_by_s2_in_s3_time": "使%1$s受到的异常伤害的持续时间和间隔时间延长 [%2$s] 倍，持续 [%3$s] 秒。"
 }

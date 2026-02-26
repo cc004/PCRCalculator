@@ -24,6 +24,8 @@ namespace Elements
 
     public bool IgnoreTalentBonusForRatioSlip { get; set; }
 
+    public UnitCtrl SourceForDamageNumEffect { get; set; } // TODO check where use
+
     public long OverrideDamageLimit { get; set; } = -1;
 
     public bool IgnoreStrikeBackAndAllUnitDamageCutTrigger { get; set; } // TODO check where set

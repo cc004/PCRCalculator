@@ -144,17 +144,27 @@ namespace Elements
             string key = "attack";
             try
             {
-                if (skillid == Owner.MainSkillIdList[0] || skillid - 10 == Owner.MainSkillIdList[0])
+                bool IsSkillAt(List<int> list, int index, int id) => list != null && list.Count > index && list[index] == id;
+
+                if (IsSkillAt(Owner.MainSkillRevolutionIdList, 0, skillid))
                 {
-                    key = "skill1";
-                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEqLv > 0)
-                        key = "skill1+";
+                    key = "skill1++";
                 }
-                else if (skillid == Owner.MainSkillIdList[1])
+                else if (IsSkillAt(Owner.MainSkillRevolutionIdList, 1, skillid))
                 {
-                    key = "skill2";
-                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEq2Lv >= 0)
-                        key = "skill2+";
+                    key = "skill2++";
+                }
+                else if (IsSkillAt(Owner.MainSkillIdList, 0, skillid) || IsSkillAt(Owner.MainSkillIdList, 0, skillid - 10))
+                {
+                    key = IsSkillAt(Owner.MainSkillEvolutionIdList, 0, skillid) ? "skill1+" : "skill1";
+                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEqLv > 0 && key == "skill1")
+                        key = Owner.unitData.uniqueEqPlus ? "skill1++" : "skill1+";
+                }
+                else if (IsSkillAt(Owner.MainSkillIdList, 1, skillid) || IsSkillAt(Owner.MainSkillIdList, 1, skillid - 10))
+                {
+                    key = IsSkillAt(Owner.MainSkillEvolutionIdList, 1, skillid) ? "skill2+" : "skill2";
+                    if (Owner.UnitId <= 200000 && Owner.unitData.uniqueEq2Lv >= 0 && key == "skill2")
+                        key = Owner.unitData.uniqueEq2Plus ? "skill2++" : "skill2+";
                 }
                 else if (skillid == Owner.UnionBurstSkillId || skillid - 10 == Owner.UnionBurstSkillId)
                 {
@@ -162,12 +172,34 @@ namespace Elements
                     if (Owner.UnitId <= 200000 && Owner.unitData.rarity == 6)
                         key = "skill0+";
                 }
-                else if (skillid == Owner.SpecialSkillIdList[0])
+                else if (IsSkillAt(Owner.SpecialSkillRevolutionIdList, 0, skillid))
+                    key = "special0++";
+                else if (IsSkillAt(Owner.SpecialSkillRevolutionIdList, 1, skillid))
+                    key = "special1++";
+                else if (IsSkillAt(Owner.SpecialSkillRevolutionIdList, 2, skillid))
+                    key = "special2++";
+                else if (IsSkillAt(Owner.SpecialSkillEvolutionIdList, 0, skillid))
+                    key = "special0+";
+                else if (IsSkillAt(Owner.SpecialSkillEvolutionIdList, 1, skillid))
+                    key = "special1+";
+                else if (IsSkillAt(Owner.SpecialSkillEvolutionIdList, 2, skillid))
+                    key = "special2+";
+                else if (IsSkillAt(Owner.SpecialSkillIdList, 0, skillid))
                     key = "special0";
-                else if (skillid == Owner.SpecialSkillIdList[1])
+                else if (IsSkillAt(Owner.SpecialSkillIdList, 1, skillid))
                     key = "special1";
-                else if (skillid == Owner.SpecialSkillIdList[2])
+                else if (IsSkillAt(Owner.SpecialSkillIdList, 2, skillid))
                     key = "special2";
+
+                // if (!unitFirearmDatas.ContainsKey(key))
+                // {
+                //     if (key.EndsWith("++"))
+                //         key = key.Replace("++", "+");
+                //     if (!unitFirearmDatas.ContainsKey(key) && key.EndsWith("+"))
+                //         key = key.Substring(0, key.Length - 1);
+                //     if (!unitFirearmDatas.ContainsKey(key))
+                //         key = "attack";
+                // }
                 return unitFirearmDatas[key][0];
             }
             catch (Exception e)
@@ -205,6 +237,8 @@ namespace Elements
             List<string> namelist = new List<string>();
             Action<List<Skill>> action = a =>
             {
+                // if (a == null)
+                //     return;
                 foreach (var skill in a)
                 {
                     foreach (var effect in skill.SkillEffects)
@@ -221,8 +255,10 @@ namespace Elements
             action(UnionBurstEvolutionList);
             action(MainSkillList);
             action(MainSkillEvolutionList);
+            action(MainSkillRevolutionList);
             action(SpecialSkillList);
             action(SpecialSkillEvolutionList);
+            action(SpecialSkillRevolutionList);
             data.requireFsxkList = namelist;
             return data;
 
@@ -261,11 +297,11 @@ namespace Elements
             Dictionary<string, List<FirearmCtrlData>> dic = new Dictionary<string, List<FirearmCtrlData>>();
             if (Attack != null)
                 dic.Add("attack", GetFirearmCtrlDatasFromSkill(Attack));
-            if (UnionBurstList.Count > 0)
+            if (UnionBurstList != null && UnionBurstList.Count > 0)
                 dic.Add("skill0", GetFirearmCtrlDatasFromSkill(UnionBurstList[0]));
-            if (UnionBurstEvolutionList.Count > 0)
+            if (UnionBurstEvolutionList != null && UnionBurstEvolutionList.Count > 0)
                 dic.Add("skill0+", GetFirearmCtrlDatasFromSkill(UnionBurstEvolutionList[0]));
-            if (MainSkillList.Count > 0)
+            if (MainSkillList != null && MainSkillList.Count > 0)
             {
                 for (int i = 0; i < MainSkillList.Count; i++)
                 {
@@ -277,25 +313,35 @@ namespace Elements
                     dic.Add("skill2", GetFirearmCtrlDatasFromSkill(MainSkillList[1]));
                 }*/
             }
-            if (MainSkillEvolutionList.Count > 0)
+            if (MainSkillEvolutionList != null && MainSkillEvolutionList.Count > 0)
             {
                 dic.Add("skill1+", GetFirearmCtrlDatasFromSkill(MainSkillEvolutionList[0]));
                 if (MainSkillEvolutionList.Count > 1)
                     dic.Add("skill2+", GetFirearmCtrlDatasFromSkill(MainSkillEvolutionList[1]));
             }
-            for (int i = 0; i < SpecialSkillList.Count; i++)
+            if (MainSkillRevolutionList != null && MainSkillRevolutionList.Count > 0)
+            {
+                dic.Add("skill1++", GetFirearmCtrlDatasFromSkill(MainSkillRevolutionList[0]));
+                if (MainSkillRevolutionList.Count > 1)
+                    dic.Add("skill2++", GetFirearmCtrlDatasFromSkill(MainSkillRevolutionList[1]));
+            }
+            for (int i = 0; SpecialSkillList != null && i < SpecialSkillList.Count; i++)
             {
                 dic.Add("special" + i, GetFirearmCtrlDatasFromSkill(SpecialSkillList[i]));
             }
-            for (int i = 0; i < SpecialSkillEvolutionList.Count; i++)
+            for (int i = 0; SpecialSkillEvolutionList != null && i < SpecialSkillEvolutionList.Count; i++)
             {
                 dic.Add("special" + i + "+", GetFirearmCtrlDatasFromSkill(SpecialSkillEvolutionList[i]));
+            }
+            for (int i = 0; SpecialSkillRevolutionList != null && i < SpecialSkillRevolutionList.Count; i++)
+            {
+                dic.Add("special" + i + "++", GetFirearmCtrlDatasFromSkill(SpecialSkillRevolutionList[i]));
             }
             return dic;
         }
         public UnitActionControllerData2 GetUnitActionControllerData()
         {
-            return new UnitActionControllerData2(AttackDetail, UseDefaultDelay, Attack, UnionBurstList, MainSkillList, SpecialSkillList, SpecialSkillEvolutionList, UnionBurstEvolutionList, MainSkillEvolutionList, Annihilation);
+            return new UnitActionControllerData2(AttackDetail, UseDefaultDelay, Attack, UnionBurstList, MainSkillList, SpecialSkillList, SpecialSkillEvolutionList, UnionBurstEvolutionList, MainSkillEvolutionList, MainSkillRevolutionList, SpecialSkillRevolutionList, Annihilation);
         }
 
         private List<FirearmCtrlData> GetFirearmCtrlDatasFromSkill(Skill skill)

@@ -18,6 +18,14 @@ namespace Elements
         private const float NO_DISPLAY = 0.0f;
         private const float NO_VALUE_DISPLAY = -1f;
 
+        public enum eSkillEvolutionType
+        {
+          NORMAL = 0,
+          EVOLUTION = 1,
+          REVOLUTION = 2,
+        }
+
+
         public static readonly List<eActionType> TALENT_CONSIDER_DAMAGE_ACTION = new List<eActionType>
         {
             eActionType.ATTACK,
@@ -764,6 +772,18 @@ namespace Elements
                 eActionType.ETHEREALIZATION,
                 typeof(EtherealizationAction)
             },
+            {
+                eActionType.REDUCE_DAMAGE_BY_HIGHER_DEF,
+                typeof(ReduceDamageHigherDefAction)
+            },
+            {
+                eActionType.EXTEND_SLIP_DAMAGE,
+                typeof(ExtendSlipDamageAction)
+            },
+            {
+                eActionType.CONVERT_DAMAGE_OVER_TIME,
+                typeof(ConvertDamageOverTimeAction)
+            }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
         {

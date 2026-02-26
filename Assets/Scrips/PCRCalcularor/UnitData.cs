@@ -617,6 +617,9 @@ namespace PCRCaculator
         public Dictionary<int, int> playLoveDic = new Dictionary<int, int>();
         public int uniqueEqLv;//专武等级
         public int uniqueEq2Lv = -1;//专武2等级
+        public int connectRank;
+        public bool uniqueEqPlus = false; // SP+
+        public bool uniqueEq2Plus = false; // SP+
         public int[] exEquip = new int[] { 0, 0, 0 };
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
         public Dictionary<int, int[]> exEquipSubs = new Dictionary<int, int[]>();
@@ -679,7 +682,7 @@ namespace PCRCaculator
             skillLevel = new int[4] { lv, lv, lv, lv };
         }
 
-        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1)
+        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1, bool uniqueEqPlus = false, bool uniqueEq2Plus = false)
         {
             unitId = id;
             level = lv;
@@ -698,6 +701,8 @@ namespace PCRCaculator
             }
             uniqueEqLv = uniqueeqlv;
             uniqueEq2Lv = uniqueeq2lv;
+            this.uniqueEqPlus = uniqueEqPlus;
+            this.uniqueEq2Plus = uniqueEq2Plus;
         }
 
         public void SetMaxLove()
@@ -824,7 +829,7 @@ namespace PCRCaculator
         /// <returns></returns>
         public UnitData Copy()
         {
-            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv);
+            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv, uniqueEqPlus, uniqueEq2Plus);
         }
         /// <summary>
         /// 比较相同角色是否有所提升
@@ -1015,6 +1020,20 @@ namespace PCRCaculator
             return li;
         }
 
+        public int[] GetRevlotionSkillLv()
+        {
+            int[] li = new int[3] { 0, 0, 0 };
+            if (uniqueEqPlus)
+            {
+                li[1] = skillLevel[1];
+            }
+            if (uniqueEq2Plus)
+            {
+                li[2] = skillLevel[2];
+            }
+            return li;
+        }
+
         public new long GetHashCode()
         {
             unchecked
@@ -1036,6 +1055,9 @@ namespace PCRCaculator
                 hashCode = (hashCode * 397) ^ skillLevel[3];
                 hashCode = (hashCode * 397) ^ uniqueEqLv;
                 hashCode = (hashCode * 397) ^ uniqueEq2Lv;
+                hashCode = (hashCode * 397) ^ connectRank;
+                hashCode = (hashCode * 397) ^ (uniqueEqPlus ? 1 : 0);
+                hashCode = (hashCode * 397) ^ (uniqueEq2Plus ? 1 : 0);
                 hashCode = (hashCode * 397) ^ exEquip[0];
                 hashCode = (hashCode * 397) ^ exEquip[1];
                 hashCode = (hashCode * 397) ^ exEquip[2];
@@ -1159,8 +1181,10 @@ namespace PCRCaculator
         public int UB_ev;
         public int skill_1;
         public int skill_1_ev;
+        public int skill_1_rev;
         public int skill_2;
         public int skill_2_ev;
+        public int skill_2_rev;
         public int skill_3;
         public int skill_4;
         public int skill_5;
@@ -1187,7 +1211,9 @@ namespace PCRCaculator
         public int SPskill_4;
         public int SPskill_5;
         public int SPskill_1_ev;
+        public int SPskill_1_rev;
         public int SPskill_2_ev;
+        public int SPskill_2_rev;
 
         public int SPUB;
 
@@ -1252,15 +1278,25 @@ namespace PCRCaculator
             int rarity = unitData.rarity;
             bool isUnitEquip = unitData.uniqueEqLv > 0;
             bool isUnitEquip2 = unitData.uniqueEq2Lv >= 0;
+            bool isUnitEquipPlus = unitData.uniqueEqPlus;
+            bool isUnitEquip2Plus = unitData.uniqueEq2Plus;
             List<int> skills = new List<int> { UB, skill_1, skill_2, EXskill };
 
             if (rarity >= 5) { skills[3] = EXskill_ev; }
             if (rarity == 6 && UB_ev != 0) { skills[0] = UB_ev; }
-            if (isUnitEquip)
+            if (isUnitEquipPlus)
             {
                 skills[1] = skill_1_ev == 0 ? skills[1] : skill_1_ev;
             }
-            if (isUnitEquip2)
+            else if (isUnitEquip)
+            {
+                skills[1] = skill_1_ev == 0 ? skills[1] : skill_1_ev;
+            }
+            if (isUnitEquip2Plus)
+            {
+                skills[2] = skill_2_ev == 0 ? skills[2] : skill_2_ev;
+            }
+            else if (isUnitEquip2)
             {
                 skills[2] = skill_2_ev == 0 ? skills[2] : skill_2_ev;
             }
@@ -1291,11 +1327,11 @@ namespace PCRCaculator
         public int type;
         public int areawidth;
         public float casttime;
-        public int[] skillactions = new int[7] { 0, 0, 0, 0, 0, 0, 0 };//长度为7
-        public int[] dependactions = new int[7] { 0, 0, 0, 0, 0, 0, 0 };//长度为7
+        public int[] skillactions = new int[20] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };//长度为20
+        public int[] dependactions = new int[20] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };//长度为20
         public string describes = "";
         public int icon;
-        public static string[] num = new string[10] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩" };
+        public static string[] num = new string[20] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳" };
         /// <summary>
         /// 不要用这个构造函数！
         /// </summary>
@@ -1308,8 +1344,8 @@ namespace PCRCaculator
         /// <param name="ty"></param>
         /// <param name="area"></param>
         /// <param name="time"></param>
-        /// <param name="actions">长度为7</param>
-        /// <param name="deactions">长度为7</param>
+        /// <param name="actions">长度为20</param>
+        /// <param name="deactions">长度为20</param>
         /// <param name="des"></param>
         /// <param name="ir">图标</param>
         public SkillData(int id, string name, int ty, int area, float time, int[] actions, int[] deactions, string des, int ir)
@@ -2336,10 +2372,10 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 325;
-        public int playerProcess = 88;
+        public int playerLevel = 331;
+        public int playerProcess = 90;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 330;
+        public int maxUniqueEqLv = 340;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;

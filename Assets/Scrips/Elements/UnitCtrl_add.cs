@@ -41,7 +41,7 @@ namespace Elements
         public Action<int,ActionState> SemanOnChangeState;
         public Action<int,eSemanEvent> SemanOnEventCallback;
         public Action<int, UnitAbnormalStateChangeData, int> NoSkipOnAbnormalStateChange;
-        public Action<int,long, long, long, int,string, UnitCtrl> NoSkipOnLifeChanged;
+        public Action<int,long, long, long, int,string, UnitCtrl, int, int> NoSkipOnLifeChanged;
         public Action<int,double, int,string> NoSkipOnTPChanged;
         public Action<int,float> SemanOnTPChanged;
         public Action<int, UnitSkillExecData> NoSkipOnStartAction;
@@ -144,23 +144,26 @@ namespace Elements
         /// <returns></returns>
         public bool JudgeIsTargetSkill(int skillid,int targetSkill)
         {
-            if(skillid == UnionBurstSkillId && targetSkill == 0)
+            List<int> skillIdList = MainSkillIdList;
+            switch(targetSkill)
             {
-                return true;
-            }
-            if (MainSkillIdList != null && MainSkillIdList.Count > 0)
-                if (skillid == (MainSkill1Evolved ? MainSkillEvolutionIdList : MainSkillIdList)[0] && targetSkill == 1 )
-                {
-                    return true;
-                }
-            if (MainSkillIdList != null && MainSkillIdList.Count > 1)
-                if (skillid == MainSkillIdList[1] && targetSkill == 2)
-                {
-                    return true;
-                }
-            if(skillid == 1 && targetSkill == 3)
-            {
-                return true;
+                case 0:
+                    return skillid == UnionBurstSkillId;
+                case 1:
+                    if (MainSkill1EvolutionType == SkillDefine.eSkillEvolutionType.EVOLUTION)
+                        skillIdList = MainSkillEvolutionIdList;
+                    else if (MainSkill1EvolutionType == SkillDefine.eSkillEvolutionType.REVOLUTION)
+                        skillIdList = MainSkillRevolutionIdList;
+                    return skillid == skillIdList?[0];
+                case 2:
+                    skillIdList = MainSkillIdList;
+                    if (MainSkill2EvolutionType == SkillDefine.eSkillEvolutionType.EVOLUTION)
+                        skillIdList = MainSkillEvolutionIdList;
+                    else if (MainSkill2EvolutionType == SkillDefine.eSkillEvolutionType.REVOLUTION)
+                        skillIdList = MainSkillRevolutionIdList;
+                    return skillid == skillIdList?[1];
+                case 3:
+                    return skillid == 1;
             }
             return false;
         }
