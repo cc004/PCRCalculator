@@ -5131,6 +5131,19 @@ namespace Elements.Battle
 
         public bool GetAdvPlayed() => LKLFFOFDCHK;
 
+        public void TriggerUnionBurstSeal(bool _isEnemy)
+        {
+            var units = _isEnemy ? EnemyList : UnitList;
+            foreach (var unit in units)
+            {
+                if (!unit.IsDead && !unit.IdleOnly)
+                {
+                    unit.execPassiveSeal(PassiveSealAction.ePassiveTiming.TEAM_UB);
+                }
+            }
+        }
+
+
         public void CallbackStanbyDone(UnitCtrl _unit)
         {
             if (allStandByDone)

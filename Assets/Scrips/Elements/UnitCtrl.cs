@@ -8344,7 +8344,7 @@ this.updateCurColor();
         });
         }
 
-		private void execPassiveSeal(PassiveSealAction.ePassiveTiming _timing)
+		public void execPassiveSeal(PassiveSealAction.ePassiveTiming _timing)
 		{
 			List<PassiveSealData> value = null;
 			if (!passiveSealDictionary.TryGetValue(_timing, out value))
@@ -12186,10 +12186,13 @@ this.updateCurColor();
             if (unitActionController.GetIsSkillPrincessForm(UnionBurstSkillId)) 
             {
                 //Debug.LogError("UB特效鸽了！");
+                BattleManager.Instance.TriggerUnionBurstSeal(IsOther);
                 princessFormProcessor.StartPrincessFormSkill(unitActionController.GetPrincessFormMovieData(UnionBurstSkillId));
             }
-            else if (unitActionController.StartAction(UnionBurstSkillId))
+            else if (unitActionController.StartAction(UnionBurstSkillId)){
+                BattleManager.Instance.TriggerUnionBurstSeal(IsOther);
                 AppendCoroutine(updateSkill1(), ePauseType.SYSTEM, this);
+            }
             else
                 SetState(ActionState.IDLE);
 #if !REDUCE_ANALYSE

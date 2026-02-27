@@ -52,6 +52,7 @@ namespace Elements
       BUFF = 1,
       DAMAGED = 2,
       DEBUFF = 3,
+      TEAM_UB = 4,
     }
 
     public enum eSealTarget
