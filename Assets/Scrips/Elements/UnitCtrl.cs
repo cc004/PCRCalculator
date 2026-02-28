@@ -9979,7 +9979,7 @@ this.updateCurColor();
                     if (_damageData.ActionType == eActionType.ATTACK)
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.TotalDamageForLogBarrier;
                     else
-                        TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
+                        TotalDamageForLogBarrier = (DoubleWithEx)a;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
 #if DONT_USE_EX
