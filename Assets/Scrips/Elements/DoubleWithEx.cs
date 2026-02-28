@@ -77,11 +77,11 @@ namespace Elements
             double _num = value;
             if (_num >= 0.0)
             {
-                long num = Mathf.CeilToInt(_num);
+                long num = (long)Math.Ceiling(_num);
                 return Approximately(_num, num) ? (LongWithEx)this.Ceil() : (LongWithEx)this.Floor();
             }
-            long num1 = Mathf.FloorToInt(_num);
-            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Floor();
+            long num1 = (long)Math.Floor(_num);
+            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Ceil();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -374,11 +374,11 @@ namespace Elements
             double _num = value;
             if (_num >= 0.0)
             {
-                long num = Mathf.CeilToInt((float)_num);
+                long num = (long)Math.Ceiling(_num);
                 return Approximately(_num, num) ? (LongWithEx)this.Ceil() : (LongWithEx)this.Floor();
             }
-            long num1 = Mathf.FloorToInt((float)_num);
-            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Floor();
+            long num1 = (long)Math.Floor(_num);
+            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Ceil();
         }
 
         public DoubleWithEx Max(double f)
