@@ -59,23 +59,23 @@ namespace Elements
 			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			CurrentPitch += _deltaAngle;
-			if (CurrentPitch < 0f)
-			{
-				CurrentPitch += 360f;
-			}
-			CurrentPitch %= 360f;
-			if (CurrentPitch < 180f && !IsFront)
-			{
-				IsFront = true;
-				SetSortOder(_sortOrder - 1);
-			}
-			if (CurrentPitch > 180f && IsFront)
-			{
-				IsFront = false;
-				SetSortOder(_sortOrder + 1);
-			}
-			((Component)this).transform.localPosition = Quaternion.AngleAxis(CircleEffectController.Roll, Vector3.left) * Quaternion.AngleAxis(CircleEffectController.Yaw, Vector3.forward) * new Vector3(CircleEffectController.Radius * Mathf.Cos((float)Math.PI / 180f * CurrentPitch), 0f, CircleEffectController.Radius * Mathf.Sin((float)Math.PI / 180f * CurrentPitch));
+			// CurrentPitch += _deltaAngle;
+			// if (CurrentPitch < 0f)
+			// {
+			// 	CurrentPitch += 360f;
+			// }
+			// CurrentPitch %= 360f;
+			// if (CurrentPitch < 180f && !IsFront)
+			// {
+			// 	IsFront = true;
+			// 	SetSortOder(_sortOrder - 1);
+			// }
+			// if (CurrentPitch > 180f && IsFront)
+			// {
+			// 	IsFront = false;
+			// 	SetSortOder(_sortOrder + 1);
+			// }
+			// ((Component)this).transform.localPosition = Quaternion.AngleAxis(CircleEffectController.Roll, Vector3.left) * Quaternion.AngleAxis(CircleEffectController.Yaw, Vector3.forward) * new Vector3(CircleEffectController.Radius * Mathf.Cos((float)Math.PI / 180f * CurrentPitch), 0f, CircleEffectController.Radius * Mathf.Sin((float)Math.PI / 180f * CurrentPitch));
 		}
 
 		protected virtual void SetSortOder(int _sortOrder)
