@@ -9578,6 +9578,8 @@ this.updateCurColor();
                 //if (unitCtrl.UnitDamageInfo != null)
                 //    unitCtrl.UnitDamageInfo.SetDamage((int)((long)unitCtrl.UnitDamageInfo.damage + num1));
             }*/
+            MyGameCtrl.Instance.BattleStats.AddPlayerDamage(_damageData.Source.UnitId, num1);
+
             accumulateDamage += num1;
             BattleLogIntreface battleLog = this.battleLog;
             UnitCtrl source1 = _damageData.Source;

@@ -115,17 +115,7 @@ namespace PCRCalculatorServer
                         EnemyList = enemyList,
                         Success = true,
                         Message = "战斗模拟完成",
-                        Stats = battleRequest[index].CalcStats ? new BattleStatsData
-                        {
-                            TotalDamage = totalDamage,
-                            TotalMagicBuff = MyGameCtrl.Instance.BattleStats.TotalMagicBuff,
-                            TotalPhysicsBuff = MyGameCtrl.Instance.BattleStats.TotalPhysicsBuff,
-                            TotalMagicDebuff = MyGameCtrl.Instance.BattleStats.TotalMagicDebuff,
-                            TotalPhysicsDebuff = MyGameCtrl.Instance.BattleStats.TotalPhysicsDebuff,
-                            ScorePhysicsExpectation = MyGameCtrl.Instance.BattleStats.ScorePhysicsExpectation,
-                            ScoreMagicExpectation = MyGameCtrl.Instance.BattleStats.ScoreMagicExpectation,
-                            PlayerTpGained = new Dictionary<int, long>(MyGameCtrl.Instance.BattleStats.PlayerTpGainedDic)
-                        } : null,
+                        Stats = battleRequest[index].CalcStats ? MyGameCtrl.Instance.BattleStats.ToBattleStatsData() : null,
                         BattleFrames = battleFrames,
                         CurrentSeed = currentSeed,
                         TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
