@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Elements.Battle;
 
 namespace Elements
@@ -253,6 +254,9 @@ namespace Elements
                     }
                     _addValue[_evalue] = sumHp;
                     break;
+                case 16:
+                    _addValue[_evalue] = (DoubleWithEx)_target.Owner.Energy * _valueDictionary[eValueNumber.VALUE_2];
+                    break;
 
                 default:
                     if (_valueDictionary[eValueNumber.VALUE_1] > 200f)
@@ -280,6 +284,9 @@ namespace Elements
                         {
                             _addValue[_evalue] = (double)value3 * _valueDictionary[eValueNumber.VALUE_2];
                         }
+                    } else
+                    {
+                        UnityEngine.Debug.Log($"Invalid eAdditiveValueType: {(int)_valueDictionary[eValueNumber.VALUE_1]}");
                     }
 
                     break;
@@ -355,6 +362,7 @@ namespace Elements
             DAMAGE_RATE = 13,
 			MAX_HP = 14,
 			HP_SUM = 15,
+            TP = 16,
 			SKILL_COUNT = 20,
             STRIKE_BACK_COUNT = 100, // 0x00000064
             SEAL_COUNT = 200, // 0x000000C8

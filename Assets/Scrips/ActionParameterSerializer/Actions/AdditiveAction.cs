@@ -24,6 +24,8 @@ namespace ActionParameterSerializer.Actions
                     keyType = PropertyKey.def; break;
                 case 10:
                     keyType = PropertyKey.magicDef; break;
+                case 16:
+                    keyType = PropertyKey.tp; break;
                 default:
                     keyType = PropertyKey.unknown; break;
             }
@@ -95,6 +97,11 @@ namespace ActionParameterSerializer.Actions
                     break;
                 case 15:
                     result = Utils.JavaFormat(Utils.GetString("Modifier_add_s1_total_current_hp_of_s2_to_value_d3_of_effect_d4"),
+                        buildExpression(level, null, RoundingMode.UNNECESSARY, property, false, false, true),
+                        targetParameter.buildTargetClause(), actionDetail2, actionDetail1 % 10);
+                    break;
+                case 16:
+                    result = Utils.JavaFormat(Utils.GetString("Modifier_add_s1_total_current_tp_of_s2_to_value_d3_of_effect_d4"),
                         buildExpression(level, null, RoundingMode.UNNECESSARY, property, false, false, true),
                         targetParameter.buildTargetClause(), actionDetail2, actionDetail1 % 10);
                     break;
