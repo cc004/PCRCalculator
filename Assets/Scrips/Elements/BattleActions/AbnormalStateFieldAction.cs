@@ -69,7 +69,7 @@ namespace Elements
       abnormalStateFieldData.UniqueEffectPrefabLeft = gameObject2;
       abnormalStateFieldData.TargetAction = targetAction;
       abnormalStateFieldData.SourceActionController = _sourceActionController;
-      abnormalStateFieldData.FieldTargetType = _source.IsOther ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
+      abnormalStateFieldData.FieldTargetType = (_source.IsOther ^ _source.IsBonusEnemy) ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
       abnormalStateFieldData.Skill = _skill;
       abnormalStateFieldData.IsTargetAbnormalStateBuff = IsTargetAbnormalStateBuff;
       abnormalStateFieldData.Cache();

@@ -35,7 +35,7 @@ namespace Elements
         return true;
       if (_unit.ModeChangeUnableStateBarrier)
         return false;
-      return _unit.IsNoDamageMotion();
+      return !_unit.IsNoDamageMotion();
     }
 
     public override void OnExit(BasePartsData _parts, UnitCtrl _source)
@@ -48,13 +48,15 @@ namespace Elements
     public override void OnEnter(BasePartsData _parts, UnitCtrl _source)
     {
       UnitCtrl owner = _parts.Owner;
-      if (this.TargetAction.ActionType == eActionType.CHANGE_SPEED && (this.TargetAction.ActionDetail1 == 1 || this.TargetAction.ActionDetail1 == 2) && owner.OverwriteSpeedDataCount > 0)
+      if (TargetAction.IsChangeSpeedAction() && owner.OverwriteSpeedDataCount > 0)
       {
         return;
       }
       base.OnEnter(_parts, _source);
-      if (_parts.Owner.IsSummonOrPhantom)
-        TargetAction.AppendTargetNum(_parts.Owner, 0);
+      if (owner.IsSummonOrPhantom)
+        TargetAction.AppendTargetNum(owner, 0);
+      if (!TargetAction.IsAppendTargetNum(owner))
+        TargetAction.AppendTargetNum(owner, 0);
       SourceActionController.ExecAction(TargetAction, Skill, _parts, 0, 0.0f);
     }
 
@@ -85,6 +87,8 @@ namespace Elements
           TargetSet.Remove(_unit.BossPartsListForBattle[index]);
         }
       }
+      if (Enable)
+        updateTarget();
     }
 
     public void CallUpdateTarget()

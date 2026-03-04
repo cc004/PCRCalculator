@@ -351,6 +351,12 @@ namespace Elements
                    actionExecedData.ExecedPartsNumber == actionExecedData.TargetPartsNumber;
         }
 
+        public bool IsChangeSpeedAction()
+        {
+            return (ActionType == eActionType.CHANGE_SPEED || ActionType == eActionType.FORCE_CHANGE_SPEED) &&
+                   (uint)(ActionDetail1 - 1) < 2U;
+        }
+
         // RVA: 0x354BC2C Offset: 0x354BC2C VA: 0x354BC2C Slot: 11
         public virtual bool IsIgnoreDebuffImmune() // TODO forceChangeSpeed action(no implement) return true
         {
