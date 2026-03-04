@@ -8570,6 +8570,10 @@ this.updateCurColor();
 			{
 				num++;
 			}
+			if (IsAbnormalState(eAbnormalState.TAUNT))
+			{
+				num++;
+			}
 			if (IsAbnormalState(eAbnormalState.DECREASE_HEAL))
 			{
 				num++;
@@ -8591,6 +8595,22 @@ this.updateCurColor();
 				num++;
 			}
 			if (IsAbnormalState(eAbnormalState.CRYSTALIZE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CHAINED_ACN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PUPPET))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.DISABLE_HEAL))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.RATIO_SLIP))
 			{
 				num++;
 			}
