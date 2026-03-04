@@ -167,7 +167,8 @@ namespace Elements
         public List<UnitCtrl> ExecedMultiBossList { get; set; } = new List<UnitCtrl>();
         public Dictionary<UnitCtrl, double> AllSealDamageCutExecValueDic { get; set; } = new Dictionary<UnitCtrl, double>();
         public double AllSealDamageCutValueForCountZero { get; set; } = -1.0;
-        public bool AlreadyTriggerCause { get; set; }
+        // public bool AlreadyTriggerCause { get; set; } // no longer used
+        public HashSet<TriggerAction> AlreadyTriggeredActions { get; set; }
         public bool IgnoreTriggerCausedByTrigger { get; set; }
 
 
@@ -189,6 +190,7 @@ namespace Elements
             HitOnceKeyList = new List<BasePartsData>();
             AlreadyExecedData = new Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>>();
             AlreadyExecedKeys = new Dictionary<UnitCtrl, List<int>>();
+            AlreadyTriggeredActions = new HashSet<TriggerAction>();
         }
 
         public virtual void Initialize(UnitCtrl _ownerUnitCtrl) => Initialize();
@@ -262,7 +264,7 @@ namespace Elements
         {
             ExecedMultiBossList.Clear();
             AllSealDamageCutExecValueDic.Clear();
-            AlreadyTriggerCause = false;
+            AlreadyTriggeredActions.Clear();
             ExecedMultiBossList.Clear();
             AllSealDamageCutValueForCountZero = -1.0;
             ResetHitData();
