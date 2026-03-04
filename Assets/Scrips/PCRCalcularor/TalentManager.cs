@@ -50,9 +50,13 @@ namespace PCRCaculator
             TalentLevelManager.Instance.SaveTalentSkills(global);
             TalentSkillTreeManager.Instance.SaveTalentSkills(global);
             TeamSkillTreeManager.Instance.SaveTeamSkills(global);
-            if (global) {
+            RoleMasteryManager.Instance.SaveRoleMastery(global);
+            if (global)
+            {
                 MainManager.Instance.SavePlayerSetting();
-            } else {
+            }
+            else
+            {
                 GuildManager.Instance.SaveDataToJson();
             }
 
