@@ -956,6 +956,14 @@ namespace Elements
                     IconType = eStateIconType.RATIO_SLIP,
                     IsBuff = false
                 }
+            },
+            {
+                UnitCtrl.eAbnormalState.CHAINED_ACN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CHAINED_ACN,
+                    IsBuff = false
+                }
             }
         };
 
@@ -5023,6 +5031,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.RATIO_SLIP:
                     result = UnitCtrl.eAbnormalStateCategory.RATIO_SLIP;
                     break;
+                case UnitCtrl.eAbnormalState.CHAINED_ACN:
+                    result = UnitCtrl.eAbnormalStateCategory.CHAINED_ACN;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
@@ -5037,7 +5048,7 @@ this.updateCurColor();
             this.updateCurColor();
         }*/
 
-        public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
+		public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
 		{
 			switch (_state)
 			{
@@ -5053,6 +5064,7 @@ this.updateCurColor();
 			case UnitCtrl.eAbnormalState.NPC_STUN:
 			case UnitCtrl.eAbnormalState.CRYSTALIZE:
 			case UnitCtrl.eAbnormalState.STUN2:
+			case UnitCtrl.eAbnormalState.CHAINED_ACN:
 				return true;
 			default:
 				return false;

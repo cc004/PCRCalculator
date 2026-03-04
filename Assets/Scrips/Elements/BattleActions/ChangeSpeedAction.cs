@@ -71,6 +71,10 @@ namespace Elements
             {
                 eChangeSpeedType.STUN2,
                 UnitCtrl.eAbnormalState.STUN2
+            },
+            {
+                eChangeSpeedType.CHAINED_ACN,
+                UnitCtrl.eAbnormalState.CHAINED_ACN
             }
         };
 
@@ -79,6 +83,20 @@ namespace Elements
           Skill _skill,
           UnitCtrl _source,
           UnitActionController _sourceActionController) => base.ExecActionOnStart(_skill, _source, _sourceActionController);
+
+        public override void ReadyAction(
+          UnitCtrl _source,
+          UnitActionController _sourceActionController,
+          Skill _skill)
+        {
+            base.ReadyAction(_source, _sourceActionController, _skill);
+            if (AbnormalStateFieldAction == null)
+            {
+                return;
+            }
+            UnitCtrl.eAbnormalState abnormalState = AbnormalStateDic[(eChangeSpeedType)ActionDetail1];
+            AbnormalStateFieldAction.IsTargetAbnormalStateBuff = UnitCtrl.ABNORMAL_CONST_DATA[abnormalState].IsBuff;
+        }
 
         public override void ExecAction(
           UnitCtrl _source,
@@ -107,6 +125,7 @@ namespace Elements
                 case 11:
                 case 12:
                 case 13:
+                case 15:
                     if (_target.Owner.ModeChangeUnableStateBarrier)
                     {
                         action($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
@@ -283,6 +302,7 @@ namespace Elements
 			case UnitCtrl.eAbnormalState.NPC_STUN:
 			case UnitCtrl.eAbnormalState.CRYSTALIZE:
 			case UnitCtrl.eAbnormalState.STUN2:
+			case UnitCtrl.eAbnormalState.CHAINED_ACN:
 				return true;
 			default:
 				return false;
@@ -325,7 +345,9 @@ namespace Elements
             [Description("结晶")]
             CRYSTALIZE,
             [Description("击晕2")]
-            STUN2
+            STUN2,
+            [Description("拘束(ACN)")]
+            CHAINED_ACN = 15
         }
 
         public enum eCancelTriggerType
