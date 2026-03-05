@@ -838,11 +838,11 @@ namespace PCRCaculator.Battle
         [Description("191")]
         XIANGSHUI = 191,//炼望香水
         [Description("192")]
-        TOULAN = 192,//龙妹偷懒的诱惑
+        TOULAN = 192,//维尔姆偷懒的诱惑
         [Description("193")]
         WOFANGPINGZHANG = 193,//吹雪我方屏障
         [Description("194")]
-        BANDITOUZI = 194,//大和蛮贼骰子
+        BANDITOUZI = 194,//大和班迪骰子
         [Description("195")]
         JIANCIFANGYU = 195,//若菜尖刺防御
         [Description("196")]
@@ -850,7 +850,7 @@ namespace PCRCaculator.Battle
         [Description("197")]
         SHUIQIELU = 197,//水切噜
         [Description("198")]
-        WANGLINGQUTI = 198,//格蕾斯亡灵躯体
+        WANGLINGQUTI = 198,//格蕾丝亡灵躯体
         [Description("199")]
         HUONIAO = 199,//春电火鸟
         [Description("200")]
@@ -880,7 +880,7 @@ namespace PCRCaculator.Battle
         REDUCTION_ALL_DAMAGE = 217,
         TRANSCEND_DAMAGE = 218,
         [Description("219")]
-        RENNAI = 219,//忍耐\n华音
+        RENNAI = 219,//忍耐\n花音
         [Description("220")]
         JIANYA = 220,//剑压\n彩羽
         [Description("221")]
