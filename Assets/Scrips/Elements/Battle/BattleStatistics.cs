@@ -14,6 +14,7 @@ namespace Elements.Battle
         public long TotalPhysicsDebuff { get; private set; }
         public Dictionary<int, long> PlayerTpGainedDic { get; private set; } = new Dictionary<int, long>();
         public Dictionary<int, long> PlayerDamageDic { get; set; } = new Dictionary<int, long>();
+        public Dictionary<int, long> PlayerNonUbDamageDic { get; set; } = new Dictionary<int, long>();
         
         /// 物理伤害期望
         public double ScorePhysicsExpectation { get; private set; }
@@ -56,6 +57,17 @@ namespace Elements.Battle
             PlayerDamageDic[unitId] += damage;
         }
 
+        public void AddPlayerNonUbDamage(int unitId, long damage)
+        {
+            if (!IsEnabled) return;
+
+            if (!PlayerNonUbDamageDic.ContainsKey(unitId))
+            {
+                PlayerNonUbDamageDic.Add(unitId, 0);
+            }
+            PlayerNonUbDamageDic[unitId] += damage;
+        }
+
         public void Reset()
         {
             TotalMagicBuff = 0;
@@ -65,6 +77,7 @@ namespace Elements.Battle
             ScorePhysicsExpectation = 0;
             ScoreMagicExpectation = 0;
             PlayerDamageDic.Clear();
+            PlayerNonUbDamageDic.Clear();
             PlayerTpGainedDic.Clear();
         }
 
@@ -80,7 +93,8 @@ namespace Elements.Battle
                 ScorePhysicsExpectation = ScorePhysicsExpectation,
                 ScoreMagicExpectation = ScoreMagicExpectation,
                 PlayerTpGained = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerTpGainedDic.ContainsKey(p.unitId) ? PlayerTpGainedDic[p.unitId] : 0).ToList(),
-                PlayerDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerDamageDic.ContainsKey(p.unitId) ? PlayerDamageDic[p.unitId] : 0).ToList()
+                PlayerDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerDamageDic.ContainsKey(p.unitId) ? PlayerDamageDic[p.unitId] : 0).ToList(),
+                PlayerNonUbDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerNonUbDamageDic.ContainsKey(p.unitId) ? PlayerNonUbDamageDic[p.unitId] : 0).ToList()
             };
         }
     }

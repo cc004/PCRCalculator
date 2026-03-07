@@ -9610,7 +9610,17 @@ this.updateCurColor();
                 //if (unitCtrl.UnitDamageInfo != null)
                 //    unitCtrl.UnitDamageInfo.SetDamage((int)((long)unitCtrl.UnitDamageInfo.damage + num1));
             }*/
-            MyGameCtrl.Instance.BattleStats.AddPlayerDamage(_damageData.Source == null ? _damageData.StrikeBackSource.UnitId : _damageData.Source.UnitId, num1);
+            UnitCtrl damageSource = _damageData.Source ?? _damageData.StrikeBackSource;
+            if (damageSource != null)
+            {
+                MyGameCtrl.Instance.BattleStats.AddPlayerDamage(damageSource.UnitId, num1);
+                
+                // 非UB伤害统计
+                if (_skill == null || _skill.SkillId != damageSource.UnionBurstSkillId) 
+                {
+                    MyGameCtrl.Instance.BattleStats.AddPlayerNonUbDamage(damageSource.UnitId, num1);
+                }
+            }
 
             accumulateDamage += num1;
             BattleLogIntreface battleLog = this.battleLog;
