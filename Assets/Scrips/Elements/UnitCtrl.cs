@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: Elements.UnitCtrl
 // Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
@@ -1645,9 +1645,161 @@ namespace Elements
             }
             set 
             {
+                bool stateChanged = currentState != value;
                 currentState = value;
                 //MyOnChangeState?.Invoke(UnitId, currentState, BattleHeaderController.CurrentFrameCount);
+                if (stateChanged && MyGameCtrl.Instance != null && MyGameCtrl.Instance.BattleStats.IsEnabled)
+                {
+                    int frame = BattleHeaderController.CurrentFrameCount;
+                    var stats = MyGameCtrl.Instance.BattleStats;
 
+                    if (!stats.AllUnitStateChangeDic.ContainsKey(this.UnitId))
+                        stats.AllUnitStateChangeDic[this.UnitId] = new List<UnitStateChangeDataForTolerance>();
+
+                    stats.AllUnitStateChangeDic[this.UnitId].Add(new UnitStateChangeDataForTolerance
+                    {
+                        currentFrameCount = frame,
+                        realFrameCount = battleManager.FrameCount,
+                        changStateTo = value
+                    });
+
+                    if (value == ActionState.SKILL_1 && !this.IsOther)
+                    {
+                        int finalTolerance = -1;
+                        var myStateList = stats.AllUnitStateChangeDic[this.UnitId];
+
+                        ActionState prevState = myStateList.Count >= 2 ? myStateList[myStateList.Count - 2].changStateTo : ActionState.IDLE;
+                        int lastIdleFrame = 0;
+                        if (prevState == ActionState.IDLE && myStateList.Count >= 2)
+                        {
+                            lastIdleFrame = myStateList[myStateList.Count - 2].currentFrameCount;
+                        }
+
+                        int lastTpReadyFrame = 0;
+                        if (stats.IsSkillReady.ContainsKey(this.UnitId))
+                        {
+                            var readyArray = stats.IsSkillReady[this.UnitId];
+                            for (int k = frame; k >= 0; k--)
+                            {
+                                if (k < 5400 && !readyArray[k])
+                                {
+                                    lastTpReadyFrame = k + 1;
+                                    break;
+                                }
+                            }
+                        }
+
+                        int conditionMetFrame = System.Math.Max(lastIdleFrame, lastTpReadyFrame);
+
+                        if (prevState == ActionState.IDLE && frame == conditionMetFrame)
+                        {
+                            int idx = battleManager.UnitList.IndexOf(this);
+                            if (idx != -1)
+                            {
+                                bool isFakeAuto = false;
+
+                                for (int i = 0; i < idx; ++i)
+                                {
+                                    var uc = battleManager.UnitList[i];
+                                    if (uc.IsSkillReady && uc.CurrentState == ActionState.IDLE)
+                                    {
+                                        isFakeAuto = true;
+                                        break;
+                                    }
+                                }
+
+                                if (isFakeAuto)
+                                {
+                                    finalTolerance = 5400;
+                                }
+                                else
+                                {
+                                    int tolerance = 114514;
+                                    for (int i = 0; i < battleManager.UnitList.Count; ++i)
+                                    {
+                                        var uc = battleManager.UnitList[i];
+                                        if (i != idx && !uc.IsSkillReady) continue;
+
+                                        bool wasReadyPrev = frame > 0 && stats.IsSkillReady.ContainsKey(uc.UnitId) && stats.IsSkillReady[uc.UnitId][frame - 1];
+
+                                        if (i != idx && uc.CurrentState == ActionState.IDLE && frame > 0 && wasReadyPrev)
+                                        {
+                                            tolerance = 0;
+                                        }
+                                        else
+                                        {
+                                            var list = stats.AllUnitStateChangeDic.ContainsKey(uc.UnitId) ? stats.AllUnitStateChangeDic[uc.UnitId] : new List<UnitStateChangeDataForTolerance>();
+                                            int resultIndex = -1;
+
+                                            for (int j = list.Count - 1; j >= 0; j--)
+                                            {
+                                                if (i == idx)
+                                                {
+                                                    if (list[j].currentFrameCount < frame && list[j].changStateTo == ActionState.IDLE)
+                                                    {
+                                                        resultIndex = j; break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (list[j].changStateTo == ActionState.IDLE)
+                                                    {
+                                                        resultIndex = j; break;
+                                                    }
+                                                }
+                                            }
+
+                                            if (resultIndex != -1)
+                                            {
+                                                var last = list[resultIndex];
+                                                UnitStateChangeDataForTolerance next = new UnitStateChangeDataForTolerance();
+                                                bool hasNext = false;
+                                                if (resultIndex + 1 < list.Count)
+                                                {
+                                                    next = list[resultIndex + 1];
+                                                    hasNext = true;
+                                                }
+
+                                                int lframe = last.currentFrameCount;
+                                                int rframe = hasNext ? next.currentFrameCount : 5400;
+
+                                                bool flag = false;
+                                                if (stats.IsSkillReady.ContainsKey(uc.UnitId))
+                                                {
+                                                    var readyArray = stats.IsSkillReady[uc.UnitId];
+                                                    for (int k = lframe; k < rframe && k < 5400; k++)
+                                                    {
+                                                        if (readyArray[k])
+                                                        {
+                                                            flag = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+
+                                                if (flag && hasNext)
+                                                {
+                                                    tolerance = System.Math.Min(tolerance, battleManager.FrameCount - next.realFrameCount);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (tolerance != 114514)
+                                    {
+                                        finalTolerance = tolerance;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!stats.PlayerUbToleranceFrames.ContainsKey(this.UnitId))
+                        {
+                            stats.PlayerUbToleranceFrames[this.UnitId] = new List<int>();
+                        }
+                        stats.PlayerUbToleranceFrames[this.UnitId].Add(finalTolerance);
+                    }
+                }
             }
         }
 
@@ -4093,7 +4245,7 @@ this.updateCurColor();
             if (UnionBurstCoolDownTime > 0f && battleManager.GetBlackOutUnitLength() == 0)
             {
                 UnionBurstCoolDownTime -= BattleManager.DeltaTime_60fps;
-            }            
+            }
             /*else
             {
                 if ((double)this.sortOffsetResetTimer <= 0.0)
@@ -4103,6 +4255,18 @@ this.updateCurColor();
                     return;
                 this.hitEffectSortOffset = 0;
             }*/
+            if (MyGameCtrl.Instance != null && MyGameCtrl.Instance.BattleStats.IsEnabled)
+            {
+                var stats = MyGameCtrl.Instance.BattleStats;
+                if (!stats.IsSkillReady.ContainsKey(this.UnitId))
+                    stats.IsSkillReady[this.UnitId] = new bool[5400];
+
+                int currentFrame = BattleHeaderController.CurrentFrameCount;
+                if (currentFrame >= 0 && currentFrame < 5400)
+                {
+                    stats.IsSkillReady[this.UnitId][currentFrame] = (this.Energy >= 1000 && !this.IsDead && !this.IsUnableActionState());
+                }
+            }
         }
 
         /*public void BattleRecovery(eBattleCategory _category)

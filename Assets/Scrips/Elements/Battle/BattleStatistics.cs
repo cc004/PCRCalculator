@@ -4,8 +4,19 @@ using PCRCaculator.Guild;
 
 namespace Elements.Battle
 {
+    public class UnitStateChangeDataForTolerance
+    {
+        public int currentFrameCount;
+        public int realFrameCount;
+        public UnitCtrl.ActionState changStateTo;
+    }
+
     public class BattleStatistics
     {
+        public Dictionary<int, List<int>> PlayerUbToleranceFrames { get; set; } = new Dictionary<int, List<int>>();
+        public Dictionary<int, List<UnitStateChangeDataForTolerance>> AllUnitStateChangeDic { get; set; } = new Dictionary<int, List<UnitStateChangeDataForTolerance>>();
+        public Dictionary<int, bool[]> IsSkillReady { get; set; } = new Dictionary<int, bool[]>();
+
         public bool IsEnabled { get; set; } = true;
 
         public long TotalMagicBuff { get; private set; }
@@ -79,10 +90,21 @@ namespace Elements.Battle
             PlayerDamageDic.Clear();
             PlayerNonUbDamageDic.Clear();
             PlayerTpGainedDic.Clear();
+            PlayerUbToleranceFrames.Clear();
+            AllUnitStateChangeDic.Clear();
+            IsSkillReady.Clear();
         }
 
         public BattleStatsData ToBattleStatsData()
         {
+            var ubToleranceFrames = MyGameCtrl.Instance.tempData.playerList.Select(p =>
+            {
+                int unitId = p.unitId;
+                if (PlayerUbToleranceFrames.ContainsKey(unitId))
+                    return PlayerUbToleranceFrames[unitId];
+                return new List<int>();
+            }).ToList();
+
             return new BattleStatsData
             {
                 TotalDamage = GuildCalculator.Instance.GetTotalDamage(),
@@ -94,7 +116,8 @@ namespace Elements.Battle
                 ScoreMagicExpectation = ScoreMagicExpectation,
                 PlayerTpGained = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerTpGainedDic.ContainsKey(p.unitId) ? PlayerTpGainedDic[p.unitId] : 0).ToList(),
                 PlayerDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerDamageDic.ContainsKey(p.unitId) ? PlayerDamageDic[p.unitId] : 0).ToList(),
-                PlayerNonUbDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerNonUbDamageDic.ContainsKey(p.unitId) ? PlayerNonUbDamageDic[p.unitId] : 0).ToList()
+                PlayerNonUbDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerNonUbDamageDic.ContainsKey(p.unitId) ? PlayerNonUbDamageDic[p.unitId] : 0).ToList(),
+                UBToleranceFrames = ubToleranceFrames
             };
         }
     }
