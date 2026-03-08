@@ -1648,7 +1648,7 @@ namespace Elements
                 bool stateChanged = currentState != value;
                 currentState = value;
                 //MyOnChangeState?.Invoke(UnitId, currentState, BattleHeaderController.CurrentFrameCount);
-                if (stateChanged && MyGameCtrl.Instance != null && MyGameCtrl.Instance.BattleStats.IsEnabled)
+                if (stateChanged && MyGameCtrl.Instance != null && MyGameCtrl.Instance.BattleStats != null && MyGameCtrl.Instance.BattleStats.IsEnabled && battleManager != null)
                 {
                     int frame = BattleHeaderController.CurrentFrameCount;
                     var stats = MyGameCtrl.Instance.BattleStats;
@@ -4255,7 +4255,7 @@ this.updateCurColor();
                     return;
                 this.hitEffectSortOffset = 0;
             }*/
-            if (MyGameCtrl.Instance != null && MyGameCtrl.Instance.BattleStats.IsEnabled)
+            if (MyGameCtrl.Instance != null && MyGameCtrl.Instance.BattleStats != null && MyGameCtrl.Instance.BattleStats.IsEnabled)
             {
                 var stats = MyGameCtrl.Instance.BattleStats;
                 if (!stats.IsSkillReady.ContainsKey(this.UnitId))
