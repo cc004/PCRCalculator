@@ -1056,7 +1056,7 @@ namespace PCRCaculator.Guild
             //List<List<float>> UBTimes = CreateUBExecTimeData();
             for (int i = 0; i < 5; i++)
             {
-                if (i >= PlayerIds.Count)
+                if (i >= players.Count)
                 {
                     continue;
                 }
