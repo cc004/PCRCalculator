@@ -11167,7 +11167,7 @@ this.updateCurColor();
         {
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
-            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
+            var num = ((double)_energy > 0.0 & _useRecoveryRate ? ((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_setEnergyType == eSetEnergyType.BY_ATK)
             {
