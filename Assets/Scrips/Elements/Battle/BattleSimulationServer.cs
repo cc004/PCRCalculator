@@ -68,7 +68,7 @@ namespace Elements.Battle
         public bool Success { get; set; }
         public string Message { get; set; }
         public BattleStatsData Stats { get; set; }
-        public float RemainingTime { get; set; }
+        // public float RemainingTime { get; set; }
         public int BattleFrames { get; set; }
         public int CurrentSeed { get; set; }
         public string TalentLevel { get; set; }
@@ -76,6 +76,9 @@ namespace Elements.Battle
         public string TeamSkill { get; set; }
         public List<int> SemanUBNum { get; set; }
         public eBattleResult Result { get; set; }
+        public List<eBattleResult> ResultList { get; set; }
+        public List<int> BattleFramesList { get; set; }
+        public List<int> CurrentSeedList { get; set; }
         public OnceResultData OnceResult { get; set; }
     }
 
@@ -114,6 +117,7 @@ namespace Elements.Battle
         public int WaveGroupId { get; set; } = 0;
         public List<bool> SetToggles { get; set; }
         public bool NeedOnceResult { get; set; }
+        public int RepeatCount { get; set; } = 1;
     }
 
 #if UNITY_5_3_OR_NEWER
