@@ -58,6 +58,8 @@ namespace Elements.Battle
         public double ScoreMagicExpectation { get; set; }
         public List<long> PlayerTpGained { get; set; }
         public List<long> PlayerDamageList { get; set; }
+        public List<long> PlayerNonUbDamageList { get; set; }
+        public List<List<int>> UBToleranceFrames { get; set; }
     }
 
     [Serializable]
