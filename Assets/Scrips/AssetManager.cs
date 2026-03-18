@@ -234,18 +234,43 @@ namespace PCRApi
                 Debug.Log($"resolving file {path}");
 
                 var cacheFile = $"{ABExTool.persistentDataPath}/Pool/{content.MD5}";
+                var expectedMd5 = content.md5;
 
                 if (File.Exists(cacheFile))
                 {
                     var bytes = File.ReadAllBytes(cacheFile);
-                    Debug.Log($"file {path} loaded from cache");
-                    return bytes;
+                    var cacheMd5 = Content.CalcMd5(bytes);
+                    if (string.Equals(cacheMd5, expectedMd5, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Debug.Log($"file {path} loaded from cache");
+                        return bytes;
+                    }
+
+                    Debug.LogWarning(
+                        $"file {path} cache md5 mismatch, expected {expectedMd5}, actual {cacheMd5}, redownloading");
                 }
 
                 var raw = content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}");
+                var downloadMd5 = Content.CalcMd5(raw);
+                if (!string.Equals(downloadMd5, expectedMd5, StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.LogError(
+                        $"file {path} download md5 mismatch, expected {expectedMd5}, actual {downloadMd5}");
+                    return null;
+                }
+
                 File.WriteAllBytes(cacheFile, raw);
 
-                return raw;
+                var bytesFromPool = File.ReadAllBytes(cacheFile);
+                var savedMd5 = Content.CalcMd5(bytesFromPool);
+                if (!string.Equals(savedMd5, expectedMd5, StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.LogError(
+                        $"file {path} pool cache md5 mismatch after save, expected {expectedMd5}, actual {savedMd5}");
+                    return null;
+                }
+
+                return bytesFromPool;
             }
             return null;
         }

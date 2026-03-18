@@ -742,6 +742,7 @@
   "use_d1_if_s2_environment_not_enabled": "场上环境不为%2$s的场合，使用 [动作%1$d]。",
   "Modifier_add_s1_max_hp_of_s2_to_value_d3_of_effect_d4": "使 [动作%4$d] 的系数%3$d 提高 [%1$s * %2$s最大HP]。",
   "Modifier_add_s1_total_current_hp_of_s2_to_value_d3_of_effect_d4": "使 [动作%4$d] 的系数%3$d 提高 [%1$s * %2$s当前HP的总和]。",
+  "Modifier_add_s1_total_current_tp_of_s2_to_value_d3_of_effect_d4": "使 [动作%4$d] 的系数%3$d 提高 [%1$s * %2$s当前TP]。",
   "Enable_s1_to_resist_all_sorts_of_incapacity_efficacies_in_a_period_of_s2_sec": "使%1$s免疫所有控制效果，持续时间 [%2$s] 秒。",
   "s_parent_target_parts": " %1$s 个部位",
   "parent_target_parts": "第一个部位",

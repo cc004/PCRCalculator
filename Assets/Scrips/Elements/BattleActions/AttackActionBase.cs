@@ -209,7 +209,7 @@ namespace Elements
         {
             bool flag = judgeIsPhysical(_actionDetail1);
             LongWithEx num = 0;
-            long num2 = 0;
+            long num2 = AdditionalCritical;
             int num3 = 0;
             if (!_source.IsPartsBoss)
             {

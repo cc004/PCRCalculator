@@ -434,35 +434,40 @@ namespace Elements
                         if (ActionDetail3 == 0 || ActionDetail3 != actionCountWaveReset)
                         {
                             var source = damageData.Source;
-                            if (!actionParameter.IgnoreTriggerCausedByTrigger && !actionParameter.AlreadyTriggerCause)
+                            if (source == null || actionParameter == null)
+                                return;
+                            if (actionParameter.AlreadyTriggeredActions.Contains(this))
+                                return;
+                            var p = Value[eValueNumber.VALUE_1] / 100f;
+                            float num5 = BattleManager.Random(0f, 1f,new RandomData(_source,target,ActionId,17, base.Value[eValueNumber.VALUE_1] / 100f, 0));
+                            if (p < num5)
+                                return;
+                            actionParameter.AlreadyTriggeredActions.Add(this);
+                            actionCountWaveReset++;
+                            Action<bool> callback = (bool _waitUbTurn) =>
                             {
-                                var p = Value[eValueNumber.VALUE_1] / 100f;
-                                float num5 = BattleManager.Random(0f, 1f,new RandomData(_source,target,ActionId,17, base.Value[eValueNumber.VALUE_1] / 100f, 0));
-                                if (p < num5)
-                                    return;
-                                actionParameter.AlreadyTriggerCause = true;
-                                actionCountWaveReset++;
-                                Action<bool> callback = (bool _waitUbTurn) =>
-                                {
-                                    uint actionType = (uint)damageData.ActionType;
-                                    bool inRange = actionType <= 0x2F;
-                                    long mask = (1L << (int)actionType) & 0xC00000000002L;
+                                uint actionType = (uint)damageData.ActionType;
+                                bool inRange = actionType <= 0x2F;
+                                long mask = (1L << (int)actionType) & 0xC00000000002L;
 
-                                    if (inRange && mask != 0)
-                                    {
-                                        var targetPart = damageData.Source.GetIndexSmallestParts();
-                                        _source.ExecSkillWithTargetParts(_skill, targetPart);
-                                        return;
-                                    }
-                                };
-                                if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
+                                if (inRange && mask != 0)
                                 {
-                                    _source.AppendCoroutine(waitStateIdle(callback, _source), ePauseType.SYSTEM, _source);
+                                    var targetPart = damageData.Source.GetIndexSmallestParts();
+                                    _source.ExecSkillWithTargetParts(_skill, targetPart);
+                                    return;
                                 }
-                                else
-                                {
-                                    _source.AppendCoroutine(waitChargeSkillTurnNone(callback, _source), ePauseType.SYSTEM, _source);
-                                }
+                            };
+                            if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
+                            {
+                                _source.AppendCoroutine(waitStateIdle(callback, _source), ePauseType.SYSTEM, _source);
+                            }
+                            else if (battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE)
+                            {
+                                callback?.Invoke(false);
+                            }
+                            else
+                            {
+                                _source.AppendCoroutine(waitChargeSkillTurnNone(callback, _source), ePauseType.SYSTEM, _source);
                             }
                         }
 

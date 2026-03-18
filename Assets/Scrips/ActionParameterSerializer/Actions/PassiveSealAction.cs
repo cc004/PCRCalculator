@@ -39,7 +39,9 @@ namespace ActionParameterSerializer.Actions
         {
             Unknown = -1,
             Buff = 1,
-            Damage = 2
+            Damage = 2,
+            Debuff = 3,
+            Team_UB = 4
         }
 
         public enum eSealTarget

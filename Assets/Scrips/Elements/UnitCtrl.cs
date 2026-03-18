@@ -956,6 +956,14 @@ namespace Elements
                     IconType = eStateIconType.RATIO_SLIP,
                     IsBuff = false
                 }
+            },
+            {
+                UnitCtrl.eAbnormalState.CHAINED_ACN,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.CHAINED_ACN,
+                    IsBuff = false
+                }
             }
         };
 
@@ -5023,6 +5031,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.RATIO_SLIP:
                     result = UnitCtrl.eAbnormalStateCategory.RATIO_SLIP;
                     break;
+                case UnitCtrl.eAbnormalState.CHAINED_ACN:
+                    result = UnitCtrl.eAbnormalStateCategory.CHAINED_ACN;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
@@ -5037,7 +5048,7 @@ this.updateCurColor();
             this.updateCurColor();
         }*/
 
-        public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
+		public static bool IsUnableAbnormalState(UnitCtrl.eAbnormalState _state)
 		{
 			switch (_state)
 			{
@@ -5053,6 +5064,7 @@ this.updateCurColor();
 			case UnitCtrl.eAbnormalState.NPC_STUN:
 			case UnitCtrl.eAbnormalState.CRYSTALIZE:
 			case UnitCtrl.eAbnormalState.STUN2:
+			case UnitCtrl.eAbnormalState.CHAINED_ACN:
 				return true;
 			default:
 				return false;
@@ -8344,7 +8356,7 @@ this.updateCurColor();
         });
         }
 
-		private void execPassiveSeal(PassiveSealAction.ePassiveTiming _timing)
+		public void execPassiveSeal(PassiveSealAction.ePassiveTiming _timing)
 		{
 			List<PassiveSealData> value = null;
 			if (!passiveSealDictionary.TryGetValue(_timing, out value))
@@ -8570,6 +8582,10 @@ this.updateCurColor();
 			{
 				num++;
 			}
+			if (IsAbnormalState(eAbnormalState.TAUNT))
+			{
+				num++;
+			}
 			if (IsAbnormalState(eAbnormalState.DECREASE_HEAL))
 			{
 				num++;
@@ -8591,6 +8607,22 @@ this.updateCurColor();
 				num++;
 			}
 			if (IsAbnormalState(eAbnormalState.CRYSTALIZE))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.CHAINED_ACN))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.PUPPET))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.DISABLE_HEAL))
+			{
+				num++;
+			}
+			if (IsAbnormalState(eAbnormalState.RATIO_SLIP))
 			{
 				num++;
 			}
@@ -9578,6 +9610,8 @@ this.updateCurColor();
                 //if (unitCtrl.UnitDamageInfo != null)
                 //    unitCtrl.UnitDamageInfo.SetDamage((int)((long)unitCtrl.UnitDamageInfo.damage + num1));
             }*/
+            MyGameCtrl.Instance.BattleStats.AddPlayerDamage(_damageData.Source == null ? _damageData.StrikeBackSource.UnitId : _damageData.Source.UnitId, num1);
+
             accumulateDamage += num1;
             BattleLogIntreface battleLog = this.battleLog;
             UnitCtrl source1 = _damageData.Source;
@@ -9977,7 +10011,7 @@ this.updateCurColor();
                     if (_damageData.ActionType == eActionType.ATTACK)
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.TotalDamageForLogBarrier;
                     else
-                        TotalDamageForLogBarrier = (DoubleWithEx)_damageData.Damage;
+                        TotalDamageForLogBarrier = (DoubleWithEx)a;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
 #if DONT_USE_EX
@@ -11133,7 +11167,7 @@ this.updateCurColor();
         {
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
-            var num = ((double)_energy > 0.0 & _useRecoveryRate ? (float)((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
+            var num = ((double)_energy > 0.0 & _useRecoveryRate ? ((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_setEnergyType == eSetEnergyType.BY_ATK)
             {
@@ -12186,10 +12220,13 @@ this.updateCurColor();
             if (unitActionController.GetIsSkillPrincessForm(UnionBurstSkillId)) 
             {
                 //Debug.LogError("UB特效鸽了！");
+                BattleManager.Instance.TriggerUnionBurstSeal(IsOther);
                 princessFormProcessor.StartPrincessFormSkill(unitActionController.GetPrincessFormMovieData(UnionBurstSkillId));
             }
-            else if (unitActionController.StartAction(UnionBurstSkillId))
+            else if (unitActionController.StartAction(UnionBurstSkillId)){
+                BattleManager.Instance.TriggerUnionBurstSeal(IsOther);
                 AppendCoroutine(updateSkill1(), ePauseType.SYSTEM, this);
+            }
             else
                 SetState(ActionState.IDLE);
 #if !REDUCE_ANALYSE

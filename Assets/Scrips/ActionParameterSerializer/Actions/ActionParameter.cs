@@ -664,6 +664,7 @@ namespace ActionParameterSerializer.Actions
         waveEnergyRecovery,
         waveHpRecovery,
         accuracy,
+        tp,
         unknown
     }
 

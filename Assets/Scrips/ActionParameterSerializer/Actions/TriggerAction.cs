@@ -18,7 +18,10 @@ namespace ActionParameterSerializer.Actions
             stealthFree = 8,
             Break = 9,
             dot = 10,
-            allBreak = 11
+            allBreak = 11,
+            DAMAGED_2 = 12,
+            DAMAGED_HP = 13,
+            DAMAGED_FOR_EXEC_TO_SOURCE = 14
         }
 
         private TriggerType triggerType;

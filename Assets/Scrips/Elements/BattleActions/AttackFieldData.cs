@@ -49,8 +49,8 @@ namespace Elements
             {
                 if (TargetList[index].Owner.CurrentState != UnitCtrl.ActionState.DIE)
                 {
-                    float receiveDamagePrecent = 0f;
-                    float damageUpPrecent = 0f;
+                    double receiveDamagePrecent = 1;
+                    double damageUpPrecent = 1;
                     var realDamageType = DamageType;
                     if (IsWeakTypeDamage)
                     {
@@ -65,12 +65,12 @@ namespace Elements
                     switch (realDamageType)
                     {
                         case DamageData.eDamageType.ATK:
-                            receiveDamagePrecent = (float)TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)Source.PhysicalDamageUpPercentOrMin / 100f; 
+                            receiveDamagePrecent = TargetList[index].Owner.PhysicalReceiveDamagePercentOrMin / 100;
+                            damageUpPrecent = Source.PhysicalDamageUpPercentOrMin / 100; 
                             break;
                         case DamageData.eDamageType.MGC:
-                            receiveDamagePrecent = (float)TargetList[index].Owner.MagicReceiveDamagePercentOrMin / 100f;
-                            damageUpPrecent = (float)Source.MagicDamageUpPercentOrMin / 100f;
+                            receiveDamagePrecent = TargetList[index].Owner.MagicReceiveDamagePercentOrMin / 100;
+                            damageUpPrecent = Source.MagicDamageUpPercentOrMin / 100;
                             break;
                     }
 
@@ -80,7 +80,7 @@ namespace Elements
                     damageData.DamageType = realDamageType;
                     damageData.Source = Source;
                     damageData.ActionType = eActionType.ATTACK_FIELD;
-                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == Source.IsOther; // yes it has
+                    damageData.TargetIncludeMyTeam = TargetList[index].Owner.IsOther == Source.IsOther || IsEnvironmentAbnormalState;
                     damageData.ExecAbsorber = _damage =>
                     {
                         if (_damage > AbsorberValue)

@@ -95,7 +95,7 @@ namespace Elements
             attackFieldData.IsEnvironmentAbnormalState = IsEnvironmentAbnormalState;
             attackFieldData.onExec = action;
             attackFieldData.Cache();
-            action?.Invoke("领域中心：" + attackFieldData.CenterX + "范围：" + attackFieldData.Size + "\n");
+            action?.Invoke("领域中心：" + attackFieldData.CenterX + "范围：" + attackFieldData.Size + "攻击: " + attackFieldData.Value + "\n");
             battleManager.ExecField(attackFieldData, ActionId);
         }
 

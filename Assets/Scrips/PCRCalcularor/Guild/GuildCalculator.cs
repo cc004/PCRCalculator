@@ -778,14 +778,15 @@ namespace PCRCaculator.Guild
         }
         public void AddSummonUnit(UnitCtrl unitCtrl)
         {
-            if (playerIds.Contains(unitCtrl.UnitId))
+            List<int> idList = unitCtrl.IsOther ? bossId : playerIds; 
+            if (idList.Contains(unitCtrl.UnitId))
             {
-                AddSkillGroupPrefab(unitCtrl.UnitId, unitCtrl, playerIds.Count, false);
+                AddSkillGroupPrefab(unitCtrl.UnitId, unitCtrl, idList.Count, false);
                 return;
             }
-            int idx = playerIds.Count + 1;
+            int idx = idList.Count + 1;
             AddSkillGroupPrefab(unitCtrl.UnitId, unitCtrl, idx);
-            PlayerIds.Add(unitCtrl.UnitId);
+            idList.Add(unitCtrl.UnitId);
         }
         public void OnBattleFinished(int result, int currentFrame)
         {
@@ -1055,7 +1056,7 @@ namespace PCRCaculator.Guild
             //List<List<float>> UBTimes = CreateUBExecTimeData();
             for (int i = 0; i < 5; i++)
             {
-                if (i >= PlayerIds.Count)
+                if (i >= players.Count)
                 {
                     continue;
                 }

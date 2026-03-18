@@ -486,7 +486,7 @@ namespace Elements
         LIANJINCAILIAO = 190,
         [Description("香水\n炼望")]
         XIANGSHUI = 191,
-        [Description("偷懒的诱惑\n龙妹")]
+        [Description("偷懒的诱惑\n维尔姆")]
         TOULANDEYOUHUO = 192,
         [Description("我方屏障\n吹雪")]
         WOFANGPINGZHANG = 193,
@@ -498,7 +498,7 @@ namespace Elements
         EMOQINWEN = 196,
         [Description("水切噜")]
         SHUIQIELU = 197,
-        [Description("亡灵躯体\n格蕾斯")]
+        [Description("亡灵躯体\n格蕾丝")]
         WANGLINGQUTI = 198,
         [Description("火鸟\n春电")]
         HUONIAO = 199,
@@ -508,7 +508,7 @@ namespace Elements
         XUSHU = 201,
         [Description("绝怠灵度\n紫罗兰")]
         RATIO_SLIP = 202,
-        [Description("调和状态\n鹿妹/水els/sms")]
+        [Description("调和状态\n鹿妹/sls/sms")]
         REDUCE_DAMAGE_BY_HIGHER_DEF = 203,
         [Description("污秽\n紫罗兰")]
         CONVERT_DAMAGE_OVER_TIME = 204,
@@ -528,7 +528,7 @@ namespace Elements
         REDUCTION_MGC_DAMAGE = 216,
         REDUCTION_ALL_DAMAGE = 217,
         TRANSCEND_DAMAGE = 218,
-        [Description("忍耐\n华音")]
+        [Description("忍耐\n花音")]
         RENNAI = 219,
         [Description("剑压\n彩羽")]
         JIANYA = 220,

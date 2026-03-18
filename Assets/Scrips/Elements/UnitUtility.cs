@@ -3684,6 +3684,8 @@ namespace Elements
         {
             if (_unitId == 418101)
                 return 418131;
+            if (_unitId == 435601)
+                return 435601;
             if (_unitId >= 403101 && _unitId <= 403109)
                 return _unitId + 30;
             if (!IsUnitTypePersonOrSummonPerson(_unitId) || IsUnitTypeSummonPersonOnly(_unitId) && _rarity == 0)
