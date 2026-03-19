@@ -1803,8 +1803,8 @@ namespace Elements
                     }
                     else
                     {
-                        protectedTarget = null;
                         target = protectedTarget;
+                        protectedTarget = null;
                     }
                 }
 
