@@ -240,9 +240,9 @@ namespace Elements
 
             LongWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
             LongWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
-            float num6 = 0f;
+            double num6 = 0f;
             double damageUpPrecent = (_isPhysicalForTarget ? _source.PhysicalDamageUpPercentOrMin : _source.MagicDamageUpPercentOrMin) / 100f;
-            num6 = (!_isPhysicalForTarget) ? ((float)_target.Owner.MagicReceiveDamagePercentOrMin / 100f) : ((float)_target.Owner.PhysicalReceiveDamagePercentOrMin / 100f);
+            num6 = (!_isPhysicalForTarget) ? (_target.Owner.MagicReceiveDamagePercentOrMin / 100.0) : (_target.Owner.PhysicalReceiveDamagePercentOrMin / 100.0);
             num4 = BattleUtil.DoubleToLong(num4 * num6 * damageUpPrecent);
             num5 = BattleUtil.DoubleToLong(num5 * num6 * damageUpPrecent);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
@@ -265,9 +265,9 @@ namespace Elements
                 }
             }
             double criticalDamageRate = getCriticalDamageRate(_valueDictionary);
-            float num7 = (flag ? ((float)(int)_source.PhysicalCriticalDamageRateOrMin / 100f) : ((float)(int)_source.MagicCriticalDamageRateOrMin / 100f));
-            float num8 = (float)(int)_target.Owner.ReceiveCriticalDamageRateOrMin / 100f;
-            criticalDamageRate *= Mathf.Max(0.5f, num7 * num8);
+            double num7 = (flag ? (_source.PhysicalCriticalDamageRateOrMin / 100.0) : (_source.MagicCriticalDamageRateOrMin / 100.0));
+            double num8 = _target.Owner.ReceiveCriticalDamageRateOrMin / 100.0;
+            criticalDamageRate *= Math.Max(0.5, num7 * num8);
 
             DamageData damageData = new DamageData
             {
