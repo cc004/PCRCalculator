@@ -1,4 +1,4 @@
-﻿using Elements;
+using Elements;
 using Elements.Battle;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
@@ -22,8 +22,12 @@ public class ThreadController : IDisposable
 {
     private readonly BlockingCollection<(BattleSimulationRequest request, Action callback, Action<Exception> callbackFailed)> queue = new();
 
-    public ThreadController(int workerNum)
+    public ThreadController(int? workerNum = null)
     {
+        int effectiveWorkerNum = workerNum ?? ProcessorHelper.GetTotalLogicalProcessorCount();
+        
+        Console.WriteLine($"[ThreadController] 检测到处理器组数: {ProcessorHelper.GetProcessorGroupCount()}, 总逻辑处理器数: {ProcessorHelper.GetTotalLogicalProcessorCount()}, 使用线程数: {effectiveWorkerNum}");
+        
         new SpineCreator().Awake();
         new BaseBackManager().Awake();
         new MainManager().Awake();
@@ -39,8 +43,11 @@ public class ThreadController : IDisposable
         while (!MainManager.Instance.LoadFinished)
             Thread.Sleep(0);
 
-        for (var i = 0; i < workerNum; ++i)
-            new Thread(WorkerTask, 5 * 1024 * 1024).Start();
+        for (var i = 0; i < effectiveWorkerNum; ++i)
+        {
+            int threadIndex = i;
+            new Thread(() => WorkerTask(threadIndex), 5 * 1024 * 1024).Start();
+        }
     }
 
     public void DispatchTask(BattleSimulationRequest request, Action callback, Action<Exception> callbackFailed)
@@ -48,8 +55,9 @@ public class ThreadController : IDisposable
         queue.Add((request, callback, callbackFailed));
     }
 
-    private void WorkerTask()
+    private void WorkerTask(int threadIndex)
     {
+        ProcessorHelper.SetThreadGroupAffinityForIndex(threadIndex);
         ThreadInit();
         foreach (var (request, callback, callbackFailed) in queue.GetConsumingEnumerable())
         {
@@ -148,7 +156,7 @@ public class ThreadController : IDisposable
             while (!BattleManager.Instance.battleFinishedProcessed)
             {
                 CoroutineRunner.Update();
-                if (watch.ElapsedMilliseconds > 10000)
+                if (watch.ElapsedMilliseconds > 60000)
                 {
                     Console.WriteLine("battle stuck detected, request = " + JsonConvert.SerializeObject(request));
                     throw new Exception();

@@ -1,4 +1,4 @@
-﻿using Elements;
+using Elements;
 using Elements.Battle;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Ocsp;
@@ -23,7 +23,7 @@ namespace PCRCalculatorServer
     [ApiController]
     public class ApiController : Controller
     {
-        private static readonly ThreadController controller = new(Environment.ProcessorCount);
+        private static readonly ThreadController controller = new();
         private static readonly JsonSerializerOptions DebugJsonOptions = new()
         {
             IncludeFields = true,

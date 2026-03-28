@@ -164,7 +164,7 @@ namespace Elements.Battle
         }
 
 #if ENABLE_THREADING
-        private ThreadController controller = new(Environment.ProcessorCount);
+        private ThreadController controller = new();
 #endif
 
         public void StartServer()
