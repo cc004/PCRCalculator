@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using PCRCaculator.Guild;
+
 namespace PCRCaculator
 {
     public class TalentLevelManager : MonoBehaviour
@@ -13,7 +13,8 @@ namespace PCRCaculator
         [ThreadStatic]
 #endif
         public static TalentLevelManager Instance;
-        private bool loadSliderEvents = false;
+        private const int TalentElementCount = 5;
+        private bool loadSliderEvents;
         public List<Slider> talentLevelSliders;
         private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
@@ -21,48 +22,61 @@ namespace PCRCaculator
         public void Awake()
         {
             Instance = this;
+#if !UNITY_5_3_OR_NEWER
+            SyncTalentLevelsByCSharp();
+#endif
         }
 
         private void OnEnable()
         {
             LoadTalentLevelSliders();
         }
+
         public void LoadGlobalSettings()
         {
             PlayerGroup.talentLevel = MainManager.Instance.PlayerSetting.talentLevel;
             LoadTalentLevelSliders();
         }
+
         public void ReLoad()
         {
             GuildManager.LoadAddedPlayerData();
+
             if ((PlayerGroup.talentLevel?.Count ?? 0) == 0 &&
                 (PlayerGroup.talentSkill?.Count ?? 0) == 0 &&
                 (PlayerGroup.teamSkill?.Count ?? 0) == 0)
             {
                 PlayerGroup.talentLevel = new Dictionary<int, int>();
             }
-            OnEnable();
+
+            LoadTalentLevelSliders();
         }
+
         /// <summary>
         /// 加载属性等级滑动条
         /// </summary>
         public void LoadTalentLevelSliders()
         {
+#if UNITY_5_3_OR_NEWER
+            if (talentLevelSliders == null || talentLevelSliders.Count == 0)
+            {
+                SyncTalentLevelsByCSharp();
+                return;
+            }
+
+            var normalizedLevels = BuildTalentLevels(PlayerGroup.talentLevel);
             loadSliderEvents = true;
             for (int i = 0; i < talentLevelSliders.Count; i++)
             {
                 int key = i + 1;
-                if (PlayerGroup.talentLevel.TryGetValue(key, out int savedValue))
-                {
-                    talentLevelSliders[i].value = savedValue;
-                }
-                else
-                {
-                    talentLevelSliders[i].value = 0;
-                }
+                talentLevelSliders[i].value = normalizedLevels.TryGetValue(key, out int savedValue) ? savedValue : 0;
             }
+
             loadSliderEvents = false;
-            OnTalentSliderChanged();
+            ApplyTalentLevelsDirect(normalizedLevels, true);
+#else
+            SyncTalentLevelsByCSharp();
+#endif
         }
 
         /// <summary>
@@ -70,59 +84,95 @@ namespace PCRCaculator
         /// </summary>
         public void OnTalentSliderChanged()
         {
-            if (loadSliderEvents) return;
-            var talentLevels = new Dictionary<int, int>();
+            if (loadSliderEvents)
+            {
+                return;
+            }
 
+#if UNITY_5_3_OR_NEWER
+            if (talentLevelSliders == null || talentLevelSliders.Count == 0)
+            {
+                SyncTalentLevelsByCSharp(true);
+                return;
+            }
+
+            var talentLevels = new Dictionary<int, int>(TalentElementCount);
             for (int i = 0; i < talentLevelSliders.Count; i++)
             {
-                float sliderValue = talentLevelSliders[i].value;
                 int key = i + 1;
-                int oldValue = PlayerGroup.talentLevel.GetValueOrDefault(key, 0);
-
-                if (PlayerGroup.talentLevel.ContainsKey(key))
-                {
-                    PlayerGroup.talentLevel[key] = (int)sliderValue;
-                }
-                else
-                {
-                    PlayerGroup.talentLevel.Add(key, (int)sliderValue);
-                }
-                talentLevels[key] = (int)sliderValue;
-
+                talentLevels[key] = (int)talentLevelSliders[i].value;
             }
-            MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);
-            OnTalentLevelChanged?.Invoke();
 
+            ApplyTalentLevels(talentLevels, true);
+#else
+            SyncTalentLevelsByCSharp(true);
+#endif
         }
+
         /// <summary>
         /// 保存属性技能到玩家设置
         /// </summary>
         public void SaveTalentSkills(bool global = false)
         {
-            var talentLevels = new Dictionary<int, int>();
-            for (int i = 0; i < talentLevelSliders.Count; i++)
+#if UNITY_5_3_OR_NEWER
+            Dictionary<int, int> talentLevels;
+            if (talentLevelSliders != null && talentLevelSliders.Count > 0)
             {
-                float sliderValue = talentLevelSliders[i].value;
-                int key = i + 1;
-                if (PlayerGroup.talentLevel.ContainsKey(key))
+                talentLevels = new Dictionary<int, int>(TalentElementCount);
+                for (int i = 0; i < talentLevelSliders.Count; i++)
                 {
-                    PlayerGroup.talentLevel[key] = (int)sliderValue;
+                    int key = i + 1;
+                    talentLevels[key] = (int)talentLevelSliders[i].value;
                 }
-                else
-                {
-                    PlayerGroup.talentLevel.Add(key, (int)sliderValue);
-                }
-
-                talentLevels[key] = (int)sliderValue;
             }
+            else
+            {
+                talentLevels = PlayerGroup.talentLevel;
+            }
+#else
+            var talentLevels = PlayerGroup.talentLevel;
+#endif
+
+            ApplyTalentLevels(talentLevels);
+
             if (global)
             {
-                MainManager.Instance.PlayerSetting.talentLevel = talentLevels;
+                MainManager.Instance.PlayerSetting.talentLevel = PlayerGroup.talentLevel;
             }
-            PlayerGroup.talentLevel = talentLevels;
-            GuildManager.Instance.SaveDataToJson();
-            // 直接将数据设置到PrincessKnightInfo
-            MainManager.Instance.TeamEnhanceData.SetTalentLevels(talentLevels);
+
+            GuildManager.Instance?.SaveDataToJson();
+        }
+
+        private void SyncTalentLevelsByCSharp(bool notify = false)
+        {
+            ApplyTalentLevelsDirect(BuildTalentLevels(PlayerGroup?.talentLevel), notify);
+        }
+
+        private void ApplyTalentLevels(Dictionary<int, int> talentLevels, bool notify = false)
+        {
+            ApplyTalentLevelsDirect(BuildTalentLevels(talentLevels), notify);
+        }
+
+        private void ApplyTalentLevelsDirect(Dictionary<int, int> normalizedLevels, bool notify = false)
+        {
+            PlayerGroup.talentLevel = normalizedLevels;
+            MainManager.Instance.TeamEnhanceData.SetTalentLevels(normalizedLevels);
+
+            if (notify)
+            {
+                OnTalentLevelChanged?.Invoke();
+            }
+        }
+
+        private Dictionary<int, int> BuildTalentLevels(Dictionary<int, int> source)
+        {
+            var talentLevels = new Dictionary<int, int>(TalentElementCount);
+            for (int i = 1; i <= TalentElementCount; i++)
+            {
+                talentLevels[i] = source != null && source.TryGetValue(i, out var value) ? value : 0;
+            }
+
+            return talentLevels;
         }
     }
 }
