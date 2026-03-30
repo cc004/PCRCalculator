@@ -2372,8 +2372,8 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 331;
-        public int playerProcess = 90;
+        public int playerLevel = 334;
+        public int playerProcess = 91;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 340;
         //public float bodyWidth = 100;
