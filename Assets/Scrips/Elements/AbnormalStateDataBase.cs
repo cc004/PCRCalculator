@@ -57,7 +57,6 @@ namespace Elements.Battle
         protected BattleManager BattleManager => staticBattleManager;
 
         public UnitCtrl PauseTarget { get; set; }
-
         public Skill Skill { get; set; }
 
         public UnitCtrl Source { get; set; }
@@ -71,7 +70,9 @@ namespace Elements.Battle
         public GameObject UniqueEffectPrefabLeft { get; set; }
 
         public Action<string> onExec;
-        public int TargetTalentId { get; set; } // TODO find where set
+
+        public int TargetTalentId { get; set; } 
+
         private bool stopFlag { get; set; }
         public bool IsTargetAbnormalStateBuff { get; set; } // TODO find where set
 

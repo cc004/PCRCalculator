@@ -36,5 +36,4 @@ Data/
 server/
 PCRCalculatorServer/linux
 *.db
-PCRCalculatorServer/Properties/PublishProfiles/FolderProfile.pubxml
-PCRCalculatorServer/Properties/PublishProfiles/FolderProfile.pubxml.user
+PCRCalculatorServer/Properties/PublishProfiles

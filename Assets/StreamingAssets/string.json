@@ -772,5 +772,6 @@
   "etherealization_s1_with_s2_seal_by_s3_unit": "在 [%1$s] 拥有 [%2$s] 标记的情况下，进入 [虚化] 状态，无法被 %3$s 敌人锁定，若我方所有人都处于 [虚化] 或 [隐秘] 状态，则解除 [虚化] 和 [隐蔽] 状态。",
   "reduce_s1_damage_higher_def_by_s2_time": "使%1$s受到伤害时，按物理/魇法防御中较高的防御计算伤害，持续 [%2$s] 秒",
   "convert_s1_s2_damages_to_s3_dot_in_s4_time": "使%1$s受到的 [%2$s%] 的伤害拆分成每秒1次，共 [%3$s] 次的持续伤害，效果持续 [%4$s] 秒，此伤害不给予受击TP。",
-  "extend_s1_slip_damage_last_and_interval_by_s2_in_s3_time": "使%1$s受到的异常伤害的持续时间和间隔时间延长 [%2$s] 倍，持续 [%3$s] 秒。"
+  "extend_s1_slip_damage_last_and_interval_by_s2_in_s3_time": "使%1$s受到的异常伤害的持续时间和间隔时间延长 [%2$s] 倍，持续 [%3$s] 秒。",
+  "effect_is_effect_by_s1_talent_unit": "本效果仅 [%1$s] 属性的角色受影响。"
 }
