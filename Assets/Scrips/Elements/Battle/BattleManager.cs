@@ -705,7 +705,7 @@ namespace Elements.Battle
             {
                 BattleLeftTime -= DeltaTime_60fps;
 
-                if (MyGameCtrl.Instance.BattleStats.IsEnabled)
+                if (MyGameCtrl.Instance.BattleStats.LogLevel >= BattleStatisticsLogLevel.Simple)
                 {
                     // 1. 获取 Boss 单位
                     var boss = BossUnit; 
@@ -828,16 +828,14 @@ namespace Elements.Battle
             isUpdateFrameExecuted = true;
 
             var logicFrameCount = BattleHeaderController.CurrentFrameCount;
-#if UNITY_5_3_OR_NEWER
-            foreach(var unit in UnitList)
+            if (!IsSkillReady.ContainsKey(logicFrameCount))
             {
-                if (!IsSkillReady.ContainsKey(logicFrameCount))
-                {
-                    IsSkillReady[logicFrameCount] = new Dictionary<int, bool>();
-                }
+                IsSkillReady[logicFrameCount] = new Dictionary<int, bool>();
+            }
+            foreach (var unit in UnitList)
+            {
                 IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
             }
-#endif
 
             if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {

@@ -96,7 +96,7 @@ namespace Elements.Battle
     [Serializable]
     public class BattleSimulationRequest
     {
-        public bool CalcStats { get; set; } = false;
+        public int CalcStats { get; set; } = 0;
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         // 如果要进行工会战，请提供 EnemyData 列表

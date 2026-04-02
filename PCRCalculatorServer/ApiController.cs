@@ -126,7 +126,7 @@ namespace PCRCalculatorServer
                         EnemyList = enemyList,
                         Success = true,
                         Message = "战斗模拟完成",
-                        Stats = request.CalcStats ? MyGameCtrl.Instance.BattleStats.ToBattleStatsData() : null,
+                        Stats = request.CalcStats != 0 ? MyGameCtrl.Instance.BattleStats.ToBattleStatsData() : null,
                         BattleFrames = battleFrames,
                         CurrentSeed = currentSeed,
                         TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
