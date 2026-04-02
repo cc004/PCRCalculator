@@ -178,6 +178,7 @@ public class CommandLineServer : MonoBehaviour
         BattleUIManager.Instance.Start();
         new TalentLevelManager().Awake();
         new TalentSkillTreeManager().Awake();
+        new RoleMasteryManager().Awake();
         new TeamSkillTreeManager().Awake();
 
         MyGameCtrl.Instance.playerUnitCtrl = new List<UnitCtrl>();

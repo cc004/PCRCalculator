@@ -359,6 +359,12 @@ namespace Elements
             {
                 mainManager.TeamEnhanceData.SetTalentLevels(req.TalentSkillLevels);
             }
+            if (RoleMasteryManager.Instance is not null)
+            {
+                RoleMasteryManager.Instance.SetRoleMastery(
+                    req.RoleMastery ?? new Dictionary<int, (int slotLevel, int enhanceLevel)>());
+                RoleMasteryManager.Instance.UpdateRoleMasteryData();
+            }
             if (req.TalentFullInfo)
             {
                 if (req.TalentSkillNodeLevels is not null)

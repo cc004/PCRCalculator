@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,6 +10,9 @@ namespace PCRCaculator
 {
     public class RoleMasteryManager : MonoBehaviour
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         public static RoleMasteryManager Instance;
         public List<Toggle> unitRoleToggle;
         public GameObject roleMasteryPanel;
@@ -18,7 +22,7 @@ namespace PCRCaculator
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
         public List<GameObject> roleSlotPrefabs;
 
-        private void Awake()
+        public void Awake()
         {
             if (Instance == null)
             {
@@ -29,21 +33,21 @@ namespace PCRCaculator
             {
                 Destroy(gameObject);
             }
-            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData();
+            UpdateRoleMasteryData();
         }
 
         void OnEnable()
         {
             roleMastery = PlayerGroup?.roleMastery ?? new Dictionary<int, (int, int)>();
             RefreshRoleSlotData();
-            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData();
+            UpdateRoleMasteryData();
         }
 
         public void ReLoad()
         {
             GuildManager.LoadAddedPlayerData();
             OnEnable();
-            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData();
+            UpdateRoleMasteryData();
         }
 
         public void RefreshRoleSlotData()
@@ -120,6 +124,25 @@ namespace PCRCaculator
             {
                 MainManager.Instance.PlayerSetting.roleMastery = roleMastery;
             }
+        }
+
+        public void SetRoleMastery(Dictionary<int, (int slotLevel, int enhanceLevel)> newRoleMastery)
+        {
+            roleMastery.Clear();
+            if (newRoleMastery == null)
+            {
+                return;
+            }
+
+            foreach (var kvp in newRoleMastery)
+            {
+                roleMastery[kvp.Key] = kvp.Value;
+            }
+        }
+
+        public void UpdateRoleMasteryData()
+        {
+            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData(roleMastery);
         }
     }
 }

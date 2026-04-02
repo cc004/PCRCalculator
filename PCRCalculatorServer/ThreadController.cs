@@ -81,6 +81,7 @@ public class ThreadController : IDisposable
         new TalentLevelManager().Awake();
         new TalentSkillTreeManager().Awake();
         new TeamSkillTreeManager().Awake();
+        new RoleMasteryManager().Awake();
 
         const float parentScale = 1 / 540f;
         const float parentOffset = 5000f * parentScale;
@@ -148,7 +149,7 @@ public class ThreadController : IDisposable
             while (!BattleManager.Instance.battleFinishedProcessed)
             {
                 CoroutineRunner.Update();
-                if (watch.ElapsedMilliseconds > 10000)
+                if (watch.ElapsedMilliseconds > 60000)
                 {
                     Console.WriteLine("battle stuck detected, request = " + JsonConvert.SerializeObject(request));
                     throw new Exception();
