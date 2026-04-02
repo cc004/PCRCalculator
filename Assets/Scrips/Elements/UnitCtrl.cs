@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: Elements.UnitCtrl
 // Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
@@ -1645,9 +1645,18 @@ namespace Elements
             }
             set 
             {
+                bool stateChanged = currentState != value;
                 currentState = value;
                 //MyOnChangeState?.Invoke(UnitId, currentState, BattleHeaderController.CurrentFrameCount);
-
+                if (stateChanged && !IsSummonOrPhantom && battleManager != null)
+                {
+                    MyGameCtrl.Instance.BattleStats.RecordStateChange(
+                        this,
+                        value,
+                        battleManager,
+                        BattleHeaderController.CurrentFrameCount,
+                        battleManager.FrameCount);
+                }
             }
         }
 
@@ -4093,7 +4102,7 @@ this.updateCurColor();
             if (UnionBurstCoolDownTime > 0f && battleManager.GetBlackOutUnitLength() == 0)
             {
                 UnionBurstCoolDownTime -= BattleManager.DeltaTime_60fps;
-            }            
+            }
             /*else
             {
                 if ((double)this.sortOffsetResetTimer <= 0.0)
@@ -9610,7 +9619,17 @@ this.updateCurColor();
                 //if (unitCtrl.UnitDamageInfo != null)
                 //    unitCtrl.UnitDamageInfo.SetDamage((int)((long)unitCtrl.UnitDamageInfo.damage + num1));
             }*/
-            MyGameCtrl.Instance.BattleStats.AddPlayerDamage(_damageData.Source == null ? _damageData.StrikeBackSource.UnitId : _damageData.Source.UnitId, num1);
+            UnitCtrl damageSource = _damageData.Source ?? _damageData.StrikeBackSource;
+            if (damageSource != null)
+            {
+                MyGameCtrl.Instance.BattleStats.AddPlayerDamage(damageSource.UnitId, num1);
+                
+                // 非UB伤害统计
+                if (_skill == null || _skill.SkillId != damageSource.UnionBurstSkillId) 
+                {
+                    MyGameCtrl.Instance.BattleStats.AddPlayerNonUbDamage(damageSource.UnitId, num1);
+                }
+            }
 
             accumulateDamage += num1;
             BattleLogIntreface battleLog = this.battleLog;

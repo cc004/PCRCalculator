@@ -1,4 +1,4 @@
-﻿using Elements;
+using Elements;
 using Elements.Battle;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -84,7 +84,7 @@ public class CommandLineServer : MonoBehaviour
         else
         {
             // var controller = new ThreadController(1);
-            var controller = new ThreadController(Environment.ProcessorCount);
+            var controller = new ThreadController();
 
             var requests = new[]
             {

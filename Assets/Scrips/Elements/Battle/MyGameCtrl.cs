@@ -348,7 +348,7 @@ namespace Elements
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
-            BattleStats.IsEnabled = req.CalcStats;
+            BattleStats.LogLevel = (BattleStatisticsLogLevel)req.CalcStats;
             BattleStats.Reset();
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
