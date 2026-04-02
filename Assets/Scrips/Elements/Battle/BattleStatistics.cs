@@ -94,7 +94,7 @@ namespace Elements.Battle
 
         public void RecordStateChange(UnitCtrl unit, UnitCtrl.ActionState nextState, BattleManager battleManager, int frame, int realFrame)
         {
-            if (LogLevel < BattleStatisticsLogLevel.Full || unit == null || battleManager == null)
+            if (LogLevel < BattleStatisticsLogLevel.Simple || unit == null || battleManager == null)
             {
                 return;
             }
@@ -106,6 +106,11 @@ namespace Elements.Battle
                 realFrameCount = realFrame,
                 changStateTo = nextState
             });
+
+            if (LogLevel < BattleStatisticsLogLevel.Full)
+            {
+                return;
+            }
 
             if (nextState != UnitCtrl.ActionState.SKILL_1 || unit.IsOther)
             {
@@ -357,7 +362,26 @@ namespace Elements.Battle
                 PlayerTpGained = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerTpGainedDic.ContainsKey(p.unitId) ? PlayerTpGainedDic[p.unitId] : 0).ToList(),
                 PlayerDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerDamageDic.ContainsKey(p.unitId) ? PlayerDamageDic[p.unitId] : 0).ToList(),
                 PlayerNonUbDamageList = MyGameCtrl.Instance.tempData.playerList.Select(p => PlayerNonUbDamageDic.ContainsKey(p.unitId) ? PlayerNonUbDamageDic[p.unitId] : 0).ToList(),
-                UBToleranceFrames = ubToleranceFrames
+                UBToleranceFrames = ubToleranceFrames,
+                UBTime = MyGameCtrl.Instance.tempData.playerList.SelectMany((p, i) => AllUnitStateChangeDic[p.unitId]
+                    .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
+                    .Select(s => (state: s, pos: i)))
+                .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.realFrameCount)
+                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.001f)))
+                .GroupBy(s => s.t.pos).Select(g =>
+                    (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
+                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), Math.Max(0, MyGameCtrl.Instance.tempData.playerList.Count()))
+                    .Select(x => new List<float>())), (result, tuple) =>
+                {
+                    int index = tuple.Key;
+                    int playerCount = MyGameCtrl.Instance.tempData.playerList.Count();
+                    while (result.Count <= index)
+                    {
+                        result.Add(new List<float>());
+                    }
+                    result[index] = tuple.list;
+                    return result;
+                })
             };
         }
     }
