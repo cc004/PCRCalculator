@@ -13,12 +13,12 @@ namespace Elements
     public class BlindAction : ActionParameter
     {
         private const float PERCENTAGE_TO_RATE = 0.01f;
-        private enum eBlindType
+        public enum eBlindType
         {
             PHYSICAL,
             MAGIC
         }
-        private Dictionary<eBlindType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eBlindType, UnitCtrl.eAbnormalState>
+        public static readonly Dictionary<eBlindType, UnitCtrl.eAbnormalState> AbnormalStateDic = new Dictionary<eBlindType, UnitCtrl.eAbnormalState>
         {
             {
                 eBlindType.PHYSICAL,
@@ -57,7 +57,7 @@ namespace Elements
             if (randomNum <=judgeNum)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
-                _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eBlindType)base.ActionDetail2], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, base.ActionDetail1);
+                _target.Owner.SetAbnormalState(_source, AbnormalStateDic[(eBlindType)base.ActionDetail2], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, base.ActionDetail1);
                 action("致盲");
                 //_target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.PHYSICS_DARK, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, ActionDetail1);
             }

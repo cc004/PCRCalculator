@@ -5166,6 +5166,8 @@ this.updateCurColor();
             AbnormalStateEffectPrefabData abnormalEffectData = _action?.CreateAbnormalEffectData();
             if (_action != null && _action.AbnormalStateFieldAction != null)
                 _action.AbnormalStateFieldAction.TargetAbnormalState = _abnormalState;
+            if (_action != null)
+                _action.EnvironmentTargetAbnormalState = _abnormalState;
             // bool isAbnormalState = this.IsNoDamageMotion() || this.IsAbnormalState(eAbnormalState.NO_ABNORMAL);
             // bool isEnvironmentAbnormalState = action != null && action.IsEnvironmentAbnormalState;
             // if ((isAbnormalState) && (!ABNORMAL_CONST_DATA[_abnormalState].IsBuff || isEnvironmentAbnormalState))
@@ -5186,6 +5188,10 @@ this.updateCurColor();
             }
             else
             {
+                if (AddAbnormalEffectTimeDataDictionary.TryGetValue(_abnormalState, out AddAbnormalEffectTimeData addAbnormalEffectTimeData))
+                {
+                    _effectTime = addAbnormalEffectTimeData.GetResultTime(_effectTime);
+                }
                 if (tryApplyConditionExSkill(_abnormalState, ref _effectTime))
                 {
                     return;
