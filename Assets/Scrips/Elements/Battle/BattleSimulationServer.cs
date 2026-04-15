@@ -58,6 +58,9 @@ namespace Elements.Battle
         public double ScoreMagicExpectation { get; set; }
         public List<long> PlayerTpGained { get; set; }
         public List<long> PlayerDamageList { get; set; }
+        public List<long> PlayerNonUbDamageList { get; set; }
+        public List<List<int>> UBToleranceFrames { get; set; }
+        public List<List<float>> UBTime { get; set; }
     }
 
     [Serializable]
@@ -94,7 +97,7 @@ namespace Elements.Battle
     [Serializable]
     public class BattleSimulationRequest
     {
-        public bool CalcStats { get; set; } = false;
+        public int CalcStats { get; set; } = 0;
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
         public List<PCRCaculator.UnitData> EnemyList { get; set; }
         // 如果要进行工会战，请提供 EnemyData 列表
@@ -105,6 +108,7 @@ namespace Elements.Battle
         public Dictionary<int, int> TalentSkillLevels { get; set; }
         public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
+        public Dictionary<int, (int slotLevel, int enhanceLevel)> RoleMastery { get; set; }
         public int BattleTime { get; set; } = 90;
         public bool TalentFullInfo { get; set; }
         public bool IsTalentQuest { get; set; }
@@ -162,7 +166,7 @@ namespace Elements.Battle
         }
 
 #if ENABLE_THREADING
-        private ThreadController controller = new(Environment.ProcessorCount);
+        private ThreadController controller = new();
 #endif
 
         public void StartServer()

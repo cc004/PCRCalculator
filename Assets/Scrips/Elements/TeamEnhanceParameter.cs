@@ -322,7 +322,7 @@ namespace Elements
         /// <summary>
         /// 更新职业数据
         /// </summary>
-        public void UpdateRoleMasteryData()
+        public void UpdateRoleMasteryData(Dictionary<int, (int slotLevel, int enhanceLevel)> roleMasteryData = null)
         {
             // 清空现有的roleBuffParameter数据
             foreach (var dict in roleBuffParameter.Values)
@@ -332,9 +332,9 @@ namespace Elements
 
             try
             {
-                // 获取当前玩家组数据
-                var playerGroup = GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
-                if (playerGroup?.roleMastery == null) return;
+                var roleMastery = roleMasteryData
+                    ?? GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup()?.roleMastery;
+                if (roleMastery == null) return;
 
                 // 遍历所有unit_role_id (假设是1-7)
                 for (int unitRoleId = 1; unitRoleId <= 8; unitRoleId++)
@@ -352,9 +352,9 @@ namespace Elements
                     foreach (int masteryId in masteryIds)
                     {
                         // 检查是否有该mastery_id的数据
-                        if (playerGroup.roleMastery.ContainsKey(masteryId))
+                        if (roleMastery.ContainsKey(masteryId))
                         {
-                            var (slotLevel, enhanceLevel) = playerGroup.roleMastery[masteryId];
+                            var (slotLevel, enhanceLevel) = roleMastery[masteryId];
 
                             // 获取强化数据
                             if (MainManager.Instance.UnitRoleMasterySlotEnhanceDataDic.TryGetValue(masteryId, out var slotEnhanceData))

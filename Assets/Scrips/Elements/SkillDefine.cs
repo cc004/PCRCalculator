@@ -783,6 +783,10 @@ namespace Elements
             {
                 eActionType.CONVERT_DAMAGE_OVER_TIME,
                 typeof(ConvertDamageOverTimeAction)
+            },
+            {
+                eActionType.ADD_ABNORMAL_EFFECT_TIME,
+                typeof(AddAbnormalEffectTimeAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>

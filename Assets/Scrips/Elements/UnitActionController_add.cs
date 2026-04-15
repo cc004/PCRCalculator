@@ -1082,18 +1082,18 @@ namespace Elements
             float _a1 = (float)num3 - num4;
             float _a2 = (float)num3 + num4;
             //Debug.Log(BattleHeaderController.CurrentFrameCount + "-弹道检测：" + num1 + "--" + num2 + "--" + num3+"--"+num4);
-            //if ((double)_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || (double)_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
-            //   return _hitFlag;
-            if (speed.x > 0)
-            {
-                if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2))
-                    return _hitFlag;
-            }
-            else
-            {
-                if (_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
-                    return _hitFlag;
-            }
+            if ((double)_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || (double)_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
+              return _hitFlag;
+            // if (speed.x > 0)
+            // {
+            //     if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2))
+            //         return _hitFlag;
+            // }
+            // else
+            // {
+            //     if (_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
+            //         return _hitFlag;
+            // }
             if ((eMoveTypes)data.MoveType != eMoveTypes.PARABORIC && (eMoveTypes)data.MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return true;
             InFlag = true;

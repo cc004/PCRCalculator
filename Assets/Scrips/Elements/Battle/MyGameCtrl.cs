@@ -348,7 +348,7 @@ namespace Elements
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
-            BattleStats.IsEnabled = req.CalcStats;
+            BattleStats.LogLevel = (BattleStatisticsLogLevel)req.CalcStats;
             BattleStats.Reset();
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
@@ -358,6 +358,12 @@ namespace Elements
             if (req.TalentSkillLevels is not null)
             {
                 mainManager.TeamEnhanceData.SetTalentLevels(req.TalentSkillLevels);
+            }
+            if (RoleMasteryManager.Instance is not null)
+            {
+                RoleMasteryManager.Instance.SetRoleMastery(
+                    req.RoleMastery ?? new Dictionary<int, (int slotLevel, int enhanceLevel)>());
+                RoleMasteryManager.Instance.UpdateRoleMasteryData();
             }
             if (req.TalentFullInfo)
             {

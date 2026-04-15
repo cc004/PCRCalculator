@@ -547,10 +547,10 @@ namespace PCRCaculator
                                 databaseCache.abyssBossFilterDic = dbTool.AbyssBossFilterDic;
                                 databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic;
                                 databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic;
-                                databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic;
-                                databaseCache.UnitRoleMasteryIdDic = dbTool.UnitRoleMasteryIdDic;
-                                databaseCache.UnitRoleSlotDataDic = dbTool.UnitRoleSlotDataDic;
-                                databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool.UnitRoleMasterySlotEnhanceDataDic;
+                                databaseCache.UnitRoleDataDic = dbTool3.UnitRoleDataDic;
+                                databaseCache.UnitRoleMasteryIdDic = dbTool3.UnitRoleMasteryIdDic;
+                                databaseCache.UnitRoleSlotDataDic = dbTool3.UnitRoleSlotDataDic;
+                                databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool3.UnitRoleMasterySlotEnhanceDataDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10;
                                 databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn;

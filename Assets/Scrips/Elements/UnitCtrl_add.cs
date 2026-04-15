@@ -57,6 +57,7 @@ namespace Elements
         public Action<float> NoSkipOnSkillCD;
         public Action<float> NoSkipOnUsingSkill;
         public Dictionary<int, int> MySkillExecDic = new Dictionary<int, int>();
+        public Dictionary<eAbnormalState, AddAbnormalEffectTimeData> AddAbnormalEffectTimeDataDictionary { get; set; } = new Dictionary<eAbnormalState, AddAbnormalEffectTimeData>(new eAbnormalState_DictComparer());
 
         public BattleUIManager UIManager { get => BattleUIManager.Instance; }
         private const float BOSS_DELTA_FIX = -1f;

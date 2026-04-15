@@ -34,7 +34,7 @@ namespace PCRCaculator
             }
 
             UpdateRoleMasteryData(level, null, true);
-            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData();
+            RoleMasteryManager.Instance?.UpdateRoleMasteryData();
         }
 
         public void OnStarSliderValueChanged()
@@ -51,7 +51,7 @@ namespace PCRCaculator
 
             roleSlotStarText.text = star.ToString();
             UpdateRoleMasteryData(null, star, true);
-            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData();
+            RoleMasteryManager.Instance?.UpdateRoleMasteryData();
         }
 
         private void UpdateRoleMasteryData(int? level, int? star, bool isUIOperation = false)
