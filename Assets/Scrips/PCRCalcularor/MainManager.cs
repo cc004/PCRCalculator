@@ -583,13 +583,13 @@ namespace PCRCaculator
                                     Task.Run(() =>
                                     {
                                         // var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
-                                        var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17 || p.Key / 1000 == 1319 || p.Key / 1000 == 132001 || p.Key / 1000 == 132101).ToList();
+                                        var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17 || p.Key / 1000 == 1319 || p.Key / 1000 == 1320 || p.Key / 1000 == 1321).ToList();
                                         databaseCache.skillDataDic.OverrideWith(filteredSkillData);
                                     }),
                                     Task.Run(() =>
                                     {
                                         // var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
-                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17 || p.Key / 100000 == 1319 || p.Key / 100000 == 132001 || p.Key / 100000 == 132101).ToList();
+                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17 || p.Key / 100000 == 1319 || p.Key / 100000 == 1320 || p.Key / 100000 == 1321).ToList();
                                         databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
                                     }),
                                     Task.Run(() =>
