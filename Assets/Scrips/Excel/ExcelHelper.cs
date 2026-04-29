@@ -606,6 +606,8 @@ namespace ExcelHelper
                 }
             }
 
+            var dieFrame = TimelineData.allUnitStateChangeDic.FirstOrDefault().Value.LastOrDefault().realFrameCount;
+            msg.AppendLine($"最后一帧：{dieFrame}");
             src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"//{m}")));
 
             return src.ToString();
