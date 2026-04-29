@@ -260,8 +260,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10065100;
-            public long BossVersionJP = 10062200;
+            public long CharacterVersionJP = 10062600;
+            public long BossVersionJP = 10062600;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -589,7 +589,7 @@ namespace PCRCaculator
                                     Task.Run(() =>
                                     {
                                         // var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
-                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17 || p.Key / 10000 == 1319 || p.Key / 10000 == 132001 || p.Key / 10000 == 132101).ToList();
+                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17 || p.Key / 100000 == 1319 || p.Key / 100000 == 132001 || p.Key / 100000 == 132101).ToList();
                                         databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
                                     }),
                                     Task.Run(() =>
@@ -827,8 +827,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 91;
-                playerSetting.playerLevel = 334;
+                playerSetting.playerProcess = 92;
+                playerSetting.playerLevel = 337;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
