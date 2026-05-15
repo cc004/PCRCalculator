@@ -436,6 +436,8 @@ namespace Elements
                             var source = damageData.Source;
                             if (source == null || actionParameter == null)
                                 return;
+                            if (actionParameter.IgnoreTriggerCausedByTrigger)
+                                return;
                             if (actionParameter.AlreadyTriggeredActions.Contains(this))
                                 return;
                             var p = Value[eValueNumber.VALUE_1] / 100f;

@@ -260,7 +260,7 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10062600;
+            public long CharacterVersionJP = 10065700;
             public long BossVersionJP = 10062600;
             public long BossVersionCN = 0;
             public bool useQA = false;
@@ -565,7 +565,7 @@ namespace PCRCaculator
                                 Task.WaitAll(
                                     Task.Run(() =>
                                     {
-                                        var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 10000 == 17 || p.Key == 105701 || p.Key == 131901 || p.Key == 132001 || p.Key == 132101).ToList();
+                                        var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
                                         databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
                                         // databaseCache.unitRarityDic[170301] = databaseCache.unitRarityDic[105701];
                                     }),
@@ -582,14 +582,12 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() =>
                                     {
-                                        // var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
-                                        var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17 || p.Key / 1000 == 1319 || p.Key / 1000 == 1320 || p.Key / 1000 == 1321).ToList();
+                                        var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
                                         databaseCache.skillDataDic.OverrideWith(filteredSkillData);
                                     }),
                                     Task.Run(() =>
                                     {
-                                        // var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
-                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17 || p.Key / 100000 == 1319 || p.Key / 100000 == 1320 || p.Key / 100000 == 1321).ToList();
+                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
                                         databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
                                     }),
                                     Task.Run(() =>
@@ -600,8 +598,7 @@ namespace PCRCaculator
                                     }),
                                     Task.Run(() =>
                                     {
-                                        // var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17).ToList();
-                                        var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17 || p.Key == 13190101 || p.Key == 13200101 || p.Key == 13210101).ToList();
+                                        var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17).ToList();
                                         databaseCache.allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern);
                                     }),
                                     Task.Run(() =>
