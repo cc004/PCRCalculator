@@ -21,9 +21,9 @@ namespace Elements
 
             if (!UnityEngine.Object.Equals(_source, _target.Owner))
             {
-                if (_source != null && _source.ProtectionSourceData != null && _source.ProtectionSourceData.Enable)
+                if (_target.Owner != null && _target.Owner.ProtectionSourceData != null && _target.Owner.ProtectionSourceData.Enable)
                 {
-                    _source.ProtectionSourceData.Disable();
+                    _target.Owner.ProtectionSourceData.Disable();
                 }
 
                 GameObject effectPrefab = null;
