@@ -1604,6 +1604,7 @@ namespace Elements
 #endif
             if (exec)
             {
+                bool redirectedByProtect = false;
                 if (_protectedTarget != null)
                 {
                     action.SkipAppendIsAlreadyExeced = true;
@@ -1632,6 +1633,7 @@ namespace Elements
                             hasProtected = false;
                             finalProtectedTarget = currentTarget;
                             currentTarget = protectedValue;
+                            redirectedByProtect = true;
                         }
                         else
                         {
@@ -1659,6 +1661,7 @@ namespace Elements
                                 action.SkipAppendIsAlreadyExeced = true;
                                 hasProtected = false;
                                 finalProtectedTarget = target;
+                                redirectedByProtect = true;
 
                                 // if (target.Owner != null && target.Owner.ProtectionSourceData != null)
                                 // {
@@ -1688,37 +1691,54 @@ namespace Elements
                     {
                     }
                 }
-#if !REDUCE_ANALYSE
-                actionExecData.targetNames = new List<string> { currentTarget.Owner.UnitName };
-#endif
-
-                int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
-                int index2 = skill.ActionParameters.Count;
-                if (!battleManager.skipping)
+                if (redirectedByProtect && currentTarget != null)
                 {
-                    var skillName = string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName;
-                    Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + currentTarget.Owner.UnitName, eLogMessageType.EXEC_ACTION, Owner);
+                    isResisted = currentTarget.ResistStatus(action.ActionType, actionDetail, currentTarget.Owner, _last, true, currentTarget, skill);
+                    if (isResisted)
+                    {
+                        exec = false;
+                    }
                 }
+                if (exec)
+                {
+#if !REDUCE_ANALYSE
+                    actionExecData.targetNames = new List<string> { currentTarget.Owner.UnitName };
+#endif
+
+                    int index = skill.ActionParameters.FindIndex(a => a == action) + 1;
+                    int index2 = skill.ActionParameters.Count;
+                    if (!battleManager.skipping)
+                    {
+                        var skillName = string.IsNullOrEmpty(skill.SkillName) ? skill.SkillId.ToString() : skill.SkillName;
+                        var targetName = currentTarget.Owner.UnitName;
+                        if (finalProtectedTarget != null)
+                        {
+                            targetName = "由" + finalProtectedTarget.Owner.UnitName + " -> " + targetName;
+                        }
+                        Owner.UIManager.LogMessage("执行技能" + skillName + "(" + index + "/" + index2 + ")" + ",目标" + targetName, eLogMessageType.EXEC_ACTION, Owner);
+                    }
 
 #if !REDUCE_ANALYSE
-                var detail = action.GetSkillDetail(Owner);
-                if (!string.IsNullOrEmpty(detail))
-                    actionExecData.describe += $"<color=#c080ff><size=8>{detail}\n</size></color>";
+                    var detail = action.GetSkillDetail(Owner);
+                    if (!string.IsNullOrEmpty(detail))
+                        actionExecData.describe += $"<color=#c080ff><size=8>{detail}\n</size></color>";
 #endif
-                action.PreExecAction();
-                action.ExecAction(Owner, currentTarget, num, this, skill, starttime, dictionary, 
-                    _valueDictionary,a=>
-                    {
+                    action.PreExecAction();
+                    action.ExecAction(Owner, currentTarget, num, this, skill, starttime, dictionary,
+                        _valueDictionary,a=>
+                        {
 #if !REDUCE_ANALYSE
-                    actionExecData.describe += a;
-                    //if (b > 0)
-                    //    actionExecData.damageList.Add(b);
+                        actionExecData.describe += a;
+                        //if (b > 0)
+                        //    actionExecData.damageList.Add(b);
 #endif
-                });
-                action.SkipAppendIsAlreadyExeced = false;
+                    });
+                    action.SkipAppendIsAlreadyExeced = false;
+                }
             }
-            else
+            if (!exec)
             {
+                action.SkipAppendIsAlreadyExeced = false;
 #if !REDUCE_ANALYSE
                 actionExecData.describe = "执行失败，原因：" + (isResisted?"<color=#FF0000>被抵抗</color>": "<color=#FF0000>已经执行过了</color>");
 #endif
