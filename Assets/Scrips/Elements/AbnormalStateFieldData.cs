@@ -57,7 +57,7 @@ namespace Elements
         TargetAction.AppendTargetNum(owner, 0);
       if (!TargetAction.IsAppendTargetNum(owner))
         TargetAction.AppendTargetNum(owner, 0);
-      SourceActionController.ExecAction(TargetAction, Skill, _parts, 0, 0.0f);
+      SourceActionController.ExecAction(TargetAction, Skill, _parts, 0, 0.0f, _ignoreProtect: true);
     }
 
     public override void ResetTarget(UnitCtrl _unit, UnitCtrl.eAbnormalState _abnormalState, bool _strict)
