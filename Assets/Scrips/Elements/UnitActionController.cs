@@ -2289,6 +2289,7 @@ namespace Elements
                     break;
             }
             float num = actionParameter.TargetWidth;
+            BasePartsData basePartsData1 = null;
             if (actionParameter.TargetSort == PriorityPattern.BACK || actionParameter.TargetSort == PriorityPattern.FORWARD)
             {
                 int index1 = 0;
@@ -2318,7 +2319,6 @@ namespace Elements
                     num = skill.SkillId == 1 ? Owner.SearchAreaSize : skill.skillAreaWidth;
                 float _start = attackSide < 1 ? -num : 0.0f;
                 float _end = attackSide > -1 ? num : 0.0f;
-                BasePartsData basePartsData1 = null;
                 int index1 = 0;
                 for (int count = unitCtrlList3.Count; index1 < count; ++index1)
                 {
@@ -2364,11 +2364,11 @@ namespace Elements
                             actionParameter.TargetList.Add(basePartsData2);
                     }
                 }
-                if (!(actionParameter.TargetSort != PriorityPattern.NEAR || actionParameter.TargetList.Count != 0 || (basePartsData1 == null || Owner.IsConfusionOrConvert()))){
-                    actionParameter.TargetList.Add(basePartsData1);
-                }
             }
             filterTargetByFlight(actionParameter);
+            if (!(actionParameter.TargetSort != PriorityPattern.NEAR || actionParameter.TargetList.Count != 0 || (basePartsData1 == null || Owner.IsConfusionOrConvert()))){
+                actionParameter.TargetList.Add(basePartsData1);
+            }
         }
         private bool isInActionTargetArea(Skill _skill, ActionParameter _action, Vector3 _basePosition, bool _considerBodyWidth, BasePartsData _checkUnitCtrl)
         {
