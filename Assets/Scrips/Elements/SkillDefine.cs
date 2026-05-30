@@ -904,9 +904,12 @@ namespace Elements
           { (eActionType)123, false },
           { (eActionType)124, false },
           { (eActionType)125, false },
+          { (eActionType)126, false },
+          { (eActionType)127, false },
           { (eActionType)128, false },
           { (eActionType)129, false },
           { (eActionType)130, false },
+          { (eActionType)131, false },
         };
 
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()
