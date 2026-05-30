@@ -733,7 +733,7 @@ namespace PCRCaculator
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
                 PlayerSetting playerSetting = MainManager.Instance.PlayerSetting;
-                int playerLevel = playerSetting.playerLevel;
+                int playerLevel = playerSetting.playerLevel + (battle_mode == 0 ? 0 : 10);
                 level = playerLevel;
                 skillLevel[0] = playerLevel;
                 skillLevel[1] = playerLevel;
