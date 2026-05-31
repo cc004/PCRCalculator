@@ -733,7 +733,7 @@ namespace PCRCaculator
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
                 PlayerSetting playerSetting = MainManager.Instance.PlayerSetting;
-                int playerLevel = playerSetting.playerLevel;
+                int playerLevel = playerSetting.playerLevel + (battle_mode == 0 ? 0 : 10);
                 level = playerLevel;
                 skillLevel[0] = playerLevel;
                 skillLevel[1] = playerLevel;
@@ -2410,10 +2410,10 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 337;
-        public int playerProcess = 92;
+        public int playerLevel = 343;
+        public int playerProcess = 94;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 340;
+        public int maxUniqueEqLv = 350;
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
@@ -2426,6 +2426,7 @@ namespace PCRCaculator
         public Dictionary<int, int> talentSkill = new();
         public Dictionary<int, int> teamSkill = new();
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
+        [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
         public Dictionary<int, int> ExEquipDefault = new Dictionary<int, int>()
         {

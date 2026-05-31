@@ -365,34 +365,35 @@ namespace Elements
                     req.RoleMastery ?? new Dictionary<int, (int slotLevel, int enhanceLevel)>());
                 RoleMasteryManager.Instance.UpdateRoleMasteryData();
             }
-            if (req.TalentFullInfo)
+            if (req.TalentSkillNodeLevels is not null)
             {
-                if (req.TalentSkillNodeLevels is not null)
+                var talentSkillLevels = TeamEnhanceParameter.ExpandTalentSkillLevels(
+                    req.TalentSkillNodeLevels,
+                    MainManager.Instance.TalentSkillNodeDic);
+                mainManager.TeamEnhanceData.UpdateTalentInfoData(
+                    talentSkillLevels,
+                    MainManager.Instance.TalentSkillNodeDic,
+                    TeamEnhanceParameter.DataType.TalentSkill);
+
+                if (TalentSkillTreeManager.Instance is not null)
                 {
                     TalentSkillTreeManager.Instance.SetSkillLevels(req.TalentSkillNodeLevels);
-                    TalentSkillTreeManager.Instance.UpdateTalentInfoData();
-                }
-                if (req.MasterSkillNodeLevels is not null)
-                {
-                    TeamSkillTreeManager.Instance.SetSkillLevels(req.MasterSkillNodeLevels);
-                    TeamSkillTreeManager.Instance.UpdateTalentInfoData();
                 }
             }
-            else
+
+            if (req.MasterSkillNodeLevels is not null)
             {
-                if (req.TalentSkillNodeLevels is not null)
+                var teamSkillLevels = TeamEnhanceParameter.ExpandTeamSkillLevels(
+                    req.MasterSkillNodeLevels,
+                    MainManager.Instance.TeamSkillNodeDic);
+                mainManager.TeamEnhanceData.UpdateTalentInfoData(
+                    teamSkillLevels,
+                    MainManager.Instance.TeamSkillNodeDic,
+                    TeamEnhanceParameter.DataType.TeamSkill);
+
+                if (TeamSkillTreeManager.Instance is not null)
                 {
-                    foreach (var node in req.TalentSkillNodeLevels)
-                    {
-                        TalentSkillTreeManager.Instance.EnhanceSkill(node.Key, node.Value);
-                    }
-                }
-                if (req.MasterSkillNodeLevels is not null)
-                {
-                    foreach (var node in req.MasterSkillNodeLevels)
-                    {
-                        TeamSkillTreeManager.Instance.EnhanceSkill(node.Key, node.Value);
-                    }
+                    TeamSkillTreeManager.Instance.SetSkillLevels(req.MasterSkillNodeLevels);
                 }
             }
 

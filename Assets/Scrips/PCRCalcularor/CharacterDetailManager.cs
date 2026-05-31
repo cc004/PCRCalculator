@@ -383,7 +383,7 @@ namespace PCRCaculator
         }
         public void EquipmentButton()
         {
-            data.SetMax();
+            data.SetMax(MainManager.Instance.IsGuildBattle ? 0 : 2);
             SetDetails();
             SetSilders(data);
             SetSkills();

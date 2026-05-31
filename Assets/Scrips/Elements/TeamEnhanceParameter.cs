@@ -87,10 +87,216 @@ namespace Elements
                 PlayerGroup.teamSkill = PlayerSetting.teamSkill;
             }
             talentLevelParameter = PlayerGroup.talentLevel;
-            UpdateTalentInfoData(PlayerGroup.talentSkill, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
-            UpdateTalentInfoData(PlayerGroup.teamSkill, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
+
+            var talentSkillLevels = ExpandTalentSkillLevels(PlayerGroup.talentSkill, MainManager.Instance.TalentSkillNodeDic);
+            var teamSkillLevels = ExpandTeamSkillLevels(PlayerGroup.teamSkill, MainManager.Instance.TeamSkillNodeDic);
+
+            UpdateTalentInfoData(talentSkillLevels, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
+            UpdateTalentInfoData(teamSkillLevels, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
             UpdateRoleMasteryData();
             UpdateCombinedData();
+        }
+
+        public static Dictionary<int, int> ExpandTalentSkillLevels(
+            Dictionary<int, int> savedSkillNodes,
+            Dictionary<int, TalentSkillNode> nodeDataDict)
+        {
+            var result = new Dictionary<int, int>();
+            if (savedSkillNodes == null || savedSkillNodes.Count == 0 || nodeDataDict == null)
+                return result;
+
+            var children = BuildTalentChildren(nodeDataDict);
+            foreach (var kvp in savedSkillNodes
+                .Where(kvp => kvp.Key > 0 && kvp.Value > 0)
+                .OrderBy(kvp => nodeDataDict.TryGetValue(kvp.Key, out var node) ? node.page_num : int.MaxValue)
+                .ThenBy(kvp => kvp.Key))
+            {
+                if (!nodeDataDict.TryGetValue(kvp.Key, out var node))
+                    continue;
+
+                foreach (var prevNode in nodeDataDict.Values.Where(n => n.node_id > 0 && n.page_num < node.page_num))
+                    result[prevNode.node_id] = GetMaxSkillLevel(prevNode);
+
+                foreach (var nextNode in nodeDataDict.Values.Where(n => n.node_id > 0 && n.page_num > node.page_num))
+                    result[nextNode.node_id] = 0;
+
+                foreach (int ancestorId in GetTalentAncestors(kvp.Key, nodeDataDict))
+                {
+                    if (nodeDataDict.TryGetValue(ancestorId, out var ancestor))
+                        result[ancestorId] = GetMaxSkillLevel(ancestor);
+                }
+
+                result[kvp.Key] = kvp.Value;
+
+                foreach (int descendantId in GetDescendants(kvp.Key, children))
+                    result[descendantId] = 0;
+            }
+
+            return result;
+        }
+
+        public static Dictionary<int, int> ExpandTeamSkillLevels(
+            Dictionary<int, int> savedSkillNodes,
+            Dictionary<int, TeamSkillNode> nodeDataDict)
+        {
+            var result = new Dictionary<int, int>();
+            if (savedSkillNodes == null || savedSkillNodes.Count == 0 || nodeDataDict == null)
+                return result;
+
+            var children = BuildTeamChildren(nodeDataDict);
+            foreach (var kvp in savedSkillNodes
+                .Where(kvp => kvp.Key > 0 && kvp.Value > 0)
+                .OrderBy(kvp => kvp.Key))
+            {
+                if (!nodeDataDict.ContainsKey(kvp.Key))
+                    continue;
+
+                foreach (int ancestorId in GetTeamAncestors(kvp.Key, nodeDataDict))
+                {
+                    if (nodeDataDict.TryGetValue(ancestorId, out var ancestor))
+                        result[ancestorId] = GetMaxSkillLevel(ancestor);
+                }
+
+                result[kvp.Key] = kvp.Value;
+
+                foreach (int descendantId in GetDescendants(kvp.Key, children))
+                    result[descendantId] = 0;
+            }
+
+            return result;
+        }
+
+        private static Dictionary<int, List<int>> BuildTalentChildren(Dictionary<int, TalentSkillNode> nodeDataDict)
+        {
+            var children = nodeDataDict.Values
+                .Where(n => n.node_id > 0)
+                .ToDictionary(n => n.node_id, _ => new List<int>());
+
+            foreach (var node in nodeDataDict.Values)
+            {
+                if (node.node_id <= 0 || node.pre_node_ids == null)
+                    continue;
+
+                foreach (int parentId in node.pre_node_ids)
+                {
+                    if (parentId > 0 && children.TryGetValue(parentId, out var childList))
+                        childList.Add(node.node_id);
+                }
+            }
+
+            return children;
+        }
+
+        private static Dictionary<int, List<int>> BuildTeamChildren(Dictionary<int, TeamSkillNode> nodeDataDict)
+        {
+            var children = nodeDataDict.Values
+                .Where(n => n.node_id > 0)
+                .ToDictionary(n => n.node_id, _ => new List<int>());
+
+            foreach (var node in nodeDataDict.Values)
+            {
+                if (node.node_id > 0 && node.pre_node_id > 0 && children.TryGetValue(node.pre_node_id, out var childList))
+                    childList.Add(node.node_id);
+            }
+
+            return children;
+        }
+
+        private static List<int> GetTalentAncestors(int nodeId, Dictionary<int, TalentSkillNode> nodeDataDict)
+        {
+            var result = new List<int>();
+            var queue = new Queue<int>();
+
+            if (nodeDataDict.TryGetValue(nodeId, out var node) && node.pre_node_ids != null)
+            {
+                foreach (int parentId in node.pre_node_ids)
+                {
+                    if (parentId > 0)
+                        queue.Enqueue(parentId);
+                }
+            }
+
+            while (queue.Count > 0)
+            {
+                int currentId = queue.Dequeue();
+                if (currentId <= 0 || result.Contains(currentId))
+                    continue;
+
+                result.Add(currentId);
+                if (nodeDataDict.TryGetValue(currentId, out var parentNode) && parentNode.pre_node_ids != null)
+                {
+                    foreach (int parentId in parentNode.pre_node_ids)
+                    {
+                        if (parentId > 0 && !result.Contains(parentId))
+                            queue.Enqueue(parentId);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static List<int> GetTeamAncestors(int nodeId, Dictionary<int, TeamSkillNode> nodeDataDict)
+        {
+            var result = new List<int>();
+            var queue = new Queue<int>();
+
+            if (nodeDataDict.TryGetValue(nodeId, out var node) && node.pre_node_id > 0)
+                queue.Enqueue(node.pre_node_id);
+
+            while (queue.Count > 0)
+            {
+                int currentId = queue.Dequeue();
+                if (currentId <= 0 || result.Contains(currentId))
+                    continue;
+
+                result.Add(currentId);
+                if (nodeDataDict.TryGetValue(currentId, out var parentNode) && parentNode.pre_node_id > 0 && !result.Contains(parentNode.pre_node_id))
+                    queue.Enqueue(parentNode.pre_node_id);
+            }
+
+            return result;
+        }
+
+        private static List<int> GetDescendants(int nodeId, Dictionary<int, List<int>> children)
+        {
+            var result = new List<int>();
+            var queue = new Queue<int>();
+
+            if (children.TryGetValue(nodeId, out var childList))
+            {
+                foreach (int childId in childList)
+                    queue.Enqueue(childId);
+            }
+
+            while (queue.Count > 0)
+            {
+                int currentId = queue.Dequeue();
+                if (currentId <= 0 || result.Contains(currentId))
+                    continue;
+
+                result.Add(currentId);
+                if (children.TryGetValue(currentId, out var nextChildren))
+                {
+                    foreach (int childId in nextChildren)
+                    {
+                        if (childId > 0 && !result.Contains(childId))
+                            queue.Enqueue(childId);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static int GetMaxSkillLevel(TalentSkillNode node)
+        {
+            return node?.enhance_level_ids?.Count ?? 0;
+        }
+
+        private static int GetMaxSkillLevel(TeamSkillNode node)
+        {
+            return node?.enhance_level_ids?.Count ?? 0;
         }
 
         public List<int> GetActivatedEnhanceIds<T>(Dictionary<int, int> skillLevels, Dictionary<int, T> skillNodeDict)

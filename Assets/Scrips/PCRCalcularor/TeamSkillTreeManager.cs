@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -62,7 +62,7 @@ namespace PCRCaculator
         void OnEnable()
         {
             // GuildManager.LoadAddedPlayerData();
-            skillLevels = PlayerGroup.teamSkill;
+            ApplySavedSkillNodesByEnhance(PlayerGroup.teamSkill);
             UpdateAllNodeUI();
             UpdateTalentInfoData();
             SetupMasterPointInput();
@@ -88,8 +88,8 @@ namespace PCRCaculator
         {
             enhanceDataDict = MainManager.Instance.TeamSkillEnhanceDataDic;
             paramTypeDict = MainManager.Instance.ParamTypeDic;
-            skillLevels = PlayerGroup.teamSkill;
             BuildNodeRelationships();
+            ApplySavedSkillNodesByEnhance(PlayerGroup.teamSkill);
             UpdateTalentInfoData();
         }
         private void SetupMasterPointInput()
@@ -487,6 +487,67 @@ namespace PCRCaculator
 
             return activeSkills;
         }
+        private Dictionary<int, int> GetHighestActiveTeamSkills()
+        {
+            var highestSkills = new Dictionary<int, int>();
+            var activeSkills = GetActiveTeamSkills();
+            var highestLeafSkills = new Dictionary<int, int>();
+
+            foreach (var kvp in activeSkills)
+            {
+                int nodeId = kvp.Key;
+                int level = kvp.Value;
+                bool hasActiveChild = false;
+
+                if (nodeChildrenDict != null && nodeChildrenDict.TryGetValue(nodeId, out var children))
+                {
+                    foreach (int childId in children)
+                    {
+                        if (activeSkills.TryGetValue(childId, out int childLevel) && childLevel > 0)
+                        {
+                            hasActiveChild = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasActiveChild)
+                {
+                    highestLeafSkills[nodeId] = level;
+                }
+            }
+
+            int maxNodeId = highestLeafSkills.Keys.DefaultIfEmpty(0).Max();
+            if (maxNodeId > 0 && highestLeafSkills.TryGetValue(maxNodeId, out int levelAtMaxNode))
+            {
+                highestSkills[maxNodeId] = levelAtMaxNode;
+            }
+
+            return highestSkills;
+        }
+        private void ApplySavedSkillNodesByEnhance(Dictionary<int, int> savedSkillNodes)
+        {
+            if (nodeChildrenDict == null || nodeChildrenDict.Count == 0)
+            {
+                BuildNodeRelationships();
+            }
+
+            skillLevels = new Dictionary<int, int>();
+            if (savedSkillNodes == null || savedSkillNodes.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var kvp in savedSkillNodes.OrderBy(kvp => kvp.Key))
+            {
+                if (kvp.Key <= 0 || kvp.Value <= 0)
+                {
+                    continue;
+                }
+
+                EnhanceSkill(kvp.Key, kvp.Value);
+            }
+        }
         public List<int> GetActivatedEnhanceIds()
         {
             List<int> activatedEnhanceIds = new List<int>();
@@ -530,19 +591,15 @@ namespace PCRCaculator
         }
         public void SaveTeamSkills(bool global = false)
         {
-            var activeSkills = GetActiveTeamSkills();
-            if (global) MainManager.Instance.PlayerSetting.teamSkill = activeSkills; //公共
-            PlayerGroup.teamSkill = activeSkills; //队内
+            var highestSkills = GetHighestActiveTeamSkills();
+            if (global) MainManager.Instance.PlayerSetting.teamSkill = highestSkills; //公共
+            PlayerGroup.teamSkill = highestSkills; //队内
             GuildManager.Instance.SaveDataToJson();
         }
 
         public void SetSkillLevels(Dictionary<int, int> newSkillLevels)
         {
-            skillLevels.Clear();
-            foreach (var kvp in newSkillLevels)
-            {
-                skillLevels[kvp.Key] = kvp.Value;
-            }
+            skillLevels = TeamEnhanceParameter.ExpandTeamSkillLevels(newSkillLevels, NodeDataDict);
         }
     }
 }

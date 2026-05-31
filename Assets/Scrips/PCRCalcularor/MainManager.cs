@@ -46,7 +46,8 @@ namespace PCRCaculator
         public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3, calculator = 4 }
         public StayPage stayPage;
         //public int loadCharacterMax;//最多加载到的角色序号
-        public int levelMax { get => playerSetting.playerLevel; }
+        public int EffectiveLevelMax => playerSetting.playerLevel + (IsGuildBattle ? 0 : 10);
+        public int levelMax { get => EffectiveLevelMax; }
         public bool UseNewBattleSystem = true;
         public bool useJapanData {get => Version.useJP;}
         public bool useVerification;
@@ -261,7 +262,7 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10065700;
-            public long BossVersionJP = 10062600;
+            public long BossVersionJP = 10063700;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -824,8 +825,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 92;
-                playerSetting.playerLevel = 337;
+                playerSetting.playerProcess = 94;
+                playerSetting.playerLevel = 343;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";

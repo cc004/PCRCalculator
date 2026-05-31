@@ -2728,6 +2728,7 @@ namespace PCRCaculator.Guild
         public Dictionary<int, int> talentLevel = new Dictionary<int, int>();
         public Dictionary<int, int> talentSkill = new Dictionary<int, int>();
         public Dictionary<int, int> teamSkill = new Dictionary<int, int>();
+        [JsonConverter(typeof(PCRCaculator.RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
         public List<List<float>> UBExecTimeData = new List<List<float>> { };
         public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};

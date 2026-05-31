@@ -108,6 +108,7 @@ namespace Elements.Battle
         public Dictionary<int, int> TalentSkillLevels { get; set; }
         public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
+        [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> RoleMastery { get; set; }
         public int BattleTime { get; set; } = 90;
         public bool TalentFullInfo { get; set; }
