@@ -748,6 +748,7 @@
   "parent_target_parts": "第一个部位",
   "s_atk_dec_forward_without_owner": "除自身以外物理攻击力%1$s高的",
   "atk_dec_forward_without_owner": "除自身以外物理攻击力最高的",
+  "atk_dec_forward_without_owner_and_magic_chara": "除自身和魔法角色以外物理攻击力最高的",
   "the_s_lowest_DEF": "物理防御力%s低的",
   "the_lowest_DEF": "物理防御力最低的",
   "the_s_lowest_Magic_DEF": "魔法防御力%s低的",
@@ -775,5 +776,6 @@
   "extend_s1_slip_damage_last_and_interval_by_s2_in_s3_time": "使%1$s受到的异常伤害的持续时间和间隔时间延长 [%2$s] 倍，持续 [%3$s] 秒。",
   "add_abnormal_effect_time_fixed": "使%1$s的[%2$s]持续时间增加 [%3$s] 秒。",
   "add_abnormal_effect_time_percentage": "使%1$s的[%2$s]持续时间变为原本的 [%3$s]%%。",
-  "effect_is_effect_by_s1_talent_unit": "本效果仅 [%1$s] 属性的角色受影响。"
+  "effect_is_effect_by_s1_talent_unit": "本效果仅 [%1$s] 属性的角色受影响。",
+  "Add_s1_d2_mark_stacks_and_on_ub_remove_1_mark_stack_and_use_action_d3": "对%s追加 [%d] 层标记，使用 UB 时，减少 1 层标记，并使用动作(%d)"
 }

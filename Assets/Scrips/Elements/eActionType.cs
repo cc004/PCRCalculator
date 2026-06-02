@@ -167,6 +167,7 @@ namespace Elements
         REDUCE_DAMAGE_BY_HIGHER_DEF = 130,
         IF_CONTAINS_CHARA_TYPE_GROUP = 131,
         TRANSCEND_DAMAGE = 132,
+        [Description("UB触发标记")]
         ENCHANT_UB_TRIGGER_SEAL = 133,
         FOLLOW_UP_DAMAGE = 134,
 

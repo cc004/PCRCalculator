@@ -1497,6 +1497,9 @@ namespace Elements
           BasePartsData _protectedTarget = null 
           )
         {
+            if (_action.NoDelayExecByTriggerOnly)
+                yield break;
+
             if (_target.Owner.ProtectionTargetData != null)
                 _target.Owner.ProtectionTargetData.DisableIfOwnerDead();
             // temporary fix for log barrier skill
@@ -2254,6 +2257,9 @@ namespace Elements
                 case PriorityPattern.MAGIC_STR_DEC_WITHOUT_OWNER_FORWARD:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner);
                     break;
+                case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA:
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner && e.AtkType == 1);
+                    break;
                 case PriorityPattern.FLIGHT_ONLY:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT));
                     break;
@@ -2734,6 +2740,7 @@ namespace Elements
                     this.sortTargetPosition(targetList, false, new Comparison<BasePartsData>(this.Owner.CompareEnergyAscSameLeft), new Comparison<BasePartsData>(this.Owner.CompareEnergyAscSameRight));
                     break;
                 case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
+                case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA:
                     this.sortTargetPosition(targetList, _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE, new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameLeft), new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameRight));
                     break;
                 case PriorityPattern.HP_ASC_WITHOUT_OWNER:

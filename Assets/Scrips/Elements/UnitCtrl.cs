@@ -2201,6 +2201,7 @@ this.updateCurColor();
             AccumulativeDamageSourceDataDictionary = new Dictionary<int, AccumulativeDamageSourceData>();
             DamageSealDataDictionary = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
             SealDictionary = new Dictionary<eStateIconType, SealData>();
+            UbTriggerSealActionDictionary = new Dictionary<eStateIconType, Action>();
             UbAbnormalDataList = new List<UbAbnormalData>();
             //UnitUnionBurstTimelineList = new List<UnitUnionBurstTimeline>();
             //this.CircleEffectList = new List<CircleEffectController>();
@@ -2293,6 +2294,7 @@ this.updateCurColor();
             this.DamageOnceOwnerSealDateDictionary = (Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>)null;
             this.DamageOwnerSealDataDictionary = (Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>)null;
             this.SealDictionary = (Dictionary<eStateIconType, SealData>)null;
+            this.UbTriggerSealActionDictionary = (Dictionary<eStateIconType, Action>)null;
             this.UbAbnormalDataList = (List<UbAbnormalData>)null;
             this.SkillExecCountDictionary = (Dictionary<int, int>)null;
             //this.OwnerPassiveAction = (Dictionary<eParamType, PassiveActionValue>)null;
@@ -6783,6 +6785,7 @@ this.updateCurColor();
                 unableStateGuardData.RemoveSeal(this.UnableStateGuardData.Count, true);
             }
             ChargeEnergyByReceiveDamageDictionary.Clear();
+            UbTriggerSealActionDictionary.Clear();
 
             for (int index = LifeStealQueueList.Count - 1; index >= 0; --index)
             {
@@ -7948,6 +7951,13 @@ this.updateCurColor();
             get;
             set;
         } = new Dictionary<eStateIconType, Action>();
+
+        public Dictionary<eStateIconType, Action> UbTriggerSealActionDictionary
+        {
+            get;
+            set;
+        } = new Dictionary<eStateIconType, Action>();
+
         private List<AweAction.AweData> aweDatas { get; set; } = new List<AweAction.AweData>();
 
         private IEnumerator aweCoroutine { get; set; }
@@ -8431,6 +8441,14 @@ this.updateCurColor();
 				}
 			}
 		}
+
+        public void ExecUbTriggerSealActions()
+        {
+            foreach (KeyValuePair<eStateIconType, Action> trigger in UbTriggerSealActionDictionary.ToArray())
+            {
+                trigger.Value.Call();
+            }
+        }
 
         public void AddDebuffDamageUpData(DebuffDamageUpData _debuffDamageUpData)
         {
@@ -12239,6 +12257,7 @@ this.updateCurColor();
                 this.playUbVoice3WithDelay();
                 this.playUbVoice4WithDelay();
             }*/
+            ExecUbTriggerSealActions();
             CurrentState = ActionState.SKILL_1;
             CurrentSkillId = UnionBurstSkillId;
             battleManager.HELHEEOHPFO = this;

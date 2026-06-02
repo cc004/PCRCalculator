@@ -569,6 +569,8 @@ namespace ActionParameterSerializer
                     return Utils.JavaFormat(Utils.GetString("the_lowest_Magic_DEF"));
                 case TargetType.flightOnly:
                     return Utils.JavaFormat(Utils.GetString("flight_only"));
+                case TargetType.ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA:
+                    return Utils.JavaFormat(Utils.GetString("atk_dec_forward_without_owner_and_magic_chara"));
                 default:
                     var target_type = (TargetType)((int)type / 1000 * 1000);
                     var target_val = (int)type % 1000;
