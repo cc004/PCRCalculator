@@ -334,6 +334,16 @@ namespace Elements
                             owner.AdditionalMagicDamageUpPercent = (int)(owner.AdditionalMagicDamageUpPercent + _value);
                             break;
                         }
+                    case UnitCtrl.BuffParamKind.BUFF_ENHANCE:
+                        {
+                            owner.BuffEnhance = owner.BuffEnhance + _value;
+                            break;
+                        }
+                    case UnitCtrl.BuffParamKind.DEBUFF_ENHANCE:
+                        {
+                            owner.DebuffEnhance = owner.DebuffEnhance + _value;
+                            break;
+                        }
                     case UnitCtrl.BuffParamKind.MAX_HP:
                         if (Owner.MaxHp + (long)_value > 0L)
                         {

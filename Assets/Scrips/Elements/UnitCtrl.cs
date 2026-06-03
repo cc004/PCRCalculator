@@ -1213,6 +1213,22 @@ namespace Elements
                     BuffIcon = eStateIconType.NONE,
                     DebuffIcon = eStateIconType.DEBUFF_MAX_HP
                 }
+            },
+            {
+                BuffParamKind.BUFF_ENHANCE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.BUFF_ENHANCE,
+                    DebuffIcon = eStateIconType.NONE
+                }
+            },
+            {
+                BuffParamKind.DEBUFF_ENHANCE,
+                new BuffDebuffConstData
+                {
+                    BuffIcon = eStateIconType.DEBUFF_ENHANCE,
+                    DebuffIcon = eStateIconType.NONE
+                }
             }
         };
 
@@ -2202,6 +2218,7 @@ this.updateCurColor();
             DamageSealDataDictionary = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
             SealDictionary = new Dictionary<eStateIconType, SealData>();
             UbTriggerSealActionDictionary = new Dictionary<eStateIconType, Action>();
+            TranscendDamageListForSkillAction = new List<TranscendDamageDataForSkillAction>();
             UbAbnormalDataList = new List<UbAbnormalData>();
             //UnitUnionBurstTimelineList = new List<UnitUnionBurstTimeline>();
             //this.CircleEffectList = new List<CircleEffectController>();
@@ -2295,6 +2312,7 @@ this.updateCurColor();
             this.DamageOwnerSealDataDictionary = (Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>)null;
             this.SealDictionary = (Dictionary<eStateIconType, SealData>)null;
             this.UbTriggerSealActionDictionary = (Dictionary<eStateIconType, Action>)null;
+            this.TranscendDamageListForSkillAction = (List<TranscendDamageDataForSkillAction>)null;
             this.UbAbnormalDataList = (List<UbAbnormalData>)null;
             this.SkillExecCountDictionary = (Dictionary<int, int>)null;
             //this.OwnerPassiveAction = (Dictionary<eParamType, PassiveActionValue>)null;
@@ -6786,6 +6804,7 @@ this.updateCurColor();
             }
             ChargeEnergyByReceiveDamageDictionary.Clear();
             UbTriggerSealActionDictionary.Clear();
+            ClearTranscendDamageData();
 
             for (int index = LifeStealQueueList.Count - 1; index >= 0; --index)
             {
@@ -7958,6 +7977,9 @@ this.updateCurColor();
             set;
         } = new Dictionary<eStateIconType, Action>();
 
+        public List<TranscendDamageDataForSkillAction> TranscendDamageListForSkillAction { get; private set; } =
+            new List<TranscendDamageDataForSkillAction>();
+
         private List<AweAction.AweData> aweDatas { get; set; } = new List<AweAction.AweData>();
 
         private IEnumerator aweCoroutine { get; set; }
@@ -8069,6 +8091,14 @@ this.updateCurColor();
             },
             {
                 BuffParamKind.MAX_HP,
+                0
+            },
+            {
+                BuffParamKind.BUFF_ENHANCE,
+                0
+            },
+            {
+                BuffParamKind.DEBUFF_ENHANCE,
                 0
             }
     };
@@ -8441,6 +8471,50 @@ this.updateCurColor();
 				}
 			}
 		}
+
+        public void AddTranscendDamageData(TranscendDamageDataForSkillAction data)
+        {
+            if (data == null)
+                return;
+
+            if (TranscendDamageListForSkillAction.Count == 0)
+                OnChangeState.Call(this, eStateIconType.TRANSCEND_DAMAGE, true);
+
+            TranscendDamageListForSkillAction.Add(data);
+            data.StartTimer();
+        }
+
+        public void RemoveTranscendDamageData(TranscendDamageDataForSkillAction data)
+        {
+            if (data == null || TranscendDamageListForSkillAction == null)
+                return;
+
+            TranscendDamageListForSkillAction.Remove(data);
+            if (TranscendDamageListForSkillAction.Count == 0)
+                OnChangeState.Call(this, eStateIconType.TRANSCEND_DAMAGE, false);
+        }
+
+        public void ClearTranscendDamageData()
+        {
+            if (TranscendDamageListForSkillAction == null || TranscendDamageListForSkillAction.Count == 0)
+                return;
+
+            TranscendDamageListForSkillAction.Clear();
+            OnChangeState.Call(this, eStateIconType.TRANSCEND_DAMAGE, false);
+        }
+
+        public DoubleWithEx CalcTranscendDamageForSkillAction(DoubleWithEx damage, DoubleWithEx totalDamage)
+        {
+            if (TranscendDamageListForSkillAction == null || TranscendDamageListForSkillAction.Count == 0)
+                return 0.0;
+
+            DoubleWithEx result = 0.0;
+            foreach (TranscendDamageDataForSkillAction data in TranscendDamageListForSkillAction.ToArray())
+            {
+                result += data.CalcTranscendDamage(damage, totalDamage);
+            }
+            return result;
+        }
 
         public void ExecUbTriggerSealActions()
         {
@@ -8958,6 +9032,14 @@ this.updateCurColor();
             },
             {
                 BuffParamKind.MAX_HP,
+                0
+            },
+            {
+                BuffParamKind.BUFF_ENHANCE,
+                0
+            },
+            {
+                BuffParamKind.DEBUFF_ENHANCE,
                 0
             }
         };
@@ -10039,6 +10121,9 @@ this.updateCurColor();
                 return 1;
             }
 
+            bool logBarrierApplied = false;
+            DoubleWithEx totalDamageForTranscend = a;
+
             if (battleManager.isReleaseSlipDamageLogBarrier ||
                 _damageData.ActionType == eActionType.ATTACK)
             {
@@ -10057,6 +10142,7 @@ this.updateCurColor();
                         TotalDamageForLogBarrier = (DoubleWithEx)a;
                     long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
                     long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
+                    logBarrierApplied |= (double)TotalDamageForLogBarrier > allLogBarrierStartValue;
 #if DONT_USE_EX
                     var tt = execBarrier(TotalDamageForLogBarrier, allLogBarrierEffectValue, allLogBarrierStartValue);
 #else
@@ -10070,6 +10156,7 @@ this.updateCurColor();
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
                         double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
+                        logBarrierApplied |= (double)TotalDamageForLogBarrier > abnormalStateSubValue;
 #if DONT_USE_EX
                         var t = execBarrier(TotalDamageForLogBarrier, abnormalStateMainValue, abnormalStateSubValue);
 #else
@@ -10084,6 +10171,7 @@ this.updateCurColor();
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
                         double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_MGC_BARRIR);
+                        logBarrierApplied |= (double)TotalDamageForLogBarrier > abnormalStateSubValue;
 #if DONT_USE_EX
                         var t = execBarrier(TotalDamageForLogBarrier, abnormalStateMainValue, abnormalStateSubValue);
 #else
@@ -10098,6 +10186,7 @@ this.updateCurColor();
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
                         double abnormalStateMainValue = GetAbnormalStateMainValue(eAbnormalStateCategory.LOG_ALL_BARRIR);
+                        logBarrierApplied |= (double)TotalDamageForLogBarrier > abnormalStateSubValue;
 #if DONT_USE_EX
                         var t = execBarrier(TotalDamageForLogBarrier, abnormalStateMainValue, abnormalStateSubValue);
 #else
@@ -10108,7 +10197,16 @@ this.updateCurColor();
                         b *= t;
                         TotalDamageForLogBarrier *= t;
                     }
+                    totalDamageForTranscend = TotalDamageForLogBarrier;
                 }
+            }
+
+            UnitCtrl transcendSource = _damageData.Source ?? _damageData.StrikeBackSource;
+            if (logBarrierApplied && transcendSource != null)
+            {
+                DoubleWithEx transcendDamage = transcendSource.CalcTranscendDamageForSkillAction(a, totalDamageForTranscend);
+                a += transcendDamage;
+                b += transcendDamage;
             }
 
             if (_hasEffect)
@@ -14702,6 +14800,10 @@ this.updateCurColor();
             [Description("魔法伤害百分比提升")]
             MAGIC_DAMAGE_UP_PERCENT = 19,
             MAX_HP = 100, // 0x00000064
+            [Description("Buff增强")]
+            BUFF_ENHANCE = 200, // 0x000000C8
+            [Description("Debuff增强")]
+            DEBUFF_ENHANCE = 210, // 0x000000D2
             NONE = 101, // 0x00000065
             NUM = 101, // 0x00000065
         }

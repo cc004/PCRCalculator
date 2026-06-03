@@ -46,7 +46,9 @@ namespace Elements
         { BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT, true },
         { BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT, true },
         { BuffParamKind.MAGIC_DAMAGE_UP_PERCENT, true },
-        { BuffParamKind.MAX_HP, true }
+        { BuffParamKind.MAX_HP, true },
+        { BuffParamKind.BUFF_ENHANCE, true },
+        { BuffParamKind.DEBUFF_ENHANCE, true }
     };
 
   }

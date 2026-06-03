@@ -380,6 +380,8 @@ namespace ActionParameterSerializer
                 case AuraAction.AuraType.receivedPhysicalDamage: return Utils.GetString("received_physical_damage");
                 case AuraAction.AuraType.receivedMagicalDamage: return Utils.GetString("received_magical_damage");
                 case AuraAction.AuraType.maxHP: return Utils.GetString("max_HP");
+                case AuraAction.AuraType.BUFF_ENHANCE: return Utils.GetString("Buff_Enhance");
+                case AuraAction.AuraType.DEBUFF_ENHANCE: return Utils.GetString("Debuff_Enhance");
                 default:
                     if (Enum.TryParse<PropertyKey>(val.ToString(), out var key))
                         return key.description();

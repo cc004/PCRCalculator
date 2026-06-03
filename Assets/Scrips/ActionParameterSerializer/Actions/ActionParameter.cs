@@ -207,6 +207,8 @@ namespace ActionParameterSerializer.Actions
                     return new ConvertDamageOverTimeAction();
                 case 130:
                     return new ReduceDamageHigherDefAction();
+                case 132:
+                    return new TranscendDamageAction();
                 case 133:
                     return new EnchantUbTriggerSealAction();
                 /*

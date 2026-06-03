@@ -789,8 +789,12 @@ namespace Elements
                 typeof(AddAbnormalEffectTimeAction)
             },
             {
-                  eActionType.ENCHANT_UB_TRIGGER_SEAL,
-                  typeof(EnchantUbTriggerSealAction)
+                eActionType.TRANSCEND_DAMAGE,
+                typeof(TranscendDamageAction)
+            },
+            {
+                eActionType.ENCHANT_UB_TRIGGER_SEAL,
+                typeof(EnchantUbTriggerSealAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
