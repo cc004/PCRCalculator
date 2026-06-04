@@ -757,6 +757,14 @@ namespace Elements
                 typeof(TauntAction)
             },
             {
+                eActionType.FORCE_CHANGE_SPEED,
+                typeof(ForceChangeSpeedAction)
+            },
+            {
+                eActionType.GUTS,
+                typeof(GutsAction)
+            },
+            {
                 eActionType.ENCHANT_PROTECT,
                 typeof(EnchantProtectAction)
             },

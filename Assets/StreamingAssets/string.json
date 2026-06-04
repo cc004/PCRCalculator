@@ -372,6 +372,7 @@
   "Trigger_d_on_stealth": "触发条件：潜伏时 [%d%%] 的概率触发。",
   "Trigger_d1_on_break_and_last_for_s2_sec": "触发条件：Break时 [%1$d%%] 的概率触发，持续时间 [%2$s] 秒。",
   "Trigger_d_on_dot_damaged": "触发条件：受到持续伤害时 [%d%%] 的概率触发。",
+  "Enchant_s1_to_trigger_action_d2": "赋予%1$s触发效果，满足条件时执行 [动作%2$d]。",
   "Charge_for_s1_sec_and_deal_s2_damage_taken_additional_damage_on_the_next_effect": "蓄力 [%1$s] 秒，使下一个动作的效果提高 [%2$s * 蓄力中受到的伤害]。",
   "Make_s1_attract_enemy_attacks_last_for_s2_sec": "使%1$s进入挑衅状态，持续时间 [%2$s] 秒。",
   "Make_s1_to_be_invulnerable_for_s2_sec": "使%1$s进入无敌状态，持续时间 [%2$s] 秒。",

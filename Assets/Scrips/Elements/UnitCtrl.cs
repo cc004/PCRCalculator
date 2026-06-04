@@ -5192,7 +5192,7 @@ this.updateCurColor();
             // bool isEnvironmentAbnormalState = action != null && action.IsEnvironmentAbnormalState;
             // if ((isAbnormalState) && (!ABNORMAL_CONST_DATA[_abnormalState].IsBuff || isEnvironmentAbnormalState))
             // TODO environment abnormal staet
-            if ((IsNoDamageMotion() || IsAbnormalState(eAbnormalState.NO_ABNORMAL)) && !ABNORMAL_CONST_DATA[_abnormalState].IsBuff)
+            if (!_isIgnoreDebuffImmune && (IsNoDamageMotion() || IsAbnormalState(eAbnormalState.NO_ABNORMAL)) && !ABNORMAL_CONST_DATA[_abnormalState].IsBuff)
             {
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
