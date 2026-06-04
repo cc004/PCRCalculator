@@ -201,6 +201,8 @@ namespace ActionParameterSerializer.Actions
                     return new AllUnitSealDamageCutAction();
                 case 117:
                     return new ForceChangeSpeedAction();
+                case 118:
+                    return new GutsAction();
                 case 124:
                     return new EnchantProtectAction();
                 case 125:

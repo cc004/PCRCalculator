@@ -2217,6 +2217,7 @@ this.updateCurColor();
             AccumulativeDamageSourceDataDictionary = new Dictionary<int, AccumulativeDamageSourceData>();
             DamageSealDataDictionary = new Dictionary<UnitCtrl, Dictionary<int, AttackSealData>>();
             SealDictionary = new Dictionary<eStateIconType, SealData>();
+            gutsDictionary = new Dictionary<eStateIconType, GutsData>();
             UbTriggerSealActionDictionary = new Dictionary<eStateIconType, Action>();
             TranscendDamageListForSkillAction = new List<TranscendDamageDataForSkillAction>();
             UbAbnormalDataList = new List<UbAbnormalData>();
@@ -2332,6 +2333,7 @@ this.updateCurColor();
             this.aweDatas = (List<AweAction.AweData>)null;
             this.aweCoroutine = (IEnumerator)null;
             this.ToadDatas = (List<ToadData>)null;
+            this.gutsDictionary = (Dictionary<eStateIconType, GutsData>)null;
             this.OnSlipDamage = (System.Action)null;
             this.OnBreakAll = (System.Action)null;
             this.knightGuardDatas = (Dictionary<eStateIconType, List<KnightGuardData>>)null;
@@ -6839,6 +6841,7 @@ this.updateCurColor();
             }*/
             StrikeBackDictionary.Clear();
             ClearKnightGuard();
+            ClearGuts();
             ClearAwe();
             DamageSealDataDictionary.Clear();
             DamageOnceOwnerSealDateDictionary.Clear();
@@ -6866,6 +6869,15 @@ this.updateCurColor();
                     knightGuardData.Value.Clear();
                 }
             }
+        }
+
+        public void ClearGuts()
+        {
+            foreach (eStateIconType iconType in gutsDictionary.Keys)
+            {
+                OnChangeState.Call(this, iconType, false);
+            }
+            gutsDictionary.Clear();
         }
 
         public void CureAbnormalState(CureAction.eCureActionType type)
@@ -7988,7 +8000,7 @@ this.updateCurColor();
 
         private Dictionary<eStateIconType, List<KnightGuardData>> knightGuardDatas { get; set; } = new Dictionary<eStateIconType, List<KnightGuardData>>();
 
-        // private Dictionary<eStateIconType, GutsData> gutsDictionary { get; set; }
+        private Dictionary<eStateIconType, GutsData> gutsDictionary { get; set; } = new Dictionary<eStateIconType, GutsData>();
 
         private IEnumerator knightGuardCoroutine { get; set; }
 
@@ -9857,19 +9869,50 @@ this.updateCurColor();
             return (long)num1;
         }
 
-        public bool ExecGuts() // TODO implement gutsaction only use in 804100501 boss
+        public void AddGuts(
+            eStateIconType iconType,
+            eInhibitHealType inhibitHealType,
+            LongWithEx healValue,
+            float limitTime,
+            int remainCount,
+            int remainMaxCount,
+            SkillEffectCtrl effect,
+            NormalSkillEffect execEffectData,
+            Skill skill,
+            UnitCtrl source)
         {
-            // bool triggered = false;
-            // foreach (var guts in gutsDictionary.Values)
-            // {
-            //     if (guts.IsEnable)
-            //     {
-            //         triggered = true;
-            //         guts.Exec();
-            //     }
-            // }
-            // return triggered;
-            return false;
+            if (gutsDictionary.TryGetValue(iconType, out GutsData gutsData))
+            {
+                gutsData.AddRemainCount(limitTime, healValue, remainCount);
+                return;
+            }
+
+            gutsDictionary[iconType] = new GutsData(
+                iconType,
+                inhibitHealType,
+                healValue,
+                limitTime,
+                remainCount,
+                remainMaxCount,
+                effect,
+                execEffectData,
+                skill,
+                this,
+                source);
+        }
+
+        public bool ExecGuts()
+        {
+            bool triggered = false;
+            foreach (GutsData guts in gutsDictionary.Values)
+            {
+                if (guts.IsEnable)
+                {
+                    triggered = true;
+                    guts.Exec();
+                }
+            }
+            return triggered;
         }
 
 

@@ -79,7 +79,7 @@ namespace Elements
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       duration = (float)_valueDictionary[eValueNumber.VALUE_1];
       repeatTime = (float)_valueDictionary[eValueNumber.VALUE_2];
-      triggerDamage = (long)_valueDictionary[eValueNumber.VALUE_3];
+      triggerDamage = BattleUtil.DoubleToLong(_valueDictionary[eValueNumber.VALUE_3]);
       isLoopMotion = true;
       cancelAction = false;
       _sourceActionController.AppendCoroutine(updateStartMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);
@@ -112,8 +112,13 @@ namespace Elements
       yield return null;
       float timer = motionRepeatAction.duration;
       float repeatTimer = 0.0f;
-      while (!motionRepeatAction.isActionCancel(_source, _sourceActionController, _skill))
+      while (true)
       {
+        if (motionRepeatAction.isActionCancel(_source, _sourceActionController, _skill))
+        {
+          motionRepeatAction.totalDamage = 0;
+          yield break;
+        }
         repeatTimer -= BattleManager.DeltaTime_60fps;
         if (repeatTimer < 0.0 && !motionRepeatAction.cancelAction)
         {
@@ -150,6 +155,7 @@ namespace Elements
         timer -= BattleManager.DeltaTime_60fps;
         if (timer < 0.0)
         {
+          motionRepeatAction.totalDamage = 0;
           _sourceActionController.CreateNormalPrefabWithTargetMotion(_skill, 2, false);
           foreach (ShakeEffect shakeEffect in _skill.ShakeEffects)
           {
@@ -160,7 +166,7 @@ namespace Elements
           {
             motionRepeatAction.successAction.ReadyAction(_source, _sourceActionController, _skill);
             motionRepeatAction.successAction.CancelByIfForAll = false;
-            _sourceActionController.ExecUnitActionWithDelay(motionRepeatAction.successAction, _skill, false, (uint) motionRepeatAction.failAction.DepenedActionId > 0U);
+            _sourceActionController.ExecUnitActionWithDelay(motionRepeatAction.successAction, _skill, false, (uint) motionRepeatAction.successAction.DepenedActionId > 0U);
           }
           _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 2);
           _sourceActionController.AppendCoroutine(motionRepeatAction.updateEndMotion(_source, _sourceActionController, _skill), ePauseType.SYSTEM, _skill.BlackOutTime > 0.0 ? _source : null);

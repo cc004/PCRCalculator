@@ -367,6 +367,7 @@ namespace Elements
                             break;
                         Owner.SetCurrentHpZero();
                         Owner.ClearKnightGuard();
+                        Owner.ClearGuts();
                         if (Owner.IsDead || Owner.CurrentState >= UnitCtrl.ActionState.DIE)
                             break;
                         Owner.SetState(UnitCtrl.ActionState.DIE);
