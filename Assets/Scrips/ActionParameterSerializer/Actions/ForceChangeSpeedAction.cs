@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Elements;
 
 namespace ActionParameterSerializer.Actions
 {
@@ -19,10 +20,11 @@ namespace ActionParameterSerializer.Actions
             StringBuilder str = new StringBuilder();
             try
             {
-                switch ((Ailment.ActionDetail)actionDetail1)
+                ChangeSpeedAction.eChangeSpeedType speedType = (ChangeSpeedAction.eChangeSpeedType)actionDetail1;
+                switch (speedType)
                 {
-                    case Ailment.ActionDetail.haste:
-                    case Ailment.ActionDetail.slow:
+                    case ChangeSpeedAction.eChangeSpeedType.HASTE:
+                    case ChangeSpeedAction.eChangeSpeedType.SLOW:
                         if (UserSettings.get().getExpression() == UserSettings.EXPRESSION_ORIGINAL)
                         {
                             str.Append(Utils.JavaFormat(Utils.GetString("Force_change_speed_of_s1_with_s2_for_s3_sec"),
@@ -40,7 +42,7 @@ namespace ActionParameterSerializer.Actions
                         break;
                     default:
                         str.Append(Utils.JavaFormat(Utils.GetString("Force_s1_s2_for_s3_sec"),
-                            ((Ailment.ActionDetail)actionDetail1).description(),
+                            speedType.GetDescription(),
                             targetParameter.buildTargetClause(),
                             buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)));
                         break;

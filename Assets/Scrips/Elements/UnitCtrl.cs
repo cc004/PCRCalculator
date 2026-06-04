@@ -964,6 +964,14 @@ namespace Elements
                     IconType = eStateIconType.CHAINED_ACN,
                     IsBuff = false
                 }
+            },
+            {
+                UnitCtrl.eAbnormalState.PUPPET,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.PUPPET,
+                    IsBuff = false
+                }
             }
         };
 
@@ -5065,6 +5073,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.CHAINED_ACN:
                     result = UnitCtrl.eAbnormalStateCategory.CHAINED_ACN;
                     break;
+                case UnitCtrl.eAbnormalState.PUPPET:
+                    result = UnitCtrl.eAbnormalStateCategory.PUPPET;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
@@ -5237,7 +5248,9 @@ this.updateCurColor();
                         break;
                     case eAbnormalState.CONVERT:
                     case eAbnormalState.CONFUSION:
-                        OnActiveUnableState.Call();
+                    case eAbnormalState.CONFUSION2:
+                    case eAbnormalState.PUPPET:
+                        OnActiveCharmState.Call();
                         break;
                     default:
                         if (IsUnableAbnormalState(_abnormalState))
@@ -5245,7 +5258,6 @@ this.updateCurColor();
                             OnActiveUnableState.Call();
                         }
                         break;
-                        // TODO OnActiveCharmState
                 }
                 BattleLogIntreface battleLog = this.battleLog;
                 UnitCtrl unitCtrl1 = _source;
@@ -5356,6 +5368,7 @@ this.updateCurColor();
             case eAbnormalState.FREEZE:
                 return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.FREEZE], ref _effectTime);
             case eAbnormalState.CHAINED:
+            case eAbnormalState.CHAINED_ACN:
                 return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.CHAINED], ref _effectTime);
             case eAbnormalState.SLEEP:
                 return tryConditionExSkill(ExSkillData.ABNORMAL_CONDITION_PAIR[eAbnormalState.SLEEP], ref _effectTime);
@@ -5829,6 +5842,8 @@ this.updateCurColor();
                     break;
                 case eAbnormalState.CONVERT:
                 case eAbnormalState.CONFUSION:
+                case eAbnormalState.CONFUSION2:
+                case eAbnormalState.PUPPET:
                     if (!IsAbnormalState(eAbnormalState.PAUSE_ACTION))
                         SetDirectionAuto();
                     switch (CurrentState)
@@ -5843,6 +5858,10 @@ this.updateCurColor();
                     if ((long)Hp > 0L && !IsUnableActionState() && CurrentState != ActionState.DAMAGE)
                     {
                         SetState(ActionState.IDLE);
+                    }
+                    if (_abnormalState == eAbnormalState.PUPPET && _enable)
+                    {
+                        battleManager.CheckAcnLosingBattleFinish();
                     }
                     break;
                 case eAbnormalState.SLEEP:
@@ -5982,6 +6001,7 @@ this.updateCurColor();
                 case eAbnormalState.PARALYSIS:
                 case eAbnormalState.FREEZE:
                 case eAbnormalState.CHAINED:
+                case eAbnormalState.CHAINED_ACN:
                 case eAbnormalState.STUN:
                 case eAbnormalState.DETAIN:
                 case eAbnormalState.FAINT:
@@ -6693,11 +6713,10 @@ this.updateCurColor();
         //public bool IsConfusionOrConvert() => m_abnormalState[eAbnormalState.CONFUSION] || m_abnormalState[eAbnormalState.CONVERT];
         public bool IsConfusionOrConvert()
         {
-            if (!m_abnormalState[eAbnormalState.CONFUSION] && !m_abnormalState[eAbnormalState.CONVERT])
-            {
-                return m_abnormalState[eAbnormalState.CONFUSION2];
-            }
-            return true;
+            return m_abnormalState[eAbnormalState.CONFUSION]
+                || m_abnormalState[eAbnormalState.CONVERT]
+                || m_abnormalState[eAbnormalState.CONFUSION2]
+                || m_abnormalState[eAbnormalState.PUPPET];
         }
         public bool IsPoisonState()
         {
@@ -6761,7 +6780,7 @@ this.updateCurColor();
 
         public bool IsUnableActionState()
         {
-            if (!IsAbnormalState(eAbnormalState.PARALYSIS) && !IsAbnormalState(eAbnormalState.FREEZE) && !IsAbnormalState(eAbnormalState.SLEEP) && !IsAbnormalState(eAbnormalState.CHAINED) && !IsAbnormalState(eAbnormalState.STUN) && !IsAbnormalState(eAbnormalState.STUN2) && !IsAbnormalState(eAbnormalState.NPC_STUN) && !IsAbnormalState(eAbnormalState.STONE) && !IsAbnormalState(eAbnormalState.DETAIN) && !IsAbnormalState(eAbnormalState.FAINT) && !IsAbnormalState(eAbnormalState.PAUSE_ACTION) && !IsAbnormalState(eAbnormalState.CRYSTALIZE))
+            if (!IsAbnormalState(eAbnormalState.PARALYSIS) && !IsAbnormalState(eAbnormalState.FREEZE) && !IsAbnormalState(eAbnormalState.SLEEP) && !IsAbnormalState(eAbnormalState.CHAINED) && !IsAbnormalState(eAbnormalState.CHAINED_ACN) && !IsAbnormalState(eAbnormalState.STUN) && !IsAbnormalState(eAbnormalState.STUN2) && !IsAbnormalState(eAbnormalState.NPC_STUN) && !IsAbnormalState(eAbnormalState.STONE) && !IsAbnormalState(eAbnormalState.DETAIN) && !IsAbnormalState(eAbnormalState.FAINT) && !IsAbnormalState(eAbnormalState.PAUSE_ACTION) && !IsAbnormalState(eAbnormalState.CRYSTALIZE))
             {
                 return KnockBackEnableCount > 0;
             }
@@ -6770,7 +6789,7 @@ this.updateCurColor();
 
         public bool IsUnableActionState(eAbnormalState _removeCheckState)
         {
-            if ((!IsAbnormalState(eAbnormalState.PARALYSIS) || _removeCheckState == eAbnormalState.PARALYSIS) && (!IsAbnormalState(eAbnormalState.FREEZE) || _removeCheckState == eAbnormalState.FREEZE) && (!IsAbnormalState(eAbnormalState.SLEEP) || _removeCheckState == eAbnormalState.SLEEP) && (!IsAbnormalState(eAbnormalState.CHAINED) || _removeCheckState == eAbnormalState.CHAINED) && (!IsAbnormalState(eAbnormalState.STUN) || _removeCheckState == eAbnormalState.STUN) && (!IsAbnormalState(eAbnormalState.STUN2) || _removeCheckState == eAbnormalState.STUN2) && (!IsAbnormalState(eAbnormalState.NPC_STUN) || _removeCheckState == eAbnormalState.NPC_STUN) && (!IsAbnormalState(eAbnormalState.STONE) || _removeCheckState == eAbnormalState.STONE) && (!IsAbnormalState(eAbnormalState.DETAIN) || _removeCheckState == eAbnormalState.DETAIN) && (!IsAbnormalState(eAbnormalState.FAINT) || _removeCheckState == eAbnormalState.FAINT) && (!IsAbnormalState(eAbnormalState.PAUSE_ACTION) || _removeCheckState == eAbnormalState.PAUSE_ACTION) && (!IsAbnormalState(eAbnormalState.CRYSTALIZE) || _removeCheckState == eAbnormalState.CRYSTALIZE))
+            if ((!IsAbnormalState(eAbnormalState.PARALYSIS) || _removeCheckState == eAbnormalState.PARALYSIS) && (!IsAbnormalState(eAbnormalState.FREEZE) || _removeCheckState == eAbnormalState.FREEZE) && (!IsAbnormalState(eAbnormalState.SLEEP) || _removeCheckState == eAbnormalState.SLEEP) && (!IsAbnormalState(eAbnormalState.CHAINED) || _removeCheckState == eAbnormalState.CHAINED) && (!IsAbnormalState(eAbnormalState.CHAINED_ACN) || _removeCheckState == eAbnormalState.CHAINED_ACN) && (!IsAbnormalState(eAbnormalState.STUN) || _removeCheckState == eAbnormalState.STUN) && (!IsAbnormalState(eAbnormalState.STUN2) || _removeCheckState == eAbnormalState.STUN2) && (!IsAbnormalState(eAbnormalState.NPC_STUN) || _removeCheckState == eAbnormalState.NPC_STUN) && (!IsAbnormalState(eAbnormalState.STONE) || _removeCheckState == eAbnormalState.STONE) && (!IsAbnormalState(eAbnormalState.DETAIN) || _removeCheckState == eAbnormalState.DETAIN) && (!IsAbnormalState(eAbnormalState.FAINT) || _removeCheckState == eAbnormalState.FAINT) && (!IsAbnormalState(eAbnormalState.PAUSE_ACTION) || _removeCheckState == eAbnormalState.PAUSE_ACTION) && (!IsAbnormalState(eAbnormalState.CRYSTALIZE) || _removeCheckState == eAbnormalState.CRYSTALIZE))
             {
                 return KnockBackEnableCount > 0;
             }
@@ -10451,6 +10470,7 @@ this.updateCurColor();
             //    this.Hp = (long)1L;
             _hp = Hp.Min(MaxHp);
             var hp2 = Hp;
+            _hp = Hp.ZeroCapForHp();
             
             if (!IsBoss)
             {
@@ -10499,7 +10519,8 @@ this.updateCurColor();
                     else
                     {
                         // Hp = _hp;
-                        Hp = _hp.ZeroCapForHp();
+                        // Hp = _hp.ZeroCapForHp();
+                        Hp = hp2;
                     }
                 }
             }

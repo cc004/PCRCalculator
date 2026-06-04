@@ -42,14 +42,17 @@ namespace Elements
                 UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.CONVERT;
                 switch (base.ActionDetail1)
                 {
-                    case 0:
+                    case (int)eEffectType.CONVERT:
                         _abnormalState = UnitCtrl.eAbnormalState.CONVERT;
                         break;
-                    case 1:
+                    case (int)eEffectType.CONFUSION:
                         _abnormalState = UnitCtrl.eAbnormalState.CONFUSION;
                         break;
-                    case 2:
+                    case (int)eEffectType.CONFUSION2:
                         _abnormalState = UnitCtrl.eAbnormalState.CONFUSION2;
+                        break;
+                    case (int)eEffectType.PUPPET:
+                        _abnormalState = UnitCtrl.eAbnormalState.PUPPET;
                         break;
                 }
                 //_target.Owner.SetAbnormalState(_source, _abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill);
@@ -85,7 +88,8 @@ namespace Elements
         {
             CONVERT,
             CONFUSION,
-            CONFUSION2
+            CONFUSION2,
+            PUPPET
         }
     }
 }

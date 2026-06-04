@@ -133,6 +133,7 @@ namespace Elements.Battle
         private float startRemainTime;
 
         private bool isPauseTimeLimit;
+        private bool wasJudgeAllUnitPuppet;
 
         public bool IsPlayCutin;
         public float BattleStartPos = 560f;
@@ -478,6 +479,7 @@ namespace Elements.Battle
             }
             SingletonMonoBehaviour<BattleHeaderController>.Instance.SetWaveNum(POKEAEBGPIB + currentWaveOffset + 1);
             isPauseTimeLimit = false;
+            wasJudgeAllUnitPuppet = false;
             MiliLimitTime01 = tempData.PHDACAOAOMA.CAMIPEAOGNI;
             int num = -1;
             int num2 = -1;
@@ -2524,6 +2526,52 @@ namespace Elements.Battle
                 UnitList[index].IdleOnly = true;
             createHpList();
             /*this.battleProcessor.FinishBattle();*/
+        }
+
+        public void CheckAcnLosingBattleFinish()
+        {
+            if (BattleCategory != eBattleCategory.ACN_LOSING_UNKNOWN || wasJudgeAllUnitPuppet || battleFinished)
+            {
+                return;
+            }
+
+            bool hasJudgeTarget = false;
+            for (int i = 0; i < UnitList.Count; i++)
+            {
+                UnitCtrl unit = UnitList[i];
+                if (unit == null || unit.IdleOnly || unit.IsSummonOrPhantom || unit.IsDivision)
+                {
+                    continue;
+                }
+                if (!unit.IsAbnormalState(UnitCtrl.eAbnormalState.PUPPET))
+                {
+                    return;
+                }
+                hasJudgeTarget = true;
+            }
+
+            if (!hasJudgeTarget)
+            {
+                return;
+            }
+
+            for (int i = 0; i < EnemyList.Count; i++)
+            {
+                if (EnemyList[i] != null)
+                {
+                    EnemyList[i].IdleOnly = true;
+                }
+            }
+            for (int i = 0; i < UnitList.Count; i++)
+            {
+                if (UnitList[i] != null)
+                {
+                    UnitList[i].IdleOnly = true;
+                }
+            }
+
+            wasJudgeAllUnitPuppet = true;
+            finishBattle(eBattleResult.WIN);
         }
 
         /*private List<UnitDamageInfo> createDamageUnitInfoList(
@@ -4692,6 +4740,7 @@ namespace Elements.Battle
             stopWatch.Restart();
             battleFinishedProcessed = false;
             isPauseTimeLimit = false;
+            wasJudgeAllUnitPuppet = false;
             battleFinished = false;
             battleManager.enabled = true;
             battleManager.BattleReady = true;
