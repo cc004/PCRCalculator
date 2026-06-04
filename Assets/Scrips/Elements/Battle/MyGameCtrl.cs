@@ -1170,8 +1170,7 @@ namespace Elements
             int[] skillLvEv = unitData.GetEvlotionSkillLv();
             int[] skillLvEv2 = unitData.GetRevlotionSkillLv();
             UnitDetailData detailData = rarityData.detailData;
-            return new UnitParameter(
-                new UnitData(
+            var uniqueData = new UnitData(
                     unitData.unitId,
                     new DateTime(),
                     1,
@@ -1195,7 +1194,17 @@ namespace Elements
                     new List<SkillLevelInfo> {
                         new SkillLevelInfo(skillData.EXskill, unitData.rank < 7 ? 0 : unitData.skillLevel[3], 0)
                     },
-                    new List<SkillLevelInfo>(), 0),
+                    new List<SkillLevelInfo>(), 0);
+            int connectRankLimit = unitData.connectRankLimit > 0
+                ? unitData.connectRankLimit
+                : ConnectRankTempData.Instance.GetDefaultConnectRankLimit(); // TODO may be 15 always
+            uniqueData.ConnectRankLimit = connectRankLimit;
+            uniqueData.ConnectRank = connectRankLimit > 0
+                ? Math.Min(Math.Max(0, unitData.connectRank), connectRankLimit)
+                : Math.Max(0, unitData.connectRank);
+
+            return new UnitParameter(
+                uniqueData,
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(unitData.unitId, detailData.name, "?", unitData.unitId, 0, detailData.minrarity, detailData.motionType, detailData.seType,
                 detailData.moveSpeed, detailData.searchAreaWidth, detailData.atkType, detailData.normalAtkCastTime, 0, 0, 0, 0, detailData.guildId),

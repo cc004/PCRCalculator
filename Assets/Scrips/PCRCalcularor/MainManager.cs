@@ -105,6 +105,13 @@ namespace PCRCaculator
             public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic = new();
             public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic = new();
             public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic = new();
+            public Dictionary<int, List<connect_rank_status>> ConnectRankStatusDic = new();
+            public Dictionary<int, connect_rank_chart> ConnectRankChartDic = new();
+            public List<connect_rank_bonus> ConnectRankBonusList = new();
+            public Dictionary<int, connect_rank_boost> ConnectRankBoostDic = new();
+            public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic = new();
+            public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic = new();
+            public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic = new();
         }
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
@@ -192,6 +199,13 @@ namespace PCRCaculator
         public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get => databaseCache.UnitRoleMasteryIdDic; }
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get => databaseCache.UnitRoleSlotDataDic; }
         public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic { get => databaseCache.UnitRoleMasterySlotEnhanceDataDic; }
+        public Dictionary<int, List<connect_rank_status>> ConnectRankStatusDic { get => databaseCache.ConnectRankStatusDic; }
+        public Dictionary<int, connect_rank_chart> ConnectRankChartDic { get => databaseCache.ConnectRankChartDic; }
+        public List<connect_rank_bonus> ConnectRankBonusList { get => databaseCache.ConnectRankBonusList; }
+        public Dictionary<int, connect_rank_boost> ConnectRankBoostDic { get => databaseCache.ConnectRankBoostDic; }
+        public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic { get => databaseCache.ConnectRankLimitCommonDic; }
+        public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic { get => databaseCache.ConnectRankLimitItemDic; }
+        public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get => databaseCache.ConnectRankEnhanceDic; }
 
         public Dictionary<int, string> UnitName_cn { get => databaseCache.unitName_cn; }
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => databaseCache.skillNameAndDescribe_cn; }
@@ -552,6 +566,16 @@ namespace PCRCaculator
                                 databaseCache.UnitRoleMasteryIdDic = dbTool3.UnitRoleMasteryIdDic;
                                 databaseCache.UnitRoleSlotDataDic = dbTool3.UnitRoleSlotDataDic;
                                 databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool3.UnitRoleMasterySlotEnhanceDataDic;
+
+                                var connectRankDb = dbTool;
+                                databaseCache.ConnectRankStatusDic = connectRankDb.ConnectRankStatusDic ?? new Dictionary<int, List<connect_rank_status>>();
+                                databaseCache.ConnectRankChartDic = connectRankDb.ConnectRankChartDic ?? new Dictionary<int, connect_rank_chart>();
+                                databaseCache.ConnectRankBonusList = connectRankDb.ConnectRankBonusList ?? new List<connect_rank_bonus>();
+                                databaseCache.ConnectRankBoostDic = connectRankDb.ConnectRankBoostDic ?? new Dictionary<int, connect_rank_boost>();
+                                databaseCache.ConnectRankLimitCommonDic = connectRankDb.ConnectRankLimitCommonDic ?? new Dictionary<int, connect_rank_limit_common>();
+                                databaseCache.ConnectRankLimitItemDic = connectRankDb.ConnectRankLimitItemDic ?? new Dictionary<int, List<connect_rank_limit_item>>();
+                                databaseCache.ConnectRankEnhanceDic = connectRankDb.ConnectRankEnhanceDic ?? new Dictionary<int, List<connect_rank_enhance>>();
+                                ConnectRankTempData.Instance.ClearCache();
 
                                 databaseCache.unitName_cn = dbTool3.Dic10;
                                 databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn;

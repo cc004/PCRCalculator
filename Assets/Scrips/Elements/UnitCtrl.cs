@@ -1890,6 +1890,8 @@ namespace Elements
 
         public long StartAdditionalPhysicalDamageUpPermyriadByRole { get; set; }
         public long StartAdditionalMagicDamageUpPermyriadByRole { get; set; }
+        public long StartAdditionalWholeDamageUpPermyriad { get; set; }
+        public long StartAdditionalWholeDamageCutPermyriad { get; set; }
         public long StartAbnormalStateDodgeHit { get; set; }
         public long StartAbnormalStateDodgeResist { get; set; }
         public long StartTalentFormationBonus { get; set; }
@@ -1997,6 +1999,8 @@ namespace Elements
         public long AdditionalPhysicalDamageUpPermyriadByRole { get; set; }
 
         public long AdditionalMagicDamageUpPermyriadByRole { get; set; }
+        public long AdditionalWholeDamageUpPermyriad { get; set; }
+        public long AdditionalWholeDamageCutPermyriad { get; set; }
         public long AbnormalStateDodgeHit { get; set; }
         public long AbnormalStateDodgeResist { get; set; }
         public long AdditionalTalentBonusPermyriad { get; set; }
@@ -2104,9 +2108,11 @@ namespace Elements
 
         public double MagicReceiveDamagePercentOrMin => Mathf.Max(0f, (AdditionalMagicReceiveDamagePercent + AdditionalPhysicalAndMagicReceiveDamagePercent) + 100f);
 
-        public double PhysicalDamageUpPercentOrMin => Math.Max(0.0, (AdditionalPhysicalDamageUpPercent * 100.0 + AdditionalPhysicalDamageUpPermyriadByRole + 10000.0) / 100.0);
+        public double PhysicalDamageUpPercentOrMin => Math.Max(0.0, (AdditionalPhysicalDamageUpPercent * 100.0 + AdditionalPhysicalDamageUpPermyriadByRole + AdditionalWholeDamageUpPermyriad + 10000.0) / 100.0);
 
-        public double MagicDamageUpPercentOrMin => Math.Max(0.0, (AdditionalMagicDamageUpPercent * 100.0 + AdditionalMagicDamageUpPermyriadByRole + 10000.0) / 100.0);
+        public double MagicDamageUpPercentOrMin => Math.Max(0.0, (AdditionalMagicDamageUpPercent * 100.0 + AdditionalMagicDamageUpPermyriadByRole + AdditionalWholeDamageUpPermyriad + 10000.0) / 100.0);
+
+        public double WholeDamageCutPercentOrMin => Math.Max(0.0, AdditionalWholeDamageCutPermyriad / 100.0);
 
         public long TalentBonusPermyriadZero => Math.Min(2000000000, Math.Max(0, AdditionalTalentBonusPermyriad));
 
@@ -2792,6 +2798,8 @@ this.updateCurColor();
             AdditionalMagicReceiveDamagePercent = (StartMagicReceiveDamagePercent = 0);
             AdditionalPhysicalDamageUpPercent = (StartPhysicalDamageUpPercent = 0);
             AdditionalMagicDamageUpPercent = (StartMagicDamageUpPercent = 0);
+            AdditionalWholeDamageUpPermyriad = (StartAdditionalWholeDamageUpPermyriad = 0);
+            AdditionalWholeDamageCutPermyriad = (StartAdditionalWholeDamageCutPermyriad = 0);
 
             MoveSpeed = StartMoveSpeed = _data.MasterData.MoveSpeed;
             moveRate = IsMoveSpeedForceZero ? 0.0f : MoveSpeedZero * (_isOther ? -1f : 1f);
@@ -2981,6 +2989,7 @@ this.updateCurColor();
             SetAdditiveAtkForTalentLevel(teamEnhanceParameter);
             SetTalentEnhance(teamEnhanceParameter);
             SetRoleEnhance(teamEnhanceParameter);
+            SetConnectRankStatus(_data, 0); // TODO systemId in 讨魔战线, connect rank bonus diff
         }
 
         public int UnitIdForActionPattern
@@ -3062,7 +3071,8 @@ this.updateCurColor();
             }
         }
         private Dictionary<eParamType, long> talentBuffParameter = new Dictionary<eParamType, long>();
-        private Dictionary<eParamType, long> roleBuffParameter = new Dictionary<eParamType, long>(); 
+        private Dictionary<eParamType, long> roleBuffParameter = new Dictionary<eParamType, long>();
+        private Dictionary<eParamType, long> connectRankBuffParameter = new Dictionary<eParamType, long>();
 
 
         // RVA: 0x2851D88 Offset: 0x2851D88 VA: 0x2851D88
@@ -3096,7 +3106,7 @@ this.updateCurColor();
 
         // RVA: 0x2852008 Offset: 0x2852008 VA: 0x2852008
         public void SetRoleEnhance(TeamEnhanceParameter _teamEnhanceParameter)
-        { 
+        {
             if (_teamEnhanceParameter == null || this == null)
                 return;
 
@@ -3120,6 +3130,35 @@ this.updateCurColor();
             }
         }
 
+        public void SetConnectRankStatus(UnitParameter unitParameter, int systemId)
+        {
+            connectRankBuffParameter.Clear();
+
+            if (unitParameter?.UniqueData == null || unitParameter.UniqueData.ConnectRank < 1)
+                return;
+
+            int roleId = RoleId;
+            if (MainManager.Instance?.UnitRoleDataDic != null &&
+                MainManager.Instance.UnitRoleDataDic.TryGetValue(unitParameter.UniqueData.Id, out var roleData))
+            {
+                roleId = roleData.unit_role_id;
+            }
+
+            if (roleId <= 0)
+                return;
+
+            var statusDictionary = ConnectRankTempData.Instance.CreateScaledRankStatusDictionary(
+                roleId,
+                unitParameter.UniqueData.ConnectRank,
+                unitParameter.MasterData.AtkType,
+                systemId);
+
+            foreach (var pair in statusDictionary)
+            {
+                connectRankBuffParameter[pair.Key] = pair.Value;
+            }
+        }
+
         /// <summary>
         /// 应用被动技能效果
         /// </summary>
@@ -3136,9 +3175,11 @@ this.updateCurColor();
             applyTalentLevel();
             
             applyTalentEnhance(_isFirst);
-            
+
             applyRoleEnhance(_isFirst);
-        
+
+            applyConnectRankEnhance(_isFirst);
+
             MaxHpAfterPassive = MaxHp;
         
             unitActionController.SetAttackValue(AdditionalAttackEnhanceZero);
@@ -3211,6 +3252,24 @@ this.updateCurColor();
                 );
             }
 
+        }
+
+        private void applyConnectRankEnhance(bool _first)
+        {
+            if (connectRankBuffParameter == null)
+                return;
+
+            bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
+            foreach (KeyValuePair<eParamType, long> pair in connectRankBuffParameter)
+            {
+                ApplyEnhanceValue(
+                    pair.Key,
+                    pair.Value,
+                    _first,
+                    isClanBattleOrSekaiEnemy,
+                    true
+                );
+            }
         }
 
         // RVA: 0x284D25C Offset: 0x284D25C VA: 0x284D25C
@@ -3374,6 +3433,14 @@ this.updateCurColor();
         
                 case eParamType.ENERGY_CHARGE:  // 111
                     EnergyCharge += _value / 10.0;
+                    break;
+
+                case eParamType.ADDITIONAL_WHOLE_DAMAGE_UP_PERMYRIAD:  // 112
+                    AdditionalWholeDamageUpPermyriad += _value;
+                    break;
+
+                case eParamType.ADDITIONAL_WHOLE_DAMAGE_CUT_PERMYRIAD:  // 113
+                    AdditionalWholeDamageCutPermyriad += _value;
                     break;
             }
         }
@@ -9500,6 +9567,11 @@ this.updateCurColor();
                 double num4 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_ALL_DAMAGE) / 100.0;
                 num *= 1.0 - num4;
             }
+            double wholeDamageCutRate = WholeDamageCutPercentOrMin / 100.0;
+            if (wholeDamageCutRate > 0.0)
+            {
+                num *= 1.0 - wholeDamageCutRate;
+            }
             if (_actionType == eActionType.ATTACK)
             {
                 if (_damageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
@@ -10082,6 +10154,13 @@ this.updateCurColor();
                 double num2 = GetAbnormalStateMainValue(eAbnormalStateCategory.CUT_ALL_DAMAGE) / 100f;
                 a *= 1f - num2;
                 b *= 1f - num2;
+            }
+
+            double wholeDamageCutRate = WholeDamageCutPercentOrMin / 100.0;
+            if (wholeDamageCutRate > 0.0)
+            {
+                a *= 1.0 - wholeDamageCutRate;
+                b *= 1.0 - wholeDamageCutRate;
             }
 
             if (_byAttack && !_damageData.IgnoreStrikeBackAndAllUnitDamageCutTrigger)

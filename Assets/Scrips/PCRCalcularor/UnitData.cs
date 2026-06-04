@@ -618,6 +618,7 @@ namespace PCRCaculator
         public int uniqueEqLv;//专武等级
         public int uniqueEq2Lv = -1;//专武2等级
         public int connectRank;
+        public int connectRankLimit;
         public bool uniqueEqPlus = false; // SP+
         public bool uniqueEq2Plus = false; // SP+
         public int[] exEquip = new int[] { 0, 0, 0 };
@@ -687,7 +688,7 @@ namespace PCRCaculator
             skillLevel = new int[4] { lv, lv, lv, lv };
         }
 
-        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1, bool uniqueEqPlus = false, bool uniqueEq2Plus = false)
+        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1, bool uniqueEqPlus = false, bool uniqueEq2Plus = false, int connectRank = 0, int connectRankLimit = 0)
         {
             unitId = id;
             level = lv;
@@ -708,6 +709,8 @@ namespace PCRCaculator
             uniqueEq2Lv = uniqueeq2lv;
             this.uniqueEqPlus = uniqueEqPlus;
             this.uniqueEq2Plus = uniqueEq2Plus;
+            this.connectRank = connectRank;
+            this.connectRankLimit = connectRankLimit;
         }
 
         public void SetMaxLove()
@@ -867,7 +870,7 @@ namespace PCRCaculator
         /// <returns></returns>
         public UnitData Copy()
         {
-            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv, uniqueEqPlus, uniqueEq2Plus);
+            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv, uniqueEqPlus, uniqueEq2Plus, connectRank, connectRankLimit);
         }
         /// <summary>
         /// 比较相同角色是否有所提升
@@ -1094,6 +1097,7 @@ namespace PCRCaculator
                 hashCode = (hashCode * 397) ^ uniqueEqLv;
                 hashCode = (hashCode * 397) ^ uniqueEq2Lv;
                 hashCode = (hashCode * 397) ^ connectRank;
+                hashCode = (hashCode * 397) ^ connectRankLimit;
                 hashCode = (hashCode * 397) ^ (uniqueEqPlus ? 1 : 0);
                 hashCode = (hashCode * 397) ^ (uniqueEq2Plus ? 1 : 0);
                 hashCode = (hashCode * 397) ^ exEquip[0];
