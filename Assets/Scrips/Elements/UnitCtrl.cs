@@ -10281,18 +10281,7 @@ this.updateCurColor();
                         TotalDamageForLogBarrier = (DoubleWithEx)_damageData.TotalDamageForLogBarrier;
                     else
                         TotalDamageForLogBarrier = (DoubleWithEx)a;
-                    long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
-                    long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
-                    logBarrierApplied |= (double)TotalDamageForLogBarrier > allLogBarrierStartValue;
-#if DONT_USE_EX
-                    var tt = execBarrier(TotalDamageForLogBarrier, allLogBarrierEffectValue, allLogBarrierStartValue);
-#else
-                    var tt = TotalDamageForLogBarrier.Select(x =>
-                        execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
-#endif
-                    a *= tt;
-                    b *= tt;
-                    TotalDamageForLogBarrier *= tt;
+
                     if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.LOG_ATK_BARRIR))
                     {
                         double abnormalStateSubValue = GetAbnormalStateSubValue(eAbnormalStateCategory.LOG_ATK_BARRIR);
@@ -10338,6 +10327,19 @@ this.updateCurColor();
                         b *= t;
                         TotalDamageForLogBarrier *= t;
                     }
+
+                    long allLogBarrierStartValue = battleManager.allLogBarrierStartValue;
+                    long allLogBarrierEffectValue = battleManager.allLogBarrierEffectValue;
+                    logBarrierApplied |= (double)TotalDamageForLogBarrier > allLogBarrierStartValue;
+#if DONT_USE_EX
+                    var tt = execBarrier(TotalDamageForLogBarrier, allLogBarrierEffectValue, allLogBarrierStartValue);
+#else
+                    var tt = TotalDamageForLogBarrier.Select(x =>
+                        execBarrier(x, allLogBarrierEffectValue, allLogBarrierStartValue), $"barrier:{allLogBarrierEffectValue}:{allLogBarrierStartValue}");
+#endif
+                    a *= tt;
+                    b *= tt;
+                    TotalDamageForLogBarrier *= tt;
                     totalDamageForTranscend = TotalDamageForLogBarrier;
                 }
             }
