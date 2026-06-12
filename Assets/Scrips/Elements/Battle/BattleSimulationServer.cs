@@ -47,6 +47,107 @@ namespace Elements.Battle
     }
 
     [Serializable]
+    public class BuffDebuffEventData
+    {
+        public int TargetUnitId { get; set; }
+        public int SourceUnitId { get; set; }
+        public UnitCtrl.BuffParamKind BuffParamKind { get; set; }
+        public int BuffParamKindValue { get; set; }
+        public string BuffParamKindName { get; set; }
+        public string BuffParamKindDescription { get; set; }
+        public bool IsBuff { get; set; }
+        public long Value { get; set; }
+        public int StartFrame { get; set; }
+        public int EndFrame { get; set; }
+        public bool IsActiveAtBattleEnd { get; set; }
+        public int SkillId { get; set; }
+        public int ActionId { get; set; }
+        public string Describe { get; set; }
+    }
+
+    [Serializable]
+    public class BossDefEventData
+    {
+        public int TargetUnitId { get; set; }
+        public int Frame { get; set; }
+        public long Value { get; set; }
+        public int SourceUnitId { get; set; }
+        public int SkillId { get; set; }
+        public int ActionId { get; set; }
+        public string Describe { get; set; }
+    }
+
+    [Serializable]
+    public class SkillExecEventData
+    {
+        public int UnitId { get; set; }
+        public int SkillId { get; set; }
+        public string SkillName { get; set; }
+        public int ActionId { get; set; }
+        public int StartFrame { get; set; }
+        public int EndFrame { get; set; }
+    }
+
+    [Serializable]
+    public class HitTraceEventData
+    {
+        public int Frame { get; set; }
+        public int SourceUnitId { get; set; }
+        public int TargetUnitId { get; set; }
+        public int SkillId { get; set; }
+        public string SkillName { get; set; }
+        public int ActionId { get; set; }
+        public long Damage { get; set; }
+        public DamageData.eDamageType DamageType { get; set; }
+        public int DamageTypeValue { get; set; }
+        public string DamageTypeName { get; set; }
+        public bool IsCritical { get; set; }
+        public long RemainingHp { get; set; }
+        public int TargetPartsIndex { get; set; }
+        public eActionType ActionType { get; set; }
+        public int ActionTypeValue { get; set; }
+        public string ActionTypeName { get; set; }
+        public bool IsSlipDamage { get; set; }
+    }
+
+    [Serializable]
+    public class TpChangeEventData
+    {
+        public int Frame { get; set; }
+        public int TargetUnitId { get; set; }
+        public int TargetLaneIndex { get; set; }
+        public int SourceUnitId { get; set; }
+        public int SourceLaneIndex { get; set; }
+        public int SetEnergyTypeValue { get; set; }
+        public string SetEnergyTypeName { get; set; }
+        public int SkillId { get; set; }
+        public string SkillName { get; set; }
+        public int ActionId { get; set; }
+        public double EnergyBefore { get; set; }
+        public double EnergyAfter { get; set; }
+        public double EnergyCap { get; set; }
+        public double DeltaBeforeCap { get; set; }
+        public double AppliedDelta { get; set; }
+        public double OverflowDelta { get; set; }
+        public bool IsIncrease { get; set; }
+        public bool IsReadyBefore { get; set; }
+        public bool IsReadyAfter { get; set; }
+        public bool CrossedReady { get; set; }
+    }
+
+    [Serializable]
+    public class AutoSemanTeacherPayloadData
+    {
+        public string ToggleProfile { get; set; }
+        public int SemanSkillToggleIndex { get; set; }
+        public List<List<int>> TeacherGenesByLane { get; set; }
+        public List<List<float>> UBTime { get; set; }
+        public List<int> SemanUBNum { get; set; }
+        public int CalcStats { get; set; }
+        public int Seed { get; set; }
+    }
+
+    [Serializable]
     public class BattleStatsData
     {
         public long TotalDamage { get; set; }
@@ -61,6 +162,38 @@ namespace Elements.Battle
         public List<long> PlayerNonUbDamageList { get; set; }
         public List<List<int>> UBToleranceFrames { get; set; }
         public List<List<float>> UBTime { get; set; }
+        public List<List<int>> SkillReadyCrossingFrames { get; set; }
+        public List<List<int>> AutoSemanUBExecTimeList { get; set; }
+        public List<AutoSemanTeacherPayloadData> AutoSemanTeacherPayloads { get; set; }
+        public List<BuffDebuffEventData> BuffDebuffEvents { get; set; }
+        public List<BossDefEventData> BossDefEvents { get; set; }
+        public List<BossDefEventData> BossMagicDefEvents { get; set; }
+        public List<SkillExecEventData> SkillExecEvents { get; set; }
+        public List<HitTraceEventData> HitTraceEvents { get; set; }
+        public List<TpChangeEventData> TpChangeEvents { get; set; }
+    }
+
+    [Serializable]
+    public class BattleResponseValidationData
+    {
+        public bool Checked { get; set; }
+        public bool Ok { get; set; } = true;
+        public string FailureCode { get; set; } = "";
+        public string FailureMessage { get; set; } = "";
+        public bool WinConsistencyOk { get; set; } = true;
+        public long TotalDamage { get; set; }
+        public int BattleFrames { get; set; }
+        public int LimitFrames { get; set; }
+        public int CurrentSeed { get; set; }
+        public bool RequestFixedSeed { get; set; }
+        public int RequestSeed { get; set; }
+        public int MainEnemyId { get; set; }
+        public int MainUnitId { get; set; }
+        public long MainInitialCurrentHp { get; set; }
+        public long MainInitialMaxHp { get; set; }
+        public long MainFinalHp { get; set; }
+        public bool MainIsDead { get; set; }
+        public bool SupportsSimpleGuildHpCheck { get; set; }
     }
 
     [Serializable]
@@ -83,6 +216,7 @@ namespace Elements.Battle
         public List<int> BattleFramesList { get; set; }
         public List<int> CurrentSeedList { get; set; }
         public OnceResultData OnceResult { get; set; }
+        public BattleResponseValidationData Validation { get; set; }
     }
 
     public class BattleTask
@@ -123,6 +257,60 @@ namespace Elements.Battle
         public List<bool> SetToggles { get; set; }
         public bool NeedOnceResult { get; set; }
         public int RepeatCount { get; set; } = 1;
+
+        public BattleSimulationRequest DeepClone()
+        {
+            return new BattleSimulationRequest
+            {
+                CalcStats = this.CalcStats,
+                BattleTime = this.BattleTime,
+                RepeatCount = 1,
+                WaveGroupId = this.WaveGroupId,
+                IsAutoMode = this.IsAutoMode,
+                IsSetMode = this.IsSetMode,
+                IsSemanMode = this.IsSemanMode,
+                IsGuildBattle = this.IsGuildBattle,
+                IsSkipping = this.IsSkipping,
+                TalentFullInfo = this.TalentFullInfo,
+                IsTalentQuest = this.IsTalentQuest,
+                ToMaxUnitAttr = this.ToMaxUnitAttr,
+                NeedOnceResult = this.NeedOnceResult,
+                PlayerList = this.PlayerList?.Select(u => u.Clone()).ToList(),
+                EnemyList = this.EnemyList?.Select(u => u.Clone()).ToList(),
+                GuildEnemyList = this.GuildEnemyList?.ToList(),
+                UBExecTimeList = this.UBExecTimeList?.Select(l => l.ToList()).ToList(),
+                SemanUBExecTimeList = this.SemanUBExecTimeList?.Select(l => l.ToList()).ToList(),
+                SetToggles = this.SetToggles?.ToList(),
+                Settings = this.Settings != null ? new GuildRandomData
+                {
+                    DataName = this.Settings.DataName,
+                    UseFixedRandomSeed = this.Settings.UseFixedRandomSeed,
+                    RandomSeed = this.Settings.RandomSeed,
+                    ForceNoCritical_player = this.Settings.ForceNoCritical_player,
+                    ForceNoCritical_enemy = this.Settings.ForceNoCritical_enemy,
+                    ForceIgnoreDodge_player = this.Settings.ForceIgnoreDodge_player,
+                    ForceIgnoreDodge_enemy = this.Settings.ForceIgnoreDodge_enemy,
+                    ForceCritical_player = this.Settings.ForceCritical_player,
+                    randomSpecialDatas = this.Settings.randomSpecialDatas?.Select(s => s != null ? new GuildRandomSpecialData
+                    {
+                        fixTimeExec = s.fixTimeExec,
+                        startFream = s.startFream,
+                        endFream = s.endFream,
+                        fixCountExec = s.fixCountExec,
+                        countEcexNum = s.countEcexNum,
+                        sourceNum = s.sourceNum,
+                        sourceSkillNum = s.sourceSkillNum,
+                        sourceSkillType = s.sourceSkillType,
+                        targetNum = s.targetNum,
+                        resuleType = s.resuleType
+                    } : null).ToList()
+                } : null,
+                TalentSkillLevels = this.TalentSkillLevels != null ? new Dictionary<int, int>(this.TalentSkillLevels) : null,
+                TalentSkillNodeLevels = this.TalentSkillNodeLevels != null ? new Dictionary<int, int>(this.TalentSkillNodeLevels) : null,
+                MasterSkillNodeLevels = this.MasterSkillNodeLevels != null ? new Dictionary<int, int>(this.MasterSkillNodeLevels) : null,
+                RoleMastery = this.RoleMastery != null ? new Dictionary<int, (int, int)>(this.RoleMastery) : null,
+            };
+        }
     }
 
 #if UNITY_5_3_OR_NEWER

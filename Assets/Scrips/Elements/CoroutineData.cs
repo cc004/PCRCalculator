@@ -104,6 +104,101 @@ namespace Elements
             }
 #endif
         }
+
+#if ENABLE_THREADING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal new CoroutineDiagnosticsCounters UpdateWithDiagnostics()
+        {
+            var counters = new CoroutineDiagnosticsCounters
+            {
+                TopLevelCoroutineCount = CoroutineList.Count,
+                UnitBoundBucketCount = CoroutineDataDictionary.Count
+            };
+
+#if UNITY_5_3_OR_NEWER
+            if (blackOutUnitList.Count != 0)
+            {
+                for (int index = blackOutUnitList.Count - 1; index >= 0; --index)
+                {
+                    CoroutineDataBase coroutineDataBase = null;
+                    if (CoroutineDataDictionary.TryGetValue(blackOutUnitList[index], out coroutineDataBase))
+                        counters.Add(coroutineDataBase.UpdateWithDiagnostics());
+                    while (blackOutUnitList.Count <= index - 1)
+                        --index;
+                }
+            }
+            else
+            {
+                counters = base.UpdateWithDiagnostics();
+                counters.UnitBoundBucketCount = CoroutineDataDictionary.Count;
+                if (keyList == null)
+                {
+                    keyList = new List<UnitCtrl>(CoroutineDataDictionary.Keys);
+                    keyListOther = new List<UnitCtrl>();
+                }
+                else
+                {
+                    set.Clear();
+                    foreach (var key in keyList)
+                    {
+                        set.Add(key);
+                        if (CoroutineDataDictionary.ContainsKey(key))
+                            keyListOther.Add(key);
+                    }
+
+                    foreach (UnitCtrl key in CoroutineDataDictionary.Keys)
+                    {
+                        if (!set.Contains(key))
+                            keyListOther.Add(key);
+                    }
+
+                    keyList.Clear();
+                    var t = keyList;
+                    keyList = keyListOther;
+                    keyListOther = t;
+                }
+
+                for (int index = 0; index < keyList.Count; ++index)
+                {
+                    UnitCtrl key = keyList[index];
+                    if (key == null)
+                        coroutineDataRemoveKeyList.Add(key);
+                    else
+                        counters.Add(CoroutineDataDictionary[key].UpdateWithDiagnostics());
+                }
+
+                for (int index = coroutineDataRemoveKeyList.Count - 1; index >= 0; --index)
+                {
+                    CoroutineDataDictionary.Remove(coroutineDataRemoveKeyList[index]);
+                    coroutineDataRemoveKeyList.RemoveAt(index);
+                }
+            }
+#else
+            if (blackOutUnitList.Count != 0)
+            {
+                for (int index = blackOutUnitList.Count - 1; index >= 0; --index)
+                {
+                    if (blackOutUnitList.Count <= index) continue;
+                    CoroutineDataBase coroutineDataBase = null;
+                    if (CoroutineDataDictionary.TryGetValue(blackOutUnitList[index], out coroutineDataBase))
+                        counters.Add(coroutineDataBase.UpdateWithDiagnostics());
+                }
+            }
+            else
+            {
+                counters = base.UpdateWithDiagnostics();
+                counters.UnitBoundBucketCount = CoroutineDataDictionary.Count;
+                toUpdate.Clear();
+                foreach (var value in CoroutineDataDictionary.Values)
+                    toUpdate.Add(value);
+                foreach (var value in toUpdate)
+                    counters.Add(value.UpdateWithDiagnostics());
+            }
+#endif
+
+            return counters;
+        }
+#endif
 #if !UNITY_5_3_OR_NEWER
         private List<CoroutineDataBase> toUpdate = new();
 #endif
