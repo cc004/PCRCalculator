@@ -42,8 +42,8 @@ namespace Elements
         public List<UnitCtrl> enemyUnitCtrl;
         public List<UnitCtrl> extraEffectEnemyUnitCtrl;
         public Dictionary<int, UnitCtrlData> allUnitCtrlDataDic = new Dictionary<int, UnitCtrlData>();
-        
-        public BattleStatistics BattleStats = new BattleStatistics(); 
+
+        public BattleStatistics BattleStats = new BattleStatistics();
 
         private int finishCount;
         private MainManager mainManager;
@@ -69,7 +69,7 @@ namespace Elements
         public void Awake()
         {
             Instance = this;
-            
+
             //System.IO.File.WriteAllText("fieldnames.txt",
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
         }
@@ -234,7 +234,7 @@ namespace Elements
                 BattleManager.Instance.semanubmanager.Disable();
             }
         }
-        
+
         public void ReStart(bool rebuild = true)
         {
             isBattleFinish = false;
@@ -248,7 +248,7 @@ namespace Elements
                 if (mainManager.IsGuildBattle)
                 {
                     tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
-                    
+
                     tempData.waveGroupId = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().waveGroupId;
 
                     var extra_data = GetExtraEffectEnemyData(tempData);
@@ -322,8 +322,8 @@ namespace Elements
             playerUnitCtrl.Clear();
             enemyUnitCtrl.Clear();
             playerUnitCtrlDic.Clear();
-            
-            BattleStats.Reset(); 
+
+            BattleStats.Reset();
             // enemyUnitCtrlDic.Clear();
             allUnitCtrlDataDic.Clear();
             IsUnitCreated = false;
@@ -348,7 +348,7 @@ namespace Elements
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
             isBattleFinish = false;
-            BattleStats.LogLevel = (BattleStatisticsLogLevel)req.CalcStats;
+            BattleStats.LogLevel = BattleStatistics.NormalizeLogLevel(req.CalcStats);
             BattleStats.Reset();
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
@@ -374,6 +374,8 @@ namespace Elements
                     talentSkillLevels,
                     MainManager.Instance.TalentSkillNodeDic,
                     TeamEnhanceParameter.DataType.TalentSkill);
+                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().talentSkill =
+                    new Dictionary<int, int>(talentSkillLevels);
 
                 if (TalentSkillTreeManager.Instance is not null)
                 {
@@ -390,6 +392,8 @@ namespace Elements
                     teamSkillLevels,
                     MainManager.Instance.TeamSkillNodeDic,
                     TeamEnhanceParameter.DataType.TeamSkill);
+                GuildManager.Instance.SettingData.GetCurrentPlayerGroup().teamSkill =
+                    new Dictionary<int, int>(teamSkillLevels);
 
                 if (TeamSkillTreeManager.Instance is not null)
                 {
@@ -436,7 +440,7 @@ namespace Elements
                         {
                             if (a != 0)
                             {
-                                tempData.MPartsDataDic.Add(a, GuildManager.Instance.GetEnemyDataByID(a, boss_id: enemyid_0));                        
+                                tempData.MPartsDataDic.Add(a, GuildManager.Instance.GetEnemyDataByID(a, boss_id: enemyid_0));
                             }
                         };
                         action(value.child_enemy_parameter_1);
@@ -501,7 +505,7 @@ namespace Elements
                 {
                     foreach (var enemy in tempData.enemyList)
                     {
-                        enemy.SetMax(battle_mode: 2); // only in jjc 
+                        enemy.SetMax(battle_mode: 2); // only in jjc
                         enemy.SetMaxLove();
                     }
                 }
@@ -552,8 +556,15 @@ namespace Elements
                 }
                 else
                 {
-                    // BattleManager.Instance.semanubmanager.SetUbExec(null);
-                    BattleManager.Instance.semanubmanager.Disable();
+                    if (BattleStats.NeedsAutoSemanTeacherTrace())
+                    {
+                        BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    }
+                    else
+                    {
+                        // BattleManager.Instance.semanubmanager.SetUbExec(null);
+                        BattleManager.Instance.semanubmanager.Disable();
+                    }
                     BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
                 }
             }
@@ -680,7 +691,7 @@ namespace Elements
             int skinID = UnitUtility.GetSkinId(data.PrefabId, data.rarity /* force use 3x skin */);
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
-            
+
             if (unitid == 105701 && data.rarity == 6)
             {
                 skinID = 170361;
@@ -698,7 +709,7 @@ namespace Elements
             // {
             //     prefabOverride = UnitUtility.GetSkinId(prefab, 3);
             // }
-            
+
             var dataAsset = SpineCreator.Instance.Createskeletondata(skinID, SPINE_SCALE, true, prefabOverride: prefabOverride);
             //}
             if(dataAsset == null)
@@ -720,12 +731,12 @@ namespace Elements
             SpineResourceInfo info = ResourceDefineSpine.GetResource(eSpineType.SD_NORMAL_BOUND);
             SpineResourceSet resourceSet = new SpineResourceSet(info, unitid2, 0, 0);
             resourceSet.Skelton = dataAsset;
-            
+
             battleSpineController.Create(resourceSet);
 
             unitCtrl.UnitSpineCtrl = battleSpineController;
             battleSpineController.Owner = unitCtrl;
-            
+
             unitCtrl.CenterBone = battleSpineController.skeleton.FindBone("Center");
             unitCtrl.StateBone = battleSpineController.skeleton.FindBone("State");
             battleSpineController.SetAnimeEventDelegateForBattle(() => { battleSpineController.IsStopState = true; });
@@ -792,7 +803,7 @@ namespace Elements
             var unitId = data.unitId;
             bool useSkillEffects = false;
 
-            
+
             //if (!ignoreEffects)
             //{
             //    useSkillEffects = LoadSkillEffectPrefabs(unitid);
@@ -1127,6 +1138,7 @@ namespace Elements
         //public bool UseFixedRandomSeed;
         //public int RandomSeed;
         public GuildSettingData SettingData;
+        public GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier;
         public Dictionary<int, BaseData> playerUnitBaseDataDic;
         public GuildRandomData randomData;
         public bool skipping;
@@ -1134,6 +1146,7 @@ namespace Elements
 
         public void CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {
+            this.useLogBarrier = useLogBarrier;
             AllUnitParameters = new List<List<UnitParameter>>();
             PlayerParameters = new List<UnitParameter>();
             EnemyParameters = new List<UnitParameter>();
@@ -1183,12 +1196,12 @@ namespace Elements
                         new SkillLevelInfo(skillData.UB, unitData.skillLevel[0], 0),
                         new SkillLevelInfo(skillData.UB_ev, skillLvEv[0], 0)
                     },
-                    new List<SkillLevelInfo> { 
-                        new SkillLevelInfo(skillData.skill_1, unitData.rank < 2 ? 0 : unitData.skillLevel[1], 0), 
+                    new List<SkillLevelInfo> {
+                        new SkillLevelInfo(skillData.skill_1, unitData.rank < 2 ? 0 : unitData.skillLevel[1], 0),
                         new SkillLevelInfo(skillData.skill_2, unitData.rank < 4 ? 0 : unitData.skillLevel[2], 0) ,
-                        new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0), 
+                        new SkillLevelInfo(skillData.skill_1_ev, skillLvEv[1], 0),
                         new SkillLevelInfo(skillData.skill_2_ev, skillLvEv[2], 0),
-                        new SkillLevelInfo(skillData.skill_1_rev, skillLvEv2[1], 0), 
+                        new SkillLevelInfo(skillData.skill_1_rev, skillLvEv2[1], 0),
                         new SkillLevelInfo(skillData.skill_2_rev, skillLvEv2[2], 0)
                     },
                     new List<SkillLevelInfo> {

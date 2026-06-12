@@ -35,8 +35,8 @@ namespace Elements
             }
             // double pp = (double)_valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
             double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)_valueDictionary[eValueNumber.VALUE_3]);
-            if (BattleManager.Random(0.0f, 1f,
-                    new RandomData(_source, _target.Owner, ActionId, 7, pp)) < pp)
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 7, pp);
+            if (BattleManager.Random(0.0f, 1f, ref randomData) < pp)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.CONVERT;

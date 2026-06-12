@@ -27,7 +27,8 @@ namespace Elements
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double dodgeByLevelDiff = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
 
-            double num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 4, (float)dodgeByLevelDiff));
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 4, (float)dodgeByLevelDiff);
+            double num = BattleManager.Random(0.0f, 1f, ref randomData);
       AweData _aweData = new AweData
       {
         LifeTime = (float)_valueDictionary[eValueNumber.VALUE_3],

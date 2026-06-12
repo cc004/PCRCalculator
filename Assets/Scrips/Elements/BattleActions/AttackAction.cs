@@ -119,7 +119,7 @@ namespace Elements
                     var data = new RandomData(_source, _target.Owner, ActionId, 1, criticalRate,
                         damageData.CriticalDamageRate);
                     double num2 = BattleManager.Random(0.0f, 1f,
-                        data);
+                        ref data);
 
 
                     if (MyGameCtrl.Instance.tempData.isGuildBattle && (MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_player && _target.Owner.IsOther || MyGameCtrl.Instance.tempData.randomData.ForceNoCritical_enemy && !_target.Owner.IsOther))
@@ -145,7 +145,12 @@ namespace Elements
                         if (num2 <= criticalRate)
                             criticalData.IsCritical = true;
                         criticalData.critVar = DoubleWithEx.Binomial(criticalRate, criticalData.IsCritical,
-                            $"rnd:{data.id}:{(int)(criticalRate * 1000)}", data.id);
+#if !DONT_USE_EX
+                            $"rnd:{data.id}:{(int)(criticalRate * 1000)}",
+#else
+                            null,
+#endif
+                            data.id);
                     }
                     else
                         criticalData.critVar = 0.0;

@@ -37,7 +37,8 @@ namespace Elements
 			if (ActionDetail3 != 0)
                 EnergyChargeMultiple = 1f - ActionDetail3 / 100f;
 			double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
-			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0)) < pp)
+			var randomData = new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,79,0);
+			if (BattleManager.Random(0f, 1f, ref randomData) < pp)
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);
 				_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)base.ActionDetail1], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], (float)_valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _isEnvironmentAbnormalState: IsEnvironmentAbnormalState);

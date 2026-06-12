@@ -20,7 +20,8 @@ namespace Elements
 		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, ValueDictionary _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-			if (BattleManager.Random(0f, 1f,new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,93,0)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target) || base.TargetAssignment == eTargetAssignment.OWNER_SITE)
+			var randomData = new PCRCaculator.Guild.RandomData(_source,_target.Owner,ActionId,93,0);
+			if (BattleManager.Random(0f, 1f, ref randomData) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target) || base.TargetAssignment == eTargetAssignment.OWNER_SITE)
 			{
 				AppendIsAlreadyExeced(_target.Owner, _num);
 				UnitCtrl.eAbnormalState abnormalState = AbnormalStateDic[(ChangeSpeedAction.eChangeSpeedType)base.ActionDetail1];

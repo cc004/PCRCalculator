@@ -243,7 +243,7 @@ namespace Elements
                                 }
                                 break;
                         }
-                        if (firearmCtrl.MoveType == eMoveTypes.PARABORIC_ROTATE)
+                        if (firearmCtrl.MoveType == eMoveTypes.PARABORIC_ROTATE && firearmCtrl.particle != null)
                             firearmCtrl.particle.transform.eulerAngles = new Vector3(0.0f, 0.0f, currentTime >= firearmCtrl.duration / 2.0 ? firearmCtrl.easingDownRotate.GetCurVal(fnhfjlaenpf, true) : firearmCtrl.easingUpRotate.GetCurVal(fnhfjlaenpf, true));
                         firearmCtrl.transform.position = b;
                         switch (firearmCtrl.MoveType)

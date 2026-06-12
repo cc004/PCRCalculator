@@ -127,7 +127,8 @@ namespace Elements
         {
             if (!UnitCtrl.IsUnableAbnormalState(_state))
                 return _state == UnitCtrl.eAbnormalState.SILENCE;
-            if (owner.abnormalStateCategoryDataDictionary.TryGetValue(UnitCtrl.GetAbnormalStateCategory(_state), out var state))
+            var state = owner.GetCategoryDataSafe(UnitCtrl.GetAbnormalStateCategory(_state));
+            if (state != null)
             {
                 return state.ActionType != eActionType.FORCE_CHANGE_SPEED;
             }

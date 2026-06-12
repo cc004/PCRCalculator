@@ -12,6 +12,47 @@ namespace Elements
   [Serializable]
   public class DamageData
   {
+    [ThreadStatic]
+    private static Stack<DamageData> s_pool;
+
+    public static DamageData Rent()
+    {
+        if (s_pool != null && s_pool.Count > 0)
+            return s_pool.Pop();
+        return new DamageData();
+    }
+
+    public void Return()
+    {
+        Target = null;
+        Source = null;
+        StrikeBackSource = null;
+        SourceForDamageNumEffect = null;
+        LimitDamageFunc = null;
+        ExecAbsorber = null;
+        OverrideDamageLimit = -1;
+        DamegeNumScale = 1f;
+        TargetIncludeMyTeam = false;
+        IgnoreTalentBonusForRatioSlip = false;
+        IgnoreStrikeBackAndAllUnitDamageCutTrigger = false;
+        IgnoreLogBarrier = false;
+        IsLogBarrierCritical = false;
+        IgnoreDef = false;
+        IsDivisionDamage = false;
+        IsSlipDamage = false;
+        DamageNumMagic = false;
+        IsAlwaysChargeEnegry = false;
+        CriticalRate = 0f;
+        CriticalRateForLogBarrier = 0f;
+        CriticalDamageRate = 0.0;
+        DamageType = eDamageType.NONE;
+        ActionType = eActionType.ATTACK;
+        DefPenetrate = 0;
+        LifeSteal = 0;
+        s_pool ??= new Stack<DamageData>();
+        s_pool.Push(this);
+    }
+
     public eDamageSoundType DamageSoundType { get; set; }
     public DoubleWithEx critVar;
     public BasePartsData Target { get; set; }

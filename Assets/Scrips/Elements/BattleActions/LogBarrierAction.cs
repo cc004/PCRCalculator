@@ -44,7 +44,13 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       AppendIsAlreadyExeced(_target.Owner, _num);
-      if (GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew != GuildPlayerGroupData.LogBarrierType.FullBarrier)
+      var useLogBarrier = GuildManager.StaticsettingData.GetCurrentPlayerGroup().useLogBarrierNew;
+      var tempData = MyGameCtrl.Instance?.tempData;
+      if (tempData?.isGuildBattle == true)
+      {
+          useLogBarrier = tempData.useLogBarrier;
+      }
+      if (useLogBarrier != GuildPlayerGroupData.LogBarrierType.FullBarrier)
             {
                 return;
             }

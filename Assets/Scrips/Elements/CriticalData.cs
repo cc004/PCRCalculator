@@ -6,7 +6,7 @@
 
 namespace Elements
 {
-  public class CriticalData
+  public struct CriticalData
   {
     public DoubleWithEx critVar { get; set; }
     public bool IsCritical { get; set; }

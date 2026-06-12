@@ -50,7 +50,8 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             UnitCtrl.eAbnormalState state = abnormalStateDic[(TauntAction.eTauntType)ActionDetail1];
             float pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
-            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 21, pp));
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 21, pp);
+            float num = BattleManager.Random(0.0f, 1f, ref randomData);
 
             if (!_source.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
             {

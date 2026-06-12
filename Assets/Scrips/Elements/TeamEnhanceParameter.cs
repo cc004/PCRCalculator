@@ -304,6 +304,9 @@ namespace Elements
         {
             List<int> activatedEnhanceIds = new List<int>();
 
+            if (skillLevels == null || skillNodeDict == null)
+                return activatedEnhanceIds;
+
             foreach (var nodeId in skillLevels.Keys)
             {
                 int level = skillLevels[nodeId];

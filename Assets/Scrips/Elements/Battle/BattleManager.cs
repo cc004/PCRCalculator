@@ -49,6 +49,7 @@ namespace Elements.Battle
 
         public ScriptManager scriptMgr;
         public static int randomCounter;
+        private static readonly Predicate<UnitCtrl> s_IsPartsBossPredicate = u => u.IsPartsBoss;
         public AutoubManager ubmanager = new AutoubManager();
         public SemanUbManager semanubmanager = new SemanUbManager();
 #if ENABLE_THREADING
@@ -125,6 +126,60 @@ namespace Elements.Battle
         private List<Vector2> questWinPositionList = new List<Vector2>();
         private List<BattleSpineController> unitSpineControllerList = new List<BattleSpineController>();
         private bool isUpdateFrameExecuted;
+#if ENABLE_THREADING
+        public int ActiveFrameCount;
+        public int TotalFrameCount;
+        [ThreadStatic] public static long AllocUnitUpdate;
+        [ThreadStatic] public static long AllocCoroutineMgr;
+        [ThreadStatic] public static long AllocSpineEffect;
+        [ThreadStatic] public static long AllocOther;
+        [ThreadStatic] public static bool CollectUpdateFrameDiagnostics;
+        [ThreadStatic] public static long UpdateFrameTimeTicks;
+        [ThreadStatic] public static long UpdateFrameStatsTicks;
+        [ThreadStatic] public static long UpdateFrameUnitEffectTicks;
+        [ThreadStatic] public static long UpdateFrameCutInCheckTicks;
+        [ThreadStatic] public static long UpdateFrameCoroutineMgrTicks;
+        [ThreadStatic] public static long UpdateFrameSpineScriptUbTicks;
+        [ThreadStatic] public static long UpdateFrameSkillReadyTicks;
+        [ThreadStatic] public static long UpdateFrameTailTicks;
+        [ThreadStatic] public static int UpdateFrameDiagnosticsFrameCount;
+        [ThreadStatic] private static long _allocSnapshot;
+
+        public static void ResetUpdateFrameDiagnostics()
+        {
+            UpdateFrameTimeTicks = 0;
+            UpdateFrameStatsTicks = 0;
+            UpdateFrameUnitEffectTicks = 0;
+            UpdateFrameCutInCheckTicks = 0;
+            UpdateFrameCoroutineMgrTicks = 0;
+            UpdateFrameSpineScriptUbTicks = 0;
+            UpdateFrameSkillReadyTicks = 0;
+            UpdateFrameTailTicks = 0;
+            UpdateFrameDiagnosticsFrameCount = 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static long StartUpdateFrameDiagnosticsPhase(bool collect)
+        {
+            return collect ? Stopwatch.GetTimestamp() : 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void RecordUpdateFrameDiagnosticsPhase(
+            bool collect,
+            ref long phaseStartTicks,
+            ref long destinationTicks)
+        {
+            if (!collect)
+            {
+                return;
+            }
+
+            var nowTicks = Stopwatch.GetTimestamp();
+            destinationTicks += nowTicks - phaseStartTicks;
+            phaseStartTicks = nowTicks;
+        }
+#endif
         //private TowerTempData towerTempData;
         //private SpaceBattleTempData spaceBattleTempData;
         //private ReplayTempData replayTempData;
@@ -327,6 +382,34 @@ namespace Elements.Battle
         public eBattleResult battleResult { get; private set; }
 
         public void SetBattleResult(eBattleResult CCNMAFPNDNB) => battleResult = CCNMAFPNDNB;
+
+        public sealed class BattleValidationSnapshot
+        {
+            public bool Captured { get; set; }
+            public int MainEnemyId { get; set; }
+            public int MainUnitId { get; set; }
+            public long MainInitialCurrentHp { get; set; }
+            public long MainInitialMaxHp { get; set; }
+            public long MainFinalHp { get; set; }
+            public bool MainIsDead { get; set; }
+            public int LimitFrames { get; set; }
+            public bool SupportsSimpleGuildHpCheck { get; set; }
+
+            public void Reset()
+            {
+                Captured = false;
+                MainEnemyId = 0;
+                MainUnitId = 0;
+                MainInitialCurrentHp = 0;
+                MainInitialMaxHp = 0;
+                MainFinalHp = 0;
+                MainIsDead = false;
+                LimitFrames = 0;
+                SupportsSimpleGuildHpCheck = false;
+            }
+        }
+
+        public BattleValidationSnapshot ValidationSnapshot { get; } = new BattleValidationSnapshot();
 
         public int AMNJIJHNJGC { get; set; }
 
@@ -667,12 +750,135 @@ namespace Elements.Battle
         public bool skipping = false;
         public bool skipUB = false;
 
+#if ENABLE_THREADING
+        public bool[][] IsSkillReadyFrames;
+        internal Dictionary<int, int> _unitIdToSlot;
+        public SkillReadyFrameHistory IsSkillReady { get; private set; }
+        private const int MaxFrames = 5400;
+
+        public sealed class SkillReadyFrameHistory
+        {
+            private readonly BattleManager owner;
+            private readonly SkillReadyFrameSnapshot frameSnapshot;
+
+            public SkillReadyFrameHistory(BattleManager owner)
+            {
+                this.owner = owner;
+                frameSnapshot = new SkillReadyFrameSnapshot(owner);
+            }
+
+            public bool ContainsKey(int frame)
+            {
+                return owner.IsSkillReadyFrames != null &&
+                       frame >= 0 &&
+                       frame < owner.IsSkillReadyFrames.Length;
+            }
+
+            public SkillReadyFrameSnapshot this[int frame]
+            {
+                get
+                {
+                    frameSnapshot.Frame = frame;
+                    return frameSnapshot;
+                }
+            }
+        }
+
+        public sealed class SkillReadyFrameSnapshot
+        {
+            private readonly BattleManager owner;
+
+            internal int Frame { get; set; }
+
+            public SkillReadyFrameSnapshot(BattleManager owner)
+            {
+                this.owner = owner;
+            }
+
+            public bool this[int unitId]
+            {
+                get
+                {
+                    if (owner.IsSkillReadyFrames == null ||
+                        owner._unitIdToSlot == null ||
+                        Frame < 0 ||
+                        Frame >= owner.IsSkillReadyFrames.Length ||
+                        !owner._unitIdToSlot.TryGetValue(unitId, out int slot))
+                    {
+                        return false;
+                    }
+
+                    var frame = owner.IsSkillReadyFrames[Frame];
+                    return frame != null &&
+                           slot >= 0 &&
+                           slot < frame.Length &&
+                           frame[slot];
+                }
+            }
+
+            public Enumerator GetEnumerator()
+            {
+                return new Enumerator(owner, Frame);
+            }
+
+            public struct Enumerator
+            {
+                private readonly BattleManager owner;
+                private readonly int frame;
+                private int index;
+                private KeyValuePair<int, bool> current;
+
+                internal Enumerator(BattleManager owner, int frame)
+                {
+                    this.owner = owner;
+                    this.frame = frame;
+                    index = -1;
+                    current = default;
+                }
+
+                public KeyValuePair<int, bool> Current => current;
+
+                public bool MoveNext()
+                {
+                    if (owner.UnitList == null ||
+                        owner.IsSkillReadyFrames == null ||
+                        frame < 0 ||
+                        frame >= owner.IsSkillReadyFrames.Length ||
+                        owner.IsSkillReadyFrames[frame] == null)
+                    {
+                        return false;
+                    }
+
+                    var frameValues = owner.IsSkillReadyFrames[frame];
+                    index++;
+                    if (index >= owner.UnitList.Count || index >= frameValues.Length)
+                    {
+                        return false;
+                    }
+
+                    current = new KeyValuePair<int, bool>(owner.UnitList[index].UnitId, frameValues[index]);
+                    return true;
+                }
+            }
+        }
+#else
         public Dictionary<int, Dictionary<int, bool>> IsSkillReady = new Dictionary<int, Dictionary<int, bool>>();
+#endif
 
         private void updateFrame()
         {
             if (battleFinished) return;
-            
+#if ENABLE_THREADING
+            var collectFrameDiagnostics = CollectUpdateFrameDiagnostics;
+            if (collectFrameDiagnostics)
+            {
+                UpdateFrameDiagnosticsFrameCount++;
+            }
+
+            var framePhaseStartTicks = StartUpdateFrameDiagnosticsPhase(collectFrameDiagnostics);
+            _allocSnapshot = GC.GetAllocatedBytesForCurrentThread();
+#endif
+
             bool _canUpdateTime = !isPauseTimeLimit && BlackOutUnitList.Count == 0;
             //BattleHeaderController instance = BattleHeaderController..Instance;
 
@@ -686,7 +892,7 @@ namespace Elements.Battle
             else if (!isShowMultiTarget)
             {
                 isShowMultiTarget = true;
-                int num = EnemyList.FindLastIndex((UnitCtrl JNOIHMMFADD) => JNOIHMMFADD.IsPartsBoss);
+                int num = EnemyList.FindLastIndex(s_IsPartsBossPredicate);
                 for (int i = 0; i < EnemyList.Count; i++)
                 {
                     UnitCtrl unitCtrl = EnemyList[i];
@@ -706,8 +912,27 @@ namespace Elements.Battle
             if (_canUpdateTime)
             {
                 BattleLeftTime -= DeltaTime_60fps;
+                if (BattleLeftTime <= 0.0f)
+                {
+                    BattleLeftTime = 0.0f;
+                    isPauseTimeLimit = true;
+                    BattleHeaderController.Instance.SetRestTime(BattleLeftTime);
+                    GamePause(true);
+                    if (targetFrameCount > 0)
+                        targetFrameCount = FrameCount;
+                    GameState = eBattleGameState.WAIT_WAVE_END;
+                    finishBattle(eBattleResult.TIME_OVER);
+#if ENABLE_THREADING
+                    AllocOther += GC.GetAllocatedBytesForCurrentThread() - _allocSnapshot;
+                    RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameTimeTicks);
+#endif
+                    return;
+                }
 
-                if (MyGameCtrl.Instance.BattleStats.LogLevel >= BattleStatisticsLogLevel.Simple)
+#if ENABLE_THREADING
+                RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameTimeTicks);
+#endif
+                if (MyGameCtrl.Instance.BattleStats.NeedsCoreStats())
                 {
                     // 1. 获取 Boss 单位
                     var boss = BossUnit; 
@@ -763,6 +988,9 @@ namespace Elements.Battle
                         );
                     }
                 }
+#if ENABLE_THREADING
+                RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameStatsTicks);
+#endif
 
                 semanubmanager.ProcessFrame();
                 BattleHeaderController.CurrentFrameCount++;
@@ -785,12 +1013,29 @@ namespace Elements.Battle
                     finishBattle(eBattleResult.TIME_OVER);
                     //BattleHeaderController.Instance.gameObject.SetActive(false);
                     //this.UnitUiCtrl.HideSettingButtons();
+#if ENABLE_THREADING
+                    AllocOther += GC.GetAllocatedBytesForCurrentThread() - _allocSnapshot;
+                    RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameTimeTicks);
+#endif
                     return;
                 }
             }
             ++FrameCount;
             if (BattleLeftTime <= 0.0 && battleResult != eBattleResult.WIN)
+            {
+#if ENABLE_THREADING
+                AllocOther += GC.GetAllocatedBytesForCurrentThread() - _allocSnapshot;
+                RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameTimeTicks);
+#endif
                 return;
+            }
+#if ENABLE_THREADING
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameTimeTicks);
+#endif
+#if ENABLE_THREADING
+            var allocCurrent = GC.GetAllocatedBytesForCurrentThread();
+            _allocSnapshot = allocCurrent;
+#endif
             //this.UnitUiCtrl._Update(_canUpdateTime);
             switch (GameState)
             {
@@ -809,16 +1054,45 @@ namespace Elements.Battle
                 if (!effectUpdateList[index2]._Update())
                     effectUpdateList.RemoveAt(index2);
             }
+#if ENABLE_THREADING
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameUnitEffectTicks);
+            allocCurrent = GC.GetAllocatedBytesForCurrentThread();
+            AllocUnitUpdate += allocCurrent - _allocSnapshot;
+            _allocSnapshot = allocCurrent;
+#endif
             //if (this.JJCJONPDGIM != 0 && this.UnitUiCtrl.UnitCtrls != null && (this.EnemyList != null && !this.callStartCutIn()))
+#if ENABLE_THREADING
+            bool shouldUpdateCoroutine = FrameCount != 0 && (EnemyList != null && !callStartCutIn() && !IsPausingEffectSkippedInThisFrame);
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameCutInCheckTicks);
+            allocCurrent = GC.GetAllocatedBytesForCurrentThread();
+            _allocSnapshot = allocCurrent;
+            if (shouldUpdateCoroutine)
+#else
             if (FrameCount != 0 && (EnemyList != null && !callStartCutIn() && !IsPausingEffectSkippedInThisFrame))
+#endif
+            {
                 CoroutineManager._Update();
+#if ENABLE_THREADING
+                allocCurrent = GC.GetAllocatedBytesForCurrentThread();
+                AllocCoroutineMgr += allocCurrent - _allocSnapshot;
+#endif
+            }
+#if ENABLE_THREADING
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameCoroutineMgrTicks);
+#endif
 
             // foreach (var spineCtrl in unitSpineControllerList)
             // {
-            //     spineCtrl.RealUpdate();
-            //     spineCtrl.RealLateUpdate();
+                //     spineCtrl.RealUpdate();
+                //     spineCtrl.RealLateUpdate();
             // }
+#if ENABLE_THREADING
+            allocCurrent = GC.GetAllocatedBytesForCurrentThread();
+            _allocSnapshot = allocCurrent;
+#endif
+#if UNITY_5_3_OR_NEWER
             unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
+#endif
 #if UNITY_5_3_OR_NEWER
             if (!skipping && !skipUB)
                unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
@@ -828,16 +1102,52 @@ namespace Elements.Battle
             IsPausingEffectSkippedInThisFrame = false;
             IsTalentBonusEffectPlaying = false;
             isUpdateFrameExecuted = true;
+#if ENABLE_THREADING
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameSpineScriptUbTicks);
+            ActiveFrameCount++;
+            TotalFrameCount = FrameCount;
+#endif
 
-            var logicFrameCount = BattleHeaderController.CurrentFrameCount;
-            if (!IsSkillReady.ContainsKey(logicFrameCount))
+            bool needSkillReadyHistory = MyGameCtrl.Instance.BattleStats.NeedsUbTime() ||
+                                         MyGameCtrl.Instance.BattleStats.NeedsSkillReadyTrace();
+#if ENABLE_THREADING
+            // Server-side simulations only need the per-frame readiness snapshot for Full stats.
+            if (needSkillReadyHistory)
             {
-                IsSkillReady[logicFrameCount] = new Dictionary<int, bool>();
+                var frame = BattleHeaderController.CurrentFrameCount;
+                if (frame < MaxFrames && IsSkillReadyFrames != null && _unitIdToSlot != null)
+                {
+                    for (int i = 0; i < UnitList.Count && i < IsSkillReadyFrames[frame].Length; i++)
+                    {
+                        if (_unitIdToSlot.TryGetValue(UnitList[i].UnitId, out int slot) &&
+                            slot >= 0 &&
+                            slot < IsSkillReadyFrames[frame].Length)
+                        {
+                            IsSkillReadyFrames[frame][slot] = UnitList[i].IsSkillReady;
+                        }
+                    }
+                }
             }
-            foreach (var unit in UnitList)
+#else
+            if (true)
             {
-                IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
+                var logicFrameCount = BattleHeaderController.CurrentFrameCount;
+                if (!IsSkillReady.ContainsKey(logicFrameCount))
+                {
+                    IsSkillReady[logicFrameCount] = new Dictionary<int, bool>();
+                }
+                foreach (var unit in UnitList)
+                {
+                    IsSkillReady[logicFrameCount][unit.UnitId] = unit.IsSkillReady;
+                }
             }
+#endif
+#if ENABLE_THREADING
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameSkillReadyTicks);
+            allocCurrent = GC.GetAllocatedBytesForCurrentThread();
+            AllocSpineEffect += allocCurrent - _allocSnapshot;
+            _allocSnapshot = allocCurrent;
+#endif
 
             if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
             {
@@ -849,6 +1159,10 @@ namespace Elements.Battle
                 MyGameCtrl.Instance.PauseButton();
                 stepping = false;
             }
+#if ENABLE_THREADING
+            AllocOther += GC.GetAllocatedBytesForCurrentThread() - _allocSnapshot;
+            RecordUpdateFrameDiagnosticsPhase(collectFrameDiagnostics, ref framePhaseStartTicks, ref UpdateFrameTailTicks);
+#endif
         }
 
         private bool callStartCutIn() => GameState == eBattleGameState.PLAY && (updateMainUnit() || updateEnemyUnit());
@@ -1073,13 +1387,13 @@ namespace Elements.Battle
         public static Action<RandomData> OnCallRandom;        
 
         //public static float Random(float Min, float Max) => (float)BattleManager.Random((int)((double)Min * 1000.0), (int)((double)Max * 1000.0)) / 1000f;
-        public static float Random(float Min, float Max, RandomData data)
+        public static float Random(float Min, float Max, ref RandomData data)
         {
-            return Random((int)(Min * 1000.0), (int)(Max * 1000.0),data) / 1000f;
+            return Random((int)(Min * 1000.0), (int)(Max * 1000.0), ref data) / 1000f;
         }
 
         //public static int Random(int Min, int Max) => Min == Max ? Min : UnityEngine.Random.Range(Min, Max);
-        public static int Random(int Min, int Max, RandomData data)
+        public static int Random(int Min, int Max, ref RandomData data)
         {
             if (Max == Min) return Min;
             int result = UnityEngine.Random.Range(Min, Max);
@@ -3369,9 +3683,12 @@ namespace Elements.Battle
             int index1 = 0;
             for (int count = UnitList.Count; index1 < count; ++index1)
             {
-                if (!UnitList[index1].IsDead)
+                UnitCtrl unitCtrl = UnitList[index1];
+                if (unitCtrl.TryRepairInvalidZeroHpSummonDerivedUnit())
+                    continue;
+                if (!unitCtrl.IsDead)
                 {
-                    idleonlyDone = UnitList[index1].CurrentState == UnitCtrl.ActionState.IDLE;
+                    idleonlyDone = unitCtrl.CurrentState == UnitCtrl.ActionState.IDLE;
                     if (!idleonlyDone)
                         return;
                 }
@@ -3379,9 +3696,12 @@ namespace Elements.Battle
             int index2 = 0;
             for (int count = EnemyList.Count; index2 < count; ++index2)
             {
-                if (!EnemyList[index2].IsDead)
+                UnitCtrl unitCtrl = EnemyList[index2];
+                if (unitCtrl.TryRepairInvalidZeroHpSummonDerivedUnit())
+                    continue;
+                if (!unitCtrl.IsDead)
                 {
-                    idleonlyDone = EnemyList[index2].CurrentState == UnitCtrl.ActionState.IDLE;
+                    idleonlyDone = unitCtrl.CurrentState == UnitCtrl.ActionState.IDLE;
                     if (!idleonlyDone)
                         return;
                 }
@@ -3582,8 +3902,8 @@ namespace Elements.Battle
                 unitCtrl.CureAllAbnormalState();
                 unitCtrl.CutInFrameSet.CutInFrame = -1;
             }
-            if (!GIMAJHFCKNE && otherAllDead)
-                GIMAJHFCKNE = otherAllDead;
+            if (!GIMAJHFCKNE && AreAllCurrentBattleEnemiesDead())
+                GIMAJHFCKNE = true;
             ChargeSkillTurn = eChargeSkillTurn.NONE;
             //this.UnitUiCtrl.HidePopUp();
             playerAllDead = false;
@@ -3692,6 +4012,15 @@ namespace Elements.Battle
                                                         // this.currentWaveOffset = this.battleProcessor.GetCurrentWaveOffset();
             battleTimeScale.SetBaseTimeScale(1f);
             UnitList = new List<UnitCtrl>();
+#if ENABLE_THREADING
+            _unitIdToSlot = new Dictionary<int, int>();
+            IsSkillReady = new SkillReadyFrameHistory(this);
+            IsSkillReadyFrames = new bool[MaxFrames][];
+            for (int i = 0; i < MaxFrames; i++)
+            {
+                IsSkillReadyFrames[i] = new bool[10];
+            }
+#endif
             EnemyList = new List<UnitCtrl>();
             LPBCBINDJLJ = new List<UnitCtrl>();
             activeActionIds = new HashSet<long>();
@@ -4194,25 +4523,176 @@ namespace Elements.Battle
 
         public void Init(MyGameCtrl gameCtrl)
         {
+            ResetPerBattleTransientState();
+
+            GameState = eBattleGameState.PLAY;
+            StartCoroutine(coroutineStartProcess(gameCtrl));
+        }
+
+        private void ResetPerBattleTransientState()
+        {
+            battleResult = eBattleResult.INVALID_VALUE;
+            playerAllDead = false;
+            otherAllDead = false;
+            hasActiveDeadUnit = false;
+            BKIIPLLBGBA = false;
             stepping = false;
             skipping = false;
             skipUB = false;
+            isUBExecing = false;
+            isPrincessFormSkill = false;
+            IsFramePause = false;
+            IsPlayCutin = false;
+            isShowMultiTarget = false;
+            isPauseTimeLimit = false;
             isAllActionDone = true;
             isAllActionsCompleted = false;
             isDamageNumHiddenBySkillScreen = false;
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
             deltaTimeAccumulated = 0.0f;
+            cutinSkipTimeAccumulated = 0.0f;
             ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
+            ValidationSnapshot.Reset();
 
-            GameState = eBattleGameState.PLAY;
-            StartCoroutine(coroutineStartProcess(gameCtrl));
+            if (GuildCalculator.Instance != null)
+            {
+                GuildCalculator.Instance.ClearTotalDamage();
+                GuildCalculator.Instance.dmglist?.Clear();
+                GuildCalculator.Instance.bossValues?.Clear();
+            }
         }
+
+        private UnitCtrl FindMainValidationEnemy()
+        {
+            if (EnemyList == null || EnemyList.Count == 0)
+                return null;
+
+            var mainUnitId = ValidationSnapshot.MainUnitId;
+            if (mainUnitId != 0)
+            {
+                var matched = EnemyList.FirstOrDefault(unit => unit != null && unit.UnitId == mainUnitId);
+                if (matched != null)
+                    return matched;
+            }
+
+            return EnemyList.FirstOrDefault(unit => unit != null && !unit.IsSummonOrPhantom);
+        }
+
+        private void CaptureBattleValidationSnapshot()
+        {
+            ValidationSnapshot.Reset();
+            var snapshot = ValidationSnapshot;
+            snapshot.LimitFrames = Math.Max(0, (MyGameCtrl.Instance.tempData?.SettingData?.limitTime ?? 90) * 60);
+
+            var mainEnemyData = tempData?.guildEnemy != null && tempData.guildEnemy.Count > 0
+                ? tempData.guildEnemy[0]
+                : null;
+            if (mainEnemyData != null)
+            {
+                snapshot.MainEnemyId = mainEnemyData.enemy_id;
+                snapshot.MainUnitId = mainEnemyData.unit_id;
+            }
+
+            var mainEnemy = FindMainValidationEnemy();
+            if (mainEnemy == null)
+                return;
+
+            snapshot.Captured = true;
+            if (snapshot.MainUnitId == 0)
+                snapshot.MainUnitId = mainEnemy.UnitId;
+            snapshot.MainInitialCurrentHp = Math.Max(0L, (long)mainEnemy.Hp);
+            snapshot.MainInitialMaxHp = Math.Max(0L, (long)mainEnemy.MaxHp);
+            snapshot.MainFinalHp = snapshot.MainInitialCurrentHp;
+            snapshot.MainIsDead = mainEnemy.IsDead || (long)mainEnemy.Hp <= 0L;
+            snapshot.SupportsSimpleGuildHpCheck = tempData?.isGuildBattle == true && !mainEnemy.IsPartsBoss;
+        }
+
+        public BattleValidationSnapshot RefreshBattleValidationSnapshot()
+        {
+            var snapshot = ValidationSnapshot;
+            if (!snapshot.Captured)
+                return snapshot;
+
+            var mainEnemy = FindMainValidationEnemy();
+            if (mainEnemy == null)
+                return snapshot;
+
+            snapshot.MainFinalHp = Math.Max(0L, (long)mainEnemy.Hp);
+            snapshot.MainIsDead = mainEnemy.IsDead || (long)mainEnemy.Hp <= 0L;
+            return snapshot;
+        }
+
+        private bool AreAllCurrentBattleEnemiesDead()
+        {
+            if (EnemyList == null || EnemyList.Count == 0)
+                return false;
+
+            var hasPrimaryEnemy = false;
+            for (int index = 0; index < EnemyList.Count; ++index)
+            {
+                var unit = EnemyList[index];
+                if (unit == null || unit.IsSummonOrPhantom)
+                    continue;
+
+                hasPrimaryEnemy = true;
+                if (!unit.IsDead && (long)unit.Hp > 0L)
+                    return false;
+            }
+
+            return hasPrimaryEnemy;
+        }
+
+#if UNITY_5_3_OR_NEWER
+        private static IEnumerable<int> CollectBattleResourcePrefabIds(TempData tempData)
+        {
+            if (tempData == null)
+                yield break;
+
+            if (tempData.playerList != null)
+            {
+                foreach (var unitData in tempData.playerList)
+                {
+                    if (unitData != null && unitData.PrefabId > 0)
+                        yield return unitData.PrefabId;
+                }
+            }
+
+            if (tempData.enemyList != null)
+            {
+                foreach (var unitData in tempData.enemyList)
+                {
+                    if (unitData != null && unitData.PrefabId > 0)
+                        yield return unitData.PrefabId;
+                }
+            }
+
+            if (tempData.guildEnemy != null)
+            {
+                foreach (var enemyData in tempData.guildEnemy)
+                {
+                    var prefabId = enemyData?.detailData?.prefab_id ?? 0;
+                    if (prefabId > 0)
+                        yield return prefabId;
+                }
+            }
+        }
+#endif
 
         private IEnumerator coroutineStartProcess(MyGameCtrl gameCtrl)
         {
             SetStarted(false);
+#if ENABLE_THREADING
+            if (IsSkillReadyFrames != null)
+            {
+                for (int i = 0; i < IsSkillReadyFrames.Length; i++)
+                {
+                    Array.Clear(IsSkillReadyFrames[i], 0, IsSkillReadyFrames[i].Length);
+                }
+            }
+#else
             IsSkillReady.Clear();
+#endif
             activeActionIds.Clear();
             effectUpdateList.Clear();
             isExtraEffectCalled.Clear();
@@ -4281,6 +4761,15 @@ namespace Elements.Battle
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
             skipping = tempData.skipping;
+#if UNITY_5_3_OR_NEWER
+            var battleResourcePrepare = ABExTool.PrepareBattleUnitResources(CollectBattleResourcePrefabIds(tempData));
+            if (!battleResourcePrepare.Success)
+            {
+                UnityEngine.Debug.LogError($"battle resource prepare failed before battle start: {battleResourcePrepare}");
+                SetStarted(false);
+                yield break;
+            }
+#endif
             // ISSUE: object of a compiler-generated type is created
             // ISSUE: variable of a compiler-generated type
             //BattleManager.FDEDCCJJGHM fdedccjjghm = new BattleManager.FDEDCCJJGHM();
@@ -4481,6 +4970,13 @@ namespace Elements.Battle
                 yield return null;
             }*/
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
+#if ENABLE_THREADING
+            _unitIdToSlot.Clear();
+            for (int i = 0; i < UnitList.Count; i++)
+            {
+                _unitIdToSlot[UnitList[i].UnitId] = i;
+            }
+#endif
             battleManager.InitializeEnemyFirst();
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
@@ -4591,6 +5087,7 @@ namespace Elements.Battle
                 (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index3].ExecActionOnStartAndDetermineInstanceID();
             }
             StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
+            CaptureBattleValidationSnapshot();
             //battleManager.tempData = Singleton<EHPLBCOOOPK>.Instance;
             // ISSUE: reference to a compiler-generated field
             //fdedccjjghm.mainPlayerViewerId = (int) Singleton<UserData>.Instance.UserInfo.ViewerId;
@@ -4737,6 +5234,15 @@ namespace Elements.Battle
                 scriptMgr.ParseScript();
             }
             RestFrameCount();
+#if ENABLE_THREADING
+            ActiveFrameCount = 0;
+            TotalFrameCount = 0;
+            AllocUnitUpdate = 0;
+            AllocCoroutineMgr = 0;
+            AllocSpineEffect = 0;
+            AllocOther = 0;
+            _allocSnapshot = 0;
+#endif
             stopWatch.Restart();
             battleFinishedProcessed = false;
             isPauseTimeLimit = false;

@@ -31,8 +31,8 @@ namespace Elements
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
       // double pp = _valueDictionary[eValueNumber.VALUE_3] * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
       double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)_valueDictionary[eValueNumber.VALUE_3]);
-      if (BattleManager.Random(0.0f, 1f,
-              new RandomData(_source, _target.Owner, ActionId, 14, (float)pp)) < pp)
+      var randomData = new RandomData(_source, _target.Owner, ActionId, 14, (float)pp);
+      if (BattleManager.Random(0.0f, 1f, ref randomData) < pp)
       {
         UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.SILENCE;
         switch ((eSilenceType)ActionDetail1)

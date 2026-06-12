@@ -160,7 +160,8 @@ namespace Elements
 
             // double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
             double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
-            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 6, pp));
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 6, pp);
+            float num = BattleManager.Random(0.0f, 1f, ref randomData);
             //start add
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, ActionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
@@ -205,7 +206,7 @@ namespace Elements
                             _target,
                             0
                         }
-                    }, 0.5f, _skill.SkillId, _source, _despelable: true, eEffectType.COMMON, _isBuff: true, _additional: false, _isShowIcon: false);
+                    }, 0.5f, _skill.SkillId, _source, _despelable: true, eEffectType.COMMON, _isBuff: true, _additional: false, _isShowIcon: false, _actionId: ActionId);
                 }
                 MyGameCtrl myGameCtrl = MyGameCtrl.Instance;
                 if(myGameCtrl.tempData.isGuildBattle)// && _target.Owner.IsBoss)

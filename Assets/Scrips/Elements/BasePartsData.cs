@@ -526,7 +526,8 @@ namespace Elements
             if (!dictionary.ContainsKey(_detail1))
                 return false;
             var prob = dictionary[_detail1] / 100.0f;
-            var num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, (int)_actionType, 9, prob));
+            var randomData = new RandomData(_source, _target.Owner, (int)_actionType, 9, prob);
+            var num = BattleManager.Random(0.0f, 1f, ref randomData);
             if (dictionary[_detail1] != 100 && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, _actionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
                 num = fix;

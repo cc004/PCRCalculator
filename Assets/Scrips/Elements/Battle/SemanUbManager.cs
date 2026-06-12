@@ -311,6 +311,80 @@ namespace Elements.Battle
 
             }
 
+            public int GetTeacherUbNumber(int unitId, int semanSkillToggleIndex)
+            {
+                var t_history = history.Where(h => h.action == Action.WAIT_UNIT_EVENT).ToList();
+
+                if (t_history.Count == 0 ||
+                (delay == 0 && t_history.Count(h => h.skillId == (int)eSemanEvent.UB) == 0))
+                {
+                    return delay;
+                }
+
+                int lastDelay = t_history.Last().delay;
+                var lasts = t_history.Where(h => h.delay == lastDelay).ToList();
+                UbStatus last = null;
+
+                var conditions = new List<Func<UbStatus, bool>>
+                {
+                    h => h.skillId == (int)eSemanEvent.UB,
+                    h => h.waitUnit == unitId && h.skillId == (int)eSemanEvent.IDLE,
+                    h => h.waitUnit == unitId,
+                    h => true,
+                };
+
+                foreach (var condition in conditions)
+                {
+                    var info = lasts.Where(condition).ToList();
+                    if (info.Count > 0)
+                    {
+                        last = info.Last();
+                        break;
+                    }
+                }
+
+                if (last == null)
+                {
+                    return delay;
+                }
+
+                if (semanSkillToggleIndex == 5)
+                {
+                    int trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId && h.action == Action.WAIT_UNIT_EVENT) - 1;
+                    if (trigger >= 100 || lastDelay >= 10)
+                    {
+                        return delay;
+                    }
+                    return 100000 + last.waitUnit * 10000 + last.skillId * 1000 + trigger * 10 + lastDelay;
+                }
+                else if (semanSkillToggleIndex == 6)
+                {
+                    int no_ub_trigger = t_history.Where(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
+                    int ub_trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
+                    int trigger = no_ub_trigger + ub_trigger - 1;
+
+                    if (trigger >= 100 || lastDelay >= 100)
+                    {
+                        return delay;
+                    }
+                    return 200000 + last.waitUnit * 10000 + trigger * 100 + lastDelay;
+                }
+                else if (semanSkillToggleIndex == 7)
+                {
+                    int no_ub_trigger = t_history.Where(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
+                    int ub_trigger = t_history.Count(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
+                    int trigger = no_ub_trigger + ub_trigger - 1;
+
+                    if (trigger >= 1000 || lastDelay >= 100)
+                    {
+                        return delay;
+                    }
+                    return 300000 + trigger * 100 + lastDelay;
+                }
+
+                return delay;
+            }
+
             public void Clear()
             {
                 delay = 0;
@@ -576,6 +650,8 @@ namespace Elements.Battle
 
         private List<UbRecord> auto2seman;
         private List<List<int>> auto2semanAll;
+        private Dictionary<int, List<List<int>>> auto2semanTeacherProfiles;
+        private static readonly int[] AutoSemanTeacherProfileIndexes = { 5, 6, 7 };
         private bool enable = false;
 
         public void Disable()
@@ -587,6 +663,7 @@ namespace Elements.Battle
         {
             enable = true;
             ubMod = false;
+            UBNums = new List<int> { 0, 0, 0, 0, 0 };
             if (ublists == null || ublists.Count == 0)
             {
                 auto2seman = new List<UbRecord>() {
@@ -597,10 +674,13 @@ namespace Elements.Battle
                     new UbRecord(this, unitId: 4),
                 };
                 auto2semanAll = new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+                auto2semanTeacherProfiles = AutoSemanTeacherProfileIndexes.ToDictionary(
+                    profile => profile,
+                    profile => new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() });
                 return;
             }
             ubMod = true;
-            UBNums = new List<int> { 0, 0, 0, 0, 0 };
+            auto2semanTeacherProfiles = null;
             queues = ublists.Select((ublist, id) => new Queue<UbStatus>(ublist.Select(num => GetUbStatus(id, num)))).ToArray();
         }
 
@@ -720,6 +800,14 @@ namespace Elements.Battle
                 if (pos >= 0 && pos <= 4) // no boss
                 {
                     auto2semanAll[pos].Add(auto2seman[pos].GetUbNumber(pos));
+                    foreach (int profile in AutoSemanTeacherProfileIndexes)
+                    {
+                        if (auto2semanTeacherProfiles != null && auto2semanTeacherProfiles.ContainsKey(profile))
+                        {
+                            auto2semanTeacherProfiles[profile][pos].Add(auto2seman[pos].GetTeacherUbNumber(pos, profile));
+                        }
+                    }
+                    UBNums[pos]++;
                     auto2seman[pos].Clear();
                 }
                 return;
@@ -773,8 +861,23 @@ namespace Elements.Battle
 
         public List<List<int>> Auto2Seman()
         {
+            return BuildAuto2SemanOutput(auto2semanAll);
+        }
+
+        public List<List<int>> Auto2Seman(int semanSkillToggleIndex)
+        {
+            if (auto2semanTeacherProfiles != null && auto2semanTeacherProfiles.ContainsKey(semanSkillToggleIndex))
+            {
+                return BuildAuto2SemanOutput(auto2semanTeacherProfiles[semanSkillToggleIndex]);
+            }
+            return BuildAuto2SemanOutput(null);
+        }
+
+        private List<List<int>> BuildAuto2SemanOutput(List<List<int>> source)
+        {
             var ret = new List<List<int>>();
-            foreach (var seman in auto2semanAll)
+            var lanes = source ?? new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+            foreach (var seman in lanes)
             {
                 var ub = new List<int>(seman)
                 {

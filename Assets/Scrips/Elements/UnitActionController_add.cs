@@ -853,7 +853,12 @@ namespace Elements
         public FirearmCtrl2(string name)
         {
             this.name = name;
+#if !UNITY_5_3_OR_NEWER
+            // Server firearmPrefab is a bare marker object; cloning it only builds one IlEmit method per worker.
+            obj = new GameObject();
+#else
             obj = Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
+#endif
             // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm constructing {name}@{GetHashCode():x}.");
         }
 

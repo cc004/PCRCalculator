@@ -838,8 +838,7 @@ namespace PCRCaculator.Guild
             OnToggleSwitched(0);
             if (currentFrame < 5400)
             {
-                int additionalTime = (BattleResult == eBattleResult.WIN && IsGuildBoss) ? 20 : 0;
-                backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
+                backTime = CalculateBackTime();
                 RefreshTotalDamage(true, 0, false, 0, 0);
             }
             else
@@ -1194,9 +1193,7 @@ namespace PCRCaculator.Guild
                     }
                 }
             }
-            var currentFrame = BattleHeaderController.CurrentFrameCount;
-            int additionalTime = (BattleResult == eBattleResult.WIN && IsGuildBoss) ? 20 : 0;
-            backTime = Mathf.CeilToInt((MyGameCtrl.Instance.tempData.SettingData.limitTime * 60 - currentFrame) / 60.0f) + additionalTime;
+            backTime = CalculateBackTime();
             string prefix = IsGuildBoss ? (BattleResult == eBattleResult.WIN ? "返" : "剩") : "剩";
             detail = $"{prefix}{backTime}s";
             return new OnceResultData
@@ -1212,6 +1209,23 @@ namespace PCRCaculator.Guild
                 BattleResult = BattleResult,
             };
         }
+
+        private int CalculateBackTime()
+        {
+            if (BattleResult == eBattleResult.TIME_OVER)
+            {
+                return 0;
+            }
+
+            var remainingSeconds = Mathf.CeilToInt(Mathf.Max(0.0f, BattleManager.Instance.BattleLeftTime));
+            if (BattleResult == eBattleResult.WIN && IsGuildBoss)
+            {
+                remainingSeconds += 20;
+            }
+
+            return remainingSeconds;
+        }
+
         public static List<ValueChangeData> CreateLineChatData(List<ValueChangeData> data, float deltaXforChat = 1 / 5400.0f)
         {
             return data;/*
@@ -1950,7 +1964,7 @@ namespace PCRCaculator.Guild
         public string description;
         public long totalDamage;
     }
-    public class RandomData
+    public struct RandomData
     {
         public int id;//第几次调用
         public int frame;
@@ -1984,13 +1998,16 @@ namespace PCRCaculator.Guild
         public int randomResult;
         public double targetResult;
         public double criticalDamageRate;
-        public RandomData() { }
         public RandomData(UnitCtrl source, UnitCtrl target, int actionid, int type, double targetResult, double criDamage = 0)
         {
+            id = 0;
+            frame = 0;
             ownerID = source == null ? 0 : source.UnitId;
             targetID = target == null ? 0 : target.UnitId;
             actionID = actionid;
             this.type = type;
+            currentSeed = 0;
+            randomResult = 0;
             this.targetResult = targetResult;
             criticalDamageRate = criDamage;
         }

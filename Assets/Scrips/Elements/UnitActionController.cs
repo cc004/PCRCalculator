@@ -1083,6 +1083,11 @@ namespace Elements
             Owner.SemanOnStartAction?.Invoke(Owner.UnitId, skillExecData.skillID);
             if (!Owner.battleManager.skipping)
                 Owner.NoSkipOnStartAction?.Invoke(Owner.UnitId, skillExecData);
+            MyGameCtrl.Instance.BattleStats.RecordSkillExecStart(
+                Owner,
+                skillExecData.skillID,
+                skillExecData.skillName,
+                skill.ActionParameters.FirstOrDefault()?.ActionId ?? 0);
             Owner.AppendStartSkill(skillId);
             //end added Scripts
 #if !REDUCE_ANALYSE
@@ -2147,10 +2152,10 @@ namespace Elements
                 num4 = -BattleDefine.BATTLE_FIELD_SIZE;
               if (num5 > (double) BattleDefine.BATTLE_FIELD_SIZE)
                 num5 = BattleDefine.BATTLE_FIELD_SIZE;
-              vector3_2.x = (float) ((num4 + (num5 - (double) num4) * BattleManager.Random(0.0f, 1f,
-                  new RandomData(Owner,_target.Owner,_skill.SkillId,8,0))) / 540.0);
-              vector3_2.y += (float) (_skillEffect.CenterY + _skillEffect.DeltaY * (double) BattleManager.Random(-1f, 1f,
-                  new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0)) + 9.25925922393799);
+              var xRandomData = new RandomData(Owner,_target.Owner,_skill.SkillId,8,0);
+              vector3_2.x = (float) ((num4 + (num5 - (double) num4) * BattleManager.Random(0.0f, 1f, ref xRandomData)) / 540.0);
+              var yRandomData = new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0);
+              vector3_2.y += (float) (_skillEffect.CenterY + _skillEffect.DeltaY * (double) BattleManager.Random(-1f, 1f, ref yRandomData) + 9.25925922393799);
               prefab2.transform.position = vector3_2;
               break;
             case eEffectBehavior.SERIES:
@@ -2533,6 +2538,7 @@ namespace Elements
             }
 
             List<BasePartsData> targetList = _actionParameter.TargetList;
+#if !NO_PROB_EVENT
             var lst = targetList.Select(part => new BasePartsDataEx
             {
                 Energy = part.Owner.Energy,
@@ -2543,6 +2549,7 @@ namespace Elements
                 UnitName = part.Owner.UnitNameEx,
                 hash = part.GetHashCode()
             }).ToList();
+#endif
 
             void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare,
                 Func<BasePartsDataEx, DoubleWithEx> getter)
@@ -2587,8 +2594,8 @@ namespace Elements
                     int count = targetList.Count;
                     while (count > 1)
                     {
-                        int index = BattleManager.Random(0, count,
-                                                    new RandomData(null,null,_actionParameter.ActionId,10,count));
+                        var randomData = new RandomData(null,null,_actionParameter.ActionId,10,count);
+                        int index = BattleManager.Random(0, count, ref randomData);
                         --count;
                         BasePartsData basePartsData = targetList[index];
                         targetList[index] = targetList[count];

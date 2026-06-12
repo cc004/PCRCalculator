@@ -51,12 +51,22 @@ namespace Elements
             }
             bool actionDone = false;
             int actionCount = 0;
+            float TriggerRandom()
+            {
+                var randomData = new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f);
+                return BattleManager.Random(0.0f, 1f, ref randomData);
+            }
+            float DamagedHpTriggerRandom()
+            {
+                var randomData = new RandomData(_source, target, ActionId, 17, base.Value[eValueNumber.VALUE_1] / 100f, 0);
+                return BattleManager.Random(0f, 1f, ref randomData);
+            }
             switch (ActionDetail1)
             {
                 case 1:
                     target.OnDodge += () =>
                     {
-                        float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
+                        float num = TriggerRandom();
                         if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || num > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
@@ -70,7 +80,7 @@ namespace Elements
                     {
                         if (!byAtack)
                             return;
-                        float num = BattleManager.Random(0.0f, 1f, new RandomData(_source,null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
+                        float num = TriggerRandom();
                         if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || num > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         if (_source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
@@ -86,7 +96,7 @@ namespace Elements
                         target.HasUnDeadTime = true;
                     target.OnHpChange = (byAttack, damage, critical) =>
                     {
-                        float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f));
+                        float num = TriggerRandom();
                         if (_source.HasUnDeadTime)
                         {
                             if (_source.UnDeadTimeHitCount > 1)
@@ -139,8 +149,7 @@ namespace Elements
                         //if (target.EnemyPoint != 0 && this.battleManager.FICLPNJNOEP >= (int) HatsuneUtility.GetHatsuneSpecialBattle().purpose_count || this.judgeSilenceOrToad(_source))
                         // return;
                         _source.SkillUseCount[_skill.SkillId]++;
-                        if (BattleManager.Random(0.0f, 1f,
-                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) <= (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        if (TriggerRandom() <= (double)Value[eValueNumber.VALUE_1] / 100.0)
                         {
                             if (ActionDetail3 != 0 && actionCount >= ActionDetail3)
                                 return;
@@ -165,8 +174,7 @@ namespace Elements
                 case 5:
                     target.OnDamage += (byAtack, damage, critical) =>
                     {
-                        if (_source.IsDead || _source.IdleOnly || (judgeSilenceOrToad(_source) || !critical) || BattleManager.Random(0.0f, 1f,
-                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        if (_source.IsDead || _source.IdleOnly || (judgeSilenceOrToad(_source) || !critical) || TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         if ((double)Value[eValueNumber.VALUE_4] != 1.0)
                         {
@@ -187,8 +195,7 @@ namespace Elements
                             if (!summonUnit.Value.IsDead)
                                 flag = true;
                         }
-                        if (!flag || _source.IsDead || (_source.IdleOnly || judgeSilenceOrToad(_source)) || (!critical || BattleManager.Random(0.0f, 1f,
-                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0))
+                        if (!flag || _source.IsDead || (_source.IdleOnly || judgeSilenceOrToad(_source)) || (!critical || TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0))
                             return;
                         _source.CancelByAwake = true;
                         _source.CurrentTriggerSkillId = _skill.SkillId;
@@ -202,7 +209,7 @@ namespace Elements
                         if (!judgeSilenceOrToad(_source) && !used && _limitTime <= Value[eValueNumber.VALUE_3])
                         {
                             used = true;
-                        if (BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        if (TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         _source.CancelByAwake = true;
                         _source.CurrentTriggerSkillId = _skill.SkillId;
@@ -224,7 +231,7 @@ namespace Elements
                         if (judgeSilenceOrToad(_source) || used2 || (!_source.IsStealth || _source.ActionsTargetOnMe.Count != 0))
                             return;
                         used2 = true;
-                        if (BattleManager.Random(0.0f, 1f, new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        if (TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         _source.CancelByAwake = true;
                         _source.CurrentTriggerSkillId = _skill.SkillId;
@@ -238,8 +245,7 @@ namespace Elements
                         var point = parts.BreakPoint;
                         if (parts.BreakPoint != 0 || parts.IsBreak ||
                             (judgeSilenceOrToad(_source) || battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE) ||
-                            BattleManager.Random(0.0f, 1f,
-                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) >
+                            TriggerRandom() >
                             (double) Value[eValueNumber.VALUE_1] / 100.0)
                         {
                             if (parts.IsBreak ||
@@ -281,8 +287,7 @@ namespace Elements
                 case 10:
                     target.OnSlipDamage += () =>
                     {
-                        if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || BattleManager.Random(0.0f, 1f,
-                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        if (_source.TargetEnemyList.Count == 0 || judgeSilenceOrToad(_source) || _source.CurrentState == UnitCtrl.ActionState.SKILL && _source.CurrentSkillId == _skill.SkillId || TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         if ((double)Value[eValueNumber.VALUE_4] != 1.0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
                             _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
@@ -293,8 +298,7 @@ namespace Elements
                 case 11:
                     target.OnBreakAll += () =>
                     {
-                        if (judgeSilenceOrToad(_source) || BattleManager.Random(0.0f, 1f,
-                                new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                        if (judgeSilenceOrToad(_source) || TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         if ((double)Value[eValueNumber.VALUE_4] != 1.0 && _source.GetCurrentSpineCtrl().IsAnimation(_skill.AnimId, _skill.SkillNum))
                             _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
@@ -307,8 +311,7 @@ namespace Elements
                         UnitCtrl unitCtrl8 = target;
                         unitCtrl8.OnDamage = (UnitCtrl.OnDamageDelegate)Delegate.Combine(unitCtrl8.OnDamage, (UnitCtrl.OnDamageDelegate)delegate
                         {
-                            if (!_source.IsDead && !_source.IdleOnly && !judgeSilenceOrToad(_source) && BattleManager.Random(0f, 1f,
-                            new RandomData(_source, null, ActionId, 17, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            if (!_source.IsDead && !_source.IdleOnly && !judgeSilenceOrToad(_source) && TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
 
                             {
                             if (base.Value[eValueNumber.VALUE_4] != 1f)
@@ -358,7 +361,7 @@ namespace Elements
                         bool actionDoing = false;
                         target.OnHpChangeForDamagedHP = delegate
                         {
-                            float num5 = BattleManager.Random(0f, 1f,new RandomData(_source,target,ActionId,17, base.Value[eValueNumber.VALUE_1] / 100f, 0));
+                            float num5 = DamagedHpTriggerRandom();
                             if (!judgeSilenceOrToad(_source) && !_source.IsUnableActionState() && !_source.IsDead && !(num5 > base.Value[eValueNumber.VALUE_1] / 100f))
                             {
                                 int iForAction = default(int);
@@ -441,7 +444,7 @@ namespace Elements
                             if (actionParameter.AlreadyTriggeredActions.Contains(this))
                                 return;
                             var p = Value[eValueNumber.VALUE_1] / 100f;
-                            float num5 = BattleManager.Random(0f, 1f,new RandomData(_source,target,ActionId,17, base.Value[eValueNumber.VALUE_1] / 100f, 0));
+                            float num5 = DamagedHpTriggerRandom();
                             if (p < num5)
                                 return;
                             actionParameter.AlreadyTriggeredActions.Add(this);

@@ -47,7 +47,7 @@ namespace Elements
                 //_source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParam, 0.0f, 0, null, true, eEffectType.COMMON, !isDebuff, getIsAdditional());
                 //_source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, getIsAdditional(),90);
 
-                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
+                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon(), _actionId: ActionId);
                 _source.EnableBuffParam(buffParamKind, buffParam, _enable: true, _source, !isDebuff, getIsAdditional(), _triggerCall: TriggerCall);
 
             };
@@ -96,7 +96,7 @@ namespace Elements
                 dictionary.Add(_target.Owner.DummyPartsData, CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
             bool despelable = _valueDictionary[eValueNumber.VALUE_7] != 2f;
             //_target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
-            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, EnvironmentId, TriggerCall, action);
+            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, EnvironmentId, TriggerCall, action, ActionId);
 
         }
 
