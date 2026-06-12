@@ -10,8 +10,11 @@ public class AutoCreateLnk
     [PostProcessBuild(999)]
     public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
     {
-        // 在 Windows 和 Mac 平台打包时执行
-        if (target == BuildTarget.StandaloneWindows64 || target == BuildTarget.StandaloneWindows || target == BuildTarget.StandaloneOSX)
+        // Run for desktop players so each package has the expected writable folder.
+        if (target == BuildTarget.StandaloneWindows64
+            || target == BuildTarget.StandaloneWindows
+            || target == BuildTarget.StandaloneOSX
+            || target == BuildTarget.StandaloneLinux64)
         {
             string buildDir = Path.GetDirectoryName(pathToBuiltProject);
             string saveDir = Path.Combine(buildDir, "save");
@@ -42,9 +45,9 @@ public class AutoCreateLnk
                     Debug.LogWarning("⚠️ 源快捷方式未找到，跳过复制: " + sourceShortcutPath);
                 }
             }
-            else if (target == BuildTarget.StandaloneOSX)
+            else if (target == BuildTarget.StandaloneOSX || target == BuildTarget.StandaloneLinux64)
             {
-                Debug.Log("ℹ️ Mac平台，跳过快捷方式创建");
+                Debug.Log("ℹ️ 非 Windows 桌面平台，跳过快捷方式创建");
             }
         }
     }

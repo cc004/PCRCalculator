@@ -85,6 +85,11 @@ PlayerSettings:
   hideHomeButton: 0
   submitAnalytics: 1
   usePlayerLog: 1
+  autoStreaming: 0
+  useAnimationStreaming: 0
+  useFontStreaming: 0
+  autoStreamingId: 
+  instantGameAppId: 
   bakeCollisionMeshes: 0
   forceSingleInstance: 0
   useFlipModelSwapchain: 1
@@ -250,7 +255,7 @@ PlayerSettings:
   AndroidTargetDevices: 1
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: 
+  AndroidKeystoreName: '{inproject}: '
   AndroidKeyaliasName: 
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
