@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using ActionParameterSerializer;
 using Elements;
 using ExcelDataReader.Log;
@@ -634,10 +635,43 @@ namespace PCRCaculator
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
         private int _prefabId;
+        public const int JitaUnitId = 105701;
+        public const int JitaSixStarBattlePrefabId = 170301;
+        public const int JitaSixStarIconId = 105761;
+
         public int PrefabId
         {
-            get => _prefabId == 0 ? (rarity == 6 && unitId == 105701 ? 170301 : unitId) : _prefabId;
-            set => _prefabId = value;
+            get => GetBattlePrefabId(unitId, rarity, _prefabId);
+            set => _prefabId = NormalizeStoredBattlePrefabId(unitId, rarity, value);
+        }
+
+        public static int GetBattlePrefabId(int unitId, int rarity, int prefabId)
+        {
+            if (unitId == JitaUnitId)
+            {
+                if (rarity == 6 && (prefabId == 0 || prefabId == unitId || prefabId == JitaSixStarBattlePrefabId))
+                    return JitaSixStarBattlePrefabId;
+                if (rarity != 6 && prefabId == JitaSixStarBattlePrefabId)
+                    return unitId;
+            }
+
+            return prefabId == 0 ? unitId : prefabId;
+        }
+
+        private static int NormalizeStoredBattlePrefabId(int unitId, int rarity, int prefabId)
+        {
+            return unitId == JitaUnitId ? GetBattlePrefabId(unitId, rarity, prefabId) : prefabId;
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            _prefabId = NormalizeStoredBattlePrefabId(unitId, rarity, _prefabId);
+        }
+
+        public static int GetDisplayPrefabId(UnitData data)
+        {
+            return data.unitId == JitaUnitId && data.rarity == 6 ? data.unitId : data.PrefabId;
         }
         public void SetDefaultLoveDict()
         {
@@ -871,6 +905,32 @@ namespace PCRCaculator
         public UnitData Copy()
         {
             return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv, uniqueEqPlus, uniqueEq2Plus, connectRank, connectRankLimit);
+        }
+
+        public UnitData Clone()
+        {
+            return new UnitData
+            {
+                enemyid = this.enemyid,
+                _unitId = this._unitId,
+                level = this.level,
+                rarity = this.rarity,
+                rank = this.rank,
+                equipLevel = this.equipLevel?.ToArray(),
+                skillLevel = this.skillLevel?.ToArray(),
+                playLoveDic = this.playLoveDic != null ? new Dictionary<int, int>(this.playLoveDic) : null,
+                uniqueEqLv = this.uniqueEqLv,
+                uniqueEq2Lv = this.uniqueEq2Lv,
+                connectRank = this.connectRank,
+                connectRankLimit = this.connectRankLimit,
+                uniqueEqPlus = this.uniqueEqPlus,
+                uniqueEq2Plus = this.uniqueEq2Plus,
+                exEquip = this.exEquip?.ToArray(),
+                exEquipLevel = this.exEquipLevel?.ToArray(),
+                exEquipSubs = this.exEquipSubs?.ToDictionary(kv => kv.Key, kv => kv.Value?.ToArray()),
+                name = this.name,
+                _prefabId = this._prefabId
+            };
         }
         /// <summary>
         /// 比较相同角色是否有所提升

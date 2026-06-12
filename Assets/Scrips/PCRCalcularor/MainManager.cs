@@ -525,121 +525,133 @@ namespace PCRCaculator
 
                                 if (!Version.useJP) dbTool2 = dbTool3;
 
-                                databaseCache.resistDataDic = dbTool.resistDataDic;
-                                databaseCache.equipmentDic = dbTool.Dic8;
-                                databaseCache.equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
-                                databaseCache.unitRarityDic = dbTool.Dic1;
-                                databaseCache.extraEffectUnitGroupDic = dbTool.extraEffectUnitGroupDic;
-                                (databaseCache.unitStoryDic, databaseCache.unitStoryEffectDic, databaseCache.unitStoryLoveDic) = dbTool.Pair;
-                                databaseCache.skillDataDic = dbTool.Dic3;
-                                databaseCache.skillActionDic = dbTool.Dic4;
-                                databaseCache.allUnitAttackPatternDic = dbTool.Dic5;
-                                databaseCache.guildEnemyDatas = dbTool.Dic6;
-                                databaseCache.enemyMPartsDic = dbTool.Dic7;
-                                databaseCache.unitExEquips = dbTool.unitExEquips;
-                                //Guild.GuildManager.EnemyDataDic = dbTool.GetEnemyDataDic();
-                                databaseCache.enemyDataDic = dbTool.Dic2;
-                                databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic;
-                                databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic;
-                                databaseCache.mirageEnemyParameterDic = dbTool.MirageEnemyParameterDic;
-                                databaseCache.secretDungeonWaveGroupDataDic = dbTool.SecretDungeonWaveGroupDataDic;
-                                databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic;
-                                databaseCache.abyssWaveGroupDataDic = dbTool.AbyssWaveGroupDataDic;
-                                databaseCache.mirageWaveGroupDataDic = dbTool.MirageWaveGroupDataDic;
-                                databaseCache.uniqueEquipmentDataDic = dbTool2.Dic9;
-                                databaseCache.uniqueEquipment2DataDic = dbTool2.Dic92;
-                                databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic;
-                                databaseCache.talentSkillEnhanceDataDic = dbTool.TalentSkillEnhanceDataDic;
-                                databaseCache.teamSkillNodeDic = dbTool.TeamSkillNodeDic;
-                                databaseCache.teamSkillEnhanceDataDic = dbTool.TeamSkillEnhanceDataDic;
-                                databaseCache.paramTypeDic = dbTool.paramTypeDic;
-                                databaseCache.weaknessDic = dbTool.WeaknessDic;
-                                databaseCache.talentFormationDic = dbTool.TalentFormationDic;
-                                databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic;
-                                databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic;
-                                databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic;
-                                databaseCache.abyssQuestFilterDic = dbTool.AbyssQuestFilterDic;
-                                databaseCache.abyssBossFilterDic = dbTool.AbyssBossFilterDic;
-                                databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic;
-                                databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic;
-                                databaseCache.UnitRoleDataDic = dbTool3.UnitRoleDataDic;
-                                databaseCache.UnitRoleMasteryIdDic = dbTool3.UnitRoleMasteryIdDic;
-                                databaseCache.UnitRoleSlotDataDic = dbTool3.UnitRoleSlotDataDic;
-                                databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool3.UnitRoleMasterySlotEnhanceDataDic;
+                                databaseCache.resistDataDic = dbTool.resistDataDic ?? databaseCache.resistDataDic;
+                                databaseCache.equipmentDic = dbTool.Dic8 ?? databaseCache.equipmentDic;
+                                if (databaseCache.equipmentDic != null && !databaseCache.equipmentDic.ContainsKey(999999))
+                                    databaseCache.equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
+                                databaseCache.unitRarityDic = dbTool.Dic1 ?? databaseCache.unitRarityDic;
+                                databaseCache.extraEffectUnitGroupDic = dbTool.extraEffectUnitGroupDic ?? databaseCache.extraEffectUnitGroupDic;
+                                if (dbTool.Pair.Item1 != null) (databaseCache.unitStoryDic, databaseCache.unitStoryEffectDic, databaseCache.unitStoryLoveDic) = dbTool.Pair;
+                                databaseCache.skillDataDic = dbTool.Dic3 ?? databaseCache.skillDataDic;
+                                databaseCache.skillActionDic = dbTool.Dic4 ?? databaseCache.skillActionDic;
+                                databaseCache.allUnitAttackPatternDic = dbTool.Dic5 ?? databaseCache.allUnitAttackPatternDic;
+                                databaseCache.guildEnemyDatas = dbTool.Dic6 ?? databaseCache.guildEnemyDatas;
+                                databaseCache.enemyMPartsDic = dbTool.Dic7 ?? databaseCache.enemyMPartsDic;
+                                databaseCache.unitExEquips = dbTool.unitExEquips ?? databaseCache.unitExEquips;
+                                databaseCache.enemyDataDic = dbTool.Dic2 ?? databaseCache.enemyDataDic;
+                                databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic ?? databaseCache.talentQuestEnemyParameterDic;
+                                databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic ?? databaseCache.abyssEnemyParameterDic;
+                                databaseCache.mirageEnemyParameterDic = dbTool.MirageEnemyParameterDic ?? databaseCache.mirageEnemyParameterDic;
+                                databaseCache.secretDungeonWaveGroupDataDic = dbTool.SecretDungeonWaveGroupDataDic ?? databaseCache.secretDungeonWaveGroupDataDic;
+                                databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic ?? databaseCache.talentQuestWaveGroupDataDic;
+                                databaseCache.abyssWaveGroupDataDic = dbTool.AbyssWaveGroupDataDic ?? databaseCache.abyssWaveGroupDataDic;
+                                databaseCache.mirageWaveGroupDataDic = dbTool.MirageWaveGroupDataDic ?? databaseCache.mirageWaveGroupDataDic;
+                                databaseCache.uniqueEquipmentDataDic = dbTool2.Dic9 ?? databaseCache.uniqueEquipmentDataDic;
+                                databaseCache.uniqueEquipment2DataDic = dbTool2.Dic92 ?? databaseCache.uniqueEquipment2DataDic;
+                                databaseCache.talentSkillNodeDic = dbTool.TalentSkillNodeDic ?? databaseCache.talentSkillNodeDic;
+                                databaseCache.talentSkillEnhanceDataDic = dbTool.TalentSkillEnhanceDataDic ?? databaseCache.talentSkillEnhanceDataDic;
+                                databaseCache.teamSkillNodeDic = dbTool.TeamSkillNodeDic ?? databaseCache.teamSkillNodeDic;
+                                databaseCache.teamSkillEnhanceDataDic = dbTool.TeamSkillEnhanceDataDic ?? databaseCache.teamSkillEnhanceDataDic;
+                                databaseCache.paramTypeDic = dbTool.paramTypeDic ?? databaseCache.paramTypeDic;
+                                databaseCache.weaknessDic = dbTool.WeaknessDic ?? databaseCache.weaknessDic;
+                                databaseCache.talentFormationDic = dbTool.TalentFormationDic ?? databaseCache.talentFormationDic;
+                                databaseCache.extraEffectDataDic = dbTool.ExtraEffectDataDic ?? databaseCache.extraEffectDataDic;
+                                databaseCache.talentQuestBattleEffectDic = dbTool.TalentQuestBattleEffectDic ?? databaseCache.talentQuestBattleEffectDic;
+                                databaseCache.abyssBattleEffectDic = dbTool.AbyssBattleEffectDic ?? databaseCache.abyssBattleEffectDic;
+                                databaseCache.abyssQuestFilterDic = dbTool.AbyssQuestFilterDic ?? databaseCache.abyssQuestFilterDic;
+                                databaseCache.abyssBossFilterDic = dbTool.AbyssBossFilterDic ?? databaseCache.abyssBossFilterDic;
+                                databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic ?? databaseCache.mirageBattleEffectDic;
+                                databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic ?? databaseCache.mirageNemesisAreaDic;
+                                databaseCache.UnitRoleDataDic = dbTool3.UnitRoleDataDic ?? databaseCache.UnitRoleDataDic;
+                                databaseCache.UnitRoleMasteryIdDic = dbTool3.UnitRoleMasteryIdDic ?? databaseCache.UnitRoleMasteryIdDic;
+                                databaseCache.UnitRoleSlotDataDic = dbTool3.UnitRoleSlotDataDic ?? databaseCache.UnitRoleSlotDataDic;
+                                databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool3.UnitRoleMasterySlotEnhanceDataDic ?? databaseCache.UnitRoleMasterySlotEnhanceDataDic;
 
                                 var connectRankDb = dbTool;
-                                databaseCache.ConnectRankStatusDic = connectRankDb.ConnectRankStatusDic ?? new Dictionary<int, List<connect_rank_status>>();
-                                databaseCache.ConnectRankChartDic = connectRankDb.ConnectRankChartDic ?? new Dictionary<int, connect_rank_chart>();
-                                databaseCache.ConnectRankBonusList = connectRankDb.ConnectRankBonusList ?? new List<connect_rank_bonus>();
-                                databaseCache.ConnectRankBoostDic = connectRankDb.ConnectRankBoostDic ?? new Dictionary<int, connect_rank_boost>();
-                                databaseCache.ConnectRankLimitCommonDic = connectRankDb.ConnectRankLimitCommonDic ?? new Dictionary<int, connect_rank_limit_common>();
-                                databaseCache.ConnectRankLimitItemDic = connectRankDb.ConnectRankLimitItemDic ?? new Dictionary<int, List<connect_rank_limit_item>>();
-                                databaseCache.ConnectRankEnhanceDic = connectRankDb.ConnectRankEnhanceDic ?? new Dictionary<int, List<connect_rank_enhance>>();
+                                databaseCache.ConnectRankStatusDic = connectRankDb.ConnectRankStatusDic ?? databaseCache.ConnectRankStatusDic;
+                                databaseCache.ConnectRankChartDic = connectRankDb.ConnectRankChartDic ?? databaseCache.ConnectRankChartDic;
+                                databaseCache.ConnectRankBonusList = connectRankDb.ConnectRankBonusList ?? databaseCache.ConnectRankBonusList;
+                                databaseCache.ConnectRankBoostDic = connectRankDb.ConnectRankBoostDic ?? databaseCache.ConnectRankBoostDic;
+                                databaseCache.ConnectRankLimitCommonDic = connectRankDb.ConnectRankLimitCommonDic ?? databaseCache.ConnectRankLimitCommonDic;
+                                databaseCache.ConnectRankLimitItemDic = connectRankDb.ConnectRankLimitItemDic ?? databaseCache.ConnectRankLimitItemDic;
+                                databaseCache.ConnectRankEnhanceDic = connectRankDb.ConnectRankEnhanceDic ?? databaseCache.ConnectRankEnhanceDic;
                                 ConnectRankTempData.Instance.ClearCache();
 
-                                databaseCache.unitName_cn = dbTool3.Dic10;
-                                databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn;
-                                databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11;
-                                databaseCache.skillActionDescribe_cn = dbTool3.Dic12;
+                                databaseCache.unitName_cn = dbTool3.Dic10 ?? databaseCache.unitName_cn;
+                                databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn ?? databaseCache.exEquipmentName_cn;
+                                databaseCache.skillNameAndDescribe_cn = dbTool3.Dic11 ?? databaseCache.skillNameAndDescribe_cn;
+                                databaseCache.skillActionDescribe_cn = dbTool3.Dic12 ?? databaseCache.skillActionDescribe_cn;
 
-                                databaseCache.masterUnitSkillDataRf = (Version.useJP ? dbTool2 : dbTool3).masterUnitSkillDataRf;
-                                databaseCache.unitStoryEffectDic2 = (Version.useJP ? dbTool2 : dbTool3).Pair.Item2;
-                                databaseCache.ereductionTable = (Version.useJP ? dbTool2 : dbTool3).eReductions;
-                                databaseCache.rbs = (Version.useJP ? dbTool2 : dbTool3).rbs;
+                                var masterRef = (Version.useJP ? dbTool2 : dbTool3);
+                                databaseCache.masterUnitSkillDataRf = masterRef.masterUnitSkillDataRf ?? databaseCache.masterUnitSkillDataRf;
+                                databaseCache.unitStoryEffectDic2 = (masterRef.Pair.Item2 ?? databaseCache.unitStoryEffectDic2);
+                                databaseCache.ereductionTable = masterRef.eReductions ?? databaseCache.ereductionTable;
+                                databaseCache.rbs = masterRef.rbs ?? databaseCache.rbs;
 
-                                Task.WaitAll(
-                                    Task.Run(() =>
-                                    {
-                                        var filteredUnitRarity = dbTool3.Dic1.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
-                                        databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
-                                        // databaseCache.unitRarityDic[170301] = databaseCache.unitRarityDic[105701];
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        // var filteredUniqueEquipment = dbTool3.Dic9.Where(p => p.Key / 10000 == 17).ToList();
-                                        var filteredUniqueEquipment = dbTool3.Dic9.Where(p => p.Key / 10000 == 17 || p.Key == 131901 || p.Key == 132001 || p.Key == 132101).ToList();
-                                        databaseCache.uniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment);
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        var filteredUniqueEquipment2 = dbTool3.Dic92.Where(p => p.Key / 10000 == 17).ToList();
-                                        databaseCache.uniqueEquipment2DataDic.OverrideWith(filteredUniqueEquipment2);
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        var filteredSkillData = dbTool3.Dic3.Where(p => p.Key / 100000 == 17).ToList();
-                                        databaseCache.skillDataDic.OverrideWith(filteredSkillData);
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        var filteredSkillAction = dbTool3.Dic4.Where(p => p.Key / 10000000 == 17).ToList();
-                                        databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
-                                        databaseCache.masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
-                                        databaseCache.masterUnitSkillDataRf.dict.OverrideWith(filteredMasterUnitSkill);
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        var filteredAllUnitAttackPattern = dbTool3.Dic5.Where(p => p.Key / 1000000 == 17).ToList();
-                                        databaseCache.allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern);
-                                    }),
-                                    Task.Run(() =>
-                                    {
-                                        var jita = dbTool3.unitExEquips[170101];
-                                        var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
-                                        databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
-                                        databaseCache.unitExEquips[170301] = jita;
-                                    }),
-                                    Task.Run(() => databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1)),
-                                    Task.Run(() => databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2)),
-                                    Task.Run(() => databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3)),
-                                    Task.Run(() => databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic)),
-                                    Task.Run(() => databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic)),
-                                    Task.Run(() => databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic))
-                                );
+                                try
+                                {
+                                    Task.WaitAll(
+                                        Task.Run(() =>
+                                        {
+                                            var filteredUnitRarity = dbTool3.Dic1?.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
+                                            if (filteredUnitRarity != null) databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            var filteredUniqueEquipment = dbTool3.Dic9?.Where(p => p.Key / 10000 == 17 || p.Key == 131901 || p.Key == 132001 || p.Key == 132101).ToList();
+                                            if (filteredUniqueEquipment != null) databaseCache.uniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            var filteredUniqueEquipment2 = dbTool3.Dic92?.Where(p => p.Key / 10000 == 17).ToList();
+                                            if (filteredUniqueEquipment2 != null) databaseCache.uniqueEquipment2DataDic.OverrideWith(filteredUniqueEquipment2);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            var filteredSkillData = dbTool3.Dic3?.Where(p => p.Key / 100000 == 17).ToList();
+                                            if (filteredSkillData != null) databaseCache.skillDataDic.OverrideWith(filteredSkillData);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            var filteredSkillAction = dbTool3.Dic4?.Where(p => p.Key / 10000000 == 17).ToList();
+                                            if (filteredSkillAction != null) databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            if (dbTool3.masterUnitSkillDataRf?.dict != null)
+                                            {
+                                                var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
+                                                databaseCache.masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
+                                                databaseCache.masterUnitSkillDataRf.dict.OverrideWith(filteredMasterUnitSkill);
+                                            }
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            var filteredAllUnitAttackPattern = dbTool3.Dic5?.Where(p => p.Key / 1000000 == 17).ToList();
+                                            if (filteredAllUnitAttackPattern != null) databaseCache.allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            if (dbTool3.unitExEquips != null)
+                                            {
+                                                var jita = dbTool3.unitExEquips[170101];
+                                                var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
+                                                databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
+                                                databaseCache.unitExEquips[170301] = jita;
+                                            }
+                                        }),
+                                        Task.Run(() => { if (dbCN.Pair.Item1 != null) databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1); }),
+                                        Task.Run(() => { if (dbCN.Pair.Item2 != null) databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2); }),
+                                        Task.Run(() => { if (dbCN.Pair.Item3 != null) databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3); }),
+                                        Task.Run(() => { if (dbCN.TalentQuestBattleEffectDic != null) databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic); }),
+                                        Task.Run(() => { if (dbCN.AbyssBattleEffectDic != null) databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic); }),
+                                        Task.Run(() => { if (dbCN.MirageBattleEffectDic != null) databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic); })
+                                    );
+                                }
+                                catch (AggregateException ex)
+                                {
+                                    Debug.LogError($"补充数据加载部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}");
+                                }
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
                                 
@@ -652,58 +664,37 @@ namespace PCRCaculator
                                 // databaseCache.unitRarityDic[170101].ChangeRankData(databaseCache.unitRarityDic[105701].GetRankData());
                                 // databaseCache.unitRarityDic[170201].ChangeRankData(databaseCache.unitRarityDic[107601].GetRankData());
 
-                                // if (Version.useJP)
-                                // {
+                                try
+                                {
                                     if (dbTool != dbTool2)
                                         Task.WaitAll(
-                                            //              Task.Run(() => Extensions.OverrideWith(equipmentDic, dbTool2.Dic8)),
-                                            //              Task.Run(() => Extensions.OverrideWith(unitRarityDic, dbTool2.Dic1)),
-                                            //              Task.Run(() => Extensions.OverrideWith(unitStoryDic, unitStoryDic2)),
-                                            //              Task.Run(() => Extensions.OverrideWith(unitStoryEffectDic, unitStoryEffectDic2)),
-                                            // Task.Run(() => databaseCache.uniqueEquipmentDataDic.OverrideWith(dbTool2.Dic9)),
-                                            // Task.Run(() => databaseCache.uniqueEquipment2DataDic.OverrideWith(dbTool2.Dic92)),
-
-                                            Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool2.Dic3,
-                                                k => k > 2000000)),
-                                            Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool2.Dic4,
-                                                k => k > 200000000)),
-                                            Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5)),
-                                            Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6)),
-                                            Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7)),
-                                            Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2)),
-                                            Task.Run(() => databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic)),
-                                            Task.Run(() => databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic)),
-                                            Task.Run(() => databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic))
+                                            Task.Run(() => { if (dbTool2.Dic3 != null) databaseCache.skillDataDic.OverrideWith(dbTool2.Dic3, k => k > 2000000); }),
+                                            Task.Run(() => { if (dbTool2.Dic4 != null) databaseCache.skillActionDic.OverrideWith(dbTool2.Dic4, k => k > 200000000); }),
+                                            Task.Run(() => { if (dbTool2.Dic5 != null) databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool2.Dic5); }),
+                                            Task.Run(() => { if (dbTool2.Dic6 != null) databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6); }),
+                                            Task.Run(() => { if (dbTool2.Dic7 != null) databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7); }),
+                                            Task.Run(() => { if (dbTool2.Dic2 != null) databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2); }),
+                                            Task.Run(() => { if (dbTool2.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic); }),
+                                            Task.Run(() => { if (dbTool2.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic); }),
+                                            Task.Run(() => { if (dbTool2.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic); })
                                         );
-                                // }
-                                // else
-                                // if (Version.newAB)
-                                // {
+                                }
+                                catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }
+                                try
+                                {
                                     Task.WaitAll(
-                                        // Task.Run(() => databaseCache.equipmentDic.Override2With(dbTool3.Dic8)),
-                                        // Task.Run(() => databaseCache.unitRarityDic.Override2With(dbTool3.Dic1)),
-                                        // Task.Run(() => databaseCache.skillDataDic.OverrideWith(dbTool3.Dic3,
-                                        //     k => k > 2000000 && k < 4000000)),
-                                        // Task.Run(() => databaseCache.skillActionDic.OverrideWith(dbTool3.Dic4,
-                                        //     k => k > 200000000 && k < 400000000)),
-                                        Task.Run(() => databaseCache.enemyDataDic.Override2With(dbTool3.Dic2)),
-                                        // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5))
-
-
-                                        Task.Run(() => databaseCache.skillDataDic.Override2With(dbTool3.Dic3)),
-                                        Task.Run(() => databaseCache.skillActionDic.Override2With(dbTool3.Dic4)),
-                                        // Task.Run(() => databaseCache.allUnitAttackPatternDic.OverrideWith(dbTool3.Dic5)),
-                                        // Task.Run(() => databaseCache.guildEnemyDatas.OverrideWith(dbTool3.Dic6)),
-                                        // Task.Run(() => databaseCache.enemyMPartsDic.OverrideWith(dbTool3.Dic7)),
-                                        // Task.Run(() => databaseCache.enemyDataDic.OverrideWith(dbTool3.Dic2)),
-                                        Task.Run(() => databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic)),
-                                        Task.Run(() => databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic)),
-                                        Task.Run(() => databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic)),
-                                        Task.Run(() => databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic)),
-                                        Task.Run(() => databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic)),
-                                        Task.Run(() => databaseCache.mirageNemesisAreaDic.Override2With(dbTool3.MirageNemesisAreaDic))
+                                        Task.Run(() => { if (dbTool3.Dic2 != null) databaseCache.enemyDataDic.Override2With(dbTool3.Dic2); }),
+                                        Task.Run(() => { if (dbTool3.Dic3 != null) databaseCache.skillDataDic.Override2With(dbTool3.Dic3); }),
+                                        Task.Run(() => { if (dbTool3.Dic4 != null) databaseCache.skillActionDic.Override2With(dbTool3.Dic4); }),
+                                        Task.Run(() => { if (dbTool3.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic); }),
+                                        Task.Run(() => { if (dbTool3.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic); }),
+                                        Task.Run(() => { if (dbTool3.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic); }),
+                                        Task.Run(() => { if (dbTool3.TalentSkillNodeDic != null) databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic); }),
+                                        Task.Run(() => { if (dbTool3.TeamSkillNodeDic != null) databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic); }),
+                                        Task.Run(() => { if (dbTool3.MirageNemesisAreaDic != null) databaseCache.mirageNemesisAreaDic.Override2With(dbTool3.MirageNemesisAreaDic); })
                                     );
-                                // }
+                                }
+                                catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }
                             });
                     tasks.Add(dbDataTask);
                 }
@@ -809,7 +800,7 @@ namespace PCRCaculator
                 Debug.LogError($"LoadAsync 执行失败，耗时: {elapsedTime}ms，错误: {e.Message}");
                 
                 try { wait?.SetMessage($"加载时发生致命错误:{e}，请重新打开！"); } catch { }
-                throw e;
+                throw;
             }
         }
 
