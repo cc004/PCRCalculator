@@ -594,6 +594,7 @@ namespace PCRCaculator
             public bool Success => Failures.Count == 0;
             public int RequestedBundleCount { get; internal set; }
             public int EnsuredBundleCount { get; internal set; }
+            public int SkippedManifestMissingCount { get; internal set; }
             public int OptionalDependencyMissingCount { get; internal set; }
             public long ElapsedMilliseconds { get; internal set; }
 
@@ -613,6 +614,7 @@ namespace PCRCaculator
                     ? "none"
                     : string.Join(" | ", Failures.Select(f => f.ToString()));
                 return $"success={Success}, requested={RequestedBundleCount}, ensured={EnsuredBundleCount}, " +
+                       $"skippedManifestMissing={SkippedManifestMissingCount}, " +
                        $"optionalDependencyMissing={OptionalDependencyMissingCount}, elapsedMs={ElapsedMilliseconds}, " +
                        $"failures={failureText}";
             }
@@ -661,8 +663,32 @@ namespace PCRCaculator
         private static IEnumerable<string> GetRequiredBattleUnitBundleNames(int unitid)
         {
             var prefabId = GetPrefabId(unitid);
-            yield return "all_battleunit_" + prefabId + ".unity3d";
+            var battleunitBundleName = ResolveBattleunitBundleNameForPreload(prefabId);
+            if (!string.IsNullOrEmpty(battleunitBundleName))
+                yield return battleunitBundleName;
             yield return "all_battleunitprefab_" + prefabId + ".unity3d";
+        }
+
+        private static string GetBattleunitBundleName(int prefabId)
+        {
+            return "all_battleunit_" + prefabId + ".unity3d";
+        }
+
+        private static string GetFallbackBattleunitBundleName(int prefabId)
+        {
+            return "all_battleunit_" + (prefabId / 100 * 100 + 99) + ".unity3d";
+        }
+
+        private static string ResolveBattleunitBundleNameForPreload(int prefabId)
+        {
+            var battleunitBundleName = GetBattleunitBundleName(prefabId);
+            if (TryGetManifestContent(battleunitBundleName, mgrCharacter, out _))
+                return battleunitBundleName;
+
+            var fallbackBattleunitBundleName = GetFallbackBattleunitBundleName(prefabId);
+            return TryGetManifestContent(fallbackBattleunitBundleName, mgrCharacter, out _)
+                ? fallbackBattleunitBundleName
+                : null;
         }
 
         private static bool EnsureBundleAndDependenciesCachedStrict(
@@ -681,18 +707,18 @@ namespace PCRCaculator
             {
                 if (required)
                 {
-                    summary.AddFailure(
-                        BattleResourcePrepareStatus.ManifestMissing,
-                        fullname,
-                        "manifest",
-                        "required battle resource has no manifest entry");
-                    return false;
+                    summary.SkippedManifestMissingCount++;
+                    Debug.LogWarning(
+                        $"asset bundle {fullname} has no manifest entry during battle resource prepare; " +
+                        "skipping cache precheck because resource version ownership is outside prepare");
                 }
-
-                summary.OptionalDependencyMissingCount++;
-                Debug.LogWarning(
-                    $"asset bundle dependency {fullname} has no manifest entry during battle resource prepare; " +
-                    "keeping legacy optional dependency behavior");
+                else
+                {
+                    summary.OptionalDependencyMissingCount++;
+                    Debug.LogWarning(
+                        $"asset bundle dependency {fullname} has no manifest entry during battle resource prepare; " +
+                        "keeping legacy optional dependency behavior");
+                }
                 return true;
             }
 
@@ -1169,8 +1195,8 @@ namespace PCRCaculator
             //    unitid = (int)(unitid / 100) * 100;
             // preload battleunit
             var prefabId = GetPrefabId(unitid);
-            var battleunitBundleName = "all_battleunit_" + prefabId + ".unity3d";
-            var fallbackBattleunitBundleName = "all_battleunit_" + (prefabId / 100 * 100 + 99) + ".unity3d";
+            var battleunitBundleName = GetBattleunitBundleName(prefabId);
+            var fallbackBattleunitBundleName = GetFallbackBattleunitBundleName(prefabId);
             var loadedBattleunitBundleName = battleunitBundleName;
             var primaryBattleunitInManifest = TryGetManifestContent(battleunitBundleName, mgrCharacter, out _);
 #if ENABLE_THREADING
