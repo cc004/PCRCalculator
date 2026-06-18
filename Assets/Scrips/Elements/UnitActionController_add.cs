@@ -539,7 +539,7 @@ namespace Elements
                                 List<UnitCtrl> unitCtrlList1 = Owner.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                                 for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
                                 {
-                                    if ((long)unitCtrlList1[index2].Hp != 0L)
+                                    if ((long)unitCtrlList1[index2].Hp > 0L)
                                         createNormalEffectPrefab2(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                 }
                                 continue;

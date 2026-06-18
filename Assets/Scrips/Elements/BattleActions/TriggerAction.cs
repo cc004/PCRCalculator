@@ -502,7 +502,7 @@ namespace Elements
                 yield return null;
             }
             while (triggerAction.battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE);
-            if ((double)triggerAction.Value[eValueNumber.VALUE_3] == 0.0 || (long)_source.Hp != 0L)
+            if ((double)triggerAction.Value[eValueNumber.VALUE_3] == 0.0 || (long)_source.Hp > 0L)
                 _callback.Call(true);
         }
 

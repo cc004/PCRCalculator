@@ -497,7 +497,7 @@ namespace PCRCaculator.Battle
             {
                 MainManager.Instance.WindowMessage("请先停止优化！");
             }
-            else if (BattleManager.Instance?.EnemyList?.All(enemy => enemy.Hp == 0) ?? true)
+            else if (BattleManager.Instance?.EnemyList?.All(enemy => enemy.Hp <= 0) ?? true)
             {
                 ExitButton2();
             }

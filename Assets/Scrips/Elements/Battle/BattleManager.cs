@@ -2704,7 +2704,7 @@ namespace Elements.Battle
             {
                 if (!unit.IsStealth)
                 {
-                    if (unit.Hp != 0) // lanly: why not >0 ?
+                    if (unit.Hp > 0)
                     {
                         if (!unit.IsEtherealization() && !unit.IsAbnormalState(UnitCtrl.eAbnormalState.SPY))
                         {

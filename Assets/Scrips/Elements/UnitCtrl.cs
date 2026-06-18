@@ -4389,7 +4389,7 @@ this.updateCurColor();
             for (int index1 = 0; index1 < unitCtrlList.Count; ++index1)
             {
                 UnitCtrl unitCtrl = unitCtrlList[index1];
-                if (!unitCtrl.IsPhantom && !unitCtrl.IsDead && (!(unitCtrl == this) && (long)unitCtrl.Hp != 0L) && !unitCtrl.IsStealth && !unitCtrl.IsSpyOrEtherialization(this))
+                if (!unitCtrl.IsPhantom && !unitCtrl.IsDead && (!(unitCtrl == this) && (long)unitCtrl.Hp > 0L) && !unitCtrl.IsStealth && !unitCtrl.IsSpyOrEtherialization(this))
                 {
                     if (!unitCtrl.IsPartsBoss)
                     {
@@ -13309,7 +13309,7 @@ this.updateCurColor();
                         {
                             GetCurrentSpineCtrl().Pause();
                         }
-                        while (IsUnableActionState() && (long)Hp != 0L)
+                        while (IsUnableActionState() && (long)Hp > 0L)
                         {
                             /*if (_thisId != damageCoroutineId)
                                 yield break;
@@ -13340,7 +13340,7 @@ this.updateCurColor();
                         resumeIsStopState = true;
                     }
                     GetCurrentSpineCtrl().Resume();
-                    if ((long)Hp == 0L)
+                    if ((long)Hp <= 0L)
                     {
                         CurrentState = ActionState.IDLE;
                         SetState(ActionState.DIE);
@@ -13526,7 +13526,7 @@ this.updateCurColor();
                         }
                         List<UnitCtrl> unitCtrlList1 = unitCtrl.IsOther ? unitCtrl.battleManager.UnitList : unitCtrl.battleManager.EnemyList;
                         bool flag1 = unitCtrlList1.FindIndex(e => (long)e.Hp > 0L) == -1;
-                        bool flag2 = unitCtrlList1.TrueForAll(e => e.IsStealth || (long)e.Hp == 0L || e.IsSpyOrEtherialization(this));
+                        bool flag2 = unitCtrlList1.TrueForAll(e => e.IsStealth || (long)e.Hp <= 0L || e.IsSpyOrEtherialization(this));
                         if (unitCtrl.battleManager.GameState == eBattleGameState.NEXT_WAVE_PROCESS)
                         {
                             flag1 = false;
@@ -13943,7 +13943,7 @@ this.updateCurColor();
             while (true)
             {
                 currentSpineCtrl = GetCurrentSpineCtrl();
-                if (blackoutUnitContained && !battleManager.BlackoutUnitTargetList.Contains(this) && (long)Hp != 0L)
+                if (blackoutUnitContained && !battleManager.BlackoutUnitTargetList.Contains(this) && (long)Hp > 0L)
                 {
                     resumeSpineWithTime();
                     if (isContinueIdleForPauseAction)
@@ -13998,7 +13998,7 @@ this.updateCurColor();
                     isIdleDamage = false;
                     yield break;
                 }
-                if (!currentSpineCtrl.IsPlayAnime && _damageMotionWhenUnionBurst && (long)Hp != 0L && currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, MotionPrefix))
+                if (!currentSpineCtrl.IsPlayAnime && _damageMotionWhenUnionBurst && (long)Hp > 0L && currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, MotionPrefix))
                 {
                     break;
                 }

@@ -21,7 +21,7 @@ namespace Elements
             {
                 flag = _unit.GetIsProtected();
             }
-            return _unit.Hp != 0 && !_unit.IsStealth && !flag && !_unit.JudgeIsEtherialization(_source);
+            return _unit.Hp > 0 && !_unit.IsStealth && !flag && !_unit.JudgeIsEtherialization(_source);
         }
 
         public override void ExecActionOnStart(
