@@ -769,7 +769,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitSecondMax()
         {
-            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            int battleMode = GetCurrentBattleMode();
             playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn, equip_second_full: true);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
@@ -778,7 +778,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitMax()
         {
-            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            int battleMode = GetCurrentBattleMode();
             playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
@@ -787,7 +787,7 @@ namespace PCRCaculator
         }
         public void SetAllUnitMax()
         {
-            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            int battleMode = GetCurrentBattleMode();
             foreach (UnitData a in playerData.playrCharacters)
             {
                 a.SetMax(battleMode, isSetMaxExEquip.isOn);
@@ -972,7 +972,7 @@ namespace PCRCaculator
             bool changingId = lastRefreshedId != data.unitId;
             lastRefreshedId = data.unitId;
             detailTexts_setting[0].text = data.level + "";
-            detailSliders_setting[0].maxValue = MainManager.Instance.levelMax;
+            detailSliders_setting[0].maxValue = MainManager.Instance.GetLevelMax(GetCurrentBattleMode());
             detailSliders_setting[0].value = data.level;
             detailTexts_setting[1].text = data.rarity + "";
             detailSliders_setting[1].maxValue = data.GetMaxRarity();
@@ -1430,6 +1430,16 @@ namespace PCRCaculator
             filterType.text = filterToggle.isOn ? "属性" : "站位";
             talent.SetActive(filterToggle.isOn);
             position.SetActive(!filterToggle.isOn);
+        }
+
+        private int GetCurrentBattleMode()
+        {
+            if (type == 3 || type == 4)
+            {
+                return GuildManager.Instance.IsGuildBoss ? 0 : 1;
+            }
+
+            return 2;
         }
     }
 }

@@ -46,7 +46,8 @@ namespace PCRCaculator
         public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3, calculator = 4 }
         public StayPage stayPage;
         //public int loadCharacterMax;//最多加载到的角色序号
-        public int EffectiveLevelMax => playerSetting.playerLevel + (IsGuildBattle ? 0 : 10);
+        public int GetLevelMax(int battleMode) => playerSetting.playerLevel + (battleMode == 0 ? 0 : 10);
+        public int EffectiveLevelMax => GetLevelMax(IsGuildBattle ? 0 : 2);
         public int levelMax { get => EffectiveLevelMax; }
         public bool UseNewBattleSystem = true;
         public bool useJapanData {get => Version.useJP;}
@@ -945,6 +946,7 @@ namespace PCRCaculator
         public void CharacterButton()
         {
             TurnAllPageOff();
+            IsGuildBattle = false;
             CharacterManager.SwitchPage(1);
             stayPage = StayPage.character;
         }
@@ -952,6 +954,7 @@ namespace PCRCaculator
         public void BattleButton()
         {
             TurnAllPageOff();
+            IsGuildBattle = false;
             BattleManager.SwitchPage(1);
             stayPage = StayPage.battle;
         }
