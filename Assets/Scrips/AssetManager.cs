@@ -29,9 +29,12 @@ namespace PCRApi
         public int size;
         public List<Content> children;
 
-        private static readonly HttpClient client = new HttpClient();
         private const int DownloadMaxAttempts = 3;
-        private static readonly TimeSpan DownloadAttemptTimeout = TimeSpan.FromSeconds(15);
+        private static readonly TimeSpan DownloadAttemptTimeout = TimeSpan.FromSeconds(120);
+        private static readonly HttpClient client = new HttpClient
+        {
+            Timeout = DownloadAttemptTimeout + TimeSpan.FromSeconds(10)
+        };
 
         public static string CalcMd5(byte[] content)
         {
@@ -157,9 +160,26 @@ namespace PCRApi
         {
             if (ex is HttpRequestException || ex is TaskCanceledException || ex is IOException)
                 return true;
+            if (ex is WebException webException)
+                return IsTransientWebException(webException);
             if (ex is AggregateException aggregateException)
                 return aggregateException.Flatten().InnerExceptions.Any(IsTransientDownloadException);
             return false;
+        }
+
+        private static bool IsTransientWebException(WebException ex)
+        {
+            return ex.Status == WebExceptionStatus.Timeout ||
+                   ex.Status == WebExceptionStatus.RequestCanceled ||
+                   ex.Status == WebExceptionStatus.ConnectFailure ||
+                   ex.Status == WebExceptionStatus.ConnectionClosed ||
+                   ex.Status == WebExceptionStatus.ReceiveFailure ||
+                   ex.Status == WebExceptionStatus.SendFailure ||
+                   ex.Status == WebExceptionStatus.KeepAliveFailure ||
+                   ex.Status == WebExceptionStatus.NameResolutionFailure ||
+                   ex.Status == WebExceptionStatus.ProxyNameResolutionFailure ||
+                   ex.Status == WebExceptionStatus.PipelineFailure ||
+                   ex.Status == WebExceptionStatus.UnknownError;
         }
 
         private static int GetRetryDelayMs(int attempt)
