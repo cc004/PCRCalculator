@@ -421,6 +421,7 @@
   "d1_chance_use_d2": "以 [%1$d%%] 的概率使用 [动作%2$d]。",
   "use_d1_if_s2_has_any_dot_debuff": "%2$s身上挂有dot的场合，使用 [动作%1$d]。",
   "use_d1_if_s2_is_in_state_of_ID_d3_with_stacks_greater_than_or_equal_to_d4": "%2$s的标记 [ID: %3$d] 层数在 [%4$d] 以上的场合，使用 [动作%1$d]。",
+  "use_d1_if_s2_is_in_talent_s3": "%2$s拥有属性 [%3$s] 的场合，使用 [动作%1$d]。",
   "use_d1_if_s2_is_alone": "%2$s是单独的场合，使用 [动作%1$d]。",
   "use_d1_if_the_count_of_s2_except_stealth_units_is_d3": "排除潜伏状态的单位，%2$s的数量是 [%3$d] 的场合，使用 [动作%1$d]。",
   "use_d1_if_among_s2_exists_unit_ID_d3": "排除潜伏状态的单位，%2$s中存在 [ID: %3$d] 的单位的场合，使用 [动作%1$d]。",
