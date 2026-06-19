@@ -58,6 +58,13 @@ namespace ActionParameterSerializer.Actions
                         trueClause = Utils.JavaFormat(Utils.GetString("use_d1_to_s2_in_state_of_ID_d3"),
                             actionDetail2 % 10, targetParameter.buildTargetClause(true), actionDetail1 - 6000);
                     }
+                    else if (actionDetail1 >= 4000)
+                    {
+                        int talentId = actionDetail1 - 4000;
+                        var talentDescription = ((PCRCaculator.Battle.Talent)talentId).description();
+                        trueClause = Utils.JavaFormat(Utils.GetString("use_d1_if_s2_is_in_talent_s3"),
+                            actionDetail2 % 10, targetParameter.buildTargetClause(true), talentDescription);
+                    }
                     else if (actionDetail1 >= 1600)
                     {
                         var arr = new[] { 35, 67, 71 };
