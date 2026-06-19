@@ -52,7 +52,6 @@ namespace Elements
       ValueDictionary additionalValue = null;
       if (chargeAction.ActionDetail2 != 0)
       {
-        // ISSUE: reference to a compiler-generated method
         additionalValue = _skill.ActionParameters.Find(a=>a.ActionId == ActionDetail2).AdditionalValue;
       }
       eValueNumber targetValue = (eValueNumber) ((int) chargeAction.Value[eValueNumber.VALUE_4] + 1);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using ActionParameterSerializer;
 using Elements;
 using ExcelDataReader.Log;
@@ -618,6 +619,7 @@ namespace PCRCaculator
         public int uniqueEqLv;//专武等级
         public int uniqueEq2Lv = -1;//专武2等级
         public int connectRank;
+        public int connectRankLimit;
         public bool uniqueEqPlus = false; // SP+
         public bool uniqueEq2Plus = false; // SP+
         public int[] exEquip = new int[] { 0, 0, 0 };
@@ -633,10 +635,43 @@ namespace PCRCaculator
         public string name;
         public int love2 => playLoveDic == null ? 0 : playLoveDic.TryGetValue(unitId, out var val) ? val : 0;
         private int _prefabId;
+        public const int JitaUnitId = 105701;
+        public const int JitaSixStarBattlePrefabId = 170301;
+        public const int JitaSixStarIconId = 105761;
+
         public int PrefabId
         {
-            get => _prefabId == 0 ? (rarity == 6 && unitId == 105701 ? 170301 : unitId) : _prefabId;
-            set => _prefabId = value;
+            get => GetBattlePrefabId(unitId, rarity, _prefabId);
+            set => _prefabId = NormalizeStoredBattlePrefabId(unitId, rarity, value);
+        }
+
+        public static int GetBattlePrefabId(int unitId, int rarity, int prefabId)
+        {
+            if (unitId == JitaUnitId)
+            {
+                if (rarity == 6 && (prefabId == 0 || prefabId == unitId || prefabId == JitaSixStarBattlePrefabId))
+                    return JitaSixStarBattlePrefabId;
+                if (rarity != 6 && prefabId == JitaSixStarBattlePrefabId)
+                    return unitId;
+            }
+
+            return prefabId == 0 ? unitId : prefabId;
+        }
+
+        private static int NormalizeStoredBattlePrefabId(int unitId, int rarity, int prefabId)
+        {
+            return unitId == JitaUnitId ? GetBattlePrefabId(unitId, rarity, prefabId) : prefabId;
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            _prefabId = NormalizeStoredBattlePrefabId(unitId, rarity, _prefabId);
+        }
+
+        public static int GetDisplayPrefabId(UnitData data)
+        {
+            return data.unitId == JitaUnitId && data.rarity == 6 ? data.unitId : data.PrefabId;
         }
         public void SetDefaultLoveDict()
         {
@@ -687,7 +722,7 @@ namespace PCRCaculator
             skillLevel = new int[4] { lv, lv, lv, lv };
         }
 
-        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1, bool uniqueEqPlus = false, bool uniqueEq2Plus = false)
+        public UnitData(int id, int lv, int ra, int lov, int rank, int[] eqlv, int[] sklv, Dictionary<int, int> playLoveDic = null, int uniqueeqlv = 0, int uniqueeq2lv = -1, bool uniqueEqPlus = false, bool uniqueEq2Plus = false, int connectRank = 0, int connectRankLimit = 0)
         {
             unitId = id;
             level = lv;
@@ -708,6 +743,8 @@ namespace PCRCaculator
             uniqueEq2Lv = uniqueeq2lv;
             this.uniqueEqPlus = uniqueEqPlus;
             this.uniqueEq2Plus = uniqueEq2Plus;
+            this.connectRank = connectRank;
+            this.connectRankLimit = connectRankLimit;
         }
 
         public void SetMaxLove()
@@ -795,10 +832,10 @@ namespace PCRCaculator
                             //彩装
                             if (exEquip[i] / 100 % 10 == 5)
                             {
-                                //非满贯词条
-                                if (playerSetting.ExEquipSubsDefault.ContainsKey(exEquip[i]))
+                                // 角色专属词条
+                                if (playerSetting.TryGetUnitExEquipSubsDefault(unitId, exEquip[i], out var defaultExEquipSubs))
                                 {
-                                    exEquipSubs[i] = playerSetting.ExEquipSubsDefault[exEquip[i]];
+                                    exEquipSubs[i] = defaultExEquipSubs;
                                 }
                                 // 其余彩装词条，武器防具满贯，饰品攻击
                                 else if (temp != null && temp.Length > i && temp[i].TryGetValue(exEquip[i], out var exEquipData))
@@ -867,7 +904,33 @@ namespace PCRCaculator
         /// <returns></returns>
         public UnitData Copy()
         {
-            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv, uniqueEqPlus, uniqueEq2Plus);
+            return new UnitData(unitId, level, rarity, love, rank, equipLevel, skillLevel, playLoveDic, uniqueEqLv, uniqueEq2Lv, uniqueEqPlus, uniqueEq2Plus, connectRank, connectRankLimit);
+        }
+
+        public UnitData Clone()
+        {
+            return new UnitData
+            {
+                enemyid = this.enemyid,
+                _unitId = this._unitId,
+                level = this.level,
+                rarity = this.rarity,
+                rank = this.rank,
+                equipLevel = this.equipLevel?.ToArray(),
+                skillLevel = this.skillLevel?.ToArray(),
+                playLoveDic = this.playLoveDic != null ? new Dictionary<int, int>(this.playLoveDic) : null,
+                uniqueEqLv = this.uniqueEqLv,
+                uniqueEq2Lv = this.uniqueEq2Lv,
+                connectRank = this.connectRank,
+                connectRankLimit = this.connectRankLimit,
+                uniqueEqPlus = this.uniqueEqPlus,
+                uniqueEq2Plus = this.uniqueEq2Plus,
+                exEquip = this.exEquip?.ToArray(),
+                exEquipLevel = this.exEquipLevel?.ToArray(),
+                exEquipSubs = this.exEquipSubs?.ToDictionary(kv => kv.Key, kv => kv.Value?.ToArray()),
+                name = this.name,
+                _prefabId = this._prefabId
+            };
         }
         /// <summary>
         /// 比较相同角色是否有所提升
@@ -1094,6 +1157,7 @@ namespace PCRCaculator
                 hashCode = (hashCode * 397) ^ uniqueEqLv;
                 hashCode = (hashCode * 397) ^ uniqueEq2Lv;
                 hashCode = (hashCode * 397) ^ connectRank;
+                hashCode = (hashCode * 397) ^ connectRankLimit;
                 hashCode = (hashCode * 397) ^ (uniqueEqPlus ? 1 : 0);
                 hashCode = (hashCode * 397) ^ (uniqueEq2Plus ? 1 : 0);
                 hashCode = (hashCode * 397) ^ exEquip[0];
@@ -2410,8 +2474,8 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 343;
-        public int playerProcess = 94;
+        public int playerLevel = 349;
+        public int playerProcess = 96;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 350;
         //public float bodyWidth = 100;
@@ -2456,16 +2520,16 @@ namespace PCRCaculator
             { 100201, new[] { 4110303, 4203302, 4305302 } }, // u1,
             // { 100301, new[] {0, 0, 0} }, // 剑圣,
             // { 100401, new[] {0, 0, 0} }, // 炸弹人,
-            { 100501, new[] { 4108501, 4202401, 4302401 } }, // 跳跳虎,
+            { 100501, new[] { 4108501, 4202302, 4302401 } }, // 跳跳虎,
             // { 100601, new[] {0, 0, 0} }, // 妹法,
-            // { 100701, new[] { 4108501, 4201401, 4302401 } }, // 布丁,
+            { 100701, new[] { 4108501, 4201402, 4302401 } }, // 布丁,
             // { 100801, new[] { 4110303, 4203302, 4305302 } }, // 雪哥,
             // { 100901, new[] {0, 0, 0} }, // 中二,
             // { 101001, new[] {0, 0, 0} }, // 真步,
-            // { 101101, new[] { 4106301, 4201301, 4301301 } }, // 妹弓,
+            { 101101, new[] { 4106401, 4201401, 4301401 } }, // 妹弓,
             // { 101201, new[] {0, 0, 0} }, // 星法,
             // { 101301, new[] { 4109303, 4204301, 4304301 } }, // 77香,
-            // { 101401, new[] { 4109303, 4203302, 4305302 } }, // 驴,
+            { 101401, new[] { 4109401, 4203302, 4305401 } }, // 驴,
             // { 101501, new[] {0, 0, 0} }, // 圣母,
             // { 101601, new[] {0, 0, 0} }, // 暴击弓,
             // { 101701, new[] {0, 0, 0} }, // 狗拳,
@@ -2474,16 +2538,16 @@ namespace PCRCaculator
             // { 102101, new[] {0, 0, 0} }, // 铃铛,
             // { 102201, new[] {0, 0, 0} }, // 姐法,
             // { 102301, new[] {0, 0, 0} }, // 熊锤,
-            // { 102501, new[] {0, 0, 0} }, // 女仆,
+            { 102501, new[] { 4110301, 4203301, 4305302 } }, // 女仆,
             { 102601, new[] { 4104302, 4201303, 4303302 } }, // 松鼠,
             // { 102701, new[] {0, 0, 0} }, // 病娇,
             // { 102801, new[] {0, 0, 0} }, // 充电宝,
-            // { 102901, new[] { 4108302, 4202302, 4302301 } }, // 偶像,
+            { 102901, new[] { 4108401, 4202302, 4302401 } }, // 偶像,
             // { 103001, new[] {0, 0, 0} }, // 扇子,
             // { 103101, new[] {0, 0, 0} }, // 忍,
             // { 103201, new[] {0, 0, 0} }, // 哈哈剑,
-            // { 103301, new[] { 4104301, 4202303, 4303302 } }, // 奶牛,
-            // { 103401, new[] { 4102303, 4201303, 4303302 } }, // 黄骑,
+            { 103301, new[] { 4104401, 4202303, 4303401 } }, // 奶牛,
+            { 103401, new[] { 4102303, 4201303, 4303302 } }, // 黄骑,
             // { 103601, new[] { 4109303, 4204301, 4304301 } }, // xcw,
             // { 103701, new[] {0, 0, 0} }, // 智,
             // { 103801, new[] {0, 0, 0} }, // 栞,
@@ -2494,24 +2558,24 @@ namespace PCRCaculator
             // { 104501, new[] {0, 0, 0} }, // 空花,
             // { 104601, new[] {0, 0, 0} }, // 猫剑,
             // { 104701, new[] {0, 0, 0} }, // 黑骑,
-            // { 104801, new[] { 4104302, 4202302, 4301301 } }, // 子龙,
-            // { 104901, new[] { 4102303, 4202302, 4303302 } }, // 静流,
+            { 104801, new[] { 4104302, 4202302, 4301301 } }, // 子龙,
+            { 104901, new[] { 4102303, 4202302, 4303302 } }, // 静流,
             // { 105001, new[] {0, 0, 0} }, // 大眼,
             // { 105101, new[] {0, 0, 0} }, // 深月,
-            // { 105201, new[] {0, 0, 0} }, // 羊驼,
+            { 105201, new[] { 4108401, 4202302, 4302401 } }, // 羊驼,
             // { 105301, new[] { 4101303, 4201303, 4303302 } }, // 毛二力,
             // { 105401, new[] { 4107301, 4201303, 4303302 } }, // 裁缝,
             // { 105501, new[] { 4104301, 4201303, 4303302 } }, // 路人妹,
             // { 105601, new[] {0, 0, 0} }, // 流夏,
             // { 105701, new[] {0, 0, 0} }, // 姬塔,
             // { 105801, new[] { 4102301, 4202303, 4302301 } }, // 吃货,
-            // { 105901, new[] {0, 0, 0} }, // 普白,
+            { 105901, new[] { 4104302, 4201303, 4303302 } }, // 普白,
             // { 106001, new[] {0, 0, 0} }, // 黑猫,
             // { 106101, new[] {0, 0, 0} }, // 611,
             // { 106301, new[] {0, 0, 0} }, // yls,
             // { 106401, new[] {0, 0, 0} }, // 雪菲,
-            // { 106501, new[] { 4107302, 4201301, 4301301 } }, // 龙拳,
-            // { 106601, new[] { 4105302, 4202303, 4303302 } }, // 龙锤,
+            { 106501, new[] { 4107302, 4201301, 4301301 } }, // 龙拳,
+            { 106601, new[] { 4105302, 4202303, 4303302 } }, // 龙锤,
             // { 106701, new[] {0, 0, 0} }, // 龙妈,
             // { 106801, new[] {0, 0, 0} }, // 晶,
             // { 106901, new[] { 4101403, 4201301, 4301301 } }, // 霸瞳,
@@ -2524,27 +2588,27 @@ namespace PCRCaculator
             // { 107901, new[] {0, 0, 0} }, // 水猫剑,
             // { 108001, new[] {0, 0, 0} }, // 水子龙,
             // { 108101, new[] {0, 0, 0} }, // 瓜忍,
-            // { 108201, new[] {0, 0, 0} }, // 狼布丁,
+            { 108201, new[] { 4107302, 4201301, 4303302 } }, // 狼布丁,
             // { 108301, new[] { 4109303, 4204301, 4304301 } }, // 瓜眼,
             { 108401, new[] { 4110301, 4203301, 4305302 } }, // 圣千,
             // { 108501, new[] { 4105302, 4201303, 4302301 } }, // 圣铃,
             // { 108601, new[] {0, 0, 0} }, // 圣锤,
             // { 108701, new[] {0, 0, 0} }, // 春猫,
             // { 108801, new[] {0, 0, 0} }, // 春田,
-            // { 108901, new[] { 4108301, 4201303, 4302301 } }, // 春剑,
-            // { 109001, new[] { 4105302, 4201301, 4301301 } }, // 情病,
+            { 108901, new[] { 4108501, 4201401, 4302401 } }, // 春剑,
+            { 109001, new[] { 4105302, 4201401, 4303401 } }, // 情病,
             // { 109101, new[] {0, 0, 0} }, // 情姐,
             // { 109201, new[] {0, 0, 0} }, // 安,
             // { 109301, new[] {0, 0, 0} }, // 露,
             // { 109401, new[] {0, 0, 0} }, // 龙女,
             // { 109501, new[] {0, 0, 0} }, // 江m,
             // { 109601, new[] {0, 0, 0} }, // 忍扇,
-            // { 109701, new[] {0, 0, 0} }, // 雷姆,
+            { 109701, new[] { 4105401, 4201401, 4303401 } }, // 蕾姆,
             // { 109801, new[] {0, 0, 0} }, // 拉姆,
             // { 109901, new[] {0, 0, 0} }, // emt,
             // { 110001, new[] {0, 0, 0} }, // 水暴,
             // { 110101, new[] {0, 0, 0} }, // 水老师,
-            // { 110301, new[] { 4101303, 4201303, 4301301 } }, // 水电,
+            { 110301, new[] { 4101303, 4201303, 4301301 } }, // 水电,
             // { 110401, new[] {0, 0, 0} }, // 水狼,
             // { 110501, new[] {0, 0, 0} }, // 水狗,
             // { 110601, new[] {0, 0, 0} }, // 水狐,
@@ -2553,7 +2617,7 @@ namespace PCRCaculator
             // { 110901, new[] {0, 0, 0} }, // 切噜,
             // { 111001, new[] {0, 0, 0} }, // 优妮,
             // { 111101, new[] {0, 0, 0} }, // mcw,
-            // { 111201, new[] {0, 0, 0} }, // 瓜炸,
+            { 111201, new[] { 4107302, 4201301, 4303302 } }, // 瓜炸,
             // { 111301, new[] {0, 0, 0} }, // 瓜兔,
             // { 111401, new[] {0, 0, 0} }, // 露娜,
             // { 111501, new[] {0, 0, 0} }, // 圣克,
@@ -2563,15 +2627,15 @@ namespace PCRCaculator
             // { 111901, new[] {0, 0, 0} }, // 春妈,
             // { 112001, new[] {0, 0, 0} }, // 春黑,
             // { 112101, new[] {0, 0, 0} }, // 春女仆,
-            // { 112201, new[] { 4109301, 4203302, 4305302 } }, // 魔驴,
-            // { 112301, new[] {0, 0, 0} }, // 魔栞,
+            { 112201, new[] { 4109501, 4203401, 4305401 } }, // 魔驴,
+            { 112301, new[] { 4106301, 4201301, 4301301 } }, // 魔栞,
             // { 112401, new[] {0, 0, 0} }, // 卯月,
             // { 112501, new[] {0, 0, 0} }, // 凛,
             // { 112601, new[] {0, 0, 0} }, // 未央,
             // { 112701, new[] {0, 0, 0} }, // 武松,
             // { 112801, new[] {0, 0, 0} }, // 牛叉,
             // { 112901, new[] {0, 0, 0} }, // 爽弓,
-            // { 113001, new[] { 4104302, 4201303, 4303302 } }, // 兔人妹,
+            { 113001, new[] { 4104302, 4201303, 4303302 } }, // 路人兔,
             // { 113101, new[] {0, 0, 0} }, // 水流夏,
             // { 113201, new[] {0, 0, 0} }, // 水中二,
             // { 113301, new[] {0, 0, 0} }, // 水77香,
@@ -2588,7 +2652,7 @@ namespace PCRCaculator
             // { 114401, new[] {0, 0, 0} }, // 圣哈,
             // { 114501, new[] {0, 0, 0} }, // 圣电,
             // { 114601, new[] {0, 0, 0} }, // 蛋黄,
-            // { 114701, new[] { 4103301, 4201301, 4302301 } }, // 512,
+            { 114701, new[] { 4103301, 4201301, 4302301 } }, // 512,
             // { 115001, new[] {0, 0, 0} }, // 春花,
             // { 115501, new[] {0, 0, 0} }, // 礼妈,
             // { 115601, new[] {0, 0, 0} }, // 礼田,
@@ -2609,7 +2673,7 @@ namespace PCRCaculator
             // { 117201, new[] {0, 0, 0} }, // 水望,
             // { 117301, new[] { 4110303, 4203302, 4305302 } }, // 水千,
             // { 117401, new[] {0, 0, 0} }, // 水裁,
-            // { 117501, new[] { 4102303, 4201301, 4303302 } }, // 江月,
+            { 117501, new[] { 4102303, 4201301, 4303302 } }, // 江月,
             // { 117601, new[] {0, 0, 0} }, // 江雪,
             // { 117701, new[] {0, 0, 0} }, // 瓜狗,
             // { 117801, new[] {0, 0, 0} }, // 瓜扇,
@@ -2624,14 +2688,14 @@ namespace PCRCaculator
             // { 119201, new[] { 4104302, 4202302, 4303302 } }, // 圣牛,
             // { 119301, new[] {0, 0, 0} }, // 弹弓,
             // { 119901, new[] {0, 0, 0} }, // 但丁,
-            // { 120001, new[] { 4102301, 4202302, 4303302 } }, // 黑姐,
+            { 120001, new[] { 4102303, 4202302, 4303302 } }, // 黑姐,
             // { 120701, new[] {0, 0, 0} }, // 春菲,
             // { 120801, new[] {0, 0, 0} }, // 春流夏,
             // { 120901, new[] {0, 0, 0} }, // 春伊,
             // { 121001, new[] {0, 0, 0} }, // 超吃,
             // { 121101, new[] {0, 0, 0} }, // 超猫,
             // { 121201, new[] {0, 0, 0} }, // 超晶,
-            // { 121301, new[] { 4105402, 4201303, 4302301 } }, // 舞铃,
+            { 121301, new[] { 4105402, 4201303, 4302301 } }, // 舞铃,
             // { 121401, new[] {0, 0, 0} }, // 车眼,
             // { 121501, new[] {0, 0, 0} }, // 怪盗妹,
             // { 121601, new[] {0, 0, 0} }, // 怪盗龙锤,
@@ -2649,12 +2713,12 @@ namespace PCRCaculator
             { 123001, new[] { 4110303, 4203302, 4305302 } }, // 爱梅斯,
             // { 123101, new[] {0, 0, 0} }, // 屁狐,
             // { 123201, new[] {0, 0, 0} }, // 野锤,
-            // { 123301, new[] { 4107302, 4201301, 4301301 } }, // 史莱姆,
-            // { 123501, new[] { 4104301, 4202303, 4303302 } }, // 瓜松,
+            { 123301, new[] { 4107302, 4201401, 4301401 } }, // 史莱姆,
+            { 123501, new[] { 4104401, 4202303, 4303401 } }, // 瓜松,
             // { 123601, new[] {0, 0, 0} }, // 瓜智,
             // { 123701, new[] { 4110301, 4204301, 4305302 } }, // 瓜七,
             // { 123801, new[] {0, 0, 0} }, // 兔克,
-            // { 123901, new[] { 4103301, 4201301, 4301301 } }, // 野虎,
+            // { 123901, new[] { 4103401, 4201401, 4301401 } }, // 野虎,
             // { 124001, new[] {0, 0, 0} }, // 圣妹,
             // { 124101, new[] {0, 0, 0} }, // 圣姐,
             // { 124201, new[] {0, 0, 0} }, // 白骑,
@@ -2664,14 +2728,14 @@ namespace PCRCaculator
             // { 124801, new[] {0, 0, 0} }, // 解望,
             // { 124901, new[] {0, 0, 0} }, // 解龙拳,
             // { 125001, new[] {0, 0, 0} }, // 513,
-            // { 125101, new[] { 4103301, 4201301, 4301301 } }, // 猫咖,
+            { 125101, new[] { 4103301, 4201301, 4301301 } }, // 猫咖,
             // { 125201, new[] {0, 0, 0} }, // 猫二力,
             // { 125301, new[] {0, 0, 0} }, // 狗妈,
             // { 125401, new[] {0, 0, 0} }, // 游栞,
             // { 125501, new[] {0, 0, 0} }, // 魔姬,
             // { 125601, new[] {0, 0, 0} }, // 鼠鼠,
             // { 125701, new[] {0, 0, 0} }, // 魔绿,
-            // { 125801, new[] {0, 0, 0} }, // 莉莉,
+            { 125801, new[] { 4105401, 4201401, 4303401 } }, // 莉莉,
             // { 126001, new[] {0, 0, 0} }, // 可璃亚,
             // { 126101, new[] { 4110303, 4203302, 4305302 } }, // 猪妹,
             // { 126201, new[] {0, 0, 0} }, // 礼伊,
@@ -2682,13 +2746,13 @@ namespace PCRCaculator
             // { 126701, new[] {0, 0, 0} }, // 水哈,
             // { 126801, new[] {0, 0, 0} }, // 水鬼,
             // { 126901, new[] {0, 0, 0} }, // 水兰法,
-            // { 127001, new[] {0, 0, 0} }, // 水m,
+            { 127001, new[] { 4103501, 4202302, 4302401 } }, // 水m,
             // { 127101, new[] {0, 0, 0} }, // 水忍,
             // { 127201, new[] { 4109303, 4203302, 4305302 } }, // 学猫,
             // { 127301, new[] {0, 0, 0} }, // 学暴,
             // { 127501, new[] {0, 0, 0} }, // 火电,
             // { 127601, new[] {0, 0, 0} }, // 流沙,
-            // { 127701, new[] {0, 0, 0} }, // 琳德,
+            { 127701, new[] { 4110303, 4203302, 4305302 } }, // 琳德,
             // { 127801, new[] {0, 0, 0} }, // 维尔姆,
             // { 127901, new[] { 4108303, 4203302, 4302301 } }, // 圣吃,
             // { 128001, new[] {0, 0, 0} }, // 圣婆,
@@ -2696,19 +2760,19 @@ namespace PCRCaculator
             // { 128401, new[] {0, 0, 0} }, // 春星,
             // { 128501, new[] { 4109301, 4204301, 4305302 } }, // 春驴,
             // { 128701, new[] {0, 0, 0} }, // 星猫,
-            // { 128801, new[] { 4101303, 4201303, 4301301 } }, // 星怜,
+            { 128801, new[] { 4101403, 4201301, 4301301 } }, // 星剑,
             // { 128901, new[] {0, 0, 0} }, // 星田,
             { 129001, new[] { 4109303, 4203302, 4305302 } }, // els,
             { 129301, new[] { 4105302, 4201303, 4302301 } }, // 水优妮,
             // { 129401, new[] {0, 0, 0} }, // 水华,
             // { 129501, new[] {0, 0, 0} }, // 水切噜,
-            // { 129601, new[] { 4103301, 4201301, 4301301 } }, // 银莲,
-            // { 129701, new[] {0, 0, 0} }, // 涅妃,
+            { 129601, new[] { 4103303, 4201401, 4301401 } }, // 银莲,
+            { 129701, new[] { 4104402, 4201401, 4303401 } }, // 涅妃,
             // { 129801, new[] {0, 0, 0} }, // 战狼,
             // { 129901, new[] { 4105302, 4201301, 4301301 } }, // 战病,
             // { 130001, new[] {0, 0, 0} }, // 大和,
-            // { 130101, new[] {0, 0, 0} }, // 若菜,
-            // { 130201, new[] {0, 0, 0} }, // 吹雪,
+            { 130101, new[] { 4105302, 4201301, 4302301 } }, // 若菜,
+            { 130201, new[] { 4102401, 4201401, 4301401 } }, // 吹雪,
             // { 130701, new[] {0, 0, 0} }, // hcw,
             // { 130801, new[] { 4110301, 4203301, 4305302 } }, // 花女仆,
             // { 130901, new[] { 4109301, 4203301, 4305302 } }, // 库露露,
@@ -2718,9 +2782,9 @@ namespace PCRCaculator
             // { 131601, new[] {0, 0, 0} }, // 水莉莉,
             // { 131701, new[] {0, 0, 0} }, // sms,
             // { 131801, new[] {0, 0, 0} }, // 水龙妈,
-            // { 131901, new[] {0, 0, 0} }, // 水emt,
-            // { 132001, new[] {0, 0, 0} }, // 水多娜,
-            // { 132101, new[] {0, 0, 0} }, // 水蕾姆,
+            { 131901, new[] { 4109501, 4203401, 4304401 } }, // 水emt,
+            { 132001, new[] { 4109501, 4204401, 4305401 } }, // 水多娜,
+            { 132101, new[] { 4105401, 4201401, 4303401 } }, // 水蕾姆,
             // { 132201, new[] {0, 0, 0} }, // 炼金望,
             // { 132301, new[] {0, 0, 0} }, // 鹿妹,
             // { 132501, new[] {0, 0, 0} }, // 苑,
@@ -2730,13 +2794,13 @@ namespace PCRCaculator
             // { 133101, new[] {0, 0, 0} }, // 紫罗兰,
             // { 133201, new[] {0, 0, 0} }, // 春二力,
             // { 133501, new[] {0, 0, 0} }, // 春电,
-            // { 133601, new[] {0, 0, 0} }, // 美杜莎,
+            { 133601, new[] { 4107302, 4201301, 4303302 } }, // 美杜莎,
             // { 133701, new[] {0, 0, 0} }, // 原晶,
             // { 133801, new[] {0, 0, 0} }, // 原花,
             // { 133901, new[] {0, 0, 0} }, // 原克,
-            // { 134001, new[] {0, 0, 0} }, // 菲欧,
+            { 134001, new[] { 4110303, 4203302, 4305302 } }, // 菲欧,
             // { 134301, new[] {0, 0, 0} }, // 礼兰法,
-            // { 134401, new[] {0, 0, 0} }, // 礼千,
+            { 134401, new[] { 4109501, 4204401, 4305401 } }, // 礼千,
             // { 134501, new[] {0, 0, 0} }, // 火机,
             // { 134601, new[] {0, 0, 0} }, // 机菜,
             // { 134701, new[] {0, 0, 0} }, // 小凤,
@@ -2769,11 +2833,32 @@ namespace PCRCaculator
             // { 181201, new[] {0, 0, 0} }, // 白菲,
         };
 
-        public Dictionary<int, int[]> ExEquipSubsDefault = new Dictionary<int, int[]>
+        public Dictionary<int, Dictionary<int, int[]>> UnitExEquipSubsDefault = new()
         {
-            { 4110501, new int[] { 0, 4, 0, 4, 0, 4, 0, 4 } },//hp书
-            { 4108501, new int[] { 0, 4, 0, 4, 0, 4, 0, 4 } },//hp盾牌
+            { 100501, new Dictionary<int, int[]> { { 4108501, new[] { 0, 4, 0, 4, 0, 4, 0, 4 } } } }, // 跳跳虎 hp盾牌
+            { 100701, new Dictionary<int, int[]> { { 4108501, new[] { 0, 4, 0, 4, 0, 4, 0, 4 } } } }, // 布丁 hp盾牌
+            { 108901, new Dictionary<int, int[]> { { 4108501, new[] { 0, 4, 0, 4, 0, 4, 0, 4 } } } }, // 春剑 hp盾牌
+            { 118601, new Dictionary<int, int[]> { { 4110501, new[] { 0, 4, 0, 4, 0, 4, 0, 4 } } } }, // 蚊子 hp书
+            { 127001, new Dictionary<int, int[]> { { 4103501, new[] { 0, 4, 0, 4, 0, 4, 0, 4 } } } }, // 水m hp匕首
+            { 131901, new Dictionary<int, int[]> { { 4109501, new[] { 0, 4, 0, 4, 0, 4, 0, 4 } } } }, // 水emt hp法杖
         };
+
+        public bool TryGetUnitExEquipSubsDefault(int unitId, int exEquipId, out int[] subs)
+        {
+            subs = null;
+            if (UnitExEquipSubsDefault == null ||
+                !UnitExEquipSubsDefault.TryGetValue(unitId, out var unitSubsDefault) ||
+                unitSubsDefault == null ||
+                !unitSubsDefault.TryGetValue(exEquipId, out var configuredSubs) ||
+                configuredSubs == null ||
+                configuredSubs.Length != 8)
+            {
+                return false;
+            }
+
+            subs = configuredSubs.ToArray();
+            return true;
+        }
 
         public int GetMaxRank()
         {

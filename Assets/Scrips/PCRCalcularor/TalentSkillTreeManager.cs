@@ -98,6 +98,9 @@ namespace PCRCaculator
         {
             nodeChildrenDict = new Dictionary<int, List<int>>();
 
+            if (NodeDataDict == null || NodeDataDict.Count == 0)
+                return;
+
             // 初始化子节点列表
             foreach (var node in NodeDataDict.Values)
             {

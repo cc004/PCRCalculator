@@ -193,10 +193,16 @@ namespace ActionParameterSerializer.Actions
                     return new IfContainsUnitGroupAction();
                 case 110:
                     return new SlipDamageUpAction();
+                case 111:
+                    return new EnchantTriggerAction();
                 case 112:
                     return new AddAbnormalEffectTimeAction();
                 case 114:
                     return new AllUnitSealDamageCutAction();
+                case 117:
+                    return new ForceChangeSpeedAction();
+                case 118:
+                    return new GutsAction();
                 case 124:
                     return new EnchantProtectAction();
                 case 125:
@@ -207,6 +213,10 @@ namespace ActionParameterSerializer.Actions
                     return new ConvertDamageOverTimeAction();
                 case 130:
                     return new ReduceDamageHigherDefAction();
+                case 132:
+                    return new TranscendDamageAction();
+                case 133:
+                    return new EnchantUbTriggerSealAction();
                 /*
                 case 901:
                     return new ExStartPassiveAction();

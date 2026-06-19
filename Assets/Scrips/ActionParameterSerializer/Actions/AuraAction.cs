@@ -27,6 +27,8 @@ namespace ActionParameterSerializer.Actions
             receivedMagicalDamage = 17,
             physicalDamageUpPercent = 18,
             magicDamageUpPercent = 19,
+            BUFF_ENHANCE = 200,
+            DEBUFF_ENHANCE = 210,
             maxHP = 100
         }
 
@@ -60,6 +62,14 @@ namespace ActionParameterSerializer.Actions
             if (actionDetail1 == 1)
             {
                 auraType = AuraType.maxHP;
+            }
+            else if (actionDetail1 == 200)
+            {
+                auraType = AuraType.BUFF_ENHANCE;
+            }
+            else if (actionDetail1 == 210)
+            {
+                auraType = AuraType.DEBUFF_ENHANCE;
             }
             else if (actionDetail1 >= 1000)
             {

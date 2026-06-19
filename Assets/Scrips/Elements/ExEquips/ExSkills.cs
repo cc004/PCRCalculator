@@ -256,9 +256,8 @@ namespace Elements
             {
                 return eTryExResult.FAILED;
             }
-            if (BattleManager.Random(0f, 1f,
-                    new RandomData(owner, owner, 0, 17, exConditionPassiveData.HitRate)
-                    ) > exConditionPassiveData.HitRate)
+            var randomData = new RandomData(owner, owner, 0, 17, exConditionPassiveData.HitRate);
+            if (BattleManager.Random(0f, 1f, ref randomData) > exConditionPassiveData.HitRate)
             {
                 return eTryExResult.FAILED;
             }

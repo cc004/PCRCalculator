@@ -380,6 +380,8 @@ namespace ActionParameterSerializer
                 case AuraAction.AuraType.receivedPhysicalDamage: return Utils.GetString("received_physical_damage");
                 case AuraAction.AuraType.receivedMagicalDamage: return Utils.GetString("received_magical_damage");
                 case AuraAction.AuraType.maxHP: return Utils.GetString("max_HP");
+                case AuraAction.AuraType.BUFF_ENHANCE: return Utils.GetString("Buff_Enhance");
+                case AuraAction.AuraType.DEBUFF_ENHANCE: return Utils.GetString("Debuff_Enhance");
                 default:
                     if (Enum.TryParse<PropertyKey>(val.ToString(), out var key))
                         return key.description();
@@ -569,6 +571,8 @@ namespace ActionParameterSerializer
                     return Utils.JavaFormat(Utils.GetString("the_lowest_Magic_DEF"));
                 case TargetType.flightOnly:
                     return Utils.JavaFormat(Utils.GetString("flight_only"));
+                case TargetType.ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA:
+                    return Utils.JavaFormat(Utils.GetString("atk_dec_forward_without_owner_and_magic_chara"));
                 default:
                     var target_type = (TargetType)((int)type / 1000 * 1000);
                     var target_val = (int)type % 1000;

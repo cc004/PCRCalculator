@@ -2355,11 +2355,14 @@ namespace PCRCaculator.Guild
         public string GetFinalTeamSkillNodeDescription()
         {
             var teamSkill = SettingData.GetCurrentPlayerGroup().teamSkill;
-            if (teamSkill == null || teamSkill.Count == 0)
+            var activeTeamSkill = teamSkill?
+                .Where(node => node.Value > 0)
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            if (activeTeamSkill == null || activeTeamSkill.Count == 0)
             {
                 return "无";
             }
-            return $"第{teamSkill.Keys.Max()}个";
+            return $"第{activeTeamSkill.Keys.Max()}个";
         }
         public void GetTalentFormationBonusDescription()
         {

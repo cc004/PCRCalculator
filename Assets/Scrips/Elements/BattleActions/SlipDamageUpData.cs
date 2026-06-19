@@ -27,7 +27,7 @@ namespace Elements
                 var iconCounter = _owner.SlipDamageUpIconCounter;
                 if (iconCounter == 0)
                 {
-                    _owner.OnChangeState(_owner, eStateIconType.SLIP_DAMAGE_UP, true);
+                    _owner.OnChangeState?.Invoke(_owner, eStateIconType.SLIP_DAMAGE_UP, true);
                 }
                 _owner.SlipDamageUpIconCounter = iconCounter + 1;
             }
@@ -50,7 +50,7 @@ namespace Elements
             {
                 if (--_owner.SlipDamageUpIconCounter == 0)
                 {
-                    _owner.OnChangeState(_owner, eStateIconType.SLIP_DAMAGE_UP, false);
+                    _owner.OnChangeState?.Invoke(_owner, eStateIconType.SLIP_DAMAGE_UP, false);
                 }
             }
         }

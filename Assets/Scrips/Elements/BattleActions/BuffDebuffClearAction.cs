@@ -39,9 +39,10 @@ namespace Elements
 		  ValueDictionary _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-			bool flag = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 18, BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))) >= (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target) && ActionDetail1 == 1;
-			if (BattleManager.Random(0.0f, 1f,
-					new RandomData(_source, _target.Owner, ActionId, 18, Value[eValueNumber.VALUE_1] / 100.0f)) > (double)_valueDictionary[eValueNumber.VALUE_1] / 100.0 | flag && (double)Value[eValueNumber.VALUE_3] == 0.0)
+			var dodgeRandomData = new RandomData(_source, _target.Owner, ActionId, 18, BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target));
+			bool flag = BattleManager.Random(0.0f, 1f, ref dodgeRandomData) >= (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target) && ActionDetail1 == 1;
+			var randomData = new RandomData(_source, _target.Owner, ActionId, 18, Value[eValueNumber.VALUE_1] / 100.0f);
+			if (BattleManager.Random(0.0f, 1f, ref randomData) > (double)_valueDictionary[eValueNumber.VALUE_1] / 100.0 | flag && (double)Value[eValueNumber.VALUE_3] == 0.0)
 			{
 				ActionExecedData actionExecedData = AlreadyExecedData[_target.Owner][_num];
 				if (actionExecedData.ExecedPartsNumber != actionExecedData.TargetPartsNumber)

@@ -74,7 +74,9 @@ namespace Elements
                             break;
                     }
 
-                    DamageData damageData = new DamageData();
+                    DamageData damageData = DamageData.Rent();
+                    try
+                    {
                     damageData.Target = TargetList[index];
                     damageData.Damage = BattleUtil.DoubleToLong(Value * receiveDamagePrecent * damageUpPrecent);
                     damageData.DamageType = realDamageType;
@@ -110,6 +112,8 @@ namespace Elements
                     };
                     //end add
                     owner.SetDamage(_damageData, false, actionId, _skill: _skill, _noMotion: true, _energyChargeMultiple: ((float)energyChargeMultiple), callBack: action0);
+                    }
+                    finally { damageData.Return(); }
                 }
             }
         }

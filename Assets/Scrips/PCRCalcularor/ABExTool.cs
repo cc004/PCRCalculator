@@ -438,26 +438,105 @@ namespace PCRCaculator
                 defaultVal ?? (10046200));
         }*/
 
-        public static Task StaticInitialize(Tuple<int?, int?> _ = default)
+        public static async Task StaticInitialize(Tuple<int?, int?> _ = default)
         {
             var ver = MainManager.Instance.Version;
 
             if (ver.BossVersionJP == ver.CharacterVersionJP)
             {
                 mgrCharacter = mgrDataJP;
-                return Task.WhenAll(
+                await Task.WhenAll(
                     Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),
                     Task.Run(() => mgrDataCN.Initialize(ver.BossVersionCN.ToString(),
                         ver.useQA))
                 );
+                VerifyPersistentBundleCaches();
+                return;
             }
 
-            return Task.WhenAll(
+            await Task.WhenAll(
                 Task.Run(() => mgrCharacter.Initialize(ver.CharacterVersionJP.ToString())),
                 Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),
                 Task.Run(() => mgrDataCN.Initialize(ver.BossVersionCN.ToString(),
                     ver.useQA))
             );
+            VerifyPersistentBundleCaches();
+        }
+
+        private static readonly object bundleCachePreflightLock = new object();
+        private static readonly HashSet<string> verifiedBundleCacheDirectories =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        private static void VerifyPersistentBundleCaches()
+        {
+            VerifyPersistentBundleCache(mgrCharacter);
+
+            if (!ReferenceEquals(mgrCharacter, mgrDataJP))
+                VerifyPersistentBundleCache(mgrDataJP);
+        }
+
+        private static void VerifyPersistentBundleCache(AssetManager mgr)
+        {
+            if (mgr?.registries == null || mgr.registries.Count == 0)
+                return;
+
+            string cacheDir;
+            try
+            {
+                cacheDir = Path.GetFullPath(GetBundleCacheDirectory(mgr));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"asset bundle cache preflight skipped: failed to resolve cache directory: {ex.Message}");
+                return;
+            }
+
+            if (!Directory.Exists(cacheDir))
+                return;
+
+            lock (bundleCachePreflightLock)
+            {
+                if (!verifiedBundleCacheDirectories.Add(cacheDir))
+                    return;
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+            int checkedCount = 0;
+            int noManifestCount = 0;
+            int quarantinedCount = 0;
+            int errorCount = 0;
+
+            foreach (var file in Directory.EnumerateFiles(cacheDir, "*.unity3d", SearchOption.TopDirectoryOnly))
+            {
+                var fullname = Path.GetFileName(file);
+                if (!TryGetManifestContent(fullname, mgr, out var content))
+                {
+                    noManifestCount++;
+                    continue;
+                }
+
+                checkedCount++;
+                try
+                {
+                    if (!IsExpectedBundleFile(file, fullname, content, out var reason))
+                    {
+                        Debug.LogWarning($"asset bundle {fullname} {reason} in preflight cache scan: {file}");
+                        if (QuarantineCorruptBundleFile(file, fullname))
+                            quarantinedCount++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errorCount++;
+                    Debug.LogWarning($"asset bundle {fullname} preflight cache scan failed: {ex}");
+                }
+            }
+
+            stopwatch.Stop();
+            Debug.Log(
+                $"asset bundle cache preflight completed for {cacheDir}: checked={checkedCount}, " +
+                $"quarantined={quarantinedCount}, noManifest={noManifestCount}, errors={errorCount}, " +
+                $"elapsedMs={stopwatch.ElapsedMilliseconds}");
         }
 
         public static IEnumerable<(AssetManager mgr, Content content)> CacheAllFiles(Regex regex, bool useOld)
@@ -468,6 +547,271 @@ namespace PCRCaculator
                     yield return (m, pair.Value);
         }
 
+        public enum BattleResourcePrepareStatus
+        {
+            Success,
+            ManifestMissing,
+            CacheUnavailable,
+            DependencyUnavailable,
+            DependencyParseFailed,
+            UnexpectedError
+        }
+
+        public sealed class BattleResourcePrepareFailure
+        {
+            public BattleResourcePrepareStatus Status { get; }
+            public string BundleName { get; }
+            public string Stage { get; }
+            public string Message { get; }
+            public Exception Exception { get; }
+
+            public BattleResourcePrepareFailure(
+                BattleResourcePrepareStatus status,
+                string bundleName,
+                string stage,
+                string message,
+                Exception exception = null)
+            {
+                Status = status;
+                BundleName = bundleName;
+                Stage = stage;
+                Message = message;
+                Exception = exception;
+            }
+
+            public override string ToString()
+            {
+                var exceptionText = Exception == null
+                    ? string.Empty
+                    : $", exception={Exception.GetType().Name}: {Exception.Message}";
+                return $"status={Status}, bundle={BundleName}, stage={Stage}, message={Message}{exceptionText}";
+            }
+        }
+
+        public sealed class BattleResourcePrepareSummary
+        {
+            public List<BattleResourcePrepareFailure> Failures { get; } = new List<BattleResourcePrepareFailure>();
+            public bool Success => Failures.Count == 0;
+            public int RequestedBundleCount { get; internal set; }
+            public int EnsuredBundleCount { get; internal set; }
+            public int SkippedManifestMissingCount { get; internal set; }
+            public int OptionalDependencyMissingCount { get; internal set; }
+            public long ElapsedMilliseconds { get; internal set; }
+
+            internal void AddFailure(
+                BattleResourcePrepareStatus status,
+                string bundleName,
+                string stage,
+                string message,
+                Exception exception = null)
+            {
+                Failures.Add(new BattleResourcePrepareFailure(status, bundleName, stage, message, exception));
+            }
+
+            public override string ToString()
+            {
+                var failureText = Failures.Count == 0
+                    ? "none"
+                    : string.Join(" | ", Failures.Select(f => f.ToString()));
+                return $"success={Success}, requested={RequestedBundleCount}, ensured={EnsuredBundleCount}, " +
+                       $"skippedManifestMissing={SkippedManifestMissingCount}, " +
+                       $"optionalDependencyMissing={OptionalDependencyMissingCount}, elapsedMs={ElapsedMilliseconds}, " +
+                       $"failures={failureText}";
+            }
+        }
+
+        public static BattleResourcePrepareSummary PrepareBattleUnitResources(IEnumerable<int> unitIds)
+        {
+            var summary = new BattleResourcePrepareSummary();
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var bundleNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var unitId in unitIds ?? Enumerable.Empty<int>())
+                {
+                    if (unitId <= 0)
+                        continue;
+
+                    foreach (var bundleName in GetRequiredBattleUnitBundleNames(unitId))
+                        bundleNames.Add(bundleName);
+                }
+
+                summary.RequestedBundleCount = bundleNames.Count;
+                var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var bundleName in bundleNames)
+                    EnsureBundleAndDependenciesCachedStrict(bundleName, mgrCharacter, true, visited, summary);
+            }
+            catch (Exception ex)
+            {
+                summary.AddFailure(
+                    BattleResourcePrepareStatus.UnexpectedError,
+                    string.Empty,
+                    "prepare",
+                    "unexpected battle resource prepare failure",
+                    ex);
+            }
+            finally
+            {
+                stopwatch.Stop();
+                summary.ElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            }
+
+            Debug.Log($"battle resource prepare completed: {summary}");
+            return summary;
+        }
+
+        private static IEnumerable<string> GetRequiredBattleUnitBundleNames(int unitid)
+        {
+            var prefabId = GetPrefabId(unitid);
+            var battleunitBundleName = ResolveBattleunitBundleNameForPreload(prefabId);
+            if (!string.IsNullOrEmpty(battleunitBundleName))
+                yield return battleunitBundleName;
+            yield return "all_battleunitprefab_" + prefabId + ".unity3d";
+        }
+
+        private static string GetBattleunitBundleName(int prefabId)
+        {
+            return "all_battleunit_" + prefabId + ".unity3d";
+        }
+
+        private static string GetFallbackBattleunitBundleName(int prefabId)
+        {
+            return "all_battleunit_" + (prefabId / 100 * 100 + 99) + ".unity3d";
+        }
+
+        private static string ResolveBattleunitBundleNameForPreload(int prefabId)
+        {
+            var battleunitBundleName = GetBattleunitBundleName(prefabId);
+            if (TryGetManifestContent(battleunitBundleName, mgrCharacter, out _))
+                return battleunitBundleName;
+
+            var fallbackBattleunitBundleName = GetFallbackBattleunitBundleName(prefabId);
+            return TryGetManifestContent(fallbackBattleunitBundleName, mgrCharacter, out _)
+                ? fallbackBattleunitBundleName
+                : null;
+        }
+
+        private static bool EnsureBundleAndDependenciesCachedStrict(
+            string fullname,
+            AssetManager mgr,
+            bool required,
+            HashSet<string> visited,
+            BattleResourcePrepareSummary summary)
+        {
+            if (string.IsNullOrEmpty(fullname))
+                return true;
+            if (!visited.Add(fullname))
+                return true;
+
+            if (!TryGetManifestContent(fullname, mgr, out _))
+            {
+                if (required)
+                {
+                    summary.SkippedManifestMissingCount++;
+                    Debug.LogWarning(
+                        $"asset bundle {fullname} has no manifest entry during battle resource prepare; " +
+                        "skipping cache precheck because resource version ownership is outside prepare");
+                }
+                else
+                {
+                    summary.OptionalDependencyMissingCount++;
+                    Debug.LogWarning(
+                        $"asset bundle dependency {fullname} has no manifest entry during battle resource prepare; " +
+                        "keeping legacy optional dependency behavior");
+                }
+                return true;
+            }
+
+            byte[] bytes;
+            try
+            {
+                bytes = ReadOrRepairBundleCacheFile(fullname, mgr);
+            }
+            catch (Exception ex)
+            {
+                summary.AddFailure(
+                    required
+                        ? BattleResourcePrepareStatus.CacheUnavailable
+                        : BattleResourcePrepareStatus.DependencyUnavailable,
+                    fullname,
+                    "cache",
+                    "download/cache validation failed",
+                    ex);
+                return false;
+            }
+
+            if (bytes == null)
+            {
+                summary.AddFailure(
+                    required
+                        ? BattleResourcePrepareStatus.CacheUnavailable
+                        : BattleResourcePrepareStatus.DependencyUnavailable,
+                    fullname,
+                    "cache",
+                    "download/cache validation returned no bytes");
+                return false;
+            }
+
+            summary.EnsuredBundleCount++;
+            return EnsureBundleDependenciesCachedStrict(fullname, bytes, mgr, visited, summary);
+        }
+
+#if UNITY_5_3_OR_NEWER
+        private static bool EnsureBundleDependenciesCachedStrict(
+            string fullname,
+            byte[] raw,
+            AssetManager mgr,
+            HashSet<string> visited,
+            BattleResourcePrepareSummary summary)
+        {
+            if (raw == null)
+                return true;
+
+            try
+            {
+                using var ms = new MemoryStream(raw);
+                var ab = am.LoadBundleFile(ms, fullname);
+                var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
+                var info = am.GetBaseField(assetsFileInstance,
+                    assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+
+                var success = true;
+                foreach (var val in info["m_Dependencies"]["Array"])
+                {
+                    var depName = val.AsString;
+                    if (string.IsNullOrEmpty(depName))
+                        continue;
+
+                    Debug.Log($"preparing asset bundle dependency: {fullname} => {depName}");
+                    if (!EnsureBundleAndDependenciesCachedStrict(depName, mgr, false, visited, summary))
+                        success = false;
+                }
+
+                return success;
+            }
+            catch (Exception ex)
+            {
+                summary.AddFailure(
+                    BattleResourcePrepareStatus.DependencyParseFailed,
+                    fullname,
+                    "dependency-parse",
+                    "failed to parse asset bundle dependencies",
+                    ex);
+                return false;
+            }
+        }
+#else
+        private static bool EnsureBundleDependenciesCachedStrict(
+            string fullname,
+            byte[] raw,
+            AssetManager mgr,
+            HashSet<string> visited,
+            BattleResourcePrepareSummary summary)
+        {
+            return true;
+        }
+#endif
+
 #if ENABLE_THREADING
         private static object loadBundleLock = new();
         public static AssetBundle TryGetAssetBundleByNameWithLock(string fullname, bool useOldManifest)
@@ -476,6 +820,189 @@ namespace PCRCaculator
                 return TryGetAssetBundleByName(fullname, useOldManifest);
         }
 #endif
+        private static string GetBundleCacheDirectory(AssetManager mgr)
+        {
+#if UNITY_ANDROID || PLATFORM_ANDROID
+            return Path.Combine(Application.persistentDataPath, "AB", mgr.SubFolder);
+#else
+            var root = string.IsNullOrWhiteSpace(persistentDataPath)
+                ? Application.persistentDataPath
+                : persistentDataPath;
+            return Path.Combine(root, ".ABExt2", mgr.SubFolder);
+#endif
+        }
+
+        private static string GetBundleCachePath(string fullname, AssetManager mgr)
+        {
+            return Path.Combine(GetBundleCacheDirectory(mgr), fullname);
+        }
+
+        private static void EnsureParentDirectory(string file)
+        {
+            var directory = Path.GetDirectoryName(file);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+        }
+
+        private static bool TryGetManifestContent(string fullname, AssetManager mgr, out Content content)
+        {
+            content = null;
+            return mgr?.registries != null && mgr.registries.TryGetValue("a/" + fullname, out content);
+        }
+
+        private static bool IsExpectedBundleBytes(string fullname, byte[] bytes, AssetManager mgr, string source)
+        {
+            if (bytes == null) return false;
+            if (!TryGetManifestContent(fullname, mgr, out var content))
+            {
+                Debug.LogWarning($"asset bundle {fullname} has no manifest entry while checking {source}; keeping legacy load path");
+                return true;
+            }
+
+            if (content.size > 0 && bytes.Length != content.size)
+            {
+                Debug.LogWarning(
+                    $"asset bundle {fullname} size mismatch in {source}, expected {content.size}, actual {bytes.Length}");
+                return false;
+            }
+
+            var actualMd5 = Content.CalcMd5(bytes);
+            if (!string.Equals(actualMd5, content.md5, StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.LogWarning(
+                    $"asset bundle {fullname} md5 mismatch in {source}, expected {content.md5}, actual {actualMd5}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsExpectedBundleFile(string file, string fullname, Content content, out string reason)
+        {
+            reason = null;
+            var fileInfo = new FileInfo(file);
+            if (content.size > 0 && fileInfo.Length != content.size)
+            {
+                reason = $"size mismatch, expected {content.size}, actual {fileInfo.Length}";
+                return false;
+            }
+
+            var actualMd5 = CalcFileMd5(file);
+            if (!string.Equals(actualMd5, content.md5, StringComparison.OrdinalIgnoreCase))
+            {
+                reason = $"md5 mismatch, expected {content.md5}, actual {actualMd5}";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string CalcFileMd5(string file)
+        {
+            using var md5 = MD5.Create();
+            using var stream = File.OpenRead(file);
+            return string.Concat(md5.ComputeHash(stream).Select(b => $"{b:x2}"));
+        }
+
+        private static bool QuarantineCorruptBundleFile(string file, string fullname)
+        {
+            try
+            {
+                if (!File.Exists(file)) return true;
+
+                var cacheDir = Path.GetDirectoryName(file);
+                var cacheRoot = Path.GetDirectoryName(cacheDir) ?? Path.GetTempPath();
+                var versionName = Path.GetFileName(cacheDir);
+                var quarantineDir = Path.Combine(cacheRoot, ".corrupt", versionName);
+                Directory.CreateDirectory(quarantineDir);
+
+                var stamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff");
+                var processId = Process.GetCurrentProcess().Id;
+                var target = Path.Combine(quarantineDir, $"{Path.GetFileName(file)}.{stamp}.{processId}.corrupt");
+                var counter = 1;
+                while (File.Exists(target))
+                {
+                    target = Path.Combine(
+                        quarantineDir,
+                        $"{Path.GetFileName(file)}.{stamp}.{processId}.{counter}.corrupt");
+                    counter++;
+                }
+
+                File.Move(file, target);
+                Debug.LogWarning($"asset bundle {fullname} corrupt cache quarantined: {file} -> {target}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"asset bundle {fullname} corrupt cache quarantine failed: {ex}");
+                return false;
+            }
+        }
+
+        private static bool TryWriteBundleCacheFile(string file, string fullname, byte[] bytes, AssetManager mgr)
+        {
+            if (!IsExpectedBundleBytes(fullname, bytes, mgr, "resolved bytes")) return false;
+
+            EnsureParentDirectory(file);
+            var temp = $"{file}.tmp.{Process.GetCurrentProcess().Id}.{Guid.NewGuid():N}";
+            try
+            {
+                File.WriteAllBytes(temp, bytes);
+                var savedBytes = File.ReadAllBytes(temp);
+                if (!IsExpectedBundleBytes(fullname, savedBytes, mgr, "temporary cache file"))
+                {
+                    File.Delete(temp);
+                    return false;
+                }
+
+                if (File.Exists(file))
+                    File.Delete(file);
+                File.Move(temp, file);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"asset bundle {fullname} cache write failed: {ex}");
+                if (File.Exists(temp))
+                    File.Delete(temp);
+                return false;
+            }
+        }
+
+        private static byte[] ResolveVerifiedBundleBytes(string fullname, AssetManager mgr)
+        {
+            var bytes = mgr.ResolveFile("a/" + fullname);
+            if (bytes == null)
+            {
+                Debug.LogWarning($"asset bundle {fullname} could not be resolved from manifest");
+                return null;
+            }
+
+            return IsExpectedBundleBytes(fullname, bytes, mgr, "ResolveFile") ? bytes : null;
+        }
+
+        private static byte[] ReadOrRepairBundleCacheFile(string fullname, AssetManager mgr)
+        {
+            var file = GetBundleCachePath(fullname, mgr);
+            EnsureParentDirectory(file);
+
+            if (File.Exists(file))
+            {
+                var existingBytes = File.ReadAllBytes(file);
+                if (IsExpectedBundleBytes(fullname, existingBytes, mgr, file))
+                    return existingBytes;
+
+                if (!QuarantineCorruptBundleFile(file, fullname))
+                    return null;
+            }
+
+            var resolvedBytes = ResolveVerifiedBundleBytes(fullname, mgr);
+            if (resolvedBytes == null)
+                return null;
+
+            return TryWriteBundleCacheFile(file, fullname, resolvedBytes, mgr) ? resolvedBytes : null;
+        }
+
 #if UNITY_5_3_OR_NEWER
         private static AssetsManager am = new AssetsManager();
         private static HashSet<string> loadedDep = new HashSet<string>();
@@ -492,26 +1019,12 @@ namespace PCRCaculator
             var info = am.GetBaseField(assetsFileInstance, 
                 assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
 
-            var bundlePath = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
-#if UNITY_ANDROID
-            bundlePath = persistentDataPath + $"/AB/{mgr.SubFolder}/";
-#endif
-
             foreach (var val in info["m_Dependencies"]["Array"])
             {
                 var depName = val.AsString;
-                var file = bundlePath + path;
-                if (File.Exists(file))
-                {
-                    LoadDependency(depName, File.ReadAllBytes(file), mgr);
-                }
-                else
-                {
-                    Debug.Log($"resolving asset bundle dependency: {path} => {depName}");
-                    var bytes = mgr.ResolveFile("a/" + depName);
-                    if (bytes != null) File.WriteAllBytes(file, bytes);
-                    LoadDependency(depName, bytes, mgr);
-                }
+                Debug.Log($"resolving asset bundle dependency: {path} => {depName}");
+                var bytes = ReadOrRepairBundleCacheFile(depName, mgr);
+                LoadDependency(depName, bytes, mgr);
             }
         }
 #else
@@ -526,47 +1039,51 @@ namespace PCRCaculator
             useOldManifest &= !MainManager.Instance.Version.newAB;
 
             //internal packed
-            var path = Application.streamingAssetsPath + "/AB/" + fullname;
             var mgr = useOldManifest ? mgrDataJP : mgrCharacter;
+            var streamingPath = Path.Combine(Application.streamingAssetsPath, "AB", fullname);
+            AssetBundle asset = null;
 #if PLATFORM_ANDROID
-            var www = new WWW(path);
+            var www = new WWW(streamingPath);
             while (!www.isDone) { Thread.Sleep(0); }
-            path = Application.persistentDataPath + $"/AB/{mgr.SubFolder}/";
 #else
-            var www = new WWW("file://" + path);
+            var www = new WWW("file://" + streamingPath);
             while (!www.isDone)
             {
                 Thread.Sleep(0);
             }
-
-            path = persistentDataPath + $"/.ABExt2/{mgr.SubFolder}/";
 #endif
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            path += fullname;
 
-            LoadDependency(fullname, www.bytes, mgr);
-
-            var asset = www.getAssetBundle();
-            if (asset == null)
+            if (IsExpectedBundleBytes(fullname, www.bytes, mgr, streamingPath))
             {
-                if (!File.Exists(path))
-                {
-                    var bytes = mgr.ResolveFile("a/" + fullname);
-                    if (bytes != null) File.WriteAllBytes(path, bytes);
-                }
-
-                www = new WWW("file://" + path);
-                while (!www.isDone)
-                {
-                    Thread.Sleep(0);
-                }
-
                 LoadDependency(fullname, www.bytes, mgr);
-
-                asset = www.assetBundle;
+                asset = www.getAssetBundle();
+            }
+            else if (www.bytes != null)
+            {
+                Debug.LogWarning($"asset bundle {fullname} ignored from stale or corrupt streaming asset: {streamingPath}");
             }
 
-            AssetBundleDic.Add(fullname, asset);
+            if (asset == null)
+            {
+                var bytes = ReadOrRepairBundleCacheFile(fullname, mgr);
+                var path = GetBundleCachePath(fullname, mgr);
+
+                if (bytes != null)
+                {
+                    www = new WWW("file://" + path);
+                    while (!www.isDone)
+                    {
+                        Thread.Sleep(0);
+                    }
+
+                    LoadDependency(fullname, www.bytes, mgr);
+
+                    asset = www.assetBundle;
+                }
+            }
+
+            if (asset != null)
+                AssetBundleDic.Add(fullname, asset);
 
             return asset;
         }
@@ -677,22 +1194,100 @@ namespace PCRCaculator
             //if (unitid >= 200000 && unitid <= 299999)
             //    unitid = (int)(unitid / 100) * 100;
             // preload battleunit
+            var prefabId = GetPrefabId(unitid);
+            var battleunitBundleName = GetBattleunitBundleName(prefabId);
+            var fallbackBattleunitBundleName = GetFallbackBattleunitBundleName(prefabId);
+            var loadedBattleunitBundleName = battleunitBundleName;
+            var primaryBattleunitInManifest = TryGetManifestContent(battleunitBundleName, mgrCharacter, out _);
 #if ENABLE_THREADING
-            if (TryGetAssetBundleByNameWithLock("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
-                TryGetAssetBundleByNameWithLock("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
+            var battleunitBundle = TryGetAssetBundleByNameWithLock(battleunitBundleName, false);
+            if (battleunitBundle == null)
+            {
+                if (primaryBattleunitInManifest)
+                {
+                    Debug.LogError(
+                        $"asset bundle {battleunitBundleName} failed to load and will not fall back to {fallbackBattleunitBundleName}");
+                }
+                else
+                {
+                    loadedBattleunitBundleName = fallbackBattleunitBundleName;
+                    battleunitBundle = TryGetAssetBundleByNameWithLock(fallbackBattleunitBundleName, false);
+                }
+            }
 #else
-            if (TryGetAssetBundleByName("all_battleunit_" + GetPrefabId(unitid) + ".unity3d", false) == null)
-                TryGetAssetBundleByName("all_battleunit_" + (GetPrefabId(unitid) / 100 * 100 + 99) + ".unity3d", false);
+            var battleunitBundle = TryGetAssetBundleByName(battleunitBundleName, false);
+            if (battleunitBundle == null)
+            {
+                if (primaryBattleunitInManifest)
+                {
+                    Debug.LogError(
+                        $"asset bundle {battleunitBundleName} failed to load and will not fall back to {fallbackBattleunitBundleName}");
+                }
+                else
+                {
+                    loadedBattleunitBundleName = fallbackBattleunitBundleName;
+                    battleunitBundle = TryGetAssetBundleByName(fallbackBattleunitBundleName, false);
+                }
+            }
 #endif
-            GameObject a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + GetPrefabId(unitid) + ".unity3d", "prefab", unitid > 200000);
+            var prefabBundleName = "all_battleunitprefab_" + prefabId + ".unity3d";
+            GameObject a = GetAssetBundleByName<GameObject>(prefabBundleName, "prefab", unitid > 200000);
             /*if(a==null)
             {
                 unitid = (int)(unitid / 100) * 100;
                 a = GetAssetBundleByName<GameObject>("all_battleunitprefab_" + unitid + ".unity3d", "prefab");
             }*/
             prefabCache[unitid] = a;
+#if DONT_USE_EX
+            if (a != null && battleunitBundle != null)
+            {
+                CompactServerBattleunitDependencies(prefabBundleName);
+                CompactServerBattleunitBundleData(loadedBattleunitBundleName);
+            }
+#endif
             return a;
         }
+
+#if DONT_USE_EX
+        private static void CompactServerBattleunitBundleData(string fullname)
+        {
+            if (!AssetBundle.UseServerCompactBattleunitBundleData ||
+                !AssetBundle.UseServerLightweightRootEffectPrefabs)
+            {
+                return;
+            }
+
+#if ENABLE_THREADING
+            lock (loadBundleLock)
+            {
+#endif
+                if (AssetBundle.TryCompactServerBattleunitBundleData(fullname))
+                    AssetBundleDic.Remove(fullname);
+#if ENABLE_THREADING
+            }
+#endif
+        }
+
+        private static void CompactServerBattleunitDependencies(string ownerBundleName)
+        {
+            if (!AssetBundle.UseServerCompactBattleunitBundleData ||
+                !AssetBundle.UseServerLightweightRootEffectPrefabs)
+            {
+                return;
+            }
+
+#if ENABLE_THREADING
+            lock (loadBundleLock)
+            {
+#endif
+                foreach (var compactedName in AssetBundle.TryCompactServerBattleunitDependencies(ownerBundleName))
+                    AssetBundleDic.Remove(compactedName);
+#if ENABLE_THREADING
+            }
+#endif
+        }
+#endif
+
         public static int GetPrefabId(int unitid)
         {
             if (unitid == 207001)

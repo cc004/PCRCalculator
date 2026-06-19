@@ -395,7 +395,7 @@ namespace Elements
             bool endFlag = false;
             while (true)
             {
-                if ((long)_source.Hp == 0L || _source.IsUnableActionState())
+                if ((long)_source.Hp <= 0L || _source.IsUnableActionState())
                 {
                     _source.ActionsTargetOnMe.Remove((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
                     base.battleManager.CallbackActionEnd((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
@@ -449,7 +449,7 @@ namespace Elements
                         }
                         break;
                 }
-                if ((long)_source.Hp == 0L)
+                if ((long)_source.Hp <= 0L)
                 {
                     _source.ActionsTargetOnMe.Remove((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
                     base.battleManager.CallbackActionEnd((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
@@ -599,7 +599,7 @@ namespace Elements
         {
             while (true)
             {
-                if ((long)_source.Hp == 0L)
+                if ((long)_source.Hp <= 0L)
                 {
                     _source.ActionsTargetOnMe.Remove((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
                     base.battleManager.CallbackActionEnd((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
@@ -698,7 +698,7 @@ namespace Elements
         {
             while (true)
             {
-                if ((long)_source.Hp == 0L)
+                if ((long)_source.Hp <= 0L)
                 {
                     _source.ActionsTargetOnMe.Remove((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);
                     base.battleManager.CallbackActionEnd((long)base.ActionId * 100L + base.IdOffsetDictionary[_source.GetFirstParts(_owner: true)]);

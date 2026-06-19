@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
@@ -28,7 +29,12 @@ namespace PCRApi
         public int size;
         public List<Content> children;
 
-        private static readonly HttpClient client = new HttpClient();
+        private const int DownloadMaxAttempts = 3;
+        private static readonly TimeSpan DownloadAttemptTimeout = TimeSpan.FromSeconds(120);
+        private static readonly HttpClient client = new HttpClient
+        {
+            Timeout = DownloadAttemptTimeout + TimeSpan.FromSeconds(10)
+        };
 
         public static string CalcMd5(byte[] content)
         {
@@ -100,10 +106,90 @@ namespace PCRApi
                 if (CalcMd5(bytes) == path) return bytes;
             }
             path ??= md5;
-            var result = client.GetByteArrayAsync(urlgetter(path)).Result;
+            var url = urlgetter(path);
+            var result = DownloadByteArrayWithRetry(url);
             if (cache != null)
                 File.WriteAllBytes(cache, result);
             return result;
+        }
+
+        private static byte[] DownloadByteArrayWithRetry(string url)
+        {
+            Exception lastException = null;
+            for (var attempt = 1; attempt <= DownloadMaxAttempts; attempt++)
+            {
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                try
+                {
+                    using var cts = new CancellationTokenSource(DownloadAttemptTimeout);
+                    using var response = client.GetAsync(url, cts.Token).GetAwaiter().GetResult();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var message = $"download http {(int)response.StatusCode} {response.ReasonPhrase} for {url}";
+                        if (IsTransientStatusCode(response.StatusCode))
+                            throw new HttpRequestException(message);
+
+                        throw new InvalidOperationException(message);
+                    }
+
+                    return response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                }
+                catch (Exception ex) when (attempt < DownloadMaxAttempts && IsTransientDownloadException(ex))
+                {
+                    stopwatch.Stop();
+                    lastException = ex;
+                    var delayMs = GetRetryDelayMs(attempt);
+                    UnityEngine.Debug.LogWarning(
+                        $"download attempt {attempt}/{DownloadMaxAttempts} failed for {url} " +
+                        $"after {stopwatch.ElapsedMilliseconds}ms, retrying in {delayMs}ms: " +
+                        $"{ex.GetType().Name}: {ex.Message}");
+                    Thread.Sleep(delayMs);
+                }
+            }
+
+            throw lastException ?? new InvalidOperationException($"download failed for {url}");
+        }
+
+        private static bool IsTransientStatusCode(HttpStatusCode statusCode)
+        {
+            var code = (int)statusCode;
+            return code == 408 || code == 425 || code == 429 || code >= 500;
+        }
+
+        private static bool IsTransientDownloadException(Exception ex)
+        {
+            if (ex is HttpRequestException || ex is TaskCanceledException || ex is IOException)
+                return true;
+            if (ex is WebException webException)
+                return IsTransientWebException(webException);
+            if (ex is AggregateException aggregateException)
+                return aggregateException.Flatten().InnerExceptions.Any(IsTransientDownloadException);
+            return false;
+        }
+
+        private static bool IsTransientWebException(WebException ex)
+        {
+            return ex.Status == WebExceptionStatus.Timeout ||
+                   ex.Status == WebExceptionStatus.RequestCanceled ||
+                   ex.Status == WebExceptionStatus.ConnectFailure ||
+                   ex.Status == WebExceptionStatus.ConnectionClosed ||
+                   ex.Status == WebExceptionStatus.ReceiveFailure ||
+                   ex.Status == WebExceptionStatus.SendFailure ||
+                   ex.Status == WebExceptionStatus.KeepAliveFailure ||
+                   ex.Status == WebExceptionStatus.NameResolutionFailure ||
+                   ex.Status == WebExceptionStatus.ProxyNameResolutionFailure ||
+                   ex.Status == WebExceptionStatus.PipelineFailure ||
+                   ex.Status == WebExceptionStatus.UnknownError;
+        }
+
+        private static int GetRetryDelayMs(int attempt)
+        {
+            return attempt switch
+            {
+                1 => 500,
+                2 => 1500,
+                _ => 3000
+            };
         }
 
         public void DownloadChildren(string urlroot)
@@ -224,9 +310,31 @@ namespace PCRApi
 
                 File.WriteAllText(file, JsonConvert.SerializeObject(registries));
             }
-            
+
         }
-        
+
+        private static void WriteAllBytesAtomically(string file, byte[] bytes)
+        {
+            var directory = Path.GetDirectoryName(file);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+
+            var temp = $"{file}.tmp.{Guid.NewGuid():N}";
+            try
+            {
+                File.WriteAllBytes(temp, bytes);
+                if (File.Exists(file))
+                    File.Delete(file);
+                File.Move(temp, file);
+            }
+            catch
+            {
+                if (File.Exists(temp))
+                    File.Delete(temp);
+                throw;
+            }
+        }
+
         public byte[] ResolveFile(string path)
         {
             if (registries.TryGetValue(path, out var content))
@@ -250,7 +358,32 @@ namespace PCRApi
                         $"file {path} cache md5 mismatch, expected {expectedMd5}, actual {cacheMd5}, redownloading");
                 }
 
-                var raw = content.GetByteArray(hash => $"{pool}{content.@class}/{hash.Substring(0, 2)}/{hash}");
+                var poolHash = string.IsNullOrEmpty(content.path) ? content.md5 : content.path;
+                var downloadUrl = $"{pool}{content.@class}/{poolHash.Substring(0, 2)}/{poolHash}";
+                Debug.Log(
+                    $"file {path} downloading from {downloadUrl}, manifestVersion={Ver}, class={content.@class}, " +
+                    $"type={content.type}, expectedMd5={expectedMd5}, expectedSize={content.size}, poolCache={cacheFile}");
+
+                byte[] raw;
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                try
+                {
+                    raw = content.GetByteArray(_ => downloadUrl);
+                    stopwatch.Stop();
+                    Debug.Log(
+                        $"file {path} downloaded from {downloadUrl} in {stopwatch.ElapsedMilliseconds}ms, " +
+                        $"bytes={raw?.Length ?? 0}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    Debug.LogError(
+                        $"file {path} download failed from {downloadUrl} after {stopwatch.ElapsedMilliseconds}ms, " +
+                        $"manifestVersion={Ver}, class={content.@class}, type={content.type}, " +
+                        $"expectedMd5={expectedMd5}, expectedSize={content.size}, poolCache={cacheFile}: {ex}");
+                    throw;
+                }
+
                 var downloadMd5 = Content.CalcMd5(raw);
                 if (!string.Equals(downloadMd5, expectedMd5, StringComparison.OrdinalIgnoreCase))
                 {
@@ -259,7 +392,7 @@ namespace PCRApi
                     return null;
                 }
 
-                File.WriteAllBytes(cacheFile, raw);
+                WriteAllBytesAtomically(cacheFile, raw);
 
                 var bytesFromPool = File.ReadAllBytes(cacheFile);
                 var savedMd5 = Content.CalcMd5(bytesFromPool);

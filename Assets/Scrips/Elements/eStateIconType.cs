@@ -445,7 +445,9 @@ namespace Elements
         [Description("雷云1\n非会战")]
         LEIYUN1 = 164,
         UNABLE_STATE_GUARD_EXTRA_EFFECT = 165,
+        [Description("束缚\n六凶·魔蜘")]
         CHAINED_ACN = 166,
+        [Description("不死\n六凶·魔蜘")]
         PUPPET = 167,
         [Description("集辉\n六凶·魔蜘")]
         JIHUI = 168,

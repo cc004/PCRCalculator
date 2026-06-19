@@ -86,7 +86,8 @@ namespace Elements
       //start add
       // double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
       double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
-      float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 15, pp));
+      var randomData = new RandomData(_source, _target.Owner, ActionId, 15, pp);
+      float num = BattleManager.Random(0.0f, 1f, ref randomData);
       if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, ActionType, BattleHeaderController.CurrentFrameCount, out float fix))
       {
         num = 1 - fix;

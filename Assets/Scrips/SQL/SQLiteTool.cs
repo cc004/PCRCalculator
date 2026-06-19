@@ -382,6 +382,13 @@ namespace PCRCaculator.SQL
         public Dictionary<int, unit_role_mastery_slot_data> UnitRoleSlotDataDic { get; private set; }
         public Dictionary<int, unit_role_mastery_enhance_data[]> UnitRoleMasteryEnhanceDataDic { get; private set; }
         public Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic { get; private set; }
+        public Dictionary<int, List<connect_rank_status>> ConnectRankStatusDic { get; private set; }
+        public Dictionary<int, connect_rank_chart> ConnectRankChartDic { get; private set; }
+        public List<connect_rank_bonus> ConnectRankBonusList { get; private set; }
+        public Dictionary<int, connect_rank_boost> ConnectRankBoostDic { get; private set; }
+        public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic { get; private set; }
+        public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic { get; private set; }
+        public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get; private set; }
         public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
@@ -608,6 +615,35 @@ namespace PCRCaculator.SQL
                 Task.Run(() => UnitRoleMasteryIdDic = GetDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
             tasks.Add(
                 Task.Run(() => UnitRoleMasterySlotEnhanceDataDic = GetUnitRoleMasterySlotEnhanceData()));
+            tasks.Add(Task.Run(() =>
+            {
+                ConnectRankStatusDic = (GetDatas<connect_rank_status>() ?? Array.Empty<connect_rank_status>())
+                    .GroupBy(x => x.role_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.rank_from).ThenBy(x => x.rank_to).ToList());
+            }));
+            tasks.Add(
+                Task.Run(() => ConnectRankChartDic = GetDatasDic<connect_rank_chart>(a => a.rank)));
+            tasks.Add(Task.Run(() =>
+                ConnectRankBonusList = (GetDatas<connect_rank_bonus>() ?? Array.Empty<connect_rank_bonus>())
+                    .OrderBy(x => x.bonus_level)
+                    .ThenBy(x => x.bonus_number)
+                    .ToList()));
+            tasks.Add(
+                Task.Run(() => ConnectRankBoostDic = GetDatasDic<connect_rank_boost>(a => a.system_id)));
+            tasks.Add(
+                Task.Run(() => ConnectRankLimitCommonDic = GetDatasDic<connect_rank_limit_common>(a => a.max_rank)));
+            tasks.Add(Task.Run(() =>
+            {
+                ConnectRankLimitItemDic = (GetDatas<connect_rank_limit_item>() ?? Array.Empty<connect_rank_limit_item>())
+                    .GroupBy(x => x.group_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.max_rank).ToList());
+            }));
+            tasks.Add(Task.Run(() =>
+            {
+                ConnectRankEnhanceDic = (GetDatas<connect_rank_enhance>() ?? Array.Empty<connect_rank_enhance>())
+                    .GroupBy(x => x.role_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.rank).ToList());
+            }));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();

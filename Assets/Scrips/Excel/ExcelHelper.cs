@@ -490,7 +490,7 @@ namespace ExcelHelper
             if (AsmExportEnabled)
                 File.WriteAllText(filePath + ".asm", CreateAsmString());
             if (PyExportEnabled)
-                File.WriteAllText(filePath + ".py", CreatePyString());
+                AutoTimelineLegacyScriptExporter.WriteScriptSet(TimelineData, filePath);
         }
 
         private static (string, Func<UnitData, object>)[] conditions =
@@ -606,6 +606,12 @@ namespace ExcelHelper
                 }
             }
 
+            var lastDamage = FindLastDamage();
+            if (lastDamage.realFrame > 0 && lastDamage.logicFrame == 5399)
+            {
+                src.AppendLine($"wait {lastDamage.realFrame}; pause;");
+            }
+
             var dieFrame = TimelineData.allUnitStateChangeDic.FirstOrDefault().Value.LastOrDefault().realFrameCount;
             msg.AppendLine($"最后一帧：{dieFrame}");
             src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"//{m}")));
@@ -613,104 +619,30 @@ namespace ExcelHelper
             return src.ToString();
         }
 
-        private static string CreatePyString()
+        private static (int logicFrame, int realFrame) FindLastDamage()
         {
-            var units = TimelineData.playerGroupData.playerData.playrCharacters;
-            var cdict = units.ToDictionary(u => u.unitId, u => new { name = u.GetNicName(), unit = u });
-            var msg = new StringBuilder();
-            var src = new StringBuilder();
-            string unitNames = "";
-            foreach (var tuple in cdict)
+            int bestLogic = 0;
+            int bestReal = 0;
+
+            foreach (var list in TimelineData.allUnitHPDic.Values)
             {
-                unitNames += $", \"{tuple.Value.name}\"";
-            }
-            var pythonCode = new StringBuilder();
-            pythonCode.Append($@"from autotimeline import *
-import sys
-sys.path.append('.')
-
-import ctypes, os
-from ctypes import wintypes
-
-pos_name = [""暂停"", ""SET"", ""AUTO"", ""SPEED""{unitNames}]
-pos_dnplayer = ([0.94,0.95,0.95,0.95,0.74,0.62,0.50,0.38,0.26],[0.05,0.64,0.76,0.90,0.80,0.80,0.80,0.80,0.80])
-pos_mumu     = ([0.95,0.36,0.24,0.10,0.20,0.20,0.20,0.20,0.20],pos_dnplayer[0])
-GetModuleFileNameExA = ctypes.windll.psapi.GetModuleFileNameExA
-
-def _get_name(h):
-    buf = ctypes.create_string_buffer(1024)
-    GetModuleFileNameExA(wintypes.HANDLE(h), None, buf, 1024)
-    return os.path.basename(buf.value.decode(errors=""ignore""))
-
-def detect(h):
-    n = _get_name(h)
-    if ""MuMu"" in n: return ""MUMU"", pos_mumu
-    if ""Ld9Box"" in n or ""LdBox"" in n: return ""雷电"", pos_dnplayer
-
-handle_name, (pos_x, pos_y) = detect(Program.hwnd)
-print(""当前模拟器"" + handle_name)
-print(""minitouch 连接中"")
-minitouch.connect(""127.0.0.1"", 1111)
-max_x = minitouch.getMaxX()
-max_y = minitouch.getMaxY()
-for i, name in enumerate(pos_name):
-    print(name + "" 定位中"")
-    minitouch.setPos(name, int(max_x * pos_x[i]), int(max_y * pos_y[i]))
-
-print(""解除暂停，塔塔开!"")
-autopcr.setOffset(2, 0); # offset calibration
-
-");
-
-            src.Append(pythonCode.ToString());
-
-            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
-            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
-            msg.AppendLine("帧轴：");
-
-            cdict.Add(TimelineData.playerGroupData.selectedEnemyIDs[0], new { name = string.Empty, unit = (UnitData)null });
-
-            var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
-            foreach (var (unit, data) in TimelineData.allUnitStateChangeDic.SelectMany(pair =>
-                             pair.Value.Select(dat => (pair.Key, dat)))
-                         .Where(t => t.dat.changStateTo == UnitCtrl.ActionState.SKILL_1)
-                         .OrderBy(t => t.dat.realFrameCount))
-            {
-                var frame = data.currentFrameCount;
-                var unit_id = unit;
-                if (unit_id <= 200000)
+                foreach (var data in list)
                 {
-                    var name = cdict[unit].name;
+                    if (data.damage <= 0 || data.xValue >= 5400)
+                        continue;
 
-                    if (data.operation == "连点")
+                    if (data.xValue > bestLogic ||
+                        (data.xValue == bestLogic && data.realFrameCount > bestReal))
                     {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 5); minitouch.press(\"{name}\") #连点 lframe {data.currentFrameCount}");
+                        bestLogic = data.xValue;
+                        bestReal = data.realFrameCount;
                     }
-                    else if (data.operation == "AUTO")
-                    {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} - 5); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}");
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount} + 5); minitouch.press(\"AUTO\") #关AUTO lframe {data.currentFrameCount}");
-
-                    }
-                    else
-                    {
-                        src.AppendLine($"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"{name}\") # lframe {data.currentFrameCount}");
-                    }
-
-                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
-                }
-                else
-                {
-                    src.AppendLine("# bossub");
-                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
                 }
             }
-            var dieFrame = TimelineData.allUnitStateChangeDic.FirstOrDefault().Value.LastOrDefault().realFrameCount;
-            src.AppendLine($"autopcr.waitFrame({dieFrame} - 60); minitouch.press(\"暂停\") # lframe {dieFrame / 60}");
-            src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"# {m}")));
 
-            return src.ToString();
+            return (bestLogic, bestReal);
         }
+
         private static void CreateUnitExecTimeExcel(FileInfo newFile)
         {
             using (ExcelPackage package = new ExcelPackage(newFile))

@@ -12,8 +12,8 @@ namespace Elements
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
-            if (BattleManager.Random(0f, 1f,
-                new RandomData(_source, _target.Owner, ActionId, 11, (float)pp)) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 11, (float)pp);
+            if (BattleManager.Random(0f, 1f, ref randomData) < BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 /*Dictionary<BasePartsData, FloatWithEx> dictionary1 = new Dictionary<BasePartsData, FloatWithEx> {

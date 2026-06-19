@@ -55,17 +55,16 @@ namespace Elements
         {
 			base.ReadyAction(_source, _sourceActionController, _skill);
 			if (actionParameter != null)
-				actionParameter.CancelByIfForAll = true;
-			// TODO in new version
-			// if (actionParameter != null)
-            // {
-			// 	actionParameter.NoDelayExecByTriggerOnly = 1;
-			// 	foreach (var ind in actionParameter.ActionChildrenIndexes)
-			// 	{
-			// 		var childParam = _skill.ActionParameters[ind];
-			// 		childParam.NoDelayExecByTriggerOnly = 1;
-			// 	}
-            // }
+            {
+				actionParameter.NoDelayExecByTriggerOnly = true;
+				if (actionParameter.ActionChildrenIndexes == null)
+					return;
+				foreach (var ind in actionParameter.ActionChildrenIndexes)
+				{
+					var childParam = _skill.ActionParameters[ind];
+					childParam.NoDelayExecByTriggerOnly = true;
+				}
+            }
         }
 
 		// RVA: 0x30DDF28 Offset: 0x30DDF28 VA: 0x30DDF28 Slot: 8

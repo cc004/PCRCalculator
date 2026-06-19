@@ -9,7 +9,9 @@ namespace ActionParameterSerializer.Actions
         {
             unknown = -1,
             charm = 0,
-            confusion = 1
+            confusion = 1,
+            confusion2 = 2,
+            puppet = 3
         }
 
         private readonly List<ActionValue> chanceValues = new();
@@ -46,6 +48,10 @@ namespace ActionParameterSerializer.Actions
                     );
                 case CharmType.confusion:
                     return Utils.JavaFormat(Utils.GetString("Confuse_s1_with_s2_chance_for_s3_sec"), targetParameter.buildTargetClause(), buildExpression(level, chanceValues, RoundingMode.UNNECESSARY, property), buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
+                case CharmType.confusion2:
+                    return Utils.JavaFormat(Utils.GetString("Confuse2_s1_with_s2_chance_for_s3_sec"), targetParameter.buildTargetClause(), buildExpression(level, chanceValues, RoundingMode.UNNECESSARY, property), buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
+                case CharmType.puppet:
+                    return Utils.JavaFormat(Utils.GetString("Puppet_s1_with_s2_chance_for_s3_sec"), targetParameter.buildTargetClause(), buildExpression(level, chanceValues, RoundingMode.UNNECESSARY, property), buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
                 default:
                     return base.localizedDetail(level, property);
             }

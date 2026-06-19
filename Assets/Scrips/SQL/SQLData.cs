@@ -1021,6 +1021,107 @@ namespace PCRCaculator.SQL
         public int unit_role_id { get; set; }
     }
 
+    public class connect_rank_status
+    {
+        [PrimaryKey]
+        public int id { get; set; }
+        public int role_id { get; set; }
+        public int rank_from { get; set; }
+        public int rank_to { get; set; }
+        public int param_type_1 { get; set; }
+        public int param_type_2 { get; set; }
+        public int param_type_3 { get; set; }
+        public int param_type_4 { get; set; }
+        public int param_type_5 { get; set; }
+        public int value_1 { get; set; }
+        public int value_2 { get; set; }
+        public int value_3 { get; set; }
+        public int value_4 { get; set; }
+        public int value_5 { get; set; }
+
+        [Ignore]
+        public IEnumerable<(int paramType, int value)> Parameters
+        {
+            get
+            {
+                if (param_type_1 != 0) yield return (param_type_1, value_1);
+                if (param_type_2 != 0) yield return (param_type_2, value_2);
+                if (param_type_3 != 0) yield return (param_type_3, value_3);
+                if (param_type_4 != 0) yield return (param_type_4, value_4);
+                if (param_type_5 != 0) yield return (param_type_5, value_5);
+            }
+        }
+    }
+
+    public class connect_rank_chart
+    {
+        [PrimaryKey]
+        public int rank { get; set; }
+        public int bonus_level { get; set; }
+    }
+
+    public class connect_rank_bonus
+    {
+        public int bonus_level { get; set; }
+        public int bonus_number { get; set; }
+        public int bonus_type { get; set; }
+        public int value_1 { get; set; }
+        public int value_2 { get; set; }
+        public int description_type { get; set; }
+        public string description { get; set; }
+    }
+
+    public class connect_rank_boost
+    {
+        [PrimaryKey]
+        public int system_id { get; set; }
+        public int coefficient { get; set; }
+    }
+
+    public class connect_rank_limit_common
+    {
+        [PrimaryKey]
+        public int max_rank { get; set; }
+        public int required_promotion_level { get; set; }
+        public int required_material_count { get; set; }
+        public int required_gold { get; set; }
+        public int icon_frame_id { get; set; }
+        public string outline_color { get; set; }
+    }
+
+    public class connect_rank_limit_item
+    {
+        public int group_id { get; set; }
+        public int max_rank { get; set; }
+        public int required_item_id_1 { get; set; }
+        public int required_item_id_2 { get; set; }
+        public int required_item_id_3 { get; set; }
+        public int required_item_id_4 { get; set; }
+        public int required_item_id_5 { get; set; }
+        public int required_item_type_1 { get; set; }
+        public int required_item_type_2 { get; set; }
+        public int required_item_type_3 { get; set; }
+        public int required_item_type_4 { get; set; }
+        public int required_item_type_5 { get; set; }
+        public int required_item_count_1 { get; set; }
+        public int required_item_count_2 { get; set; }
+        public int required_item_count_3 { get; set; }
+        public int required_item_count_4 { get; set; }
+        public int required_item_count_5 { get; set; }
+    }
+
+    public class connect_rank_enhance
+    {
+        public int role_id { get; set; }
+        public int rank { get; set; }
+        public int required_item_id_1 { get; set; }
+        public int required_item_id_2 { get; set; }
+        public int required_item_id_3 { get; set; }
+        public int required_item_count_1 { get; set; }
+        public int required_item_count_2 { get; set; }
+        public int required_item_count_3 { get; set; }
+    }
+
     public class unit_role_mastery_id : DbBaseData
     {
         public int mastery_id { get; set; }

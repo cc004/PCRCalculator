@@ -335,7 +335,7 @@ namespace Elements
 
         private bool comparePosition(BasePartsData _source, BasePartsData _target, bool _ahead)
         {
-            if (_source == _target || (long)_target.Owner.Hp == 0L || _target.Owner.IsStealth || _target.Owner.IsSummonOrPhantom && _target.Owner.IdleOnly)
+            if (_source == _target || (long)_target.Owner.Hp <= 0L || _target.Owner.IsStealth || _target.Owner.IsSummonOrPhantom && _target.Owner.IdleOnly)
                 return false;
             float x1 = _source.GetBottomTransformPosition().x;
             float x2 = _target.GetBottomTransformPosition().x;

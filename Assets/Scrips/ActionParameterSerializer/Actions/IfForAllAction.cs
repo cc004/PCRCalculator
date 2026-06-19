@@ -104,6 +104,13 @@ namespace ActionParameterSerializer.Actions
                     trueClause = Utils.JavaFormat(Utils.GetString("use_d1_if_s2_is_in_state_of_ID_d3_with_stacks_greater_than_or_equal_to_d4"),
                         actionDetail2 % 10, targetParameter.buildTargetClause(true), actionDetail1 - 6000, (int)actionValue3.value);
                 }
+                else if (actionDetail1 >= 4000)
+                {
+                    int talentId = actionDetail1 - 4000;
+                    var talentDescription = ((PCRCaculator.Battle.Talent)talentId).description();
+                    trueClause = Utils.JavaFormat(Utils.GetString("use_d1_if_s2_is_in_talent_s3"),
+                        actionDetail2 % 10, targetParameter.buildTargetClause(true), talentDescription);
+                }
                 else if (actionDetail1 >= 3000)
                 {
                     var env = (EnvironmentAction.EnvironmentType) (actionDetail1 - 3000);

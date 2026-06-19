@@ -24,12 +24,13 @@ namespace Elements
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 
-      int num1 = BattleManager.Random(0.0f, 1f,
-          new RandomData(_source, _target.Owner, ActionId, 20, (float)_valueDictionary[eValueNumber.VALUE_3])) <= (double)_valueDictionary[eValueNumber.VALUE_3] ? 1 : 0;
+      var firstRandomData = new RandomData(_source, _target.Owner, ActionId, 20, (float)_valueDictionary[eValueNumber.VALUE_3]);
+      int num1 = BattleManager.Random(0.0f, 1f, ref firstRandomData) <= (double)_valueDictionary[eValueNumber.VALUE_3] ? 1 : 0;
       // double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
       double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, 1.0f);
 
-      float num2 = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 20, (float)pp));
+      var randomData = new RandomData(_source, _target.Owner, ActionId, 20, (float)pp);
+      float num2 = BattleManager.Random(0.0f, 1f, ref randomData);
       if (num1 != 0 && num2 <= pp)
       {
         AppendIsAlreadyExeced(_target.Owner, _num);

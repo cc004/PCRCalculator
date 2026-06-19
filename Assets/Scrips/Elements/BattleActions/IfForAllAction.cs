@@ -21,7 +21,7 @@ namespace Elements
             {
                 flag = _unit.GetIsProtected();
             }
-            return _unit.Hp != 0 && !_unit.IsStealth && !flag && !_unit.JudgeIsEtherialization(_source);
+            return _unit.Hp > 0 && !_unit.IsStealth && !flag && !_unit.JudgeIsEtherialization(_source);
         }
 
         public override void ExecActionOnStart(
@@ -211,7 +211,8 @@ namespace Elements
                 default:
                     if (ActionDetail1 < 100)
                     {
-                        flag = BattleManager.Random(0.0f, 100f, new RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1)) < (double)ActionDetail1;
+                        var randomData = new RandomData(_source, _target.Owner, ActionId, 12, ActionDetail1);
+                        flag = BattleManager.Random(0.0f, 100f, ref randomData) < (double)ActionDetail1;
                         break;
                     }
                     else if ((base.ActionDetail1 > 600 && base.ActionDetail1 < 700) || base.ActionDetail1 > 6000)

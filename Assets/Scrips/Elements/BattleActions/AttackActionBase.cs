@@ -81,7 +81,8 @@ namespace Elements
             //end add
             var _accuracy = _source.IsPartsBoss ? parts.GetAccuracyZero() : (int)_source.AccuracyZero;
 
-            float num = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 2, _target.GetDodgeRate(_accuracy)));
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 2, _target.GetDodgeRate(_accuracy));
+            float num = BattleManager.Random(0.0f, 1f, ref randomData);
             //start add
             if(MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source,_target.Owner,_skill,ActionType,BattleHeaderController.CurrentFrameCount,out float fix))
             {
@@ -126,8 +127,8 @@ namespace Elements
                 return false;
             UnitCtrl.eAbnormalStateCategory _abnormalStateCategory = flag ? UnitCtrl.eAbnormalStateCategory.PHYSICAL_DARK : UnitCtrl.eAbnormalStateCategory.MAGIC_DARK;
             double pp = 1.0 - _source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0;
-            if (BattleManager.Random(0.0f, 1f,
-                    new RandomData(_source, _target.Owner, ActionId, 3, (float)pp)) >= 1.0 - _source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0)
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 3, (float)pp);
+            if (BattleManager.Random(0.0f, 1f, ref randomData) >= 1.0 - _source.GetAbnormalStateMainValue(_abnormalStateCategory) / 100.0)
                 return false;
             ActionExecTime actionExecTime = ActionExecTimeList[_num];
             _target.SetMissAtk(_source, eMissLogType.DODGE_ATTACK_DARK, actionExecTime.DamageNumType, actionExecTime.DamageNumScale);

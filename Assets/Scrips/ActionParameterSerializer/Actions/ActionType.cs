@@ -84,6 +84,11 @@ namespace ActionParameterSerializer.Actions
         spyAction = 95,
         changeEnergyFieldAction = 96,
         changeEnergyByDamageAction = 97,
-        addAbnormalEffectTime = 112
+        enchantTrigger = 111,
+        addAbnormalEffectTime = 112,
+        forceChangeSpeed = 117,
+        guts = 118,
+        transcendDamage = 132,
+        enchantUbTriggerSeal = 133
     }
 }

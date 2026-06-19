@@ -76,6 +76,18 @@ namespace PCRCaculator
         public List<Slider> detailSliders_setting;
         public List<Button> detailButtons_setting;
 
+        [Header("Connect Rank")]
+        public TextMeshProUGUI connectRankText_setting;
+        public Slider connectRankSlider_setting;
+        public Button connectRankMinusButton_setting;
+        public Button connectRankAddButton_setting;
+
+        [Header("SP Unique Equipment")]
+        public TextMeshProUGUI uniqueEqPlusText_setting;
+        public Slider uniqueEqPlusSlider_setting;
+        public TextMeshProUGUI uniqueEq2PlusText_setting;
+        public Slider uniqueEq2PlusSlider_setting;
+
         public Dropdown[] ExEquip;
 
         public GameObject EXsettingPannel;
@@ -510,7 +522,8 @@ namespace PCRCaculator
         {
             if (isinstating) { return; }
             //UnitData data = playerData.playrCharacters[selectedCharacterId_setting];
-            Dictionary<int, int> loveDic = playerData.playrCharacters[selectedCharacterId_setting].playLoveDic;
+            UnitData oldData = playerData.playrCharacters[selectedCharacterId_setting];
+            Dictionary<int, int> loveDic = oldData.playLoveDic;
             UnitData data = new UnitData(selectedCharId[selectedCharacterId_setting]);
             data.level = (int)detailSliders_setting[0].value;
             data.rarity = (int)detailSliders_setting[1].value;
@@ -525,6 +538,10 @@ namespace PCRCaculator
                 data.equipLevel[i - 8] = (int)detailSliders_setting[i].value;
             }
             data.playLoveDic = loveDic;
+            data.connectRankLimit = GetConnectRankLimit(oldData);
+            data.connectRank = GetConnectRankSliderValue(oldData);
+            data.uniqueEqPlus = GetBoolSliderValue(uniqueEqPlusSlider_setting, oldData.uniqueEqPlus);
+            data.uniqueEq2Plus = GetBoolSliderValue(uniqueEq2PlusSlider_setting, oldData.uniqueEq2Plus);
             playerData.playrCharacters[selectedCharacterId_setting] = data;
             if (MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId))
             {
@@ -545,7 +562,14 @@ namespace PCRCaculator
             {
                 data.uniqueEq2Lv = -1;
             }
-
+            if (!MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId) || data.uniqueEqLv <= 0)
+            {
+                data.uniqueEqPlus = false;
+            }
+            if (!MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId) || data.uniqueEq2Lv < 0)
+            {
+                data.uniqueEq2Plus = false;
+            }
             if (MainManager.Instance.UnitExEquips.TryGetValue(data.unitId, out var temp))
             {
                 for (int i = 0; i < 3; ++i)
@@ -604,9 +628,148 @@ namespace PCRCaculator
             }
             OnSliderDraged();
         }
+        public void AddConnectRankButton_setting()
+        {
+            AddOptionalSlider(connectRankSlider_setting);
+        }
+        public void MinusConnectRankButton_setting()
+        {
+            MinusOptionalSlider(connectRankSlider_setting);
+        }
+        private void AddOptionalSlider(Slider slider)
+        {
+            if (slider == null) return;
+            if (slider.value < slider.maxValue)
+            {
+                slider.value++;
+            }
+            OnSliderDraged();
+        }
+        private void MinusOptionalSlider(Slider slider)
+        {
+            if (slider == null) return;
+            if (slider.value > slider.minValue)
+            {
+                slider.value--;
+            }
+            OnSliderDraged();
+        }
+        private int GetConnectRankLimit(UnitData data)
+        {
+            if (data.connectRankLimit > 0)
+            {
+                return data.connectRankLimit;
+            }
+            return ConnectRankTempData.Instance.GetDefaultConnectRankLimit();
+        }
+        private int GetConnectRankSliderValue(UnitData data)
+        {
+            int connectRank = connectRankSlider_setting != null
+                ? Mathf.RoundToInt(connectRankSlider_setting.value)
+                : data.connectRank;
+            int limit = GetConnectRankLimit(data);
+            return limit > 0 ? Math.Min(Math.Max(0, connectRank), limit) : Math.Max(0, connectRank);
+        }
+        private bool GetBoolSliderValue(Slider slider, bool fallback)
+        {
+            return slider != null ? Mathf.RoundToInt(slider.value) > 0 : fallback;
+        }
+        private void RefreshConnectRankSlider(UnitData data)
+        {
+            if (connectRankSlider_setting == null) return;
+
+            int limit = GetConnectRankLimit(data);
+            int value = limit > 0
+                ? Math.Min(Math.Max(0, data.connectRank), limit)
+                : Math.Max(0, data.connectRank);
+            data.connectRankLimit = limit;
+            data.connectRank = value;
+
+            RefreshOptionalIntSlider(
+                connectRankSlider_setting,
+                connectRankText_setting,
+                connectRankMinusButton_setting,
+                connectRankAddButton_setting,
+                value,
+                0,
+                Math.Max(0, limit),
+                limit > 0);
+        }
+        private void RefreshUniqueEqPlusSlider(UnitData data)
+        {
+            bool canEquipPlus = data.rank >= 7
+                && MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId)
+                && data.uniqueEqLv > 0;
+            data.uniqueEqPlus &= canEquipPlus;
+            RefreshOptionalBoolSlider(
+                uniqueEqPlusSlider_setting,
+                uniqueEqPlusText_setting,
+                data.uniqueEqPlus,
+                canEquipPlus);
+        }
+        private void RefreshUniqueEq2PlusSlider(UnitData data)
+        {
+            bool canEquipPlus = data.rank >= 7
+                && MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId)
+                && MainManager.Instance.JudgeWeatherAllowUniqueEq2(data.unitId)
+                && data.uniqueEqLv > 0
+                && data.uniqueEq2Lv >= 0;
+            data.uniqueEq2Plus &= canEquipPlus;
+            RefreshOptionalBoolSlider(
+                uniqueEq2PlusSlider_setting,
+                uniqueEq2PlusText_setting,
+                data.uniqueEq2Plus,
+                canEquipPlus);
+        }
+        private void RefreshOptionalIntSlider(
+            Slider slider,
+            TextMeshProUGUI text,
+            Button minusButton,
+            Button addButton,
+            int value,
+            int min,
+            int max,
+            bool interactable)
+        {
+            if (slider == null) return;
+
+            slider.minValue = min;
+            slider.maxValue = max;
+            slider.value = Math.Min(Math.Max(value, min), max);
+            slider.interactable = interactable;
+            if (text != null)
+            {
+                text.text = interactable ? slider.value.ToString() : "null";
+            }
+            if (minusButton != null)
+            {
+                minusButton.interactable = interactable;
+            }
+            if (addButton != null)
+            {
+                addButton.interactable = interactable;
+            }
+        }
+        private void RefreshOptionalBoolSlider(
+            Slider slider,
+            TextMeshProUGUI text,
+            bool value,
+            bool interactable)
+        {
+            if (slider == null) return;
+
+            slider.minValue = 0;
+            slider.maxValue = interactable ? 1 : 0;
+            slider.value = interactable && value ? 1 : 0;
+            slider.interactable = interactable;
+            if (text != null)
+            {
+                text.text = interactable ? (value ? "已装备" : "未装备") : "null";
+            }
+        }
         public void SetSelectedUnitSecondMax()
         {
-            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            int battleMode = GetCurrentBattleMode();
             playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn, equip_second_full: true);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
@@ -615,7 +778,7 @@ namespace PCRCaculator
         }
         public void SetSelectedUnitMax()
         {
-            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            int battleMode = GetCurrentBattleMode();
             playerData.playrCharacters[selectedCharacterId_setting].SetMax(battleMode, isSetMaxExEquip.isOn);
             playerData.playrCharacters[selectedCharacterId_setting].SetMaxLove();
             RefreshSettingValues();
@@ -624,7 +787,7 @@ namespace PCRCaculator
         }
         public void SetAllUnitMax()
         {
-            int battleMode = MainManager.Instance.IsGuildBattle ? GuildManager.Instance.IsGuildBoss ? 0 : 1 : 2;
+            int battleMode = GetCurrentBattleMode();
             foreach (UnitData a in playerData.playrCharacters)
             {
                 a.SetMax(battleMode, isSetMaxExEquip.isOn);
@@ -809,7 +972,7 @@ namespace PCRCaculator
             bool changingId = lastRefreshedId != data.unitId;
             lastRefreshedId = data.unitId;
             detailTexts_setting[0].text = data.level + "";
-            detailSliders_setting[0].maxValue = MainManager.Instance.levelMax;
+            detailSliders_setting[0].maxValue = MainManager.Instance.GetLevelMax(GetCurrentBattleMode());
             detailSliders_setting[0].value = data.level;
             detailTexts_setting[1].text = data.rarity + "";
             detailSliders_setting[1].maxValue = data.GetMaxRarity();
@@ -870,6 +1033,10 @@ namespace PCRCaculator
                 detailButtons_setting[2].interactable = false;
                 detailButtons_setting[3].interactable = false;
             }
+
+            RefreshConnectRankSlider(data);
+            RefreshUniqueEqPlusSlider(data);
+            RefreshUniqueEq2PlusSlider(data);
 
             // ex equip
 
@@ -1263,6 +1430,16 @@ namespace PCRCaculator
             filterType.text = filterToggle.isOn ? "属性" : "站位";
             talent.SetActive(filterToggle.isOn);
             position.SetActive(!filterToggle.isOn);
+        }
+
+        private int GetCurrentBattleMode()
+        {
+            if (type == 3 || type == 4)
+            {
+                return GuildManager.Instance.IsGuildBoss ? 0 : 1;
+            }
+
+            return 2;
         }
     }
 }

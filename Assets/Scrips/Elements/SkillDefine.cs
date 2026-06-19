@@ -757,6 +757,14 @@ namespace Elements
                 typeof(TauntAction)
             },
             {
+                eActionType.FORCE_CHANGE_SPEED,
+                typeof(ForceChangeSpeedAction)
+            },
+            {
+                eActionType.GUTS,
+                typeof(GutsAction)
+            },
+            {
                 eActionType.ENCHANT_PROTECT,
                 typeof(EnchantProtectAction)
             },
@@ -787,6 +795,14 @@ namespace Elements
             {
                 eActionType.ADD_ABNORMAL_EFFECT_TIME,
                 typeof(AddAbnormalEffectTimeAction)
+            },
+            {
+                eActionType.TRANSCEND_DAMAGE,
+                typeof(TranscendDamageAction)
+            },
+            {
+                eActionType.ENCHANT_UB_TRIGGER_SEAL,
+                typeof(EnchantUbTriggerSealAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
@@ -910,6 +926,9 @@ namespace Elements
           { (eActionType)129, false },
           { (eActionType)130, false },
           { (eActionType)131, false },
+          { (eActionType)132, false },
+          { (eActionType)133, false },
+          { (eActionType)134, false },
         };
 
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()

@@ -48,7 +48,8 @@ namespace Elements
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             // double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
             double judgeNum = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f));
-            double randomNum = BattleManager.Random(0.0f, 1f, new RandomData(_source, _target.Owner, ActionId, 5, (float)judgeNum));
+            var randomData = new RandomData(_source, _target.Owner, ActionId, 5, (float)judgeNum);
+            double randomNum = BattleManager.Random(0.0f, 1f, ref randomData);
 
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, eActionType.BLIND, BattleHeaderController.CurrentFrameCount, out float fix))
             {

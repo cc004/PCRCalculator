@@ -1083,6 +1083,11 @@ namespace Elements
             Owner.SemanOnStartAction?.Invoke(Owner.UnitId, skillExecData.skillID);
             if (!Owner.battleManager.skipping)
                 Owner.NoSkipOnStartAction?.Invoke(Owner.UnitId, skillExecData);
+            MyGameCtrl.Instance.BattleStats.RecordSkillExecStart(
+                Owner,
+                skillExecData.skillID,
+                skillExecData.skillName,
+                skill.ActionParameters.FirstOrDefault()?.ActionId ?? 0);
             Owner.AppendStartSkill(skillId);
             //end added Scripts
 #if !REDUCE_ANALYSE
@@ -1497,6 +1502,9 @@ namespace Elements
           BasePartsData _protectedTarget = null 
           )
         {
+            if (_action.NoDelayExecByTriggerOnly)
+                yield break;
+
             if (_target.Owner.ProtectionTargetData != null)
                 _target.Owner.ProtectionTargetData.DisableIfOwnerDead();
             // temporary fix for log barrier skill
@@ -2011,7 +2019,7 @@ namespace Elements
                                     List<UnitCtrl> unitCtrlList1 = Owner.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                                     for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
                                     {
-                                        if ((long)unitCtrlList1[index2].Hp != 0L && !unitCtrlList1[index2].JudgeIsEtherialization(Owner))
+                                        if ((long)unitCtrlList1[index2].Hp > 0L && !unitCtrlList1[index2].JudgeIsEtherialization(Owner))
                                             createNormalEffectPrefab(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                     }
                                     continue;
@@ -2144,10 +2152,10 @@ namespace Elements
                 num4 = -BattleDefine.BATTLE_FIELD_SIZE;
               if (num5 > (double) BattleDefine.BATTLE_FIELD_SIZE)
                 num5 = BattleDefine.BATTLE_FIELD_SIZE;
-              vector3_2.x = (float) ((num4 + (num5 - (double) num4) * BattleManager.Random(0.0f, 1f,
-                  new RandomData(Owner,_target.Owner,_skill.SkillId,8,0))) / 540.0);
-              vector3_2.y += (float) (_skillEffect.CenterY + _skillEffect.DeltaY * (double) BattleManager.Random(-1f, 1f,
-                  new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0)) + 9.25925922393799);
+              var xRandomData = new RandomData(Owner,_target.Owner,_skill.SkillId,8,0);
+              vector3_2.x = (float) ((num4 + (num5 - (double) num4) * BattleManager.Random(0.0f, 1f, ref xRandomData)) / 540.0);
+              var yRandomData = new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0);
+              vector3_2.y += (float) (_skillEffect.CenterY + _skillEffect.DeltaY * (double) BattleManager.Random(-1f, 1f, ref yRandomData) + 9.25925922393799);
               prefab2.transform.position = vector3_2;
               break;
             case eEffectBehavior.SERIES:
@@ -2254,6 +2262,9 @@ namespace Elements
                 case PriorityPattern.MAGIC_STR_DEC_WITHOUT_OWNER_FORWARD:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner);
                     break;
+                case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA:
+                    unitCtrlList3 = unitCtrlList3.FindAll(e => e != Owner && e.AtkType == 1);
+                    break;
                 case PriorityPattern.FLIGHT_ONLY:
                     unitCtrlList3 = unitCtrlList3.FindAll(e => e.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT));
                     break;
@@ -2329,7 +2340,7 @@ namespace Elements
                         {
                             if (judgeIsTarget(_unitCtrl, actionParameter))
                                 actionParameter.TargetList.Add(_unitCtrl.GetFirstParts());
-                            else if ((long)_unitCtrl.Hp == 0L)
+                            else if ((long)_unitCtrl.Hp <= 0L)
                                 basePartsData1 = _unitCtrl.GetFirstParts();
                         }
                     }
@@ -2527,6 +2538,7 @@ namespace Elements
             }
 
             List<BasePartsData> targetList = _actionParameter.TargetList;
+#if !NO_PROB_EVENT
             var lst = targetList.Select(part => new BasePartsDataEx
             {
                 Energy = part.Owner.Energy,
@@ -2537,6 +2549,7 @@ namespace Elements
                 UnitName = part.Owner.UnitNameEx,
                 hash = part.GetHashCode()
             }).ToList();
+#endif
 
             void AddProbEvent(Func<BasePartsDataEx, BasePartsDataEx, int, int> _compare,
                 Func<BasePartsDataEx, DoubleWithEx> getter)
@@ -2581,8 +2594,8 @@ namespace Elements
                     int count = targetList.Count;
                     while (count > 1)
                     {
-                        int index = BattleManager.Random(0, count,
-                                                    new RandomData(null,null,_actionParameter.ActionId,10,count));
+                        var randomData = new RandomData(null,null,_actionParameter.ActionId,10,count);
+                        int index = BattleManager.Random(0, count, ref randomData);
                         --count;
                         BasePartsData basePartsData = targetList[index];
                         targetList[index] = targetList[count];
@@ -2734,6 +2747,7 @@ namespace Elements
                     this.sortTargetPosition(targetList, false, new Comparison<BasePartsData>(this.Owner.CompareEnergyAscSameLeft), new Comparison<BasePartsData>(this.Owner.CompareEnergyAscSameRight));
                     break;
                 case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER:
+                case PriorityPattern.ATK_DEC_FORWARD_WITHOUT_OWNER_AND_MAGIC_CHARA:
                     this.sortTargetPosition(targetList, _actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE, new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameLeft), new Comparison<BasePartsData>(this.Owner.CompareAtkDecSameRight));
                     break;
                 case PriorityPattern.HP_ASC_WITHOUT_OWNER:

@@ -539,7 +539,7 @@ namespace Elements
                                 List<UnitCtrl> unitCtrlList1 = Owner.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                                 for (int index2 = 0; index2 < unitCtrlList1.Count; ++index2)
                                 {
-                                    if ((long)unitCtrlList1[index2].Hp != 0L)
+                                    if ((long)unitCtrlList1[index2].Hp > 0L)
                                         createNormalEffectPrefab2(_skilleffect, _skill, unitCtrlList1[index2].GetFirstParts(true), _firearmEndTarget, true, startTime, _skipCutIn, execTimeIndex);
                                 }
                                 continue;
@@ -853,7 +853,12 @@ namespace Elements
         public FirearmCtrl2(string name)
         {
             this.name = name;
+#if !UNITY_5_3_OR_NEWER
+            // Server firearmPrefab is a bare marker object; cloning it only builds one IlEmit method per worker.
+            obj = new GameObject();
+#else
             obj = Object.Instantiate(MyGameCtrl.Instance.firearmPrefab);
+#endif
             // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm constructing {name}@{GetHashCode():x}.");
         }
 

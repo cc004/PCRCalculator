@@ -47,7 +47,7 @@ namespace Elements
                 //_source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParam, 0.0f, 0, null, true, eEffectType.COMMON, !isDebuff, getIsAdditional());
                 //_source.EnableBuffParam(buffParamKind, buffParam, true, _source, !isDebuff, getIsAdditional(),90);
 
-                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon());
+                _source.SetBuffParam(UnitCtrl.BuffParamKind.NUM, buffParamKind, buffParam, 0f, 0, _source, _despelable: true, eEffectType.COMMON, !isDebuff, getIsAdditional(), isShowIcon(), _actionId: ActionId);
                 _source.EnableBuffParam(buffParamKind, buffParam, _enable: true, _source, !isDebuff, getIsAdditional(), _triggerCall: TriggerCall);
 
             };
@@ -96,7 +96,7 @@ namespace Elements
                 dictionary.Add(_target.Owner.DummyPartsData, CalculateBuffDebuffParam(_target, _valueDictionary[eValueNumber.VALUE_2], (eChangeParameterType)(float)_valueDictionary[eValueNumber.VALUE_1], changeParamKind, ActionDetail1 % 10 == 1));
             bool despelable = _valueDictionary[eValueNumber.VALUE_7] != 2f;
             //_target.Owner.SetBuffParam(changeParamKind, dictionary, _valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, _despelable, EffectType, ActionDetail1 % 10 != 1, getIsAdditional(),action);
-            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, EnvironmentId, TriggerCall, action);
+            _target.Owner.SetBuffParam(changeParamKind, changeParamKind, dictionary, (float)_valueDictionary[eValueNumber.VALUE_4], _skill.SkillId, _source, despelable, base.EffectType, base.ActionDetail1 % 10 != 1, getIsAdditional(), isShowIcon(), _skill.BonusId, EnvironmentId, TriggerCall, action, ActionId);
 
         }
 
@@ -244,6 +244,16 @@ namespace Elements
                         baseStat = (double) owner.MaxHp;
                     break;
 
+                case UnitCtrl.BuffParamKind.BUFF_ENHANCE:
+                    if (owner != null)
+                        baseStat = owner.BuffEnhanceZero;
+                    break;
+
+                case UnitCtrl.BuffParamKind.DEBUFF_ENHANCE:
+                    if (owner != null)
+                        baseStat = owner.DebuffEnhanceZero;
+                    break;
+
                 default:
                     return 0f;
             }
@@ -330,6 +340,12 @@ namespace Elements
                         case UnitCtrl.BuffParamKind.MAX_HP:
                             f = (long)_target.Owner.StartMaxHP * num1;
                             break;
+                        case UnitCtrl.BuffParamKind.BUFF_ENHANCE:
+                            f = (double)_target.Owner.StartBuffEnhance * num1;
+                            break;
+                        case UnitCtrl.BuffParamKind.DEBUFF_ENHANCE:
+                            f = (double)_target.Owner.StartDebuffEnhance * num1;
+                            break;
                     }
                     break;
                 case eChangeParameterType.CURRENT_VALUE_PERCENTAGE:
@@ -343,7 +359,11 @@ namespace Elements
             var num2 = f.Abs().Ceil();
             if (_isDebuf)
             {
-                num2 = (num2 * (1f - (float)_target.GetDebuffResistPercent(_targetChangeParamKind) / 100f)).Floor();
+                if (_targetChangeParamKind != UnitCtrl.BuffParamKind.BUFF_ENHANCE &&
+                    _targetChangeParamKind != UnitCtrl.BuffParamKind.DEBUFF_ENHANCE)
+                {
+                    num2 = (num2 * (1f - (float)_target.GetDebuffResistPercent(_targetChangeParamKind) / 100f)).Floor();
+                }
                 num2 *= -1;
             }
             return (LongWithEx)num2;
@@ -353,6 +373,10 @@ namespace Elements
         {
             if (value == 1)
                 return UnitCtrl.BuffParamKind.MAX_HP;
+            if (value == 200)
+                return UnitCtrl.BuffParamKind.BUFF_ENHANCE;
+            if (value == 210)
+                return UnitCtrl.BuffParamKind.DEBUFF_ENHANCE;
 
             value = value % 1000 / 10;
             return (UnitCtrl.BuffParamKind)value;
