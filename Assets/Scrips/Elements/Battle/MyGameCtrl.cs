@@ -880,6 +880,10 @@ namespace Elements
                     unitid = GuildManager.EnemyDataDic[unitid].unit_id;
                 else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
                     unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
+                else if (GuildManager.AbyssEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.AbyssEnemyParameterDic[unitid].unit_id;
+                else if (GuildManager.TalentQuestEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.TalentQuestEnemyParameterDic[unitid].unit_id;
             }
             var a = ABExTool.LoadUnitPrefab(prefab);
             if (a == null)

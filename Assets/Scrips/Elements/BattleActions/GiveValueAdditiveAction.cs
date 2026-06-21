@@ -42,9 +42,10 @@ namespace Elements
   BasePartsData _target)
         {
             base.createValue(_source, _skill, _valueDictionary, _addValue, _evalue, _target);
-            //XX: ignore influence by clamp of add value
-            if (MasterData.action_value_4 != 0.0 || MasterData.action_value_5 != 0.0)
-                _addValue[_evalue] = _addValue[_evalue].Min(Value[eValueNumber.VALUE_4]);
+            if (MasterData.action_value_2 >= 0)
+                createPositiveValue(_addValue, _evalue);
+            else
+                createNegativeValue(_addValue, _evalue);
         }
 
         public override void SetLevel(float _level)
@@ -54,22 +55,22 @@ namespace Elements
             Value[eValueNumber.VALUE_4] = MasterData.action_value_4 + MasterData.action_value_5 * _level;
 
         }
-        private void createPositiveValue(Dictionary<eValueNumber, double> _addValue, eValueNumber _evalue)
+        private void createPositiveValue(ValueDictionary _addValue, eValueNumber _evalue)
         {
-            if ((double)base.MasterData.action_value_4 != 0.0 || (double)base.MasterData.action_value_5 != 0.0)
+            if (MasterData.action_value_4 != 0.0 || MasterData.action_value_5 != 0.0)
             {
-                _addValue[_evalue] = Math.Min(_addValue[_evalue], base.Value[eValueNumber.VALUE_4]);
+                _addValue[_evalue] = _addValue[_evalue].Min(Value[eValueNumber.VALUE_4]);
             }
-            _addValue[_evalue] = Math.Max(_addValue[_evalue], 0);
+            _addValue[_evalue] = _addValue[_evalue].Max(0);
         }
 
-        private void createNegativeValue(Dictionary<eValueNumber, double> _addValue, eValueNumber _evalue)
+        private void createNegativeValue(ValueDictionary _addValue, eValueNumber _evalue)
         {
-            if ((double)base.MasterData.action_value_4 != 0.0 || (double)base.MasterData.action_value_5 != 0.0)
+            if (MasterData.action_value_4 != 0.0 || MasterData.action_value_5 != 0.0)
             {
-                _addValue[_evalue] = Math.Max(_addValue[_evalue], base.Value[eValueNumber.VALUE_4]);
+                _addValue[_evalue] = _addValue[_evalue].Max(Value[eValueNumber.VALUE_4]);
             }
-            _addValue[_evalue] = Math.Min(_addValue[_evalue], 0f);
+            _addValue[_evalue] = _addValue[_evalue].Min(0);
         }
     }
 }

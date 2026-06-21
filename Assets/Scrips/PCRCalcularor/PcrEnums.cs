@@ -900,8 +900,10 @@ namespace PCRCaculator.Battle
         MANALIUMAI = 228,//玛那流脉\n霸瞳皇帝
         [Description("230")]
         ZHENSHIDEZHIYIN = 230,//真实的指引\n修驴
-        BUFF_ENHANCE = 233,
-        DEBUFF_ENHANCE = 235,
+        [Description("233")]
+        BUFF_ENHANCE = 233,//提升我方全体的增益效果
+        [Description("235")]
+        DEBUFF_ENHANCE = 235,//提升我方全体的减益效果
         [Description("236")]
         ZHENCANGTIANTIANQUAN = 236,//珍藏甜甜圈\n纳娜
         [Description("237")]
@@ -916,17 +918,24 @@ namespace PCRCaculator.Battle
         SHENJI = 241,//神机\n完莱
         [Description("242")]
         SHELUOYIN = 242,//蛇落印\n鬼妃
+        [Description("244")]
+        CHIBAOBAO = 244,//吃饱饱\n阿吃
         [Description("246")]
-        ENERGY_DAMAGE_REDUCE_LIMIT = 246, //妖精的指引\nyls
+        YAOJINGDEZHIYIN = 246,//妖精的指引\nyls
         [Description("247")]
         CHAIN = 247,//CHAIN\n姬塔
         [Description("248")]
-        STACKABLE_SLIP = 248,//干杯\n黄骑
+        GANBEI = 248,//干杯\n黄骑
         [Description("249")]
-        PHYSICAL_FOLLOW_UP = 249,//证据\n驴
-        MAGIC_FOLLOW_UP = 250,
-        [Description("251")]
-        CANGZHISUOLIAN = 251,//苍之锁链\n凛
+        ZHENGJU = 249,//证据\n驴
+        ENERGY_DAMAGE_REDUCE_LIMIT = 251,
+        [Description("252")]
+        MEIHUOZHIJIAN = 252,//魅惑之箭\n水栞
+        STACKABLE_SLIP = 253,
+        PHYSICAL_FOLLOW_UP = 254,
+        MAGIC_FOLLOW_UP = 255,
+        [Description("256")]
+        CANGZHISUOLIAN = 256,//苍之锁链\n凛
         [Description("0")]
         EX_PASSIVE_1 = 999,
         [Description("0")]

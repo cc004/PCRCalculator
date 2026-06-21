@@ -117,13 +117,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: AtlasTalentQuest_0
+      name: 22
       rect:
         serializedVersion: 2
         x: 0
         y: 955
-        width: 71
-        height: 45
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -138,34 +138,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 25
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 889
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7fb4b79a122b17e4c837bb8d2c59a5b8
-      internalID: 1424385556
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_2
+      name: 24
       rect:
         serializedVersion: 2
         x: 66
-        y: 922
-        width: 93
-        height: 31
+        y: 856
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -183,8 +162,8 @@ TextureImporter:
       name: AtlasTalentQuest_3
       rect:
         serializedVersion: 2
-        x: 0
-        y: 823
+        x: 132
+        y: 856
         width: 64
         height: 64
       alignment: 0
@@ -201,34 +180,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 21
+      name: 10
       rect:
         serializedVersion: 2
         x: 66
-        y: 856
+        y: 790
         width: 64
         height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 56cd6e4ec2a2b7b44a5194d0aa37f840
-      internalID: -1794796925
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_5
-      rect:
-        serializedVersion: 2
-        x: 132
-        y: 856
-        width: 50
-        height: 56
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -243,11 +201,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_6
+      name: 13
       rect:
         serializedVersion: 2
-        x: 198
-        y: 810
+        x: 132
+        y: 791
         width: 64
         height: 64
       alignment: 0
@@ -264,32 +222,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 22
+      name: 26
       rect:
         serializedVersion: 2
         x: 264
         y: 810
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3a1e91dc441167a409b7e5d53b9fdb69
-      internalID: -180835720
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_8
-      rect:
-        serializedVersion: 2
-        x: 330
-        y: 805
         width: 64
         height: 64
       alignment: 0
@@ -306,179 +243,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 24
-      rect:
-        serializedVersion: 2
-        x: 396
-        y: 805
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b69d5fd33c05d7d429ea70ca71eb2321
-      internalID: -1863730239
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: max_hp_down
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 757
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 587b56fcfea1ec9409c30d6b11e1b0e2
-      internalID: 820562591
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 16
-      rect:
-        serializedVersion: 2
-        x: 66
-        y: 790
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 16d3d02894d76694d995f0c9045a4069
-      internalID: -919737227
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 18
-      rect:
-        serializedVersion: 2
-        x: 132
-        y: 790
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: be0fcc7fcfc22df4497409f9f80f3cea
-      internalID: -1624380152
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 14
-      rect:
-        serializedVersion: 2
-        x: 198
-        y: 744
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0e1bbfe0a32a5304bb6db3f9ee18e819
-      internalID: 771993467
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 15
+      name: 1
       rect:
         serializedVersion: 2
         x: 264
         y: 744
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8bae7612eb1086c4d9304ce6a50fac37
-      internalID: -289901491
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 12
-      rect:
-        serializedVersion: 2
-        x: 330
-        y: 739
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bbafdbbaf4d2d0d4b8e7af93222ad74a
-      internalID: -82967395
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 13
-      rect:
-        serializedVersion: 2
-        x: 396
-        y: 739
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0593ac2d0fc8e4943ad3ea8a06bae2d6
-      internalID: 2087032839
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_17
-      rect:
-        serializedVersion: 2
-        x: 462
-        y: 755
         width: 64
         height: 64
       alignment: 0
@@ -495,74 +264,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 26
+      name: AtlasTalentQuest_21
       rect:
         serializedVersion: 2
         x: 528
         y: 755
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bc1eaa8fc657b694887e8ef7fb4d958f
-      internalID: -673246404
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 2
-      rect:
-        serializedVersion: 2
-        x: 629
-        y: 743
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6afd0f35dfc5bbe408e02b5230071f5c
-      internalID: -438482552
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_magic_cut
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 691
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8267bf8040dcfdc47b5119bb67454788
-      internalID: 1254424793
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_21
-      rect:
-        serializedVersion: 2
-        x: 66
-        y: 724
         width: 64
         height: 64
       alignment: 0
@@ -582,8 +288,8 @@ TextureImporter:
       name: AtlasTalentQuest_22
       rect:
         serializedVersion: 2
-        x: 132
-        y: 724
+        x: 629
+        y: 743
         width: 64
         height: 64
       alignment: 0
@@ -600,11 +306,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_23
+      name: 3
       rect:
         serializedVersion: 2
-        x: 198
-        y: 678
+        x: 695
+        y: 743
         width: 64
         height: 64
       alignment: 0
@@ -624,8 +330,8 @@ TextureImporter:
       name: AtlasTalentQuest_24
       rect:
         serializedVersion: 2
-        x: 264
-        y: 678
+        x: 761
+        y: 743
         width: 64
         height: 64
       alignment: 0
@@ -645,8 +351,8 @@ TextureImporter:
       name: AtlasTalentQuest_25
       rect:
         serializedVersion: 2
-        x: 365
-        y: 673
+        x: 827
+        y: 743
         width: 64
         height: 64
       alignment: 0
@@ -663,34 +369,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: energy_recover
-      rect:
-        serializedVersion: 2
-        x: 431
-        y: 673
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6c79546d073927f45b32a32960c6fc17
-      internalID: -745904591
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: AtlasTalentQuest_27
       rect:
         serializedVersion: 2
-        x: 497
-        y: 689
-        width: 64
-        height: 64
+        x: 959
+        y: 743
+        width: 52
+        height: 52
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -705,95 +390,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 11
+      name: energy_recover
       rect:
         serializedVersion: 2
-        x: 563
-        y: 689
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a41ceefe397d5cc41a51b91db80a6192
-      internalID: -827437689
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 1
-      rect:
-        serializedVersion: 2
-        x: 653
-        y: 677
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d44f4ca456966554fb10bf7967e54dc3
-      internalID: 17592625
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 19
-      rect:
-        serializedVersion: 2
-        x: 719
-        y: 677
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ea90aeaa6b03662429e90138d7349aad
-      internalID: -264932425
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 17
-      rect:
-        serializedVersion: 2
-        x: 785
-        y: 677
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 507efb1401b3dc7408c0b126df0533b0
-      internalID: 779109508
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_32
-      rect:
-        serializedVersion: 2
-        x: 851
-        y: 677
+        x: 264
+        y: 678
         width: 64
         height: 64
       alignment: 0
@@ -810,11 +411,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_33
+      name: boss_tp_down_cut
       rect:
         serializedVersion: 2
-        x: 917
-        y: 677
+        x: 365
+        y: 673
         width: 64
         height: 64
       alignment: 0
@@ -831,32 +432,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 6
+      name: 35
       rect:
         serializedVersion: 2
-        x: 0
-        y: 625
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 501533709afbea6468065e20dab89fb4
-      internalID: 209196251
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_35
-      rect:
-        serializedVersion: 2
-        x: 66
-        y: 658
+        x: 497
+        y: 689
         width: 64
         height: 64
       alignment: 0
@@ -873,34 +453,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss_magic_def_lower_limit
+      name: 6
       rect:
         serializedVersion: 2
-        x: 132
-        y: 658
+        x: 653
+        y: 677
         width: 64
         height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 581d29934e3b0244cb7a6cbd5891b782
-      internalID: -1416414788
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_37
-      rect:
-        serializedVersion: 2
-        x: 198
-        y: 658
-        width: 16
-        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -915,179 +474,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 7
-      rect:
-        serializedVersion: 2
-        x: 233
-        y: 612
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 45470717aa882b246bf8e210569ae18e
-      internalID: -1569863355
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_def_up
-      rect:
-        serializedVersion: 2
-        x: 299
-        y: 612
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ad49cdde1f7bd0640bc46531f07dfe49
-      internalID: 561708996
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 33
+      name: AtlasTalentQuest_46
       rect:
         serializedVersion: 2
         x: 389
         y: 607
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9f678397e3250f14e976f3ba1a82d93d
-      internalID: -1896570772
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_def_lower_limit
-      rect:
-        serializedVersion: 2
-        x: 455
-        y: 607
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 05c938e8b4c051c46a84b8b3d125938f
-      internalID: 1456415224
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_physics_cut
-      rect:
-        serializedVersion: 2
-        x: 524
-        y: 625
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fee72f0f1e694f948a7689126647b159
-      internalID: -1326939604
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_tp_down_cut
-      rect:
-        serializedVersion: 2
-        x: 587
-        y: 623
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b409c44885619174db638be0516ed651
-      internalID: 1347258123
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_magic_def_up
-      rect:
-        serializedVersion: 2
-        x: 673
-        y: 611
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 771dc236b8f2b9a4fa4dcd7eb8f708ee
-      internalID: 1137001192
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: boss_haste
-      rect:
-        serializedVersion: 2
-        x: 739
-        y: 611
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 58b4c8d931ac9bd4f888648f377f4c71
-      internalID: -674558318
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_46
-      rect:
-        serializedVersion: 2
-        x: 805
-        y: 611
         width: 64
         height: 64
       alignment: 0
@@ -1104,55 +495,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 23
+      name: boss_physics_cut
       rect:
         serializedVersion: 2
-        x: 871
-        y: 611
+        x: 587
+        y: 623
         width: 64
         height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6d930ab7f9ed6b14d95326ccc8bb7333
-      internalID: -1435253604
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 3
-      rect:
-        serializedVersion: 2
-        x: 937
-        y: 611
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c80d6fe67b3b3c94f89225c32fc627ae
-      internalID: 91483858
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_49
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 512
-        width: 99
-        height: 111
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1167,55 +516,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 8
+      name: boss_magic_def_up
       rect:
         serializedVersion: 2
-        x: 101
-        y: 593
+        x: 805
+        y: 611
         width: 64
         height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ad58bdfe136bb09478464eb1a44e9f87
-      internalID: 509207690
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 4
-      rect:
-        serializedVersion: 2
-        x: 167
-        y: 592
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 75ee20ba374219f4d8f298e5bef311bf
-      internalID: -891424294
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AtlasTalentQuest_52
-      rect:
-        serializedVersion: 2
-        x: 237
-        y: 562
-        width: 150
-        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1233,10 +540,10 @@ TextureImporter:
       name: AtlasTalentQuest_53
       rect:
         serializedVersion: 2
-        x: 389
-        y: 557
-        width: 150
-        height: 48
+        x: 871
+        y: 611
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1251,55 +558,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 5
-      rect:
-        serializedVersion: 2
-        x: 541
-        y: 557
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 23e57f587e58a3f47b8bfb5d6af65e7a
-      internalID: -1571883520
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 34
-      rect:
-        serializedVersion: 2
-        x: 607
-        y: 557
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 24844d15ac474d4408c8559b391e9d59
-      internalID: -845522429
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: AtlasTalentQuest_56
       rect:
         serializedVersion: 2
-        x: 675
-        y: 497
-        width: 147
-        height: 112
+        x: 101
+        y: 592
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1314,13 +579,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_57
+      name: 34
       rect:
         serializedVersion: 2
-        x: 824
-        y: 497
-        width: 147
-        height: 112
+        x: 167
+        y: 592
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1338,10 +603,10 @@ TextureImporter:
       name: AtlasTalentQuest_58
       rect:
         serializedVersion: 2
-        x: 101
-        y: 512
-        width: 134
-        height: 78
+        x: 237
+        y: 562
+        width: 150
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1359,8 +624,8 @@ TextureImporter:
       name: AtlasTalentQuest_59
       rect:
         serializedVersion: 2
-        x: 237
-        y: 512
+        x: 389
+        y: 557
         width: 150
         height: 48
       alignment: 0
@@ -1380,10 +645,10 @@ TextureImporter:
       name: AtlasTalentQuest_60
       rect:
         serializedVersion: 2
-        x: 390
-        y: 512
-        width: 49
-        height: 37
+        x: 541
+        y: 557
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1398,13 +663,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_61
+      name: 5
       rect:
         serializedVersion: 2
-        x: 441
-        y: 512
-        width: 36
-        height: 36
+        x: 607
+        y: 557
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1422,10 +687,10 @@ TextureImporter:
       name: AtlasTalentQuest_62
       rect:
         serializedVersion: 2
-        x: 482
-        y: 422
-        width: 191
-        height: 133
+        x: 675
+        y: 497
+        width: 147
+        height: 112
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1443,10 +708,10 @@ TextureImporter:
       name: AtlasTalentQuest_63
       rect:
         serializedVersion: 2
-        x: 0
-        y: 422
-        width: 480
-        height: 88
+        x: 824
+        y: 497
+        width: 147
+        height: 112
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1464,10 +729,10 @@ TextureImporter:
       name: AtlasTalentQuest_64
       rect:
         serializedVersion: 2
-        x: 675
-        y: 422
-        width: 239
-        height: 73
+        x: 101
+        y: 512
+        width: 134
+        height: 78
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1482,34 +747,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_65
-      rect:
-        serializedVersion: 2
-        x: 916
-        y: 422
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d997c0fd2250e3d459e4820c279f1411
-      internalID: -726431888
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: AtlasTalentQuest_66
       rect:
         serializedVersion: 2
-        x: 0
-        y: 353
-        width: 150
-        height: 48
+        x: 390
+        y: 512
+        width: 49
+        height: 37
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1527,10 +771,10 @@ TextureImporter:
       name: AtlasTalentQuest_67
       rect:
         serializedVersion: 2
-        x: 152
-        y: 353
-        width: 150
-        height: 48
+        x: 441
+        y: 512
+        width: 36
+        height: 36
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1548,10 +792,10 @@ TextureImporter:
       name: AtlasTalentQuest_68
       rect:
         serializedVersion: 2
-        x: 304
-        y: 353
-        width: 150
-        height: 48
+        x: 482
+        y: 422
+        width: 191
+        height: 133
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1569,10 +813,10 @@ TextureImporter:
       name: AtlasTalentQuest_69
       rect:
         serializedVersion: 2
-        x: 479
-        y: 328
+        x: 0
+        y: 422
         width: 480
-        height: 92
+        height: 88
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1590,10 +834,10 @@ TextureImporter:
       name: AtlasTalentQuest_70
       rect:
         serializedVersion: 2
-        x: 0
-        y: 206
-        width: 477
-        height: 145
+        x: 675
+        y: 422
+        width: 239
+        height: 73
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1608,13 +852,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AtlasTalentQuest_71
+      name: 9
       rect:
         serializedVersion: 2
-        x: 479
-        y: 225
-        width: 534
-        height: 100
+        x: 916
+        y: 422
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1632,10 +876,10 @@ TextureImporter:
       name: AtlasTalentQuest_72
       rect:
         serializedVersion: 2
-        x: 979
-        y: 237
-        width: 41
-        height: 8
+        x: 0
+        y: 353
+        width: 150
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1653,10 +897,10 @@ TextureImporter:
       name: AtlasTalentQuest_73
       rect:
         serializedVersion: 2
-        x: 849
-        y: 219
-        width: 58
-        height: 7
+        x: 152
+        y: 353
+        width: 150
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1674,10 +918,10 @@ TextureImporter:
       name: AtlasTalentQuest_74
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 616
-        height: 204
+        x: 304
+        y: 353
+        width: 150
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1695,10 +939,10 @@ TextureImporter:
       name: AtlasTalentQuest_75
       rect:
         serializedVersion: 2
-        x: 618
-        y: 0
-        width: 311
-        height: 217
+        x: 479
+        y: 328
+        width: 480
+        height: 92
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1713,34 +957,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 9
-      rect:
-        serializedVersion: 2
-        x: 931
-        y: 132
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1211171ff2155584e9bb870340c8e46b
-      internalID: -1639401552
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: AtlasTalentQuest_77
       rect:
         serializedVersion: 2
-        x: 931
-        y: 67
-        width: 64
-        height: 64
+        x: 0
+        y: 206
+        width: 477
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1755,7 +978,931 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
+      name: 11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 823
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e175f4d95542a0c4a84e9914353bb2a7
+      internalID: -2109806006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 16
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 810
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 519f8477bf69c1b439f7b119fcb7b141
+      internalID: -1197559182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 14
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 805
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83c0d917b74a10d43ab986ed552d7161
+      internalID: -1885586879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 15
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 805
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 41b8a6d86eb5ff64e8a2a1706ba35c64
+      internalID: 113123794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 889
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59618ccbdf97f7c4787d55f1b6c7e6c8
+      internalID: 582693908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_11
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 821
+        width: 93
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b57ffcb9dd7dbf548bb094a5e54660e1
+      internalID: 1003851684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_12
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 809
+        width: 71
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75844f94008fe0d448fa04cd30cd8fef
+      internalID: 1888440684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_13
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 757
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0b6764769beeef49ac1a23289efc3a9
+      internalID: 796276023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_14
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 724
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3940516aef2bdd1418861da6913afc26
+      internalID: 1730290429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss_magic_cut
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 724
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d143780c1d77c0948957b30a8d08d070
+      internalID: 1254424793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 12
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 744
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00ae8da70541e04448a0ed0dd62b7b46
+      internalID: -82967395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 2
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 739
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff5871a7b77868441a89b9d3f035614c
+      internalID: -438482552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: max_hp_down
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 739
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19afbf28a6d305240bfc5a5b6185b41d
+      internalID: 820562591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 21
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 755
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fbe258fc2f3fb247bade50af85e47f4
+      internalID: -1794796925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 23
+      rect:
+        serializedVersion: 2
+        x: 893
+        y: 743
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 373cc6410d3218c4ab6f3ae1150a01f5
+      internalID: -1435253604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss_haste
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 691
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85556a57dad369046945df5ff481ee65
+      internalID: -674558318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 33
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 658
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88a74662bff411247a8939a5994521b2
+      internalID: -1896570772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_30
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 658
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: badd5d9c375b7bf4095a9fc5dba273a9
+      internalID: 1818477489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_31
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 678
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8901667f8d91a6d46b6c5c3863253bce
+      internalID: -366297240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_34
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 673
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 533a4822de462814cbbd78914ef739c5
+      internalID: 1495707572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_36
+      rect:
+        serializedVersion: 2
+        x: 563
+        y: 689
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0da16f0d2c5d7f04ea0766f65364ed3d
+      internalID: -871719295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 17
+      rect:
+        serializedVersion: 2
+        x: 719
+        y: 677
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c17cdc13ebc25a34c8cc816438bba86d
+      internalID: 779109508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 18
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 677
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83ec1d10eff7e174cb438b2c645f0ec1
+      internalID: -1624380152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 19
+      rect:
+        serializedVersion: 2
+        x: 851
+        y: 677
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 810838f54b5d1d144994047317b0fcbb
+      internalID: -264932425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 25
+      rect:
+        serializedVersion: 2
+        x: 917
+        y: 677
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f896ef29f02e6d42a5c7cf2b0320839
+      internalID: 1424385556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_42
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 625
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9caa5c9460a8b8c4fa60709d84313913
+      internalID: -743011440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_43
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 658
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9930f4dee0c34824eb3bed990f801a3d
+      internalID: -1153372083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 4
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 612
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36e61381393bdd64794c82369d405dd3
+      internalID: -891424294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_45
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 612
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c72b0d40cc8cc3d4d8e3199349ba215a
+      internalID: 1936257469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss_def_up
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 607
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d524a279c68a2a4c850efd5765ee401
+      internalID: 561708996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 8
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 623
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40e6173cbaa7fb2499d7bd1194984fb7
+      internalID: 509207690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 7
+      rect:
+        serializedVersion: 2
+        x: 673
+        y: 611
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e59ef5c83d6941948af86c7ff934ecaa
+      internalID: -1569863355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss_magic_def_lower_limit
+      rect:
+        serializedVersion: 2
+        x: 739
+        y: 611
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b378aefa40202d24e87708f71fde6e0b
+      internalID: -1416414788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_54
+      rect:
+        serializedVersion: 2
+        x: 937
+        y: 611
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5205c6856b37984abf60911c2a69948
+      internalID: 1566664216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_55
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 99
+        height: 111
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33796b4a39da306428cddfa403ab590f
+      internalID: -1678149490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_65
+      rect:
+        serializedVersion: 2
+        x: 237
+        y: 512
+        width: 150
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3778b3512d5215949bff10005e3038e4
+      internalID: -344516995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_76
+      rect:
+        serializedVersion: 2
+        x: 961
+        y: 332
+        width: 50
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7719f83e657505848aeb53a33ef71ad2
+      internalID: -998887490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_78
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 225
+        width: 534
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dafbf90d5a28f36458c7c5d95c383b18
+      internalID: 1314057824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_79
+      rect:
+        serializedVersion: 2
+        x: 979
+        y: 237
+        width: 41
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3153a2b7bd85a6847a8f6df5981cfe04
+      internalID: 2077915222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_80
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 219
+        width: 58
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f41033e9ff0077478a38c8317cbeb43
+      internalID: -2133193306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_81
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 616
+        height: 204
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adfb6bf3f50bc38418a01d31fbe914df
+      internalID: 1549614967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasTalentQuest_82
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 0
+        width: 311
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bca46e6cb402ed2429f2bec519d992c9
+      internalID: 347945087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
       name: boss_atk_up
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 132
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 890b3f988061f8944ada58b70453febf
+      internalID: 1158485177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss_damage_cut
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 66
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05363ea38ab3c7642ad1738ad07d39a1
+      internalID: -726431888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss_def_lower_limit
       rect:
         serializedVersion: 2
         x: 931
@@ -1769,8 +1916,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ba99f7bef76bbf6478fdf7fc29daaf25
-      internalID: 1158485177
+      spriteID: c01633e9b3740e54e8d6d93efa86ab26
+      internalID: 1456415224
       vertices: []
       indices: 
       edges: []
@@ -1786,84 +1933,91 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      1: 17592625
-      11: -827437689
-      12: -82967395
-      13: 2087032839
-      14: 771993467
-      15: -289901491
-      16: -919737227
-      17: 779109508
-      18: -1624380152
-      19: -264932425
-      2: -438482552
-      21: -1794796925
-      22: -180835720
-      23: -1435253604
-      24: -1863730239
-      25: 1424385556
-      26: -673246404
-      3: 91483858
-      33: -1896570772
-      34: -845522429
-      4: -891424294
-      5: -1571883520
-      6: 209196251
-      7: -1569863355
-      8: 509207690
-      9: -1639401552
-      AtlasTalentQuest_0: -197887468
-      AtlasTalentQuest_17: -50212259
-      AtlasTalentQuest_2: 947800758
+      1: -438482552
+      10: -756623791
+      11: -82967395
+      12: -1858419336
+      13: -1885586879
+      14: 113123794
+      15: -1197559182
+      16: 779109508
+      17: -1624380152
+      18: -264932425
+      19: -1794796925
+      2: -99849462
+      21: -197887468
+      22: -1435253604
+      23: 947800758
+      24: 1424385556
+      25: 1232919559
+      26: 1232919559
+      3: -891424294
+      33: -16121611
+      34: 1158485177
+      35: 708209630
+      4: -2069580220
+      5: 749299852
+      6: -1569863355
+      7: 509207690
+      8: -864234720
+      9: -2109806006
+      AtlasTalentQuest_1: 582693908
+      AtlasTalentQuest_11: 1003851684
+      AtlasTalentQuest_12: 1888440684
+      AtlasTalentQuest_13: 796276023
+      AtlasTalentQuest_14: 1730290429
       AtlasTalentQuest_21: -87094605
       AtlasTalentQuest_22: -1244526507
-      AtlasTalentQuest_23: -99849462
       AtlasTalentQuest_24: 68219864
       AtlasTalentQuest_25: 165322773
       AtlasTalentQuest_27: 1627462547
       AtlasTalentQuest_3: 1595185325
-      AtlasTalentQuest_32: -1297847913
-      AtlasTalentQuest_33: -777977200
-      AtlasTalentQuest_35: 708209630
-      AtlasTalentQuest_37: 749299852
+      AtlasTalentQuest_30: 1818477489
+      AtlasTalentQuest_31: -366297240
+      AtlasTalentQuest_34: 1495707572
+      AtlasTalentQuest_36: -871719295
+      AtlasTalentQuest_42: -743011440
+      AtlasTalentQuest_43: -1153372083
+      AtlasTalentQuest_45: 1936257469
       AtlasTalentQuest_46: 1360805372
-      AtlasTalentQuest_49: -1646420635
-      AtlasTalentQuest_5: -756623791
-      AtlasTalentQuest_52: 1353047273
-      AtlasTalentQuest_53: 310953665
-      AtlasTalentQuest_56: -1048774155
-      AtlasTalentQuest_57: -16121611
-      AtlasTalentQuest_58: -692830621
-      AtlasTalentQuest_59: -2037247611
-      AtlasTalentQuest_6: -1858419336
-      AtlasTalentQuest_60: 2084097533
-      AtlasTalentQuest_61: -2069580220
-      AtlasTalentQuest_62: 1162154234
-      AtlasTalentQuest_63: 1176942509
-      AtlasTalentQuest_64: -1560396792
-      AtlasTalentQuest_65: -726431888
-      AtlasTalentQuest_66: 1049088904
-      AtlasTalentQuest_67: 1608020528
-      AtlasTalentQuest_68: -247327401
-      AtlasTalentQuest_69: 1467920986
-      AtlasTalentQuest_70: 762839989
-      AtlasTalentQuest_71: -864234720
-      AtlasTalentQuest_72: 1302273998
-      AtlasTalentQuest_73: 263089291
-      AtlasTalentQuest_74: 1165820156
-      AtlasTalentQuest_75: -922155706
-      AtlasTalentQuest_77: -759194298
-      AtlasTalentQuest_8: 1232919559
-      boss_atk_up: 1158485177
-      boss_def_lower_limit: 1456415224
-      boss_def_up: 561708996
-      boss_haste: -674558318
-      boss_magic_cut: 1254424793
-      boss_magic_def_lower_limit: -1416414788
-      boss_magic_def_up: 1137001192
-      boss_physics_cut: -1326939604
-      boss_tp_down_cut: 1347258123
-      energy_recover: -745904591
+      AtlasTalentQuest_53: 1566664216
+      AtlasTalentQuest_54: -1678149490
+      AtlasTalentQuest_55: -1048774155
+      AtlasTalentQuest_56: -692830621
+      AtlasTalentQuest_58: -2037247611
+      AtlasTalentQuest_59: 2084097533
+      AtlasTalentQuest_60: 1162154234
+      AtlasTalentQuest_62: 1176942509
+      AtlasTalentQuest_63: -1560396792
+      AtlasTalentQuest_64: -344516995
+      AtlasTalentQuest_65: 1049088904
+      AtlasTalentQuest_66: 1608020528
+      AtlasTalentQuest_67: -247327401
+      AtlasTalentQuest_68: 1467920986
+      AtlasTalentQuest_69: 762839989
+      AtlasTalentQuest_70: 1302273998
+      AtlasTalentQuest_72: 263089291
+      AtlasTalentQuest_73: 1165820156
+      AtlasTalentQuest_74: -922155706
+      AtlasTalentQuest_75: -998887490
+      AtlasTalentQuest_76: -759194298
+      AtlasTalentQuest_77: 1314057824
+      AtlasTalentQuest_78: 2077915222
+      AtlasTalentQuest_79: -2133193306
+      AtlasTalentQuest_80: 1549614967
+      AtlasTalentQuest_81: 347945087
+      AtlasTalentQuest_82: -50212259
+      boss_atk_up: -726431888
+      boss_damage_cut: 1456415224
+      boss_def_lower_limit: -674558318
+      boss_def_up: -1646420635
+      boss_haste: 1254424793
+      boss_magic_cut: -1416414788
+      boss_magic_def_lower_limit: 1353047273
+      boss_magic_def_up: 561708996
+      boss_physics_cut: -1297847913
+      boss_tp_down_cut: -777977200
+      energy_recover: 310953665
       max_hp_down: 820562591
   spritePackingTag: 
   pSDRemoveMatte: 0
