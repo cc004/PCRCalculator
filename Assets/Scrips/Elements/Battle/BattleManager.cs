@@ -6128,11 +6128,8 @@ namespace Elements.Battle
                                  ?? GuildManager.AbyssEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
                                  ?? GuildManager.TalentQuestEnemyParameterDic.GetValueOrDefault(_summonData.SummonId);
 
-                    if (enemyData != null)
-                    {
-                        unitData_my = enemyData.CreateUnitData();
-                        parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
-                    }
+                    unitData_my = enemyData.CreateUnitData();
+                    parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
                 }
                 else
                 {
