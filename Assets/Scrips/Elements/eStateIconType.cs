@@ -551,7 +551,9 @@ namespace Elements
         MANALIUMAI = 228,
         [Description("真实的指引\n修驴")]
         ZHENSHIDEZHIYIN = 230,
+        [Description("提升我方全体的增益效果")]
         BUFF_ENHANCE = 233,
+        [Description("提升我方全体的减益效果")]
         DEBUFF_ENHANCE = 235,
         [Description("珍藏甜甜圈\n纳娜")]
         ZHENCANGTIANTIANQUAN = 236,
@@ -567,17 +569,42 @@ namespace Elements
         SHENJI = 241,
         [Description("蛇落印\n鬼妃")]
         SHELUOYIN = 242,
+        [Description("吃饱饱\n阿吃")]
+        CHIBAOBAO = 244,
+        [Description("妖精的指引\nyls")]
+        YAOJINGDEZHIYIN = 246,
         [Description("CHAIN\n姬塔")]
         CHAIN = 247,
-        [Description("妖精的指引\nyls")]
-        ENERGY_DAMAGE_REDUCE_LIMIT = 251,
         [Description("干杯\n黄骑")]
-        STACKABLE_SLIP = 253,
+        GANBEI = 248,
         [Description("证据\n驴")]
+        ZHENGJU = 249,
+        ENERGY_DAMAGE_REDUCE_LIMIT = 251,
+        [Description("魅惑之箭\n水栞")]
+        MEIHUOZHIJIAN = 252,
+        STACKABLE_SLIP = 253,
         PHYSICAL_FOLLOW_UP = 254,
         MAGIC_FOLLOW_UP = 255,
         [Description("苍之锁链\n凛")]
-        CANGZHISUOLIAN = 251,
+        CANGZHISUOLIAN = 256,
+        [Description("诅咒之锁\ngcw")]
+        ZUZHOUZHISUO = 258,
+        [Description("千里真眼\n霸猫")]
+        QIANLIZHENYAN = 259,
+        [Description("谨贺之羽\n春黑")]
+        JINHEZHIYU = 260,
+        [Description("效率全开扳手\n电子龙")]
+        XIAOLVQUANKAIBANSHOU = 261,
+        [Description("榴弹\n真穗")]
+        LIUDAN = 262,
+        [Description("超级巨型手臂\n机娘")]
+        CHAOJIJUXINGSHOUBI = 263,
+        [Description("战乙女的圣枪·祓\n武莉莉")]
+        SHENGQIANGBA = 264,
+        [Description("战乙女的圣枪·爱\n武盾妹")]
+        SHENGQIANGAI = 264,
+        [Description("战乙女的圣枪·义\n武猪妹")]
+        SHENGQIANGYI = 265,
         // Token: 0x0400885F RID: 34911
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912
