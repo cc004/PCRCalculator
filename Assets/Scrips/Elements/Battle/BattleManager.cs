@@ -6123,11 +6123,16 @@ namespace Elements.Battle
                 PCRCaculator.UnitData unitData_my = new PCRCaculator.UnitData();
                 if (UnitUtility.IsQuestMonsterUnit(_summonData.SummonId))
                 {
-                    //parameter = UnitUtility.CreateUnitParameterFromEnemyParameter(this._summonData.SummonId);
-                    //Debug.LogError("特殊召唤物鸽了！");
-                    EnemyData enemyData = GuildManager.EnemyDataDic.ContainsKey(_summonData.SummonId) ? GuildManager.EnemyDataDic[_summonData.SummonId] : GuildManager.MirageEnemyParameterDic[_summonData.SummonId];
-                    unitData_my = enemyData.CreateUnitData();
-                    parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
+                    var enemyData = GuildManager.EnemyDataDic.GetValueOrDefault(_summonData.SummonId)
+                                 ?? GuildManager.MirageEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
+                                 ?? GuildManager.AbyssEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
+                                 ?? GuildManager.TalentQuestEnemyParameterDic.GetValueOrDefault(_summonData.SummonId);
+
+                    if (enemyData != null)
+                    {
+                        unitData_my = enemyData.CreateUnitData();
+                        parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
+                    }
                 }
                 else
                 {
