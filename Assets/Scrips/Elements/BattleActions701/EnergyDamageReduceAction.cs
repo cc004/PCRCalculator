@@ -6,6 +6,13 @@ namespace Elements
 	// Token: 0x02000798 RID: 1944
 	public class EnergyDamageReduceAction : ActionParameter
 	{
+		private static readonly Dictionary<eEnergyDamageReduceType, UnitCtrl.eAbnormalState> abnormalStateDic =
+			new Dictionary<eEnergyDamageReduceType, UnitCtrl.eAbnormalState>
+			{
+				{ eEnergyDamageReduceType.NORMAL, UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE },
+				{ eEnergyDamageReduceType.LIMIT, UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE_LIMIT }
+			};
+
 		// Token: 0x06003E96 RID: 16022 RVA: 0x00105EA4 File Offset: 0x00105EA4
 		public override void ExecActionOnStart(Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController)
 		{
@@ -17,7 +24,7 @@ namespace Elements
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			base.AppendIsAlreadyExeced(_target.Owner, _num);
-			_target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE, (float)_valueDictionary[eValueNumber.VALUE_2], this, _skill, _valueDictionary[eValueNumber.VALUE_1], 0f, false, false, 1f, _valueDictionary[eValueNumber.VALUE_4] == 0f);
+			_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eEnergyDamageReduceType)ActionDetail1], (float)_valueDictionary[eValueNumber.VALUE_2], this, _skill, _valueDictionary[eValueNumber.VALUE_1], 0f, false, false, 1f, _valueDictionary[eValueNumber.VALUE_4] == 0f);
 		}
 
 		// Token: 0x06003E98 RID: 16024 RVA: 0x00105F1C File Offset: 0x00105F1C
@@ -30,6 +37,12 @@ namespace Elements
 		// Token: 0x06003E99 RID: 16025 RVA: 0x00105F58 File Offset: 0x00105F58
 		public EnergyDamageReduceAction()
 		{
+		}
+
+		private enum eEnergyDamageReduceType
+		{
+			NORMAL = 0,
+			LIMIT = 1
 		}
 	}
 }

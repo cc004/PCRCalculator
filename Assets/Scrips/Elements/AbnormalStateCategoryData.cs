@@ -25,6 +25,8 @@ namespace Elements
     public eActionType ActionType { get; set; }
     public double SubValue { get; set; }
 
+    public int StackNum { get; set; }
+
     public double EnergyReduceRate { get; set; }
 
     public bool IsEnergyReduceMode { get; set; }

@@ -51,6 +51,10 @@ namespace Elements
             {
                 _energy *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
             }
+            if (owner.IsAbnormalState(UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE_LIMIT) && _energy < 0f)
+            {
+                _energy = Math.Max(_energy, -owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE_LIMIT));
+            }
             _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1 || ActionDetail1 == 4, _source, _effectType: EffectType,action:action, _useRecoveryRate: ActionDetail1 != 4);
     }
 

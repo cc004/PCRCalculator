@@ -12,6 +12,13 @@ namespace Elements
 {
   public class FearAction : ActionParameter
   {
+    private static readonly Dictionary<eFearType, UnitCtrl.eAbnormalState> abnormalStateDic =
+      new Dictionary<eFearType, UnitCtrl.eAbnormalState>
+      {
+        { eFearType.FEAR, UnitCtrl.eAbnormalState.FEAR },
+        { eFearType.ALL_FEAR, UnitCtrl.eAbnormalState.ALL_FEAR }
+      };
+
     public override void ExecAction(
       UnitCtrl _source,
       BasePartsData _target,
@@ -34,7 +41,7 @@ namespace Elements
       if (num1 != 0 && num2 <= pp)
       {
         AppendIsAlreadyExeced(_target.Owner, _num);
-        _target.Owner.SetAbnormalState(_source, UnitCtrl.eAbnormalState.FEAR, (float)_valueDictionary[eValueNumber.VALUE_1], this, _skill);
+        _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eFearType)ActionDetail1], (float)_valueDictionary[eValueNumber.VALUE_1], this, _skill);
       }
       else
       {
@@ -53,6 +60,12 @@ namespace Elements
       base.SetLevel(_level);
       Value[eValueNumber.VALUE_1] = (MasterData.action_value_1 + MasterData.action_value_2 * _level);
       Value[eValueNumber.VALUE_3] = (MasterData.action_value_3 + MasterData.action_value_4 * _level);
+    }
+
+    private enum eFearType
+    {
+      FEAR = 0,
+      ALL_FEAR = 1
     }
   }
 }

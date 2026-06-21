@@ -1006,6 +1006,54 @@ namespace Elements
                     IconType = eStateIconType.PUPPET,
                     IsBuff = false
                 }
+            },
+            {
+                UnitCtrl.eAbnormalState.ALL_FEAR,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.ALL_FEAR,
+                    IsBuff = false
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.REDUCTION_ATK_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.REDUCTION_ATK_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.REDUCTION_MGC_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.REDUCTION_MGC_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.REDUCTION_ALL_DAMAGE,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.REDUCTION_ALL_DAMAGE,
+                    IsBuff = true
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.STACKABLE_SLIP,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.STACKABLE_SLIP,
+                    IsBuff = false
+                }
+            },
+            {
+                UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE_LIMIT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.ENERGY_DAMAGE_REDUCE_LIMIT,
+                    IsBuff = true
+                }
             }
         };
 
@@ -1054,6 +1102,10 @@ namespace Elements
             },
             {
                 UnitCtrl.eAbnormalStateCategory.RATIO_SLIP,
+                0
+            },
+            {
+                UnitCtrl.eAbnormalStateCategory.STACKABLE_SLIP,
                 0
             }
 
@@ -5262,6 +5314,24 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.PUPPET:
                     result = UnitCtrl.eAbnormalStateCategory.PUPPET;
                     break;
+                case UnitCtrl.eAbnormalState.ALL_FEAR:
+                    result = UnitCtrl.eAbnormalStateCategory.ALL_FEAR;
+                    break;
+                case UnitCtrl.eAbnormalState.REDUCTION_ATK_DAMAGE:
+                    result = UnitCtrl.eAbnormalStateCategory.REDUCTION_ATK_DAMAGE;
+                    break;
+                case UnitCtrl.eAbnormalState.REDUCTION_MGC_DAMAGE:
+                    result = UnitCtrl.eAbnormalStateCategory.REDUCTION_MGC_DAMAGE;
+                    break;
+                case UnitCtrl.eAbnormalState.REDUCTION_ALL_DAMAGE:
+                    result = UnitCtrl.eAbnormalStateCategory.REDUCTION_ALL_DAMAGE;
+                    break;
+                case UnitCtrl.eAbnormalState.STACKABLE_SLIP:
+                    result = UnitCtrl.eAbnormalStateCategory.STACKABLE_SLIP;
+                    break;
+                case UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE_LIMIT:
+                    result = UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE_LIMIT;
+                    break;
                 default:
                     if (abnormalState != UnitCtrl.eAbnormalState.NONE)
                         Debug.LogError($"GetAbnormalStateCategory not found category for abnormalState:{abnormalState}");
@@ -5374,7 +5444,8 @@ this.updateCurColor();
           double _reduceEnergyRate = 1f,
           bool _showsIcon = true,
           bool _isEnvironmentAbnormalState = false,
-          bool _isIgnoreDebuffImmune = false)
+          bool _isIgnoreDebuffImmune = false,
+          int _stackMax = 0)
         {
             if (battleManager.GameState != eBattleGameState.PLAY)
                 return;
@@ -5430,6 +5501,7 @@ this.updateCurColor();
                     case eAbnormalState.CURSE2:
                     case eAbnormalState.BLACK_FRAME:
                     case eAbnormalState.RATIO_SLIP:
+                    case eAbnormalState.STACKABLE_SLIP:
                         OnSlipDamage.Call();
                         break;
                     case eAbnormalState.CONVERT:
@@ -5512,12 +5584,15 @@ this.updateCurColor();
                         battleManager.AppendCoroutine(updateOverlapAbnormalState(_abnormalState, idx, _effectTime), ePauseType.SYSTEM);
                         return;
                     }
-                    if (IsAbnormalState(abnormalStateCategory))
-                        switchAbnormalState(_abnormalState, abnormalEffectData, _showsIcon);
+                    bool isAlreadyAbnormalState = IsAbnormalState(abnormalStateCategory);
+                    if (isAlreadyAbnormalState)
+                        switchAbnormalState(_abnormalState, abnormalEffectData, _showsIcon, _stackMax);
                     stateCategoryData.Duration = _effectTime;
                     stateCategoryData.Time = _effectTime;
                     stateCategoryData.MainValue = _value;
                     stateCategoryData.SubValue = _value2;
+                    if (!isAlreadyAbnormalState)
+                        stateCategoryData.StackNum = 1;
                     stateCategoryData.EnergyReduceRate = _reduceEnergyRate;
                     stateCategoryData.ActionId = _action == null ? 0 : _action.ActionId;
                     stateCategoryData.IsEnergyReduceMode = _reduceEnergy;
@@ -5533,7 +5608,7 @@ this.updateCurColor();
                     if (_action != null)
                         stateCategoryData.EnergyChargeMultiple = _action.EnergyChargeMultiple;
                     stateCategoryData.AbsorberValue = battleManager.KIHOGJBONDH;
-                    if (IsAbnormalState(abnormalStateCategory))
+                    if (isAlreadyAbnormalState)
                         return;
                     stateCategoryData.CurrentAbnormalState = _abnormalState;
                     //if (barriers.ContainsKey(_abnormalState)) barriers[_abnormalState] = _value;
@@ -5791,9 +5866,13 @@ this.updateCurColor();
         }
         private void switchAbnormalState(
           eAbnormalState abnormalState,
-          AbnormalStateEffectPrefabData _specialEffectData, bool _showsIconAfterSwitch)
+          AbnormalStateEffectPrefabData _specialEffectData, bool _showsIconAfterSwitch, int _stackMax)
         {
             AbnormalStateCategoryData stateCategoryData = GetCategoryDataSafe(GetAbnormalStateCategory(abnormalState));
+            if (abnormalState == eAbnormalState.STACKABLE_SLIP)
+            {
+                stateCategoryData.StackNum = Math.Min(stateCategoryData.StackNum + 1, _stackMax);
+            }
             EnableAbnormalState(stateCategoryData.CurrentAbnormalState, _enable: false, _reduceEnergy: false, _switch: true);
             stateCategoryData.ShowsIcon = _showsIconAfterSwitch;
             EnableAbnormalState(abnormalState, true);
@@ -6286,7 +6365,9 @@ this.updateCurColor();
                 case eAbnormalState.COMPENSATION:
                 case eAbnormalState.POISON2:
                 case eAbnormalState.CURSE2:
+                case eAbnormalState.BLACK_FRAME:
                 case eAbnormalState.RATIO_SLIP:
+                case eAbnormalState.STACKABLE_SLIP:
                     if (_enable)
                     {
                         AppendCoroutine(UpdateSlipDamage(_abnormalState, ++slipDamageIdDictionary[abnormalStateCategory]), ePauseType.SYSTEM);
@@ -6662,7 +6743,11 @@ this.updateCurColor();
             float time = 0f;
             LongWithEx damage = 0;
             LongWithEx incrementDamage = 0;
-            if (_abnormalState == eAbnormalState.RATIO_SLIP)
+            if (_abnormalState == eAbnormalState.STACKABLE_SLIP)
+            {
+                damage = BattleUtil.DoubleToLong(categoryData.MainValue + categoryData.MainValue * categoryData.SubValue * (categoryData.StackNum - 1));
+            }
+            else if (_abnormalState == eAbnormalState.RATIO_SLIP)
             {
                 var maxHp = this.MaxHp;
                 damage = BattleUtil.DoubleToLong(categoryData.MainValue / 100.0 * maxHp);
@@ -7068,11 +7153,19 @@ this.updateCurColor();
         //public bool IsSlipDamageState() => m_abnormalState[eAbnormalState.BURN] || m_abnormalState[eAbnormalState.POISON] || (m_abnormalState[eAbnormalState.VENOM] || m_abnormalState[eAbnormalState.CURSE]) || (m_abnormalState[eAbnormalState.DETAIN] || m_abnormalState[eAbnormalState.HEX]) || m_abnormalState[eAbnormalState.COMPENSATION];
         public bool IsSlipDamageState()
         {
-            if (!GetAbnormalStateSafe(eAbnormalState.BURN) && !GetAbnormalStateSafe(eAbnormalState.POISON) && !GetAbnormalStateSafe(eAbnormalState.VENOM) && !GetAbnormalStateSafe(eAbnormalState.CURSE) && !GetAbnormalStateSafe(eAbnormalState.DETAIN) && !GetAbnormalStateSafe(eAbnormalState.HEX) && !GetAbnormalStateSafe(eAbnormalState.COMPENSATION) && !GetAbnormalStateSafe(eAbnormalState.POISON_BY_BEHAVIOUR) && !GetAbnormalStateSafe(eAbnormalState.POISON2))
-            {
-                return GetAbnormalStateSafe(eAbnormalState.CURSE2);
-            }
-            return true;
+            return GetAbnormalStateSafe(eAbnormalState.BURN)
+                || GetAbnormalStateSafe(eAbnormalState.POISON)
+                || GetAbnormalStateSafe(eAbnormalState.VENOM)
+                || GetAbnormalStateSafe(eAbnormalState.CURSE)
+                || GetAbnormalStateSafe(eAbnormalState.DETAIN)
+                || GetAbnormalStateSafe(eAbnormalState.HEX)
+                || GetAbnormalStateSafe(eAbnormalState.COMPENSATION)
+                || GetAbnormalStateSafe(eAbnormalState.POISON_BY_BEHAVIOUR)
+                || GetAbnormalStateSafe(eAbnormalState.POISON2)
+                || GetAbnormalStateSafe(eAbnormalState.CURSE2)
+                || GetAbnormalStateSafe(eAbnormalState.BLACK_FRAME)
+                || GetAbnormalStateSafe(eAbnormalState.RATIO_SLIP)
+                || GetAbnormalStateSafe(eAbnormalState.STACKABLE_SLIP);
         }
         public bool IsBarrierState()
         {
@@ -10076,6 +10169,120 @@ this.updateCurColor();
             }
         }
 
+        private static bool ShouldRecordReductionDamage(eActionType actionType)
+        {
+            int actionTypeValue = (int)actionType;
+            return actionTypeValue >= 0
+                && actionTypeValue <= 0x2F
+                && ((0x3FFFFFFFFFFDUL >> actionTypeValue) & 1UL) == 0UL;
+        }
+
+        private void ApplyReductionDamage(
+            DamageData damageData,
+            Skill skill,
+            int actionId,
+            ref DoubleWithEx damage,
+            ref DoubleWithEx damageForEnergy,
+            bool isIgnoreDamageCutAction,
+            ref bool isNoDamageByResist)
+        {
+            if (isIgnoreDamageCutAction)
+                return;
+
+            ActionParameter actionParameter = skill?.ActionParameters?.Find(x => x.ActionId == actionId);
+            if (damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.REDUCTION_ATK_DAMAGE))
+            {
+                ApplyReductionDamageImpl(
+                    damageData,
+                    ref damage,
+                    ref damageForEnergy,
+                    eAbnormalStateCategory.REDUCTION_ATK_DAMAGE,
+                    actionParameter?.ReductionDamageDictionaryAtk,
+                    actionParameter?.ReductionDamageDictionaryAtkForEnergy,
+                    ref isNoDamageByResist);
+            }
+            else if (damageData.DamageType == DamageData.eDamageType.MGC && IsAbnormalState(eAbnormalState.REDUCTION_MGC_DAMAGE))
+            {
+                ApplyReductionDamageImpl(
+                    damageData,
+                    ref damage,
+                    ref damageForEnergy,
+                    eAbnormalStateCategory.REDUCTION_MGC_DAMAGE,
+                    actionParameter?.ReductionDamageDictionaryMgc,
+                    actionParameter?.ReductionDamageDictionaryMgcForEnergy,
+                    ref isNoDamageByResist);
+            }
+
+            if (IsAbnormalState(eAbnormalState.REDUCTION_ALL_DAMAGE))
+            {
+                ApplyReductionDamageImpl(
+                    damageData,
+                    ref damage,
+                    ref damageForEnergy,
+                    eAbnormalStateCategory.REDUCTION_ALL_DAMAGE,
+                    actionParameter?.ReductionDamageDictionaryAll,
+                    actionParameter?.ReductionDamageDictionaryAllForEnergy,
+                    ref isNoDamageByResist);
+            }
+        }
+
+        private void ApplyReductionDamageImpl(
+            DamageData damageData,
+            ref DoubleWithEx damage,
+            ref DoubleWithEx damageForEnergy,
+            eAbnormalStateCategory abnormalStateCategory,
+            Dictionary<BasePartsData, double> reductionDamageDictionary,
+            Dictionary<BasePartsData, double> reductionDamageDictionaryForEnergy,
+            ref bool isNoDamageByResist)
+        {
+            if (damageData?.Target == null)
+                return;
+
+            double reductionValue = GetAbnormalStateMainValue(abnormalStateCategory);
+            double usedReduction = 0.0;
+            double usedReductionForEnergy = 0.0;
+            reductionDamageDictionary?.TryGetValue(damageData.Target, out usedReduction);
+            reductionDamageDictionaryForEnergy?.TryGetValue(damageData.Target, out usedReductionForEnergy);
+
+            double remainingReduction = Math.Max(0.0, reductionValue - usedReduction);
+            double remainingReductionForEnergy = Math.Max(0.0, reductionValue - usedReductionForEnergy);
+            bool shouldRecord = ShouldRecordReductionDamage(damageData.ActionType);
+
+            if (remainingReduction > 0.0)
+            {
+                DoubleWithEx appliedReduction = damage.Min(remainingReduction);
+                if (BattleUtil.DoubleToLong(damage) <= 0)
+                {
+                    isNoDamageByResist = true;
+                }
+                if ((double)appliedReduction > 0.0)
+                {
+                    damage -= appliedReduction;
+                    if (reductionDamageDictionary != null && shouldRecord)
+                    {
+                        reductionDamageDictionary[damageData.Target] = usedReduction + (double)appliedReduction;
+                    }
+                    if (BattleUtil.DoubleToLong(damage) <= 0)
+                    {
+                        isNoDamageByResist = true;
+                    }
+                }
+            }
+
+            if (remainingReductionForEnergy > 0.0)
+            {
+                DoubleWithEx appliedReductionForEnergy = damageForEnergy.Min(remainingReductionForEnergy);
+                if ((double)appliedReductionForEnergy > 0.0)
+                {
+                    damageForEnergy -= appliedReductionForEnergy;
+                    if (reductionDamageDictionaryForEnergy != null && shouldRecord)
+                    {
+                        reductionDamageDictionaryForEnergy[damageData.Target] = usedReductionForEnergy + (double)appliedReductionForEnergy;
+                    }
+                }
+            }
+        }
+
         private static readonly WaitForSeconds LARGE_NUM_SHOW_TIME = new WaitForSeconds(0.2f);
         public LongWithEx SetDamageImpl(
           DamageData _damageData,
@@ -10430,7 +10637,10 @@ this.updateCurColor();
             }
 
             if (_upperLimitFunc != null)
+            {
                 num5 = _upperLimitFunc((int)BattleUtil.DoubleToLong(num5), _critical ? num1 : 1.0);
+                b = _upperLimitFunc((int)BattleUtil.DoubleToLong(b), _critical ? num1 : 1.0);
+            }
             /*if (_damageData.Source != null && _damageData.ActionType != eActionType.FORCE_HP_CHANGE)
             {
                 foreach (KeyValuePair<EnchantStrikeBackAction.eStrikeBackEffectType, StrikeBackDataSet> strikeBack1 in StrikeBackDictionary)
@@ -10505,6 +10715,8 @@ this.updateCurColor();
                 long dot = BattleUtil.DoubleToLong(cutValue / ConvertDamageOverTimeData.NumberOfDamage);
                 ConvertDamageOverTimeData.AddDamage(dot);
             }
+
+            ApplyReductionDamage(_damageData, _skill, _actionId, ref num5, ref b, ignore_damage_cut_action, ref isNoDamageByResist);
 
             if (_energyAdd)
             {
@@ -11502,6 +11714,14 @@ this.updateCurColor();
         {
             if (IsAbnormalState(eAbnormalState.FEAR) && (_setEnergyType == eSetEnergyType.BY_ATK || _setEnergyType == eSetEnergyType.KILL_BONUS))
                 return;
+            if (IsAbnormalState(eAbnormalState.ALL_FEAR)
+                && (_setEnergyType == eSetEnergyType.BY_ATK
+                    || _setEnergyType == eSetEnergyType.BY_SET_DAMAGE
+                    || _setEnergyType == eSetEnergyType.KILL_BONUS
+                    || (_setEnergyType == eSetEnergyType.BY_CHANGE_ENERGY && (double)_energy > 0.0)))
+            {
+                return;
+            }
             var num = ((double)_energy > 0.0 & _useRecoveryRate ? ((EnergyRecoveryRateZeroWithLimit + 100.0) / 100.0) * _energy : _energy) * _multipleValue;
             //GameObject MDOJNMEMHLN = (double)_energy >= 0.0 ? Singleton<LCEGKJFKOPD>.Instance.NMJAMHCPMDF : Singleton<LCEGKJFKOPD>.Instance.OJCMBLJEGHF;
             if (_setEnergyType == eSetEnergyType.BY_ATK)
@@ -14939,9 +15159,15 @@ this.updateCurColor();
             PUPPET = 72,
             DISABLE_HEAL = 73,
             RATIO_SLIP = 74,
-            NUM = 75,
+            ALL_FEAR = 75,
+            REDUCTION_ATK_DAMAGE = 76,
+            REDUCTION_MGC_DAMAGE = 77,
+            REDUCTION_ALL_DAMAGE = 78,
+            STACKABLE_SLIP = 79,
+            ENERGY_DAMAGE_REDUCE_LIMIT = 80,
+            NUM = 81,
             TOP = 0,
-            END = 74,
+            END = 80,
         }
         public class eAbnormalStateCategory_DictComparer : IEqualityComparer<eAbnormalStateCategory>
         {

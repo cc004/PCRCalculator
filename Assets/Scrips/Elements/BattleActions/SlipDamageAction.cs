@@ -57,6 +57,10 @@ namespace Elements
       {
           eSlipDamageType.RATIO,
           UnitCtrl.eAbnormalState.RATIO_SLIP
+      },
+      {
+          eSlipDamageType.STACKABLE,
+          UnitCtrl.eAbnormalState.STACKABLE_SLIP
       }
     };
     private enum eCancelTriggerType
@@ -94,8 +98,9 @@ namespace Elements
       }
       bool flag = false;
       UnitCtrl targetOwner = _target.Owner;
+      UnitCtrl.eAbnormalState eAbnormalState = abnormalStateDic[(eSlipDamageType)base.ActionDetail1];
       eCancelTriggerType actionDetail = (eCancelTriggerType)base.ActionDetail2;
-      if (actionDetail == eCancelTriggerType.MAX_HP)
+      if (actionDetail == eCancelTriggerType.MAX_HP && eAbnormalState != UnitCtrl.eAbnormalState.STACKABLE_SLIP)
       {
         flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)targetOwner.Hp / targetOwner.MaxHp);
       }
@@ -104,15 +109,15 @@ namespace Elements
       {
         AppendIsAlreadyExeced(_target.Owner, _num);
         //_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)ActionDetail1], AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);
-        UnitCtrl.eAbnormalState eAbnormalState = abnormalStateDic[(eSlipDamageType)base.ActionDetail1];
         targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = null;
         actionDetail = (eCancelTriggerType)base.ActionDetail2;
-        if (actionDetail == eCancelTriggerType.MAX_HP)
+        if (actionDetail == eCancelTriggerType.MAX_HP && eAbnormalState != UnitCtrl.eAbnormalState.STACKABLE_SLIP)
         {
           targetOwner.IsReleaseSlipDamageDic[eAbnormalState] = () => BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)(long)targetOwner.Hp / (long)targetOwner.MaxHp);
         }
         float slipDamageExtendValue = _target.Owner.GetSlipDamageExtendValue();
-        targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] * slipDamageExtendValue : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, 0f, _valueDictionary[eValueNumber.VALUE_6] == 0f);
+        int stackMax = eAbnormalState == UnitCtrl.eAbnormalState.STACKABLE_SLIP ? BattleUtil.DoubleToInt(_valueDictionary[eValueNumber.VALUE_7]) : 0;
+        targetOwner.SetAbnormalState(_source, eAbnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_3] * slipDamageExtendValue : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergy: false, _isDamageRelease: false, _reduceEnergyRate: 0f, _showsIcon: _valueDictionary[eValueNumber.VALUE_6] == 0f, _isEnvironmentAbnormalState: IsEnvironmentAbnormalState, _stackMax: stackMax);
 
 
         callback?.Invoke("DOT伤害，参数1：" + (int)_valueDictionary[eValueNumber.VALUE_1] + "，参数2：" + (int)_valueDictionary[eValueNumber.VALUE_5]);
@@ -153,6 +158,7 @@ namespace Elements
       WORLD_LIGHTNING,
 
       RATIO,
+      STACKABLE,
     }
 
     private class eSlipDamageType_DictComparer : IEqualityComparer<eSlipDamageType>
