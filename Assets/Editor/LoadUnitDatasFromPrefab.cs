@@ -48,7 +48,7 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
     }
 
     [MenuItem("PCRTools/下载全部数据")]
-    public static void DownloadAllFiles()
+    public static async void DownloadAllFiles()
     {
         var regexes = new (string, bool)[]
         {
@@ -68,9 +68,8 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
             (@"a/unit_icon_unit_.*\.unity3d", true),
         };
 
-        ABExTool.StaticInitialize().Wait();
-        var client = new HttpClient();
-        
+        await ABExTool.StaticInitialize();
+
         foreach (var (reg, useNew) in regexes)
         {
             foreach (var (mgr, content) in ABExTool.CacheAllFiles(new Regex(reg), !useNew))
@@ -86,7 +85,7 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
     }
 
     [MenuItem("PCRTools/下载全部角色数据")]
-    public static void DownloadAllUnitFiles()
+    public static async void DownloadAllUnitFiles()
     {
         var regexes = new (string, bool)[]
         {
@@ -103,16 +102,16 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
             (@"a/spine_sdnormal_4\d\d\d\d\d(_\d*)?\.unity3d", true),
             (@"a/unit_icon_unit_1\d\d\d31\.unity3d", true),
             (@"a/unit_icon_unit_1\d\d\d61\.unity3d", true),
+            (@"a/atlasngui_atlaspromotionframe.unity3d", true),
         };
 
-        ABExTool.StaticInitialize().Wait();
-        var client = new HttpClient();
+        await ABExTool.StaticInitialize();
 
         foreach (var (reg, useNew) in regexes)
         {
             foreach (var (mgr, content) in ABExTool.CacheAllFiles(new Regex(reg), !useNew))
             {
-                var filePath = ABExTool.persistentDataPath + "/.ABExt2/jp10055800/" + content.url.Split('/').Last();
+                var filePath = ABExTool.persistentDataPath + "/.ABExt2/" + content.url.Split('/').Last();
                 if (File.Exists(filePath)) continue;
                 Debug.Log($"resolving: {content.url}");
                 var resp = mgr.ResolveFile(content.url);

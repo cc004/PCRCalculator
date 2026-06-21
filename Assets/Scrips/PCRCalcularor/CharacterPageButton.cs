@@ -78,6 +78,7 @@ namespace PCRCaculator
                 backgrounds1.Add(sprites["AtlasPromotionFrame_orange"]);
                 backgrounds1.Add(sprites["AtlasPromotionFrame_vivid_blue"]);
                 backgrounds1.Add(sprites["AtlasPromotionFrame_pink"]);
+                backgrounds1.Add(sprites["AtlasPromotionFrame_lime_green"]);
             }
         }
 
@@ -223,9 +224,13 @@ namespace PCRCaculator
             {
                 backtype = 8;
             }
-            else
+            else if (data.rank <= 39)
             {
                 backtype = 9;
+            }
+            else
+            {
+                backtype = 10;
             }
             backImage.sprite = backgrounds1[backtype < backgrounds1.Count ? backtype : (backgrounds1.Count - 1)];
             if (buttonType == ButtonType.typeA)
