@@ -567,15 +567,15 @@ namespace Elements
         SHENJI = 241,
         [Description("蛇落印\n鬼妃")]
         SHELUOYIN = 242,
-        [Description("妖精的指引\nyls")]
-        ENERGY_DAMAGE_REDUCE_LIMIT = 246,
         [Description("CHAIN\n姬塔")]
         CHAIN = 247,
+        [Description("妖精的指引\nyls")]
+        ENERGY_DAMAGE_REDUCE_LIMIT = 251,
         [Description("干杯\n黄骑")]
-        STACKABLE_SLIP = 248,
+        STACKABLE_SLIP = 253,
         [Description("证据\n驴")]
-        PHYSICAL_FOLLOW_UP = 249,
-        MAGIC_FOLLOW_UP = 250,
+        PHYSICAL_FOLLOW_UP = 254,
+        MAGIC_FOLLOW_UP = 255,
         [Description("苍之锁链\n凛")]
         CANGZHISUOLIAN = 251,
         // Token: 0x0400885F RID: 34911

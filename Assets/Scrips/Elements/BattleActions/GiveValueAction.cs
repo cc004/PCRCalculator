@@ -150,27 +150,27 @@ namespace Elements
         {
             switch ((int)_valueDictionary[eValueNumber.VALUE_1])
             {
-                case 0:
+                case (int)eAdditiveValueType.HP:
                     _addValue[_evalue] = calcHpValue(_source, _valueDictionary);
                     break;
-                case 1:
+                case (int)eAdditiveValueType.DAMAGE:
                     _addValue[_evalue] = calcDamageValue(_source, _valueDictionary);
                     break;
-                case 2:
+                case (int)eAdditiveValueType.DEFEAT_NUMBER:
                     _addValue[_evalue] = (double)_skill.DefeatEnemyCount * _valueDictionary[eValueNumber.VALUE_2];
                     break;
-                case 3:
+                case (int)eAdditiveValueType.SEAL:
                     break;
-                case 4:
+                case (int)eAdditiveValueType.TARGET:
                     _addValue[_evalue] = (double)TargetList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
-                case 5:
+                case (int)eAdditiveValueType.DAMAGED_TARGET:
                     _addValue[_evalue] = (double)_skill.DamagedPartsList.Count * _valueDictionary[eValueNumber.VALUE_2];
                     break;
-                case 6:
+                case (int)eAdditiveValueType.SKILL_DAMAGE:
                     _addValue[_evalue] = (DoubleWithEx)_skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
                     break;
-                case 7:
+                case (int)eAdditiveValueType.TARGET_ATK:
                     //_addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.Atk) * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
@@ -181,7 +181,7 @@ namespace Elements
                         _addValue[_evalue] = (DoubleWithEx)_target.Owner.AtkZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
-                case 8:
+                case (int)eAdditiveValueType.TARGET_MAGIC_ATK:
                     //_addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.MagicStr) * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
@@ -192,7 +192,7 @@ namespace Elements
                         _addValue[_evalue] = (DoubleWithEx)_target.Owner.MagicStrZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
-                case 9:
+                case (int)eAdditiveValueType.TARGET_DEF:
                     //_addValue[_evalue] = (float)(int)_target.Owner.Def * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
@@ -203,7 +203,7 @@ namespace Elements
                         _addValue[_evalue] = (DoubleWithEx)_target.Owner.DefZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
-                case 10:
+                case (int)eAdditiveValueType.TARGET_MAGIC_DEF:
                     //_addValue[_evalue] = (float)(int)_target.Owner.MagicDef * _valueDictionary[eValueNumber.VALUE_2];
                     if (_target.Owner == _source && parameterParts != null)
                     {
@@ -214,25 +214,25 @@ namespace Elements
                         _addValue[_evalue] = (DoubleWithEx)_target.Owner.MagicDefZero * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
-                case 11:
+                case (int)eAdditiveValueType.AHEAD_UNIT_NUM:
                     List<UnitCtrl> _targetList1 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                     _addValue[_evalue] = (double)countUnitNumCompareX(_targetList1, parts, true) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
-                case 12:
+                case (int)eAdditiveValueType.BEHIND_UNIT_NUM:
                     List<UnitCtrl> _targetList2 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                     _addValue[_evalue] = (double)countUnitNumCompareX(_targetList2, parts, false) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
-                case 13:
+                case (int)eAdditiveValueType.DAMAGE_RATE:
                     {
                         long num = _target.Owner.MaxHp;
                         double value = (num - (long)_target.Owner.Hp) / (double)num * _valueDictionary[eValueNumber.VALUE_2];
                         _addValue[_evalue] = BattleUtil.DoubleToPerMille(value);
                         return;
                     }
-                case 14:
+                case (int)eAdditiveValueType.MAX_HP:
                     _addValue[_evalue] = calcMaxHpValue(_source, _valueDictionary);
                     return;
-                case 15:
+                case (int)eAdditiveValueType.HP_SUM:
                     DoubleWithEx sumHp = 0;
                     foreach(BasePartsData target in TargetList)
                     {
@@ -254,8 +254,11 @@ namespace Elements
                     }
                     _addValue[_evalue] = sumHp;
                     break;
-                case 16:
+                case (int)eAdditiveValueType.TP:
                     _addValue[_evalue] = (DoubleWithEx)_target.Owner.Energy * _valueDictionary[eValueNumber.VALUE_2];
+                    break;
+                case (int)eAdditiveValueType.NEGATIVE_EFFECT_COUNT:
+                    _addValue[_evalue] = (double)_target.Owner.GetNegativeEffectCount() * _valueDictionary[eValueNumber.VALUE_2];
                     break;
 
                 default:
@@ -363,6 +366,7 @@ namespace Elements
 			MAX_HP = 14,
 			HP_SUM = 15,
             TP = 16,
+            NEGATIVE_EFFECT_COUNT = 17,
 			SKILL_COUNT = 20,
             STRIKE_BACK_COUNT = 100, // 0x00000064
             SEAL_COUNT = 200, // 0x000000C8
