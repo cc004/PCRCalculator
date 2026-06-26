@@ -34,7 +34,9 @@ namespace Elements.Battle
                 else continue;
 
                 var ready = unitCtrl.JudgeSkillReadyAndIsMyTurn();
-                if (ready && !unitCtrl.lastCanReleaseSkill)
+                bool hasCurrentFrameAutoPoint = unitCtrl.critPoint?.frame == BattleHeaderController.CurrentFrameCount &&
+                                                unitCtrl.critPoint.description2 == "AUTO";
+                if (ready && !unitCtrl.lastCanReleaseSkill && !hasCurrentFrameAutoPoint)
                 {
                     unitCtrl.critPoint = new UnitCtrl.CritPoint
                     {
