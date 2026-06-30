@@ -824,6 +824,20 @@ namespace PCRCaculator
 
                     if (equipSource != null)
                     {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            int equipId = equipSource.Length > i ? equipSource[i] : 0;
+                            if (equipId == 0) continue;
+                            if (temp == null || temp.Length <= i || !temp[i].ContainsKey(equipId))
+                            {
+                                equipSource = null;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (equipSource != null)
+                    {
                         // jjc装备
                         for (int i = 0; i < 3; i++)
                         {
