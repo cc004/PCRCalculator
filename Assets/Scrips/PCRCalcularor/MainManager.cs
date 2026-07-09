@@ -563,7 +563,7 @@ namespace PCRCaculator
                                 databaseCache.abyssBossFilterDic = dbTool.AbyssBossFilterDic ?? databaseCache.abyssBossFilterDic;
                                 databaseCache.mirageBattleEffectDic = dbTool.MirageBattleEffectDic ?? databaseCache.mirageBattleEffectDic;
                                 databaseCache.mirageNemesisAreaDic = dbTool.MirageNemesisAreaDic ?? databaseCache.mirageNemesisAreaDic;
-                                databaseCache.UnitRoleDataDic = dbTool3.UnitRoleDataDic ?? databaseCache.UnitRoleDataDic;
+                                databaseCache.UnitRoleDataDic = dbTool.UnitRoleDataDic ?? databaseCache.UnitRoleDataDic;
                                 databaseCache.UnitRoleMasteryIdDic = dbTool3.UnitRoleMasteryIdDic ?? databaseCache.UnitRoleMasteryIdDic;
                                 databaseCache.UnitRoleSlotDataDic = dbTool3.UnitRoleSlotDataDic ?? databaseCache.UnitRoleSlotDataDic;
                                 databaseCache.UnitRoleMasterySlotEnhanceDataDic = dbTool3.UnitRoleMasterySlotEnhanceDataDic ?? databaseCache.UnitRoleMasterySlotEnhanceDataDic;
@@ -630,6 +630,11 @@ namespace PCRCaculator
                                         {
                                             var filteredAllUnitAttackPattern = dbTool3.Dic5?.Where(p => p.Key / 1000000 == 17).ToList();
                                             if (filteredAllUnitAttackPattern != null) databaseCache.allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern);
+                                        }),
+                                        Task.Run(() =>
+                                        {
+                                            var filteredUnitRoleData = dbTool3.UnitRoleDataDic?.Where(p => p.Key / 10000 == 17).ToList();
+                                            if (filteredUnitRoleData != null) databaseCache.UnitRoleDataDic.OverrideWith(filteredUnitRoleData);
                                         }),
                                         Task.Run(() =>
                                         {
