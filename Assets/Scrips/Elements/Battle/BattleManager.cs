@@ -1090,9 +1090,7 @@ namespace Elements.Battle
             allocCurrent = GC.GetAllocatedBytesForCurrentThread();
             _allocSnapshot = allocCurrent;
 #endif
-#if UNITY_5_3_OR_NEWER
             unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealUpdate(true));
-#endif
 #if UNITY_5_3_OR_NEWER
             if (!skipping && !skipUB)
                unitSpineControllerList.ForEach(spineCtrl => spineCtrl.RealLateUpdate());
