@@ -1993,6 +1993,7 @@ namespace Elements
         public long StartAbnormalStateDodgeHit { get; set; }
         public long StartAbnormalStateDodgeResist { get; set; }
         public long StartTalentFormationBonus { get; set; }
+        public long StartTalentBonusEnhancePercent { get; set; }
         public long StartAdditionalAttackEnhance { get; set; }
         public long StartBuffEnhance { get; set; }
         public long StartDebuffEnhance { get; set; }
@@ -2102,6 +2103,7 @@ namespace Elements
         public long AbnormalStateDodgeHit { get; set; }
         public long AbnormalStateDodgeResist { get; set; }
         public long AdditionalTalentBonusPermyriad { get; set; }
+        public long TalentBonusEnhancePercent { get; set; }
         public long AdditionalAttackEnhance { get; set; }
         public long BuffEnhance { get; set; }
         public long DebuffEnhance { get; set; }
@@ -2213,6 +2215,8 @@ namespace Elements
         public double WholeDamageCutPercentOrMin => Math.Max(0.0, AdditionalWholeDamageCutPermyriad / 100.0);
 
         public long TalentBonusPermyriadZero => Math.Min(2000000000, Math.Max(0, AdditionalTalentBonusPermyriad));
+
+        public long TalentBonusEnhancePercentZero => Math.Min(2000000000, Math.Max(0, TalentBonusEnhancePercent));
 
         public long AbnormalStateDodgeHitZero => Math.Min(2000000000, Math.Max(0, AbnormalStateDodgeHit));
 
@@ -2905,6 +2909,7 @@ this.updateCurColor();
             AdditionalMagicReceiveDamagePercent = (StartMagicReceiveDamagePercent = 0);
             AdditionalPhysicalDamageUpPercent = (StartPhysicalDamageUpPercent = 0);
             AdditionalMagicDamageUpPercent = (StartMagicDamageUpPercent = 0);
+            TalentBonusEnhancePercent = (StartTalentBonusEnhancePercent = 0);
             AdditionalWholeDamageUpPermyriad = (StartAdditionalWholeDamageUpPermyriad = 0);
             AdditionalWholeDamageCutPermyriad = (StartAdditionalWholeDamageCutPermyriad = 0);
 
@@ -9829,14 +9834,22 @@ this.updateCurColor();
                 talentBonusPermyriad = _source.TalentBonusPermyriadZero;
             }
 
+            long talentBonusEnhancePercent = 0;
+            if (_source != null)
+            {
+                talentBonusEnhancePercent = _source.TalentBonusEnhancePercentZero;
+            }
+
             double formationBonus = getTalentFormationBonusPermyriad(_actionType, _targetIncludeMyTeam, _source, _isIgnoreTalentBonusForRatioSlip);
+            double talentBonusEnhance = (talentBonusEnhancePercent + 100.0) / 100.0;
 
             // 最终伤害率计算
             // 1. 基础加成部分：(talentBonusPermyriad + 10000) / 10000
-            // 2. 阵型加成部分：formationBonus + 10000
-            // 3. 弱点百分比部分：weaknessPercent
+            // 2. 阵型加成部分：formationBonus
+            // 3. 天赋加成强化部分：(talentBonusEnhancePercent + 100) / 100
+            // 4. 弱点百分比部分：weaknessPercent
             // 全部相乘后除以1000000得到最终倍率
-            return weaknessPercent * ((formationBonus * ((talentBonusPermyriad + 10000.0) / 10000.0) + 10000.0) / 1000000.0);
+            return weaknessPercent * (((talentBonusPermyriad + 10000.0) / 10000.0) * formationBonus * talentBonusEnhance + 10000.0) / 1000000.0;
     }
 
 
