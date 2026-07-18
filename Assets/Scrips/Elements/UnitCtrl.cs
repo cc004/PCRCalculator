@@ -2506,7 +2506,9 @@ this.updateCurColor();
           bool _isFirstWave,
           bool _isGaugeAlwaysVisible = false,
           BaseData additional = null,
-          BaseData exOverride = null)
+          BaseData exOverride = null,
+          IReadOnlyDictionary<eParamType, long> labyrinthEnhanceParameter = null,
+          IReadOnlyDictionary<eParamType, long> labyrinthRelicPassiveParameter = null)
         {
             ToadDatas = new List<ToadData>();
             transformCache = transform;
@@ -3102,6 +3104,8 @@ this.updateCurColor();
             SetTalentEnhance(teamEnhanceParameter);
             SetRoleEnhance(teamEnhanceParameter);
             SetConnectRankStatus(_data, 0); // TODO systemId in 讨魔战线, connect rank bonus diff
+            SetLabyrinthEnhance(labyrinthEnhanceParameter);
+            SetLabyrinthRelicPassiveEnhance(labyrinthRelicPassiveParameter);
         }
 
         public int UnitIdForActionPattern
@@ -3185,6 +3189,16 @@ this.updateCurColor();
         private Dictionary<eParamType, long> talentBuffParameter = new Dictionary<eParamType, long>();
         private Dictionary<eParamType, long> roleBuffParameter = new Dictionary<eParamType, long>();
         private Dictionary<eParamType, long> connectRankBuffParameter = new Dictionary<eParamType, long>();
+        private Dictionary<eParamType, long> labyrinthBuffParameter = new Dictionary<eParamType, long>();
+        private Dictionary<eParamType, long> labyrinthRelicPassiveParameter = new Dictionary<eParamType, long>();
+
+        private enum PassiveEnhanceType
+        {
+            Knight = 0,
+            Role = 1,
+            Labyrinth = 2,
+            LabyrinthRelic = 3,
+        }
 
 
         // RVA: 0x2851D88 Offset: 0x2851D88 VA: 0x2851D88
@@ -3271,6 +3285,30 @@ this.updateCurColor();
             }
         }
 
+        public void SetLabyrinthEnhance(IReadOnlyDictionary<eParamType, long> enhanceParameter)
+        {
+            labyrinthBuffParameter.Clear();
+            if (enhanceParameter == null)
+                return;
+
+            foreach (var pair in enhanceParameter)
+            {
+                labyrinthBuffParameter[pair.Key] = pair.Value;
+            }
+        }
+
+        public void SetLabyrinthRelicPassiveEnhance(IReadOnlyDictionary<eParamType, long> passiveParameter)
+        {
+            labyrinthRelicPassiveParameter.Clear();
+            if (passiveParameter == null)
+                return;
+
+            foreach (var pair in passiveParameter)
+            {
+                labyrinthRelicPassiveParameter[pair.Key] = pair.Value;
+            }
+        }
+
         /// <summary>
         /// 应用被动技能效果
         /// </summary>
@@ -3291,6 +3329,10 @@ this.updateCurColor();
             applyRoleEnhance(_isFirst);
 
             applyConnectRankEnhance(_isFirst);
+
+            applyLabyrinthEnhance(_isFirst);
+
+            applyLabyrinthRelicPassiveEnhance(_isFirst);
 
             MaxHpAfterPassive = MaxHp;
 
@@ -3332,7 +3374,7 @@ this.updateCurColor();
                     pair.Value,  // int 类型，会自动转换为 long
                     _first,
                     isClanBattleOrSekaiEnemy,
-                    false
+                    PassiveEnhanceType.Knight
                 );
             }
 
@@ -3360,7 +3402,7 @@ this.updateCurColor();
                     pair.Value,
                     _first,
                     isClanBattleOrSekaiEnemy,
-                    true
+                    PassiveEnhanceType.Role
                 );
             }
 
@@ -3379,13 +3421,59 @@ this.updateCurColor();
                     pair.Value,
                     _first,
                     isClanBattleOrSekaiEnemy,
-                    true
+                    PassiveEnhanceType.Role
                 );
             }
         }
 
+        private void applyLabyrinthEnhance(bool _first)
+        {
+            if (labyrinthBuffParameter == null)
+                return;
+
+            bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
+            foreach (KeyValuePair<eParamType, long> pair in labyrinthBuffParameter)
+            {
+                ApplyEnhanceValue(
+                    pair.Key,
+                    pair.Value,
+                    _first,
+                    isClanBattleOrSekaiEnemy,
+                    PassiveEnhanceType.Labyrinth
+                );
+            }
+        }
+
+        private void applyLabyrinthRelicPassiveEnhance(bool _first)
+        {
+            if (labyrinthRelicPassiveParameter == null)
+                return;
+
+            bool isClanBattleOrSekaiEnemy = IsClanBattleOrSekaiEnemy;
+            foreach (KeyValuePair<eParamType, long> pair in labyrinthRelicPassiveParameter)
+            {
+                ApplyEnhanceValue(
+                    pair.Key,
+                    pair.Value,
+                    _first,
+                    isClanBattleOrSekaiEnemy,
+                    PassiveEnhanceType.LabyrinthRelic
+                );
+            }
+        }
+
+        private static bool UsesFixedEnhanceValue(PassiveEnhanceType enhanceType)
+        {
+            return (((int)enhanceType) & ~1) == 2;
+        }
+
+        private static bool UsesPermyriadEnhanceField(PassiveEnhanceType enhanceType)
+        {
+            return (((int)enhanceType) | 2) == 3;
+        }
+
         // RVA: 0x284D25C Offset: 0x284D25C VA: 0x284D25C
-        public void ApplyEnhanceValue(eParamType _buffType, long _value, bool _first, bool _isImmutableMaxHp, bool _isRole)
+        private void ApplyEnhanceValue(eParamType _buffType, long _value, bool _first, bool _isImmutableMaxHp, PassiveEnhanceType _enhanceType)
         {
             switch (_buffType)
             {
@@ -3460,15 +3548,29 @@ this.updateCurColor();
                     break;
 
                 case eParamType.PHYSICAL_PENETRATE:  // 12
-                    long currentPhysicalPenetrate = PhysicalPenetrate;
-                    long startPhysicalPenetrate = StartPhysicalPenetrate;
-                    PhysicalPenetrate = currentPhysicalPenetrate + (long)Math.Ceiling((startPhysicalPenetrate * _value) / 10000.0);
+                    if (UsesFixedEnhanceValue(_enhanceType))
+                    {
+                        PhysicalPenetrate += _value;
+                    }
+                    else
+                    {
+                        long currentPhysicalPenetrate = PhysicalPenetrate;
+                        long startPhysicalPenetrate = StartPhysicalPenetrate;
+                        PhysicalPenetrate = currentPhysicalPenetrate + (long)Math.Ceiling((startPhysicalPenetrate * _value) / 10000.0);
+                    }
                     break;
 
                 case eParamType.MAGIC_PENETRATE:  // 13
-                    long currentMagicPenetrate = MagicPenetrate;
-                    long startMagicPenetrate = StartMagicPenetrate;
-                    MagicPenetrate = currentMagicPenetrate + (long)Math.Ceiling((startMagicPenetrate * _value) / 10000.0);
+                    if (UsesFixedEnhanceValue(_enhanceType))
+                    {
+                        MagicPenetrate += _value;
+                    }
+                    else
+                    {
+                        long currentMagicPenetrate = MagicPenetrate;
+                        long startMagicPenetrate = StartMagicPenetrate;
+                        MagicPenetrate = currentMagicPenetrate + (long)Math.Ceiling((startMagicPenetrate * _value) / 10000.0);
+                    }
                     break;
 
                 case eParamType.ENERGY_RECOVERY_RATE:  // 14
@@ -3488,28 +3590,28 @@ this.updateCurColor();
                     break;
 
                 case eParamType.PHYSICAL_CRITICAL_DAMAGE_RATE:  // 100
-                    if (_isRole)
+                    if (UsesPermyriadEnhanceField(_enhanceType))
                         PhysicalCriticalDamagePermyriadByRole += _value;
                     else
                         PhysicalCriticalDamageRate += _value;
                     break;
 
                 case eParamType.MAGIC_CRITICAL_DAMAGE_RATE:  // 101
-                    if (_isRole)
+                    if (UsesPermyriadEnhanceField(_enhanceType))
                         MagicCriticalDamagePermyriadByRole += _value;
                     else
                         MagicCriticalDamageRate += _value;
                     break;
 
                 case eParamType.PHYSICAL_DAMAGE_UP_PERCENT:  // 102
-                    if (_isRole)
+                    if (UsesPermyriadEnhanceField(_enhanceType))
                         AdditionalPhysicalDamageUpPermyriadByRole += _value;
                     else
                         AdditionalPhysicalDamageUpPercent += _value;
                     break;
 
                 case eParamType.MAGIC_DAMAGE_UP_PERCENT:  // 103
-                    if (_isRole)
+                    if (UsesPermyriadEnhanceField(_enhanceType))
                         AdditionalMagicDamageUpPermyriadByRole += _value;
                     else
                         AdditionalMagicDamageUpPercent += _value;

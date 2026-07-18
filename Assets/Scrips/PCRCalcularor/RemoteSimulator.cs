@@ -83,6 +83,9 @@ namespace PCRCaculator
             request.IsTalentQuest = GuildManager.Instance.IsTalentQuestBoss;
             request.MasterSkillNodeLevels = group.teamSkill;
             request.NeedOnceResult = true;
+            request.LabyrinthEnhancedNodeIds = group.labyrinthEnhancedNodeIds;
+            request.LabyrinthRelicIds = group.labyrinthRelicIds;
+            request.LabyrinthAlphaRupee = group.labyrinthAlphaRupee;
             request.PlayerList = GuildManager.Instance.SettingData.GetCurrentPlayerData().playrCharacters;
             request.SemanUBExecTimeList = battleData.SemanUBExecTimeList;
             request.Settings = GuildManager.Instance.SettingData.GetCurrentRandomData();

@@ -205,7 +205,14 @@ namespace Elements
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                 tempData.skipping = mainManager.GuildBattleData.skipping;
                 stopFrame = mainManager.GuildBattleData.stopFrame;
-                tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
+                var playerGroup = tempData.SettingData.GetCurrentPlayerGroup();
+                tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
+                    playerGroup.labyrinthEnhancedNodeIds);
+                tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
+                    playerGroup.labyrinthRelicIds,
+                    tempData.playerList,
+                    playerGroup.labyrinthAlphaRupee);
+                tempData.CreateAllUnitParameters(playerGroup.useLogBarrierNew);
             }
             else
             {
@@ -302,7 +309,14 @@ namespace Elements
                     tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                     tempData.skipping = mainManager.GuildBattleData.skipping;
                     stopFrame = stopFrameText.text == "" ? -1 : int.Parse(stopFrameText.text);
-                    tempData.CreateAllUnitParameters(tempData.SettingData.GetCurrentPlayerGroup().useLogBarrierNew);
+                    var playerGroup = tempData.SettingData.GetCurrentPlayerGroup();
+                    tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
+                        playerGroup.labyrinthEnhancedNodeIds);
+                    tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
+                        playerGroup.labyrinthRelicIds,
+                        tempData.playerList,
+                        playerGroup.labyrinthAlphaRupee);
+                    tempData.CreateAllUnitParameters(playerGroup.useLogBarrierNew);
                 }
                 else
                 {
@@ -421,6 +435,13 @@ namespace Elements
                     player.SetMaxLove();
                 }
             }
+
+            tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
+                req.LabyrinthEnhancedNodeIds);
+            tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
+                req.LabyrinthRelicIds,
+                tempData.playerList,
+                req.LabyrinthAlphaRupee);
 
             tempData.skipping = req.IsSkipping;
 
@@ -747,7 +768,14 @@ namespace Elements
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
             UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
 
-            unitCtrl.Initialize(unitParameter, unitData, isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null, false, true); // TODO hush add _teamEnhanceParameter
+            unitCtrl.Initialize(
+                unitParameter,
+                unitData,
+                isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null,
+                false,
+                true,
+                labyrinthEnhanceParameter: isplayer ? tempData.LabyrinthEnhanceParameter : null,
+                labyrinthRelicPassiveParameter: isplayer ? tempData.LabyrinthRelicPassiveParameter : null); // TODO hush add _teamEnhanceParameter
             unitCtrl.BattleStartProcess(respawnPos);
             //callBack.Call<UnitCtrl>(unitCtrl);
             //if (!IsAutoMode && isplayer)
@@ -1147,6 +1175,8 @@ namespace Elements
         public GuildRandomData randomData;
         public bool skipping;
         public int waveGroupId;
+        public IReadOnlyDictionary<eParamType, long> LabyrinthEnhanceParameter;
+        public IReadOnlyDictionary<eParamType, long> LabyrinthRelicPassiveParameter;
 
         public void CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {

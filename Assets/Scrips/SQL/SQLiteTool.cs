@@ -389,6 +389,11 @@ namespace PCRCaculator.SQL
         public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic { get; private set; }
         public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic { get; private set; }
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get; private set; }
+        public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get; private set; }
+        public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get; private set; }
+        public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
+        public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
+        public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get; private set; }
         public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
@@ -644,6 +649,16 @@ namespace PCRCaculator.SQL
                     .GroupBy(x => x.role_id)
                     .ToDictionary(g => g.Key, g => g.OrderBy(x => x.rank).ToList());
             }));
+            tasks.Add(
+                Task.Run(() => LabyrinthEnhanceNodeDic = GetDatasDic<labyrinth_enhance_node>(a => a.node_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthEnhanceDataDic = GetDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthRelicDic = GetDatasDic<labyrinth_relic>(a => a.relic_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthRelicEffectGroupDic = GetDatasDic<labyrinth_relic_effect_group>(a => a.effect_group_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthRelicEffectDic = GetDatasDic<labyrinth_relic_effect>(a => a.effect_id)));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();

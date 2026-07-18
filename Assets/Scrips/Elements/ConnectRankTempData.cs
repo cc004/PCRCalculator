@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using PCRCaculator;
 using PCRCaculator.SQL;
 
@@ -15,17 +16,38 @@ namespace Elements
 
     public class ConnectRankTempData
     {
+#if ENABLE_THREADING
+        [ThreadStatic]
+        private static ConnectRankTempData instance;
+
+        private static int cacheGeneration;
+
+        public static ConnectRankTempData Instance => instance ??= new ConnectRankTempData();
+#else
         public static readonly ConnectRankTempData Instance = new ConnectRankTempData();
+#endif
 
         private readonly Dictionary<(int rank, int attackType, int roleId), IReadOnlyDictionary<eParamType, long>> statusCache = new();
+#if ENABLE_THREADING
+        private int localCacheGeneration;
+#endif
 
         public void ClearCache()
         {
+#if ENABLE_THREADING
+            int currentGeneration = Interlocked.Increment(ref cacheGeneration);
             statusCache.Clear();
+            localCacheGeneration = currentGeneration;
+#else
+            statusCache.Clear();
+#endif
         }
 
         public IReadOnlyDictionary<eParamType, long> CreateRankStatusDictionary(int roleId, int rank, int attackType)
         {
+#if ENABLE_THREADING
+            EnsureCurrentCache();
+#endif
             rank = Math.Max(0, rank);
             var key = (rank, attackType, roleId);
             if (statusCache.TryGetValue(key, out var cached))
@@ -168,6 +190,18 @@ namespace Elements
 
             return statusDictionary.ToDictionary(pair => pair.Key, pair => pair.Value * coefficient / 100);
         }
+
+#if ENABLE_THREADING
+        private void EnsureCurrentCache()
+        {
+            int currentGeneration = Volatile.Read(ref cacheGeneration);
+            if (localCacheGeneration == currentGeneration)
+                return;
+
+            statusCache.Clear();
+            localCacheGeneration = currentGeneration;
+        }
+#endif
 
         private static bool TryConvertParamType(int connectRankParamType, int attackType, out eParamType paramType)
         {

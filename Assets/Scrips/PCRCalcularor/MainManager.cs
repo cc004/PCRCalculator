@@ -113,6 +113,11 @@ namespace PCRCaculator
             public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic = new();
             public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic = new();
             public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic = new();
+            public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic = new();
+            public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic = new();
+            public Dictionary<int, labyrinth_relic> LabyrinthRelicDic = new();
+            public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic = new();
+            public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic = new();
         }
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
@@ -207,6 +212,11 @@ namespace PCRCaculator
         public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic { get => databaseCache.ConnectRankLimitCommonDic; }
         public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic { get => databaseCache.ConnectRankLimitItemDic; }
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get => databaseCache.ConnectRankEnhanceDic; }
+        public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get => databaseCache.LabyrinthEnhanceNodeDic; }
+        public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get => databaseCache.LabyrinthEnhanceDataDic; }
+        public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get => databaseCache.LabyrinthRelicDic; }
+        public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get => databaseCache.LabyrinthRelicEffectGroupDic; }
+        public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get => databaseCache.LabyrinthRelicEffectDic; }
 
         public Dictionary<int, string> UnitName_cn { get => databaseCache.unitName_cn; }
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => databaseCache.skillNameAndDescribe_cn; }
@@ -577,6 +587,12 @@ namespace PCRCaculator
                                 databaseCache.ConnectRankLimitItemDic = connectRankDb.ConnectRankLimitItemDic ?? databaseCache.ConnectRankLimitItemDic;
                                 databaseCache.ConnectRankEnhanceDic = connectRankDb.ConnectRankEnhanceDic ?? databaseCache.ConnectRankEnhanceDic;
                                 ConnectRankTempData.Instance.ClearCache();
+
+                                databaseCache.LabyrinthEnhanceNodeDic = dbTool.LabyrinthEnhanceNodeDic ?? databaseCache.LabyrinthEnhanceNodeDic;
+                                databaseCache.LabyrinthEnhanceDataDic = dbTool.LabyrinthEnhanceDataDic ?? databaseCache.LabyrinthEnhanceDataDic;
+                                databaseCache.LabyrinthRelicDic = dbTool.LabyrinthRelicDic ?? databaseCache.LabyrinthRelicDic;
+                                databaseCache.LabyrinthRelicEffectGroupDic = dbTool.LabyrinthRelicEffectGroupDic ?? databaseCache.LabyrinthRelicEffectGroupDic;
+                                databaseCache.LabyrinthRelicEffectDic = dbTool.LabyrinthRelicEffectDic ?? databaseCache.LabyrinthRelicEffectDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10 ?? databaseCache.unitName_cn;
                                 databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn ?? databaseCache.exEquipmentName_cn;

@@ -1122,6 +1122,75 @@ namespace PCRCaculator.SQL
         public int required_item_count_3 { get; set; }
     }
 
+    public class labyrinth_enhance_node
+    {
+        [PrimaryKey]
+        public int node_id { get; set; }
+        public int information_id { get; set; }
+        public int cost { get; set; }
+        public int effect_id { get; set; }
+        public int pos_y { get; set; }
+        public int icon_id { get; set; }
+        public int pre_node_1 { get; set; }
+        public int pos_x { get; set; }
+        public int pre_node_3 { get; set; }
+        public int is_rare { get; set; }
+        public int pre_node_2 { get; set; }
+    }
+
+    public class labyrinth_enhance_data
+    {
+        [PrimaryKey]
+        public int effect_id { get; set; }
+        public int effect_value_1 { get; set; }
+        public int effect_type { get; set; }
+        public int effect_value_2 { get; set; }
+    }
+
+    public class labyrinth_relic
+    {
+        [PrimaryKey]
+        public int relic_id { get; set; }
+        public int effect_group_id { get; set; }
+        public int relic_mark_id { get; set; }
+        public int relic_mark_count { get; set; }
+    }
+
+    public class labyrinth_relic_effect_group
+    {
+        [PrimaryKey]
+        public int effect_group_id { get; set; }
+        public int effect_id_1 { get; set; }
+        public int effect_id_2 { get; set; }
+        public int effect_id_3 { get; set; }
+        public int effect_id_4 { get; set; }
+        public int effect_id_5 { get; set; }
+
+        [Ignore]
+        public IEnumerable<int> EffectIds
+        {
+            get
+            {
+                if (effect_id_1 != 0) yield return effect_id_1;
+                if (effect_id_2 != 0) yield return effect_id_2;
+                if (effect_id_3 != 0) yield return effect_id_3;
+                if (effect_id_4 != 0) yield return effect_id_4;
+                if (effect_id_5 != 0) yield return effect_id_5;
+            }
+        }
+    }
+
+    public class labyrinth_relic_effect
+    {
+        [PrimaryKey]
+        public int effect_id { get; set; }
+        public int effect_type { get; set; }
+        public int effect_value_1 { get; set; }
+        public int effect_value_2 { get; set; }
+        public int effect_value_3 { get; set; }
+        public int effect_value_4 { get; set; }
+    }
+
     public class unit_role_mastery_id : DbBaseData
     {
         public int mastery_id { get; set; }
