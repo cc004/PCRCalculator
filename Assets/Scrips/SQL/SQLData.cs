@@ -133,6 +133,65 @@ namespace PCRCaculator.SQL
             };
         }
     }
+    public class labyrinth_enemy_parameter
+    {
+        [PrimaryKey]
+        public int enemy_id { get; set; }
+        public int unit_id { get; set; }
+        public string name { get; set; }
+        public int level { get; set; }
+        public int rarity { get; set; }
+        public int promotion_level { get; set; }
+        public long hp { get; set; }
+        public int atk { get; set; }
+        public int magic_str { get; set; }
+        public int def { get; set; }
+        public int magic_def { get; set; }
+        public int physical_critical { get; set; }
+        public int magic_critical { get; set; }
+        public int wave_hp_recovery { get; set; }
+        public int wave_energy_recovery { get; set; }
+        public int dodge { get; set; }
+        public int physical_penetrate { get; set; }
+        public int magic_penetrate { get; set; }
+        public int life_steal { get; set; }
+        public int hp_recovery_rate { get; set; }
+        public int energy_recovery_rate { get; set; }
+        public int energy_reduce_rate { get; set; }
+        public int union_burst_level { get; set; }
+        public int main_skill_lv_1 { get; set; }
+        public int main_skill_lv_2 { get; set; }
+        public int main_skill_lv_3 { get; set; }
+        public int main_skill_lv_4 { get; set; }
+        public int main_skill_lv_5 { get; set; }
+        public int main_skill_lv_6 { get; set; }
+        public int main_skill_lv_7 { get; set; }
+        public int main_skill_lv_8 { get; set; }
+        public int main_skill_lv_9 { get; set; }
+        public int main_skill_lv_10 { get; set; }
+        public int ex_skill_lv_1 { get; set; }
+        public int ex_skill_lv_2 { get; set; }
+        public int ex_skill_lv_3 { get; set; }
+        public int ex_skill_lv_4 { get; set; }
+        public int ex_skill_lv_5 { get; set; }
+        public int resist_status_id { get; set; }
+        public int resist_variation_id { get; set; }
+        public int accuracy { get; set; }
+        public int unique_equipment_flag_1 { get; set; }
+        public int break_durability { get; set; }
+        public int virtual_hp { get; set; }
+
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, def, magic_str, magic_def, physical_critical,
+            magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery,
+            physical_penetrate, magic_penetrate, energy_recovery_rate, hp_recovery_rate,
+            energy_reduce_rate, accuracy)
+            {
+                realhp = hp
+            };
+        }
+    }
     public class talent_quest_enemy_parameter
     {
         [PrimaryKey]

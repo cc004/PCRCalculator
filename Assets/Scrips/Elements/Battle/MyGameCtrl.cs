@@ -183,6 +183,11 @@ namespace Elements
                             tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
+                        else if (MainManager.Instance.LabyrinthEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.LabyrinthEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
                         else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
                         {
                             tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
@@ -492,6 +497,11 @@ namespace Elements
                         else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
                         {
                             tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
+                            tempData.extra_effect_cnt++;
+                        }
+                        else if (MainManager.Instance.LabyrinthEnemyParameterDic.ContainsKey(enemy))
+                        {
+                            tempData.guildEnemy.Add(GuildManager.LabyrinthEnemyParameterDic[enemy]);
                             tempData.extra_effect_cnt++;
                         }
                         else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))

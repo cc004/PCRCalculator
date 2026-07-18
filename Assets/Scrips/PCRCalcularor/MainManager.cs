@@ -101,6 +101,7 @@ namespace PCRCaculator
             public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips = new Dictionary<int, Dictionary<int, ex_equipment_data>[]>();
             public Dictionary<int, EnemyData> talentQuestEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, EnemyData> abyssEnemyParameterDic = new Dictionary<int, EnemyData>();
+            public Dictionary<int, EnemyData> labyrinthEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, EnemyData> mirageEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, unit_role_data> UnitRoleDataDic = new();
             public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic = new();
@@ -200,6 +201,7 @@ namespace PCRCaculator
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> UnitExEquips { get => databaseCache.unitExEquips; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get => databaseCache.talentQuestEnemyParameterDic; }
         public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get => databaseCache.abyssEnemyParameterDic; }
+        public Dictionary<int, EnemyData> LabyrinthEnemyParameterDic { get => databaseCache.labyrinthEnemyParameterDic; }
         public Dictionary<int, EnemyData> MirageEnemyParameterDic { get => databaseCache.mirageEnemyParameterDic; }
         public Dictionary<int, unit_role_data> UnitRoleDataDic { get => databaseCache.UnitRoleDataDic; }
         public Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic { get => databaseCache.UnitRoleMasteryIdDic; }
@@ -552,6 +554,7 @@ namespace PCRCaculator
                                 databaseCache.enemyDataDic = dbTool.Dic2 ?? databaseCache.enemyDataDic;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic ?? databaseCache.talentQuestEnemyParameterDic;
                                 databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic ?? databaseCache.abyssEnemyParameterDic;
+                                databaseCache.labyrinthEnemyParameterDic = dbTool.LabyrinthEnemyParameterDic ?? databaseCache.labyrinthEnemyParameterDic;
                                 databaseCache.mirageEnemyParameterDic = dbTool.MirageEnemyParameterDic ?? databaseCache.mirageEnemyParameterDic;
                                 databaseCache.secretDungeonWaveGroupDataDic = dbTool.SecretDungeonWaveGroupDataDic ?? databaseCache.secretDungeonWaveGroupDataDic;
                                 databaseCache.talentQuestWaveGroupDataDic = dbTool.TalentQuestWaveGroupDataDic ?? databaseCache.talentQuestWaveGroupDataDic;
@@ -698,6 +701,7 @@ namespace PCRCaculator
                                             Task.Run(() => { if (dbTool2.Dic2 != null) databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2); }),
                                             Task.Run(() => { if (dbTool2.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthEnemyParameterDic != null) databaseCache.labyrinthEnemyParameterDic.OverrideWith(dbTool2.LabyrinthEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic); })
                                         );
                                 }
@@ -710,6 +714,23 @@ namespace PCRCaculator
                                         Task.Run(() => { if (dbTool3.Dic4 != null) databaseCache.skillActionDic.Override2With(dbTool3.Dic4); }),
                                         Task.Run(() => { if (dbTool3.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic); }),
                                         Task.Run(() => { if (dbTool3.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic); }),
+                                        Task.Run(() =>
+                                        {
+                                            if (dbTool3.LabyrinthEnemyParameterDic != null)
+                                            {
+                                                foreach (var pair in dbTool3.LabyrinthEnemyParameterDic)
+                                                {
+                                                    if (databaseCache.labyrinthEnemyParameterDic.TryGetValue(pair.Key, out var enemyData))
+                                                    {
+                                                        pair.Value.Override2With(enemyData);
+                                                    }
+                                                    else
+                                                    {
+                                                        databaseCache.labyrinthEnemyParameterDic.Add(pair.Key, pair.Value);
+                                                    }
+                                                }
+                                            }
+                                        }),
                                         Task.Run(() => { if (dbTool3.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic); }),
                                         Task.Run(() => { if (dbTool3.TalentSkillNodeDic != null) databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic); }),
                                         Task.Run(() => { if (dbTool3.TeamSkillNodeDic != null) databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic); }),
