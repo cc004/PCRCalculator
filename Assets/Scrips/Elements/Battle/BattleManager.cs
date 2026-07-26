@@ -4278,59 +4278,52 @@ namespace Elements.Battle
             //             return CreateBonusEnemyDatas(extraEffect, _timing);
             //         }
             //     }
-            var data = MyGameCtrl.GetExtraEffectEnemyData(tempData);
-            if (data != null)
-            {
-                return CreateBonusEnemyDatas(data, _timing);
-            }
-            return new List<BonusEnemyData>();
+            return CreateBonusEnemyDatas(tempData?.ExtraEffectEnemySlots, _timing);
         }
 
-        protected List<BonusEnemyData> CreateBonusEnemyDatas(extra_effect_data _extraEffect, BattleDefine.eExtraEffectExecTiming _timing)
+        protected List<BonusEnemyData> CreateBonusEnemyDatas(
+            IReadOnlyList<ExtraEffectEnemySlot> slots,
+            BattleDefine.eExtraEffectExecTiming _timing)
         {
             var result = new List<BonusEnemyData>();
-            
-            if (_extraEffect == null)
-                return result;
-            var enemy_ids = _extraEffect.enemy_ids;
-            var exec_timings = _extraEffect.exec_timings;
-            for (int i = 0; i < enemy_ids.Count; i++)
-            {
-                if (exec_timings != null && i < exec_timings.Count)
-                {
-                    var execTiming = exec_timings[i];
-                    if (execTiming == (int)_timing)
-                    {
-                        int enemyId = enemy_ids[i];
 
-                        var unitCtrl = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl?.Find(unit => unit.enemyId == enemyId);
-                        if (unitCtrl != null)
+            if (slots == null)
+                return result;
+
+            for (int i = 0; i < slots.Count; i++)
+            {
+                var slot = slots[i];
+                if (slot.ExecTiming == (int)_timing)
+                {
+                    int enemyId = slot.EnemyId;
+
+                    var unitCtrl = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl?.Find(unit => unit.enemyId == enemyId);
+                    if (unitCtrl != null)
+                    {
+                        var skillAndBonusList = new List<ValueTuple<int, int>>();
                         {
-                            var skillAndBonusList = new List<ValueTuple<int, int>>();
+                            // *(_QWORD *)(v32 + 1216);  0x4c0
+                            var skillList = unitCtrl.MainSkillIdList;
+                            if (skillList != null)
                             {
-                                // *(_QWORD *)(v32 + 1216);  0x4c0 
-                                var skillList = unitCtrl.MainSkillIdList;
-                                if (skillList != null)
+                                for (int skillIndex = 0; skillIndex < skillList.Count; skillIndex++)
                                 {
-                                    for (int skillIndex = 0; skillIndex < skillList.Count; skillIndex++)
+                                    var skillId = skillList[skillIndex];
+                                    if (skillId > 0)
                                     {
-                                        var skillId = skillList[skillIndex];
-                                        if (skillId > 0)
-                                        {
-                                            skillAndBonusList.Add(new ValueTuple<int, int>(skillId, 0));
-                                        }
+                                        skillAndBonusList.Add(new ValueTuple<int, int>(skillId, 0));
                                     }
                                 }
                             }
-                            
-                            var bonusEnemyData = new BonusEnemyData
-                            {
-                                Id = enemyId,
-                                SkillIdAndBonusIdList = skillAndBonusList
-                            };
-                            
-                            result.Add(bonusEnemyData);
                         }
+
+                        var bonusEnemyData = new BonusEnemyData
+                        {
+                            Id = enemyId,
+                            SkillIdAndBonusIdList = skillAndBonusList
+                        };
+
+                        result.Add(bonusEnemyData);
                     }
                 }
             }

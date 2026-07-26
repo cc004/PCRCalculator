@@ -392,6 +392,8 @@ namespace PCRCaculator.SQL
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get; private set; }
         public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get; private set; }
         public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get; private set; }
+        public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get; private set; }
+        public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get; private set; }
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get; private set; }
@@ -657,6 +659,10 @@ namespace PCRCaculator.SQL
                 Task.Run(() => LabyrinthEnhanceNodeDic = GetDatasDic<labyrinth_enhance_node>(a => a.node_id)));
             tasks.Add(
                 Task.Run(() => LabyrinthEnhanceDataDic = GetDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthQuestDataDic = GetDatasDic<labyrinth_quest_data>(a => a.quest_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
             tasks.Add(
                 Task.Run(() => LabyrinthRelicDic = GetDatasDic<labyrinth_relic>(a => a.relic_id)));
             tasks.Add(

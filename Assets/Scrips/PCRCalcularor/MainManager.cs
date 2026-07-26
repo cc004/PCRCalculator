@@ -116,6 +116,8 @@ namespace PCRCaculator
             public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic = new();
             public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic = new();
             public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic = new();
+            public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic = new();
+            public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic = new();
             public Dictionary<int, labyrinth_relic> LabyrinthRelicDic = new();
             public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic = new();
             public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic = new();
@@ -216,6 +218,8 @@ namespace PCRCaculator
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get => databaseCache.ConnectRankEnhanceDic; }
         public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get => databaseCache.LabyrinthEnhanceNodeDic; }
         public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get => databaseCache.LabyrinthEnhanceDataDic; }
+        public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get => databaseCache.LabyrinthQuestDataDic; }
+        public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get => databaseCache.LabyrinthDifficultyEnemyDataDic; }
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get => databaseCache.LabyrinthRelicDic; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get => databaseCache.LabyrinthRelicEffectGroupDic; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get => databaseCache.LabyrinthRelicEffectDic; }
@@ -593,6 +597,8 @@ namespace PCRCaculator
 
                                 databaseCache.LabyrinthEnhanceNodeDic = dbTool.LabyrinthEnhanceNodeDic ?? databaseCache.LabyrinthEnhanceNodeDic;
                                 databaseCache.LabyrinthEnhanceDataDic = dbTool.LabyrinthEnhanceDataDic ?? databaseCache.LabyrinthEnhanceDataDic;
+                                databaseCache.LabyrinthQuestDataDic = dbTool.LabyrinthQuestDataDic ?? databaseCache.LabyrinthQuestDataDic;
+                                databaseCache.LabyrinthDifficultyEnemyDataDic = dbTool.LabyrinthDifficultyEnemyDataDic ?? databaseCache.LabyrinthDifficultyEnemyDataDic;
                                 databaseCache.LabyrinthRelicDic = dbTool.LabyrinthRelicDic ?? databaseCache.LabyrinthRelicDic;
                                 databaseCache.LabyrinthRelicEffectGroupDic = dbTool.LabyrinthRelicEffectGroupDic ?? databaseCache.LabyrinthRelicEffectGroupDic;
                                 databaseCache.LabyrinthRelicEffectDic = dbTool.LabyrinthRelicEffectDic ?? databaseCache.LabyrinthRelicEffectDic;
@@ -670,7 +676,10 @@ namespace PCRCaculator
                                         Task.Run(() => { if (dbCN.Pair.Item3 != null) databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3); }),
                                         Task.Run(() => { if (dbCN.TalentQuestBattleEffectDic != null) databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic); }),
                                         Task.Run(() => { if (dbCN.AbyssBattleEffectDic != null) databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic); }),
-                                        Task.Run(() => { if (dbCN.MirageBattleEffectDic != null) databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic); })
+                                        Task.Run(() => { if (dbCN.MirageBattleEffectDic != null) databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic); }),
+                                        Task.Run(() => { if (dbCN.ExtraEffectDataDic != null) databaseCache.extraEffectDataDic.TryAdd(dbCN.ExtraEffectDataDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthQuestDataDic != null) databaseCache.LabyrinthQuestDataDic.TryAdd(dbCN.LabyrinthQuestDataDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbCN.LabyrinthDifficultyEnemyDataDic); })
                                     );
                                 }
                                 catch (AggregateException ex)
@@ -702,7 +711,10 @@ namespace PCRCaculator
                                             Task.Run(() => { if (dbTool2.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.LabyrinthEnemyParameterDic != null) databaseCache.labyrinthEnemyParameterDic.OverrideWith(dbTool2.LabyrinthEnemyParameterDic); }),
-                                            Task.Run(() => { if (dbTool2.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic); })
+                                            Task.Run(() => { if (dbTool2.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic); }),
+                                            Task.Run(() => { if (dbTool2.ExtraEffectDataDic != null) databaseCache.extraEffectDataDic.TryAdd(dbTool2.ExtraEffectDataDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthQuestDataDic != null) databaseCache.LabyrinthQuestDataDic.TryAdd(dbTool2.LabyrinthQuestDataDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbTool2.LabyrinthDifficultyEnemyDataDic); })
                                         );
                                 }
                                 catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }

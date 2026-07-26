@@ -2744,6 +2744,8 @@ namespace PCRCaculator.Guild
         public List<int> labyrinthEnhancedNodeIds = new List<int>();
         public List<int> labyrinthRelicIds = new List<int>();
         public int labyrinthAlphaRupee;
+        public int labyrinthQuestId;
+        public int labyrinthDifficulty;
         public List<List<float>> UBExecTimeData = new List<List<float>> { };
         public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};
         public bool useAutoMode;

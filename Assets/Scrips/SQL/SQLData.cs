@@ -1009,6 +1009,19 @@ namespace PCRCaculator.SQL
                 return new List<int> { exec_timing_1, exec_timing_2, exec_timing_3, exec_timing_4, exec_timing_5 }.Where(x => x != 0).ToList();
             }
         }
+
+        [Ignore]
+        public IEnumerable<(int enemyId, int execTiming)> EnemySlots
+        {
+            get
+            {
+                if (enemy_id_1 != 0) yield return (enemy_id_1, exec_timing_1);
+                if (enemy_id_2 != 0) yield return (enemy_id_2, exec_timing_2);
+                if (enemy_id_3 != 0) yield return (enemy_id_3, exec_timing_3);
+                if (enemy_id_4 != 0) yield return (enemy_id_4, exec_timing_4);
+                if (enemy_id_5 != 0) yield return (enemy_id_5, exec_timing_5);
+            }
+        }
     }
     public class talent_quest_battle_effect : DbBaseData
     {
@@ -1204,6 +1217,45 @@ namespace PCRCaculator.SQL
         public int effect_value_1 { get; set; }
         public int effect_type { get; set; }
         public int effect_value_2 { get; set; }
+    }
+
+    public class labyrinth_quest_data
+    {
+        [PrimaryKey]
+        public int quest_id { get; set; }
+        public int wave_group_id { get; set; }
+        public int limit_time { get; set; }
+        public int quest_type { get; set; }
+        public int reward_id { get; set; }
+    }
+
+    public class labyrinth_difficulty_enemy_data
+    {
+        [PrimaryKey]
+        public int difficulty { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
+        public int exec_timing_1 { get; set; }
+        public int exec_timing_2 { get; set; }
+        public int exec_timing_3 { get; set; }
+        public int exec_timing_4 { get; set; }
+        public int exec_timing_5 { get; set; }
+
+        [Ignore]
+        public IEnumerable<(int enemyId, int execTiming)> EnemySlots
+        {
+            get
+            {
+                if (enemy_id_1 != 0) yield return (enemy_id_1, exec_timing_1);
+                if (enemy_id_2 != 0) yield return (enemy_id_2, exec_timing_2);
+                if (enemy_id_3 != 0) yield return (enemy_id_3, exec_timing_3);
+                if (enemy_id_4 != 0) yield return (enemy_id_4, exec_timing_4);
+                if (enemy_id_5 != 0) yield return (enemy_id_5, exec_timing_5);
+            }
+        }
     }
 
     public class labyrinth_relic

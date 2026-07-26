@@ -65,6 +65,8 @@ namespace Elements
 
 
         private const float SPINE_SCALE = 0.01f;
+        private const int LABYRINTH_ID_MIN = 770000000;
+        private const int LABYRINTH_ID_MAX = 771000000;
 
         public void Awake()
         {
@@ -91,12 +93,82 @@ namespace Elements
             }
         }
 #endif
+        private static bool IsLabyrinthId(int id)
+        {
+            return id >= LABYRINTH_ID_MIN && id < LABYRINTH_ID_MAX;
+        }
+
+        public static void ConfigureLabyrinthContext(
+            TempData battleTempData,
+            int requestedQuestId = 0,
+            int requestedDifficulty = 0)
+        {
+            if (battleTempData == null)
+                return;
+
+            var manager = MainManager.Instance;
+            int selectedQuestId = requestedQuestId != 0 ? requestedQuestId : battleTempData.waveGroupId;
+            labyrinth_quest_data questData = null;
+            bool hasQuestData = selectedQuestId != 0
+                && manager?.LabyrinthQuestDataDic != null
+                && manager.LabyrinthQuestDataDic.TryGetValue(selectedQuestId, out questData);
+
+            int labyrinthEnemyId = battleTempData.guildEnemy?
+                .FirstOrDefault(enemy => manager?.LabyrinthEnemyParameterDic?.ContainsKey(enemy.enemy_id) == true)?
+                .enemy_id ?? 0;
+            bool isLabyrinthBattle = hasQuestData
+                || IsLabyrinthId(selectedQuestId)
+                || IsLabyrinthId(battleTempData.waveGroupId)
+                || labyrinthEnemyId != 0;
+
+            battleTempData.IsLabyrinthBattle = isLabyrinthBattle;
+            if (!isLabyrinthBattle)
+            {
+                battleTempData.LabyrinthQuestId = 0;
+                battleTempData.LabyrinthDifficulty = 0;
+                battleTempData.LabyrinthExtraEffectContentType = 0;
+                return;
+            }
+
+            if (selectedQuestId == 0)
+                selectedQuestId = labyrinthEnemyId;
+            if (selectedQuestId == 0)
+                throw new InvalidOperationException("Labyrinth战斗缺少LabyrinthQuestId或WaveGroupId。");
+
+            if (battleTempData.waveGroupId == 0 && questData != null)
+                battleTempData.waveGroupId = questData.wave_group_id;
+
+            int questType = questData?.quest_type ?? ((selectedQuestId / 10000) % 10 == 3 ? 3 : 1);
+            int difficulty = requestedDifficulty > 0
+                ? requestedDifficulty
+                : (selectedQuestId / 100000) % 10;
+
+            if (difficulty <= 0
+                || manager?.LabyrinthDifficultyEnemyDataDic == null
+                || !manager.LabyrinthDifficultyEnemyDataDic.ContainsKey(difficulty))
+            {
+                throw new InvalidOperationException(
+                    $"Labyrinth难度数据不存在: questId={selectedQuestId}, difficulty={difficulty}。");
+            }
+
+            battleTempData.LabyrinthQuestId = selectedQuestId;
+            battleTempData.LabyrinthDifficulty = difficulty;
+            battleTempData.LabyrinthExtraEffectContentType = questType == 3
+                ? (int)eBattleCategory.LABYRINTH_EX
+                : (int)eBattleCategory.LABYRINTH;
+        }
+
         public static extra_effect_data GetExtraEffectEnemyData(TempData _tempData)
         {
             Dictionary<int, extra_effect_data> extra_effect_enemy = MainManager.Instance.ExtraEffectDataDic;
             int enemy_id = _tempData?.guildEnemy?.FirstOrDefault()?.enemy_id ?? 0;
             int content_type = 0;
-            if (enemy_id >= 900000000)
+            if (_tempData?.IsLabyrinthBattle == true)
+            {
+                content_type = _tempData.LabyrinthExtraEffectContentType;
+                enemy_id = _tempData.LabyrinthQuestId;
+            }
+            else if (enemy_id >= 900000000)
             {
                 var kind = enemy_id / 1000 % 10;
                 content_type = kind == 0 ? (int)eBattleCategory.ABYSS_BATTLE : (int)eBattleCategory.ABYSS_BOSS_BATTLE;
@@ -124,15 +196,109 @@ namespace Elements
             {
                 content_type = (int)eBattleCategory.CLAN_BATTLE;
             }
-            foreach (var i in extra_effect_enemy.Keys)
+            if (extra_effect_enemy == null)
+                return null;
+
+            foreach (var extraEffect in extra_effect_enemy.Values)
             {
-                var extraEffect = extra_effect_enemy[i];
-                if (extraEffect != null && (extraEffect.target_value_1 == enemy_id || extraEffect.extra_effect_id == enemy_id || extraEffect.extra_effect_id == _tempData.waveGroupId) && extraEffect.target_value_2 == 0 && extraEffect.content_type == content_type)
+                if (extraEffect == null
+                    || extraEffect.target_value_2 != 0
+                    || extraEffect.content_type != content_type)
+                {
+                    continue;
+                }
+
+                if (_tempData?.IsLabyrinthBattle == true)
+                {
+                    if (extraEffect.target_value_1 == enemy_id)
+                        return extraEffect;
+                }
+                else if (extraEffect.target_value_1 == enemy_id
+                    || extraEffect.extra_effect_id == enemy_id
+                    || extraEffect.extra_effect_id == _tempData.waveGroupId)
                 {
                     return extraEffect;
                 }
             }
             return null;
+        }
+
+        public static List<ExtraEffectEnemySlot> BuildExtraEffectEnemySlots(TempData battleTempData)
+        {
+            var result = new List<ExtraEffectEnemySlot>();
+            var extraEffectData = GetExtraEffectEnemyData(battleTempData);
+            if (extraEffectData != null)
+            {
+                foreach (var slot in extraEffectData.EnemySlots)
+                {
+                    result.Add(new ExtraEffectEnemySlot(
+                        slot.enemyId,
+                        slot.execTiming,
+                        ExtraEffectEnemySource.ExtraEffectData,
+                        extraEffectData.extra_effect_id));
+                }
+            }
+
+            if (battleTempData?.IsLabyrinthBattle == true)
+            {
+                if (!MainManager.Instance.LabyrinthDifficultyEnemyDataDic.TryGetValue(
+                        battleTempData.LabyrinthDifficulty,
+                        out var difficultyData))
+                {
+                    throw new InvalidOperationException(
+                        $"Labyrinth难度环境数据不存在: questId={battleTempData.LabyrinthQuestId}, "
+                        + $"difficulty={battleTempData.LabyrinthDifficulty}。");
+                }
+
+                foreach (var slot in difficultyData.EnemySlots)
+                {
+                    result.Add(new ExtraEffectEnemySlot(
+                        slot.enemyId,
+                        slot.execTiming,
+                        ExtraEffectEnemySource.LabyrinthDifficulty,
+                        difficultyData.difficulty));
+                }
+            }
+
+            return result;
+        }
+
+        private static void AppendExtraEffectEnemies(TempData battleTempData)
+        {
+            var slots = BuildExtraEffectEnemySlots(battleTempData);
+            var resolvedSlots = new List<ExtraEffectEnemySlot>(slots.Count);
+            battleTempData.extra_effect_cnt = 0;
+
+            foreach (var slot in slots)
+            {
+                if (!TryResolveExtraEffectEnemy(slot.EnemyId, out var enemyData))
+                {
+                    string message = $"找不到环境Buff敌人: enemyId={slot.EnemyId}, source={slot.Source}, "
+                        + $"sourceId={slot.SourceId}, questId={battleTempData.LabyrinthQuestId}, "
+                        + $"difficulty={battleTempData.LabyrinthDifficulty}";
+                    if (battleTempData.IsLabyrinthBattle)
+                        throw new InvalidOperationException(message);
+
+                    Debug.LogError(message);
+                    continue;
+                }
+
+                battleTempData.guildEnemy.Add(enemyData);
+                resolvedSlots.Add(slot);
+                battleTempData.extra_effect_cnt++;
+            }
+
+            battleTempData.ExtraEffectEnemySlots = resolvedSlots;
+        }
+
+        private static bool TryResolveExtraEffectEnemy(int enemyId, out EnemyData enemyData)
+        {
+            var manager = MainManager.Instance;
+            return manager.LabyrinthEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || manager.EnemyDataDic.TryGetValue(enemyId, out enemyData)
+                || manager.TalentQuestEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || manager.AbyssEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || manager.MirageEnemyParameterDic.TryGetValue(enemyId, out enemyData);
         }
 
 
@@ -160,43 +326,14 @@ namespace Elements
             tempData.playerList = mainManager.PlayerDataForBattle;
             if (mainManager.IsGuildBattle)
             {
-                tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
-                tempData.extra_effect_cnt = 0;
-                tempData.waveGroupId = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().waveGroupId;
-                var extra_data = GetExtraEffectEnemyData(tempData);
-                if (extra_data != null)
-                {
-                    foreach (var enemy in extra_data.enemy_ids)
-                    {
-                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.LabyrinthEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.LabyrinthEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else
-                            Debug.LogError("找不到增援敌人ID " + enemy);
-                    }
-                }
+                var playerGroup = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup();
+                tempData.guildEnemy = new List<EnemyData>(mainManager.GuildBattleData.enemyData);
+                tempData.waveGroupId = playerGroup.waveGroupId;
+                ConfigureLabyrinthContext(
+                    tempData,
+                    playerGroup.labyrinthQuestId,
+                    playerGroup.labyrinthDifficulty);
+                AppendExtraEffectEnemies(tempData);
 
                 tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
                 tempData.mParts = mainManager.GuildBattleData.mParts;
@@ -210,7 +347,6 @@ namespace Elements
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                 tempData.skipping = mainManager.GuildBattleData.skipping;
                 stopFrame = mainManager.GuildBattleData.stopFrame;
-                var playerGroup = tempData.SettingData.GetCurrentPlayerGroup();
                 tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
                     playerGroup.labyrinthEnhancedNodeIds);
                 tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
@@ -259,48 +395,14 @@ namespace Elements
                 tempData.playerList = mainManager.PlayerDataForBattle;
                 if (mainManager.IsGuildBattle)
                 {
-                    tempData.guildEnemy = mainManager.GuildBattleData.enemyData;
-
-                    tempData.waveGroupId = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().waveGroupId;
-
-                    var extra_data = GetExtraEffectEnemyData(tempData);
-                    if (extra_data != null)
-                    {
-                        tempData.extra_effect_cnt = extra_data.enemy_ids.Count;
-                        foreach (var enemy in extra_data.enemy_ids)
-                        {
-                            if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
-                            {
-                                if (!tempData.guildEnemy.Contains(GuildManager.EnemyDataDic[enemy]))
-                                {
-                                    tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
-                                }
-                            }
-                            else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
-                            {
-                                if (!tempData.guildEnemy.Contains(GuildManager.TalentQuestEnemyParameterDic[enemy]))
-                                {
-                                    tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
-                                }
-                            }
-                            else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
-                            {
-                                if (!tempData.guildEnemy.Contains(GuildManager.AbyssEnemyParameterDic[enemy]))
-                                {
-                                    tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
-                                }
-                            }
-                            else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
-                            {
-                                if (!tempData.guildEnemy.Contains(GuildManager.MirageEnemyParameterDic[enemy]))
-                                {
-                                    tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
-                                }
-                            }
-                            else
-                                Debug.LogError("找不到环境Buff ID " + enemy);
-                        }
-                    }
+                    var playerGroup = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup();
+                    tempData.guildEnemy = new List<EnemyData>(mainManager.GuildBattleData.enemyData);
+                    tempData.waveGroupId = playerGroup.waveGroupId;
+                    ConfigureLabyrinthContext(
+                        tempData,
+                        playerGroup.labyrinthQuestId,
+                        playerGroup.labyrinthDifficulty);
+                    AppendExtraEffectEnemies(tempData);
 
                     tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
                     tempData.mParts = mainManager.GuildBattleData.mParts;
@@ -314,7 +416,6 @@ namespace Elements
                     tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                     tempData.skipping = mainManager.GuildBattleData.skipping;
                     stopFrame = stopFrameText.text == "" ? -1 : int.Parse(stopFrameText.text);
-                    var playerGroup = tempData.SettingData.GetCurrentPlayerGroup();
                     tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
                         playerGroup.labyrinthEnhancedNodeIds);
                     tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
@@ -478,41 +579,8 @@ namespace Elements
                     }
                     tempData.guildEnemy.Add(enemyData);
                 }
-                tempData.extra_effect_cnt = 0;
-                var extra_data = GetExtraEffectEnemyData(tempData);
-                if (extra_data != null)
-                {
-                    foreach (var enemy in extra_data.enemy_ids)
-                    {
-                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.LabyrinthEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.LabyrinthEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.MirageEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.MirageEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else
-                            Debug.LogError("找不到增援敌人ID " + enemy);
-                    }
-                }
+                ConfigureLabyrinthContext(tempData, req.LabyrinthQuestId, req.LabyrinthDifficulty);
+                AppendExtraEffectEnemies(tempData);
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = req.UBExecTimeList;
                 tempData.SemanUBExecTimeList = req.SemanUBExecTimeList;
@@ -1161,6 +1229,33 @@ namespace Elements
         public static Transform Transform => MyGameCtrl.Instance.effectParent;
 
     }
+
+    public enum ExtraEffectEnemySource
+    {
+        ExtraEffectData,
+        LabyrinthDifficulty
+    }
+
+    public sealed class ExtraEffectEnemySlot
+    {
+        public int EnemyId { get; }
+        public int ExecTiming { get; }
+        public ExtraEffectEnemySource Source { get; }
+        public int SourceId { get; }
+
+        public ExtraEffectEnemySlot(
+            int enemyId,
+            int execTiming,
+            ExtraEffectEnemySource source,
+            int sourceId)
+        {
+            EnemyId = enemyId;
+            ExecTiming = execTiming;
+            Source = source;
+            SourceId = sourceId;
+        }
+    }
+
     public class TempData
     {
         public List<List<UnitParameter>> AllUnitParameters;
@@ -1175,6 +1270,7 @@ namespace Elements
         public List<PCRCaculator.UnitData> enemyList;
         public List<EnemyData> guildEnemy;
         public int extra_effect_cnt = 0;
+        public List<ExtraEffectEnemySlot> ExtraEffectEnemySlots = new List<ExtraEffectEnemySlot>();
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         //public bool UseFixedRandomSeed;
@@ -1185,6 +1281,10 @@ namespace Elements
         public GuildRandomData randomData;
         public bool skipping;
         public int waveGroupId;
+        public bool IsLabyrinthBattle;
+        public int LabyrinthQuestId;
+        public int LabyrinthDifficulty;
+        public int LabyrinthExtraEffectContentType;
         public IReadOnlyDictionary<eParamType, long> LabyrinthEnhanceParameter;
         public IReadOnlyDictionary<eParamType, long> LabyrinthRelicPassiveParameter;
 

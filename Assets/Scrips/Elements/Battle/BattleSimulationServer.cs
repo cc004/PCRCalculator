@@ -247,6 +247,8 @@ namespace Elements.Battle
         public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
         public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
         public int LabyrinthAlphaRupee { get; set; }
+        public int LabyrinthQuestId { get; set; }
+        public int LabyrinthDifficulty { get; set; }
         public int BattleTime { get; set; } = 90;
         public bool TalentFullInfo { get; set; }
         public bool IsTalentQuest { get; set; }
@@ -315,6 +317,8 @@ namespace Elements.Battle
                 LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
                 LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
                 LabyrinthAlphaRupee = this.LabyrinthAlphaRupee,
+                LabyrinthQuestId = this.LabyrinthQuestId,
+                LabyrinthDifficulty = this.LabyrinthDifficulty,
             };
         }
     }
