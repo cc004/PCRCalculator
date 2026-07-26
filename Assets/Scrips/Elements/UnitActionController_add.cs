@@ -6,6 +6,7 @@ using System.IO;
 using Elements.Battle;
 using Newtonsoft.Json;
 using PCRCaculator;
+using PCRCaculator.Guild;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
@@ -638,6 +639,7 @@ namespace Elements
                     //Debug.Log("生成弹道");
                     break;
                 case eEffectBehavior.WORLD_POS_CENTER:
+                    break;
                     /*switch (_skillEffect.TrackDimension)
                     {
                         case eTrackDimension.X:
@@ -652,6 +654,7 @@ namespace Elements
                     }
                     break;*/
                 case eEffectBehavior.TARGET_CENTER:
+                    break;
                     /*Vector3 vector3_1 = new Vector3();
                     int index2 = 0;
                     for (int count = _skillEffect.TargetAction.TargetList.Count; index2 < count; ++index2)
@@ -659,6 +662,10 @@ namespace Elements
                     prefab2.transform.position = vector3_1;
                     break;*/
                 case eEffectBehavior.SKILL_AREA_RANDOM:
+                    var xRandomData = new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0);
+                    BattleManager.Random(0.0f, 1.0f, ref xRandomData);
+                    var yRandomData = new RandomData(Owner, _target.Owner, _skill.SkillId, 8, 0);
+                    BattleManager.Random(-1.0f, 1.0f, ref yRandomData);
                     break;
                 /*Vector3 vector3_2 = new Vector3();
                 int attackSide = UnitActionController.GetAttackSide(_skillEffect.TargetAction.Direction, this.Owner);
