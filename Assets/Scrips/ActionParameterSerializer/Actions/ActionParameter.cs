@@ -207,6 +207,8 @@ namespace ActionParameterSerializer.Actions
                     return new EnchantProtectAction();
                 case 125:
                     return new EtherealizationAction();
+                case 126:
+                    return new TalentBonusEnhanceBuffDebuffAction();
                 case 128:
                     return new ExtendSlipDamageAction();
                 case 129:

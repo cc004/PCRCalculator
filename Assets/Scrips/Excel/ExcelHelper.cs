@@ -517,7 +517,18 @@ namespace ExcelHelper
                 info.skillLevel[0], info.skillLevel[1], info.skillLevel[2], info.skillLevel[3]
             });
             string unitsLove = JsonConvert.SerializeObject(info.playLoveDic);
-            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|{info.uniqueEq2Lv}|000|{unitsLove}";
+            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|{info.uniqueEq2Lv}|{info.GetExEquipDescribe()}|{info.TalentLevelDescribe()}|{UnitRoleMasteryDetail(info)}|{unitsLove}";
+        }
+
+        private static string UnitRoleMasteryDetail(UnitData info)
+        {
+            if (!MainManager.Instance.UnitRoleDataDic.ContainsKey(info.unitId))
+                return "无";
+
+            return info.RoleMasteryDescribe()
+                .Replace("\r\n", "/")
+                .Replace('\n', '/')
+                .Replace('\r', '/');
         }
 
         private static string ToTime(long time, int limit)
@@ -570,8 +581,10 @@ namespace ExcelHelper
 
             //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
             //msg.AppendLine($"对\"{enemy}\"（{seed}:{enemy}-{PCRBattle.Instance.enemyUnitid}）造成{damage}伤害：");
-            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
             msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
+            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
+            msg.AppendLine($"属性技能：{GuildManager.Instance.GetFinalTalentSkillNodeDescription()}");
+            msg.AppendLine($"大师技能：{GuildManager.Instance.GetFinalTeamSkillNodeDescription()}");
             msg.AppendLine("帧轴：");
 
             var skippingFrame = 0;

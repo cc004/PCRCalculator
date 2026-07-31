@@ -17,7 +17,19 @@ namespace Elements
       {
         eDamageCutType.ALL,
         UnitCtrl.eAbnormalState.CUT_ALL_DAMAGE
-      }
+      },
+      {
+        eDamageCutType.ATK_REDUCTION,
+        UnitCtrl.eAbnormalState.REDUCTION_ATK_DAMAGE
+      },
+      {
+        eDamageCutType.MGC_REDUCTION,
+        UnitCtrl.eAbnormalState.REDUCTION_MGC_DAMAGE
+      },
+      {
+        eDamageCutType.ALL_REDUCTION,
+        UnitCtrl.eAbnormalState.REDUCTION_ALL_DAMAGE
+      },
     };
 
         public override void ExecActionOnStart(
@@ -54,6 +66,9 @@ namespace Elements
             ATK = 1,
             MGC = 2,
             ALL = 3,
+            ATK_REDUCTION = 4,
+            MGC_REDUCTION = 5,
+            ALL_REDUCTION = 6,
         }
     }
 }

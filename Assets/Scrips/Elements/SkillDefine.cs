@@ -781,6 +781,10 @@ namespace Elements
                 typeof(EtherealizationAction)
             },
             {
+                eActionType.TALENT_BONUS_ENHANCE_BUFF_DEBUFF,
+                typeof(TalentBonusEnhanceBuffDebuffAction)
+            },
+            {
                 eActionType.REDUCE_DAMAGE_BY_HIGHER_DEF,
                 typeof(ReduceDamageHigherDefAction)
             },

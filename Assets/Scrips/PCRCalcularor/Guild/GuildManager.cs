@@ -194,6 +194,13 @@ namespace PCRCaculator.Guild
                 return MainManager.Instance.AbyssEnemyParameterDic;
             }
         }
+        public static Dictionary<int, EnemyData> LabyrinthEnemyParameterDic
+        {
+            get
+            {
+                return MainManager.Instance.LabyrinthEnemyParameterDic;
+            }
+        }
         public static Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic
         {
             get
@@ -1093,6 +1100,7 @@ namespace PCRCaculator.Guild
             return SettingData.changedEnemyDataDic.TryGetValue(enemy_id, out EnemyData data) ? data :
                    isTalentQuestBoss ? TalentQuestEnemyParameterDic[enemy_id] :
                    isAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
+                   LabyrinthEnemyParameterDic.ContainsKey(enemy_id) ? LabyrinthEnemyParameterDic[enemy_id] :
                    isMirageBoss ? MirageEnemyParameterDic[enemy_id] :
                    EnemyDataDic[enemy_id];
         }
@@ -2733,6 +2741,11 @@ namespace PCRCaculator.Guild
         public Dictionary<int, int> teamSkill = new Dictionary<int, int>();
         [JsonConverter(typeof(PCRCaculator.RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
+        public List<int> labyrinthEnhancedNodeIds = new List<int>();
+        public List<int> labyrinthRelicIds = new List<int>();
+        public int labyrinthAlphaRupee;
+        public int labyrinthQuestId;
+        public int labyrinthDifficulty;
         public List<List<float>> UBExecTimeData = new List<List<float>> { };
         public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};
         public bool useAutoMode;

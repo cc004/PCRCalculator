@@ -244,6 +244,11 @@ namespace Elements.Battle
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
         [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> RoleMastery { get; set; }
+        public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
+        public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
+        public int LabyrinthAlphaRupee { get; set; }
+        public int LabyrinthQuestId { get; set; }
+        public int LabyrinthDifficulty { get; set; }
         public int BattleTime { get; set; } = 90;
         public bool TalentFullInfo { get; set; }
         public bool IsTalentQuest { get; set; }
@@ -309,6 +314,11 @@ namespace Elements.Battle
                 TalentSkillNodeLevels = this.TalentSkillNodeLevels != null ? new Dictionary<int, int>(this.TalentSkillNodeLevels) : null,
                 MasterSkillNodeLevels = this.MasterSkillNodeLevels != null ? new Dictionary<int, int>(this.MasterSkillNodeLevels) : null,
                 RoleMastery = this.RoleMastery != null ? new Dictionary<int, (int, int)>(this.RoleMastery) : null,
+                LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
+                LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
+                LabyrinthAlphaRupee = this.LabyrinthAlphaRupee,
+                LabyrinthQuestId = this.LabyrinthQuestId,
+                LabyrinthDifficulty = this.LabyrinthDifficulty,
             };
         }
     }

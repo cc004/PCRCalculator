@@ -347,6 +347,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get; private set; }
         public Dictionary<int, int> AbyssQuestFilterDic { get; private set; }
         public Dictionary<int, int> AbyssBossFilterDic { get; private set; }
+        public Dictionary<int, EnemyData> LabyrinthEnemyParameterDic { get; private set; }
         public Dictionary<int, EnemyData> MirageEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
@@ -389,6 +390,13 @@ namespace PCRCaculator.SQL
         public Dictionary<int, connect_rank_limit_common> ConnectRankLimitCommonDic { get; private set; }
         public Dictionary<int, List<connect_rank_limit_item>> ConnectRankLimitItemDic { get; private set; }
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get; private set; }
+        public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get; private set; }
+        public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get; private set; }
+        public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get; private set; }
+        public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get; private set; }
+        public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
+        public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
+        public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get; private set; }
         public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
@@ -478,6 +486,9 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
                 .ContinueWith(_ => AbyssEnemyParameterDic = GetAbyssEnemyDataDic()));
+            tasks.Add(
+                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
+                .ContinueWith(_ => LabyrinthEnemyParameterDic = GetLabyrinthEnemyDataDic()));
             tasks.Add(
                 Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
                 .ContinueWith(_ => MirageEnemyParameterDic = GetMirageEnemyDataDic()));
@@ -644,6 +655,20 @@ namespace PCRCaculator.SQL
                     .GroupBy(x => x.role_id)
                     .ToDictionary(g => g.Key, g => g.OrderBy(x => x.rank).ToList());
             }));
+            tasks.Add(
+                Task.Run(() => LabyrinthEnhanceNodeDic = GetDatasDic<labyrinth_enhance_node>(a => a.node_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthEnhanceDataDic = GetDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthQuestDataDic = GetDatasDic<labyrinth_quest_data>(a => a.quest_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
+            tasks.Add(
+                Task.Run(() => LabyrinthRelicDic = GetDatasDic<labyrinth_relic>(a => a.relic_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthRelicEffectGroupDic = GetDatasDic<labyrinth_relic_effect_group>(a => a.effect_group_id)));
+            tasks.Add(
+                Task.Run(() => LabyrinthRelicEffectDic = GetDatasDic<labyrinth_relic_effect>(a => a.effect_id)));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();
@@ -1202,6 +1227,79 @@ namespace PCRCaculator.SQL
 
                     dic.Add(e.enemy_id, e);
                     idx++;
+                }
+            }
+            return dic;
+        }
+        private Dictionary<int, EnemyData> GetLabyrinthEnemyDataDic()
+        {
+            Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
+
+            var list = GetDatas<labyrinth_enemy_parameter>();
+            if (list is not null)
+            {
+                foreach (var dd in list)
+                {
+                    if (!dic1.ContainsKey(dd.unit_id))
+                        continue;
+
+                    EnemyData e = new EnemyData();
+                    e.enemy_id = dd.enemy_id;
+                    e.unit_id = dd.unit_id;
+                    e.name = dd.name;
+                    e.level = dd.level;
+                    e.rarity = dd.rarity;
+                    e.promotion_level = dd.promotion_level;
+                    e.baseData = dd.GetBaseData();
+                    e.union_burst_level = dd.union_burst_level;
+                    e.main_skill_lvs = new List<int>
+                    {
+                        dd.main_skill_lv_1,dd.main_skill_lv_2,dd.main_skill_lv_3,dd.main_skill_lv_4,
+                        dd.main_skill_lv_5,dd.main_skill_lv_6,dd.main_skill_lv_7,dd.main_skill_lv_8,
+                        dd.main_skill_lv_9,dd.main_skill_lv_10
+                    };
+                    e.ex_skill_lvs = new List<int>
+                    {
+                        dd.ex_skill_lv_1,dd.ex_skill_lv_2,dd.ex_skill_lv_3,dd.ex_skill_lv_4,dd.ex_skill_lv_5,
+                    };
+                    e.resist_status_id = dd.resist_status_id;
+                    e.resist_variation_id = dd.resist_variation_id;
+                    e.unique_equipment_flag_1 = dd.unique_equipment_flag_1;
+                    e.break_durability = dd.break_durability;
+                    e.virtual_hp = dd.virtual_hp;
+                    EnemyDetailData detailData = new EnemyDetailData();
+                    unit_enemy_data tp2 = dic1[dd.unit_id];
+                    detailData.unit_id = tp2.unit_id;
+                    detailData.unit_name = tp2.unit_name;
+                    detailData.prefab_id = tp2.prefab_id;
+                    detailData.motion_type = tp2.motion_type;
+                    detailData.se_type = tp2.se_type;
+                    detailData.move_speed = tp2.move_speed;
+                    detailData.search_area_width = tp2.search_area_width;
+                    detailData.atk_type = tp2.atk_type;
+                    detailData.normal_atk_cast_time = tp2.normal_atk_cast_time;
+                    detailData.cutin = tp2.cutin;
+                    detailData.visual_change_flag = tp2.visual_change_flag;
+                    detailData.comment = tp2.comment;
+                    e.detailData = detailData;
+                    EnemySkillData skillData = new EnemySkillData();
+
+                    if (!unitSkillDataDic.ContainsKey(e.unit_id) || !unitAttackPatternDic.ContainsKey(e.unit_id)) continue;
+
+                    var skList = unitSkillDataDic[e.unit_id];
+                    skillData.UB = skList.union_burst;
+                    skillData.raw_data = skList;
+                    skillData.MainSkills = skList.GetMainSkillIDs();
+                    skillData.enemyAttackPatterns = new List<UnitAttackPattern>();
+                    var list0 = unitAttackPatternDic[e.unit_id];
+                    foreach (var dd3 in list0)
+                    {
+                        UnitAttackPattern attackPattern = new UnitAttackPattern(dd3.pattern_id, dd3.unit_id, dd3.loop_start, dd3.loop_end, dd3.GetAllPatterns().ToArray());
+                        skillData.enemyAttackPatterns.Add(attackPattern);
+                    }
+                    e.skillData = skillData;
+
+                    dic.Add(e.enemy_id, e);
                 }
             }
             return dic;

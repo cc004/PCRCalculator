@@ -149,6 +149,24 @@ namespace Elements
         public Dictionary<BasePartsData, long> LimitDamageDictionaryMgc { get; set; } =
             new Dictionary<BasePartsData, long>();
 
+        public Dictionary<BasePartsData, double> ReductionDamageDictionaryAtk { get; set; } =
+            new Dictionary<BasePartsData, double>();
+
+        public Dictionary<BasePartsData, double> ReductionDamageDictionaryAtkForEnergy { get; set; } =
+            new Dictionary<BasePartsData, double>();
+
+        public Dictionary<BasePartsData, double> ReductionDamageDictionaryMgc { get; set; } =
+            new Dictionary<BasePartsData, double>();
+
+        public Dictionary<BasePartsData, double> ReductionDamageDictionaryMgcForEnergy { get; set; } =
+            new Dictionary<BasePartsData, double>();
+
+        public Dictionary<BasePartsData, double> ReductionDamageDictionaryAll { get; set; } =
+            new Dictionary<BasePartsData, double>();
+
+        public Dictionary<BasePartsData, double> ReductionDamageDictionaryAllForEnergy { get; set; } =
+            new Dictionary<BasePartsData, double>();
+
         public Dictionary<BasePartsData, LongWithEx> TotalDamageDictionary { get; set; } =
             new Dictionary<BasePartsData, LongWithEx>();
 
@@ -191,6 +209,12 @@ namespace Elements
             AlreadyExecedData = new Dictionary<UnitCtrl, Dictionary<int, ActionExecedData>>();
             AlreadyExecedKeys = new Dictionary<UnitCtrl, List<int>>();
             AlreadyTriggeredActions = new HashSet<TriggerAction>();
+            ReductionDamageDictionaryAtk = new Dictionary<BasePartsData, double>();
+            ReductionDamageDictionaryAtkForEnergy = new Dictionary<BasePartsData, double>();
+            ReductionDamageDictionaryMgc = new Dictionary<BasePartsData, double>();
+            ReductionDamageDictionaryMgcForEnergy = new Dictionary<BasePartsData, double>();
+            ReductionDamageDictionaryAll = new Dictionary<BasePartsData, double>();
+            ReductionDamageDictionaryAllForEnergy = new Dictionary<BasePartsData, double>();
         }
 
         public virtual void Initialize(UnitCtrl _ownerUnitCtrl) => Initialize();

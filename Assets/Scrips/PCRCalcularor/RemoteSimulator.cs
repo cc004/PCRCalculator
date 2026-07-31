@@ -38,42 +38,13 @@ namespace PCRCaculator
         {
             var request = new BattleSimulationRequest();
             var battleData = GuildManager.Instance.GetBattleData(true);
+            var group = GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
 
             request.BattleTime = GuildManager.Instance.SettingData.limitTime;
-            {
-                var tempData = new TempData();
-                tempData.guildEnemy = battleData.enemyData;
-                tempData.extra_effect_cnt = 0;
-                tempData.waveGroupId = battleData.SettingData.GetCurrentPlayerGroup().waveGroupId;
-                var extra_data = MyGameCtrl.GetExtraEffectEnemyData(tempData);
-                if (extra_data != null)
-                {
-                    foreach (var enemy in extra_data.enemy_ids)
-                    {
-                        if (MainManager.Instance.EnemyDataDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.EnemyDataDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.TalentQuestEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.TalentQuestEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else if (MainManager.Instance.AbyssEnemyParameterDic.ContainsKey(enemy))
-                        {
-                            tempData.guildEnemy.Add(GuildManager.AbyssEnemyParameterDic[enemy]);
-                            tempData.extra_effect_cnt++;
-                        }
-                        else
-                            UnityEngine.Debug.LogError("找不到增援敌人ID " + enemy);
-                    }
-                }
-                request.GuildEnemyList = tempData.guildEnemy
-                    .Select(e => e.enemy_id).ToList();
-            }
-
-            var group = GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
+            request.GuildEnemyList = battleData.enemyData.Select(e => e.enemy_id).ToList();
+            request.WaveGroupId = group.waveGroupId;
+            request.LabyrinthQuestId = group.labyrinthQuestId;
+            request.LabyrinthDifficulty = group.labyrinthDifficulty;
 
             request.IsAutoMode = battleData.isAutoMode;
             request.IsGuildBattle = true;
@@ -83,6 +54,9 @@ namespace PCRCaculator
             request.IsTalentQuest = GuildManager.Instance.IsTalentQuestBoss;
             request.MasterSkillNodeLevels = group.teamSkill;
             request.NeedOnceResult = true;
+            request.LabyrinthEnhancedNodeIds = group.labyrinthEnhancedNodeIds;
+            request.LabyrinthRelicIds = group.labyrinthRelicIds;
+            request.LabyrinthAlphaRupee = group.labyrinthAlphaRupee;
             request.PlayerList = GuildManager.Instance.SettingData.GetCurrentPlayerData().playrCharacters;
             request.SemanUBExecTimeList = battleData.SemanUBExecTimeList;
             request.Settings = GuildManager.Instance.SettingData.GetCurrentRandomData();

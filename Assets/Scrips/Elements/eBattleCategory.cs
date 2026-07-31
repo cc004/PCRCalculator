@@ -68,6 +68,8 @@ namespace Elements
     SEVEN_QUEST = 56,
     SEVEN_SCENARIO_BOSS = 57,
     SEVEN_SPECIAL_BOSS = 58,
+    LABYRINTH = 59,
+    LABYRINTH_EX = 60,
 
   }
 }

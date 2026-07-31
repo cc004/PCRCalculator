@@ -133,6 +133,65 @@ namespace PCRCaculator.SQL
             };
         }
     }
+    public class labyrinth_enemy_parameter
+    {
+        [PrimaryKey]
+        public int enemy_id { get; set; }
+        public int unit_id { get; set; }
+        public string name { get; set; }
+        public int level { get; set; }
+        public int rarity { get; set; }
+        public int promotion_level { get; set; }
+        public long hp { get; set; }
+        public int atk { get; set; }
+        public int magic_str { get; set; }
+        public int def { get; set; }
+        public int magic_def { get; set; }
+        public int physical_critical { get; set; }
+        public int magic_critical { get; set; }
+        public int wave_hp_recovery { get; set; }
+        public int wave_energy_recovery { get; set; }
+        public int dodge { get; set; }
+        public int physical_penetrate { get; set; }
+        public int magic_penetrate { get; set; }
+        public int life_steal { get; set; }
+        public int hp_recovery_rate { get; set; }
+        public int energy_recovery_rate { get; set; }
+        public int energy_reduce_rate { get; set; }
+        public int union_burst_level { get; set; }
+        public int main_skill_lv_1 { get; set; }
+        public int main_skill_lv_2 { get; set; }
+        public int main_skill_lv_3 { get; set; }
+        public int main_skill_lv_4 { get; set; }
+        public int main_skill_lv_5 { get; set; }
+        public int main_skill_lv_6 { get; set; }
+        public int main_skill_lv_7 { get; set; }
+        public int main_skill_lv_8 { get; set; }
+        public int main_skill_lv_9 { get; set; }
+        public int main_skill_lv_10 { get; set; }
+        public int ex_skill_lv_1 { get; set; }
+        public int ex_skill_lv_2 { get; set; }
+        public int ex_skill_lv_3 { get; set; }
+        public int ex_skill_lv_4 { get; set; }
+        public int ex_skill_lv_5 { get; set; }
+        public int resist_status_id { get; set; }
+        public int resist_variation_id { get; set; }
+        public int accuracy { get; set; }
+        public int unique_equipment_flag_1 { get; set; }
+        public int break_durability { get; set; }
+        public int virtual_hp { get; set; }
+
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, def, magic_str, magic_def, physical_critical,
+            magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery,
+            physical_penetrate, magic_penetrate, energy_recovery_rate, hp_recovery_rate,
+            energy_reduce_rate, accuracy)
+            {
+                realhp = hp
+            };
+        }
+    }
     public class talent_quest_enemy_parameter
     {
         [PrimaryKey]
@@ -950,6 +1009,19 @@ namespace PCRCaculator.SQL
                 return new List<int> { exec_timing_1, exec_timing_2, exec_timing_3, exec_timing_4, exec_timing_5 }.Where(x => x != 0).ToList();
             }
         }
+
+        [Ignore]
+        public IEnumerable<(int enemyId, int execTiming)> EnemySlots
+        {
+            get
+            {
+                if (enemy_id_1 != 0) yield return (enemy_id_1, exec_timing_1);
+                if (enemy_id_2 != 0) yield return (enemy_id_2, exec_timing_2);
+                if (enemy_id_3 != 0) yield return (enemy_id_3, exec_timing_3);
+                if (enemy_id_4 != 0) yield return (enemy_id_4, exec_timing_4);
+                if (enemy_id_5 != 0) yield return (enemy_id_5, exec_timing_5);
+            }
+        }
     }
     public class talent_quest_battle_effect : DbBaseData
     {
@@ -1120,6 +1192,114 @@ namespace PCRCaculator.SQL
         public int required_item_count_1 { get; set; }
         public int required_item_count_2 { get; set; }
         public int required_item_count_3 { get; set; }
+    }
+
+    public class labyrinth_enhance_node
+    {
+        [PrimaryKey]
+        public int node_id { get; set; }
+        public int information_id { get; set; }
+        public int cost { get; set; }
+        public int effect_id { get; set; }
+        public int pos_y { get; set; }
+        public int icon_id { get; set; }
+        public int pre_node_1 { get; set; }
+        public int pos_x { get; set; }
+        public int pre_node_3 { get; set; }
+        public int is_rare { get; set; }
+        public int pre_node_2 { get; set; }
+    }
+
+    public class labyrinth_enhance_data
+    {
+        [PrimaryKey]
+        public int effect_id { get; set; }
+        public int effect_value_1 { get; set; }
+        public int effect_type { get; set; }
+        public int effect_value_2 { get; set; }
+    }
+
+    public class labyrinth_quest_data
+    {
+        [PrimaryKey]
+        public int quest_id { get; set; }
+        public int wave_group_id { get; set; }
+        public int limit_time { get; set; }
+        public int quest_type { get; set; }
+        public int reward_id { get; set; }
+    }
+
+    public class labyrinth_difficulty_enemy_data
+    {
+        [PrimaryKey]
+        public int difficulty { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
+        public int exec_timing_1 { get; set; }
+        public int exec_timing_2 { get; set; }
+        public int exec_timing_3 { get; set; }
+        public int exec_timing_4 { get; set; }
+        public int exec_timing_5 { get; set; }
+
+        [Ignore]
+        public IEnumerable<(int enemyId, int execTiming)> EnemySlots
+        {
+            get
+            {
+                if (enemy_id_1 != 0) yield return (enemy_id_1, exec_timing_1);
+                if (enemy_id_2 != 0) yield return (enemy_id_2, exec_timing_2);
+                if (enemy_id_3 != 0) yield return (enemy_id_3, exec_timing_3);
+                if (enemy_id_4 != 0) yield return (enemy_id_4, exec_timing_4);
+                if (enemy_id_5 != 0) yield return (enemy_id_5, exec_timing_5);
+            }
+        }
+    }
+
+    public class labyrinth_relic
+    {
+        [PrimaryKey]
+        public int relic_id { get; set; }
+        public int effect_group_id { get; set; }
+        public int relic_mark_id { get; set; }
+        public int relic_mark_count { get; set; }
+    }
+
+    public class labyrinth_relic_effect_group
+    {
+        [PrimaryKey]
+        public int effect_group_id { get; set; }
+        public int effect_id_1 { get; set; }
+        public int effect_id_2 { get; set; }
+        public int effect_id_3 { get; set; }
+        public int effect_id_4 { get; set; }
+        public int effect_id_5 { get; set; }
+
+        [Ignore]
+        public IEnumerable<int> EffectIds
+        {
+            get
+            {
+                if (effect_id_1 != 0) yield return effect_id_1;
+                if (effect_id_2 != 0) yield return effect_id_2;
+                if (effect_id_3 != 0) yield return effect_id_3;
+                if (effect_id_4 != 0) yield return effect_id_4;
+                if (effect_id_5 != 0) yield return effect_id_5;
+            }
+        }
+    }
+
+    public class labyrinth_relic_effect
+    {
+        [PrimaryKey]
+        public int effect_id { get; set; }
+        public int effect_type { get; set; }
+        public int effect_value_1 { get; set; }
+        public int effect_value_2 { get; set; }
+        public int effect_value_3 { get; set; }
+        public int effect_value_4 { get; set; }
     }
 
     public class unit_role_mastery_id : DbBaseData

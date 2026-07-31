@@ -9,7 +9,10 @@ namespace ActionParameterSerializer.Actions
         {
             Physical = 1,
             Magical = 2,
-            All = 3
+            All = 3,
+            PhysicalReduction = 4,
+            MagicalReduction = 5,
+            AllReduction = 6
         }
 
         public DamageType damageType;
@@ -40,6 +43,21 @@ namespace ActionParameterSerializer.Actions
                         buildExpression(level, durationValues, null, property));
                 case DamageType.All:
                     return Utils.JavaFormat(Utils.GetString("Reduce_s1_all_damage_taken_by_s2_for_s3_sec"),
+                        buildExpression(level, actionValues, null, property),
+                        targetParameter.buildTargetClause(),
+                        buildExpression(level, durationValues, null, property));
+                case DamageType.PhysicalReduction:
+                    return Utils.JavaFormat(Utils.GetString("Reduce_fixed_physical_damage_taken_by_s2_by_s1_for_s3_sec"),
+                        buildExpression(level, actionValues, null, property),
+                        targetParameter.buildTargetClause(),
+                        buildExpression(level, durationValues, null, property));
+                case DamageType.MagicalReduction:
+                    return Utils.JavaFormat(Utils.GetString("Reduce_fixed_magical_damage_taken_by_s2_by_s1_for_s3_sec"),
+                        buildExpression(level, actionValues, null, property),
+                        targetParameter.buildTargetClause(),
+                        buildExpression(level, durationValues, null, property));
+                case DamageType.AllReduction:
+                    return Utils.JavaFormat(Utils.GetString("Reduce_fixed_all_damage_taken_by_s2_by_s1_for_s3_sec"),
                         buildExpression(level, actionValues, null, property),
                         targetParameter.buildTargetClause(),
                         buildExpression(level, durationValues, null, property));

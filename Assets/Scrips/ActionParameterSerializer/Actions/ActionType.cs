@@ -88,6 +88,7 @@ namespace ActionParameterSerializer.Actions
         addAbnormalEffectTime = 112,
         forceChangeSpeed = 117,
         guts = 118,
+        talentBonusEnhanceBuffDebuff = 126,
         transcendDamage = 132,
         enchantUbTriggerSeal = 133
     }

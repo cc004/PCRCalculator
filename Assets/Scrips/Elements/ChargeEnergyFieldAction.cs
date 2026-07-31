@@ -64,6 +64,10 @@ namespace Elements
 					{
 						val *= owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE);
 					}
+					if (owner.IsAbnormalState(UnitCtrl.eAbnormalState.ENERGY_DAMAGE_REDUCE_LIMIT) && val < 0f)
+					{
+						val = Math.Max(val, -owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE_LIMIT));
+					}
 					owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, val, ChargeType == eChargeType.INCREASE, base.Source);
 					list.Add(owner);
 				}

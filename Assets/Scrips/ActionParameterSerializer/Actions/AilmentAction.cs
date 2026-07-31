@@ -92,12 +92,22 @@ namespace ActionParameterSerializer.Actions
                             str.Append(Utils.JavaFormat(Utils.GetString("s1_and_deal_s2_present_damage_up_to_s3_per_second_for_s4_sec"),
                                 targetParameter.buildTargetClause(), actionValue1.value, actionValue5.value, buildExpression(level, durationValues, RoundingMode.HALF_UP, property)));
                             break;
+                        case Ailment.DotDetail.stackable:
+                            str.Append(Utils.JavaFormat(Utils.GetString("Stackable_slip_s1_and_deal_s2_damage_per_second_for_s3_sec_max_s4_stacks_each_stack_adds_s5_times_base_damage"),
+                                targetParameter.buildTargetClause(),
+                                buildExpression(level, property),
+                                buildExpression(level, durationValues, RoundingMode.HALF_UP, property),
+                                actionValue7.valueString(),
+                                actionValue5.valueString()));
+                            break;
                         default:
                             str.Append(Utils.JavaFormat(Utils.GetString("s1_s2_and_deal_s3_damage_per_second_for_s4_sec"),
                                 ailment.description(), targetParameter.buildTargetClause(), buildExpression(level, property), buildExpression(level, durationValues, RoundingMode.HALF_UP, property)));
                             break;
                     }
-                    if ((Ailment.DotDetail)ailment.ailmentDetail.detail != Ailment.DotDetail.raio_damage && (int)actionValue5.value > 0)
+                    if ((Ailment.DotDetail)ailment.ailmentDetail.detail != Ailment.DotDetail.raio_damage
+                        && (Ailment.DotDetail)ailment.ailmentDetail.detail != Ailment.DotDetail.stackable
+                        && (int)actionValue5.value > 0)
                     {
                         str.Append(Utils.JavaFormat(Utils.GetString("DMG_shall_be_increased_by_s_percents_of_base_DMG_through_each_tick"), actionValue5.valueString()));
                     }
