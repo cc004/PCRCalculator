@@ -30,55 +30,6 @@ using Object = UnityEngine.Object;
 
 namespace Elements
 {
-    public class AccumulativeDamageSourceData // TypeDefIndex: 2274
-    {
-        // Fields
-        private eAccumulativeDamageType AccumulativeDamageType; // 0x10
-        private double effectValue; // 0x14
-        private int countLimit; // 0x18
-
-        // Methods
-
-        // RVA: 0x2ED65A4 Offset: 0x2ED65A4 VA: 0x2ED65A4
-        public AccumulativeDamageSourceData(eAccumulativeDamageType _damageType, double _effectValue, int _countLimit)
-        {
-            this.AccumulativeDamageType = _damageType;
-            this.effectValue = _effectValue;
-            this.countLimit = _countLimit;
-        }
-
-        public AccumulativeDamageData CreateAccumulativeDamageData()
-        {
-            if (AccumulativeDamageType == eAccumulativeDamageType.FIXED)
-            {
-                return new AccumulativeDamageData
-                {
-                    AccumulativeDamageType = eAccumulativeDamageType.FIXED,
-                    FixedValue = effectValue,
-                    CountLimit = countLimit
-                };
-            }
-            else
-            {
-                return new AccumulativeDamageData
-                {
-                    AccumulativeDamageType = eAccumulativeDamageType.PERCENTAGE,
-                    PercentageValue = effectValue,
-                    CountLimit = countLimit
-                };
-            }
-        }
-    }
-
-    public class BasePartsDataEx
-    {
-        public LongWithEx Hp;
-        public DoubleWithEx Energy, GetAtkZeroEx, GetMagicStrZeroEx;
-        public long MaxHp;
-        public string UnitName;
-        public int hash;
-    }
-
     public partial class UnitCtrl : FixedTransformMonoBehavior, ISingletonField
     {
         public class BuffDebuffCoroutineDataSet // TypeDefIndex: 2261

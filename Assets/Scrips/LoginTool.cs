@@ -66,7 +66,7 @@ namespace PCRCaculator
                 yield break;
             }
             string url = $"http://{serverRoot}{RoutePrefix}/check/game_start";
-            var web = UnityWebRequest.Post(url,dataSTR);
+            var web = UnityWebRequest.PostWwwForm(url,dataSTR);
             web.SetRequestHeader("User-Agent", $"PCRCalculaltor");
             web.timeout = 30;
             yield return web.SendWebRequest();
