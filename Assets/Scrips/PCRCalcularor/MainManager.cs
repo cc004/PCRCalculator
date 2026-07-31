@@ -1418,7 +1418,7 @@ namespace PCRCaculator
 #if UNITY_5_3_OR_NEWER
         public async Task SendPostRequestAsync2(Action onComplete)
         {
-            const string app_ver = "11.4.0"; // change this when the app version changes
+            const string app_ver = "11.7.2"; // change this when the app version changes
             using UnityWebRequest www = new UnityWebRequest(Url2, UnityWebRequest.kHttpVerbPOST);
             byte[] postData = System.Text.Encoding.UTF8.GetBytes("{\"viewer_id\": \"0\"}");
 
