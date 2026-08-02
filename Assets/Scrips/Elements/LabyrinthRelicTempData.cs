@@ -136,6 +136,19 @@ namespace Elements
             return result;
         }
 
+        public IReadOnlyDictionary<int, int> CreateRelicMarkCountDictionary(IEnumerable<int> relicIds)
+        {
+            var manager = MainManager.Instance;
+            if (manager == null || relicIds == null || manager.LabyrinthRelicDic == null)
+                return new Dictionary<int, int>();
+
+            var normalizedRelicIds = relicIds.Where(id => id > 0).ToList();
+            if (normalizedRelicIds.Count == 0)
+                return new Dictionary<int, int>();
+
+            return CreateRelicMarkCounts(normalizedRelicIds, manager.LabyrinthRelicDic);
+        }
+
         private static void AddBattleSkillSpecs(
             ICollection<LabyrinthRelicBattleSkillSpec> result,
             int effectGroupId,

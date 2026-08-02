@@ -785,6 +785,10 @@ namespace Elements
                 typeof(TalentBonusEnhanceBuffDebuffAction)
             },
             {
+                eActionType.GIVE_VALUE_AS_LABYRINTH_ADDITIVE,
+                typeof(GiveValueAsLabyrinthAdditiveAction)
+            },
+            {
                 eActionType.REDUCE_DAMAGE_BY_HIGHER_DEF,
                 typeof(ReduceDamageHigherDefAction)
             },
