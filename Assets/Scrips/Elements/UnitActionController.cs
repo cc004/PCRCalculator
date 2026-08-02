@@ -459,6 +459,93 @@ namespace Elements
             }
         }
 
+        public Skill CreateLabyrinthRelicSkill(int skillId, int level)
+        {
+            var manager = MainManager.Instance;
+            if (manager == null || !manager.SkillDataDic.TryGetValue(skillId, out var data))
+            {
+                Debug.LogError($"遗物技能{skillId}不存在");
+                return null;
+            }
+
+            var skillParameter = new MasterSkillData.SkillData(data);
+            var skill = new Skill
+            {
+                SkillId = skillParameter.SkillId,
+                skillAreaWidth = skillParameter.skill_area_width == 0 ? Owner.SearchAreaSize : skillParameter.skill_area_width,
+                CastTime = (float)(double)skillParameter.skill_cast_time,
+                UnionBurstCoolDownTime = (float)(double)skillParameter.boss_ub_cool_time,
+                SkillName = skillParameter.Name,
+                AnimId = eSpineCharacterAnimeId.NONE,
+                ActionParameters = new List<ActionParameter>()
+            };
+
+            if (manager.SkillNameAndDescribe_cn.TryGetValue(skill.SkillId, out string[] names))
+                skill.SkillName = names[0];
+
+            foreach (var actionData in skillParameter.ActionDataList)
+                skill.ActionParameters.Add(createLabyrinthRelicActionParameter(actionData));
+
+            dependActionSolve(skill);
+            initializeAction(skill);
+            execActionOnStart(skill);
+            skill.SetLevel(level);
+            skillDictionary[skill.SkillId] = skill;
+            return skill;
+        }
+
+        private ActionParameter createLabyrinthRelicActionParameter(MasterSkillAction.SkillAction actionParam)
+        {
+            if (!SkillDefine.SkillActionTypeDictionary.ContainsKey((eActionType)actionParam.action_type))
+                throw new Exception($"动作{actionParam.action_id}类型{actionParam.action_type}未实现");
+
+            var actionParameter = Activator.CreateInstance(SkillDefine.SkillActionTypeDictionary[(eActionType)actionParam.action_type]) as ActionParameter;
+            actionParameter.TargetSort = (PriorityPattern)actionParam.target_type;
+            actionParameter.TargetNth = actionParam.target_number;
+            actionParameter.TargetNum = actionParam.target_count;
+            actionParameter.TargetWidth = actionParam.target_range <= 0 ? Owner.SearchAreaSize : actionParam.target_range;
+            actionParameter.ActionType = (eActionType)actionParam.action_type;
+            actionParameter.ActionDetail1 = actionParam.action_detail_1;
+            actionParameter.ActionDetail2 = actionParam.action_detail_2;
+            actionParameter.ActionDetail3 = actionParam.action_detail_3;
+            actionParameter.Value = new ValueDictionary();
+            actionParameter.Value.Add(eValueNumber.VALUE_1, actionParam.action_value_1);
+            actionParameter.Value.Add(eValueNumber.VALUE_2, actionParam.action_value_2);
+            actionParameter.Value.Add(eValueNumber.VALUE_3, actionParam.action_value_3);
+            actionParameter.Value.Add(eValueNumber.VALUE_4, actionParam.action_value_4);
+            actionParameter.Value.Add(eValueNumber.VALUE_5, actionParam.action_value_5);
+            actionParameter.Value.Add(eValueNumber.VALUE_6, actionParam.action_value_6);
+            actionParameter.Value.Add(eValueNumber.VALUE_7, actionParam.action_value_7);
+            actionParameter.MasterData = actionParam;
+
+            var execTimes = GetLabyrinthRelicActionExecTimes(actionParam.action_id);
+            actionParameter.ExecTime = execTimes.ToArray();
+            actionParameter.ActionExecTimeList = execTimes.Select(_ => new ActionExecTime()).ToList();
+            actionParameter.ActionWeightSum = actionParameter.ActionExecTimeList.Count;
+            actionParameter.ActionEffectList = new List<NormalSkillEffect>();
+            actionParameter.ActionSubEffectList = new List<NormalSkillEffect>();
+            actionParameter.DepenedActionId = actionParam.DependActionId;
+            actionParameter.ActionId = actionParam.action_id;
+            actionParameter.TargetList = new List<BasePartsData>();
+            actionParameter.ActionChildrenIndexes = new List<int>();
+            actionParameter.TargetAssignment = (eTargetAssignment)actionParam.target_assignment;
+            actionParameter.Direction = (DirectionType)actionParam.target_area;
+            return actionParameter;
+        }
+
+        private static List<float> GetLabyrinthRelicActionExecTimes(int actionId)
+        {
+            var actionExecTimeDictionary = MainManager.Instance?.RelicActionExecTimeDic;
+            if (actionExecTimeDictionary != null &&
+                actionExecTimeDictionary.TryGetValue(actionId, out var execTimes) &&
+                execTimes != null)
+            {
+                return execTimes.Select(x => (float)x.exec_time).ToList();
+            }
+
+            return new List<float>();
+        }
+
         private void dependActionSolve(Skill skill)
         {
             for (int index1 = 0; index1 < skill.ActionParameters.Count; ++index1)
@@ -959,7 +1046,18 @@ namespace Elements
                 return false;
             }
 
-            Skill skill = skillDictionary[skillId];
+            return StartAction(skillId, skillDictionary[skillId]);
+        }
+
+        public bool StartAction(int skillId, Skill skill)
+        {
+            if (skill == null)
+            {
+                MainManager.Instance.WindowConfigMessage("角色" + Owner.UnitId + "的技能" + skillId + "错误！", null);
+                return false;
+            }
+
+            skillDictionary[skillId] = skill;
             actionStartFirstProcess(skill, out var _hasNoTarget, false);
             bool flag = false;
             List<int> hasParentIndexes = skill.HasParentIndexes;

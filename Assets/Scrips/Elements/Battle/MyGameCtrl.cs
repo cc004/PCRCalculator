@@ -67,6 +67,7 @@ namespace Elements
         private const float SPINE_SCALE = 0.01f;
         private const int LABYRINTH_ID_MIN = 770000000;
         private const int LABYRINTH_ID_MAX = 771000000;
+        private const int LABYRINTH_RELIC_EFFECT_ENEMY_ID = 770999901;
 
         public void Awake()
         {
@@ -268,6 +269,7 @@ namespace Elements
             var slots = BuildExtraEffectEnemySlots(battleTempData);
             var resolvedSlots = new List<ExtraEffectEnemySlot>(slots.Count);
             battleTempData.extra_effect_cnt = 0;
+            battleTempData.LabyrinthRelicSkillEnemyId = 0;
 
             foreach (var slot in slots)
             {
@@ -286,6 +288,22 @@ namespace Elements
                 battleTempData.guildEnemy.Add(enemyData);
                 resolvedSlots.Add(slot);
                 battleTempData.extra_effect_cnt++;
+            }
+
+            if (battleTempData.LabyrinthRelicBattleSkillSpecs != null &&
+                battleTempData.LabyrinthRelicBattleSkillSpecs.Count > 0)
+            {
+                if (!TryResolveExtraEffectEnemy(LABYRINTH_RELIC_EFFECT_ENEMY_ID, out var relicEnemyData))
+                {
+                    throw new InvalidOperationException(
+                        $"找不到遗物效果敌人: enemyId={LABYRINTH_RELIC_EFFECT_ENEMY_ID}, "
+                        + $"questId={battleTempData.LabyrinthQuestId}, "
+                        + $"difficulty={battleTempData.LabyrinthDifficulty}");
+                }
+
+                battleTempData.guildEnemy.Add(relicEnemyData);
+                battleTempData.extra_effect_cnt++;
+                battleTempData.LabyrinthRelicSkillEnemyId = LABYRINTH_RELIC_EFFECT_ENEMY_ID;
             }
 
             battleTempData.ExtraEffectEnemySlots = resolvedSlots;
@@ -333,6 +351,10 @@ namespace Elements
                     tempData,
                     playerGroup.labyrinthQuestId,
                     playerGroup.labyrinthDifficulty);
+                tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
+                    playerGroup.labyrinthRelicIds);
+                tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
+                    playerGroup.labyrinthRelicIds);
                 AppendExtraEffectEnemies(tempData);
 
                 tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
@@ -402,6 +424,10 @@ namespace Elements
                         tempData,
                         playerGroup.labyrinthQuestId,
                         playerGroup.labyrinthDifficulty);
+                    tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
+                        playerGroup.labyrinthRelicIds);
+                    tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
+                        playerGroup.labyrinthRelicIds);
                     AppendExtraEffectEnemies(tempData);
 
                     tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
@@ -548,6 +574,10 @@ namespace Elements
                 req.LabyrinthRelicIds,
                 tempData.playerList,
                 req.LabyrinthAlphaRupee);
+            tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
+                req.LabyrinthRelicIds);
+            tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
+                req.LabyrinthRelicIds);
 
             tempData.skipping = req.IsSkipping;
 
@@ -707,8 +737,11 @@ namespace Elements
                 int ed = enemyUnitCtrl.Count - tempData.extra_effect_cnt;
                 for (int i = enemyUnitCtrl.Count - 1; i >= ed; i--)
                 {
-                    enemyUnitCtrl[i].UnitName = $"环境Buff{extraEffectEnemyUnitCtrl.Count + 1}";
-                    extraEffectEnemyUnitCtrl.Add(enemyUnitCtrl[i]);
+                    var hiddenEnemy = enemyUnitCtrl[i];
+                    hiddenEnemy.UnitName = hiddenEnemy.enemyId == tempData.LabyrinthRelicSkillEnemyId
+                        ? "遗物效果"
+                        : $"环境Buff{extraEffectEnemyUnitCtrl.Count + 1}";
+                    extraEffectEnemyUnitCtrl.Add(hiddenEnemy);
                     enemyUnitCtrl.RemoveAt(i);
                 }
             }
@@ -1287,6 +1320,9 @@ namespace Elements
         public int LabyrinthExtraEffectContentType;
         public IReadOnlyDictionary<eParamType, long> LabyrinthEnhanceParameter;
         public IReadOnlyDictionary<eParamType, long> LabyrinthRelicPassiveParameter;
+        public IReadOnlyList<LabyrinthRelicBattleSkillSpec> LabyrinthRelicBattleSkillSpecs = Array.Empty<LabyrinthRelicBattleSkillSpec>();
+        public IReadOnlyDictionary<int, int> LabyrinthRelicMarkCounts = new Dictionary<int, int>();
+        public int LabyrinthRelicSkillEnemyId;
 
         public void CreateAllUnitParameters(GuildPlayerGroupData.LogBarrierType useLogBarrier = GuildPlayerGroupData.LogBarrierType.NoBarrier)
         {

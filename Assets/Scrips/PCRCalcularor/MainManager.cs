@@ -121,6 +121,9 @@ namespace PCRCaculator
             public Dictionary<int, labyrinth_relic> LabyrinthRelicDic = new();
             public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic = new();
             public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic = new();
+            public Dictionary<int, List<labyrinth_relic_mark_effect>> LabyrinthRelicMarkEffectDic = new();
+            public Dictionary<int, List<relic_action_exec_time>> RelicActionExecTimeDic = new();
+            public Dictionary<int, List<relic_skill_exec_time>> RelicSkillExecTimeDic = new();
         }
 
         private Dictionary<string, Sprite> spriteCacheDic = new Dictionary<string, Sprite>();//图片缓存
@@ -223,6 +226,9 @@ namespace PCRCaculator
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get => databaseCache.LabyrinthRelicDic; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get => databaseCache.LabyrinthRelicEffectGroupDic; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get => databaseCache.LabyrinthRelicEffectDic; }
+        public Dictionary<int, List<labyrinth_relic_mark_effect>> LabyrinthRelicMarkEffectDic { get => databaseCache.LabyrinthRelicMarkEffectDic; }
+        public Dictionary<int, List<relic_action_exec_time>> RelicActionExecTimeDic { get => databaseCache.RelicActionExecTimeDic; }
+        public Dictionary<int, List<relic_skill_exec_time>> RelicSkillExecTimeDic { get => databaseCache.RelicSkillExecTimeDic; }
 
         public Dictionary<int, string> UnitName_cn { get => databaseCache.unitName_cn; }
         public Dictionary<int, string[]> SkillNameAndDescribe_cn { get => databaseCache.skillNameAndDescribe_cn; }
@@ -602,6 +608,9 @@ namespace PCRCaculator
                                 databaseCache.LabyrinthRelicDic = dbTool.LabyrinthRelicDic ?? databaseCache.LabyrinthRelicDic;
                                 databaseCache.LabyrinthRelicEffectGroupDic = dbTool.LabyrinthRelicEffectGroupDic ?? databaseCache.LabyrinthRelicEffectGroupDic;
                                 databaseCache.LabyrinthRelicEffectDic = dbTool.LabyrinthRelicEffectDic ?? databaseCache.LabyrinthRelicEffectDic;
+                                databaseCache.LabyrinthRelicMarkEffectDic = dbTool.LabyrinthRelicMarkEffectDic ?? databaseCache.LabyrinthRelicMarkEffectDic;
+                                databaseCache.RelicActionExecTimeDic = dbTool.RelicActionExecTimeDic ?? databaseCache.RelicActionExecTimeDic;
+                                databaseCache.RelicSkillExecTimeDic = dbTool.RelicSkillExecTimeDic ?? databaseCache.RelicSkillExecTimeDic;
 
                                 databaseCache.unitName_cn = dbTool3.Dic10 ?? databaseCache.unitName_cn;
                                 databaseCache.exEquipmentName_cn = dbTool3.ExEquipmentName_cn ?? databaseCache.exEquipmentName_cn;
@@ -679,7 +688,13 @@ namespace PCRCaculator
                                         Task.Run(() => { if (dbCN.MirageBattleEffectDic != null) databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic); }),
                                         Task.Run(() => { if (dbCN.ExtraEffectDataDic != null) databaseCache.extraEffectDataDic.TryAdd(dbCN.ExtraEffectDataDic); }),
                                         Task.Run(() => { if (dbCN.LabyrinthQuestDataDic != null) databaseCache.LabyrinthQuestDataDic.TryAdd(dbCN.LabyrinthQuestDataDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbCN.LabyrinthDifficultyEnemyDataDic); })
+                                        Task.Run(() => { if (dbCN.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbCN.LabyrinthDifficultyEnemyDataDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthRelicDic != null) databaseCache.LabyrinthRelicDic.TryAdd(dbCN.LabyrinthRelicDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthRelicEffectGroupDic != null) databaseCache.LabyrinthRelicEffectGroupDic.TryAdd(dbCN.LabyrinthRelicEffectGroupDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthRelicEffectDic != null) databaseCache.LabyrinthRelicEffectDic.TryAdd(dbCN.LabyrinthRelicEffectDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthRelicMarkEffectDic != null) databaseCache.LabyrinthRelicMarkEffectDic.TryAdd(dbCN.LabyrinthRelicMarkEffectDic); }),
+                                        Task.Run(() => { if (dbCN.RelicActionExecTimeDic != null) databaseCache.RelicActionExecTimeDic.TryAdd(dbCN.RelicActionExecTimeDic); }),
+                                        Task.Run(() => { if (dbCN.RelicSkillExecTimeDic != null) databaseCache.RelicSkillExecTimeDic.TryAdd(dbCN.RelicSkillExecTimeDic); })
                                     );
                                 }
                                 catch (AggregateException ex)
@@ -714,7 +729,13 @@ namespace PCRCaculator
                                             Task.Run(() => { if (dbTool2.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.OverrideWith(dbTool2.MirageEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.ExtraEffectDataDic != null) databaseCache.extraEffectDataDic.TryAdd(dbTool2.ExtraEffectDataDic); }),
                                             Task.Run(() => { if (dbTool2.LabyrinthQuestDataDic != null) databaseCache.LabyrinthQuestDataDic.TryAdd(dbTool2.LabyrinthQuestDataDic); }),
-                                            Task.Run(() => { if (dbTool2.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbTool2.LabyrinthDifficultyEnemyDataDic); })
+                                            Task.Run(() => { if (dbTool2.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbTool2.LabyrinthDifficultyEnemyDataDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthRelicDic != null) databaseCache.LabyrinthRelicDic.TryAdd(dbTool2.LabyrinthRelicDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthRelicEffectGroupDic != null) databaseCache.LabyrinthRelicEffectGroupDic.TryAdd(dbTool2.LabyrinthRelicEffectGroupDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthRelicEffectDic != null) databaseCache.LabyrinthRelicEffectDic.TryAdd(dbTool2.LabyrinthRelicEffectDic); }),
+                                            Task.Run(() => { if (dbTool2.LabyrinthRelicMarkEffectDic != null) databaseCache.LabyrinthRelicMarkEffectDic.TryAdd(dbTool2.LabyrinthRelicMarkEffectDic); }),
+                                            Task.Run(() => { if (dbTool2.RelicActionExecTimeDic != null) databaseCache.RelicActionExecTimeDic.TryAdd(dbTool2.RelicActionExecTimeDic); }),
+                                            Task.Run(() => { if (dbTool2.RelicSkillExecTimeDic != null) databaseCache.RelicSkillExecTimeDic.TryAdd(dbTool2.RelicSkillExecTimeDic); })
                                         );
                                 }
                                 catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }

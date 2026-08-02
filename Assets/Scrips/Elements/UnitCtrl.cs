@@ -1586,7 +1586,13 @@ namespace Elements
         public UnitParameter UnitParameter { get; set; }
 
         public bool IsOther { get; set; }
-        public bool IsBonusEnemy { get; set; }
+        public eBonusEnemyType BonusEnemyType { get; set; }
+        public bool IsBonusEnemy
+        {
+            get => BonusEnemyType != eBonusEnemyType.NONE;
+            set => BonusEnemyType = value ? eBonusEnemyType.EXTRA_EFFECT : eBonusEnemyType.NONE;
+        }
+        public bool IsRelicEnemy => BonusEnemyType == eBonusEnemyType.RELIC;
         public bool IsPlayerUnit => !IsOther;// == battleManager.BJKKBMOLHDH;
 
         public bool JoyFlag { get; set; }
@@ -14964,6 +14970,13 @@ this.updateCurColor();
         }
 
         private bool isMyTurn() => battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE || unitActionController.Skill1Charging;
+
+        public enum eBonusEnemyType
+        {
+            NONE = 0,
+            EXTRA_EFFECT = 1,
+            RELIC = 2,
+        }
 
         public enum ActionState
         {

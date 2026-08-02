@@ -1302,6 +1302,30 @@ namespace PCRCaculator.SQL
         public int effect_value_4 { get; set; }
     }
 
+    public class labyrinth_relic_mark_effect
+    {
+        public string description { get; set; }
+        public int effect_group_id { get; set; }
+        public int relic_mark_id { get; set; }
+        public int trigger_count { get; set; }
+    }
+
+    public class relic_action_exec_time
+    {
+        [PrimaryKey]
+        public int id { get; set; }
+        public int action_id { get; set; }
+        public double exec_time { get; set; }
+    }
+
+    public class relic_skill_exec_time
+    {
+        [PrimaryKey]
+        public int id { get; set; }
+        public int skill_id { get; set; }
+        public double exec_time { get; set; }
+    }
+
     public class unit_role_mastery_id : DbBaseData
     {
         public int mastery_id { get; set; }

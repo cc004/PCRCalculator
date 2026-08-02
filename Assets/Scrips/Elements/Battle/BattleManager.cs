@@ -365,6 +365,7 @@ namespace Elements.Battle
 
         public CoroutineManager CoroutineManager { get; private set; }
         private Dictionary<BattleDefine.eExtraEffectExecTiming, bool> isExtraEffectCalled { get; set; } = new Dictionary<BattleDefine.eExtraEffectExecTiming, bool>();
+        private readonly LabyrinthRelicBattleSkillExecutor labyrinthRelicBattleSkillExecutor = new LabyrinthRelicBattleSkillExecutor();
 
         public eChargeSkillTurn ChargeSkillTurn { get; set; }
 
@@ -1046,6 +1047,7 @@ namespace Elements.Battle
                         UnitList[index1]._Update();
                     for (int index2 = 0; index2 < EnemyList.Count; ++index2)
                         EnemyList[index2]._Update();
+                    TryExecLabyrinthRelicBattleSkills();
                     break;
             }
             this.battleCameraEffect.UpdateShake();
@@ -4281,6 +4283,38 @@ namespace Elements.Battle
             return CreateBonusEnemyDatas(tempData?.ExtraEffectEnemySlots, _timing);
         }
 
+        private void InitializeLabyrinthRelicBattleSkills()
+        {
+            var specs = tempData?.LabyrinthRelicBattleSkillSpecs;
+            if (specs == null || specs.Count == 0)
+            {
+                labyrinthRelicBattleSkillExecutor.Clear();
+                return;
+            }
+
+            var relicSource = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl?
+                .FirstOrDefault(unit => unit != null && unit.IsRelicEnemy);
+            if (relicSource == null)
+            {
+                int relicEnemyId = tempData.LabyrinthRelicSkillEnemyId;
+                relicSource = MyGameCtrl.Instance.extraEffectEnemyUnitCtrl?
+                    .FirstOrDefault(unit => unit != null && unit.enemyId == relicEnemyId);
+            }
+
+            labyrinthRelicBattleSkillExecutor.Initialize(relicSource, specs);
+        }
+
+        private void TryExecLabyrinthRelicBattleSkills()
+        {
+            var specs = tempData?.LabyrinthRelicBattleSkillSpecs;
+            if (specs == null || specs.Count == 0)
+                return;
+
+            float limitTime = tempData.SettingData?.limitTime ?? 90f;
+            float passedTime = Math.Max(0f, limitTime - BattleLeftTime);
+            labyrinthRelicBattleSkillExecutor.TryExec(passedTime);
+        }
+
         protected List<BonusEnemyData> CreateBonusEnemyDatas(
             IReadOnlyList<ExtraEffectEnemySlot> slots,
             BattleDefine.eExtraEffectExecTiming _timing)
@@ -4687,6 +4721,7 @@ namespace Elements.Battle
             activeActionIds.Clear();
             effectUpdateList.Clear();
             isExtraEffectCalled.Clear();
+            labyrinthRelicBattleSkillExecutor.Clear();
             foreach(var unitSpineController in unitSpineControllerList)
             {
                 unitSpineController.Destroy();
@@ -5000,9 +5035,12 @@ namespace Elements.Battle
             }
             for (int index = 0; index < (tempData.extra_effect_cnt); ++index)
             {
-                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsOther = true;
-                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].IsBonusEnemy = true;
-                (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index].WaveStartProcess(true);
+                var hiddenEnemy = (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index];
+                hiddenEnemy.IsOther = true;
+                hiddenEnemy.BonusEnemyType = hiddenEnemy.enemyId == tempData.LabyrinthRelicSkillEnemyId
+                    ? UnitCtrl.eBonusEnemyType.RELIC
+                    : UnitCtrl.eBonusEnemyType.EXTRA_EFFECT;
+                hiddenEnemy.WaveStartProcess(true);
             }
             //battleManager.battleProcessor.SetupHpAndEnergy();
             // ISSUE: explicit non-virtual call
@@ -5077,6 +5115,7 @@ namespace Elements.Battle
             {
                 (MyGameCtrl.Instance.extraEffectEnemyUnitCtrl)[index3].ExecActionOnStartAndDetermineInstanceID();
             }
+            InitializeLabyrinthRelicBattleSkills();
             StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             CaptureBattleValidationSnapshot();
             //battleManager.tempData = Singleton<EHPLBCOOOPK>.Instance;

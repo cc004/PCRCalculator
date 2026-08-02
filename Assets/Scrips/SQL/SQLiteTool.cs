@@ -397,6 +397,9 @@ namespace PCRCaculator.SQL
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get; private set; }
+        public Dictionary<int, List<labyrinth_relic_mark_effect>> LabyrinthRelicMarkEffectDic { get; private set; }
+        public Dictionary<int, List<relic_action_exec_time>> RelicActionExecTimeDic { get; private set; }
+        public Dictionary<int, List<relic_skill_exec_time>> RelicSkillExecTimeDic { get; private set; }
         public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
@@ -669,6 +672,24 @@ namespace PCRCaculator.SQL
                 Task.Run(() => LabyrinthRelicEffectGroupDic = GetDatasDic<labyrinth_relic_effect_group>(a => a.effect_group_id)));
             tasks.Add(
                 Task.Run(() => LabyrinthRelicEffectDic = GetDatasDic<labyrinth_relic_effect>(a => a.effect_id)));
+            tasks.Add(Task.Run(() =>
+            {
+                LabyrinthRelicMarkEffectDic = (GetDatas<labyrinth_relic_mark_effect>() ?? Array.Empty<labyrinth_relic_mark_effect>())
+                    .GroupBy(x => x.relic_mark_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.trigger_count).ToList());
+            }));
+            tasks.Add(Task.Run(() =>
+            {
+                RelicActionExecTimeDic = (GetDatas<relic_action_exec_time>() ?? Array.Empty<relic_action_exec_time>())
+                    .GroupBy(x => x.action_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.id).ToList());
+            }));
+            tasks.Add(Task.Run(() =>
+            {
+                RelicSkillExecTimeDic = (GetDatas<relic_skill_exec_time>() ?? Array.Empty<relic_skill_exec_time>())
+                    .GroupBy(x => x.skill_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.id).ToList());
+            }));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();
