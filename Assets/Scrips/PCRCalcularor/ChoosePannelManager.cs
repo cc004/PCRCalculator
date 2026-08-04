@@ -160,7 +160,7 @@ namespace PCRCaculator
         public IEnumerator InitialButtonCoroutine(WaitUI wait)
         {
             parent.localPosition = Vector3.zero;
-            parent.sizeDelta = new Vector2(100, original_hight);
+            parent.sizeDelta = new Vector2(114, original_hight);
 
             int total = MainManager.Instance.UnitRarityDic.Count;
             int cnt = 1;
@@ -887,6 +887,8 @@ namespace PCRCaculator
 
         private void RefreshBasePage()
         {
+            const int ButtonsPerRow = 8;
+            const int VisibleRows = 2;
             int count = 1;
             int displayCount = 0;
             firstShowUnitId = -1;
@@ -903,8 +905,8 @@ namespace PCRCaculator
                 {
                     buttons[id].RefreshData(unitData);
                     buttons[id].transform.localPosition = new Vector3(
-                        baseRange.x + range.x * ((count - 1) % 8),
-                        -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
+                        baseRange.x + range.x * ((count - 1) % ButtonsPerRow),
+                        -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / ButtonsPerRow)), 0);
                     togglePerferbs[id].isOn = selectedCharId.Contains(id);
                     buttons[id].gameObject.SetActive(true);
                     if (count == 1)
@@ -917,12 +919,14 @@ namespace PCRCaculator
                     buttons[id].gameObject.SetActive(false);
                 }
             }
-            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95;
-            parent.sizeDelta = new Vector2(100, neededHeight);
+            int rowCount = Mathf.CeilToInt(displayCount / (float)ButtonsPerRow);
+            float neededHeight = rowCount * range.y;
+            parent.sizeDelta = new Vector2(parent.sizeDelta.x, neededHeight);
 
-            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95)
+            float maxScrollPosition = Mathf.Max(0, rowCount - VisibleRows) * range.y;
+            if (parent.localPosition.y > maxScrollPosition)
             {
-                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95);
+                parent.SetLocalPosY(maxScrollPosition);
             }
             Canvas.ForceUpdateCanvases();
             TurnAllToggles(selectedCharId.Count != 5);

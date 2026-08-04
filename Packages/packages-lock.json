@@ -72,6 +72,13 @@
       },
       "url": "https://packages-v2.unity.cn"
     },
+    "com.unity.device-simulator.devices": {
+      "version": "1.0.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages-v2.unity.cn"
+    },
     "com.unity.editorcoroutines": {
       "version": "1.0.0",
       "depth": 1,
