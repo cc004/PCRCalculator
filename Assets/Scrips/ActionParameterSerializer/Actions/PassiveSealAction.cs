@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace ActionParameterSerializer.Actions
@@ -9,6 +10,7 @@ namespace ActionParameterSerializer.Actions
         public List<ActionValue> lifeTime = new();
         public ePassiveTiming passiveTiming;
         public eSealTarget sealTarget;
+        public double sealNum;
 
         public
             override void childInit()
@@ -18,21 +20,64 @@ namespace ActionParameterSerializer.Actions
             lifeTime.Add(new ActionValue(actionValue5, actionValue6, null));
             passiveTiming = (ePassiveTiming)(actionDetail1);
             sealTarget = (eSealTarget)(actionDetail3);
+            sealNum = actionValue7.value;
         }
 
         public
             override string localizedDetail(int level, Property property)
         {
-            return Utils.JavaFormat(Utils.GetString("Passive_Whenever_s1_get_s2_seals_s3_with_d4_marks_id_d5_for_s6_sec_caps_at_d7_This_passive_skill_will_listen_for_s8_sec"),
+            if (sealNum > 0)
+            {
+                return Utils.JavaFormat(Utils.GetString("Passive_Whenever_s1_s2_add_s3_mark_stacks_ID_s4_to_s5_for_s6_sec_caps_at_s7_listens_for_s8_sec"),
+                    targetParameter.buildTargetClause(),
+                    passiveTimingDescription(),
+                    Utils.roundDownDouble(sealNum),
+                    (int)actionValue2.value,
+                    sealTargetDescription(),
+                    buildExpression(level, sealDuration, RoundingMode.UNNECESSARY, property),
+                    sealNumLimit,
+                    buildExpression(level, lifeTime, RoundingMode.UNNECESSARY, property)
+                );
+            }
+
+            return Utils.JavaFormat(Utils.GetString("Passive_Whenever_s1_s2_remove_s3_mark_stacks_ID_s4_from_s5_listens_for_s6_sec"),
                 targetParameter.buildTargetClause(),
-                passiveTiming.description(),
-                sealTarget.description(),
-                actionDetail2,
+                passiveTimingDescription(),
+                Utils.roundDownDouble(Math.Abs(sealNum)),
                 (int)actionValue2.value,
-                buildExpression(level, sealDuration, RoundingMode.UNNECESSARY, property),
-                (int)actionValue1.value,
+                sealTargetDescription(),
                 buildExpression(level, lifeTime, RoundingMode.UNNECESSARY, property)
             );
+        }
+
+        private string passiveTimingDescription()
+        {
+            switch (passiveTiming)
+            {
+                case ePassiveTiming.Buff:
+                    return Utils.GetString("Passive_seal_timing_buff");
+                case ePassiveTiming.Damage:
+                    return Utils.GetString("Passive_seal_timing_damaged");
+                case ePassiveTiming.Debuff:
+                    return Utils.GetString("Passive_seal_timing_debuff");
+                case ePassiveTiming.Team_UB:
+                    return Utils.GetString("Passive_seal_timing_team_ub");
+                default:
+                    return Utils.GetString("Unknown");
+            }
+        }
+
+        private string sealTargetDescription()
+        {
+            switch (sealTarget)
+            {
+                case eSealTarget.Source:
+                    return Utils.GetString("Passive_seal_source");
+                case eSealTarget.Target:
+                    return Utils.GetString("Passive_seal_target");
+                default:
+                    return Utils.GetString("Unknown");
+            }
         }
 
         public enum ePassiveTiming
@@ -47,7 +92,8 @@ namespace ActionParameterSerializer.Actions
         public enum eSealTarget
         {
             Unknown = -1,
-            Self = 0
+            Source = 0,
+            Target = 1
         }
     }
 }
