@@ -2481,7 +2481,7 @@ namespace PCRCaculator.Guild
         {
             var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
             var waveGroupId = isBattle ? MyGameCtrl.Instance.tempData.waveGroupId : WaveGroupId;
-            var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId)
+            var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId) || IsMirageBossId(bossId)
                 ? (MainManager.Instance.TalentFormationDic.TryGetValue(waveGroupId, out var talentData) ? talentData : null)
                 : MainManager.Instance.TalentFormationDic.TryGetValue(bossId, out var bossData)
                     ? bossData
