@@ -111,6 +111,21 @@ namespace PCRCaculator
         public GameObject talent;
         public Toggle isSetMaxExEquip;
         private bool initialized = false;
+        private bool initializationInProgress;
+        private readonly List<Action> initializationCallbacks = new List<Action>();
+        private sealed class InitialButtonInstance
+        {
+            public readonly int Id;
+            public readonly GameObject GameObject;
+            public Toggle Toggle;
+            public CharacterPageButton Button;
+
+            public InitialButtonInstance(int id, GameObject gameObject)
+            {
+                Id = id;
+                GameObject = gameObject;
+            }
+        }
         [System.Serializable]
         public class SubItemData
         {
@@ -146,58 +161,104 @@ namespace PCRCaculator
 
         private IEnumerator WaitForLoadFinished(Action callback = null)
         {
-            while (!MainManager.Instance.LoadFinished)
+            if (initialized)
             {
-            yield return null;
+                callback?.Invoke();
+                yield break;
             }
-            var wait = MainManager.Instance.OpenWaitUI();
-            yield return StartCoroutine(InitialButtonCoroutine(wait));
-            wait.Close();
-            initialized = true;
-            callback?.Invoke();
-        }
 
-        public IEnumerator InitialButtonCoroutine(WaitUI wait)
-        {
-            parent.localPosition = Vector3.zero;
-            parent.sizeDelta = new Vector2(114, original_hight);
-
-            int total = MainManager.Instance.UnitRarityDic.Count;
-            int cnt = 1;
-            int batchSize = 500; // 每帧加载多少个角色，可根据实际情况调整
-
-            foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+            if (callback != null)
             {
+                initializationCallbacks.Add(callback);
+            }
 
-                if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
-                {
-                    GameObject b = Instantiate(togglePerferb);
-                    b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
-                    b.transform.localScale = Vector3.one;
-                    int bundleCountBefore = ABExTool.AssetBundleDic.Count;
+            if (initializationInProgress)
+            {
+                yield break;
+            }
 
-                    int id0 = id;
-                    b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-                    b.GetComponent<CharacterPageButton>().SetButton(id);
-
-                    togglePerferbs[id0] = b.GetComponent<Toggle>();
-                    buttons[id0] = b.GetComponent<CharacterPageButton>();
-                    int bundleCountAfter = ABExTool.AssetBundleDic.Count;
-                    if (bundleCountAfter > bundleCountBefore)
-                    {
-                        cnt++;
-                        try
-                        {
-                            wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
-                        }
-                        catch { }
-                    }
-                }
-
-                // **关键：每加载一批后等待一帧，避免卡顿**
-                if (cnt % batchSize == 0)
+            initializationInProgress = true;
+            WaitUI wait = null;
+            var initializedButtons = new List<InitialButtonInstance>();
+            try
+            {
+                while (!MainManager.Instance.LoadFinished)
                 {
                     yield return null;
+                }
+                wait = MainManager.Instance.OpenWaitUI();
+
+                parent.localPosition = Vector3.zero;
+                parent.sizeDelta = new Vector2(114, original_hight);
+
+                int total = MainManager.Instance.UnitRarityDic.Count;
+                int processed = 0;
+
+                foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+                {
+                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
+                    {
+                        int id0 = id;
+                        GameObject b = Instantiate(togglePerferb);
+                        var initializedButton = new InitialButtonInstance(id0, b);
+                        initializedButtons.Add(initializedButton);
+                        b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
+                        b.transform.localScale = Vector3.one;
+
+                        initializedButton.Toggle = b.GetComponent<Toggle>();
+                        initializedButton.Button = b.GetComponent<CharacterPageButton>();
+                        initializedButton.Toggle.onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+                        initializedButton.Button.SetButton(id);
+
+                        togglePerferbs[id0] = initializedButton.Toggle;
+                        buttons[id0] = initializedButton.Button;
+                    }
+
+                    processed++;
+                    wait?.SetMessage($"正在加载角色头像 ({processed}/{total})");
+                    yield return null;
+                }
+
+                initialized = true;
+
+                var callbacks = initializationCallbacks.ToArray();
+                initializationCallbacks.Clear();
+                foreach (var pendingCallback in callbacks)
+                {
+                    pendingCallback?.Invoke();
+                }
+            }
+            finally
+            {
+                try
+                {
+                    if (!initialized)
+                    {
+                        initializationCallbacks.Clear();
+                        for (int i = initializedButtons.Count - 1; i >= 0; i--)
+                        {
+                            var initializedButton = initializedButtons[i];
+                            if (togglePerferbs.TryGetValue(initializedButton.Id, out var toggle)
+                                && toggle == initializedButton.Toggle)
+                            {
+                                togglePerferbs.Remove(initializedButton.Id);
+                            }
+                            if (buttons.TryGetValue(initializedButton.Id, out var button)
+                                && button == initializedButton.Button)
+                            {
+                                buttons.Remove(initializedButton.Id);
+                            }
+                            if (initializedButton.GameObject != null)
+                            {
+                                Destroy(initializedButton.GameObject);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    initializationInProgress = false;
+                    wait?.Close();
                 }
             }
         }
