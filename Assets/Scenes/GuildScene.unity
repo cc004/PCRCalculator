@@ -50498,20 +50498,20 @@ MonoBehaviour:
   - {fileID: 1812018376}
   - {fileID: 1657515155}
   TalentTexts:
-  - {fileID: 661442405}
-  - {fileID: 1536620200}
-  - {fileID: 754706867}
-  - {fileID: 493920813}
   - {fileID: 1776467093}
+  - {fileID: 493920813}
+  - {fileID: 754706867}
+  - {fileID: 1536620200}
+  - {fileID: 661442405}
   - {fileID: 563789834}
   - {fileID: 866370955}
   - {fileID: 997821746}
   RoleMasteryTexts:
-  - {fileID: 1006210026}
-  - {fileID: 171655449}
-  - {fileID: 220593557}
-  - {fileID: 1320815100}
   - {fileID: 997821746}
+  - {fileID: 1320815100}
+  - {fileID: 220593557}
+  - {fileID: 171655449}
+  - {fileID: 1006210026}
   TalentBonus:
   - {fileID: 1048286111}
   - {fileID: 1531784306}
