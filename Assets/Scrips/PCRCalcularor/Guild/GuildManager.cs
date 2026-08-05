@@ -540,6 +540,11 @@ namespace PCRCaculator.Guild
         }
         public void OnChooseTalentQuestDropDownChanged()
         {
+            TryApplyTalentQuestSelection();
+        }
+
+        private bool TryApplyTalentQuestSelection()
+        {
             int firstOption = dropdowns_ChooseTalentQuestBoss[0].value + 1;
             int secondOption = dropdowns_ChooseTalentQuestBoss[1].value + 1;
             int thirdOption = dropdowns_ChooseTalentQuestBoss[2].value + 1;
@@ -548,18 +553,64 @@ namespace PCRCaculator.Guild
             // 格式: 8 + firstOption(第2位) + 001(第3-5位固定) + secondOption-1*10 + thirdOption(第5-7位) + 1(最后1位)
             string waveGroupIdStr = $"8{firstOption}001{(secondOption - 1) * 10 + thirdOption:D3}1";
 
-            if (int.TryParse(waveGroupIdStr, out int waveGroupId))
-            {
-                WaveGroupId = waveGroupId;
-                var matchingData = TalentQuestWaveGroupDataDic?.Values
-                    .FirstOrDefault(data => data.wave_group_id == waveGroupId);
-                specialEnemyid = matchingData.enemy_ids.ToArray();
-                SetBossImages(specialEnemyid, TalentQuestEnemyParameterDic);
-            }
-            else
+            if (!int.TryParse(waveGroupIdStr, out int waveGroupId))
             {
                 Debug.LogError($"无法解析wave_group_id字符串: {waveGroupIdStr}");
+                return false;
             }
+
+            if (!TryResolveTalentQuestSelection(
+                    TalentQuestWaveGroupDataDic,
+                    TalentQuestEnemyParameterDic,
+                    waveGroupId,
+                    out var enemyIds,
+                    out var error))
+            {
+                Debug.LogError(error);
+                return false;
+            }
+
+            WaveGroupId = waveGroupId;
+            specialEnemyid = enemyIds;
+            SetBossImages(enemyIds, TalentQuestEnemyParameterDic);
+            return true;
+        }
+
+        public static bool TryResolveTalentQuestSelection(
+            IReadOnlyDictionary<int, WaveGroupDataBase> waveGroups,
+            IReadOnlyDictionary<int, EnemyData> enemies,
+            int waveGroupId,
+            out int[] enemyIds,
+            out string error)
+        {
+            enemyIds = Array.Empty<int>();
+            var matchingData = waveGroups?.Values.FirstOrDefault(data => data?.wave_group_id == waveGroupId);
+            if (matchingData?.enemy_ids == null || matchingData.enemy_ids.Count == 0)
+            {
+                error = $"未找到属性深域wave_group_id: {waveGroupId}";
+                return false;
+            }
+
+            if (enemies == null)
+            {
+                error = $"属性深域wave_group_id {waveGroupId} 的敌人数据字典缺失";
+                return false;
+            }
+
+            var missingEnemyIds = matchingData.enemy_ids
+                .Where(enemyId => !enemies.TryGetValue(enemyId, out var enemy) || enemy?.detailData == null)
+                .Distinct()
+                .ToArray();
+            if (missingEnemyIds.Length > 0)
+            {
+                error =
+                    $"属性深域wave_group_id {waveGroupId} 的敌人数据不完整: {string.Join(",", missingEnemyIds)}";
+                return false;
+            }
+
+            enemyIds = matchingData.enemy_ids.ToArray();
+            error = null;
+            return true;
         }
         public void UpdateTalentQuestDropdownOptions()
         {
@@ -878,7 +929,8 @@ namespace PCRCaculator.Guild
             {
                 if (toggles_ChooseType[1].isOn)
                 {
-                    OnChooseTalentQuestDropDownChanged();
+                    if (!TryApplyTalentQuestSelection())
+                        return;
                 }
                 else if (toggles_ChooseType[2].isOn)
                 {

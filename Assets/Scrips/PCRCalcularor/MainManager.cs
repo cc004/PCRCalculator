@@ -57,6 +57,9 @@ namespace PCRCaculator
 
         public class DatabaseCache
         {
+            public int cacheSchemaVersion;
+            public bool cacheBuildComplete;
+            public string databaseSourceFingerprint;
             public Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();//抵抗数据
             public Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
             public Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
@@ -385,29 +388,100 @@ namespace PCRCaculator
             return Path.Combine(ABExTool.persistentDataPath, $"cache_{cacheKey}.json");
         }
 
-        private bool loadFromCahce()
+        private sealed class CacheLoadResult
         {
-            var path = cachePath();
-            if (File.Exists(path))
-            {
-                var jsonStr = File.ReadAllText(path);
-                databaseCache = JsonConvert.DeserializeObject<DatabaseCache>(jsonStr);
-                return true;
-            }
-            return false;
+            public bool Loaded { get; set; }
+            public bool CanPublishReplacement { get; set; } = true;
+            public string Status { get; set; }
         }
 
-        private void saveToCache()
+        private DatabaseSourceDescriptor[] GetDatabaseSources()
         {
+            return new[]
+            {
+                new DatabaseSourceDescriptor(
+                    "character",
+                    ABExTool.mgrCharacter?.DataVer,
+                    SQLiteTool.ResolveSourceDatabasePath(ABExTool.mgrCharacter)),
+                new DatabaseSourceDescriptor(
+                    "jp",
+                    ABExTool.mgrDataJP?.DataVer,
+                    SQLiteTool.ResolveSourceDatabasePath(ABExTool.mgrDataJP)),
+                new DatabaseSourceDescriptor(
+                    "cn",
+                    ABExTool.mgrDataCN?.DataVer,
+                    SQLiteTool.ResolveSourceDatabasePath(ABExTool.mgrDataCN)),
+            };
+        }
+
+        private CacheLoadResult LoadFromCache(string expectedSourceFingerprint, string fingerprintStatus)
+        {
+            var path = cachePath();
+            if (!File.Exists(path))
+            {
+                return new CacheLoadResult { Status = "not_found" };
+            }
+
             try
             {
-                var path = cachePath();
-                var jsonStr = JsonConvert.SerializeObject(databaseCache);
-                File.WriteAllText(path, jsonStr);
+                var jsonStr = File.ReadAllText(path);
+                var cachedData = JsonConvert.DeserializeObject<DatabaseCache>(jsonStr);
+                if (!DatabaseCacheContract.TryValidate(cachedData, expectedSourceFingerprint, out var reason))
+                {
+                    return RejectCache(path, $"{reason}; fingerprintStatus={fingerprintStatus}");
+                }
+
+                databaseCache = cachedData;
+                return new CacheLoadResult { Loaded = true, Status = "loaded" };
             }
             catch (Exception e)
             {
-                Debug.LogError($"保存缓存失败: {e.Message}");
+                return RejectCache(path, $"缓存读取或反序列化失败: {e}");
+            }
+        }
+
+        private CacheLoadResult RejectCache(string path, string reason)
+        {
+            if (DatabaseCacheContract.TryQuarantineRejectedCache(path, out var quarantinedPath, out var error))
+            {
+                Debug.LogWarning(
+                    $"数据库缓存被拒绝并已保留，将从数据库重新加载: reason={reason}; " +
+                    $"quarantine={Path.GetFileName(quarantinedPath)}");
+                return new CacheLoadResult { Status = "rejected" };
+            }
+
+            Debug.LogError(
+                $"数据库缓存被拒绝，但无法保留原文件；本次不会发布新缓存: reason={reason}; error={error}");
+            return new CacheLoadResult { Status = "rejected_quarantine_failed", CanPublishReplacement = false };
+        }
+
+        private void SaveToCache(string sourceFingerprint)
+        {
+            databaseCache.cacheSchemaVersion = DatabaseCacheContract.CurrentSchemaVersion;
+            databaseCache.cacheBuildComplete = true;
+            databaseCache.databaseSourceFingerprint = sourceFingerprint;
+
+            if (!DatabaseCacheContract.TryValidate(databaseCache, sourceFingerprint, out var validationReason))
+            {
+                databaseCache.cacheBuildComplete = false;
+                throw new InvalidDataException($"拒绝保存不完整的数据库缓存: {validationReason}");
+            }
+
+            string jsonStr;
+            try
+            {
+                jsonStr = JsonConvert.SerializeObject(databaseCache);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"数据库缓存序列化失败，本次继续使用内存数据: {exception}");
+                return;
+            }
+
+            var path = cachePath();
+            if (!DatabaseCacheContract.TryWriteAtomically(path, jsonStr, out var error))
+            {
+                Debug.LogError($"数据库缓存原子发布失败，本次继续使用内存数据: {error}");
             }
         }
 
@@ -473,18 +547,32 @@ namespace PCRCaculator
                     return;
                 }
 
-                bool loadedCache = false;
+                string sourceFingerprint = null;
+                string fingerprintStatus = null;
+                var databaseSources = GetDatabaseSources();
+                var fingerprintAvailable = await Task.Run(() =>
+                    DatabaseCacheContract.TryComputeSourceFingerprint(
+                        databaseSources,
+                        out sourceFingerprint,
+                        out fingerprintStatus));
+                if (!fingerprintAvailable)
+                    Debug.LogWarning($"数据库缓存无法验证来源，将从数据库重新加载: {fingerprintStatus}");
+                var preparedSourceFingerprint = fingerprintAvailable ? sourceFingerprint : null;
+
                 var cacheStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                if (loadFromCahce())
+                var cacheLoadResult = LoadFromCache(sourceFingerprint, fingerprintStatus);
+                var loadedCache = cacheLoadResult.Loaded;
+                var canPublishReplacementCache = cacheLoadResult.CanPublishReplacement;
+                if (loadedCache)
                 {
-                    loadedCache = true;
                     cacheStopwatch.Stop();
                     Debug.Log($"缓存加载完成，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
                 }
                 else
                 {
                     cacheStopwatch.Stop();
-                    Debug.Log($"缓存加载不存在，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
+                    Debug.Log(
+                        $"缓存未使用，status={cacheLoadResult.Status}，耗时: {cacheStopwatch.ElapsedMilliseconds}ms");
                     
                     // SQL补丁加载计时
                     var sqlStopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -509,7 +597,11 @@ namespace PCRCaculator
                     var dbInitStopwatch = System.Diagnostics.Stopwatch.StartNew();
                     var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
                     var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
-                    var dbTool2 = SQLData.OpenDB(ABExTool.mgrDataJP);
+                    var dbTool2 = DatabaseCacheContract.ResolveSharedDatabase(
+                        dbTool,
+                        () => SQLData.OpenDB(ABExTool.mgrDataJP),
+                        ReferenceEquals(ABExTool.mgrDataJP, ABExTool.mgrCharacter));
+                    var dbTool2ForCleanup = dbTool2;
                     dbInitStopwatch.Stop();
                     Debug.Log($"数据库打开完成，耗时: {dbInitStopwatch.ElapsedMilliseconds}ms");
 
@@ -527,22 +619,31 @@ namespace PCRCaculator
                     dbPrepareStopwatch.Stop();
                     Debug.Log($"数据库准备完成，耗时: {dbPrepareStopwatch.ElapsedMilliseconds}ms");
 
+                    if (string.IsNullOrWhiteSpace(preparedSourceFingerprint))
+                    {
+                        databaseSources = GetDatabaseSources();
+                        var preparedFingerprintAvailable = await Task.Run(() =>
+                            DatabaseCacheContract.TryComputeSourceFingerprint(
+                                databaseSources,
+                                out preparedSourceFingerprint,
+                                out fingerprintStatus));
+                        if (!preparedFingerprintAvailable)
+                            throw new InvalidDataException($"数据库已准备，但无法确认来源: {fingerprintStatus}");
+                    }
+
                     // 数据库数据加载计时
                     var dbDataStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                    var dbDataTask = Task.WhenAll(
+                    var dbDataTask = DatabaseCacheContract.RunAfterSuccessAsync(
+                        Task.WhenAll(
                             dbTool.ParallelGetAll(),
-                            ABExTool.mgrDataJP != ABExTool.mgrCharacter ? dbTool2.ParallelGetAll() : Task.CompletedTask,
-                            dbTool3.ParallelGetAll())
-                        .ContinueWith(_ =>
+                            ABExTool.mgrDataJP != ABExTool.mgrCharacter
+                                ? dbTool2.ParallelGetAll()
+                                : Task.CompletedTask,
+                            dbTool3.ParallelGetAll()),
+                        () =>
                             {
                                 dbDataStopwatch.Stop();
                                 Debug.Log($"数据库数据加载完成，耗时: {dbDataStopwatch.ElapsedMilliseconds}ms");
-                                dbTool.CloseDB();
-                                if (ABExTool.mgrDataJP != ABExTool.mgrCharacter)
-                                    dbTool2.CloseDB();
-                                else
-                                    dbTool2 = dbTool;
-                                dbTool3.CloseDB();
 
                                 var dbCN = dbTool3;
 
@@ -771,7 +872,15 @@ namespace PCRCaculator
                                     );
                                 }
                                 catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }
-                            });
+                            },
+                        () =>
+                        {
+                            dbTool.CloseDB();
+                            if (!ReferenceEquals(dbTool2ForCleanup, dbTool))
+                                dbTool2ForCleanup.CloseDB();
+                            if (!ReferenceEquals(dbTool3, dbTool) && !ReferenceEquals(dbTool3, dbTool2ForCleanup))
+                                dbTool3.CloseDB();
+                        });
                     tasks.Add(dbDataTask);
                 }
 
@@ -848,11 +957,40 @@ namespace PCRCaculator
                 await Task.WhenAll(tasks);
                 Debug.Log($"加载json完成，耗时: {jsonLoadStopwatch.ElapsedMilliseconds}ms");
 
-                // var saveCacheStopWatch = System.Diagnostics.Stopwatch.StartNew();
                 if (!loadedCache)
-                    saveToCache();
-                // saveCacheStopWatch.Stop();
-                // Debug.Log($"保存缓存完成，耗时: {saveCacheStopWatch.ElapsedMilliseconds}ms");
+                {
+                    databaseSources = GetDatabaseSources();
+                    var rebuiltFingerprintAvailable = await Task.Run(() =>
+                        DatabaseCacheContract.TryComputeSourceFingerprint(
+                            databaseSources,
+                            out sourceFingerprint,
+                            out fingerprintStatus));
+                    if (!rebuiltFingerprintAvailable)
+                    {
+                        throw new InvalidDataException($"数据库已加载，但无法建立缓存来源契约: {fingerprintStatus}");
+                    }
+                    if (!string.Equals(
+                            preparedSourceFingerprint,
+                            sourceFingerprint,
+                            StringComparison.Ordinal))
+                    {
+                        throw new InvalidDataException("数据库来源在加载过程中发生变化，拒绝发布不一致缓存");
+                    }
+
+                    databaseCache.cacheSchemaVersion = DatabaseCacheContract.CurrentSchemaVersion;
+                    databaseCache.cacheBuildComplete = true;
+                    databaseCache.databaseSourceFingerprint = sourceFingerprint;
+                    if (!DatabaseCacheContract.TryValidate(databaseCache, sourceFingerprint, out var validationReason))
+                    {
+                        databaseCache.cacheBuildComplete = false;
+                        throw new InvalidDataException($"数据库加载结果不完整: {validationReason}");
+                    }
+
+                    if (canPublishReplacementCache)
+                        SaveToCache(sourceFingerprint);
+                    else
+                        Debug.LogWarning("数据库已在内存中完整加载，但因原坏缓存无法保留，本次跳过新缓存发布");
+                }
 
 
                 // 角色数据加载计时
@@ -873,7 +1011,7 @@ namespace PCRCaculator
                 // 异常情况下也要停止计时并输出
                 stopwatch.Stop();
                 var elapsedTime = stopwatch.ElapsedMilliseconds;
-                Debug.LogError($"LoadAsync 执行失败，耗时: {elapsedTime}ms，错误: {e.Message}");
+                Debug.LogError($"LoadAsync 执行失败，耗时: {elapsedTime}ms，错误: {e}");
                 
                 try { wait?.SetMessage($"加载时发生致命错误:{e}，请重新打开！"); } catch { }
                 throw;
