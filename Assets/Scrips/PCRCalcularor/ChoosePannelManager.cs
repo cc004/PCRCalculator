@@ -191,8 +191,7 @@ namespace PCRCaculator
                 parent.localPosition = Vector3.zero;
                 parent.sizeDelta = new Vector2(114, original_hight);
 
-                int total = MainManager.Instance.UnitRarityDic.Count;
-                int processed = 0;
+                wait?.SetMessage("正在加载角色头像");
 
                 foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
                 {
@@ -213,10 +212,6 @@ namespace PCRCaculator
                         togglePerferbs[id0] = initializedButton.Toggle;
                         buttons[id0] = initializedButton.Button;
                     }
-
-                    processed++;
-                    wait?.SetMessage($"正在加载角色头像 ({processed}/{total})");
-                    yield return null;
                 }
 
                 initialized = true;
