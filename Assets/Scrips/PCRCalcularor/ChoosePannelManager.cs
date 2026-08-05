@@ -111,6 +111,21 @@ namespace PCRCaculator
         public GameObject talent;
         public Toggle isSetMaxExEquip;
         private bool initialized = false;
+        private bool initializationInProgress;
+        private readonly List<Action> initializationCallbacks = new List<Action>();
+        private sealed class InitialButtonInstance
+        {
+            public readonly int Id;
+            public readonly GameObject GameObject;
+            public Toggle Toggle;
+            public CharacterPageButton Button;
+
+            public InitialButtonInstance(int id, GameObject gameObject)
+            {
+                Id = id;
+                GameObject = gameObject;
+            }
+        }
         [System.Serializable]
         public class SubItemData
         {
@@ -146,58 +161,99 @@ namespace PCRCaculator
 
         private IEnumerator WaitForLoadFinished(Action callback = null)
         {
-            while (!MainManager.Instance.LoadFinished)
+            if (initialized)
             {
-            yield return null;
+                callback?.Invoke();
+                yield break;
             }
-            var wait = MainManager.Instance.OpenWaitUI();
-            yield return StartCoroutine(InitialButtonCoroutine(wait));
-            wait.Close();
-            initialized = true;
-            callback?.Invoke();
-        }
 
-        public IEnumerator InitialButtonCoroutine(WaitUI wait)
-        {
-            parent.localPosition = Vector3.zero;
-            parent.sizeDelta = new Vector2(100, original_hight);
-
-            int total = MainManager.Instance.UnitRarityDic.Count;
-            int cnt = 1;
-            int batchSize = 500; // 每帧加载多少个角色，可根据实际情况调整
-
-            foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+            if (callback != null)
             {
+                initializationCallbacks.Add(callback);
+            }
 
-                if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
+            if (initializationInProgress)
+            {
+                yield break;
+            }
+
+            initializationInProgress = true;
+            WaitUI wait = null;
+            var initializedButtons = new List<InitialButtonInstance>();
+            try
+            {
+                while (!MainManager.Instance.LoadFinished)
                 {
-                    GameObject b = Instantiate(togglePerferb);
-                    b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
-                    b.transform.localScale = Vector3.one;
-                    int bundleCountBefore = ABExTool.AssetBundleDic.Count;
+                    yield return null;
+                }
+                wait = MainManager.Instance.OpenWaitUI();
 
-                    int id0 = id;
-                    b.GetComponent<Toggle>().onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-                    b.GetComponent<CharacterPageButton>().SetButton(id);
+                parent.localPosition = Vector3.zero;
+                parent.sizeDelta = new Vector2(114, original_hight);
 
-                    togglePerferbs[id0] = b.GetComponent<Toggle>();
-                    buttons[id0] = b.GetComponent<CharacterPageButton>();
-                    int bundleCountAfter = ABExTool.AssetBundleDic.Count;
-                    if (bundleCountAfter > bundleCountBefore)
+                wait?.SetMessage("正在加载角色头像");
+
+                foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+                {
+                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
                     {
-                        cnt++;
-                        try
-                        {
-                            wait?.SetMessage($"正在加载角色头像 ({cnt}/{total})");
-                        }
-                        catch { }
+                        int id0 = id;
+                        GameObject b = Instantiate(togglePerferb);
+                        var initializedButton = new InitialButtonInstance(id0, b);
+                        initializedButtons.Add(initializedButton);
+                        b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
+                        b.transform.localScale = Vector3.one;
+
+                        initializedButton.Toggle = b.GetComponent<Toggle>();
+                        initializedButton.Button = b.GetComponent<CharacterPageButton>();
+                        initializedButton.Toggle.onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+                        initializedButton.Button.SetButton(id);
+
+                        togglePerferbs[id0] = initializedButton.Toggle;
+                        buttons[id0] = initializedButton.Button;
                     }
                 }
 
-                // **关键：每加载一批后等待一帧，避免卡顿**
-                if (cnt % batchSize == 0)
+                initialized = true;
+
+                var callbacks = initializationCallbacks.ToArray();
+                initializationCallbacks.Clear();
+                foreach (var pendingCallback in callbacks)
                 {
-                    yield return null;
+                    pendingCallback?.Invoke();
+                }
+            }
+            finally
+            {
+                try
+                {
+                    if (!initialized)
+                    {
+                        initializationCallbacks.Clear();
+                        for (int i = initializedButtons.Count - 1; i >= 0; i--)
+                        {
+                            var initializedButton = initializedButtons[i];
+                            if (togglePerferbs.TryGetValue(initializedButton.Id, out var toggle)
+                                && toggle == initializedButton.Toggle)
+                            {
+                                togglePerferbs.Remove(initializedButton.Id);
+                            }
+                            if (buttons.TryGetValue(initializedButton.Id, out var button)
+                                && button == initializedButton.Button)
+                            {
+                                buttons.Remove(initializedButton.Id);
+                            }
+                            if (initializedButton.GameObject != null)
+                            {
+                                Destroy(initializedButton.GameObject);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    initializationInProgress = false;
+                    wait?.Close();
                 }
             }
         }
@@ -887,6 +943,8 @@ namespace PCRCaculator
 
         private void RefreshBasePage()
         {
+            const int ButtonsPerRow = 8;
+            const int VisibleRows = 2;
             int count = 1;
             int displayCount = 0;
             firstShowUnitId = -1;
@@ -903,8 +961,8 @@ namespace PCRCaculator
                 {
                     buttons[id].RefreshData(unitData);
                     buttons[id].transform.localPosition = new Vector3(
-                        baseRange.x + range.x * ((count - 1) % 8),
-                        -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / 8)), 0);
+                        baseRange.x + range.x * ((count - 1) % ButtonsPerRow),
+                        -1 * (baseRange.y + range.y * Mathf.FloorToInt((count - 1) / ButtonsPerRow)), 0);
                     togglePerferbs[id].isOn = selectedCharId.Contains(id);
                     buttons[id].gameObject.SetActive(true);
                     if (count == 1)
@@ -917,12 +975,14 @@ namespace PCRCaculator
                     buttons[id].gameObject.SetActive(false);
                 }
             }
-            int neededHeight = Mathf.CeilToInt(displayCount / 8f) * 95;
-            parent.sizeDelta = new Vector2(100, neededHeight);
+            int rowCount = Mathf.CeilToInt(displayCount / (float)ButtonsPerRow);
+            float neededHeight = rowCount * range.y;
+            parent.sizeDelta = new Vector2(parent.sizeDelta.x, neededHeight);
 
-            if (parent.localPosition.y > Mathf.CeilToInt(count / 8 - 2) * 95)
+            float maxScrollPosition = Mathf.Max(0, rowCount - VisibleRows) * range.y;
+            if (parent.localPosition.y > maxScrollPosition)
             {
-                parent.SetLocalPosY(Mathf.CeilToInt(count / 8 - 2) * 95);
+                parent.SetLocalPosY(maxScrollPosition);
             }
             Canvas.ForceUpdateCanvases();
             TurnAllToggles(selectedCharId.Count != 5);

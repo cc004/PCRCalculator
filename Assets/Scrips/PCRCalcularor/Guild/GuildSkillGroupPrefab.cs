@@ -51,6 +51,7 @@ namespace PCRCaculator.Guild
         public float prefabTransformY;
         public int prefabHight;
         public int abnormalPrefabHight;
+        public float expandedBaseHeight;
         public const float deltaXforChat = 1 / 5400.0f;
 
         private List<GameObject> prefabs = new List<GameObject>();
@@ -153,16 +154,16 @@ namespace PCRCaculator.Guild
         {
             RectTransform rectTransform = GetComponent<RectTransform>();
             float sizeX = rectTransform.sizeDelta.x;
-            float sizeY = 50 + MaxHight;
+            float sizeY = expandedBaseHeight + MaxHight;
             if (!change)
             {
-                rectTransform.sizeDelta = new Vector2(sizeX, 35);
-                return 35;
+                rectTransform.sizeDelta = new Vector2(sizeX, originalScale.y);
+                return originalScale.y;
             }
             if (MaxHight >= 0)
             {
                 sizeX = rectTransform.sizeDelta.x;
-                sizeY = 50 + MaxHight;
+                sizeY = expandedBaseHeight + MaxHight;
                 rectTransform.sizeDelta = new Vector2(sizeX,sizeY);
                 return sizeY;
             }

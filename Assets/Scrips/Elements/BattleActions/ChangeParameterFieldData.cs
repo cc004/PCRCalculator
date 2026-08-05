@@ -29,7 +29,7 @@ namespace Elements
 
         protected override int getClearedIndex(UnitCtrl _unit) => !IsBuff ? _unit.ClearedDebuffFieldIndex : _unit.ClearedBuffFieldIndex;
         public bool ShowsIcon = true;
-        public bool TriggerCall = true; // TODO implement
+        public bool TriggerCall = true;
 
         public void DispelImmediately(UnitCtrl _unit)
         {
@@ -125,7 +125,7 @@ namespace Elements
 
             owner.fieldTime = remaining;
             owner.SetBuffParam(UnitCtrl.BuffParamKind.NUM, BuffParamKind, dictionary, 0f, 0, _source, _despelable: true, Elements.eEffectType.COMMON, IsBuff, _additional: false, _isShowIcon: false);
-            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, _source, IsBuff, _additional: false, ShowsIcon, extraKey: this);
+            owner.EnableBuffParam(BuffParamKind, dictionary, _enable: true, _source, IsBuff, _additional: false, ShowsIcon, _triggerCall: TriggerCall, extraKey: this);
             node[owner] = owner.EnableBuffDebuffField(this);
     }
 

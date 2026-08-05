@@ -30,55 +30,6 @@ using Object = UnityEngine.Object;
 
 namespace Elements
 {
-    public class AccumulativeDamageSourceData // TypeDefIndex: 2274
-    {
-        // Fields
-        private eAccumulativeDamageType AccumulativeDamageType; // 0x10
-        private double effectValue; // 0x14
-        private int countLimit; // 0x18
-
-        // Methods
-
-        // RVA: 0x2ED65A4 Offset: 0x2ED65A4 VA: 0x2ED65A4
-        public AccumulativeDamageSourceData(eAccumulativeDamageType _damageType, double _effectValue, int _countLimit)
-        {
-            this.AccumulativeDamageType = _damageType;
-            this.effectValue = _effectValue;
-            this.countLimit = _countLimit;
-        }
-
-        public AccumulativeDamageData CreateAccumulativeDamageData()
-        {
-            if (AccumulativeDamageType == eAccumulativeDamageType.FIXED)
-            {
-                return new AccumulativeDamageData
-                {
-                    AccumulativeDamageType = eAccumulativeDamageType.FIXED,
-                    FixedValue = effectValue,
-                    CountLimit = countLimit
-                };
-            }
-            else
-            {
-                return new AccumulativeDamageData
-                {
-                    AccumulativeDamageType = eAccumulativeDamageType.PERCENTAGE,
-                    PercentageValue = effectValue,
-                    CountLimit = countLimit
-                };
-            }
-        }
-    }
-
-    public class BasePartsDataEx
-    {
-        public LongWithEx Hp;
-        public DoubleWithEx Energy, GetAtkZeroEx, GetMagicStrZeroEx;
-        public long MaxHp;
-        public string UnitName;
-        public int hash;
-    }
-
     public partial class UnitCtrl : FixedTransformMonoBehavior, ISingletonField
     {
         public class BuffDebuffCoroutineDataSet // TypeDefIndex: 2261
@@ -1635,7 +1586,13 @@ namespace Elements
         public UnitParameter UnitParameter { get; set; }
 
         public bool IsOther { get; set; }
-        public bool IsBonusEnemy { get; set; }
+        public eBonusEnemyType BonusEnemyType { get; set; }
+        public bool IsBonusEnemy
+        {
+            get => BonusEnemyType != eBonusEnemyType.NONE;
+            set => BonusEnemyType = value ? eBonusEnemyType.EXTRA_EFFECT : eBonusEnemyType.NONE;
+        }
+        public bool IsRelicEnemy => BonusEnemyType == eBonusEnemyType.RELIC;
         public bool IsPlayerUnit => !IsOther;// == battleManager.BJKKBMOLHDH;
 
         public bool JoyFlag { get; set; }
@@ -7870,7 +7827,7 @@ this.updateCurColor();
           bool _isShowIcon,
           int _bonusId = 0,
           int _environmentId = -1, // TODO implement
-          bool _triggerCall = true, // TODO implement
+          bool _triggerCall = true,
           Action<string> action = null,
           int _actionId = 0,
           string _describe = null)
@@ -7928,7 +7885,7 @@ this.updateCurColor();
             var idx = ++buffDebuffIndex;
             var dispelled = IdleOnly || (long)Hp < 0;
             buffDebuffFlag.Add((short) ((_isBuff ? 2 : 0) | (_despelable ? 4 : 0) | (_additional ? 8 : 0) | (dispelled ? 1 : 0) | (int)_kind << 4));
-            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, idx, _isBuff, _additional, _isShowIcon, _bonusId, _actionId, describe);
+            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, idx, _isBuff, _additional, _isShowIcon, _bonusId, _actionId, describe, _triggerCall);
             // TODO fill _cr Enable EnvironmentId
 
             buffDebuffCoroutineList.Add(_cr);
@@ -8043,7 +8000,8 @@ this.updateCurColor();
           bool _isShowIcon,
           int _bonusId,
           int _actionId,
-          string _describe)
+          string _describe,
+          bool _triggerCall)
         {
             long eventToken = CreateBuffDebuffEventToken(_buffDebuffId);
             if (_kind == BuffParamKind.MAX_HP)
@@ -8067,7 +8025,7 @@ this.updateCurColor();
                 }*/
                 maxHpDebufCounter++;
             }
-            EnableBuffParam(_kind, _value, true, _source, _isBuff, _additional, _isShowIcon, _maxTime, _skillId: _skillId, _actionId: _actionId, _describe: _describe);
+            EnableBuffParam(_kind, _value, true, _source, _isBuff, _additional, _isShowIcon, _maxTime, _triggerCall: _triggerCall, _skillId: _skillId, _actionId: _actionId, _describe: _describe);
             MyGameCtrl.Instance.BattleStats.RecordBuffDebuffStart(eventToken, this, _source, _kind, _isBuff, (long)_value.Values.Sum(v => v), _skillId, _actionId, _describe);
             float time = 0.0f;
             var buffId = getBuffDebuffParamValue(_kind, _isBuff, _additional);
@@ -8194,7 +8152,7 @@ this.updateCurColor();
           bool _additional,
           bool _showsIcon = true,
           float buffTime = 0,
-          bool _triggerCall = true, // TODO implement
+          bool _triggerCall = true,
           object extraKey = null,
           int _skillId = 0,
           int _actionId = 0,
@@ -8254,14 +8212,18 @@ this.updateCurColor();
                     if (_isBuff)
                     {
                         ++buffCounter;
-                        execPassiveSeal(PassiveSealAction.ePassiveTiming.BUFF);
-                        OnSetBuffForEnchantTrigger?.Invoke();
+                        if (_triggerCall)
+                        {
+                            execPassiveSeal(PassiveSealAction.ePassiveTiming.BUFF);
+                            OnSetBuffForEnchantTrigger?.Invoke();
+                        }
                     }
                     else
                     {
                         debuffCounterDictionary[_kind]++;
                         ++debuffCounter;
-                        execPassiveSeal(PassiveSealAction.ePassiveTiming.DEBUFF);
+                        if (_triggerCall)
+                            execPassiveSeal(PassiveSealAction.ePassiveTiming.DEBUFF);
                     }
                 }
                 else if (_isBuff)
@@ -15013,6 +14975,13 @@ this.updateCurColor();
         }
 
         private bool isMyTurn() => battleManager.ChargeSkillTurn == eChargeSkillTurn.NONE || unitActionController.Skill1Charging;
+
+        public enum eBonusEnemyType
+        {
+            NONE = 0,
+            EXTRA_EFFECT = 1,
+            RELIC = 2,
+        }
 
         public enum ActionState
         {

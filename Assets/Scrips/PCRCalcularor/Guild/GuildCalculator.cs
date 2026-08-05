@@ -15,7 +15,6 @@ using OfficeOpenXml;
 using PCRCaculator.Battle;
 using SFB;
 using UnityEngine;
-using UnityEngine.Networking.Types;
 using UnityEngine.UI;
 using XCharts.Runtime;
 using static UnityEngine.GraphicsBuffer;

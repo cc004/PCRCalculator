@@ -19,6 +19,7 @@ public static class UniversalDoNotShipCleanup
 
             string[] dangerousPatterns = {
                 "_BackUpThisFolder_ButDontShipItWithYourGame",
+                "_BurstDebugInformation_DoNotShip",
             };
 
             foreach (string pattern in dangerousPatterns)

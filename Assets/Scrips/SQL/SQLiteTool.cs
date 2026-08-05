@@ -39,38 +39,16 @@ namespace PCRCaculator.SQL
 
         public void Prepare()
         {
+            this.path = ResolveSourceDatabasePath(mgr);
 
-            string rootPath = $"{mgr.DataVer}.db";
-            string publicPath = Path.Combine(ABExTool.persistentDataPath, $"{mgr.DataVer}.db");
-
-            // 检查第一个路径（本体目录）
-            if (File.Exists(rootPath))
-            {
-                this.path = rootPath;
-                Debug.Log($"使用本体目录{mgr.DataVer}.db");
-            }
+            if (File.Exists(this.path))
+                Debug.Log($"使用数据库来源 {mgr.DataVer}.db: {this.path}");
             else
-            {
-                // 检查第二个路径（公共目录）
-                if (File.Exists(publicPath))
-                {
-                    this.path = publicPath;
-                    Debug.Log($"使用公共目录{mgr.DataVer}.db");
-                }
-                else
-                {
-                    Debug.Log($"未找到{mgr.DataVer}.db，将自动下载存放至公共目录，如果是jp数据库需要反哈希，无法直接食用");
-                    this.path = publicPath;
-                }
-            }
+                Debug.Log($"未找到{mgr.DataVer}.db，将自动下载存放至公共目录，如果是jp数据库需要反哈希，无法直接食用");
 
             if (!File.Exists(this.path))
             {
-                File.WriteAllBytes(this.path, mgr.ResolveDatabase());
-                if (!mgr.DataVer.StartsWith("jp"))
-                {
-                    Unhash();
-                }
+                DownloadAndPrepareSourceDatabase(this.path);
             }
 
             string dbPath = null;
@@ -117,10 +95,110 @@ namespace PCRCaculator.SQL
             catch (Exception e)
             {
                 Debug.LogError($"error occured while trying to patch database: {e}");
+                try
+                {
+                    if (!string.IsNullOrEmpty(dbPath) && File.Exists(dbPath))
+                        File.Delete(dbPath);
+                }
+                catch (Exception cleanupException)
+                {
+                    Debug.LogWarning($"清理失败的数据库补丁临时文件时出错: {cleanupException}");
+                }
+
+                throw new InvalidDataException($"数据库 {mgr.DataVer} 补丁或解析失败", e);
             }
 
             ConnectDB(path, @readonly);
         }
+
+        private void DownloadAndPrepareSourceDatabase(string destinationPath)
+        {
+            var directory = Path.GetDirectoryName(destinationPath);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+
+            var stagingPath = $"{destinationPath}.download-{Guid.NewGuid():N}.tmp";
+            try
+            {
+                File.WriteAllBytes(stagingPath, mgr.ResolveDatabase());
+                this.path = stagingPath;
+                if (!mgr.DataVer.StartsWith("jp", StringComparison.OrdinalIgnoreCase))
+                    Unhash();
+
+                if (File.Exists(destinationPath))
+                    throw new IOException($"数据库正式路径在发布前意外出现: {destinationPath}");
+                File.Move(stagingPath, destinationPath);
+            }
+            catch (Exception exception)
+            {
+                if (File.Exists(stagingPath))
+                {
+                    if (DatabaseCacheContract.TryQuarantineRejectedCache(
+                            stagingPath,
+                            out var quarantinedPath,
+                            out var quarantineError))
+                    {
+                        Debug.LogError(
+                            $"数据库下载/反哈希失败，staging 已保留: dataVersion={mgr.DataVer}, " +
+                            $"file={Path.GetFileName(quarantinedPath)}, error={exception}");
+                    }
+                    else
+                    {
+                        Debug.LogError(
+                            $"数据库下载/反哈希失败且 staging 无法保留: dataVersion={mgr.DataVer}, " +
+                            $"quarantineError={quarantineError}, error={exception}");
+                        try
+                        {
+                            File.Delete(stagingPath);
+                        }
+                        catch (Exception cleanupException)
+                        {
+                            Debug.LogError(
+                                $"数据库 staging 清理失败: dataVersion={mgr.DataVer}, error={cleanupException}");
+                        }
+                    }
+                }
+
+                throw new InvalidDataException(
+                    $"数据库 {mgr.DataVer} 下载或反哈希失败，未发布到正式来源路径",
+                    exception);
+            }
+            finally
+            {
+                this.path = destinationPath;
+            }
+        }
+
+        public static string ResolveSourceDatabasePath(IDataBaseManager manager)
+        {
+            if (manager == null)
+                return null;
+
+            var rootPath = $"{manager.DataVer}.db";
+            if (File.Exists(rootPath))
+                return rootPath;
+
+#if UNITY_STANDALONE_OSX && !UNITY_EDITOR
+            var macOSAppRootPath = GetMacOSAppRootPath(rootPath);
+            if (File.Exists(macOSAppRootPath))
+                return macOSAppRootPath;
+#endif
+
+            return Path.Combine(ABExTool.persistentDataPath, $"{manager.DataVer}.db");
+        }
+
+#if UNITY_STANDALONE_OSX && !UNITY_EDITOR
+        private static string GetMacOSAppRootPath(string fileName)
+        {
+            DirectoryInfo directory = new DirectoryInfo(UnityEngine.Application.dataPath);
+            while (directory != null && !directory.Name.EndsWith(".app", StringComparison.OrdinalIgnoreCase))
+            {
+                directory = directory.Parent;
+            }
+
+            return directory?.Parent == null ? string.Empty : Path.Combine(directory.Parent.FullName, fileName);
+        }
+#endif
 
         private string path;
         private bool @readonly;
@@ -134,6 +212,16 @@ namespace PCRCaculator.SQL
         }
         public T[] GetDatas<T>(Func<T, bool> func = null) where T : new()
         {
+            return ReadDatas(func, allowMissingSchema: false);
+        }
+
+        protected T[] GetOptionalDatas<T>(Func<T, bool> func = null) where T : new()
+        {
+            return ReadDatas(func, allowMissingSchema: true);
+        }
+
+        private T[] ReadDatas<T>(Func<T, bool> func, bool allowMissingSchema) where T : new()
+        {
             var conn = new SQLiteConnection(path, @readonly ? SQLiteOpenFlags.ReadOnly : SQLiteOpenFlags.ReadWrite);
             lock (connections) connections.Add(conn);
             try
@@ -142,15 +230,39 @@ namespace PCRCaculator.SQL
             }
             catch (Exception ex)
             {
-                return null;
+                var message = $"数据库读取失败: dataVersion={mgr.DataVer}, table={typeof(T).Name}";
+                if (allowMissingSchema && IsMissingOptionalSchema(ex))
+                {
+                    Debug.LogWarning($"{message}; optionalSchema=true; error={ex.Message}");
+                    return Array.Empty<T>();
+                }
+
+                var wrapped = new InvalidDataException(message, ex);
+                Debug.LogError($"{wrapped}");
+                throw wrapped;
             }
+        }
+
+        private static bool IsMissingOptionalSchema(Exception exception)
+        {
+            var message = exception?.ToString() ?? string.Empty;
+            return message.IndexOf("no such table", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   message.IndexOf("no such column", StringComparison.OrdinalIgnoreCase) >= 0;
         }
         public Dictionary<int, T> GetDatasDic<T>(Func<T, int> func, Func<T, bool> select = null) where T : new()
         {
             Dictionary<int, T> dict = new Dictionary<int, T>();
             var list = GetDatas<T>(select);
-            if (list == null) return dict;
             foreach (var item in list)
+                dict[func(item)] = item;
+            return dict;
+        }
+
+        protected Dictionary<int, T> GetOptionalDatasDic<T>(Func<T, int> func, Func<T, bool> select = null)
+            where T : new()
+        {
+            var dict = new Dictionary<int, T>();
+            foreach (var item in GetOptionalDatas<T>(select))
                 dict[func(item)] = item;
             return dict;
         }
@@ -181,15 +293,31 @@ namespace PCRCaculator.SQL
         }*/
         public void CloseDB()
         {
-            foreach (var conn in connections) conn.Close();
+            SQLiteConnection[] openConnections;
+            lock (connections)
+            {
+                openConnections = connections.ToArray();
+                connections.Clear();
+            }
+
+            foreach (var connection in openConnections)
+            {
+                try
+                {
+                    connection.Close();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogWarning($"关闭数据库连接失败: dataVersion={mgr.DataVer}, error={exception}");
+                }
+            }
         }
         private void Unhash()
         {
             string rainbowJsonContent = MainManager.Instance.LoadJsonDatas("Datas/rainbow");
             if (string.IsNullOrEmpty(rainbowJsonContent))
             {
-                Debug.LogError("Rainbow table not found, unhashing skipped.");
-                return;
+                throw new InvalidDataException("Rainbow table not found; database unhashing cannot continue.");
             }
 
             Debug.Log($"Start Unhashing {mgr.DataVer}.db");
@@ -251,8 +379,8 @@ namespace PCRCaculator.SQL
 
                     if (!ExecTransaction(dbConnection, transactionCmds))
                     {
-                        Debug.LogError($"Failed when executing a transaction for '{intactTableName}' ({hashedTableName}). Transaction: {string.Join("; ", transactionCmds)}");
-                        continue;
+                        throw new InvalidDataException(
+                            $"反哈希事务未完成: table={intactTableName}, hashedTable={hashedTableName}");
                     }
                 }
                 Debug.Log("Unhashing complete.");
@@ -314,7 +442,7 @@ namespace PCRCaculator.SQL
                 {
                     Debug.LogError($"Transaction failed: {e}");
                     transaction.Rollback();
-                    return false;
+                    throw new InvalidDataException("数据库反哈希事务失败", e);
                 }
             }
         }
@@ -397,6 +525,9 @@ namespace PCRCaculator.SQL
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get; private set; }
+        public Dictionary<int, List<labyrinth_relic_mark_effect>> LabyrinthRelicMarkEffectDic { get; private set; }
+        public Dictionary<int, List<relic_action_exec_time>> RelicActionExecTimeDic { get; private set; }
+        public Dictionary<int, List<relic_skill_exec_time>> RelicSkillExecTimeDic { get; private set; }
         public Dictionary<int, mirage_nemesis_area> MirageNemesisAreaDic { get; private set; }
         // public Dictionary<(int, int), promotion_bonus> rbs
         public Dictionary<int, Dictionary<int, promotion_bonus>> rbs
@@ -460,41 +591,48 @@ namespace PCRCaculator.SQL
             });
             var enemyTalentWeaknessTask = Task.Run(() =>
             {
-                EnemyTalentWeaknessDic = GetDatasDic<enemy_talent_weakness>(a => a.enemy_id);
+                EnemyTalentWeaknessDic = GetOptionalDatasDic<enemy_talent_weakness>(a => a.enemy_id);
             });
             var talentWeaknessTask = Task.Run(() =>
             {
-                TalentWeaknessDic = GetDatasDic<talent_weakness>(a => a.resist_id);
+                TalentWeaknessDic = GetOptionalDatasDic<talent_weakness>(a => a.resist_id);
             });
             var talentDicTask = Task.Run(() => TalentDic = GetDatas<unit_talent>()
                         .GroupBy(x => x.unit_id)
                         .ToDictionary(g => g.Key, g => g.ToArray()));
             var UnitRoleDataDicTask =
-                Task.Run(() => UnitRoleDataDic = GetDatasDic<unit_role_data>(a => a.unit_id));
+                Task.Run(() => UnitRoleDataDic = GetOptionalDatasDic<unit_role_data>(a => a.unit_id));
             var tasks = new List<Task>();
 
             tasks.Add(
-                Task.WhenAll(rarityDicTask, unitSkillDataDicTask, unitAttackPatternDicTask, equipDicTask,
-                        rankStateDicTask, unitDicTask, talentDicTask, UnitRoleDataDicTask)
-                .ContinueWith(_ => Dic1 = GetUnitRarityData()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(rarityDicTask, unitSkillDataDicTask, unitAttackPatternDicTask, equipDicTask,
+                        rankStateDicTask, unitDicTask, talentDicTask, UnitRoleDataDicTask),
+                    () => Dic1 = GetUnitRarityData()));
             tasks.Add(
-                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
-                    .ContinueWith(_ => Dic2 = GetEnemyDataDic()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => Dic2 = GetEnemyDataDic()));
             tasks.Add(
-                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
-                .ContinueWith(_ => TalentQuestEnemyParameterDic = GetTalentQuestEnemyDataDic()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => TalentQuestEnemyParameterDic = GetTalentQuestEnemyDataDic()));
             tasks.Add(
-                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
-                .ContinueWith(_ => AbyssEnemyParameterDic = GetAbyssEnemyDataDic()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => AbyssEnemyParameterDic = GetAbyssEnemyDataDic()));
             tasks.Add(
-                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
-                .ContinueWith(_ => LabyrinthEnemyParameterDic = GetLabyrinthEnemyDataDic()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => LabyrinthEnemyParameterDic = GetLabyrinthEnemyDataDic()));
             tasks.Add(
-                Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask)
-                .ContinueWith(_ => MirageEnemyParameterDic = GetMirageEnemyDataDic()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => MirageEnemyParameterDic = GetMirageEnemyDataDic()));
             tasks.Add(
-                Task.WhenAll(enemyTalentWeaknessTask, talentWeaknessTask)
-                    .ContinueWith(_ => WeaknessDic = GetWeaknessDict()));
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(enemyTalentWeaknessTask, talentWeaknessTask),
+                    () => WeaknessDic = GetWeaknessDict()));
             tasks.Add(
                 Task.Run(() => resistDataDic = GetResistData()));
             tasks.Add(
@@ -547,7 +685,7 @@ namespace PCRCaculator.SQL
                             5 => data.enemy_id_5,
                             _ => 0,
                         };
-                    })));
+                    }, optional: true)));
             tasks.Add(
             Task.Run(() => MirageWaveGroupDataDic = GetWaveGroupDataDic<mirage_wave_group_data>(
                 data => data.wave_group_id,
@@ -563,19 +701,22 @@ namespace PCRCaculator.SQL
                         5 => data.enemy_id_5,
                         _ => 0,
                     };
-                })));
+                }, optional: true)));
             tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
                 Task.Run(() => Dic4 = GetSkillActionDic()));
-            tasks.Add(unitAttackPatternDicTask.ContinueWith(
-                _ => Dic5 = GetUnitAttackPatternDic()));
-            tasks.Add(waveDicTask.ContinueWith(
-                _ => Dic6 = GetGuildEnemyData()));
+            tasks.Add(DatabaseCacheContract.RunAfterSuccessAsync(
+                unitAttackPatternDicTask,
+                () => Dic5 = GetUnitAttackPatternDic()));
+            tasks.Add(DatabaseCacheContract.RunAfterSuccessAsync(
+                waveDicTask,
+                () => Dic6 = GetGuildEnemyData()));
             tasks.Add(
                 Task.Run(() => Dic7 = GetMPartsData()));
-            tasks.Add(dic2Task.ContinueWith(
-                _ => Dic8 = GetEquipmentData()));
+            tasks.Add(DatabaseCacheContract.RunAfterSuccessAsync(
+                dic2Task,
+                () => Dic8 = GetEquipmentData()));
             tasks.Add(
                 Task.Run(() => Dic9 = GetUEQData()));
             tasks.Add(
@@ -591,9 +732,9 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => Dic12 = GetSkillActionDes_cn()));
             tasks.Add(
-                Task.Run(() => eReductions = GetDatas<EReduction>().ToList()));
+                Task.Run(() => eReductions = GetOptionalDatas<EReduction>().ToList()));
             tasks.Add(
-                Task.Run(() => rbs = GetDatas<promotion_bonus>()
+                Task.Run(() => rbs = GetOptionalDatas<promotion_bonus>()
                     .GroupBy(x => x.unit_id)
                     .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.promotion_level, x => x))));
             tasks.Add(
@@ -603,105 +744,116 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => TalentSkillEnhanceDataDic = GetTalentSkillEnhanceData()));
             tasks.Add(
-                Task.Run(() => paramTypeDic = GetDatasDic<param_type>(a => a.parameter_type)));
+                Task.Run(() => paramTypeDic = GetOptionalDatasDic<param_type>(a => a.parameter_type)));
             tasks.Add(
                 Task.Run(() => TeamSkillNodeDic = GetTeamSkillData()));
             tasks.Add(
                 Task.Run(() => TeamSkillEnhanceDataDic = GetTeamSkillEnhanceData()));
             tasks.Add(
-                Task.Run(() => ExtraEffectDataDic = GetDatasDic<extra_effect_data>(a => a.extra_effect_id)));
+                Task.Run(() => ExtraEffectDataDic = GetOptionalDatasDic<extra_effect_data>(a => a.extra_effect_id)));
             tasks.Add(
-                Task.Run(() => TalentQuestBattleEffectDic = GetDatasDic<talent_quest_battle_effect>(a => a.id)));
+                Task.Run(() => TalentQuestBattleEffectDic = GetOptionalDatasDic<talent_quest_battle_effect>(a => a.id)));
             tasks.Add(
-                Task.Run(() => AbyssBattleEffectDic = GetDatasDic<abyss_battle_effect>(a => a.id)));
+                Task.Run(() => AbyssBattleEffectDic = GetOptionalDatasDic<abyss_battle_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => AbyssQuestFilterDic = GetAbyssQuestFilteredDic()));
             tasks.Add(
                 Task.Run(() => AbyssBossFilterDic = GetAbyssBossFilteredDic()));
             tasks.Add(
-                Task.Run(() => MirageBattleEffectDic = GetDatasDic<mirage_battle_effect>(a => a.id)));
+                Task.Run(() => MirageBattleEffectDic = GetOptionalDatasDic<mirage_battle_effect>(a => a.id)));
             tasks.Add(
-                Task.Run(() => MirageNemesisAreaDic = GetDatasDic<mirage_nemesis_area>(a => a.nemesis_id)));
+                Task.Run(() => MirageNemesisAreaDic = GetOptionalDatasDic<mirage_nemesis_area>(a => a.nemesis_id)));
             tasks.Add(
-                Task.Run(() => UnitRoleMasteryIdDic = GetDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
+                Task.Run(() => UnitRoleMasteryIdDic = GetOptionalDatasDic<unit_role_mastery_id>(a => a.mastery_id)));
             tasks.Add(
                 Task.Run(() => UnitRoleMasterySlotEnhanceDataDic = GetUnitRoleMasterySlotEnhanceData()));
             tasks.Add(Task.Run(() =>
             {
-                ConnectRankStatusDic = (GetDatas<connect_rank_status>() ?? Array.Empty<connect_rank_status>())
+                ConnectRankStatusDic = GetOptionalDatas<connect_rank_status>()
                     .GroupBy(x => x.role_id)
                     .ToDictionary(g => g.Key, g => g.OrderBy(x => x.rank_from).ThenBy(x => x.rank_to).ToList());
             }));
             tasks.Add(
-                Task.Run(() => ConnectRankChartDic = GetDatasDic<connect_rank_chart>(a => a.rank)));
+                Task.Run(() => ConnectRankChartDic = GetOptionalDatasDic<connect_rank_chart>(a => a.rank)));
             tasks.Add(Task.Run(() =>
-                ConnectRankBonusList = (GetDatas<connect_rank_bonus>() ?? Array.Empty<connect_rank_bonus>())
+                ConnectRankBonusList = GetOptionalDatas<connect_rank_bonus>()
                     .OrderBy(x => x.bonus_level)
                     .ThenBy(x => x.bonus_number)
                     .ToList()));
             tasks.Add(
-                Task.Run(() => ConnectRankBoostDic = GetDatasDic<connect_rank_boost>(a => a.system_id)));
+                Task.Run(() => ConnectRankBoostDic = GetOptionalDatasDic<connect_rank_boost>(a => a.system_id)));
             tasks.Add(
-                Task.Run(() => ConnectRankLimitCommonDic = GetDatasDic<connect_rank_limit_common>(a => a.max_rank)));
+                Task.Run(() => ConnectRankLimitCommonDic = GetOptionalDatasDic<connect_rank_limit_common>(a => a.max_rank)));
             tasks.Add(Task.Run(() =>
             {
-                ConnectRankLimitItemDic = (GetDatas<connect_rank_limit_item>() ?? Array.Empty<connect_rank_limit_item>())
+                ConnectRankLimitItemDic = GetOptionalDatas<connect_rank_limit_item>()
                     .GroupBy(x => x.group_id)
                     .ToDictionary(g => g.Key, g => g.OrderBy(x => x.max_rank).ToList());
             }));
             tasks.Add(Task.Run(() =>
             {
-                ConnectRankEnhanceDic = (GetDatas<connect_rank_enhance>() ?? Array.Empty<connect_rank_enhance>())
+                ConnectRankEnhanceDic = GetOptionalDatas<connect_rank_enhance>()
                     .GroupBy(x => x.role_id)
                     .ToDictionary(g => g.Key, g => g.OrderBy(x => x.rank).ToList());
             }));
             tasks.Add(
-                Task.Run(() => LabyrinthEnhanceNodeDic = GetDatasDic<labyrinth_enhance_node>(a => a.node_id)));
+                Task.Run(() => LabyrinthEnhanceNodeDic = GetOptionalDatasDic<labyrinth_enhance_node>(a => a.node_id)));
             tasks.Add(
-                Task.Run(() => LabyrinthEnhanceDataDic = GetDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
+                Task.Run(() => LabyrinthEnhanceDataDic = GetOptionalDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
             tasks.Add(
-                Task.Run(() => LabyrinthQuestDataDic = GetDatasDic<labyrinth_quest_data>(a => a.quest_id)));
+                Task.Run(() => LabyrinthQuestDataDic = GetOptionalDatasDic<labyrinth_quest_data>(a => a.quest_id)));
             tasks.Add(
-                Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
+                Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetOptionalDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
             tasks.Add(
-                Task.Run(() => LabyrinthRelicDic = GetDatasDic<labyrinth_relic>(a => a.relic_id)));
+                Task.Run(() => LabyrinthRelicDic = GetOptionalDatasDic<labyrinth_relic>(a => a.relic_id)));
             tasks.Add(
-                Task.Run(() => LabyrinthRelicEffectGroupDic = GetDatasDic<labyrinth_relic_effect_group>(a => a.effect_group_id)));
+                Task.Run(() => LabyrinthRelicEffectGroupDic = GetOptionalDatasDic<labyrinth_relic_effect_group>(a => a.effect_group_id)));
             tasks.Add(
-                Task.Run(() => LabyrinthRelicEffectDic = GetDatasDic<labyrinth_relic_effect>(a => a.effect_id)));
+                Task.Run(() => LabyrinthRelicEffectDic = GetOptionalDatasDic<labyrinth_relic_effect>(a => a.effect_id)));
+            tasks.Add(Task.Run(() =>
+            {
+                LabyrinthRelicMarkEffectDic = GetOptionalDatas<labyrinth_relic_mark_effect>()
+                    .GroupBy(x => x.relic_mark_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.trigger_count).ToList());
+            }));
+            tasks.Add(Task.Run(() =>
+            {
+                RelicActionExecTimeDic = GetOptionalDatas<relic_action_exec_time>()
+                    .GroupBy(x => x.action_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.id).ToList());
+            }));
+            tasks.Add(Task.Run(() =>
+            {
+                RelicSkillExecTimeDic = GetOptionalDatas<relic_skill_exec_time>()
+                    .GroupBy(x => x.skill_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.id).ToList());
+            }));
             tasks.Add(Task.Run(() =>
             {
                 masterUnitSkillDataRf = new MasterUnitSkillDataRf();
-                try
-                {
-                    masterUnitSkillDataRf.dict = GetDatas<MasterUnitSkillDataRf.UnitSkillDataRf>()
-                        .GroupBy(x => x.skill_id)
-                        .ToDictionary(g => g.Key, g => g.OrderBy(x => x.min_lv).ToList());
-                }
-                catch
-                {
-                    masterUnitSkillDataRf.dict = new Dictionary<int, List<MasterUnitSkillDataRf.UnitSkillDataRf>>();
-                }
+                masterUnitSkillDataRf.dict = GetOptionalDatas<MasterUnitSkillDataRf.UnitSkillDataRf>()
+                    .GroupBy(x => x.skill_id)
+                    .ToDictionary(g => g.Key, g => g.OrderBy(x => x.min_lv).ToList());
             }));
 
             tasks.Add(Task.Run(() =>
             {
-                var enhanceLevel = GetDatas<ex_equipment_enhance_data>()
+                var enhanceLevel = GetOptionalDatas<ex_equipment_enhance_data>()
                     .GroupBy(x => x.rarity)
                     .ToDictionary(g => g.Key, g => g.Max(x => x.enhance_level));
 
-                var subStatusGroupData = GetDatas<ex_equipment_sub_status_group>();
+                var subStatusGroupData = GetOptionalDatas<ex_equipment_sub_status_group>();
                 var subStatusGroups = subStatusGroupData != null ?
                     subStatusGroupData.GroupBy(x => x.ex_equipment_id)
                         .ToDictionary(g => g.Key, g => g.ToList()) :
                     new Dictionary<int, List<ex_equipment_sub_status_group>>();
 
-                var subStatusesData = GetDatas<ex_equipment_sub_status>();
+                var subStatusesData = GetOptionalDatas<ex_equipment_sub_status>();
                 var subStatuses = subStatusesData != null ?
                     subStatusesData.GroupBy(x => x.group_id)
                     .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values)) : new Dictionary<int, Dictionary<int, int[]>>();
 
-                var categories = GetDatas<ex_equipment_data>()
+                var categories = GetOptionalDatas<ex_equipment_data>()
                     // .Where(x => x.clan_battle_equip_flag)
                     .Select(x =>
                     {
@@ -728,7 +880,7 @@ namespace PCRCaculator.SQL
 
                 var empty = new Dictionary<int, ex_equipment_data>();
 
-                unitExEquips = GetDatas<unit_ex_equipment_slot>()
+                unitExEquips = GetOptionalDatas<unit_ex_equipment_slot>()
                     .ToDictionary(x => x.unit_id,
                         x => new Dictionary<int, ex_equipment_data>[]
                         {
@@ -737,7 +889,7 @@ namespace PCRCaculator.SQL
                             categories.TryGetValue(x.slot_category_3, out var val3) ? val3 : empty,
                         });
 
-                extraEffectUnitGroupDic = GetDatas<extra_effect_unit_group>()
+                extraEffectUnitGroupDic = GetOptionalDatas<extra_effect_unit_group>()
                     .GroupBy(x => x.group_id)
                     .ToDictionary(g => g.Key, g => g.ToList());
             }));
@@ -1090,7 +1242,7 @@ namespace PCRCaculator.SQL
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
-            var list = GetDatas<abyss_enemy_parameter>();
+            var list = GetOptionalDatas<abyss_enemy_parameter>();
             if (list is not null)
             {
                 int idx = 0;
@@ -1163,7 +1315,7 @@ namespace PCRCaculator.SQL
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
-            var list = GetDatas<mirage_enemy_parameter>();
+            var list = GetOptionalDatas<mirage_enemy_parameter>();
             if (list is not null)
             {
                 int idx = 0;
@@ -1235,7 +1387,7 @@ namespace PCRCaculator.SQL
         {
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
-            var list = GetDatas<labyrinth_enemy_parameter>();
+            var list = GetOptionalDatas<labyrinth_enemy_parameter>();
             if (list is not null)
             {
                 foreach (var dd in list)
@@ -1304,11 +1456,11 @@ namespace PCRCaculator.SQL
             }
             return dic;
         }
-        private Dictionary<int, WaveGroupDataBase> GetWaveGroupDataDic<T>(Func<T, int> getId, Func<T, int> getWaveGroupId, Func<T, int, int> getEnemyId) where T : class, new()
+        private Dictionary<int, WaveGroupDataBase> GetWaveGroupDataDic<T>(Func<T, int> getId, Func<T, int> getWaveGroupId, Func<T, int, int> getEnemyId, bool optional = false) where T : class, new()
         {
             Dictionary<int, WaveGroupDataBase> dic = new Dictionary<int, WaveGroupDataBase>();
 
-            var list = GetDatas<T>();
+            var list = optional ? GetOptionalDatas<T>() : GetDatas<T>();
             if (list is not null)
             {
                 foreach (var data in list)
@@ -1421,7 +1573,7 @@ namespace PCRCaculator.SQL
         private Dictionary<int, string> GetExEquipmentName_cn()
         {
             Dictionary<int, string> dic = new Dictionary<int, string>();
-            var list = GetDatas<ex_equipment_data>();
+            var list = GetOptionalDatas<ex_equipment_data>();
             foreach (var dd in list)
             {
                 dic.Add(dd.ex_equipment_id, dd.name);
@@ -1503,9 +1655,9 @@ namespace PCRCaculator.SQL
 
         public Dictionary<int, TalentSkillNode> GetTalentSkillData()
         {
-            var node_list = GetDatas<talent_skill_node>();
-            var titleDic = GetDatas<team_skill_title>().ToDictionary(x => x.title_id, x => x.title_text);
-            var enhanceLevelDic = GetDatas<talent_skill_enhance_level>().ToDictionary(x => x.enhance_level_id);
+            var node_list = GetOptionalDatas<talent_skill_node>();
+            var titleDic = GetOptionalDatas<team_skill_title>().ToDictionary(x => x.title_id, x => x.title_text);
+            var enhanceLevelDic = GetOptionalDatas<talent_skill_enhance_level>().ToDictionary(x => x.enhance_level_id);
 
             return node_list.ToDictionary(
                 dd => dd.node_id,
@@ -1550,7 +1702,7 @@ namespace PCRCaculator.SQL
         }
         public Dictionary<int, TalentSkillEnhanceData> GetTalentSkillEnhanceData()
         {
-            var enhanceList = GetDatas<talent_skill_enhance_data>();
+            var enhanceList = GetOptionalDatas<talent_skill_enhance_data>();
 
             return enhanceList.ToDictionary(
                 dd => dd.enhance_id,
@@ -1578,9 +1730,9 @@ namespace PCRCaculator.SQL
         }
         public Dictionary<int, TeamSkillNode> GetTeamSkillData()
         {
-            var node_list = GetDatas<team_skill_node>();
-            var titleDic = GetDatas<team_skill_title>().ToDictionary(x => x.title_id, x => x.title_text);
-            var enhanceLevelDic = GetDatas<team_skill_enhance_level>().ToDictionary(x => x.enhance_level_id);
+            var node_list = GetOptionalDatas<team_skill_node>();
+            var titleDic = GetOptionalDatas<team_skill_title>().ToDictionary(x => x.title_id, x => x.title_text);
+            var enhanceLevelDic = GetOptionalDatas<team_skill_enhance_level>().ToDictionary(x => x.enhance_level_id);
 
             return node_list.ToDictionary(
                 dd => dd.node_id,
@@ -1625,7 +1777,7 @@ namespace PCRCaculator.SQL
         }
         public Dictionary<int, TeamSkillEnhanceData> GetTeamSkillEnhanceData()
         {
-            var enhanceList = GetDatas<team_skill_enhance_data>();
+            var enhanceList = GetOptionalDatas<team_skill_enhance_data>();
 
             return enhanceList.ToDictionary(
                 dd => dd.enhance_id,
@@ -1745,8 +1897,8 @@ namespace PCRCaculator.SQL
 
         private Dictionary<int, talentFormationData> GetTalentFormationData()
         {
-            var overwriteDic = GetDatasDic<talent_formation_overwrite>(a => a.id);
-            var bonusDic = GetDatasDic<talent_formation_bonus>(a => a.formation_bonus_id);
+            var overwriteDic = GetOptionalDatasDic<talent_formation_overwrite>(a => a.id);
+            var bonusDic = GetOptionalDatasDic<talent_formation_bonus>(a => a.formation_bonus_id);
 
             if (overwriteDic == null || bonusDic == null)
                 return new Dictionary<int, talentFormationData>();
@@ -1772,8 +1924,8 @@ namespace PCRCaculator.SQL
 
         private Dictionary<int, UnitRoleMasterySlotEnhanceData> GetUnitRoleMasterySlotEnhanceData()
         {
-            var slotDataList = GetDatas<unit_role_mastery_slot_data>();
-            var enhanceDataList = GetDatas<unit_role_mastery_enhance_data>();
+            var slotDataList = GetOptionalDatas<unit_role_mastery_slot_data>();
+            var enhanceDataList = GetOptionalDatas<unit_role_mastery_enhance_data>();
 
             // 将slot数据按mastery_id和slot_level分组
             var slotDataDict = new Dictionary<int, Dictionary<int, unit_role_mastery_slot_data>>();
@@ -1859,7 +2011,7 @@ namespace PCRCaculator.SQL
 
         private Dictionary<int, int> GetAbyssQuestFilteredDic()
         {
-            var abyssQuestDataList = GetDatas<abyss_quest_data>();
+            var abyssQuestDataList = GetOptionalDatas<abyss_quest_data>();
 
             if (abyssQuestDataList == null || !abyssQuestDataList.Any())
                 return new Dictionary<int, int>();
@@ -1878,7 +2030,7 @@ namespace PCRCaculator.SQL
         }
         private Dictionary<int, int> GetAbyssBossFilteredDic()
         {
-            var abyssBossDataList = GetDatas<abyss_boss_data>();
+            var abyssBossDataList = GetOptionalDatas<abyss_boss_data>();
 
             if (abyssBossDataList == null || !abyssBossDataList.Any())
                 return new Dictionary<int, int>();
