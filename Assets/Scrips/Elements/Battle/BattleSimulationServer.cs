@@ -238,6 +238,7 @@ namespace Elements.Battle
         public List<int> GuildEnemyList { get; set; }
         public List<List<float>> UBExecTimeList { get; set; }
         public List<List<int>> SemanUBExecTimeList { get; set; }
+        public List<int> SemanUBSequenceData { get; set; }
         public GuildRandomData Settings { get; set; } = new GuildRandomData();
         public Dictionary<int, int> TalentSkillLevels { get; set; }
         public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
@@ -256,6 +257,7 @@ namespace Elements.Battle
         public bool IsAutoMode { get; set; }
         public bool IsSetMode { get; set; }
         public bool IsSemanMode { get; set; }
+        public bool UseSequenceUB { get; set; }
         public bool IsGuildBattle { get; set; } = true;
         public bool IsSkipping { get; set; } = true;
         public int WaveGroupId { get; set; } = 0;
@@ -274,6 +276,7 @@ namespace Elements.Battle
                 IsAutoMode = this.IsAutoMode,
                 IsSetMode = this.IsSetMode,
                 IsSemanMode = this.IsSemanMode,
+                UseSequenceUB = this.UseSequenceUB,
                 IsGuildBattle = this.IsGuildBattle,
                 IsSkipping = this.IsSkipping,
                 TalentFullInfo = this.TalentFullInfo,
@@ -285,6 +288,7 @@ namespace Elements.Battle
                 GuildEnemyList = this.GuildEnemyList?.ToList(),
                 UBExecTimeList = this.UBExecTimeList?.Select(l => l.ToList()).ToList(),
                 SemanUBExecTimeList = this.SemanUBExecTimeList?.Select(l => l.ToList()).ToList(),
+                SemanUBSequenceData = this.SemanUBSequenceData?.ToList(),
                 SetToggles = this.SetToggles?.ToList(),
                 Settings = this.Settings != null ? new GuildRandomData
                 {

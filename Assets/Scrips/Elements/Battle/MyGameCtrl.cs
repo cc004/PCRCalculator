@@ -362,6 +362,8 @@ namespace Elements
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
                 tempData.SemanUBExecTimeList = mainManager.GuildBattleData.SemanUBExecTimeList;
+                tempData.SemanUBSequenceData = mainManager.GuildBattleData.SemanUBSequenceData;
+                tempData.useSequenceUB = mainManager.GuildBattleData.useSequenceUB;
                 tempData.isGuildBattle = true;
                 tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                 tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
@@ -390,12 +392,12 @@ namespace Elements
             {
                 if (IsSemanMode)
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
                     BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
                 }
                 else
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.semanubmanager.SetUbExec(null, null, tempData.useSequenceUB);
                     BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
                 }
             }
@@ -435,6 +437,8 @@ namespace Elements
                     tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                     tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
                     tempData.SemanUBExecTimeList = mainManager.GuildBattleData.SemanUBExecTimeList;
+                    tempData.SemanUBSequenceData = mainManager.GuildBattleData.SemanUBSequenceData;
+                    tempData.useSequenceUB = mainManager.GuildBattleData.useSequenceUB;
                     tempData.isGuildBattle = true;
                     tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                     tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
@@ -480,12 +484,12 @@ namespace Elements
             staticBattleManager.Init(this);
             if (IsSemanMode)
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
                 BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
             }
             else
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(null);
+                BattleManager.Instance.semanubmanager.SetUbExec(null, null, tempData.useSequenceUB);
                 BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
             }
         }
@@ -614,6 +618,8 @@ namespace Elements
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = req.UBExecTimeList;
                 tempData.SemanUBExecTimeList = req.SemanUBExecTimeList;
+                tempData.SemanUBSequenceData = req.SemanUBSequenceData;
+                tempData.useSequenceUB = req.UseSequenceUB;
                 // tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                 tempData.tryCount = 9999;
                 tempData.SettingData = new();
@@ -680,14 +686,14 @@ namespace Elements
 
                 if (req.IsSemanMode)
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
                     BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
                 }
                 else
                 {
-                    if (BattleStats.NeedsAutoSemanTeacherTrace())
+                    if (tempData.useSequenceUB || BattleStats.NeedsAutoSemanTeacherTrace())
                     {
-                        BattleManager.Instance.semanubmanager.SetUbExec(null);
+                        BattleManager.Instance.semanubmanager.SetUbExec(null, null, tempData.useSequenceUB);
                     }
                     else
                     {
@@ -1295,10 +1301,12 @@ namespace Elements
         public List<UnitParameter> PlayerParameters;
         public List<UnitParameter> EnemyParameters;
         public List<List<int>> SemanUBExecTimeList;
+        public List<int> SemanUBSequenceData;
         public List<List<float>> UBExecTimeList;
         public int tryCount = 30;
         public bool isGuildBattle;
         public bool isGuildEnemyViolent;
+        public bool useSequenceUB;
         public List<PCRCaculator.UnitData> playerList;
         public List<PCRCaculator.UnitData> enemyList;
         public List<EnemyData> guildEnemy;
