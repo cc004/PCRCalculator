@@ -16,7 +16,7 @@ namespace PCRCaculator
         private const int TalentElementCount = 5;
         private bool loadSliderEvents;
         public List<Slider> talentLevelSliders;
-        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+        private TeamEnhanceConfiguration PlayerGroup => TalentEnhanceContext.ActiveConfiguration;
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
 
         public void Awake()
@@ -156,7 +156,7 @@ namespace PCRCaculator
         private void ApplyTalentLevelsDirect(Dictionary<int, int> normalizedLevels, bool notify = false)
         {
             PlayerGroup.talentLevel = normalizedLevels;
-            MainManager.Instance.TeamEnhanceData.SetTalentLevels(normalizedLevels);
+            TalentEnhanceContext.ActiveTeamEnhanceData.SetTalentLevels(normalizedLevels);
 
             if (notify)
             {

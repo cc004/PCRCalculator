@@ -504,6 +504,7 @@ namespace Elements
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;
             IsSemanMode = req.IsSemanMode;
+            mainManager.SetArenaEnemyTeamEnhanceOverride(CreateEnemyTeamEnhanceConfiguration(req));
 
             if (req.TalentSkillLevels is not null)
             {
@@ -709,6 +710,33 @@ namespace Elements
             }
         }
 
+        private static TeamEnhanceConfiguration CreateEnemyTeamEnhanceConfiguration(BattleSimulationRequest req)
+        {
+            if (req.EnemyTalentSkillLevels == null &&
+                req.EnemyTalentSkillNodeLevels == null &&
+                req.EnemyMasterSkillNodeLevels == null &&
+                req.EnemyRoleMastery == null)
+            {
+                return null;
+            }
+
+            return new TeamEnhanceConfiguration
+            {
+                talentLevel = req.EnemyTalentSkillLevels != null
+                    ? new Dictionary<int, int>(req.EnemyTalentSkillLevels)
+                    : new Dictionary<int, int>(),
+                talentSkill = req.EnemyTalentSkillNodeLevels != null
+                    ? new Dictionary<int, int>(req.EnemyTalentSkillNodeLevels)
+                    : new Dictionary<int, int>(),
+                teamSkill = req.EnemyMasterSkillNodeLevels != null
+                    ? new Dictionary<int, int>(req.EnemyMasterSkillNodeLevels)
+                    : new Dictionary<int, int>(),
+                roleMastery = req.EnemyRoleMastery != null
+                    ? new Dictionary<int, (int slotLevel, int enhanceLevel)>(req.EnemyRoleMastery)
+                    : new Dictionary<int, (int slotLevel, int enhanceLevel)>(),
+            };
+        }
+
         public void Initialize()//由GameManager的init调用，生成己方战斗小人
         {
             finishCount = 0;
@@ -769,6 +797,28 @@ namespace Elements
             else
             {
                 StartCoroutine(LoadCharacterPrefab(unitData, idx, isPlayer, action));
+            }
+        }
+
+        /// <summary>
+        /// Only arena battles may replace the opponent's enhancement configuration.
+        /// All other battle types retain the previous shared-configuration behavior.
+        /// </summary>
+        public TeamEnhanceParameter EnemyTeamEnhanceForCurrentBattle
+        {
+            get
+            {
+                if (tempData?.isGuildBattle != false)
+                    return null;
+
+                var category = BattleManager.Instance?.BattleCategory;
+                bool isArena = category == eBattleCategory.ARENA ||
+                               category == eBattleCategory.ARENA_REPLAY ||
+                               category == eBattleCategory.GRAND_ARENA ||
+                               category == eBattleCategory.GRAND_ARENA_REPLAY;
+                return isArena
+                    ? MainManager.Instance.ArenaEnemyTeamEnhanceData ?? MainManager.Instance.TeamEnhanceData
+                    : MainManager.Instance.TeamEnhanceData;
             }
         }
         public void TryingExecUB(int playerIdx)
@@ -888,7 +938,7 @@ namespace Elements
             unitCtrl.Initialize(
                 unitParameter,
                 unitData,
-                isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null,
+                isplayer ? MainManager.Instance.TeamEnhanceData : EnemyTeamEnhanceForCurrentBattle,
                 false,
                 true,
                 labyrinthEnhanceParameter: isplayer ? tempData.LabyrinthEnhanceParameter : null,

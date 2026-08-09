@@ -2858,14 +2858,34 @@ namespace PCRCaculator.Guild
         }
     }
     [Serializable]
-    public class GuildPlayerGroupData
+    public class TeamEnhanceConfiguration
     {
-        public AddedPlayerData playerData;
         public Dictionary<int, int> talentLevel = new Dictionary<int, int>();
         public Dictionary<int, int> talentSkill = new Dictionary<int, int>();
         public Dictionary<int, int> teamSkill = new Dictionary<int, int>();
         [JsonConverter(typeof(PCRCaculator.RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
+
+        public TeamEnhanceConfiguration Clone()
+        {
+            return new TeamEnhanceConfiguration
+            {
+                talentLevel = talentLevel != null ? new Dictionary<int, int>(talentLevel) : new Dictionary<int, int>(),
+                talentSkill = talentSkill != null ? new Dictionary<int, int>(talentSkill) : new Dictionary<int, int>(),
+                teamSkill = teamSkill != null ? new Dictionary<int, int>(teamSkill) : new Dictionary<int, int>(),
+                roleMastery = roleMastery != null
+                    ? new Dictionary<int, (int slotLevel, int enhanceLevel)>(roleMastery)
+                    : new Dictionary<int, (int slotLevel, int enhanceLevel)>(),
+            };
+        }
+    }
+
+    [Serializable]
+    public class GuildPlayerGroupData : TeamEnhanceConfiguration
+    {
+        public AddedPlayerData playerData;
+        // Null means the arena opponent inherits this group's configuration.
+        public TeamEnhanceConfiguration arenaEnemyTeamEnhance;
         public List<int> labyrinthEnhancedNodeIds = new List<int>();
         public List<int> labyrinthRelicIds = new List<int>();
         public int labyrinthAlphaRupee;

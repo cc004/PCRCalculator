@@ -245,6 +245,11 @@ namespace Elements.Battle
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
         [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> RoleMastery { get; set; }
+        public Dictionary<int, int> EnemyTalentSkillLevels { get; set; }
+        public Dictionary<int, int> EnemyTalentSkillNodeLevels { get; set; }
+        public Dictionary<int, int> EnemyMasterSkillNodeLevels { get; set; }
+        [JsonConverter(typeof(RoleMasteryJsonConverter))]
+        public Dictionary<int, (int slotLevel, int enhanceLevel)> EnemyRoleMastery { get; set; }
         public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
         public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
         public int LabyrinthAlphaRupee { get; set; }
@@ -318,6 +323,10 @@ namespace Elements.Battle
                 TalentSkillNodeLevels = this.TalentSkillNodeLevels != null ? new Dictionary<int, int>(this.TalentSkillNodeLevels) : null,
                 MasterSkillNodeLevels = this.MasterSkillNodeLevels != null ? new Dictionary<int, int>(this.MasterSkillNodeLevels) : null,
                 RoleMastery = this.RoleMastery != null ? new Dictionary<int, (int, int)>(this.RoleMastery) : null,
+                EnemyTalentSkillLevels = this.EnemyTalentSkillLevels != null ? new Dictionary<int, int>(this.EnemyTalentSkillLevels) : null,
+                EnemyTalentSkillNodeLevels = this.EnemyTalentSkillNodeLevels != null ? new Dictionary<int, int>(this.EnemyTalentSkillNodeLevels) : null,
+                EnemyMasterSkillNodeLevels = this.EnemyMasterSkillNodeLevels != null ? new Dictionary<int, int>(this.EnemyMasterSkillNodeLevels) : null,
+                EnemyRoleMastery = this.EnemyRoleMastery != null ? new Dictionary<int, (int, int)>(this.EnemyRoleMastery) : null,
                 LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
                 LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
                 LabyrinthAlphaRupee = this.LabyrinthAlphaRupee,

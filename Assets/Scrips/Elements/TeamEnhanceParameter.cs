@@ -54,7 +54,7 @@ namespace Elements
 
         public Dictionary<int, Dictionary<int, int>> TalentSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
         public Dictionary<int, Dictionary<int, int>> TeamSkillData { get; set; } = new Dictionary<int, Dictionary<int, int>>();
-        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance.SettingData.GetCurrentPlayerGroup();
+        private TeamEnhanceConfiguration PlayerGroup => TalentEnhanceContext.ActiveConfiguration;
         private PlayerSetting PlayerSetting => MainManager.Instance.PlayerSetting;
         // 事件：当数据变化时触发 UI 更新等操作
         public event Action OnDataChanged;
@@ -79,21 +79,29 @@ namespace Elements
         /// </summary>
         public void LoadFromPlayerSetting(bool isGlobal = false)
         {
-            if (isGlobal)
+            if (isGlobal && !TalentEnhanceContext.IsEditingArenaEnemy)
             {
                 MainManager.Instance.LoadPlayerSettings();
                 PlayerGroup.talentLevel = PlayerSetting.talentLevel;
                 PlayerGroup.talentSkill = PlayerSetting.talentSkill;
                 PlayerGroup.teamSkill = PlayerSetting.teamSkill;
             }
-            talentLevelParameter = PlayerGroup.talentLevel;
+            LoadFromConfiguration(PlayerGroup);
+        }
 
-            var talentSkillLevels = ExpandTalentSkillLevels(PlayerGroup.talentSkill, MainManager.Instance.TalentSkillNodeDic);
-            var teamSkillLevels = ExpandTeamSkillLevels(PlayerGroup.teamSkill, MainManager.Instance.TeamSkillNodeDic);
+        public void LoadFromConfiguration(TeamEnhanceConfiguration configuration)
+        {
+            configuration ??= new TeamEnhanceConfiguration();
+            talentLevelParameter = configuration.talentLevel != null
+                ? new Dictionary<int, int>(configuration.talentLevel)
+                : new Dictionary<int, int>();
+
+            var talentSkillLevels = ExpandTalentSkillLevels(configuration.talentSkill, MainManager.Instance.TalentSkillNodeDic);
+            var teamSkillLevels = ExpandTeamSkillLevels(configuration.teamSkill, MainManager.Instance.TeamSkillNodeDic);
 
             UpdateTalentInfoData(talentSkillLevels, MainManager.Instance.TalentSkillNodeDic, DataType.TalentSkill);
             UpdateTalentInfoData(teamSkillLevels, MainManager.Instance.TeamSkillNodeDic, DataType.TeamSkill);
-            UpdateRoleMasteryData();
+            UpdateRoleMasteryData(configuration.roleMastery);
             UpdateCombinedData();
         }
 

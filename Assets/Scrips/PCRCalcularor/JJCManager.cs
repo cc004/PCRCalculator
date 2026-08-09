@@ -40,6 +40,36 @@ namespace PCRCaculator
             calSettingTexts.text = "x" + SettingData.calSpeed;
             GuildManager.Instance.SaveDataToJson();
         }
+
+        /// <summary>
+        /// Opens the player-side enhancement editor from the arena page.
+        /// </summary>
+        public void OpenPlayerEnhancePanel()
+        {
+            if (TalentManager.Instance == null || !TalentManager.Instance.HasLiveTalentPanel)
+            {
+                MainManager.Instance.WindowMessage("请先在竞技场场景中添加并绑定属性强化面板。");
+                return;
+            }
+
+            TalentManager.Instance.OpenArenaTalentPanel(false);
+        }
+
+        /// <summary>
+        /// Opens the opponent-side enhancement editor from the arena page.
+        /// The first visit starts from a copy of the player-side configuration.
+        /// </summary>
+        public void OpenEnemyEnhancePanel()
+        {
+            if (TalentManager.Instance == null || !TalentManager.Instance.HasLiveTalentPanel)
+            {
+                MainManager.Instance.WindowMessage("请先在竞技场场景中添加并绑定属性强化面板。");
+                return;
+            }
+
+            TalentManager.Instance.OpenArenaTalentPanel(true);
+        }
+
         /// <summary>
         /// 开始战斗
         /// </summary>

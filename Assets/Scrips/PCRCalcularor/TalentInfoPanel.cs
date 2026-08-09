@@ -14,8 +14,10 @@ namespace PCRCaculator
         public Transform tableContainer;
 
         private MainManager mainManager => MainManager.Instance;
-        private TeamEnhanceParameter teamEnhanceData => MainManager.Instance.TeamEnhanceData;
+        private TeamEnhanceParameter teamEnhanceData => TalentEnhanceContext.ActiveTeamEnhanceData;
         private Dictionary<int, param_type> paramTypeDict => MainManager.Instance.ParamTypeDic;
+        private TeamEnhanceParameter subscribedTeamEnhanceData;
+        private TalentLevelManager subscribedTalentLevelManager;
 
         private void OnEnable()
         {
@@ -29,22 +31,33 @@ namespace PCRCaculator
             UnsubscribeEvents();
         }
 
+        private void OnDestroy()
+        {
+            UnsubscribeEvents();
+        }
+
         private void SubscribeEvents()
         {
-            if (teamEnhanceData != null)
-                teamEnhanceData.OnDataChanged += RefreshTable;
+            UnsubscribeEvents();
 
-            if (TalentLevelManager.Instance != null)
-                TalentLevelManager.Instance.OnTalentLevelChanged += RefreshTable;
+            subscribedTeamEnhanceData = teamEnhanceData;
+            if (subscribedTeamEnhanceData != null)
+                subscribedTeamEnhanceData.OnDataChanged += RefreshTable;
+
+            subscribedTalentLevelManager = TalentLevelManager.Instance;
+            if (subscribedTalentLevelManager != null)
+                subscribedTalentLevelManager.OnTalentLevelChanged += RefreshTable;
         }
 
         private void UnsubscribeEvents()
         {
-            if (teamEnhanceData != null)
-                teamEnhanceData.OnDataChanged -= RefreshTable;
+            if (subscribedTeamEnhanceData != null)
+                subscribedTeamEnhanceData.OnDataChanged -= RefreshTable;
+            subscribedTeamEnhanceData = null;
 
-            if (TalentLevelManager.Instance != null)
-                TalentLevelManager.Instance.OnTalentLevelChanged -= RefreshTable;
+            if (subscribedTalentLevelManager != null)
+                subscribedTalentLevelManager.OnTalentLevelChanged -= RefreshTable;
+            subscribedTalentLevelManager = null;
         }
 
         /// <summary>
@@ -52,6 +65,9 @@ namespace PCRCaculator
         /// </summary>
         private void RefreshTable()
         {
+            if (tableContainer == null || rowPrefab == null || teamEnhanceData == null)
+                return;
+
             ClearTable();
             RenderTable();
         }
@@ -61,6 +77,9 @@ namespace PCRCaculator
         /// </summary>
         private void ClearTable()
         {
+            if (tableContainer == null)
+                return;
+
             for (int i = tableContainer.childCount - 1; i >= 1; i--)
             {
                 DestroyImmediate(tableContainer.GetChild(i).gameObject);

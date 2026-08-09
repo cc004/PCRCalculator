@@ -18,6 +18,7 @@ namespace PCRCaculator
         public PlayerSetting PlayerSetting { get => MainManager.Instance.PlayerSetting; }
         public TeamEnhanceParameter TalnetInfoData { get => MainManager.Instance.TeamEnhanceData; }
         public GuildSettingData SettingData => GuildManager.Instance.SettingData;
+        public bool HasLiveTalentPanel => talentPanel != null;
 
 
         private bool isLoading;
@@ -34,6 +35,22 @@ namespace PCRCaculator
         /// </summary>
         public void OpenTalentButton()
         {
+            TalentEnhanceContext.EndArenaEnemyEditing();
+            OpenTalentPanel();
+        }
+
+        public void OpenArenaTalentPanel(bool isEnemy)
+        {
+            if (isEnemy)
+                TalentEnhanceContext.BeginArenaEnemyEditing();
+            else
+                TalentEnhanceContext.EndArenaEnemyEditing();
+
+            OpenTalentPanel();
+        }
+
+        private void OpenTalentPanel()
+        {
             isLoading = true;
             talentPanel.SetActive(true);
             TalentLevelManager.Instance.LoadTalentLevelSliders();
@@ -47,6 +64,12 @@ namespace PCRCaculator
         /// </summary>
         public void SaveButton(bool global = false)
         {
+            if (global && TalentEnhanceContext.IsEditingArenaEnemy)
+            {
+                MainManager.Instance.WindowMessage("敌方独立属性强化仅保存到当前配置，请使用普通保存。");
+                return;
+            }
+
             TalentLevelManager.Instance.SaveTalentSkills(global);
             TalentSkillTreeManager.Instance.SaveTalentSkills(global);
             TeamSkillTreeManager.Instance.SaveTeamSkills(global);
@@ -64,6 +87,12 @@ namespace PCRCaculator
         }
         public void UsePlayerSetting()
         {
+            if (TalentEnhanceContext.IsEditingArenaEnemy)
+            {
+                MainManager.Instance.WindowMessage("敌方独立属性强化不能覆盖为全局配置。");
+                return;
+            }
+
             MainManager.Instance.LoadPlayerSettings();
             if ((PlayerSetting.teamSkill?.Count ?? 0) > 0 ||
                 (PlayerSetting.talentSkill?.Count ?? 0) > 0 ||
@@ -100,5 +129,12 @@ namespace PCRCaculator
                 talentManagers[i].SetActive(i == selectedIndex);
             }
         }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
+        }
+
     }
 }
