@@ -116,7 +116,7 @@ namespace Elements
 
     public float DamegeNumScale { get; set; } = 1f;
 
-    public Func<int, int> ExecAbsorber { get; set; }
+    public Func<long, long> ExecAbsorber { get; set; }
         public bool IsAlwaysChargeEnegry
         {
             get;

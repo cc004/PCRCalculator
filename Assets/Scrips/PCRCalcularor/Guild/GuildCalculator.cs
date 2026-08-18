@@ -1748,7 +1748,7 @@ namespace PCRCaculator.Guild
 
         public bool IsDamageRelease;
         public bool IsReleasedByDamage;
-        public int AbsorberValue;
+        public long AbsorberValue;
 
         public string SkillName;
         public string SourceName;

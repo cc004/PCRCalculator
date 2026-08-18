@@ -21,7 +21,7 @@ namespace Elements
 
         public double EnergyChargeMultiple { get; set; } = 1f;
 
-        public int AbsorberValue { get; set; }
+        public long AbsorberValue { get; set; }
 
         public bool IsWeakTypeDamage { get; set; }
 
@@ -87,7 +87,7 @@ namespace Elements
                     {
                         if (_damage > AbsorberValue)
                         {
-                            int num = _damage - AbsorberValue;
+                            long num = _damage - AbsorberValue;
                             BattleManager.SubstructEnemyPoint(AbsorberValue);
                             AbsorberValue = 0;
                             return num;

@@ -37,7 +37,7 @@ namespace Elements
 
     public bool IsEnvironmentAbnormalState { get; set; }
 
-    public int AbsorberValue { get; set; }
+    public long AbsorberValue { get; set; }
 
     public Skill Skill { get; set; }
 

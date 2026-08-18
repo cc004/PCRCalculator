@@ -5778,7 +5778,7 @@ namespace Elements.Battle
             }
         }
 
-        public int KIHOGJBONDH { get; set; }
+        public long KIHOGJBONDH { get; set; }
 
         //public int GetPurposeCount() => this.battleProcessor.GetPurposeCount();
 
@@ -5815,7 +5815,7 @@ namespace Elements.Battle
           ref int MAEOBJJBBBK,
           ref int PIKPGKDJBDO) => this.battleProcessor.SetDamageGoldModeMaxHpAttackNum(ref HFFGLNMNFKH, ref KLFEGBADIOE, ref BLAFDFNAEEC, ref MAEOBJJBBBK, ref PIKPGKDJBDO);
          */
-        public void SubstructEnemyPoint(int PBAANIPPIGL)
+        public void SubstructEnemyPoint(long PBAANIPPIGL)
         {
             /*this.FICLPNJNOEP += PBAANIPPIGL;
             int purposeCount = this.GetPurposeCount();
