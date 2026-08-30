@@ -81,7 +81,8 @@ namespace PCRCaculator
                                 int statusIndex = exEquipSubs[k];     // 状态类型索引
                                 int statusLevel = exEquipSubs[k + 1]; // 状态等级
 
-                                if (statusIndex < statusKeys.Count && statusLevel < exEquipData.status[statusKeys[statusIndex]].Length)
+                                if (statusIndex >= 0 && statusIndex < statusKeys.Count &&
+                                    statusLevel >= 0 && statusLevel < exEquipData.status[statusKeys[statusIndex]].Length)
                                 {
                                     var selectedKey = statusKeys[statusIndex];
 

@@ -646,7 +646,9 @@ namespace PCRCaculator
                             if (j < subItems.Length)
                             {
                                 var subItem = subItems[j];
-                                subItemValues[j * 2] = subItem.typeOption.value;     // typeOption值
+                                // UI 的第 0 项为“无”，存档中使用 -1 表示未选择词条，
+                                // 其余选项仍沿用原本从 0 开始的属性索引。
+                                subItemValues[j * 2] = subItem.typeOption.value - 1;
                                 subItemValues[j * 2 + 1] = subItem.valueOption.value; // valueOption值
                             }
                             else
@@ -1130,8 +1132,11 @@ namespace PCRCaculator
                         {
                             int statusIndex = data.exEquipSubs[i][k * 2];
                             int statusLevel = data.exEquipSubs[i][k * 2 + 1];
-                            subItems[k].typeOption.value = statusIndex;
-                            subItems[k].valueOption.value = statusLevel;
+                            subItems[k].typeOption.value = Mathf.Clamp(
+                                statusIndex + 1, 0, subItems[k].typeOption.options.Count - 1);
+                            subItems[k].valueOption.value = statusIndex < 0
+                                ? 0
+                                : Mathf.Clamp(statusLevel, 0, subItems[k].valueOption.options.Count - 1);
                         }
                     }
                     else
@@ -1231,11 +1236,12 @@ namespace PCRCaculator
                             {
                                 if (k is eParamType enumKey)
                                 {
-                                    //饰品攻击其余贯通
+                                    // 饰品默认攻击，其余装备默认贯通。
                                     bool isAtkType = enumKey == eParamType.MAGIC_ATK || enumKey == eParamType.ATK;
                                     bool isPenetrateType = enumKey == eParamType.PHYSICAL_PENETRATE || enumKey == eParamType.MAGIC_PENETRATE;
 
-                                    if ((exEquipData.category > 300 && isAtkType) || (exEquipData.category <= 300 && isPenetrateType))
+                                    if ((exEquipData.category > 300 && isAtkType) ||
+                                        (exEquipData.category <= 300 && isPenetrateType))
                                     {
                                         typeIndex = index;
                                     }
@@ -1248,6 +1254,7 @@ namespace PCRCaculator
                             subItem.typeOption.SetActive(true);
                             subItem.valueOption.SetActive(true);
                             subItem.typeOption.ClearOptions();
+                            statusKeys.Insert(0, "无");
                             subItem.typeOption.AddOptions(statusKeys);
 
                             // 添加typeOption变更监听
@@ -1257,7 +1264,8 @@ namespace PCRCaculator
                             {
                                 UpdateValueOptions(equipIndex, subItemIndex);
                             });
-                            subItem.typeOption.value = typeIndex;
+                            // 第 0 项为“无”，因此原属性索引需加一。
+                            subItem.typeOption.value = typeIndex + 1;
                         }
                     }
                     else
@@ -1303,6 +1311,15 @@ namespace PCRCaculator
                 return;
             }
 
+            // typeOption 的第 0 项为“无”。未选择词条时只提供数值 0。
+            if (subItem.typeOption.value == 0)
+            {
+                subItem.valueOption.ClearOptions();
+                subItem.valueOption.AddOptions(new List<string> { "0" });
+                subItem.valueOption.value = 0;
+                return;
+            }
+
             // 获取对应装备的数据
             if (MainManager.Instance.UnitExEquips.TryGetValue(
                 playerData.playrCharacters[selectedCharacterId_setting].unitId,
@@ -1314,9 +1331,10 @@ namespace PCRCaculator
                     {
                         // 获取当前选中的typeOption键
                         var statusKeys = exEquipData.status.Keys.ToList();
-                        if (subItem.typeOption.value < statusKeys.Count)
+                        int statusIndex = subItem.typeOption.value - 1;
+                        if (statusIndex >= 0 && statusIndex < statusKeys.Count)
                         {
-                            var selectedKey = statusKeys[subItem.typeOption.value];
+                            var selectedKey = statusKeys[statusIndex];
                             if (exEquipData.status.TryGetValue(selectedKey, out var values))
                             {
                                 // 使用paramTypeDict来格式化值

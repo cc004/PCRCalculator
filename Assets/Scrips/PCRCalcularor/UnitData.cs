@@ -318,6 +318,12 @@ namespace PCRCaculator
                                 int statusLevel = a.exEquipSubs[i][k * 2 + 1];
                                 var paramTypes = new List<eParamType>(equip.status.Keys);
 
+                                if (statusIndex < 0 || statusIndex >= paramTypes.Count ||
+                                    statusLevel < 0 || statusLevel >= equip.status[paramTypes[statusIndex]].Length)
+                                {
+                                    continue;
+                                }
+
                                 if (paramTypes[statusIndex] == (eParamType)(j + 1))
                                 {
                                     var present2 = equip.status[paramTypes[statusIndex]][statusLevel];
