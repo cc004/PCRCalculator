@@ -238,12 +238,18 @@ namespace Elements.Battle
         public List<int> GuildEnemyList { get; set; }
         public List<List<float>> UBExecTimeList { get; set; }
         public List<List<int>> SemanUBExecTimeList { get; set; }
+        public List<int> SemanUBSequenceData { get; set; }
         public GuildRandomData Settings { get; set; } = new GuildRandomData();
         public Dictionary<int, int> TalentSkillLevels { get; set; }
         public Dictionary<int, int> TalentSkillNodeLevels { get; set; }
         public Dictionary<int, int> MasterSkillNodeLevels { get; set; }
         [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> RoleMastery { get; set; }
+        public Dictionary<int, int> EnemyTalentSkillLevels { get; set; }
+        public Dictionary<int, int> EnemyTalentSkillNodeLevels { get; set; }
+        public Dictionary<int, int> EnemyMasterSkillNodeLevels { get; set; }
+        [JsonConverter(typeof(RoleMasteryJsonConverter))]
+        public Dictionary<int, (int slotLevel, int enhanceLevel)> EnemyRoleMastery { get; set; }
         public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
         public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
         public int LabyrinthAlphaRupee { get; set; }
@@ -256,6 +262,7 @@ namespace Elements.Battle
         public bool IsAutoMode { get; set; }
         public bool IsSetMode { get; set; }
         public bool IsSemanMode { get; set; }
+        public bool UseSequenceUB { get; set; }
         public bool IsGuildBattle { get; set; } = true;
         public bool IsSkipping { get; set; } = true;
         public int WaveGroupId { get; set; } = 0;
@@ -274,6 +281,7 @@ namespace Elements.Battle
                 IsAutoMode = this.IsAutoMode,
                 IsSetMode = this.IsSetMode,
                 IsSemanMode = this.IsSemanMode,
+                UseSequenceUB = this.UseSequenceUB,
                 IsGuildBattle = this.IsGuildBattle,
                 IsSkipping = this.IsSkipping,
                 TalentFullInfo = this.TalentFullInfo,
@@ -285,6 +293,7 @@ namespace Elements.Battle
                 GuildEnemyList = this.GuildEnemyList?.ToList(),
                 UBExecTimeList = this.UBExecTimeList?.Select(l => l.ToList()).ToList(),
                 SemanUBExecTimeList = this.SemanUBExecTimeList?.Select(l => l.ToList()).ToList(),
+                SemanUBSequenceData = this.SemanUBSequenceData?.ToList(),
                 SetToggles = this.SetToggles?.ToList(),
                 Settings = this.Settings != null ? new GuildRandomData
                 {
@@ -314,6 +323,10 @@ namespace Elements.Battle
                 TalentSkillNodeLevels = this.TalentSkillNodeLevels != null ? new Dictionary<int, int>(this.TalentSkillNodeLevels) : null,
                 MasterSkillNodeLevels = this.MasterSkillNodeLevels != null ? new Dictionary<int, int>(this.MasterSkillNodeLevels) : null,
                 RoleMastery = this.RoleMastery != null ? new Dictionary<int, (int, int)>(this.RoleMastery) : null,
+                EnemyTalentSkillLevels = this.EnemyTalentSkillLevels != null ? new Dictionary<int, int>(this.EnemyTalentSkillLevels) : null,
+                EnemyTalentSkillNodeLevels = this.EnemyTalentSkillNodeLevels != null ? new Dictionary<int, int>(this.EnemyTalentSkillNodeLevels) : null,
+                EnemyMasterSkillNodeLevels = this.EnemyMasterSkillNodeLevels != null ? new Dictionary<int, int>(this.EnemyMasterSkillNodeLevels) : null,
+                EnemyRoleMastery = this.EnemyRoleMastery != null ? new Dictionary<int, (int, int)>(this.EnemyRoleMastery) : null,
                 LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
                 LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
                 LabyrinthAlphaRupee = this.LabyrinthAlphaRupee,

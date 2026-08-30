@@ -5778,7 +5778,7 @@ namespace Elements.Battle
             }
         }
 
-        public int KIHOGJBONDH { get; set; }
+        public long KIHOGJBONDH { get; set; }
 
         //public int GetPurposeCount() => this.battleProcessor.GetPurposeCount();
 
@@ -5815,7 +5815,7 @@ namespace Elements.Battle
           ref int MAEOBJJBBBK,
           ref int PIKPGKDJBDO) => this.battleProcessor.SetDamageGoldModeMaxHpAttackNum(ref HFFGLNMNFKH, ref KLFEGBADIOE, ref BLAFDFNAEEC, ref MAEOBJJBBBK, ref PIKPGKDJBDO);
          */
-        public void SubstructEnemyPoint(int PBAANIPPIGL)
+        public void SubstructEnemyPoint(long PBAANIPPIGL)
         {
             /*this.FICLPNJNOEP += PBAANIPPIGL;
             int purposeCount = this.GetPurposeCount();
@@ -6175,7 +6175,10 @@ namespace Elements.Battle
                 // TODO enemy & unit enhance info 
                 // may be ex+
 
-                unitCtrl.Initialize(parameter,unitData_my, flag && MyGameCtrl.Instance.tempData.isGuildBattle ? null : MainManager.Instance.TeamEnhanceData, flag, true, false,
+                var teamEnhance = flag
+                    ? MyGameCtrl.Instance.EnemyTeamEnhanceForCurrentBattle
+                    : MainManager.Instance.TeamEnhanceData;
+                unitCtrl.Initialize(parameter,unitData_my, teamEnhance, flag, true, false,
                     _summonData.ConsiderEquipmentAndBonus ? MainManager.Instance.UnitRarityDic[_summonData.Owner.unitData.PrefabId].GetBonusData(_summonData.Owner.unitData) : null,
                     _summonData.ConsiderEquipmentAndBonus ? (
                         MainManager.Instance.PlayerSetting.exDivisionFixed ?

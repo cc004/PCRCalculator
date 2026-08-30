@@ -362,6 +362,8 @@ namespace Elements
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
                 tempData.SemanUBExecTimeList = mainManager.GuildBattleData.SemanUBExecTimeList;
+                tempData.SemanUBSequenceData = mainManager.GuildBattleData.SemanUBSequenceData;
+                tempData.useSequenceUB = mainManager.GuildBattleData.useSequenceUB;
                 tempData.isGuildBattle = true;
                 tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                 tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
@@ -390,12 +392,12 @@ namespace Elements
             {
                 if (IsSemanMode)
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
                     BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
                 }
                 else
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(null);
+                    BattleManager.Instance.semanubmanager.SetUbExec(null, null, tempData.useSequenceUB);
                     BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
                 }
             }
@@ -435,6 +437,8 @@ namespace Elements
                     tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                     tempData.UBExecTimeList = mainManager.GuildBattleData.UBExecTimeList;
                     tempData.SemanUBExecTimeList = mainManager.GuildBattleData.SemanUBExecTimeList;
+                    tempData.SemanUBSequenceData = mainManager.GuildBattleData.SemanUBSequenceData;
+                    tempData.useSequenceUB = mainManager.GuildBattleData.useSequenceUB;
                     tempData.isGuildBattle = true;
                     tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                     tempData.tryCount = mainManager.GuildBattleData.SettingData.UBTryingCount;
@@ -480,12 +484,12 @@ namespace Elements
             staticBattleManager.Init(this);
             if (IsSemanMode)
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
                 BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
             }
             else
             {
-                BattleManager.Instance.semanubmanager.SetUbExec(null);
+                BattleManager.Instance.semanubmanager.SetUbExec(null, null, tempData.useSequenceUB);
                 BattleManager.Instance.ubmanager.SetUbExec(tempData.UBExecTimeList, tempData.tryCount);
             }
         }
@@ -500,6 +504,7 @@ namespace Elements
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;
             IsSemanMode = req.IsSemanMode;
+            mainManager.SetArenaEnemyTeamEnhanceOverride(CreateEnemyTeamEnhanceConfiguration(req));
 
             if (req.TalentSkillLevels is not null)
             {
@@ -614,6 +619,8 @@ namespace Elements
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = req.UBExecTimeList;
                 tempData.SemanUBExecTimeList = req.SemanUBExecTimeList;
+                tempData.SemanUBSequenceData = req.SemanUBSequenceData;
+                tempData.useSequenceUB = req.UseSequenceUB;
                 // tempData.isGuildEnemyViolent = mainManager.GuildBattleData.SettingData.GetCurrentPlayerGroup().isViolent;
                 tempData.tryCount = 9999;
                 tempData.SettingData = new();
@@ -680,14 +687,14 @@ namespace Elements
 
                 if (req.IsSemanMode)
                 {
-                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList);
+                    BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
                     BattleManager.Instance.ubmanager.SetUbExec(null, tempData.tryCount);
                 }
                 else
                 {
-                    if (BattleStats.NeedsAutoSemanTeacherTrace())
+                    if (tempData.useSequenceUB || BattleStats.NeedsAutoSemanTeacherTrace())
                     {
-                        BattleManager.Instance.semanubmanager.SetUbExec(null);
+                        BattleManager.Instance.semanubmanager.SetUbExec(null, null, tempData.useSequenceUB);
                     }
                     else
                     {
@@ -701,6 +708,33 @@ namespace Elements
             {
                 BattleManager.Instance.semanubmanager.Disable();
             }
+        }
+
+        private static TeamEnhanceConfiguration CreateEnemyTeamEnhanceConfiguration(BattleSimulationRequest req)
+        {
+            if (req.EnemyTalentSkillLevels == null &&
+                req.EnemyTalentSkillNodeLevels == null &&
+                req.EnemyMasterSkillNodeLevels == null &&
+                req.EnemyRoleMastery == null)
+            {
+                return null;
+            }
+
+            return new TeamEnhanceConfiguration
+            {
+                talentLevel = req.EnemyTalentSkillLevels != null
+                    ? new Dictionary<int, int>(req.EnemyTalentSkillLevels)
+                    : new Dictionary<int, int>(),
+                talentSkill = req.EnemyTalentSkillNodeLevels != null
+                    ? new Dictionary<int, int>(req.EnemyTalentSkillNodeLevels)
+                    : new Dictionary<int, int>(),
+                teamSkill = req.EnemyMasterSkillNodeLevels != null
+                    ? new Dictionary<int, int>(req.EnemyMasterSkillNodeLevels)
+                    : new Dictionary<int, int>(),
+                roleMastery = req.EnemyRoleMastery != null
+                    ? new Dictionary<int, (int slotLevel, int enhanceLevel)>(req.EnemyRoleMastery)
+                    : new Dictionary<int, (int slotLevel, int enhanceLevel)>(),
+            };
         }
 
         public void Initialize()//由GameManager的init调用，生成己方战斗小人
@@ -763,6 +797,28 @@ namespace Elements
             else
             {
                 StartCoroutine(LoadCharacterPrefab(unitData, idx, isPlayer, action));
+            }
+        }
+
+        /// <summary>
+        /// Only arena battles may replace the opponent's enhancement configuration.
+        /// All other battle types retain the previous shared-configuration behavior.
+        /// </summary>
+        public TeamEnhanceParameter EnemyTeamEnhanceForCurrentBattle
+        {
+            get
+            {
+                if (tempData?.isGuildBattle != false)
+                    return null;
+
+                var category = BattleManager.Instance?.BattleCategory;
+                bool isArena = category == eBattleCategory.ARENA ||
+                               category == eBattleCategory.ARENA_REPLAY ||
+                               category == eBattleCategory.GRAND_ARENA ||
+                               category == eBattleCategory.GRAND_ARENA_REPLAY;
+                return isArena
+                    ? MainManager.Instance.ArenaEnemyTeamEnhanceData ?? MainManager.Instance.TeamEnhanceData
+                    : MainManager.Instance.TeamEnhanceData;
             }
         }
         public void TryingExecUB(int playerIdx)
@@ -882,7 +938,7 @@ namespace Elements
             unitCtrl.Initialize(
                 unitParameter,
                 unitData,
-                isplayer || !MyGameCtrl.Instance.tempData.isGuildBattle ? MainManager.Instance.TeamEnhanceData : null,
+                isplayer ? MainManager.Instance.TeamEnhanceData : EnemyTeamEnhanceForCurrentBattle,
                 false,
                 true,
                 labyrinthEnhanceParameter: isplayer ? tempData.LabyrinthEnhanceParameter : null,
@@ -1295,10 +1351,12 @@ namespace Elements
         public List<UnitParameter> PlayerParameters;
         public List<UnitParameter> EnemyParameters;
         public List<List<int>> SemanUBExecTimeList;
+        public List<int> SemanUBSequenceData;
         public List<List<float>> UBExecTimeList;
         public int tryCount = 30;
         public bool isGuildBattle;
         public bool isGuildEnemyViolent;
+        public bool useSequenceUB;
         public List<PCRCaculator.UnitData> playerList;
         public List<PCRCaculator.UnitData> enemyList;
         public List<EnemyData> guildEnemy;

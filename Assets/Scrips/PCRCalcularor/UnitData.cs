@@ -318,6 +318,12 @@ namespace PCRCaculator
                                 int statusLevel = a.exEquipSubs[i][k * 2 + 1];
                                 var paramTypes = new List<eParamType>(equip.status.Keys);
 
+                                if (statusIndex < 0 || statusIndex >= paramTypes.Count ||
+                                    statusLevel < 0 || statusLevel >= equip.status[paramTypes[statusIndex]].Length)
+                                {
+                                    continue;
+                                }
+
                                 if (paramTypes[statusIndex] == (eParamType)(j + 1))
                                 {
                                     var present2 = equip.status[paramTypes[statusIndex]][statusLevel];
@@ -2488,8 +2494,8 @@ namespace PCRCaculator
     {
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 352;
-        public int playerProcess = 97;
+        public int playerLevel = 355;
+        public int playerProcess = 98;
         //public int maxLove = 8;
         public int maxUniqueEqLv = 360;
         //public float bodyWidth = 100;
@@ -3141,10 +3147,12 @@ namespace PCRCaculator
         public Dictionary<int, EnemyData> MPartsDataDic;
         public MasterEnemyMParts.EnemyMParts mParts;
         public List<List<int>> SemanUBExecTimeList = null;
+        public List<int> SemanUBSequenceData = null;
         public List<List<float>> UBExecTimeList = null;
         public bool isAutoMode = false;
         public bool isSetMode = false;
         public bool isSemanMode = false;
+        public bool useSequenceUB = false;
         public bool forceAutoMode = false;
         public int stopFrame = -1;
         //public bool isViolent = false;

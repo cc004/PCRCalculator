@@ -92,7 +92,7 @@ namespace Elements
 
       public double ReduceEnergy { get; set; }
 
-      public int AbsorberValue { get; set; }
+      public long AbsorberValue { get; set; }
 
       public Skill Skill { get; set; }
 

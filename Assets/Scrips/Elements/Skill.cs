@@ -130,7 +130,7 @@ namespace Elements
         [JsonIgnore]
         public bool IsLifeStealEnabled { get; set; } = true;
         [JsonIgnore]
-        public int AbsorberValue { get; set; }
+        public long AbsorberValue { get; set; }
         public int BonusId
         {
             get;

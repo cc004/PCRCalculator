@@ -120,7 +120,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 655912852699361170}
   m_HandleRect: {fileID: 7709740265116673652}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -229,8 +229,8 @@ MonoBehaviour:
   prefabParent: {fileID: 1840817638048924922}
   actionPrefab: {fileID: 4730206903275958282, guid: e4423262979006e4098c1a0e98085403,
     type: 3}
-  prefabBasePos: {x: 0, y: -32.5, z: 0}
-  prefabAddPos: {x: 0, y: 70, z: 0}
+  prefabBasePos: {x: 0, y: -37.5, z: 0}
+  prefabAddPos: {x: 0, y: 100, z: 0}
 --- !u!1 &1866736444130084532
 GameObject:
   m_ObjectHideFlags: 0

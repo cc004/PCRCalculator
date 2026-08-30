@@ -37996,7 +37996,7 @@ RectTransform:
   m_GameObject: {fileID: 1285031240}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 666074283}
@@ -38041,8 +38041,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -72.10098, y: 46.913002}
-  m_SizeDelta: {x: 129.202, y: 26.413}
+  m_AnchoredPosition: {x: -104.4, y: 65.11301}
+  m_SizeDelta: {x: 150, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1287375976
 MonoBehaviour:
@@ -48497,8 +48497,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -72.10098, y: 99.73899}
-  m_SizeDelta: {x: 129.202, y: 26.413}
+  m_AnchoredPosition: {x: -104.4, y: 117.938995}
+  m_SizeDelta: {x: 150, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1684494744
 MonoBehaviour:
@@ -51180,8 +51180,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -72.10098, y: 73.326}
-  m_SizeDelta: {x: 129.202, y: 26.413}
+  m_AnchoredPosition: {x: -104.4, y: 91.52601}
+  m_SizeDelta: {x: 150, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1752142726
 MonoBehaviour:
@@ -63357,8 +63357,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -72.10098, y: 20.5}
-  m_SizeDelta: {x: 129.202, y: 26.413}
+  m_AnchoredPosition: {x: -104.4, y: 38.7}
+  m_SizeDelta: {x: 150, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5244005138876124275
 GameObject:
@@ -64281,7 +64281,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "12\u8D2F"
+  m_Text: "\u7269\u7406\u8D2F\u901A+12"
 --- !u!1 &7454129780099338545
 GameObject:
   m_ObjectHideFlags: 0

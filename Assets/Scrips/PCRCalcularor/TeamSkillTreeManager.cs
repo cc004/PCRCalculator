@@ -24,7 +24,7 @@ namespace PCRCaculator
         private Dictionary<int, List<int>> nodeChildrenDict;
         private Dictionary<int, TeamSkillTreeNode> NodeUIDict = new();
         private Dictionary<int, param_type> paramTypeDict;
-        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+        private TeamEnhanceConfiguration PlayerGroup => TalentEnhanceContext.ActiveConfiguration;
         public Dictionary<int, int> skillLevels = new Dictionary<int, int>();
         private float maxNodeY = 0f;
         private static readonly Dictionary<int, string> talentTypeMap = new Dictionary<int, string>
@@ -587,7 +587,7 @@ namespace PCRCaculator
         }
         public void UpdateTalentInfoData()
         {
-            MainManager.Instance.TeamEnhanceData.UpdateTalentInfoData(
+            TalentEnhanceContext.ActiveTeamEnhanceData.UpdateTalentInfoData(
                 skillLevels,
                 NodeDataDict,
                 TeamEnhanceParameter.DataType.TeamSkill);

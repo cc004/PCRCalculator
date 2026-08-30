@@ -158,8 +158,20 @@ namespace PCRCaculator
 #if ENABLE_THREADING
         [ThreadStatic]
         public static TeamEnhanceParameter teamEnhanceData;
+        [ThreadStatic]
+        private static TeamEnhanceParameter arenaEnemyTeamEnhanceData;
+        [ThreadStatic]
+        private static TeamEnhanceConfiguration arenaEnemyTeamEnhanceConfiguration;
+        [ThreadStatic]
+        private static TeamEnhanceConfiguration arenaEnemyTeamEnhanceOverride;
+        [ThreadStatic]
+        private static bool hasArenaEnemyTeamEnhanceOverride;
 #else
         public TeamEnhanceParameter teamEnhanceData;
+        private TeamEnhanceParameter arenaEnemyTeamEnhanceData;
+        private TeamEnhanceConfiguration arenaEnemyTeamEnhanceConfiguration;
+        private TeamEnhanceConfiguration arenaEnemyTeamEnhanceOverride;
+        private bool hasArenaEnemyTeamEnhanceOverride;
 #endif
         private static byte[] Keys = { 0x20, 0x20, 0x78, 0x25, 0xCE, 0x37, 0x66, 0xFF };
         
@@ -238,6 +250,47 @@ namespace PCRCaculator
         public Dictionary<int, string> SkillActionDescribe_cn { get => databaseCache.skillActionDescribe_cn; }
         public PlayerSetting PlayerSetting { get => playerSetting; }
         public TeamEnhanceParameter TeamEnhanceData { get => teamEnhanceData ??= new TeamEnhanceParameter(); }
+        public TeamEnhanceParameter ArenaEnemyTeamEnhanceData
+        {
+            get
+            {
+                var configuration = GetArenaEnemyTeamEnhanceConfiguration();
+                if (configuration == null)
+                    return null;
+
+                var result = arenaEnemyTeamEnhanceData ??= new TeamEnhanceParameter();
+                if (!ReferenceEquals(arenaEnemyTeamEnhanceConfiguration, configuration))
+                {
+                    arenaEnemyTeamEnhanceConfiguration = configuration;
+                    result.LoadFromConfiguration(configuration);
+                }
+                return result;
+            }
+        }
+
+        public void RefreshArenaEnemyTeamEnhanceData()
+        {
+            var configuration = GetArenaEnemyTeamEnhanceConfiguration();
+            arenaEnemyTeamEnhanceConfiguration = configuration;
+            if (configuration != null)
+                (arenaEnemyTeamEnhanceData ??= new TeamEnhanceParameter()).LoadFromConfiguration(configuration);
+        }
+
+        public void SetArenaEnemyTeamEnhanceOverride(TeamEnhanceConfiguration configuration)
+        {
+            hasArenaEnemyTeamEnhanceOverride = true;
+            arenaEnemyTeamEnhanceOverride = configuration;
+            arenaEnemyTeamEnhanceConfiguration = configuration;
+            if (configuration != null)
+                (arenaEnemyTeamEnhanceData ??= new TeamEnhanceParameter()).LoadFromConfiguration(configuration);
+        }
+
+        private TeamEnhanceConfiguration GetArenaEnemyTeamEnhanceConfiguration()
+        {
+            return hasArenaEnemyTeamEnhanceOverride
+                ? arenaEnemyTeamEnhanceOverride
+                : GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup()?.arenaEnemyTeamEnhance;
+        }
         public GameObject LatestUIback
         {
             get
@@ -302,7 +355,7 @@ namespace PCRCaculator
         public class VersionData
         {
             public long CharacterVersionJP = 10065700;
-            public long BossVersionJP = 10065100;
+            public long BossVersionJP = 10065500;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -1054,8 +1107,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 97;
-                playerSetting.playerLevel = 352;
+                playerSetting.playerProcess = 98;
+                playerSetting.playerLevel = 355;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";

@@ -51,7 +51,18 @@ namespace PCRCaculator
                 return;
             }
             groupData.SemanUBExecTimeData = BattleManager.Instance.semanubmanager.Auto2Seman();
-            MainManager.Instance.WindowMessage("已覆盖为此次战斗语义UB时间");
+            groupData.useSequenceUB = MyGameCtrl.Instance.tempData.useSequenceUB;
+            if (groupData.useSequenceUB)
+            {
+                groupData.SemanUBSequenceData = BattleManager.Instance.semanubmanager.Auto2SemanSequence();
+                MainManager.Instance.WindowMessage("已覆盖为此次战斗序列语义UB时间");
+            }
+            else
+            {
+                groupData.SemanUBSequenceData = new List<int>();
+                MainManager.Instance.WindowMessage("已覆盖为此次战斗语义UB时间");
+            }
+            GuildManager.SaveSettingData(MyGameCtrl.Instance.tempData.SettingData);
         }
         public void ReplaceUBTime()
         {

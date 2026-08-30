@@ -52,6 +52,7 @@ namespace PCRCaculator
             request.IsSetMode = battleData.isSetMode;
             request.IsSkipping = true;
             request.IsTalentQuest = GuildManager.Instance.IsTalentQuestBoss;
+            request.UseSequenceUB = battleData.useSequenceUB;
             request.MasterSkillNodeLevels = group.teamSkill;
             request.NeedOnceResult = true;
             request.LabyrinthEnhancedNodeIds = group.labyrinthEnhancedNodeIds;
@@ -59,6 +60,7 @@ namespace PCRCaculator
             request.LabyrinthAlphaRupee = group.labyrinthAlphaRupee;
             request.PlayerList = GuildManager.Instance.SettingData.GetCurrentPlayerData().playrCharacters;
             request.SemanUBExecTimeList = battleData.SemanUBExecTimeList;
+            request.SemanUBSequenceData = battleData.SemanUBSequenceData;
             request.Settings = GuildManager.Instance.SettingData.GetCurrentRandomData();
             request.TalentFullInfo = true;
             request.TalentSkillLevels = group.talentLevel;

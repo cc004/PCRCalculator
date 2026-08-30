@@ -18,7 +18,7 @@ namespace PCRCaculator
         public GameObject roleMasteryPanel;
         private Dictionary<int, unit_role_mastery_id> UnitRoleMasteryIdDic => MainManager.Instance.UnitRoleMasteryIdDic;
         private Dictionary<int, UnitRoleMasterySlotEnhanceData> UnitRoleMasterySlotEnhanceDataDic => MainManager.Instance.UnitRoleMasterySlotEnhanceDataDic;
-        private GuildPlayerGroupData PlayerGroup => GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+        private TeamEnhanceConfiguration PlayerGroup => TalentEnhanceContext.ActiveConfiguration;
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();
         public List<GameObject> roleSlotPrefabs;
         public Text roleLevelBatchText;
@@ -218,7 +218,7 @@ namespace PCRCaculator
 
         public void UpdateRoleMasteryData()
         {
-            MainManager.Instance.TeamEnhanceData.UpdateRoleMasteryData(roleMastery);
+            TalentEnhanceContext.ActiveTeamEnhanceData.UpdateRoleMasteryData(roleMastery);
         }
     }
 }

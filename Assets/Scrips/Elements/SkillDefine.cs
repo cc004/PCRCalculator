@@ -773,6 +773,10 @@ namespace Elements
                 typeof(AutoRevivalAction)
             },
             {
+                eActionType.HP_LOWER_LIMIT,
+                typeof(HpLowerLimitAction)
+            },
+            {
                 eActionType.DAMAGE_CUT_FOR_SPECIAL_NULLIFICATION,
                 typeof(DamageCutForSpecialNullificationAction)
             },

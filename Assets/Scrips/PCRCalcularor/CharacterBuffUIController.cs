@@ -8,6 +8,8 @@ namespace PCRCaculator.Battle
 
     public class CharacterBuffUIController : MonoBehaviour
     {
+        private const float PartsDisplayMinimumSpacing = 0.6f;
+
         public List<SpriteRenderer> abnormalIcons;
         public SpriteRenderer rular;
         public TextMesh posText;
@@ -127,13 +129,33 @@ namespace PCRCaculator.Battle
         public void SetPartsBossData()
         {
             bossPartsList = owner2.BossPartsList;
+            var orderedParts = new List<PartsData>(bossPartsList);
+            orderedParts.Sort((left, right) => left.PositionX.CompareTo(right.PositionX));
+
+            var displayXByPart = new Dictionary<PartsData, float>();
+            float displayXSum = 0f;
+            float previousDisplayX = 0f;
+            for (int index = 0; index < orderedParts.Count; index++)
+            {
+                PartsData partsData = orderedParts[index];
+                float sourceX = owner2.gameObject.transform.position.x + partsData.PositionX / 540.0f;
+                float displayX = index == 0
+                    ? sourceX
+                    : Mathf.Max(sourceX, previousDisplayX + PartsDisplayMinimumSpacing);
+
+                displayXByPart.Add(partsData, displayX);
+                displayXSum += displayX;
+                previousDisplayX = displayX;
+            }
+
+            float centerOffset = orderedParts.Count == 0
+                ? 0f
+                : displayXSum / orderedParts.Count - owner2.gameObject.transform.position.x;
             foreach(PartsData partsData in bossPartsList)
             {
                 GameObject a = Instantiate(partsDataPrefab);
-                Vector3 tansFix = new Vector3(partsData.PositionX / 540.0f,0, 0 );
                 a.transform.SetParent(owner2.gameObject.transform, false);
-                a.transform.position = owner2.gameObject.transform.position+ tansFix;
-                a.transform.position = new Vector3(a.transform.position.x, poszFix, transform.position.z);
+                a.transform.position = new Vector3(displayXByPart[partsData] - centerOffset, poszFix, transform.position.z);
                 a.GetComponent<PartsdataUI>().Init(partsData);
             }
         }

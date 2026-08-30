@@ -203,6 +203,8 @@ namespace ActionParameterSerializer.Actions
                     return new ForceChangeSpeedAction();
                 case 118:
                     return new GutsAction();
+                case 122:
+                    return new HpLowerLimitAction();
                 case 124:
                     return new EnchantProtectAction();
                 case 125:

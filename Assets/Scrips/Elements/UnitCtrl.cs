@@ -935,6 +935,14 @@ namespace Elements
                 }
             },
             {
+                UnitCtrl.eAbnormalState.HP_LOWER_LIMIT,
+                new AbnormalConstData
+                {
+                    IconType = eStateIconType.NONE,
+                    IsBuff = true
+                }
+            },
+            {
                 UnitCtrl.eAbnormalState.RATIO_SLIP,
                 new AbnormalConstData
                 {
@@ -5369,6 +5377,9 @@ this.updateCurColor();
                 case UnitCtrl.eAbnormalState.TAUNT:
                     result = UnitCtrl.eAbnormalStateCategory.TAUNT;
                     break;
+                case UnitCtrl.eAbnormalState.HP_LOWER_LIMIT:
+                    result = UnitCtrl.eAbnormalStateCategory.HP_LOWER_LIMIT;
+                    break;
                 case UnitCtrl.eAbnormalState.RATIO_SLIP:
                     result = UnitCtrl.eAbnormalStateCategory.RATIO_SLIP;
                     break;
@@ -6867,11 +6878,11 @@ this.updateCurColor();
                     TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther,
                     IgnoreTalentBonusForRatioSlip = (_abnormalState == eAbnormalState.RATIO_SLIP),
                     OverrideDamageLimit = maxLimitDamage,
-                    ExecAbsorber = delegate (int _damage)
+                    ExecAbsorber = delegate (long _damage)
                     {
                         if (_damage > categoryData.AbsorberValue)
                         {
-                            int result = _damage - categoryData.AbsorberValue;
+                            long result = _damage - categoryData.AbsorberValue;
                             battleManager.SubstructEnemyPoint(categoryData.AbsorberValue);
                             categoryData.AbsorberValue = 0;
                             return result;
@@ -6934,11 +6945,11 @@ this.updateCurColor();
                 IsSlipDamage = true,
                 ActionType = eActionType.DAMAGE_BY_ATTACK,
                 TargetIncludeMyTeam = this.IsOther == categoryData.Source.IsOther || categoryData.IsEnvironmentAbnormalState,
-                ExecAbsorber = delegate (int _damage)
+                ExecAbsorber = delegate (long _damage)
                 {
                     if (_damage > categoryData.AbsorberValue)
                     {
-                        int result = _damage - categoryData.AbsorberValue;
+                        long result = _damage - categoryData.AbsorberValue;
                         battleManager.SubstructEnemyPoint(categoryData.AbsorberValue);
                         categoryData.AbsorberValue = 0;
                         return result;
@@ -8910,11 +8921,11 @@ this.updateCurColor();
                                damageData.DamageType = DamageData.eDamageType.NONE;
                                damageData.Source = this;
                                damageData.ActionType = eActionType.CONTINUOUS_ATTACK_NEARBY;
-                               damageData.ExecAbsorber = (Func<int, int>)(_damage =>
+                               damageData.ExecAbsorber = (Func<long, long>)(_damage =>
                      {
                                    if (_damage > _data.AbsorberValue)
                                    {
-                                       int num2 = _damage - _data.AbsorberValue;
+                                       long num2 = _damage - _data.AbsorberValue;
                                        this.battleManager.SubstructEnemyPoint(_data.AbsorberValue);
                                        _data.AbsorberValue = 0;
                                        return num2;
@@ -10516,45 +10527,48 @@ this.updateCurColor();
 
             Tuple<StrikeBackData, List<StrikeBackData>> tuple =  searchStrikeBack(_damageData);
 
-            if (!_damageData.IgnoreDef && !flag1)
+            if (!flag1)
             {
-                var damageType = _damageData.DamageType;
-                if (_damageData.Target.Owner.ReduceDamageByHigherDefData != null && _damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
+                if (!_damageData.IgnoreDef && _damageData.DamageType != DamageData.eDamageType.NONE)
                 {
-                    var def = _damageData.Target.GetDefZero();
-                    var magicDef = _damageData.Target.GetMagicDefZero();
-                    if (def != magicDef)
+                    var damageType = _damageData.DamageType;
+                    if (_damageData.Target.Owner.ReduceDamageByHigherDefData != null && _damageData.Target.Owner.ReduceDamageByHigherDefData.Enable)
                     {
-                        damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                        var def = _damageData.Target.GetDefZero();
+                        var magicDef = _damageData.Target.GetMagicDefZero();
+                        if (def != magicDef)
+                        {
+                            damageType = def > magicDef ? DamageData.eDamageType.ATK : DamageData.eDamageType.MGC;
+                        }
                     }
-                }
-                switch (damageType)
-                {
-                    case DamageData.eDamageType.ATK:
-                        var defZero = _damageData.Target.GetDefZero();
-                        var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
-                        break;
-                    case DamageData.eDamageType.MGC:
-                        var magicDefZero = _damageData.Target.GetMagicDefZero();
-                        var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                        a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
-                        break;
-                }
-                if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
-                {
                     switch (damageType)
                     {
                         case DamageData.eDamageType.ATK:
-                            var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
+                            var defZero = _damageData.Target.GetDefZero();
                             var num3 = (defZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
+                            a *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
                             break;
                         case DamageData.eDamageType.MGC:
-                            var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
+                            var magicDefZero = _damageData.Target.GetMagicDefZero();
                             var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
-                            b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
+                            a *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
                             break;
+                    }
+                    if (MainManager.Instance.PlayerSetting.tpCalculationChanged)
+                    {
+                        switch (damageType)
+                        {
+                            case DamageData.eDamageType.ATK:
+                                var defZero = _damageData.Target.GetDefZeroForDamagedEnergy();
+                                var num3 = (defZero - _damageData.DefPenetrate).Max(0);
+                                b *= (1.0f - (DoubleWithEx)num3 / (defZero + 100.0f));
+                                break;
+                            case DamageData.eDamageType.MGC:
+                                var magicDefZero = _damageData.Target.GetMagicDefZeroForDamagedEnergy();
+                                var num4 = (magicDefZero - _damageData.DefPenetrate).Max(0);
+                                b *= (1.0f - (DoubleWithEx)num4 / (magicDefZero + 100.0f));
+                                break;
+                        }
                     }
                 }
                 var unit = _damageData.Source;
@@ -10592,7 +10606,8 @@ this.updateCurColor();
                     _damageData.ActionType == eActionType.CONTINUOUS_ATTACK ||
                     _damageData.ActionType == eActionType.CONTINUOUS_ATTACK_NEARBY ||
                     _damageData.ActionType == eActionType.ENCHANT_STRIKE_BACK ||
-                    _damageData.ActionType == eActionType.ATTACK_FIELD) &&
+                    _damageData.ActionType == eActionType.ATTACK_FIELD ||
+                    _damageData.ActionType == eActionType.DAMAGE_BY_ATTACK) &&
                     !_damageData.IgnoreLogBarrier)
                 {
                     DoubleWithEx TotalDamageForLogBarrier = 0;
@@ -10822,7 +10837,7 @@ this.updateCurColor();
                 _fDamage = num5.Max(1);
             /*if (this.battleManager.GetPurpose() == eHatsuneSpecialPurpose.ABSORBER && this.battleManager.KIHOGJBONDH != 0 && this.IsBoss)
             {
-                int PBAANIPPIGL = BattleUtil.FloatToInt(_fDamage);
+                long PBAANIPPIGL = BattleUtil.DoubleToLong(_fDamage);
                 switch (_damageData.ActionType)
                 {
                     case eActionType.ATTACK:
@@ -10876,6 +10891,17 @@ this.updateCurColor();
             _hp = Hp.Min(MaxHp);
             var hp2 = Hp;
             _hp = Hp.ZeroCapForHp();
+
+            if (IsAbnormalState(eAbnormalState.HP_LOWER_LIMIT))
+            {
+                long hpLowerLimit = BattleUtil.DoubleToLong(GetAbnormalStateMainValue(eAbnormalStateCategory.HP_LOWER_LIMIT));
+                if (hp <= hpLowerLimit)
+                    Hp = hp;
+                else
+                    Hp = Hp.Max(hpLowerLimit);
+                hp2 = Hp;
+                num6 = Math.Max(0L, hp - (long)Hp);
+            }
 
             if (!IsBoss)
             {

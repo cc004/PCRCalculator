@@ -57,6 +57,13 @@ namespace Elements.Battle
                     return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
                 }
             }
+            private bool canProcess
+            {
+                get
+                {
+                    return skillReady && parent.IsSequenceTurn(unitId);
+                }
+            }
             public bool IsIdle
             {
                 get
@@ -90,7 +97,7 @@ namespace Elements.Battle
 
             public void OnEventCallback(int unitPos, int eventId)
             {
-                if (!skillReady) return;
+                if (!canProcess) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
                 if (history.Count == 0 || history.Last().frame < frame || eventId == (int)eSemanEvent.UB || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == eventId && h.action == Action.WAIT_UNIT_EVENT) == 0)
                 {
@@ -106,7 +113,7 @@ namespace Elements.Battle
 
             public void OnChangeStateCallBack(int unitPos, ActionState state)
             {
-                if (!skillReady) return;
+                if (!canProcess) return;
                 if (parent.State2Id.ContainsKey(state))
                 {
                     var stateId = parent.State2Id[state];
@@ -127,7 +134,7 @@ namespace Elements.Battle
 
             public void OnSkillCallBack(int unitPos, int skillId)
             {
-                if (!skillReady) return;
+                if (!canProcess) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
                 if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.action != Action.WAIT_UNIT_EVENT && h.frame == frame && h.waitUnit == unitPos && h.skillId == skillId) == 0)
                 {
@@ -142,7 +149,7 @@ namespace Elements.Battle
             }
             public void ProcessFrame()
             {
-                if (skillReady)
+                if (canProcess)
                 {
                     foreach (var ub in history)
                     {
@@ -404,10 +411,17 @@ namespace Elements.Battle
             }
 
             public Action action { get; set; }
-            public bool skillReady { 
+            public bool skillReady {
                 get
                 {
                     return unitId < parent.players.Count && parent.players[unitId].IsSkillReady;
+                }
+            }
+            private bool canProcess
+            {
+                get
+                {
+                    return skillReady && parent.IsSequenceTurn(unitId);
                 }
             }
 
@@ -444,9 +458,9 @@ namespace Elements.Battle
 
             public void OnEventCallback(int unitPos, int eventId)
             {
-                if (!skillReady) return;
+                if (!canProcess) return;
                 if (
-                    (lastUpdateFrame < BattleHeaderController.CurrentFrameCount || eventId == (int)eSemanEvent.UB) && 
+                    (lastUpdateFrame < BattleHeaderController.CurrentFrameCount || eventId == (int)eSemanEvent.UB) &&
                 (action == Action.WAIT_UNIT_EVENT && waitUnit == unitPos && skillId == eventId ||
                 (action == Action.WAIT_UNIT_ANY_EVENT && waitUnit == unitPos) ||
                 (action == Action.WAIT_EVENT))
@@ -464,7 +478,7 @@ namespace Elements.Battle
 
             public void OnSkillCallBack(int unitPos, int skillId)
             {
-                if (!skillReady) return;
+                if (!canProcess) return;
                 if (lastUpdateFrame < BattleHeaderController.CurrentFrameCount && (
                     action == Action.WAIT_EXEC || (waitUnit == unitPos &&
                     (action == Action.WAIT_UNIT_EXEC || (action == Action.WAIT_UNIT_ACTION && this.skillId == skillId))
@@ -481,18 +495,18 @@ namespace Elements.Battle
 
             public void ProcessFrame()
             {
-                if (skillReady && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle))
+                if (canProcess && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle))
                     delay--;
             }
 
             public bool IsUbExec()
             {
-                return skillReady && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle) && delay <= 0;
+                return canProcess && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle) && delay <= 0;
             }
 
             public void OnChangeStateCallBack(int unitPos, ActionState state)
             {
-                if (!skillReady) return;
+                if (!canProcess) return;
                 if ((action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && parent.State2Id.ContainsKey(state) && skillId == parent.State2Id[state]) ||
                     (state == ActionState.SKILL_1 && action == Action.WAIT_UB)
                     // (state == ActionState.SKILL_1 && (action == Action.WAIT_UB || action == Action.WAIT_EXEC))
@@ -650,19 +664,30 @@ namespace Elements.Battle
 
         private List<UbRecord> auto2seman;
         private List<List<int>> auto2semanAll;
+        private List<int> auto2semanSequence;
         private Dictionary<int, List<List<int>>> auto2semanTeacherProfiles;
         private static readonly int[] AutoSemanTeacherProfileIndexes = { 5, 6, 7 };
         private bool enable = false;
+        private bool auto2semanSequenceMode = false;
+        private List<int> ubSequence = new List<int>();
+        private int ubSequenceIndex = 0;
 
         public void Disable()
         {
             enable = false;
+            auto2semanSequenceMode = false;
+            auto2semanSequence = null;
+            ubSequence = new List<int>();
+            ubSequenceIndex = 0;
         }
 
-        public void SetUbExec(List<List<int>> ublists)
+        public void SetUbExec(List<List<int>> ublists, List<int> sequence = null, bool recordSequence = false)
         {
             enable = true;
             ubMod = false;
+            auto2semanSequenceMode = recordSequence;
+            ubSequence = NormalizeSequence(sequence);
+            ubSequenceIndex = 0;
             UBNums = new List<int> { 0, 0, 0, 0, 0 };
             if (ublists == null || ublists.Count == 0)
             {
@@ -674,14 +699,29 @@ namespace Elements.Battle
                     new UbRecord(this, unitId: 4),
                 };
                 auto2semanAll = new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+                auto2semanSequence = new List<int>();
                 auto2semanTeacherProfiles = AutoSemanTeacherProfileIndexes.ToDictionary(
                     profile => profile,
                     profile => new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() });
                 return;
             }
             ubMod = true;
+            auto2semanSequence = null;
             auto2semanTeacherProfiles = null;
             queues = ublists.Select((ublist, id) => new Queue<UbStatus>(ublist.Select(num => GetUbStatus(id, num)))).ToArray();
+        }
+
+        private List<int> NormalizeSequence(List<int> sequence)
+        {
+            return sequence?.Where(pos => pos >= 0 && pos <= 4).ToList() ?? new List<int>();
+        }
+
+        private bool IsSequenceTurn(int unitId)
+        {
+            return ubSequence == null ||
+                ubSequence.Count == 0 ||
+                ubSequenceIndex >= ubSequence.Count ||
+                ubSequence[ubSequenceIndex] == unitId;
         }
 
         public bool IsUbExec(int pos)
@@ -689,6 +729,7 @@ namespace Elements.Battle
             if (!enable) return false;
             if (!ubMod) return false;
             if (pos < 0 || pos > 4) return false;
+            if (!IsSequenceTurn(pos)) return false;
             if (queues[pos].Count == 0 || queues[pos].Peek().IsUbExec())
             {
                 return true;
@@ -800,6 +841,10 @@ namespace Elements.Battle
                 if (pos >= 0 && pos <= 4) // no boss
                 {
                     auto2semanAll[pos].Add(auto2seman[pos].GetUbNumber(pos));
+                    if (auto2semanSequenceMode)
+                    {
+                        auto2semanSequence.Add(pos);
+                    }
                     foreach (int profile in AutoSemanTeacherProfileIndexes)
                     {
                         if (auto2semanTeacherProfiles != null && auto2semanTeacherProfiles.ContainsKey(profile))
@@ -808,7 +853,17 @@ namespace Elements.Battle
                         }
                     }
                     UBNums[pos]++;
-                    auto2seman[pos].Clear();
+                    if (auto2semanSequenceMode)
+                    {
+                        foreach (var record in auto2seman)
+                        {
+                            record.Clear();
+                        }
+                    }
+                    else
+                    {
+                        auto2seman[pos].Clear();
+                    }
                 }
                 return;
             }
@@ -816,6 +871,10 @@ namespace Elements.Battle
             if (queues[pos].Count > 0)
                 queues[pos].Dequeue();
             UBNums[pos]++;
+            if (ubSequence != null && ubSequenceIndex < ubSequence.Count && ubSequence[ubSequenceIndex] == pos)
+            {
+                ubSequenceIndex++;
+            }
         }
 
         public int skill2Id(int skillId)
@@ -862,6 +921,11 @@ namespace Elements.Battle
         public List<List<int>> Auto2Seman()
         {
             return BuildAuto2SemanOutput(auto2semanAll);
+        }
+
+        public List<int> Auto2SemanSequence()
+        {
+            return auto2semanSequence?.ToList() ?? new List<int>();
         }
 
         public List<List<int>> Auto2Seman(int semanSkillToggleIndex)

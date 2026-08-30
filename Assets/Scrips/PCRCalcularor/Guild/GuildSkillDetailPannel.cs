@@ -77,7 +77,7 @@ namespace PCRCaculator.Guild
                 bgImage.color = backgroundColor;
             }
             prefabs.Add(a);
-            posy += (view.localPosition.y - view.sizeDelta.y - 30);
+            posy += (view.localPosition.y - view.sizeDelta.y - 38);
         }
     }
 }

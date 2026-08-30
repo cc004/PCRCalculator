@@ -94,11 +94,17 @@ public class StatusPanel : MonoBehaviour
     private void UpdateCellTexts(PartsData part, Text[] cellTexts)
     {
         var HpPencent = (float)part.BreakPoint != 0 ? string.Format("{0:P2}", (float)part.BreakPoint / (float)part.MaxBreakPoint) : "0.00%";
+        var breakStatus = "-";
+        if (part.IsBreak)
+        {
+            var remainingTime = Mathf.Max(0.0f, part.BreakTime + part.RecoverTime);
+            breakStatus = $"<color=#f75291>Break\n余{remainingTime:N2}s</color>";
+        }
         string[] properties = new string[]
         {
             "部位"+part.Index.ToString(),
             $"{(float)part.BreakPoint}\n<color=#f75291>{HpPencent}</color>",
-            part.IsBreak?"<color=#f75291>Break</color>":"-",
+            breakStatus,
             "-",
             $"{(float)part.Atk}",
             $"{(float)part.MagicStr}",
