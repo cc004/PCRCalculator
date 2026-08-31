@@ -91,7 +91,11 @@ namespace Elements
                 if (sealData.GetCurrentCount() == 0)
                     return;
 
-                _source.ExecSkillWithTargetPartsAndActionList(_skill, _target, new List<ActionParameter> { targetAction });
+                _source.ExecSkillWithTargetPartsAndActionList(
+                    _skill,
+                    _target,
+                    new List<ActionParameter> { targetAction },
+                    false);
                 sealData.RemoveSeal(1, true);
             };
         }

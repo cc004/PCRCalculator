@@ -36,7 +36,7 @@ namespace Elements
         {
             // Properties
             public IEnumerator Coroutine { get; set; }
-            public bool Enable { get; set; } // TODO find where use
+            public bool Enable { get; set; }
             public int EnvironmentId { get; set; }
         }
 
@@ -3641,9 +3641,14 @@ this.updateCurColor();
         public void ExecSkillWithTargetPartsAndActionList(
           Skill _skill,
           BasePartsData _targetParts,
-          List<ActionParameter> _actionList)
+          List<ActionParameter> _actionList,
+          bool _considerTargetAssignment)
         {
-            unitActionController.ExecSkillWithTargetPartsAndActionList(_skill, _targetParts, _actionList);
+            unitActionController.ExecSkillWithTargetPartsAndActionList(
+                _skill,
+                _targetParts,
+                _actionList,
+                _considerTargetAssignment);
         }
 
         public void ExecSkillWithTargetParts(
@@ -7896,8 +7901,24 @@ this.updateCurColor();
             var idx = ++buffDebuffIndex;
             var dispelled = IdleOnly || (long)Hp < 0;
             buffDebuffFlag.Add((short) ((_isBuff ? 2 : 0) | (_despelable ? 4 : 0) | (_additional ? 8 : 0) | (dispelled ? 1 : 0) | (int)_kind << 4));
-            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, idx, _isBuff, _additional, _isShowIcon, _bonusId, _actionId, describe, _triggerCall);
-            // TODO fill _cr Enable EnvironmentId
+            _cr.Enable = true;
+            _cr.EnvironmentId = _environmentId;
+            _cr.Coroutine = UpdateBuffParam(
+                _kind,
+                _value,
+                _time,
+                _skillId,
+                _source,
+                _despelable,
+                idx,
+                _isBuff,
+                _additional,
+                _isShowIcon,
+                _bonusId,
+                _actionId,
+                describe,
+                _triggerCall,
+                _cr);
 
             buffDebuffCoroutineList.Add(_cr);
 
@@ -7919,6 +7940,22 @@ this.updateCurColor();
 
         public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
+
+        public void DisableEnvironmentCoroutine(int _environmentId)
+        {
+            foreach (var data in buffDebuffCoroutineList)
+            {
+                if (data.EnvironmentId == _environmentId)
+                    data.Enable = false;
+            }
+
+            if (ExtendSlipDamageData != null
+                && ExtendSlipDamageData.Enable
+                && ExtendSlipDamageData.EnvironmentId == _environmentId)
+            {
+                ExtendSlipDamageData.Enable = false;
+            }
+        }
 
         private void clearHistoryBuff()
         {
@@ -8012,7 +8049,8 @@ this.updateCurColor();
           int _bonusId,
           int _actionId,
           string _describe,
-          bool _triggerCall)
+          bool _triggerCall,
+          BuffDebuffCoroutineDataSet _coroutineDataSet)
         {
             long eventToken = CreateBuffDebuffEventToken(_buffDebuffId);
             if (_kind == BuffParamKind.MAX_HP)
@@ -8042,6 +8080,9 @@ this.updateCurColor();
             var buffId = getBuffDebuffParamValue(_kind, _isBuff, _additional);
             while (true)
             {
+                if (!_coroutineDataSet.Enable)
+                    break;
+
                 if (!isStopBuffDebuffEffectTimer && FlagDeltaTimeForPause)
                 {
                     if ((time += BattleManager.DeltaTime_60fps) > _maxTime)
@@ -14596,6 +14637,12 @@ this.updateCurColor();
 
         //public void PlayDieEffect() => this.AppendCoroutine(this.CreatePrefabWithTime(this.dieEffects, _ignorePause: true), ePauseType.IGNORE_BLACK_OUT);
         public bool ModeChangeUnableStateBarrier
+        {
+            get;
+            set;
+        }
+
+        public bool TriggerStealthUnableStateBarrier
         {
             get;
             set;

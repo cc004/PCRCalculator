@@ -17,7 +17,7 @@ namespace Elements
         private const int UNDESPELABLE_NUMBER = 2;
         private const int DETAIL_DIGIT = 10;
         private const int DETAIL_DEBUFF = 1;
-        public int EnvironmentId { get; set; } // TODO implement
+        public int EnvironmentId { get; set; } = -1;
 
 
         public override void ExecActionOnStart(

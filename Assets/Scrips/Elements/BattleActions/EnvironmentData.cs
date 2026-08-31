@@ -71,50 +71,25 @@ namespace Elements
 
             Enable = true;
 
+            environmentId = manager.CurrentEnvironmentId;
+            manager.CurrentEnvironmentId++;
+
             manager.AppendCoroutine(this.UpdateEnvironment(), ePauseType.SYSTEM, SourceUnit);
         }
 
         public IEnumerator UpdateEnvironment()
         {
-            // —— 第一步：销毁残留特效（如果有）并等待一帧 —— 
-            var bm = battleManager;
-            // if (bm != null && !bm.IsPaused && SkillEffect != null)
-            //     UnityEngine.Object.Destroy(SkillEffect);
-            yield return null;
-
-            // —— 第二步：第一次恢复后，遍历 EnemyUnitList 和 UnitList —— 
-            if (!WaitingAnotherEnvironmentEnd)
-            {
-                foreach (var ctrl in EnemyUnitList)
-                {
-                    if (ctrl.IsPartsBoss)
-                    {
-                        foreach (var part in ctrl.BossPartsListForBattle)
-                            UpdateEnvironmentCallback(part);
-                    }
-                    else
-                    {
-                        UpdateEnvironmentCallback(ctrl.GetFirstParts());
-                    }
-                }
-            }
-            foreach (var ctrl in UnitList)
-            {
-                if (ctrl.IsPartsBoss)
-                {
-                    foreach (var part in ctrl.BossPartsListForBattle)
-                        UpdateEnvironmentCallback(part);
-                }
-                else
-                {
-                    UpdateEnvironmentCallback(ctrl.GetFirstParts());
-                }
-            }
-
-            // —— 第三步：进入循环，每帧累积时间并检查结束条件 —— 
             while (true)
             {
-                // 终止条件
+                if (stopCalled)
+                    yield break;
+
+                if (!WaitingAnotherEnvironmentEnd)
+                {
+                    UpdateEnvironmentUnits(EnemyUnitList);
+                    UpdateEnvironmentUnits(UnitList);
+                }
+
                 if (SourceUnit == null
                     || SourceUnit.IsDead
                     || SourceUnit.Hp < 1
@@ -126,10 +101,31 @@ namespace Elements
                     yield break;
                 }
 
-                // 等待一帧
                 yield return null;
 
                 timer += BattleManager.DeltaTime_60fps;
+            }
+        }
+
+        private void UpdateEnvironmentUnits(List<UnitCtrl> units)
+        {
+            if (units == null)
+                return;
+
+            foreach (var ctrl in units)
+            {
+                if (ctrl == null)
+                    continue;
+
+                if (ctrl.IsPartsBoss)
+                {
+                    foreach (var part in ctrl.BossPartsListForBattle)
+                        UpdateEnvironmentCallback(part);
+                }
+                else
+                {
+                    UpdateEnvironmentCallback(ctrl.GetFirstParts());
+                }
             }
         }
 
@@ -208,17 +204,10 @@ namespace Elements
                 || (sortCode == 21 && owner.AtkType != 2))
                     continue;
 
-                // 原 LODWORD(current[5].klass)
-                int actionTypeValue = (int)current.ActionType;
-                // 原 HIDWORD(current[2].monitor)
-                int detail1 = current.ActionDetail1;
+                if (current.IsChangeSpeedAction() && owner.OverwriteSpeedDataCount > 0)
+                    continue;
 
-                // 跳过加入 TargetList 的条件
-                bool skipAdd = actionTypeValue == 8
-                            && (detail1 - 1) <= 1
-                            && owner.OverwriteSpeedDataCount > 0;
-
-                if (!hasAddedToTargetList && !skipAdd)
+                if (!hasAddedToTargetList)
                 {
                     TargetList.Add(parts);
                 }
@@ -231,18 +220,10 @@ namespace Elements
                 if (!current.IsAppendTargetNum(owner))
                     current.AppendTargetNum(owner, 0);
 
-                // Buff/Debuff 动作分支 (原 actionTypeValue == 10)
-                if (actionTypeValue == 10) // TODO fix
-                {
-                    // int depth = current.GetTypeHierarchyDepth();
-                    // var lastType = current.GetTypeAtDepth(depth - 1);
-                    // if (depth >= BuffDebuffActionTypeInfo.Depth
-                    //     && lastType == BuffDebuffActionTypeInfo)
-                    // {
-                        // LODWORD(current[26].klass) 已经超了定义的最后一个属性了
-                        // current.SetTargetEnvironmentId(this.EnvironmentId);
-                    // }
-                }
+                if (current is BuffDebuffAction buffDebuffAction)
+                    buffDebuffAction.EnvironmentId = environmentId;
+                else if (current is ExtendSlipDamageAction extendSlipDamageAction)
+                    extendSlipDamageAction.EnvironmentId = environmentId;
 
                 // 执行动作
                 if (SourceActionController != null)
@@ -278,9 +259,8 @@ namespace Elements
 
                         // 原 HIDWORD(current[1].klass)
                         int sortCode = (int)current.TargetSort;
-                        bool typeMatch = (sortCode == 20 && owner.AtkType == 1)
-                                    || (sortCode == 21 && owner.AtkType == 2);
-                        if (!typeMatch)
+                        if ((sortCode == 20 && owner.AtkType != 1)
+                            || (sortCode == 21 && owner.AtkType != 2))
                             continue;
 
                         // 原 LODWORD(current[10].monitor)
@@ -298,19 +278,7 @@ namespace Elements
                 }
             }
 
-            var coroutineList = parts.Owner?.buffDebuffCoroutineList;
-            if (coroutineList != null)
-            {
-                foreach (var data in coroutineList)
-                {
-                    // 原 HIDWORD(current[1].monitor)
-                    if (data.EnvironmentId == this.environmentId)
-                    {
-                        // 原 LOBYTE(current[1].monitor) = 0
-                        data.Enable = false;
-                    }
-                }
-            }
+            parts.Owner?.DisableEnvironmentCoroutine(environmentId);
         }
 
         public void InitializeSkillEffect()
@@ -354,74 +322,31 @@ namespace Elements
             if (owner == null)
                 return;
 
-            if (owner.RevivalFlagForEnvironment || EnvironmentType != 0)
-            {
-                if (TargetList != null && TargetList.Contains(unit)){
-                    SourceActionController.ExecAction(
-                        TargetActions.Find(p => p.TargetList.Contains(unit)),
-                        Skill,
-                        unit,
-                        0,
-                        0f
-                    );
-                    return;
-                }
-            }
+            bool contains = TargetList != null && TargetList.Contains(unit);
 
-            bool isPhantom = owner.IsSummonOrPhantom;
-
-            if (!isPhantom)
+            if (owner.IsStealth || owner.IsDead)
             {
-                if (owner.RevivalFlagForEnvironment)
-                {
-                    owner.RevivalFlagForEnvironment = false;
-                    ResetHitDataForAllActions();
-                    if (TargetList != null && TargetList.Contains(unit))
-                        SourceActionController.ExecAction(
-                            TargetActions.Find(p => p.TargetList.Contains(unit)),
-                            Skill,
-                            unit,
-                            0,
-                            0f
-                        );
-                }
-                else
-                {
-                    OnEnter(unit);
-                    // TargetList.Add(unit); // TODO fix real logic
-                }
+                if (contains)
+                    OnExit(unit);
                 return;
             }
+
+            bool canEnter = !owner.IsSummonOrPhantom || !owner.IdleOnly;
 
             if (owner.RevivalFlagForEnvironment)
             {
                 owner.RevivalFlagForEnvironment = false;
                 ResetHitDataForAllActions();
-                if (TargetList != null && TargetList.Contains(unit))
-                    SourceActionController.ExecAction(
-                        TargetActions.Find(p => p.TargetList.Contains(unit)),
-                        Skill,
-                        unit,
-                        0,
-                        0f
-                    );
             }
-            else if (owner.IdleOnly)
+            else if (canEnter)
             {
-                if (TargetList != null && TargetList.Contains(unit))
-                    SourceActionController.ExecAction(
-                        TargetActions.Find(p => p.TargetList.Contains(unit)),
-                        Skill,
-                        unit,
-                        0,
-                        0f
-                    );
+                if (!contains)
+                    OnEnter(unit);
+                return;
             }
-            else
-            {
-                // TargetList.Add(unit); // TODO fix real logic
-                OnEnter(unit);
-            }
+
+            if (contains)
+                OnExit(unit);
         }
 
         private void ResetHitDataForAllActions()

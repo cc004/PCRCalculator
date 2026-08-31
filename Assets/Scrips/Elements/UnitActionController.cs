@@ -823,7 +823,11 @@ namespace Elements
         } 
 
         // RVA: 0x35B5F28 Offset: 0x35B5F28 VA: 0x35B5F28
-        public void ExecSkillWithTargetPartsAndActionList(Skill _skill, BasePartsData _targetParts, List<ActionParameter> _actionList)
+        public void ExecSkillWithTargetPartsAndActionList(
+            Skill _skill,
+            BasePartsData _targetParts,
+            List<ActionParameter> _actionList,
+            bool _considerTargetAssignment)
         {
             bool hasNoTarget = false;
             actionStartFirstProcess(_skill, out hasNoTarget, true);
@@ -838,9 +842,11 @@ namespace Elements
                 {
                     continue;
                 }
-                if (actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
+                if (!_considerTargetAssignment || actionParameter.TargetAssignment == eTargetAssignment.OTHER_SIDE)
                 {
-                    if (!_targetParts.Owner.IsStealth && !_targetParts.Owner.IsSpyOrEtherialization(Owner))
+                    if (!_targetParts.Owner.IsStealth
+                        && (actionParameter.TargetAssignment != eTargetAssignment.OTHER_SIDE
+                            || !_targetParts.Owner.IsSpyOrEtherialization(Owner)))
                     {
                         actionParameter.AppendTargetNum(_targetParts.Owner, 0);
                         ExecAction(actionParameter, _skill, _targetParts, 0, 0f, true);

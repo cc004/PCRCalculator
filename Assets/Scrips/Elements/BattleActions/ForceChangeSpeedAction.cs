@@ -34,7 +34,9 @@ namespace Elements
             UnitCtrl targetOwner = _target.Owner;
             ChangeSpeedAction.eChangeSpeedType actionDetail = (ChangeSpeedAction.eChangeSpeedType)ActionDetail1;
 
-            if (ChangeSpeedAction.IsUnableAbnormalState(abnormalState) && targetOwner.ModeChangeUnableStateBarrier)
+            if (ChangeSpeedAction.IsUnableAbnormalState(abnormalState)
+                && (targetOwner.ModeChangeUnableStateBarrier
+                    || targetOwner.TriggerStealthUnableStateBarrier))
             {
                 action?.Invoke($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
                 return;

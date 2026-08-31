@@ -126,7 +126,8 @@ namespace Elements
                 case 12:
                 case 13:
                 case 15:
-                    if (_target.Owner.ModeChangeUnableStateBarrier)
+                    if (_target.Owner.ModeChangeUnableStateBarrier
+                        || _target.Owner.TriggerStealthUnableStateBarrier)
                     {
                         action($"目标处于MODECHANGE状态，技能{actionDetail.GetDescription()}无效！");
                         return;
