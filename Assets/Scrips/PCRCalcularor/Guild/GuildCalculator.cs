@@ -1012,41 +1012,8 @@ namespace PCRCaculator.Guild
                 UBTimes.Add(ubline);
             }
             return UBTimes;*/
-            return PlayerIds.Take(5).Concat(bossId).SelectMany((id, i) => allUnitStateChangeDic[id]
-                    .Where(state => state.changStateTo == UnitCtrl.ActionState.SKILL_1)
-                    .Select(s => (state: s, pos: i)))
-                .GroupBy(s => s.state.currentFrameCount).SelectMany(g => g.OrderBy(t => t.state.id)
-                    .Select((t, i) => (t, normalized: t.state.currentFrameCount + i * 0.001f)))
-                .GroupBy(s => s.t.pos).Select(g =>
-                    (g.Key, list: g.OrderBy(t => t.normalized).Select(t => t.normalized).ToList()))
-                .Aggregate(new List<List<float>>(Enumerable.Repeat(new List<float>(), Math.Max(0, PlayerIds.Take(5).Count() + bossId.Count))
-                    .Select(x => new List<float>())), (result, tuple) =>
-                {
-                    int index = tuple.Key;
-                    int playerCount = Math.Min(PlayerIds.Count, 5);
-                    int bossStartIndex = playerCount;
-
-                    if (index >= bossStartIndex)
-                    {
-                        index = bossStartIndex;
-                    }
-
-                    while (result.Count <= index)
-                    {
-                        result.Add(new List<float>());
-                    }
-
-                    if (tuple.Key >= bossStartIndex && result[index].Any())
-                    {
-                        result[index].AddRange(tuple.list);
-                        result[index].Sort();
-                    }
-                    else
-                    {
-                        result[index] = tuple.list;
-                    }
-                    return result;
-                });
+            return BattleManager.Instance?.ubmanager?.GetRecordedUbTime() ??
+                Enumerable.Range(0, 6).Select(_ => new List<float>()).ToList();
         }
         public List<UBDetail> CreateUBDetailList()
         {

@@ -404,6 +404,7 @@ namespace Elements
             else
             {
                 BattleManager.Instance.semanubmanager.Disable();
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
             }
         }
 
@@ -707,6 +708,7 @@ namespace Elements
             else
             {
                 BattleManager.Instance.semanubmanager.Disable();
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
             }
         }
 
