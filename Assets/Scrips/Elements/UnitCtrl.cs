@@ -10506,6 +10506,7 @@ this.updateCurColor();
             {
                 a = (DoubleWithEx)_damageData.LogBarrierExpectedDamage;
                 b = (DoubleWithEx)_damageData.LogBarrierExpectedDamageForEnergyCalc;
+                isNoDamageByResist = _damageData.LogBarrierExpectedIsNoDamageByResist;
             }
             if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.CUT_ATK_DAMAGE))
             {
@@ -10835,6 +10836,7 @@ this.updateCurColor();
 #endif
                 });
                 OnChangeState.Call(this, eStateIconType.STRIKE_BACK, ADIFIOLCOPN: false);
+                isHit = false;
                 return 0L;
             }
             if (_skill != null && _damageData.ActionType == eActionType.ATTACK)

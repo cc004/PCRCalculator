@@ -37,6 +37,7 @@ namespace Elements
         IgnoreStrikeBackAndAllUnitDamageCutTrigger = false;
         IgnoreLogBarrier = false;
         IsLogBarrierCritical = false;
+        LogBarrierExpectedIsNoDamageByResist = false;
         IgnoreDef = false;
         IsDivisionDamage = false;
         IsSlipDamage = false;
@@ -75,6 +76,8 @@ namespace Elements
     public LongWithEx LogBarrierExpectedDamage { get; set; }
 
     public LongWithEx LogBarrierExpectedDamageForEnergyCalc { get; set; }
+
+    public bool LogBarrierExpectedIsNoDamageByResist { get; set; }
 
     public LongWithEx Damage { get; set; }
 

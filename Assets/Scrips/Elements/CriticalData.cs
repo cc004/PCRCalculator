@@ -20,5 +20,6 @@ namespace Elements
             set;
         }
         public LongWithEx ExpectedDamageForEnergyCalc { get; set; }
+        public bool ExpectedIsNoDamageByResist { get; set; }
     }
 }

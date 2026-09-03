@@ -233,6 +233,7 @@ namespace Elements
                     );
                     criticalData.ExpectedDamage = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamage * talentDamageRate);
                     criticalData.ExpectedDamageForEnergyCalc = BattleUtil.DoubleToLong((DoubleWithEx)criticalData.ExpectedDamageForEnergyCalc * talentDamageRate);
+                    criticalData.ExpectedIsNoDamageByResist = isNoDamageByResist;
                     criticalData.CriticalRate = damageData.CriticalDamageRate;
                     num1 += criticalData.ExpectedDamage;
                     criticalDataList.Add(criticalData);
@@ -247,6 +248,7 @@ namespace Elements
             damageData.IsLogBarrierCritical = CriticalDataDictionary[_target][_num].IsCritical;
             damageData.LogBarrierExpectedDamage = CriticalDataDictionary[_target][_num].ExpectedDamage;
             damageData.LogBarrierExpectedDamageForEnergyCalc = CriticalDataDictionary[_target][_num].ExpectedDamageForEnergyCalc;
+            damageData.LogBarrierExpectedIsNoDamageByResist = CriticalDataDictionary[_target][_num].ExpectedIsNoDamageByResist;
             damageData.TotalDamageForLogBarrier = TotalDamageDictionary[_target];
             if (flag)
             {
