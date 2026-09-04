@@ -148,7 +148,7 @@ namespace Elements
       eValueNumber _evalue,
       BasePartsData _target)
         {
-            switch ((int)_valueDictionary[eValueNumber.VALUE_1])
+            switch (BattleUtil.DoubleToInt(_valueDictionary[eValueNumber.VALUE_1]))
             {
                 case (int)eAdditiveValueType.HP:
                     _addValue[_evalue] = calcHpValue(_source, _valueDictionary);
@@ -200,7 +200,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = (DoubleWithEx)_target.Owner.DefZero * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = (DoubleWithEx)_target.GetDefZero() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case (int)eAdditiveValueType.TARGET_MAGIC_DEF:
@@ -211,7 +211,7 @@ namespace Elements
                     }
                     else
                     {
-                        _addValue[_evalue] = (DoubleWithEx)_target.Owner.MagicDefZero * _valueDictionary[eValueNumber.VALUE_2];
+                        _addValue[_evalue] = (DoubleWithEx)_target.GetMagicDefZero() * _valueDictionary[eValueNumber.VALUE_2];
                     }
                     break;
                 case (int)eAdditiveValueType.AHEAD_UNIT_NUM:
@@ -303,11 +303,11 @@ namespace Elements
 
         protected virtual DoubleWithEx calcDamageValue(
             UnitCtrl _source,
-            ValueDictionary _valueDictionary) => ((double)_source.MaxHp - _source.Hp) / (double)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => 0f;
 
         protected virtual DoubleWithEx calcHpValue(
             UnitCtrl _source,
-            ValueDictionary _valueDictionary) => _source.Hp / (double)_source.MaxHp * _valueDictionary[eValueNumber.VALUE_2];
+            ValueDictionary _valueDictionary) => 0f;
 
         protected virtual DoubleWithEx calcMaxHpValue(UnitCtrl _source, ValueDictionary _valueDictionary)
         {
