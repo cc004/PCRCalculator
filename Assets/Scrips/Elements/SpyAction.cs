@@ -48,6 +48,11 @@ namespace Elements
 			AppendIsAlreadyExeced(_target.Owner, _num);
 			UnitCtrl.eAbnormalState abnormalState = AbnormalStateDic[(eSpyType)base.ActionDetail1];
 			List<UnitCtrl> targetList = (_target.Owner.IsOther ? base.battleManager.EnemyList : base.battleManager.UnitList);
+			foreach (UnitCtrl tauntTarget in _target.Owner.TauntTargetList)
+			{
+				tauntTarget.EnableAbnormalState(UnitCtrl.eAbnormalState.TAUNT, _enable: false);
+			}
+			_target.Owner.TauntTargetList.Clear();
 			_target.Owner.SetAbnormalState(_source, abnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill);
 			_target.Owner.AppendCoroutine(updateSpy(_target.Owner, targetList), ePauseType.SYSTEM, _target.Owner);
 			eCancelTriggerType actionDetail = (eCancelTriggerType)base.ActionDetail2;
@@ -70,7 +75,7 @@ namespace Elements
 			base.Value[eValueNumber.VALUE_1] = (double)base.MasterData.action_value_1 + (double)base.MasterData.action_value_2 * (double)_level;
 		}
 
-		private IEnumerator updateSpy(UnitCtrl _target, List<UnitCtrl> _targetList) // TODO add Etherealization
+		private IEnumerator updateSpy(UnitCtrl _target, List<UnitCtrl> _targetList)
 		{
 			yield return null;
 			while (true)
@@ -79,7 +84,7 @@ namespace Elements
 				{
 					yield break;
 				}
-				if (!_targetList.Exists((UnitCtrl e) => ((!e.IsDead && (long)e.Hp > 0) || e.HasUnDeadTime) && !e.IsStealth && !e.IsAbnormalState(UnitCtrl.eAbnormalState.SPY)))
+				if (!_targetList.Exists((UnitCtrl e) => ((!e.IsDead && (long)e.Hp > 0) || e.HasUnDeadTime) && !e.IsStealth && !e.IsAbnormalState(UnitCtrl.eAbnormalState.SPY) && !e.IsEtherealization()))
 				{
 					break;
 				}
@@ -88,6 +93,13 @@ namespace Elements
 			foreach (UnitCtrl _target2 in _targetList)
 			{
 				_target2.DispelAbnormalState(UnitCtrl.eAbnormalState.SPY);
+				foreach (SealData sealData in _target2.SealDictionary.Values)
+				{
+					if (sealData.IsEtherealization)
+					{
+						sealData.RemoveSeal(sealData.Count, _isPassiveSeal: true);
+					}
+				}
 			}
 		}
 	}
