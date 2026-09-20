@@ -252,6 +252,7 @@ namespace Elements.Battle
         public Dictionary<int, (int slotLevel, int enhanceLevel)> EnemyRoleMastery { get; set; }
         public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
         public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
+        public List<int> LabyrinthOwnedUnitIds { get; set; } = new List<int>();
         public int LabyrinthAlphaRupee { get; set; }
         public int LabyrinthQuestId { get; set; }
         public int LabyrinthDifficulty { get; set; }
@@ -329,6 +330,7 @@ namespace Elements.Battle
                 EnemyRoleMastery = this.EnemyRoleMastery != null ? new Dictionary<int, (int, int)>(this.EnemyRoleMastery) : null,
                 LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
                 LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
+                LabyrinthOwnedUnitIds = this.LabyrinthOwnedUnitIds?.ToList(),
                 LabyrinthAlphaRupee = this.LabyrinthAlphaRupee,
                 LabyrinthQuestId = this.LabyrinthQuestId,
                 LabyrinthDifficulty = this.LabyrinthDifficulty,

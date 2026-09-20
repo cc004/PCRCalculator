@@ -579,9 +579,16 @@ namespace Elements
 
             tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
                 req.LabyrinthEnhancedNodeIds);
+            var labyrinthOwnedUnits = (req.LabyrinthOwnedUnitIds ?? new List<int>())
+                .Where(unitId => unitId > 0)
+                .Distinct()
+                .Select(unitId => new PCRCaculator.UnitData { unitId = unitId })
+                .ToList();
+            if (labyrinthOwnedUnits.Count == 0)
+                labyrinthOwnedUnits = tempData.playerList;
             tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
                 req.LabyrinthRelicIds,
-                tempData.playerList,
+                labyrinthOwnedUnits,
                 req.LabyrinthAlphaRupee);
             tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
                 req.LabyrinthRelicIds);
