@@ -1591,6 +1591,10 @@ namespace Elements
             for (int index = 0; index < _action.TargetList.Count && (index < _action.TargetNum || _action.TargetNum == 0 || index == 0); ++index)
             {
                 BasePartsData target = _action.TargetList[index];
+                if (!_action.AlreadyExecedData.ContainsKey(target.Owner))
+                {
+                    _action.AppendTargetNum(target.Owner, 0);
+                }
                 ExecAction(_action, _skill, target, 0, 0.0f);
             }
         }
