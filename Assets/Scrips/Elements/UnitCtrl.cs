@@ -1607,7 +1607,9 @@ namespace Elements
 
         public SummonAction.eSummonType SummonType { get; set; }
 
-        public bool IsSummonOrPhantom;
+        public bool IsSummonOrPhantom =>
+            SummonType == SummonAction.eSummonType.SUMMON ||
+            SummonType == SummonAction.eSummonType.PHANTOM;
         public bool IsGuest
         {
             get;
@@ -2473,8 +2475,10 @@ this.updateCurColor();
           BaseData additional = null,
           BaseData exOverride = null,
           IReadOnlyDictionary<eParamType, long> labyrinthEnhanceParameter = null,
-          IReadOnlyDictionary<eParamType, long> labyrinthRelicPassiveParameter = null)
+          IReadOnlyDictionary<eParamType, long> labyrinthRelicPassiveParameter = null,
+          SummonAction.eSummonType summonType = SummonAction.eSummonType.NONE)
         {
+            SummonType = summonType;
             ToadDatas = new List<ToadData>();
             transformCache = transform;
             m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;

@@ -1302,6 +1302,10 @@ namespace PCRCaculator
             {
                 return enemy.detailData.prefab_id;
             }
+            else if (MainManager.Instance.LabyrinthEnemyParameterDic.TryGetValue(unitid, out var labyrinthEnemy))
+            {
+                return labyrinthEnemy.detailData.prefab_id;
+            }
             else if (MainManager.Instance.MirageEnemyParameterDic.TryGetValue(unitid, out var mirageEnemy))
             {
                 return mirageEnemy.detailData.prefab_id;

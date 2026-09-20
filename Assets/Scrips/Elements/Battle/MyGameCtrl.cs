@@ -58,6 +58,10 @@ namespace Elements
         public bool IsSemanMode;
         public bool ForceAutoMode;
 
+        private bool hasPendingServerSetState;
+        private bool pendingServerAllSet;
+        private List<bool> pendingServerSetToggles = new List<bool>();
+
         public InputField stopFrameText;
         public int stopFrame;
         public int CurrentSeedForSave { get; set; }
@@ -679,23 +683,11 @@ namespace Elements
             unitCount.Clear();
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
+            StageServerSetState(req.IsGuildBattle, req.IsSetMode, req.SetToggles);
             staticBattleManager.Init(this);
 
             if (req.IsGuildBattle)
             {
-                if (IsSetMode)
-                {
-                    foreach(var unit in playerUnitCtrl)
-                        unit.pressing = true;
-                }
-                else if (req.SetToggles?.Count > 0)
-                {
-                    for (int i = 0; i < playerUnitCtrl.Count && i < req.SetToggles.Count; i++)
-                    {
-                        playerUnitCtrl[i].pressing = req.SetToggles[i];
-                    }
-                }
-
                 if (req.IsSemanMode)
                 {
                     BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
@@ -719,6 +711,39 @@ namespace Elements
             {
                 BattleManager.Instance.semanubmanager.Disable();
                 BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+            }
+        }
+
+        private void StageServerSetState(
+            bool isGuildBattle,
+            bool isSetMode,
+            IReadOnlyList<bool> setToggles)
+        {
+            hasPendingServerSetState = isGuildBattle;
+            pendingServerAllSet = isGuildBattle && isSetMode;
+            pendingServerSetToggles = isGuildBattle && setToggles != null
+                ? setToggles.ToList()
+                : new List<bool>();
+        }
+
+        public void ApplyPendingServerSetState()
+        {
+            if (!hasPendingServerSetState)
+                return;
+
+            bool allSet = pendingServerAllSet;
+            var setToggles = pendingServerSetToggles;
+            hasPendingServerSetState = false;
+            pendingServerAllSet = false;
+            pendingServerSetToggles = new List<bool>();
+
+            if (playerUnitCtrl == null || playerUnitCtrl.Count == 0)
+                throw new InvalidOperationException("无法在玩家角色初始化前应用服务器SET状态。");
+
+            for (int i = 0; i < playerUnitCtrl.Count; i++)
+            {
+                playerUnitCtrl[i].pressing = allSet ||
+                    (i < setToggles.Count && setToggles[i]);
             }
         }
 
@@ -1085,6 +1110,8 @@ namespace Elements
             {
                 if (GuildManager.EnemyDataDic.ContainsKey(unitid))
                     unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+                else if (GuildManager.LabyrinthEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.LabyrinthEnemyParameterDic[unitid].unit_id;
                 else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
                     unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
                 else if (GuildManager.AbyssEnemyParameterDic.ContainsKey(unitid))
@@ -1129,6 +1156,8 @@ namespace Elements
             {
                 if (GuildManager.EnemyDataDic.ContainsKey(unitid))
                     unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+                else if (GuildManager.LabyrinthEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.LabyrinthEnemyParameterDic[unitid].unit_id;
                 else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
                     unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
             }

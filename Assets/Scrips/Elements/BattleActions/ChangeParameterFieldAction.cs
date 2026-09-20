@@ -53,7 +53,11 @@ namespace Elements
             parameterFieldData.StayTime = (float)_valueDictionary[eValueNumber.VALUE_3];
             parameterFieldData.CenterX = _target.GetLocalPosition().x + Position;
             parameterFieldData.Size = (float)_valueDictionary[eValueNumber.VALUE_5];
-            parameterFieldData.FieldTargetType = _source.IsOther == (ActionDetail1 % 10 == 1) ? eFieldTargetType.PLAYER : eFieldTargetType.ENEMY;
+            bool isDebuff = ActionDetail1 % 10 == DETAIL_DEBUFF;
+            bool isEnemySource = _source.IsOther && !_source.IsBonusEnemy;
+            parameterFieldData.FieldTargetType = isEnemySource == isDebuff
+                ? eFieldTargetType.PLAYER
+                : eFieldTargetType.ENEMY;
             parameterFieldData.PauseTarget = _skill.BlackOutTime > 0.0 ? _source : null;
             parameterFieldData.TargetTalentId = (int)_valueDictionary[eValueNumber.VALUE_7];
             parameterFieldData.EffectType = (ChangeParameterFieldData.eEffectType)ActionDetail3;

@@ -4990,6 +4990,7 @@ namespace Elements.Battle
             //while (!(battleManager.UnitUiCtrl).IsUnitCreated)
             //    yield return (object)null;
             MyGameCtrl.Instance.Initialize();
+            MyGameCtrl.Instance.ApplyPendingServerSetState();
             /*
             while (!MyGameCtrl.Instance.IsUnitCreated)
             {
@@ -6154,6 +6155,7 @@ namespace Elements.Battle
                 if (UnitUtility.IsQuestMonsterUnit(_summonData.SummonId))
                 {
                     var enemyData = GuildManager.EnemyDataDic.GetValueOrDefault(_summonData.SummonId)
+                                 ?? GuildManager.LabyrinthEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
                                  ?? GuildManager.MirageEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
                                  ?? GuildManager.AbyssEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
                                  ?? GuildManager.TalentQuestEnemyParameterDic.GetValueOrDefault(_summonData.SummonId);
@@ -6185,10 +6187,13 @@ namespace Elements.Battle
                         MainManager.Instance.UnitRarityDic[_summonData.Owner.unitData.PrefabId].GetEXSkillValue(unitData_my) :
                         new BaseData()
                         // MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
-                    ) : null); 
+                    ) : null,
+                    labyrinthEnhanceParameter: !flag ? MyGameCtrl.Instance.tempData.LabyrinthEnhanceParameter : null,
+                    labyrinthRelicPassiveParameter: !flag ? MyGameCtrl.Instance.tempData.LabyrinthRelicPassiveParameter : null,
+                    summonType: _summonData.SummonType);
                 if (!flag)
                     unitCtrl.SetTalentFormationBonus(_this.UnitTalentFormationBonusDictionary);
-                unitCtrl.ApplyPassiveSkill(true, false);
+                unitCtrl.ApplyPassiveSkill(true, _summonData.ConsiderEquipmentAndBonus);
 
                 // this logic maybe in unitCtrl Initialize
                 // define action function
@@ -6224,8 +6229,6 @@ namespace Elements.Battle
                 
                 BattleManager.Instance.QueueUpdateSkillTarget();
                 unitCtrl.ExecActionOnStartAndDetermineInstanceID();
-                unitCtrl.SummonType = _summonData.SummonType;
-                unitCtrl.IsSummonOrPhantom = unitCtrl.SummonType == SummonAction.eSummonType.SUMMON || unitCtrl.SummonType == SummonAction.eSummonType.PHANTOM;
                 unitCtrl.SetLeftDirection(_summonData.Owner.IsLeftDir);
                 int skillNum = _summonData.Skill.SkillNum;
                 //if (this.unitCtrl.SummonEffects.Count > 0)
