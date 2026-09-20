@@ -140,12 +140,15 @@ namespace Elements
                 battleTempData.waveGroupId = questData.wave_group_id;
 
             int questType = questData?.quest_type ?? ((selectedQuestId / 10000) % 10 == 3 ? 3 : 1);
-            int difficulty = requestedDifficulty > 0
-                ? requestedDifficulty
-                : (selectedQuestId / 100000) % 10;
+            int difficulty = requestedDifficulty;
 
-            if (difficulty <= 0
-                || manager?.LabyrinthDifficultyEnemyDataDic == null
+            if (difficulty <= 0)
+            {
+                throw new InvalidOperationException(
+                    $"Labyrinth战斗缺少有效LabyrinthDifficulty: questId={selectedQuestId}, difficulty={difficulty}。");
+            }
+
+            if (manager?.LabyrinthDifficultyEnemyDataDic == null
                 || !manager.LabyrinthDifficultyEnemyDataDic.ContainsKey(difficulty))
             {
                 throw new InvalidOperationException(
