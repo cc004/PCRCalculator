@@ -274,6 +274,13 @@ namespace Elements
         private bool startSkillExeced;
         private bool[] m_abnormalStateArr = new bool[(int)eAbnormalState.NUM];
         public AbnormalStateCategoryData[] m_categoryDataArr = new AbnormalStateCategoryData[(int)eAbnormalStateCategory.NUM];
+        public Dictionary<eActionType, List<int>> AbnormalStateForceHitData { get; } = new Dictionary<eActionType, List<int>>();
+
+        public bool IsForceHit(eActionType actionType, int id)
+        {
+            return AbnormalStateForceHitData.TryGetValue(actionType, out var forceHitIds)
+                && forceHitIds.Contains(id);
+        }
 
         private bool GetAbnormalStateSafe(eAbnormalState state)
         {
