@@ -243,6 +243,71 @@ namespace PCRCaculator.SQL
             }
         }
 
+        protected Dictionary<int, int[]> ReadResistDataByAilmentId()
+        {
+            try
+            {
+                using var dbConnection = new SqliteConnection("Data Source=" + path);
+                dbConnection.Open();
+
+                var ailmentColumns = new List<(int ailmentId, string columnName)>();
+                using (var schemaCommand = dbConnection.CreateCommand())
+                {
+                    schemaCommand.CommandText = "PRAGMA table_info(resist_data)";
+                    using var schemaReader = schemaCommand.ExecuteReader();
+                    while (schemaReader.Read())
+                    {
+                        var columnName = schemaReader["name"]?.ToString();
+                        const string prefix = "ailment_";
+                        if (columnName != null &&
+                            columnName.StartsWith(prefix, StringComparison.Ordinal) &&
+                            int.TryParse(columnName.Substring(prefix.Length), out var ailmentId) &&
+                            ailmentId > 0)
+                        {
+                            ailmentColumns.Add((ailmentId, columnName));
+                        }
+                    }
+                }
+
+                if (ailmentColumns.Count == 0)
+                    throw new InvalidDataException("resist_data 不包含 ailment_* 列");
+
+                ailmentColumns.Sort((left, right) => left.ailmentId.CompareTo(right.ailmentId));
+                var maxAilmentId = ailmentColumns[ailmentColumns.Count - 1].ailmentId;
+                var result = new Dictionary<int, int[]>();
+
+                using var dataCommand = dbConnection.CreateCommand();
+                dataCommand.CommandText = "SELECT * FROM resist_data";
+                using var dataReader = dataCommand.ExecuteReader();
+                var resistStatusIdOrdinal = dataReader.GetOrdinal("resist_status_id");
+                var ailmentOrdinals = ailmentColumns
+                    .Select(column => (column.ailmentId, ordinal: dataReader.GetOrdinal(column.columnName)))
+                    .ToArray();
+
+                while (dataReader.Read())
+                {
+                    var ailments = new int[maxAilmentId];
+                    foreach (var column in ailmentOrdinals)
+                    {
+                        if (!dataReader.IsDBNull(column.ordinal))
+                            ailments[column.ailmentId - 1] = Convert.ToInt32(dataReader.GetValue(column.ordinal));
+                    }
+
+                    result[Convert.ToInt32(dataReader.GetValue(resistStatusIdOrdinal))] = ailments;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var wrapped = new InvalidDataException(
+                    $"数据库读取失败: dataVersion={mgr.DataVer}, table=resist_data",
+                    ex);
+                Debug.LogError($"{wrapped}");
+                throw wrapped;
+            }
+        }
+
         private static bool IsMissingOptionalSchema(Exception exception)
         {
             var message = exception?.ToString() ?? string.Empty;
@@ -484,6 +549,7 @@ namespace PCRCaculator.SQL
         public Elements.MasterUnitSkillDataRf masterUnitSkillDataRf { get; private set; }
         public Dictionary<int, GuildEnemyData> Dic6 { get; private set; }
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> Dic7 { get; private set; }
+        public Dictionary<int, ailment_data> AilmentDataDic { get; private set; }
         public Dictionary<int, int[]> resistDataDic { get; private set; }
         public Dictionary<int, EquipmentData> Dic8 { get; private set; }
         public Dictionary<int, unique_equip_enhance_rate[]> Dic9 { get; private set; }
@@ -634,7 +700,9 @@ namespace PCRCaculator.SQL
                     Task.WhenAll(enemyTalentWeaknessTask, talentWeaknessTask),
                     () => WeaknessDic = GetWeaknessDict()));
             tasks.Add(
-                Task.Run(() => resistDataDic = GetResistData()));
+                Task.Run(() => AilmentDataDic = GetDatasDic<ailment_data>(a => a.ailment_id)));
+            tasks.Add(
+                Task.Run(() => resistDataDic = ReadResistDataByAilmentId()));
             tasks.Add(
                 Task.Run(() => TalentFormationDic = GetTalentFormationData()));
             tasks.Add(
@@ -1803,71 +1871,6 @@ namespace PCRCaculator.SQL
                 }
             );
         }
-        private Dictionary<int, int[]> GetResistData()
-        {
-            Dictionary<int, int[]> dict = new Dictionary<int, int[]>();
-
-            var resistList = GetDatas<resist_data>();
-            foreach (var resist in resistList)
-            {
-                dict[resist.resist_status_id] = new int[]
-                {
-                    resist.ailment_1,
-                    resist.ailment_2,
-                    resist.ailment_3,
-                    resist.ailment_4,
-                    resist.ailment_5,
-                    resist.ailment_6,
-                    resist.ailment_7,
-                    resist.ailment_8,
-                    resist.ailment_9,
-                    resist.ailment_10,
-                    resist.ailment_11,
-                    resist.ailment_12,
-                    resist.ailment_13,
-                    resist.ailment_14,
-                    resist.ailment_15,
-                    resist.ailment_16,
-                    resist.ailment_17,
-                    resist.ailment_18,
-                    resist.ailment_19,
-                    resist.ailment_20,
-                    resist.ailment_21,
-                    resist.ailment_22,
-                    resist.ailment_23,
-                    resist.ailment_24,
-                    resist.ailment_25,
-                    resist.ailment_26,
-                    resist.ailment_27,
-                    resist.ailment_28,
-                    resist.ailment_29,
-                    resist.ailment_30,
-                    resist.ailment_31,
-                    resist.ailment_32,
-                    resist.ailment_33,
-                    resist.ailment_34,
-                    resist.ailment_35,
-                    resist.ailment_36,
-                    resist.ailment_37,
-                    resist.ailment_38,
-                    resist.ailment_39,
-                    resist.ailment_40,
-                    resist.ailment_41,
-                    resist.ailment_42,
-                    resist.ailment_43,
-                    resist.ailment_44,
-                    resist.ailment_45,
-                    resist.ailment_46,
-                    resist.ailment_47,
-                    resist.ailment_48,
-                    resist.ailment_49,
-                    resist.ailment_50
-                };
-            }
-
-            return dict;
-        }
-
         private Dictionary<int, int[]> GetWeaknessDict()
         {
             Dictionary<int, int[]> dict = new Dictionary<int, int[]>();

@@ -1032,6 +1032,14 @@ namespace PCRCaculator.SQL
         public string description { get; set; }
     }
 
+    public class ailment_data
+    {
+        public int ailment_id { get; set; }
+        public string ailment_name { get; set; }
+        public int ailment_detail_1 { get; set; }
+        public int ailment_action { get; set; }
+    }
+
     public class resist_data : DbBaseData
     {
         public int resist_status_id { get; set; }

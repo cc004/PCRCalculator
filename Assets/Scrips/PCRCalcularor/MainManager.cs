@@ -60,6 +60,7 @@ namespace PCRCaculator
             public int cacheSchemaVersion;
             public bool cacheBuildComplete;
             public string databaseSourceFingerprint;
+            public Dictionary<int, ailment_data> ailmentDataDic = new Dictionary<int, ailment_data>();
             public Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();//抵抗数据
             public Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
             public Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
@@ -178,6 +179,7 @@ namespace PCRCaculator
         // 优化：添加数据缓存字典，避免重复计算
         private static readonly Dictionary<string, object> _dataCache = new Dictionary<string, object>();
 
+        public Dictionary<int, ailment_data> AilmentDataDic { get => databaseCache.ailmentDataDic; }
         public Dictionary<int, int[]> ResistDataDic { get => databaseCache.resistDataDic; }  // 抵抗
         public Dictionary<int, EquipmentData> EquipmentDic { get => databaseCache.equipmentDic; }  // 装备类与装备id的对应字典
         public Dictionary<int, UnitRarityData> UnitRarityDic { get => databaseCache.unitRarityDic; }  // 角色基础数据与角色id的对应字典 
@@ -702,6 +704,7 @@ namespace PCRCaculator
 
                                 if (!Version.useJP) dbTool2 = dbTool3;
 
+                                databaseCache.ailmentDataDic = dbTool.AilmentDataDic ?? databaseCache.ailmentDataDic;
                                 databaseCache.resistDataDic = dbTool.resistDataDic ?? databaseCache.resistDataDic;
                                 databaseCache.equipmentDic = dbTool.Dic8 ?? databaseCache.equipmentDic;
                                 if (databaseCache.equipmentDic != null && !databaseCache.equipmentDic.ContainsKey(999999))
