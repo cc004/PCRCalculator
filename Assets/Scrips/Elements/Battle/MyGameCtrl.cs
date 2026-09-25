@@ -917,6 +917,13 @@ namespace Elements
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
 
+            // Temporary fix: this labyrinth enemy reuses the 261000 Spine assets,
+            // whose animation names are also prefixed with 261000 rather than its unit id.
+            if (!isplayer && unitid == 261001 && data.PrefabId == 261000)
+            {
+                unitid2 = data.PrefabId;
+            }
+
             if (unitid == 105701 && data.rarity == 6)
             {
                 skinID = 170361;
