@@ -90,7 +90,11 @@ namespace Elements
           });
         else
           dataDictionary[_source].Add(ActionId, _attackSealData);
-        _sourceActionController.AppendCoroutine(updateAttackSealData(_attackSealData, _source, () => dataDictionary[_source].Remove(ActionId)), ePauseType.SYSTEM, _source);
+        _sourceActionController.AppendCoroutine(updateAttackSealData(_attackSealData, _source, () =>
+        {
+          if (dataDictionary.ContainsKey(_source))
+            dataDictionary[_source].Remove(ActionId);
+        }), ePauseType.SYSTEM, _source);
       }
       action($"每{(AttackSealData.eExecConditionType)ActionDetail1}增加标记");
         }

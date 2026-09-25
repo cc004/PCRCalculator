@@ -1344,6 +1344,7 @@ namespace Elements
         private bool resumeIsStopState;
         private bool animeLoop;
         private string animeName = "";
+        private BattleSpineController damageResumeSpineCtrl;
         private SkillEffectCtrl runSmokeEffect;
         public Action<bool> OnStartErrorUndoDivision;
         /*
@@ -13929,7 +13930,11 @@ this.updateCurColor();
             float fAlpha = 1f;
             while (true)
             {
-                while (!unitCtrl.ModeChangeEnd)
+                // ModeChangeAction registers a continuous action before the skill
+                // animation switches to the alternate spine. Keep IdleOnly summons
+                // alive during that transition so the native mode-change lifecycle can
+                // reach its end coroutine and release the action normally.
+                while (!unitCtrl.ModeChangeEnd && !unitCtrl.unitActionController.ModeChanging)
                 {
                     if (unitCtrl.JoyFlag)
                     {
@@ -14136,6 +14141,7 @@ this.updateCurColor();
                 animeLoop = currentSpineCtrl.loop;
                 resumeIsStopState = currentSpineCtrl.IsStopState;
                 animeName = currentSpineCtrl.AnimationName;
+                damageResumeSpineCtrl = currentSpineCtrl;
                 isIdleDamage = true;
             }
             currentSpineCtrl.loop = false;
@@ -14361,6 +14367,13 @@ this.updateCurColor();
         private void resumeSpineWithTime()
         {
             BattleSpineController currentSpineCtrl = GetCurrentSpineCtrl();
+            // Damage recovery is delayed across blackout frames. A mode change can
+            // replace the active spine in that interval; animation names are local to
+            // a spine asset and must never be restored onto a different controller.
+            if (damageResumeSpineCtrl != null && !object.ReferenceEquals(currentSpineCtrl, damageResumeSpineCtrl))
+            {
+                return;
+            }
             if (!(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, MotionPrefix)) && !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, MotionPrefix)) && !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMAGE_MULTI_TARGET, -1, PartsMotionPrefix)) && !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE_MULTI_TARGET, -1, PartsMotionPrefix)) && !currentSpineCtrl.AnimationName.IsNullOrEmpty())
             {
                 return;
