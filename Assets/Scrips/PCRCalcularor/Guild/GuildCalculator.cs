@@ -247,7 +247,7 @@ namespace PCRCaculator.Guild
         }
         private void AddSkillGroupPrefab(int a, UnitCtrl b, int c, bool create = true)
         {
-            bool isPlayer = b.UnitId <= 200000;
+            bool isPlayer = !b.IsOther;
             if (create)
             {
                 allUnitStateChangeDic.Add(a, new List<UnitStateChangeData>());
@@ -258,7 +258,8 @@ namespace PCRCaculator.Guild
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
             b.NoSkipOnChangeState += AppendChangeState;
-            if (isPlayer)
+            // Repeated summons share a damage series without clearing earlier hits.
+            if (isPlayer && !playerUnitDamageDic.ContainsKey(b.UnitId))
             {
                 playerUnitDamageDic.Add(b.UnitId, new List<ValueChangeData> { new ValueChangeData(0, 0) });
             }
