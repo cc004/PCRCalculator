@@ -356,8 +356,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10065700;
-            public long BossVersionJP = 10065500;
+            public long CharacterVersionJP = 10066000;
+            public long BossVersionJP = 10066000;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -790,7 +790,7 @@ namespace PCRCaculator
                                         }),
                                         Task.Run(() =>
                                         {
-                                            var filteredUniqueEquipment = dbTool3.Dic9?.Where(p => p.Key / 10000 == 17 || p.Key == 131901 || p.Key == 132001 || p.Key == 132101).ToList();
+                                            var filteredUniqueEquipment = dbTool3.Dic9?.Where(p => p.Key / 10000 == 17).ToList();
                                             if (filteredUniqueEquipment != null) databaseCache.uniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment);
                                         }),
                                         Task.Run(() =>
@@ -1110,8 +1110,8 @@ namespace PCRCaculator
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 98;
-                playerSetting.playerLevel = 355;
+                playerSetting.playerProcess = 99;
+                playerSetting.playerLevel = 358;
                 if (PlayerLevelText != null)
                 {
                     PlayerLevelText.text = playerSetting.playerLevel + "";
