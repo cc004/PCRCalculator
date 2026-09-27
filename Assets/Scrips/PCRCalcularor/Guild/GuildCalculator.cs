@@ -75,6 +75,7 @@ namespace PCRCaculator.Guild
         private readonly Dictionary<int, UnitStateChangeData> allUnitLastStateDic = new Dictionary<int, UnitStateChangeData>();
         private readonly List<int> playerIds = new List<int>();
         private List<int> bossId = new List<int>();
+        private readonly Dictionary<int, string> trackedUnitNames = new Dictionary<int, string>();
         public List<UnitCtrl> players;
         private List<UnitCtrl> boss;
         private readonly Dictionary<int, GuildSkillGroupPrefab> skillGroupPrefabDic = new Dictionary<int, GuildSkillGroupPrefab>();
@@ -173,6 +174,7 @@ namespace PCRCaculator.Guild
             allUnitLastStateDic.Clear();
             playerIds.Clear();
             bossId.Clear();
+            trackedUnitNames.Clear();
             allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
             allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
             allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();
@@ -248,12 +250,13 @@ namespace PCRCaculator.Guild
         private void AddSkillGroupPrefab(int a, UnitCtrl b, int c, bool create = true)
         {
             bool isPlayer = !b.IsOther;
+            trackedUnitNames[a] = b.UnitName;
             if (create)
             {
                 allUnitStateChangeDic.Add(a, new List<UnitStateChangeData>());
                 allUnitAbnormalStateDic.Add(a, new List<UnitAbnormalStateChangeData>());
                 allUnitHPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, b.Hp, b.Hp, "初始化"){target = a} });
-                allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0){describe = "初始化", target = a} });
+                allUnitTPDic.Add(a, new List<ValueChangeData> { new ValueChangeData(0, 0){describe = "初始化", source = a, target = a} });
                 allUnitLastStateDic.Add(a, new UnitStateChangeData(0, UnitCtrl.ActionState.GAME_START, UnitCtrl.ActionState.GAME_START));
                 allUnitSkillExecDic.Add(a, new List<UnitSkillExecData>());
             }
@@ -412,12 +415,13 @@ namespace PCRCaculator.Guild
                 // skillGroupPrefabDic[unitid].RefreshHPChat(allUnitHPDic[unitid]);
             }
         }
-        public void AppendChangeTP(int unitid, double currentTP, int frame, string describe)
+        public void AppendChangeTP(int unitid, double currentTP, int frame, string describe, UnitCtrl source)
         {
             if (unitid >= 400000 && !allUnitTPDic.ContainsKey(unitid)) { return; }
 
             var t = new ValueChangeData(frame, currentTP, 0, describe)
             {
+                source = source?.UnitId ?? unitid,
                 target = unitid
             };
             allUnitTPDic[unitid].Add(t);
@@ -564,9 +568,20 @@ namespace PCRCaculator.Guild
             }
         }
 
-        private static string GetTpDescription(ValueChangeData x)
+        private string GetTpDescription(ValueChangeData x)
         {
-            return $"{(int) (x.yValue * 1000) / 1000f:F3} {MainManager.Instance.GetUnitNickName(x.target)}\n" + $"来源：{MainManager.Instance.GetUnitNickName(x.source)}\n" + $"([{x.xValue}] {x.describe})";
+            var sourceName = x.source == x.target ? "自身" : GetTrackedUnitName(x.source);
+            return $"{(int) (x.yValue * 1000) / 1000f:F3} {GetTrackedUnitName(x.target)}\n" +
+                $"来源：{sourceName}\n([{x.xValue}] {x.describe})";
+        }
+
+        private string GetTrackedUnitName(int unitId)
+        {
+            if (trackedUnitNames.TryGetValue(unitId, out var name) && !string.IsNullOrEmpty(name))
+                return name;
+
+            var nickname = MainManager.Instance.GetUnitNickName(unitId);
+            return string.IsNullOrEmpty(nickname) || nickname == "???" ? $"单位{unitId}" : nickname;
         }
 
         private static string GetHpDescription(ValueChangeData x)
@@ -797,7 +812,7 @@ namespace PCRCaculator.Guild
                 int unitid = unitCtrl.UnitId;
                 AppendChangeState(unitid, UnitCtrl.ActionState.GAME_START, 5400, "时间耗尽", unitCtrl);
                 AppendChangeHP(unitid, unitCtrl.Hp, unitCtrl.MaxHp, unitCtrl.Hp, 5400, "时间耗尽", unitCtrl, 0, 0);
-                AppendChangeTP(unitid, unitCtrl.Energy, 5400, "时间耗尽");
+                AppendChangeTP(unitid, unitCtrl.Energy, 5400, "时间耗尽", unitCtrl);
                 if (allUnitAbnormalStateDic.TryGetValue(unitid, out var value))
                 {
                   foreach (UnitAbnormalStateChangeData changeData in allUnitAbnormalStateDic[unitid])

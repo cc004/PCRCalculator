@@ -42,7 +42,7 @@ namespace Elements
         public Action<int,eSemanEvent> SemanOnEventCallback;
         public Action<int, UnitAbnormalStateChangeData, int> NoSkipOnAbnormalStateChange;
         public Action<int,long, long, long, int,string, UnitCtrl, int, int> NoSkipOnLifeChanged;
-        public Action<int,double, int,string> NoSkipOnTPChanged;
+        public Action<int, double, int, string, UnitCtrl> NoSkipOnTPChanged;
         public Action<int,float> SemanOnTPChanged;
         public Action<int, UnitSkillExecData> NoSkipOnStartAction;
         public Action<int, int> SemanOnStartAction;

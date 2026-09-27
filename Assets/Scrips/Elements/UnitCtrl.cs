@@ -4969,7 +4969,7 @@ this.updateCurColor();
 
             SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
-                NoSkipOnTPChanged?.Invoke(UnitId,Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+                NoSkipOnTPChanged?.Invoke(UnitId, Energy, BattleHeaderController.CurrentFrameCount, type.GetDescription(), source);
             if(!battleManager.skipping && uIManager != null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
@@ -6822,7 +6822,8 @@ this.updateCurColor();
                 if (time > 1f || BattleUtil.Approximately(time, 1f))
                 {
                     AbnormalStateCategoryData abnormalStateCategoryData = GetCategoryDataSafe(category);
-                    ChargeEnergy(eSetEnergyType.BY_USE_SKILL, abnormalStateCategoryData.MainValue, _hasEffect: true, this);
+                    ChargeEnergy(eSetEnergyType.BY_USE_SKILL, abnormalStateCategoryData.MainValue,
+                        _hasEffect: true, abnormalStateCategoryData.Source ?? this);
                     time = 0f;
                 }
             }
