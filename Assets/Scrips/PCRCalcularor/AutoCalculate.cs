@@ -38,10 +38,17 @@ namespace PCRCaculator
             buttonText.text = (data.isCalculating && !data.isCanceled && !data.isFinish) ? "取消" : "开始批量计算";
             scroll.ClearAll();
             // 仅实例化可见区数量，按需重绑
+            data.resultDatas.Sort((left, right) =>
+            {
+                var damageCompare = right.currentDamage.CompareTo(left.currentDamage);
+                return damageCompare != 0 ? damageCompare : left.id.CompareTo(right.id);
+            });
             var datas = data.resultDatas;
             scroll.EnableVirtualization(datas.Count, (idx, go) =>
             {
-                go.GetComponent<AutoCalculatorPrefab>().Init(datas[idx]);
+                var result = go.GetComponent<AutoCalculatorPrefab>();
+                result.Init(datas[idx]);
+                result.count.text = "第" + (idx + 1) + "条";
             }, bufferRows: 15);
         }
         public void ButtonPress()
@@ -85,7 +92,10 @@ namespace PCRCaculator
 #endif
                 var content =
                     "id,返秒,伤害,蓝字,种子,警告\n" +
-                    string.Join("\n", calculatorData.resultDatas.Select(
+                    string.Join("\n", calculatorData.resultDatas
+                        .OrderByDescending(data => data.currentDamage)
+                        .ThenBy(data => data.id)
+                        .Select(
                         data => $"{data.id},{data.backTime}," +
                                 $"{data.currentDamage},{data.exceptDamage}," +
                                 $"{data.randomSeed},{string.Join(",", data.warnings)}"));
