@@ -765,6 +765,10 @@ namespace Elements
                 typeof(GutsAction)
             },
             {
+                eActionType.ABNORMAL_STATE_FORCE_HIT,
+                typeof(AbnormalStateForceHitAction)
+            },
+            {
                 eActionType.ENCHANT_PROTECT,
                 typeof(EnchantProtectAction)
             },

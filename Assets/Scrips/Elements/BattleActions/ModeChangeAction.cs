@@ -513,8 +513,7 @@ namespace Elements
                 _source.PlayAnimeNoOverlap(_skill.AnimId, _skill.SkillNum, 1, 1);
                 _source.ModeChangeEnd = true;
                 _sourceUnitActionController.AppendCoroutine(updateModeChangeEnd(_skill, _source, _sourceUnitActionController), ePauseType.SYSTEM);
-                _sourceUnitActionController.DisableUBByModeChange = false;
-                _sourceUnitActionController.ModeChanging = false;
+                endModeChangeFlags(_sourceUnitActionController, _source);
                 _sourceUnitActionController.ExecUnitActionWithDelay(_action, _skill, false, false);
                 int _targetmotion = 1;
                 _source.ModeChangeEndEffectList.Clear();
@@ -728,6 +727,7 @@ namespace Elements
             _unit.ModeChangeUnableStateBarrier = false;
             _unitActionController.DisableUBByModeChange = false;
         }
+
         /*private IEnumerator updateModeChangeEnd2(
           UnitCtrl _source,
           UnitActionController _sourceActionController)

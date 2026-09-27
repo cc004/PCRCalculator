@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Elements.Battle;
+using PCRCaculator;
 using PCRCaculator.Battle;
 using PCRCaculator.Guild;
 using Spine;
@@ -439,24 +440,19 @@ namespace Elements
             {
                 return;
             }
-            Dictionary<eActionType, Dictionary<int, int>> resistDic = new Dictionary<eActionType, Dictionary<int, int>>();
             ResistData unitResistdata = new ResistData(_resistId);
-            for (int i = 0; i < StaticAilmentData.ailmentDatas.Length; i++)
+            foreach (var ailment in MainManager.Instance.AilmentDataDic.Values.OrderBy(data => data.ailment_id))
             {
-                AilmentData ailment = StaticAilmentData.ailmentDatas[i];
-                if (ailment == null)
-                    break;
-                if (!resistDic.ContainsKey((eActionType)ailment.ailment_action))
-                {
-                    resistDic.Add((eActionType)ailment.ailment_action, new Dictionary<int, int>());
-                }
-                resistDic[(eActionType)ailment.ailment_action].Add(ailment.ailment_detail1, unitResistdata.ailments[i]);
-                eActionType key = (eActionType)(int)ailment.ailment_action;
+                int ailmentIndex = ailment.ailment_id - 1;
+                if (ailmentIndex < 0 || ailmentIndex >= unitResistdata.ailments.Length)
+                    continue;
+
+                eActionType key = (eActionType)ailment.ailment_action;
                 if (!abnormalResistIdDictionary[_resistId].ContainsKey(key))
                 {
                     abnormalResistIdDictionary[_resistId].Add(key, new Dictionary<int, int>());
                 }
-                abnormalResistIdDictionary[_resistId][key][ailment.ailment_detail1] = unitResistdata.ailments[i];
+                abnormalResistIdDictionary[_resistId][key][ailment.ailment_detail_1] = unitResistdata.ailments[ailmentIndex];
             }
             
         }
@@ -517,6 +513,10 @@ namespace Elements
       )
         {
             if (!abnormalResistStatusDictionary.ContainsKey(_actionType))
+            {
+                return false;
+            }
+            if (_target.Owner.IsForceHit(_actionType, _detail1))
             {
                 return false;
             }

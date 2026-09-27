@@ -1894,7 +1894,7 @@ namespace ExcelHelper
         public static ExcelPicture InsertImage(this ExcelWorksheet worksheet, byte[] imageBytes, int rowNum, int columnNum, bool autofit, int widthCount,int hightCount)
         {
 #if UNITY_5_3_OR_NEWER
-#if PLATFORM_ANDROID || UNITY_EDITOR_OSX
+#if PLATFORM_ANDROID || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             return null;
 #else
             using (var image = (new MemoryStream(imageBytes)))

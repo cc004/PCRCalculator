@@ -70,7 +70,7 @@ namespace Elements
                     // if (_target.IsPartsBoss)
                     // {
                         var smallestParts = _target.GetIndexSmallestParts();
-                        Source.ExecSkillWithTargetPartsAndActionList(Skill, smallestParts, TargetActions);
+                        Source.ExecSkillWithTargetPartsAndActionList(Skill, smallestParts, TargetActions, true);
                     // }
                 }
             };

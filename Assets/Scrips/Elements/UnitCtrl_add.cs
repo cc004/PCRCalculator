@@ -42,7 +42,7 @@ namespace Elements
         public Action<int,eSemanEvent> SemanOnEventCallback;
         public Action<int, UnitAbnormalStateChangeData, int> NoSkipOnAbnormalStateChange;
         public Action<int,long, long, long, int,string, UnitCtrl, int, int> NoSkipOnLifeChanged;
-        public Action<int,double, int,string> NoSkipOnTPChanged;
+        public Action<int, double, int, string, UnitCtrl> NoSkipOnTPChanged;
         public Action<int,float> SemanOnTPChanged;
         public Action<int, UnitSkillExecData> NoSkipOnStartAction;
         public Action<int, int> SemanOnStartAction;
@@ -384,9 +384,7 @@ namespace Elements
                             var result = list
                                 .Select((e, index) => new { e, index })     // 带上 index
                                 .LastOrDefault(x =>
-                                    i == idx
-                                        ? x.e.currentFrameCount < frame && x.e.changStateTo == ActionState.IDLE
-                                        : x.e.changStateTo == ActionState.IDLE
+                                        x.e.currentFrameCount < frame && x.e.changStateTo == ActionState.IDLE
                                 );
 
                             UnitStateChangeData? last = result?.e;
@@ -395,9 +393,9 @@ namespace Elements
                                 : null;
                             
                             int lframe = last?.currentFrameCount ?? 0;
-                            int rframe = next?.currentFrameCount ?? 5400;
+                            int rframe = next?.currentFrameCount ?? battleManager.FrameCount;
 
-                            bool flag = Enumerable
+                            bool flag = lframe < rframe && Enumerable
                                         .Range(lframe, rframe - lframe)
                                         .Any(i => battleManager.IsSkillReady[i][uc.UnitId]);
                             

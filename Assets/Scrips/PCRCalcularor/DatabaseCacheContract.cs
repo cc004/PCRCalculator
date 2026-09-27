@@ -24,7 +24,7 @@ namespace PCRCaculator
 
     public static class DatabaseCacheContract
     {
-        public const int CurrentSchemaVersion = 3;
+        public const int CurrentSchemaVersion = 4;
 
         public static T ResolveSharedDatabase<T>(T primary, Func<T> createSeparate, bool sharesPrimary)
             where T : class
@@ -57,6 +57,8 @@ namespace PCRCaculator
             var coreCounts = new[]
             {
                 ("unitRarityDic", cache.unitRarityDic?.Count ?? 0),
+                ("ailmentDataDic", cache.ailmentDataDic?.Count ?? 0),
+                ("resistDataDic", cache.resistDataDic?.Count ?? 0),
                 ("skillDataDic", cache.skillDataDic?.Count ?? 0),
                 ("skillActionDic", cache.skillActionDic?.Count ?? 0),
                 ("allUnitAttackPatternDic", cache.allUnitAttackPatternDic?.Count ?? 0),
@@ -70,6 +72,13 @@ namespace PCRCaculator
                 return Reject(
                     $"核心数据为空: {string.Join(", ", emptyCore)}; counts={FormatCounts(coreCounts)}",
                     out reason);
+
+            if (cache.ailmentDataDic.Any(pair =>
+                    pair.Value == null || pair.Key <= 0 || pair.Value.ailment_id != pair.Key))
+                return Reject("ailmentDataDic 包含不完整条目", out reason);
+            var maxAilmentId = cache.ailmentDataDic.Keys.Max();
+            if (cache.resistDataDic.Any(pair => pair.Value == null || pair.Value.Length < maxAilmentId))
+                return Reject($"resistDataDic 未覆盖最大 ailment_id={maxAilmentId}", out reason);
 
             if (cache.masterUnitSkillDataRf?.dict == null)
                 return Reject("masterUnitSkillDataRf 结构缺失", out reason);

@@ -234,6 +234,7 @@ namespace Elements
                         if (TriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
                             return;
                         _source.CancelByAwake = true;
+                        _source.TriggerStealthUnableStateBarrier = true;
                         _source.CurrentTriggerSkillId = _skill.SkillId;
                         _source.SetState(UnitCtrl.ActionState.SKILL, _skillId: _skill.SkillId);
                     };
@@ -530,15 +531,18 @@ namespace Elements
                 unitCtrlList.Remove(_source);
             BattleManager.Instance.QueueUpdateSkillTarget();
             _source.IsDead = true;
+            battleManager.CheckAcnLosingBattleFinish();
             _source.CureAllAbnormalState();
-            /*foreach (SkillEffectCtrl repeatEffect in _source.RepeatEffectList)
+            // ChangeColorEffect is not represented by the calculator runtime; every local repeat effect follows the native cleanup branch.
+            foreach (SkillEffectCtrl repeatEffect in _source.RepeatEffectList)
             {
-              if (!(repeatEffect is ChangeColorEffect))
                 repeatEffect.SetTimeToDie(true);
-            }*/
+            }
             battleManager.CallbackFadeOutDone(_source);
             battleManager.CallbackDead(_source);
             _source.gameObject.SetActive(false);
+            if (_source.EnemyPoint != 0)
+                battleManager.SubstructEnemyPoint(_source.EnemyPoint);
         }
 
         public override void SetLevel(float _level)

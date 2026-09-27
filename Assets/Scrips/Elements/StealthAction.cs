@@ -110,7 +110,9 @@ namespace Elements
                     List<UnitCtrl> unitCtrlList = _source.IsOther ? stealthAction.battleManager.EnemyList : stealthAction.battleManager.UnitList;
                     if (unitCtrlList.Contains(_source))
                         unitCtrlList.Remove(_source);
+                    stealthAction.battleManager.QueueUpdateSkillTarget();
                     _source.IsDead = true;
+                    stealthAction.battleManager.CheckAcnLosingBattleFinish();
                     _source.CureAllAbnormalState();
                     stealthAction.battleManager.CallbackFadeOutDone(_source);
                     stealthAction.battleManager.CallbackDead(_source);

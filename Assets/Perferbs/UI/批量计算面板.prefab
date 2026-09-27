@@ -2132,7 +2132,7 @@ PrefabInstance:
     - target: {fileID: 2242390254784355953, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}
       propertyPath: addPosHight
-      value: -50
+      value: -60
       objectReference: {fileID: 0}
     - target: {fileID: 4256330426606583410, guid: 42fce9398644d4946a5823abbe9654d6,
         type: 3}

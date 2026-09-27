@@ -28,7 +28,8 @@ namespace Elements
           ValueDictionary _valueDictionary, System.Action<string> action)
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-            if (_target.Owner.ModeChangeUnableStateBarrier)
+            if (_target.Owner.ModeChangeUnableStateBarrier
+                || _target.Owner.TriggerStealthUnableStateBarrier)
             {
                 action($"目标处于MODECHANGE状态，技能无效!");
                 return;

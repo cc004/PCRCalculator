@@ -36,7 +36,7 @@ namespace Elements
         {
             // Properties
             public IEnumerator Coroutine { get; set; }
-            public bool Enable { get; set; } // TODO find where use
+            public bool Enable { get; set; }
             public int EnvironmentId { get; set; }
         }
 
@@ -274,6 +274,13 @@ namespace Elements
         private bool startSkillExeced;
         private bool[] m_abnormalStateArr = new bool[(int)eAbnormalState.NUM];
         public AbnormalStateCategoryData[] m_categoryDataArr = new AbnormalStateCategoryData[(int)eAbnormalStateCategory.NUM];
+        public Dictionary<eActionType, List<int>> AbnormalStateForceHitData { get; } = new Dictionary<eActionType, List<int>>();
+
+        public bool IsForceHit(eActionType actionType, int id)
+        {
+            return AbnormalStateForceHitData.TryGetValue(actionType, out var forceHitIds)
+                && forceHitIds.Contains(id);
+        }
 
         private bool GetAbnormalStateSafe(eAbnormalState state)
         {
@@ -1337,6 +1344,7 @@ namespace Elements
         private bool resumeIsStopState;
         private bool animeLoop;
         private string animeName = "";
+        private BattleSpineController damageResumeSpineCtrl;
         private SkillEffectCtrl runSmokeEffect;
         public Action<bool> OnStartErrorUndoDivision;
         /*
@@ -1607,7 +1615,9 @@ namespace Elements
 
         public SummonAction.eSummonType SummonType { get; set; }
 
-        public bool IsSummonOrPhantom;
+        public bool IsSummonOrPhantom =>
+            SummonType == SummonAction.eSummonType.SUMMON ||
+            SummonType == SummonAction.eSummonType.PHANTOM;
         public bool IsGuest
         {
             get;
@@ -2473,8 +2483,10 @@ this.updateCurColor();
           BaseData additional = null,
           BaseData exOverride = null,
           IReadOnlyDictionary<eParamType, long> labyrinthEnhanceParameter = null,
-          IReadOnlyDictionary<eParamType, long> labyrinthRelicPassiveParameter = null)
+          IReadOnlyDictionary<eParamType, long> labyrinthRelicPassiveParameter = null,
+          SummonAction.eSummonType summonType = SummonAction.eSummonType.NONE)
         {
+            SummonType = summonType;
             ToadDatas = new List<ToadData>();
             transformCache = transform;
             m00 = transformCache.TargetTransform.parent.localToWorldMatrix.m00;
@@ -3641,9 +3653,14 @@ this.updateCurColor();
         public void ExecSkillWithTargetPartsAndActionList(
           Skill _skill,
           BasePartsData _targetParts,
-          List<ActionParameter> _actionList)
+          List<ActionParameter> _actionList,
+          bool _considerTargetAssignment)
         {
-            unitActionController.ExecSkillWithTargetPartsAndActionList(_skill, _targetParts, _actionList);
+            unitActionController.ExecSkillWithTargetPartsAndActionList(
+                _skill,
+                _targetParts,
+                _actionList,
+                _considerTargetAssignment);
         }
 
         public void ExecSkillWithTargetParts(
@@ -4952,7 +4969,7 @@ this.updateCurColor();
 
             SemanOnTPChanged?.Invoke(UnitId, (float)Energy);
             if (!battleManager.skipping)
-                NoSkipOnTPChanged?.Invoke(UnitId,Energy, BattleHeaderController.CurrentFrameCount,type.GetDescription());
+                NoSkipOnTPChanged?.Invoke(UnitId, Energy, BattleHeaderController.CurrentFrameCount, type.GetDescription(), source);
             if(!battleManager.skipping && uIManager != null)
                 uIManager.LogMessage($"TP变更为：{(int)(energy * 1000) / 1000f:F3}", eLogMessageType.CHANGE_TP, this);
         }
@@ -6805,7 +6822,8 @@ this.updateCurColor();
                 if (time > 1f || BattleUtil.Approximately(time, 1f))
                 {
                     AbnormalStateCategoryData abnormalStateCategoryData = GetCategoryDataSafe(category);
-                    ChargeEnergy(eSetEnergyType.BY_USE_SKILL, abnormalStateCategoryData.MainValue, _hasEffect: true, this);
+                    ChargeEnergy(eSetEnergyType.BY_USE_SKILL, abnormalStateCategoryData.MainValue,
+                        _hasEffect: true, abnormalStateCategoryData.Source ?? this);
                     time = 0f;
                 }
             }
@@ -7896,8 +7914,24 @@ this.updateCurColor();
             var idx = ++buffDebuffIndex;
             var dispelled = IdleOnly || (long)Hp < 0;
             buffDebuffFlag.Add((short) ((_isBuff ? 2 : 0) | (_despelable ? 4 : 0) | (_additional ? 8 : 0) | (dispelled ? 1 : 0) | (int)_kind << 4));
-            _cr.Coroutine = UpdateBuffParam(_kind, _value, _time, _skillId, _source, _despelable, idx, _isBuff, _additional, _isShowIcon, _bonusId, _actionId, describe, _triggerCall);
-            // TODO fill _cr Enable EnvironmentId
+            _cr.Enable = true;
+            _cr.EnvironmentId = _environmentId;
+            _cr.Coroutine = UpdateBuffParam(
+                _kind,
+                _value,
+                _time,
+                _skillId,
+                _source,
+                _despelable,
+                idx,
+                _isBuff,
+                _additional,
+                _isShowIcon,
+                _bonusId,
+                _actionId,
+                describe,
+                _triggerCall,
+                _cr);
 
             buffDebuffCoroutineList.Add(_cr);
 
@@ -7919,6 +7953,22 @@ this.updateCurColor();
 
         public List<BuffDebuffCoroutineDataSet> buffDebuffCoroutineList = new List<BuffDebuffCoroutineDataSet>();
         private LinkedList<ChangeParameterFieldData> buffDebuffFieldDataList = new LinkedList<ChangeParameterFieldData>();
+
+        public void DisableEnvironmentCoroutine(int _environmentId)
+        {
+            foreach (var data in buffDebuffCoroutineList)
+            {
+                if (data.EnvironmentId == _environmentId)
+                    data.Enable = false;
+            }
+
+            if (ExtendSlipDamageData != null
+                && ExtendSlipDamageData.Enable
+                && ExtendSlipDamageData.EnvironmentId == _environmentId)
+            {
+                ExtendSlipDamageData.Enable = false;
+            }
+        }
 
         private void clearHistoryBuff()
         {
@@ -8012,7 +8062,8 @@ this.updateCurColor();
           int _bonusId,
           int _actionId,
           string _describe,
-          bool _triggerCall)
+          bool _triggerCall,
+          BuffDebuffCoroutineDataSet _coroutineDataSet)
         {
             long eventToken = CreateBuffDebuffEventToken(_buffDebuffId);
             if (_kind == BuffParamKind.MAX_HP)
@@ -8042,6 +8093,9 @@ this.updateCurColor();
             var buffId = getBuffDebuffParamValue(_kind, _isBuff, _additional);
             while (true)
             {
+                if (!_coroutineDataSet.Enable)
+                    break;
+
                 if (!isStopBuffDebuffEffectTimer && FlagDeltaTimeForPause)
                 {
                     if ((time += BattleManager.DeltaTime_60fps) > _maxTime)
@@ -10465,6 +10519,7 @@ this.updateCurColor();
             {
                 a = (DoubleWithEx)_damageData.LogBarrierExpectedDamage;
                 b = (DoubleWithEx)_damageData.LogBarrierExpectedDamageForEnergyCalc;
+                isNoDamageByResist = _damageData.LogBarrierExpectedIsNoDamageByResist;
             }
             if (_damageData.DamageType == DamageData.eDamageType.ATK && IsAbnormalState(eAbnormalState.CUT_ATK_DAMAGE))
             {
@@ -10794,6 +10849,7 @@ this.updateCurColor();
 #endif
                 });
                 OnChangeState.Call(this, eStateIconType.STRIKE_BACK, ADIFIOLCOPN: false);
+                isHit = false;
                 return 0L;
             }
             if (_skill != null && _damageData.ActionType == eActionType.ATTACK)
@@ -13875,7 +13931,11 @@ this.updateCurColor();
             float fAlpha = 1f;
             while (true)
             {
-                while (!unitCtrl.ModeChangeEnd)
+                // ModeChangeAction registers a continuous action before the skill
+                // animation switches to the alternate spine. Keep IdleOnly summons
+                // alive during that transition so the native mode-change lifecycle can
+                // reach its end coroutine and release the action normally.
+                while (!unitCtrl.ModeChangeEnd && !unitCtrl.unitActionController.ModeChanging)
                 {
                     if (unitCtrl.JoyFlag)
                     {
@@ -14082,6 +14142,7 @@ this.updateCurColor();
                 animeLoop = currentSpineCtrl.loop;
                 resumeIsStopState = currentSpineCtrl.IsStopState;
                 animeName = currentSpineCtrl.AnimationName;
+                damageResumeSpineCtrl = currentSpineCtrl;
                 isIdleDamage = true;
             }
             currentSpineCtrl.loop = false;
@@ -14307,6 +14368,13 @@ this.updateCurColor();
         private void resumeSpineWithTime()
         {
             BattleSpineController currentSpineCtrl = GetCurrentSpineCtrl();
+            // Damage recovery is delayed across blackout frames. A mode change can
+            // replace the active spine in that interval; animation names are local to
+            // a spine asset and must never be restored onto a different controller.
+            if (damageResumeSpineCtrl != null && !object.ReferenceEquals(currentSpineCtrl, damageResumeSpineCtrl))
+            {
+                return;
+            }
             if (!(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE, MotionPrefix)) && !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMEGE, MotionPrefix)) && !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.DAMAGE_MULTI_TARGET, -1, PartsMotionPrefix)) && !(currentSpineCtrl.AnimationName == currentSpineCtrl.ConvertAnimeIdToAnimeName(eSpineCharacterAnimeId.IDLE_MULTI_TARGET, -1, PartsMotionPrefix)) && !currentSpineCtrl.AnimationName.IsNullOrEmpty())
             {
                 return;
@@ -14601,6 +14669,12 @@ this.updateCurColor();
             set;
         }
 
+        public bool TriggerStealthUnableStateBarrier
+        {
+            get;
+            set;
+        }
+
         public bool MultiTargetByTime
         {
             get;
@@ -14713,7 +14787,7 @@ this.updateCurColor();
         public void StartCutIn()
         {
             battleManager.semanubmanager.UbExecCallback(battleManager.UnitList.IndexOf(this));
-            battleManager.ubmanager.UbExecCallback(battleManager.UnitList.IndexOf(this));
+            battleManager.ubmanager.UbExecCallback(this, battleManager.UnitList.IndexOf(this));
             battleManager.scriptMgr?.UbExecCallback(UnitId);
             ++UbCounter;
             //this.battleCameraEffect.DAHAALGOJNA = Vector3.zero;

@@ -6,7 +6,7 @@ namespace Elements
 {
     public class ExtendSlipDamageAction : ActionParameter 
     {
-        public int EnvironmentId { get; set; } // no found where set
+        public int EnvironmentId { get; set; } = -1;
 
         public override void ExecActionOnStart(Skill _skill, UnitCtrl _source, UnitActionController _sourceActionController) 
         { 

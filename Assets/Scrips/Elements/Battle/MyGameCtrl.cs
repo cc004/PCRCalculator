@@ -58,6 +58,10 @@ namespace Elements
         public bool IsSemanMode;
         public bool ForceAutoMode;
 
+        private bool hasPendingServerSetState;
+        private bool pendingServerAllSet;
+        private List<bool> pendingServerSetToggles = new List<bool>();
+
         public InputField stopFrameText;
         public int stopFrame;
         public int CurrentSeedForSave { get; set; }
@@ -140,12 +144,15 @@ namespace Elements
                 battleTempData.waveGroupId = questData.wave_group_id;
 
             int questType = questData?.quest_type ?? ((selectedQuestId / 10000) % 10 == 3 ? 3 : 1);
-            int difficulty = requestedDifficulty > 0
-                ? requestedDifficulty
-                : (selectedQuestId / 100000) % 10;
+            int difficulty = requestedDifficulty;
 
-            if (difficulty <= 0
-                || manager?.LabyrinthDifficultyEnemyDataDic == null
+            if (difficulty <= 0)
+            {
+                throw new InvalidOperationException(
+                    $"Labyrinth战斗缺少有效LabyrinthDifficulty: questId={selectedQuestId}, difficulty={difficulty}。");
+            }
+
+            if (manager?.LabyrinthDifficultyEnemyDataDic == null
                 || !manager.LabyrinthDifficultyEnemyDataDic.ContainsKey(difficulty))
             {
                 throw new InvalidOperationException(
@@ -404,6 +411,7 @@ namespace Elements
             else
             {
                 BattleManager.Instance.semanubmanager.Disable();
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
             }
         }
 
@@ -575,9 +583,16 @@ namespace Elements
 
             tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
                 req.LabyrinthEnhancedNodeIds);
+            var labyrinthOwnedUnits = (req.LabyrinthOwnedUnitIds ?? new List<int>())
+                .Where(unitId => unitId > 0)
+                .Distinct()
+                .Select(unitId => new PCRCaculator.UnitData { unitId = unitId })
+                .ToList();
+            if (labyrinthOwnedUnits.Count == 0)
+                labyrinthOwnedUnits = tempData.playerList;
             tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
                 req.LabyrinthRelicIds,
-                tempData.playerList,
+                labyrinthOwnedUnits,
                 req.LabyrinthAlphaRupee);
             tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
                 req.LabyrinthRelicIds);
@@ -668,23 +683,11 @@ namespace Elements
             unitCount.Clear();
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
+            StageServerSetState(req.IsGuildBattle, req.IsSetMode, req.SetToggles);
             staticBattleManager.Init(this);
 
             if (req.IsGuildBattle)
             {
-                if (IsSetMode)
-                {
-                    foreach(var unit in playerUnitCtrl)
-                        unit.pressing = true;
-                }
-                else if (req.SetToggles?.Count > 0)
-                {
-                    for (int i = 0; i < playerUnitCtrl.Count && i < req.SetToggles.Count; i++)
-                    {
-                        playerUnitCtrl[i].pressing = req.SetToggles[i];
-                    }
-                }
-
                 if (req.IsSemanMode)
                 {
                     BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
@@ -707,6 +710,40 @@ namespace Elements
             else
             {
                 BattleManager.Instance.semanubmanager.Disable();
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+            }
+        }
+
+        private void StageServerSetState(
+            bool isGuildBattle,
+            bool isSetMode,
+            IReadOnlyList<bool> setToggles)
+        {
+            hasPendingServerSetState = isGuildBattle;
+            pendingServerAllSet = isGuildBattle && isSetMode;
+            pendingServerSetToggles = isGuildBattle && setToggles != null
+                ? setToggles.ToList()
+                : new List<bool>();
+        }
+
+        public void ApplyPendingServerSetState()
+        {
+            if (!hasPendingServerSetState)
+                return;
+
+            bool allSet = pendingServerAllSet;
+            var setToggles = pendingServerSetToggles;
+            hasPendingServerSetState = false;
+            pendingServerAllSet = false;
+            pendingServerSetToggles = new List<bool>();
+
+            if (playerUnitCtrl == null || playerUnitCtrl.Count == 0)
+                throw new InvalidOperationException("无法在玩家角色初始化前应用服务器SET状态。");
+
+            for (int i = 0; i < playerUnitCtrl.Count; i++)
+            {
+                playerUnitCtrl[i].pressing = allSet ||
+                    (i < setToggles.Count && setToggles[i]);
             }
         }
 
@@ -879,6 +916,13 @@ namespace Elements
             int skinID = UnitUtility.GetSkinId(data.PrefabId, data.rarity /* force use 3x skin */);
             int unitid2 = unitid, prefabOverride = -1;
             string skin = null, p0 = null;
+
+            // Temporary fix: this labyrinth enemy reuses the 261000 Spine assets,
+            // whose animation names are also prefixed with 261000 rather than its unit id.
+            if (!isplayer && unitid == 261001 && data.PrefabId == 261000)
+            {
+                unitid2 = data.PrefabId;
+            }
 
             if (unitid == 105701 && data.rarity == 6)
             {
@@ -1073,6 +1117,8 @@ namespace Elements
             {
                 if (GuildManager.EnemyDataDic.ContainsKey(unitid))
                     unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+                else if (GuildManager.LabyrinthEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.LabyrinthEnemyParameterDic[unitid].unit_id;
                 else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
                     unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
                 else if (GuildManager.AbyssEnemyParameterDic.ContainsKey(unitid))
@@ -1117,6 +1163,8 @@ namespace Elements
             {
                 if (GuildManager.EnemyDataDic.ContainsKey(unitid))
                     unitid = GuildManager.EnemyDataDic[unitid].unit_id;
+                else if (GuildManager.LabyrinthEnemyParameterDic.ContainsKey(unitid))
+                    unitid = GuildManager.LabyrinthEnemyParameterDic[unitid].unit_id;
                 else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
                     unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
             }
