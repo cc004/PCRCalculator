@@ -1149,7 +1149,8 @@ namespace Elements.Battle
             _allocSnapshot = allocCurrent;
 #endif
 
-            if (MyGameCtrl.Instance.stopFrame == BattleHeaderController.CurrentFrameCount)
+            if (MyGameCtrl.Instance.stopFrame >= 0 &&
+                BattleHeaderController.CurrentFrameCount >= MyGameCtrl.Instance.stopFrame)
             {
                 MyGameCtrl.Instance.stopFrame = -1;
                 MyGameCtrl.Instance.PauseButton();

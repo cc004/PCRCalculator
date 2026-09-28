@@ -112,6 +112,7 @@ namespace PCRCaculator.Battle
         public GameObject battleStatus;
         public Toggle translucent;
         public InputField pauseTime;
+        public InputField pauseTime2;
         public Button changeBattlePanel;
         private Dictionary<KeyCode, Action> inputActions;
         private Dictionary<KeyCode, int> keyToValue;
@@ -167,6 +168,22 @@ namespace PCRCaculator.Battle
                 { KeyCode.RightBracket, 11 }, // ]键
                 { KeyCode.Backslash, 12 } // \键
             };
+        }
+        public void SetPauseFrame()
+        {
+            OnPauseFrameEndEdit(pauseTime != null ? pauseTime.text : string.Empty);
+        }
+        public void SetPauseFrame2()
+        {
+            OnPauseFrameEndEdit(pauseTime2 != null ? pauseTime2.text : string.Empty);
+        }
+        public void OnPauseFrameEndEdit(string value)
+        {
+            pauseTime.SetTextWithoutNotify(value);
+            pauseTime2.SetTextWithoutNotify(value);
+            myGameCtrl.stopFrame = int.TryParse(value, out int frame) && frame >= 0
+                ? frame
+                : -1;
         }
         public void ReStart()
         {
