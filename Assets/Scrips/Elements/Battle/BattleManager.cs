@@ -4576,6 +4576,8 @@ namespace Elements.Battle
             isDamageNumHiddenBySkillScreen = false;
             allUnitsFadeOutDone = false;
             idleonlyDone = false;
+            // A reused worker must not carry an unfinished multipart boss into this battle.
+            CountIsNotPartsBossReady = 0;
             deltaTimeAccumulated = 0.0f;
             cutinSkipTimeAccumulated = 0.0f;
             ignoreAllActionDoneCoroutineState = eIgnoreAllActionDoneState.NOT_RUNNING;
