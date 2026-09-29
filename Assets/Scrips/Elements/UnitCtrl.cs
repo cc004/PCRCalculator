@@ -13931,11 +13931,7 @@ this.updateCurColor();
             float fAlpha = 1f;
             while (true)
             {
-                // ModeChangeAction registers a continuous action before the skill
-                // animation switches to the alternate spine. Keep IdleOnly summons
-                // alive during that transition so the native mode-change lifecycle can
-                // reach its end coroutine and release the action normally.
-                while (!unitCtrl.ModeChangeEnd && !unitCtrl.unitActionController.ModeChanging)
+                while (!unitCtrl.ModeChangeEnd)
                 {
                     if (unitCtrl.JoyFlag)
                     {
