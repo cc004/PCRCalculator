@@ -47,6 +47,7 @@ namespace UnityEngine.UI
         internal InvokeExtended<Action<string>> onValueChanged;
         internal InvokeExtended<Action<string>> onEndEdit;
         internal bool interactable;
+        public void SetTextWithoutNotify(string text) {}
     }
     public class Image : MonoBehaviour { public Sprite sprite;
         internal Color color;

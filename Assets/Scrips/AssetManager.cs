@@ -45,7 +45,7 @@ namespace PCRApi
 
         public string MD5 => modified == null ? path : CalcMd5(modified);
         [JsonIgnore]
-        public bool IsAssets => type != "every" || url.EndsWith(".cdb") || url == "manifest/seven2_assetmanifest";
+        public bool IsAssets => !url.StartsWith("manifest/");
 
         [JsonIgnore]
         public byte[] modified;
