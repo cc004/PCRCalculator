@@ -87,23 +87,13 @@ namespace Elements
       return false;
     }*/
 
-    public static bool Approximately(double _a, double _b) => Mathf.Abs((float)(_b - _a)) < Mathf.Max(1E-05f * Mathf.Max(Mathf.Abs((float)_a), Mathf.Abs((float)_b)), Mathf.Epsilon * 8f);
-    public static bool LessThanOrApproximately(float _lhs, float _rhs)
-    {
-      if (!(_lhs < _rhs))
-      {
-        return Approximately(_lhs, _rhs);
-      }
-      return true;
-    }
-    public static bool LessThanOrApproximately(double _lhs, double _rhs)
-    {
-      if (!(_lhs < _rhs))
-      {
-        return Approximately(_lhs, _rhs);
-      }
-      return true;
-    }
+    public static bool Approximately(float _a, float _b) => Mathf.Abs(_b - _a) < Mathf.Max(1E-05f * Mathf.Max(Mathf.Abs(_a), Mathf.Abs(_b)), Mathf.Epsilon * 8f);
+
+    public static bool Approximately(double _a, double _b) => System.Math.Abs(_b - _a) < System.Math.Max(1E-14 * System.Math.Max(System.Math.Abs(_a), System.Math.Abs(_b)), 2.220446049250313E-16);
+
+    public static bool LessThanOrApproximately(float _lhs, float _rhs) => _lhs < _rhs || Approximately(_lhs, _rhs);
+
+    public static bool LessThanOrApproximately(double _lhs, double _rhs) => _lhs < _rhs || Approximately(_lhs, _rhs);
     public static int FloatToInt(float _num)
     {
       if (_num >= 0.0)
@@ -119,10 +109,10 @@ namespace Elements
     {
       if (_num >= 0.0)
       {
-        int num = Mathf.CeilToInt((float)_num);
+        int num = (int)System.Math.Ceiling(_num);
         return Approximately(_num, num) ? num : (int)_num;
       }
-      int num1 = Mathf.FloorToInt((float)_num);
+      int num1 = (int)System.Math.Floor(_num);
       return Approximately(_num, num1) ? num1 : (int)_num;
     }
 
