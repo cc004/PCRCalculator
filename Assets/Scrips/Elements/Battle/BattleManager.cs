@@ -3822,11 +3822,14 @@ namespace Elements.Battle
             //Debug.LogError("GameOver!");
             if (!unitctrl.IsOther)
                 return;
-            //UnitCtrl GEDLBPMPOKB = this.EnemyList.Find((Predicate<UnitCtrl>)(JNOIHMMFADD => this.battleProcessor.JudgeIgnoreUnit(JNOIHMMFADD)));
-            //if (!((UnityEngine.Object)GEDLBPMPOKB != (UnityEngine.Object)null))
-            //GEDLBPMPOKB.IdleOnly = true;
-            //GEDLBPMPOKB.CureAllAbnormalState();
-            //this.CallbackFadeOutDone(GEDLBPMPOKB);
+            if (tempData?.isGuildBattle == true && !tempData.IsLabyrinthBattle &&
+                tempData.guildEnemy?.Count > 0 &&
+                tempData.guildEnemy[0].enemy_id >= 750000000 && tempData.guildEnemy[0].enemy_id < 770000000)
+            {
+                UnitCtrl ignoredEnemy = EnemyList.Find(unit => !unit.IsBonusEnemy && unit.IsSummonOrPhantom);
+                if (ignoredEnemy != null)
+                    ignoredEnemy.IdleOnly = true;
+            }
         }
 
         private IEnumerator updateIgnoreAllActionDoneCounter()
