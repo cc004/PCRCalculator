@@ -1,0 +1,4511 @@
+fileFormatVersion: 2
+guid: 655031056c0abfa49b1193e8c2c44219
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2256027051409299806
+    second: AtlasLabyrinth_0
+  - first:
+      213: -4057783659262879677
+    second: AtlasLabyrinth_1
+  - first:
+      213: -1792788999518812894
+    second: AtlasLabyrinth_2
+  - first:
+      213: -1922971264899919416
+    second: AtlasLabyrinth_3
+  - first:
+      213: 2064488342483466411
+    second: AtlasLabyrinth_4
+  - first:
+      213: -8511477203728113017
+    second: AtlasLabyrinth_5
+  - first:
+      213: 1752729321095451624
+    second: AtlasLabyrinth_6
+  - first:
+      213: -3149154660408108848
+    second: AtlasLabyrinth_7
+  - first:
+      213: 8312484811949088888
+    second: AtlasLabyrinth_8
+  - first:
+      213: 1383490401340737550
+    second: AtlasLabyrinth_9
+  - first:
+      213: -903529775559168868
+    second: AtlasLabyrinth_10
+  - first:
+      213: 673617806937686992
+    second: AtlasLabyrinth_11
+  - first:
+      213: -5792742552433220443
+    second: AtlasLabyrinth_12
+  - first:
+      213: -3547922163919187287
+    second: AtlasLabyrinth_13
+  - first:
+      213: -4361439979103010316
+    second: AtlasLabyrinth_14
+  - first:
+      213: 1900351894638975579
+    second: AtlasLabyrinth_15
+  - first:
+      213: 8202835078312134
+    second: AtlasLabyrinth_16
+  - first:
+      213: 9006652313180795519
+    second: AtlasLabyrinth_17
+  - first:
+      213: -6559014501316478556
+    second: AtlasLabyrinth_18
+  - first:
+      213: -2709155466011461078
+    second: AtlasLabyrinth_19
+  - first:
+      213: 3280210019452850299
+    second: AtlasLabyrinth_20
+  - first:
+      213: -1114828177990725260
+    second: AtlasLabyrinth_21
+  - first:
+      213: 7648492946201555782
+    second: AtlasLabyrinth_22
+  - first:
+      213: 2308551563708943542
+    second: AtlasLabyrinth_23
+  - first:
+      213: -3689409920396387896
+    second: AtlasLabyrinth_24
+  - first:
+      213: 8408669601951155436
+    second: AtlasLabyrinth_25
+  - first:
+      213: -6987188018349047676
+    second: AtlasLabyrinth_26
+  - first:
+      213: 8178760699673186616
+    second: AtlasLabyrinth_27
+  - first:
+      213: -4231673356356831043
+    second: AtlasLabyrinth_28
+  - first:
+      213: -801422339179002729
+    second: AtlasLabyrinth_29
+  - first:
+      213: 8500721867555983917
+    second: AtlasLabyrinth_30
+  - first:
+      213: 4785451635759517688
+    second: AtlasLabyrinth_31
+  - first:
+      213: 8965675109546459978
+    second: AtlasLabyrinth_32
+  - first:
+      213: -4171375256342990973
+    second: AtlasLabyrinth_33
+  - first:
+      213: -1488270917627622242
+    second: AtlasLabyrinth_34
+  - first:
+      213: 2178444583809308962
+    second: AtlasLabyrinth_35
+  - first:
+      213: 8168375895611251353
+    second: AtlasLabyrinth_36
+  - first:
+      213: -3788161284256296407
+    second: AtlasLabyrinth_37
+  - first:
+      213: -5039476940074924107
+    second: AtlasLabyrinth_38
+  - first:
+      213: 8813212035780637806
+    second: AtlasLabyrinth_39
+  - first:
+      213: -8453748634960338903
+    second: AtlasLabyrinth_40
+  - first:
+      213: 3014744887852766344
+    second: AtlasLabyrinth_41
+  - first:
+      213: -4571621203372330427
+    second: AtlasLabyrinth_42
+  - first:
+      213: 8843117830505153179
+    second: AtlasLabyrinth_43
+  - first:
+      213: 269849310274441172
+    second: AtlasLabyrinth_44
+  - first:
+      213: -1283017268559864642
+    second: AtlasLabyrinth_45
+  - first:
+      213: 6990228694373715275
+    second: AtlasLabyrinth_46
+  - first:
+      213: 9163315640188115812
+    second: AtlasLabyrinth_47
+  - first:
+      213: 3206981460849023959
+    second: AtlasLabyrinth_48
+  - first:
+      213: -5180224890826726825
+    second: AtlasLabyrinth_49
+  - first:
+      213: 7203750913401809508
+    second: AtlasLabyrinth_50
+  - first:
+      213: 9195704726872134350
+    second: AtlasLabyrinth_51
+  - first:
+      213: -3623881107408097440
+    second: AtlasLabyrinth_52
+  - first:
+      213: 5133739517586460713
+    second: AtlasLabyrinth_53
+  - first:
+      213: 4082718851809069523
+    second: AtlasLabyrinth_54
+  - first:
+      213: -6850819090901831953
+    second: AtlasLabyrinth_55
+  - first:
+      213: -373985785066138274
+    second: AtlasLabyrinth_56
+  - first:
+      213: 4547867411820910560
+    second: AtlasLabyrinth_57
+  - first:
+      213: 1807519927521117930
+    second: AtlasLabyrinth_58
+  - first:
+      213: -5212005572231514026
+    second: AtlasLabyrinth_59
+  - first:
+      213: -3653114429869432688
+    second: AtlasLabyrinth_60
+  - first:
+      213: 1226917659625497199
+    second: AtlasLabyrinth_61
+  - first:
+      213: -8363148189210271846
+    second: AtlasLabyrinth_62
+  - first:
+      213: 2769438135226699000
+    second: AtlasLabyrinth_63
+  - first:
+      213: -14917436673433752
+    second: AtlasLabyrinth_64
+  - first:
+      213: 8886176061766243682
+    second: AtlasLabyrinth_65
+  - first:
+      213: -9087914029099116638
+    second: AtlasLabyrinth_66
+  - first:
+      213: 2254917241978447724
+    second: AtlasLabyrinth_67
+  - first:
+      213: 6847267050507950145
+    second: AtlasLabyrinth_68
+  - first:
+      213: -6539134921430488052
+    second: AtlasLabyrinth_69
+  - first:
+      213: 7283873057427573054
+    second: AtlasLabyrinth_70
+  - first:
+      213: -3667473074137896397
+    second: AtlasLabyrinth_71
+  - first:
+      213: 1360939247782979357
+    second: AtlasLabyrinth_72
+  - first:
+      213: -8810564906574786689
+    second: AtlasLabyrinth_73
+  - first:
+      213: 2593049849379923563
+    second: AtlasLabyrinth_74
+  - first:
+      213: -3824889033756086804
+    second: AtlasLabyrinth_75
+  - first:
+      213: -5931852884097214845
+    second: AtlasLabyrinth_76
+  - first:
+      213: 866306112303762526
+    second: AtlasLabyrinth_77
+  - first:
+      213: -312879820489888326
+    second: AtlasLabyrinth_78
+  - first:
+      213: 316549109015394136
+    second: AtlasLabyrinth_79
+  - first:
+      213: -1866398801081353107
+    second: AtlasLabyrinth_80
+  - first:
+      213: 9151779130032433447
+    second: AtlasLabyrinth_81
+  - first:
+      213: -3475445949055367565
+    second: AtlasLabyrinth_82
+  - first:
+      213: -1755925278430734192
+    second: AtlasLabyrinth_83
+  - first:
+      213: 7679184994222122573
+    second: AtlasLabyrinth_84
+  - first:
+      213: 5092754372139030833
+    second: AtlasLabyrinth_85
+  - first:
+      213: -1118886654516861043
+    second: AtlasLabyrinth_86
+  - first:
+      213: 8282489661496064167
+    second: AtlasLabyrinth_87
+  - first:
+      213: -5721449963685388928
+    second: AtlasLabyrinth_88
+  - first:
+      213: 7751408735888153597
+    second: AtlasLabyrinth_89
+  - first:
+      213: -5401050414099421295
+    second: AtlasLabyrinth_90
+  - first:
+      213: 7743493713650511769
+    second: AtlasLabyrinth_91
+  - first:
+      213: -8090275568349860591
+    second: AtlasLabyrinth_92
+  - first:
+      213: 907048977322106444
+    second: AtlasLabyrinth_93
+  - first:
+      213: 3301678186876137132
+    second: AtlasLabyrinth_94
+  - first:
+      213: -3452274811208092122
+    second: AtlasLabyrinth_95
+  - first:
+      213: 4738839136643227725
+    second: AtlasLabyrinth_96
+  - first:
+      213: -3325228505206538303
+    second: AtlasLabyrinth_97
+  - first:
+      213: -5776949724668961745
+    second: AtlasLabyrinth_98
+  - first:
+      213: -8967284653282380281
+    second: AtlasLabyrinth_99
+  - first:
+      213: -5045121406893205531
+    second: AtlasLabyrinth_100
+  - first:
+      213: -6290522213150018013
+    second: AtlasLabyrinth_101
+  - first:
+      213: -4850777050728605360
+    second: AtlasLabyrinth_102
+  - first:
+      213: -6771566177349048946
+    second: AtlasLabyrinth_103
+  - first:
+      213: -8486151622406374389
+    second: AtlasLabyrinth_104
+  - first:
+      213: -5153493344027115470
+    second: AtlasLabyrinth_105
+  - first:
+      213: -3549951962859705137
+    second: AtlasLabyrinth_106
+  - first:
+      213: 3427443034139645711
+    second: AtlasLabyrinth_107
+  - first:
+      213: 4426881030100925471
+    second: AtlasLabyrinth_108
+  - first:
+      213: 8299906892996635040
+    second: AtlasLabyrinth_109
+  - first:
+      213: -5538103988519509981
+    second: AtlasLabyrinth_110
+  - first:
+      213: 1178765600808342725
+    second: AtlasLabyrinth_111
+  - first:
+      213: 6327937437782635565
+    second: AtlasLabyrinth_112
+  - first:
+      213: -1312179476221373134
+    second: AtlasLabyrinth_113
+  - first:
+      213: -4986914885915478240
+    second: AtlasLabyrinth_114
+  - first:
+      213: -2039732257892055648
+    second: AtlasLabyrinth_115
+  - first:
+      213: -5294369830579487100
+    second: AtlasLabyrinth_116
+  - first:
+      213: -211833260386082632
+    second: AtlasLabyrinth_117
+  - first:
+      213: -2352152023319918606
+    second: AtlasLabyrinth_118
+  - first:
+      213: -7096645359320937783
+    second: AtlasLabyrinth_119
+  - first:
+      213: 7556221478446827937
+    second: AtlasLabyrinth_120
+  - first:
+      213: 6006445964178987578
+    second: AtlasLabyrinth_121
+  - first:
+      213: -5314426904771836898
+    second: AtlasLabyrinth_122
+  - first:
+      213: -2811774667817193854
+    second: AtlasLabyrinth_123
+  - first:
+      213: 9032683590016962223
+    second: AtlasLabyrinth_124
+  - first:
+      213: -7838974977842723291
+    second: AtlasLabyrinth_125
+  - first:
+      213: 2656589189309829799
+    second: AtlasLabyrinth_126
+  - first:
+      213: -1643248087751899778
+    second: AtlasLabyrinth_127
+  - first:
+      213: -480814083284089303
+    second: AtlasLabyrinth_128
+  - first:
+      213: -3780496825879133928
+    second: AtlasLabyrinth_129
+  - first:
+      213: 6272611597320615071
+    second: AtlasLabyrinth_130
+  - first:
+      213: -6720993993063228069
+    second: AtlasLabyrinth_131
+  - first:
+      213: 493149726495436975
+    second: AtlasLabyrinth_132
+  - first:
+      213: 6762473482880100022
+    second: AtlasLabyrinth_133
+  - first:
+      213: -511006078587128571
+    second: AtlasLabyrinth_134
+  - first:
+      213: 8044018932093722067
+    second: AtlasLabyrinth_135
+  - first:
+      213: 7153242576940965684
+    second: AtlasLabyrinth_136
+  - first:
+      213: -7246088291572447361
+    second: AtlasLabyrinth_137
+  - first:
+      213: 6451934246469135064
+    second: AtlasLabyrinth_138
+  - first:
+      213: 2250402163273992537
+    second: AtlasLabyrinth_139
+  - first:
+      213: 1776632091571026586
+    second: AtlasLabyrinth_140
+  - first:
+      213: 6590568109234099731
+    second: AtlasLabyrinth_141
+  - first:
+      213: 2156784043069714732
+    second: AtlasLabyrinth_142
+  - first:
+      213: -5345175247556239518
+    second: AtlasLabyrinth_143
+  - first:
+      213: 531841812533212151
+    second: AtlasLabyrinth_144
+  - first:
+      213: -1812265200868256928
+    second: AtlasLabyrinth_145
+  - first:
+      213: -6545812727547091400
+    second: AtlasLabyrinth_146
+  - first:
+      213: 1893370347485155453
+    second: AtlasLabyrinth_147
+  - first:
+      213: 8890051781214092420
+    second: AtlasLabyrinth_148
+  - first:
+      213: 5111165551785240971
+    second: AtlasLabyrinth_149
+  - first:
+      213: -2859346974757727728
+    second: AtlasLabyrinth_150
+  - first:
+      213: -3674410715227879255
+    second: AtlasLabyrinth_151
+  - first:
+      213: 8299292218659011312
+    second: AtlasLabyrinth_152
+  - first:
+      213: -4157938186292897678
+    second: AtlasLabyrinth_153
+  - first:
+      213: -3403309556219885637
+    second: AtlasLabyrinth_154
+  - first:
+      213: -7125819478707438994
+    second: AtlasLabyrinth_155
+  - first:
+      213: 8515845289352630573
+    second: AtlasLabyrinth_156
+  - first:
+      213: -3481903093853507664
+    second: AtlasLabyrinth_157
+  - first:
+      213: -4641058380566881832
+    second: AtlasLabyrinth_158
+  - first:
+      213: -977165664545302978
+    second: AtlasLabyrinth_159
+  - first:
+      213: 3764885037095358464
+    second: AtlasLabyrinth_160
+  - first:
+      213: -2650972931025803108
+    second: AtlasLabyrinth_161
+  - first:
+      213: 9019672385204323098
+    second: AtlasLabyrinth_162
+  - first:
+      213: 516393685724973366
+    second: AtlasLabyrinth_163
+  - first:
+      213: 499446422071357182
+    second: AtlasLabyrinth_164
+  - first:
+      213: 4968305527338553249
+    second: AtlasLabyrinth_165
+  - first:
+      213: -7920321846562079071
+    second: AtlasLabyrinth_166
+  - first:
+      213: -3941311760074012673
+    second: AtlasLabyrinth_167
+  - first:
+      213: -3644991647870541116
+    second: AtlasLabyrinth_168
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: AtlasLabyrinth_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1224
+        width: 40
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a6a315895bf0b0e0800000000000000
+      internalID: -2256027051409299806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_1
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 1192
+        width: 59
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 348504ec24bdfa7c0800000000000000
+      internalID: -4057783659262879677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_2
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 1225
+        width: 40
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 225047e47ebbe17e0800000000000000
+      internalID: -1792788999518812894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_3
+      rect:
+        serializedVersion: 2
+        x: 1752
+        y: 1127
+        width: 107
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c15b5aa2db3055e0800000000000000
+      internalID: -1922971264899919416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_4
+      rect:
+        serializedVersion: 2
+        x: 1861
+        y: 1235
+        width: 155
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba879a8953986ac10800000000000000
+      internalID: 2064488342483466411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1196
+        width: 78
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78263f5349821e980800000000000000
+      internalID: -8511477203728113017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_6
+      rect:
+        serializedVersion: 2
+        x: 148
+        y: 1163
+        width: 64
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e35e4bf702f25810800000000000000
+      internalID: 1752729321095451624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_7
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 1199
+        width: 44
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d8db937584fb44d0800000000000000
+      internalID: -3149154660408108848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_8
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 1139
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8702e0125e0eb5370800000000000000
+      internalID: 8312484811949088888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_9
+      rect:
+        serializedVersion: 2
+        x: 1863
+        y: 1098
+        width: 109
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e08c312a035233310800000000000000
+      internalID: 1383490401340737550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_10
+      rect:
+        serializedVersion: 2
+        x: 1974
+        y: 1188
+        width: 64
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9caecbc4740673f0800000000000000
+      internalID: -903529775559168868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_11
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 1106
+        width: 79
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d306e093db295900800000000000000
+      internalID: 673617806937686992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_12
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 1113
+        width: 64
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a4adeef65b0c9fa0800000000000000
+      internalID: -5792742552433220443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_13
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 1163
+        width: 43
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a29cd0f69f33cec0800000000000000
+      internalID: -3547922163919187287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_14
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 1188
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f1c068627d0973c0800000000000000
+      internalID: -4361439979103010316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_15
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 1188
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5a523ccaf76f5a10800000000000000
+      internalID: 1900351894638975579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_16
+      rect:
+        serializedVersion: 2
+        x: 1257
+        y: 1131
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c07efe5f642d1000800000000000000
+      internalID: 8202835078312134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_17
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 1163
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f72779e3f8e0efc70800000000000000
+      internalID: 9006652313180795519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_18
+      rect:
+        serializedVersion: 2
+        x: 348
+        y: 1139
+        width: 92
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a9356cef03b9f4a0800000000000000
+      internalID: -6559014501316478556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_19
+      rect:
+        serializedVersion: 2
+        x: 442
+        y: 1139
+        width: 40
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2a34171575276ad0800000000000000
+      internalID: -2709155466011461078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_20
+      rect:
+        serializedVersion: 2
+        x: 531
+        y: 1073
+        width: 105
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b701a2622a5a58d20800000000000000
+      internalID: 3280210019452850299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_21
+      rect:
+        serializedVersion: 2
+        x: 1192
+        y: 1132
+        width: 48
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4715441cda55780f0800000000000000
+      internalID: -1114828177990725260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_22
+      rect:
+        serializedVersion: 2
+        x: 1718
+        y: 649
+        width: 32
+        height: 525
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 643bc65afc7e42a60800000000000000
+      internalID: 7648492946201555782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_23
+      rect:
+        serializedVersion: 2
+        x: 1974
+        y: 1098
+        width: 64
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bc4b8c7a6f990020800000000000000
+      internalID: 2308551563708943542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_24
+      rect:
+        serializedVersion: 2
+        x: 148
+        y: 1113
+        width: 46
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c998f789359cccc0800000000000000
+      internalID: -3689409920396387896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_25
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 1088
+        width: 72
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce48ce1b37891b470800000000000000
+      internalID: 8408669601951155436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_26
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 1088
+        width: 45
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 480807b5485880f90800000000000000
+      internalID: -6987188018349047676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_27
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 1084
+        width: 174
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83112fef58bc08170800000000000000
+      internalID: 8178760699673186616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_28
+      rect:
+        serializedVersion: 2
+        x: 1126
+        y: 1062
+        width: 64
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db8bdd4b0831645c0800000000000000
+      internalID: -4231673356356831043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_29
+      rect:
+        serializedVersion: 2
+        x: 1192
+        y: 1063
+        width: 63
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7944c2ee0a6c0e4f0800000000000000
+      internalID: -801422339179002729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_30
+      rect:
+        serializedVersion: 2
+        x: 1257
+        y: 1063
+        width: 63
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d22d112ff71a8f570800000000000000
+      internalID: 8500721867555983917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_31
+      rect:
+        serializedVersion: 2
+        x: 1322
+        y: 1101
+        width: 32
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ff024788e6596240800000000000000
+      internalID: 4785451635759517688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_32
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 1062
+        width: 112
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a43041c820a7c6c70800000000000000
+      internalID: 8965675109546459978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_33
+      rect:
+        serializedVersion: 2
+        x: 1752
+        y: 990
+        width: 109
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38f62d42e4c4c16c0800000000000000
+      internalID: -4171375256342990973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_34
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1016
+        width: 113
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9cc2415c79985be0800000000000000
+      internalID: -1488270917627622242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_35
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 1016
+        width: 91
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 229d3dc9ec36b3e10800000000000000
+      internalID: 2178444583809308962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_36
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 1001
+        width: 112
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99a95c16996eb5170800000000000000
+      internalID: 8168375895611251353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_37
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 1069
+        width: 32
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 922140ce16fbd6bc0800000000000000
+      internalID: -3788161284256296407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_38
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 1069
+        width: 32
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b7cf0d5c6e201ab0800000000000000
+      internalID: -5039476940074924107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_39
+      rect:
+        serializedVersion: 2
+        x: 415
+        y: 995
+        width: 114
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e64f6e2f6a1de4a70800000000000000
+      internalID: 8813212035780637806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_40
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 977
+        width: 102
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 920eeb808604eaa80800000000000000
+      internalID: -8453748634960338903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_41
+      rect:
+        serializedVersion: 2
+        x: 642
+        y: 1005
+        width: 114
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88493e0b08686d920800000000000000
+      internalID: 3014744887852766344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_42
+      rect:
+        serializedVersion: 2
+        x: 758
+        y: 1062
+        width: 366
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 542395dacb65e80c0800000000000000
+      internalID: -4571621203372330427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_43
+      rect:
+        serializedVersion: 2
+        x: 1322
+        y: 1063
+        width: 31
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b92ce2260d019ba70800000000000000
+      internalID: 8843117830505153179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_44
+      rect:
+        serializedVersion: 2
+        x: 1471
+        y: 1067
+        width: 216
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4dfcac99482beb300800000000000000
+      internalID: 269849310274441172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_45
+      rect:
+        serializedVersion: 2
+        x: 1863
+        y: 1065
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebc1cca879ec13ee0800000000000000
+      internalID: -1283017268559864642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_46
+      rect:
+        serializedVersion: 2
+        x: 1896
+        y: 966
+        width: 119
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4d43e236f7420160800000000000000
+      internalID: 6990228694373715275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_47
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 1001
+        width: 80
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46b91328603aa2f70800000000000000
+      internalID: 9163315640188115812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_48
+      rect:
+        serializedVersion: 2
+        x: 758
+        y: 1005
+        width: 36
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7db5b27b5ac718c20800000000000000
+      internalID: 3206981460849023959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_49
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 954
+        width: 114
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 752e2a568e42c18b0800000000000000
+      internalID: -5180224890826726825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_50
+      rect:
+        serializedVersion: 2
+        x: 912
+        y: 974
+        width: 112
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46ae5b3e94dd8f360800000000000000
+      internalID: 7203750913401809508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_51
+      rect:
+        serializedVersion: 2
+        x: 1026
+        y: 974
+        width: 88
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec218986ab4bd9f70800000000000000
+      internalID: 9195704726872134350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_52
+      rect:
+        serializedVersion: 2
+        x: 1127
+        y: 973
+        width: 113
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06fe0bc355365bdc0800000000000000
+      internalID: -3623881107408097440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_53
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 973
+        width: 113
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 920502b34e4be3740800000000000000
+      internalID: 5133739517586460713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_54
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 985
+        width: 143
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d9cedf1a2bb8a830800000000000000
+      internalID: 4082718851809069523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_55
+      rect:
+        serializedVersion: 2
+        x: 1502
+        y: 990
+        width: 143
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: feee45285500de0a0800000000000000
+      internalID: -6850819090901831953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_56
+      rect:
+        serializedVersion: 2
+        x: 1647
+        y: 991
+        width: 64
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e555612f8e55fcaf0800000000000000
+      internalID: -373985785066138274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_57
+      rect:
+        serializedVersion: 2
+        x: 1863
+        y: 1040
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e7192fb0554d1f30800000000000000
+      internalID: 4547867411820910560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_58
+      rect:
+        serializedVersion: 2
+        x: 1863
+        y: 1015
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae606542cc9951910800000000000000
+      internalID: 1807519927521117930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_59
+      rect:
+        serializedVersion: 2
+        x: 1891
+        y: 1018
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 658b8c3eb8c3ba7b0800000000000000
+      internalID: -5212005572231514026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_60
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 955
+        width: 218
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09067c3f7c78d4dc0800000000000000
+      internalID: -3653114429869432688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_61
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 894
+        width: 133
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f62a1a66c13e60110800000000000000
+      internalID: 1226917659625497199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_62
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 894
+        width: 119
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9f9b22280120fb80800000000000000
+      internalID: -8363148189210271846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_63
+      rect:
+        serializedVersion: 2
+        x: 642
+        y: 977
+        width: 40
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8fc8b959f450f6620800000000000000
+      internalID: 2769438135226699000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_64
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 901
+        width: 102
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86fde1e9ba00bcff0800000000000000
+      internalID: -14917436673433752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_65
+      rect:
+        serializedVersion: 2
+        x: 1863
+        y: 990
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26518251c0a025b70800000000000000
+      internalID: 8886176061766243682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_66
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 955
+        width: 46
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a71242275e31e180800000000000000
+      internalID: -9087914029099116638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_67
+      rect:
+        serializedVersion: 2
+        x: 537
+        y: 901
+        width: 153
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c676706d8431b4f10800000000000000
+      internalID: 2254917241978447724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_68
+      rect:
+        serializedVersion: 2
+        x: 912
+        y: 954
+        width: 22
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14853c3aa11660f50800000000000000
+      internalID: 6847267050507950145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_69
+      rect:
+        serializedVersion: 2
+        x: 936
+        y: 954
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0ca8cd4f635045a0800000000000000
+      internalID: -6539134921430488052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_70
+      rect:
+        serializedVersion: 2
+        x: 954
+        y: 954
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e39420144f3851560800000000000000
+      internalID: 7283873057427573054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_71
+      rect:
+        serializedVersion: 2
+        x: 1011
+        y: 884
+        width: 113
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33a63b09ba48a1dc0800000000000000
+      internalID: -3667473074137896397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_72
+      rect:
+        serializedVersion: 2
+        x: 1126
+        y: 884
+        width: 113
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d17edf8090703e210800000000000000
+      internalID: 1360939247782979357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_73
+      rect:
+        serializedVersion: 2
+        x: 1241
+        y: 884
+        width: 113
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7f4619d5e59ab580800000000000000
+      internalID: -8810564906574786689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_74
+      rect:
+        serializedVersion: 2
+        x: 1371
+        y: 866
+        width: 163
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b66ab25791d5cf320800000000000000
+      internalID: 2593049849379923563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_75
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 866
+        width: 122
+        height: 122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ced6ead50b34beac0800000000000000
+      internalID: -3824889033756086804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_76
+      rect:
+        serializedVersion: 2
+        x: 1660
+        y: 927
+        width: 38
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 386528fea33ddada0800000000000000
+      internalID: -5931852884097214845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_77
+      rect:
+        serializedVersion: 2
+        x: 1689
+        y: 966
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5c8d9ab1dcb50c00800000000000000
+      internalID: 866306112303762526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_78
+      rect:
+        serializedVersion: 2
+        x: 1695
+        y: 962
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abdef42067d68abf0800000000000000
+      internalID: -312879820489888326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_79
+      rect:
+        serializedVersion: 2
+        x: 1699
+        y: 956
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85734dcccbb946400800000000000000
+      internalID: 316549109015394136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_80
+      rect:
+        serializedVersion: 2
+        x: 1785
+        y: 392
+        width: 104
+        height: 596
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6cb454dd283916e0800000000000000
+      internalID: -1866398801081353107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_81
+      rect:
+        serializedVersion: 2
+        x: 972
+        y: 954
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 729aa6c61a6a10f70800000000000000
+      internalID: 9151779130032433447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_82
+      rect:
+        serializedVersion: 2
+        x: 1891
+        y: 829
+        width: 128
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3760c72b25cb4cfc0800000000000000
+      internalID: -3475445949055367565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_83
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 896
+        width: 186
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 098d1073343b1a7e0800000000000000
+      internalID: -1755925278430734192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_84
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 896
+        width: 66
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d46ae11f012f19a60800000000000000
+      internalID: 7679184994222122573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_85
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 921
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1391aaf6e191da640800000000000000
+      internalID: 5092754372139030833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_86
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 901
+        width: 61
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d87e89d048ae870f0800000000000000
+      internalID: -1118886654516861043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_87
+      rect:
+        serializedVersion: 2
+        x: 860
+        y: 832
+        width: 149
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a87151f67051f270800000000000000
+      internalID: 8282489661496064167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_88
+      rect:
+        serializedVersion: 2
+        x: 1657
+        y: 866
+        width: 50
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08d5c5252935990b0800000000000000
+      internalID: -5721449963685388928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_89
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 896
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfb19733d29829b60800000000000000
+      internalID: 7751408735888153597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_90
+      rect:
+        serializedVersion: 2
+        x: 537
+        y: 894
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 197a0ada34d9b05b0800000000000000
+      internalID: -5401050414099421295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_91
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 826
+        width: 285
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99feb9a718a667b60800000000000000
+      internalID: 7743493713650511769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_92
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 801
+        width: 278
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11d2c751c3199bf80800000000000000
+      internalID: -8090275568349860591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_93
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 826
+        width: 291
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4e5a273d3c769c00800000000000000
+      internalID: 907048977322106444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_94
+      rect:
+        serializedVersion: 2
+        x: 1011
+        y: 866
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cae686361dae1dd20800000000000000
+      internalID: 3301678186876137132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_95
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 816
+        width: 340
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 626b9e2a95e0710d0800000000000000
+      internalID: -3452274811208092122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_96
+      rect:
+        serializedVersion: 2
+        x: 1011
+        y: 841
+        width: 14
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d40a65b561db3c140800000000000000
+      internalID: 4738839136643227725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_97
+      rect:
+        serializedVersion: 2
+        x: 1371
+        y: 842
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cf3926da4a6ad1d0800000000000000
+      internalID: -3325228505206538303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_98
+      rect:
+        serializedVersion: 2
+        x: 1400
+        y: 771
+        width: 316
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2cd0df35d624dfa0800000000000000
+      internalID: -5776949724668961745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_99
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 826
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 706ba495e1ecd8380800000000000000
+      internalID: -8967284653282380281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_100
+      rect:
+        serializedVersion: 2
+        x: 1011
+        y: 826
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e759658fc02cf9b0800000000000000
+      internalID: -5045121406893205531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_101
+      rect:
+        serializedVersion: 2
+        x: 1371
+        y: 816
+        width: 27
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3263d71306393b8a0800000000000000
+      internalID: -6290522213150018013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_102
+      rect:
+        serializedVersion: 2
+        x: 1891
+        y: 692
+        width: 121
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05954be09f39eacb0800000000000000
+      internalID: -4850777050728605360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_103
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 731
+        width: 278
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e856f0260709602a0800000000000000
+      internalID: -6771566177349048946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_104
+      rect:
+        serializedVersion: 2
+        x: 712
+        y: 755
+        width: 315
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0cfc5c9f022b3a80800000000000000
+      internalID: -8486151622406374389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_105
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 755
+        width: 60
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2308ce4ab1d1b78b0800000000000000
+      internalID: -5153493344027115470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_106
+      rect:
+        serializedVersion: 2
+        x: 1091
+        y: 755
+        width: 58
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcceb0c8f790cbec0800000000000000
+      internalID: -3549951962859705137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_107
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 804
+        width: 32
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f07d7c9b749b09f20800000000000000
+      internalID: 3427443034139645711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_108
+      rect:
+        serializedVersion: 2
+        x: 1195
+        y: 555
+        width: 203
+        height: 259
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1cb41e97d07f6d30800000000000000
+      internalID: 4426881030100925471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_109
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 731
+        width: 428
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a961e928513f2370800000000000000
+      internalID: 8299906892996635040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_110
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 774
+        width: 40
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 320ee1bb3c3b423b0800000000000000
+      internalID: -5538103988519509981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_111
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 731
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c491ad8111db5010800000000000000
+      internalID: 1178765600808342725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_112
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 648
+        width: 108
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d24fde3a29951d750800000000000000
+      internalID: 6327937437782635565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_113
+      rect:
+        serializedVersion: 2
+        x: 853
+        y: 648
+        width: 96
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2355446f7b33acde0800000000000000
+      internalID: -1312179476221373134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_114
+      rect:
+        serializedVersion: 2
+        x: 951
+        y: 648
+        width: 191
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02776e3455beacab0800000000000000
+      internalID: -4986914885915478240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_115
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 742
+        width: 39
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a54073815a61b3e0800000000000000
+      internalID: -2039732257892055648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_116
+      rect:
+        serializedVersion: 2
+        x: 1400
+        y: 649
+        width: 279
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48eb3ca90be9686b0800000000000000
+      internalID: -5294369830579487100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_117
+      rect:
+        serializedVersion: 2
+        x: 1681
+        y: 749
+        width: 32
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b02313a5ca6f0df0800000000000000
+      internalID: -211833260386082632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_118
+      rect:
+        serializedVersion: 2
+        x: 2008
+        y: 742
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f7cc40723a7b5fd0800000000000000
+      internalID: -2352152023319918606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_119
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 595
+        width: 304
+        height: 124
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ca40c435a6a38d90800000000000000
+      internalID: -7096645359320937783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_120
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 660
+        width: 395
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a9000b66671dd860800000000000000
+      internalID: 7556221478446827937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_121
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 698
+        width: 34
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3a9779e7ce2b5350800000000000000
+      internalID: 6006445964178987578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_122
+      rect:
+        serializedVersion: 2
+        x: 1141
+        y: 700
+        width: 48
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e14cb4c13ec5f36b0800000000000000
+      internalID: -5314426904771836898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_123
+      rect:
+        serializedVersion: 2
+        x: 1681
+        y: 715
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28e605846d19af8d0800000000000000
+      internalID: -2811774667817193854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_124
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 660
+        width: 36
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fae067f2ed98a5d70800000000000000
+      internalID: 9032683590016962223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_125
+      rect:
+        serializedVersion: 2
+        x: 1141
+        y: 648
+        width: 49
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52642825acd563390800000000000000
+      internalID: -7838974977842723291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_126
+      rect:
+        serializedVersion: 2
+        x: 1681
+        y: 681
+        width: 32
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a294fedac91ed420800000000000000
+      internalID: 2656589189309829799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_127
+      rect:
+        serializedVersion: 2
+        x: 1891
+        y: 554
+        width: 128
+        height: 136
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7545bb02920239e0800000000000000
+      internalID: -1643248087751899778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_128
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 544
+        width: 219
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 926c8d2832ec359f0800000000000000
+      internalID: -480814083284089303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_129
+      rect:
+        serializedVersion: 2
+        x: 531
+        y: 544
+        width: 210
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8118bf2ba2af88bc0800000000000000
+      internalID: -3780496825879133928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_130
+      rect:
+        serializedVersion: 2
+        x: 1681
+        y: 649
+        width: 32
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f947a48930bcc0750800000000000000
+      internalID: 6272611597320615071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_131
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 411
+        width: 318
+        height: 182
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5d9ee9929b3ab2a0800000000000000
+      internalID: -6720993993063228069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_132
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 544
+        width: 183
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa077dc301508d600800000000000000
+      internalID: 493149726495436975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_133
+      rect:
+        serializedVersion: 2
+        x: 929
+        y: 370
+        width: 264
+        height: 276
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b62116bdc129dd50800000000000000
+      internalID: 6762473482880100022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_134
+      rect:
+        serializedVersion: 2
+        x: 1400
+        y: 555
+        width: 350
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 505bfbfcdaa88e8f0800000000000000
+      internalID: -511006078587128571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_135
+      rect:
+        serializedVersion: 2
+        x: 1752
+        y: 586
+        width: 30
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3dd96f5899812af60800000000000000
+      internalID: 8044018932093722067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_136
+      rect:
+        serializedVersion: 2
+        x: 2021
+        y: 579
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43f14c6693c654360800000000000000
+      internalID: 7153242576940965684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_137
+      rect:
+        serializedVersion: 2
+        x: 1752
+        y: 555
+        width: 30
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7705b91719b07b90800000000000000
+      internalID: -7246088291572447361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_138
+      rect:
+        serializedVersion: 2
+        x: 2021
+        y: 554
+        width: 22
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8da68fa6300e98950800000000000000
+      internalID: 6451934246469135064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_139
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 533
+        width: 32
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95987b728d80b3f10800000000000000
+      internalID: 2250402163273992537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_140
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 533
+        width: 17
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9a76aa697dd7a810800000000000000
+      internalID: 1776632091571026586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_141
+      rect:
+        serializedVersion: 2
+        x: 375
+        y: 407
+        width: 552
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3169aeae6c6667b50800000000000000
+      internalID: 6590568109234099731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_142
+      rect:
+        serializedVersion: 2
+        x: 1277
+        y: 449
+        width: 485
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c21b668f8af6eed10800000000000000
+      internalID: 2156784043069714732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_143
+      rect:
+        serializedVersion: 2
+        x: 1372
+        y: 541
+        width: 31
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26f133bae6f12d5b0800000000000000
+      internalID: -5345175247556239518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_144
+      rect:
+        serializedVersion: 2
+        x: 1612
+        y: 534
+        width: 21
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f3fdb88f4b716700800000000000000
+      internalID: 531841812533212151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_145
+      rect:
+        serializedVersion: 2
+        x: 1647
+        y: 538
+        width: 36
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 063127fc66a89d6e0800000000000000
+      internalID: -1812265200868256928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_146
+      rect:
+        serializedVersion: 2
+        x: 1891
+        y: 392
+        width: 152
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8362358610a9825a0800000000000000
+      internalID: -6545812727547091400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_147
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 411
+        width: 40
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d705c1eac4a964a10800000000000000
+      internalID: 1893370347485155453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_148
+      rect:
+        serializedVersion: 2
+        x: 1262
+        y: 528
+        width: 20
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48c38165efecf5b70800000000000000
+      internalID: 8890051781214092420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_149
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 490
+        width: 87
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b896f5e3df18ee640800000000000000
+      internalID: 5111165551785240971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_150
+      rect:
+        serializedVersion: 2
+        x: 1752
+        y: 502
+        width: 30
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0125aff631f8158d0800000000000000
+      internalID: -2859346974757727728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_151
+      rect:
+        serializedVersion: 2
+        x: 1762
+        y: 462
+        width: 20
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a804ff1ceed10dc0800000000000000
+      internalID: -3674410715227879255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_152
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 168
+        width: 373
+        height: 241
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0fa75542d420d2370800000000000000
+      internalID: 8299292218659011312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_153
+      rect:
+        serializedVersion: 2
+        x: 375
+        y: 168
+        width: 373
+        height: 237
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 278daffcf390c46c0800000000000000
+      internalID: -4157938186292897678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_154
+      rect:
+        serializedVersion: 2
+        x: 750
+        y: 370
+        width: 161
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb742d87df305c0d0800000000000000
+      internalID: -3403309556219885637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_155
+      rect:
+        serializedVersion: 2
+        x: 1210
+        y: 178
+        width: 316
+        height: 269
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6a751630f00c1d90800000000000000
+      internalID: -7125819478707438994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_156
+      rect:
+        serializedVersion: 2
+        x: 1528
+        y: 340
+        width: 188
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d211c0afb2c5e2670800000000000000
+      internalID: 8515845289352630573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_157
+      rect:
+        serializedVersion: 2
+        x: 1718
+        y: 392
+        width: 59
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bf2784859bcdafc0800000000000000
+      internalID: -3481903093853507664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_158
+      rect:
+        serializedVersion: 2
+        x: 750
+        y: 178
+        width: 458
+        height: 190
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d916740ef5a79fb0800000000000000
+      internalID: -4641058380566881832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_159
+      rect:
+        serializedVersion: 2
+        x: 1528
+        y: 178
+        width: 152
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e36911e51096072f0800000000000000
+      internalID: -977165664545302978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_160
+      rect:
+        serializedVersion: 2
+        x: 1682
+        y: 303
+        width: 38
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00090487efe8f3430800000000000000
+      internalID: 3764885037095358464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_161
+      rect:
+        serializedVersion: 2
+        x: 1728
+        y: 0
+        width: 278
+        height: 390
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c98e7092a2ad53bd0800000000000000
+      internalID: -2650972931025803108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_162
+      rect:
+        serializedVersion: 2
+        x: 1682
+        y: 261
+        width: 44
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a13018efe305c2d70800000000000000
+      internalID: 9019672385204323098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_163
+      rect:
+        serializedVersion: 2
+        x: 1682
+        y: 217
+        width: 44
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63944e932599a2700800000000000000
+      internalID: 516393685724973366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_164
+      rect:
+        serializedVersion: 2
+        x: 1682
+        y: 178
+        width: 44
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efe27ebefd36ee600800000000000000
+      internalID: 499446422071357182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_165
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1023
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1afcf9ccd87f2f440800000000000000
+      internalID: 4968305527338553249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_166
+      rect:
+        serializedVersion: 2
+        x: 1025
+        y: 0
+        width: 631
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1aeb6e48e3d551290800000000000000
+      internalID: -7920321846562079071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_167
+      rect:
+        serializedVersion: 2
+        x: 1643
+        y: 0
+        width: 83
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff708bf06d5ad49c0800000000000000
+      internalID: -3941311760074012673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinth_168
+      rect:
+        serializedVersion: 2
+        x: 2008
+        y: 0
+        width: 33
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c2296388636a6dc0800000000000000
+      internalID: -3644991647870541116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b80888091faa3aa429ea819acd0ef14e
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      AtlasLabyrinth_0: -2256027051409299806
+      AtlasLabyrinth_1: -4057783659262879677
+      AtlasLabyrinth_10: -903529775559168868
+      AtlasLabyrinth_100: -5045121406893205531
+      AtlasLabyrinth_101: -6290522213150018013
+      AtlasLabyrinth_102: -4850777050728605360
+      AtlasLabyrinth_103: -6771566177349048946
+      AtlasLabyrinth_104: -8486151622406374389
+      AtlasLabyrinth_105: -5153493344027115470
+      AtlasLabyrinth_106: -3549951962859705137
+      AtlasLabyrinth_107: 3427443034139645711
+      AtlasLabyrinth_108: 4426881030100925471
+      AtlasLabyrinth_109: 8299906892996635040
+      AtlasLabyrinth_11: 673617806937686992
+      AtlasLabyrinth_110: -5538103988519509981
+      AtlasLabyrinth_111: 1178765600808342725
+      AtlasLabyrinth_112: 6327937437782635565
+      AtlasLabyrinth_113: -1312179476221373134
+      AtlasLabyrinth_114: -4986914885915478240
+      AtlasLabyrinth_115: -2039732257892055648
+      AtlasLabyrinth_116: -5294369830579487100
+      AtlasLabyrinth_117: -211833260386082632
+      AtlasLabyrinth_118: -2352152023319918606
+      AtlasLabyrinth_119: -7096645359320937783
+      AtlasLabyrinth_12: -5792742552433220443
+      AtlasLabyrinth_120: 7556221478446827937
+      AtlasLabyrinth_121: 6006445964178987578
+      AtlasLabyrinth_122: -5314426904771836898
+      AtlasLabyrinth_123: -2811774667817193854
+      AtlasLabyrinth_124: 9032683590016962223
+      AtlasLabyrinth_125: -7838974977842723291
+      AtlasLabyrinth_126: 2656589189309829799
+      AtlasLabyrinth_127: -1643248087751899778
+      AtlasLabyrinth_128: -480814083284089303
+      AtlasLabyrinth_129: -3780496825879133928
+      AtlasLabyrinth_13: -3547922163919187287
+      AtlasLabyrinth_130: 6272611597320615071
+      AtlasLabyrinth_131: -6720993993063228069
+      AtlasLabyrinth_132: 493149726495436975
+      AtlasLabyrinth_133: 6762473482880100022
+      AtlasLabyrinth_134: -511006078587128571
+      AtlasLabyrinth_135: 8044018932093722067
+      AtlasLabyrinth_136: 7153242576940965684
+      AtlasLabyrinth_137: -7246088291572447361
+      AtlasLabyrinth_138: 6451934246469135064
+      AtlasLabyrinth_139: 2250402163273992537
+      AtlasLabyrinth_14: -4361439979103010316
+      AtlasLabyrinth_140: 1776632091571026586
+      AtlasLabyrinth_141: 6590568109234099731
+      AtlasLabyrinth_142: 2156784043069714732
+      AtlasLabyrinth_143: -5345175247556239518
+      AtlasLabyrinth_144: 531841812533212151
+      AtlasLabyrinth_145: -1812265200868256928
+      AtlasLabyrinth_146: -6545812727547091400
+      AtlasLabyrinth_147: 1893370347485155453
+      AtlasLabyrinth_148: 8890051781214092420
+      AtlasLabyrinth_149: 5111165551785240971
+      AtlasLabyrinth_15: 1900351894638975579
+      AtlasLabyrinth_150: -2859346974757727728
+      AtlasLabyrinth_151: -3674410715227879255
+      AtlasLabyrinth_152: 8299292218659011312
+      AtlasLabyrinth_153: -4157938186292897678
+      AtlasLabyrinth_154: -3403309556219885637
+      AtlasLabyrinth_155: -7125819478707438994
+      AtlasLabyrinth_156: 8515845289352630573
+      AtlasLabyrinth_157: -3481903093853507664
+      AtlasLabyrinth_158: -4641058380566881832
+      AtlasLabyrinth_159: -977165664545302978
+      AtlasLabyrinth_16: 8202835078312134
+      AtlasLabyrinth_160: 3764885037095358464
+      AtlasLabyrinth_161: -2650972931025803108
+      AtlasLabyrinth_162: 9019672385204323098
+      AtlasLabyrinth_163: 516393685724973366
+      AtlasLabyrinth_164: 499446422071357182
+      AtlasLabyrinth_165: 4968305527338553249
+      AtlasLabyrinth_166: -7920321846562079071
+      AtlasLabyrinth_167: -3941311760074012673
+      AtlasLabyrinth_168: -3644991647870541116
+      AtlasLabyrinth_17: 9006652313180795519
+      AtlasLabyrinth_18: -6559014501316478556
+      AtlasLabyrinth_19: -2709155466011461078
+      AtlasLabyrinth_2: -1792788999518812894
+      AtlasLabyrinth_20: 3280210019452850299
+      AtlasLabyrinth_21: -1114828177990725260
+      AtlasLabyrinth_22: 7648492946201555782
+      AtlasLabyrinth_23: 2308551563708943542
+      AtlasLabyrinth_24: -3689409920396387896
+      AtlasLabyrinth_25: 8408669601951155436
+      AtlasLabyrinth_26: -6987188018349047676
+      AtlasLabyrinth_27: 8178760699673186616
+      AtlasLabyrinth_28: -4231673356356831043
+      AtlasLabyrinth_29: -801422339179002729
+      AtlasLabyrinth_3: -1922971264899919416
+      AtlasLabyrinth_30: 8500721867555983917
+      AtlasLabyrinth_31: 4785451635759517688
+      AtlasLabyrinth_32: 8965675109546459978
+      AtlasLabyrinth_33: -4171375256342990973
+      AtlasLabyrinth_34: -1488270917627622242
+      AtlasLabyrinth_35: 2178444583809308962
+      AtlasLabyrinth_36: 8168375895611251353
+      AtlasLabyrinth_37: -3788161284256296407
+      AtlasLabyrinth_38: -5039476940074924107
+      AtlasLabyrinth_39: 8813212035780637806
+      AtlasLabyrinth_4: 2064488342483466411
+      AtlasLabyrinth_40: -8453748634960338903
+      AtlasLabyrinth_41: 3014744887852766344
+      AtlasLabyrinth_42: -4571621203372330427
+      AtlasLabyrinth_43: 8843117830505153179
+      AtlasLabyrinth_44: 269849310274441172
+      AtlasLabyrinth_45: -1283017268559864642
+      AtlasLabyrinth_46: 6990228694373715275
+      AtlasLabyrinth_47: 9163315640188115812
+      AtlasLabyrinth_48: 3206981460849023959
+      AtlasLabyrinth_49: -5180224890826726825
+      AtlasLabyrinth_5: -8511477203728113017
+      AtlasLabyrinth_50: 7203750913401809508
+      AtlasLabyrinth_51: 9195704726872134350
+      AtlasLabyrinth_52: -3623881107408097440
+      AtlasLabyrinth_53: 5133739517586460713
+      AtlasLabyrinth_54: 4082718851809069523
+      AtlasLabyrinth_55: -6850819090901831953
+      AtlasLabyrinth_56: -373985785066138274
+      AtlasLabyrinth_57: 4547867411820910560
+      AtlasLabyrinth_58: 1807519927521117930
+      AtlasLabyrinth_59: -5212005572231514026
+      AtlasLabyrinth_6: 1752729321095451624
+      AtlasLabyrinth_60: -3653114429869432688
+      AtlasLabyrinth_61: 1226917659625497199
+      AtlasLabyrinth_62: -8363148189210271846
+      AtlasLabyrinth_63: 2769438135226699000
+      AtlasLabyrinth_64: -14917436673433752
+      AtlasLabyrinth_65: 8886176061766243682
+      AtlasLabyrinth_66: -9087914029099116638
+      AtlasLabyrinth_67: 2254917241978447724
+      AtlasLabyrinth_68: 6847267050507950145
+      AtlasLabyrinth_69: -6539134921430488052
+      AtlasLabyrinth_7: -3149154660408108848
+      AtlasLabyrinth_70: 7283873057427573054
+      AtlasLabyrinth_71: -3667473074137896397
+      AtlasLabyrinth_72: 1360939247782979357
+      AtlasLabyrinth_73: -8810564906574786689
+      AtlasLabyrinth_74: 2593049849379923563
+      AtlasLabyrinth_75: -3824889033756086804
+      AtlasLabyrinth_76: -5931852884097214845
+      AtlasLabyrinth_77: 866306112303762526
+      AtlasLabyrinth_78: -312879820489888326
+      AtlasLabyrinth_79: 316549109015394136
+      AtlasLabyrinth_8: 8312484811949088888
+      AtlasLabyrinth_80: -1866398801081353107
+      AtlasLabyrinth_81: 9151779130032433447
+      AtlasLabyrinth_82: -3475445949055367565
+      AtlasLabyrinth_83: -1755925278430734192
+      AtlasLabyrinth_84: 7679184994222122573
+      AtlasLabyrinth_85: 5092754372139030833
+      AtlasLabyrinth_86: -1118886654516861043
+      AtlasLabyrinth_87: 8282489661496064167
+      AtlasLabyrinth_88: -5721449963685388928
+      AtlasLabyrinth_89: 7751408735888153597
+      AtlasLabyrinth_9: 1383490401340737550
+      AtlasLabyrinth_90: -5401050414099421295
+      AtlasLabyrinth_91: 7743493713650511769
+      AtlasLabyrinth_92: -8090275568349860591
+      AtlasLabyrinth_93: 907048977322106444
+      AtlasLabyrinth_94: 3301678186876137132
+      AtlasLabyrinth_95: -3452274811208092122
+      AtlasLabyrinth_96: 4738839136643227725
+      AtlasLabyrinth_97: -3325228505206538303
+      AtlasLabyrinth_98: -5776949724668961745
+      AtlasLabyrinth_99: -8967284653282380281
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Elements;
@@ -11,7 +10,6 @@ namespace PCRCaculator
     public class TalentManager : MonoBehaviour
     {
         public static TalentManager Instance;
-        public List<TextMeshProUGUI> texts;
         public GameObject talentPanel;
         public ToggleGroup talentToggles;
         public List<GameObject> talentManagers;
@@ -21,7 +19,6 @@ namespace PCRCaculator
         public bool HasLiveTalentPanel => talentPanel != null;
 
 
-        private bool isLoading;
         private void Awake()
         {
             Instance = this;
@@ -51,12 +48,10 @@ namespace PCRCaculator
 
         private void OpenTalentPanel()
         {
-            isLoading = true;
             talentPanel.SetActive(true);
             TalentLevelManager.Instance.LoadTalentLevelSliders();
             TalentSkillTreeManager.Instance.InitializeData();
             TeamSkillTreeManager.Instance.InitializeData();
-            isLoading = false;
             OnTalentToggleChanged();
         }
         /// <summary>

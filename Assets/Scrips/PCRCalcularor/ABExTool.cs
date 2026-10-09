@@ -1136,7 +1136,7 @@ namespace PCRCaculator
             }
             return result;
         }
-        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4,EX装备=5,EX装备类型=6 }
+        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4,EX装备=5,EX装备类型=6,黎明界遗物=7,黎明界科技树=8 }
         public static Sprite GetSprites(SpriteType type, int id)
         {
 #if UNITY_5_3_OR_NEWER
@@ -1163,6 +1163,12 @@ namespace PCRCaculator
                     break;
                 case SpriteType.EX装备类型:
                     assetName = "icon_icon_extra_equip_category_" + id + ".unity3d";
+                    break;
+                case SpriteType.黎明界遗物:
+                    assetName = "icon_labyrinth_icon_relic_" + id + ".unity3d";
+                    break;
+                case SpriteType.黎明界科技树:
+                    assetName = "labyrinth_node_icon_0" + id + ".unity3d";
                     break;
             }
             if (spriteDic.TryGetValue(assetName, out Sprite value))

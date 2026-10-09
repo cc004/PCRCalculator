@@ -94,6 +94,7 @@ namespace PCRCaculator
             public Dictionary<int, WaveGroupDataBase> talentQuestWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
             public Dictionary<int, WaveGroupDataBase> abyssWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
             public Dictionary<int, WaveGroupDataBase> mirageWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
+            public Dictionary<int, WaveGroupDataBase> LabyrinthWaveGroupDataDic = new Dictionary<int, WaveGroupDataBase>();
             public Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> enemyMPartsDic = new Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts>();
             public Dictionary<int, int> unitStoryLoveDic = new Dictionary<int, int>();
@@ -120,8 +121,10 @@ namespace PCRCaculator
             public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic = new();
             public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic = new();
             public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic = new();
+            public Dictionary<int, labyrinth_enhance_information> LabyrinthEnhanceInformationDic = new();
             public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic = new();
             public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic = new();
+            public Dictionary<int, labyrinth_difficulty_effect> LabyrinthDifficultyEffectDic = new();
             public Dictionary<int, labyrinth_relic> LabyrinthRelicDic = new();
             public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic = new();
             public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic = new();
@@ -212,6 +215,7 @@ namespace PCRCaculator
         public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get => databaseCache.talentQuestWaveGroupDataDic; }
         public Dictionary<int, WaveGroupDataBase> AbyssWaveGroupDataDic { get => databaseCache.abyssWaveGroupDataDic; }
         public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get => databaseCache.mirageWaveGroupDataDic; }
+        public Dictionary<int, WaveGroupDataBase> LabyrinthWaveGroupDataDic { get => databaseCache.LabyrinthWaveGroupDataDic; }
         public Dictionary<int, EnemyData> EnemyDataDic { get => databaseCache.enemyDataDic; }
         public Dictionary<int, Elements.MasterEnemyMParts.EnemyMParts> EnemyMPartsDic { get => databaseCache.enemyMPartsDic; }
         public Dictionary<int, int> UnitStoryLoveDic { get => databaseCache.unitStoryLoveDic; }
@@ -238,8 +242,10 @@ namespace PCRCaculator
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get => databaseCache.ConnectRankEnhanceDic; }
         public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get => databaseCache.LabyrinthEnhanceNodeDic; }
         public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get => databaseCache.LabyrinthEnhanceDataDic; }
+        public Dictionary<int, labyrinth_enhance_information> LabyrinthEnhanceInformationDic { get => databaseCache.LabyrinthEnhanceInformationDic; }
         public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get => databaseCache.LabyrinthQuestDataDic; }
         public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get => databaseCache.LabyrinthDifficultyEnemyDataDic; }
+        public Dictionary<int, labyrinth_difficulty_effect> LabyrinthDifficultyEffectDic { get => databaseCache.LabyrinthDifficultyEffectDic; }
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get => databaseCache.LabyrinthRelicDic; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get => databaseCache.LabyrinthRelicEffectGroupDic; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get => databaseCache.LabyrinthRelicEffectDic; }
@@ -760,8 +766,11 @@ namespace PCRCaculator
 
                                 databaseCache.LabyrinthEnhanceNodeDic = dbTool.LabyrinthEnhanceNodeDic ?? databaseCache.LabyrinthEnhanceNodeDic;
                                 databaseCache.LabyrinthEnhanceDataDic = dbTool.LabyrinthEnhanceDataDic ?? databaseCache.LabyrinthEnhanceDataDic;
+                                databaseCache.LabyrinthEnhanceInformationDic = dbTool.LabyrinthEnhanceInformationDic ?? databaseCache.LabyrinthEnhanceInformationDic;
                                 databaseCache.LabyrinthQuestDataDic = dbTool.LabyrinthQuestDataDic ?? databaseCache.LabyrinthQuestDataDic;
+                                databaseCache.LabyrinthWaveGroupDataDic = dbTool.LabyrinthWaveGroupDataDic ?? databaseCache.LabyrinthWaveGroupDataDic;
                                 databaseCache.LabyrinthDifficultyEnemyDataDic = dbTool.LabyrinthDifficultyEnemyDataDic ?? databaseCache.LabyrinthDifficultyEnemyDataDic;
+                                databaseCache.LabyrinthDifficultyEffectDic = dbTool.LabyrinthDifficultyEffectDic ?? databaseCache.LabyrinthDifficultyEffectDic;
                                 databaseCache.LabyrinthRelicDic = dbTool.LabyrinthRelicDic ?? databaseCache.LabyrinthRelicDic;
                                 databaseCache.LabyrinthRelicEffectGroupDic = dbTool.LabyrinthRelicEffectGroupDic ?? databaseCache.LabyrinthRelicEffectGroupDic;
                                 databaseCache.LabyrinthRelicEffectDic = dbTool.LabyrinthRelicEffectDic ?? databaseCache.LabyrinthRelicEffectDic;
@@ -845,11 +854,14 @@ namespace PCRCaculator
                                         Task.Run(() => { if (dbCN.MirageBattleEffectDic != null) databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic); }),
                                         Task.Run(() => { if (dbCN.ExtraEffectDataDic != null) databaseCache.extraEffectDataDic.TryAdd(dbCN.ExtraEffectDataDic); }),
                                         Task.Run(() => { if (dbCN.LabyrinthQuestDataDic != null) databaseCache.LabyrinthQuestDataDic.TryAdd(dbCN.LabyrinthQuestDataDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthWaveGroupDataDic != null) databaseCache.LabyrinthWaveGroupDataDic.TryAdd(dbCN.LabyrinthWaveGroupDataDic); }),
                                         Task.Run(() => { if (dbCN.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbCN.LabyrinthDifficultyEnemyDataDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthRelicDic != null) databaseCache.LabyrinthRelicDic.TryAdd(dbCN.LabyrinthRelicDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthDifficultyEffectDic != null) databaseCache.LabyrinthDifficultyEffectDic.OverrideWith(dbCN.LabyrinthDifficultyEffectDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthRelicDic != null) databaseCache.LabyrinthRelicDic.OverrideWith(dbCN.LabyrinthRelicDic); }),
                                         Task.Run(() => { if (dbCN.LabyrinthRelicEffectGroupDic != null) databaseCache.LabyrinthRelicEffectGroupDic.TryAdd(dbCN.LabyrinthRelicEffectGroupDic); }),
                                         Task.Run(() => { if (dbCN.LabyrinthRelicEffectDic != null) databaseCache.LabyrinthRelicEffectDic.TryAdd(dbCN.LabyrinthRelicEffectDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthRelicMarkEffectDic != null) databaseCache.LabyrinthRelicMarkEffectDic.TryAdd(dbCN.LabyrinthRelicMarkEffectDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthRelicMarkEffectDic != null) databaseCache.LabyrinthRelicMarkEffectDic.OverrideWith(dbCN.LabyrinthRelicMarkEffectDic); }),
+                                        Task.Run(() => { if (dbCN.LabyrinthEnhanceInformationDic != null) databaseCache.LabyrinthEnhanceInformationDic.OverrideWith(dbCN.LabyrinthEnhanceInformationDic); }),
                                         Task.Run(() => { if (dbCN.RelicActionExecTimeDic != null) databaseCache.RelicActionExecTimeDic.TryAdd(dbCN.RelicActionExecTimeDic); }),
                                         Task.Run(() => { if (dbCN.RelicSkillExecTimeDic != null) databaseCache.RelicSkillExecTimeDic.TryAdd(dbCN.RelicSkillExecTimeDic); })
                                     );

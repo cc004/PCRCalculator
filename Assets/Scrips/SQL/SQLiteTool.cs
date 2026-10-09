@@ -543,6 +543,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, EnemyData> LabyrinthEnemyParameterDic { get; private set; }
         public Dictionary<int, EnemyData> MirageEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get; private set; }
+        public Dictionary<int, WaveGroupDataBase> LabyrinthWaveGroupDataDic { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
         public Dictionary<int, UnitAttackPattern> Dic5 { get; private set; }
@@ -586,7 +587,9 @@ namespace PCRCaculator.SQL
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get; private set; }
         public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get; private set; }
         public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get; private set; }
+        public Dictionary<int, labyrinth_enhance_information> LabyrinthEnhanceInformationDic { get; private set; }
         public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get; private set; }
+        public Dictionary<int, labyrinth_difficulty_effect> LabyrinthDifficultyEffectDic { get; private set; }
         public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get; private set; }
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
@@ -755,21 +758,37 @@ namespace PCRCaculator.SQL
                         };
                     }, optional: true)));
             tasks.Add(
-            Task.Run(() => MirageWaveGroupDataDic = GetWaveGroupDataDic<mirage_wave_group_data>(
-                data => data.wave_group_id,
-                data => data.wave_group_id,
-                (data, index) =>
-                {
-                    return index switch
+                Task.Run(() => MirageWaveGroupDataDic = GetWaveGroupDataDic<mirage_wave_group_data>(
+                    data => data.wave_group_id,
+                    data => data.wave_group_id,
+                    (data, index) =>
                     {
-                        1 => data.enemy_id_1,
-                        2 => data.enemy_id_2,
-                        3 => data.enemy_id_3,
-                        4 => data.enemy_id_4,
-                        5 => data.enemy_id_5,
-                        _ => 0,
-                    };
-                }, optional: true)));
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    }, optional: true)));
+            tasks.Add(
+                Task.Run(() => LabyrinthWaveGroupDataDic = GetWaveGroupDataDic<labyrinth_wave_group_data>(
+                    data => data.wave_group_id,
+                    data => data.wave_group_id,
+                    (data, index) =>
+                    {
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    }, optional: true)));
             tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
@@ -869,9 +888,13 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => LabyrinthEnhanceDataDic = GetOptionalDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
             tasks.Add(
+                Task.Run(() => LabyrinthEnhanceInformationDic = GetOptionalDatasDic<labyrinth_enhance_information>(a => a.information_id)));
+            tasks.Add(
                 Task.Run(() => LabyrinthQuestDataDic = GetOptionalDatasDic<labyrinth_quest_data>(a => a.quest_id)));
             tasks.Add(
                 Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetOptionalDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
+            tasks.Add(
+                Task.Run(() => LabyrinthDifficultyEffectDic = GetOptionalDatasDic<labyrinth_difficulty_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => LabyrinthRelicDic = GetOptionalDatasDic<labyrinth_relic>(a => a.relic_id)));
             tasks.Add(

@@ -24,7 +24,7 @@ namespace PCRCaculator
 
     public static class DatabaseCacheContract
     {
-        public const int CurrentSchemaVersion = 4;
+        public const int CurrentSchemaVersion = 7;
 
         public static T ResolveSharedDatabase<T>(T primary, Func<T> createSeparate, bool sharesPrimary)
             where T : class

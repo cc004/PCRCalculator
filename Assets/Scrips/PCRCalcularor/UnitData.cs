@@ -2509,6 +2509,9 @@ namespace PCRCaculator
         public Dictionary<int, int> talentLevel = new();
         public Dictionary<int, int> talentSkill = new();
         public Dictionary<int, int> teamSkill = new();
+        public List<int> labyrinthRelicIds = new List<int>();
+        public List<int> labyrinthEnhancedNodeIds = new List<int>();
+        public int labyrinthAlphaRupee;
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();
         [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> roleMastery = new Dictionary<int, (int, int)>();

@@ -1202,6 +1202,16 @@ namespace PCRCaculator.SQL
         public int required_item_count_3 { get; set; }
     }
 
+    public class labyrinth_difficulty_effect
+    {
+        [PrimaryKey]
+        public int id { get; set; }
+        public int difficulty { get; set; }
+        public string icon_name { get; set; }
+        public string effect_name { get; set; }
+        public string description { get; set; }
+    }
+
     public class labyrinth_enhance_node
     {
         [PrimaryKey]
@@ -1216,6 +1226,13 @@ namespace PCRCaculator.SQL
         public int pre_node_3 { get; set; }
         public int is_rare { get; set; }
         public int pre_node_2 { get; set; }
+    }
+    public class labyrinth_enhance_information
+    {
+        [PrimaryKey]
+        public int information_id { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
     }
 
     public class labyrinth_enhance_data
@@ -1236,7 +1253,16 @@ namespace PCRCaculator.SQL
         public int quest_type { get; set; }
         public int reward_id { get; set; }
     }
-
+    public class labyrinth_wave_group_data
+    {
+        [PrimaryKey]
+        public int wave_group_id { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
+    }
     public class labyrinth_difficulty_enemy_data
     {
         [PrimaryKey]
@@ -1270,6 +1296,8 @@ namespace PCRCaculator.SQL
     {
         [PrimaryKey]
         public int relic_id { get; set; }
+        public string name { get; set; }
+        public string effect_description { get; set; }
         public int effect_group_id { get; set; }
         public int relic_mark_id { get; set; }
         public int relic_mark_count { get; set; }
