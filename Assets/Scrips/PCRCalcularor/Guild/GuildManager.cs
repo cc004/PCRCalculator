@@ -10,6 +10,7 @@ using Elements;
 using Elements.Battle;
 using Newtonsoft.Json;
 using PCRCaculator.Update;
+using PCRCaculator.SQL;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -125,6 +126,7 @@ namespace PCRCaculator.Guild
         private int currentPage;
         private bool isInit;
         private int[] specialEnemyid;
+        private readonly List<int> labyrinthStageTypes = new();
         private readonly List<int> labyrinthWaveGroupIds = new();
         private readonly List<Sprite[]> labyrinthWaveGroupOptionIcons = new();
         private int specialInputValue;
@@ -278,16 +280,17 @@ namespace PCRCaculator.Guild
         public Dropdown specialEnemyDropdown;
         private readonly Dictionary<int, int[]> specialEnemyIds = new Dictionary<int, int[]>()
         {
-            { 0, new[] { 501010901 } },
-            { 1, new[] { 501010902 } },
-            { 2, new[] { 501010903 } },
-            { 3, new[] { 501010904 } },
-            { 4, new[] { 501010905 } },
-            { 5, new[] { 501011001 } },
-            { 6, new[] { 501011002 } },
-            { 7, new[] { 501011003 } },
-            { 8, new[] { 501011004 } },
-            { 9, new[] { 710078001, 710078002, 710078003, 710078004, 710078005 } },
+            { 0, new[] { 710078001, 710078002, 710078003, 710078004, 710078005 } },
+            { 1, new[] { 710078005 } },
+            { 2, new[] { 501010901 } },
+            { 3, new[] { 501010902 } },
+            { 4, new[] { 501010903 } },
+            { 5, new[] { 501010904 } },
+            { 6, new[] { 501010905 } },
+            { 7, new[] { 501011001 } },
+            { 8, new[] { 501011002 } },
+            { 9, new[] { 501011003 } },
+            { 10, new[] { 501011004 } },
         };
         public void Awake()
         {
@@ -855,28 +858,21 @@ namespace PCRCaculator.Guild
                 return;
             }
 
+            Dropdown difficultyDropdown = dropdowns_ChooseLabyrinthBoss[0];
             Dropdown floorDropdown = dropdowns_ChooseLabyrinthBoss[1];
             Dropdown stageDropdown = dropdowns_ChooseLabyrinthBoss[2];
-            if (floorDropdown == null || stageDropdown == null)
+            if (difficultyDropdown == null || floorDropdown == null || stageDropdown == null)
             {
                 return;
             }
 
             stageDropdown.ClearOptions();
 
-            List<string> options = new()
-            {
-                "普通关卡",
-                "极难关卡"
-            };
-
             int floor = floorDropdown.value + 1;
-            if (floor == 3 || floor == 5)
-            {
-                options.Add("BOSS关卡");
-            }
-
-            stageDropdown.AddOptions(options);
+            labyrinthStageTypes.Clear();
+            labyrinthStageTypes.AddRange(GetLabyrinthStageTypes(MainManager.Instance?.LabyrinthQuestDataDic?.Values,
+                difficultyDropdown.value + 1, floor));
+            stageDropdown.AddOptions(labyrinthStageTypes.Select(GetLabyrinthStageName).ToList());
             stageDropdown.onValueChanged.RemoveListener(OnLabyrinthStageChanged);
             stageDropdown.onValueChanged.AddListener(OnLabyrinthStageChanged);
             UpdateLabyrinthWaveGroupDropdownOptions();
@@ -885,6 +881,33 @@ namespace PCRCaculator.Guild
         private void OnLabyrinthStageChanged(int _)
         {
             UpdateLabyrinthWaveGroupDropdownOptions();
+        }
+
+        private static List<int> GetLabyrinthStageTypes(IEnumerable<labyrinth_quest_data> quests, int difficulty, int floor)
+        {
+            var types = new List<int> { 1, 2 };
+            if (floor == 3 || floor == 5)
+                types.Add(3);
+            if (quests?.Any(quest => MatchesLabyrinthRegularQuest(quest, difficulty, floor, 4)) == true)
+                types.Add(4);
+            return types;
+        }
+
+        private static string GetLabyrinthStageName(int stage) => stage switch
+        {
+            1 => "普通关卡",
+            2 => "极难关卡",
+            4 => "地狱关卡",
+            3 => "BOSS关卡",
+            _ => $"关卡{stage}",
+        };
+
+        private int GetSelectedLabyrinthStageType()
+        {
+            var dropdown = dropdowns_ChooseLabyrinthBoss != null && dropdowns_ChooseLabyrinthBoss.Count > 2
+                ? dropdowns_ChooseLabyrinthBoss[2] : null;
+            return dropdown != null && dropdown.value >= 0 && dropdown.value < labyrinthStageTypes.Count
+                ? labyrinthStageTypes[dropdown.value] : 0;
         }
 
         public void UpdateLabyrinthWaveGroupDropdownOptions()
@@ -907,32 +930,29 @@ namespace PCRCaculator.Guild
 
             int difficulty = difficultyDropdown.value + 1;
             int floor = floorDropdown.value + 1;
-            int stage = stageDropdown.value + 1;
-            string waveGroupPrefix = $"770{floor}{stage}";
-            var waveGroupsForStage = LabyrinthWaveGroupDataDic?
-                .Values
-                .Where(data => data != null && data.wave_group_id.ToString().StartsWith(waveGroupPrefix))
-                .OrderBy(data => data.wave_group_id)
-                .ToList() ?? new List<WaveGroupDataBase>();
-
-            int skipCount;
-            int takeCount;
-            if (stage == 1 || stage == 2)
+            int stage = GetSelectedLabyrinthStageType();
+            List<WaveGroupDataBase> matchingWaveGroups;
+            if (stage == 1 || stage == 2 || stage == 4)
             {
-                int firstHalfCount = (waveGroupsForStage.Count + 1) / 2;
-                bool useFirstHalf = difficulty <= 5;
-                skipCount = useFirstHalf ? 0 : firstHalfCount;
-                takeCount = useFirstHalf ? firstHalfCount : waveGroupsForStage.Count - firstHalfCount;
+                var matchingWaveGroupIds = new HashSet<int>(MainManager.Instance?.LabyrinthQuestDataDic?
+                    .Values
+                    .Where(data => MatchesLabyrinthRegularQuest(data, difficulty, floor, stage))
+                    .Select(data => data.wave_group_id) ?? Enumerable.Empty<int>());
+                matchingWaveGroups = LabyrinthWaveGroupDataDic?.Values
+                    .Where(data => data != null && matchingWaveGroupIds.Contains(data.wave_group_id))
+                    .OrderBy(data => data.wave_group_id)
+                    .ToList() ?? new List<WaveGroupDataBase>();
             }
             else
             {
-                GetLabyrinthWaveGroupRange(difficulty, stage, out skipCount, out takeCount);
+                string waveGroupPrefix = $"770{floor}{stage}";
+                var waveGroupsForStage = LabyrinthWaveGroupDataDic?.Values
+                    .Where(data => data != null && data.wave_group_id.ToString().StartsWith(waveGroupPrefix))
+                    .OrderBy(data => data.wave_group_id)
+                    .ToList() ?? new List<WaveGroupDataBase>();
+                GetLabyrinthWaveGroupRange(difficulty, stage, out int skipCount, out int takeCount);
+                matchingWaveGroups = waveGroupsForStage.Skip(skipCount).Take(takeCount).ToList();
             }
-
-            var matchingWaveGroups = waveGroupsForStage
-                .Skip(skipCount)
-                .Take(takeCount)
-                .ToList();
 
             EnsureLabyrinthWaveGroupDropdownImages(waveGroupDropdown);
             labyrinthWaveGroupIds.Clear();
@@ -949,6 +969,23 @@ namespace PCRCaculator.Guild
             waveGroupDropdown.onValueChanged.RemoveListener(OnLabyrinthWaveGroupChanged);
             waveGroupDropdown.onValueChanged.AddListener(OnLabyrinthWaveGroupChanged);
             UpdateLabyrinthBossImages();
+        }
+
+        private static bool MatchesLabyrinthRegularQuest(labyrinth_quest_data quest, int difficulty, int floor, int stage)
+        {
+            if (quest == null || difficulty <= 0 || quest.reward_id <= 0)
+                return false;
+
+            bool matchesStage = (stage == 1 || stage == 2 || stage == 4) && quest.quest_type == stage;
+            if (!matchesStage || quest.reward_id / 10 % 10 != floor)
+                return false;
+
+            // 现有 reward_id 编码为 难度 * 100 + 层数 * 10 + 奖励类型。
+            // 难度 1～5 共用旧组关卡；难度 6 起每个难度有独立关卡记录。
+            // 从记录关联到波次，不依赖波次数量或波次 ID 中关卡序号的位数。
+            int questDifficulty = quest.reward_id / 100;
+            return difficulty <= 5 ? questDifficulty >= 1 && questDifficulty <= 5
+                : questDifficulty == difficulty;
         }
 
         private static void GetLabyrinthWaveGroupRange(int difficulty, int stage, out int skipCount, out int takeCount)
@@ -982,7 +1019,7 @@ namespace PCRCaculator.Guild
             UpdateLabyrinthDropdownOptions();
             SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[0], group.labyrinthDifficulty - 1);
             SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[1], group.labyrinthFloor - 1);
-            SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[2], group.labyrinthBossType - 1);
+            SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[2], labyrinthStageTypes.IndexOf(group.labyrinthBossType));
 
             int waveGroupOptionIndex = labyrinthWaveGroupIds.IndexOf(group.labyrinthWaveGroupId);
             SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[3], waveGroupOptionIndex);
@@ -1015,6 +1052,13 @@ namespace PCRCaculator.Guild
                 return false;
             }
 
+            int stage = GetSelectedLabyrinthStageType();
+            if (stage == 0)
+            {
+                error = "请选择一个有效的黎明界关卡类型。";
+                return false;
+            }
+
             int waveGroupOptionIndex = waveGroupDropdown.value;
             if (waveGroupOptionIndex < 0 || waveGroupOptionIndex >= labyrinthWaveGroupIds.Count)
             {
@@ -1033,17 +1077,22 @@ namespace PCRCaculator.Guild
 
             var questData = MainManager.Instance?.LabyrinthQuestDataDic?
                 .Values
-                .FirstOrDefault(data => data != null && data.wave_group_id == waveGroupId);
+                .Where(data => data != null && data.wave_group_id == waveGroupId
+                    && (stage == 3 || MatchesLabyrinthRegularQuest(data,
+                        difficultyDropdown.value + 1, floorDropdown.value + 1, stage)))
+                .OrderBy(data => data.quest_type)
+                .ThenBy(data => data.quest_id)
+                .FirstOrDefault();
             if (questData == null)
             {
                 error = $"找不到黎明界关卡数据: wave_group_id={waveGroupId}。";
                 return false;
             }
 
-            // Dropdown 的值是从 0 开始；黎明界数据中的难度、层数和关卡类型从 1 开始。
+            // 难度和层数从 1 开始；关卡类型通过选项映射取得，避免无 BOSS 的层将地狱类型存成 3。
             group.labyrinthDifficulty = difficultyDropdown.value + 1;
             group.labyrinthFloor = floorDropdown.value + 1;
-            group.labyrinthBossType = bossTypeDropdown.value + 1;
+            group.labyrinthBossType = stage;
             group.labyrinthWaveGroupId = waveGroupId;
             group.labyrinthQuestId = questData.quest_id;
 
@@ -2069,13 +2118,7 @@ namespace PCRCaculator.Guild
             }
             else if (IsLabyrinthBoss)
             {
-                string stageName = data.labyrinthBossType switch
-                {
-                    1 => "普通关卡",
-                    2 => "极难关卡",
-                    3 => "BOSS关卡",
-                    _ => $"关卡{data.labyrinthBossType}",
-                };
+                string stageName = GetLabyrinthStageName(data.labyrinthBossType);
                 BossText.text = $"黎明界 难度{data.labyrinthDifficulty} 第{data.labyrinthFloor}层 {stageName}";
             }
             else if (data.isSpecialBoss)
@@ -3420,6 +3463,8 @@ namespace PCRCaculator.Guild
         public List<int> labyrinthRelicIds = new List<int>();
         public int labyrinthAlphaRupee;
         public int labyrinthOwnedUnitsCount;
+        public Dictionary<int, int> labyrinthOwnedUnitRoleCounts = new();
+        public Dictionary<int, int> labyrinthOwnedUnitTalentCounts = new();
         public int labyrinthQuestId;
         public int labyrinthDifficulty;
         public int labyrinthFloor;

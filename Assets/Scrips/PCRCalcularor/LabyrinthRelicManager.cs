@@ -13,6 +13,7 @@ namespace PCRCaculator
         public LabyrinthRelicSoltPrefab relicSlotPrefab;
         public RectTransform Content;
         public InputField relicAlphaRupee;
+        public InputField labyrinthOwnedUnitsCount;
         public List<Image> relicMarkImage;
         public List<Text> relicMarkCount;
         public List<Sprite> relicMarkSprites;
@@ -38,6 +39,11 @@ namespace PCRCaculator
             {
                 relicAlphaRupee.contentType = InputField.ContentType.IntegerNumber;
                 relicAlphaRupee.SetTextWithoutNotify(Mathf.Max(0, selectionGroup?.labyrinthAlphaRupee ?? 0).ToString());
+            }
+            if (labyrinthOwnedUnitsCount != null)
+            {
+                labyrinthOwnedUnitsCount.contentType = InputField.ContentType.IntegerNumber;
+                labyrinthOwnedUnitsCount.SetTextWithoutNotify(Mathf.Max(0, selectionGroup?.labyrinthOwnedUnitsCount ?? 0).ToString());
             }
 
             foreach (var slot in relicSlots)
@@ -80,6 +86,13 @@ namespace PCRCaculator
                     ? Mathf.Max(0, alphaRupee)
                     : 0;
                 relicAlphaRupee.SetTextWithoutNotify(group.labyrinthAlphaRupee.ToString());
+            }
+            if (labyrinthOwnedUnitsCount != null)
+            {
+                group.labyrinthOwnedUnitsCount = int.TryParse(labyrinthOwnedUnitsCount.text, out int ownedUnitsCount)
+                    ? Mathf.Max(0, ownedUnitsCount)
+                    : 0;
+                labyrinthOwnedUnitsCount.SetTextWithoutNotify(group.labyrinthOwnedUnitsCount.ToString());
             }
             UpdateRelicMarks();
         }

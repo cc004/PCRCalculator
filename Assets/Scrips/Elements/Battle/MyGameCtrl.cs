@@ -390,7 +390,8 @@ namespace Elements
                     playerGroup.labyrinthEnhancedNodeIds);
                 tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
                     playerGroup.labyrinthRelicIds,
-                    tempData.playerList,
+                    LabyrinthRelicTempData.Instance.CreateOwnedUnitList(playerGroup.labyrinthOwnedUnitsCount,
+                        playerGroup.labyrinthOwnedUnitRoleCounts, playerGroup.labyrinthOwnedUnitTalentCounts),
                     playerGroup.labyrinthAlphaRupee);
                 tempData.CreateAllUnitParameters(playerGroup.useLogBarrierNew);
             }
@@ -466,7 +467,8 @@ namespace Elements
                         playerGroup.labyrinthEnhancedNodeIds);
                     tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
                         playerGroup.labyrinthRelicIds,
-                        tempData.playerList,
+                        LabyrinthRelicTempData.Instance.CreateOwnedUnitList(playerGroup.labyrinthOwnedUnitsCount,
+                            playerGroup.labyrinthOwnedUnitRoleCounts, playerGroup.labyrinthOwnedUnitTalentCounts),
                         playerGroup.labyrinthAlphaRupee);
                     tempData.CreateAllUnitParameters(playerGroup.useLogBarrierNew);
                 }
