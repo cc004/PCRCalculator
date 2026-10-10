@@ -5003,6 +5003,12 @@ namespace Elements.Battle
                 yield return null;
             }*/
             UnitList = MyGameCtrl.Instance.playerUnitCtrl;
+            if (UnitList == null || UnitList.Count == 0)
+            {
+                UnityEngine.Debug.LogError(
+                    $"战斗无法启动：未创建任何我方角色，配置角色数={tempData.playerList?.Count ?? 0}。");
+                yield break;
+            }
 #if ENABLE_THREADING
             _unitIdToSlot.Clear();
             for (int i = 0; i < UnitList.Count; i++)
@@ -5102,7 +5108,8 @@ namespace Elements.Battle
             //battleManager.CMINMBPDEOL = new BattleVoiceFlagManager(battleManager.GetMyUnitList(), battleManager.GetOpponentUnitList());
             // ISSUE: explicit non-virtual call
             // ISSUE: explicit non-virtual call
-            (battleManager.UnitList)[HeldRandom(0, (battleManager.UnitList).Count)].IsStartVoicePlay = true;
+            if (battleManager.UnitList.Count > 0)
+                battleManager.UnitList[HeldRandom(0, battleManager.UnitList.Count)].IsStartVoicePlay = true;
             int index1 = 0;
             // ISSUE: explicit non-virtual call
             for (int count = (battleManager.UnitList).Count; index1 < count; ++index1)
@@ -6160,11 +6167,10 @@ namespace Elements.Battle
                 PCRCaculator.UnitData unitData_my = new PCRCaculator.UnitData();
                 if (UnitUtility.IsQuestMonsterUnit(_summonData.SummonId))
                 {
-                    var enemyData = GuildManager.EnemyDataDic.GetValueOrDefault(_summonData.SummonId)
-                                 ?? GuildManager.LabyrinthEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
-                                 ?? GuildManager.MirageEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
-                                 ?? GuildManager.AbyssEnemyParameterDic.GetValueOrDefault(_summonData.SummonId)
-                                 ?? GuildManager.TalentQuestEnemyParameterDic.GetValueOrDefault(_summonData.SummonId);
+                    if (!MainManager.Instance.TryGetEnemyParameter(_summonData.SummonId, out var enemyData))
+                    {
+                        throw new InvalidOperationException($"找不到召唤物敌人数据：summonId={_summonData.SummonId}");
+                    }
 
                     unitData_my = enemyData.CreateUnitData();
                     parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);

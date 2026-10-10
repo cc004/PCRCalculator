@@ -119,12 +119,15 @@ namespace Elements
                 && manager.LabyrinthQuestDataDic.TryGetValue(selectedQuestId, out questData);
 
             int labyrinthEnemyId = battleTempData.guildEnemy?
-                .FirstOrDefault(enemy => manager?.LabyrinthEnemyParameterDic?.ContainsKey(enemy.enemy_id) == true)?
+                .FirstOrDefault(enemy => enemy != null && (IsLabyrinthId(enemy.enemy_id)
+                    || manager?.LabyrinthEnemyParameterDic?.ContainsKey(enemy.enemy_id) == true))?
                 .enemy_id ?? 0;
-            bool isLabyrinthBattle = hasQuestData
-                || IsLabyrinthId(selectedQuestId)
-                || IsLabyrinthId(battleTempData.waveGroupId)
-                || labyrinthEnemyId != 0;
+            bool hasSelectedEnemies = battleTempData.guildEnemy?.Any(enemy => enemy != null) == true;
+            // 已选敌人决定战斗类型，避免旧的任务或波次 ID 将普通战斗误判为黎明界。
+            bool isLabyrinthBattle = labyrinthEnemyId != 0
+                || (!hasSelectedEnemies && (hasQuestData
+                    || IsLabyrinthId(selectedQuestId)
+                    || IsLabyrinthId(battleTempData.waveGroupId)));
 
             battleTempData.IsLabyrinthBattle = isLabyrinthBattle;
             if (!isLabyrinthBattle)
@@ -132,6 +135,11 @@ namespace Elements
                 battleTempData.LabyrinthQuestId = 0;
                 battleTempData.LabyrinthDifficulty = 0;
                 battleTempData.LabyrinthExtraEffectContentType = 0;
+                if (IsLabyrinthId(battleTempData.waveGroupId)
+                    || manager?.LabyrinthQuestDataDic?.ContainsKey(battleTempData.waveGroupId) == true)
+                {
+                    battleTempData.waveGroupId = 0;
+                }
                 return;
             }
 
@@ -505,6 +513,9 @@ namespace Elements
         // Start battle using parameters from server request, do not rely on MainManager
         public void StartByServer(Elements.Battle.BattleSimulationRequest req)
         {
+            if (req?.PlayerList == null || req.PlayerList.Count == 0)
+                throw new ArgumentException("战斗请求必须包含至少一名我方角色。", nameof(req));
+
             isBattleFinish = false;
             BattleStats.LogLevel = BattleStatistics.NormalizeLogLevel(req.CalcStats);
             BattleStats.Reset();
@@ -1113,23 +1124,15 @@ namespace Elements
         {
             int unitid = summonData.SummonId;
             int prefab = ABExTool.GetPrefabId(unitid);
-            if (unitid >= 999999)
+            if (unitid >= 999999 && MainManager.Instance.TryGetEnemyParameter(unitid, out var summonEnemyData))
             {
-                if (GuildManager.EnemyDataDic.ContainsKey(unitid))
-                    unitid = GuildManager.EnemyDataDic[unitid].unit_id;
-                else if (GuildManager.LabyrinthEnemyParameterDic.ContainsKey(unitid))
-                    unitid = GuildManager.LabyrinthEnemyParameterDic[unitid].unit_id;
-                else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
-                    unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
-                else if (GuildManager.AbyssEnemyParameterDic.ContainsKey(unitid))
-                    unitid = GuildManager.AbyssEnemyParameterDic[unitid].unit_id;
-                else if (GuildManager.TalentQuestEnemyParameterDic.ContainsKey(unitid))
-                    unitid = GuildManager.TalentQuestEnemyParameterDic[unitid].unit_id;
+                unitid = summonEnemyData.unit_id;
             }
             var a = ABExTool.LoadUnitPrefab(prefab);
             if (a == null)
             {
-                Debug.LogError("召唤物" + unitid + "的预制体丢失！");
+                throw new InvalidOperationException(
+                    $"召唤物预制体丢失：summonId={summonData.SummonId}, unitId={unitid}, prefabId={prefab}");
             }
             GameObject b = Instantiate(a);
             b.transform.SetParent(unitParent);
@@ -1157,17 +1160,7 @@ namespace Elements
         public static void CreateSummonSpine(SummonData summonData,UnitCtrl summonUnitCtrl, GameObject exitObj,
           Action<BattleSpineController> _callback = null)
         {
-            int unitid = summonData.SummonId;
-            int prefabID = ABExTool.GetPrefabId(unitid);
-            if (unitid >= 999999)
-            {
-                if (GuildManager.EnemyDataDic.ContainsKey(unitid))
-                    unitid = GuildManager.EnemyDataDic[unitid].unit_id;
-                else if (GuildManager.LabyrinthEnemyParameterDic.ContainsKey(unitid))
-                    unitid = GuildManager.LabyrinthEnemyParameterDic[unitid].unit_id;
-                else if (GuildManager.MirageEnemyParameterDic.ContainsKey(unitid))
-                    unitid = GuildManager.MirageEnemyParameterDic[unitid].unit_id;
-            }
+            int prefabID = ABExTool.GetPrefabId(summonData.SummonId);
             //SkeletonDataAsset dataAsset = ScriptableObject.CreateInstance<SkeletonDataAsset>();
             //dataAsset = Resources.Load<SkeletonDataAsset>("Unit/" + prefabID + "/" + prefabID + "_SkeletonData");
             //if (dataAsset == null)

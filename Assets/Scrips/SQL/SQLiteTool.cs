@@ -533,6 +533,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, int[]> WeaknessDic { get; private set; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get; private set; }
         public Dictionary<int, EnemyData> Dic2 { get; private set; }
+        public Dictionary<int, EnemyData> TowerEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> SecretDungeonWaveGroupDataDic { get; private set; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get; private set; }
@@ -682,6 +683,10 @@ namespace PCRCaculator.SQL
                 DatabaseCacheContract.RunAfterSuccessAsync(
                     Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
                     () => Dic2 = GetEnemyDataDic()));
+            tasks.Add(
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => TowerEnemyParameterDic = GetTowerEnemyDataDic()));
             tasks.Add(
                 DatabaseCacheContract.RunAfterSuccessAsync(
                     Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
@@ -1252,6 +1257,69 @@ namespace PCRCaculator.SQL
                 dic.Add(e.enemy_id, e);
                 idx++;
 
+            }
+            return dic;
+        }
+        private Dictionary<int, EnemyData> GetTowerEnemyDataDic()
+        {
+            var dic = new Dictionary<int, EnemyData>();
+            foreach (var dd in GetOptionalDatas<tower_enemy_parameter>())
+            {
+                if (!dic1.TryGetValue(dd.unit_id, out var detail) ||
+                    !unitSkillDataDic.TryGetValue(dd.unit_id, out var skills) ||
+                    !unitAttackPatternDic.TryGetValue(dd.unit_id, out var patterns))
+                {
+                    continue;
+                }
+
+                var enemy = new EnemyData
+                {
+                    enemy_id = dd.enemy_id,
+                    unit_id = dd.unit_id,
+                    name = dd.name,
+                    level = dd.level,
+                    rarity = dd.rarity,
+                    promotion_level = dd.promotion_level,
+                    baseData = dd.GetBaseData(),
+                    union_burst_level = dd.union_burst_level,
+                    main_skill_lvs = new List<int>
+                    {
+                        dd.main_skill_lv_1, dd.main_skill_lv_2, dd.main_skill_lv_3, dd.main_skill_lv_4,
+                        dd.main_skill_lv_5, dd.main_skill_lv_6, dd.main_skill_lv_7, dd.main_skill_lv_8,
+                        dd.main_skill_lv_9, dd.main_skill_lv_10
+                    },
+                    ex_skill_lvs = new List<int>
+                    {
+                        dd.ex_skill_lv_1, dd.ex_skill_lv_2, dd.ex_skill_lv_3, dd.ex_skill_lv_4, dd.ex_skill_lv_5
+                    },
+                    resist_status_id = dd.resist_status_id,
+                    resist_variation_id = dd.resist_variation_id,
+                    detailData = new EnemyDetailData
+                    {
+                        unit_id = detail.unit_id,
+                        unit_name = detail.unit_name,
+                        prefab_id = detail.prefab_id,
+                        motion_type = detail.motion_type,
+                        se_type = detail.se_type,
+                        move_speed = detail.move_speed,
+                        search_area_width = detail.search_area_width,
+                        atk_type = detail.atk_type,
+                        normal_atk_cast_time = detail.normal_atk_cast_time,
+                        cutin = detail.cutin,
+                        visual_change_flag = detail.visual_change_flag,
+                        comment = detail.comment
+                    },
+                    skillData = new EnemySkillData
+                    {
+                        UB = skills.union_burst,
+                        raw_data = skills,
+                        MainSkills = skills.GetMainSkillIDs(),
+                        enemyAttackPatterns = patterns.Select(pattern => new UnitAttackPattern(
+                            pattern.pattern_id, pattern.unit_id, pattern.loop_start, pattern.loop_end,
+                            pattern.GetAllPatterns().ToArray())).ToList()
+                    }
+                };
+                dic.Add(enemy.enemy_id, enemy);
             }
             return dic;
         }

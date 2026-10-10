@@ -168,6 +168,13 @@ namespace PCRCaculator.Guild
                 return MainManager.Instance.EnemyDataDic;
             }
         }
+        public static Dictionary<int, EnemyData> TowerEnemyParameterDic
+        {
+            get
+            {
+                return MainManager.Instance.TowerEnemyParameterDic;
+            }
+        }
         public static Dictionary<int, EnemyData> TalentQuestEnemyParameterDic
         {
             get
@@ -267,18 +274,20 @@ namespace PCRCaculator.Guild
             return prefix == 75 || prefix == 76;
         }
         public bool IsLabyrinthBossId(int id) => id / SpecialBossPrefixDivisor == 77;
-        public Dropdown dungeonDropdown;
-        private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
+        [UnityEngine.Serialization.FormerlySerializedAs("dungeonDropdown")]
+        public Dropdown specialEnemyDropdown;
+        private readonly Dictionary<int, int[]> specialEnemyIds = new Dictionary<int, int[]>()
         {
-            { 0, 501010901 },
-            { 1, 501010902 },
-            { 2, 501010903 },
-            { 3, 501010904 },
-            { 4, 501010905 },
-            { 5, 501011001 },
-            { 6, 501011002 },
-            { 7, 501011003 },
-            { 8, 501011004 },
+            { 0, new[] { 501010901 } },
+            { 1, new[] { 501010902 } },
+            { 2, new[] { 501010903 } },
+            { 3, new[] { 501010904 } },
+            { 4, new[] { 501010905 } },
+            { 5, new[] { 501011001 } },
+            { 6, new[] { 501011002 } },
+            { 7, new[] { 501011003 } },
+            { 8, new[] { 501011004 } },
+            { 9, new[] { 710078001, 710078002, 710078003, 710078004, 710078005 } },
         };
         public void Awake()
         {
@@ -1098,13 +1107,7 @@ namespace PCRCaculator.Guild
                     continue;
                 }
 
-                int prefabId = enemyData.detailData.prefab_id;
-                if (enemyData.detailData.visual_change_flag == 1)
-                {
-                    prefabId = enemyData.rarity > 5 ? prefabId + 60 : prefabId + 30;
-                }
-
-                icons.Add(ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId));
+                icons.Add(GetBossSprite(enemyData));
             }
 
             return icons.ToArray();
@@ -1324,13 +1327,13 @@ namespace PCRCaculator.Guild
         }
         public void OnDungeonDropdownValueChanged()
         {
-            if (!toggles_ChooseType[0].isOn && dungeonEnemy.ContainsKey(dungeonDropdown.value))
+            if (!toggles_ChooseType[0].isOn && specialEnemyDropdown != null
+                && specialEnemyIds.TryGetValue(specialEnemyDropdown.value, out var enemyIds))
             {
-                int enemyId = dungeonEnemy[dungeonDropdown.value];
-
-                if (EnemyDataDic.TryGetValue(enemyId, out EnemyData data))
+                if (enemyIds.All(enemyId => TowerEnemyParameterDic.ContainsKey(enemyId)
+                    || EnemyDataDic.ContainsKey(enemyId)))
                 {
-                    specialInput.text = enemyId.ToString();
+                    specialInput.text = string.Join(",", enemyIds);
                     OnInputFinished();
                 }
                 else
@@ -1344,14 +1347,15 @@ namespace PCRCaculator.Guild
             if (!toggles_ChooseType[0].isOn)
             {
                 var bossid = specialInput.text.Split(',').Select(x => int.Parse(x, NumberStyles.Any)).ToArray();
-                EnemyData data = null;
-                if (bossid.Reverse().All(x => EnemyDataDic.TryGetValue(x, out data)))
+                if (bossid.All(enemyId => TowerEnemyParameterDic.ContainsKey(enemyId)
+                    || EnemyDataDic.ContainsKey(enemyId)))
                 {
-                    //string Path = "GuildEnemy/icon_unit_" + data.unit_id;
-                    //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                    // bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, data.unit_id);
+                    var inputEnemyDataDic = bossid.Distinct().ToDictionary(
+                        enemyId => enemyId,
+                        enemyId => TowerEnemyParameterDic.TryGetValue(enemyId, out var enemyData)
+                            ? enemyData : EnemyDataDic[enemyId]);
                     specialEnemyid = bossid;
-                    SetBossImages(specialEnemyid, EnemyDataDic);
+                    SetBossImages(specialEnemyid, inputEnemyDataDic);
                 }
                 else
                 {
@@ -1428,9 +1432,25 @@ namespace PCRCaculator.Guild
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
-            group.waveGroupId = WaveGroupId;
+            group.waveGroupId = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss
+                ? WaveGroupId : 0;
             SaveDataToJson();
             Refresh();
+        }
+        private static Sprite GetBossSprite(EnemyData enemyData)
+        {
+            if (enemyData?.detailData == null)
+                return null;
+
+            int prefabId = enemyData.detailData.prefab_id;
+            if (enemyData.detailData.visual_change_flag == 1)
+            {
+                int upgradedIconId = prefabId + (enemyData.rarity > 5 ? 60 : 30);
+                var upgradedSprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, upgradedIconId);
+                if (upgradedSprite != null)
+                    return upgradedSprite;
+            }
+            return ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
         }
         private void SetBossImages(int[] enemyIds, Dictionary<int, EnemyData> enemyDataDic)
         {
@@ -1439,12 +1459,7 @@ namespace PCRCaculator.Guild
                 if (i < enemyIds.Length)
                 {
                     var enemyData = enemyDataDic[enemyIds[i]];
-                    int prefabId = enemyData.detailData.prefab_id;
-                    if (enemyData.detailData.visual_change_flag == 1)
-                    {
-                        prefabId = enemyData.rarity > 5 ? prefabId + 60 : prefabId + 30;
-                    }
-                    bossImage_ChooseBoss[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
+                    bossImage_ChooseBoss[i].sprite = GetBossSprite(enemyData);
                     bossImage_ChooseBoss[i].SetActive(i <= enemyIds.Length);
                 }
                 else
@@ -1509,8 +1524,20 @@ namespace PCRCaculator.Guild
         public void StartCalButton() => StartCalButton(false);
         public void ReStartCalButton() => ReStartCalButton(false);
 
+        private bool CheckBattlePlayerSelection()
+        {
+            var players = SettingData.GetCurrentPlayerData()?.playrCharacters;
+            if (players != null && players.Count > 0)
+                return true;
+
+            MainManager.Instance.WindowConfigMessage("请至少选择一名我方角色后再开始战斗。", null);
+            return false;
+        }
         private void ReStartCalButton(bool skipping)
         {
+            if (!CheckBattlePlayerSelection())
+                return;
+
             var group = SyncSequenceUBToggleToSetting();
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
@@ -1593,6 +1620,9 @@ namespace PCRCaculator.Guild
         }
         private void StartCalButton(bool skipping)
         {
+            if (!CheckBattlePlayerSelection())
+                return;
+
             /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
             {
                 return;
@@ -1610,6 +1640,7 @@ namespace PCRCaculator.Guild
                    isAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
                    LabyrinthEnemyParameterDic.ContainsKey(enemy_id) ? LabyrinthEnemyParameterDic[enemy_id] :
                    isMirageBoss ? MirageEnemyParameterDic[enemy_id] :
+                   TowerEnemyParameterDic.ContainsKey(enemy_id) ? TowerEnemyParameterDic[enemy_id] :
                    EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
@@ -1903,6 +1934,10 @@ namespace PCRCaculator.Guild
             {
                 data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
             }
+            else
+            {
+                data.waveGroupId = 0;
+            }
             TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
             TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
             if (data.currentGuildMonth < 1000) data.currentGuildMonth += 1024;
@@ -1917,7 +1952,6 @@ namespace PCRCaculator.Guild
             {
                 if (selectedBossEnemyids[i] > 0)
                 {
-                    int prefab_id = 0;
                     EnemyData enemyParam = null;
                     if (IsTalentQuestBoss && TalentQuestEnemyParameterDic != null && TalentQuestEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
                     {
@@ -1939,20 +1973,15 @@ namespace PCRCaculator.Guild
                     {
                         enemyParam = LabyrinthEnemyParameterDic[selectedBossEnemyids[i]];
                     }
+                    else if (TowerEnemyParameterDic != null && TowerEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
+                    {
+                        enemyParam = TowerEnemyParameterDic[selectedBossEnemyids[i]];
+                    }
                     else
                     {
                         enemyParam = EnemyDataDic[selectedBossEnemyids[i]];
                     }
-                    if (enemyParam != null)
-                    {
-                        prefab_id = enemyParam.detailData.prefab_id;
-                        if (enemyParam.detailData.visual_change_flag == 1)
-                        {
-                            var rarity = enemyParam.rarity;
-                            prefab_id = rarity > 5 ? prefab_id + 60 : prefab_id + 30;
-                        }
-                    }
-                    BossPictures[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefab_id);
+                    BossPictures[i].sprite = GetBossSprite(enemyParam);
                     BossPictures[i].gameObject.SetActive(true);
                 }
                 else
@@ -2706,7 +2735,6 @@ namespace PCRCaculator.Guild
                  };
                 if (enemyData.detailData.visual_change_flag == 1)
                 {
-                    var un = MainManager.Instance.UnitRarityDic[enemyData.detailData.prefab_id];
                     int rarity = enemyData.rarity;
                     int UnitEquip = enemyData.unique_equipment_flag_1;
                     action(rarity == 6 ? enemyData.skillData.raw_data.union_burst_evolution : enemyData.skillData.raw_data.union_burst, enemyData.level, rarity == 6 ? "UB+" : "UB");
@@ -3391,6 +3419,7 @@ namespace PCRCaculator.Guild
         public List<int> labyrinthEnhancedNodeIds = new List<int>();
         public List<int> labyrinthRelicIds = new List<int>();
         public int labyrinthAlphaRupee;
+        public int labyrinthOwnedUnitsCount;
         public int labyrinthQuestId;
         public int labyrinthDifficulty;
         public int labyrinthFloor;

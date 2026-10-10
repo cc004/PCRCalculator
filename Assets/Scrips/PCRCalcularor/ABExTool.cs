@@ -1304,25 +1304,9 @@ namespace PCRCaculator
             {
                 return unit.detailData.prefabIdBattle;
             }
-            else if (MainManager.Instance.EnemyDataDic.TryGetValue(unitid, out var enemy))
+            else if (MainManager.Instance.TryGetEnemyParameter(unitid, out var enemy))
             {
                 return enemy.detailData.prefab_id;
-            }
-            else if (MainManager.Instance.LabyrinthEnemyParameterDic.TryGetValue(unitid, out var labyrinthEnemy))
-            {
-                return labyrinthEnemy.detailData.prefab_id;
-            }
-            else if (MainManager.Instance.MirageEnemyParameterDic.TryGetValue(unitid, out var mirageEnemy))
-            {
-                return mirageEnemy.detailData.prefab_id;
-            }
-            else if (MainManager.Instance.AbyssEnemyParameterDic.TryGetValue(unitid, out var abyssEnemy))
-            {
-                return abyssEnemy.detailData.prefab_id;
-            }
-            else if (MainManager.Instance.TalentQuestEnemyParameterDic.TryGetValue(unitid, out var talentEnemy))
-            {
-                return talentEnemy.detailData.prefab_id;
             }
             return unitid;
         }

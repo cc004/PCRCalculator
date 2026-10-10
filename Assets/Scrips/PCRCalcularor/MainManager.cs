@@ -104,6 +104,7 @@ namespace PCRCaculator
             public Dictionary<int, UnitAttackPattern> allUnitAttackPatternDic = new Dictionary<int, UnitAttackPattern>();//所有角色技能循环数据
             public Dictionary<int, Guild.GuildEnemyData> guildEnemyDatas = new Dictionary<int, Guild.GuildEnemyData>();
             public Dictionary<int, Dictionary<int, ex_equipment_data>[]> unitExEquips = new Dictionary<int, Dictionary<int, ex_equipment_data>[]>();
+            public Dictionary<int, EnemyData> towerEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, EnemyData> talentQuestEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, EnemyData> abyssEnemyParameterDic = new Dictionary<int, EnemyData>();
             public Dictionary<int, EnemyData> labyrinthEnemyParameterDic = new Dictionary<int, EnemyData>();
@@ -225,6 +226,7 @@ namespace PCRCaculator
         public Dictionary<int, UnitAttackPattern> AllUnitAttackPatternDic { get => databaseCache.allUnitAttackPatternDic; }  // 所有角色技能循环数据
         public Dictionary<int, Guild.GuildEnemyData> GuildEnemyDatas { get => databaseCache.guildEnemyDatas; }
         public Dictionary<int, Dictionary<int, ex_equipment_data>[]> UnitExEquips { get => databaseCache.unitExEquips; }
+        public Dictionary<int, EnemyData> TowerEnemyParameterDic { get => databaseCache.towerEnemyParameterDic; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get => databaseCache.talentQuestEnemyParameterDic; }
         public Dictionary<int, EnemyData> AbyssEnemyParameterDic { get => databaseCache.abyssEnemyParameterDic; }
         public Dictionary<int, EnemyData> LabyrinthEnemyParameterDic { get => databaseCache.labyrinthEnemyParameterDic; }
@@ -725,6 +727,7 @@ namespace PCRCaculator
                                 databaseCache.enemyMPartsDic = dbTool.Dic7 ?? databaseCache.enemyMPartsDic;
                                 databaseCache.unitExEquips = dbTool.unitExEquips ?? databaseCache.unitExEquips;
                                 databaseCache.enemyDataDic = dbTool.Dic2 ?? databaseCache.enemyDataDic;
+                                databaseCache.towerEnemyParameterDic = dbTool.TowerEnemyParameterDic ?? databaseCache.towerEnemyParameterDic;
                                 databaseCache.talentQuestEnemyParameterDic = dbTool.TalentQuestEnemyParameterDic ?? databaseCache.talentQuestEnemyParameterDic;
                                 databaseCache.abyssEnemyParameterDic = dbTool.AbyssEnemyParameterDic ?? databaseCache.abyssEnemyParameterDic;
                                 databaseCache.labyrinthEnemyParameterDic = dbTool.LabyrinthEnemyParameterDic ?? databaseCache.labyrinthEnemyParameterDic;
@@ -892,6 +895,7 @@ namespace PCRCaculator
                                             Task.Run(() => { if (dbTool2.Dic6 != null) databaseCache.guildEnemyDatas.OverrideWith(dbTool2.Dic6); }),
                                             Task.Run(() => { if (dbTool2.Dic7 != null) databaseCache.enemyMPartsDic.OverrideWith(dbTool2.Dic7); }),
                                             Task.Run(() => { if (dbTool2.Dic2 != null) databaseCache.enemyDataDic.OverrideWith(dbTool2.Dic2); }),
+                                            Task.Run(() => { if (dbTool2.TowerEnemyParameterDic != null) databaseCache.towerEnemyParameterDic.OverrideWith(dbTool2.TowerEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.OverrideWith(dbTool2.TalentQuestEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.OverrideWith(dbTool2.AbyssEnemyParameterDic); }),
                                             Task.Run(() => { if (dbTool2.LabyrinthEnemyParameterDic != null) databaseCache.labyrinthEnemyParameterDic.OverrideWith(dbTool2.LabyrinthEnemyParameterDic); }),
@@ -914,25 +918,10 @@ namespace PCRCaculator
                                         Task.Run(() => { if (dbTool3.Dic2 != null) databaseCache.enemyDataDic.Override2With(dbTool3.Dic2); }),
                                         Task.Run(() => { if (dbTool3.Dic3 != null) databaseCache.skillDataDic.Override2With(dbTool3.Dic3); }),
                                         Task.Run(() => { if (dbTool3.Dic4 != null) databaseCache.skillActionDic.Override2With(dbTool3.Dic4); }),
+                                        Task.Run(() => { if (dbTool3.TowerEnemyParameterDic != null) databaseCache.towerEnemyParameterDic.Override2With(dbTool3.TowerEnemyParameterDic); }),
                                         Task.Run(() => { if (dbTool3.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic); }),
                                         Task.Run(() => { if (dbTool3.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic); }),
-                                        Task.Run(() =>
-                                        {
-                                            if (dbTool3.LabyrinthEnemyParameterDic != null)
-                                            {
-                                                foreach (var pair in dbTool3.LabyrinthEnemyParameterDic)
-                                                {
-                                                    if (databaseCache.labyrinthEnemyParameterDic.TryGetValue(pair.Key, out var enemyData))
-                                                    {
-                                                        pair.Value.Override2With(enemyData);
-                                                    }
-                                                    else
-                                                    {
-                                                        databaseCache.labyrinthEnemyParameterDic.Add(pair.Key, pair.Value);
-                                                    }
-                                                }
-                                            }
-                                        }),
+                                        Task.Run(() => { if (dbTool3.LabyrinthEnemyParameterDic != null) databaseCache.labyrinthEnemyParameterDic.Override2With(dbTool3.LabyrinthEnemyParameterDic); }),
                                         Task.Run(() => { if (dbTool3.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic); }),
                                         Task.Run(() => { if (dbTool3.TalentSkillNodeDic != null) databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic); }),
                                         Task.Run(() => { if (dbTool3.TeamSkillNodeDic != null) databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic); }),
@@ -1326,6 +1315,15 @@ namespace PCRCaculator
         {
             return UniqueEquipment2DataDic.ContainsKey(unitid);
         }
+        public bool TryGetEnemyParameter(int enemyId, out EnemyData enemyData)
+        {
+            return EnemyDataDic.TryGetValue(enemyId, out enemyData)
+                || LabyrinthEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || MirageEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || AbyssEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || TalentQuestEnemyParameterDic.TryGetValue(enemyId, out enemyData)
+                || TowerEnemyParameterDic.TryGetValue(enemyId, out enemyData);
+        }
         public string GetUnitNickName(int unitid)
         {
             if (unitid >= 400000 && unitid <= 499999)
@@ -1336,12 +1334,14 @@ namespace PCRCaculator
             }
             if (EnemyDataDic.TryGetValue(unitid, out var data2))
                 return data2.name;
-            if (TalentQuestEnemyParameterDic.TryGetValue(unitid, out var data3))
+            if (TowerEnemyParameterDic.TryGetValue(unitid, out var data3))
                 return data3.name;
-            if (AbyssEnemyParameterDic.TryGetValue(unitid, out var data4))
+            if (TalentQuestEnemyParameterDic.TryGetValue(unitid, out var data4))
                 return data4.name;
-            if (MirageEnemyParameterDic.TryGetValue(unitid, out var data5))
+            if (AbyssEnemyParameterDic.TryGetValue(unitid, out var data5))
                 return data5.name;
+            if (MirageEnemyParameterDic.TryGetValue(unitid, out var data6))
+                return data6.name;
             if (unitid >= 200000)
                 return "敌方单位";
             if (unitNickNameDic.ContainsKey(unitid))
