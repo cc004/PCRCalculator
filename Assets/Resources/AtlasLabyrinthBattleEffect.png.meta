@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: 136295b8d2763e343b2d7046f9d8e733
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5874151385118667836
+    second: AtlasLabyrinthBattleEffect_0
+  - first:
+      213: 4272472860565095777
+    second: AtlasLabyrinthBattleEffect_1
+  - first:
+      213: -2308113339977611554
+    second: AtlasLabyrinthBattleEffect_2
+  - first:
+      213: -140948790683589983
+    second: AtlasLabyrinthBattleEffect_3
+  - first:
+      213: -239200768300879289
+    second: AtlasLabyrinthBattleEffect_4
+  - first:
+      213: -6505030792340966663
+    second: AtlasLabyrinthBattleEffect_5
+  - first:
+      213: -6300348298171749113
+    second: AtlasLabyrinthBattleEffect_6
+  - first:
+      213: 751944547403795511
+    second: AtlasLabyrinthBattleEffect_7
+  - first:
+      213: 6893699624013507765
+    second: AtlasLabyrinthBattleEffect_8
+  - first:
+      213: 6269410022258643052
+    second: AtlasLabyrinthBattleEffect_9
+  - first:
+      213: 182012969616572253
+    second: AtlasLabyrinthBattleEffect_10
+  - first:
+      213: -7202633689381637790
+    second: AtlasLabyrinthBattleEffect_11
+  - first:
+      213: 502849137637232664
+    second: AtlasLabyrinthBattleEffect_12
+  - first:
+      213: 7513688123000766873
+    second: AtlasLabyrinthBattleEffect_13
+  - first:
+      213: -6749170527857888836
+    second: AtlasLabyrinthBattleEffect_14
+  - first:
+      213: -1140382483032722830
+    second: AtlasLabyrinthBattleEffect_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: def_lower_limit
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 395
+        width: 65
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cb02251072da7ea0800000000000000
+      internalID: -5874151385118667836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: decrease_income
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 329
+        width: 65
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 165ca7e1e6fda4b30800000000000000
+      internalID: 4272472860565095777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damage_up
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 263
+        width: 65
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed64b4d652fe7ffd0800000000000000
+      internalID: -2308113339977611554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damage_limit
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 197
+        width: 65
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a2a8c752df3b0ef0800000000000000
+      internalID: -140948790683589983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hp_recovery_down
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 198
+        width: 66
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 742fc672b203eacf0800000000000000
+      internalID: -239200768300879289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damage_cut
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 131
+        width: 65
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f2f981a5fc79b5a0800000000000000
+      internalID: -6505030792340966663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: critical_down
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 65
+        width: 65
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d6c3e7a9aa098a0800000000000000
+      internalID: -6300348298171749113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tp_down_cut
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 131
+        width: 66
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73c8bc6f4917f6a00800000000000000
+      internalID: 751944547403795511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinthBattleEffect_8
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 65
+        width: 66
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bca19d98475baf50800000000000000
+      internalID: 6893699624013507765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: add_monster
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 65
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c601000d23b610750800000000000000
+      internalID: 6269410022258643052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: def_up
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 0
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5f728ed4d3a68200800000000000000
+      internalID: 182012969616572253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: increase_dot_interval
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 0
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 261752912da1b0c90800000000000000
+      internalID: -7202633689381637790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: life_steal_down
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 0
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8109a7060aa7af600800000000000000
+      internalID: 502849137637232664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: limit_time
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 0
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9914884e98bf54860800000000000000
+      internalID: 7513688123000766873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinthBattleEffect_14
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 0
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb1be7ed9212652a0800000000000000
+      internalID: -6749170527857888836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AtlasLabyrinthBattleEffect_15
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 0
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 272b1c67c2c8c20f0800000000000000
+      internalID: -1140382483032722830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 0d92aa982ca2c3d44a7ae9d14cced3f8
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      AtlasLabyrinthBattleEffect_14: -6749170527857888836
+      AtlasLabyrinthBattleEffect_15: -1140382483032722830
+      AtlasLabyrinthBattleEffect_8: 6893699624013507765
+      add_monster: 6269410022258643052
+      critical_down: -6300348298171749113
+      damage_cut: -6505030792340966663
+      damage_limit: -140948790683589983
+      damage_up: -2308113339977611554
+      decrease_income: 4272472860565095777
+      def_lower_limit: -5874151385118667836
+      def_up: 182012969616572253
+      hp_recovery_down: -239200768300879289
+      increase_dot_interval: -7202633689381637790
+      life_steal_down: 502849137637232664
+      limit_time: 7513688123000766873
+      tp_down_cut: 751944547403795511
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

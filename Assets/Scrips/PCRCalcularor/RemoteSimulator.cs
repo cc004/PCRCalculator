@@ -58,6 +58,9 @@ namespace PCRCaculator
             request.LabyrinthEnhancedNodeIds = group.labyrinthEnhancedNodeIds;
             request.LabyrinthRelicIds = group.labyrinthRelicIds;
             request.LabyrinthAlphaRupee = group.labyrinthAlphaRupee;
+            request.LabyrinthOwnedUnitsCount = group.labyrinthOwnedUnitsCount;
+            request.LabyrinthOwnedUnitRoleCounts = group.labyrinthOwnedUnitRoleCounts;
+            request.LabyrinthOwnedUnitTalentCounts = group.labyrinthOwnedUnitTalentCounts;
             request.PlayerList = GuildManager.Instance.SettingData.GetCurrentPlayerData().playrCharacters;
             request.SemanUBExecTimeList = battleData.SemanUBExecTimeList;
             request.SemanUBSequenceData = battleData.SemanUBSequenceData;

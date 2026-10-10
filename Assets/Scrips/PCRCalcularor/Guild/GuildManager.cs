@@ -10,6 +10,7 @@ using Elements;
 using Elements.Battle;
 using Newtonsoft.Json;
 using PCRCaculator.Update;
+using PCRCaculator.SQL;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -53,6 +54,7 @@ namespace PCRCaculator.Guild
         public List<Dropdown> dropdowns_ChooseAbyssBoss;
         public List<Dropdown> dropdowns_ChooseSecretDungeonBoss;
         public List<Dropdown> dropdowns_ChooseMirageBoss;
+        public List<Dropdown> dropdowns_ChooseLabyrinthBoss;
         public List<Image> bossImage_ChooseBoss;
         public List<Toggle> toggles_ChooseBoss;
         public Toggle usePlayerSettingHP;
@@ -124,6 +126,9 @@ namespace PCRCaculator.Guild
         private int currentPage;
         private bool isInit;
         private int[] specialEnemyid;
+        private readonly List<int> labyrinthStageTypes = new();
+        private readonly List<int> labyrinthWaveGroupIds = new();
+        private readonly List<Sprite[]> labyrinthWaveGroupOptionIcons = new();
         private int specialInputValue;
         public Image backgroundImage;
         public GameObject setImageButton;
@@ -152,6 +157,7 @@ namespace PCRCaculator.Guild
         public Text BossText;
         public List<Image> TalentQuestBattleEffectPictures;
         public GameObject ExtraEffectPrefab;
+        public GameObject relicButton;
         public static Dictionary<int, EnemyData> EnemyDataDic
         {
             get
@@ -162,6 +168,13 @@ namespace PCRCaculator.Guild
                     enemyDataDic = JsonConvert.DeserializeObject<Dictionary<int, EnemyData>>(enemyDataDicTxt);
                 }*/
                 return MainManager.Instance.EnemyDataDic;
+            }
+        }
+        public static Dictionary<int, EnemyData> TowerEnemyParameterDic
+        {
+            get
+            {
+                return MainManager.Instance.TowerEnemyParameterDic;
             }
         }
         public static Dictionary<int, EnemyData> TalentQuestEnemyParameterDic
@@ -190,6 +203,13 @@ namespace PCRCaculator.Guild
             get
             {
                 return MainManager.Instance.AbyssEnemyParameterDic;
+            }
+        }
+        public static Dictionary<int, WaveGroupDataBase> LabyrinthWaveGroupDataDic
+        {
+            get
+            {
+                return MainManager.Instance.LabyrinthWaveGroupDataDic;
             }
         }
         public static Dictionary<int, EnemyData> LabyrinthEnemyParameterDic
@@ -238,44 +258,39 @@ namespace PCRCaculator.Guild
         {
             get => MainManager.Instance.EnemyMPartsDic;
         }
+        private const int SpecialBossPrefixDivisor = 10000000;
         public int BossType => selectedBossEnemyids[0] / 100000000;
         public bool IsGuildBoss { get => BossType == 4; }
         public bool IsDungeonBoss { get => BossType == 5; }
-        public bool IsMirageBoss { get => BossType == 7; }
+        public bool IsMirageBoss { get => IsMirageBossId(selectedBossEnemyids[0]); }
         public bool IsTalentQuestBoss { get => BossType == 8; }
         public bool IsAbyssBoss { get => BossType == 9; }
-        public bool IsGuildBossId(int id)
+        public bool IsLabyrinthBoss { get => IsLabyrinthBossId(selectedBossEnemyids[0]); }
+        public bool IsGuildBossId(int id) => id / 100000000 == 4;
+        public bool IsTalentQuestBossId(int id) => id / 100000000 == 8;
+        public bool IsAbyssBossId(int id) => id / 100000000 == 9;
+        public bool IsDungeonBossId(int id) => id / 100000000 == 5;
+        public bool IsMirageBossId(int id)
         {
-            return id / 100000000 == 4;
+            int prefix = id / SpecialBossPrefixDivisor;
+            return prefix == 75 || prefix == 76;
         }
-        public bool IsTalentQuestBossId(int id)
+        public bool IsLabyrinthBossId(int id) => id / SpecialBossPrefixDivisor == 77;
+        [UnityEngine.Serialization.FormerlySerializedAs("dungeonDropdown")]
+        public Dropdown specialEnemyDropdown;
+        private readonly Dictionary<int, int[]> specialEnemyIds = new Dictionary<int, int[]>()
         {
-            return id / 100000000 == 8;
-        }
-        public bool IsAbyssBossId(int id)
-        {
-            return id / 100000000 == 9;
-        }
-        public bool IsDungeonBossId(int Id)
-        {
-            return Id / 100000000 == 5;
-        }
-        public bool IsMirageBossId(int Id)
-        {
-            return Id / 100000000 == 7;
-        }
-        public Dropdown dungeonDropdown;
-        private Dictionary<int, int> dungeonEnemy = new Dictionary<int, int>()
-        {
-            { 0, 501010901 },
-            { 1, 501010902 },
-            { 2, 501010903 },
-            { 3, 501010904 },
-            { 4, 501010905 },
-            { 5, 501011001 },
-            { 6, 501011002 },
-            { 7, 501011003 },
-            { 8, 501011004 },
+            { 0, new[] { 710078001, 710078002, 710078003, 710078004, 710078005 } },
+            { 1, new[] { 710078005 } },
+            { 2, new[] { 501010901 } },
+            { 3, new[] { 501010902 } },
+            { 4, new[] { 501010903 } },
+            { 5, new[] { 501010904 } },
+            { 6, new[] { 501010905 } },
+            { 7, new[] { 501011001 } },
+            { 8, new[] { 501011002 } },
+            { 9, new[] { 501011003 } },
+            { 10, new[] { 501011004 } },
         };
         public void Awake()
         {
@@ -760,6 +775,493 @@ namespace PCRCaculator.Guild
                 Debug.LogError($"无法解析wave_group_id字符串: {waveGroupIdStr}");
             }
         }
+        public void UpdateLabyrinthDropdownOptions()
+        {
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count == 0)
+            {
+                return;
+            }
+
+            Dropdown dropdown1 = dropdowns_ChooseLabyrinthBoss[0];
+            if (dropdown1 == null)
+            {
+                return;
+            }
+
+            dropdown1.ClearOptions();
+
+            List<string> options = new();
+            var difficultyEffects = MainManager.Instance?.LabyrinthDifficultyEffectDic;
+            if (difficultyEffects != null)
+            {
+                int maxDifficulty = difficultyEffects.Values
+                    .Where(effect => effect != null)
+                    .Select(effect => effect.difficulty)
+                    .DefaultIfEmpty(0)
+                    .Max();
+
+                for (int difficulty = 1; difficulty <= maxDifficulty; difficulty++)
+                {
+                    options.Add($"难度{difficulty}");
+                }
+            }
+
+            dropdown1.AddOptions(options);
+            dropdown1.onValueChanged.RemoveListener(OnLabyrinthDifficultyChanged);
+            dropdown1.onValueChanged.AddListener(OnLabyrinthDifficultyChanged);
+            UpdateLabyrinthFloorDropdownOptions();
+        }
+
+        private void OnLabyrinthDifficultyChanged(int _)
+        {
+            UpdateLabyrinthFloorDropdownOptions();
+        }
+
+        public void UpdateLabyrinthFloorDropdownOptions()
+        {
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 2)
+            {
+                return;
+            }
+
+            Dropdown difficultyDropdown = dropdowns_ChooseLabyrinthBoss[0];
+            Dropdown floorDropdown = dropdowns_ChooseLabyrinthBoss[1];
+            if (difficultyDropdown == null || floorDropdown == null)
+            {
+                return;
+            }
+
+            floorDropdown.ClearOptions();
+
+            int floorCount = difficultyDropdown.value == 0 ? 3 : 5;
+            List<string> options = new();
+            for (int floor = 1; floor <= floorCount; floor++)
+            {
+                options.Add($"第{floor}层");
+            }
+
+            floorDropdown.AddOptions(options);
+            floorDropdown.onValueChanged.RemoveListener(OnLabyrinthFloorChanged);
+            floorDropdown.onValueChanged.AddListener(OnLabyrinthFloorChanged);
+            UpdateLabyrinthStageDropdownOptions();
+        }
+
+        private void OnLabyrinthFloorChanged(int _)
+        {
+            UpdateLabyrinthStageDropdownOptions();
+        }
+
+        public void UpdateLabyrinthStageDropdownOptions()
+        {
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 3)
+            {
+                return;
+            }
+
+            Dropdown difficultyDropdown = dropdowns_ChooseLabyrinthBoss[0];
+            Dropdown floorDropdown = dropdowns_ChooseLabyrinthBoss[1];
+            Dropdown stageDropdown = dropdowns_ChooseLabyrinthBoss[2];
+            if (difficultyDropdown == null || floorDropdown == null || stageDropdown == null)
+            {
+                return;
+            }
+
+            stageDropdown.ClearOptions();
+
+            int floor = floorDropdown.value + 1;
+            labyrinthStageTypes.Clear();
+            labyrinthStageTypes.AddRange(GetLabyrinthStageTypes(MainManager.Instance?.LabyrinthQuestDataDic?.Values,
+                difficultyDropdown.value + 1, floor));
+            stageDropdown.AddOptions(labyrinthStageTypes.Select(GetLabyrinthStageName).ToList());
+            stageDropdown.onValueChanged.RemoveListener(OnLabyrinthStageChanged);
+            stageDropdown.onValueChanged.AddListener(OnLabyrinthStageChanged);
+            UpdateLabyrinthWaveGroupDropdownOptions();
+        }
+
+        private void OnLabyrinthStageChanged(int _)
+        {
+            UpdateLabyrinthWaveGroupDropdownOptions();
+        }
+
+        private static List<int> GetLabyrinthStageTypes(IEnumerable<labyrinth_quest_data> quests, int difficulty, int floor)
+        {
+            var types = new List<int> { 1, 2 };
+            if (floor == 3 || floor == 5)
+                types.Add(3);
+            if (quests?.Any(quest => MatchesLabyrinthRegularQuest(quest, difficulty, floor, 4)) == true)
+                types.Add(4);
+            return types;
+        }
+
+        private static string GetLabyrinthStageName(int stage) => stage switch
+        {
+            1 => "普通关卡",
+            2 => "极难关卡",
+            4 => "地狱关卡",
+            3 => "BOSS关卡",
+            _ => $"关卡{stage}",
+        };
+
+        private int GetSelectedLabyrinthStageType()
+        {
+            var dropdown = dropdowns_ChooseLabyrinthBoss != null && dropdowns_ChooseLabyrinthBoss.Count > 2
+                ? dropdowns_ChooseLabyrinthBoss[2] : null;
+            return dropdown != null && dropdown.value >= 0 && dropdown.value < labyrinthStageTypes.Count
+                ? labyrinthStageTypes[dropdown.value] : 0;
+        }
+
+        public void UpdateLabyrinthWaveGroupDropdownOptions()
+        {
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 4)
+            {
+                return;
+            }
+
+            Dropdown difficultyDropdown = dropdowns_ChooseLabyrinthBoss[0];
+            Dropdown floorDropdown = dropdowns_ChooseLabyrinthBoss[1];
+            Dropdown stageDropdown = dropdowns_ChooseLabyrinthBoss[2];
+            Dropdown waveGroupDropdown = dropdowns_ChooseLabyrinthBoss[3];
+            if (difficultyDropdown == null || floorDropdown == null || stageDropdown == null || waveGroupDropdown == null)
+            {
+                return;
+            }
+
+            waveGroupDropdown.ClearOptions();
+
+            int difficulty = difficultyDropdown.value + 1;
+            int floor = floorDropdown.value + 1;
+            int stage = GetSelectedLabyrinthStageType();
+            List<WaveGroupDataBase> matchingWaveGroups;
+            if (stage == 1 || stage == 2 || stage == 4)
+            {
+                var matchingWaveGroupIds = new HashSet<int>(MainManager.Instance?.LabyrinthQuestDataDic?
+                    .Values
+                    .Where(data => MatchesLabyrinthRegularQuest(data, difficulty, floor, stage))
+                    .Select(data => data.wave_group_id) ?? Enumerable.Empty<int>());
+                matchingWaveGroups = LabyrinthWaveGroupDataDic?.Values
+                    .Where(data => data != null && matchingWaveGroupIds.Contains(data.wave_group_id))
+                    .OrderBy(data => data.wave_group_id)
+                    .ToList() ?? new List<WaveGroupDataBase>();
+            }
+            else
+            {
+                string waveGroupPrefix = $"770{floor}{stage}";
+                var waveGroupsForStage = LabyrinthWaveGroupDataDic?.Values
+                    .Where(data => data != null && data.wave_group_id.ToString().StartsWith(waveGroupPrefix))
+                    .OrderBy(data => data.wave_group_id)
+                    .ToList() ?? new List<WaveGroupDataBase>();
+                GetLabyrinthWaveGroupRange(difficulty, stage, out int skipCount, out int takeCount);
+                matchingWaveGroups = waveGroupsForStage.Skip(skipCount).Take(takeCount).ToList();
+            }
+
+            EnsureLabyrinthWaveGroupDropdownImages(waveGroupDropdown);
+            labyrinthWaveGroupIds.Clear();
+            labyrinthWaveGroupOptionIcons.Clear();
+            List<Dropdown.OptionData> options = new();
+            foreach (var waveGroupData in matchingWaveGroups)
+            {
+                labyrinthWaveGroupIds.Add(waveGroupData.wave_group_id);
+                labyrinthWaveGroupOptionIcons.Add(GetLabyrinthWaveGroupIcons(waveGroupData));
+                options.Add(new Dropdown.OptionData(string.Empty));
+            }
+
+            waveGroupDropdown.AddOptions(options);
+            waveGroupDropdown.onValueChanged.RemoveListener(OnLabyrinthWaveGroupChanged);
+            waveGroupDropdown.onValueChanged.AddListener(OnLabyrinthWaveGroupChanged);
+            UpdateLabyrinthBossImages();
+        }
+
+        private static bool MatchesLabyrinthRegularQuest(labyrinth_quest_data quest, int difficulty, int floor, int stage)
+        {
+            if (quest == null || difficulty <= 0 || quest.reward_id <= 0)
+                return false;
+
+            bool matchesStage = (stage == 1 || stage == 2 || stage == 4) && quest.quest_type == stage;
+            if (!matchesStage || quest.reward_id / 10 % 10 != floor)
+                return false;
+
+            // 现有 reward_id 编码为 难度 * 100 + 层数 * 10 + 奖励类型。
+            // 难度 1～5 共用旧组关卡；难度 6 起每个难度有独立关卡记录。
+            // 从记录关联到波次，不依赖波次数量或波次 ID 中关卡序号的位数。
+            int questDifficulty = quest.reward_id / 100;
+            return difficulty <= 5 ? questDifficulty >= 1 && questDifficulty <= 5
+                : questDifficulty == difficulty;
+        }
+
+        private static void GetLabyrinthWaveGroupRange(int difficulty, int stage, out int skipCount, out int takeCount)
+        {
+            switch (stage)
+            {
+                case 3: // BOSS 关卡：难度 1、2 共用前 5 个，之后每个难度对应 5 个关卡
+                    skipCount = Mathf.Max(0, difficulty - 2) * 5;
+                    takeCount = 5;
+                    break;
+                default:
+                    skipCount = 0;
+                    takeCount = 0;
+                    break;
+            }
+        }
+
+        private void OnLabyrinthWaveGroupChanged(int _)
+        {
+            UpdateLabyrinthBossImages();
+        }
+
+        private void RestoreLabyrinthDropdownSelection(GuildPlayerGroupData group)
+        {
+            if (group == null || dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 4)
+            {
+                return;
+            }
+
+            // 依次赋值以触发下一级下拉框的选项重建。
+            UpdateLabyrinthDropdownOptions();
+            SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[0], group.labyrinthDifficulty - 1);
+            SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[1], group.labyrinthFloor - 1);
+            SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[2], labyrinthStageTypes.IndexOf(group.labyrinthBossType));
+
+            int waveGroupOptionIndex = labyrinthWaveGroupIds.IndexOf(group.labyrinthWaveGroupId);
+            SetLabyrinthDropdownValue(dropdowns_ChooseLabyrinthBoss[3], waveGroupOptionIndex);
+        }
+
+        private static void SetLabyrinthDropdownValue(Dropdown dropdown, int value)
+        {
+            if (dropdown != null && value >= 0 && value < dropdown.options.Count)
+            {
+                dropdown.value = value;
+            }
+        }
+
+        private bool TryApplyLabyrinthSelection(GuildPlayerGroupData group, out string error)
+        {
+            error = null;
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 4)
+            {
+                error = "黎明界关卡选项未完整配置。";
+                return false;
+            }
+
+            Dropdown difficultyDropdown = dropdowns_ChooseLabyrinthBoss[0];
+            Dropdown floorDropdown = dropdowns_ChooseLabyrinthBoss[1];
+            Dropdown bossTypeDropdown = dropdowns_ChooseLabyrinthBoss[2];
+            Dropdown waveGroupDropdown = dropdowns_ChooseLabyrinthBoss[3];
+            if (difficultyDropdown == null || floorDropdown == null || bossTypeDropdown == null || waveGroupDropdown == null)
+            {
+                error = "黎明界关卡选项未初始化。";
+                return false;
+            }
+
+            int stage = GetSelectedLabyrinthStageType();
+            if (stage == 0)
+            {
+                error = "请选择一个有效的黎明界关卡类型。";
+                return false;
+            }
+
+            int waveGroupOptionIndex = waveGroupDropdown.value;
+            if (waveGroupOptionIndex < 0 || waveGroupOptionIndex >= labyrinthWaveGroupIds.Count)
+            {
+                error = "请选择一个有效的黎明界关卡。";
+                return false;
+            }
+
+            int waveGroupId = labyrinthWaveGroupIds[waveGroupOptionIndex];
+            var waveGroups = LabyrinthWaveGroupDataDic;
+            if (waveGroups == null || !waveGroups.TryGetValue(waveGroupId, out WaveGroupDataBase waveGroupData) ||
+                waveGroupData?.enemy_ids == null || waveGroupData.enemy_ids.Count == 0)
+            {
+                error = $"找不到黎明界关卡数据: {waveGroupId}。";
+                return false;
+            }
+
+            var questData = MainManager.Instance?.LabyrinthQuestDataDic?
+                .Values
+                .Where(data => data != null && data.wave_group_id == waveGroupId
+                    && (stage == 3 || MatchesLabyrinthRegularQuest(data,
+                        difficultyDropdown.value + 1, floorDropdown.value + 1, stage)))
+                .OrderBy(data => data.quest_type)
+                .ThenBy(data => data.quest_id)
+                .FirstOrDefault();
+            if (questData == null)
+            {
+                error = $"找不到黎明界关卡数据: wave_group_id={waveGroupId}。";
+                return false;
+            }
+
+            // 难度和层数从 1 开始；关卡类型通过选项映射取得，避免无 BOSS 的层将地狱类型存成 3。
+            group.labyrinthDifficulty = difficultyDropdown.value + 1;
+            group.labyrinthFloor = floorDropdown.value + 1;
+            group.labyrinthBossType = stage;
+            group.labyrinthWaveGroupId = waveGroupId;
+            group.labyrinthQuestId = questData.quest_id;
+
+            WaveGroupId = waveGroupId;
+            specialEnemyid = waveGroupData.enemy_ids.ToArray();
+            SetBossImages(specialEnemyid, LabyrinthEnemyParameterDic);
+            return true;
+        }
+
+        private static void ClearLabyrinthSelection(GuildPlayerGroupData group)
+        {
+            group.labyrinthQuestId = 0;
+            group.labyrinthDifficulty = 0;
+            group.labyrinthFloor = 0;
+            group.labyrinthBossType = 0;
+            group.labyrinthWaveGroupId = 0;
+        }
+
+        private void UpdateLabyrinthBossImages()
+        {
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 4)
+            {
+                return;
+            }
+
+            Dropdown waveGroupDropdown = dropdowns_ChooseLabyrinthBoss[3];
+            if (waveGroupDropdown == null || waveGroupDropdown.options.Count == 0)
+            {
+                return;
+            }
+
+            if (waveGroupDropdown.value < 0 || waveGroupDropdown.value >= labyrinthWaveGroupIds.Count)
+            {
+                return;
+            }
+
+            int waveGroupId = labyrinthWaveGroupIds[waveGroupDropdown.value];
+            if (!LabyrinthWaveGroupDataDic.TryGetValue(waveGroupId, out WaveGroupDataBase waveGroupData) ||
+                waveGroupData?.enemy_ids == null)
+            {
+                return;
+            }
+
+            WaveGroupId = waveGroupId;
+            specialEnemyid = waveGroupData.enemy_ids.ToArray();
+            SetBossImages(specialEnemyid, LabyrinthEnemyParameterDic);
+        }
+
+        private Sprite[] GetLabyrinthWaveGroupIcons(WaveGroupDataBase waveGroupData)
+        {
+            if (waveGroupData?.enemy_ids == null || LabyrinthEnemyParameterDic == null)
+            {
+                return Array.Empty<Sprite>();
+            }
+
+            List<Sprite> icons = new();
+            foreach (int enemyId in waveGroupData.enemy_ids)
+            {
+                if (!LabyrinthEnemyParameterDic.TryGetValue(enemyId, out var enemyData) || enemyData?.detailData == null)
+                {
+                    continue;
+                }
+
+                icons.Add(GetBossSprite(enemyData));
+            }
+
+            return icons.ToArray();
+        }
+
+        private void EnsureLabyrinthWaveGroupDropdownImages(Dropdown dropdown)
+        {
+            if (dropdown.transform.Find("LabyrinthWaveGroupCaptionIcons") == null)
+            {
+                CreateLabyrinthDropdownIconRow(dropdown.transform, "LabyrinthWaveGroupCaptionIcons");
+            }
+
+            if (dropdown.itemText != null &&
+                dropdown.itemText.transform.parent.Find("LabyrinthWaveGroupItemIcons") == null)
+            {
+                CreateLabyrinthDropdownIconRow(
+                    dropdown.itemText.transform.parent,
+                    "LabyrinthWaveGroupItemIcons");
+            }
+        }
+
+        private static void CreateLabyrinthDropdownIconRow(Transform parent, string name)
+        {
+            var rowObject = new GameObject(name, typeof(RectTransform));
+            rowObject.transform.SetParent(parent, false);
+
+            var rowRect = (RectTransform)rowObject.transform;
+            rowRect.anchorMin = new Vector2(0f, 0f);
+            rowRect.anchorMax = new Vector2(1f, 1f);
+            rowRect.offsetMin = Vector2.zero;
+            rowRect.offsetMax = Vector2.zero;
+
+            for (int index = 0; index < 5; index++)
+            {
+                var iconObject = new GameObject($"Icon{index + 1}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                iconObject.transform.SetParent(rowObject.transform, false);
+
+                var iconRect = (RectTransform)iconObject.transform;
+                iconRect.anchorMin = new Vector2(0f, 0.5f);
+                iconRect.anchorMax = new Vector2(0f, 0.5f);
+                iconRect.pivot = new Vector2(0f, 0.5f);
+                iconRect.anchoredPosition = new Vector2(4f + index * 32f, 0f);
+                iconRect.sizeDelta = new Vector2(28f, 28f);
+
+                var iconImage = iconObject.GetComponent<Image>();
+                iconImage.preserveAspect = true;
+                iconImage.raycastTarget = false;
+                iconImage.enabled = false;
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (dropdowns_ChooseLabyrinthBoss == null || dropdowns_ChooseLabyrinthBoss.Count < 4 ||
+                labyrinthWaveGroupOptionIcons.Count == 0)
+            {
+                return;
+            }
+
+            Dropdown waveGroupDropdown = dropdowns_ChooseLabyrinthBoss[3];
+            if (waveGroupDropdown == null)
+            {
+                return;
+            }
+
+            RefreshLabyrinthDropdownIconRow(
+                waveGroupDropdown.transform.Find("LabyrinthWaveGroupCaptionIcons"),
+                waveGroupDropdown.value);
+
+            Transform templateIconRow = waveGroupDropdown.itemText?.transform.parent.Find("LabyrinthWaveGroupItemIcons");
+            var visibleIconRows = waveGroupDropdown
+                .GetComponentsInChildren<Transform>(true)
+                .Where(transform =>
+                    transform.name == "LabyrinthWaveGroupItemIcons" &&
+                    transform != templateIconRow &&
+                    transform.gameObject.activeInHierarchy)
+                .ToArray();
+            for (int index = 0; index < visibleIconRows.Length; index++)
+            {
+                RefreshLabyrinthDropdownIconRow(visibleIconRows[index], index);
+            }
+        }
+
+        private void RefreshLabyrinthDropdownIconRow(Transform iconRow, int optionIndex)
+        {
+            if (iconRow == null)
+            {
+                return;
+            }
+
+            Sprite[] icons = optionIndex >= 0 && optionIndex < labyrinthWaveGroupOptionIcons.Count
+                ? labyrinthWaveGroupOptionIcons[optionIndex]
+                : Array.Empty<Sprite>();
+            for (int index = 0; index < iconRow.childCount; index++)
+            {
+                var iconImage = iconRow.GetChild(index).GetComponent<Image>();
+                if (iconImage == null)
+                {
+                    continue;
+                }
+
+                iconImage.sprite = index < icons.Length ? icons[index] : null;
+                iconImage.enabled = iconImage.sprite != null;
+            }
+        }
         public void UpdateMirageAreaDropdownOptions()
         {
             Dropdown dropdown = dropdowns_ChooseMirageBoss[0];
@@ -874,13 +1376,13 @@ namespace PCRCaculator.Guild
         }
         public void OnDungeonDropdownValueChanged()
         {
-            if (!toggles_ChooseType[0].isOn && dungeonEnemy.ContainsKey(dungeonDropdown.value))
+            if (!toggles_ChooseType[0].isOn && specialEnemyDropdown != null
+                && specialEnemyIds.TryGetValue(specialEnemyDropdown.value, out var enemyIds))
             {
-                int enemyId = dungeonEnemy[dungeonDropdown.value];
-
-                if (EnemyDataDic.TryGetValue(enemyId, out EnemyData data))
+                if (enemyIds.All(enemyId => TowerEnemyParameterDic.ContainsKey(enemyId)
+                    || EnemyDataDic.ContainsKey(enemyId)))
                 {
-                    specialInput.text = enemyId.ToString();
+                    specialInput.text = string.Join(",", enemyIds);
                     OnInputFinished();
                 }
                 else
@@ -894,14 +1396,15 @@ namespace PCRCaculator.Guild
             if (!toggles_ChooseType[0].isOn)
             {
                 var bossid = specialInput.text.Split(',').Select(x => int.Parse(x, NumberStyles.Any)).ToArray();
-                EnemyData data = null;
-                if (bossid.Reverse().All(x => EnemyDataDic.TryGetValue(x, out data)))
+                if (bossid.All(enemyId => TowerEnemyParameterDic.ContainsKey(enemyId)
+                    || EnemyDataDic.ContainsKey(enemyId)))
                 {
-                    //string Path = "GuildEnemy/icon_unit_" + data.unit_id;
-                    //bossImage_ChooseBoss.sprite = MainManager.LoadSourceSprite(Path);
-                    // bossImage_ChooseBoss.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, data.unit_id);
+                    var inputEnemyDataDic = bossid.Distinct().ToDictionary(
+                        enemyId => enemyId,
+                        enemyId => TowerEnemyParameterDic.TryGetValue(enemyId, out var enemyData)
+                            ? enemyData : EnemyDataDic[enemyId]);
                     specialEnemyid = bossid;
-                    SetBossImages(specialEnemyid, EnemyDataDic);
+                    SetBossImages(specialEnemyid, inputEnemyDataDic);
                 }
                 else
                 {
@@ -914,16 +1417,18 @@ namespace PCRCaculator.Guild
         public void FinishChooseBossButton()
         {
             int[] enemyId = new int[] {0};
+            var group = SettingData.GetCurrentPlayerGroup();
+            bool isLabyrinthSelected = toggles_ChooseType.Count > 5 && toggles_ChooseType[5].isOn;
             if (toggles_ChooseType[0].isOn)
             {
                 //int month = dropdowns_ChooseBoss[2].value;
                 int clanBattleID = GetClanBattleID();
                 int month = clanBattleID - 1000;
-                SettingData.GetCurrentPlayerGroup().currentGuildMonth = GetClanBattleID();
+                group.currentGuildMonth = GetClanBattleID();
                 int num = dropdowns_ChooseBoss[0].value;
-                SettingData.GetCurrentPlayerGroup().currentGuildEnemyNum = num;
+                group.currentGuildEnemyNum = num;
                 int turn = dropdowns_ChooseBoss[1].value + 1;
-                SettingData.GetCurrentPlayerGroup().currentTurn = turn;
+                group.currentTurn = turn;
                 turn = clanBattleID >= 1067 && turn == 1 ? turn - 1 : turn;
                 enemyId = new[] { GetGuildBossID(clanBattleID, num, turn) };
             }
@@ -942,11 +1447,24 @@ namespace PCRCaculator.Guild
                 {
                     OnChooseMirageDropDownChanged();
                 }
+                else if (isLabyrinthSelected)
+                {
+                    if (!TryApplyLabyrinthSelection(group, out string error))
+                    {
+                        MainManager.Instance.WindowConfigMessage(error, null);
+                        return;
+                    }
+                }
                 enemyId = specialEnemyid;
             }
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
 
-            var group = SettingData.GetCurrentPlayerGroup();
+            if (!isLabyrinthSelected)
+            {
+                // 防止切换到其他 Boss 后，旧的黎明界任务上下文仍被带入战斗或远程模拟。
+                ClearLabyrinthSelection(group);
+            }
+
             group.selectedEnemyIDs = toggles_ChooseType[0].isOn ? enemyId : specialEnemyid;
             group.isSpecialBoss = false;//!isGuildBoss;
             group.talentQuestMap = dropdowns_ChooseTalentQuestBoss[0].value;
@@ -963,9 +1481,25 @@ namespace PCRCaculator.Guild
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
-            group.waveGroupId = WaveGroupId;
+            group.waveGroupId = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss
+                ? WaveGroupId : 0;
             SaveDataToJson();
             Refresh();
+        }
+        private static Sprite GetBossSprite(EnemyData enemyData)
+        {
+            if (enemyData?.detailData == null)
+                return null;
+
+            int prefabId = enemyData.detailData.prefab_id;
+            if (enemyData.detailData.visual_change_flag == 1)
+            {
+                int upgradedIconId = prefabId + (enemyData.rarity > 5 ? 60 : 30);
+                var upgradedSprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, upgradedIconId);
+                if (upgradedSprite != null)
+                    return upgradedSprite;
+            }
+            return ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
         }
         private void SetBossImages(int[] enemyIds, Dictionary<int, EnemyData> enemyDataDic)
         {
@@ -974,12 +1508,7 @@ namespace PCRCaculator.Guild
                 if (i < enemyIds.Length)
                 {
                     var enemyData = enemyDataDic[enemyIds[i]];
-                    int prefabId = enemyData.detailData.prefab_id;
-                    if (enemyData.detailData.visual_change_flag == 1)
-                    {
-                        prefabId = enemyData.rarity > 5 ? prefabId + 60 : prefabId + 30;
-                    }
-                    bossImage_ChooseBoss[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefabId);
+                    bossImage_ChooseBoss[i].sprite = GetBossSprite(enemyData);
                     bossImage_ChooseBoss[i].SetActive(i <= enemyIds.Length);
                 }
                 else
@@ -1044,8 +1573,20 @@ namespace PCRCaculator.Guild
         public void StartCalButton() => StartCalButton(false);
         public void ReStartCalButton() => ReStartCalButton(false);
 
+        private bool CheckBattlePlayerSelection()
+        {
+            var players = SettingData.GetCurrentPlayerData()?.playrCharacters;
+            if (players != null && players.Count > 0)
+                return true;
+
+            MainManager.Instance.WindowConfigMessage("请至少选择一名我方角色后再开始战斗。", null);
+            return false;
+        }
         private void ReStartCalButton(bool skipping)
         {
+            if (!CheckBattlePlayerSelection())
+                return;
+
             var group = SyncSequenceUBToggleToSetting();
             SaveDataToJson();
             GuildBattleData battleData = new GuildBattleData();
@@ -1128,6 +1669,9 @@ namespace PCRCaculator.Guild
         }
         private void StartCalButton(bool skipping)
         {
+            if (!CheckBattlePlayerSelection())
+                return;
+
             /*if (!CheckDataIsReady(SettingData..currentGuildMonth))
             {
                 return;
@@ -1145,6 +1689,7 @@ namespace PCRCaculator.Guild
                    isAbyssBoss ? AbyssEnemyParameterDic[enemy_id] :
                    LabyrinthEnemyParameterDic.ContainsKey(enemy_id) ? LabyrinthEnemyParameterDic[enemy_id] :
                    isMirageBoss ? MirageEnemyParameterDic[enemy_id] :
+                   TowerEnemyParameterDic.ContainsKey(enemy_id) ? TowerEnemyParameterDic[enemy_id] :
                    EnemyDataDic[enemy_id];
         }
         /*private bool CheckDataIsReady(int month)
@@ -1252,6 +1797,7 @@ namespace PCRCaculator.Guild
 
             // 从数据表中找到匹配quest_id的数据
             List<object> battleEffects = new List<object>();
+            string atlasName = "AtlasTalentQuest";
             if (IsTalentQuestBoss)
             {
                 battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
@@ -1279,9 +1825,20 @@ namespace PCRCaculator.Guild
                     .Cast<object>()
                     .ToList();
             }
+            else if (IsLabyrinthBoss)
+            {
+                atlasName = "AtlasLabyrinthBattleEffect";
+                int difficulty = SettingData.GetCurrentPlayerGroup().labyrinthDifficulty;
+                battleEffects = MainManager.Instance.LabyrinthDifficultyEffectDic
+                    .Values
+                    .Where(x => x.difficulty == difficulty)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
 
             // 加载精灵图集
-            var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
+            var sprites = Resources.LoadAll<Sprite>(atlasName)
                 .ToDictionary(x => x.name, x => x);
 
             // 按顺序设置TalentQuestBattleEffectPictures的图片
@@ -1291,7 +1848,7 @@ namespace PCRCaculator.Guild
                 {
                     var effectData = battleEffects[i];
                     var iconProperty = effectData.GetType().GetProperty("icon_name");
-                    string iconName = (string)iconProperty.GetValue(effectData);
+                    string iconName = iconProperty?.GetValue(effectData)?.ToString();
 
                     if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
                     {
@@ -1311,6 +1868,16 @@ namespace PCRCaculator.Guild
         }
         public void UpdateTooglesChooseType()
         {
+            if (IsLabyrinthBoss)
+            {
+                if (toggles_ChooseType.Count > 5)
+                {
+                    toggles_ChooseType[5].isOn = true;
+                    RestoreLabyrinthDropdownSelection(SettingData.GetCurrentPlayerGroup());
+                }
+                return;
+            }
+
             switch (BossType)
             {
                 case 8:
@@ -1344,8 +1911,7 @@ namespace PCRCaculator.Guild
                 playerData = SettingData.addedPlayerDatas[SettingData.currentPlayerGroupNum];
             }*/
             UpdateTooglesChooseType();
-            bool isMuiltBoss = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss;
-
+            
             MainManager.Instance.TeamEnhanceData.LoadFromPlayerSetting();
             characterGroupNameText.text = playerData.playerName;
             for (int i = 0; i < 5; i++)
@@ -1413,9 +1979,13 @@ namespace PCRCaculator.Guild
                 dropdowns_ChooseMirageBoss[0].value = data.mirageArea;
                 dropdowns_ChooseMirageBoss[1].value = data.mirageFloor;
             }
-            if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss)
+            if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss)
             {
                 data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
+            }
+            else
+            {
+                data.waveGroupId = 0;
             }
             TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
             TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
@@ -1431,7 +2001,6 @@ namespace PCRCaculator.Guild
             {
                 if (selectedBossEnemyids[i] > 0)
                 {
-                    int prefab_id = 0;
                     EnemyData enemyParam = null;
                     if (IsTalentQuestBoss && TalentQuestEnemyParameterDic != null && TalentQuestEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
                     {
@@ -1449,20 +2018,19 @@ namespace PCRCaculator.Guild
                     {
                         enemyParam = MirageEnemyParameterDic[selectedBossEnemyids[i]];
                     }
+                    else if (IsLabyrinthBoss && LabyrinthEnemyParameterDic != null && LabyrinthEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
+                    {
+                        enemyParam = LabyrinthEnemyParameterDic[selectedBossEnemyids[i]];
+                    }
+                    else if (TowerEnemyParameterDic != null && TowerEnemyParameterDic.ContainsKey(selectedBossEnemyids[i]))
+                    {
+                        enemyParam = TowerEnemyParameterDic[selectedBossEnemyids[i]];
+                    }
                     else
                     {
                         enemyParam = EnemyDataDic[selectedBossEnemyids[i]];
                     }
-                    if (enemyParam != null)
-                    {
-                        prefab_id = enemyParam.detailData.prefab_id;
-                        if (enemyParam.detailData.visual_change_flag == 1)
-                        {
-                            var rarity = enemyParam.rarity;
-                            prefab_id = rarity > 5 ? prefab_id + 60 : prefab_id + 30;
-                        }
-                    }
-                    BossPictures[i].sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, prefab_id);
+                    BossPictures[i].sprite = GetBossSprite(enemyParam);
                     BossPictures[i].gameObject.SetActive(true);
                 }
                 else
@@ -1475,6 +2043,8 @@ namespace PCRCaculator.Guild
                 BossPictures[i].gameObject.SetActive(false);
             }
             SetBattleEffectPictures();
+            if (relicButton != null)
+                relicButton.SetActive(IsLabyrinthBoss);
             // else
             // {
             //     bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
@@ -1545,6 +2115,11 @@ namespace PCRCaculator.Guild
             else if (IsMirageBoss)
             {
                 BossText.text = $"{dropdowns_ChooseMirageBoss[0].options[dropdowns_ChooseMirageBoss[0].value].text} {dropdowns_ChooseMirageBoss[1].options[dropdowns_ChooseMirageBoss[1].value].text}";
+            }
+            else if (IsLabyrinthBoss)
+            {
+                string stageName = GetLabyrinthStageName(data.labyrinthBossType);
+                BossText.text = $"黎明界 难度{data.labyrinthDifficulty} 第{data.labyrinthFloor}层 {stageName}";
             }
             else if (data.isSpecialBoss)
             {
@@ -2203,7 +2778,6 @@ namespace PCRCaculator.Guild
                  };
                 if (enemyData.detailData.visual_change_flag == 1)
                 {
-                    var un = MainManager.Instance.UnitRarityDic[enemyData.detailData.prefab_id];
                     int rarity = enemyData.rarity;
                     int UnitEquip = enemyData.unique_equipment_flag_1;
                     action(rarity == 6 ? enemyData.skillData.raw_data.union_burst_evolution : enemyData.skillData.raw_data.union_burst, enemyData.level, rarity == 6 ? "UB+" : "UB");
@@ -2818,7 +3392,12 @@ namespace PCRCaculator.Guild
                 des += $"D{data.dungeonDay + 1}-";
                 des += $"{data.dungeonFloor + 8}";
             }
-            else if (data.selectedEnemyIDs[0] / 100000000 == 7)
+            else if (data.selectedEnemyIDs[0] / 10000000 == 77)
+            {
+                des += $"黎明{data.labyrinthDifficulty}-{data.labyrinthFloor}-{data.labyrinthBossType}";
+            }
+            else if (data.selectedEnemyIDs[0] / 10000000 == 75 ||
+                     data.selectedEnemyIDs[0] / 10000000 == 76)
             {
                 des += data.mirageArea switch
                 {
@@ -2883,8 +3462,14 @@ namespace PCRCaculator.Guild
         public List<int> labyrinthEnhancedNodeIds = new List<int>();
         public List<int> labyrinthRelicIds = new List<int>();
         public int labyrinthAlphaRupee;
+        public int labyrinthOwnedUnitsCount;
+        public Dictionary<int, int> labyrinthOwnedUnitRoleCounts = new();
+        public Dictionary<int, int> labyrinthOwnedUnitTalentCounts = new();
         public int labyrinthQuestId;
         public int labyrinthDifficulty;
+        public int labyrinthFloor;
+        public int labyrinthBossType;
+        public int labyrinthWaveGroupId;
         public List<List<float>> UBExecTimeData = new List<List<float>> { };
         public List<List<int>> SemanUBExecTimeData = new List<List<int>> {};
         public List<int> SemanUBSequenceData = new List<int>();

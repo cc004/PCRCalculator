@@ -176,6 +176,7 @@ namespace PCRCaculator.Guild
             EnemyData enemyData = GuildManager.Instance.IsTalentQuestBoss ? GuildManager.TalentQuestEnemyParameterDic[enemyId] :
                                   GuildManager.Instance.IsAbyssBoss ? GuildManager.AbyssEnemyParameterDic[enemyId] :
                                   GuildManager.Instance.IsMirageBoss ? GuildManager.MirageEnemyParameterDic[enemyId] :
+                                  GuildManager.TowerEnemyParameterDic.ContainsKey(enemyId) ? GuildManager.TowerEnemyParameterDic[enemyId] :
                                   GuildManager.EnemyDataDic[enemyId];
             if (GuildManager.Instance.SettingData.changedEnemyDataDic.ContainsKey(enemyId))
             {

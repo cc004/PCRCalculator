@@ -27,14 +27,16 @@ namespace Elements
         // RVA: 0x3581F88 Offset: 0x3581F88 VA: 0x3581F88
         private IEnumerator updateTimer()
         {
-            while(Timer > 0)
+            while (Enable)
             {
-                if (!Enable || Target.IsDead || Target.IdleOnly)
-                    break;
+                if (Target.IsDead || Target.IdleOnly || Timer <= 0.0)
+                {
+                    Disable(false);
+                    yield break;
+                }
                 Timer -= Target.DeltaTimeForPause;
                 yield return null;
             }
-            Disable(false);
         }
 
         // RVA: 0x3581C7C Offset: 0x3581C7C VA: 0x3581C7C
@@ -76,14 +78,14 @@ namespace Elements
         // RVA: 0x3582244 Offset: 0x3582244 VA: 0x3582244
         private IEnumerator updateDamage()
         {
-            float timer = 0;
+            double timer = 0.0;
             float interval = Target.GetSlipDamageExtendValue();
             while(DamageList.Count > 0)
             {
                 if (Target.IsDead || Target.IdleOnly)
                     break;
                 timer -= Target.DeltaTimeForPause;
-                if (BattleUtil.LessThanOrApproximately(timer, 0))
+                if (BattleUtil.LessThanOrApproximately(timer, 0.0))
                 {
                     var damageData = new DamageData
                     {

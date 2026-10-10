@@ -253,6 +253,9 @@ namespace Elements.Battle
         public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
         public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
         public List<int> LabyrinthOwnedUnitIds { get; set; } = new List<int>();
+        public int? LabyrinthOwnedUnitsCount { get; set; }
+        public Dictionary<int, int> LabyrinthOwnedUnitRoleCounts { get; set; }
+        public Dictionary<int, int> LabyrinthOwnedUnitTalentCounts { get; set; }
         public int LabyrinthAlphaRupee { get; set; }
         public int LabyrinthQuestId { get; set; }
         public int LabyrinthDifficulty { get; set; }
@@ -331,6 +334,9 @@ namespace Elements.Battle
                 LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
                 LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
                 LabyrinthOwnedUnitIds = this.LabyrinthOwnedUnitIds?.ToList(),
+                LabyrinthOwnedUnitsCount = this.LabyrinthOwnedUnitsCount,
+                LabyrinthOwnedUnitRoleCounts = this.LabyrinthOwnedUnitRoleCounts != null ? new Dictionary<int, int>(this.LabyrinthOwnedUnitRoleCounts) : null,
+                LabyrinthOwnedUnitTalentCounts = this.LabyrinthOwnedUnitTalentCounts != null ? new Dictionary<int, int>(this.LabyrinthOwnedUnitTalentCounts) : null,
                 LabyrinthAlphaRupee = this.LabyrinthAlphaRupee,
                 LabyrinthQuestId = this.LabyrinthQuestId,
                 LabyrinthDifficulty = this.LabyrinthDifficulty,

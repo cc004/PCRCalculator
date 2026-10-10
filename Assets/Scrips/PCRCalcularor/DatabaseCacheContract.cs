@@ -24,7 +24,7 @@ namespace PCRCaculator
 
     public static class DatabaseCacheContract
     {
-        public const int CurrentSchemaVersion = 4;
+        public const int CurrentSchemaVersion = 8;
 
         public static T ResolveSharedDatabase<T>(T primary, Func<T> createSeparate, bool sharesPrimary)
             where T : class
@@ -137,6 +137,10 @@ namespace PCRCaculator
                 return Reject("allUnitAttackPatternDic 包含不完整条目", out reason);
             if (cache.enemyDataDic.Any(pair => !IsEnemyDataComplete(pair.Value)))
                 return Reject("enemyDataDic 包含不完整条目", out reason);
+            if (cache.towerEnemyParameterDic == null ||
+                cache.towerEnemyParameterDic.Any(pair =>
+                    pair.Key != pair.Value?.enemy_id || !IsEnemyDataComplete(pair.Value)))
+                return Reject("towerEnemyParameterDic 包含不完整条目", out reason);
             if (cache.guildEnemyDatas.Any(pair =>
                     pair.Value?.enemyIds == null ||
                     pair.Value.enemyIds.Length == 0 ||

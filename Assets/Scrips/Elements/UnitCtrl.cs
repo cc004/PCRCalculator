@@ -1254,16 +1254,16 @@ namespace Elements
                 BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT,
                 new BuffDebuffConstData
                 {
-                    BuffIcon = eStateIconType.NONE,
-                    DebuffIcon = eStateIconType.BUFF_PHYSICAL_ATK
+                    BuffIcon = eStateIconType.BUFF_PHYSICAL_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_DAMAGE
                 }
             },
             {
                 BuffParamKind.MAGIC_DAMAGE_UP_PERCENT,
                 new BuffDebuffConstData
                 {
-                    BuffIcon = eStateIconType.NONE,
-                    DebuffIcon = eStateIconType.BUFF_MAGIC_ATK
+                    BuffIcon = eStateIconType.BUFF_MAGIC_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_MAGIC_DAMAGE
                 }
             },
             {
@@ -3980,35 +3980,20 @@ this.updateCurColor();
             else
             {
                 vector3.x += 200f * num;
-                if (battleManager.IsBossBattle)
+                // Special event opening positions are not supported by this loader.
+                if (battleManager.IsBossBattle && !IsBonusEnemy &&
+                    jiliicmhlch != eBattleCategory.HATSUNE_SPECIAL_BATTLE)
                 {
-                    /*vector3.x += (float)((double)this.MoveSpeed * (double)this.battleManager.GetBossUnit().UnitAppearDelay * 1.60000002384186);
-                    bool flag = true;
-                    eHatsuneSpecialPurpose purpose = this.battleManager.GetPurpose();
-                    if ((purpose == eHatsuneSpecialPurpose.DEFEAT_OTHERS ? 1 : (purpose == eHatsuneSpecialPurpose.GET_POINT ? 1 : 0)) != 0)
+                    if (IsShadow)
                     {
-                        int initialPosition = this.battleManager.GetInitialPosition(this.UnitId);
-                        vector3.x = 100f + (float)initialPosition;
-                        if ((int)HatsuneUtility.GetHatsuneSpecialBattle().start_idle_trigger == 0)
-                        {
-                            this.SetState(UnitCtrl.ActionState.GAME_START);
-                        }
-                        else
-                        {
-                            this.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, 0.0f);
-                            float moveSpeed = this.MoveSpeed;
-                            this.MoveSpeed = 0.0f;
-                            this.SetState(UnitCtrl.ActionState.IDLE);
-                            this.AppendCoroutine(this.waitShadowAppear(moveSpeed), ePauseType.SYSTEM);
-                        }
-                        flag = false;
+                        vector3.x = 100f + SearchAreaSize;
+                        AppendCoroutine(waitBossMotionEnd(), ePauseType.SYSTEM);
+                        IsMoveSpeedForceZero = true;
                     }
-                    if (this.IsShadow & flag)
+                    else
                     {
-                        vector3.x = 100f + this.SearchAreaSize;
-                        this.AppendCoroutine(this.waitBossMotionEnd(), ePauseType.SYSTEM);
-                        this.IsMoveSpeedForceZero = (ObscuredBool)true;
-                    }*/
+                        vector3.x += MoveSpeed * battleManager.GetBossUnit().UnitAppearDelay * 1.6f;
+                    }
                 }
             }
             transform.localPosition = vector3;
@@ -4063,14 +4048,14 @@ this.updateCurColor();
             }*/
         }
 
-        /*private IEnumerator waitBossMotionEnd()
+        private IEnumerator waitBossMotionEnd()
         {
             while (!battleManager.GetBossUnit().GameStartDone)
                 yield return null;
             IsMoveSpeedForceZero = false;
             SetLeftDirection(IsOther);
             SetState(ActionState.IDLE);
-        }*/
+        }
 
         public void SetOverlapPos(float overlapPosX)
         {
@@ -13931,11 +13916,7 @@ this.updateCurColor();
             float fAlpha = 1f;
             while (true)
             {
-                // ModeChangeAction registers a continuous action before the skill
-                // animation switches to the alternate spine. Keep IdleOnly summons
-                // alive during that transition so the native mode-change lifecycle can
-                // reach its end coroutine and release the action normally.
-                while (!unitCtrl.ModeChangeEnd && !unitCtrl.unitActionController.ModeChanging)
+                while (!unitCtrl.ModeChangeEnd)
                 {
                     if (unitCtrl.JoyFlag)
                     {

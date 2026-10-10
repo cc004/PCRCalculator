@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Elements;
+using Elements.Battle;
 using PCRCaculator.Guild;
 
 public class StatusPanel : MonoBehaviour
@@ -34,6 +35,7 @@ public class StatusPanel : MonoBehaviour
         {
             HandleUnits(bossPartsList);
         }
+        HandleEnemySummons(BattleManager.Instance?.EnemyList);
 
         // 再处理玩家单位
         HandleUnits(playerUnits);
@@ -71,6 +73,29 @@ public class StatusPanel : MonoBehaviour
             cells.Add(cell);
         }
     }
+    private void HandleEnemySummons(List<UnitCtrl> enemyUnits)
+    {
+        if (enemyUnits == null)
+        {
+            return;
+        }
+
+        foreach (var unit in enemyUnits)
+        {
+            if (unit == null || !unit.IsSummonOrPhantom)
+            {
+                continue;
+            }
+
+            GridLayoutGroup gridLayout = GetComponentInChildren<GridLayoutGroup>();
+            GameObject cell = Instantiate(CellPrefab);
+            Text[] cellTexts = cell.GetComponentsInChildren<Text>();
+            UpdateCellTexts(unit, cellTexts);
+            cell.transform.SetParent(gridLayout.transform, false);
+            cells.Add(cell);
+        }
+    }
+
     private void UpdateCellTexts(UnitCtrl unitCtrl, Text[] cellTexts)
     {
         var HpPencent = unitCtrl.Hp != 0 ? string.Format("{0:P2}", (double)unitCtrl.Hp / unitCtrl.MaxHp) : "0.00%";
