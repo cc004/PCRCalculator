@@ -3980,35 +3980,20 @@ this.updateCurColor();
             else
             {
                 vector3.x += 200f * num;
-                if (battleManager.IsBossBattle)
+                // Special event opening positions are not supported by this loader.
+                if (battleManager.IsBossBattle && !IsBonusEnemy &&
+                    jiliicmhlch != eBattleCategory.HATSUNE_SPECIAL_BATTLE)
                 {
-                    /*vector3.x += (float)((double)this.MoveSpeed * (double)this.battleManager.GetBossUnit().UnitAppearDelay * 1.60000002384186);
-                    bool flag = true;
-                    eHatsuneSpecialPurpose purpose = this.battleManager.GetPurpose();
-                    if ((purpose == eHatsuneSpecialPurpose.DEFEAT_OTHERS ? 1 : (purpose == eHatsuneSpecialPurpose.GET_POINT ? 1 : 0)) != 0)
+                    if (IsShadow)
                     {
-                        int initialPosition = this.battleManager.GetInitialPosition(this.UnitId);
-                        vector3.x = 100f + (float)initialPosition;
-                        if ((int)HatsuneUtility.GetHatsuneSpecialBattle().start_idle_trigger == 0)
-                        {
-                            this.SetState(UnitCtrl.ActionState.GAME_START);
-                        }
-                        else
-                        {
-                            this.GetCurrentSpineCtrl().CurColor = new Color(1f, 1f, 1f, 0.0f);
-                            float moveSpeed = this.MoveSpeed;
-                            this.MoveSpeed = 0.0f;
-                            this.SetState(UnitCtrl.ActionState.IDLE);
-                            this.AppendCoroutine(this.waitShadowAppear(moveSpeed), ePauseType.SYSTEM);
-                        }
-                        flag = false;
+                        vector3.x = 100f + SearchAreaSize;
+                        AppendCoroutine(waitBossMotionEnd(), ePauseType.SYSTEM);
+                        IsMoveSpeedForceZero = true;
                     }
-                    if (this.IsShadow & flag)
+                    else
                     {
-                        vector3.x = 100f + this.SearchAreaSize;
-                        this.AppendCoroutine(this.waitBossMotionEnd(), ePauseType.SYSTEM);
-                        this.IsMoveSpeedForceZero = (ObscuredBool)true;
-                    }*/
+                        vector3.x += MoveSpeed * battleManager.GetBossUnit().UnitAppearDelay * 1.6f;
+                    }
                 }
             }
             transform.localPosition = vector3;
@@ -4063,14 +4048,14 @@ this.updateCurColor();
             }*/
         }
 
-        /*private IEnumerator waitBossMotionEnd()
+        private IEnumerator waitBossMotionEnd()
         {
             while (!battleManager.GetBossUnit().GameStartDone)
                 yield return null;
             IsMoveSpeedForceZero = false;
             SetLeftDirection(IsOther);
             SetState(ActionState.IDLE);
-        }*/
+        }
 
         public void SetOverlapPos(float overlapPosX)
         {

@@ -966,6 +966,10 @@ namespace Elements
             //sa.gameObject.name = unitid.ToString();
             battleSpineController.Initialize(false);
             UnitCtrl unitCtrl = isplayer ? playerUnitCtrlDic[unitid] : enemyUnitCtrl[idx];
+            UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
+            unitCtrl.IsShadow = !isplayer &&
+                ((UnitUtility.IsPersonUnit(unitParameter.MasterData.UnitId) && !staticBattleManager.IsDefenceReplayMode) ||
+                 unitParameter.MasterData.VisualChangeFlag == 1);
             //unitCtrl.IsOther = !isplayer;
             unitCtrl.unitData = data;
             battleSpineController.gameObject.transform.SetParent(unitCtrl.transform.TargetTransform, false);
@@ -988,7 +992,6 @@ namespace Elements
             unitCtrl.transform.localPosition = new Vector3(-1400f, staticBattleManager.GetRespawnPos(respawnPos), 0);
             //battleProcessor.AddUnitSkillUseCount(ref unitCtrl.SkillUseCount, pPararm.MasterData.PrefabId);
             PCRCaculator.UnitData unitData = isplayer ? tempData.playerList[idx] : tempData.enemyList[idx];
-            UnitParameter unitParameter = isplayer ? tempData.PlayerParameters[idx] : tempData.EnemyParameters[idx];
 
             unitCtrl.Initialize(
                 unitParameter,
@@ -1582,7 +1585,8 @@ namespace Elements
                 ),
                 new UnitDataForView(),
                 new MasterUnitData.UnitData(enemyData.unit_id, enemyData.detailData.unit_name, "?", enemyData.detailData.unit_id, 0, 1, enemyData.detailData.motion_type, enemyData.detailData.se_type,
-                enemyData.detailData.move_speed, enemyData.detailData.search_area_width, enemyData.detailData.atk_type, enemyData.detailData.normal_atk_cast_time),
+                enemyData.detailData.move_speed, enemyData.detailData.search_area_width, enemyData.detailData.atk_type, enemyData.detailData.normal_atk_cast_time,
+                VisualChangeFlag: enemyData.detailData.visual_change_flag),
                 new MasterUnitSkillData.UnitSkillData(
                     unit_id: enemyData.unit_id,
                     union_burst: enemyData.skillData.UB,

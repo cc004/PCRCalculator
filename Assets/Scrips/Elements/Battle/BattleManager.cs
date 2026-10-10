@@ -1830,11 +1830,13 @@ namespace Elements.Battle
         private void checkBossBattle(Dictionary<int, UnitCtrl> IGIJGFNEKHB)
         {
             IsBossBattle = false;
+            BossUnit = null;
             List<UnitCtrl> unitCtrlList = new List<UnitCtrl>(IGIJGFNEKHB.Values);
             for (int index = 0; index < unitCtrlList.Count; ++index)
             {
                 if (UnitUtility.JudgeIsBoss(unitCtrlList[index].UnitId))
                 {
+                    BossUnit = unitCtrlList[index];
                     IsBossBattle = true;
                     break;
                 }
@@ -5020,6 +5022,7 @@ namespace Elements.Battle
             battleManager.AMLOLHFMOPP = true;
             //battleManager.stageBgTex.SetActiveWithCheck(true);
             battleManager.sortAndSetPositionOneWave(battleManager.currentEnemyUnitCtrlDictionary);
+            battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
             if (battleManager.BossUnit != null)
                 battleManager.resetAllUnitY();
             // ISSUE: explicit non-virtual call
@@ -5030,9 +5033,6 @@ namespace Elements.Battle
                 (battleManager.UnitUiCtrl).SetUnitListForDefenceMode((battleManager.EnemyList));
             }*/
             battleManager.setupEnemyProcess();
-            battleManager.checkBossBattle(battleManager.currentEnemyUnitCtrlDictionary);
-            if (IsBossBattle) 
-                BossUnit = EnemyList[0];
             if (tempData.isGuildBattle)
                 GuildManager.Instance.CalcTalentFormationBonus(true); 
             foreach(var unit in UnitList)

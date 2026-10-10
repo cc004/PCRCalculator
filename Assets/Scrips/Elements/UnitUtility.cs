@@ -159,14 +159,14 @@ namespace Elements
             }*/
 
         //public static int GetSummonResourceId(int _unitId) => (int) ManagerSingleton<MasterDataManager>.Instance.masterUnitData[UnitUtility.GetUnitResourceId(_unitId)].PrefabId;
-        /*
-            public static bool IsPersonUnit(int _unitId)
-            {
-              _unitId = UnitUtility.GetUnitResourceId(_unitId);
-              UnitDefine.UnitType unitType = UnitUtility.getUnitType(_unitId);
-              return unitType == UnitDefine.UnitType.PERSON || unitType == UnitDefine.UnitType.GUEST;
-            }
+    public static bool IsPersonUnit(int _unitId)
+    {
+      _unitId = GetUnitResourceId(_unitId);
+      UnitDefine.UnitType unitType = getUnitType(_unitId);
+      return unitType == UnitDefine.UnitType.PERSON || unitType == UnitDefine.UnitType.GUEST;
+    }
 
+        /*
             public static bool IsPlayableUnit(int _unitId)
             {
               MasterUnitData.UnitData unitData = ManagerSingleton<MasterDataManager>.Instance.masterUnitData.Get(_unitId);
