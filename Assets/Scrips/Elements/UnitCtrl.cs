@@ -1254,16 +1254,16 @@ namespace Elements
                 BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT,
                 new BuffDebuffConstData
                 {
-                    BuffIcon = eStateIconType.NONE,
-                    DebuffIcon = eStateIconType.BUFF_PHYSICAL_ATK
+                    BuffIcon = eStateIconType.BUFF_PHYSICAL_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_PHYSICAL_DAMAGE
                 }
             },
             {
                 BuffParamKind.MAGIC_DAMAGE_UP_PERCENT,
                 new BuffDebuffConstData
                 {
-                    BuffIcon = eStateIconType.NONE,
-                    DebuffIcon = eStateIconType.BUFF_MAGIC_ATK
+                    BuffIcon = eStateIconType.BUFF_MAGIC_DAMAGE,
+                    DebuffIcon = eStateIconType.DEBUFF_MAGIC_DAMAGE
                 }
             },
             {
