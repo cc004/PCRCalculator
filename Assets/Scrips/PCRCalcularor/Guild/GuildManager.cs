@@ -277,7 +277,9 @@ namespace PCRCaculator.Guild
             return prefix == 75 || prefix == 76;
         }
         public bool IsLabyrinthBossId(int id) => id / SpecialBossPrefixDivisor == 77;
+#if UNITY_5_3_OR_NEWER
         [UnityEngine.Serialization.FormerlySerializedAs("dungeonDropdown")]
+#endif
         public Dropdown specialEnemyDropdown;
         private const int LunaTower780ExWaveGroupId = 715707801;
         private static readonly Dictionary<int, (int[] EnemyIds, int WaveGroupId)> specialEnemyIds = new()
@@ -818,8 +820,10 @@ namespace PCRCaculator.Guild
             }
 
             dropdown1.AddOptions(options);
+#if UNITY_5_3_OR_NEWER
             dropdown1.onValueChanged.RemoveListener(OnLabyrinthDifficultyChanged);
             dropdown1.onValueChanged.AddListener(OnLabyrinthDifficultyChanged);
+#endif
             UpdateLabyrinthFloorDropdownOptions();
         }
 
@@ -852,8 +856,10 @@ namespace PCRCaculator.Guild
             }
 
             floorDropdown.AddOptions(options);
+#if UNITY_5_3_OR_NEWER
             floorDropdown.onValueChanged.RemoveListener(OnLabyrinthFloorChanged);
             floorDropdown.onValueChanged.AddListener(OnLabyrinthFloorChanged);
+#endif
             UpdateLabyrinthStageDropdownOptions();
         }
 
@@ -884,8 +890,10 @@ namespace PCRCaculator.Guild
             labyrinthStageTypes.AddRange(GetLabyrinthStageTypes(MainManager.Instance?.LabyrinthQuestDataDic?.Values,
                 difficultyDropdown.value + 1, floor));
             stageDropdown.AddOptions(labyrinthStageTypes.Select(GetLabyrinthStageName).ToList());
+#if UNITY_5_3_OR_NEWER
             stageDropdown.onValueChanged.RemoveListener(OnLabyrinthStageChanged);
             stageDropdown.onValueChanged.AddListener(OnLabyrinthStageChanged);
+#endif
             UpdateLabyrinthWaveGroupDropdownOptions();
         }
 
@@ -965,7 +973,9 @@ namespace PCRCaculator.Guild
                 matchingWaveGroups = waveGroupsForStage.Skip(skipCount).Take(takeCount).ToList();
             }
 
+#if UNITY_5_3_OR_NEWER
             EnsureLabyrinthWaveGroupDropdownImages(waveGroupDropdown);
+#endif
             labyrinthWaveGroupIds.Clear();
             labyrinthWaveGroupOptionIcons.Clear();
             List<Dropdown.OptionData> options = new();
@@ -977,8 +987,10 @@ namespace PCRCaculator.Guild
             }
 
             waveGroupDropdown.AddOptions(options);
+#if UNITY_5_3_OR_NEWER
             waveGroupDropdown.onValueChanged.RemoveListener(OnLabyrinthWaveGroupChanged);
             waveGroupDropdown.onValueChanged.AddListener(OnLabyrinthWaveGroupChanged);
+#endif
             UpdateLabyrinthBossImages();
         }
 
@@ -1173,6 +1185,7 @@ namespace PCRCaculator.Guild
             return icons.ToArray();
         }
 
+#if UNITY_5_3_OR_NEWER
         private void EnsureLabyrinthWaveGroupDropdownImages(Dropdown dropdown)
         {
             if (dropdown.transform.Find("LabyrinthWaveGroupCaptionIcons") == null)
@@ -1273,6 +1286,7 @@ namespace PCRCaculator.Guild
                 iconImage.enabled = iconImage.sprite != null;
             }
         }
+#endif
         public void UpdateMirageAreaDropdownOptions()
         {
             Dropdown dropdown = dropdowns_ChooseMirageBoss[0];
