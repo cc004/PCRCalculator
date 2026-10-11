@@ -52,20 +52,21 @@ public class LoadUnitDatasFromPrefab:MonoBehaviour
     {
         var regexes = new (string, bool)[]
         {
-            (@"a/all_abnormalstateicon\.unity3d", true),
-            (@"a/all_abnormalstateicon.\.unity3d", true),
-            (@"a/all_battleunit_1\d\d\d\d\d(_\d*)?\.unity3d", true),
-            (@"a/all_battleunit_[2-9]\d\d\d\d\d(_\d*)?\.unity3d", false),
-            (@"a/all_battleunitprefab_1\d\d\d\d\d(_\d*)?\.unity3d", true),
-            (@"a/all_battleunitprefab_[2-9]\d\d\d\d\d(_\d*)?\.unity3d", false),
-            (@"a/all_fxsk_\d\d\d\d\.unity3d", true),
-            (@"a/icon_icon_equipment_.*\.unity3d", true),
-            (@"a/icon_icon_skill_.*\.unity3d", true),
-            (@"a/icon_unity_plate_.*\.unity3d", true),
-            (@"a/spine_.*\.cysp\.unity3d", true),
-            (@"a/spine_sdmodechange_.*\.unity3d", true),
-            (@"a/spine_sdnormal_.*\.unity3d", true),
-            (@"a/unit_icon_unit_.*\.unity3d", true),
+            // (@"a/all_abnormalstateicon\.unity3d", true),
+            // (@"a/all_abnormalstateicon.\.unity3d", true),
+            // (@"a/all_battleunit_1\d\d\d\d\d(_\d*)?\.unity3d", true),
+            // (@"a/all_battleunit_[2-9]\d\d\d\d\d(_\d*)?\.unity3d", false),
+            // (@"a/all_battleunitprefab_1\d\d\d\d\d(_\d*)?\.unity3d", true),
+            // (@"a/all_battleunitprefab_[2-9]\d\d\d\d\d(_\d*)?\.unity3d", false),
+            // (@"a/all_fxsk_\d\d\d\d\.unity3d", true),
+            // (@"a/icon_icon_equipment_.*\.unity3d", true),
+            // (@"a/icon_icon_skill_.*\.unity3d", true),
+            // (@"a/icon_unity_plate_.*\.unity3d", true),
+            // (@"a/spine_.*\.cysp\.unity3d", true),
+            // (@"a/spine_sdmodechange_.*\.unity3d", true),
+            // (@"a/spine_sdnormal_.*\.unity3d", true),
+            // (@"a/unit_icon_unit_.*\.unity3d", true),
+            (@"a/icon_icon_connect_.*\.unity3d", true),
         };
 
         await ABExTool.StaticInitialize();

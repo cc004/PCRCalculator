@@ -768,6 +768,24 @@ namespace PCRCaculator
             }
         }
 
+        public int GetConnectRankLimit()
+        {
+            return connectRankLimit > 0
+                ? connectRankLimit
+                : Math.Max(0, ConnectRankTempData.Instance.GetDefaultConnectRankLimit());
+        }
+
+        public bool CanEquipUniqueEqPlus()
+        {
+            return rank >= 7
+                && connectRank >= 6
+                && MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId)
+                && uniqueEqLv > 0
+                && MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var unitRarityData)
+                && unitRarityData.skillData != null
+                && unitRarityData.skillData.skill_1_rev > 0;
+        }
+
         /*
         battle_mode: 0-会战, 1-普通, 2-jjc
         */
@@ -803,6 +821,9 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
+                connectRankLimit = GetConnectRankLimit();
+                connectRank = connectRankLimit;
+                uniqueEqPlus = CanEquipUniqueEqPlus();
                 MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp);
                 //会战ex装备
                 if (battle_mode == 0 && ex_equip_full)

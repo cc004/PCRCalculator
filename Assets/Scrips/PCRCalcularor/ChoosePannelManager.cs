@@ -84,9 +84,11 @@ namespace PCRCaculator
 
         [Header("SP Unique Equipment")]
         public TextMeshProUGUI uniqueEqPlusText_setting;
-        public Slider uniqueEqPlusSlider_setting;
+        [UnityEngine.Serialization.FormerlySerializedAs("uniqueEqPlusSlider_setting")]
+        public Toggle uniqueEqPlusToggle_setting;
         public TextMeshProUGUI uniqueEq2PlusText_setting;
-        public Slider uniqueEq2PlusSlider_setting;
+        [UnityEngine.Serialization.FormerlySerializedAs("uniqueEq2PlusSlider_setting")]
+        public Toggle uniqueEq2PlusToggle_setting;
 
         public Dropdown[] ExEquip;
 
@@ -150,6 +152,14 @@ namespace PCRCaculator
         private void Start()
         {
             Instance = this;
+            if (uniqueEqPlusToggle_setting != null)
+            {
+                uniqueEqPlusToggle_setting.onValueChanged.AddListener(_ => OnSliderDraged());
+            }
+            if (uniqueEq2PlusToggle_setting != null)
+            {
+                uniqueEq2PlusToggle_setting.onValueChanged.AddListener(_ => OnSliderDraged());
+            }
             StartCoroutine(SearchCharaInitialize());
             // StartCoroutine(WaitForLoadFinished());
             for (int i = 0; i < ExEquip.Length; i++)
@@ -594,10 +604,10 @@ namespace PCRCaculator
                 data.equipLevel[i - 8] = (int)detailSliders_setting[i].value;
             }
             data.playLoveDic = loveDic;
-            data.connectRankLimit = GetConnectRankLimit(oldData);
+            data.connectRankLimit = oldData.GetConnectRankLimit();
             data.connectRank = GetConnectRankSliderValue(oldData);
-            data.uniqueEqPlus = GetBoolSliderValue(uniqueEqPlusSlider_setting, oldData.uniqueEqPlus);
-            data.uniqueEq2Plus = GetBoolSliderValue(uniqueEq2PlusSlider_setting, oldData.uniqueEq2Plus);
+            data.uniqueEqPlus = uniqueEqPlusToggle_setting != null ? uniqueEqPlusToggle_setting.isOn : oldData.uniqueEqPlus;
+            data.uniqueEq2Plus = uniqueEq2PlusToggle_setting != null ? uniqueEq2PlusToggle_setting.isOn : oldData.uniqueEq2Plus;
             playerData.playrCharacters[selectedCharacterId_setting] = data;
             if (MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId))
             {
@@ -618,7 +628,7 @@ namespace PCRCaculator
             {
                 data.uniqueEq2Lv = -1;
             }
-            if (!MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId) || data.uniqueEqLv <= 0)
+            if (!data.CanEquipUniqueEqPlus())
             {
                 data.uniqueEqPlus = false;
             }
@@ -712,31 +722,19 @@ namespace PCRCaculator
             }
             OnSliderDraged();
         }
-        private int GetConnectRankLimit(UnitData data)
-        {
-            if (data.connectRankLimit > 0)
-            {
-                return data.connectRankLimit;
-            }
-            return ConnectRankTempData.Instance.GetDefaultConnectRankLimit();
-        }
         private int GetConnectRankSliderValue(UnitData data)
         {
             int connectRank = connectRankSlider_setting != null
                 ? Mathf.RoundToInt(connectRankSlider_setting.value)
                 : data.connectRank;
-            int limit = GetConnectRankLimit(data);
+            int limit = data.GetConnectRankLimit();
             return limit > 0 ? Math.Min(Math.Max(0, connectRank), limit) : Math.Max(0, connectRank);
-        }
-        private bool GetBoolSliderValue(Slider slider, bool fallback)
-        {
-            return slider != null ? Mathf.RoundToInt(slider.value) > 0 : fallback;
         }
         private void RefreshConnectRankSlider(UnitData data)
         {
             if (connectRankSlider_setting == null) return;
 
-            int limit = GetConnectRankLimit(data);
+            int limit = data.GetConnectRankLimit();
             int value = limit > 0
                 ? Math.Min(Math.Max(0, data.connectRank), limit)
                 : Math.Max(0, data.connectRank);
@@ -753,19 +751,17 @@ namespace PCRCaculator
                 Math.Max(0, limit),
                 limit > 0);
         }
-        private void RefreshUniqueEqPlusSlider(UnitData data)
+        private void RefreshUniqueEqPlusToggle(UnitData data)
         {
-            bool canEquipPlus = data.rank >= 7
-                && MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId)
-                && data.uniqueEqLv > 0;
+            bool canEquipPlus = data.CanEquipUniqueEqPlus();
             data.uniqueEqPlus &= canEquipPlus;
-            RefreshOptionalBoolSlider(
-                uniqueEqPlusSlider_setting,
+            RefreshOptionalToggle(
+                uniqueEqPlusToggle_setting,
                 uniqueEqPlusText_setting,
                 data.uniqueEqPlus,
                 canEquipPlus);
         }
-        private void RefreshUniqueEq2PlusSlider(UnitData data)
+        private void RefreshUniqueEq2PlusToggle(UnitData data)
         {
             bool canEquipPlus = data.rank >= 7
                 && MainManager.Instance.JudgeWeatherAllowUniqueEq(data.unitId)
@@ -773,8 +769,8 @@ namespace PCRCaculator
                 && data.uniqueEqLv > 0
                 && data.uniqueEq2Lv >= 0;
             data.uniqueEq2Plus &= canEquipPlus;
-            RefreshOptionalBoolSlider(
-                uniqueEq2PlusSlider_setting,
+            RefreshOptionalToggle(
+                uniqueEq2PlusToggle_setting,
                 uniqueEq2PlusText_setting,
                 data.uniqueEq2Plus,
                 canEquipPlus);
@@ -808,21 +804,19 @@ namespace PCRCaculator
                 addButton.interactable = interactable;
             }
         }
-        private void RefreshOptionalBoolSlider(
-            Slider slider,
+        private void RefreshOptionalToggle(
+            Toggle toggle,
             TextMeshProUGUI text,
-            bool value,
+            bool isOn,
             bool interactable)
         {
-            if (slider == null) return;
+            if (toggle == null) return;
 
-            slider.minValue = 0;
-            slider.maxValue = interactable ? 1 : 0;
-            slider.value = interactable && value ? 1 : 0;
-            slider.interactable = interactable;
+            toggle.SetIsOnWithoutNotify(interactable && isOn);
+            toggle.interactable = interactable;
             if (text != null)
             {
-                text.text = interactable ? (value ? "已装备" : "未装备") : "null";
+                text.text = interactable ? (isOn ? "已装备" : "未装备") : "null";
             }
         }
         public void SetSelectedUnitSecondMax()
@@ -1097,8 +1091,8 @@ namespace PCRCaculator
             }
 
             RefreshConnectRankSlider(data);
-            RefreshUniqueEqPlusSlider(data);
-            RefreshUniqueEq2PlusSlider(data);
+            RefreshUniqueEqPlusToggle(data);
+            RefreshUniqueEq2PlusToggle(data);
 
             // ex equip
 
