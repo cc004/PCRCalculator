@@ -580,6 +580,12 @@ namespace PCRCaculator.SQL
         public int equipment_enhance_level { get; set; }
     }
 
+    public class experience_team
+    {
+        [PrimaryKey]
+        public int team_level { get; set; }
+    }
+
     public class equipment_data : DbBaseData
     {
         [PrimaryKey]
@@ -789,6 +795,14 @@ namespace PCRCaculator.SQL
         public int sale_price { get; set; }
         public int require_level { get; set; }
     }
+    public class unique_equipment_enhance_data
+    {
+        [PrimaryKey]
+        public int equip_slot { get; set; }
+        [PrimaryKey]
+        public int enhance_level { get; set; }
+    }
+
     public class unique_equipment_enhance_rate : unique_equip_enhance_rate
     {
         public override int max_lv { get => -1; }

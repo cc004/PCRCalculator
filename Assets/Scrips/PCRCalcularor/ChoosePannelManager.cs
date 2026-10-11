@@ -606,6 +606,7 @@ namespace PCRCaculator
             data.playLoveDic = loveDic;
             data.connectRankLimit = oldData.GetConnectRankLimit();
             data.connectRank = GetConnectRankSliderValue(oldData);
+            data.ClampLevel(MainManager.Instance.GetLevelMax(GetCurrentBattleMode(), data.connectRank));
             data.uniqueEqPlus = uniqueEqPlusToggle_setting != null ? uniqueEqPlusToggle_setting.isOn : oldData.uniqueEqPlus;
             data.uniqueEq2Plus = uniqueEq2PlusToggle_setting != null ? uniqueEq2PlusToggle_setting.isOn : oldData.uniqueEq2Plus;
             playerData.playrCharacters[selectedCharacterId_setting] = data;
@@ -1025,10 +1026,13 @@ namespace PCRCaculator
                 selectedCharacterId_setting = playerData.playrCharacters.Count - 1;
             }
             UnitData data = playerData.playrCharacters[selectedCharacterId_setting];
+            RefreshConnectRankSlider(data);
+            int levelMax = MainManager.Instance.GetLevelMax(GetCurrentBattleMode(), data.connectRank);
+            data.ClampLevel(levelMax);
             bool changingId = lastRefreshedId != data.unitId;
             lastRefreshedId = data.unitId;
             detailTexts_setting[0].text = data.level + "";
-            detailSliders_setting[0].maxValue = MainManager.Instance.GetLevelMax(GetCurrentBattleMode());
+            detailSliders_setting[0].maxValue = levelMax;
             detailSliders_setting[0].value = data.level;
             detailTexts_setting[1].text = data.rarity + "";
             detailSliders_setting[1].maxValue = data.GetMaxRarity();
@@ -1090,7 +1094,6 @@ namespace PCRCaculator
                 detailButtons_setting[3].interactable = false;
             }
 
-            RefreshConnectRankSlider(data);
             RefreshUniqueEqPlusToggle(data);
             RefreshUniqueEq2PlusToggle(data);
 

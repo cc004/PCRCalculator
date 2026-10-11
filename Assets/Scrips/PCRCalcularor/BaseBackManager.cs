@@ -40,6 +40,21 @@ namespace PCRCaculator
         {
             isLoading = true;
             SettingBack.SetActive(true);
+            int levelLimit = MainManager.Instance.PlayerLevelLimit;
+            PlayerSetting.ApplyPlayerLevelLimit(levelLimit);
+            sliders[0].minValue = 1;
+            sliders[0].maxValue = Mathf.Max(1, levelLimit);
+            sliders[0].interactable = levelLimit > 0;
+            int processLimit = MainManager.Instance.PlayerProcessLimit;
+            PlayerSetting.ApplyPlayerProcessLimit(processLimit);
+            sliders[1].minValue = PCRCaculator.PlayerSetting.MinimumPlayerProcess;
+            sliders[1].maxValue = Mathf.Max(sliders[1].minValue, processLimit);
+            sliders[1].interactable = processLimit >= PCRCaculator.PlayerSetting.MinimumPlayerProcess;
+            int uniqueEqLimit = MainManager.Instance.UniqueEqLevelLimit;
+            PlayerSetting.ApplyUniqueEqLevelLimit(uniqueEqLimit);
+            sliders[2].minValue = 1;
+            sliders[2].maxValue = Mathf.Max(1, uniqueEqLimit);
+            sliders[2].interactable = uniqueEqLimit > 0;
             sliders[0].value = PlayerSetting.playerLevel;
             sliders[1].value = PlayerSetting.playerProcess;
             sliders[2].value = PlayerSetting.maxUniqueEqLv;
@@ -63,8 +78,11 @@ namespace PCRCaculator
         {
             if (isLoading) { return; }
             PlayerSetting.playerLevel = (int)sliders[0].value;
+            PlayerSetting.ApplyPlayerLevelLimit(MainManager.Instance.PlayerLevelLimit);
             PlayerSetting.playerProcess = (int)sliders[1].value;
+            PlayerSetting.ApplyPlayerProcessLimit(MainManager.Instance.PlayerProcessLimit);
             PlayerSetting.maxUniqueEqLv = (int)sliders[2].value;
+            PlayerSetting.ApplyUniqueEqLevelLimit(MainManager.Instance.UniqueEqLevelLimit);
 
             texts[0].text = PlayerSetting.playerLevel + "";
             texts[1].text = PlayerSetting.ProcessStr();

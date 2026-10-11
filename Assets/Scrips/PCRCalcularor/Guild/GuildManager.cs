@@ -138,6 +138,7 @@ namespace PCRCaculator.Guild
         public Text version;
         public InputField RandomSeed;
         public Toggle UseFixedRandomSeed;
+        public Toggle GuildLevelToggle;
         public string[] TalentNames = { "火", "水", "风", "光", "暗" };
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
@@ -2159,6 +2160,12 @@ namespace PCRCaculator.Guild
         }
         private void RefreshCalcSettings_start()
         {
+            if (GuildLevelToggle != null)
+            {
+                GuildLevelToggle.SetIsOnWithoutNotify(MainManager.Instance.PlayerSetting.enableGuildLevelBonus);
+                GuildLevelToggle.onValueChanged.RemoveListener(OnGuildLevelToggleChanged);
+                GuildLevelToggle.onValueChanged.AddListener(OnGuildLevelToggleChanged);
+            }
             SettingSliders[0].value = SettingData.FPSforLogic / 10;
             SettingTexts[0].text = SettingData.FPSforLogic + "";
             SettingSliders[1].value = SettingData.FPSforAnimation / 10;
@@ -2192,6 +2199,18 @@ namespace PCRCaculator.Guild
             SettingInputs[11].text = SettingData.dispFields;
             SettingInputs[12].text = SettingData.dispFields;
         }
+        private void OnGuildLevelToggleChanged(bool enabled)
+        {
+            MainManager.Instance.PlayerSetting.enableGuildLevelBonus = enabled;
+            MainManager.Instance.SavePlayerSetting();
+
+            var choosePanel = ChoosePannelManager.Instance;
+            if (choosePanel != null && choosePanel.settingBack != null && choosePanel.settingBack.activeInHierarchy)
+            {
+                choosePanel.RefreshSettingValues();
+            }
+        }
+
         public void RefreshCalcUI()
         {
             SettingTexts[0].text = (int)SettingSliders[0].value * 10 + "";

@@ -527,6 +527,9 @@ namespace PCRCaculator.SQL
         private Dictionary<int, wave_group_data> waveDic;
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
+        public int PlayerProcessLimit { get; private set; }
+        public int PlayerLevelLimit { get; private set; }
+        public int UniqueEqLevelLimit { get; private set; }
         public Dictionary<int, unit_talent[]> TalentDic { get; private set; }
         public Dictionary<int, enemy_talent_weakness> EnemyTalentWeaknessDic { get; private set; }
         public Dictionary<int, talent_weakness> TalentWeaknessDic { get; private set; }
@@ -620,6 +623,42 @@ namespace PCRCaculator.SQL
             return temp;
         }
 
+        public static int CalculatePlayerLevelLimit(IEnumerable<experience_team> levels)
+        {
+            return Math.Max(0, levels.Select(row => row.team_level).DefaultIfEmpty(1).Max() - 1);
+        }
+
+        public static int CalculateUniqueEqLevelLimit(IEnumerable<unique_equipment_enhance_data> enhancements)
+        {
+            return Math.Max(0, enhancements
+                .Where(row => row != null && row.equip_slot == 1)
+                .Select(row => row.enhance_level)
+                .DefaultIfEmpty(0).Max());
+        }
+
+        public static int CalculatePlayerProcessLimit(IEnumerable<unit_promotion> promotions)
+        {
+            int limit = 0;
+            foreach (var promotion in promotions)
+            {
+                if (promotion == null || promotion.unit_id < 100000 || promotion.unit_id >= 200000
+                    || promotion.promotion_level < 8)
+                    continue;
+
+                int equipmentCount = promotion.GetEquips().Count(id => id > 0 && id != 999999);
+                if (equipmentCount < 3)
+                    continue;
+
+                int rank = promotion.promotion_level;
+                // Keep the existing progression encoding: R10-3 = 13, R10-4 = 14, R10-5 = 15.
+                int process = rank == 8 ? PlayerSetting.MinimumPlayerProcess
+                    : rank == 9 ? (equipmentCount >= 5 ? 12 : 11)
+                    : (rank - 10) * 3 + 13 + Math.Min(2, equipmentCount - 3);
+                limit = Math.Max(limit, process);
+            }
+            return limit;
+        }
+
         // TRAP: this method uses thread static field, so make sure not to run the method two times at once
         public Task ParallelGetAll()
         {
@@ -638,6 +677,7 @@ namespace PCRCaculator.SQL
             var equipDicTask = Task.Run(() =>
             {
                 equipDic = GetDatasDicList<unit_promotion>(a => a.unit_id);
+                PlayerProcessLimit = CalculatePlayerProcessLimit(equipDic.Values.SelectMany(rows => rows));
             });
             var rankStateDicTask = Task.Run(() =>
             {
@@ -673,6 +713,8 @@ namespace PCRCaculator.SQL
             var UnitRoleDataDicTask =
                 Task.Run(() => UnitRoleDataDic = GetOptionalDatasDic<unit_role_data>(a => a.unit_id));
             var tasks = new List<Task>();
+            tasks.Add(Task.Run(() => PlayerLevelLimit = CalculatePlayerLevelLimit(GetDatas<experience_team>())));
+            tasks.Add(Task.Run(() => UniqueEqLevelLimit = CalculateUniqueEqLevelLimit(GetDatas<unique_equipment_enhance_data>())));
 
             tasks.Add(
                 DatabaseCacheContract.RunAfterSuccessAsync(

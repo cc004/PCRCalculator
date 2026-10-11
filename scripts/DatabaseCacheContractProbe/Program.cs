@@ -13,6 +13,129 @@ static void Require(bool condition, string message)
         throw new InvalidOperationException(message);
 }
 
+static unit_promotion CreatePromotion(int rank, int equipmentCount, int unitId = 100101)
+{
+    int[] slots = Enumerable.Repeat(999999, 6).ToArray();
+    int[] releaseOrder = [1, 3, 5, 4, 2, 0];
+    foreach (int slot in releaseOrder.Take(equipmentCount))
+        slots[slot] = 10010001 + slot;
+    return new unit_promotion
+    {
+        unit_id = unitId,
+        promotion_level = rank,
+        equip_slot_1 = slots[0], equip_slot_2 = slots[1], equip_slot_3 = slots[2],
+        equip_slot_4 = slots[3], equip_slot_5 = slots[4], equip_slot_6 = slots[5],
+    };
+}
+
+foreach (var (rank, count, expected) in new[]
+{
+    (8, 5, 10), (9, 3, 11), (9, 5, 12),
+    (10, 3, 13), (10, 4, 14), (10, 5, 15),
+    (38, 5, 99), (42, 3, 109), (42, 4, 110), (42, 5, 111),
+})
+{
+    int actual = SQLData.CalculatePlayerProcessLimit([CreatePromotion(rank, count)]);
+    Require(actual == expected, $"R{rank}-{count}: expected process {expected}, got {actual}");
+    var settings = new PlayerSetting();
+    settings.ApplyPlayerProcessLimit(actual);
+    Require(settings.GetMaxRank() == rank, $"Progression encoding changed rank for {expected}");
+    Require(settings.GetEquipmentIsAble().Count(enabled => enabled) == count,
+        $"Progression encoding changed equipment count for {expected}");
+}
+Require(SQLData.CalculatePlayerProcessLimit(
+    [CreatePromotion(42, 4), CreatePromotion(99, 5, 600101), CreatePromotion(43, 0), CreatePromotion(38, 5)]) == 110,
+    "Progression limit included enemy rows or unreleased ranks");
+Require(SQLData.CalculatePlayerProcessLimit([]) == 0, "Missing progression data must not invent a limit");
+var savedSettings = new PlayerSetting { playerProcess = 111 };
+savedSettings.ApplyPlayerProcessLimit(99);
+Require(savedSettings.playerProcess == 99, "Older database did not clamp saved progression");
+savedSettings.playerProcess = 80;
+savedSettings.ApplyPlayerProcessLimit(110);
+Require(savedSettings.playerProcess == 80, "Valid lower progression was overwritten");
+savedSettings.ApplyPlayerProcessLimit(0);
+Require(savedSettings.playerProcess == 80, "Progression changed before database was loaded");
+Require(SQLData.CalculatePlayerLevelLimit(
+    [new experience_team { team_level = 359 }, new experience_team { team_level = 1 }]) == 358,
+    "Team experience level 359 must configure player level 358");
+Require(SQLData.CalculatePlayerLevelLimit([new experience_team { team_level = 392 }]) == 391,
+    "Team experience level 392 must configure player level 391");
+Require(SQLData.CalculatePlayerLevelLimit([]) == 0, "Missing experience data must not invent a level limit");
+var levelSettings = new PlayerSetting { playerLevel = 300 };
+Require(!levelSettings.enableGuildLevelBonus, "Guild level bonus must default to disabled");
+levelSettings.ApplyPlayerLevelLimit(358, setToMaximum: true);
+Require(levelSettings.playerLevel == 358, "Database loading did not replace the saved player level");
+foreach (var (mode, connectRank, expected) in new[]
+{
+    (0, 0, 358), (0, 8, 358), (0, 9, 358), (0, 10, 358),
+    (1, 0, 368), (1, 8, 368), (1, 9, 373), (1, 10, 373),
+    (2, 0, 368), (2, 8, 368), (2, 9, 373),
+})
+{
+    Require(levelSettings.GetLevelMax(mode, connectRank) == expected,
+        $"Wrong level limit for battle mode {mode}, connect rank {connectRank}");
+}
+levelSettings.enableGuildLevelBonus = true;
+foreach (var (mode, connectRank, expected) in new[]
+{
+    (0, 0, 368), (0, 8, 368), (0, 9, 373), (0, 10, 373),
+    (1, 8, 368), (1, 9, 373), (2, 8, 368), (2, 9, 373),
+})
+{
+    Require(levelSettings.GetLevelMax(mode, connectRank) == expected,
+        $"Wrong enabled guild bonus for battle mode {mode}, connect rank {connectRank}");
+}
+levelSettings.enableGuildLevelBonus = false;
+Require(levelSettings.GetLevelMax(0, 9) == 358, "Disabling guild level bonus did not restore the guild limit");
+var connectedUnit = new UnitData { level = 373, skillLevel = [373, 373, 373, 0] };
+connectedUnit.ClampLevel(levelSettings.GetLevelMax(2, 8));
+Require(connectedUnit.level == 368 && connectedUnit.skillLevel.SequenceEqual([368, 368, 368, 0]),
+    "Connection rank decrease did not clamp character and skill levels");
+levelSettings.ApplyPlayerLevelLimit(391, setToMaximum: true);
+Require(levelSettings.playerLevel == 391, "Database update did not refresh the player level");
+levelSettings.ApplyPlayerLevelLimit(358);
+Require(levelSettings.playerLevel == 358, "Database level limit did not clamp excessive levels");
+levelSettings.playerLevel = 300;
+levelSettings.ApplyPlayerLevelLimit(358);
+Require(levelSettings.playerLevel == 300, "Manually selected lower player level was overwritten");
+levelSettings.ApplyPlayerLevelLimit(0, setToMaximum: true);
+Require(levelSettings.playerLevel == 300, "Player level changed before database was loaded");
+
+Require(SQLData.CalculateUniqueEqLevelLimit(
+    [new unique_equipment_enhance_data { equip_slot = 1, enhance_level = 360 },
+     new unique_equipment_enhance_data { equip_slot = 1, enhance_level = 370 },
+     new unique_equipment_enhance_data { equip_slot = 2, enhance_level = 999 }]) == 370,
+    "Unique equipment 1 limit included another slot or subtracted a level");
+Require(SQLData.CalculateUniqueEqLevelLimit([]) == 0,
+    "Missing unique equipment enhancement data must not invent a level limit");
+Require(SQLData.CalculateUniqueEqLevelLimit(
+    [new unique_equipment_enhance_data { equip_slot = 2, enhance_level = 5 }]) == 0,
+    "Unique equipment 2 data must not define the unique equipment 1 limit");
+var uniqueEqSettings = new PlayerSetting();
+uniqueEqSettings.ApplyUniqueEqLevelLimit(360);
+Require(uniqueEqSettings.maxUniqueEqLv == 360, "New settings did not use the database unique equipment limit");
+uniqueEqSettings.ApplyUniqueEqLevelLimit(370, setToMaximum: true);
+Require(uniqueEqSettings.maxUniqueEqLv == 370, "Database update did not refresh the unique equipment limit");
+uniqueEqSettings.ApplyUniqueEqLevelLimit(360);
+Require(uniqueEqSettings.maxUniqueEqLv == 360, "Older database did not clamp the unique equipment limit");
+uniqueEqSettings.maxUniqueEqLv = 300;
+uniqueEqSettings.ApplyUniqueEqLevelLimit(370);
+Require(uniqueEqSettings.maxUniqueEqLv == 300, "Manually selected lower unique equipment level was overwritten");
+uniqueEqSettings.ApplyUniqueEqLevelLimit(0, setToMaximum: true);
+Require(uniqueEqSettings.maxUniqueEqLv == 300, "Unique equipment level changed before database was loaded");
+uniqueEqSettings.ApplyUniqueEqLevelLimit(360, setToMaximum: true);
+Require(uniqueEqSettings.maxUniqueEqLv == 360, "Reloading did not restore the database unique equipment limit");
+
+Require(JsonConvert.DeserializeObject<PlayerSetting>("{}").playerProcess == 0,
+    "Missing saved progression must default to the database limit after loading");
+Require(JsonConvert.DeserializeObject<PlayerSetting>("{}").maxUniqueEqLv == 0,
+    "Missing saved unique equipment level must select the database maximum after loading");
+Require(!JsonConvert.DeserializeObject<PlayerSetting>("{}").enableGuildLevelBonus,
+    "Existing settings must default to disabled guild level bonus");
+var enabledGuildSettings = JsonConvert.DeserializeObject<PlayerSetting>(
+    JsonConvert.SerializeObject(new PlayerSetting { enableGuildLevelBonus = true }));
+Require(enabledGuildSettings.enableGuildLevelBonus, "Saved guild level bonus was not restored");
+
 static MainManager.DatabaseCache CreateValidCache(string fingerprint)
 {
     var enemy = new EnemyData
@@ -34,6 +157,9 @@ static MainManager.DatabaseCache CreateValidCache(string fingerprint)
     return new MainManager.DatabaseCache
     {
         cacheSchemaVersion = DatabaseCacheContract.CurrentSchemaVersion,
+        playerProcessLimit = 99,
+        playerLevelLimit = 358,
+        uniqueEqLevelLimit = 360,
         cacheBuildComplete = true,
         databaseSourceFingerprint = fingerprint,
         unitRarityDic =
@@ -105,6 +231,18 @@ try
 
     var validCache = CreateValidCache(fingerprintA);
     Require(DatabaseCacheContract.TryValidate(validCache, fingerprintA, out var validReason), validReason);
+    var missingProgressionCache = CreateValidCache(fingerprintA);
+    missingProgressionCache.playerProcessLimit = 0;
+    Require(!DatabaseCacheContract.TryValidate(missingProgressionCache, fingerprintA, out _),
+        "Cache missing JP progression limit was accepted");
+    var missingLevelCache = CreateValidCache(fingerprintA);
+    missingLevelCache.playerLevelLimit = 0;
+    Require(!DatabaseCacheContract.TryValidate(missingLevelCache, fingerprintA, out _),
+        "Cache missing JP player level limit was accepted");
+    var missingUniqueEqLevelCache = CreateValidCache(fingerprintA);
+    missingUniqueEqLevelCache.uniqueEqLevelLimit = 0;
+    Require(!DatabaseCacheContract.TryValidate(missingUniqueEqLevelCache, fingerprintA, out _),
+        "Cache missing JP unique equipment 1 level limit was accepted");
 
     var nullEntryCache = CreateValidCache(fingerprintA);
     nullEntryCache.unitRarityDic[1] = null;
@@ -403,6 +541,9 @@ try
                 var realCache = new MainManager.DatabaseCache
                 {
                     cacheSchemaVersion = DatabaseCacheContract.CurrentSchemaVersion,
+                    playerProcessLimit = realDatabase.PlayerProcessLimit,
+                    playerLevelLimit = realDatabase.PlayerLevelLimit,
+                    uniqueEqLevelLimit = realDatabase.UniqueEqLevelLimit,
                     cacheBuildComplete = true,
                     databaseSourceFingerprint = "real-db-probe",
                     unitRarityDic = realDatabase.Dic1,

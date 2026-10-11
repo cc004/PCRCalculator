@@ -768,6 +768,15 @@ namespace PCRCaculator
             }
         }
 
+        public void ClampLevel(int maxLevel)
+        {
+            level = Math.Max(1, Math.Min(level, maxLevel));
+            for (int i = 0; i < skillLevel.Length; i++)
+            {
+                skillLevel[i] = Math.Min(skillLevel[i], level);
+            }
+        }
+
         public int GetConnectRankLimit()
         {
             return connectRankLimit > 0
@@ -794,7 +803,9 @@ namespace PCRCaculator
             if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out UnitRarityData un))
             {
                 PlayerSetting playerSetting = MainManager.Instance.PlayerSetting;
-                int playerLevel = playerSetting.playerLevel + (battle_mode == 0 ? 0 : 10);
+                connectRankLimit = GetConnectRankLimit();
+                connectRank = connectRankLimit;
+                int playerLevel = MainManager.Instance.GetLevelMax(battle_mode, connectRank);
                 level = playerLevel;
                 skillLevel[0] = playerLevel;
                 skillLevel[1] = playerLevel;
@@ -821,8 +832,6 @@ namespace PCRCaculator
 
                 uniqueEqLv = MainManager.Instance.JudgeWeatherAllowUniqueEq(unitId) ? playerSetting.maxUniqueEqLv : -1;
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
-                connectRankLimit = GetConnectRankLimit();
-                connectRank = connectRankLimit;
                 uniqueEqPlus = CanEquipUniqueEqPlus();
                 MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp);
                 //会战ex装备
@@ -2513,12 +2522,14 @@ namespace PCRCaculator
     [Serializable]
     public class PlayerSetting
     {
+        public const int MinimumPlayerProcess = 10;
         public bool tpCalculationChanged = true;
         public bool exDivisionFixed = true;
-        public int playerLevel = 358;
-        public int playerProcess = 99;
+        public int playerLevel; // Initialized from the database after loading.
+        public int playerProcess; // 0 selects the database maximum after loading.
+        public bool enableGuildLevelBonus = false;
         //public int maxLove = 8;
-        public int maxUniqueEqLv = 360;
+        public int maxUniqueEqLv; // Initialized from the database after loading.
         //public float bodyWidth = 100;
         public bool allowRarity6 = true;
         public bool showAllUnits = true;
@@ -2902,6 +2913,44 @@ namespace PCRCaculator
 
             subs = configuredSubs.ToArray();
             return true;
+        }
+
+        public int GetLevelMax(int battleMode, int connectRank = 0)
+        {
+            if (battleMode == 0 && !enableGuildLevelBonus)
+                return playerLevel;
+
+            return playerLevel + (connectRank >= 9 ? 15 : 10);
+        }
+
+        public void ApplyPlayerLevelLimit(int limit, bool setToMaximum = false)
+        {
+            if (limit <= 0)
+                return;
+
+            playerLevel = setToMaximum || playerLevel <= 0
+                ? limit
+                : Math.Min(limit, Math.Max(1, playerLevel));
+        }
+
+        public void ApplyUniqueEqLevelLimit(int limit, bool setToMaximum = false)
+        {
+            if (limit <= 0)
+                return;
+
+            maxUniqueEqLv = setToMaximum || maxUniqueEqLv <= 0
+                ? limit
+                : Math.Min(limit, Math.Max(1, maxUniqueEqLv));
+        }
+
+        public void ApplyPlayerProcessLimit(int limit)
+        {
+            if (limit < MinimumPlayerProcess)
+                return;
+
+            playerProcess = playerProcess <= 0
+                ? limit
+                : Math.Min(limit, Math.Max(MinimumPlayerProcess, playerProcess));
         }
 
         public int GetMaxRank()
