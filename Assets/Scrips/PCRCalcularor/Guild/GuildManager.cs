@@ -278,20 +278,30 @@ namespace PCRCaculator.Guild
         public bool IsLabyrinthBossId(int id) => id / SpecialBossPrefixDivisor == 77;
         [UnityEngine.Serialization.FormerlySerializedAs("dungeonDropdown")]
         public Dropdown specialEnemyDropdown;
-        private readonly Dictionary<int, int[]> specialEnemyIds = new Dictionary<int, int[]>()
+        private const int LunaTower780ExWaveGroupId = 715707801;
+        private static readonly Dictionary<int, (int[] EnemyIds, int WaveGroupId)> specialEnemyIds = new()
         {
-            { 0, new[] { 710078001, 710078002, 710078003, 710078004, 710078005 } },
-            { 1, new[] { 710078005 } },
-            { 2, new[] { 501010901 } },
-            { 3, new[] { 501010902 } },
-            { 4, new[] { 501010903 } },
-            { 5, new[] { 501010904 } },
-            { 6, new[] { 501010905 } },
-            { 7, new[] { 501011001 } },
-            { 8, new[] { 501011002 } },
-            { 9, new[] { 501011003 } },
-            { 10, new[] { 501011004 } },
+            { 0, (new[] { 710078001, 710078002, 710078003, 710078004, 710078005 }, LunaTower780ExWaveGroupId) },
+            { 1, (new[] { 710078005 }, LunaTower780ExWaveGroupId) },
+            { 2, (new[] { 501010901 }, 0) },
+            { 3, (new[] { 501010902 }, 0) },
+            { 4, (new[] { 501010903 }, 0) },
+            { 5, (new[] { 501010904 }, 0) },
+            { 6, (new[] { 501010905 }, 0) },
+            { 7, (new[] { 501011001 }, 0) },
+            { 8, (new[] { 501011002 }, 0) },
+            { 9, (new[] { 501011003 }, 0) },
+            { 10, (new[] { 501011004 }, 0) },
         };
+
+        private static int GetSpecialEnemyWaveGroupId(int[] enemyIds)
+        {
+            if (enemyIds == null)
+                return 0;
+            return specialEnemyIds.Values
+                .FirstOrDefault(selection => selection.WaveGroupId != 0 && selection.EnemyIds.SequenceEqual(enemyIds))
+                .WaveGroupId;
+        }
         public void Awake()
         {
             Instance = this;
@@ -1377,8 +1387,9 @@ namespace PCRCaculator.Guild
         public void OnDungeonDropdownValueChanged()
         {
             if (!toggles_ChooseType[0].isOn && specialEnemyDropdown != null
-                && specialEnemyIds.TryGetValue(specialEnemyDropdown.value, out var enemyIds))
+                && specialEnemyIds.TryGetValue(specialEnemyDropdown.value, out var selection))
             {
+                var enemyIds = selection.EnemyIds;
                 if (enemyIds.All(enemyId => TowerEnemyParameterDic.ContainsKey(enemyId)
                     || EnemyDataDic.ContainsKey(enemyId)))
                 {
@@ -1404,12 +1415,14 @@ namespace PCRCaculator.Guild
                         enemyId => TowerEnemyParameterDic.TryGetValue(enemyId, out var enemyData)
                             ? enemyData : EnemyDataDic[enemyId]);
                     specialEnemyid = bossid;
+                    WaveGroupId = GetSpecialEnemyWaveGroupId(bossid);
                     SetBossImages(specialEnemyid, inputEnemyDataDic);
                 }
                 else
                 {
                     MainManager.Instance.WindowConfigMessage("bossID无效！", null);
                     specialEnemyid = new[] { 0 };
+                    WaveGroupId = 0;
                 }
                 specialInputValue = 0;
             }
@@ -1481,8 +1494,10 @@ namespace PCRCaculator.Guild
             //group.specialBossID = specialEnemyid;
             //group.specialInputValue = specialInputValue;
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
-            group.waveGroupId = IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss
-                ? WaveGroupId : 0;
+            int specialEnemyWaveGroupId = GetSpecialEnemyWaveGroupId(group.selectedEnemyIDs);
+            group.waveGroupId = specialEnemyWaveGroupId != 0 ? specialEnemyWaveGroupId
+                : IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss ? WaveGroupId : 0;
+            WaveGroupId = group.waveGroupId;
             SaveDataToJson();
             Refresh();
         }
@@ -1979,13 +1994,21 @@ namespace PCRCaculator.Guild
                 dropdowns_ChooseMirageBoss[0].value = data.mirageArea;
                 dropdowns_ChooseMirageBoss[1].value = data.mirageFloor;
             }
-            if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss)
+            int specialEnemyWaveGroupId = GetSpecialEnemyWaveGroupId(data.selectedEnemyIDs);
+            if (specialEnemyWaveGroupId != 0)
+            {
+                data.waveGroupId = specialEnemyWaveGroupId;
+                WaveGroupId = specialEnemyWaveGroupId;
+            }
+            else if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss)
             {
                 data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
+                WaveGroupId = data.waveGroupId;
             }
             else
             {
                 data.waveGroupId = 0;
+                WaveGroupId = 0;
             }
             TalentTexts[5].text = "属性技能：" + GetFinalTalentSkillNodeDescription();
             TalentTexts[6].text = "大师技能：" + GetFinalTeamSkillNodeDescription();
@@ -3174,6 +3197,7 @@ namespace PCRCaculator.Guild
             var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
             var waveGroupId = isBattle ? MyGameCtrl.Instance.tempData.waveGroupId : WaveGroupId;
             var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId) || IsMirageBossId(bossId)
+                || (waveGroupId != 0 && specialEnemyIds.Values.Any(selection => selection.WaveGroupId == waveGroupId))
                 ? (MainManager.Instance.TalentFormationDic.TryGetValue(waveGroupId, out var talentData) ? talentData : null)
                 : MainManager.Instance.TalentFormationDic.TryGetValue(bossId, out var bossData)
                     ? bossData
