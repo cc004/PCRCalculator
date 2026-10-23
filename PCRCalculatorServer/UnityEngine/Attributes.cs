@@ -7,8 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+namespace UnityEngine.Serialization
+{
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+    public sealed class FormerlySerializedAsAttribute(string oldName) : Attribute
+    {
+        public string oldName { get; } = oldName;
+    }
+}
+
 namespace UnityEngine
 {
+    public class CanvasRenderer : Component { }
     namespace Internal
     {
 

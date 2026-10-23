@@ -87,7 +87,7 @@ foreach (var (mode, connectRank, expected) in new[]
 }
 levelSettings.enableGuildLevelBonus = false;
 Require(levelSettings.GetLevelMax(0, 9) == 358, "Disabling guild level bonus did not restore the guild limit");
-var connectedUnit = new UnitData { level = 373, skillLevel = [373, 373, 373, 0] };
+var connectedUnit = new PCRCaculator.UnitData { level = 373, skillLevel = [373, 373, 373, 0] };
 connectedUnit.ClampLevel(levelSettings.GetLevelMax(2, 8));
 Require(connectedUnit.level == 368 && connectedUnit.skillLevel.SequenceEqual([368, 368, 368, 0]),
     "Connection rank decrease did not clamp character and skill levels");
@@ -178,6 +178,8 @@ static MainManager.DatabaseCache CreateValidCache(string fingerprint)
                 ratitydatas_rate = [new BaseData()],
             },
         },
+        ailmentDataDic = { [1] = new ailment_data { ailment_id = 1 } },
+        resistDataDic = { [1] = new int[1] },
         skillDataDic = { [1] = new SkillData() },
         skillActionDic = { [1] = new SkillAction { details = new int[3], values = new double[7] } },
         allUnitAttackPatternDic =

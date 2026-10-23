@@ -35,6 +35,11 @@ public class Component : UnityEngine.Object
         throw new NotImplementedException();
     }
 
+    public T[] GetComponentsInChildren<T>(bool includeInactive = false)
+    {
+        return gameObject.GetComponentsInChildren<T>(includeInactive);
+    }
+
     public T GetComponentInParent<T>()
     {
         throw new NotImplementedException();
