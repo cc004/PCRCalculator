@@ -36,8 +36,8 @@ namespace PCRCaculator
         { 5, "暗属性" }
     };
         // 布局常量
-        private const float SPACING_X = 110f;
-        private const float SPACING_Y = 80f;
+        private const float SPACING_X = 125f;
+        private const float SPACING_Y = 90f;
         private const float PADDING = 50f;
         private bool isUpdatingSkills = false;
         public void Awake()

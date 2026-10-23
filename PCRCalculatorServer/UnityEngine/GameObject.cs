@@ -23,6 +23,8 @@ public sealed class GameObject : UnityEngine.Object
 
     public Transform transform => GetComponent<Transform>() ?? AddComponent<Transform>();
 
+    public bool activeInHierarchy => activeSelf && (transform.parent == null || transform.parent.gameObject.activeInHierarchy);
+
     public bool activeSelf
     {
         get => m_IsActive;
@@ -91,6 +93,12 @@ public sealed class GameObject : UnityEngine.Object
     public GameObject(string name)
     {
         this.name = name;
+    }
+
+    public GameObject(string name, params Type[] components) : this(name)
+    {
+        foreach (var component in components)
+            AddComponent(component);
     }
 
     public GameObject() : this(string.Empty)

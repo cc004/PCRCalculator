@@ -191,7 +191,7 @@ namespace PCRCaculator
         }
         public void SetSilders(UnitData unit)
         {
-            detailSetSliders[0].maxValue = MainManager.Instance.levelMax;
+            detailSetSliders[0].maxValue = MainManager.Instance.GetLevelMax(MainManager.Instance.IsGuildBattle ? 0 : 2, unit.connectRank);
             detailSetSliders[0].minValue = 1;
             detailSetSliders[0].value = unit.level;
             detailSetTexts[0].text = unit.level.ToString();

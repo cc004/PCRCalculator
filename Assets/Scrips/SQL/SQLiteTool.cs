@@ -712,12 +712,16 @@ namespace PCRCaculator.SQL
         private Dictionary<int, wave_group_data> waveDic;
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
+        public int PlayerProcessLimit { get; private set; }
+        public int PlayerLevelLimit { get; private set; }
+        public int UniqueEqLevelLimit { get; private set; }
         public Dictionary<int, unit_talent[]> TalentDic { get; private set; }
         public Dictionary<int, enemy_talent_weakness> EnemyTalentWeaknessDic { get; private set; }
         public Dictionary<int, talent_weakness> TalentWeaknessDic { get; private set; }
         public Dictionary<int, int[]> WeaknessDic { get; private set; }
         public Dictionary<int, talentFormationData> TalentFormationDic { get; private set; }
         public Dictionary<int, EnemyData> Dic2 { get; private set; }
+        public Dictionary<int, EnemyData> TowerEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> SecretDungeonWaveGroupDataDic { get; private set; }
         public Dictionary<int, EnemyData> TalentQuestEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> TalentQuestWaveGroupDataDic { get; private set; }
@@ -728,6 +732,7 @@ namespace PCRCaculator.SQL
         public Dictionary<int, EnemyData> LabyrinthEnemyParameterDic { get; private set; }
         public Dictionary<int, EnemyData> MirageEnemyParameterDic { get; private set; }
         public Dictionary<int, WaveGroupDataBase> MirageWaveGroupDataDic { get; private set; }
+        public Dictionary<int, WaveGroupDataBase> LabyrinthWaveGroupDataDic { get; private set; }
         public Dictionary<int, SkillData> Dic3 { get; private set; }
         public Dictionary<int, SkillAction> Dic4 { get; private set; }
         public Dictionary<int, UnitAttackPattern> Dic5 { get; private set; }
@@ -771,7 +776,9 @@ namespace PCRCaculator.SQL
         public Dictionary<int, List<connect_rank_enhance>> ConnectRankEnhanceDic { get; private set; }
         public Dictionary<int, labyrinth_enhance_node> LabyrinthEnhanceNodeDic { get; private set; }
         public Dictionary<int, labyrinth_enhance_data> LabyrinthEnhanceDataDic { get; private set; }
+        public Dictionary<int, labyrinth_enhance_information> LabyrinthEnhanceInformationDic { get; private set; }
         public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get; private set; }
+        public Dictionary<int, labyrinth_difficulty_effect> LabyrinthDifficultyEffectDic { get; private set; }
         public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get; private set; }
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
@@ -801,6 +808,42 @@ namespace PCRCaculator.SQL
             return temp;
         }
 
+        public static int CalculatePlayerLevelLimit(IEnumerable<experience_team> levels)
+        {
+            return Math.Max(0, levels.Select(row => row.team_level).DefaultIfEmpty(1).Max() - 1);
+        }
+
+        public static int CalculateUniqueEqLevelLimit(IEnumerable<unique_equipment_enhance_data> enhancements)
+        {
+            return Math.Max(0, enhancements
+                .Where(row => row != null && row.equip_slot == 1)
+                .Select(row => row.enhance_level)
+                .DefaultIfEmpty(0).Max());
+        }
+
+        public static int CalculatePlayerProcessLimit(IEnumerable<unit_promotion> promotions)
+        {
+            int limit = 0;
+            foreach (var promotion in promotions)
+            {
+                if (promotion == null || promotion.unit_id < 100000 || promotion.unit_id >= 200000
+                    || promotion.promotion_level < 8)
+                    continue;
+
+                int equipmentCount = promotion.GetEquips().Count(id => id > 0 && id != 999999);
+                if (equipmentCount < 3)
+                    continue;
+
+                int rank = promotion.promotion_level;
+                // Keep the existing progression encoding: R10-3 = 13, R10-4 = 14, R10-5 = 15.
+                int process = rank == 8 ? PlayerSetting.MinimumPlayerProcess
+                    : rank == 9 ? (equipmentCount >= 5 ? 12 : 11)
+                    : (rank - 10) * 3 + 13 + Math.Min(2, equipmentCount - 3);
+                limit = Math.Max(limit, process);
+            }
+            return limit;
+        }
+
         // TRAP: this method uses thread static field, so make sure not to run the method two times at once
         public Task ParallelGetAll()
         {
@@ -819,6 +862,7 @@ namespace PCRCaculator.SQL
             var equipDicTask = Task.Run(() =>
             {
                 equipDic = GetDatasDicList<unit_promotion>(a => a.unit_id);
+                PlayerProcessLimit = CalculatePlayerProcessLimit(equipDic.Values.SelectMany(rows => rows));
             });
             var rankStateDicTask = Task.Run(() =>
             {
@@ -854,6 +898,8 @@ namespace PCRCaculator.SQL
             var UnitRoleDataDicTask =
                 Task.Run(() => UnitRoleDataDic = GetOptionalDatasDic<unit_role_data>(a => a.unit_id));
             var tasks = new List<Task>();
+            tasks.Add(Task.Run(() => PlayerLevelLimit = CalculatePlayerLevelLimit(GetDatas<experience_team>())));
+            tasks.Add(Task.Run(() => UniqueEqLevelLimit = CalculateUniqueEqLevelLimit(GetDatas<unique_equipment_enhance_data>())));
 
             tasks.Add(
                 DatabaseCacheContract.RunAfterSuccessAsync(
@@ -864,6 +910,10 @@ namespace PCRCaculator.SQL
                 DatabaseCacheContract.RunAfterSuccessAsync(
                     Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
                     () => Dic2 = GetEnemyDataDic()));
+            tasks.Add(
+                DatabaseCacheContract.RunAfterSuccessAsync(
+                    Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
+                    () => TowerEnemyParameterDic = GetTowerEnemyDataDic()));
             tasks.Add(
                 DatabaseCacheContract.RunAfterSuccessAsync(
                     Task.WhenAll(dic1Task, unitSkillDataDicTask, unitAttackPatternDicTask),
@@ -940,21 +990,37 @@ namespace PCRCaculator.SQL
                         };
                     }, optional: true)));
             tasks.Add(
-            Task.Run(() => MirageWaveGroupDataDic = GetWaveGroupDataDic<mirage_wave_group_data>(
-                data => data.wave_group_id,
-                data => data.wave_group_id,
-                (data, index) =>
-                {
-                    return index switch
+                Task.Run(() => MirageWaveGroupDataDic = GetWaveGroupDataDic<mirage_wave_group_data>(
+                    data => data.wave_group_id,
+                    data => data.wave_group_id,
+                    (data, index) =>
                     {
-                        1 => data.enemy_id_1,
-                        2 => data.enemy_id_2,
-                        3 => data.enemy_id_3,
-                        4 => data.enemy_id_4,
-                        5 => data.enemy_id_5,
-                        _ => 0,
-                    };
-                }, optional: true)));
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    }, optional: true)));
+            tasks.Add(
+                Task.Run(() => LabyrinthWaveGroupDataDic = GetWaveGroupDataDic<labyrinth_wave_group_data>(
+                    data => data.wave_group_id,
+                    data => data.wave_group_id,
+                    (data, index) =>
+                    {
+                        return index switch
+                        {
+                            1 => data.enemy_id_1,
+                            2 => data.enemy_id_2,
+                            3 => data.enemy_id_3,
+                            4 => data.enemy_id_4,
+                            5 => data.enemy_id_5,
+                            _ => 0,
+                        };
+                    }, optional: true)));
             tasks.Add(
                 Task.Run(() => Dic3 = GetSkillDataDic()));
             tasks.Add(
@@ -1054,9 +1120,13 @@ namespace PCRCaculator.SQL
             tasks.Add(
                 Task.Run(() => LabyrinthEnhanceDataDic = GetOptionalDatasDic<labyrinth_enhance_data>(a => a.effect_id)));
             tasks.Add(
+                Task.Run(() => LabyrinthEnhanceInformationDic = GetOptionalDatasDic<labyrinth_enhance_information>(a => a.information_id)));
+            tasks.Add(
                 Task.Run(() => LabyrinthQuestDataDic = GetOptionalDatasDic<labyrinth_quest_data>(a => a.quest_id)));
             tasks.Add(
                 Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetOptionalDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
+            tasks.Add(
+                Task.Run(() => LabyrinthDifficultyEffectDic = GetOptionalDatasDic<labyrinth_difficulty_effect>(a => a.id)));
             tasks.Add(
                 Task.Run(() => LabyrinthRelicDic = GetOptionalDatasDic<labyrinth_relic>(a => a.relic_id)));
             tasks.Add(
@@ -1414,6 +1484,69 @@ namespace PCRCaculator.SQL
                 dic.Add(e.enemy_id, e);
                 idx++;
 
+            }
+            return dic;
+        }
+        private Dictionary<int, EnemyData> GetTowerEnemyDataDic()
+        {
+            var dic = new Dictionary<int, EnemyData>();
+            foreach (var dd in GetOptionalDatas<tower_enemy_parameter>())
+            {
+                if (!dic1.TryGetValue(dd.unit_id, out var detail) ||
+                    !unitSkillDataDic.TryGetValue(dd.unit_id, out var skills) ||
+                    !unitAttackPatternDic.TryGetValue(dd.unit_id, out var patterns))
+                {
+                    continue;
+                }
+
+                var enemy = new EnemyData
+                {
+                    enemy_id = dd.enemy_id,
+                    unit_id = dd.unit_id,
+                    name = dd.name,
+                    level = dd.level,
+                    rarity = dd.rarity,
+                    promotion_level = dd.promotion_level,
+                    baseData = dd.GetBaseData(),
+                    union_burst_level = dd.union_burst_level,
+                    main_skill_lvs = new List<int>
+                    {
+                        dd.main_skill_lv_1, dd.main_skill_lv_2, dd.main_skill_lv_3, dd.main_skill_lv_4,
+                        dd.main_skill_lv_5, dd.main_skill_lv_6, dd.main_skill_lv_7, dd.main_skill_lv_8,
+                        dd.main_skill_lv_9, dd.main_skill_lv_10
+                    },
+                    ex_skill_lvs = new List<int>
+                    {
+                        dd.ex_skill_lv_1, dd.ex_skill_lv_2, dd.ex_skill_lv_3, dd.ex_skill_lv_4, dd.ex_skill_lv_5
+                    },
+                    resist_status_id = dd.resist_status_id,
+                    resist_variation_id = dd.resist_variation_id,
+                    detailData = new EnemyDetailData
+                    {
+                        unit_id = detail.unit_id,
+                        unit_name = detail.unit_name,
+                        prefab_id = detail.prefab_id,
+                        motion_type = detail.motion_type,
+                        se_type = detail.se_type,
+                        move_speed = detail.move_speed,
+                        search_area_width = detail.search_area_width,
+                        atk_type = detail.atk_type,
+                        normal_atk_cast_time = detail.normal_atk_cast_time,
+                        cutin = detail.cutin,
+                        visual_change_flag = detail.visual_change_flag,
+                        comment = detail.comment
+                    },
+                    skillData = new EnemySkillData
+                    {
+                        UB = skills.union_burst,
+                        raw_data = skills,
+                        MainSkills = skills.GetMainSkillIDs(),
+                        enemyAttackPatterns = patterns.Select(pattern => new UnitAttackPattern(
+                            pattern.pattern_id, pattern.unit_id, pattern.loop_start, pattern.loop_end,
+                            pattern.GetAllPatterns().ToArray())).ToList()
+                    }
+                };
+                dic.Add(enemy.enemy_id, enemy);
             }
             return dic;
         }

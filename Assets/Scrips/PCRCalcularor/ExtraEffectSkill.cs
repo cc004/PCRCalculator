@@ -19,6 +19,7 @@ namespace PCRCaculator
 
             // 从数据表中找到匹配quest_id的数据
             List<object> battleEffects = new List<object>();
+            string atlasName = "AtlasTalentQuest";
             if (GuildManager.Instance.IsTalentQuestBoss)
             {
                 battleEffects = MainManager.Instance.TalentQuestBattleEffectDic
@@ -46,6 +47,17 @@ namespace PCRCaculator
                     .Cast<object>()
                     .ToList();
             }
+            else if (GuildManager.Instance.IsLabyrinthBoss)
+            {
+                atlasName = "AtlasLabyrinthBattleEffect";
+                int difficulty = GuildManager.Instance.SettingData.GetCurrentPlayerGroup().labyrinthDifficulty;
+                battleEffects = MainManager.Instance.LabyrinthDifficultyEffectDic
+                    .Values
+                    .Where(x => x.difficulty == difficulty)
+                    .OrderBy(x => x.id)
+                    .Cast<object>()
+                    .ToList();
+            }
             if (battleEffects.Count > 0)
             {
                 var firstEffect = battleEffects[0];
@@ -54,14 +66,14 @@ namespace PCRCaculator
                 var descProperty = firstEffect.GetType().GetProperty("description");
 
                 // 加载精灵图集
-                var sprites = Resources.LoadAll<Sprite>("AtlasTalentQuest")
+                var sprites = Resources.LoadAll<Sprite>(atlasName)
                     .ToDictionary(x => x.name, x => x);
 
                 // 按顺序设置TalentQuestBattleEffectPictures的图片
                 foreach (var effectData in battleEffects)
                 {
                     GameObject a = Instantiate(extraDetailPrefab);
-                    a.transform.SetParent(Content);
+                    a.transform.SetParent(Content, false);
                     ExtraEffecDetail detailComponent = a.GetComponent<ExtraEffecDetail>();
                     if (detailComponent != null)
                     {
@@ -69,12 +81,13 @@ namespace PCRCaculator
                         string effectName = effectProperty != null ? effectProperty.GetValue(effectData)?.ToString() : "";
                         string description = descProperty != null ? descProperty.GetValue(effectData)?.ToString() : "";
 
+                        detailComponent.nameText.text = effectName ?? "";
+                        detailComponent.describeText.text = description ?? "";
+
                         if (!string.IsNullOrEmpty(iconName) && sprites.ContainsKey(iconName))
                         {
                             detailComponent.Icon.sprite = sprites[iconName];
                             detailComponent.Icon.gameObject.SetActive(true);
-                            detailComponent.nameText.text = effectName ?? "";
-                            detailComponent.describeText.text = description ?? "";
                         }
                         else
                         {

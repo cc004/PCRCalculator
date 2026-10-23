@@ -20,6 +20,57 @@ namespace Elements
         private const int PassiveEffectType = 14;
         private const int BattleSkillEffectType = 1;
 
+        public List<PCRCaculator.UnitData> CreateOwnedUnitList(
+            int ownedUnitsCount,
+            IReadOnlyDictionary<int, int> roleCounts = null,
+            IReadOnlyDictionary<int, int> talentCounts = null)
+        {
+            if (ownedUnitsCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(ownedUnitsCount), "持有角色数量不能为负数。");
+
+            ValidateOwnedUnitCounts(roleCounts, ownedUnitsCount, nameof(roleCounts));
+            ValidateOwnedUnitCounts(talentCounts, ownedUnitsCount, nameof(talentCounts));
+            if (roleCounts != null && roleCounts.Values.Sum(count => (long)count) > ownedUnitsCount)
+                throw new ArgumentException("职能人数合计不能超过持有角色总数。", nameof(roleCounts));
+
+            // 这是供遗物统计使用的角色记录，不根据数量推测真实角色 ID。
+            // 未提供的职能、属性保持未知；真实 UnitData 仍通过数据库查询职能和属性。
+            var units = Enumerable.Range(0, ownedUnitsCount)
+                .Select(_ => new LabyrinthOwnedUnitData()).ToList();
+            int roleIndex = 0;
+            if (roleCounts != null)
+            {
+                foreach (var pair in roleCounts.OrderBy(pair => pair.Key))
+                {
+                    for (int i = 0; i < pair.Value; i++)
+                        units[roleIndex++].OwnedRoleId = pair.Key;
+                }
+            }
+            if (talentCounts != null)
+            {
+                // 与真实角色的 talent_id 列表一致，一名角色可以计入多个属性。
+                foreach (var pair in talentCounts.OrderBy(pair => pair.Key))
+                {
+                    for (int i = 0; i < pair.Value; i++)
+                        units[i].OwnedTalentIds.Add(pair.Key);
+                }
+            }
+            return units.Cast<PCRCaculator.UnitData>().ToList();
+        }
+
+        private static void ValidateOwnedUnitCounts(IReadOnlyDictionary<int, int> counts, int total, string parameterName)
+        {
+            if (counts == null)
+                return;
+            foreach (var pair in counts)
+            {
+                if (pair.Key < 1 || pair.Key > 9)
+                    throw new ArgumentException($"职能或属性 ID 必须在 1～9 之间：{pair.Key}。", parameterName);
+                if (pair.Value < 0 || pair.Value > total)
+                    throw new ArgumentException($"分类人数必须在 0～{total} 之间：ID={pair.Key}, count={pair.Value}。", parameterName);
+            }
+        }
+
         public IReadOnlyDictionary<eParamType, long> CreatePassiveParameterDictionary(
             IEnumerable<int> relicIds,
             IEnumerable<PCRCaculator.UnitData> ownUnits,
@@ -232,13 +283,15 @@ namespace Elements
             if (additiveType >= 10 && additiveType <= 19)
             {
                 int roleId = additiveType - 10;
-                return ownUnits.Count(unit => GetUnitRoleId(unit.unitId) == roleId);
+                return ownUnits.Count(unit => unit is LabyrinthOwnedUnitData ownedUnit
+                    ? ownedUnit.OwnedRoleId == roleId : GetUnitRoleId(unit.unitId) == roleId);
             }
 
             if (additiveType >= 20 && additiveType <= 29)
             {
                 int talentId = additiveType % 10;
-                return ownUnits.Count(unit => HasTalent(unit.unitId, talentId));
+                return ownUnits.Count(unit => unit is LabyrinthOwnedUnitData ownedUnit
+                    ? ownedUnit.OwnedTalentIds.Contains(talentId) : HasTalent(unit.unitId, talentId));
             }
 
             if (additiveType == 30)
@@ -296,6 +349,13 @@ namespace Elements
                    paramType != eParamType.NONE &&
                    paramType != eParamType.BASE_PARAMETER_NUM;
         }
+    }
+
+    // 仅用于遗物持有角色统计，不加入战斗的参战角色列表。
+    public sealed class LabyrinthOwnedUnitData : PCRCaculator.UnitData
+    {
+        public int? OwnedRoleId { get; set; }
+        public HashSet<int> OwnedTalentIds { get; } = new HashSet<int>();
     }
 
     public sealed class LabyrinthRelicBattleSkillSpec

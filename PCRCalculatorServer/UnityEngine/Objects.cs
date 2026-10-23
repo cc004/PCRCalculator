@@ -51,6 +51,11 @@ public class Object
         }
     }
 
+    public static T Instantiate<T>(T original, Transform parent, bool worldPositionStays = false) where T : Component
+    {
+        throw new NotImplementedException();
+    }
+
     public static void DestroyImmediate(UnityEngine.Object obj)
     {
     }

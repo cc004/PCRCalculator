@@ -45,7 +45,9 @@ namespace PCRApi
 
         public string MD5 => modified == null ? path : CalcMd5(modified);
         [JsonIgnore]
-        public bool IsAssets => !url.StartsWith("manifest/");
+        // "every" is also used by asset bundles; only manifest paths can contain child manifests.
+        public bool IsAssets => type != "every" || !url.StartsWith("manifest/", StringComparison.Ordinal) ||
+                                url.EndsWith(".cdb") || url == "manifest/seven2_assetmanifest";
 
         [JsonIgnore]
         public byte[] modified;

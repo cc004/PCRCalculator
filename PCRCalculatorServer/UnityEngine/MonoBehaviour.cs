@@ -24,4 +24,9 @@ public class MonoBehaviour : Behaviour
     {
         throw new NotImplementedException();
     }
+
+    public void StopCoroutine(Coroutine routine)
+    {
+        throw new NotImplementedException();
+    }
 }

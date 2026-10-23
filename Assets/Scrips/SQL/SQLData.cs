@@ -133,6 +133,63 @@ namespace PCRCaculator.SQL
             };
         }
     }
+    public class tower_enemy_parameter
+    {
+        [PrimaryKey]
+        public int enemy_id { get; set; }
+        public int unit_id { get; set; }
+        public string name { get; set; }
+        public int level { get; set; }
+        public int rarity { get; set; }
+        public int promotion_level { get; set; }
+        public long hp { get; set; }
+        public int atk { get; set; }
+        public int magic_str { get; set; }
+        public int def { get; set; }
+        public int magic_def { get; set; }
+        public int physical_critical { get; set; }
+        public int magic_critical { get; set; }
+        public int wave_hp_recovery { get; set; }
+        public int wave_energy_recovery { get; set; }
+        public int dodge { get; set; }
+        public int physical_penetrate { get; set; }
+        public int magic_penetrate { get; set; }
+        public int life_steal { get; set; }
+        public int hp_recovery_rate { get; set; }
+        public int energy_recovery_rate { get; set; }
+        public int energy_reduce_rate { get; set; }
+        public int union_burst_level { get; set; }
+        public int main_skill_lv_1 { get; set; }
+        public int main_skill_lv_2 { get; set; }
+        public int main_skill_lv_3 { get; set; }
+        public int main_skill_lv_4 { get; set; }
+        public int main_skill_lv_5 { get; set; }
+        public int main_skill_lv_6 { get; set; }
+        public int main_skill_lv_7 { get; set; }
+        public int main_skill_lv_8 { get; set; }
+        public int main_skill_lv_9 { get; set; }
+        public int main_skill_lv_10 { get; set; }
+        public int ex_skill_lv_1 { get; set; }
+        public int ex_skill_lv_2 { get; set; }
+        public int ex_skill_lv_3 { get; set; }
+        public int ex_skill_lv_4 { get; set; }
+        public int ex_skill_lv_5 { get; set; }
+        public int resist_status_id { get; set; }
+        public int resist_variation_id { get; set; }
+        public int accuracy { get; set; }
+        public int enemy_color { get; set; }
+
+        public BaseData GetBaseData()
+        {
+            return new BaseData(hp, atk, def, magic_str, magic_def, physical_critical,//0-5
+            magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery, //6-9
+            physical_penetrate, magic_penetrate, energy_recovery_rate, hp_recovery_rate,//10-13
+            energy_reduce_rate, accuracy)
+            {
+                realhp = hp
+            };
+        }
+    }
     public class labyrinth_enemy_parameter
     {
         [PrimaryKey]
@@ -523,6 +580,12 @@ namespace PCRCaculator.SQL
         public int equipment_enhance_level { get; set; }
     }
 
+    public class experience_team
+    {
+        [PrimaryKey]
+        public int team_level { get; set; }
+    }
+
     public class equipment_data : DbBaseData
     {
         [PrimaryKey]
@@ -732,6 +795,14 @@ namespace PCRCaculator.SQL
         public int sale_price { get; set; }
         public int require_level { get; set; }
     }
+    public class unique_equipment_enhance_data
+    {
+        [PrimaryKey]
+        public int equip_slot { get; set; }
+        [PrimaryKey]
+        public int enhance_level { get; set; }
+    }
+
     public class unique_equipment_enhance_rate : unique_equip_enhance_rate
     {
         public override int max_lv { get => -1; }
@@ -1202,6 +1273,16 @@ namespace PCRCaculator.SQL
         public int required_item_count_3 { get; set; }
     }
 
+    public class labyrinth_difficulty_effect
+    {
+        [PrimaryKey]
+        public int id { get; set; }
+        public int difficulty { get; set; }
+        public string icon_name { get; set; }
+        public string effect_name { get; set; }
+        public string description { get; set; }
+    }
+
     public class labyrinth_enhance_node
     {
         [PrimaryKey]
@@ -1216,6 +1297,13 @@ namespace PCRCaculator.SQL
         public int pre_node_3 { get; set; }
         public int is_rare { get; set; }
         public int pre_node_2 { get; set; }
+    }
+    public class labyrinth_enhance_information
+    {
+        [PrimaryKey]
+        public int information_id { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
     }
 
     public class labyrinth_enhance_data
@@ -1236,7 +1324,16 @@ namespace PCRCaculator.SQL
         public int quest_type { get; set; }
         public int reward_id { get; set; }
     }
-
+    public class labyrinth_wave_group_data
+    {
+        [PrimaryKey]
+        public int wave_group_id { get; set; }
+        public int enemy_id_1 { get; set; }
+        public int enemy_id_2 { get; set; }
+        public int enemy_id_3 { get; set; }
+        public int enemy_id_4 { get; set; }
+        public int enemy_id_5 { get; set; }
+    }
     public class labyrinth_difficulty_enemy_data
     {
         [PrimaryKey]
@@ -1270,6 +1367,8 @@ namespace PCRCaculator.SQL
     {
         [PrimaryKey]
         public int relic_id { get; set; }
+        public string name { get; set; }
+        public string effect_description { get; set; }
         public int effect_group_id { get; set; }
         public int relic_mark_id { get; set; }
         public int relic_mark_count { get; set; }

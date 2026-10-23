@@ -251,7 +251,8 @@ namespace Elements
         int OnlyDispOwned = 0,
         string StartTime = "",
         string EndTime = "",
-        int originalUnitID = 0)
+        int originalUnitID = 0,
+        int VisualChangeFlag = 0)
       {
         _UnitId = UnitId;
         _UnitName = UnitName;
@@ -276,6 +277,7 @@ namespace Elements
         _StartTime = StartTime;
         _EndTime = EndTime;
                 _OriginalUnitId = originalUnitID;
+                this.VisualChangeFlag = VisualChangeFlag;
       }
     }
   }

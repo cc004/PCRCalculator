@@ -138,6 +138,11 @@ public class Transform : Component, IEnumerable
         throw new NotImplementedException();
     }
 
+    public void SetSiblingIndex(int index)
+    {
+        throw new NotImplementedException();
+    }
+
     public Transform Find(string n)
     {
         throw new NotImplementedException();
@@ -185,7 +190,7 @@ public class RectTransform : Transform
     internal Vector2 anchorMax;
     internal Vector2 offsetMin;
     internal Vector2 offsetMax;
-    internal object pivot;
+    internal Vector2 pivot;
 
     internal void SetSizeWithCurrentAnchors(object horizontal, float maxX)
     {
