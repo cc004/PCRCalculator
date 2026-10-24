@@ -454,6 +454,22 @@ namespace Elements
                 }
                 abnormalResistIdDictionary[_resistId][key][ailment.ailment_detail_1] = unitResistdata.ailments[ailmentIndex];
             }
+
+            // Client 11.7.2 maps ailment 54 to ratio damage (46), detail -1.
+            // Some JP databases omit that metadata row while retaining ailment_54.
+            // Keep the real resistance value, including 0%, so ResistStatus consumes
+            // the same random draw as the client. Explicit database mappings win.
+            const int ratioDamageAilmentId = 54;
+            var resistances = abnormalResistIdDictionary[_resistId];
+            if (unitResistdata.ailments.Length >= ratioDamageAilmentId
+                && !MainManager.Instance.AilmentDataDic.Values.Any(ailment => ailment.ailment_id == ratioDamageAilmentId)
+                && !resistances.ContainsKey(eActionType.RATIO_DAMAGE))
+            {
+                resistances[eActionType.RATIO_DAMAGE] = new Dictionary<int, int>
+                {
+                    [-1] = unitResistdata.ailments[ratioDamageAilmentId - 1]
+                };
+            }
             
         }
         private void createDebuffStatus(int _resistId)
