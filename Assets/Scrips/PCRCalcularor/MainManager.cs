@@ -370,8 +370,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10066000;
-            public long BossVersionJP = 10066000;
+            public long CharacterVersionJP = 10067700;
+            public long BossVersionJP = 10066500;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -716,11 +716,11 @@ namespace PCRCaculator
 
                                 var dbCN = dbTool3;
 
-                                // BossVersionJP supplies progression and level limits even when CN boss data is selected.
+                                // Progression follows the selected region; JP resources may be newer than CN availability.
+                                if (!Version.useJP) dbTool2 = dbTool3;
                                 databaseCache.playerProcessLimit = dbTool2.PlayerProcessLimit;
                                 databaseCache.playerLevelLimit = dbTool2.PlayerLevelLimit;
                                 databaseCache.uniqueEqLevelLimit = dbTool2.UniqueEqLevelLimit;
-                                if (!Version.useJP) dbTool2 = dbTool3;
 
                                 databaseCache.ailmentDataDic = dbTool.AilmentDataDic ?? databaseCache.ailmentDataDic;
                                 databaseCache.resistDataDic = dbTool.resistDataDic ?? databaseCache.resistDataDic;

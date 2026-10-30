@@ -233,6 +233,19 @@ try
 
     var validCache = CreateValidCache(fingerprintA);
     Require(DatabaseCacheContract.TryValidate(validCache, fingerprintA, out var validReason), validReason);
+    var sparseResistanceCache = CreateValidCache(fingerprintA);
+    sparseResistanceCache.ailmentDataDic[3] = new ailment_data { ailment_id = 3 };
+    foreach (var id in sparseResistanceCache.resistDataDic.Keys.ToArray())
+        sparseResistanceCache.resistDataDic[id] = new int[3];
+    Require(DatabaseCacheContract.TryValidate(sparseResistanceCache, fingerprintA, out var sparseReason), sparseReason);
+    Require(sparseResistanceCache.ailmentDataDic.ContainsKey(3), "Validation discarded a later source row");
+    sparseResistanceCache.resistDataDic[1] = new int[1];
+    Require(DatabaseCacheContract.TryValidate(sparseResistanceCache, fingerprintA, out var shortSourceReason),
+        "A source array shorter than metadata is governed by the client loop, not a cache gate: " + shortSourceReason);
+    var priorSourcePolicyCache = CreateValidCache(fingerprintA);
+    priorSourcePolicyCache.cacheSchemaVersion = DatabaseCacheContract.CurrentSchemaVersion - 1;
+    Require(!DatabaseCacheContract.TryValidate(priorSourcePolicyCache, fingerprintA, out _),
+        "Previous data-source policy cache must be rebuilt");
     var missingProgressionCache = CreateValidCache(fingerprintA);
     missingProgressionCache.playerProcessLimit = 0;
     Require(!DatabaseCacheContract.TryValidate(missingProgressionCache, fingerprintA, out _),

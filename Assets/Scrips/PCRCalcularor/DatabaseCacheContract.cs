@@ -24,7 +24,7 @@ namespace PCRCaculator
 
     public static class DatabaseCacheContract
     {
-        public const int CurrentSchemaVersion = 11;
+        public const int CurrentSchemaVersion = 14;
 
         public static T ResolveSharedDatabase<T>(T primary, Func<T> createSeparate, bool sharesPrimary)
             where T : class
@@ -82,9 +82,10 @@ namespace PCRCaculator
             if (cache.ailmentDataDic.Any(pair =>
                     pair.Value == null || pair.Key <= 0 || pair.Value.ailment_id != pair.Key))
                 return Reject("ailmentDataDic 包含不完整条目", out reason);
-            var maxAilmentId = cache.ailmentDataDic.Keys.Max();
-            if (cache.resistDataDic.Any(pair => pair.Value == null || pair.Value.Length < maxAilmentId))
-                return Reject($"resistDataDic 未覆盖最大 ailment_id={maxAilmentId}", out reason);
+            // The client iterates the actual resistance array length. Metadata may
+            // contain later IDs; do not reject or extend a valid shorter source array.
+            if (cache.resistDataDic.Any(pair => pair.Value == null || pair.Value.Length == 0))
+                return Reject("resistDataDic 包含空抗性数组", out reason);
 
             if (cache.masterUnitSkillDataRf?.dict == null)
                 return Reject("masterUnitSkillDataRf 结构缺失", out reason);
