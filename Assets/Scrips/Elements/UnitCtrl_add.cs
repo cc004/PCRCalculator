@@ -298,6 +298,7 @@ namespace Elements
             public readonly int frame;
             public string description;
             public string description2;
+            public bool hasRepeatedPressCandidate;
 
             public CritPoint()
             {
@@ -340,8 +341,14 @@ namespace Elements
         {
             var frame = BattleHeaderController.CurrentFrameCount;
             var res = string.Empty;
-            res = new[] { critPoint, globalCritPoint }.Where(c => c?.frame >= frame - 8).Distinct()
-                .OrderByDescending(c => c.frame).FirstOrDefault()?.ToString(frame);
+            var operationPoint = new[] { critPoint, globalCritPoint }.Where(c => c?.frame >= frame - 8).Distinct()
+                .OrderByDescending(c => c.frame).FirstOrDefault();
+            res = operationPoint?.ToString(frame);
+            // Prefer repeated press only when this unit has a same-frame candidate.
+            if (res == "AUTO" && !IsOther && !IsSummonOrPhantom &&
+                ReferenceEquals(operationPoint, critPoint) && operationPoint?.frame == frame &&
+                operationPoint.hasRepeatedPressCandidate)
+                return "连点";
             if (res == "AUTO" && !IsOther)
             {
                 int idx = battleManager.UnitList.IndexOf(this);
