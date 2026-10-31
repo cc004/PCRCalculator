@@ -1,0 +1,24 @@
+name: Build desktop on demand
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Select blue or dev above, then the desktop package
+        type: choice
+        required: true
+        default: macos
+        options:
+          - macos
+          - windows
+
+permissions:
+  contents: read
+
+jobs:
+  select-branch:
+    name: Select blue or dev; master only registers this manual workflow
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Select blue or dev to use that branch build entry.'
