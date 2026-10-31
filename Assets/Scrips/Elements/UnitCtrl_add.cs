@@ -320,7 +320,11 @@ namespace Elements
             }
         }
 
+#if ENABLE_THREADING
+        [ThreadStatic]
+#endif
         private static CritPoint globalCritPoint;
+        public static void ResetGlobalOperationPoint() => globalCritPoint = null;
         public CritPoint critPoint;
         public bool lastCanReleaseSkill = false, skillReleased = false;
         public int enemyId;
@@ -382,7 +386,7 @@ namespace Elements
                             tolerance = 0;
                             toggle = frame - 1;
                             desc = $"{uc.UnitNameEx}待机";
-                            idle_unit_name.Append(uc.UnitNameEx);
+                            idle_unit_name.Add(uc.UnitNameEx);
                         }
                         else
                         {
@@ -419,8 +423,7 @@ namespace Elements
                     }
                     if (idle_unit_name.Count > 0)
                     {
-                        desc += string.Join(",", idle_unit_name);
-                        res = $"AUTO({desc}待机，容错{tolerance}帧)";
+                        res = $"AUTO({string.Join(",", idle_unit_name)}待机，容错{tolerance}帧)";
                     }
                     else if (tolerance != 114514)
                     {

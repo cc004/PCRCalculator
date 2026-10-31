@@ -84,7 +84,10 @@ namespace PCRCaculator
         {
             if (TalentEnhanceContext.IsEditingArenaEnemy)
             {
-                MainManager.Instance.WindowMessage("敌方独立属性强化不能覆盖为全局配置。");
+                TalentEnhanceContext.ClearArenaEnemyConfiguration();
+                GuildManager.Instance.SaveDataToJson();
+                OpenTalentPanel();
+                MainManager.Instance.WindowMessage("已清除敌方独立属性强化，恢复继承我方配置！");
                 return;
             }
 

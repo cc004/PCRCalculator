@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -63,7 +63,7 @@ namespace Elements
         private List<bool> pendingServerSetToggles = new List<bool>();
 
         public InputField stopFrameText;
-        public int stopFrame;
+        public int stopFrame = -1;
         public int CurrentSeedForSave { get; set; }
         //public bool ignoreEffects => false;//!tempData.SettingData.useSkillEffects;
 
@@ -403,6 +403,7 @@ namespace Elements
             }
             unitCount.Clear();
             BattleManager.Instance.Init(this);
+            BattleManager.Instance.semanubmanager.Disable();
 
             if (mainManager.IsGuildBattle)
             {
@@ -500,6 +501,12 @@ namespace Elements
             BattleHeaderController.Instance.ReStart();
             BattleUIManager.Instance.ReStart();
             staticBattleManager.Init(this);
+            BattleManager.Instance.semanubmanager.Disable();
+            if (!tempData.isGuildBattle)
+            {
+                BattleManager.Instance.ubmanager.SetUbExec(null, 0);
+                return;
+            }
             if (IsSemanMode)
             {
                 BattleManager.Instance.semanubmanager.SetUbExec(tempData.SemanUBExecTimeList, tempData.useSequenceUB ? tempData.SemanUBSequenceData : null);
@@ -518,6 +525,8 @@ namespace Elements
             if (req?.PlayerList == null || req.PlayerList.Count == 0)
                 throw new ArgumentException("战斗请求必须包含至少一名我方角色。", nameof(req));
 
+            BattleManager.Instance.semanubmanager.Disable();
+            stopFrame = -1;
             isBattleFinish = false;
             BattleStats.LogLevel = BattleStatistics.NormalizeLogLevel(req.CalcStats);
             BattleStats.Reset();
