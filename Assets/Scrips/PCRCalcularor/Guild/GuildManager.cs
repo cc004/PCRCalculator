@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1956,6 +1956,7 @@ namespace PCRCaculator.Guild
                     RoleMasteryTexts[i].text = "无";
                 }
             }
+            UnitUBTimes[5].SetSemanMode(data.useSemanMode);
             if (data.UBExecTimeData?.Count >= 6)
                 UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             else
