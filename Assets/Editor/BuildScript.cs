@@ -173,17 +173,19 @@ public static class BuildScript
 
     private static void BuildLinuxServerPackage(BuildRequest request)
     {
-        string targetRoot = Path.Combine(request.OutputRoot, "Linux");
-        string publishRoot = Path.Combine(targetRoot, "publish");
-
-        RecreateDirectory(targetRoot);
-        PublishServer(publishRoot, "linux-x64", request.ServerSelfContained, publishSingleFile: true);
-
-        if (request.ZipDesktopBuilds)
+        string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+        string target = "linux";
+        var arguments = $"{Quote(Path.Combine(projectRoot, "scripts", "build_server.py"))} --target {target} --output-root {Quote(request.OutputRoot)}";
+        if (!request.ServerSelfContained) arguments += " --framework-dependent";
+        if (!request.ZipDesktopBuilds) arguments += " --no-zip";
+        using var process = Process.Start(new ProcessStartInfo
         {
-            string zipPath = Path.Combine(request.OutputRoot, "mzq-linux-x64.zip");
-            RecreateZip(targetRoot, zipPath);
-        }
+            FileName = "python3", Arguments = arguments, WorkingDirectory = projectRoot,
+            UseShellExecute = false,
+        });
+        if (process == null) throw new InvalidOperationException("Failed to start server package helper (python3 required).");
+        process.WaitForExit();
+        if (process.ExitCode != 0) throw new InvalidOperationException($"Server package failed: exit {process.ExitCode}");
     }
 
     private static void BuildLegacyAppleSilicon()
@@ -210,55 +212,6 @@ public static class BuildScript
         AssertBuildSucceeded(report, BuildTarget.StandaloneOSX);
 
         RecreateZip(targetRoot, zipPath);
-    }
-
-    private static void PublishServer(string outputPath, string runtimeId, bool selfContained, bool publishSingleFile)
-    {
-        string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-        string serverProjectPath = Path.Combine(projectRoot, "PCRCalculatorServer", "PCRCalculatorServer.csproj");
-        Directory.CreateDirectory(outputPath);
-
-        string arguments =
-            $"publish {Quote(serverProjectPath)} -c Release -r {runtimeId} --self-contained {selfContained.ToString().ToLowerInvariant()} -p:PublishSingleFile={publishSingleFile.ToString().ToLowerInvariant()} -o {Quote(outputPath)}";
-
-        ProcessStartInfo startInfo = new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = arguments,
-            WorkingDirectory = projectRoot,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-        };
-
-        Process process = Process.Start(startInfo);
-        if (process == null)
-        {
-            throw new InvalidOperationException("Failed to start dotnet publish for PCRCalculatorServer.");
-        }
-
-        using (process)
-        {
-            string stdout = process.StandardOutput.ReadToEnd();
-            string stderr = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            if (!string.IsNullOrWhiteSpace(stdout))
-            {
-                UnityEngine.Debug.Log(stdout);
-            }
-
-            if (!string.IsNullOrWhiteSpace(stderr))
-            {
-                UnityEngine.Debug.LogWarning(stderr);
-            }
-
-            if (process.ExitCode != 0)
-            {
-                throw new InvalidOperationException($"dotnet publish failed for runtime {runtimeId} with exit code {process.ExitCode}.");
-            }
-        }
     }
 
     private static void ApplyAndroidSigningFromEnvironment()

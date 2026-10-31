@@ -29,6 +29,9 @@ Options:
   --log <path>
   -h, --help
 
+Server packaging requires .NET 8 SDK and Python 3, but not Unity.
+Runtime databases are acquired by the application at the configured versions.
+
 Android signing can be provided via environment variables:
   PCRCALC_ANDROID_KEYSTORE_NAME
   PCRCALC_ANDROID_KEYSTORE_PASS
@@ -105,6 +108,17 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+# Server-only invocation needs .NET/Python, not Unity; Editor mixed builds share this helper.
+case "$TARGET" in
+  linux|linux64)
+    server_args=(--target linux --output-root "$OUTPUT_ROOT")
+    [[ "$SERVER_SELF_CONTAINED" == true ]] || server_args+=(--framework-dependent)
+    [[ "$ZIP_DESKTOP_BUILDS" == true ]] || server_args+=(--no-zip)
+    python3 "$PROJECT_ROOT/scripts/build_server.py" "${server_args[@]}"
+    exit 0
+    ;;
+esac
 
 if [[ -z "$UNITY_PATH" ]]; then
   UNITY_PATH="$(detect_unity_path || true)"

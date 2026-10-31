@@ -611,8 +611,7 @@ namespace PCRCaculator
                     abStopwatch.Stop();
                     Debug.LogError($"AB资源初始化失败");
                     Debug.LogError(ex.ToString());
-                    try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
-                    SaveManager.Save(new VersionData());
+                    try { wait?.SetMessage($"数据初始化失败：{ex}。已保留版本设置；请检查指定版本和网络后重新打开。"); } catch { }
                     return;
                 }
 

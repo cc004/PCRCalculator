@@ -1,69 +1,31 @@
-name: Build project
+name: Build server
 
 on:
   push:
-    branches:
-      - '**'  # 所有分支
+    branches: ['**']
   pull_request:
-    branches:
-      - '**'  # 所有分支
+    branches: ['**']
 
-env:
-  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+permissions:
+  contents: read
 
 jobs:
-  buildForSomePlatforms:
-    name: Build for ${{ matrix.targetPlatform }} on version ${{ matrix.unityVersion }}
+  server:
+    name: Linux .NET server
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        buildName:
-          - PCRCalculator
-        projectPath:
-          - ./
-        unityVersion:
-          - 2021.3.27f1
-        targetPlatform:
-          - StandaloneOSX # Build a macOS standalone (Intel 64-bit).
-          - StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - StandaloneLinux64 # Build a Linux 64-bit standalone.
-          # - Android # Build an Android .apk standalone app.
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           lfs: true
-
-      # 获取当前分支的提交哈希值
-      - name: Get Git Commit Hash
-        id: get_commit_hash
-        run: echo "::set-output name=hash::$(git rev-parse --short HEAD)"
-
-      - uses: actions/cache@v3
+      - uses: actions/setup-dotnet@v4
         with:
-          path: Library
-          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('**/Assets/**') }}
-          restore-keys: |
-            Library-${{ matrix.targetPlatform }}-
-            Library-
-
-      - if: matrix.targetPlatform == 'Android'
-        uses: jlumbroso/free-disk-space@v1.3.1
-
-      - uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          dotnet-version: '8.0.x'
+      - name: Test server packaging
+        run: python3 scripts/test_build_server.py
+      - name: Build project server package
+        run: ./build.sh --target linux
+      - uses: actions/upload-artifact@v4
         with:
-          unityVersion: ${{ matrix.unityVersion }}
-          targetPlatform: ${{ matrix.targetPlatform }}
-          versioning: Custom
-          version: ${{ steps.get_commit_hash.outputs.hash }}
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.buildName }}_${{ matrix.targetPlatform }}
-          path: build/${{ matrix.targetPlatform }}
+          name: PCRCalculatorServer_linux-x64_${{ github.sha }}
+          path: Builds/mzq-linux-x64.zip
+          if-no-files-found: error

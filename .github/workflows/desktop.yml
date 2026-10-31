@@ -1,0 +1,63 @@
+name: Build desktop on demand
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Desktop package to build (select the intended branch above)
+        type: choice
+        required: true
+        default: macos
+        options:
+          - macos
+          - windows
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    name: dev ${{ inputs.target }} desktop
+    timeout-minutes: 45
+    runs-on: ${{ inputs.target == 'macos' && 'macos-15-intel' || 'windows-2022' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-dev-project-il2cpp-${{ runner.os }}-${{ runner.arch }}-${{ inputs.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-dev-project-il2cpp-${{ runner.os }}-${{ runner.arch }}-${{ inputs.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-
+      # Preserve this branch's existing build entry and backend selection.
+      - name: Inspect Windows build host
+        if: inputs.target == 'windows'
+        shell: pwsh
+        run: |
+          Get-PSDrive C | Select-Object Name, Used, Free
+          docker version
+          & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          Get-ChildItem "${env:ProgramFiles(x86)}/Windows Kits/10/Include" -Directory | Select-Object Name
+      - name: Inspect Mac build host
+        if: inputs.target == 'macos'
+        run: |
+          df -h .
+          xcode-select -p
+          xcrun --sdk macosx --show-sdk-version
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: auto
+          targetPlatform: ${{ inputs.target == 'macos' && 'StandaloneOSX' || 'StandaloneWindows64' }}
+          buildMethod: ${{ inputs.target == 'macos' && 'BuildScript.BuildAppleSilicon' || 'BuildScript.BuildFromCommandLine' }}
+          customParameters: -pcrBuildTarget ${{ inputs.target }} -pcrOutputRoot Builds
+          versioning: None
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PCRCalculator_dev_${{ inputs.target }}_${{ github.sha }}
+          path: Builds/*.zip
+          if-no-files-found: error
