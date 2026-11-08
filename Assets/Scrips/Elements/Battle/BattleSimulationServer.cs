@@ -197,6 +197,15 @@ namespace Elements.Battle
     }
 
     [Serializable]
+    public enum SemanOptimizationTarget
+    {
+        None,
+        RealDamage,
+        ExpectedDamage,
+        PhysicalAttack,
+        MagicAttack
+    }
+
     public class BattleSimulationResponse
     {
         public List<PCRCaculator.UnitData> PlayerList { get; set; }
@@ -216,6 +225,7 @@ namespace Elements.Battle
         public List<int> BattleFramesList { get; set; }
         public List<int> CurrentSeedList { get; set; }
         public OnceResultData OnceResult { get; set; }
+        public long? OptimizationFitness { get; set; }
         public BattleResponseValidationData Validation { get; set; }
     }
 
@@ -273,12 +283,16 @@ namespace Elements.Battle
         public List<bool> SetToggles { get; set; }
         public bool NeedOnceResult { get; set; }
         public int RepeatCount { get; set; } = 1;
+        public SemanOptimizationTarget OptimizationTarget { get; set; }
+        public int OptimizationTpDemand { get; set; }
 
         public BattleSimulationRequest DeepClone()
         {
             return new BattleSimulationRequest
             {
                 CalcStats = this.CalcStats,
+                OptimizationTarget = this.OptimizationTarget,
+                OptimizationTpDemand = this.OptimizationTpDemand,
                 BattleTime = this.BattleTime,
                 RepeatCount = 1,
                 WaveGroupId = this.WaveGroupId,

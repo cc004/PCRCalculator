@@ -91,13 +91,14 @@ namespace PCRCalculatorServer
 
                         List<string> errorList = new List<string>();
                         List<List<float>> ubExecTime = GuildCalculator.Instance.CreateUBExecTimeData();
+                        var scheduledUb = MyGameCtrl.Instance.tempData.UBExecTimeList;
                         for (int i = 0; i < 5; i++)
                         {
-                            if (ubExecTime.Count > i && MyGameCtrl.Instance.tempData.UBExecTimeList.Count > i)
+                            if (ubExecTime.Count > i && scheduledUb != null && scheduledUb.Count > i)
                             {
-                                if (MyGameCtrl.Instance.tempData.UBExecTimeList[i].Count != ubExecTime[i].Count)
+                                if (scheduledUb[i] != null && scheduledUb[i].Count != ubExecTime[i].Count)
                                 {
-                                    errorList.Add(GuildCalculator.Instance.players[i].UnitName + "的某个UB释放失败！");
+                                    errorList.Add(MyGameCtrl.Instance.playerUnitCtrl[i].UnitName + "的某个UB释放失败！");
                                 }
                             }
                         }
@@ -133,7 +134,8 @@ namespace PCRCalculatorServer
                         TalentSkill = GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
                         TeamSkill = GuildManager.Instance.GetFinalTeamSkillNodeDescription(),
                         Result = battleResult,
-                        OnceResult = onceResult
+                        OnceResult = onceResult,
+                        OptimizationFitness = GetOptimizationFitness(request)
                     };
 
                     if (request.IsGuildBattle && request.IsSemanMode)
@@ -274,6 +276,7 @@ namespace PCRCalculatorServer
                     SemanUBNum = first.SemanUBNum,
                     Result = first.Result,
                     OnceResult = first.OnceResult,
+                    OptimizationFitness = first.OptimizationFitness,
                     ResultList = runs.Select(r => r?.Result ?? first.Result).ToList(),
                     BattleFramesList = runs.Select(r => r?.BattleFrames ?? first.BattleFrames).ToList(),
                     CurrentSeedList = runs.Select(r => r?.CurrentSeed ?? first.CurrentSeed).ToList()
@@ -281,6 +284,32 @@ namespace PCRCalculatorServer
             }
 
             return responses;
+        }
+
+        private static long? GetOptimizationFitness(BattleSimulationRequest request)
+        {
+            switch (request.OptimizationTarget)
+            {
+                case SemanOptimizationTarget.RealDamage:
+                case SemanOptimizationTarget.ExpectedDamage:
+                    if (BattleManager.Instance.battleResult == eBattleResult.WIN)
+                        return (long)(BattleManager.Instance.BattleLeftTime * 1000000000);
+                    return request.OptimizationTarget == SemanOptimizationTarget.RealDamage
+                        ? GuildCalculator.Instance.GetTotalDamage()
+                        : GuildCalculator.Instance.GetTotalDamageExpect();
+                case SemanOptimizationTarget.PhysicalAttack:
+                case SemanOptimizationTarget.MagicAttack:
+                    var units = MyGameCtrl.Instance.playerUnitCtrl.AsEnumerable();
+                    if (request.OptimizationTarget == SemanOptimizationTarget.MagicAttack)
+                        units = units.Take(5);
+                    var players = units.ToList();
+                    var attack = players.Sum(unit => request.OptimizationTarget == SemanOptimizationTarget.MagicAttack
+                        ? (float)unit.MagicStr : (float)unit.Atk);
+                    return (long)attack * (players.All(unit => unit.EnergyRecoveryRate >= request.OptimizationTpDemand) ? 1 : 0)
+                        + players.Sum(unit => (long)unit.EnergyRecoveryRate);
+                default:
+                    return null;
+            }
         }
 
         private static BattleSimulationResponse CreateFailedResponse(string message)
@@ -305,12 +334,14 @@ namespace PCRCalculatorServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ArenaModelProvider>();
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.IncludeFields = true;
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.DictionaryKeyPolicy = null;
+                    options.JsonSerializerOptions.Converters.Add(new RoleMasteryPairJsonConverter());
                 });
         }
 

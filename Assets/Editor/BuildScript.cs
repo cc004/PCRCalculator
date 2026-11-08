@@ -7,6 +7,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using PCRCaculator;
+using System.Threading.Tasks;
 
 public static class BuildScript
 {
@@ -26,6 +28,26 @@ public static class BuildScript
         Execute(BuildRequest.ForTargets(BuildPlatform.Windows64));
     }
 
+    [MenuItem("PCR Build/Mac (Apple Silicon)")]
+    public static void BuildMacArm64()
+    {
+        Execute(BuildRequest.ForTargets(BuildPlatform.MacArm64));
+    }
+
+    [MenuItem("PCR Build/Mac (Intel)")]
+    public static void BuildMacIntel()
+    {
+        Execute(BuildRequest.ForTargets(BuildPlatform.MacIntel));
+    }
+
+    [MenuItem("PCR Build/Prepare Offline Server (Editor)")]
+    public static void PrepareOfflineServerForEditor()
+    {
+        PublishServer(RemoteSimulator.GetEditorServerDirectory(), RemoteSimulator.GetHostRuntimeId(),
+            selfContained: true, publishSingleFile: true);
+        UnityEngine.Debug.Log("Editor offline server prepared: " + RemoteSimulator.GetEditorServerDirectory());
+    }
+
     [MenuItem("PCR Build/Linux")]
     public static void BuildLinux64()
     {
@@ -41,17 +63,18 @@ public static class BuildScript
     [MenuItem("PCR Build/All")]
     public static void BuildAll()
     {
-        Execute(BuildRequest.ForTargets(BuildPlatform.Windows64, BuildPlatform.Linux64, BuildPlatform.Android));
+        Execute(BuildRequest.ForTargets(BuildPlatform.Windows64, BuildPlatform.MacArm64, BuildPlatform.Linux64, BuildPlatform.Android));
     }
 
     public static void BuildAppleSilicon()
     {
-        BuildLegacyAppleSilicon();
+        BuildMacArm64();
     }
 
     private static void Execute(BuildRequest request)
     {
-        string[] scenes = GetEnabledScenes();
+        string[] scenes = request.Platforms.All(p => p == BuildPlatform.EditorServer || p == BuildPlatform.Linux64)
+            ? Array.Empty<string>() : GetEnabledScenes();
         BuildOptions buildOptions = BuildOptions.StrictMode;
         if (request.DevelopmentBuild)
         {
@@ -80,6 +103,13 @@ public static class BuildScript
                     break;
                 case BuildPlatform.Linux64:
                     BuildLinuxServerPackage(request);
+                    break;
+                case BuildPlatform.MacArm64:
+                case BuildPlatform.MacIntel:
+                    BuildMacPlayer(request, scenes, buildOptions, platform == BuildPlatform.MacArm64);
+                    break;
+                case BuildPlatform.EditorServer:
+                    PrepareOfflineServerForEditor();
                     break;
                 case BuildPlatform.Android:
                     BuildAndroidPlayer(request, scenes, androidBuildOptions);
@@ -122,6 +152,8 @@ public static class BuildScript
 
         BuildReport report = BuildPipeline.BuildPlayer(options);
         AssertBuildSucceeded(report, target);
+
+        PublishServer(Path.Combine(appRoot, "server"), runtimeId, request.ServerSelfContained, publishSingleFile: true);
 
         if (shouldZip && request.ZipDesktopBuilds)
         {
@@ -188,30 +220,115 @@ public static class BuildScript
         if (process.ExitCode != 0) throw new InvalidOperationException($"Server package failed: exit {process.ExitCode}");
     }
 
-    private static void BuildLegacyAppleSilicon()
+    private static void BuildMacPlayer(BuildRequest request, string[] scenes, BuildOptions options, bool arm64)
     {
         EnsureBuildTargetSupported(BuildTargetGroup.Standalone, BuildTarget.StandaloneOSX);
         SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneOSX);
 
-        string targetRoot = Path.Combine(Path.GetFullPath(DefaultOutputRoot), "MacOS");
+        string runtimeId = arm64 ? "osx-arm64" : "osx-x64";
+        string targetRoot = Path.Combine(request.OutputRoot, arm64 ? "MacOS" : "MacOS-Intel");
         string outputPath = Path.Combine(targetRoot, "mzq.app");
-        string zipPath = Path.Combine(Path.GetFullPath(DefaultOutputRoot), $"{GetBundleVersion()}-mac-arm.zip");
+        string zipPath = Path.Combine(request.OutputRoot, $"{GetBundleVersion()}-mac-{(arm64 ? "arm" : "x64")}.zip");
 
         RecreateDirectory(targetRoot);
 
-        BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+        int previousArchitecture = PlayerSettings.GetArchitecture(UnityEditor.Build.NamedBuildTarget.Standalone);
+        try
         {
-            scenes = GetEnabledScenes(),
-            locationPathName = outputPath,
-            targetGroup = BuildTargetGroup.Standalone,
-            target = BuildTarget.StandaloneOSX,
-            options = BuildOptions.StrictMode | BuildOptions.CompressWithLz4HC,
+            PlayerSettings.SetArchitecture(UnityEditor.Build.NamedBuildTarget.Standalone, arm64 ? 1 : 0);
+            BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+            {
+                scenes = scenes,
+                locationPathName = outputPath,
+                targetGroup = BuildTargetGroup.Standalone,
+                target = BuildTarget.StandaloneOSX,
+                options = options | BuildOptions.CompressWithLz4HC,
+            });
+            AssertBuildSucceeded(report, BuildTarget.StandaloneOSX);
+        }
+        finally
+        {
+            PlayerSettings.SetArchitecture(UnityEditor.Build.NamedBuildTarget.Standalone, previousArchitecture);
+        }
+
+        PublishServer(Path.Combine(outputPath, "Contents", "Resources", "server"), runtimeId,
+            request.ServerSelfContained, publishSingleFile: true);
+        // Adding the companion changes the app bundle after Unity's initial signing.
+        if (Application.platform == RuntimePlatform.OSXEditor)
+            RunBuildProcess("/usr/bin/codesign", "--force --deep --sign - " + Quote(outputPath), targetRoot);
+        if (request.ZipDesktopBuilds)
+        {
+            if (Application.platform == RuntimePlatform.OSXEditor)
+            {
+                if (File.Exists(zipPath))
+                    File.Delete(zipPath);
+                RunBuildProcess("/usr/bin/ditto", "-c -k --sequesterRsrc --keepParent " + Quote(outputPath) + " " + Quote(zipPath), targetRoot);
+            }
+            else
+                RecreateZip(targetRoot, zipPath);
+        }
+    }
+
+    private static void PublishServer(string outputPath, string runtimeId, bool selfContained, bool publishSingleFile)
+    {
+        string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+        string serverProjectPath = Path.Combine(projectRoot, "PCRCalculatorServer", "PCRCalculatorServer.csproj");
+        Directory.CreateDirectory(outputPath);
+
+        string arguments =
+            $"publish {Quote(serverProjectPath)} -c Release -r {runtimeId} --self-contained {selfContained.ToString().ToLowerInvariant()} -p:PublishSingleFile={publishSingleFile.ToString().ToLowerInvariant()} -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o {Quote(outputPath)}";
+
+        RunBuildProcess(RemoteSimulator.GetDotnetPath(), arguments, projectRoot);
+        string executable = Path.Combine(outputPath, runtimeId.StartsWith("win-")
+            ? "PCRCalculatorServer.exe" : "PCRCalculatorServer");
+        if (!File.Exists(executable) || !Directory.Exists(Path.Combine(outputPath, "Data", "StreamingAssets"))
+            || !File.Exists(Path.Combine(outputPath, "classdata.tpk")))
+            throw new InvalidOperationException("Server publish is missing its executable or required data: " + outputPath);
+    }
+
+    private static void RunBuildProcess(string executable, string arguments, string workingDirectory)
+    {
+
+        ProcessStartInfo startInfo = new ProcessStartInfo
+        {
+            FileName = executable,
+            Arguments = arguments,
+            WorkingDirectory = workingDirectory,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
         };
 
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        AssertBuildSucceeded(report, BuildTarget.StandaloneOSX);
+        Process process = Process.Start(startInfo);
+        if (process == null)
+        {
+            throw new InvalidOperationException("Failed to start build tool: " + executable);
+        }
 
-        RecreateZip(targetRoot, zipPath);
+        using (process)
+        {
+            Task<string> stdoutTask = process.StandardOutput.ReadToEndAsync();
+            Task<string> stderrTask = process.StandardError.ReadToEndAsync();
+            process.WaitForExit();
+            string stdout = stdoutTask.GetAwaiter().GetResult();
+            string stderr = stderrTask.GetAwaiter().GetResult();
+
+            if (!string.IsNullOrWhiteSpace(stdout))
+            {
+                UnityEngine.Debug.Log(stdout);
+            }
+
+            if (!string.IsNullOrWhiteSpace(stderr))
+            {
+                UnityEngine.Debug.LogWarning(stderr);
+            }
+
+            if (process.ExitCode != 0)
+            {
+                throw new InvalidOperationException($"Build tool {executable} failed with exit code {process.ExitCode}.");
+            }
+        }
     }
 
     private static void ApplyAndroidSigningFromEnvironment()
@@ -346,8 +463,11 @@ public static class BuildScript
     private enum BuildPlatform
     {
         Windows64,
+        MacArm64,
+        MacIntel,
         Linux64,
         Android,
+        EditorServer,
     }
 
     private sealed class BuildRequest
@@ -453,6 +573,7 @@ public static class BuildScript
                 {
                     case "all":
                         AddPlatform(platforms, BuildPlatform.Windows64);
+                        AddPlatform(platforms, BuildPlatform.MacArm64);
                         AddPlatform(platforms, BuildPlatform.Linux64);
                         AddPlatform(platforms, BuildPlatform.Android);
                         break;
@@ -464,6 +585,18 @@ public static class BuildScript
                     case "linux":
                     case "linux64":
                         AddPlatform(platforms, BuildPlatform.Linux64);
+                        break;
+                    case "mac":
+                    case "macos":
+                    case "mac-arm64":
+                        AddPlatform(platforms, BuildPlatform.MacArm64);
+                        break;
+                    case "mac-intel":
+                    case "mac-x64":
+                        AddPlatform(platforms, BuildPlatform.MacIntel);
+                        break;
+                    case "editor-server":
+                        AddPlatform(platforms, BuildPlatform.EditorServer);
                         break;
                     case "android":
                         AddPlatform(platforms, BuildPlatform.Android);

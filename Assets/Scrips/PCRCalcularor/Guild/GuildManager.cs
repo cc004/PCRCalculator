@@ -2701,25 +2701,77 @@ namespace PCRCaculator.Guild
 
         public static RemoteSimulator simulator;
 
-        private IEnumerator WaitRemoteCalculation()
+        public static void CancelRemoteCalculation()
+        {
+            var task = simulator;
+            simulator = null;
+            task?.Dispose();
+            if (task != null && MainManager.Instance != null)
+                MainManager.Instance.AutoCalculatorData.isCalculating = false;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                CancelRemoteCalculation();
+        }
+
+        private void OnApplicationQuit()
+        {
+            CancelRemoteCalculation();
+        }
+
+        private IEnumerator WaitRemoteCalculation(RemoteSimulator task, AutoCalculatorData data)
         {
             const int EXEC_ONCE = 10;
-            while (!MainManager.Instance.AutoCalculatorData.isFinish)
+            try
             {
-                var request = simulator.Simulate(EXEC_ONCE);
-
-                while (!request.IsCompleted)
-                    yield return null;
-
-                foreach (var item in request.Result)
+                while (simulator == task && !data.isFinish)
                 {
-                    item.OnceResult.id = MainManager.Instance.AutoCalculatorData.resultDatas.Count;
-                    MainManager.Instance.AutoCalculatorData.resultDatas.Add(
-                        item.OnceResult);
+                    while (data.isPaues && simulator == task && !data.isFinish)
+                        yield return null;
+                    if (simulator != task || data.isFinish)
+                        yield break;
+                    var request = task.Simulate(Math.Min(EXEC_ONCE, data.execTime - data.execedTime));
+                    while (!request.IsCompleted && simulator == task && !data.isFinish)
+                        yield return null;
+                    if (simulator != task || data.isCanceled)
+                        yield break;
+                    if (request.IsFaulted || request.IsCanceled)
+                    {
+                        data.isCanceled = true;
+                        MainManager.Instance.WindowMessage("脱机跑批失败：" +
+                            (request.Exception == null ? "请求已取消。" : request.Exception.GetBaseException().Message));
+                        yield break;
+                    }
+                    var results = request.Result;
+                    var failed = results.FirstOrDefault(item => item == null || !item.Success || item.OnceResult == null);
+                    if (results.Length == 0 || results.Any(item => item == null || !item.Success || item.OnceResult == null))
+                    {
+                        data.isCanceled = true;
+                        MainManager.Instance.WindowMessage("脱机跑批失败：" + (failed?.Message ?? "未返回跑批结果。"));
+                        yield break;
+                    }
+                    foreach (var item in results)
+                    {
+                        item.OnceResult.id = data.resultDatas.Count;
+                        data.resultDatas.Add(item.OnceResult);
+                    }
+                    if (autoCalculate != null)
+                        autoCalculate.Init(data);
                 }
-                autoCalculate.Init(MainManager.Instance.AutoCalculatorData);
             }
-            MainManager.Instance.AutoCalculatorData.isCalculating = false;
+            finally
+            {
+                task.Dispose();
+                if (simulator == task)
+                {
+                    simulator = null;
+                    data.isCalculating = false;
+                    if (autoCalculate != null)
+                        autoCalculate.Init(data);
+                }
+            }
         }
 
         public void StartAutoCalculateByButton(int time)
@@ -2729,15 +2781,25 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("输入错误！", null);
                 return;
             }
-            MainManager.Instance.AutoCalculatorData.Reset();
-            MainManager.Instance.AutoCalculatorData.execTime = time;
-            MainManager.Instance.AutoCalculatorData.isCalculating = true;
-            if (MainManager.Instance.AutoCalculatorData.useRemote)
+            CancelRemoteCalculation();
+            var data = MainManager.Instance.AutoCalculatorData;
+            data.Reset();
+            data.execTime = time;
+            data.isCalculating = true;
+            if (data.useRemote)
             {
-                if (simulator != null) simulator.Dispose();
-                simulator = new RemoteSimulator();
-                simulator.CreateRequest();
-                this.StartCoroutine(WaitRemoteCalculation());
+                try
+                {
+                    simulator = new RemoteSimulator();
+                    simulator.CreateRequest();
+                    this.StartCoroutine(WaitRemoteCalculation(simulator, data));
+                }
+                catch (Exception error)
+                {
+                    CancelRemoteCalculation();
+                    data.isCalculating = false;
+                    MainManager.Instance.WindowMessage("脱机跑批失败：" + error.GetBaseException().Message);
+                }
             }
             else
             {
