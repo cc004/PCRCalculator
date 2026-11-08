@@ -1149,6 +1149,9 @@ namespace Elements.Battle
             _allocSnapshot = allocCurrent;
 #endif
 
+            MyGameCtrl.Instance.BattleStats.CaptureActionProgressSnapshot(
+                BattleHeaderController.CurrentFrameCount);
+
             if (MyGameCtrl.Instance.stopFrame >= 0 &&
                 BattleHeaderController.CurrentFrameCount >= MyGameCtrl.Instance.stopFrame &&
                 !GetIsPlayCutin() && !isUBExecing)
@@ -5020,6 +5023,7 @@ namespace Elements.Battle
                     $"战斗无法启动：未创建任何我方角色，配置角色数={tempData.playerList?.Count ?? 0}。");
                 yield break;
             }
+            MyGameCtrl.Instance.BattleStats.InitializeActionProgressUnits(UnitList);
 #if ENABLE_THREADING
             _unitIdToSlot.Clear();
             for (int i = 0; i < UnitList.Count; i++)
@@ -5140,6 +5144,8 @@ namespace Elements.Battle
             InitializeLabyrinthRelicBattleSkills();
             StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             CaptureBattleValidationSnapshot();
+            MyGameCtrl.Instance.BattleStats.CaptureActionProgressSnapshot(
+                BattleHeaderController.CurrentFrameCount);
             //battleManager.tempData = Singleton<EHPLBCOOOPK>.Instance;
             // ISSUE: reference to a compiler-generated field
             //fdedccjjghm.mainPlayerViewerId = (int) Singleton<UserData>.Instance.UserInfo.ViewerId;

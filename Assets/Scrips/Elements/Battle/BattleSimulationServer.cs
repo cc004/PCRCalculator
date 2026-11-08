@@ -78,6 +78,17 @@ namespace Elements.Battle
     }
 
     [Serializable]
+    public class ActionProgressData
+    {
+        public List<int> Frames { get; set; }
+        public List<int> UnitIds { get; set; }
+        public List<float> StartFrames { get; set; }
+        public List<float> LoopFrames { get; set; }
+        // Progress[frameIndex][unitIndex] uses standard frames.
+        public List<List<float>> Progress { get; set; }
+    }
+
+    [Serializable]
     public class SkillExecEventData
     {
         public int UnitId { get; set; }
@@ -171,6 +182,11 @@ namespace Elements.Battle
         public List<SkillExecEventData> SkillExecEvents { get; set; }
         public List<HitTraceEventData> HitTraceEvents { get; set; }
         public List<TpChangeEventData> TpChangeEvents { get; set; }
+        [Newtonsoft.Json.JsonProperty(NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+#if ENABLE_THREADING
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+#endif
+        public ActionProgressData ActionProgress { get; set; }
     }
 
     [Serializable]
@@ -283,6 +299,7 @@ namespace Elements.Battle
         public List<bool> SetToggles { get; set; }
         public bool NeedOnceResult { get; set; }
         public int RepeatCount { get; set; } = 1;
+        public List<int> ActionProgressFrames { get; set; }
         public SemanOptimizationTarget OptimizationTarget { get; set; }
         public int OptimizationTpDemand { get; set; }
 
@@ -295,6 +312,7 @@ namespace Elements.Battle
                 OptimizationTpDemand = this.OptimizationTpDemand,
                 BattleTime = this.BattleTime,
                 RepeatCount = 1,
+                ActionProgressFrames = this.ActionProgressFrames?.ToList(),
                 WaveGroupId = this.WaveGroupId,
                 IsAutoMode = this.IsAutoMode,
                 IsSetMode = this.IsSetMode,
@@ -779,12 +797,16 @@ namespace Elements.Battle
                         var playerList = MyGameCtrl.Instance.tempData.playerList;
                         var enemyList = MyGameCtrl.Instance.tempData.enemyList;
 
+                        var battleStats = MyGameCtrl.Instance.BattleStats;
+                        battleStats.CaptureActionProgressSnapshot(battleFrames);
+
                         task.Result = new BattleSimulationResponse
                         {
                             PlayerList = playerList,
                             EnemyList = enemyList,
                             Success = true,
                             Message = "战斗模拟完成",
+                            Stats = battleStats.NeedsActionProgressSnapshots() ? battleStats.ToBattleStatsData() : null,
                             BattleFrames = battleFrames,
                             CurrentSeed = currentSeed,
                             TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),

@@ -1733,6 +1733,10 @@ namespace Elements
                 bool stateChanged = currentState != value;
                 var previousState = currentState;
                 currentState = value;
+                if (stateChanged)
+                {
+                    MyGameCtrl.Instance?.BattleStats.RecordActionProgressStateChange(this, previousState, value);
+                }
                 //MyOnChangeState?.Invoke(UnitId, currentState, BattleHeaderController.CurrentFrameCount);
                 if (stateChanged &&
                     IsTrackedSkillState(previousState) &&
@@ -1763,6 +1767,7 @@ namespace Elements
         private List<UnitCtrl> targetPlayerList { get; set; }
 
         private float m_fCastTimer { get; set; }
+        internal float ActionProgressCastTimer => m_fCastTimer;
 
         private LongWithEx accumulateDamage { get; set; }
 
@@ -3924,24 +3929,96 @@ this.updateCurColor();
             currentActionPatternId = UnitUtility.GetDefaultActionPatternId(this.UnitIdForActionPattern);
             attackPatternIndex = 0;
             attackPatternIsLoop = attackPatternDictionary[currentActionPatternId].Count == 0;
+            m_fCastTimer = GetInitialActionProgressWaitSeconds();
+            MyGameCtrl.Instance.BattleStats.RecordActionProgressWaitConfigured(
+                this,
+                m_fCastTimer,
+                m_fCastTimer);
+        }
+
+        internal void GetActionProgressSequenceFrames(out float startFrames, out float loopFrames)
+        {
+            startFrames = GetInitialActionProgressWaitSeconds() * 60f;
+            loopFrames = 0f;
+
+            int patternId = UnitUtility.GetDefaultActionPatternId(UnitIdForActionPattern);
+            if (attackPatternDictionary == null ||
+                attackPatternLoopDictionary == null ||
+                !attackPatternDictionary.TryGetValue(patternId, out var startActions) ||
+                !attackPatternLoopDictionary.TryGetValue(patternId, out var loopActions))
+            {
+                return;
+            }
+
+            for (int i = 0; i < startActions.Count; i++)
+            {
+                startFrames += GetActionProgressMotionFrames(startActions[i]);
+                int nextSkillId = i + 1 < startActions.Count
+                    ? startActions[i + 1]
+                    : loopActions.Count > 0 ? loopActions[0] : 0;
+                startFrames += GetActionProgressRecastFrames(nextSkillId);
+            }
+
+            for (int i = 0; i < loopActions.Count; i++)
+            {
+                loopFrames += GetActionProgressMotionFrames(loopActions[i]);
+                int nextSkillId = loopActions[(i + 1) % loopActions.Count];
+                loopFrames += GetActionProgressRecastFrames(nextSkillId);
+            }
+        }
+
+        private float GetInitialActionProgressWaitSeconds()
+        {
             switch (battleManager.BattleCategory)
             {
                 case eBattleCategory.STORY:
-                    m_fCastTimer = 90f;
-                    break;
+                    return 90f;
                 case eBattleCategory.TUTORIAL:
-                    m_fCastTimer = 0.3f;
-                    break;
+                    return 0.3f;
                 default:
-                    m_fCastTimer = battleManager.CurrentWave != 0 ? 0.3f : 2.5f;
-                    /*
-                    //XX: force make up for part boss additional 1 frame
-                    if (battleManager.BossUnit.IsPartsBoss)
-                    {
-                        m_fCastTimer += BattleManager.DeltaTime_60fps;
-                    }*/
-                    break;
+                    return battleManager.CurrentWave != 0 ? 0.3f : 2.5f;
             }
+        }
+
+        private float GetActionProgressRecastFrames(int skillId)
+        {
+            if (skillId == 0)
+            {
+                return 0f;
+            }
+            if (skillId == 1)
+            {
+                return Math.Max(0f, m_fAtkRecastTime * 60f);
+            }
+            return castTimeDictionary != null && castTimeDictionary.TryGetValue(skillId, out float castTime)
+                ? Math.Max(0f, castTime * 60f)
+                : 0f;
+        }
+
+        private float GetActionProgressMotionFrames(int skillId)
+        {
+            if (unitActionController?.skillDictionary == null ||
+                !unitActionController.skillDictionary.TryGetValue(skillId, out var skill) ||
+                skill == null ||
+                skill.AnimId == eSpineCharacterAnimeId.NONE)
+            {
+                return 0f;
+            }
+
+            var spine = GetCurrentSpineCtrl();
+            var skeletonData = spine?.state?.Data?.skeletonData;
+            if (skeletonData == null)
+            {
+                return 0f;
+            }
+
+            string animationName = spine.ConvertAnimeIdToAnimeName(
+                skill.AnimId,
+                skill.SkillNum,
+                -1,
+                MotionPrefix);
+            var animation = skeletonData.FindAnimation(animationName);
+            return Math.Max(0f, (animation?.Duration ?? 0f) * 60f);
         }
 
         public void ResetPosForUserUnit(int index)
@@ -12701,7 +12778,12 @@ this.updateCurColor();
                     m_fCastTimer = castTimeDictionary[skillId];
                     break;
             }
+            float standardCastTime = m_fCastTimer;
             setIdleCastTime();
+            MyGameCtrl.Instance.BattleStats.RecordActionProgressWaitConfigured(
+                this,
+                standardCastTime,
+                m_fCastTimer);
 
             //if (!IsAbnormalState(eAbnormalState.SLOW) && !IsAbnormalState(eAbnormalState.HASTE) || GetCategoryDataSafe(eAbnormalStateCategory.SPEED).MainValue <= 0.01)
             //    return;
@@ -12797,6 +12879,7 @@ this.updateCurColor();
                 SetState(ActionState.ATK);
             else if (unitActionController.StartAction(skillId) || IsBoss)
             {
+                MyGameCtrl.Instance.BattleStats.RecordActionProgressMotionStart(this);
                 ChargeEnergy(eSetEnergyType.BY_ATK, skillStackVal, _hasEffect: false, this, _hasNumberEffect: false);
                 AppendCoroutine(updateSkill(skillId), ePauseType.SYSTEM, this);
                 //if (!this.voiceTypeDictionary.ContainsKey(skillId) || !this.judgePlayVoice("skill", 2, true, 0.5f))
@@ -13623,6 +13706,7 @@ this.updateCurColor();
                 actionController = ToadDatas[0].UnitActionController;
             if (actionController.StartAction(1))
             {
+                MyGameCtrl.Instance.BattleStats.RecordActionProgressMotionStart(this);
                 ChargeEnergy(eSetEnergyType.BY_ATK, skillStackVal, _source: this, _hasNumberEffect: false);
                 //if (this.judgePlayVoice("attack", 1, false, 0.0f))
                 //    this.PlayVoice(SoundManager.eVoiceType.ATTACK, 0, true, false);

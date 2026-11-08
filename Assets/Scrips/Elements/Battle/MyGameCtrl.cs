@@ -530,6 +530,7 @@ namespace Elements
             isBattleFinish = false;
             BattleStats.LogLevel = BattleStatistics.NormalizeLogLevel(req.CalcStats);
             BattleStats.Reset();
+            BattleStats.ConfigureActionProgressSnapshots(req.ActionProgressFrames, req.BattleTime);
             // Only use the minimal parameters provided by the HTTP request
             IsAutoMode = req.IsAutoMode;
             IsSetMode = req.IsSetMode;

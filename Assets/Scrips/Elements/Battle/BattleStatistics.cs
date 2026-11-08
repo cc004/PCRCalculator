@@ -33,6 +33,7 @@ namespace Elements.Battle
     public class BattleStatistics
     {
         private const int MaxTrackedFrames = 5400;
+        private ActionProgressRecorder actionProgressRecorder;
 
         public Dictionary<int, List<int>> PlayerUbToleranceFrames { get; set; } = new Dictionary<int, List<int>>();
         public Dictionary<int, List<UnitStateChangeDataForTolerance>> AllUnitStateChangeDic { get; set; } = new Dictionary<int, List<UnitStateChangeDataForTolerance>>();
@@ -84,6 +85,43 @@ namespace Elements.Battle
         public bool NeedsSkillReadyTrace() => LogLevel.HasFlag(BattleStatisticsLogLevel.SkillReadyTrace);
         public bool NeedsAutoSemanTeacherTrace() => LogLevel.HasFlag(BattleStatisticsLogLevel.AutoSemanTeacherTrace);
         public bool NeedsTpChangeTrace() => LogLevel.HasFlag(BattleStatisticsLogLevel.TpChangeTrace);
+
+        internal bool NeedsActionProgressSnapshots() => actionProgressRecorder != null;
+
+        internal void ConfigureActionProgressSnapshots(List<int> requestedFrames, int battleTimeSeconds)
+        {
+            actionProgressRecorder = ActionProgressRecorder.Create(
+                requestedFrames,
+                Math.Min(MaxTrackedFrames / 60, Math.Max(0, battleTimeSeconds)) * 60);
+        }
+
+        internal void InitializeActionProgressUnits(IReadOnlyList<UnitCtrl> units)
+        {
+            actionProgressRecorder?.InitializeUnits(units);
+        }
+
+        internal void RecordActionProgressWaitConfigured(UnitCtrl unit, float standardSeconds, float actualSeconds)
+        {
+            actionProgressRecorder?.ConfigureNextWait(unit, standardSeconds * 60f, actualSeconds * 60f);
+        }
+
+        internal void RecordActionProgressStateChange(
+            UnitCtrl unit,
+            UnitCtrl.ActionState previousState,
+            UnitCtrl.ActionState nextState)
+        {
+            actionProgressRecorder?.RecordStateChange(unit, previousState, nextState);
+        }
+
+        internal void CaptureActionProgressSnapshot(int frame)
+        {
+            actionProgressRecorder?.Capture(frame);
+        }
+
+        internal void RecordActionProgressMotionStart(UnitCtrl unit)
+        {
+            actionProgressRecorder?.BeginRegularAction(unit);
+        }
 
         public long TotalMagicBuff { get; private set; }
         public long TotalPhysicsBuff { get; private set; }
@@ -694,6 +732,7 @@ namespace Elements.Battle
 
         public void Reset()
         {
+            actionProgressRecorder = null;
             TotalMagicBuff = 0;
             TotalPhysicsBuff = 0;
             TotalMagicDebuff = 0;
@@ -738,7 +777,8 @@ namespace Elements.Battle
                 BossMagicDefEvents = NeedsBossDef() ? BossMagicDefEvents.ToList() : new List<BossDefEventData>(),
                 SkillExecEvents = NeedsSkillExecMin() ? SkillExecEvents.ToList() : new List<SkillExecEventData>(),
                 HitTraceEvents = NeedsHitTrace() ? HitTraceEvents.ToList() : new List<HitTraceEventData>(),
-                TpChangeEvents = NeedsTpChangeTrace() ? TpChangeEvents.ToList() : new List<TpChangeEventData>()
+                TpChangeEvents = NeedsTpChangeTrace() ? TpChangeEvents.ToList() : new List<TpChangeEventData>(),
+                ActionProgress = actionProgressRecorder?.BuildData()
             };
 
             statsData.UBTime = playerList
@@ -904,6 +944,275 @@ namespace Elements.Battle
 #endif
 
             return crossingFrames;
+        }
+
+        private sealed class ActionProgressRecorder
+        {
+            private readonly int[] requestedFrames;
+            private readonly List<int> capturedFrames;
+            private readonly List<int> unitIds = new List<int>();
+            private readonly List<List<float>> snapshots;
+            private readonly List<UnitActionProgressTracker> trackers = new List<UnitActionProgressTracker>();
+            private readonly Dictionary<UnitCtrl, UnitActionProgressTracker> trackerByUnit =
+                new Dictionary<UnitCtrl, UnitActionProgressTracker>();
+            private int nextFrameIndex;
+
+            private ActionProgressRecorder(int[] frames)
+            {
+                requestedFrames = frames;
+                capturedFrames = new List<int>(frames.Length);
+                snapshots = new List<List<float>>(frames.Length);
+            }
+
+            public static ActionProgressRecorder Create(
+                List<int> frames,
+                int maxFrame)
+            {
+                if (frames == null || frames.Count == 0)
+                {
+                    return null;
+                }
+
+                int[] normalizedFrames = frames
+                    .Where(frame => frame >= 0 && frame <= maxFrame)
+                    .Distinct()
+                    .OrderBy(frame => frame)
+                    .ToArray();
+                return normalizedFrames.Length == 0
+                    ? null
+                    : new ActionProgressRecorder(normalizedFrames);
+            }
+
+            public void InitializeUnits(IReadOnlyList<UnitCtrl> units)
+            {
+                unitIds.Clear();
+                trackers.Clear();
+                trackerByUnit.Clear();
+                if (units == null)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < units.Count; i++)
+                {
+                    UnitCtrl unit = units[i];
+                    if (unit == null || unit.IsOther || unit.IsSummonOrPhantom)
+                    {
+                        continue;
+                    }
+
+                    var tracker = new UnitActionProgressTracker(unit);
+                    unitIds.Add(unit.UnitId);
+                    trackers.Add(tracker);
+                    trackerByUnit[unit] = tracker;
+                }
+            }
+
+            public void ConfigureNextWait(UnitCtrl unit, float standardFrames, float actualFrames)
+            {
+                if (unit != null && trackerByUnit.TryGetValue(unit, out var tracker))
+                {
+                    tracker.ConfigureNextWait(standardFrames, actualFrames);
+                }
+            }
+
+            public void BeginRegularAction(UnitCtrl unit)
+            {
+                if (unit != null && trackerByUnit.TryGetValue(unit, out var tracker))
+                {
+                    tracker.BeginRegularAction();
+                }
+            }
+
+            public void RecordStateChange(
+                UnitCtrl unit,
+                UnitCtrl.ActionState previousState,
+                UnitCtrl.ActionState nextState)
+            {
+                if (unit == null || !trackerByUnit.TryGetValue(unit, out var tracker))
+                {
+                    return;
+                }
+
+                bool previousWasRegular = IsRegularActionState(previousState);
+                bool nextIsRegular = IsRegularActionState(nextState);
+                if (previousWasRegular && previousState != nextState)
+                {
+                    tracker.CompleteRegularAction();
+                }
+                if (nextIsRegular && previousState != nextState)
+                {
+                    tracker.CompleteWait();
+                }
+                if (nextState == UnitCtrl.ActionState.IDLE)
+                {
+                    tracker.ActivatePendingWait();
+                }
+            }
+
+            public void Capture(int frame)
+            {
+                while (nextFrameIndex < requestedFrames.Length &&
+                       requestedFrames[nextFrameIndex] < frame)
+                {
+                    nextFrameIndex++;
+                }
+
+                if (nextFrameIndex >= requestedFrames.Length ||
+                    requestedFrames[nextFrameIndex] != frame)
+                {
+                    return;
+                }
+
+                var snapshot = new List<float>(trackers.Count);
+                for (int i = 0; i < trackers.Count; i++)
+                {
+                    trackers[i].ActivateWaitIfIdle();
+                    snapshot.Add(trackers[i].GetProgress());
+                }
+                capturedFrames.Add(frame);
+                snapshots.Add(snapshot);
+                nextFrameIndex++;
+            }
+
+            public ActionProgressData BuildData()
+            {
+                return new ActionProgressData
+                {
+                    Frames = capturedFrames.ToList(),
+                    UnitIds = unitIds.ToList(),
+                    StartFrames = trackers.Select(tracker => tracker.StartFrames).ToList(),
+                    LoopFrames = trackers.Select(tracker => tracker.LoopFrames).ToList(),
+                    Progress = snapshots.Select(snapshot => snapshot.ToList()).ToList()
+                };
+            }
+
+            private static bool IsRegularActionState(UnitCtrl.ActionState state)
+            {
+                return state == UnitCtrl.ActionState.ATK || state == UnitCtrl.ActionState.SKILL;
+            }
+        }
+
+        private sealed class UnitActionProgressTracker
+        {
+            private readonly UnitCtrl unit;
+            private float completedProgress;
+            private bool hasActiveWait;
+            private float activeWaitStandardFrames;
+            private float activeWaitActualFrames;
+            private bool hasPendingWait;
+            private float pendingWaitStandardFrames;
+            private float pendingWaitActualFrames;
+            private bool hasActiveMotion;
+            private Spine.Animation activeMotion;
+            private float activeMotionStandardFrames;
+            private float activeMotionStartTime;
+            public float StartFrames { get; }
+            public float LoopFrames { get; }
+
+            public UnitActionProgressTracker(UnitCtrl unit)
+            {
+                this.unit = unit;
+                unit.GetActionProgressSequenceFrames(out float startFrames, out float loopFrames);
+                StartFrames = startFrames;
+                LoopFrames = loopFrames;
+            }
+
+            public void ConfigureNextWait(float standardFrames, float actualFrames)
+            {
+                if (!hasActiveWait && hasPendingWait && unit.CurrentState == UnitCtrl.ActionState.IDLE)
+                {
+                    ActivatePendingWait();
+                }
+
+                pendingWaitStandardFrames = Math.Max(0f, standardFrames);
+                pendingWaitActualFrames = Math.Max(0f, actualFrames);
+                hasPendingWait = pendingWaitStandardFrames > 0f || pendingWaitActualFrames > 0f;
+            }
+
+            public void ActivateWaitIfIdle()
+            {
+                if (unit.CurrentState == UnitCtrl.ActionState.IDLE)
+                {
+                    ActivatePendingWait();
+                }
+            }
+
+            public void ActivatePendingWait()
+            {
+                if (hasActiveWait || !hasPendingWait)
+                {
+                    return;
+                }
+
+                activeWaitStandardFrames = pendingWaitStandardFrames;
+                activeWaitActualFrames = pendingWaitActualFrames;
+                hasActiveWait = true;
+                hasPendingWait = false;
+            }
+
+            public void CompleteWait()
+            {
+                if (hasActiveWait)
+                {
+                    completedProgress += activeWaitStandardFrames;
+                    hasActiveWait = false;
+                    return;
+                }
+
+                if (hasPendingWait)
+                {
+                    completedProgress += pendingWaitStandardFrames;
+                    hasPendingWait = false;
+                }
+            }
+
+            public void BeginRegularAction()
+            {
+                CompleteRegularAction();
+                var track = unit.GetCurrentSpineCtrl()?.state?.GetCurrent(0);
+                activeMotion = track?.Animation;
+                activeMotionStandardFrames = Math.Max(0f, (activeMotion?.Duration ?? 0f) * 60f);
+                activeMotionStartTime = track?.TrackTime ?? 0f;
+                hasActiveMotion = activeMotion != null && activeMotionStandardFrames > 0f;
+            }
+
+            public void CompleteRegularAction()
+            {
+                if (!hasActiveMotion)
+                {
+                    return;
+                }
+
+                completedProgress += activeMotionStandardFrames;
+                hasActiveMotion = false;
+                activeMotion = null;
+            }
+
+            public float GetProgress()
+            {
+                float progress = completedProgress;
+                if (hasActiveWait && activeWaitActualFrames > 0f)
+                {
+                    float remainingFrames = Math.Max(0f, unit.ActionProgressCastTimer * 60f);
+                    float elapsedActualFrames = Math.Max(
+                        0f,
+                        Math.Min(activeWaitActualFrames, activeWaitActualFrames - remainingFrames));
+                    progress += activeWaitStandardFrames * elapsedActualFrames / activeWaitActualFrames;
+                }
+
+                if (hasActiveMotion)
+                {
+                    var track = unit.GetCurrentSpineCtrl()?.state?.GetCurrent(0);
+                    if (track?.Animation == activeMotion)
+                    {
+                        float elapsedFrames = Math.Max(0f, (track.TrackTime - activeMotionStartTime) * 60f);
+                        progress += Math.Min(activeMotionStandardFrames, elapsedFrames);
+                    }
+                }
+
+                return progress;
+            }
         }
     }
 }

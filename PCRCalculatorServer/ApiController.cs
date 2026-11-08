@@ -78,6 +78,8 @@ namespace PCRCalculatorServer
                     var totalDamage = GuildCalculator.Instance.GetTotalDamage();
 
                     var battleFrames = BattleHeaderController.CurrentFrameCount;
+                    var battleStats = MyGameCtrl.Instance.BattleStats;
+                    battleStats.CaptureActionProgressSnapshot(battleFrames);
 
                     var currentSeed = MyGameCtrl.Instance.CurrentSeedForSave;
                     var playerList = MyGameCtrl.Instance.tempData.playerList;
@@ -127,7 +129,9 @@ namespace PCRCalculatorServer
                         EnemyList = enemyList,
                         Success = true,
                         Message = "战斗模拟完成",
-                        Stats = request.CalcStats != 0 ? MyGameCtrl.Instance.BattleStats.ToBattleStatsData() : null,
+                        Stats = request.CalcStats != 0 || battleStats.NeedsActionProgressSnapshots()
+                            ? battleStats.ToBattleStatsData()
+                            : null,
                         BattleFrames = battleFrames,
                         CurrentSeed = currentSeed,
                         TalentLevel = GuildManager.Instance.GetTalentLevelDescription(),
