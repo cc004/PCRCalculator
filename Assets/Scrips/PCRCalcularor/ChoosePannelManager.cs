@@ -381,6 +381,9 @@ namespace PCRCaculator
             // }
             RefreshSelectedButtons();
             nextButtonText.text = "下一步";
+#if UNITY_5_3_OR_NEWER
+            ArenaSuggestionPanel.Bind(this, player, type == 1);
+#endif
             if (type == 4 || type == 5)
             {
                 playerData = player;
@@ -388,6 +391,25 @@ namespace PCRCaculator
                 NextButton(player);
             }
         }
+#if UNITY_5_3_OR_NEWER
+        internal int[] GetArenaSuggestionRoster()
+        {
+            return buttons.Keys.Where(MainManager.Instance.JudgeWeatherShowThisUnit).OrderBy(id => id).ToArray();
+        }
+
+        internal bool ApplyArenaSuggestion(int[] team)
+        {
+            if (type != 1 || team.Length != 5 || team.Distinct().Count() != 5
+                || team.Any(id => !buttons.ContainsKey(id) || !MainManager.Instance.UnitRarityDic.ContainsKey(id)))
+                return false;
+            selectedCharId.Clear();
+            selectedCharId.AddRange(team);
+            RefreshBasePage();
+            RefreshSelectedButtons();
+            return true;
+        }
+#endif
+
         public void OnToggleSwitched(bool k)
         {
             if (!isActiveAndEnabled) return;

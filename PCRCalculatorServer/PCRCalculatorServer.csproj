@@ -32,6 +32,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Models/Arena/**/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+		<Content Update="Models/Arena/**/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
 		<None Include="../Assets/StreamingAssets/**/*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Data/StreamingAssets/%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -62,6 +64,7 @@
 	  <PackageReference Include="GeneticSharp" Version="3.1.4" />
 	  <PackageReference Include="Mono.Cecil" Version="0.11.6" />
 	  <PackageReference Include="Mono.Data.Sqlite" Version="1.0.61" />
+	  <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.4" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	  <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
 	  <PackageReference Include="TinyPinyin" Version="1.1.0" />

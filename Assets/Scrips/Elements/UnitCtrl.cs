@@ -8215,7 +8215,7 @@ this.updateCurColor();
 
             SemanOnEventCallback?.Invoke(UnitId, _isBuff ? eSemanEvent.BUFF : eSemanEvent.DEBUFF);
 #if REDUCE_ANALYSE
-            if (_kind != BuffParamKind.NUM)
+            if (_showsIcon && _kind != BuffParamKind.NUM)
 #else
             eStateIconType eStateIconType2 = eStateIconType.NONE;
 			if (_showsIcon)
