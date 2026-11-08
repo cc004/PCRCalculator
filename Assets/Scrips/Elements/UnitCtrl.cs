@@ -6807,7 +6807,7 @@ this.updateCurColor();
                 if (time > 1f || BattleUtil.Approximately(time, 1f))
                 {
                     AbnormalStateCategoryData abnormalStateCategoryData = GetCategoryDataSafe(category);
-                    ChargeEnergy(eSetEnergyType.BY_USE_SKILL, abnormalStateCategoryData.MainValue,
+                    ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, abnormalStateCategoryData.MainValue,
                         _hasEffect: true, abnormalStateCategoryData.Source ?? this);
                     time = 0f;
                 }
