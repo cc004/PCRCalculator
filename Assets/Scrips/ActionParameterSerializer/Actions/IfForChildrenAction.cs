@@ -217,5 +217,6 @@ namespace ActionParameterSerializer.Actions
         is_invisible = 1601,
         magic_defence_decreased = 1741,
         physical_defence_decreased = 1721,
+        magic_critical_increased = 1770,
     }
 }

@@ -8261,6 +8261,7 @@ this.updateCurColor();
                 {
                     if (_isBuff)
                     {
+                        ++buffCounterDictionary[_kind];
                         ++buffCounter;
                         if (_triggerCall)
                         {
@@ -8278,6 +8279,7 @@ this.updateCurColor();
                 }
                 else if (_isBuff)
                 {
+                    --buffCounterDictionary[_kind];
                     --buffCounter;
                 }
                 else
