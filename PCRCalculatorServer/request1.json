@@ -1,5 +1,5 @@
 {
-    "CalcStats": true,
+    "CalcStats": 1,
     "PlayerList": [
         {
             "enemyid": 0,

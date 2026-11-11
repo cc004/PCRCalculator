@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: Elements.Battle.BattleManager
 // Assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 // MVID: 81CDCA9F-D99D-4BB7-B092-3FE4B4616CF6
@@ -1149,8 +1149,12 @@ namespace Elements.Battle
             _allocSnapshot = allocCurrent;
 #endif
 
+            MyGameCtrl.Instance.BattleStats.CaptureActionProgressSnapshot(
+                BattleHeaderController.CurrentFrameCount);
+
             if (MyGameCtrl.Instance.stopFrame >= 0 &&
-                BattleHeaderController.CurrentFrameCount >= MyGameCtrl.Instance.stopFrame)
+                BattleHeaderController.CurrentFrameCount >= MyGameCtrl.Instance.stopFrame &&
+                !GetIsPlayCutin() && !isUBExecing)
             {
                 MyGameCtrl.Instance.stopFrame = -1;
                 MyGameCtrl.Instance.PauseButton();
@@ -4560,8 +4564,16 @@ namespace Elements.Battle
             StartCoroutine(coroutineStartProcess(gameCtrl));
         }
 
+        internal void RefreshTalentFormationBonus(bool isGuildBattle)
+        {
+            UnitTalentFormationBonusDictionary.Clear();
+            if (isGuildBattle)
+                GuildManager.Instance.CalcTalentFormationBonus(true);
+        }
+
         private void ResetPerBattleTransientState()
         {
+            UnitCtrl.ResetGlobalOperationPoint();
             battleResult = eBattleResult.INVALID_VALUE;
             playerAllDead = false;
             otherAllDead = false;
@@ -5011,6 +5023,7 @@ namespace Elements.Battle
                     $"战斗无法启动：未创建任何我方角色，配置角色数={tempData.playerList?.Count ?? 0}。");
                 yield break;
             }
+            MyGameCtrl.Instance.BattleStats.InitializeActionProgressUnits(UnitList);
 #if ENABLE_THREADING
             _unitIdToSlot.Clear();
             for (int i = 0; i < UnitList.Count; i++)
@@ -5033,8 +5046,7 @@ namespace Elements.Battle
                 (battleManager.UnitUiCtrl).SetUnitListForDefenceMode((battleManager.EnemyList));
             }*/
             battleManager.setupEnemyProcess();
-            if (tempData.isGuildBattle)
-                GuildManager.Instance.CalcTalentFormationBonus(true); 
+            RefreshTalentFormationBonus(tempData.isGuildBattle);
             foreach(var unit in UnitList)
             {
                 unit.SetTalentFormationBonus(UnitTalentFormationBonusDictionary);
@@ -5132,6 +5144,8 @@ namespace Elements.Battle
             InitializeLabyrinthRelicBattleSkills();
             StartExtraEffect(BattleDefine.eExtraEffectExecTiming.EX_SKILL);
             CaptureBattleValidationSnapshot();
+            MyGameCtrl.Instance.BattleStats.CaptureActionProgressSnapshot(
+                BattleHeaderController.CurrentFrameCount);
             //battleManager.tempData = Singleton<EHPLBCOOOPK>.Instance;
             // ISSUE: reference to a compiler-generated field
             //fdedccjjghm.mainPlayerViewerId = (int) Singleton<UserData>.Instance.UserInfo.ViewerId;
@@ -5235,7 +5249,7 @@ namespace Elements.Battle
 #endif
             if (tempData.isGuildBattle)
             {
-                BattleManager.Instance.semanubmanager.SetUnitCallBack(gameCtrl.playerUnitCtrl.ToList(), gameCtrl.enemyUnitCtrl[0]);
+                BattleManager.Instance.semanubmanager.SetUnitCallBack(gameCtrl.playerUnitCtrl.ToList(), gameCtrl.enemyUnitCtrl);
             }
 
             try
@@ -6203,6 +6217,7 @@ namespace Elements.Battle
                     labyrinthEnhanceParameter: !flag ? MyGameCtrl.Instance.tempData.LabyrinthEnhanceParameter : null,
                     labyrinthRelicPassiveParameter: !flag ? MyGameCtrl.Instance.tempData.LabyrinthRelicPassiveParameter : null,
                     summonType: _summonData.SummonType);
+            _this.semanubmanager.ObserveEnemyUnit(unitCtrl);
                 if (!flag)
                     unitCtrl.SetTalentFormationBonus(_this.UnitTalentFormationBonusDictionary);
                 unitCtrl.ApplyPassiveSkill(true, _summonData.ConsiderEquipmentAndBonus);

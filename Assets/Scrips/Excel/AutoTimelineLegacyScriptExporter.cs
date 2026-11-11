@@ -11,16 +11,15 @@ namespace ExcelHelper
 {
     public static class AutoTimelineLegacyScriptExporter
     {
-        private const int RepeatedPressAdvanceFrames = 30;
-        private const int AutoOpenAdvanceFrames = 30;
         private const int AutoCloseDelayFrames = 5;
         private const int TimeUpPauseOffsetFrames = 60;
-        private const int MinAcceleratedWindowFrames = 20;
-        private const int X2SpeedUpAfterBusinessTapFrames = 10;
-        private const int X4SpeedUpAfterBusinessTapFrames = 20;
+        private const int MinSpeedTapIntervalFrames = 10;
+        private const int PrincessFormSpeedUpDelayFrames = 70;
+        private const int X2SpeedUpAfterUbFrames = 10;
+        private const int X4SpeedUpAfterUbFrames = 20;
         private const int X4SecondSpeedTapDelayFrames = 10;
-        private const int X2SlowdownBeforeBusinessTapFrames = 30;
-        private const int X4SlowdownBeforeBusinessTapFrames = 60;
+        private const int X2SlowdownBeforeUbFrames = 30;
+        private const int X4SlowdownBeforeUbFrames = 60;
         private static readonly string[] SpeedModes = { "x1", "x2", "x4" };
 
         public static void WriteScriptSet(GuildTimelineData timelineData, string filePath)
@@ -124,11 +123,18 @@ namespace ExcelHelper
 
         private static List<ScriptLine> BuildBodyLines(GuildTimelineData timelineData)
         {
-            Dictionary<int, string> playerNames = timelineData.playerGroupData.playerData.playrCharacters
-                .ToDictionary(unit => unit.unitId, unit => unit.GetNicName());
+            var players = timelineData.playerGroupData.playerData.playrCharacters
+                .ToDictionary(
+                    unit => unit.unitId,
+                    unit => new
+                    {
+                        Name = unit.GetNicName(),
+                        IsPrincessForm = IsPrincessForm(unit.unitId)
+                    });
 
             var lines = new List<ScriptLine>();
             int order = 0;
+            // Script frames use realFrameCount (waitFrame), not currentFrameCount (lframe).
             foreach (var pair in timelineData.allUnitStateChangeDic
                          .SelectMany(pair => pair.Value.Select(data => (unitId: pair.Key, data)))
                          .Where(item => item.data.changStateTo == UnitCtrl.ActionState.SKILL_1)
@@ -139,27 +145,31 @@ namespace ExcelHelper
                 UnitStateChangeData data = pair.data;
                 if (unitId <= 200000)
                 {
-                    string actor = playerNames.TryGetValue(unitId, out string name) ? name : unitId.ToString();
+                    bool playerFound = players.TryGetValue(unitId, out var player);
+                    string actor = playerFound ? player.Name : unitId.ToString();
+                    int speedUpDelayFrames = playerFound && player.IsPrincessForm
+                        ? PrincessFormSpeedUpDelayFrames
+                        : 0;
                     if (data.operation == "连点")
                     {
                         lines.Add(new ScriptLine(
-                            data.realFrameCount - RepeatedPressAdvanceFrames,
+                            data.realFrameCount,
                             order++,
-                            $"autopcr.waitFrame({data.realFrameCount} - {RepeatedPressAdvanceFrames}); minitouch.press(\"{EscapePython(actor)}\") #连点 lframe {data.currentFrameCount}",
-                            false));
+                            $"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"{EscapePython(actor)}\") #连点 lframe {data.currentFrameCount}",
+                            speedUpDelayFrames));
                     }
-                    else if (data.operation == "AUTO")
+                    else if (IsAutoOperation(data.operation))
                     {
                         lines.Add(new ScriptLine(
-                            data.realFrameCount - AutoOpenAdvanceFrames,
+                            data.realFrameCount,
                             order++,
-                            $"autopcr.waitFrame({data.realFrameCount} - {AutoOpenAdvanceFrames}); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}",
-                            false));
+                            $"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"AUTO\") #开AUTO lframe {data.currentFrameCount}",
+                            speedUpDelayFrames));
                         lines.Add(new ScriptLine(
                             data.realFrameCount + AutoCloseDelayFrames,
                             order++,
                             $"autopcr.waitFrame({data.realFrameCount + AutoCloseDelayFrames}); minitouch.press(\"AUTO\") #关AUTO lframe {data.currentFrameCount}",
-                            false));
+                            null));
                     }
                     else
                     {
@@ -167,12 +177,12 @@ namespace ExcelHelper
                             data.realFrameCount,
                             order++,
                             $"autopcr.waitFrame({data.realFrameCount}); minitouch.press(\"{EscapePython(actor)}\") # lframe {data.currentFrameCount}",
-                            true));
+                            speedUpDelayFrames));
                     }
                 }
                 else
                 {
-                    lines.Add(new ScriptLine(data.realFrameCount, order++, "# bossub", false));
+                    lines.Add(new ScriptLine(data.realFrameCount, order++, "# bossub", null));
                 }
             }
 
@@ -183,35 +193,45 @@ namespace ExcelHelper
                     dieFrame - TimeUpPauseOffsetFrames,
                     order++,
                     $"autopcr.waitFrame({dieFrame} - {TimeUpPauseOffsetFrames}); minitouch.press(\"暂停\") # time-up pause",
-                    false));
+                    null));
             }
 
             return lines;
         }
 
+        private static bool IsAutoOperation(string operation)
+        {
+            return operation == "AUTO" ||
+                   operation?.StartsWith("AUTO(", StringComparison.Ordinal) == true;
+        }
+
         private static List<ScriptLine> BuildSpeedLines(List<ScriptLine> bodyLines, string speedMode)
         {
-            List<ScriptLine> businessTaps = bodyLines
-                .Where(line => line.RequiresX1)
+            List<ScriptLine> ubTaps = bodyLines
+                .Where(line => line.PostUbSpeedUpDelayFrames.HasValue)
                 .OrderBy(line => line.Frame)
+                .ThenBy(line => line.Order)
                 .ToList();
             var speedLines = new List<ScriptLine>();
-            if (businessTaps.Count == 0)
+            if (ubTaps.Count == 0)
                 return speedLines;
 
             int slowdownOffset = speedMode == "x4"
-                ? X4SlowdownBeforeBusinessTapFrames
-                : X2SlowdownBeforeBusinessTapFrames;
+                ? X4SlowdownBeforeUbFrames
+                : X2SlowdownBeforeUbFrames;
             int order = -100000;
 
-            TryAddSpeedWindow(speedLines, speedMode, 300, businessTaps[0].Frame - slowdownOffset, ref order);
-            for (int index = 1; index < businessTaps.Count; index++)
+            TryAddSpeedWindow(speedLines, speedMode, 300, ubTaps[0].Frame - slowdownOffset, ref order);
+            for (int index = 1; index < ubTaps.Count; index++)
             {
-                int start = businessTaps[index - 1].Frame + (
+                int defaultSpeedUpDelay =
                     speedMode == "x4"
-                        ? X4SpeedUpAfterBusinessTapFrames
-                        : X2SpeedUpAfterBusinessTapFrames);
-                int end = businessTaps[index].Frame - slowdownOffset;
+                        ? X4SpeedUpAfterUbFrames
+                        : X2SpeedUpAfterUbFrames;
+                int start = ubTaps[index - 1].Frame + Math.Max(
+                    defaultSpeedUpDelay,
+                    ubTaps[index - 1].PostUbSpeedUpDelayFrames.Value);
+                int end = ubTaps[index].Frame - slowdownOffset;
                 TryAddSpeedWindow(speedLines, speedMode, start, end, ref order);
             }
 
@@ -225,21 +245,27 @@ namespace ExcelHelper
             int slowdownFrame,
             ref int order)
         {
-            if (slowdownFrame - startFrame < MinAcceleratedWindowFrames)
+            int lastSpeedUpFrame = startFrame;
+            if (speedMode == "x4")
+                lastSpeedUpFrame += X4SecondSpeedTapDelayFrames;
+            if (slowdownFrame - lastSpeedUpFrame < MinSpeedTapIntervalFrames)
                 return;
 
-            speedLines.Add(new ScriptLine(startFrame, order++, SpeedLine(startFrame, "加速"), false));
+            speedLines.Add(new ScriptLine(startFrame, order++, SpeedLine(startFrame, "加速"), null));
             if (speedMode == "x4")
-            {
-                int secondFrame = startFrame + X4SecondSpeedTapDelayFrames;
-                if (slowdownFrame - secondFrame < MinAcceleratedWindowFrames)
-                {
-                    speedLines.RemoveAt(speedLines.Count - 1);
-                    return;
-                }
-                speedLines.Add(new ScriptLine(secondFrame, order++, SpeedLine(secondFrame, "加速*4"), false));
-            }
-            speedLines.Add(new ScriptLine(slowdownFrame, order++, SpeedLine(slowdownFrame, "减速"), false));
+                speedLines.Add(new ScriptLine(lastSpeedUpFrame, order++, SpeedLine(lastSpeedUpFrame, "加速*4"), null));
+            speedLines.Add(new ScriptLine(slowdownFrame, order++, SpeedLine(slowdownFrame, "减速"), null));
+        }
+
+        private static bool IsPrincessForm(int unitId)
+        {
+            if (MyGameCtrl.Instance == null ||
+                !MyGameCtrl.Instance.playerUnitCtrlDic.TryGetValue(unitId, out UnitCtrl unitCtrl) ||
+                unitCtrl.unitActionController == null ||
+                unitCtrl.UnionBurstSkillId == 0)
+                return false;
+
+            return unitCtrl.unitActionController.GetIsSkillPrincessForm(unitCtrl.UnionBurstSkillId);
         }
 
         private static string SpeedLine(int frame, string label)
@@ -279,18 +305,18 @@ namespace ExcelHelper
 
         private sealed class ScriptLine
         {
-            public ScriptLine(int frame, int order, string text, bool requiresX1)
+            public ScriptLine(int frame, int order, string text, int? postUbSpeedUpDelayFrames)
             {
                 Frame = frame;
                 Order = order;
                 Text = text;
-                RequiresX1 = requiresX1;
+                PostUbSpeedUpDelayFrames = postUbSpeedUpDelayFrames;
             }
 
             public int Frame { get; }
             public int Order { get; }
             public string Text { get; }
-            public bool RequiresX1 { get; }
+            public int? PostUbSpeedUpDelayFrames { get; }
         }
     }
 }

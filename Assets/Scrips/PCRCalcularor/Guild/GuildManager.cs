@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -138,6 +138,7 @@ namespace PCRCaculator.Guild
         public Text version;
         public InputField RandomSeed;
         public Toggle UseFixedRandomSeed;
+        public Toggle GuildLevelToggle;
         public string[] TalentNames = { "火", "水", "风", "光", "暗" };
         public List<Sprite> TalentSprites;
         public List<Image> WeaknessSprites;
@@ -276,7 +277,9 @@ namespace PCRCaculator.Guild
             return prefix == 75 || prefix == 76;
         }
         public bool IsLabyrinthBossId(int id) => id / SpecialBossPrefixDivisor == 77;
+#if UNITY_5_3_OR_NEWER
         [UnityEngine.Serialization.FormerlySerializedAs("dungeonDropdown")]
+#endif
         public Dropdown specialEnemyDropdown;
         private const int LunaTower780ExWaveGroupId = 715707801;
         private static readonly Dictionary<int, (int[] EnemyIds, int WaveGroupId)> specialEnemyIds = new()
@@ -817,8 +820,10 @@ namespace PCRCaculator.Guild
             }
 
             dropdown1.AddOptions(options);
+#if UNITY_5_3_OR_NEWER
             dropdown1.onValueChanged.RemoveListener(OnLabyrinthDifficultyChanged);
             dropdown1.onValueChanged.AddListener(OnLabyrinthDifficultyChanged);
+#endif
             UpdateLabyrinthFloorDropdownOptions();
         }
 
@@ -851,8 +856,10 @@ namespace PCRCaculator.Guild
             }
 
             floorDropdown.AddOptions(options);
+#if UNITY_5_3_OR_NEWER
             floorDropdown.onValueChanged.RemoveListener(OnLabyrinthFloorChanged);
             floorDropdown.onValueChanged.AddListener(OnLabyrinthFloorChanged);
+#endif
             UpdateLabyrinthStageDropdownOptions();
         }
 
@@ -883,8 +890,10 @@ namespace PCRCaculator.Guild
             labyrinthStageTypes.AddRange(GetLabyrinthStageTypes(MainManager.Instance?.LabyrinthQuestDataDic?.Values,
                 difficultyDropdown.value + 1, floor));
             stageDropdown.AddOptions(labyrinthStageTypes.Select(GetLabyrinthStageName).ToList());
+#if UNITY_5_3_OR_NEWER
             stageDropdown.onValueChanged.RemoveListener(OnLabyrinthStageChanged);
             stageDropdown.onValueChanged.AddListener(OnLabyrinthStageChanged);
+#endif
             UpdateLabyrinthWaveGroupDropdownOptions();
         }
 
@@ -964,7 +973,9 @@ namespace PCRCaculator.Guild
                 matchingWaveGroups = waveGroupsForStage.Skip(skipCount).Take(takeCount).ToList();
             }
 
+#if UNITY_5_3_OR_NEWER
             EnsureLabyrinthWaveGroupDropdownImages(waveGroupDropdown);
+#endif
             labyrinthWaveGroupIds.Clear();
             labyrinthWaveGroupOptionIcons.Clear();
             List<Dropdown.OptionData> options = new();
@@ -976,8 +987,10 @@ namespace PCRCaculator.Guild
             }
 
             waveGroupDropdown.AddOptions(options);
+#if UNITY_5_3_OR_NEWER
             waveGroupDropdown.onValueChanged.RemoveListener(OnLabyrinthWaveGroupChanged);
             waveGroupDropdown.onValueChanged.AddListener(OnLabyrinthWaveGroupChanged);
+#endif
             UpdateLabyrinthBossImages();
         }
 
@@ -1172,6 +1185,7 @@ namespace PCRCaculator.Guild
             return icons.ToArray();
         }
 
+#if UNITY_5_3_OR_NEWER
         private void EnsureLabyrinthWaveGroupDropdownImages(Dropdown dropdown)
         {
             if (dropdown.transform.Find("LabyrinthWaveGroupCaptionIcons") == null)
@@ -1272,6 +1286,7 @@ namespace PCRCaculator.Guild
                 iconImage.enabled = iconImage.sprite != null;
             }
         }
+#endif
         public void UpdateMirageAreaDropdownOptions()
         {
             Dropdown dropdown = dropdowns_ChooseMirageBoss[0];
@@ -1955,6 +1970,7 @@ namespace PCRCaculator.Guild
                     RoleMasteryTexts[i].text = "无";
                 }
             }
+            UnitUBTimes[5].SetSemanMode(data.useSemanMode);
             if (data.UBExecTimeData?.Count >= 6)
                 UnitUBTimes[5].SetUBTimes(data.UBExecTimeData[5]);
             else
@@ -2159,6 +2175,12 @@ namespace PCRCaculator.Guild
         }
         private void RefreshCalcSettings_start()
         {
+            if (GuildLevelToggle != null)
+            {
+                GuildLevelToggle.SetIsOnWithoutNotify(MainManager.Instance.PlayerSetting.enableGuildLevelBonus);
+                GuildLevelToggle.onValueChanged.RemoveListener(OnGuildLevelToggleChanged);
+                GuildLevelToggle.onValueChanged.AddListener(OnGuildLevelToggleChanged);
+            }
             SettingSliders[0].value = SettingData.FPSforLogic / 10;
             SettingTexts[0].text = SettingData.FPSforLogic + "";
             SettingSliders[1].value = SettingData.FPSforAnimation / 10;
@@ -2192,6 +2214,18 @@ namespace PCRCaculator.Guild
             SettingInputs[11].text = SettingData.dispFields;
             SettingInputs[12].text = SettingData.dispFields;
         }
+        private void OnGuildLevelToggleChanged(bool enabled)
+        {
+            MainManager.Instance.PlayerSetting.enableGuildLevelBonus = enabled;
+            MainManager.Instance.SavePlayerSetting();
+
+            var choosePanel = ChoosePannelManager.Instance;
+            if (choosePanel != null && choosePanel.settingBack != null && choosePanel.settingBack.activeInHierarchy)
+            {
+                choosePanel.RefreshSettingValues();
+            }
+        }
+
         public void RefreshCalcUI()
         {
             SettingTexts[0].text = (int)SettingSliders[0].value * 10 + "";
@@ -2667,25 +2701,77 @@ namespace PCRCaculator.Guild
 
         public static RemoteSimulator simulator;
 
-        private IEnumerator WaitRemoteCalculation()
+        public static void CancelRemoteCalculation()
+        {
+            var task = simulator;
+            simulator = null;
+            task?.Dispose();
+            if (task != null && MainManager.Instance != null)
+                MainManager.Instance.AutoCalculatorData.isCalculating = false;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                CancelRemoteCalculation();
+        }
+
+        private void OnApplicationQuit()
+        {
+            CancelRemoteCalculation();
+        }
+
+        private IEnumerator WaitRemoteCalculation(RemoteSimulator task, AutoCalculatorData data)
         {
             const int EXEC_ONCE = 10;
-            while (!MainManager.Instance.AutoCalculatorData.isFinish)
+            try
             {
-                var request = simulator.Simulate(EXEC_ONCE);
-
-                while (!request.IsCompleted)
-                    yield return null;
-
-                foreach (var item in request.Result)
+                while (simulator == task && !data.isFinish)
                 {
-                    item.OnceResult.id = MainManager.Instance.AutoCalculatorData.resultDatas.Count;
-                    MainManager.Instance.AutoCalculatorData.resultDatas.Add(
-                        item.OnceResult);
+                    while (data.isPaues && simulator == task && !data.isFinish)
+                        yield return null;
+                    if (simulator != task || data.isFinish)
+                        yield break;
+                    var request = task.Simulate(Math.Min(EXEC_ONCE, data.execTime - data.execedTime));
+                    while (!request.IsCompleted && simulator == task && !data.isFinish)
+                        yield return null;
+                    if (simulator != task || data.isCanceled)
+                        yield break;
+                    if (request.IsFaulted || request.IsCanceled)
+                    {
+                        data.isCanceled = true;
+                        MainManager.Instance.WindowMessage("脱机跑批失败：" +
+                            (request.Exception == null ? "请求已取消。" : request.Exception.GetBaseException().Message));
+                        yield break;
+                    }
+                    var results = request.Result;
+                    var failed = results.FirstOrDefault(item => item == null || !item.Success || item.OnceResult == null);
+                    if (results.Length == 0 || results.Any(item => item == null || !item.Success || item.OnceResult == null))
+                    {
+                        data.isCanceled = true;
+                        MainManager.Instance.WindowMessage("脱机跑批失败：" + (failed?.Message ?? "未返回跑批结果。"));
+                        yield break;
+                    }
+                    foreach (var item in results)
+                    {
+                        item.OnceResult.id = data.resultDatas.Count;
+                        data.resultDatas.Add(item.OnceResult);
+                    }
+                    if (autoCalculate != null)
+                        autoCalculate.Init(data);
                 }
-                autoCalculate.Init(MainManager.Instance.AutoCalculatorData);
             }
-            MainManager.Instance.AutoCalculatorData.isCalculating = false;
+            finally
+            {
+                task.Dispose();
+                if (simulator == task)
+                {
+                    simulator = null;
+                    data.isCalculating = false;
+                    if (autoCalculate != null)
+                        autoCalculate.Init(data);
+                }
+            }
         }
 
         public void StartAutoCalculateByButton(int time)
@@ -2695,15 +2781,25 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("输入错误！", null);
                 return;
             }
-            MainManager.Instance.AutoCalculatorData.Reset();
-            MainManager.Instance.AutoCalculatorData.execTime = time;
-            MainManager.Instance.AutoCalculatorData.isCalculating = true;
-            if (MainManager.Instance.AutoCalculatorData.useRemote)
+            CancelRemoteCalculation();
+            var data = MainManager.Instance.AutoCalculatorData;
+            data.Reset();
+            data.execTime = time;
+            data.isCalculating = true;
+            if (data.useRemote)
             {
-                if (simulator != null) simulator.Dispose();
-                simulator = new RemoteSimulator();
-                simulator.CreateRequest();
-                this.StartCoroutine(WaitRemoteCalculation());
+                try
+                {
+                    simulator = new RemoteSimulator();
+                    simulator.CreateRequest();
+                    this.StartCoroutine(WaitRemoteCalculation(simulator, data));
+                }
+                catch (Exception error)
+                {
+                    CancelRemoteCalculation();
+                    data.isCalculating = false;
+                    MainManager.Instance.WindowMessage("脱机跑批失败：" + error.GetBaseException().Message);
+                }
             }
             else
             {

@@ -93,6 +93,8 @@ namespace PCRCaculator.Guild
         public List<Sprite> resultSprite;
         public List<int> PlayerIds => playerIds;
         public List<int> BossId => bossId;
+        private readonly HashSet<int> primaryBossUnitIds = new HashSet<int>();
+        public IReadOnlyCollection<int> PrimaryBossUnitIds => primaryBossUnitIds;
         public Button KnifeDamageButton;
         public void Awake()
         {
@@ -175,6 +177,9 @@ namespace PCRCaculator.Guild
             playerIds.Clear();
             bossId.Clear();
             trackedUnitNames.Clear();
+            primaryBossUnitIds.Clear();
+            if (boss != null)
+                foreach (var unit in boss) primaryBossUnitIds.Add(unit.UnitId);
             allUnitStateChangeDic = new Dictionary<int, List<UnitStateChangeData>>();
             allUnitAbnormalStateDic = new Dictionary<int, List<UnitAbnormalStateChangeData>>();
             allUnitHPDic = new Dictionary<int, List<ValueChangeData>>();

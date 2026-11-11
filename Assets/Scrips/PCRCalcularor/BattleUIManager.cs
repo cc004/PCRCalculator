@@ -179,8 +179,10 @@ namespace PCRCaculator.Battle
         }
         public void OnPauseFrameEndEdit(string value)
         {
+#if UNITY_5_3_OR_NEWER
             pauseTime.SetTextWithoutNotify(value);
             pauseTime2.SetTextWithoutNotify(value);
+#endif
             myGameCtrl.stopFrame = int.TryParse(value, out int frame) && frame >= 0
                 ? frame
                 : -1;

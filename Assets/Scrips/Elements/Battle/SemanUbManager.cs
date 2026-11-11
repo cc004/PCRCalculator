@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using PCRCaculator.Guild;
@@ -6,6 +6,19 @@ using static Elements.UnitCtrl;
 
 namespace Elements.Battle
 {
+    public sealed class SemanticUbSequenceItem
+    {
+        public int SequenceIndex { get; set; }
+        public int Lane { get; set; }
+        public int Gene { get; set; }
+    }
+
+    public sealed class SemanticUbConversionSnapshot
+    {
+        public List<List<int>> SemanticLanes { get; set; }
+        public List<SemanticUbSequenceItem> SemanticSequence { get; set; }
+    }
+
     public enum eSemanEvent
     {
         ATTACK = 0,
@@ -22,7 +35,7 @@ namespace Elements.Battle
 
     public class SemanUbManager
     {
-        private List<UnitCtrl> players;
+        private List<UnitCtrl> players = new List<UnitCtrl>();
 
         private Dictionary<ActionState, int> State2Id = new Dictionary<ActionState, int>
         {
@@ -32,7 +45,6 @@ namespace Elements.Battle
             // { ActionState.ATK, 8 },
             { ActionState.IDLE, 9 },
         };
-        private bool ubMod;
         public enum Action
         {
             NO_UB = -1,
@@ -61,7 +73,7 @@ namespace Elements.Battle
             {
                 get
                 {
-                    return skillReady && parent.IsSequenceTurn(unitId);
+                    return skillReady;
                 }
             }
             public bool IsIdle
@@ -99,14 +111,31 @@ namespace Elements.Battle
             {
                 if (!canProcess) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || history.Last().frame < frame || eventId == (int)eSemanEvent.UB || history.Count(h => h.frame == frame && h.waitUnit == unitPos && h.skillId == eventId && h.action == Action.WAIT_UNIT_EVENT) == 0)
+                bool duplicate = false;
+                if (eventId != (int)eSemanEvent.UB)
+                {
+                    for (int index = history.Count - 1; index >= 0 && history[index].frame == frame; index--)
+                    {
+                        var item = history[index];
+                        if (item.waitUnit == unitPos &&
+                            item.skillId == eventId &&
+                            item.action == Action.WAIT_UNIT_EVENT)
+                        {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                }
+                if (!duplicate)
                 {
                     history.Add(new UbStatus(parent)
                     {
                         waitUnit = unitPos,
                         skillId = eventId,
                         action = Action.WAIT_UNIT_EVENT,
-                        frame = frame
+                        frame = frame,
+                        recordDelayBase = delay,
+                        hasRecordDelayBase = true
                     });
                 }
             }
@@ -126,7 +155,9 @@ namespace Elements.Battle
                             waitUnit = unitPos,
                             skillId = stateId,
                             action = Action.WAIT_UNIT_ACTION,
-                            frame = frame
+                            frame = frame,
+                            recordDelayBase = delay,
+                            hasRecordDelayBase = true
                         });
                     }
                 }
@@ -136,14 +167,28 @@ namespace Elements.Battle
             {
                 if (!canProcess) return;
                 int frame = BattleHeaderController.CurrentFrameCount;
-                if (history.Count == 0 || history.Last().frame < frame || history.Count(h => h.action != Action.WAIT_UNIT_EVENT && h.frame == frame && h.waitUnit == unitPos && h.skillId == skillId) == 0)
+                bool duplicate = false;
+                for (int index = history.Count - 1; index >= 0 && history[index].frame == frame; index--)
+                {
+                    var item = history[index];
+                    if (item.action != Action.WAIT_UNIT_EVENT &&
+                        item.waitUnit == unitPos &&
+                        item.skillId == skillId)
+                    {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (!duplicate)
                 {
                     history.Add(new UbStatus(parent)
                     {
                         waitUnit = unitPos,
                         skillId = skillId,
                         action = Action.WAIT_UNIT_ACTION,
-                        frame = frame
+                        frame = frame,
+                        recordDelayBase = delay,
+                        hasRecordDelayBase = true
                     });
                 }
             }
@@ -151,10 +196,6 @@ namespace Elements.Battle
             {
                 if (canProcess)
                 {
-                    foreach (var ub in history)
-                    {
-                        ub.delay++;
-                    }
                     delay++;
                     if (!IsIdle)
                     {
@@ -163,232 +204,155 @@ namespace Elements.Battle
                 }
             }
 
-            public int GetUbNumber(int unitId)
+            public int GetUbNumber(
+                int unitId,
+                int semanSkillType,
+                int semanUbType)
             {
-#if !UNITY_5_3_OR_NEWER
-                return 0;
-#endif
-                // any of 5 6 7 on
-                bool use_fifth = GuildManager.Instance.SemanSkillToggles.Where((t, i) => i >= 5).Any(t => t.isOn);
+                bool useTypedEvent = semanSkillType >= 5;
+                var relevantHistory = history
+                    .Where(h => useTypedEvent
+                        ? h.action == Action.WAIT_UNIT_EVENT
+                        : h.action != Action.WAIT_UNIT_EVENT)
+                    .ToList();
+                int ubSkillId = useTypedEvent ? (int)eSemanEvent.UB : 1;
 
-                var t_history = history.Where(h => use_fifth && h.action == Action.WAIT_UNIT_EVENT || !use_fifth && h.action != Action.WAIT_UNIT_EVENT).ToList();
-
-                if (t_history.Count == 0 ||
-                (delay == 0 && t_history.Count(h => !use_fifth && h.skillId == 1 || use_fifth && h.skillId == (int)eSemanEvent.UB) == 0)) // set and not after other ub
+                if (relevantHistory.Count == 0 ||
+                    (delay == 0 && relevantHistory.All(h => h.skillId != ubSkillId)))
                 {
                     return delay;
                 }
 
-                int frame = BattleHeaderController.CurrentFrameCount;
-
-                int lastDelay = t_history.Last().delay;
-                var lasts = t_history.Where(h => h.delay == lastDelay).ToList();
-                UbStatus last = null;
-
+                int HistoricalDelay(UbStatus status) => status.hasRecordDelayBase
+                    ? delay - status.recordDelayBase
+                    : status.delay;
+                int lastDelay = HistoricalDelay(relevantHistory.Last());
+                var latestEvents = relevantHistory
+                    .Where(h => HistoricalDelay(h) == lastDelay)
+                    .ToList();
                 var conditions = new List<Func<UbStatus, bool>>
                 {
-                    // ub
-                    h => !use_fifth && h.skillId == 1 || use_fifth && h.skillId == (int)eSemanEvent.UB,
-                    // self auto
-                    h => !use_fifth && h.waitUnit == unitId && h.skillId == 9 || use_fifth && h.waitUnit == unitId && h.skillId == (int)eSemanEvent.IDLE,
-                    // self skill
-                    h => h.waitUnit == unitId, 
-                    // anyway
+                    h => h.skillId == ubSkillId,
+                    h => h.waitUnit == unitId && h.skillId == 9,
+                    h => h.waitUnit == unitId,
                     h => true,
                 };
+                var last = conditions
+                    .Select(condition => latestEvents.LastOrDefault(condition))
+                    .First(status => status != null);
 
-                foreach (var condition in conditions)
+                if (useTypedEvent)
                 {
-                    var info = lasts.Where(condition).ToList();
-                    if (info.Count > 0)
+                    if (semanSkillType == 5)
                     {
-                        last = info.Last();
-                        break;
-                    }
-                }
-
-                if (use_fifth)
-                {
-                    if (GuildManager.Instance.SemanSkillToggles[5].isOn)
-                    {
-                        int trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId && h.action == Action.WAIT_UNIT_EVENT) - 1;
+                        int trigger = relevantHistory.Count(h =>
+                            h.waitUnit == last.waitUnit &&
+                            h.skillId == last.skillId) - 1;
                         if (trigger >= 100 || lastDelay >= 10)
                         {
-                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
                             return delay;
                         }
                         return 100000 + last.waitUnit * 10000 + last.skillId * 1000 + trigger * 10 + lastDelay;
                     }
-                    else if (GuildManager.Instance.SemanSkillToggles[6].isOn)
+                    if (semanSkillType == 6)
                     {
-                        int no_ub_trigger = t_history.Where(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
-                        int ub_trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
-                        int trigger = no_ub_trigger + ub_trigger - 1;
+                        int nonUbTrigger = relevantHistory
+                            .Where(h =>
+                                h.waitUnit == last.waitUnit &&
+                                h.skillId != (int)eSemanEvent.UB)
+                            .Select(h => h.frame)
+                            .ToHashSet()
+                            .Count;
+                        int ubTrigger = relevantHistory.Count(h =>
+                            h.waitUnit == last.waitUnit &&
+                            h.skillId == (int)eSemanEvent.UB);
+                        int trigger = nonUbTrigger + ubTrigger - 1;
 
                         if (trigger >= 100 || lastDelay >= 100)
                         {
-                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
                             return delay;
                         }
                         return 200000 + last.waitUnit * 10000 + trigger * 100 + lastDelay;
                     }
-                    else if (GuildManager.Instance.SemanSkillToggles[7].isOn)
+                    if (semanSkillType == 7)
                     {
-                        int no_ub_trigger = t_history.Where(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
-                        int ub_trigger = t_history.Count(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
-                        int trigger = no_ub_trigger + ub_trigger - 1;
+                        int nonUbTrigger = relevantHistory
+                            .Where(h => h.skillId != (int)eSemanEvent.UB)
+                            .Select(h => h.frame)
+                            .ToHashSet()
+                            .Count;
+                        int ubTrigger = relevantHistory.Count(h =>
+                            h.skillId == (int)eSemanEvent.UB);
+                        int trigger = nonUbTrigger + ubTrigger - 1;
 
                         if (trigger >= 1000 || lastDelay >= 100)
                         {
-                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
                             return delay;
                         }
                         return 300000 + trigger * 100 + lastDelay;
                     }
-                    else
-                    {
-                        return delay;
-                    }
-                }
-                else
-                {
-                    if (last.skillId == 9 || // auto
-                        last.skillId == 1 && GuildManager.Instance.SemanUBToggles[0].isOn ||
-                        last.skillId != 1 && GuildManager.Instance.SemanSkillToggles[1].isOn)
-                    {
-                        int trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId) - 1;
-                        if (trigger >= 10 || lastDelay >= 10)
-                        {
-                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                            return delay;
-                        }
-                        return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
-                    }
-                    else if (last.skillId == 1 && GuildManager.Instance.SemanUBToggles[1].isOn)
-                    {
-                        int trigger = t_history.Where(h => h.skillId == last.skillId).Select(x => x.frame).ToHashSet().Count() - 1;
-                        if (trigger >= 100 || lastDelay >= 100)
-                        {
-                            // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                            return delay;
-                        }
-                        return 40000 + trigger * 100 + lastDelay;
-                    }
-                    else // skill
-                    {
-                        if (GuildManager.Instance.SemanSkillToggles[0].isOn)
-                        {
-                            return delay;
-                        }
-                        else if (GuildManager.Instance.SemanSkillToggles[2].isOn)
-                        {
-                            int trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION) - 1;
-                            if (trigger >= 100 || lastDelay >= 10)
-                            {
-                                // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                                return delay;
-                            }
-                            return 20000 + last.waitUnit * 1000 + trigger * 10 + lastDelay;
-                        }
-                        else if (GuildManager.Instance.SemanSkillToggles[3].isOn)
-                        {
-                            int trigger = history.Where(h => h.skillId != 1 && h.skillId != 9 && h.action == Action.WAIT_UNIT_ACTION).Select(x => x.frame).ToHashSet().Count() - 1;
-                            if (trigger >= 100 || lastDelay >= 100)
-                            {
-                                // UnityEngine.Debug.LogError($"{unitId} trigger or delay too large: {trigger} {lastDelay}, using {delay} instead, maybe wrong!");
-                                return delay;
-                            }
-                            return 30000 + trigger * 100 + lastDelay;
-                        }
-                        else if (GuildManager.Instance.SemanSkillToggles[4].isOn)
-                        {
-                            if (IsIdle)
-                            {
-                                return delay;
-                            }
-                            return 50000 + no_idle_delay;
-                        }
-                        else
-                        {
-                            return delay;
-                        }
-                    }
-
-                }
-
-            }
-
-            public int GetTeacherUbNumber(int unitId, int semanSkillToggleIndex)
-            {
-                var t_history = history.Where(h => h.action == Action.WAIT_UNIT_EVENT).ToList();
-
-                if (t_history.Count == 0 ||
-                (delay == 0 && t_history.Count(h => h.skillId == (int)eSemanEvent.UB) == 0))
-                {
                     return delay;
                 }
 
-                int lastDelay = t_history.Last().delay;
-                var lasts = t_history.Where(h => h.delay == lastDelay).ToList();
-                UbStatus last = null;
-
-                var conditions = new List<Func<UbStatus, bool>>
+                if (last.skillId == 9 ||
+                    last.skillId == 1 && semanUbType == 0 ||
+                    last.skillId != 1 && semanSkillType == 1)
                 {
-                    h => h.skillId == (int)eSemanEvent.UB,
-                    h => h.waitUnit == unitId && h.skillId == (int)eSemanEvent.IDLE,
-                    h => h.waitUnit == unitId,
-                    h => true,
-                };
-
-                foreach (var condition in conditions)
-                {
-                    var info = lasts.Where(condition).ToList();
-                    if (info.Count > 0)
-                    {
-                        last = info.Last();
-                        break;
-                    }
-                }
-
-                if (last == null)
-                {
-                    return delay;
-                }
-
-                if (semanSkillToggleIndex == 5)
-                {
-                    int trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.skillId == last.skillId && h.action == Action.WAIT_UNIT_EVENT) - 1;
-                    if (trigger >= 100 || lastDelay >= 10)
+                    int trigger = relevantHistory.Count(h =>
+                        h.waitUnit == last.waitUnit &&
+                        h.skillId == last.skillId) - 1;
+                    if (trigger >= 10 || lastDelay >= 10)
                     {
                         return delay;
                     }
-                    return 100000 + last.waitUnit * 10000 + last.skillId * 1000 + trigger * 10 + lastDelay;
+                    return 10000 + last.waitUnit * 1000 + last.skillId * 100 + trigger * 10 + lastDelay;
                 }
-                else if (semanSkillToggleIndex == 6)
+                if (last.skillId == 1 && semanUbType == 1)
                 {
-                    int no_ub_trigger = t_history.Where(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
-                    int ub_trigger = t_history.Count(h => h.waitUnit == last.waitUnit && h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
-                    int trigger = no_ub_trigger + ub_trigger - 1;
-
+                    int trigger = relevantHistory
+                        .Where(h => h.skillId == last.skillId)
+                        .Select(h => h.frame)
+                        .ToHashSet()
+                        .Count - 1;
                     if (trigger >= 100 || lastDelay >= 100)
                     {
                         return delay;
                     }
-                    return 200000 + last.waitUnit * 10000 + trigger * 100 + lastDelay;
+                    return 40000 + trigger * 100 + lastDelay;
                 }
-                else if (semanSkillToggleIndex == 7)
+                if (semanSkillType == 2)
                 {
-                    int no_ub_trigger = t_history.Where(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId != (int)eSemanEvent.UB).Select(x => x.frame).ToHashSet().Count();
-                    int ub_trigger = t_history.Count(h => h.action == Action.WAIT_UNIT_EVENT && h.skillId == (int)eSemanEvent.UB);
-                    int trigger = no_ub_trigger + ub_trigger - 1;
-
-                    if (trigger >= 1000 || lastDelay >= 100)
+                    int trigger = relevantHistory.Count(h =>
+                        h.waitUnit == last.waitUnit &&
+                        h.skillId != 1 &&
+                        h.skillId != 9 &&
+                        h.action == Action.WAIT_UNIT_ACTION) - 1;
+                    if (trigger >= 100 || lastDelay >= 10)
                     {
                         return delay;
                     }
-                    return 300000 + trigger * 100 + lastDelay;
+                    return 20000 + last.waitUnit * 1000 + trigger * 10 + lastDelay;
                 }
-
+                if (semanSkillType == 3)
+                {
+                    int trigger = relevantHistory
+                        .Where(h =>
+                            h.skillId != 1 &&
+                            h.skillId != 9 &&
+                            h.action == Action.WAIT_UNIT_ACTION)
+                        .Select(h => h.frame)
+                        .ToHashSet()
+                        .Count - 1;
+                    if (trigger >= 100 || lastDelay >= 100)
+                    {
+                        return delay;
+                    }
+                    return 30000 + trigger * 100 + lastDelay;
+                }
+                if (semanSkillType == 4 && !IsIdle)
+                {
+                    return 50000 + no_idle_delay;
+                }
                 return delay;
             }
 
@@ -439,6 +403,96 @@ namespace Elements.Battle
             public int delay { get; set; }
             public int frame { get; set; }
             public int lastUpdateFrame { get; set; }
+            // Recording-only baseline used to derive the historical delay in O(1).
+            public int recordDelayBase { get; set; }
+            internal bool hasRecordDelayBase;
+            public int geneIndex { get; set; } = -1;
+            public int geneValue { get; set; }
+            public Action initialAction { get; set; }
+            public int initialWaitUnit { get; set; }
+            public int initialSkillId { get; set; }
+            public int initialTrigger { get; set; }
+            public int initialDelay { get; set; }
+            public int anchorSatisfiedFrame { get; set; } = -1;
+            private bool observeAnchor;
+            private Action observedAction;
+            private int observedTrigger;
+            private int observedDelay;
+            private int observedLastUpdateFrame;
+
+            internal void EnableAnchorObservation()
+            {
+                observeAnchor = true;
+                observedAction = action;
+                observedTrigger = trigger;
+                observedDelay = delay;
+                observedLastUpdateFrame = lastUpdateFrame;
+            }
+
+            private bool IsObservedAnchorSatisfied()
+            {
+                return observeAnchor &&
+                       (observedAction == Action.COUNTDOWN ||
+                        observedAction == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle) &&
+                       observedDelay <= 0;
+            }
+
+            private void CaptureObservedAnchor()
+            {
+                if (anchorSatisfiedFrame < 0 && IsObservedAnchorSatisfied())
+                {
+                    anchorSatisfiedFrame = BattleHeaderController.CurrentFrameCount;
+                }
+            }
+
+            private void ObserveEvent(int unitPos, int eventId)
+            {
+                if (!observeAnchor) return;
+                if ((observedLastUpdateFrame < BattleHeaderController.CurrentFrameCount ||
+                     eventId == (int)eSemanEvent.UB) &&
+                    (observedAction == Action.WAIT_UNIT_EVENT && waitUnit == unitPos && skillId == eventId ||
+                     observedAction == Action.WAIT_UNIT_ANY_EVENT && waitUnit == unitPos ||
+                     observedAction == Action.WAIT_EVENT))
+                {
+                    observedTrigger--;
+                    if (eventId != (int)eSemanEvent.UB)
+                        observedLastUpdateFrame = BattleHeaderController.CurrentFrameCount;
+                    if (observedTrigger < 0)
+                        observedAction = Action.COUNTDOWN;
+                    CaptureObservedAnchor();
+                }
+            }
+
+            private void ObserveSkill(int unitPos, int observedSkillId)
+            {
+                if (!observeAnchor) return;
+                if (observedLastUpdateFrame < BattleHeaderController.CurrentFrameCount &&
+                    (observedAction == Action.WAIT_EXEC ||
+                     waitUnit == unitPos &&
+                     (observedAction == Action.WAIT_UNIT_EXEC ||
+                      observedAction == Action.WAIT_UNIT_ACTION && skillId == observedSkillId)))
+                {
+                    observedTrigger--;
+                    observedLastUpdateFrame = BattleHeaderController.CurrentFrameCount;
+                    if (observedTrigger < 0)
+                        observedAction = Action.COUNTDOWN;
+                    CaptureObservedAnchor();
+                }
+            }
+
+            private void ObserveState(int unitPos, ActionState state)
+            {
+                if (!observeAnchor) return;
+                if (observedAction == Action.WAIT_UNIT_ACTION && waitUnit == unitPos &&
+                    parent.State2Id.ContainsKey(state) && skillId == parent.State2Id[state] ||
+                    state == ActionState.SKILL_1 && observedAction == Action.WAIT_UB)
+                {
+                    observedTrigger--;
+                    if (observedTrigger < 0)
+                        observedAction = Action.COUNTDOWN;
+                    CaptureObservedAnchor();
+                }
+            }
 
             // public void OnTpChangeCallBack(float energy)
             // {
@@ -458,6 +512,7 @@ namespace Elements.Battle
 
             public void OnEventCallback(int unitPos, int eventId)
             {
+                ObserveEvent(unitPos, eventId);
                 if (!canProcess) return;
                 if (
                     (lastUpdateFrame < BattleHeaderController.CurrentFrameCount || eventId == (int)eSemanEvent.UB) &&
@@ -478,6 +533,7 @@ namespace Elements.Battle
 
             public void OnSkillCallBack(int unitPos, int skillId)
             {
+                ObserveSkill(unitPos, skillId);
                 if (!canProcess) return;
                 if (lastUpdateFrame < BattleHeaderController.CurrentFrameCount && (
                     action == Action.WAIT_EXEC || (waitUnit == unitPos &&
@@ -495,6 +551,13 @@ namespace Elements.Battle
 
             public void ProcessFrame()
             {
+                if (observeAnchor &&
+                    (observedAction == Action.COUNTDOWN ||
+                     observedAction == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle))
+                {
+                    observedDelay--;
+                    CaptureObservedAnchor();
+                }
                 if (canProcess && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle))
                     delay--;
             }
@@ -504,8 +567,14 @@ namespace Elements.Battle
                 return canProcess && (action == Action.COUNTDOWN || action == Action.COUNTDOWN_EXCLUDE_IDLE && !IsIdle) && delay <= 0;
             }
 
+            public bool IsSemanticAnchorSatisfied()
+            {
+                return IsObservedAnchorSatisfied();
+            }
+
             public void OnChangeStateCallBack(int unitPos, ActionState state)
             {
+                ObserveState(unitPos, state);
                 if (!canProcess) return;
                 if ((action == Action.WAIT_UNIT_ACTION && waitUnit == unitPos && parent.State2Id.ContainsKey(state) && skillId == parent.State2Id[state]) ||
                     (state == ActionState.SKILL_1 && action == Action.WAIT_UB)
@@ -521,7 +590,7 @@ namespace Elements.Battle
             }
         }
 
-        public UbStatus GetUbStatus(int unitId, int num) // xxxxx
+        private UbStatus GetUbStatusCore(int unitId, int num)
         {
             int op = num / 10000;
             if (num < 0)
@@ -659,56 +728,117 @@ namespace Elements.Battle
             }
         }
 
-        private Queue<UbStatus>[] queues;
-        public List<int> UBNums { get; private set; }
+        public UbStatus GetUbStatus(int unitId, int num, int geneIndex = -1)
+        {
+            var status = GetUbStatusCore(unitId, num);
+            status.geneIndex = geneIndex;
+            status.geneValue = num;
+            status.initialAction = status.action;
+            status.initialWaitUnit = status.waitUnit;
+            status.initialSkillId = status.skillId;
+            status.initialTrigger = status.trigger;
+            status.initialDelay = status.delay;
+            return status;
+        }
 
-        private List<UbRecord> auto2seman;
-        private List<List<int>> auto2semanAll;
-        private List<int> auto2semanSequence;
-        private Dictionary<int, List<List<int>>> auto2semanTeacherProfiles;
-        private static readonly int[] AutoSemanTeacherProfileIndexes = { 5, 6, 7 };
-        private bool enable = false;
+        private Queue<UbStatus>[] queues;
+        public List<int> UBNums { get; private set; } = CreateUbCounts();
+
+        private List<UbRecord> auto2seman = new List<UbRecord>();
+        private List<List<int>> auto2semanAll = CreateEmptyLanes();
+        private List<int> auto2semanSequence = new List<int>();
+        private Dictionary<int, List<List<int>>> teacherProfiles = new Dictionary<int, List<List<int>>>();
+        private bool executionEnabled = false;
+        private bool recordingEnabled = false;
         private bool auto2semanSequenceMode = false;
+        private bool conversionRecordingMode = false;
+        private int conversionSemanSkillType = 6;
+        private int conversionSemanUbType = 0;
         private List<int> ubSequence = new List<int>();
         private int ubSequenceIndex = 0;
+        private readonly HashSet<UnitCtrl> subscribedUnits = new HashSet<UnitCtrl>();
+
+        private bool IsActive => executionEnabled || recordingEnabled;
+
+        private static List<int> CreateUbCounts() => new List<int> { 0, 0, 0, 0, 0 };
+
+        private static List<List<int>> CreateEmptyLanes() => Enumerable.Range(0, 5)
+            .Select(_ => new List<int>())
+            .ToList();
+
+        private void ResetRecordingState(bool recordSequence)
+        {
+            teacherProfiles = new[] { 5, 6, 7 }.ToDictionary(profile => profile, profile => CreateEmptyLanes());
+            recordingEnabled = true;
+            auto2semanSequenceMode = recordSequence;
+            auto2seman = Enumerable.Range(0, 5)
+                .Select(unitId => new UbRecord(this, unitId))
+                .ToList();
+            auto2semanAll = CreateEmptyLanes();
+            auto2semanSequence = new List<int>();
+        }
 
         public void Disable()
         {
-            enable = false;
+            teacherProfiles.Clear();
+            executionEnabled = false;
+            recordingEnabled = false;
+            subscribedUnits.Clear();
+            players = new List<UnitCtrl>();
+            queues = null;
+            UBNums = CreateUbCounts();
+            auto2seman = new List<UbRecord>();
+            auto2semanAll = CreateEmptyLanes();
             auto2semanSequenceMode = false;
-            auto2semanSequence = null;
+            conversionRecordingMode = false;
+            conversionSemanSkillType = 6;
+            conversionSemanUbType = 0;
+            auto2semanSequence = new List<int>();
             ubSequence = new List<int>();
             ubSequenceIndex = 0;
         }
 
-        public void SetUbExec(List<List<int>> ublists, List<int> sequence = null, bool recordSequence = false)
+        public void SetUbExec(
+            List<List<int>> ublists,
+            List<int> sequence = null,
+            bool recordSequence = false)
         {
-            enable = true;
-            ubMod = false;
-            auto2semanSequenceMode = recordSequence;
             ubSequence = NormalizeSequence(sequence);
             ubSequenceIndex = 0;
-            UBNums = new List<int> { 0, 0, 0, 0, 0 };
+            UBNums = CreateUbCounts();
             if (ublists == null || ublists.Count == 0)
             {
-                auto2seman = new List<UbRecord>() {
-                    new UbRecord(this, unitId: 0),
-                    new UbRecord(this, unitId: 1),
-                    new UbRecord(this, unitId: 2),
-                    new UbRecord(this, unitId: 3),
-                    new UbRecord(this, unitId: 4),
-                };
-                auto2semanAll = new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
-                auto2semanSequence = new List<int>();
-                auto2semanTeacherProfiles = AutoSemanTeacherProfileIndexes.ToDictionary(
-                    profile => profile,
-                    profile => new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() });
+                executionEnabled = false;
+                queues = null;
+                conversionRecordingMode = false;
+                conversionSemanSkillType = 6;
+                conversionSemanUbType = 0;
+                ResetRecordingState(recordSequence);
                 return;
             }
-            ubMod = true;
-            auto2semanSequence = null;
-            auto2semanTeacherProfiles = null;
-            queues = ublists.Select((ublist, id) => new Queue<UbStatus>(ublist.Select(num => GetUbStatus(id, num)))).ToArray();
+            executionEnabled = true;
+            if (recordingEnabled && !conversionRecordingMode)
+            {
+                teacherProfiles.Clear();
+                recordingEnabled = false;
+                auto2semanSequenceMode = false;
+                auto2seman = new List<UbRecord>();
+                auto2semanAll = CreateEmptyLanes();
+                auto2semanSequence = new List<int>();
+            }
+            queues = ublists.Select((ublist, id) => new Queue<UbStatus>(
+                ublist.Select((num, geneIndex) => GetUbStatus(id, num, geneIndex)))).ToArray();
+        }
+
+        public void BeginConversionRecording(
+            bool recordSequence,
+            int semanSkillType,
+            int semanUbType)
+        {
+            ResetRecordingState(recordSequence);
+            conversionRecordingMode = true;
+            conversionSemanSkillType = semanSkillType;
+            conversionSemanUbType = semanUbType;
         }
 
         private List<int> NormalizeSequence(List<int> sequence)
@@ -726,9 +856,16 @@ namespace Elements.Battle
 
         public bool IsUbExec(int pos)
         {
-            if (!enable) return false;
-            if (!ubMod) return false;
-            if (pos < 0 || pos > 4) return false;
+            if (!executionEnabled) return false;
+            if (pos < 0 || pos > 4 || pos >= queues.Length) return false;
+            if (queues[pos].Count > 0)
+            {
+                var pending = queues[pos].Peek();
+                if (pending.anchorSatisfiedFrame < 0 && pending.IsSemanticAnchorSatisfied())
+                {
+                    pending.anchorSatisfiedFrame = BattleHeaderController.CurrentFrameCount;
+                }
+            }
             if (!IsSequenceTurn(pos)) return false;
             if (queues[pos].Count == 0 || queues[pos].Peek().IsUbExec())
             {
@@ -739,7 +876,7 @@ namespace Elements.Battle
 
         // public void OnTpChangeCallBack(int pos, float energy)
         // {
-        //     if (!ubMod)
+        //     if (recordingEnabled)
         //     {
         //         auto2seman[pos].OnTpChangeCallBack(energy);
         //         return;
@@ -751,130 +888,167 @@ namespace Elements.Battle
         //     }
         // }
 
-        public void OnEventCallBack(int unitPos, eSemanEvent eventId) 
+        public void OnEventCallBack(int unitPos, eSemanEvent eventId)
         {
-            if (!enable) return;
-            if (!ubMod)
+            if (!IsActive) return;
+            if (recordingEnabled)
             {
                 foreach (var ub in auto2seman)
                 {
                     ub.OnEventCallback(unitPos, (int)eventId);
                 }
-                return;
             }
-            foreach (var queue in queues)
+            if (executionEnabled)
             {
-                if (queue.Count > 0)
+                foreach (var queue in queues)
                 {
-                    queue.Peek().OnEventCallback(unitPos, (int)eventId);
+                    if (queue.Count > 0)
+                    {
+                        queue.Peek().OnEventCallback(unitPos, (int)eventId);
+                    }
                 }
             }
         }
 
         public void OnSkillEffectCallBack(int unitPos, int skill)
         {
-            if (!enable) return;
+            if (!IsActive) return;
             if (skill == 1) // ignore ub
                 return;
-            if (!ubMod)
+            if (recordingEnabled)
             {
                 foreach (var ub in auto2seman)
                 {
                     ub.OnSkillCallBack(unitPos, skill);
                 }
-                return;
             }
-            foreach (var queue in queues)
+            if (executionEnabled)
             {
-                if (queue.Count > 0)
+                foreach (var queue in queues)
                 {
-                    queue.Peek().OnSkillCallBack(unitPos, skill);
+                    if (queue.Count > 0)
+                    {
+                        queue.Peek().OnSkillCallBack(unitPos, skill);
+                    }
                 }
             }
         }
 
         public void OnChangeStateCallBack(int unitPos, ActionState state)
         {
-            if (!enable) return;
-            if (!ubMod)
+            if (!IsActive) return;
+            if (recordingEnabled)
             {
                 foreach (var ub in auto2seman)
                 {
                     ub.OnChangeStateCallBack(unitPos, state);
                 }
-                return;
             }
-            foreach (var queue in queues)
+            if (executionEnabled)
             {
-                if (queue.Count > 0)
+                foreach (var queue in queues)
                 {
-                    queue.Peek().OnChangeStateCallBack(unitPos, state);
+                    if (queue.Count > 0)
+                    {
+                        queue.Peek().OnChangeStateCallBack(unitPos, state);
+                    }
                 }
             }
         }
 
         public void ProcessFrame()
         {
-            if (!enable) return;
-            if (!ubMod)
+            if (!IsActive) return;
+            if (recordingEnabled)
             {
                 for(int i = 0; i < auto2seman.Count; i++)
                 {
                     auto2seman[i].ProcessFrame();
                 }
-                return;
             }
-            for(int i = 0; i < queues.Length; i++)
+            if (executionEnabled)
             {
-                if (queues[i].Count > 0)
+                for(int i = 0; i < queues.Length; i++)
                 {
-                    queues[i].Peek().ProcessFrame();
+                    if (queues[i].Count > 0)
+                    {
+                        var pending = queues[i].Peek();
+                        pending.ProcessFrame();
+                        if (pending.anchorSatisfiedFrame < 0 && pending.IsSemanticAnchorSatisfied())
+                        {
+                            pending.anchorSatisfiedFrame = BattleHeaderController.CurrentFrameCount;
+                        }
+                    }
                 }
             }
         }
 
         public void UbExecCallback(int pos)
         {
-            if (!enable) return;
-            if (!ubMod)
+            if (!IsActive) return;
+            if (pos < 0 || pos > 4) return;
+            if (recordingEnabled)
             {
-                if (pos >= 0 && pos <= 4) // no boss
+                int semanticUb;
+                if (conversionRecordingMode)
                 {
-                    auto2semanAll[pos].Add(auto2seman[pos].GetUbNumber(pos));
-                    if (auto2semanSequenceMode)
+                    semanticUb = auto2seman[pos].GetUbNumber(
+                        pos,
+                        conversionSemanSkillType,
+                        conversionSemanUbType);
+                }
+                else
+                {
+#if UNITY_5_3_OR_NEWER
+                    int semanSkillType = GuildManager.Instance.SemanSkillToggles.FindIndex(
+                        5,
+                        toggle => toggle.isOn);
+                    if (semanSkillType < 0)
                     {
-                        auto2semanSequence.Add(pos);
+                        semanSkillType = GuildManager.Instance.SemanSkillToggles.FindIndex(
+                            toggle => toggle.isOn);
                     }
-                    foreach (int profile in AutoSemanTeacherProfileIndexes)
+                    int semanUbType = GuildManager.Instance.SemanUBToggles.FindIndex(
+                        toggle => toggle.isOn);
+                    semanticUb = auto2seman[pos].GetUbNumber(
+                        pos,
+                        semanSkillType,
+                        semanUbType);
+#else
+                    semanticUb = 0;
+#endif
+                }
+                foreach (var profile in teacherProfiles.Keys)
+                    teacherProfiles[profile][pos].Add(auto2seman[pos].GetUbNumber(pos, profile, 0));
+                auto2semanAll[pos].Add(semanticUb);
+                if (auto2semanSequenceMode)
+                {
+                    auto2semanSequence.Add(pos);
+                }
+                if (auto2semanSequenceMode)
+                {
+                    foreach (var record in auto2seman)
                     {
-                        if (auto2semanTeacherProfiles != null && auto2semanTeacherProfiles.ContainsKey(profile))
-                        {
-                            auto2semanTeacherProfiles[profile][pos].Add(auto2seman[pos].GetTeacherUbNumber(pos, profile));
-                        }
-                    }
-                    UBNums[pos]++;
-                    if (auto2semanSequenceMode)
-                    {
-                        foreach (var record in auto2seman)
-                        {
-                            record.Clear();
-                        }
-                    }
-                    else
-                    {
-                        auto2seman[pos].Clear();
+                        record.Clear();
                     }
                 }
-                return;
+                else
+                {
+                    auto2seman[pos].Clear();
+                }
             }
-            if (pos < 0 || pos > 4) return;
-            if (queues[pos].Count > 0)
+            if (executionEnabled && pos < queues.Length && queues[pos].Count > 0)
+            {
                 queues[pos].Dequeue();
-            UBNums[pos]++;
-            if (ubSequence != null && ubSequenceIndex < ubSequence.Count && ubSequence[ubSequenceIndex] == pos)
+            }
+            if (executionEnabled &&
+                ubSequence != null &&
+                ubSequenceIndex < ubSequence.Count &&
+                ubSequence[ubSequenceIndex] == pos)
             {
                 ubSequenceIndex++;
             }
+            UBNums[pos]++;
         }
 
         public int skill2Id(int skillId)
@@ -901,55 +1075,120 @@ namespace Elements.Battle
 
         public void SetUnitCallBack(List<UnitCtrl> players, UnitCtrl boss)
         {
-            if (!enable) return;
-            this.players = players;
-            for (int i = 0; i < players.Count; i++)
+            SetUnitCallBack(players, boss == null ? Enumerable.Empty<UnitCtrl>() : new[] { boss });
+        }
+
+        public void SetUnitCallBack(List<UnitCtrl> players, IEnumerable<UnitCtrl> bosses)
+        {
+            if (!IsActive) return;
+            this.players = players ?? new List<UnitCtrl>();
+            for (int i = 0; i < this.players.Count; i++)
             {
-                int localIndex = i;
-                // players[localIndex].SemanOnTPChanged += (unitId, energy) => OnTpChangeCallBack(localIndex, energy);
-                players[localIndex].SemanOnStartAction += (unitId, skill) => OnSkillEffectCallBack(localIndex, skill2Id(skill));
-                players[localIndex].SemanOnExecAction += (unitId, skill) => OnSkillEffectCallBack(localIndex, skill2Id(skill));
-                players[localIndex].SemanOnChangeState += (unitId, state) => OnChangeStateCallBack(localIndex, state);
-                players[localIndex].SemanOnEventCallback += (unitId, buffDebuff) => OnEventCallBack(localIndex, buffDebuff);
+                AddUnitCallBack(this.players[i], i);
             }
-            boss.SemanOnStartAction += (unitId, skill) => OnSkillEffectCallBack(5, skill2Id(skill));
-            boss.SemanOnExecAction += (unitId, skill) => OnSkillEffectCallBack(5, skill2Id(skill));
-            boss.SemanOnChangeState += (unitId, state) => OnChangeStateCallBack(5, state);
-            boss.SemanOnEventCallback += (unitId, buffDebuff) => OnEventCallBack(5, buffDebuff);
-        }
-
-        public List<List<int>> Auto2Seman()
-        {
-            return BuildAuto2SemanOutput(auto2semanAll);
-        }
-
-        public List<int> Auto2SemanSequence()
-        {
-            return auto2semanSequence?.ToList() ?? new List<int>();
-        }
-
-        public List<List<int>> Auto2Seman(int semanSkillToggleIndex)
-        {
-            if (auto2semanTeacherProfiles != null && auto2semanTeacherProfiles.ContainsKey(semanSkillToggleIndex))
+            foreach (var boss in bosses ?? Enumerable.Empty<UnitCtrl>())
             {
-                return BuildAuto2SemanOutput(auto2semanTeacherProfiles[semanSkillToggleIndex]);
+                ObserveEnemyUnit(boss);
             }
-            return BuildAuto2SemanOutput(null);
         }
+
+        public void ObserveEnemyUnit(UnitCtrl unit)
+        {
+            if (!IsActive || unit == null || !unit.IsOther) return;
+            AddUnitCallBack(unit, 5);
+        }
+
+        internal void AddUnitCallBack(UnitCtrl unit, int unitPos)
+        {
+            if (!IsActive || unit == null || !subscribedUnits.Add(unit)) return;
+            // unit.SemanOnTPChanged += (unitId, energy) => OnTpChangeCallBack(unitPos, energy);
+            unit.SemanOnStartAction += (unitId, skill) => OnSkillEffectCallBack(unitPos, skill2Id(skill));
+            unit.SemanOnExecAction += (unitId, skill) => OnSkillEffectCallBack(unitPos, skill2Id(skill));
+            unit.SemanOnChangeState += (unitId, state) => OnChangeStateCallBack(unitPos, state);
+            unit.SemanOnEventCallback += (unitId, buffDebuff) => OnEventCallBack(unitPos, buffDebuff);
+        }
+
+        public SemanticUbConversionSnapshot CaptureConversionSnapshot(bool includeSequence)
+        {
+            var lanes = BuildAuto2SemanOutput(auto2semanAll);
+            List<SemanticUbSequenceItem> sequence = null;
+            if (includeSequence)
+            {
+                if (!auto2semanSequenceMode)
+                {
+                    throw new InvalidOperationException(
+                        "Semantic sequence output was not enabled for this battle.");
+                }
+
+                var laneOrdinals = new int[5];
+                sequence = new List<SemanticUbSequenceItem>(auto2semanSequence.Count);
+                for (int sequenceIndex = 0; sequenceIndex < auto2semanSequence.Count; sequenceIndex++)
+                {
+                    int lane = auto2semanSequence[sequenceIndex];
+                    if (lane < 0 || lane >= auto2semanAll.Count ||
+                        laneOrdinals[lane] >= auto2semanAll[lane].Count)
+                    {
+                        throw new InvalidOperationException(
+                            "Semantic sequence and lane recordings are inconsistent.");
+                    }
+                    sequence.Add(new SemanticUbSequenceItem
+                    {
+                        SequenceIndex = sequenceIndex,
+                        Lane = lane,
+                        Gene = auto2semanAll[lane][laneOrdinals[lane]++],
+                    });
+                }
+                for (int lane = 0; lane < laneOrdinals.Length; lane++)
+                {
+                    if (laneOrdinals[lane] != auto2semanAll[lane].Count)
+                    {
+                        throw new InvalidOperationException(
+                            "Semantic sequence does not cover every recorded player UB.");
+                    }
+                }
+            }
+
+            return new SemanticUbConversionSnapshot
+            {
+                SemanticLanes = lanes,
+                SemanticSequence = sequence,
+            };
+        }
+
+        // Preserve the existing local-server teacher API without importing server observation DTOs.
+        public List<List<int>> Auto2Seman() => BuildAuto2SemanOutput(auto2semanAll);
+        public List<int> Auto2SemanSequence() => new List<int>(auto2semanSequence);
+        public List<List<int>> Auto2Seman(int profile) => BuildAuto2SemanOutput(
+            teacherProfiles.TryGetValue(profile, out var lanes) ? lanes : null);
 
         private List<List<int>> BuildAuto2SemanOutput(List<List<int>> source)
         {
-            var ret = new List<List<int>>();
-            var lanes = source ?? new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
-            foreach (var seman in lanes)
+            var ret = new List<List<int>>(5);
+            for (int lane = 0; lane < 5; lane++)
             {
-                var ub = new List<int>(seman)
+                var laneSource = source?.ElementAtOrDefault(lane) ?? Enumerable.Empty<int>();
+                var ub = new List<int>();
+                foreach (var gene in laneSource)
                 {
-                    -1
-                };
+                    ub.Add(gene);
+                }
+                ub.Add(-1);
                 ret.Add(ub);
             }
             return ret;
+        }
+
+        private List<int> BuildSequenceLaneOutput(
+            IReadOnlyList<SemanticUbSequenceItem> sequence)
+        {
+            if (sequence == null)
+                return null;
+            var lanes = new List<int>(sequence.Count);
+            foreach (var item in sequence)
+            {
+                lanes.Add(item.Lane);
+            }
+            return lanes;
         }
 
     }

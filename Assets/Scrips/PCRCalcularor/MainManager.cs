@@ -46,18 +46,24 @@ namespace PCRCaculator
         public enum StayPage { home = 0, character = 1, battle = 2, gamble = 3, calculator = 4 }
         public StayPage stayPage;
         //public int loadCharacterMax;//最多加载到的角色序号
-        public int GetLevelMax(int battleMode) => playerSetting.playerLevel + (battleMode == 0 ? 0 : 10);
+        public int GetLevelMax(int battleMode, int connectRank = 0) => playerSetting.GetLevelMax(battleMode, connectRank);
         public int EffectiveLevelMax => GetLevelMax(IsGuildBattle ? 0 : 2);
         public int levelMax { get => EffectiveLevelMax; }
         public bool UseNewBattleSystem = true;
         public bool useJapanData {get => Version.useJP;}
         public bool useVerification;
+        public int PlayerProcessLimit => databaseCache.playerProcessLimit;
+        public int PlayerLevelLimit => databaseCache.playerLevelLimit;
+        public int UniqueEqLevelLimit => databaseCache.uniqueEqLevelLimit;
 
         public DatabaseCache databaseCache = new DatabaseCache();
 
         public class DatabaseCache
         {
             public int cacheSchemaVersion;
+            public int playerProcessLimit;
+            public int playerLevelLimit;
+            public int uniqueEqLevelLimit;
             public bool cacheBuildComplete;
             public string databaseSourceFingerprint;
             public Dictionary<int, ailment_data> ailmentDataDic = new Dictionary<int, ailment_data>();
@@ -364,8 +370,8 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10066000;
-            public long BossVersionJP = 10066000;
+            public long CharacterVersionJP = 10067700;
+            public long BossVersionJP = 10066500;
             public long BossVersionCN = 0;
             public bool useQA = false;
             public bool useJP = true;
@@ -605,8 +611,7 @@ namespace PCRCaculator
                     abStopwatch.Stop();
                     Debug.LogError($"AB资源初始化失败");
                     Debug.LogError(ex.ToString());
-                    try { wait?.SetMessage($"出错啦！{ex} 已重置版本，请重新打开"); } catch { }
-                    SaveManager.Save(new VersionData());
+                    try { wait?.SetMessage($"数据初始化失败：{ex}。已保留版本设置；请检查指定版本和网络后重新打开。"); } catch { }
                     return;
                 }
 
@@ -710,7 +715,11 @@ namespace PCRCaculator
 
                                 var dbCN = dbTool3;
 
+                                // Progression follows the selected region; JP resources may be newer than CN availability.
                                 if (!Version.useJP) dbTool2 = dbTool3;
+                                databaseCache.playerProcessLimit = dbTool2.PlayerProcessLimit;
+                                databaseCache.playerLevelLimit = dbTool2.PlayerLevelLimit;
+                                databaseCache.uniqueEqLevelLimit = dbTool2.UniqueEqLevelLimit;
 
                                 databaseCache.ailmentDataDic = dbTool.AilmentDataDic ?? databaseCache.ailmentDataDic;
                                 databaseCache.resistDataDic = dbTool.resistDataDic ?? databaseCache.resistDataDic;
@@ -1054,6 +1063,7 @@ namespace PCRCaculator
                 try { wait?.SetMessage("加载角色数据..."); } catch { }
                 LoadUnitData();
 
+                ApplyPlayerSettingLimits(setLevelsToMaximum: true);
                 LoadFinished = true;
                 CreateShowUnitIDS();
                 wait?.Close();
@@ -1102,26 +1112,28 @@ namespace PCRCaculator
         {
             try
             {
-                playerSetting = SaveManager.Load<PlayerSetting>();
-                if (PlayerLevelText != null)
-                {
-                    PlayerLevelText.text = playerSetting.playerLevel + "";
-                }
+                playerSetting = SaveManager.Load<PlayerSetting>() ?? new PlayerSetting();
             }
             catch
             {
                 playerSetting = new PlayerSetting();
-                playerSetting.playerProcess = 99;
-                playerSetting.playerLevel = 358;
-                if (PlayerLevelText != null)
-                {
-                    PlayerLevelText.text = playerSetting.playerLevel + "";
-                }
+            }
+            ApplyPlayerSettingLimits(setLevelsToMaximum: true);
+        }
+        private void ApplyPlayerSettingLimits(bool setLevelsToMaximum = false)
+        {
+            playerSetting.ApplyPlayerProcessLimit(PlayerProcessLimit);
+            playerSetting.ApplyPlayerLevelLimit(PlayerLevelLimit, setLevelsToMaximum);
+            playerSetting.ApplyUniqueEqLevelLimit(UniqueEqLevelLimit, setLevelsToMaximum);
+            if (PlayerLevelText != null)
+            {
+                PlayerLevelText.text = playerSetting.playerLevel.ToString();
             }
         }
         public void ReLoadPlayerSetting()
         {
-            playerSetting = SaveManager.Load<PlayerSetting>();
+            playerSetting = SaveManager.Load<PlayerSetting>() ?? new PlayerSetting();
+            ApplyPlayerSettingLimits(setLevelsToMaximum: true);
         }
         /// <summary>
         /// 保存玩家设置到json
@@ -1148,6 +1160,7 @@ namespace PCRCaculator
 
         public void SavePlayerSetting()
         {
+            ApplyPlayerSettingLimits();
             SaveManager.Save(playerSetting);
         }
         public void DeletePlayerData()

@@ -37,3 +37,4 @@ server/
 PCRCalculatorServer/linux
 *.db
 PCRCalculatorServer/Properties/PublishProfiles
+!scripts/DatabaseAcquisitionProbe/DatabaseAcquisitionProbe.csproj

@@ -114,6 +114,7 @@ namespace PCRCaculator
         private void Cancel_0()
         {
             calculatorData.isCanceled = true;
+            GuildManager.CancelRemoteCalculation();
             calculatorData.isPaues = false;
             buttonText.text="开始新的计算";
         }

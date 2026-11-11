@@ -7,7 +7,9 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Elements;
@@ -122,8 +124,7 @@ namespace PCRCaculator.SQL
             {
                 File.WriteAllBytes(stagingPath, mgr.ResolveDatabase());
                 this.path = stagingPath;
-                if (!mgr.DataVer.StartsWith("jp", StringComparison.OrdinalIgnoreCase))
-                    Unhash();
+                Unhash();
 
                 if (File.Exists(destinationPath))
                     throw new IOException($"数据库正式路径在发布前意外出现: {destinationPath}");
@@ -386,129 +387,313 @@ namespace PCRCaculator.SQL
             }
 
             Debug.Log($"Start Unhashing {mgr.DataVer}.db");
-            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(rainbowJsonContent);
+            var stopwatch = Stopwatch.StartNew();
+            var rainbow = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(rainbowJsonContent);
+            if (rainbow == null)
+                throw new InvalidDataException("Rainbow table is empty.");
 
             using (var dbConnection = new SqliteConnection($"Data Source={path};Version=3;"))
             {
                 dbConnection.Open();
 
-                foreach (var entry in jsonObject)
-                {
-                    string hashedTableName = entry.Key;
-                    var colsDict = entry.Value;
-                    string intactTableName = colsDict["--table_name"];
-
-                    string createTableStatement = GetCreateTable(dbConnection, hashedTableName);
-                    string createDecTableStatement = GetCreateTable(dbConnection, intactTableName);
-
-                    if (createTableStatement == null)
-                    {
-                        if (createDecTableStatement == null)
-                        {
-                            Debug.LogWarning($"CreateTableStatement for '{intactTableName}' not found.");
-                        }
-                        continue;
-                    }
-
-                    List<string> hashedCols = new List<string>();
-                    List<string> intactCols = new List<string>();
-
-                    foreach (var colEntry in colsDict)
-                    {
-                        if (colEntry.Key != "--table_name")
-                        {
-                            hashedCols.Add(colEntry.Key);
-                            intactCols.Add(colEntry.Value);
-                        }
-
-                        createTableStatement = createTableStatement.Replace(
-                            colEntry.Key == "--table_name" ? hashedTableName : colEntry.Key,
-                            colEntry.Key == "--table_name" ? intactTableName : colEntry.Value
-                        );
-                    }
-
-                    var hashedColsFromDb = GetTableColumns(dbConnection, hashedTableName);
-                    foreach (var col in hashedColsFromDb)
-                    {
-                        if (!hashedCols.Contains(col))
-                        {
-                            hashedCols.Add(col);
-                            intactCols.Add(col);
-                        }
-                    }
-
-                    string insertStatement = $"INSERT INTO {intactTableName} (`{string.Join("`, `", intactCols)}`) SELECT `{string.Join("`, `", hashedCols)}` FROM {hashedTableName}";
-                    string dropTableStatement = $"DROP TABLE {hashedTableName}";
-
-                    List<string> transactionCmds = new List<string> { createTableStatement, insertStatement, dropTableStatement };
-
-                    if (!ExecTransaction(dbConnection, transactionCmds))
-                    {
-                        throw new InvalidDataException(
-                            $"反哈希事务未完成: table={intactTableName}, hashedTable={hashedTableName}");
-                    }
-                }
-                Debug.Log("Unhashing complete.");
+                int restoredTables = UnhashDatabase(dbConnection, rainbow);
+                Debug.Log($"Unhashing complete: {restoredTables} tables, {stopwatch.Elapsed.TotalSeconds:F2}s.");
             }
         }
 
-        private string GetCreateTable(SqliteConnection dbConnection, string tableName)
+        private sealed class UnhashTable
         {
-            using (var command = dbConnection.CreateCommand())
-            {
-                command.CommandText = $"SELECT sql FROM sqlite_master WHERE type='table' AND name='{tableName}'";
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return reader.GetString(0);
-                    }
-                }
-            }
-            return null;
+            public string Name;
+            public string CreateSql;
+            public List<string> Columns;
+            public Dictionary<string, string> OriginalColumns;
+            public List<string> PrimaryKeyColumns;
+            public int KnownColumns;
         }
 
         protected List<string> GetTableColumns(SqliteConnection dbConnection, string tableName)
         {
+            return ReadTableColumns(dbConnection, null, tableName);
+        }
+
+        private static List<string> ReadTableColumns(SqliteConnection dbConnection, SqliteTransaction transaction, string tableName,
+            SortedDictionary<int, string> primaryKey = null)
+        {
             List<string> columns = new List<string>();
             using (var command = dbConnection.CreateCommand())
             {
-                command.CommandText = $"PRAGMA table_info({tableName})";
+                command.Transaction = transaction;
+                command.CommandText = $"PRAGMA table_info({QuoteIdentifier(tableName)})";
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         columns.Add(reader.GetString(1));
+                        int keyPosition = Convert.ToInt32(reader.GetValue(5));
+                        if (primaryKey != null && keyPosition > 0)
+                            primaryKey.Add(keyPosition, reader.GetString(1));
                     }
                 }
             }
             return columns;
         }
 
-        private bool ExecTransaction(SqliteConnection dbConnection, List<string> commands)
+        // Look up only tables in this database; rainbow contains aliases for many historical versions.
+        private static int UnhashDatabase(SqliteConnection dbConnection,
+            Dictionary<string, Dictionary<string, string>> rainbow)
         {
             using (var transaction = dbConnection.BeginTransaction())
             {
                 try
                 {
-                    foreach (var cmd in commands)
+                    var tables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    using (var command = dbConnection.CreateCommand())
                     {
-                        using (var command = dbConnection.CreateCommand())
+                        command.Transaction = transaction;
+                        command.CommandText = "SELECT name, sql FROM sqlite_master WHERE type='table'";
+                        using (var reader = command.ExecuteReader())
                         {
-                            command.CommandText = cmd;
-                            command.Transaction = transaction;
-                            command.ExecuteNonQuery();
+                            while (reader.Read())
+                            {
+                                string name = reader.GetString(0);
+                                if (!name.StartsWith("sqlite_", StringComparison.OrdinalIgnoreCase))
+                                    tables.Add(name, reader.GetString(1));
+                            }
                         }
                     }
+
+                    var groups = new Dictionary<string, List<UnhashTable>>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var table in tables)
+                    {
+                        if (!rainbow.TryGetValue(table.Key, out var mapping))
+                            continue;
+                        if (mapping == null || !mapping.TryGetValue("--table_name", out string originalName) ||
+                            string.IsNullOrEmpty(originalName))
+                            throw new InvalidDataException($"Invalid rainbow table mapping: {table.Key}");
+                        if (!groups.TryGetValue(originalName, out var aliases))
+                        {
+                            aliases = new List<UnhashTable>();
+                            groups.Add(originalName, aliases);
+                        }
+                        aliases.Add(ReadUnhashTable(dbConnection, transaction, table.Key, table.Value, mapping));
+                    }
+
+                    foreach (var group in groups)
+                    {
+                        string originalName = group.Key;
+                        var aliases = group.Value;
+                        UnhashTable source;
+                        if (tables.TryGetValue(originalName, out string originalSql))
+                        {
+                            source = aliases.FirstOrDefault(table =>
+                                string.Equals(table.Name, originalName, StringComparison.OrdinalIgnoreCase)) ??
+                                ReadUnhashTable(dbConnection, transaction, originalName, originalSql, null);
+                        }
+                        else
+                        {
+                            source = aliases.OrderByDescending(table => table.KnownColumns)
+                                .ThenBy(table => table.Name, StringComparer.Ordinal).First();
+                        }
+
+                        // Transition releases contain two aliases of the same table, sometimes with permuted columns.
+                        // Compare recovered columns by name before discarding an alias; never append duplicate rows.
+                        foreach (var alias in aliases)
+                            if (alias != source)
+                                VerifyDuplicateTable(dbConnection, transaction, originalName, source, alias);
+
+                        if (!string.Equals(source.Name, originalName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var replacements = source.OriginalColumns.ToDictionary(pair => pair.Value,
+                                pair => pair.Key, StringComparer.OrdinalIgnoreCase);
+                            replacements[source.Name] = originalName;
+                            ExecuteUnhashCommand(dbConnection, transaction, RewriteCreateTable(source.CreateSql, replacements));
+                            string destinationColumns = string.Join(", ", source.Columns.Select(column =>
+                                QuoteIdentifier(replacements[column])));
+                            string sourceColumns = string.Join(", ", source.Columns.Select(QuoteIdentifier));
+                            ExecuteUnhashCommand(dbConnection, transaction,
+                                $"INSERT INTO {QuoteIdentifier(originalName)} ({destinationColumns}) " +
+                                $"SELECT {sourceColumns} FROM {QuoteIdentifier(source.Name)}");
+                        }
+
+                        foreach (var alias in aliases)
+                            if (!string.Equals(alias.Name, originalName, StringComparison.OrdinalIgnoreCase))
+                                ExecuteUnhashCommand(dbConnection, transaction, $"DROP TABLE {QuoteIdentifier(alias.Name)}");
+                    }
                     transaction.Commit();
-                    return true;
+                    return groups.Count;
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Transaction failed: {e}");
                     transaction.Rollback();
                     throw new InvalidDataException("数据库反哈希事务失败", e);
                 }
+            }
+        }
+
+        private static UnhashTable ReadUnhashTable(SqliteConnection connection, SqliteTransaction transaction,
+            string name, string createSql, Dictionary<string, string> mapping)
+        {
+            var primaryKey = new SortedDictionary<int, string>();
+            var table = new UnhashTable
+            {
+                Name = name,
+                CreateSql = createSql,
+                Columns = ReadTableColumns(connection, transaction, name, primaryKey),
+                OriginalColumns = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            };
+            table.PrimaryKeyColumns = primaryKey.Values.ToList();
+            foreach (string column in table.Columns)
+            {
+                string originalColumn = column;
+                if (mapping != null && mapping.TryGetValue(column, out string recoveredColumn))
+                {
+                    if (string.IsNullOrEmpty(recoveredColumn))
+                        throw new InvalidDataException($"Invalid rainbow column mapping: {name}.{column}");
+                    originalColumn = recoveredColumn;
+                    table.KnownColumns++;
+                }
+                if (table.OriginalColumns.ContainsKey(originalColumn))
+                    throw new InvalidDataException($"Duplicate recovered column: {name}.{originalColumn}");
+                table.OriginalColumns.Add(originalColumn, column);
+            }
+            return table;
+        }
+
+        private static void VerifyDuplicateTable(SqliteConnection connection, SqliteTransaction transaction,
+            string originalName, UnhashTable source, UnhashTable alias)
+        {
+            long sourceCount = Convert.ToInt64(ExecuteUnhashScalar(connection, transaction,
+                $"SELECT COUNT(*) FROM {QuoteIdentifier(source.Name)}"));
+            long aliasCount = Convert.ToInt64(ExecuteUnhashScalar(connection, transaction,
+                $"SELECT COUNT(*) FROM {QuoteIdentifier(alias.Name)}"));
+            if (source.Columns.Count != alias.Columns.Count || sourceCount != aliasCount)
+                throw new InvalidDataException($"Transition tables differ: {originalName}, {source.Name}, {alias.Name}");
+            if (sourceCount == 0)
+                return;
+
+            var commonColumns = source.OriginalColumns.Keys.Where(alias.OriginalColumns.ContainsKey).ToList();
+            if (commonColumns.Count == 0)
+            {
+                VerifyUnmappedDuplicate(connection, transaction, originalName, source, alias);
+                return;
+            }
+            string sourceColumns = string.Join(", ", commonColumns.Select(column => QuoteIdentifier(source.OriginalColumns[column])));
+            string aliasColumns = string.Join(", ", commonColumns.Select(column => QuoteIdentifier(alias.OriginalColumns[column])));
+            // Include multiplicity, so identical projections with different duplicate counts also fail verification.
+            string sourceRows = $"SELECT {sourceColumns}, COUNT(*) FROM {QuoteIdentifier(source.Name)} GROUP BY {sourceColumns}";
+            string aliasRows = $"SELECT {aliasColumns}, COUNT(*) FROM {QuoteIdentifier(alias.Name)} GROUP BY {aliasColumns}";
+            string comparison = $"SELECT EXISTS({sourceRows} EXCEPT {aliasRows}) OR EXISTS({aliasRows} EXCEPT {sourceRows})";
+            if (Convert.ToInt64(ExecuteUnhashScalar(connection, transaction, comparison)) != 0)
+                throw new InvalidDataException($"Transition table data differs: {originalName}, {source.Name}, {alias.Name}");
+        }
+
+        private static void VerifyUnmappedDuplicate(SqliteConnection connection, SqliteTransaction transaction,
+            string originalName, UnhashTable source, UnhashTable alias)
+        {
+            // Some known tables have no recovered field names yet. Align rows by the declared primary key,
+            // then compare whole column streams as a multiset to allow a fixed permutation of columns.
+            if (source.PrimaryKeyColumns.Count == 0 || source.PrimaryKeyColumns.Count != alias.PrimaryKeyColumns.Count)
+                throw new InvalidDataException($"Cannot verify transition tables without a primary key: {originalName}");
+            var sourceHashes = ReadColumnFingerprints(connection, transaction, source);
+            var aliasHashes = ReadColumnFingerprints(connection, transaction, alias);
+            bool sameKeys = source.PrimaryKeyColumns.Select(column => sourceHashes[column]).SequenceEqual(
+                alias.PrimaryKeyColumns.Select(column => aliasHashes[column]));
+            bool sameColumns = sourceHashes.Values.OrderBy(hash => hash, StringComparer.Ordinal).SequenceEqual(
+                aliasHashes.Values.OrderBy(hash => hash, StringComparer.Ordinal));
+            if (!sameKeys || !sameColumns)
+                throw new InvalidDataException($"Unmapped transition table data differs: {originalName}");
+        }
+
+        private static Dictionary<string, string> ReadColumnFingerprints(SqliteConnection connection,
+            SqliteTransaction transaction, UnhashTable table)
+        {
+            var hashes = table.Columns.Select(column => SHA256.Create()).ToArray();
+            try
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandText = $"SELECT {string.Join(", ", table.Columns.Select(QuoteIdentifier))} " +
+                        $"FROM {QuoteIdentifier(table.Name)} ORDER BY {string.Join(", ", table.PrimaryKeyColumns.Select(QuoteIdentifier))}";
+                    using (var reader = command.ExecuteReader())
+                        while (reader.Read())
+                            for (int i = 0; i < hashes.Length; i++)
+                            {
+                                object value = reader.GetValue(i);
+                                // Keep SQL value types and cell boundaries in the fingerprint, including NULL and blobs.
+                                byte[] bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
+                                    new object[] { value.GetType().FullName, value }) + "\n");
+                                hashes[i].TransformBlock(bytes, 0, bytes.Length, bytes, 0);
+                            }
+                }
+                var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < hashes.Length; i++)
+                {
+                    hashes[i].TransformFinalBlock(new byte[0], 0, 0);
+                    result.Add(table.Columns[i], Convert.ToBase64String(hashes[i].Hash));
+                }
+                return result;
+            }
+            finally
+            {
+                foreach (var hash in hashes) hash.Dispose();
+            }
+        }
+
+        private static string QuoteIdentifier(string name)
+        {
+            return "\"" + name.Replace("\"", "\"\"") + "\"";
+        }
+
+        private static readonly Regex SqlIdentifierTokens = new Regex(
+            @"'(''|[^'])*'|--[^\r\n]*|/\*[\s\S]*?\*/|""(""""|[^""])*""|`(``|[^`])*`|\[[^\]]*\]|[\w$]+|[^\s]",
+            RegexOptions.CultureInvariant);
+
+        private static string RewriteCreateTable(string sql, Dictionary<string, string> replacements)
+        {
+            // Replace identifier tokens once, preserving defaults, comments, constraints and unknown columns.
+            // The game uses SQLite's legacy single-quoted identifiers in CREATE TABLE statements.
+            int depth = 0;
+            bool literalContext = false;
+            return SqlIdentifierTokens.Replace(sql, match =>
+            {
+                string token = match.Value;
+                if (token.StartsWith("--", StringComparison.Ordinal) || token.StartsWith("/*", StringComparison.Ordinal))
+                    return token;
+                if (token == "(") depth++;
+                if (token == ")") depth--;
+                if (token == "," && depth == 1) literalContext = false;
+                if (string.Equals(token, "DEFAULT", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(token, "CHECK", StringComparison.OrdinalIgnoreCase))
+                    literalContext = true;
+                if (token[0] == '\'' && literalContext)
+                    return token;
+                string identifier = token;
+                if (token[0] == '"' || token[0] == '`' || token[0] == '\'')
+                    identifier = token.Substring(1, token.Length - 2).Replace(new string(token[0], 2), token[0].ToString());
+                else if (token[0] == '[')
+                    identifier = token.Substring(1, token.Length - 2);
+                return replacements.TryGetValue(identifier, out string replacement) ? QuoteIdentifier(replacement) : token;
+            });
+        }
+
+        private static object ExecuteUnhashScalar(SqliteConnection connection, SqliteTransaction transaction, string sql)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                command.CommandText = sql;
+                return command.ExecuteScalar();
+            }
+        }
+
+        private static void ExecuteUnhashCommand(SqliteConnection connection, SqliteTransaction transaction, string sql)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
             }
         }
 
@@ -527,6 +712,9 @@ namespace PCRCaculator.SQL
         private Dictionary<int, wave_group_data> waveDic;
         public (Dictionary<int, UnitStoryData>, Dictionary<int, List<int>>, Dictionary<int, int>) Pair { get; private set; }
         public Dictionary<int, UnitRarityData> Dic1 { get; private set; }
+        public int PlayerProcessLimit { get; private set; }
+        public int PlayerLevelLimit { get; private set; }
+        public int UniqueEqLevelLimit { get; private set; }
         public Dictionary<int, unit_talent[]> TalentDic { get; private set; }
         public Dictionary<int, enemy_talent_weakness> EnemyTalentWeaknessDic { get; private set; }
         public Dictionary<int, talent_weakness> TalentWeaknessDic { get; private set; }
@@ -620,6 +808,42 @@ namespace PCRCaculator.SQL
             return temp;
         }
 
+        public static int CalculatePlayerLevelLimit(IEnumerable<experience_team> levels)
+        {
+            return Math.Max(0, levels.Select(row => row.team_level).DefaultIfEmpty(1).Max() - 1);
+        }
+
+        public static int CalculateUniqueEqLevelLimit(IEnumerable<unique_equipment_enhance_data> enhancements)
+        {
+            return Math.Max(0, enhancements
+                .Where(row => row != null && row.equip_slot == 1)
+                .Select(row => row.enhance_level)
+                .DefaultIfEmpty(0).Max());
+        }
+
+        public static int CalculatePlayerProcessLimit(IEnumerable<unit_promotion> promotions)
+        {
+            int limit = 0;
+            foreach (var promotion in promotions)
+            {
+                if (promotion == null || promotion.unit_id < 100000 || promotion.unit_id >= 200000
+                    || promotion.promotion_level < 8)
+                    continue;
+
+                int equipmentCount = promotion.GetEquips().Count(id => id > 0 && id != 999999);
+                if (equipmentCount < 3)
+                    continue;
+
+                int rank = promotion.promotion_level;
+                // Keep the existing progression encoding: R10-3 = 13, R10-4 = 14, R10-5 = 15.
+                int process = rank == 8 ? PlayerSetting.MinimumPlayerProcess
+                    : rank == 9 ? (equipmentCount >= 5 ? 12 : 11)
+                    : (rank - 10) * 3 + 13 + Math.Min(2, equipmentCount - 3);
+                limit = Math.Max(limit, process);
+            }
+            return limit;
+        }
+
         // TRAP: this method uses thread static field, so make sure not to run the method two times at once
         public Task ParallelGetAll()
         {
@@ -638,6 +862,7 @@ namespace PCRCaculator.SQL
             var equipDicTask = Task.Run(() =>
             {
                 equipDic = GetDatasDicList<unit_promotion>(a => a.unit_id);
+                PlayerProcessLimit = CalculatePlayerProcessLimit(equipDic.Values.SelectMany(rows => rows));
             });
             var rankStateDicTask = Task.Run(() =>
             {
@@ -673,6 +898,8 @@ namespace PCRCaculator.SQL
             var UnitRoleDataDicTask =
                 Task.Run(() => UnitRoleDataDic = GetOptionalDatasDic<unit_role_data>(a => a.unit_id));
             var tasks = new List<Task>();
+            tasks.Add(Task.Run(() => PlayerLevelLimit = CalculatePlayerLevelLimit(GetDatas<experience_team>())));
+            tasks.Add(Task.Run(() => UniqueEqLevelLimit = CalculateUniqueEqLevelLimit(GetDatas<unique_equipment_enhance_data>())));
 
             tasks.Add(
                 DatabaseCacheContract.RunAfterSuccessAsync(

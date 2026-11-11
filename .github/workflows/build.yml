@@ -1,69 +1,179 @@
-name: Build project
+name: Build and release
 
 on:
   push:
-    branches:
-      - '**'  # 所有分支
+    branches: ['**']
+    tags: ['v*']
   pull_request:
-    branches:
-      - '**'  # 所有分支
+    branches: ['**']
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Package to build (manual runs do not publish a release)
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - linux
+          - macos
+          - windows
 
-env:
-  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+permissions:
+  contents: read
 
 jobs:
-  buildForSomePlatforms:
-    name: Build for ${{ matrix.targetPlatform }} on version ${{ matrix.unityVersion }}
+  version:
+    name: Check package version
     runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.version.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ProjectSettings
+      - name: Read package version
+        id: version
+        shell: bash
+        run: |
+          version="$(sed -n 's/^  bundleVersion: *//p' ProjectSettings/ProjectSettings.asset | tr -d '\r')"
+          if [[ ! "$version" =~ ^[0-9A-Za-z][0-9A-Za-z.+_-]*$ ]]; then
+            echo "Invalid bundleVersion for package naming: $version" >&2
+            exit 1
+          fi
+          if [[ "$GITHUB_REF" == refs/tags/* && "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "Release tag $GITHUB_REF_NAME must match bundleVersion v$version" >&2
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+  server:
+    name: Linux .NET server
+    needs: version
+    if: github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'linux'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Test server packaging
+        run: python3 scripts/test_build_server.py
+      - name: Build project server package
+        env:
+          PACKAGE_VERSION: ${{ needs.version.outputs.value }}
+        run: |
+          ./build.sh --target linux
+          mv Builds/mzq-linux-x64.zip "Builds/mzq-${PACKAGE_VERSION}-linux-x64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PCRCalculatorServer_${{ needs.version.outputs.value }}_linux-x64
+          path: Builds/mzq-${{ needs.version.outputs.value }}-linux-x64.zip
+          if-no-files-found: error
+
+  desktop:
+    name: ${{ github.ref_name }} ${{ matrix.target }} desktop
+    needs: version
+    if: >-
+      (github.event_name == 'push' &&
+        (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))) ||
+      (github.event_name == 'workflow_dispatch' && inputs.target != 'linux')
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        buildName:
-          - PCRCalculator
-        projectPath:
-          - ./
-        unityVersion:
-          - 2021.3.27f1
-        targetPlatform:
-          - StandaloneOSX # Build a macOS standalone (Intel 64-bit).
-          - StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - StandaloneLinux64 # Build a Linux 64-bit standalone.
-          # - Android # Build an Android .apk standalone app.
-
+        target: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.target != 'all' && format('["{0}"]', inputs.target) || '["macos","windows"]') }}
+    runs-on: ${{ matrix.target == 'macos' && 'macos-15-intel' || 'windows-2022' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           lfs: true
-
-      # 获取当前分支的提交哈希值
-      - name: Get Git Commit Hash
-        id: get_commit_hash
-        run: echo "::set-output name=hash::$(git rev-parse --short HEAD)"
-
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('**/Assets/**') }}
+          key: Library-${{ github.ref_name }}-project-il2cpp-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
-            Library-${{ matrix.targetPlatform }}-
-            Library-
-
-      - if: matrix.targetPlatform == 'Android'
-        uses: jlumbroso/free-disk-space@v1.3.1
-
+            Library-${{ github.ref_name }}-project-il2cpp-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-
+      # Preserve the existing build entry and backend selection for each platform.
+      - name: Inspect Windows build host
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          Get-PSDrive C | Select-Object Name, Used, Free
+          docker version
+          & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          Get-ChildItem "${env:ProgramFiles(x86)}/Windows Kits/10/Include" -Directory | Select-Object Name
+      - name: Inspect Mac build host
+        if: matrix.target == 'macos'
+        run: |
+          df -h .
+          xcode-select -p
+          xcrun --sdk macosx --show-sdk-version
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: ${{ matrix.unityVersion }}
-          targetPlatform: ${{ matrix.targetPlatform }}
-          versioning: Custom
-          version: ${{ steps.get_commit_hash.outputs.hash }}
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
+          unityVersion: auto
+          targetPlatform: ${{ matrix.target == 'macos' && 'StandaloneOSX' || 'StandaloneWindows64' }}
+          buildMethod: ${{ matrix.target == 'macos' && 'BuildScript.BuildAppleSilicon' || 'BuildScript.BuildFromCommandLine' }}
+          customParameters: -pcrBuildTarget ${{ matrix.target }} -pcrOutputRoot Builds
+          versioning: None
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.buildName }}_${{ matrix.targetPlatform }}
-          path: build/${{ matrix.targetPlatform }}
+          name: PCRCalculator_${{ needs.version.outputs.value }}_${{ matrix.target }}
+          path: Builds/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [version, server, desktop]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: PCRCalculator*_${{ needs.version.outputs.value }}_*
+          path: release
+          merge-multiple: true
+      - name: Publish all three packages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          PACKAGE_VERSION: ${{ needs.version.outputs.value }}
+        run: |
+          assets=(
+            "release/${PACKAGE_VERSION}.zip"
+            "release/${PACKAGE_VERSION}-mac-arm.zip"
+            "release/mzq-${PACKAGE_VERSION}-linux-x64.zip"
+          )
+          for asset in "${assets[@]}"; do
+            if [[ ! -s "$asset" ]]; then
+              echo "Missing release package: $asset" >&2
+              exit 1
+            fi
+          done
+
+          if release_info="$(gh release view "$RELEASE_TAG" --json isDraft,assets)"; then
+            if [[ "$(jq -r '.isDraft' <<< "$release_info")" == false ]]; then
+              for asset in "${assets[@]}"; do
+                jq -e --arg name "${asset##*/}" '.assets | any(.name == $name)' <<< "$release_info" > /dev/null
+              done
+              echo "Release $RELEASE_TAG already contains all three packages."
+              exit 0
+            fi
+            gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
+          else
+            gh release create "$RELEASE_TAG" "${assets[@]}" \
+              --draft --verify-tag --title "$RELEASE_TAG" --generate-notes
+          fi
+          gh release edit "$RELEASE_TAG" --draft=false

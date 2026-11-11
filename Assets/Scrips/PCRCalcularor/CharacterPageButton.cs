@@ -37,6 +37,7 @@ namespace PCRCaculator
         public List<Sprite> roleSprites;//1-7
         public Image characterTalentImage;
         public Image backImage;
+        public Image connectRankIcon;
         public Slider HPSlider;
         public Slider MaxHPSlider;
         public Slider TPSlider;
@@ -90,6 +91,10 @@ namespace PCRCaculator
         {
             if (unitid >= 200000 || unitid <= 0)
             {
+                if (connectRankIcon != null)
+                {
+                    connectRankIcon.gameObject.SetActive(false);
+                }
                 stars.SetStars(-1);
                 characterTalentImage.SetActive(false);
                 roleImage.gameObject.SetActive(false);
@@ -181,6 +186,10 @@ namespace PCRCaculator
         public void RefreshData(UnitData data)
         {
             int unitid = data.unitId;
+            if (connectRankIcon != null)
+            {
+                connectRankIcon.gameObject.SetActive(data.connectRank > 0);
+            }
 
             // if (data.GetHashCode() == current) return;
 

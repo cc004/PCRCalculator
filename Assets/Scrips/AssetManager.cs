@@ -87,8 +87,16 @@ namespace PCRApi
         public static List<Content> FromUrl(string urlroot, string url, string @class)
         {
             UnityEngine.Debug.Log($"downloading from {urlroot}{url}");
-            var lines = client.GetStringAsync($"{urlroot}{url}").Result.Split('\n')
-                .Where(l => !string.IsNullOrEmpty(l)).ToArray();
+            string manifestText;
+            try
+            {
+                manifestText = Encoding.UTF8.GetString(DownloadByteArrayWithRetry($"{urlroot}{url}"));
+            }
+            catch (Exception exception)
+            {
+                throw new IOException($"Failed to fetch JP manifest {urlroot}{url}; check the configured version and CDN connectivity, then retry initialization.", exception);
+            }
+            var lines = manifestText.Split('\n').Where(l => !string.IsNullOrEmpty(l)).ToArray();
             var res = new Content[lines.Length];
 
             for (int i = 0; i < lines.Length; ++i)

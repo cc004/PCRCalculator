@@ -488,172 +488,19 @@ namespace ExcelHelper
             //if (File.Exists("patch_asm_exportaabbabab"))
             //    File.WriteAllText(filePath + ".asm", CreateAsmString());
             if (AsmExportEnabled)
-                File.WriteAllText(filePath + ".asm", CreateAsmString());
+            {
+                int bossId = TimelineData.playerGroupData.selectedEnemyIDs[0];
+                var context = AsmTimelineScriptExporter.CreateContext(
+                    TimelineData,
+                    bossId,
+                    GuildCalculator.Instance.PrimaryBossUnitIds,
+                    TimelineData.playerGroupData.playerData.playrCharacters,
+                    GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
+                    GuildManager.Instance.GetFinalTeamSkillNodeDescription());
+                File.WriteAllText(filePath + ".asm", AsmTimelineScriptExporter.CreateContent(context));
+            }
             if (PyExportEnabled)
                 AutoTimelineLegacyScriptExporter.WriteScriptSet(TimelineData, filePath);
-        }
-
-        private static (string, Func<UnitData, object>)[] conditions =
-        {
-            ("st", c => c.rarity),
-            ("rk", c => c.rank),
-            ("e1", c => int.TryParse(c.equipLevel[0].ToString(), out var val) ? val : -1),
-            ("e2", c => int.TryParse(c.equipLevel[1].ToString(), out var val) ? val : -1),
-            ("e3", c => int.TryParse(c.equipLevel[2].ToString(), out var val) ? val : -1),
-            ("e4", c => int.TryParse(c.equipLevel[3].ToString(), out var val) ? val : -1),
-            ("e5", c => int.TryParse(c.equipLevel[4].ToString(), out var val) ? val : -1),
-            ("e6", c => int.TryParse(c.equipLevel[5].ToString(), out var val) ? val : -1),
-            ("ub", c => c.skillLevel[0]),
-            ("s1", c => c.skillLevel[1]),
-            ("s2", c => c.skillLevel[2]),
-            ("ex", c => c.skillLevel[3]),
-            ("lv", c => c.level)
-        };
-
-        private static string UnitDetail(UnitData info)
-        {
-            var lstring = string.Join(",", new[]
-            {
-                info.skillLevel[0], info.skillLevel[1], info.skillLevel[2], info.skillLevel[3]
-            });
-            string unitsLove = JsonConvert.SerializeObject(info.playLoveDic);
-            return $"{info.unitId}|{info.level}|{info.rarity}|{info.love2}|{(int)info.rank}|{string.Concat(info.equipLevel.Select(l => l.ToString()[0]))}|{lstring}|{info.uniqueEqLv}|{info.uniqueEq2Lv}|{info.GetExEquipDescribe()}|{info.TalentLevelDescribe()}|{UnitRoleMasteryDetail(info)}|{unitsLove}";
-        }
-
-        private static string UnitRoleMasteryDetail(UnitData info)
-        {
-            if (!MainManager.Instance.UnitRoleDataDic.ContainsKey(info.unitId))
-                return "无";
-
-            return info.RoleMasteryDescribe()
-                .Replace("\r\n", "/")
-                .Replace('\n', '/')
-                .Replace('\r', '/');
-        }
-
-        private static string ToTime(long time, int limit)
-        {
-            return $"{time / 3600}:{(time / 60 % 60):D2}:{(time % 60):D2} ({limit - time:D4}";
-        }
-
-        private static string CreateAsmString()
-        {
-            int seed = TimelineData.currentRandomSeed;
-            var units = TimelineData.playerGroupData.playerData.playrCharacters;
-            var cdict = units.ToDictionary(u => u.unitId, u => new { name = u.GetNicName(), unit = u });
-            var enemy = "boss";
-            var msg = new StringBuilder();
-            var src = new StringBuilder();
-
-            const string header = "log seed\n";
-            src.AppendLine(header);
-
-            foreach (var pair in cdict)
-            {
-                var cond = string.Join(" ", conditions.Select(t => $"{t.Item1}={t.Item2(pair.Value.unit)}"));
-
-                src.AppendLine($"//require {pair.Key}:{cond}");
-            }
-
-            src.AppendLine($"//require {TimelineData.playerGroupData.selectedEnemyIDs[0]}:");
-
-            foreach (var tuple in cdict)
-            {
-                int unitId = tuple.Value.unit.unitId;
-                string name = tuple.Value.name;
-                switch (unitId)
-                {
-                    case 105701:
-                        unitId = 170301;
-                        break;
-                    case 106101:
-                        name = "矛衣未";
-                        break;
-                    case 114701:
-                        name = "春511";
-                        break;
-                    case 125001:
-                        name = "解511";
-                        break;
-                }
-                src.AppendLine($"mov {unitId},{name}");
-            }
-
-            //var damage = dmgs.Where(pair => pair.Key <= 999999).Sum(pair => pair.Value);
-            //msg.AppendLine($"对\"{enemy}\"（{seed}:{enemy}-{PCRBattle.Instance.enemyUnitid}）造成{damage}伤害：");
-            msg.AppendLine($"boss: {TimelineData.playerGroupData.selectedEnemyIDs[0]}");
-            msg.AppendLine(string.Join("\n", cdict.Select(c => $"{UnitDetail(c.Value.unit)}|{c.Value.name}")));
-            msg.AppendLine($"属性技能：{GuildManager.Instance.GetFinalTalentSkillNodeDescription()}");
-            msg.AppendLine($"大师技能：{GuildManager.Instance.GetFinalTeamSkillNodeDescription()}");
-            msg.AppendLine("帧轴：");
-
-            var skippingFrame = 0;
-            cdict.Add(TimelineData.playerGroupData.selectedEnemyIDs[0], new { name = string.Empty, unit = (UnitData)null });
-
-            var limit = 60 * 90;// __instance.GetMiliLimitTime() / 1000;
-
-            foreach (var (unit, data) in TimelineData.allUnitStateChangeDic.SelectMany(pair =>
-                             pair.Value.Select(dat => (pair.Key, dat)))
-                         .Where(t => t.dat.changStateTo == UnitCtrl.ActionState.SKILL_1)
-                         .OrderBy(t => t.dat.realFrameCount))
-            {
-                var frame = data.currentFrameCount;
-                var unit_id = unit;
-                string name;
-                if (unit_id <= 200000)
-                {
-                    name = unit_id switch
-                    {
-                      106101 => "矛衣未",
-                      114701 => "春511",
-                      125001 => "解511",
-                      _ => cdict[unit].name,
-                    };
-                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\t{name}");
-                    src.AppendLine($"wait {data.realFrameCount}; pressub {name}; // lframe {data.currentFrameCount}");
-                }
-                else
-                {
-                    src.AppendLine($"//bossub");
-                    msg.AppendLine($"{ToTime(limit - data.currentFrameCount, limit)}:{data.realFrameCount})\tboss");
-                }
-            }
-
-            var lastDamage = FindLastDamage();
-            if (lastDamage.realFrame > 0 && lastDamage.logicFrame == 5399)
-            {
-                src.AppendLine($"wait {lastDamage.realFrame}; pause;");
-            }
-
-            var dieFrame = TimelineData.allUnitStateChangeDic.FirstOrDefault().Value.LastOrDefault().realFrameCount;
-            msg.AppendLine($"最后一帧：{dieFrame}");
-            src.AppendLine(string.Join("\n", msg.ToString().Split('\n').Select(m => $"//{m}")));
-
-            return src.ToString();
-        }
-
-        private static (int logicFrame, int realFrame) FindLastDamage()
-        {
-            int bestLogic = 0;
-            int bestReal = 0;
-
-            foreach (var list in TimelineData.allUnitHPDic.Values)
-            {
-                foreach (var data in list)
-                {
-                    if (data.damage <= 0 || data.xValue >= 5400)
-                        continue;
-
-                    if (data.xValue > bestLogic ||
-                        (data.xValue == bestLogic && data.realFrameCount > bestReal))
-                    {
-                        bestLogic = data.xValue;
-                        bestReal = data.realFrameCount;
-                    }
-                }
-            }
-
-            return (bestLogic, bestReal);
         }
 
         private static void CreateUnitExecTimeExcel(FileInfo newFile)

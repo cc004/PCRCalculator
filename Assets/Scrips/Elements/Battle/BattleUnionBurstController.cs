@@ -36,14 +36,17 @@ namespace Elements.Battle
                 var ready = unitCtrl.JudgeSkillReadyAndIsMyTurn();
                 bool hasCurrentFrameAutoPoint = unitCtrl.critPoint?.frame == BattleHeaderController.CurrentFrameCount &&
                                                 unitCtrl.critPoint.description2 == "AUTO";
-                if (ready && !unitCtrl.lastCanReleaseSkill && !hasCurrentFrameAutoPoint)
+                if (ready && !unitCtrl.lastCanReleaseSkill)
                 {
-                    unitCtrl.critPoint = new UnitCtrl.CritPoint
-                    {
-                        description = "连点",
-                        description2 = "连点",
-                        priority = UnitCtrl.eCritPointPriority.FullEnergy
-                    };
+                    if (hasCurrentFrameAutoPoint)
+                        unitCtrl.critPoint.hasRepeatedPressCandidate = true;
+                    else
+                        unitCtrl.critPoint = new UnitCtrl.CritPoint
+                        {
+                            description = "连点",
+                            description2 = "连点",
+                            priority = UnitCtrl.eCritPointPriority.FullEnergy
+                        };
                 }
                 unitCtrl.lastCanReleaseSkill = ready;
 
@@ -118,7 +121,13 @@ namespace Elements.Battle
                 else
                     continue;
 
-                if (unitCtrl.JudgeSkillReadyAndIsMyTurn() && unitCtrl.IsAutoOrUbExecTrying())
+                var ready = unitCtrl.JudgeSkillReadyAndIsMyTurn();
+                bool hasCurrentFrameAutoPoint = unitCtrl.critPoint?.frame == BattleHeaderController.CurrentFrameCount &&
+                                                unitCtrl.critPoint.description2 == "AUTO";
+                if (ready && !unitCtrl.lastCanReleaseSkill && hasCurrentFrameAutoPoint)
+                    unitCtrl.critPoint.hasRepeatedPressCandidate = true;
+                unitCtrl.lastCanReleaseSkill = ready;
+                if (ready && unitCtrl.IsAutoOrUbExecTrying())
                 {
                     unitCtrl.SetDirectionAuto();
                     unitCtrl.UpdateSkillTarget();

@@ -31,6 +31,7 @@ public class ThreadController : IDisposable
         new SpineCreator().Awake();
         new BaseBackManager().Awake();
         new MainManager().Awake();
+        PCRCalculatorServer.ServerOptions.ApplyClientContext();
 
         new BattleUIManager()
         {
@@ -95,6 +96,7 @@ public class ThreadController : IDisposable
         const float parentOffset = 5000f * parentScale;
         new MyGameCtrl()
         {
+            stopFrame = -1, // Headless simulations have no interactive pause frame.
             unitParent = new()
             {
                 localScale = parentScale * Vector3.one,

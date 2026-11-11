@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Elements;
 using Elements.Battle;
 using PCRCaculator.Guild;
@@ -50,11 +50,12 @@ namespace PCRCaculator
                 MainManager.Instance.WindowMessage("语义UB模式下无法转换成语义UB");
                 return;
             }
-            groupData.SemanUBExecTimeData = BattleManager.Instance.semanubmanager.Auto2Seman();
+            var snapshot = BattleManager.Instance.semanubmanager.CaptureConversionSnapshot(MyGameCtrl.Instance.tempData.useSequenceUB);
+            groupData.SemanUBExecTimeData = snapshot.SemanticLanes;
             groupData.useSequenceUB = MyGameCtrl.Instance.tempData.useSequenceUB;
             if (groupData.useSequenceUB)
             {
-                groupData.SemanUBSequenceData = BattleManager.Instance.semanubmanager.Auto2SemanSequence();
+                groupData.SemanUBSequenceData = snapshot.SemanticSequence.Select(item => item.Lane).ToList();
                 MainManager.Instance.WindowMessage("已覆盖为此次战斗序列语义UB时间");
             }
             else

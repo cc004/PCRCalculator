@@ -80,6 +80,8 @@ namespace Elements.Battle
     abstract public class SemanUBFitness : IFitness
     {
         abstract public long GetFitness();
+        public Func<List<List<int>>, (double Fitness, List<int> UbCounts)> RemoteEvaluation;
+        public CancellationToken CancellationToken;
         public double Evaluate(IChromosome chromosome)
         {
             var genes = chromosome.GetGenes();
@@ -90,18 +92,35 @@ namespace Elements.Battle
                 var gene = genes[i].Value as List<int>;
                 semanUb.Add(GAUBOptimization.fixPreGenes[i].Concat(gene).ToList());
             }
-            mainManager.GuildBattleData.SemanUBExecTimeList = semanUb;
-            mainManager.GuildBattleData.skipping = true;
-            MyGameCtrl.Instance.isGAEvaluateFinished = false;
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            CancellationToken.ThrowIfCancellationRequested();
+            List<int> counts;
+            double damage;
+            if (RemoteEvaluation != null)
             {
-                MyGameCtrl.Instance.ReStart();
-            });
-            while (!MyGameCtrl.Instance.isGAEvaluateFinished)
-            {
-                Thread.Sleep(100);
+                var response = RemoteEvaluation(semanUb);
+                CancellationToken.ThrowIfCancellationRequested();
+                counts = response.UbCounts;
+                damage = response.Fitness;
             }
-            var UBNums = BattleManager.Instance.semanubmanager.UBNums.Select((x, i) => Math.Max(0, x - GAUBOptimization.fixPreGenes[i].Count)).ToList();
+            else
+            {
+                mainManager.GuildBattleData.SemanUBExecTimeList = semanUb;
+                mainManager.GuildBattleData.skipping = true;
+                MyGameCtrl.Instance.isGAEvaluateFinished = false;
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    if (!CancellationToken.IsCancellationRequested)
+                        MyGameCtrl.Instance.ReStart();
+                });
+                while (!MyGameCtrl.Instance.isGAEvaluateFinished)
+                {
+                    CancellationToken.ThrowIfCancellationRequested();
+                    Thread.Sleep(100);
+                }
+                counts = BattleManager.Instance.semanubmanager.UBNums;
+                damage = GetFitness();
+            }
+            var UBNums = counts.Select((x, i) => Math.Max(0, x - GAUBOptimization.fixPreGenes[i].Count)).ToList();
             for (int i = 0; i < semanUb.Count; i++)
             {
                 var gene = chromosome.GetGene(i).Value as List<int>;
@@ -111,10 +130,11 @@ namespace Elements.Battle
                 }
             }
             ((SemanUBChromosome)chromosome).UbNums = UBNums;
-            long damage = GetFitness();
+            var owner = GAUBOptimization.instance;
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                GAUBOptimization.instance.damageText.text = damage.ToString("N0");
+                if (owner != null && !CancellationToken.IsCancellationRequested)
+                    owner.damageText.text = damage.ToString("N0");
             });
             ((SemanUBChromosome)chromosome).totalDamage = damage;
             return damage;
@@ -221,7 +241,7 @@ namespace Elements.Battle
         };
 
         private readonly int UBNum = 0;
-        public long totalDamage = 0;
+        public double totalDamage = 0;
 
         public List<int> UbNums = new List<int>();
 
@@ -303,7 +323,7 @@ namespace Elements.Battle
                 for (int j = prefix; j < minLength; j++)
                 {
                     var probability = random.GetDouble();
-                    newGene.Add(probability < (double)totalDamage1 / totalDamageSum ? gene1[j] : gene2[j]);
+                    newGene.Add(probability < totalDamage1 / totalDamageSum ? gene1[j] : gene2[j]);
                 }
 
                 child.UbNums[i] = minLength - 1;
@@ -395,10 +415,12 @@ namespace Elements.Battle
     public class GAUBOptimization : MonoBehaviour
     {
         static public List<List<int>> fixPreGenes = new List<List<int>>();
-        private long bestDamage;
+        private double bestDamage;
         private List<List<int>> bestGenes = new List<List<int>>();
         private GeneticAlgorithm ga;
         private Thread gaThread;
+        private CancellationTokenSource runCancellation;
+        private RemoteSimulator remoteSimulator;
         public Text bestDamageText;
         public Text GenerationsNumberText;
         public List<Text> bestGenesTexts;
@@ -411,6 +433,7 @@ namespace Elements.Battle
         public InputField tpDemand;
         public List<InputField> fixUb;
         public List<TMP_InputField> DIYSemanUb;
+        public Toggle useRemote;
         public Toggle considerSet;
         public Toggle considerAuto;
         public Toggle considerSkill;
@@ -427,8 +450,68 @@ namespace Elements.Battle
         private void Awake()
         {
             instance = this;
+            AddOfflineToggle();
         }
-        
+
+        private readonly Vector3[] panelCorners = new Vector3[4];
+        private RectTransform layoutContent;
+        private Canvas layoutCanvas;
+
+        private void RefreshPanelLayout()
+        {
+            // The scene also owns a GA component; only a UI instance has panel inputs.
+            if (populationMin == null)
+                return;
+            if (layoutContent == null)
+                layoutContent = transform.Find("Layout.Content") as RectTransform;
+            if (layoutContent == null)
+                return;
+            if (layoutCanvas == null)
+                layoutCanvas = GetComponentInParent<Canvas>();
+            var panel = (RectTransform)transform;
+            var content = layoutContent;
+            var canvas = layoutCanvas;
+            var corners = panelCorners;
+            var parent = panel.parent as UnityEngine.RectTransform;
+            if (parent == null || canvas == null) return;
+            var canvasRect = (UnityEngine.RectTransform)canvas.rootCanvas.transform;
+            canvasRect.GetWorldCorners(corners);
+            var min = (UnityEngine.Vector2)parent.InverseTransformPoint(corners[0]);
+            var max = (UnityEngine.Vector2)parent.InverseTransformPoint(corners[2]);
+            panel.anchorMin = UnityEngine.Vector2.zero;
+            panel.anchorMax = UnityEngine.Vector2.one;
+            panel.localScale = UnityEngine.Vector3.one;
+            panel.offsetMin = min - parent.rect.min;
+            panel.offsetMax = max - parent.rect.max;
+            var size = panel.rect.size;
+            if (size.x <= 0 || size.y <= 0) return;
+            // Keep the settings and history usable when the Canvas becomes short or narrow.
+            var scale = UnityEngine.Mathf.Min(1f, size.x / 1000f, size.y / 640f);
+            content.anchorMin = content.anchorMax = new UnityEngine.Vector2(.5f, .5f);
+            content.pivot = new UnityEngine.Vector2(.5f, .5f);
+            content.anchoredPosition = UnityEngine.Vector2.zero;
+            content.sizeDelta = size / scale;
+            content.localScale = new UnityEngine.Vector3(scale, scale, 1);
+        }
+
+        private void AddOfflineToggle()
+        {
+            // The scene also has this component; only the instantiated panel has inputs.
+            if (populationMin == null || considerSet == null || useRemote != null)
+                return;
+            useRemote = Instantiate(considerSet, transform, false);
+            useRemote.name = "useRemote";
+            useRemote.group = null;
+            useRemote.onValueChanged = new Toggle.ToggleEvent();
+            useRemote.isOn = true;
+            useRemote.interactable = true;
+            var rect = (RectTransform)useRemote.transform;
+            rect.anchorMin = rect.anchorMax = new Vector2(1, 1);
+            rect.anchoredPosition = new Vector2(-196, -326);
+            rect.sizeDelta = new Vector2(130, 24);
+            useRemote.GetComponentInChildren<Text>().text = "脱机优化";
+        }
+
         private int ParseInt(InputField inputField, int defaultValue)
         {
             int ret = string.IsNullOrEmpty(inputField.text) ? defaultValue : int.Parse(inputField.text);
@@ -466,6 +549,9 @@ namespace Elements.Battle
 
         public void Update()
         {
+            RefreshPanelLayout();
+            if (useRemote != null)
+                useRemote.interactable = gaThread == null || !gaThread.IsAlive;
             if (ga == null || !ga.IsRunning)
             {
                 return;
@@ -474,6 +560,30 @@ namespace Elements.Battle
         }
 
         public void Run()
+        {
+            StartOptimization(useRemote != null && useRemote.isOn);
+        }
+
+        private void StartOptimization(bool offline)
+        {
+            if (gaThread != null && gaThread.IsAlive)
+            {
+                MainManager.Instance.WindowMessage("优化正在运行或停止中，请稍后重试。");
+                return;
+            }
+            try
+            {
+                Run(offline);
+            }
+            catch (Exception ex)
+            {
+                StopGA();
+                UnityEngine.Debug.LogException(ex);
+                MainManager.Instance.WindowMessage("无法启动优化：" + ex.Message);
+            }
+        }
+
+        private void Run(bool offline)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -506,12 +616,14 @@ namespace Elements.Battle
                 {
                     SemanUBChromosome.useValue[i].Add(j);
                 }
-                if (DIYSemanUb[i].text == "")
+                if (!string.IsNullOrWhiteSpace(DIYSemanUb[i].text))
                 {
-                    continue;
+                    var DIYSemanUbList = DIYSemanUb[i].text.Split('\n')
+                        .Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToList();
+                    SemanUBChromosome.useValue[i].AddRange(DIYSemanUbList);
                 }
-                var DIYSemanUbList = DIYSemanUb[i].text.Split('\n').Select(x => int.Parse(x)).ToList();
-                SemanUBChromosome.useValue[i].AddRange(DIYSemanUbList);
+                if (SemanUBChromosome.useValue[i].Count == 0)
+                    throw new ArgumentException("请为每个角色选择至少一种 UB 条件。");
             }
             var populationMinValue = ParseInt(populationMin, 50);
             var populationMaxValue = ParseInt(populationMax, 1000);
@@ -520,27 +632,35 @@ namespace Elements.Battle
             bestGenes.Clear();
             bestDamageText.text = "0";
             historyTexts.text = "";
-            MyGameCtrl.Instance.IsGAUbMode = true;
             var selection = new EliteSelection();
             var crossover = new SemanUBCrossover();
             var mutation = new SemanUBMutation();
-            IFitness fitness = null;
+            SemanUBFitness fitness = null;
+            SemanOptimizationTarget target = SemanOptimizationTarget.None;
+            var tpDemandValue = considerPhysicAtk.isOn || considerMagicAtk.isOn
+                ? ParseInt(tpDemand, 0) : 0;
             if (considerRealDamage.isOn)
             {
                 fitness = new SemanUBRealDamageFitness();
+                target = SemanOptimizationTarget.RealDamage;
             }
             else if (considerExpectDamage.isOn)
             {
                 fitness = new SemanUBExpectDamageFitness();
+                target = SemanOptimizationTarget.ExpectedDamage;
             }
             else if (considerPhysicAtk.isOn)
             {
-                fitness = new SemanUBPhysicAtkFitness(ParseInt(tpDemand, 0));
+                fitness = new SemanUBPhysicAtkFitness(tpDemandValue);
+                target = SemanOptimizationTarget.PhysicalAttack;
             }
             else if (considerMagicAtk.isOn)
             {
-                fitness = new SemanUBMagicAtkFitness(ParseInt(tpDemand, 0));
+                fitness = new SemanUBMagicAtkFitness(tpDemandValue);
+                target = SemanOptimizationTarget.MagicAttack;
             }
+            if (fitness == null)
+                throw new ArgumentException("请选择优化目标。");
             var allSetChr = new SemanUBChromosome(2);
             for (int i = 0; i < 5; i++)
             {
@@ -551,7 +671,7 @@ namespace Elements.Battle
             for (int i = 0; i < 5; i++)
             {
                 var raw = MyGameCtrl.Instance.tempData.SettingData.GetCurrentPlayerGroup().SemanUBExecTimeData.ElementAtOrDefault(i) ?? new List<int>();
-                fixUb[i].text = Math.Min(ParseInt(fixUb[i], 0), raw.Count).ToString();
+                fixUb[i].text = Math.Max(0, Math.Min(ParseInt(fixUb[i], 0), raw.Count)).ToString();
                 int fixNum = int.Parse(fixUb[i].text);
                 fixPreGenes.Add(raw.Take(fixNum).ToList());
                 curChr.ReplaceGene(i, new Gene(raw.Skip(fixNum).ToList()));
@@ -566,8 +686,24 @@ namespace Elements.Battle
 
             ga.TaskExecutor = new LinearTaskExecutor();
 
+            runCancellation?.Dispose();
+            runCancellation = new CancellationTokenSource();
+            var cancellation = runCancellation;
+            fitness.CancellationToken = cancellation.Token;
+            if (offline)
+            {
+                remoteSimulator = new RemoteSimulator();
+                remoteSimulator.CreateRequest(MainManager.Instance.GuildBattleData);
+                var simulator = remoteSimulator;
+                fitness.RemoteEvaluation = sequence => simulator.SimulateSeman(sequence, target,
+                    tpDemandValue, cancellation.Token).GetAwaiter().GetResult();
+            }
+            MyGameCtrl.Instance.IsGAUbMode = true;
+
             ga.GenerationRan += delegate
             {
+                if (cancellation.IsCancellationRequested)
+                    return;
                 var bestChromosome = (SemanUBChromosome)ga.BestChromosome;
                 var totalDamage = bestChromosome.totalDamage;
                 var damageStr = totalDamage.ToString("N0");
@@ -583,6 +719,8 @@ namespace Elements.Battle
                     bestGenes = genes;
                     UnityMainThreadDispatcher.Instance().Enqueue(() =>
                     {
+                        if (this == null || cancellation.IsCancellationRequested)
+                            return;
                         for (int i = 0; i < genes.Count; i++)
                         {
                             bestGenesTexts[i].text = string.Join("\n", genes[i]);
@@ -591,7 +729,7 @@ namespace Elements.Battle
                         Save();
                     });
                 }
-                List<long> damages = new List<long>();
+                List<double> damages = new List<double>();
                 foreach (var chromosome in ga.Population.CurrentGeneration.Chromosomes)
                 {
                     damages.Add(((SemanUBChromosome)chromosome).totalDamage);
@@ -603,6 +741,8 @@ namespace Elements.Battle
                 var avgDamageText = avgDamage.ToString("N0");
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
+                    if (this == null || cancellation.IsCancellationRequested)
+                        return;
                     var time = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     var newHistoryEntry = $"{time}/{ga.GenerationsNumber}: [{minDamage}, {maxDamage}] {avgDamageText}";
                     var historyLines = historyTexts.text.Split('\n').ToList();
@@ -615,7 +755,49 @@ namespace Elements.Battle
                 });
             };
 
-            gaThread = new Thread(() => ga.Start());
+            var algorithm = ga;
+            var childServer = remoteSimulator;
+            gaThread = new Thread(() =>
+            {
+                Exception error = null;
+                bool aborting = false;
+                try
+                {
+                    algorithm.Start();
+                }
+                catch (ThreadAbortException)
+                {
+                    aborting = true;
+                }
+                catch (Exception ex)
+                {
+                    if (!cancellation.IsCancellationRequested)
+                    {
+                        error = ex;
+                    }
+                }
+                finally
+                {
+                    try { childServer?.Dispose(); }
+                    catch (Exception ex) { if (error == null) error = ex; }
+                    // Never touch Unity APIs from an aborting/reloading worker.
+                    if (!aborting && !cancellation.IsCancellationRequested && !OfflineServerManager.IsClosing)
+                        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                    {
+                        if (this == null || cancellation.IsCancellationRequested || ga != algorithm)
+                            return;
+                        if (remoteSimulator == childServer)
+                            remoteSimulator = null;
+                        if (MyGameCtrl.Instance != null)
+                            MyGameCtrl.Instance.IsGAUbMode = false;
+                        if (error != null)
+                        {
+                            UnityEngine.Debug.LogException(error);
+                            MainManager.Instance.WindowMessage("优化失败：" + error.GetBaseException().Message);
+                        }
+                    });
+                }
+            }) { IsBackground = true };
             gaThread.Start();
         }
 
@@ -630,13 +812,18 @@ namespace Elements.Battle
 
         public void StopGA()
         {
-            if (ga == null || !ga.IsRunning)
-            {
-                return;
-            }
-            MyGameCtrl.Instance.IsGAUbMode = false;
-            ga.Stop();
-            gaThread.Abort();
+            runCancellation?.Cancel();
+            if (ga != null && ga.IsRunning)
+                ga.Stop();
+            remoteSimulator?.Dispose();
+            remoteSimulator = null;
+            var worker = gaThread;
+            if (worker != null && worker != Thread.CurrentThread && worker.IsAlive)
+                worker.Join(2000);
+            if (worker != null && !worker.IsAlive && gaThread == worker)
+                gaThread = null;
+            if (MyGameCtrl.Instance != null)
+                MyGameCtrl.Instance.IsGAUbMode = false;
         }
 
         public void CopyPopulation()
@@ -660,6 +847,11 @@ namespace Elements.Battle
         }
 
         private void OnDestroy()
+        {
+            StopGA();
+        }
+
+        private void OnApplicationQuit()
         {
             StopGA();
         }

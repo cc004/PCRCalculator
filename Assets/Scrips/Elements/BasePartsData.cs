@@ -441,11 +441,11 @@ namespace Elements
                 return;
             }
             ResistData unitResistdata = new ResistData(_resistId);
-            foreach (var ailment in MainManager.Instance.AilmentDataDic.Values.OrderBy(data => data.ailment_id))
+            for (int ailmentIndex = 0; ailmentIndex < unitResistdata.ailments.Length; ailmentIndex++)
             {
-                int ailmentIndex = ailment.ailment_id - 1;
-                if (ailmentIndex < 0 || ailmentIndex >= unitResistdata.ailments.Length)
-                    continue;
+                if (!MainManager.Instance.AilmentDataDic.TryGetValue(ailmentIndex + 1, out var ailment)
+                    || ailment == null)
+                    return;
 
                 eActionType key = (eActionType)ailment.ailment_action;
                 if (!abnormalResistIdDictionary[_resistId].ContainsKey(key))
@@ -454,7 +454,7 @@ namespace Elements
                 }
                 abnormalResistIdDictionary[_resistId][key][ailment.ailment_detail_1] = unitResistdata.ailments[ailmentIndex];
             }
-            
+
         }
         private void createDebuffStatus(int _resistId)
         {
@@ -525,14 +525,14 @@ namespace Elements
                 _detail1 = -1;
             if (!dictionary.ContainsKey(_detail1))
                 return false;
-            var prob = dictionary[_detail1] / 100.0f;
+            var prob = dictionary[_detail1] / 100.0;
             var randomData = new RandomData(_source, _target.Owner, (int)_actionType, 9, prob);
             var num = BattleManager.Random(0.0f, 1f, ref randomData);
             if (dictionary[_detail1] != 100 && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, _actionType, BattleHeaderController.CurrentFrameCount, out float fix))
             {
                 num = fix;
             }
-            if (num >= prob)
+            if (!(num < prob))
                 return false;
             if (_last)
             {

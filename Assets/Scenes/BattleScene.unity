@@ -60822,7 +60822,7 @@ MonoBehaviour:
   IsSemanMode: 0
   ForceAutoMode: 0
   stopFrameText: {fileID: 0}
-  stopFrame: 0
+  stopFrame: -1
   isBattleFinish: 0
 --- !u!4 &2080290837
 Transform:
@@ -63429,7 +63429,7 @@ MonoBehaviour:
   IsSemanMode: 0
   ForceAutoMode: 0
   stopFrameText: {fileID: 1707544265}
-  stopFrame: 0
+  stopFrame: -1
   isBattleFinish: 0
 --- !u!114 &2763608784199375567
 MonoBehaviour:
