@@ -80,7 +80,7 @@ namespace Elements.Battle
     abstract public class SemanUBFitness : IFitness
     {
         abstract public long GetFitness();
-        public Func<List<List<int>>, BattleSimulationResponse> RemoteEvaluation;
+        public Func<List<List<int>>, (double Fitness, List<int> UbCounts)> RemoteEvaluation;
         public CancellationToken CancellationToken;
         public double Evaluate(IChromosome chromosome)
         {
@@ -94,13 +94,13 @@ namespace Elements.Battle
             }
             CancellationToken.ThrowIfCancellationRequested();
             List<int> counts;
-            long damage;
+            double damage;
             if (RemoteEvaluation != null)
             {
                 var response = RemoteEvaluation(semanUb);
                 CancellationToken.ThrowIfCancellationRequested();
-                counts = response.SemanUBNum;
-                damage = response.OptimizationFitness.Value;
+                counts = response.UbCounts;
+                damage = response.Fitness;
             }
             else
             {
@@ -241,7 +241,7 @@ namespace Elements.Battle
         };
 
         private readonly int UBNum = 0;
-        public long totalDamage = 0;
+        public double totalDamage = 0;
 
         public List<int> UbNums = new List<int>();
 
@@ -323,7 +323,7 @@ namespace Elements.Battle
                 for (int j = prefix; j < minLength; j++)
                 {
                     var probability = random.GetDouble();
-                    newGene.Add(probability < (double)totalDamage1 / totalDamageSum ? gene1[j] : gene2[j]);
+                    newGene.Add(probability < totalDamage1 / totalDamageSum ? gene1[j] : gene2[j]);
                 }
 
                 child.UbNums[i] = minLength - 1;
@@ -415,7 +415,7 @@ namespace Elements.Battle
     public class GAUBOptimization : MonoBehaviour
     {
         static public List<List<int>> fixPreGenes = new List<List<int>>();
-        private long bestDamage;
+        private double bestDamage;
         private List<List<int>> bestGenes = new List<List<int>>();
         private GeneticAlgorithm ga;
         private Thread gaThread;
@@ -729,7 +729,7 @@ namespace Elements.Battle
                         Save();
                     });
                 }
-                List<long> damages = new List<long>();
+                List<double> damages = new List<double>();
                 foreach (var chromosome in ga.Population.CurrentGeneration.Chromosomes)
                 {
                     damages.Add(((SemanUBChromosome)chromosome).totalDamage);

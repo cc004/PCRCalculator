@@ -16,8 +16,10 @@ namespace PCRCaculator
 {
     public class RemoteSimulator : IDisposable
     {
+        private const int ExpectedDamageSampleCount = 5;
         private readonly OfflineServerSession server;
         private JObject request;
+        private List<int> expectedDamageSeeds;
         private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
         private readonly CancellationToken taskToken;
         private int disposed;
@@ -195,6 +197,7 @@ namespace PCRCaculator
             request.ToMaxUnitAttr = false;
             request.UBExecTimeList = battleData.UBExecTimeList;
             this.request = JObject.FromObject(request);
+            expectedDamageSeeds = null;
         }
 
         public Task<BattleSimulationResponse[]> Simulate(int times)
@@ -202,8 +205,15 @@ namespace PCRCaculator
             return Send(new JArray(Enumerable.Range(0, times).Select(_ => request.DeepClone())), CancellationToken.None);
         }
 
-        public async Task<BattleSimulationResponse> SimulateSeman(List<List<int>> sequence,
-            SemanOptimizationTarget target, int tpDemand, CancellationToken token)
+        internal async Task<(double Fitness, List<int> UbCounts)> SimulateSeman(
+            List<List<int>> sequence, SemanOptimizationTarget target, int tpDemand, CancellationToken token)
+        {
+            var requests = CreateSemanRequests(sequence, target, tpDemand);
+            var results = await Send(requests, token).ConfigureAwait(false);
+            return ReadSemanFitness(requests, results);
+        }
+
+        private JArray CreateSemanRequests(List<List<int>> sequence, SemanOptimizationTarget target, int tpDemand)
         {
             var candidate = (JObject)request.DeepClone();
             candidate["SemanUBExecTimeList"] = JArray.FromObject(sequence);
@@ -211,12 +221,67 @@ namespace PCRCaculator
             candidate["OptimizationTpDemand"] = tpDemand;
             candidate["IsSemanMode"] = true;
             candidate["NeedOnceResult"] = false;
-            var results = await Send(new JArray(candidate), token).ConfigureAwait(false);
-            if (results.Length != 1 || results[0] == null || !results[0].Success)
-                throw new InvalidOperationException(results.FirstOrDefault()?.Message ?? "脱机模拟未返回结果。");
-            if (!results[0].OptimizationFitness.HasValue || results[0].SemanUBNum == null || results[0].SemanUBNum.Count != 5)
-                throw new InvalidOperationException("脱机模拟程序不支持自动优化，请更新 server 程序。");
-            return results[0];
+            if (target != SemanOptimizationTarget.ExpectedDamage)
+                return new JArray(candidate);
+
+            // Use the same distinct seeds for every candidate so their scores are comparable.
+            if (!(candidate["Settings"] is JObject settings))
+            {
+                settings = JObject.FromObject(new GuildRandomData());
+                candidate["Settings"] = settings;
+            }
+            if (expectedDamageSeeds == null)
+            {
+                expectedDamageSeeds = new List<int>(ExpectedDamageSampleCount);
+                var random = new System.Random();
+                if (settings.Value<bool>("UseFixedRandomSeed"))
+                {
+                    int seed = settings.Value<int>("RandomSeed");
+                    expectedDamageSeeds.Add(seed);
+                    random = new System.Random(seed);
+                }
+
+                while (expectedDamageSeeds.Count < ExpectedDamageSampleCount)
+                {
+                    int seed = random.Next();
+                    if (!expectedDamageSeeds.Contains(seed))
+                        expectedDamageSeeds.Add(seed);
+                }
+            }
+
+            // Average the actual outcomes instead of asking the server for symbolic expectation.
+            candidate["OptimizationTarget"] = (int)SemanOptimizationTarget.RealDamage;
+            var samples = new JArray();
+            foreach (int seed in expectedDamageSeeds)
+            {
+                var sample = (JObject)candidate.DeepClone();
+                sample["Settings"]["UseFixedRandomSeed"] = true;
+                sample["Settings"]["RandomSeed"] = seed;
+                samples.Add(sample);
+            }
+            return samples;
+        }
+
+        private static (double Fitness, List<int> UbCounts) ReadSemanFitness(
+            JArray requests, BattleSimulationResponse[] results)
+        {
+            if (results.Length != requests.Count)
+                throw new InvalidOperationException("脱机模拟返回的结果数量不符。");
+
+            for (int i = 0; i < results.Length; i++)
+            {
+                var result = results[i];
+                if (result == null || !result.Success)
+                    throw new InvalidOperationException(result?.Message ?? "脱机模拟未返回结果。");
+                if (!result.OptimizationFitness.HasValue || result.SemanUBNum == null || result.SemanUBNum.Count != 5)
+                    throw new InvalidOperationException("脱机模拟程序不支持自动优化，请更新 server 程序。");
+                if (requests.Count > 1 && result.CurrentSeed != (int)requests[i]["Settings"]["RandomSeed"])
+                    throw new InvalidOperationException("脱机模拟返回的随机种子与请求不符。");
+            }
+
+            var fitness = results.Average(result => (double)result.OptimizationFitness.Value);
+            var ubCounts = Enumerable.Range(0, 5).Select(lane => results.Max(result => result.SemanUBNum[lane])).ToList();
+            return (fitness, ubCounts);
         }
 
         private async Task<BattleSimulationResponse[]> Send(JArray requests, CancellationToken token)
