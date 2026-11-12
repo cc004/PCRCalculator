@@ -22,6 +22,50 @@ public static class BuildScript
         Execute(BuildRequest.FromEnvironment(Environment.GetCommandLineArgs()));
     }
 
+    public static void BuildWindowsMonoFromCommandLine()
+    {
+        BuildRequest request = BuildRequest.FromEnvironment(Environment.GetCommandLineArgs());
+        if (request.Platforms.Count != 1 || request.Platforms[0] != BuildPlatform.Windows64)
+        {
+            throw new InvalidOperationException("The Windows Mono build entry requires -pcrBuildTarget windows.");
+        }
+
+        var target = UnityEditor.Build.NamedBuildTarget.Standalone;
+        ScriptingImplementation previousBackend = PlayerSettings.GetScriptingBackend(target);
+        try
+        {
+            PlayerSettings.SetScriptingBackend(target, ScriptingImplementation.Mono2x);
+            UnityEngine.Debug.Log("Windows CI scripting backend: Mono.");
+            Execute(request);
+        }
+        finally
+        {
+            PlayerSettings.SetScriptingBackend(target, previousBackend);
+        }
+    }
+
+    public static void BuildMacMonoFromCommandLine()
+    {
+        BuildRequest request = BuildRequest.FromEnvironment(Environment.GetCommandLineArgs());
+        if (request.Platforms.Count != 1 || request.Platforms[0] != BuildPlatform.MacArm64)
+        {
+            throw new InvalidOperationException("The macOS Mono build entry requires -pcrBuildTarget macos.");
+        }
+
+        var target = UnityEditor.Build.NamedBuildTarget.Standalone;
+        ScriptingImplementation previousBackend = PlayerSettings.GetScriptingBackend(target);
+        try
+        {
+            PlayerSettings.SetScriptingBackend(target, ScriptingImplementation.Mono2x);
+            UnityEngine.Debug.Log("macOS CI scripting backend: Mono (Apple Silicon).");
+            Execute(request);
+        }
+        finally
+        {
+            PlayerSettings.SetScriptingBackend(target, previousBackend);
+        }
+    }
+
     [MenuItem("PCR Build/Windows")]
     public static void BuildWindows64()
     {
@@ -158,8 +202,8 @@ public static class BuildScript
         if (shouldZip && request.ZipDesktopBuilds)
         {
             string zipName = platformFolder == "Windows"
-                ? $"{GetBundleVersion()}.zip"
-                : $"{GetBundleVersion()}-{platformFolder.ToLowerInvariant()}-x64.zip";
+                ? $"PCRCalculator-{GetBundleVersion()}-win-x64.zip"
+                : $"PCRCalculator-{GetBundleVersion()}-{platformFolder.ToLowerInvariant()}-x64.zip";
             string zipPath = Path.Combine(request.OutputRoot, zipName);
             RecreateZip(targetRoot, zipPath);
         }
@@ -228,7 +272,7 @@ public static class BuildScript
         string runtimeId = arm64 ? "osx-arm64" : "osx-x64";
         string targetRoot = Path.Combine(request.OutputRoot, arm64 ? "MacOS" : "MacOS-Intel");
         string outputPath = Path.Combine(targetRoot, "mzq.app");
-        string zipPath = Path.Combine(request.OutputRoot, $"{GetBundleVersion()}-mac-{(arm64 ? "arm" : "x64")}.zip");
+        string zipPath = Path.Combine(request.OutputRoot, $"PCRCalculator-{GetBundleVersion()}-mac-{(arm64 ? "arm" : "x64")}.zip");
 
         RecreateDirectory(targetRoot);
 
@@ -275,8 +319,10 @@ public static class BuildScript
         string serverProjectPath = Path.Combine(projectRoot, "PCRCalculatorServer", "PCRCalculatorServer.csproj");
         Directory.CreateDirectory(outputPath);
 
+        // GameCI exports VERSION=none when versioning is disabled; MSBuild imports it as Version.
+        // Give NuGet an explicit application version for restore and publish.
         string arguments =
-            $"publish {Quote(serverProjectPath)} -c Release -r {runtimeId} --self-contained {selfContained.ToString().ToLowerInvariant()} -p:PublishSingleFile={publishSingleFile.ToString().ToLowerInvariant()} -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o {Quote(outputPath)}";
+            $"publish {Quote(serverProjectPath)} -c Release -r {runtimeId} --self-contained {selfContained.ToString().ToLowerInvariant()} -p:PublishSingleFile={publishSingleFile.ToString().ToLowerInvariant()} -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:Version={Quote(GetBundleVersion())} -o {Quote(outputPath)}";
 
         RunBuildProcess(RemoteSimulator.GetDotnetPath(), arguments, projectRoot);
         string executable = Path.Combine(outputPath, runtimeId.StartsWith("win-")

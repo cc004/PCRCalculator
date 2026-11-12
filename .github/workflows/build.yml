@@ -3,7 +3,6 @@ name: Build and release
 on:
   push:
     branches: ['**']
-    tags: ['v*']
   pull_request:
     branches: ['**']
   workflow_dispatch:
@@ -23,8 +22,26 @@ permissions:
   contents: read
 
 jobs:
+  compile:
+    name: Compile .NET server and shared code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore server dependencies
+        run: dotnet restore PCRCalculatorServer/PCRCalculatorServer.csproj
+      - name: Compile server and shared code
+        run: dotnet build PCRCalculatorServer/PCRCalculatorServer.csproj --configuration Release --no-restore
+
   version:
     name: Check package version
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       value: ${{ steps.version.outputs.value }}
@@ -41,16 +58,14 @@ jobs:
             echo "Invalid bundleVersion for package naming: $version" >&2
             exit 1
           fi
-          if [[ "$GITHUB_REF" == refs/tags/* && "$GITHUB_REF_NAME" != "v$version" ]]; then
-            echo "Release tag $GITHUB_REF_NAME must match bundleVersion v$version" >&2
-            exit 1
-          fi
           echo "value=$version" >> "$GITHUB_OUTPUT"
 
   server:
-    name: Linux .NET server
-    needs: version
-    if: github.event_name != 'workflow_dispatch' || inputs.target == 'all' || inputs.target == 'linux'
+    name: Package Linux .NET server
+    needs: [compile, version]
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.target == 'all' || inputs.target == 'linux'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -66,19 +81,18 @@ jobs:
           PACKAGE_VERSION: ${{ needs.version.outputs.value }}
         run: |
           ./build.sh --target linux
-          mv Builds/mzq-linux-x64.zip "Builds/mzq-${PACKAGE_VERSION}-linux-x64.zip"
+          mv Builds/mzq-linux-x64.zip "Builds/PCRCalculator-${PACKAGE_VERSION}-server-linux.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: PCRCalculatorServer_${{ needs.version.outputs.value }}_linux-x64
-          path: Builds/mzq-${{ needs.version.outputs.value }}-linux-x64.zip
+          path: Builds/PCRCalculator-${{ needs.version.outputs.value }}-server-linux.zip
           if-no-files-found: error
 
   desktop:
     name: ${{ github.ref_name }} ${{ matrix.target }} desktop
-    needs: version
+    needs: [compile, version]
     if: >-
-      (github.event_name == 'push' &&
-        (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && inputs.target != 'linux')
     timeout-minutes: 45
     strategy:
@@ -93,10 +107,10 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ github.ref_name }}-project-il2cpp-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-${{ github.ref_name }}-project-mono-burst-off-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
-            Library-${{ github.ref_name }}-project-il2cpp-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-
-      # Preserve the existing build entry and backend selection for each platform.
+            Library-${{ github.ref_name }}-project-mono-burst-off-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-
+      # Both desktop targets use Mono without Burst; macOS retains Apple Silicon architecture.
       - name: Inspect Windows build host
         if: matrix.target == 'windows'
         shell: pwsh
@@ -119,8 +133,8 @@ jobs:
         with:
           unityVersion: auto
           targetPlatform: ${{ matrix.target == 'macos' && 'StandaloneOSX' || 'StandaloneWindows64' }}
-          buildMethod: ${{ matrix.target == 'macos' && 'BuildScript.BuildAppleSilicon' || 'BuildScript.BuildFromCommandLine' }}
-          customParameters: -pcrBuildTarget ${{ matrix.target }} -pcrOutputRoot Builds
+          buildMethod: ${{ matrix.target == 'macos' && 'BuildScript.BuildMacMonoFromCommandLine' || 'BuildScript.BuildWindowsMonoFromCommandLine' }}
+          customParameters: -pcrBuildTarget ${{ matrix.target }} -pcrOutputRoot Builds --burst-disable-compilation
           versioning: None
       - uses: actions/upload-artifact@v4
         with:
@@ -131,10 +145,11 @@ jobs:
   release:
     name: Publish release
     needs: [version, server, desktop]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: read
     concurrency:
       group: release-${{ github.ref }}
       cancel-in-progress: false
@@ -148,13 +163,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: v${{ needs.version.outputs.value }}
+          RELEASE_TARGET: ${{ github.sha }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
           PACKAGE_VERSION: ${{ needs.version.outputs.value }}
         run: |
           assets=(
-            "release/${PACKAGE_VERSION}.zip"
-            "release/${PACKAGE_VERSION}-mac-arm.zip"
-            "release/mzq-${PACKAGE_VERSION}-linux-x64.zip"
+            "release/PCRCalculator-${PACKAGE_VERSION}-win-x64.zip"
+            "release/PCRCalculator-${PACKAGE_VERSION}-mac-arm.zip"
+            "release/PCRCalculator-${PACKAGE_VERSION}-server-linux.zip"
           )
           for asset in "${assets[@]}"; do
             if [[ ! -s "$asset" ]]; then
@@ -163,6 +180,7 @@ jobs:
             fi
           done
 
+          release_exists=false
           if release_info="$(gh release view "$RELEASE_TAG" --json isDraft,assets)"; then
             if [[ "$(jq -r '.isDraft' <<< "$release_info")" == false ]]; then
               for asset in "${assets[@]}"; do
@@ -171,9 +189,27 @@ jobs:
               echo "Release $RELEASE_TAG already contains all three packages."
               exit 0
             fi
+            release_exists=true
+          fi
+
+          notes_dir="$(mktemp -d "${RUNNER_TEMP}/release-notes.XXXXXX")"
+          gh api --paginate --slurp \
+            "repos/${GH_REPO}/commits/${RELEASE_TARGET}/pulls?per_page=100" \
+            > "$notes_dir/associated-prs.json"
+          jq --arg sha "$RELEASE_TARGET" --arg branch "$RELEASE_BRANCH" \
+            '[.[][] | select(.merged_at != null and .base.ref == $branch and .merge_commit_sha == $sha)]' \
+            "$notes_dir/associated-prs.json" > "$notes_dir/pr.json"
+          if [[ "$(jq 'length' "$notes_dir/pr.json")" == 1 ]]; then
+            jq --join-output '.[0].body // ""' "$notes_dir/pr.json" > "$notes_dir/body.md"
+          else
+            : > "$notes_dir/body.md"
+            echo "No unique merged PR for $RELEASE_TARGET on $RELEASE_BRANCH; publishing with an empty description."
+          fi
+
+          if [[ "$release_exists" == true ]]; then
             gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
           else
             gh release create "$RELEASE_TAG" "${assets[@]}" \
-              --draft --verify-tag --title "$RELEASE_TAG" --generate-notes
+              --draft --target "$RELEASE_TARGET" --title "$RELEASE_TAG" --notes-file "$notes_dir/body.md"
           fi
-          gh release edit "$RELEASE_TAG" --draft=false
+          gh release edit "$RELEASE_TAG" --notes-file "$notes_dir/body.md" --draft=false
