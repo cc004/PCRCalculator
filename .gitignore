@@ -1,40 +1,84 @@
-# 忽略特定目录
-.vscode
-Assets/.ABExt2
-Temp
-Logs
-Library
-MemoryCaptures
-Builds/MacOS
-.vs
+# ---------------------------------------------------------------------------
+# Unity 工程 .gitignore（PCRCalculator）
+# 约定：路径写清晰、按用途分组；台服/仓库里已被跟踪的文件不受忽略规则影响。
+# ---------------------------------------------------------------------------
+
+# ---------------------------- Unity 生成目录 ----------------------------
+# 首次打开工程 / 每次构建都会重新生成，体积很大（本机 Library 约 2 GB）
+Library/
+Temp/
 bin/
 obj/
+Logs/
+MemoryCaptures/
+Recordings/
+UserSettings/
+
+# -------------------------- 本项目的构建产物 --------------------------
+# BuildScript.cs 的默认输出根目录（Windows/MacOS/Linux 播放器 + zip + server）
+/Builds/
 save/
+server/
+Data/
 
-# 忽略特定文件
-PCRCAlculator.sln
+# ------------------------ AssetBundle / 下载缓存 ------------------------
+# 运行时缓存，不进仓库（persistentDataPath 与工程内两种历史位置）
+.ABExt2/
+*.download-*.tmp
+
+# --------------------------- 构建/生成的文件 ---------------------------
+*.unitypackage
+*.apk
+*.aab
+*.symbols.zip
+crashlytics-build.properties
+sysinfo.txt
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# ------------------------------- 服务端 -------------------------------
+# 运行数据、发布配置、本机数据库
+*.db
+PCRCalculatorServer/linux
+PCRCalculatorServer/Properties/PublishProfiles
+
+# ------------------------- 本地临时 / 脚本产物 -------------------------
+# 手工改资源时的备份、补丁脚本、日志（.tmp_scene 是本机工作目录）
+/.tmp_scene/
+view-source_*.html
+__pycache__/
+*.py[cod]
 logger.txt
-存档.json
-Assets/Resources/BillingMode.json
 
-# 忽略所有 .DS_Store 文件
-.DS_Store
-
-# 忽略所有 .csproj 文件
+# ------------------------------ 编辑器 IDE ------------------------------
+.vs/
+.vscode
+.idea/
 *.csproj
 *.csproj.user
 !PCRCalculatorServer/PCRCalculatorServer.csproj
+!scripts/DatabaseAcquisitionProbe/DatabaseAcquisitionProbe.csproj
+PCRCAlculator.sln
+*.user
+*.suo
+*.userprefs
+*.opendb
+*.VC.db
+*.VC.VC.opendb
 
-# 忽略 UserSettings 目录及其内容
-UserSettings/
-Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+# ------------------------------ 依赖清单 ------------------------------
+# 这两个文件已在库中，规则只用于防止意料外的副本被加入
 Packages/packages-lock.json
 Packages/manifest.json
 
-# 服务端
-Data/
-server/
-PCRCalculatorServer/linux
-*.db
-PCRCalculatorServer/Properties/PublishProfiles
-!scripts/DatabaseAcquisitionProbe/DatabaseAcquisitionProbe.csproj
+# ------------------------- 项目内已有特例（保持原样） -------------------------
+# Unity 6 打开工程时会重写该字体图集；BillingMode.json 随平台生成
+Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+Assets/Resources/BillingMode.json
+存档.json
+
+# ------------------------------ 操作系统 ------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini

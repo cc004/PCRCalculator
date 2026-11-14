@@ -112,8 +112,7 @@ namespace ExcelHelper
             var str = StandaloneFileBrowser.OpenFilePanel(
                 "打开Excel", string.Empty, new ExtensionFilter[]
                 {
-                    new ExtensionFilter("", "xlsx"),
-                    new ExtensionFilter("", "json"),
+                    new ExtensionFilter("存档 / 脚本", "xlsx", "json", "py"),
                 }, false);
             if (str.Length > 0)
             {
@@ -278,6 +277,83 @@ namespace ExcelHelper
             }
         }
         
+        private static readonly Regex MzqPayloadRegex = new Regex("[A-Za-z0-9+/]{40,}={0,2}", RegexOptions.Compiled);
+
+        // 从 atl 导出的 .py 里读阵容：数据放在「mzq导入用」与「mzq导入用结束」之间的一行 base64
+        // （= gzip + base64 的 GuildTimelineData，与 xlsx 的 savePage 同一种编码）。
+        public static bool ReadPyTimeLineData(string path, out GuildTimelineData guildTimelineData,
+            SystemWindowMessage.configDelegate failedAction = null)
+        {
+            guildTimelineData = null;
+
+            string text;
+            try
+            {
+                text = File.ReadAllText(path);
+            }
+            catch (Exception e)
+            {
+                MainManager.Instance.WindowConfigMessage("导入失败：读不到这个 py 文件\n" + e.Message + "\n请手动输入存档数据！",
+                    failedAction);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(text))
+            {
+                MainManager.Instance.WindowConfigMessage("导入失败：py 文件是空的\n请手动输入存档数据！", failedAction);
+                return false;
+            }
+
+            int startIndex = text.IndexOf("mzq导入用", StringComparison.Ordinal);
+            int endIndex = text.LastIndexOf("mzq导入用结束", StringComparison.Ordinal);
+            if (startIndex < 0 || endIndex <= startIndex)
+            {
+                MainManager.Instance.WindowConfigMessage(
+                    "导入失败：这个 py 里没有 mzq 导入数据（找不到 base64 段）\n请手动输入存档数据！", failedAction);
+                return false;
+            }
+
+            string body = text.Substring(startIndex, endIndex - startIndex);
+            string payload = null;
+            foreach (Match match in MzqPayloadRegex.Matches(body))
+            {
+                if (payload == null || match.Value.Length > payload.Length)
+                    payload = match.Value;
+            }
+
+            if (string.IsNullOrEmpty(payload))
+            {
+                MainManager.Instance.WindowConfigMessage(
+                    "导入失败：这个 py 里的 base64 段是空的\n请手动输入存档数据！", failedAction);
+                return false;
+            }
+
+            try
+            {
+                string jsonStr = MainManager.DecryptDES(payload);
+                if (string.IsNullOrEmpty(jsonStr) || !jsonStr.Contains("playerGroupData"))
+                {
+                    MainManager.Instance.WindowConfigMessage(
+                        "导入失败：base64 解出来的不是阵容数据\n请手动输入存档数据！", failedAction);
+                    return false;
+                }
+
+                guildTimelineData = JsonConvert.DeserializeObject<GuildTimelineData>(jsonStr);
+                if (guildTimelineData == null || guildTimelineData.playerGroupData == null)
+                {
+                    MainManager.Instance.WindowConfigMessage("导入失败：存档内容无效\n请手动输入存档数据！", failedAction);
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MainManager.Instance.WindowConfigMessage("导入失败：" + e.Message + "\n请手动输入存档数据！", failedAction);
+                return false;
+            }
+        }
+
         public static bool ReadExcelTimeLineData(out GuildTimelineData guildTimelineData,SystemWindowMessage.configDelegate failedAction = null,string path0=null)
         {
             string path = string.IsNullOrEmpty(path0) ? GetExcelPath() : path0;
@@ -288,6 +364,11 @@ namespace ExcelHelper
                 if (path.EndsWith(".json"))
                 {
                     return ReadJsonTimeLineData(path, out guildTimelineData, failedAction);
+                }
+
+                if (path.EndsWith(".py"))
+                {
+                    return ReadPyTimeLineData(path, out guildTimelineData, failedAction);
                 }
                 
                 FileStream stream = null;
@@ -500,7 +581,9 @@ namespace ExcelHelper
                 File.WriteAllText(filePath + ".asm", AsmTimelineScriptExporter.CreateContent(context));
             }
             if (PyExportEnabled)
-                AutoTimelineLegacyScriptExporter.WriteScriptSet(TimelineData, filePath);
+                AutoTimelineLegacyScriptExporter.WriteScriptSet(TimelineData, filePath,
+                    GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
+                    GuildManager.Instance.GetFinalTeamSkillNodeDescription());
         }
 
         private static void CreateUnitExecTimeExcel(FileInfo newFile)
@@ -1345,19 +1428,19 @@ namespace ExcelHelper
                     //detailAlong = 1;
                     //detailBlong = 2;
                     worksheet3.Cells[lineNum, 1].Value = "逻辑帧";
-                    // worksheet3.Cells[lineNum, 2].Value = "渲染帧";
-                    worksheet3.Cells[lineNum, 2, lineNum, 2 + charLong0 - 1].Merge = true;
-                    worksheet3.Cells[lineNum, 2].Value = enemyData.detailData.unit_name;
-                    worksheet3.Cells[lineNum, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet3.Cells[lineNum, 2].Value = "渲染帧";
+                    worksheet3.Cells[lineNum, 3, lineNum, 3 + charLong0 - 1].Merge = true;
+                    worksheet3.Cells[lineNum, 3].Value = enemyData.detailData.unit_name;
+                    worksheet3.Cells[lineNum, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     if (detailType < 4||detailType==6)
                     {
                         for (int i = 0; i < 5; i++)
                         {
                             if (i < playerDatas.playrCharacters.Count)
                             {
-                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1), lineNum, 2 + charLong0 * (i + 2) - 1].Merge = true;
-                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
-                                worksheet3.Cells[lineNum, 2 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1), lineNum, 3 + charLong0 * (i + 2) - 1].Merge = true;
+                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Value = playerDatas.playrCharacters[i].GetUnitName();
+                                worksheet3.Cells[lineNum, 3 + charLong0 * (i + 1)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             }
                         }
                     }
@@ -1366,13 +1449,13 @@ namespace ExcelHelper
                     int currentFream0 = 0;
                     foreach (var timeData in timedata)
                     {
-                        int pos = 2 + charLong0 * timeData.idx;
+                        int pos = 3 + charLong0 * timeData.idx;
                         //if (timeData.frame != currentFream0)
                         //{
                             lineNum++;
                             currentFream0 = timeData.frame;
                             worksheet3.Cells[lineNum, 1].Value = timeData.frame;
-                            // worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
+                            worksheet3.Cells[lineNum, 2].Value = timeData.realFrameCount;
                         //}
                         //worksheet2.Cells[lineNum, pos].Value = timeData.describeA;//.Replace(/<[^>] +>/ g, "");
                         worksheet3.Cells[lineNum, pos].Value = (detailType==2||detailType==6)?timeData.valueA:timeData.valueB;

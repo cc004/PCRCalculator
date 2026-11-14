@@ -967,6 +967,95 @@ namespace PCRCaculator.Guild
 #endif
         }
 
+#if UNITY_5_3_OR_NEWER
+        /// <summary>导出轴脚本：先选格式（asm / atl），再选保存位置。</summary>
+        public void ExportAxisScript()
+        {
+            Transform parent = BaseBackManager.Instance != null && BaseBackManager.Instance.latestUIback != null
+                ? BaseBackManager.Instance.latestUIback.transform
+                : transform;
+            AxisScriptChooser.Show(parent, CurrentBossText != null ? CurrentBossText.font : null, ExportAxisScriptByType);
+        }
+
+        private void ExportAxisScriptByType(string scriptType)
+        {
+            if (scriptType == AxisScriptChooser.Atl)
+            {
+                AxisScriptChooser.ShowAtlOptions(GetChooserParent(),
+                    CurrentBossText != null ? CurrentBossText.font : null, ExportAtlScript);
+                return;
+            }
+
+            string fileName = CurrentBossText.text + "-" + CreateExcelName();
+            string filePath = PickAxisScriptPath(fileName, "asm");
+            if (string.IsNullOrEmpty(filePath)) return;
+            try
+            {
+                GuildTimelineData timelineData = CreateTimeLineData();
+                int bossId = timelineData.playerGroupData.selectedEnemyIDs[0];
+                var context = AsmTimelineScriptExporter.CreateContext(timelineData, bossId,
+                    PrimaryBossUnitIds, timelineData.playerGroupData.playerData.playrCharacters,
+                    GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
+                    GuildManager.Instance.GetFinalTeamSkillNodeDescription());
+                File.WriteAllText(filePath + ".asm", AsmTimelineScriptExporter.CreateContent(context));
+                MainManager.Instance.WindowConfigMessage("成功！\n已导出 " + filePath + ".asm", null);
+            }
+            catch (System.Exception a)
+            {
+                Debug.LogError(a.ToString());
+                MainManager.Instance.WindowConfigMessage("发生错误：" + a.Message, null);
+            }
+        }
+
+        private void ExportAtlScript(AxisScriptChooser.AtlExportOptions options)
+        {
+            if (options == null) return;
+            string fileName = CurrentBossText.text + "-" + CreateExcelName();
+            string filePath = PickAxisScriptPath(fileName, "py");
+            if (string.IsNullOrEmpty(filePath)) return;
+            try
+            {
+                GuildTimelineData timelineData = CreateTimeLineData();
+                AutoTimelineLegacyScriptExporter.WriteScriptSet(timelineData, filePath,
+                    GuildManager.Instance.GetFinalTalentSkillNodeDescription(),
+                    GuildManager.Instance.GetFinalTeamSkillNodeDescription(),
+                    options.Debug, options.OffsetFrames, options.SpeedModes);
+
+                var builder = new System.Text.StringBuilder();
+                foreach (string mode in options.SpeedModes)
+                    builder.Append("\n" + filePath + "." + mode + ".py");
+                MainManager.Instance.WindowConfigMessage("成功！\n已导出" + builder, null);
+            }
+            catch (System.Exception a)
+            {
+                Debug.LogError(a.ToString());
+                MainManager.Instance.WindowConfigMessage("发生错误：" + a.Message, null);
+            }
+        }
+
+        private Transform GetChooserParent()
+        {
+            return BaseBackManager.Instance != null && BaseBackManager.Instance.latestUIback != null
+                ? BaseBackManager.Instance.latestUIback.transform
+                : transform;
+        }
+        private static string PickAxisScriptPath(string defaultName, string extension)
+        {
+#if PLATFORM_ANDROID
+            return Application.persistentDataPath + "/" + defaultName;
+#else
+            string path = StandaloneFileBrowser.SaveFilePanel("导出轴脚本", string.Empty, defaultName, extension);
+            if (string.IsNullOrEmpty(path)) return null;
+            path = path.Replace("\\", "/");
+            if (path.EndsWith("." + extension, StringComparison.OrdinalIgnoreCase))
+            {
+                path = path.Substring(0, path.Length - extension.Length - 1);
+            }
+            return path;
+#endif
+        }
+#endif
+
         private void CallExcelHelper()
         {
             string fileName = CurrentBossText.text + "-" + CreateExcelName();
