@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -24,9 +25,16 @@ namespace PCRCaculator
 
     public class ABExTool
     {
-        public static string DMMpath = "C:/Users/user/AppData/LocalLow/Cygames/PrincessConnectReDive/";
+        // DMM 客户端数据目录的兜底默认值；实际优先取 PlayerSetting.dmmPath（见 GetDmmRoot）
+        // DMM 客户端数据目录的兜底默认值；实际优先取 PlayerSetting.dmmPath（见 GetDmmRoots）
+
+        // DMM 客户端数据目录的兜底默认值；实际优先取 PlayerSetting.dmmPath（见 GetDmmRoots）
+        // 指向 LocalLow\Cygames 这一级即可，GetDmmRoots 会自动往下找游戏子目录
+        public static string DMMpath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            "AppData/LocalLow/Cygames/");
         //const string OUTpath = "F:/apk/DMMOut/"; 
-        public static string OUTpath = "D:/PCRCalculator/PCRCalculator/PCRCalculator/Assets/StreamingAssets/AB/";
+        public static string OUTpath = ""; // 由 GetDmmOutPath() 决定
         private static SHA1CryptoServiceProvider sha1 = null;
         private static UTF8Encoding utf8 = null;
 
@@ -332,54 +340,101 @@ namespace PCRCaculator
             }
             CopyAndRename(oldPath,callBack);
         }
-        static void CopyAndRename(List<string> vs,Action<string> callBack = null)
+        static void CopyAndRename(List<string> vs, Action<string> callBack = null)
         {
-            int i = 0;
+            int copied = 0;
+            int missing = 0;
+            var roots = GetDmmRoots();
+            string outPath = GetDmmOutPath();
+
+            if (roots.Count == 0)
+            {
+                callBack?.Invoke("没有找到 DMM 数据目录，请在设置里填写 DMM 路径");
+                return;
+            }
+
             foreach (string path in vs)
             {
-                string[] path_all = path.Split('/');
+                string[] path_all = path.Replace('\\', '/').Split('/');
                 if (path_all.Length < 2)
-                    return;
-                string path0 = ComputeSHA1(path_all[1]);
-                string oldPath0 = DMMpath + path_all[0] + "/" + path0;
-                string newPath = OUTpath + path0;
-                string newPath2 = OUTpath + path_all[1];
-                if (File.Exists(oldPath0))//ABNameDic.ContainsKey(path0))
-                {
-                    File.Copy(oldPath0, newPath, true);
-                    if (!File.Exists(newPath2))
-                        File.Move(newPath, newPath2);
-                    else
-                    {
-                        File.Delete(newPath2);
-                        File.Move(newPath, newPath2);
+                    continue;
 
+                string group = path_all[0];
+                string name = path_all[path_all.Length - 1];
+                string sha1Name = ComputeSHA1(name);
+
+                string source = null;
+                foreach (var root in roots)
+                {
+                    // DMM 客户端把 bundle 存成 <root>/<class>/<sha1(文件名)>，也兼容已改回原名的副本
+                    foreach (var candidate in new[]
+                    {
+                        Path.Combine(root, group, sha1Name),
+                        Path.Combine(root, group, name),
+                        Path.Combine(root, name)
+                    })
+                    {
+                        if (!File.Exists(candidate))
+                            continue;
+                        source = candidate;
+                        break;
                     }
-                    i++;
+
+                    if (source != null)
+                        break;
+                }
+
+                if (source == null)
+                {
+                    missing++;
+                    continue;
+                }
+
+                try
+                {
+                    Directory.CreateDirectory(outPath);
+                    File.Copy(source, Path.Combine(outPath, name), true);
+                    copied++;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"copy bundle {source} -> {name} failed: {ex.Message}");
                 }
             }
-            callBack?.Invoke("成功移动" + i + "个文件！");
+
+            string message = "成功移动" + copied + "个文件！" +
+                             (missing > 0 ? $"（{missing} 个在 DMM 目录里没找到）" : string.Empty);
+            callBack?.Invoke(message);
 #if UNITY_EDITOR
-            Debug.Log("成功移动" + i + "个文件！");
+            Debug.Log(message);
 #endif
         }
 
-        /*static void CreateNameDic()
+        // 「bundle 名 → DMM 客户端里的文件名（SHA1）」映射。
+        // 原来读客户端 manifest.db 的 t 表，但那个库往往不存在；当前 manifest 本身就带全部名字。
+        public static void CreateNameDic()
         {
             ABNameDic.Clear();
-            string conn = "manifest.db";
-            SQLiteHelper sql = new SQLiteHelper(conn);
-            SqliteDataReader reader = sql.ReadFullTable("t");
-
-            while (reader.Read())
+            foreach (var mgr in new[] { mgrCharacter, mgrDataJP })
             {
-                string orName = reader.GetString(reader.GetOrdinal("k"));
-                string hashName = reader.GetString(reader.GetOrdinal("v"));
-                ABNameDic.Add(orName, hashName);
-            }
-            sql.CloseConnection();
+                if (mgr == null || mgr.registries == null)
+                    continue;
 
-        }*/
+                foreach (var key in mgr.registries.Keys)
+                {
+                    if (string.IsNullOrEmpty(key) || !key.StartsWith("a/", StringComparison.Ordinal))
+                        continue;
+
+                    var name = key.Substring(2);
+                    if (ABNameDic.ContainsKey(name))
+                        continue;
+
+                    ABNameDic[name] = ComputeSHA1(name);
+                }
+            }
+
+            Debug.Log($"DMM name dic rebuilt from manifest, {ABNameDic.Count} bundles");
+        }
         public static string ComputeSHA1(string fileName)
         {
             if (sha1 == null)
@@ -402,21 +457,28 @@ namespace PCRCaculator
             int count = 0;
             listInt = new List<int>();
             listStr = new List<string>();
+
+            // 以前 CreateNameDic 被注释掉，ABNameDic 恒为空，6/9/10/11 类永远找不到文件
+            if (ABNameDic.Count == 0)
+                CreateNameDic();
+
             foreach (string key in ABNameDic.Keys)
             {
-                if (key.Contains(containStr))
+                if (!key.Contains(containStr))
+                    continue;
+
+                listStr.Add(key);
+                if (removeStrs != null && removeStrs.Length >= 2)
                 {
-                    listStr.Add(key);
-                    if (removeStrs != null)
-                    {
-                        string s0 = key.Replace(removeStrs[0], "");
-                        string s1 = s0.Replace(removeStrs[1], "");
-                        int k = int.Parse(s1);
-                        listInt.Add(k);
-                    }
-                    count++;                    
+                    string s0 = key.Replace(removeStrs[0], "");
+                    string s1 = s0.Replace(removeStrs[1], "");
+                    int k;
+                    listInt.Add(int.TryParse(s1, out k) ? k : -1);
                 }
+
+                count++;
             }
+
             return count;
         }
 
@@ -996,11 +1058,302 @@ namespace PCRCaculator
                     return null;
             }
 
+            // 本地来源按代价从低到高尝试，最后才联网
+            var reusedBytes = TryReadFromDmmPath(fullname, mgr, file);
+            if (reusedBytes != null)
+                return reusedBytes;
+
+            reusedBytes = TryReuseBundleFromOtherVersion(fullname, mgr, file);
+            if (reusedBytes != null)
+                return reusedBytes;
+
+            reusedBytes = TryReuseFromPool(fullname, mgr, file);
+            if (reusedBytes != null)
+                return reusedBytes;
             var resolvedBytes = ResolveVerifiedBundleBytes(fullname, mgr);
             if (resolvedBytes == null)
                 return null;
 
             return TryWriteBundleCacheFile(file, fullname, resolvedBytes, mgr) ? resolvedBytes : null;
+        }
+
+        // ------------------------------------------------------------------
+        // 本地来源优先级（勾选「使用DMM路径」时生效）：
+        //   1. DMM 客户端目录 <root>/<class>/<SHA1(文件名)>（不用再手动点「更新AB」）
+        //   2. 其它 jp{Ver} 版本缓存目录（硬链接，同卷零额外空间）
+        //   3. Pool 内容寻址缓存（按 md5 存，换版本后内容没变就直接复用）
+        //   4. 都没有才联网下载
+        // ------------------------------------------------------------------
+        private static bool IsDmmSourceEnabled()
+        {
+            try
+            {
+                var setting = MainManager.Instance == null ? null : MainManager.Instance.PlayerSetting;
+                return setting == null || setting.useDMMpath;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        // DMM 客户端数据根目录（不带结尾分隔符）
+        public static string GetDmmRoot()
+        {
+            try
+            {
+                var setting = MainManager.Instance == null ? null : MainManager.Instance.PlayerSetting;
+                if (setting != null && !string.IsNullOrEmpty(setting.dmmPath))
+                    return setting.dmmPath.TrimEnd('/', '\\');
+            }
+            catch (Exception)
+            {
+            }
+
+            return (DMMpath ?? string.Empty).TrimEnd('/', '\\');
+        }
+
+        // 候选 DMM 根目录（按优先级，去重、只保留存在的）
+
+        public static List<string> GetDmmRoots()
+        {
+            var roots = new List<string>();
+
+            void Add(string path)
+            {
+                if (string.IsNullOrEmpty(path)) return;
+                var trimmed = path.TrimEnd('/', '\\');
+                if (trimmed.Length == 0) return;
+
+                // 允许把路径配置到 LocalLow\Cygames 这一级或更上一层，实际数据目录是它下面的
+                // PrincessConnectReDive 子目录；两种都接受，按配置原样优先。
+                foreach (var candidate in new[]
+                {
+                    trimmed,
+                    Path.Combine(trimmed, "PrincessConnectReDive")
+                })
+                {
+                    if (!Directory.Exists(candidate)) continue;
+                    if (roots.Exists(r => string.Equals(r, candidate, StringComparison.OrdinalIgnoreCase))) continue;
+                    roots.Add(candidate);
+                }
+            }
+
+            try
+            {
+                var setting = MainManager.Instance == null ? null : MainManager.Instance.PlayerSetting;
+                if (setting != null && setting.useDMMpath)
+                    Add(setting.dmmPath);
+            }
+            catch (Exception)
+            {
+            }
+
+            Add(DMMpath);
+            return roots;
+        }
+
+        // 「更新AB」输出目录：优先 StreamingAssets/AB，不可写时退到 persistentDataPath/AB
+        public static string GetDmmOutPath()
+        {
+            if (!string.IsNullOrEmpty(OUTpath))
+                return OUTpath;
+
+            try
+            {
+                var streaming = Path.Combine(Application.streamingAssetsPath, "AB");
+                Directory.CreateDirectory(streaming);
+                return OUTpath = streaming;
+            }
+            catch (Exception)
+            {
+            }
+
+            var fallback = Path.Combine(Application.persistentDataPath, "AB");
+            Directory.CreateDirectory(fallback);
+            return OUTpath = fallback;
+        }
+
+        private static string GetPoolCacheRoot()
+        {
+            var root = string.IsNullOrWhiteSpace(persistentDataPath) ? Application.persistentDataPath : persistentDataPath;
+            return Path.Combine(root, "Pool");
+        }
+
+        // 直接从 DMM 客户端目录取 bundle，校验通过后硬链接进当前版本缓存。
+        // 直接从 DMM 客户端目录取 bundle，校验通过后硬链接进当前版本缓存。
+        // DMM 客户端布局：<root>/<class>/<SHA1(文件名)>（class 例如 a / b / m / s / v）。
+        private static byte[] TryReadFromDmmPath(string fullname, AssetManager mgr, string targetFile)
+        {
+            try
+            {
+                var roots = GetDmmRoots();
+                if (roots.Count == 0)
+                    return null;
+
+                if (!IsDmmSourceEnabled())
+                    return null;
+                if (!TryGetManifestContent(fullname, mgr, out var content))
+                    return null;
+
+                var sha1Name = ComputeSHA1(fullname);
+                var className = string.IsNullOrEmpty(content.@class) ? "a" : content.@class;
+                bool presentButMismatched = false;
+
+                foreach (var root in roots)
+                {
+                    var candidates = new[]
+                    {
+                        Path.Combine(root, className, sha1Name),
+                        Path.Combine(root, "a", sha1Name),
+                        Path.Combine(root, className, fullname),
+                        Path.Combine(root, "a", fullname),
+                        Path.Combine(root, fullname)
+                    };
+
+                    foreach (var candidate in candidates)
+                    {
+                        if (!File.Exists(candidate))
+                            continue;
+
+                        var info = new FileInfo(candidate);
+                        if (content.size > 0 && info.Length != content.size)
+                        {
+                            presentButMismatched = true;
+                            continue;
+                        }
+
+                        var bytes = File.ReadAllBytes(candidate);
+                        if (!IsExpectedBundleBytes(fullname, bytes, mgr, candidate))
+                        {
+                            presentButMismatched = true;
+                            continue;
+                        }
+                        if (!TryLinkOrCopy(candidate, targetFile))
+                            continue;
+
+                        Debug.Log($"asset bundle {fullname} reused from DMM path: {candidate} -> {targetFile}");
+                        return bytes;
+                    }
+                }
+
+                if (presentButMismatched)
+                    Debug.LogWarning($"asset bundle {fullname} found in DMM path but size/md5 does not match current version, skipped");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"asset bundle {fullname} read from DMM path failed: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        // Pool 是内容寻址（文件名就是 bundle 的 md5），版本号变了但内容没变就能直接复用。
+        private static byte[] TryReuseFromPool(string fullname, AssetManager mgr, string targetFile)
+        {
+            try
+            {
+                if (!TryGetManifestContent(fullname, mgr, out var content))
+                    return null;
+
+                var md5 = content.MD5;
+                if (string.IsNullOrEmpty(md5))
+                    return null;
+
+                var pooled = Path.Combine(GetPoolCacheRoot(), md5);
+                if (!File.Exists(pooled))
+                    return null;
+
+                var info = new FileInfo(pooled);
+                if (content.size > 0 && info.Length != content.size)
+                    return null;
+
+                var bytes = File.ReadAllBytes(pooled);
+                if (!IsExpectedBundleBytes(fullname, bytes, mgr, pooled))
+                    return null;
+                if (!TryLinkOrCopy(pooled, targetFile))
+                    return null;
+
+                Debug.Log($"asset bundle {fullname} reused from pool cache: {pooled} -> {targetFile}");
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"asset bundle {fullname} pool reuse failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        // 跨版本复用：同名 bundle 若已存在于其它 jp{Ver} 缓存目录且 md5 与当前 manifest 一致，
+        // 直接硬链接（同卷零开销）到当前版本目录，省掉一次下载。
+        private static byte[] TryReuseBundleFromOtherVersion(string fullname, AssetManager mgr, string targetFile)
+        {
+            try
+            {
+                var cacheDir = Path.GetDirectoryName(targetFile);
+                var root = string.IsNullOrEmpty(cacheDir) ? null : Path.GetDirectoryName(cacheDir);
+                if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) return null;
+
+                if (!TryGetManifestContent(fullname, mgr, out var content))
+                    return null;
+
+                var dirs = Directory.GetDirectories(root)
+                    .Where(dir => !Path.GetFileName(dir).StartsWith(".", StringComparison.Ordinal))
+                    .Where(dir => !string.Equals(dir, cacheDir, StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(dir => Path.GetFileName(dir), StringComparer.Ordinal);
+
+                foreach (var dir in dirs)
+                {
+                    var candidate = Path.Combine(dir, fullname);
+                    if (!File.Exists(candidate))
+                        continue;
+
+                    // 大小不符就不必再算 md5
+                    var info = new FileInfo(candidate);
+                    if (content.size > 0 && info.Length != content.size)
+                        continue;
+
+                    var candidateBytes = File.ReadAllBytes(candidate);
+                    if (!IsExpectedBundleBytes(fullname, candidateBytes, mgr, candidate))
+                        continue;
+                    if (!TryLinkOrCopy(candidate, targetFile))
+                        continue;
+
+                    Debug.Log($"asset bundle {fullname} reused from other version cache: {candidate} -> {targetFile}");
+                    return candidateBytes;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"asset bundle {fullname} cross-version reuse failed: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool CreateHardLink(string lpFileName, string lpExistingFileName,
+            IntPtr lpSecurityAttributes);
+
+        private static bool TryLinkOrCopy(string source, string target)
+        {
+            try
+            {
+                EnsureParentDirectory(target);
+                if (File.Exists(target)) File.Delete(target);
+#if UNITY_ANDROID || PLATFORM_ANDROID
+                File.Copy(source, target, true);
+#else
+                if (!CreateHardLink(target, source, IntPtr.Zero))
+                    File.Copy(source, target, true);
+#endif
+                return File.Exists(target);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"bundle cache link/copy failed {source} -> {target}: {ex.Message}");
+                return false;
+            }
         }
 
 #if UNITY_5_3_OR_NEWER
