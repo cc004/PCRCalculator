@@ -7,9 +7,8 @@ on:
         description: Select blue or dev above, then the desktop package
         type: choice
         required: true
-        default: macos
+        default: windows
         options:
-          - macos
           - windows
 
 permissions:

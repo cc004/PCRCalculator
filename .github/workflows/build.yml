@@ -15,7 +15,6 @@ on:
         options:
           - all
           - linux
-          - macos
           - windows
 
 permissions:
@@ -89,17 +88,13 @@ jobs:
           if-no-files-found: error
 
   desktop:
-    name: ${{ github.ref_name }} ${{ matrix.target }} desktop
+    name: ${{ github.ref_name }} windows desktop
     needs: [compile, version]
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && inputs.target != 'linux')
     timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.target != 'all' && format('["{0}"]', inputs.target) || '["macos","windows"]') }}
-    runs-on: ${{ matrix.target == 'macos' && 'macos-15-intel' || 'windows-2022' }}
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
@@ -107,24 +102,17 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ github.ref_name }}-project-mono-burst-off-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-${{ github.ref_name }}-project-mono-burst-off-v1-Windows-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
-            Library-${{ github.ref_name }}-project-mono-burst-off-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.target }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-
-      # Both desktop targets use Mono without Burst; macOS retains Apple Silicon architecture.
+            Library-${{ github.ref_name }}-project-mono-burst-off-v1-Windows-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-
+      # Windows desktop target uses Mono without Burst.
       - name: Inspect Windows build host
-        if: matrix.target == 'windows'
         shell: pwsh
         run: |
           Get-PSDrive C | Select-Object Name, Used, Free
           docker version
           & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           Get-ChildItem "${env:ProgramFiles(x86)}/Windows Kits/10/Include" -Directory | Select-Object Name
-      - name: Inspect Mac build host
-        if: matrix.target == 'macos'
-        run: |
-          df -h .
-          xcode-select -p
-          xcrun --sdk macosx --show-sdk-version
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -132,13 +120,13 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: auto
-          targetPlatform: ${{ matrix.target == 'macos' && 'StandaloneOSX' || 'StandaloneWindows64' }}
-          buildMethod: ${{ matrix.target == 'macos' && 'BuildScript.BuildMacMonoFromCommandLine' || 'BuildScript.BuildWindowsMonoFromCommandLine' }}
-          customParameters: -pcrBuildTarget ${{ matrix.target }} -pcrOutputRoot Builds --burst-disable-compilation
+          targetPlatform: StandaloneWindows64
+          buildMethod: BuildScript.BuildWindowsMonoFromCommandLine
+          customParameters: -pcrBuildTarget windows -pcrOutputRoot Builds --burst-disable-compilation
           versioning: None
       - uses: actions/upload-artifact@v4
         with:
-          name: PCRCalculator_${{ needs.version.outputs.value }}_${{ matrix.target }}
+          name: PCRCalculator_${{ needs.version.outputs.value }}_windows
           path: Builds/*.zip
           if-no-files-found: error
 
@@ -159,7 +147,7 @@ jobs:
           pattern: PCRCalculator*_${{ needs.version.outputs.value }}_*
           path: release
           merge-multiple: true
-      - name: Publish all three packages
+      - name: Publish all packages
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -170,7 +158,6 @@ jobs:
         run: |
           assets=(
             "release/PCRCalculator-${PACKAGE_VERSION}-win-x64.zip"
-            "release/PCRCalculator-${PACKAGE_VERSION}-mac-arm.zip"
             "release/PCRCalculator-${PACKAGE_VERSION}-server-linux.zip"
           )
           for asset in "${assets[@]}"; do
@@ -186,7 +173,7 @@ jobs:
               for asset in "${assets[@]}"; do
                 jq -e --arg name "${asset##*/}" '.assets | any(.name == $name)' <<< "$release_info" > /dev/null
               done
-              echo "Release $RELEASE_TAG already contains all three packages."
+              echo "Release $RELEASE_TAG already contains all packages."
               exit 0
             fi
             release_exists=true
