@@ -207,14 +207,11 @@ namespace PCRCalculatorServer
                     continue;
                 }
 
-                var requestJson = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+                // Preserve all request fields when expanding repeat runs. A JSON
+                // round-trip can change the simulation inputs and battle outcome.
                 for (var j = 0; j < repeatCount; ++j)
                 {
-                    var clonedRequest = Newtonsoft.Json.JsonConvert.DeserializeObject<BattleSimulationRequest>(requestJson);
-                    if (clonedRequest == null)
-                    {
-                        throw new InvalidOperationException("展开重复请求失败：无法反序列化 BattleSimulationRequest。");
-                    }
+                    var clonedRequest = request.DeepClone();
                     clonedRequest.RepeatCount = 1;
                     expandedRequests.Add(clonedRequest);
                     requestMap.Add(i);
