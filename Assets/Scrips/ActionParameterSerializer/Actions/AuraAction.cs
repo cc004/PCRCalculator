@@ -52,10 +52,12 @@ namespace ActionParameterSerializer.Actions
         public BreakType breakType;
         public bool isConstant = false;
 
+        protected virtual int ChangeParameterType => (int)actionValue1.value;
+
         public
             override void childInit()
         {
-            percentModifier = (int)actionValue1.value == 2 ? PercentModifier.percent : PercentModifier.number;
+            percentModifier = ChangeParameterType == 2 || ChangeParameterType == 3 ? PercentModifier.percent : PercentModifier.number;
             actionValues.Add(new ActionValue(actionValue2, actionValue3, null));
             durationValues.Add(new ActionValue(actionValue4, actionValue5, null));
             auraActionType = (actionDetail1 % 10 == 1) ? AuraActionType.reduce : AuraActionType.raise;
@@ -98,6 +100,19 @@ namespace ActionParameterSerializer.Actions
             }
         }
 
+        protected string describeValueReference(string expression)
+        {
+            switch (ChangeParameterType)
+            {
+                case 2:
+                    return Utils.JavaFormat(Utils.GetString("initial_value_s1"), expression);
+                case 3:
+                    return Utils.JavaFormat(Utils.GetString("current_value_s1"), expression);
+                default:
+                    return expression;
+            }
+        }
+
         public
             override string localizedDetail(int level, Property property)
         {
@@ -106,6 +121,7 @@ namespace ActionParameterSerializer.Actions
             {
                 r = Utils.JavaFormat("(%s)", r);
             }
+            r = describeValueReference(r);
             switch (breakType)
             {
                 case BreakType.Break:

@@ -5,6 +5,8 @@ namespace ActionParameterSerializer.Actions
     public class ChangeParameterFieldAction : AuraAction
     {
 
+        protected override int ChangeParameterType => actionDetail2;
+
         public
             override void childInit()
         {
@@ -13,7 +15,7 @@ namespace ActionParameterSerializer.Actions
             actionValues.Add(new ActionValue(actionValue1, actionValue2, null));
             durationValues.Clear();
             durationValues.Add(new ActionValue(actionValue3, actionValue4, null));
-            base.percentModifier = actionDetail2 == 2 ? PercentModifier.percent : PercentModifier.number;
+            base.percentModifier = ChangeParameterType == 2 || ChangeParameterType == 3 ? PercentModifier.percent : PercentModifier.number;
         }
 
         public
@@ -27,7 +29,7 @@ namespace ActionParameterSerializer.Actions
                     (int)actionValue5.value,
                     auraActionType.description(),
                     targetParameter.buildTargetClause(),
-                    buildExpression(level, RoundingMode.UP, property),
+                    describeValueReference(buildExpression(level, RoundingMode.UP, property)),
                     auraType.description(),
                     buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property),
                     percentModifier.description()));
@@ -38,7 +40,7 @@ namespace ActionParameterSerializer.Actions
                     (int)actionValue5.value,
                     targetParameter.buildTargetClause(),
                     auraActionType.description(),
-                    buildExpression(level, RoundingMode.UP, property),
+                    describeValueReference(buildExpression(level, RoundingMode.UP, property)),
                     auraType.description(),
                     buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property),
                     percentModifier.description()));
