@@ -554,6 +554,37 @@ namespace PCRCaculator
             }
         }
 
+        /// <summary>
+        /// 把「正在下载的数据库」的字节进度刷到加载面板。只读进度快照，不做任何 IO，可每帧调用。
+        /// </summary>
+        private static void UpdateDatabasePrepareProgress(WaitUI wait, PCRCaculator.SQL.SQLiteTool[] tools)
+        {
+            if (wait == null || tools == null)
+                return;
+
+            PCRCaculator.SQL.SQLiteTool downloading = null;
+            foreach (var tool in tools)
+            {
+                if (tool != null && tool.IsDownloadingSourceDatabase)
+                {
+                    downloading = tool;
+                    break;
+                }
+            }
+
+            if (downloading == null)
+            {
+                wait.SetMessage("正在准备数据库");
+                return;
+            }
+
+            var progress = downloading.DownloadProgress;
+            if (progress.HasTotal)
+                wait.SetProgress(progress.Fraction, "正在下载数据库");
+            else
+                wait.SetMessage("正在下载数据库");
+        }
+
         private async void LoadAsync(WaitUI wait)
         {
             // 计时开始
@@ -677,13 +708,24 @@ namespace PCRCaculator
                     var dbPrepareStopwatch = System.Diagnostics.Stopwatch.StartNew();
                     // 更新 UI：准备数据库
                     try { wait?.SetMessage("正在准备数据库"); } catch { }
-                    await Task.WhenAll(
+                    var dbPrepareTask = Task.WhenAll(
                         Task.Run(() => dbTool.Prepare()),
                         Task.Run(() =>
                         {
                             if (ABExTool.mgrDataJP != ABExTool.mgrCharacter) dbTool2.Prepare();
                         }),
                         Task.Run(() => dbTool3.Prepare()));
+
+                    // 下载/反哈希期间把字节进度刷到面板上，主线程每帧只做一次快照读取
+                    var dbPrepareTools = new[] { dbTool, dbTool2, dbTool3 };
+                    while (!dbPrepareTask.IsCompleted)
+                    {
+                        UpdateDatabasePrepareProgress(wait, dbPrepareTools);
+                        await Task.Yield();
+                    }
+
+                    await dbPrepareTask;
+                    try { wait?.ClearProgress(); } catch { }
                     dbPrepareStopwatch.Stop();
                     Debug.Log($"数据库准备完成，耗时: {dbPrepareStopwatch.ElapsedMilliseconds}ms");
 

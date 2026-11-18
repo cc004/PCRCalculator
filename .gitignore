@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------
 # Unity 工程 .gitignore（PCRCalculator）
-# 约定：路径写清晰、按用途分组；台服/仓库里已被跟踪的文件不受忽略规则影响。
+# 约定：路径写清晰、按用途分组；仓库里已经被跟踪的文件不受忽略规则影响，
+#       所以规则要生效必须同时 git rm --cached（见文末说明）。
 # ---------------------------------------------------------------------------
 
 # ---------------------------- Unity 生成目录 ----------------------------
@@ -18,12 +19,15 @@ UserSettings/
 # BuildScript.cs 的默认输出根目录（Windows/MacOS/Linux 播放器 + zip + server）
 /Builds/
 save/
+!save/.placeholder
 server/
 Data/
+*.pid
 
 # ------------------------ AssetBundle / 下载缓存 ------------------------
 # 运行时缓存，不进仓库（persistentDataPath 与工程内两种历史位置）
 .ABExt2/
+Pool/
 *.download-*.tmp
 
 # --------------------------- 构建/生成的文件 ---------------------------
@@ -43,9 +47,26 @@ sysinfo.txt
 PCRCalculatorServer/linux
 PCRCalculatorServer/Properties/PublishProfiles
 
+# ---------------- Unity 打开工程时自动重写 / 生成的资源 ----------------
+# 这些不是"源码"，是 Unity 导入时按本机状态写回的产物，提交上去只会让别人的
+# 资源被自己机器上的中间状态覆盖：
+#   - 动态字体图集（m_AtlasPopulationMode: 1 = Dynamic）每次打开工程/批量构建
+#     都会被重新烘焙；batchmode + nographics 下还会被刷成空图集（m_GlyphTable
+#     清空、atlas 变 1×1），等于把字形数据删掉。
+#   - 资源本体忽略，但保留 .meta（GUID 不变，TMP Settings 的引用才不会断）。
+Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+!Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset.meta
+Assets/Resources/BillingMode.json
+存档.json
+
 # ------------------------- 本地临时 / 脚本产物 -------------------------
-# 手工改资源时的备份、补丁脚本、日志（.tmp_scene 是本机工作目录）
+# 手工改资源时的备份、补丁脚本、日志（.tmp_scene 是本机工作目录；
+# .tmpbuild 是 dotnet 校验编译时重定向出来的 obj 目录）
 /.tmp_scene/
+/.tmpbuild/
+.tmpbuild/
+*_probe_publish/
+Player*.log
 view-source_*.html
 __pycache__/
 *.py[cod]
@@ -72,13 +93,13 @@ PCRCAlculator.sln
 Packages/packages-lock.json
 Packages/manifest.json
 
-# ------------------------- 项目内已有特例（保持原样） -------------------------
-# Unity 6 打开工程时会重写该字体图集；BillingMode.json 随平台生成
-Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
-Assets/Resources/BillingMode.json
-存档.json
-
 # ------------------------------ 操作系统 ------------------------------
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---------------------------------------------------------------------------
+# 备注：文件如果已经被跟踪，.gitignore 不会起作用。上面「Unity 自动重写」一节
+# 里的资源都用 `git rm --cached <path>` 取消跟踪（文件留在本地、.meta 保留），
+# 这样本机重新烘焙出的图集不会再出现在 git status 里。
+# ---------------------------------------------------------------------------

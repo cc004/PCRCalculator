@@ -1,4 +1,4 @@
-﻿using AssetsTools.NET.Extra;
+using AssetsTools.NET.Extra;
 using Mono.Data.Sqlite;
 using Org.BouncyCastle.Utilities;
 using PCRApi;
@@ -682,13 +682,65 @@ namespace PCRCaculator
             }
         }
 
+        /// <summary>
+        /// 战斗资源下载进度。下载线程原地更新，UI 线程只读，字段用 Interlocked/Volatile 保护。
+        /// Total 会随依赖发现而增长，所以 Done/Total 比纯比例更可信。
+        /// </summary>
+        public sealed class BattleResourcePrepareProgress
+        {
+            private int done;
+            private int total;
+            private string current;
+
+            public int Done => Volatile.Read(ref done);
+
+            public int Total => Volatile.Read(ref total);
+
+            /// <summary>最近处理的 bundle 名，用于给用户看「正在下载什么」。</summary>
+            public string Current => Volatile.Read(ref current);
+
+            public double Fraction => Total > 0 ? Math.Min(1d, (double)Done / Total) : 0d;
+
+            internal void AddTotal(int value)
+            {
+                if (value > 0)
+                    Interlocked.Add(ref total, value);
+            }
+
+            internal void Advance(string bundleName)
+            {
+                if (!string.IsNullOrEmpty(bundleName))
+                    Volatile.Write(ref current, bundleName);
+                Interlocked.Increment(ref done);
+            }
+        }
+
+        /// <summary>同步版：阻塞调用线程直到全部资源就绪。新代码请用 <see cref="PrepareBattleUnitResourcesAsync"/>。</summary>
         public static BattleResourcePrepareSummary PrepareBattleUnitResources(IEnumerable<int> unitIds)
+            => PrepareBattleUnitResourcesAsync(unitIds).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// 并发预下载战斗资源（含依赖），不阻塞主线程。
+        /// 按「依赖波次」推进：同一波内并发下载，波与波的依赖解析在协调线程上串行进行，
+        /// 所以 visited/summary 只有协调线程会改，不需要加锁。
+        /// </summary>
+        public static Task<BattleResourcePrepareSummary> PrepareBattleUnitResourcesAsync(
+            IEnumerable<int> unitIds,
+            BattleResourcePrepareProgress progress = null,
+            CancellationToken cancellationToken = default)
+            => Task.Run(() => PrepareBattleUnitResourcesCoreAsync(unitIds, progress, cancellationToken), cancellationToken);
+
+        private static async Task<BattleResourcePrepareSummary> PrepareBattleUnitResourcesCoreAsync(
+            IEnumerable<int> unitIds,
+            BattleResourcePrepareProgress progress,
+            CancellationToken cancellationToken)
         {
             var summary = new BattleResourcePrepareSummary();
             var stopwatch = Stopwatch.StartNew();
             try
             {
                 var bundleNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+                var optionalNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var unitId in unitIds ?? Enumerable.Empty<int>())
                 {
                     if (unitId <= 0)
@@ -696,12 +748,124 @@ namespace PCRCaculator
 
                     foreach (var bundleName in GetRequiredBattleUnitBundleNames(unitId))
                         bundleNames.Add(bundleName);
+
+                    // spine 系列不在 prefab 依赖里，运行期由 SpineCreator / Cysp2Skel / modechange
+                    // 第一次用到时在主线程同步下载（就是卡死的那一下），这里提前取好。
+                    // 名字猜错只会被 manifest 过滤掉，不影响正确性。
+                    var prefabId = GetPrefabId(unitId);
+                    AddOptionalBundleNames(optionalNames, bundleNames, GetSpineBundleNames(prefabId));
+                    AddOptionalBundleNames(optionalNames, bundleNames, GetIconBundleNames(prefabId));
+
+                    // 召唤物：技能里的 SUMMON 动作会在战斗中才 new 出来，prefab 依赖里没有，
+                    // 不预取就会在放技能那一帧卡主线程。这里顺着技能表把召唤物 id 找出来。
+                    foreach (var summonId in CollectSummonUnitIdsForPrepare(prefabId))
+                    {
+                        var summonPrefabId = GetPrefabId(summonId);
+                        if (summonPrefabId <= 0)
+                            continue;
+
+                        AddOptionalBundleNames(optionalNames, bundleNames, new[]
+                        {
+                            $"all_battleunit_{summonPrefabId}.unity3d",
+                            $"all_battleunitprefab_{summonPrefabId}.unity3d",
+                        });
+                        AddOptionalBundleNames(optionalNames, bundleNames, GetSpineBundleNames(summonPrefabId));
+                        AddOptionalBundleNames(optionalNames, bundleNames, GetIconBundleNames(summonPrefabId));
+                    }
                 }
 
-                summary.RequestedBundleCount = bundleNames.Count;
+                summary.RequestedBundleCount = bundleNames.Count + optionalNames.Count;
+
                 var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var bundleName in bundleNames)
-                    EnsureBundleAndDependenciesCachedStrict(bundleName, mgrCharacter, true, visited, summary);
+                var pending = bundleNames.Select(name => new PendingBundle(name, true))
+                    .Concat(optionalNames.Select(name => new PendingBundle(name, false)))
+                    .ToList();
+                progress?.AddTotal(pending.Count);
+
+                while (pending.Count > 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // 1) 先在协调线程上过滤：已访问、manifest 缺失的都出局
+                    var wave = new List<PendingBundle>(pending.Count);
+                    foreach (var item in pending)
+                    {
+                        if (!visited.Add(item.Name))
+                            continue;
+
+                        if (!TryGetManifestContent(item.Name, mgrCharacter, out _))
+                        {
+                            if (item.Required)
+                            {
+                                summary.SkippedManifestMissingCount++;
+                                Debug.LogWarning(
+                                    $"asset bundle {item.Name} has no manifest entry during battle resource prepare; " +
+                                    "skipping cache precheck because resource version ownership is outside prepare");
+                            }
+                            else
+                            {
+                                summary.OptionalDependencyMissingCount++;
+                                // 预取名单里带了不少「猜的」运行期资源名，缺失属正常情况，用 Log 以免刷屏
+                                Debug.Log(
+                                    $"optional asset bundle {item.Name} has no manifest entry during battle resource prepare; " +
+                                    "keeping legacy on-demand behavior");
+                            }
+
+                            progress?.Advance(item.Name);
+                            continue;
+                        }
+
+                        wave.Add(item);
+                    }
+
+                    pending = new List<PendingBundle>();
+                    if (wave.Count == 0)
+                        continue;
+
+                    // 2) 同一波并发下载（每个 bundle 在线程池线程上做校验/复用/下载/写盘）
+                    var results = await AssetDownloadUtil.RunBoundedAsync(
+                            wave,
+                            item => Task.Run(() => FetchBundleForPrepare(item), cancellationToken),
+                            AssetDownloadUtil.DefaultConcurrency,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+
+                    // 3) 依赖解析与计数再回到协调线程，保持单线程语义
+                    foreach (var result in results)
+                    {
+                        progress?.Advance(result.Name);
+
+                        if (result.Error != null || result.Bytes == null)
+                        {
+                            summary.AddFailure(
+                                result.Required
+                                    ? BattleResourcePrepareStatus.CacheUnavailable
+                                    : BattleResourcePrepareStatus.DependencyUnavailable,
+                                result.Name,
+                                "cache",
+                                result.Error != null
+                                    ? "download/cache validation failed"
+                                    : "download/cache validation returned no bytes",
+                                result.Error);
+                            continue;
+                        }
+
+                        summary.EnsuredBundleCount++;
+
+                        foreach (var depName in GetBundleDependencyNames(result.Name, result.Bytes, summary))
+                        {
+                            if (visited.Contains(depName))
+                                continue;
+
+                            pending.Add(new PendingBundle(depName, false));
+                            progress?.AddTotal(1);
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -722,6 +886,91 @@ namespace PCRCaculator
             return summary;
         }
 
+        private readonly struct PendingBundle
+        {
+            public PendingBundle(string name, bool required)
+            {
+                Name = name;
+                Required = required;
+            }
+
+            public string Name { get; }
+            public bool Required { get; }
+        }
+
+        private sealed class BundleFetchResult
+        {
+            public string Name;
+            public bool Required;
+            public byte[] Bytes;
+            public Exception Error;
+        }
+
+        /// <summary>在工作线程上执行：读本地缓存 / 复用其它版本 / 从池下载，最后写入缓存。</summary>
+        private static BundleFetchResult FetchBundleForPrepare(PendingBundle item)
+        {
+            var result = new BundleFetchResult { Name = item.Name, Required = item.Required };
+            try
+            {
+                result.Bytes = ReadOrRepairBundleCacheFile(item.Name, mgrCharacter);
+            }
+            catch (Exception ex)
+            {
+                result.Error = ex;
+            }
+
+            return result;
+        }
+
+#if UNITY_5_3_OR_NEWER
+        /// <summary>解析 bundle 的依赖名（只解析，不递归下载）。调用方需保证在单线程上顺序调用。</summary>
+        private static List<string> GetBundleDependencyNames(
+            string fullname,
+            byte[] raw,
+            BattleResourcePrepareSummary summary)
+        {
+            var dependencies = new List<string>();
+            if (raw == null)
+                return dependencies;
+
+            try
+            {
+                using var ms = new MemoryStream(raw);
+                var ab = am.LoadBundleFile(ms, fullname);
+                var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
+                var info = am.GetBaseField(assetsFileInstance,
+                    assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+
+                foreach (var val in info["m_Dependencies"]["Array"])
+                {
+                    var depName = val.AsString;
+                    if (string.IsNullOrEmpty(depName))
+                        continue;
+
+                    Debug.Log($"preparing asset bundle dependency: {fullname} => {depName}");
+                    dependencies.Add(depName);
+                }
+            }
+            catch (Exception ex)
+            {
+                summary.AddFailure(
+                    BattleResourcePrepareStatus.DependencyParseFailed,
+                    fullname,
+                    "dependency-parse",
+                    "failed to read bundle dependency list",
+                    ex);
+            }
+
+            return dependencies;
+        }
+#else
+        private static List<string> GetBundleDependencyNames(
+            string fullname,
+            byte[] raw,
+            BattleResourcePrepareSummary summary)
+            => new List<string>();
+#endif
+
         private static IEnumerable<string> GetRequiredBattleUnitBundleNames(int unitid)
         {
             var prefabId = GetPrefabId(unitid);
@@ -729,6 +978,151 @@ namespace PCRCaculator
             if (!string.IsNullOrEmpty(battleunitBundleName))
                 yield return battleunitBundleName;
             yield return "all_battleunitprefab_" + prefabId + ".unity3d";
+        }
+
+        /// <summary>
+        /// 运行期其它地方会按需同步下载的 spine 资源（SpineCreator 的贴图/atlas、
+        /// Cysp2Skel 的 chara_base/battle/common_battle、modechange 立绘）。
+        /// 这些都是可选的：manifest 里没有就跳过，不会让 prepare 失败。
+        /// </summary>
+        private static IEnumerable<string> GetSpineBundleNames(int prefabId)
+        {
+            if (prefabId <= 0)
+                yield break;
+
+            yield return $"spine_{prefabId:D6}_battle.cysp.unity3d";
+            yield return $"spine_{prefabId:D6}_chara_base.cysp.unity3d";
+            yield return "spine_000000_chara_base.cysp.unity3d";
+            yield return $"spine_sdnormal_{prefabId}.unity3d";
+
+            // 角色皮肤：UnitUtility.GetSkinId 对人物用 unitId + 10（★0-2）/ +30（★3-5），
+            // 敌人与召唤物直接用 unitId。三种 skin 都列出来，manifest 里没有的会自动跳过。
+            yield return $"spine_sdnormal_{prefabId + 10}.unity3d";
+            yield return $"spine_sdnormal_{prefabId + 30}.unity3d";
+            yield return $"spine_sdmodechange_{prefabId}_1.unity3d";
+            yield return $"spine_sdmodechange_{prefabId + 10}_1.unity3d";
+            yield return $"spine_sdmodechange_{prefabId + 30}_1.unity3d";
+
+            var motionType = ResolveMotionTypeForPrepare(prefabId);
+            yield return $"spine_{(motionType == 0 ? prefabId : motionType):D2}_common_battle.cysp.unity3d";
+        }
+
+        private static int ResolveMotionTypeForPrepare(int prefabId)
+        {
+#if UNITY_5_3_OR_NEWER
+            try
+            {
+                var main = MainManager.Instance;
+                if (main != null)
+                    return main.GetMotionType(prefabId, prefabId);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"prepare could not resolve motionType for {prefabId}: {ex.Message}");
+            }
+#endif
+            return 0;
+        }
+
+        /// <summary>图标（角色头像/名牌）也是运行期同步下载的，顺手一起取。</summary>
+        private static IEnumerable<string> GetIconBundleNames(int prefabId)
+        {
+            if (prefabId <= 0)
+                yield break;
+
+            yield return $"unit_icon_unit_{prefabId}.unity3d";
+            yield return $"unit_icon_unit_{prefabId + 10}.unity3d";
+            yield return $"unit_icon_unit_{prefabId + 30}.unity3d";
+        }
+
+        private static void AddOptionalBundleNames(
+            ISet<string> optionalNames,
+            ISet<string> requiredNames,
+            IEnumerable<string> names)
+        {
+            if (optionalNames == null || names == null)
+                return;
+
+            foreach (var name in names)
+            {
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                if (requiredNames != null && requiredNames.Contains(name))
+                    continue;
+                optionalNames.Add(name);
+            }
+        }
+
+        /// <summary>
+        /// 顺着技能表找出该单位会召唤出来的 unitId（SUMMON 动作的 ActionDetail2）。
+        /// 召唤物不在 tempData 的 prefab 列表里，所以以前只能在战斗中临时下载。
+        /// </summary>
+        private const int SummonActionTypeId = 15; // Elements.eActionType.SUMMON
+        private const int DivisionActionTypeId = 52; // Elements.eActionType.DIVISION（分身也是召出来的单位）
+
+        private static IEnumerable<int> CollectSummonUnitIdsForPrepare(int prefabId)
+        {
+#if UNITY_5_3_OR_NEWER
+            var main = MainManager.Instance;
+            if (main == null || prefabId <= 0)
+                yield break;
+
+            var skillIds = new List<int>();
+            try
+            {
+                if (main.TryGetEnemyParameter(prefabId, out var enemyData) && enemyData?.skillData != null)
+                {
+                    skillIds.Add(enemyData.skillData.UB);
+                    if (enemyData.skillData.MainSkills != null)
+                        skillIds.AddRange(enemyData.skillData.MainSkills);
+                }
+                else if (main.UnitRarityDic != null && main.UnitRarityDic.TryGetValue(prefabId, out var rarity)
+                         && rarity?.skillData != null)
+                {
+                    var list = rarity.skillData.GetSkillList();
+                    if (list != null)
+                        skillIds.AddRange(list);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"prepare could not collect skills for {prefabId}: {ex.Message}");
+                yield break;
+            }
+
+            var seen = new HashSet<int>();
+            foreach (var skillId in skillIds)
+            {
+                if (skillId <= 0)
+                    continue;
+                if (main.SkillDataDic == null || !main.SkillDataDic.TryGetValue(skillId, out var skill) || skill?.skillactions == null)
+                    continue;
+
+                foreach (var actionId in skill.skillactions)
+                {
+                    if (actionId <= 0)
+                        continue;
+                    if (main.SkillActionDic == null || !main.SkillActionDic.TryGetValue(actionId, out var action) || action?.details == null)
+                        continue;
+                    if (action.type != SummonActionTypeId && action.type != DivisionActionTypeId)
+                        continue;
+                    if (action.details.Length < 2)
+                        continue;
+
+                    var summonId = action.type == SummonActionTypeId
+                        ? action.details[1]                                   // SummonAction: SummonId = ActionDetail2
+                        : action.type == DivisionActionTypeId
+                            ? action.details[0]                               // DivisionAction: DivisionId = ActionDetail1（分身）
+                            : 0;
+                    if (summonId > 0 && seen.Add(summonId))
+                        yield return summonId;
+                }
+            }
+#else
+            // server 工程不定义 UNITY_5_3_OR_NEWER，也没有 MainManager：这里给一个空序列，
+            // 让迭代器方法在两条编译路径下都有合法实现。
+            yield break;
+#endif
         }
 
         private static string GetBattleunitBundleName(int prefabId)
@@ -1360,25 +1754,85 @@ namespace PCRCaculator
         private static AssetsManager am = new AssetsManager();
         private static HashSet<string> loadedDep = new HashSet<string>();
 
+        /// <summary>
+        /// 运行期依赖预载。老实现是一条依赖一个来回地串行下载（主线程一等就是几百毫秒），
+        /// 现在按「依赖波次」推进：同一层的所有依赖一起并发下载，下一层再并发，
+        /// 单层耗时约为串行的 1/并发数。方法本身仍是同步的（调用方要的是已就绪的 bundle），
+        /// 但等待期间下载是真的多线程在跑。
+        /// </summary>
         private static void LoadDependency(string path, byte[] raw, AssetManager mgr)
         {
-            if (raw == null) return;
-            if (loadedDep.Contains(path)) return;
-            loadedDep.Add(path);
+            var wave = new List<KeyValuePair<string, byte[]>>();
+            if (raw != null)
+                wave.Add(new KeyValuePair<string, byte[]>(path, raw));
 
-            using var ms = new MemoryStream(raw);
-            var ab = am.LoadBundleFile(ms, path);
-            var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
-            var info = am.GetBaseField(assetsFileInstance, 
-                assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
-
-            foreach (var val in info["m_Dependencies"]["Array"])
+            while (wave.Count > 0)
             {
-                var depName = val.AsString;
-                Debug.Log($"resolving asset bundle dependency: {path} => {depName}");
-                var bytes = ReadOrRepairBundleCacheFile(depName, mgr);
-                LoadDependency(depName, bytes, mgr);
+                var nextNames = new List<string>();
+                var seenThisRound = new HashSet<string>();
+
+                foreach (var item in wave)
+                {
+                    if (!loadedDep.Add(item.Key))
+                        continue;
+
+                    var dependencies = ParseBundleDependencyNames(item.Key, item.Value);
+                    foreach (var depName in dependencies)
+                    {
+                        Debug.Log($"resolving asset bundle dependency: {item.Key} => {depName} " +
+                                  $"(layer={wave.Count} bundle(s), parallel={AssetDownloadUtil.DefaultConcurrency})");
+                        if (loadedDep.Contains(depName) || !seenThisRound.Add(depName))
+                            continue;
+                        nextNames.Add(depName);
+                    }
+                }
+
+                if (nextNames.Count == 0)
+                    break;
+
+                var fetched = AssetDownloadUtil.RunSync(() =>
+                    AssetDownloadUtil.RunBoundedAsync(
+                        nextNames,
+                        name => Task.Run(() => ReadOrRepairBundleCacheFile(name, mgr)),
+                        AssetDownloadUtil.DefaultConcurrency));
+
+                wave = new List<KeyValuePair<string, byte[]>>(nextNames.Count);
+                for (var i = 0; i < nextNames.Count; i++)
+                {
+                    if (fetched != null && i < fetched.Length && fetched[i] != null)
+                        wave.Add(new KeyValuePair<string, byte[]>(nextNames[i], fetched[i]));
+                }
             }
+        }
+
+        /// <summary>只解析 bundle 里的依赖名，不做任何下载。</summary>
+        private static List<string> ParseBundleDependencyNames(string fullname, byte[] raw)
+        {
+            var dependencies = new List<string>();
+            if (raw == null)
+                return dependencies;
+
+            try
+            {
+                using var ms = new MemoryStream(raw);
+                var ab = am.LoadBundleFile(ms, fullname);
+                var assetsFileInstance = am.LoadAssetsFileFromBundle(ab, 0);
+                var info = am.GetBaseField(assetsFileInstance,
+                    assetsFileInstance.file.GetAssetsOfType(AssetClassID.AssetBundle).Single());
+
+                foreach (var val in info["m_Dependencies"]["Array"])
+                {
+                    var depName = val.AsString;
+                    if (!string.IsNullOrEmpty(depName))
+                        dependencies.Add(depName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"failed to read bundle dependency list of {fullname}: {ex.Message}");
+            }
+
+            return dependencies;
         }
 #else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1418,6 +1872,14 @@ namespace PCRCaculator
 
             if (asset == null)
             {
+                if (!File.Exists(GetBundleCachePath(fullname, mgr)))
+                {
+                    // 走到这里说明预取没覆盖到：接下来会在主线程同步下载，画面会顿一下。
+                    // 把名字打出来，方便把漏掉的资源加进 GetSpineBundleNames / 预取名单。
+                    Debug.LogWarning(
+                        $"asset bundle {fullname} was not prefetched; downloading synchronously on the main thread");
+                }
+
                 var bytes = ReadOrRepairBundleCacheFile(fullname, mgr);
                 var path = GetBundleCachePath(fullname, mgr);
 

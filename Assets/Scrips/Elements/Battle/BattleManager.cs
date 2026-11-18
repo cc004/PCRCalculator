@@ -4808,10 +4808,55 @@ namespace Elements.Battle
             tempData = gameCtrl.tempData;
             skipping = tempData.skipping;
 #if UNITY_5_3_OR_NEWER
-            var battleResourcePrepare = ABExTool.PrepareBattleUnitResources(CollectBattleResourcePrefabIds(tempData));
-            if (!battleResourcePrepare.Success)
+            // 资源准备放到线程池上并发跑，主线程只轮询进度：不会再把整个战斗启动卡住。
+            var prepareProgress = new ABExTool.BattleResourcePrepareProgress();
+            var prepareTask = ABExTool.PrepareBattleUnitResourcesAsync(
+                CollectBattleResourcePrefabIds(tempData), prepareProgress);
+            WaitUI prepareWait = null;
+            float prepareStartTime = Time.realtimeSinceStartup;
+            // 面板延迟：短于这个时间就不弹，避免热缓存时每场都闪一下。
+            // 注意不要用 skipping 判断——公会战自动计算(GAUB)会把 skipping 置 true，
+            // 那正是最需要看到下载进度的时候。
+            const float preparePanelDelay = 0.15f;
+            while (!prepareTask.IsCompleted)
             {
-                UnityEngine.Debug.LogError($"battle resource prepare failed before battle start: {battleResourcePrepare}");
+                if (prepareWait == null && MainManager.Instance != null &&
+                    Time.realtimeSinceStartup - prepareStartTime > preparePanelDelay)
+                {
+                    prepareWait = MainManager.Instance.OpenWaitUI();
+                    UnityEngine.Debug.Log(
+                        $"battle resource prepare ui opened after {(Time.realtimeSinceStartup - prepareStartTime) * 1000f:F0}ms " +
+                        $"(total={prepareProgress.Total}, skipping={skipping})");
+                }
+
+                prepareWait?.SetProgress(prepareProgress.Done, prepareProgress.Total, "正在准备战斗资源");
+                yield return null;
+            }
+
+            if (prepareWait != null)
+            {
+                UnityEngine.Debug.Log(
+                    $"battle resource prepare ui closed after {(Time.realtimeSinceStartup - prepareStartTime) * 1000f:F0}ms " +
+                    $"(done={prepareProgress.Done}/{prepareProgress.Total})");
+                prepareWait.Close();
+            }
+
+            ABExTool.BattleResourcePrepareSummary battleResourcePrepare = null;
+            System.Exception prepareException = null;
+            try
+            {
+                battleResourcePrepare = prepareTask.GetAwaiter().GetResult();
+            }
+            catch (System.Exception ex)
+            {
+                prepareException = ex;
+            }
+
+            if (prepareException != null || battleResourcePrepare == null || !battleResourcePrepare.Success)
+            {
+                UnityEngine.Debug.LogError(
+                    "battle resource prepare failed before battle start: " +
+                    (prepareException != null ? prepareException.ToString() : battleResourcePrepare?.ToString()));
                 SetStarted(false);
                 yield break;
             }

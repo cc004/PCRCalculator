@@ -33,6 +33,12 @@ namespace PCRCaculator.SQL
 
         public static string sql;
 
+        /// <summary>源数据库下载的字节进度；只在下自动下载时更新，可被 UI 线程轮询。</summary>
+        public AssetDownloadUtil.ByteProgress DownloadProgress { get; } = new AssetDownloadUtil.ByteProgress();
+
+        /// <summary>当前是否正在下载源数据库（供 UI 判断要不要显示进度条）。</summary>
+        public bool IsDownloadingSourceDatabase { get; private set; }
+
         protected SQLiteTool(IDataBaseManager mgr, bool readOnly)
         {
             this.mgr = mgr;
@@ -120,9 +126,11 @@ namespace PCRCaculator.SQL
                 Directory.CreateDirectory(directory);
 
             var stagingPath = $"{destinationPath}.download-{Guid.NewGuid():N}.tmp";
+            IsDownloadingSourceDatabase = true;
+            DownloadProgress.Reset();
             try
             {
-                File.WriteAllBytes(stagingPath, mgr.ResolveDatabase());
+                File.WriteAllBytes(stagingPath, ResolveDatabaseBytes(DownloadProgress));
                 this.path = stagingPath;
                 Unhash();
 
@@ -167,6 +175,24 @@ namespace PCRCaculator.SQL
             finally
             {
                 this.path = destinationPath;
+                IsDownloadingSourceDatabase = false;
+            }
+        }
+
+        /// <summary>
+        /// 让下载把字节进度回填到 progress。IDataBaseManager 接口本身没有 progress 参数，
+        /// 所以这里按具体实现分派；未知实现退回无进度版本。
+        /// </summary>
+        private byte[] ResolveDatabaseBytes(AssetDownloadUtil.ByteProgress progress)
+        {
+            switch (mgr)
+            {
+                case PCRApi.AssetManager jp:
+                    return jp.ResolveDatabase(progress);
+                case PCRApi.CN.AssetManager cn:
+                    return cn.ResolveDatabase(progress);
+                default:
+                    return mgr.ResolveDatabase();
             }
         }
 
