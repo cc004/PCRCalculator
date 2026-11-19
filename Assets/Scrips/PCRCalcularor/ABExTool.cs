@@ -3,6 +3,7 @@ using Mono.Data.Sqlite;
 using Org.BouncyCastle.Utilities;
 using PCRApi;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -484,7 +485,7 @@ namespace PCRCaculator
 
         public static AssetManager mgrCharacter = new AssetManager();
         public static AssetManager mgrDataJP = new AssetManager();
-        public static PCRApi.CN.AssetManager mgrDataCN = new PCRApi.CN.AssetManager();
+        // 国服资源管理器已移除：日服 master 数据库改为镜像下载（见 PCRCalcularor/DataSources/JpDatabaseManager.cs）
 
         //private const string KEY_VER_ID = "VER_ID";
         //private const string KEY_VER_ID_OLD = "VER_ID_OLD";
@@ -504,24 +505,9 @@ namespace PCRCaculator
         {
             var ver = MainManager.Instance.Version;
 
-            if (ver.BossVersionJP == ver.CharacterVersionJP)
-            {
-                mgrCharacter = mgrDataJP;
-                await Task.WhenAll(
-                    Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),
-                    Task.Run(() => mgrDataCN.Initialize(ver.BossVersionCN.ToString(),
-                        ver.useQA))
-                );
-                VerifyPersistentBundleCaches();
-                return;
-            }
-
-            await Task.WhenAll(
-                Task.Run(() => mgrCharacter.Initialize(ver.CharacterVersionJP.ToString())),
-                Task.Run(() => mgrDataJP.Initialize(ver.BossVersionJP.ToString())),
-                Task.Run(() => mgrDataCN.Initialize(ver.BossVersionCN.ToString(),
-                    ver.useQA))
-            );
+            // AB 清单也统一到日服数据库版本：角色库与 Boss 库不再各自维护版本号。
+            mgrCharacter = mgrDataJP;
+            await Task.Run(() => mgrDataJP.Initialize(ver.JpDatabaseVersion.ToString()));
             VerifyPersistentBundleCaches();
         }
 
@@ -1951,41 +1937,358 @@ namespace PCRCaculator
             }
             return result;
         }
-        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4,EX装备=5,EX装备类型=6,黎明界遗物=7,黎明界科技树=8 }
-        public static Sprite GetSprites(SpriteType type, int id)
+        public enum SpriteType { 角色图标=0,角色长条=1,装备图标=2,技能图标=3,装备碎片=4,EX装备=5,EX装备类型=6,黎明界遗物=7,黎明界科技树=8,道具图标=9,道具图标无效=10 }
+        /// <summary>
+        /// 计算某个精灵图所在的 AB 包名（只算名字，不加载）。
+        /// </summary>
+        public static string GetSpriteBundleName(SpriteType type, int id)
         {
-#if UNITY_5_3_OR_NEWER
-            string assetName = "";
             switch (type)
             {
                 case SpriteType.角色图标:
-                    assetName = "unit_icon_unit_" + id + ".unity3d";
-                    break;
+                    return "unit_icon_unit_" + id + ".unity3d";
                 case SpriteType.角色长条:
-                    assetName = "icon_unit_plate_" + (id >= 200000 ? id : id + 30) + ".unity3d";
-                    break;
+                    return "icon_unit_plate_" + (id >= 200000 ? id : id + 30) + ".unity3d";
                 case SpriteType.装备图标:
-                    assetName = "icon_icon_equipment_" + id + ".unity3d";
-                    break;
+                    return "icon_icon_equipment_" + id + ".unity3d";
                 case SpriteType.装备碎片:
-                    assetName = "icon_icon_equipment_invalid_" + id + ".unity3d";
-                    break;
+                    return "icon_icon_equipment_invalid_" + id + ".unity3d";
                 case SpriteType.技能图标:
-                    assetName = "icon_icon_skill_" + id + ".unity3d";
-                    break;
+                    return "icon_icon_skill_" + id + ".unity3d";
                 case SpriteType.EX装备:
-                    assetName = "icon_icon_extra_equip_" + id + ".unity3d";
-                    break;
+                    return "icon_icon_extra_equip_" + id + ".unity3d";
                 case SpriteType.EX装备类型:
-                    assetName = "icon_icon_extra_equip_category_" + id + ".unity3d";
-                    break;
+                    return "icon_icon_extra_equip_category_" + id + ".unity3d";
                 case SpriteType.黎明界遗物:
-                    assetName = "icon_labyrinth_icon_relic_" + id + ".unity3d";
-                    break;
+                    return "icon_labyrinth_icon_relic_" + id + ".unity3d";
                 case SpriteType.黎明界科技树:
-                    assetName = "labyrinth_node_icon_0" + id + ".unity3d";
-                    break;
+                    return "labyrinth_node_icon_0" + id + ".unity3d";
+                case SpriteType.道具图标:
+                    return "icon_icon_item_" + id + ".unity3d";
+                case SpriteType.道具图标无效:
+                    return "icon_icon_item_invalid_" + id + ".unity3d";
+                default:
+                    return "";
             }
+        }
+
+        /// <summary>
+        /// 预取一批精灵图所在的 AB 包：只保证包文件已经落到本地缓存（并行下载 + 校验），
+        /// 不解析、不解码。这样界面第一次显示图标时只需要读本地文件，不会在主线程同步走网络。
+        /// </summary>
+        public static void PrefetchSpriteBundles(SpriteType type, IEnumerable<int> ids)
+        {
+#if UNITY_5_3_OR_NEWER
+            if (ids == null)
+                return;
+            var bundleNames = new HashSet<string>();
+            foreach (int id in ids)
+            {
+                string bundleName = GetSpriteBundleName(type, id);
+                if (!string.IsNullOrEmpty(bundleName))
+                    bundleNames.Add(bundleName);
+            }
+            if (bundleNames.Count == 0)
+                return;
+
+            var names = bundleNames.ToArray();
+            AssetManager manager = mgrCharacter;
+            AssetDownloadUtil.RunSync(() => AssetDownloadUtil.RunBoundedAsync(
+                names,
+                name => Task.Run(() =>
+                {
+                    if (!TryGetManifestContent(name, manager, out _))
+                        return false;
+                    ReadOrRepairBundleCacheFile(name, manager);
+                    return true;
+                }),
+                AssetDownloadUtil.DefaultConcurrency));
+#endif
+        }
+
+#if UNITY_5_3_OR_NEWER
+        private static bool spriteWarmupStarted;
+        /// <summary>预热阶段后台下载的总时限（秒）；超时就把剩下的留给按需加载。</summary>
+        private const float MaxWarmupDownloadSeconds = 180f;
+        /// <summary>单个 AB 包异步载入的超时（秒）。</summary>
+        private const float SingleBundleLoadTimeoutSeconds = 20f;
+
+        /// <summary>
+        /// 启动后台「精灵图包体预热」：把界面里会用到的一大批图标 AB 包，按优先级慢慢载进来。
+        /// 每帧只处理一个包、用 LoadFromFileAsync 异步载入，不阻塞主线程；预热完成后
+        /// <see cref="GetSprites"/> 基本都是纯内存命中，不会再出现点开界面卡住的情况。
+        /// </summary>
+        public static void StartSpriteWarmup()
+        {
+            if (spriteWarmupStarted)
+                return;
+            var host = MainManager.Instance;
+            if (host == null)
+                return;
+            spriteWarmupStarted = true;
+            host.StartCoroutine(WarmSpriteBundlesRoutine(BuildSpriteWarmupList(), null));
+        }
+
+        /// <summary>
+        /// 预热名单：按「用户最常点开」的顺序排。EX 装备和装备图标最容易卡，放最前。
+        /// </summary>
+        public static List<KeyValuePair<SpriteType, int>> BuildSpriteWarmupList()
+        {
+            var list = new List<KeyValuePair<SpriteType, int>>();
+            var main = MainManager.Instance;
+            if (main == null)
+                return list;
+
+            // 顺序 = 用户最常点开的顺序：EX 装备 > 角色头像 > 技能图标 > BOSS 头像。
+            // 只预热前 MaxWarmupBundles 个，避免整个图标库都常驻内存。
+
+            // 1. EX 装备（点角色弹出装备下拉时最费时）
+            if (main.databaseCache.exEquipmentName_cn != null)
+                foreach (int id in main.databaseCache.exEquipmentName_cn.Keys)
+                    list.Add(new KeyValuePair<SpriteType, int>(SpriteType.EX装备, id));
+            // 分类图标的 id 来自数据库 ex_equipment_data.category（101..110 / 201..204 / 301..305），不是 1..9
+            var exCategories = new SortedSet<int>();
+            if (main.UnitExEquips != null)
+            {
+                foreach (var slots in main.UnitExEquips.Values)
+                {
+                    if (slots == null)
+                        continue;
+                    foreach (var slot in slots)
+                    {
+                        if (slot == null)
+                            continue;
+                        foreach (var equip in slot.Values)
+                        {
+                            if (equip != null && equip.category > 0)
+                                exCategories.Add(equip.category);
+                        }
+                    }
+                }
+            }
+            foreach (int category in exCategories)
+                list.Add(new KeyValuePair<SpriteType, int>(SpriteType.EX装备类型, category));
+
+            // 2. 角色头像（选人界面 / 编队 / 编队详情）
+            if (main.UnitRarityDic != null && main.unitDataDic != null)
+            {
+                foreach (int unitId in main.UnitRarityDic.Keys)
+                {
+                    UnitData data = main.unitDataDic.TryGetValue(unitId, out UnitData saved) ? saved : new UnitData(unitId, 1);
+                    list.Add(new KeyValuePair<SpriteType, int>(SpriteType.角色图标, CharacterPageButton.GetCharacterIconId(data)));
+                }
+            }
+
+            const int MaxWarmupBundles = 900;
+            if (list.Count >= MaxWarmupBundles)
+            {
+                list.RemoveRange(MaxWarmupBundles, list.Count - MaxWarmupBundles);
+                return list;
+            }
+
+            // 3. 技能图标
+            if (main.SkillDataDic != null)
+            {
+                var icons = new HashSet<int>();
+                foreach (var pair in main.SkillDataDic)
+                {
+                    if (pair.Value != null && pair.Value.icon > 0 && icons.Add(pair.Value.icon))
+                        list.Add(new KeyValuePair<SpriteType, int>(SpriteType.技能图标, pair.Value.icon));
+                }
+            }
+
+            // 4. BOSS / 敌人头像（切换 BOSS 时复用的也是这套 icon bundle）
+            if (main.EnemyDataDic != null)
+            {
+                foreach (var pair in main.EnemyDataDic)
+                {
+                    EnemyData enemyData = pair.Value;
+                    if (enemyData?.detailData == null)
+                        continue;
+                    int prefabId = enemyData.detailData.prefab_id;
+                    if (prefabId <= 0)
+                        continue;
+                    list.Add(new KeyValuePair<SpriteType, int>(SpriteType.角色图标, prefabId));
+                    if (enemyData.detailData.visual_change_flag == 1)
+                        list.Add(new KeyValuePair<SpriteType, int>(SpriteType.角色图标,
+                            prefabId + (enemyData.rarity > 5 ? 60 : 30)));
+                }
+            }
+
+            if (list.Count > MaxWarmupBundles)
+                list.RemoveRange(MaxWarmupBundles, list.Count - MaxWarmupBundles);
+
+            // 最后按 manifest 过滤一遍：像 4xxxxx 的敌人 prefab 根本没有对应头像包，
+            // 留在名单里只会让每次启动白跑失败请求。
+            int dropped = 0;
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                string bundleName = GetSpriteBundleName(list[i].Key, list[i].Value);
+                if (string.IsNullOrEmpty(bundleName) || !TryGetManifestContent(bundleName, mgrCharacter, out _))
+                {
+                    list.RemoveAt(i);
+                    dropped++;
+                }
+            }
+            if (dropped > 0)
+                Debug.Log($"sprite warmup candidate filtered: dropped={dropped}, kept={list.Count}");
+
+            return list;
+        }
+
+        /// <summary>
+        /// 逐帧预热一批精灵图 AB 包（协程版）。每个包：缺文件就先在后台线程下载，再异步载入，
+        /// 全程不阻塞主线程；已经载过的包直接跳过。
+        /// </summary>
+        public static IEnumerator WarmSpriteBundlesRoutine(List<KeyValuePair<SpriteType, int>> items,
+            Action<int, int> onProgress)
+        {
+            if (items == null || items.Count == 0)
+                yield break;
+
+            var names = new List<string>(items.Count);
+            var seen = new HashSet<string>();
+            for (int i = 0; i < items.Count; i++)
+            {
+                string name = GetSpriteBundleName(items[i].Key, items[i].Value);
+                if (string.IsNullOrEmpty(name) || !seen.Add(name))
+                    continue;
+                if (AssetBundleDic.ContainsKey(name))
+                    continue;
+                names.Add(name);
+            }
+
+            // 第一遍：本地已经有包体的，逐帧异步载入
+            var notDownloaded = new List<string>();
+            for (int i = 0; i < names.Count; i++)
+            {
+                string name = names[i];
+                string path = GetBundleCachePath(name, mgrCharacter);
+                if (!File.Exists(path))
+                {
+                    notDownloaded.Add(name);
+                    continue;
+                }
+                yield return LoadSpriteBundleAsync(name, path);
+                onProgress?.Invoke(i + 1, names.Count);
+            }
+
+            if (notDownloaded.Count == 0)
+            {
+                Debug.Log($"sprite bundle warmup finished: warmed={AssetBundleDic.Count}, listed={names.Count}, downloaded=0");
+                yield break;
+            }
+
+            // 第二遍：本地没有的，在后台线程静默下载（不阻塞主线程），下完谁先到就先载谁；
+            // 用户如果在这之前点开某个界面，GetSprites 仍会走原来的按需同步下载兜底。
+            Debug.Log($"sprite bundle warmup: {notDownloaded.Count} bundles not cached yet, downloading silently in background");
+            var downloadTask = Task.Run(() => AssetDownloadUtil.RunBoundedAsync(
+                notDownloaded,
+                name => Task.Run(() =>
+                {
+                    try
+                    {
+                        if (TryGetManifestContent(name, mgrCharacter, out _))
+                            ReadOrRepairBundleCacheFile(name, mgrCharacter);
+                    }
+                    catch (Exception downloadException)
+                    {
+                        Debug.LogWarning($"sprite bundle warmup download failed for {name}: {downloadException.Message}");
+                    }
+                    return true;
+                }),
+                AssetDownloadUtil.DefaultConcurrency).GetAwaiter().GetResult());
+
+            var loaded = new HashSet<string>();
+            float downloadDeadline = Time.realtimeSinceStartup + MaxWarmupDownloadSeconds;
+            while (true)
+            {
+                bool progressed = false;
+                for (int i = 0; i < notDownloaded.Count; i++)
+                {
+                    string name = notDownloaded[i];
+                    if (loaded.Contains(name) || AssetBundleDic.ContainsKey(name))
+                    {
+                        loaded.Add(name);
+                        continue;
+                    }
+                    string path = GetBundleCachePath(name, mgrCharacter);
+                    if (!File.Exists(path))
+                        continue;
+                    yield return LoadSpriteBundleAsync(name, path);
+                    loaded.Add(name);
+                    progressed = true;
+                    break;
+                }
+
+                if (downloadTask.IsCompleted && !progressed)
+                    break;
+                if (Time.realtimeSinceStartup > downloadDeadline)
+                {
+                    Debug.LogWarning($"sprite bundle warmup download phase exceeded {MaxWarmupDownloadSeconds}s, " +
+                                     "剩下没下完的包留到下次启动或点开时再按需加载");
+                    break;
+                }
+                if (!progressed)
+                    yield return null;
+            }
+
+            var stillMissing = new List<string>();
+            for (int i = 0; i < notDownloaded.Count; i++)
+            {
+                if (!AssetBundleDic.ContainsKey(notDownloaded[i]))
+                    stillMissing.Add(notDownloaded[i]);
+            }
+            Debug.Log($"sprite bundle warmup finished: warmed={AssetBundleDic.Count}, listed={names.Count}, " +
+                      $"downloaded={notDownloaded.Count - stillMissing.Count}, stillMissing={stillMissing.Count}");
+            if (stillMissing.Count > 0)
+            {
+                try
+                {
+                    string dump = Path.Combine(persistentDataPath, "warmup-missing.txt");
+                    File.WriteAllLines(dump, stillMissing.ToArray());
+                    Debug.LogWarning($"sprite bundle warmup still missing list written to {dump}");
+                }
+                catch (Exception dumpException)
+                {
+                    Debug.LogWarning($"写出预热缺失清单失败: {dumpException.Message}");
+                }
+            }
+        }
+
+        /// <summary>异步载入一个精灵图 AB 包（每帧只推进一个，不阻塞主线程）。</summary>
+        private static IEnumerator LoadSpriteBundleAsync(string name, string path)
+        {
+            if (AssetBundleDic.ContainsKey(name))
+                yield break;
+            AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(path);
+            if (request == null)
+                yield break;
+            float deadline = Time.realtimeSinceStartup + SingleBundleLoadTimeoutSeconds;
+            while (!request.isDone)
+            {
+                if (Time.realtimeSinceStartup > deadline)
+                {
+                    Debug.LogWarning($"sprite bundle warmup load timeout: {name}");
+                    yield break;
+                }
+                yield return null;
+            }
+            AssetBundle bundle = request.assetBundle;
+            if (bundle == null)
+                yield break;
+            if (!AssetBundleDic.ContainsKey(name))
+                AssetBundleDic.Add(name, bundle);
+            else
+                bundle.Unload(false);
+            yield return null;
+        }
+#endif
+
+        public static Sprite GetSprites(SpriteType type, int id)
+        {
+#if UNITY_5_3_OR_NEWER
+            string assetName = GetSpriteBundleName(type, id);
             if (spriteDic.TryGetValue(assetName, out Sprite value))
             {
                 return value;
@@ -2128,8 +2431,7 @@ namespace PCRCaculator
 
         public static void FreeDeleteAndReset(int ver, int verold)
         {
-            MainManager.Instance.Version.CharacterVersionJP = ver;
-            MainManager.Instance.Version.BossVersionJP = verold;
+            MainManager.Instance.Version.JpDatabaseVersion = ver;
             PlayerPrefs.Save();
             AssetBundleDic.Clear();
             spriteDic.Clear();

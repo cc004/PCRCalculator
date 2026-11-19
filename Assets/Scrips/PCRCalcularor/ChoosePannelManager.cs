@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -162,6 +162,9 @@ namespace PCRCaculator
             }
             StartCoroutine(SearchCharaInitialize());
             // StartCoroutine(WaitForLoadFinished());
+            EnsureTwoLevelFilterRows();
+            if (filterType != null)
+                filterType.text = "属性+站位";
             for (int i = 0; i < ExEquip.Length; i++)
             {
                 int index = i;
@@ -203,26 +206,52 @@ namespace PCRCaculator
 
                 wait?.SetMessage("正在加载角色头像");
 
-                foreach (int id in MainManager.Instance.UnitRarityDic.Keys)
+                var unitIds = MainManager.Instance.UnitRarityDic.Keys
+                    .Where(MainManager.Instance.JudgeWeatherShowThisUnit)
+                    .ToArray();
+
+                // 先把要显示的头像 AB 包并行下载到本地缓存（网络这一块在后台线程做），
+                // 免得后面逐个建按钮时在主线程里同步下载、整界面卡住。
+                var iconIds = new List<int>(unitIds.Length);
+                foreach (int unitId in unitIds)
                 {
-                    if (MainManager.Instance.JudgeWeatherShowThisUnit(id))
+                    UnitData iconData = MainManager.Instance.unitDataDic.TryGetValue(unitId, out UnitData savedData)
+                        ? savedData
+                        : new UnitData(unitId, 1);
+                    iconIds.Add(CharacterPageButton.GetCharacterIconId(iconData));
+                }
+
+                wait?.SetMessage("正在预下载角色头像资源");
+                ABExTool.PrefetchSpriteBundles(ABExTool.SpriteType.角色图标, iconIds);
+                wait?.ClearProgress();
+
+                int created = 0;
+                foreach (int id in unitIds)
+                {
+                    int id0 = id;
+                    GameObject b = Instantiate(togglePerferb);
+                    var initializedButton = new InitialButtonInstance(id0, b);
+                    initializedButtons.Add(initializedButton);
+                    b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
+                    b.transform.localScale = Vector3.one;
+
+                    initializedButton.Toggle = b.GetComponent<Toggle>();
+                    initializedButton.Button = b.GetComponent<CharacterPageButton>();
+                    initializedButton.Toggle.onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
+                    initializedButton.Button.SetButton(id);
+
+                    togglePerferbs[id0] = initializedButton.Toggle;
+                    buttons[id0] = initializedButton.Button;
+
+                    created++;
+                    if (created % 4 == 0)
                     {
-                        int id0 = id;
-                        GameObject b = Instantiate(togglePerferb);
-                        var initializedButton = new InitialButtonInstance(id0, b);
-                        initializedButtons.Add(initializedButton);
-                        b.transform.SetParent(parent, false); // 使用 false 避免本地坐标错乱
-                        b.transform.localScale = Vector3.one;
-
-                        initializedButton.Toggle = b.GetComponent<Toggle>();
-                        initializedButton.Button = b.GetComponent<CharacterPageButton>();
-                        initializedButton.Toggle.onValueChanged.AddListener(value => OnToggleSwitched(value, id0));
-                        initializedButton.Button.SetButton(id);
-
-                        togglePerferbs[id0] = initializedButton.Toggle;
-                        buttons[id0] = initializedButton.Button;
+                        wait?.SetProgress(created, unitIds.Length, "正在加载角色头像");
+                        yield return null;
                     }
                 }
+
+                sortedUnitIds = null;
 
                 initialized = true;
 
@@ -943,19 +972,79 @@ namespace PCRCaculator
             bool search = Search.text == "" 
                 || (id2alias.ContainsKey(unitid) && id2alias[unitid]?.Contains(Search.text) == true) 
                 || (id2pinyin.ContainsKey(unitid) && id2pinyin[unitid]?.Contains(pinyin) == true);
-            MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData);
-            if (filterToggle.isOn)
+            if (!MainManager.Instance.UnitRarityDic.TryGetValue(unitid, out var rarityData) || rarityData == null)
+                return false;
+            // 两级筛选：属性（才能）和站位同时生效，各自都能选「全部」
+            return search && MatchesTalentFilter(rarityData) && MatchesPositionFilter(rarityData);
+        }
+
+        /// <summary>
+        /// 第一级筛选：属性（talent_id）。talentToggles[0] 是「全部」；一个都没勾也当「全部」。
+        /// </summary>
+        private bool MatchesTalentFilter(UnitRarityData rarityData)
+        {
+            if (talentToggles == null || talentToggles.Count == 0)
+                return true;
+            if (!HasAnySelection(talentToggles))
+                return true;
+            if (talentToggles[0] != null && talentToggles[0].isOn)
+                return true;
+            int talentId = rarityData.detailData?.talent_id?.FirstOrDefault() ?? 0;
+            if (talentId <= 0)
+                return false;
+            return talentId < talentToggles.Count && talentToggles[talentId] != null && talentToggles[talentId].isOn;
+        }
+
+        /// <summary>
+        /// 第二级筛选：站位（unitPositionType）。switchToggles[0] 是「全部」；一个都没勾也当「全部」。
+        /// </summary>
+        private bool MatchesPositionFilter(UnitRarityData rarityData)
+        {
+            if (switchToggles == null || switchToggles.Count == 0)
+                return true;
+            if (!HasAnySelection(switchToggles))
+                return true;
+            if (switchToggles[0] != null && switchToggles[0].isOn)
+                return true;
+            int index = (int)rarityData.unitPositionType + 1;
+            return index > 0 && index < switchToggles.Count && switchToggles[index] != null && switchToggles[index].isOn;
+        }
+
+        /// <summary>
+        /// 这一级筛选里是否有任何一项被勾选（没有就当「全部」，不做过滤）。
+        /// </summary>
+        private static bool HasAnySelection(List<Toggle> toggles)
+        {
+            for (int i = 0; i < toggles.Count; i++)
             {
-                int talent_id = rarityData.detailData.talent_id?.FirstOrDefault() ?? 0;
-                bool hasTalent = talent_id >= 0 && talentToggles[talent_id].isOn || talentToggles[0].isOn;
-                return hasTalent && search;
+                if (toggles[i] != null && toggles[i].isOn)
+                    return true;
             }
-            else
-            {
-                int pos = (int)rarityData.unitPositionType;
-                bool position = switchToggles[0].isOn || switchToggles[pos + 1].isOn;
-                return position && search;
-            }
+            return false;
+        }
+
+        private int[] sortedUnitIds;
+
+        /// <summary>
+        /// 默认排列：按角色站位搜索宽度（search_area_width）从小到大，相同则 unit_id 小的在前。
+        /// </summary>
+        private int[] GetSortedUnitIds()
+        {
+            if (sortedUnitIds != null)
+                return sortedUnitIds;
+            sortedUnitIds = buttons.Keys
+                .Where(id => MainManager.Instance.JudgeWeatherShowThisUnit(id))
+                .OrderBy(GetSearchAreaWidth)
+                .ThenBy(id => id)
+                .ToArray();
+            return sortedUnitIds;
+        }
+
+        private static int GetSearchAreaWidth(int unitId)
+        {
+            if (MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var rarityData) && rarityData?.detailData != null)
+                return rarityData.detailData.searchAreaWidth;
+            return int.MaxValue;
         }
 
         private int firstShowUnitId;
@@ -968,7 +1057,7 @@ namespace PCRCaculator
             int displayCount = 0;
             firstShowUnitId = -1;
 
-            foreach (int id in buttons.Keys)
+            foreach (int id in GetSortedUnitIds())
             {
                 UnitData unitData;
                 if (!MainManager.Instance.unitDataDic.TryGetValue(id, out unitData))
@@ -1524,9 +1613,82 @@ namespace PCRCaculator
 
         public void SwitchFilterToggle()
         {
-            filterType.text = filterToggle.isOn ? "属性" : "站位";
-            talent.SetActive(filterToggle.isOn);
-            position.SetActive(!filterToggle.isOn);
+            // 两级筛选：属性行和站位行同时显示，按钮不再切换面板，只负责刷新一次列表
+            EnsureTwoLevelFilterRows();
+            if (filterType != null)
+                filterType.text = "属性+站位";
+            RefreshBasePage();
+        }
+
+        /// <summary>
+        /// 把「属性」和「站位」两行筛选上下叠在一起同时显示（原来靠一个按钮在两者之间切换）。
+        /// 两行都在选择栏里、原来位置重叠，这里把选择栏拉高一行、两行各占一半。
+        /// </summary>
+        private void EnsureTwoLevelFilterRows()
+        {
+            if (talent == null || position == null)
+                return;
+            if (talent == position)
+                return;
+
+            var talentRect = talent.transform as RectTransform;
+            var positionRect = position.transform as RectTransform;
+            var bar = talentRect != null ? talentRect.parent as RectTransform : null;
+            if (talentRect == null || positionRect == null || bar == null)
+                return;
+
+            const float rowHeight = 46f;
+            float y = talentRect.anchoredPosition.y;
+            bar.sizeDelta = new Vector2(bar.sizeDelta.x, rowHeight * 2f);
+            talentRect.anchoredPosition = new Vector2(talentRect.anchoredPosition.x, y + rowHeight * 0.5f);
+            positionRect.anchoredPosition = new Vector2(positionRect.anchoredPosition.x, y - rowHeight * 0.5f);
+
+            talent.SetActive(true);
+            position.SetActive(true);
+
+            // 两级筛选常显之后，「属性+站位」这个切换勾选框就没意义了，直接藏掉（它的文字是它的子节点，一起隐藏）
+            if (filterToggle != null)
+                filterToggle.gameObject.SetActive(false);
+
+            // 两行原来共用一个 ToggleGroup（点属性会把站位取消），拆成各自独立的组才能真正做两级筛选
+            AssignToggleGroup(talent, talentToggles);
+            AssignToggleGroup(position, switchToggles);
+
+            // 两级都要有默认值：某一级一个都没选时默认勾「全部」，否则两边都是空选择会把角色全过滤掉
+            EnsureAllToggle(talentToggles);
+            EnsureAllToggle(switchToggles);
+        }
+
+        /// <summary>
+        /// 给一行筛选单独挂一个 ToggleGroup，并把这一行的开关都归到组里（允许多选关掉）。
+        /// </summary>
+        private static void AssignToggleGroup(GameObject row, List<Toggle> toggles)
+        {
+            if (row == null || toggles == null || toggles.Count == 0)
+                return;
+            var group = row.GetComponent<ToggleGroup>();
+            if (group == null)
+                group = row.AddComponent<ToggleGroup>();
+            for (int i = 0; i < toggles.Count; i++)
+            {
+                if (toggles[i] != null)
+                    toggles[i].group = group;
+            }
+        }
+
+        /// <summary>
+        /// 一级筛选里如果没有任何具体项被勾选，就默认勾上「全部」（索引 0）。
+        /// </summary>
+        private static void EnsureAllToggle(List<Toggle> toggles)
+        {
+            if (toggles == null || toggles.Count == 0 || toggles[0] == null)
+                return;
+            for (int i = 1; i < toggles.Count; i++)
+            {
+                if (toggles[i] != null && toggles[i].isOn)
+                    return;
+            }
+            toggles[0].isOn = true;
         }
 
         private int GetCurrentBattleMode()

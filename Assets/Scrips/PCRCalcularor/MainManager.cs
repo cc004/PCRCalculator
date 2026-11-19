@@ -1109,6 +1109,11 @@ namespace PCRCaculator
                 LoadFinished = true;
                 CreateShowUnitIDS();
                 wait?.Close();
+
+                // 数据就绪后开始后台预热图标 AB 包：每帧只载一个包（异步），预热完再点角色 / EX 装备 / BOSS 列表就不会卡
+#if UNITY_5_3_OR_NEWER
+                try { ABExTool.StartSpriteWarmup(); } catch (Exception warmException) { Debug.LogWarning($"启动图标预取失败: {warmException.Message}"); }
+#endif
                 
                 // 计时结束并输出
                 stopwatch.Stop();

@@ -122,6 +122,18 @@ namespace PCRCaculator
         }
 
         /// <summary>
+        /// 角色头像（typeB/C/D）用的图标 id：普通角色按星级挑 +30/+60，敌人直接用自身 prefab。
+        /// 抽出来是为了让选人界面能提前预热图标包。
+        /// </summary>
+        public static int GetCharacterIconId(UnitData data)
+        {
+            int prefab = data.PrefabId;
+            if (data.unitId == UnitData.JitaUnitId && data.rarity == 6)
+                return UnitData.JitaSixStarIconId;
+            return prefab >= 200000 ? prefab : (data.rarity >= 6 ? prefab + 60 : prefab + 30);
+        }
+
+        /// <summary>
         /// 设置组件
         /// </summary>
         /// <param name="data">角色详情</param>
@@ -145,9 +157,7 @@ namespace PCRCaculator
             else if (buttonType == ButtonType.typeB || buttonType == ButtonType.typeC || buttonType == ButtonType.typeD)
             {
                 //path = "charicons/fav_push_notif_" + unitid;
-                int iconUnitid = (data.unitId == UnitData.JitaUnitId && data.rarity == 6) ?
-                    UnitData.JitaSixStarIconId :
-                    (prefab >= 200000 ? prefab : data.rarity >= 6 ? prefab + 60 : prefab + 30);
+                int iconUnitid = GetCharacterIconId(data);
                 sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, iconUnitid);
             }
             //Sprite sprite = MainManager.LoadSourceSprite(path);
